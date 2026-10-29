@@ -85,7 +85,7 @@ public class FrequencyEntry implements Serializable {
         The TripTimes getDepartureTime / getArrivalTime methods do not care when the search is happening.
         The Frequency equivalents need to know when the search is happening, and need to be able to say
         no trip is possible. Therefore we need to add another specialized method.
-
+  
         Fortunately all uses of the TripTimes itself in traversing edges use relative times,
         so we can fall back on the underlying TripTimes.
      */

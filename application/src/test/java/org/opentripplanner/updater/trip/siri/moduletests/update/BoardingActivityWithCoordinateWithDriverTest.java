@@ -22,10 +22,9 @@ class BoardingActivityWithCoordinateWithDriverTest implements RealtimeTestConsta
   private final RegularStop STOP_C = ENV_BUILDER.stop(STOP_C_ID);
 
   /**
-   * When a stop has COORDINATE_WITH_DRIVER pickup/dropoff and SIRI sends
-   * BOARDING/ALIGHTING boarding activities, the trip should stay UPDATED
-   * (not MODIFIED), because both are routable — SIRI boarding activities
-   * are less specific than the planned PickDrop value.
+   * When a stop has COORDINATE_WITH_DRIVER pickup/dropoff and SIRI sends BOARDING/ALIGHTING
+   * boarding activities, the trip should stay UPDATED (not MODIFIED), because both are routable —
+   * SIRI boarding activities are less specific than the planned PickDrop value.
    */
   @Test
   void boardingActivityShouldNotOverrideCoordinateWithDriver() {

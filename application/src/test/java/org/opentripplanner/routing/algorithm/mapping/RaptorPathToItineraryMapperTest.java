@@ -58,6 +58,7 @@ import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 import org.opentripplanner.transfer.regular.model.DefaultRaptorTransfer;
 import org.opentripplanner.transfer.regular.model.PathTransfer;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.Route;
@@ -67,6 +68,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfo;
+import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.utils.time.TimeUtils;
@@ -176,8 +178,8 @@ public class RaptorPathToItineraryMapperTest {
   }
 
   /**
-   * Create a minimalist path FlexAccess-->Transfer-->Egress (without transit) and check that the 3 legs
-   * are properly mapped in the itinerary.
+   * Create a minimalist path FlexAccess-->Transfer-->Egress (without transit) and check that the 3
+   * legs are properly mapped in the itinerary.
    */
   @Test
   void createItineraryWithOnBoardFlexAccess() {
@@ -208,6 +210,7 @@ public class RaptorPathToItineraryMapperTest {
     PathLeg<RaptorTripSchedule> transferLeg = new TransferPathLeg<>(
       S1.getIndex(),
       0,
+      S2.getIndex(),
       0,
       0,
       raptorTransfer,
@@ -266,7 +269,7 @@ public class RaptorPathToItineraryMapperTest {
     assertTrue(itinerary.isSearchWindowAware());
   }
 
-  private TripTimes buildTripTimes(TripPattern originalPattern) {
+  private TripTimes<?> buildTripTimes(TripPattern originalPattern) {
     var trip = TransitRepositoryForTest.trip("test").build();
     var stopTimes = new ArrayList<StopTime>();
     for (int i = 0; i < originalPattern.numberOfStops(); i++) {
@@ -313,15 +316,20 @@ public class RaptorPathToItineraryMapperTest {
       .atZone(ZoneIds.STOCKHOLM)
       .toInstant();
     TransitRepository transitRepository = new TransitRepository();
+    TimetableDataImport timetableDataImport = new TimetableDataImport();
     transitRepository.initTimeZone(ZoneIds.CET);
     transitRepository.index();
     return new RaptorPathToItineraryMapper<>(
       new Graph(),
-      new DefaultTransitService(transitRepository),
+      new DefaultTransitService(
+        transitRepository,
+        DefaultTimetableRepository.scheduledOnly(timetableDataImport.toScheduledTimetableData())
+      ),
       new DefaultStreetDetailsService(new DefaultStreetDetailsRepository()),
       getRaptorTransitData(),
       dateTime.atZone(ZoneIds.CET),
-      RouteRequest.defaultValue()
+      RouteRequest.defaultValue(),
+      null
     );
   }
 

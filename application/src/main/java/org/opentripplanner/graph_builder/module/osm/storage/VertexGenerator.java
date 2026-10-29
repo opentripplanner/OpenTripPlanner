@@ -8,6 +8,8 @@ import com.google.common.collect.Multimap;
 import gnu.trove.list.TLongList;
 import gnu.trove.map.TLongObjectMap;
 import gnu.trove.map.hash.TLongObjectHashMap;
+import gnu.trove.set.TLongSet;
+import gnu.trove.set.hash.TLongHashSet;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -93,12 +95,13 @@ public class VertexGenerator {
    * nodes like elevators. When there is an elevator or other Z-dimension discontinuity, a single
    * node can appear in several entities at different levels.
    *
-   * @param node The node to fetch a label for.
-   * @param entity The entity it is connected to, e.g. used for fetching level information.
+   * @param node                  The node to fetch a label for.
+   * @param entity                The entity it is connected to, e.g. used for fetching level
+   *                              information.
    * @param linearBarrierNodeType How should the node be handled if it is on a linear barrier
    *
    * @return The graph vertex. This is not always an OSM vertex; it can also be a
-   * {@link OsmBoardingLocationVertex}
+   *         {@link OsmBoardingLocationVertex}
    */
   public IntersectionVertex getVertexForOsmNode(
     OsmNode node,
@@ -255,8 +258,8 @@ public class VertexGenerator {
   }
 
   /**
-   * Tracks OSM nodes which are decomposed into multiple graph vertices because they are
-   * elevators. They can then be iterated over to build {@link ElevatorEdge} between them.
+   * Tracks OSM nodes which are decomposed into multiple graph vertices because they are elevators.
+   * They can then be iterated over to build {@link ElevatorEdge} between them.
    */
   public Map<Long, Map<OsmElevatorKey, OsmElevatorVertex>> elevatorNodes() {
     return elevatorNodes;
@@ -267,7 +270,7 @@ public class VertexGenerator {
   }
 
   public void initIntersectionNodes() {
-    Set<Long> possibleIntersectionNodes = new HashSet<>();
+    TLongSet possibleIntersectionNodes = new TLongHashSet();
     for (OsmWay way : osmdb.getWays()) {
       TLongList nodes = way.getNodeRefs();
       nodes.forEach(node -> {
@@ -297,8 +300,8 @@ public class VertexGenerator {
 
   /**
    * Get a mapping from a node to a map of vertices for that node, indexed by the applicable area
-   * the vertex is in. The null-indexed vertex, if exists, is the vertex which hasn't been split
-   * for a particular area and is applicable for all linear crossing of the barrier.
+   * the vertex is in. The null-indexed vertex, if exists, is the vertex which hasn't been split for
+   * a particular area and is applicable for all linear crossing of the barrier.
    */
   public Map<OsmNode, Map<OsmEntity, OsmVertex>> splitVerticesOnBarriers() {
     return splitVerticesOnBarriers;
@@ -363,15 +366,15 @@ public class VertexGenerator {
   }
 
   /**
-   * Create a separate elevator vertex for each connected entity and record its level from
-   * the entity's level.
+   * Create a separate elevator vertex for each connected entity and record its level from the
+   * entity's level.
    * <p>
    * If the entity is at level 5, mark that this node is active at level 5. If another entity
    * connected to the node is also at level 5, create a separate vertex for that combination, but
    * mark the level as the same.
    *
    * @param entity an entity on a level
-   * @param node the node to create the elevator vertex from
+   * @param node   the node to create the elevator vertex from
    */
   private OsmElevatorVertex getElevatorVertex(OsmNode node, OsmEntity entity) {
     Map<OsmElevatorKey, OsmElevatorVertex> elevatorVertices = getElevatorVertices(node);
@@ -397,7 +400,7 @@ public class VertexGenerator {
     return elevatorVertices;
   }
 
-  private void intersectAreaRingNodes(Set<Long> possibleIntersectionNodes, Ring outerRing) {
+  private void intersectAreaRingNodes(TLongSet possibleIntersectionNodes, Ring outerRing) {
     for (OsmNode node : outerRing.nodes) {
       long nodeId = node.getId();
       if (possibleIntersectionNodes.contains(nodeId)) {

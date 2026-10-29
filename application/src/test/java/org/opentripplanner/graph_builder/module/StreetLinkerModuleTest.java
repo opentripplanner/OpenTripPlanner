@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
+import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -31,6 +31,7 @@ import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.vertex.OsmBoardingLocationVertex;
 import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.network.CarAccess;
 import org.opentripplanner.transit.model.network.Route;
@@ -193,6 +194,7 @@ class StreetLinkerModuleTest {
     private final StreetLinkerModule module;
     private final RegularStop stop;
     private final TransitRepository transitRepository;
+    private final TimetableDataImport timetableDataImport;
     private final Graph graph;
 
     public TestModel() {
@@ -219,6 +221,7 @@ class StreetLinkerModuleTest {
       builder.withRegularStop(stop);
 
       transitRepository = new TransitRepository(builder.build());
+      timetableDataImport = new TimetableDataImport();
 
       stopVertex = TransitStopVertex.of()
         .withId(stop.getId())
@@ -233,6 +236,7 @@ class StreetLinkerModuleTest {
         new VertexLinker(graph, GeofencingZoneService.EMPTY, TRAVERSE_AREA_EDGES, 0, false),
         new DefaultVehicleParkingRepository(),
         transitRepository,
+        timetableDataImport,
         DataImportIssueStore.NOOP
       );
 
@@ -258,7 +262,7 @@ class StreetLinkerModuleTest {
     }
 
     public void withFlexTrip(UnscheduledTrip flexTrip) {
-      transitRepository.addFlexTrip(flexTrip.getId(), flexTrip);
+      timetableDataImport.addFlexTrip(flexTrip.getId(), flexTrip);
     }
 
     public void withCarsAllowedTrip(Trip trip, StopLocation... stops) {
@@ -283,7 +287,7 @@ class StreetLinkerModuleTest {
         .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(tripTimes))
         .build();
 
-      transitRepository.addTripPattern(tripPattern.getId(), tripPattern);
+      timetableDataImport.addTripPattern(tripPattern.getId(), tripPattern);
     }
 
     /**

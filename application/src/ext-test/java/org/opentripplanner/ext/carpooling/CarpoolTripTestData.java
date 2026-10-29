@@ -94,8 +94,9 @@ public class CarpoolTripTestData {
   }
 
   /**
-   * Creates a trip with origin, intermediate stops, and destination. The deviation budget is applied
-   * to the origin and destination stops, while intermediate stops retain their own deviation budget.
+   * Creates a trip with origin, intermediate stops, and destination. The deviation budget is
+   * applied to the origin and destination stops, while intermediate stops retain their own
+   * deviation budget.
    */
   public static CarpoolTrip createTripWithStops(
     WgsCoordinate boarding,

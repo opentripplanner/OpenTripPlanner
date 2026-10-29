@@ -16,6 +16,7 @@ import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.ridehailing.RideHailingAccessShifter;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
+import org.opentripplanner.ext.taxi.TaxiService;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.startonboardaccess.RoutingStartOnBoardAccess;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.startonboardaccess.TripAndServiceDateResolver;
@@ -39,9 +40,9 @@ import org.opentripplanner.transit.service.TransitServiceResolver;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 /**
- * This class exposes methods for fetching access and egress legs for a request.
- * An access or egress may be e.g. a walking path to the first transit stop on a route,
- * but could also include other modes such as bicycle, shared mobility, flex or carpooling.
+ * This class exposes methods for fetching access and egress legs for a request. An access or egress
+ * may be e.g. a walking path to the first transit stop on a route, but could also include other
+ * modes such as bicycle, shared mobility, flex or carpooling.
  */
 class AccessEgressFetcher {
 
@@ -61,7 +62,13 @@ class AccessEgressFetcher {
   private final LinkingContext linkingContext;
   private final TransitServiceResolver transitServiceResolver;
   private final AccessEgressMapper accessEgressMapper;
+
+  @Nullable
   private final CarpoolingService carpoolingService;
+
+  @Nullable
+  private final TaxiService taxiService;
+
   private final TripScheduleIndexResolver tripScheduleIndexResolver;
   private final TripLocationResolver tripLocationResolver;
 
@@ -85,7 +92,8 @@ class AccessEgressFetcher {
     ZonedDateTime transitSearchTimeZero,
     AdditionalSearchDays additionalSearchDays,
     LinkingContext linkingContext,
-    CarpoolingService carpoolingService,
+    @Nullable CarpoolingService carpoolingService,
+    @Nullable TaxiService taxiService,
     RaptorRoutingRequestTransitData requestTransitDataProvider
   ) {
     this.request = request;
@@ -100,6 +108,7 @@ class AccessEgressFetcher {
     this.additionalSearchDays = additionalSearchDays;
     this.linkingContext = linkingContext;
     this.carpoolingService = carpoolingService;
+    this.taxiService = taxiService;
     this.transitServiceResolver = new TransitServiceResolver(transitService);
     this.accessEgressMapper = new AccessEgressMapper(transitServiceResolver);
     this.tripScheduleIndexResolver = new TripScheduleIndexResolver(requestTransitDataProvider);
@@ -188,6 +197,9 @@ class AccessEgressFetcher {
       stopCountLimit,
       linkingContext
     );
+    if (taxiService != null && mode == StreetMode.TAXI) {
+      nearbyStops = taxiService.filterNearbyStops(transitService, nearbyStops, type, request);
+    }
     var accessEgresses = accessEgressMapper.mapNearbyStops(nearbyStops);
     accessEgresses = timeshiftRideHailing(streetRequest, type, accessEgresses);
 

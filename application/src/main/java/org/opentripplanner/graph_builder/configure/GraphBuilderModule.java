@@ -3,12 +3,13 @@ package org.opentripplanner.graph_builder.configure;
 import dagger.Module;
 import dagger.Provides;
 import jakarta.inject.Singleton;
-import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
+import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.cache.GraphBuildCacheManager;
 import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.service.TransitRepository;
 
 @Module
@@ -20,6 +21,7 @@ public class GraphBuilderModule {
     Graph baseGraph,
     DeduplicatorService deduplicator,
     TransitRepository transitRepository,
+    TimetableDataImport timetableDataImport,
     DataImportIssueStore issueStore,
     GraphBuilderDataSources closeDataSourcesHandle,
     GraphBuildCacheManager cacheManager
@@ -28,6 +30,7 @@ public class GraphBuilderModule {
       baseGraph,
       deduplicator,
       transitRepository,
+      timetableDataImport,
       issueStore,
       closeDataSourcesHandle,
       cacheManager

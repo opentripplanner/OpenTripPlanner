@@ -5,7 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.ext.carpooling.CarpoolBookingUrlTestData.expectedAugmentedUrl;
+import static org.opentripplanner.ext.carpooling.CarpoolBookingUrlTestData.bookingUrlTemplate;
+import static org.opentripplanner.ext.carpooling.CarpoolBookingUrlTestData.expectedExpandedUrl;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -41,9 +42,8 @@ import org.opentripplanner.transit.service.TransitServiceResolver;
 /**
  * Integration tests for {@link DefaultCarpoolingService#routeAccessEgress}.
  * <p>
- * These tests use a real street graph with transit stops to verify the full
- * access/egress routing pipeline including nearby stop finding, insertion
- * evaluation, and result mapping.
+ * These tests use a real street graph with transit stops to verify the full access/egress
+ * routing pipeline including nearby stop finding, insertion evaluation, and result mapping.
  * <p>
  * Graph layout (going east):
  * <pre>
@@ -549,13 +549,13 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
 
   /**
    * Regression test: {@code routeAccessEgress} must call {@code findNearbyStops} with
-   * {@link StreetMode#CAR_PICKUP}, not {@link StreetMode#CAR}. CAR_PICKUP allows the search
-   * to leave the drivable network and walk the last stretch to a transit stop whose link
-   * endpoint is reachable only via a pedestrian-only edge (e.g. a pedestrian-plaza stop).
+   * {@link StreetMode#CAR_PICKUP}, not {@link StreetMode#CAR}. CAR_PICKUP allows the search to
+   * leave the drivable network and walk the last stretch to a transit stop whose link endpoint is
+   * reachable only via a pedestrian-only edge (e.g. a pedestrian-plaza stop).
    * <p>
    * In this graph stopT5 is exactly such a stop: a walk-only side branch off D. A pure CAR
-   * search would never reach it, so it would not appear in any access result. If the
-   * implementation regresses to using CAR here, this assertion will fail.
+   * search would never reach it, so it would not appear in any access result. If the implementation
+   * regresses to using CAR here, this assertion will fail.
    */
   @Test
   void accessFindsTransitStopReachableOnlyViaWalkOnlySideBranchFromDrivableNetwork() {
@@ -597,17 +597,17 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
         "cannot drive past D and the passenger has to walk the pedestrian-only side branch to T5"
     );
     assertTrue(
-      walkFromDropoff.getDuration() > 0,
+      walkFromDropoff.duration().isPositive(),
       "Walk from dropoff to stopT5 should have positive duration"
     );
   }
 
   /**
-   * Counterpart to the walk-only-side-branch test: when both the passenger and the transit stop sit on
-   * the drivable network, the carpool can pick up at the passenger's location and drop off at
+   * Counterpart to the walk-only-side-branch test: when both the passenger and the transit stop sit
+   * on the drivable network, the carpool can pick up at the passenger's location and drop off at
    * the stop's link vertex without any walking. Both {@code walkToPickup} and
-   * {@code walkFromDropoff} must therefore be {@code null} (rather than zero-duration
-   * placeholders) so the itinerary mapper can tell the walking and no-walking cases apart.
+   * {@code walkFromDropoff} must therefore be {@code null} (rather than zero-duration placeholders)
+   * so the itinerary mapper can tell the walking and no-walking cases apart.
    */
   @Test
   void accessResultForStopOnDrivableNetworkHasNullWalkSegments() {
@@ -660,18 +660,12 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
 
     var pathAToP2 = router.route(vertexA, vertexP2);
     assertNotNull(pathAToP2, "Should be able to route from A to P2");
-    var drivingDurationAToP2 = Duration.between(
-      pathAToP2.states.getFirst().getTime(),
-      pathAToP2.states.getLast().getTime()
-    );
+    var drivingDurationAToP2 = pathAToP2.duration();
     assertTrue(drivingDurationAToP2.toSeconds() > 1, "Driving duration to P2 should be positive");
 
     var pathP2ToIT3 = router.route(vertexP2, vertexIT3);
     assertNotNull(pathP2ToIT3, "Should be able to route from P2 to iT3");
-    var drivingDurationP2ToIT3 = Duration.between(
-      pathP2ToIT3.states.getFirst().getTime(),
-      pathP2ToIT3.states.getLast().getTime()
-    );
+    var drivingDurationP2ToIT3 = pathP2ToIT3.duration();
     assertTrue(
       drivingDurationP2ToIT3.toSeconds() > 0,
       "Driving duration from P2 to iT3 should be positive"
@@ -679,10 +673,7 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
 
     var pathP2ToIT4 = router.route(vertexP2, vertexIT4);
     assertNotNull(pathP2ToIT4, "Should be able to route from P2 to iT4");
-    var drivingDurationP2ToIT4 = Duration.between(
-      pathP2ToIT4.states.getFirst().getTime(),
-      pathP2ToIT4.states.getLast().getTime()
-    );
+    var drivingDurationP2ToIT4 = pathP2ToIT4.duration();
     assertTrue(
       drivingDurationP2ToIT4.toSeconds() > 0,
       "Driving duration from P2 to iT4 should be positive"
@@ -762,20 +753,20 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
 
   /**
    * Verifies the booking URL is rewritten with passenger pickup/dropoff query parameters when an
-   * access leg is mapped to an itinerary. To make the walk-vs-carpool distinction non-trivial,
-   * the {@code stopT5} access path is targeted: the carpool drops at {@code D} (the only drivable
+   * access leg is mapped to an itinerary. To make the walk-vs-carpool distinction non-trivial, the
+   * {@code stopT5} access path is targeted: the carpool drops at {@code D} (the only drivable
    * vertex incident to T5's pedestrian-only side branch) and the passenger then walks
-   * {@code D → T5}. The resulting itinerary therefore contains a walk leg after the carpool leg,
-   * so the URL must use the carpool's <em>alighting</em> coordinate ({@code D}) and not the
-   * walking endpoint ({@code T5}), and equally not the driver's trip origin ({@code A}).
+   * {@code D → T5}. The resulting itinerary therefore contains a walk leg after the carpool leg, so
+   * the URL must use the carpool's <em>alighting</em> coordinate ({@code D}) and not the walking
+   * endpoint ({@code T5}), and equally not the driver's trip origin ({@code A}).
    */
   @Test
-  void accessItinerary_appendsCarpoolBoardingAndAlightingCoords_notWalkLegCoords() {
+  void accessItinerary_expandsCarpoolBoardingAndAlightingCoords_notWalkLegCoords() {
     var departureTime = SEARCH_TIME.plusMinutes(30);
     var baseTrip = CarpoolTripTestData.createSimpleTripWithTime(coordA, coordD, departureTime);
     var trip = new CarpoolTripBuilder(baseTrip)
       .withPublicContactInformation(
-        ContactInfo.of().withBookingUrl("https://book.example.com").build()
+        ContactInfo.of().withBookingUrl(bookingUrlTemplate("https://book.example.com")).build()
       )
       .build();
     context.upsertTrip(trip);
@@ -821,7 +812,7 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
     assertNotNull(bookingInfo);
 
     assertEquals(
-      expectedAugmentedUrl(
+      expectedExpandedUrl(
         "https://book.example.com",
         carpoolLeg.from().coordinate,
         carpoolLeg.to().coordinate

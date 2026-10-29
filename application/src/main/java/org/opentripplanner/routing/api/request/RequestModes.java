@@ -55,19 +55,15 @@ public class RequestModes {
   }
 
   /**
-   * Return the default set of modes with WALK for all street modes and all transit modes set.
-   * Tip: Use the {@link #of()} to change the defaults.
+   * Return the default set of modes with WALK for all street modes and all transit modes set. Tip:
+   * Use the {@link #of()} to change the defaults.
    */
   public static RequestModes defaultRequestModes() {
     return DEFAULTS;
   }
 
-  public boolean contains(StreetMode streetMode) {
-    return (
-      streetMode.equals(accessMode) ||
-      streetMode.equals(egressMode) ||
-      streetMode.equals(directMode)
-    );
+  public boolean hasAccessOrEgressMode(StreetMode streetMode) {
+    return streetMode.equals(accessMode) || streetMode.equals(egressMode);
   }
 
   @Override

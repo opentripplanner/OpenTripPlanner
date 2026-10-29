@@ -21,8 +21,8 @@ public interface CarpoolingRepository {
   /**
    * Returns all current carpooling trips with their resolved street vertices.
    * <p>
-   * The returned collection includes all driver trips that have been added via {@link #upsertCarpoolTrip}
-   * and not yet removed or expired.
+   * The returned collection includes all driver trips that have been added via
+   * {@link #upsertCarpoolTrip} and not yet removed or expired.
    */
   Collection<CarpoolTripWithVertices> getCarpoolTrips();
 
@@ -44,11 +44,11 @@ public interface CarpoolingRepository {
    * <p>
    * The method does not validate trip data beyond basic null checks. It is the caller's
    * responsibility to ensure the trip is valid (has stops, positive capacity, etc.) and that the
-   * vertices are the resolution of the trip's current route points. Invalid trips may cause
-   * routing failures later.
+   * vertices are the resolution of the trip's current route points. Invalid trips may cause routing
+   * failures later.
    *
    * @param trip the carpool trip with its resolved vertices to insert or update, must not be null.
-   *        If a trip with the same ID exists, it will be completely replaced.
+   *             If a trip with the same ID exists, it will be completely replaced.
    * @throws IllegalArgumentException if trip is null
    */
   void upsertCarpoolTrip(CarpoolTripWithVertices trip);
@@ -62,20 +62,21 @@ public interface CarpoolingRepository {
    * Removes all carpool trips that have already ended and are therefore no longer routable.
    * <p>
    * A trip is considered expired when its {@link CarpoolTrip#latestEndTime()} is before
-   * {@code now.minus(expiry)}. Removing such trips bounds the memory use of instances that run for a
-   * long time without restarting, since the SIRI source is not guaranteed to send an explicit
+   * {@code now.minus(expiry)}. Removing such trips bounds the memory use of instances that run for
+   * a long time without restarting, since the SIRI source is not guaranteed to send an explicit
    * cancellation for a journey once it has completed. This mirrors how real-time timetable data is
-   * purged once its service date has passed (see {@code TimetableRepository#purgeExpiredData}), with
-   * the difference that carpool trips carry a concrete instant rather than a service date.
+   * purged once its service date has passed (see {@code TimetableRepository#purgeExpiredData}),
+   * with the difference that carpool trips carry a concrete instant rather than a service date.
    * <p>
-   * The scan is throttled so that it runs at most once per sweep interval no matter how often it is
-   * called. The throttle state lives on the repository rather than on the caller, so when several
-   * updaters (one per SIRI feed) share a repository, the trips are swept at most once per interval
-   * in total instead of once per feed. Calls made before the interval has elapsed are a no-op and
-   * return {@code 0}. The method is safe to call concurrently from multiple updater threads.
+   * The scan is throttled so that it runs at most once per sweep interval no matter how often it
+   * is called. The throttle state lives on the repository rather than on the caller, so when
+   * several updaters (one per SIRI feed) share a repository, the trips are swept at most once per
+   * interval in total instead of once per feed. Calls made before the interval has elapsed are a
+   * no-op and return {@code 0}. The method is safe to call concurrently from multiple updater
+   * threads.
    *
-   * @param now the current instant, used both as the throttle reference and to derive the expiry
-   *            cut-off
+   * @param now    the current instant, used both as the throttle reference and to derive the expiry
+   *               cut-off
    * @param expiry how long a trip is retained after its latest end time before it becomes eligible
    *               for removal
    * @return the number of trips removed, or {@code 0} when the call was throttled
@@ -87,15 +88,15 @@ public interface CarpoolingRepository {
    * {@code null} when there is no usable entry — either nothing is cached, or the cached entry was
    * computed for a different route-point geometry than the trip now has.
    * <p>
-   * This is a routing memoization, not part of the trip's domain data: the baseline route depends
-   * only on the trip's waypoint geometry and the static street graph, never on the passenger
-   * request, so it is computed once and reused across requests. The cache is keyed by trip id and
-   * validated against the trip's current route points, so a trip whose geometry changed — including
-   * after a concurrent re-route — never reads a stale entry; entries are also dropped when the trip
-   * is removed or expires. A successful outcome carries one routed duration per leg
+   * This is a routing memoization, not part of the trip's domain data: the baseline route
+   * depends only on the trip's waypoint geometry and the static street graph, never on the
+   * passenger request, so it is computed once and reused across requests. The cache is keyed by
+   * trip id and validated against the trip's current route points, so a trip whose geometry changed
+   * — including after a concurrent re-route — never reads a stale entry; entries are also dropped
+   * when the trip is removed or expires. A successful outcome carries one routed duration per leg
    * ({@code stops().size() - 1} entries); an unroutable outcome carries {@code null} durations (see
-   * {@link CachedBaselineRouting}). Returned durations are a copy the caller may not mutate into the
-   * cache.
+   * {@link CachedBaselineRouting}). Returned durations are a copy the caller may not mutate into
+   * the cache.
    */
   @Nullable
   CachedBaselineRouting cachedBaselineRouting(CarpoolTrip trip);

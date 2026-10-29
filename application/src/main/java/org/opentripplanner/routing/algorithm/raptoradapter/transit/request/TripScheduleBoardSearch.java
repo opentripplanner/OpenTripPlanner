@@ -13,7 +13,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * stop. Normally the search scan from the upper bound index and down, it can do so because the
  * trips are ordered after the FIRST stop boarding times. We also assume that trips do not pass each
  * other; Hence trips IN SERVICE on a given day will be in order for all other stops too.
- * <p/>
+ * <p>
  * The search uses a binary search if the number of trip schedules is above a given threshold. A
  * linear search is slow when the number of schedules is very large, let say more than 300 trip
  * schedules.
@@ -84,14 +84,14 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule> impleme
   /* TripScheduleSearch implementation */
 
   /**
-   * Find the first trip leaving from the given stop AFTER the the 'earliestTime', but
-   * before the given trip ({@code tripIndexUpperBound}).
+   * Find the first trip leaving from the given stop AFTER the the 'earliestTime', but before the
+   * given trip ({@code tripIndexUpperBound}).
    *
-   * @param earliestTime     The time of arrival at the given stop for the previous trip.
+   * @param earliestTime          The time of arrival at the given stop for the previous trip.
    * @param stopPositionInPattern The stop to board
    * @param tripIndexUpperBound   Upper bound for trip index to search for. Exclusive - search start
-   *                              at {@code tripIndexUpperBound - 1}.
-   *                              Use {@code -1} (negative value) for an unbounded search.
+   *                              at {@code tripIndexUpperBound - 1}. Use {@code -1} (negative
+   *                              value) for an unbounded search.
    */
   @Override
   public RaptorBoardOrAlightEvent<T> search(
@@ -151,10 +151,10 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule> impleme
   }
 
   /**
-   * This method search for the first scheduled trip boarding, after or equals to the
-   * given {@code earliestBoardTime}. Only trips with a trip index smaller than the given
+   * This method search for the first scheduled trip boarding, after or equals to the given
+   * {@code earliestBoardTime}. Only trips with a trip index smaller than the given
    * {@code tripIndexUpperBound} is considered.
-   * <p/>
+   * <p>
    * The search searches backwards until index 0 is reached (inclusive).
    *
    * @param tripIndexUpperBound The trip index upper bound, where search start (exclusive).
@@ -179,8 +179,8 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule> impleme
   }
 
   /**
-   * This method search for the first scheduled trip boarding, after or equals to
-   * the given {@code earliestBoardTime}.
+   * This method search for the first scheduled trip boarding, after or equals to the given
+   * {@code earliestBoardTime}.
    *
    * @param tripIndexLowerBound The trip index lower bound, where search start (inclusive).
    */
@@ -199,7 +199,7 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule> impleme
 
   /**
    * Do a binary search to find the approximate upper bound index for where to start the search.
-   * <p/>
+   * <p>
    * This is just a guess and we return when the trip with a best valid departure is in the range
    * of the next {@link #binarySearchThreshold}.
    *

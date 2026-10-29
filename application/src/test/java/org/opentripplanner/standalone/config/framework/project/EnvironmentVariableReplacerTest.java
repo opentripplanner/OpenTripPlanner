@@ -23,9 +23,9 @@ public class EnvironmentVariableReplacerTest {
    * in the system environment variables. So to prepare for the test, we look up a random
    * environment variable and use it later to construct the test samples, and the expected results.
    * <p>
-   * We search for a environment variable name containing only alphanumeric characters and a value
-   * with less than 30 characters. We do this to make it easier for humans to see what is going on,
-   * if a test fails. This constraint is just to make the text involved more readable.
+   * We search for a environment variable name containing only alphanumeric characters and a
+   * value with less than 30 characters. We do this to make it easier for humans to see what is
+   * going on, if a test fails. This constraint is just to make the text involved more readable.
    */
   @BeforeEach
   public void setup() {

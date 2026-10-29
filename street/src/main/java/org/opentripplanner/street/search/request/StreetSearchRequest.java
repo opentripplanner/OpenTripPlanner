@@ -174,8 +174,9 @@ public class StreetSearchRequest implements AStarRequest {
   }
 
   /**
-   * An assumed rental period of a car rental trip, to make sure the vehicle is available during this period.
-   * The rentalPeriod only apply to free-floating vehicles in a direct search. Access and egress is not supported.
+   * An assumed rental period of a car rental trip, to make sure the vehicle is available during
+   * this period. The rentalPeriod only apply to free-floating vehicles in a direct search. Access
+   * and egress is not supported.
    */
   @Nullable
   public RentalPeriod rentalPeriod() {
@@ -267,6 +268,7 @@ public class StreetSearchRequest implements AStarRequest {
         CAR,
         CAR_TO_PARK,
         CAR_PICKUP,
+        TAXI,
         CAR_HAILING,
         CARPOOL,
         FLEXIBLE -> null;

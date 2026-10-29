@@ -10,8 +10,8 @@ import org.opentripplanner.framework.csv.OtpCsvReader;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 
 /**
- * This class handles reading the CO₂ emissions data from the files in the GTFS package
- * and saving it in a map.
+ * This class handles reading the CO₂ emissions data from the files in the GTFS package and saving
+ * it in a map.
  */
 public class TripDataReader {
 

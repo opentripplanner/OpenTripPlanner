@@ -21,6 +21,9 @@ import static org.opentripplanner.transit.model.basic.Money.USD;
 import static org.opentripplanner.transit.model.basic.Money.ZERO_USD;
 import static org.opentripplanner.transit.model.basic.Money.usDollars;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -48,6 +51,7 @@ import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.basic.Money;
@@ -81,10 +85,11 @@ public class OrcaFareServiceTest {
   }
 
   /**
-   * These tests are designed to specifically validate Orca fares. Since these fares are hard-coded, it is acceptable
-   * to make direct calls to the Orca fare service with predefined routes. Where the default fare is applied a test
-   * substitute {@link OrcaFareServiceTest#DEFAULT_TEST_RIDE_PRICE} is used. This will be the same for all cash fare
-   * types.
+   * These tests are designed to specifically validate Orca fares. Since these fares are hard-coded,
+   * it is acceptable to make direct calls to the Orca fare service with predefined routes. Where
+   * the default fare is applied a test substitute
+   * {@link OrcaFareServiceTest#DEFAULT_TEST_RIDE_PRICE} is used. This will be the same for all cash
+   * fare types.
    */
   private static void calculateFare(List<Leg> legs, FareType fareType, Money expectedPrice) {
     var itinerary = Itinerary.ofScheduledTransit(legs).withGeneralizedCost(Cost.ZERO).build();
@@ -228,9 +233,39 @@ public class OrcaFareServiceTest {
     calculateFare(rides, FareType.electronicYouth, ZERO_USD);
   }
 
+  @Test
+  void communityTransitRideFreeWeek() {
+    var seattle = ZoneId.of("America/Los_Angeles");
+    var octoberFirst = LocalDate.of(2026, 10, 1).atStartOfDay(seattle);
+    var octoberNinth = LocalDate.of(2026, 10, 9).atStartOfDay(seattle);
+
+    calculateFare(
+      List.of(getLegAt(COMM_TRANS_AGENCY_ID, "400", octoberFirst.minusMinutes(1))),
+      regular,
+      usDollars(2.5f)
+    );
+    calculateFare(List.of(getLegAt(COMM_TRANS_AGENCY_ID, "400", octoberFirst)), regular, ZERO_USD);
+    calculateFare(
+      List.of(getLegAt(COMM_TRANS_FLEX_AGENCY_ID, "DART", octoberNinth.minusMinutes(1))),
+      FareType.electronicSenior,
+      ZERO_USD
+    );
+    calculateFare(
+      List.of(getLegAt(COMM_TRANS_AGENCY_ID, "400", octoberNinth)),
+      regular,
+      usDollars(2.5f)
+    );
+    // Sound Transit routes retain their fare even when operated by Community Transit.
+    calculateFare(
+      List.of(getLegAt(COMM_TRANS_AGENCY_ID, "512", octoberFirst)),
+      regular,
+      THREE_DOLLARS
+    );
+  }
+
   /**
-   * WSF do not accept free transfers. This test is to make sure the rider is charged the cash price for WSF as well
-   * as the highest fare where Orca can be used.
+   * WSF do not accept free transfers. This test is to make sure the rider is charged the cash price
+   * for WSF as well as the highest fare where Orca can be used.
    */
   @Test
   void calculateFareWithNoFreeTransfer() {
@@ -270,10 +305,10 @@ public class OrcaFareServiceTest {
   }
 
   /**
-   * Total trip time is 2h 30m. The first four transfers are within the permitted two hour window. A single (highest)
-   * Orca fare will be charged for these transfers. The fifth transfer is outside of the original two hour window so
-   * a single Orca fare for this leg is applied and the two hour window will start again. The final transfer is within
-   * the new two hour window and will be free.
+   * Total trip time is 2h 30m. The first four transfers are within the permitted two hour window. A
+   * single (highest) Orca fare will be charged for these transfers. The fifth transfer is outside
+   * of the original two hour window so a single Orca fare for this leg is applied and the two hour
+   * window will start again. The final transfer is within the new two hour window and will be free.
    */
   @Test
   void calculateFareThatExceedsTwoHourFreeTransferWindow() {
@@ -296,9 +331,9 @@ public class OrcaFareServiceTest {
   }
 
   /**
-   * Total trip time is 2h 30m. Calculate fare with two free transfer windows which include agencies which do not permit
-   * free transfers. The free transfers will be applied for Kitsap, but not for WSF nor Skagit. Note: Not a real world
-   * trip!
+   * Total trip time is 2h 30m. Calculate fare with two free transfer windows which include agencies
+   * which do not permit free transfers. The free transfers will be applied for Kitsap, but not for
+   * WSF nor Skagit. Note: Not a real world trip!
    */
   @Test
   void calculateFareThatIncludesNoFreeTransfers() {
@@ -333,7 +368,8 @@ public class OrcaFareServiceTest {
   }
 
   /**
-   * Total trip time is 4h 30m. This is equivalent to three transfer windows and therefore three Orca fare charges.
+   * Total trip time is 4h 30m. This is equivalent to three transfer windows and therefore three
+   * Orca fare charges.
    */
   @Test
   void calculateFareThatExceedsTwoHourFreeTransferWindowTwice() {
@@ -359,8 +395,9 @@ public class OrcaFareServiceTest {
   }
 
   /**
-   * This trip starts with a cash fare so the free transfer window doesn't start until the second transfer. Therefore,
-   * all subsequent transfers will come under one transfer window and only one Orca discount charge will apply.
+   * This trip starts with a cash fare so the free transfer window doesn't start until the second
+   * transfer. Therefore, all subsequent transfers will come under one transfer window and only one
+   * Orca discount charge will apply.
    */
   @Test
   void calculateFareThatStartsWithACashFare() {
@@ -401,7 +438,8 @@ public class OrcaFareServiceTest {
   }
 
   /**
-   * Single trip (Point Defiance - Tahlequah) with WSF transit to confirm correct non Orca fares are applied.
+   * Single trip (Point Defiance - Tahlequah) with WSF transit to confirm correct non Orca fares are
+   * applied.
    */
   @Test
   void calculateFareForWSFPtToTahlequah() {
@@ -472,8 +510,8 @@ public class OrcaFareServiceTest {
   }
 
   /**
-   * Create a few Sound Transit trips but under the contracted agency IDs.
-   * SoundTransit contracts their bus service, so their routes show under the contracted agency's IDs in the GTFS feed.
+   * Create a few Sound Transit trips but under the contracted agency IDs. SoundTransit contracts
+   * their bus service, so their routes show under the contracted agency's IDs in the GTFS feed.
    * Make sure that we get ST's bus fare and not the contracted agency's fare.
    */
   @Test
@@ -577,39 +615,82 @@ public class OrcaFareServiceTest {
   }
 
   /**
-   * We explicitly do not calculate monorail fares
-   */
-  @Test
-  void calculateMonorailFares() {
-    List<Leg> rides = List.of(getLeg(MONORAIL_AGENCY_ID, 0));
-
-    calculateFare(rides, regular, usDollars(0.00f));
-    calculateFare(rides, FareType.senior, usDollars(0.00f));
-    calculateFare(rides, FareType.youth, usDollars(0.00f));
-    calculateFare(rides, FareType.electronicSpecial, usDollars(0.00f));
-    calculateFare(rides, FareType.electronicRegular, usDollars(0.00f));
-    calculateFare(rides, FareType.electronicSenior, usDollars(0.00f));
-    calculateFare(rides, FareType.electronicYouth, usDollars(0.00f));
-  }
-
-  /**
-   * Test monorail fares with transfers to ensure transfer logic works correctly
-   * with monorail's unique fare structure. Update: we now exclude monorail from fare calcs
+   * Test monorail fares with transfers to ensure transfer logic works correctly with monorail's
+   * unique fare structure. Update: monorail doesn't accept transfers anymore
    */
   @Test
   void calculateMonorailFaresWithTransfers() {
     List<Leg> rides = List.of(
-      getLeg(MONORAIL_AGENCY_ID, 0),
-      getLeg(KC_METRO_AGENCY_ID, 30),
+      getLeg(KC_METRO_AGENCY_ID, 0),
+      getLeg(MONORAIL_AGENCY_ID, 30),
       getLeg(COMM_TRANS_AGENCY_ID, 60)
     );
 
-    calculateFare(rides, regular, THREE_DOLLARS.plus(usDollars(2.50f)));
-    calculateFare(rides, FareType.youth, ZERO_USD);
-    calculateFare(rides, FareType.electronicRegular, usDollars(3.00f));
-    calculateFare(rides, FareType.electronicSenior, usDollars(1.00f));
+    calculateFare(rides, regular, THREE_DOLLARS.plus(usDollars(2.50f).plus(usDollars(4.00f))));
+    calculateFare(rides, FareType.senior, usDollars(4.00f));
+    calculateFare(rides, FareType.youth, usDollars(2.00f));
+    calculateFare(rides, FareType.electronicRegular, usDollars(3.00f).plus(usDollars(4.00f)));
+    // Monorail charges $2.00 reduced fare for senior/LIFT (no free transfer to/from monorail)
+    calculateFare(rides, FareType.electronicSenior, usDollars(3.00f));
     calculateFare(rides, FareType.electronicYouth, usDollars(0.00f));
-    calculateFare(rides, FareType.electronicSpecial, usDollars(1.00f));
+    calculateFare(rides, FareType.electronicSpecial, usDollars(3.00f));
+
+    var fares = orcaFareService.calculateFaresForType(USD, FareType.electronicRegular, rides, null);
+
+    // KC Metro is charged its normal fare
+    assertLegFareEquals(300, rides.get(0), fares, false);
+    // Monorail doesn't accept or give transfers
+    assertLegFareEquals(400, rides.get(1), fares, false);
+    // CommTrans still gets a free transfer from KC Metro (monorail doesn't break the chain)
+    assertLegFareEquals(0, rides.get(2), fares, true);
+  }
+
+  /**
+   * Test single-leg monorail fares to confirm the reduced rate of $2.00 for senior and LIFT
+   * categories, and the regular adult fare of $4.00.
+   */
+  @Test
+  void calculateMonorailReducedFares() {
+    List<Leg> rides = List.of(getLeg(MONORAIL_AGENCY_ID, 0));
+    calculateFare(rides, regular, usDollars(4.00f));
+    calculateFare(rides, FareType.senior, TWO_DOLLARS);
+    calculateFare(rides, FareType.youth, usDollars(2.00f));
+    calculateFare(rides, FareType.electronicRegular, usDollars(4.00f));
+    calculateFare(rides, FareType.electronicSenior, TWO_DOLLARS);
+    calculateFare(rides, FareType.electronicYouth, ZERO_USD);
+    calculateFare(rides, FareType.electronicSpecial, TWO_DOLLARS);
+  }
+
+  static Stream<Arguments> monorailElectronicFares() {
+    return Stream.of(
+      Arguments.of(FareType.electronicRegular, THREE_DOLLARS, usDollars(4.00f)),
+      Arguments.of(FareType.electronicSenior, ONE_DOLLAR, TWO_DOLLARS),
+      Arguments.of(FareType.electronicSpecial, ONE_DOLLAR, TWO_DOLLARS),
+      Arguments.of(FareType.electronicYouth, ZERO_USD, ZERO_USD)
+    );
+  }
+
+  @ParameterizedTest
+  @MethodSource("monorailElectronicFares")
+  void monorailChargesFareOnEveryElectronicRide(
+    FareType fareType,
+    Money metroFare,
+    Money monorailFare
+  ) {
+    var rides = List.of(
+      getLeg(KC_METRO_AGENCY_ID, 0),
+      getLeg(MONORAIL_AGENCY_ID, 30),
+      getLeg(MONORAIL_AGENCY_ID, 60)
+    );
+
+    calculateFare(rides, fareType, metroFare.plus(monorailFare.times(2)));
+
+    var fares = orcaFareService.calculateFaresForType(USD, fareType, rides, null);
+    for (var monorailRide : rides.subList(1, rides.size())) {
+      var offers = fares.getLegProducts().get(monorailRide);
+      assertEquals(1, offers.size());
+      assertEquals(monorailFare, offers.iterator().next().fareProduct().price());
+    }
   }
 
   static Stream<Arguments> allTypes() {
@@ -712,6 +793,15 @@ public class OrcaFareServiceTest {
     return createLeg(agencyId, shortName, 3, startTimeMins, "test", "test", "");
   }
 
+  private static Leg getLegAt(String agencyId, String shortName, ZonedDateTime startTime) {
+    return ((ScheduledTransitLeg) getLeg(agencyId, shortName, 0))
+      .copyOf()
+      .withStartTime(startTime)
+      .withEndTime(startTime.plusMinutes(12))
+      .withServiceDate(startTime.toLocalDate())
+      .build();
+  }
+
   private static Leg getLeg(
     String agencyId,
     String shortName,
@@ -733,8 +823,8 @@ public class OrcaFareServiceTest {
   }
 
   /**
-   * Create a {@link Leg} containing route data that will be used by {@link OrcaFareService} to determine the
-   * correct ride type.
+   * Create a {@link Leg} containing route data that will be used by {@link OrcaFareService} to
+   * determine the correct ride type.
    */
   private static Leg createLeg(
     String agencyId,
@@ -759,8 +849,8 @@ public class OrcaFareServiceTest {
   }
 
   /**
-   * Create a {@link Leg} containing route data that will be used by {@link OrcaFareService} to determine the
-   * correct ride type.
+   * Create a {@link Leg} containing route data that will be used by {@link OrcaFareService} to
+   * determine the correct ride type.
    */
   private static Leg createLeg(
     String agencyId,

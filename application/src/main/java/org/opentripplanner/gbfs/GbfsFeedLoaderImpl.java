@@ -1,7 +1,5 @@
 package org.opentripplanner.gbfs;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.util.Date;
@@ -14,6 +12,9 @@ import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.cfg.EnumFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Base class for managing the state and loading of complete GBFS datasets, and updating them
@@ -25,7 +26,9 @@ public abstract class GbfsFeedLoaderImpl<
 > implements GbfsFeedLoader {
 
   private static final Logger LOG = LoggerFactory.getLogger(GbfsFeedLoaderImpl.class);
-  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+  private static final ObjectMapper OBJECT_MAPPER = JsonMapper.builder()
+    .configure(EnumFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
+    .build();
   public static final String HEADER_ETAG = "ETag";
   public static final String HEADER_IF_NONE_MATCH = "If-None-Match";
 
@@ -33,10 +36,6 @@ public abstract class GbfsFeedLoaderImpl<
   private final Map<N, GBFSFeedUpdater<?>> feedUpdaters = new HashMap<>();
   private final HttpHeaders httpHeaders;
   private final OtpHttpClient otpHttpClient;
-
-  static {
-    OBJECT_MAPPER.configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true);
-  }
 
   public GbfsFeedLoaderImpl(List<F> feeds, HttpHeaders httpHeaders, OtpHttpClient otpHttpClient) {
     this.httpHeaders = httpHeaders;
@@ -101,8 +100,8 @@ public abstract class GbfsFeedLoaderImpl<
   protected abstract <T> Class<T> classForName(N name);
 
   /**
-   * Fetches a feed with conditional request support (ETag/If-None-Match).
-   * Returns the response including status code and headers.
+   * Fetches a feed with conditional request support (ETag/If-None-Match). Returns the response
+   * including status code and headers.
    */
   private <T> T fetchFeedWithResponse(
     URI uri,

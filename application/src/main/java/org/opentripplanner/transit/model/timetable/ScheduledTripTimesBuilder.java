@@ -3,7 +3,7 @@ package org.opentripplanner.transit.model.timetable;
 import java.util.BitSet;
 import java.util.List;
 import javax.annotation.Nullable;
-import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
+import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 import org.opentripplanner.utils.time.TimeUtils;
@@ -68,8 +68,8 @@ public class ScheduledTripTimesBuilder {
   }
 
   /**
-   * Add the {@code delta} to the existing timeShift. This is useful when moving a trip
-   * from one time-zone to another.
+   * Add the {@code delta} to the existing timeShift. This is useful when moving a trip from one
+   * time-zone to another.
    */
   public ScheduledTripTimesBuilder plusTimeShift(int delta) {
     this.timeShift += delta;

@@ -7,12 +7,11 @@ import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.TemporaryEdge;
 
 /**
- * A temporary vertex which can be used as the origin(outgoing edges),  destination(incoming
- * edges) or via point(in-/out-going edges). There is no constraint on adding incoming/outgoing
- * edges. For a temporary request scoped vertex with both incoming and outgoing edges, there
- * needs to be something that excludes it from other parallel searches. One way to do this is to
- * add a small cost to the temporary edges so that the alternative permanent edges have a small
- * advantage.
+ * A temporary vertex which can be used as the origin(outgoing edges), destination(incoming edges)
+ * or via point(in-/out-going edges). There is no constraint on adding incoming/outgoing edges. For
+ * a temporary request scoped vertex with both incoming and outgoing edges, there needs to be
+ * something that excludes it from other parallel searches. One way to do this is to add a small
+ * cost to the temporary edges so that the alternative permanent edges have a small advantage.
  */
 public final class TemporaryStreetLocation extends StreetLocation implements TemporaryVertex {
 

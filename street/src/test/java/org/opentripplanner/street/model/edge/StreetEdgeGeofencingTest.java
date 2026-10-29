@@ -100,9 +100,9 @@ class StreetEdgeGeofencingTest {
     }
 
     /**
-     * When the rider starts AT the boundary vertex and traverses into a no-drop-off zone,
-     * they continue riding normally. No drop-off is offered inside the zone — the
-     * pre-traversal fork on the approach edge handles the drop-at-boundary case.
+     * When the rider starts AT the boundary vertex and traverses into a no-drop-off zone, they
+     * continue riding normally. No drop-off is offered inside the zone — the pre-traversal fork on
+     * the approach edge handles the drop-at-boundary case.
      */
     @Test
     public void continueRidingWhenStartingAtNoDropOffZoneBoundary() {
@@ -128,10 +128,10 @@ class StreetEdgeGeofencingTest {
     }
 
     /**
-     * When the rider approaches a no-drop-off zone boundary from one edge before, the
-     * pre-traversal check forks: one branch drops at the boundary vertex (outside zone),
-     * the other continues riding into the zone. The A* picks the best option based on
-     * whether the destination is inside or outside the zone.
+     * When the rider approaches a no-drop-off zone boundary from one edge before, the pre-traversal
+     * check forks: one branch drops at the boundary vertex (outside zone), the other continues
+     * riding into the zone. The A* picks the best option based on whether the destination is inside
+     * or outside the zone.
      */
     @Test
     public void forkWhenApproachingNoDropOffZone() {
@@ -163,10 +163,10 @@ class StreetEdgeGeofencingTest {
     }
 
     /**
-     * A committed rider approaching a no-traversal zone boundary forks: one branch drops
-     * the vehicle (for walking into the zone), the other continues riding (for destinations
-     * reachable without entering the zone). The fork fires on the approach edge where
-     * tov is the boundary vertex (entering=true).
+     * A committed rider approaching a no-traversal zone boundary forks: one branch drops the
+     * vehicle (for walking into the zone), the other continues riding (for destinations reachable
+     * without entering the zone). The fork fires on the approach edge where tov is the boundary
+     * vertex (entering=true).
      */
     @Test
     public void forwardNoTraversalBoundaryForksForCommittedRider() {
@@ -193,9 +193,9 @@ class StreetEdgeGeofencingTest {
     }
 
     /**
-     * The no-traversal pre-traversal should fork (drop + continue riding), not force drop.
-     * The boundary vertex V2 has outgoing edges that don't enter the zone (V2→V4). The
-     * rider should be able to continue riding from V2 toward V4 without dropping.
+     * The no-traversal pre-traversal should fork (drop + continue riding), not force drop. The
+     * boundary vertex V2 has outgoing edges that don't enter the zone (V2→V4). The rider should be
+     * able to continue riding from V2 toward V4 without dropping.
      *
      */
     @Test
@@ -247,9 +247,9 @@ class StreetEdgeGeofencingTest {
     }
 
     /**
-     * When a rider is inside a no-drop-off zone and hits a no-traversal boundary, they
-     * cannot drop (drop-off banned) and cannot continue (traversal banned). This branch
-     * is a dead end — the A* should use the branch that dropped outside the no-drop-off zone.
+     * When a rider is inside a no-drop-off zone and hits a no-traversal boundary, they cannot drop
+     * (drop-off banned) and cannot continue (traversal banned). This branch is a dead end — the A*
+     * should use the branch that dropped outside the no-drop-off zone.
      */
     @Test
     public void noTraversalBoundaryInsideNoDropOffZoneIsDeadEnd() {
@@ -267,8 +267,8 @@ class StreetEdgeGeofencingTest {
     }
 
     /**
-     * When a rider is inside a no-drop-off zone and has a no-traversal zone already in
-     * state (from a prior boundary crossing), the traversal-ban-in-state drop is blocked.
+     * When a rider is inside a no-drop-off zone and has a no-traversal zone already in state (from
+     * a prior boundary crossing), the traversal-ban-in-state drop is blocked.
      */
     @Test
     public void traversalBanInStateInsideNoDropOffZoneIsDeadEnd() {
@@ -301,8 +301,8 @@ class StreetEdgeGeofencingTest {
     }
 
     /**
-     * Same scenario but triggered by a business area exit boundary: rider is inside a
-     * no-drop-off zone and hits a business area boundary.
+     * Same scenario but triggered by a business area exit boundary: rider is inside a no-drop-off
+     * zone and hits a business area boundary.
      */
     @Test
     public void businessAreaExitInsideNoDropOffZoneIsDeadEnd() {
@@ -323,9 +323,9 @@ class StreetEdgeGeofencingTest {
     }
 
     /**
-     * Business area exit and no-drop-off zone boundary at the same edge: the rider
-     * exits the business area AND enters a no-drop-off zone during the same traversal.
-     * The business area forced-drop must check post-traversal zone state.
+     * Business area exit and no-drop-off zone boundary at the same edge: the rider exits the
+     * business area AND enters a no-drop-off zone during the same traversal. The business area
+     * forced-drop must check post-traversal zone state.
      */
     @Test
     public void businessAreaExitEnteringNoDropOffZoneIsDeadEnd() {
@@ -345,9 +345,9 @@ class StreetEdgeGeofencingTest {
     }
 
     /**
-     * When a renting state already has a no-traversal zone in {@code currentZones} (e.g., from
-     * a pickup inside the zone or a prior boundary crossing), subsequent traversals are blocked
-     * by {@code RestrictedZoneEnforcement.enforceInside}.
+     * When a renting state already has a no-traversal zone in {@code currentZones} (e.g., from a
+     * pickup inside the zone or a prior boundary crossing), subsequent traversals are blocked by
+     * {@code RestrictedZoneEnforcement.enforceInside}.
      */
     @Test
     public void forwardTraversalBanWhenZoneAlreadyInState() {
@@ -360,8 +360,8 @@ class StreetEdgeGeofencingTest {
     }
 
     /**
-     * When a rider is already inside a no-drop-off zone and approaches a second one,
-     * no fork is offered — the rider continues riding through.
+     * When a rider is already inside a no-drop-off zone and approaches a second one, no fork is
+     * offered — the rider continues riding through.
      */
     @Test
     public void noForkWhenAlreadyInsideNoDropOffZone() {
@@ -380,8 +380,8 @@ class StreetEdgeGeofencingTest {
     }
 
     /**
-     * A committed RENTING_FLOATING state at a no-drop-off boundary takes the drop/ride
-     * fork. Generic (null-network) states only exist in arrive-by searches.
+     * A committed RENTING_FLOATING state at a no-drop-off boundary takes the drop/ride fork.
+     * Generic (null-network) states only exist in arrive-by searches.
      */
     @Test
     public void committedStateForkAtNoDropOffBoundary() {
@@ -593,8 +593,8 @@ class StreetEdgeGeofencingTest {
     }
 
     /**
-     * Create a HAVE_RENTED walker state with pre-populated currentGeofencingZones,
-     * simulating an arriveBy initial state at a destination inside geofencing zones.
+     * Create a HAVE_RENTED walker state with pre-populated currentGeofencingZones, simulating an
+     * arriveBy initial state at a destination inside geofencing zones.
      */
     private State makeHaveRentedState(
       Vertex vertex,
@@ -669,8 +669,8 @@ class StreetEdgeGeofencingTest {
     }
 
     /**
-     * When a HAVE_RENTED walker has no zones in state, the arriveBy boundary fork trigger
-     * returns false (early return). Normal walking traversal occurs.
+     * When a HAVE_RENTED walker has no zones in state, the arriveBy boundary fork trigger returns
+     * false (early return). Normal walking traversal occurs.
      */
     @Test
     public void arriveByBoundaryForkNoOpWhenNoZonesInState() {
@@ -689,8 +689,8 @@ class StreetEdgeGeofencingTest {
     }
 
     /**
-     * When a walker exits one zone but remains inside another (overlapping zones),
-     * the deferred fork only creates branches for the exited zone's network.
+     * When a walker exits one zone but remains inside another (overlapping zones), the deferred
+     * fork only creates branches for the exited zone's network.
      */
     @Test
     public void deferredForkOnlyForksExitedZoneNetworks() {
@@ -734,13 +734,13 @@ class StreetEdgeGeofencingTest {
     }
 
     /**
-     * Adjacent no-drop-off zones (same network): walker exits zone A and enters zone B
-     * at the same boundary. The deferred fork should NOT create renting branches because
-     * the walker is still inside a no-drop-off zone (B) for the same network.
+     * Adjacent no-drop-off zones (same network): walker exits zone A and enters zone B at the same
+     * boundary. The deferred fork should NOT create renting branches because the walker is still
+     * inside a no-drop-off zone (B) for the same network.
      *
-     * This is the scenario that caused the Tøyen bug: the deferred fork's post-traversal
-     * veto failed because the traversed edge exited zone B, removing it from the editor's
-     * zone state. The pre-traversal veto on s0's zones catches this.
+     * This is the scenario that caused the Tøyen bug: the deferred fork's post-traversal veto
+     * failed because the traversed edge exited zone B, removing it from the editor's zone state.
+     * The pre-traversal veto on s0's zones catches this.
      */
     @Test
     public void deferredForkBlockedByAdjacentSameNetworkNoDropOffZone() {

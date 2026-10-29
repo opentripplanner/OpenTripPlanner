@@ -1,6 +1,5 @@
 package org.opentripplanner.standalone.configure;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.ext.emission.internal.DefaultEmissionRepository;
 import org.opentripplanner.ext.empiricaldelay.internal.DefaultEmpiricalDelayRepository;
 import org.opentripplanner.ext.fares.model.FareRulesData;
@@ -18,6 +17,7 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.internal.DefaultStreetRepository;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
+import tools.jackson.databind.JsonNode;
 
 /**
  * Builds the real production {@link ConstructApplicationFactory} — the same Dagger component
@@ -30,8 +30,9 @@ import org.opentripplanner.transit.model.TransitTestEnvironment;
  * That's normally fine: a test that doesn't care about vehicle parking data, for example, doesn't
  * need real vehicle parking data to exercise the DI wiring around it.
  * <p>
- * Add a {@code withRepositoryX}/{@code withTestEnvironmentX} method to the builder on a need basis,
- * when a test actually needs to override one of the other defaults — don't add one speculatively.
+ * Add a {@code withRepositoryX}/{@code withTestEnvironmentX} method to the builder on a need
+ * basis, when a test actually needs to override one of the other defaults — don't add one
+ * speculatively.
  */
 public final class TestConstructApplicationFactoryBuilder {
 
@@ -42,12 +43,14 @@ public final class TestConstructApplicationFactoryBuilder {
   }
 
   public ConstructApplicationFactory build() {
-    var transitRepository = TransitTestEnvironment.of().build().transitRepository();
+    var env = TransitTestEnvironment.of().build();
+    var transitRepository = env.transitRepository();
 
     return DaggerConstructApplicationFactory.builder()
       .configModel(new ConfigModel(OtpConfigLoader.fromString("{}")))
       .graph(new Graph())
       .transitRepository(transitRepository)
+      .scheduledTimetableData(env.scheduledTimetableData())
       .transferRepository(TransferServiceTestFactory.defaultTransferRepository())
       .worldEnvelopeRepository(new DefaultWorldEnvelopeRepository())
       .stopConsolidationRepository(null)
@@ -73,7 +76,6 @@ public final class TestConstructApplicationFactoryBuilder {
         }
       )
       .scheduledRaptorTransitData(transitRepository.getRaptorTransitData())
-      .scheduledTripCalendars(transitRepository.getTripCalendar())
       .build();
   }
 }

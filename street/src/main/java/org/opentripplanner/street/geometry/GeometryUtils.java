@@ -12,6 +12,8 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 import org.geojson.GeoJsonObject;
 import org.geojson.LngLatAlt;
+import org.geojson.MultiPolygon;
+import org.geojson.Point;
 import org.locationtech.jts.algorithm.ConvexHull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateSequence;
@@ -70,17 +72,20 @@ public class GeometryUtils {
   }
 
   public static LineString makeLineString(List<Coordinate> coordinates) {
-    GeometryFactory factory = getGeometryFactory();
-    return factory.createLineString(coordinates.toArray(new Coordinate[] {}));
+    return GF.createLineString(coordinates.toArray(new Coordinate[] {}));
   }
 
   public static LineString makeLineString(Coordinate... coordinates) {
-    GeometryFactory factory = getGeometryFactory();
-    return factory.createLineString(coordinates);
+    return GF.createLineString(coordinates);
   }
 
   public static LineString makeLineString(WgsCoordinate... coordinates) {
-    return makeLineString(Arrays.stream(coordinates).map(WgsCoordinate::asJtsCoordinate).toList());
+    var coords = new double[coordinates.length * 2];
+    for (int i = 0; i < coordinates.length; i++) {
+      coords[i * 2] = coordinates[i].longitude();
+      coords[i * 2 + 1] = coordinates[i].latitude();
+    }
+    return makeLineString(coords);
   }
 
   /// Convert an iterable of T by applying a mapping function to each element and concatenating the
@@ -99,8 +104,8 @@ public class GeometryUtils {
   /// This method also ensures that if the first coordinate of a consecutive line string is identical
   /// with the last one of the previous line string, it is only added once to the result.
   ///
-  /// For the best performance and lowest number of allocations pass in an [Iterable] rather
-  /// than a materialized [Collection].
+  /// For the best performance and lowest number of allocations pass in an [Iterable] rather than a
+  /// materialized [Collection].
   public static LineString concatenateLineStrings(Iterable<LineString> lineStrings) {
     var coordinates = new TDoubleArrayList();
 
@@ -227,8 +232,8 @@ public class GeometryUtils {
    */
   public static Geometry convertGeoJsonToJtsGeometry(GeoJsonObject geoJsonGeom)
     throws UnsupportedGeometryException {
-    if (geoJsonGeom instanceof org.geojson.Point) {
-      org.geojson.Point geoJsonPoint = (org.geojson.Point) geoJsonGeom;
+    if (geoJsonGeom instanceof Point) {
+      Point geoJsonPoint = (Point) geoJsonGeom;
       return GF.createPoint(
         new Coordinate(
           geoJsonPoint.getCoordinates().getLongitude(),
@@ -245,8 +250,8 @@ public class GeometryUtils {
         holes[i++] = GF.createLinearRing(convertPath(hole));
       }
       return GF.createPolygon(shell, holes);
-    } else if (geoJsonGeom instanceof org.geojson.MultiPolygon) {
-      org.geojson.MultiPolygon geoJsonMultiPolygon = (org.geojson.MultiPolygon) geoJsonGeom;
+    } else if (geoJsonGeom instanceof MultiPolygon) {
+      MultiPolygon geoJsonMultiPolygon = (MultiPolygon) geoJsonGeom;
       Polygon[] jtsPolygons = new Polygon[geoJsonMultiPolygon.getCoordinates().size()];
       int i = 0;
       for (List<List<LngLatAlt>> geoJsonRings : geoJsonMultiPolygon.getCoordinates()) {
@@ -328,8 +333,8 @@ public class GeometryUtils {
     }
   }
 
-  /// Returns the sum of the distances in between the pairs of coordinates in meters.
-  /// If the number of coordinates is empty or just one(a point), then `0` is returned.
+  /// Returns the sum of the distances in between the pairs of coordinates in meters. If the number
+  /// of coordinates is empty or just one(a point), then `0` is returned.
   public static double sumDistances(Coordinate[] coordinates) {
     double distance = 0;
     for (int i = 1; i < coordinates.length; i++) {
@@ -339,9 +344,9 @@ public class GeometryUtils {
   }
 
   /**
-   * Returns the sum of the distances in between the pairs of coordinates in meters.
-   * Uses the coordinate sequence directly to avoid allocating intermediate Coordinate objects.
-   * If the sequence has fewer than 2 points, {@code 0} is returned.
+   * Returns the sum of the distances in between the pairs of coordinates in meters. Uses the
+   * coordinate sequence directly to avoid allocating intermediate Coordinate objects. If the
+   * sequence has fewer than 2 points, {@code 0} is returned.
    */
   public static double sumDistances(CoordinateSequence seq) {
     double distance = 0;

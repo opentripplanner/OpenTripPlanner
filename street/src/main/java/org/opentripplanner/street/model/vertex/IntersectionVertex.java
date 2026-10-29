@@ -32,8 +32,8 @@ public abstract class IntersectionVertex extends StreetVertex {
   }
 
   /**
-   * Takes into account both traffic lights meant for pedestrians and for cars as cyclists have
-   * to obey both rules.
+   * Takes into account both traffic lights meant for pedestrians and for cars as cyclists have to
+   * obey both rules.
    */
   public boolean hasCyclingTrafficLight() {
     // return true if node has crossing or highway traffic light

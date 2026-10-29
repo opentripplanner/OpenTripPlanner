@@ -10,7 +10,6 @@ import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.model.timetable.TripTimes;
 
 public class TripTimeOnDateHelper {
 
@@ -81,7 +80,7 @@ public class TripTimeOnDateHelper {
       return List.of();
     }
     ScheduledTransitLeg transitLeg = leg.asScheduledTransitLeg();
-    TripTimes tripTimes = transitLeg.tripTimes();
+    var tripTimes = transitLeg.tripTimes();
     TripPattern tripPattern = transitLeg.tripPattern();
     Instant serviceDateMidnight = transitLeg.serviceDateMidnight();
     LocalDate serviceDate = transitLeg.serviceDate();
@@ -106,7 +105,7 @@ public class TripTimeOnDateHelper {
       return List.of();
     }
     ScheduledTransitLeg transitLeg = leg.asScheduledTransitLeg();
-    TripTimes tripTimes = transitLeg.tripTimes();
+    var tripTimes = transitLeg.tripTimes();
     TripPattern tripPattern = transitLeg.tripPattern();
     Instant serviceDateMidnight = transitLeg.serviceDateMidnight();
     LocalDate serviceDate = transitLeg.serviceDate();

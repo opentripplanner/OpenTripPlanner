@@ -2,8 +2,6 @@ package org.opentripplanner.apis.vectortiles.model;
 
 import static org.opentripplanner.utils.lang.DoubleUtils.roundTo2Decimals;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -19,6 +17,8 @@ import org.opentripplanner.framework.json.ObjectMappers;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.utils.collection.ListUtils;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Builds a Maplibre/Mapbox <a href="https://maplibre.org/maplibre-style-spec/layers/">vector tile
@@ -122,8 +122,8 @@ public class StyleBuilder {
   }
 
   /**
-   * Puts the layer into an arbitrarily defined group in the layer selector. This allows you
-   * to switch the entire group on and off.
+   * Puts the layer into an arbitrarily defined group in the layer selector. This allows you to
+   * switch the entire group on and off.
    */
   public StyleBuilder group(Group group) {
     metadata.put("group", group.label());
@@ -209,8 +209,8 @@ public class StyleBuilder {
    * The scale of the property can be any number, but the color scale is limited to be between
    * minValue and maxValue.
    * <p>
-   * minValue is displayed as a bright green and the higher the number gets, the "redder" the color
-   * becomes.
+   * minValue is displayed as a bright green and the higher the number gets, the "redder" the
+   * color becomes.
    */
   public StyleBuilder lineColorFromProperty(String propertyName, double minValue, double maxValue) {
     var multiplier = List.of(
@@ -228,8 +228,8 @@ public class StyleBuilder {
    * The scale of the property can be any positive number. RGB values (0, 255) are computed with
    * the following formula: log2(propertyValue) * logMultiplier.
    * <p>
-   * Values less than or equal to 1 is displayed as a bright green, and the higher the number gets,
-   * the "redder" the color becomes. logMultiplier controls the minimum value where the color
+   * Values less than or equal to 1 is displayed as a bright green, and the higher the number
+   * gets, the "redder" the color becomes. logMultiplier controls the minimum value where the color
    * becomes completely red, where all higher values are displayed the same.
    */
   public StyleBuilder log2LineColorFromProperty(String propertyName, double logMultiplier) {

@@ -18,6 +18,9 @@ import org.opentripplanner.ext.empiricaldelay.internal.graphbuilder.EmpiricalDel
 import org.opentripplanner.ext.flex.AreaStopsToVerticesMapper;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationModule;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
+import org.opentripplanner.ext.taxi.TaxiRepository;
+import org.opentripplanner.ext.taxi.configure.TaxiGraphBuilderModule;
+import org.opentripplanner.ext.taxi.internal.graphbuilder.TaxiGraphBuilder;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
 import org.opentripplanner.ext.vehiclerentalgeofencing.configure.VehicleRentalGeofencingModule;
 import org.opentripplanner.ext.vehiclerentalgeofencing.internal.graphbuilder.VehicleRentalGeofencingGraphBuilder;
@@ -53,6 +56,7 @@ import org.opentripplanner.street.StreetRepository;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.transfer.regular.TransferRepository;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.service.TransitRepository;
 
 @Singleton
@@ -61,6 +65,7 @@ import org.opentripplanner.transit.service.TransitRepository;
     DataOverlayParameterBindingsModule.class,
     EdgeNamerModule.class,
     EmissionGraphBuilderModule.class,
+    TaxiGraphBuilderModule.class,
     EmpiricalDelayGraphBuilderModule.class,
     VehicleRentalGeofencingModule.class,
     GraphBuilderModule.class,
@@ -97,6 +102,9 @@ public interface GraphBuilderFactory {
   EmissionGraphBuilder emissionGraphBuilder();
 
   @Nullable
+  TaxiGraphBuilder taxiGraphBuilder();
+
+  @Nullable
   EmpiricalDelayGraphBuilder empiricalDelayGraphBuilder();
 
   @Nullable
@@ -125,6 +133,9 @@ public interface GraphBuilderFactory {
 
     @BindsInstance
     Builder transitRepository(TransitRepository transitRepository);
+
+    @BindsInstance
+    Builder timetableDataImport(TimetableDataImport timetableDataImport);
 
     @BindsInstance
     Builder transferRepository(TransferRepository transferRepository);
@@ -162,6 +173,9 @@ public interface GraphBuilderFactory {
 
     @BindsInstance
     Builder emissionRepository(@Nullable EmissionRepository emissionRepository);
+
+    @BindsInstance
+    Builder taxiRepository(@Nullable TaxiRepository taxiRepository);
 
     @BindsInstance
     Builder empiricalDelayRepository(@Nullable EmpiricalDelayRepository empiricalDelayRepository);

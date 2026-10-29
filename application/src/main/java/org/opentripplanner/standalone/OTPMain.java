@@ -48,8 +48,7 @@ public class OTPMain {
   }
 
   /**
-   * ENTRY POINT: This is the main method that is called when running otp.jar from the command
-   * line.
+   * ENTRY POINT: This is the main method that is called when running otp.jar from the command line.
    */
   public static void main(String[] args) {
     try {
@@ -128,9 +127,7 @@ public class OTPMain {
 
     /* Load graph from disk if one is not present from build. */
     if (cli.doLoadGraph() || cli.doLoadStreetGraph()) {
-      SerializedGraphObject obj = SerializedGraphObject.load(loadApp.getInputGraphDataStore());
-      app = loadApp.appConstruction(obj);
-      config.updateConfigFromSerializedGraph(obj.buildConfig, obj.routerConfig);
+      app = loadGraph(loadApp, config);
       graphAvailable = true;
     } else {
       app = loadApp.appConstruction();
@@ -155,6 +152,7 @@ public class OTPMain {
         app.streetDetailsRepository(),
         app.streetRepository(),
         app.transitRepository(),
+        app.timetableDataImport(),
         app.transferRepository(),
         app.worldEnvelopeRepository(),
         app.vehicleParkingRepository(),
@@ -162,6 +160,7 @@ public class OTPMain {
         config.routerConfig(),
         DataImportIssueSummary.combine(graphBuilder.issueSummary(), app.dataImportIssueSummary()),
         app.emissionRepository(),
+        app.taxiRepository(),
         app.empiricalDelayRepository(),
         app.stopConsolidationRepository(),
         app.fareServiceFactory()
@@ -178,6 +177,18 @@ public class OTPMain {
     } else {
       LOG.info("Done building graph. Exiting.");
     }
+  }
+
+  /**
+   * Load the graph from disk and construct the application from it. The loaded {@link
+   * SerializedGraphObject} is only referenced inside this method, so the parts of it that the
+   * application does not keep can be garbage collected while the server runs.
+   */
+  private static ConstructApplication loadGraph(LoadApplication loadApp, ConfigModel config) {
+    SerializedGraphObject obj = SerializedGraphObject.load(loadApp.getInputGraphDataStore());
+    var app = loadApp.appConstruction(obj);
+    config.updateConfigFromSerializedGraph(obj.buildConfig, obj.routerConfig);
+    return app;
   }
 
   /**
@@ -227,8 +238,8 @@ public class OTPMain {
    * Shut down this server when evicted or (auto-)reloaded.
    * <ol>
    *   <li>Stop any real-time updater threads.</li>
-   *   <li>Cleanup various stuff of some used libraries (org.geotools), which depend on the
-   *   external client to call them for cleaning-up.</li>
+   *   <li>Cleanup various stuff of some used libraries (org.geotools), which depend on the external
+   *       client to call them for cleaning-up.</li>
    * </ol>
    */
   private static void registerShutdownHookToGracefullyShutDownServer(

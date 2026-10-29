@@ -122,16 +122,16 @@ public class InterlineProcessor {
     Collection<TripPattern> tripPatterns
   ) {
     /* Record which Pattern each interlined TripTimes belongs to. */
-    Map<TripTimes, TripPattern> patternForTripTimes = new HashMap<>();
+    Map<TripTimes<?>, TripPattern> patternForTripTimes = new HashMap<>();
 
     /* TripTimes grouped by the block ID of their trips. Must be a ListMultimap to allow sorting. */
-    ListMultimap<String, TripTimes> tripTimesForBlockId = ArrayListMultimap.create();
+    ListMultimap<String, TripTimes<?>> tripTimesForBlockId = ArrayListMultimap.create();
 
     LOG.info("Finding interlining trips based on block IDs.");
     for (TripPattern pattern : tripPatterns) {
       Timetable timetable = pattern.getScheduledTimetable();
       /* TODO: Block semantics seem undefined for frequency trips, so skip them? */
-      for (TripTimes tripTimes : timetable.getTripTimes()) {
+      for (TripTimes<?> tripTimes : timetable.getTripTimes()) {
         Trip trip = tripTimes.getTrip();
         if (StringUtils.hasValue(trip.getGtfsBlockId())) {
           tripTimesForBlockId.put(trip.getGtfsBlockId(), tripTimes);
@@ -148,7 +148,7 @@ public class InterlineProcessor {
     // linking them. One from trip can have multiple interline transfers if trip which interlines
     // with the from trip doesn't operate on every service date of the from trip.
     for (String blockId : tripTimesForBlockId.keySet()) {
-      List<TripTimes> blockTripTimes = tripTimesForBlockId.get(blockId);
+      List<TripTimes<?>> blockTripTimes = tripTimesForBlockId.get(blockId);
       Collections.sort(blockTripTimes);
       for (int i = 0; i < blockTripTimes.size(); i++) {
         var fromTripTimes = blockTripTimes.get(i);
@@ -185,13 +185,13 @@ public class InterlineProcessor {
    * from each other. Then creates interline between the trips.
    *
    * @return true if interline has been created or if there is an issue preventing an interline
-   * creation for certain service dates.
+   *         creation for certain service dates.
    */
   private boolean createInterline(
-    TripTimes fromTripTimes,
-    TripTimes toTripTimes,
+    TripTimes<?> fromTripTimes,
+    TripTimes<?> toTripTimes,
     String blockId,
-    Map<TripTimes, TripPattern> patternForTripTimes,
+    Map<TripTimes<?>, TripPattern> patternForTripTimes,
     Multimap<TripPatternPair, TripPair> interlines
   ) {
     if (
@@ -243,7 +243,7 @@ public class InterlineProcessor {
    * {@link #getAndCopyDaysForService(FeedScopedId)}
    *
    * @return {@link BitSet} which index starts at the first overall date of the services and the
-   * last index is the last date.
+   *         last index is the last date.
    */
   private BitSet getDaysForService(FeedScopedId serviceId) {
     BitSet daysForService = this.daysOfServices.get(serviceId);
@@ -266,7 +266,7 @@ public class InterlineProcessor {
    * it, {@link #getDaysForService(FeedScopedId)} can be used instead.
    *
    * @return {@link BitSet} which index starts at the first overall date of the services and the
-   * last index is the last date.
+   *         last index is the last date.
    */
   private BitSet getAndCopyDaysForService(FeedScopedId serviceId) {
     return (BitSet) getDaysForService(serviceId).clone();

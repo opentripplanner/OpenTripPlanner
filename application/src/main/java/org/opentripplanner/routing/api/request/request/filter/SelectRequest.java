@@ -48,7 +48,8 @@ public class SelectRequest implements Serializable {
   }
 
   /**
-   * Will return true if the pattern matches the filter and false if it doesn't match or might not match.
+   * Will return true if the pattern matches the filter and false if it doesn't match or might not
+   * match.
    */
   public boolean matchesPatternNot(TripPattern tripPattern) {
     return matchesPattern(tripPattern, false);
@@ -57,7 +58,7 @@ public class SelectRequest implements Serializable {
   /**
    * Matches the select clause of a transit filter request.
    */
-  public boolean matchesSelect(TripTimes tripTimes) {
+  public boolean matchesSelect(TripTimes<?> tripTimes) {
     var trip = tripTimes.getTrip();
 
     return (
@@ -73,7 +74,7 @@ public class SelectRequest implements Serializable {
   /**
    * Matches the not clause of a transit filter request.
    */
-  public boolean matchesNot(TripTimes tripTimes) {
+  public boolean matchesNot(TripTimes<?> tripTimes) {
     var trip = tripTimes.getTrip();
     return (
       this.transportModeFilter != null &&

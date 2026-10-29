@@ -25,12 +25,14 @@ import org.opentripplanner.street.geometry.Polygons;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
+import org.opentripplanner.street.search.state.State;
 
 /**
  * Integration test for geofencing zone enforcement with floating scooter rentals.
@@ -206,10 +208,11 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
       .withTo(T_DEST)
       .getShortestPathTree();
 
-    var path = tree.getPath(T_ORIGIN);
-    assertNotNull(path, "arriveBy should find a path");
+    var state = tree.getState(T_ORIGIN);
+    assertNotNull(state, "arriveBy should find a path");
 
-    var descriptor = path.states
+    var descriptor = new StreetPath(state)
+      .states()
       .stream()
       .filter(s -> s.getBackEdge() != null)
       .map(s -> formatState(s))
@@ -328,8 +331,8 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
   }
 
   /**
-   * ArriveBy with adjacent no-drop-off zones (same network). Destination inside zone A,
-   * zone B is adjacent. Drop-off must happen outside BOTH zones.
+   * ArriveBy with adjacent no-drop-off zones (same network). Destination inside zone A, zone B is
+   * adjacent. Drop-off must happen outside BOTH zones.
    *
    * <pre>
    *   T_origin -- A -- B(scooter) -- C -- D -- E -- T_dest
@@ -412,10 +415,11 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
       .withTo(T_DEST)
       .getShortestPathTree();
 
-    var path = tree.getPath(T_ORIGIN);
-    assertNotNull(path, "arriveBy should find a path");
+    var state = tree.getState(T_ORIGIN);
+    assertNotNull(state, "arriveBy should find a path");
 
-    var descriptor = path.states
+    var descriptor = new StreetPath(state)
+      .states()
       .stream()
       .filter(s -> s.getBackEdge() != null)
       .map(this::formatState)
@@ -472,9 +476,9 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
   }
 
   /**
-   * Business area: origin and scooter inside BA, destination outside.
-   * Forward: rider should drop off at BA boundary (C), walk C→D→E→dest.
-   * Rider must NOT be RENTING_FLOATING on DE or E→dest edges (outside BA).
+   * Business area: origin and scooter inside BA, destination outside. Forward: rider should drop
+   * off at BA boundary (C), walk C→D→E→dest. Rider must NOT be RENTING_FLOATING on DE or E→dest
+   * edges (outside BA).
    *
    * <pre>
    *   T_origin --- A --- B(scooter) --- C --- D --- E --- T_dest
@@ -528,8 +532,8 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
   }
 
   /**
-   * Business area arrive-by: destination outside BA. The search should find a path that
-   * drops off inside the BA and walks to destination — NOT ride to destination and drop outside.
+   * Business area arrive-by: destination outside BA. The search should find a path that drops off
+   * inside the BA and walks to destination — NOT ride to destination and drop outside.
    */
   @Test
   public void arriveBySearchDropsOffInsideBusinessArea() {
@@ -592,10 +596,11 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
       .withTo(T_DEST)
       .getShortestPathTree();
 
-    var path = tree.getPath(T_ORIGIN);
-    assertNotNull(path, "arriveBy should find a path");
+    var state = tree.getState(T_ORIGIN);
+    assertNotNull(state, "arriveBy should find a path");
 
-    var arriveBy = path.states
+    var arriveBy = new StreetPath(state)
+      .states()
       .stream()
       .filter(s -> s.getBackEdge() != null)
       .map(this::formatState)
@@ -655,19 +660,20 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
       .withTo(to)
       .getShortestPathTree();
 
-    var path = tree.getPath(arriveBy ? from : to);
-    if (path == null) {
+    var state = tree.getState(arriveBy ? from : to);
+    if (state == null) {
       return null;
     }
 
-    return path.states
+    return new StreetPath(state)
+      .states()
       .stream()
       .filter(s -> s.getBackEdge() != null)
       .map(this::formatState)
       .collect(Collectors.toList());
   }
 
-  private String formatState(org.opentripplanner.street.search.state.State s) {
+  private String formatState(State s) {
     return String.format(
       Locale.ROOT,
       "%s - %s - %s (%,.2f, %d) zones=%s",

@@ -12,13 +12,13 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * The purpose of this class is to hold all parameters and their value in a map. It also contains
  * logic for mapping between the data overlay domain and the API. The purpose is to provide a
  * standardized naming scheme for the parameters. The data overlay can be configured to use any kind
- * of parameters, so if you do not find the parameter you want (e.g. snow_depth) in the {@link
- * ParameterName}, then request your parameter to be added.
+ * of parameters, so if you do not find the parameter you want (e.g. snow_depth) in the
+ * {@link ParameterName}, then request your parameter to be added.
  * <p>
- * This class contain helper logic to convert parameters to and from a string representation used by
- * the APIs(the REST API is the only supported API). The parameter string format is:
+ * This class contain helper logic to convert parameters to and from a string representation used
+ * by the APIs(the REST API is the only supported API). The parameter string format is:
  * <p>
- * [{@link ParameterName}] {@code + ' ' +} [{@link ParameterType}]   (lower case is used)
+ * [{@link ParameterName}] {@code + ' ' +} [{@link ParameterType}] (lower case is used)
  * <p>
  * When parameters are parsed the case is ignored.
  * <p>
@@ -52,7 +52,8 @@ public class DataOverlayParameters implements Serializable {
   /**
    * List all parameters supported as stings. The format is:
    * <p>
-   * [{@link ParameterName}] {@code + ' ' +} [{@link ParameterType}]   (lower case is used)  <p>
+   * [{@link ParameterName}] {@code + ' ' +} [{@link ParameterType}] (lower case is used)
+   * <p>
    * Example:
    * <pre>
    * carbon_monoxide_threshold

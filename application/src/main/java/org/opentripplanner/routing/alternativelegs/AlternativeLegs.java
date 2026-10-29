@@ -31,9 +31,9 @@ import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 /**
- * A helper class to fetch previous/next alternative legs for a scheduled transit leg.
- * The replacement legs arrive/depart from/to the same station as the original leg, but uses other
- * trips for the leg.
+ * A helper class to fetch previous/next alternative legs for a scheduled transit leg. The
+ * replacement legs arrive/depart from/to the same station as the original leg, but uses other trips
+ * for the leg.
  *
  * Generalized cost and constrained transfers are not included in the alternative legs.
  */
@@ -116,6 +116,7 @@ public class AlternativeLegs {
 
   /**
    * This has been copied and slightly modified from StopTimesHelper.
+   * <p>
    * TODO: Adapt after new transit model is in place
    */
   private static Stream<ScheduledTransitLeg> generateLegs(
@@ -158,7 +159,7 @@ public class AlternativeLegs {
 
       var servicesRunning = transitService.getServiceCodesRunningForDate(serviceDate);
 
-      for (TripTimes tripTimes : timetable.getTripTimes()) {
+      for (TripTimes<?> tripTimes : timetable.getTripTimes()) {
         if (!servicesRunning.contains(tripTimes.getServiceCode())) {
           continue;
         }
@@ -213,7 +214,7 @@ public class AlternativeLegs {
     TransitService transitService
   ) {
     LocalDate serviceDay = tripTimeOnDate.getServiceDay();
-    TripTimes tripTimes = tripTimeOnDate.getTripTimes();
+    var tripTimes = tripTimeOnDate.getTripTimes();
 
     ZonedDateTime boardingTime = ServiceDateUtils.toZonedDateTime(
       serviceDay,

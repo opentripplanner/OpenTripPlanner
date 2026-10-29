@@ -4,14 +4,14 @@ import dagger.Module;
 import dagger.Provides;
 import jakarta.inject.Singleton;
 import javax.annotation.Nullable;
-import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
+import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayRepository;
 import org.opentripplanner.ext.empiricaldelay.internal.graphbuilder.EmpiricalDelayGraphBuilder;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.standalone.config.BuildConfig;
-import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 
 @Module
 public class EmpiricalDelayGraphBuilderModule {
@@ -23,7 +23,7 @@ public class EmpiricalDelayGraphBuilderModule {
     GraphBuilderDataSources dataSources,
     BuildConfig config,
     @Nullable EmpiricalDelayRepository empiricalDelayRepository,
-    TransitRepository transitRepository,
+    TimetableDataImport timetableDataImport,
     DataImportIssueStore issueStore,
     DeduplicatorService deduplicator
   ) {
@@ -37,7 +37,7 @@ public class EmpiricalDelayGraphBuilderModule {
       issueStore,
       config.empiricalDelay,
       empiricalDelayRepository,
-      transitRepository
+      timetableDataImport
     );
   }
 }

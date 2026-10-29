@@ -13,27 +13,21 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 /**
  * Use this class to configure Raptor Event Debugging. There are two ways to debug:
  * <ol>
- *     <li>
- *         Add a list of stops, and Raptor will print all events for these stops. This can be
- *         a bit overwhelming so using the path option might be a better option.
- *     </li>
- *     <li>
- *         Add a path (also a list of stops), and Raptor will print all events on the path.
- *         So if you arrive at a stop listed, but have not followed the exact same path of
- *         stops, then the event is NOT listed. Note! there are events for dropping an accepted
- *         path. If an none matching path dominate a matching path, then both paths are logged
- *         as part of the event.
- * <p>
- *         You may also specify the first stop in the path to start logging events for. For example
- *         given the path {@code [1010, 1183, 3211, 492]}, then you may know, that you can get to
- *         stop 2 without any problems. So, to avoid getting spammed by logging events at the first
- *         two stops, you set the stop index 3211 as the first stop to print events for. This is
- *         done by adding an {@code *} to the stop: {@code [1010,1183,3211*,492]}.
- *     </li>
- *     To list stops you need to know the Raptor stop index. Enable log {@code level="debug"} for
- *     the {@code org.opentripplanner.raptor} package to list all paths found by Raptor.
- *     The paths will contain the stop index. For paths not listed you will have to do some
- *     research.
+ *   <li>Add a list of stops, and Raptor will print all events for these stops. This can be a bit
+ *       overwhelming so using the path option might be a better option.</li>
+ *   <li>Add a path (also a list of stops), and Raptor will print all events on the path. So if you
+ *       arrive at a stop listed, but have not followed the exact same path of stops, then the event is
+ *       NOT listed. Note! there are events for dropping an accepted path. If an none matching path
+ *       dominate a matching path, then both paths are logged as part of the event.
+ *       <p>
+ *       You may also specify the first stop in the path to start logging events for. For example given
+ *       the path {@code [1010, 1183, 3211, 492]}, then you may know, that you can get to stop 2 without
+ *       any problems. So, to avoid getting spammed by logging events at the first two stops, you set the
+ *       stop index 3211 as the first stop to print events for. This is done by adding an {@code *} to the
+ *       stop: {@code [1010,1183,3211*,492]}.</li>
+ *       To list stops you need to know the Raptor stop index. Enable log {@code level="debug"} for the
+ *       {@code org.opentripplanner.raptor} package to list all paths found by Raptor. The paths will
+ *       contain the stop index. For paths not listed you will have to do some research.
  * </ol>
  */
 public class DebugRaptor implements Serializable {

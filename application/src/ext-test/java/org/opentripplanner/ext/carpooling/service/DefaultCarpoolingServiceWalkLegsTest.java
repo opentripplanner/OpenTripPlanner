@@ -4,7 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.ext.carpooling.CarpoolBookingUrlTestData.expectedAugmentedUrl;
+import static org.opentripplanner.ext.carpooling.CarpoolBookingUrlTestData.bookingUrlTemplate;
+import static org.opentripplanner.ext.carpooling.CarpoolBookingUrlTestData.expectedExpandedUrl;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -29,9 +30,8 @@ import org.opentripplanner.transit.model.organization.ContactInfo;
 /**
  * Integration tests that exercise the walk-to/from-carpool behavior added to
  * {@link DefaultCarpoolingService}. The graph places the passenger's origin and destination on
- * pedestrian-only edges, so the snapper must find a nearby car-reachable vertex and the
- * resulting itinerary must contain leading and trailing WALK {@link StreetLeg}s around the
- * carpool leg.
+ * pedestrian-only edges, so the snapper must find a nearby car-reachable vertex and the resulting
+ * itinerary must contain leading and trailing WALK {@link StreetLeg}s around the carpool leg.
  *
  * <pre>
  *   A ====== B ============= C ====== D          (=  biStreet: car + ped)
@@ -44,18 +44,18 @@ import org.opentripplanner.transit.model.organization.ContactInfo;
  *   <li>{@code A} — carpool trip origin (where the driver starts).
  *   <li>{@code D} — carpool trip destination (where the driver ends).
  *   <li>{@code B} — drivable mid-route intersection nearest to the passenger's origin; the snapper
- *       resolves it as the car-reachable pickup vertex because {@code P} sits on a
- *       pedestrian-only side branch the car cannot enter.
+ *       resolves it as the car-reachable pickup vertex because {@code P} sits on a pedestrian-only side
+ *       branch the car cannot enter.
  *   <li>{@code C} — drivable mid-route intersection nearest to the passenger's destination; the
  *       snapper resolves it as the car-reachable dropoff vertex for the same reason.
- *   <li>{@code P} — passenger origin, off the drivable network on a pedestrian-only side branch
- *       from B.
- *   <li>{@code Q} — passenger destination, off the drivable network on a pedestrian-only side
- *       branch from C.
+ *   <li>{@code P} — passenger origin, off the drivable network on a pedestrian-only side branch from
+ *       B.
+ *   <li>{@code Q} — passenger destination, off the drivable network on a pedestrian-only side branch
+ *       from C.
  * </ul>
  *
- * The expected itinerary therefore walks {@code P → B}, drives {@code B → C} as a carpool leg,
- * and walks {@code C → Q}.
+ * The expected itinerary therefore walks {@code P → B}, drives {@code B → C} as a carpool leg, and
+ * walks {@code C → Q}.
  */
 class DefaultCarpoolingServiceWalkLegsTest extends GraphRoutingTest {
 
@@ -257,11 +257,10 @@ class DefaultCarpoolingServiceWalkLegsTest extends GraphRoutingTest {
   }
 
   /**
-   * Verifies that {@code from_coordinate} / {@code to_coordinate} on the booking URL reference the
-   * carpool boarding/alighting vertices (B and C — where the passenger actually gets in and out
-   * of the car) and NOT the passenger's walking endpoints (P and Q). This is the case the user's
-   * spec explicitly called out: the coordinates must not be where the passenger starts/finishes
-   * walking.
+   * Verifies that the {@code {from}} / {@code {to}} placeholders on the booking URL expand to the
+   * carpool boarding/alighting vertices (B and C — where the passenger actually gets in and out of
+   * the car) and NOT the passenger's walking endpoints (P and Q). This is the case the user's spec
+   * explicitly called out: the coordinates must not be where the passenger starts/finishes walking.
    */
   @Test
   void walkLegItinerary_bookingUrlUsesCarpoolBoardingPoints_notPassengerWalkEndpoints() {
@@ -273,7 +272,7 @@ class DefaultCarpoolingServiceWalkLegsTest extends GraphRoutingTest {
     );
     var trip = new CarpoolTripBuilder(baseTrip)
       .withPublicContactInformation(
-        ContactInfo.of().withBookingUrl("https://book.example.com").build()
+        ContactInfo.of().withBookingUrl(bookingUrlTemplate("https://book.example.com")).build()
       )
       .build();
     context.upsertTrip(trip);
@@ -286,7 +285,7 @@ class DefaultCarpoolingServiceWalkLegsTest extends GraphRoutingTest {
     assertNotNull(bookingInfo);
 
     assertEquals(
-      expectedAugmentedUrl("https://book.example.com", B_COORD, C_COORD),
+      expectedExpandedUrl("https://book.example.com", B_COORD, C_COORD),
       bookingInfo.getContactInfo().getBookingUrl()
     );
   }

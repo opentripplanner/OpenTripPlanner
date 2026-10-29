@@ -10,12 +10,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
 import java.util.function.Predicate;
-import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
+import org.opentripplanner.core.framework.transaction.internal.TransactionFactory;
+import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
+import org.opentripplanner.core.model.transaction.RepositoryHandle;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.framework.transaction.TimetableSnapshotParameters;
-import org.opentripplanner.framework.transaction.api.RepositoryHandle;
-import org.opentripplanner.framework.transaction.internal.TransactionFactory;
 import org.opentripplanner.gbfs.network.GbfsNetworkOverrides;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
@@ -41,6 +42,7 @@ import org.opentripplanner.standalone.config.routerconfig.RaptorEnvironmentFacto
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.repository.TimetableRepositoryLifecycle;
@@ -92,6 +94,7 @@ public class SpeedTest {
     RouterConfig routerConfig,
     Graph graph,
     TransitRepository transitRepository,
+    TimetableDataImport timetableDataImport,
     TransferRepository transferRepository
   ) {
     this.opts = opts;
@@ -111,9 +114,12 @@ public class SpeedTest {
     this.expectedResultsByTcId = tcIO.readExpectedResults();
 
     TransitTuningParameters tuningParameters = routerConfig.transitTuningConfig();
+    // Converted once, as on server startup, and shared by the Raptor mapping and the services
+    var scheduledTimetableData = timetableDataImport.toScheduledTimetableData();
     var scheduledRaptorData = RaptorTransitDataMapper.map(
       tuningParameters,
       transitRepository,
+      scheduledTimetableData,
       transferRepository
     );
 
@@ -123,7 +129,7 @@ public class SpeedTest {
     var registry = TransactionFactory.createRepositoryRegistry();
     var timetableSnapshot = new DefaultTimetableRepository(
       new RaptorTransitData(transitRepository.getRaptorTransitData()),
-      transitRepository.getTripCalendar()
+      scheduledTimetableData
     );
     RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableHandle =
       registry.registerRepositorySnapshot(
@@ -138,7 +144,7 @@ public class SpeedTest {
       new DefaultRealtimeVehicleRepository(),
       new RealtimeVehicleRepositoryLifecycle()
     );
-    var threadFactory = java.util.concurrent.Executors.defaultThreadFactory();
+    var threadFactory = Executors.defaultThreadFactory();
     var transitUpdateManager = TransactionFactory.createUpdateManagerWithPeriodicCommits(
       "speedtest",
       registry,
@@ -159,6 +165,10 @@ public class SpeedTest {
       new DefaultVehicleRentalRepository(),
       new DefaultVehicleParkingRepository(),
       transitRepository,
+      new DefaultTransitService(
+        transitRepository,
+        DefaultTimetableRepository.scheduledOnly(scheduledTimetableData)
+      ),
       // The speed test does not enable the CarPooling feature, so it supplies neither a carpooling
       // repository nor a resolver.
       null,
@@ -187,6 +197,7 @@ public class SpeedTest {
       transitRepository,
       timetableHandle.repositorySnapshot(transactionScope)
     );
+
     this.routingService = new DefaultRoutingService(
       this.transitService,
       graph,
@@ -205,9 +216,11 @@ public class SpeedTest {
       null,
       null,
       null,
+      null,
       TestServerContext.createLinkingContextFactory(graph, vertexLinker, this.transitService),
       routerConfig.transitTuningConfig(),
-      routerConfig.transitTuningConfig()
+      routerConfig.transitTuningConfig(),
+      null
     );
 
     initializeTransferCache(routerConfig.transitTuningConfig(), transitRepository);
@@ -229,6 +242,7 @@ public class SpeedTest {
       OtpStartupInfo.logInfo("Run Speed Test");
       var model = SetupHelper.loadGraph(opts.rootDir(), config.graph());
       var transitRepository = model.transitRepository();
+      var timetableDataImport = model.timetableDataImport();
       var transferRepository = model.transferRepository();
       var buildConfig = model.buildConfig();
       var graph = model.graph();
@@ -240,6 +254,7 @@ public class SpeedTest {
         routerConfig,
         graph,
         transitRepository,
+        timetableDataImport,
         transferRepository
       );
 
@@ -387,8 +402,8 @@ public class SpeedTest {
 
   /**
    * Save the result for the last sample run for each profile. Nothing happens if not all test-cases
-   * are run. This prevents the excluded tests-cases in the result file to be deleted, and the result
-   * to be copied to the expected-results file by mistake.
+   * are run. This prevents the excluded tests-cases in the result file to be deleted, and the
+   * result to be copied to the expected-results file by mistake.
    */
   private void saveTestCasesToResultFile() {
     for (var p : opts.profiles()) {

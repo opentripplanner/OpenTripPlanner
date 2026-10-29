@@ -31,6 +31,8 @@ import static org.opentripplanner.ext.carpooling.model.CarpoolTrip.DEFAULT_TOTAL
 import java.time.Duration;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import uk.org.siri.siri21.EstimatedCall;
 
 public class CarpoolSiriMapperTest {
@@ -312,11 +314,42 @@ public class CarpoolSiriMapperTest {
     assertEquals("https://example.com/book", mapped.publicContactInformation().getBookingUrl());
   }
 
+  /** A template reaches the trip as published: validation must not expand its placeholders. */
+  @Test
+  void mapSiriToCarpoolTrip_withBookingUrlTemplate_keepsThePlaceholdersVerbatim() {
+    var template = "https://example.com/book?pickup={from}&dropoff={to}";
+    var mapped = mapper.mapSiriToCarpoolTrip(journeyWithPublicContact(null, template));
+
+    assertNotNull(mapped.publicContactInformation());
+    assertEquals(template, mapped.publicContactInformation().getBookingUrl());
+  }
+
   @Test
   void mapSiriToCarpoolTrip_withoutPublicContact_contactInformationIsNull() {
     var journey = minimalCompleteJourney();
     var mapped = mapper.mapSiriToCarpoolTrip(journey);
 
+    assertNull(mapped.publicContactInformation());
+  }
+
+  /** An unusable URL costs the trip its URL and nothing more. */
+  @ParameterizedTest
+  @ValueSource(strings = { "https://example.com/book?pickup={From}", "https://example.com/a b" })
+  void mapSiriToCarpoolTrip_withUnusableBookingUrl_dropsTheUrl(String bookingUrl) {
+    var mapped = mapper.mapSiriToCarpoolTrip(journeyWithPublicContact("+4712345678", bookingUrl));
+
+    assertNotNull(mapped.publicContactInformation());
+    assertNull(mapped.publicContactInformation().getBookingUrl());
+    assertEquals("+4712345678", mapped.publicContactInformation().getPhoneNumber());
+  }
+
+  /** A trip whose only contact channel is an unusable URL is kept, without contact details. */
+  @Test
+  void mapSiriToCarpoolTrip_withOnlyAnUnusableBookingUrl_contactInformationIsNull() {
+    var journey = journeyWithPublicContact(null, "https://example.com/a b");
+    var mapped = mapper.mapSiriToCarpoolTrip(journey);
+
+    assertNotNull(mapped);
     assertNull(mapped.publicContactInformation());
   }
 }

@@ -69,6 +69,7 @@ public enum OTPFeature {
    * take according to OSM data, for example if you want to set a very low transfer time like 1
    * minute, when walking the distance take 1m30s.
    *
+   * <p>
    * TODO Harmonize the JavaDoc with the user doc and delete JavaDoc
    */
   MinimumTransferTimeIsDefinitive(
@@ -130,6 +131,7 @@ public enum OTPFeature {
   ),
   CarPooling(false, true, "Enable the carpooling sandbox module."),
   Emission(false, true, "Enable the emission sandbox module."),
+  TaxiRouting(false, true, "Enable the taxi routing sandbox module."),
   EmpiricalDelay(false, true, "Enable empirical delay sandbox module."),
   DataOverlay(
     false,

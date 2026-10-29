@@ -63,7 +63,7 @@ public class DirectStreetRouter {
       );
       var paths = gpFinder.find(request, linkingContext);
 
-      // Convert the internal GraphPaths to itineraries
+      // Convert the internal StreetPaths to itineraries
       final StreetPathToLegsMapper streetPathToLegsMapper = new StreetPathToLegsMapper(
         new TransitServiceResolver(transitService),
         transitService.getTimeZone(),
@@ -105,8 +105,8 @@ public class DirectStreetRouter {
   }
 
   /**
-   * Calculates the maximum distance in meters based on the maxDirectStreetDuration and the
-   * fastest mode available. This assumes that it is not possible to exceed the speed defined in the
+   * Calculates the maximum distance in meters based on the maxDirectStreetDuration and the fastest
+   * mode available. This assumes that it is not possible to exceed the speed defined in the
    * RouteRequest.
    */
   private static double calculateDistanceMaxLimit(RouteRequest request, float maxCarSpeed) {

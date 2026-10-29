@@ -116,8 +116,8 @@ public class ItineraryListFilterChainBuilder {
    * The maximum number of itineraries returned. This will remove all itineraries at the end of the
    * list AFTER the final sort of the itineraries.
    * <p>
-   * Se also the {@link #withMaxNumberOfItinerariesCropSection(ListSection)} to change which end of the
-   * list is cropped.
+   * Se also the {@link #withMaxNumberOfItinerariesCropSection(ListSection)} to change which end
+   * of the list is cropped.
    * <p>
    * Use {@code -1} to disable.
    */
@@ -155,11 +155,12 @@ public class ItineraryListFilterChainBuilder {
 
   /**
    * The given parameters is used to compare all itineraries with each other, dropping itineraries
-   * with a high relative cost. The limit is applied to itineraries with at least one transit
-   * leg. Street-only itineraries are not considered.
+   * with a high relative cost. The limit is applied to itineraries with at least one transit leg.
+   * Street-only itineraries are not considered.
    * <p>
-   * For all pairs {code (i1, i2)} in the set of returned itineraries, a generalized cost limit is
-   * computed. If the generalized-cost of i1 is less then the generalized-cost of i2, i2 is dropped if:
+   * For all pairs {code (i1, i2)} in the set of returned itineraries, a generalized cost limit
+   * is computed. If the generalized-cost of i1 is less then the generalized-cost of i2, i2 is
+   * dropped if:
    * <pre>
    * t0 := is the time between i1 and i2.
    *
@@ -167,6 +168,7 @@ public class ItineraryListFilterChainBuilder {
    *
    * i2 is dropped if i2.generalized-cost is greater than the limit.
    * </pre>
+   *
    * @param transitGeneralizedCostFilterParams container for costFactor, minimumCostDifference and
    *                                           itineraryIntervalRelaxFactor
    */
@@ -178,8 +180,9 @@ public class ItineraryListFilterChainBuilder {
   }
 
   /**
-   * This is a bit similar to {@link #withTransitGeneralizedCostLimit(TransitGeneralizedCostFilterParams)},
-   * with a few important differences.
+   * This is a bit similar to
+   * {@link #withTransitGeneralizedCostLimit(TransitGeneralizedCostFilterParams)}, with a few
+   * important differences.
    * <p>
    * This function is used to compute a max-limit for generalized-cost. The limit is applied to
    * itineraries with no transit legs, however ALL itineraries (including those with transit legs)
@@ -234,8 +237,8 @@ public class ItineraryListFilterChainBuilder {
   }
 
   /**
-   * A transit itinerary with higher generalized-cost than a walk-only itinerary is silly. This filter removes such
-   * itineraries.
+   * A transit itinerary with higher generalized-cost than a walk-only itinerary is silly. This
+   * filter removes such itineraries.
    * <p>
    * This filter only have an effect, if a walk-all-the-way itinerary exist.
    */
@@ -245,8 +248,8 @@ public class ItineraryListFilterChainBuilder {
   }
 
   /**
-   * This will NOT delete itineraries, but tag them as deleted using the {@link
-   * Itinerary#systemNotices()}.
+   * This will NOT delete itineraries, but tag them as deleted using the
+   * {@link Itinerary#systemNotices()}.
    */
   public ItineraryListFilterChainBuilder withDebugEnabled(ItineraryFilterDebugProfile value) {
     this.debug = value;
@@ -255,9 +258,8 @@ public class ItineraryListFilterChainBuilder {
 
   /**
    * Set the search window for the current request. This is used to filter out itineraries outside
-   * the search window. The filter uses the itinerary-departure-time. The filter is ignored if
-   * both arguments are {@code null}, the searchWindow is required if the earliestDepartureTime is
-   * set.
+   * the search window. The filter uses the itinerary-departure-time. The filter is ignored if both
+   * arguments are {@code null}, the searchWindow is required if the earliestDepartureTime is set.
    */
   public ItineraryListFilterChainBuilder withSearchWindow(
     @Nullable Instant earliestDepartureTime,
@@ -272,8 +274,8 @@ public class ItineraryListFilterChainBuilder {
   }
 
   /**
-   * The Paging module (the subscriber) needs information from the itinerary filtering for use
-   * with next/previous requests. This method is used to register a callback to avoid circular
+   * The Paging module (the subscriber) needs information from the itinerary filtering for use with
+   * next/previous requests. This method is used to register a callback to avoid circular
    * dependencies between the paging module and the itinerary-filter-chain.
    */
   public ItineraryListFilterChainBuilder withPageCursorInputSubscriber(
@@ -308,8 +310,7 @@ public class ItineraryListFilterChainBuilder {
   }
 
   /**
-   * Adjust filters to include multi-criteria parameter c2 and treat it as the
-   * transit-group.
+   * Adjust filters to include multi-criteria parameter c2 and treat it as the transit-group.
    */
   public ItineraryListFilterChainBuilder withTransitGroupPriority() {
     this.transitGroupPriorityUsed = true;
@@ -572,8 +573,8 @@ public class ItineraryListFilterChainBuilder {
 
   /**
    * These filters will group the itineraries by the main-legs and reduce the number of itineraries
-   * in each group. The main legs are the legs that together constitute more than a given
-   * percentage of the total travel distance.
+   * in each group. The main legs are the legs that together constitute more than a given percentage
+   * of the total travel distance.
    * <p>
    * Each group is filtered using generalized-cost, keeping only the itineraries with the lowest
    * cost. If there is a tie, the filter look at the number-of-transfers as a tiebreaker.

@@ -19,9 +19,10 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
  * Information given to the GraphBuilder about how to assign permissions, safety values, names, etc.
  * to edges based on OSM tags.
  * <p>
- * WayPropertyPickers, CreativeNamePickers, SlopeOverridePickers, and SpeedPickers are applied to ways based on how well
- * their OSMSpecifiers match a given OSM way. Generally one OSMSpecifier will win out over all the others based on the
- * number of exact, partial, and wildcard tag matches. See OSMSpecifier for more details on the matching process.
+ * WayPropertyPickers, CreativeNamePickers, SlopeOverridePickers, and SpeedPickers are applied to
+ * ways based on how well their OSMSpecifiers match a given OSM way. Generally one OSMSpecifier will
+ * win out over all the others based on the number of exact, partial, and wildcard tag matches. See
+ * OSMSpecifier for more details on the matching process.
  */
 public class WayPropertySet {
 
@@ -211,8 +212,9 @@ public class WayPropertySet {
     Float speed = null;
     Float currentSpeed;
 
-    if (way.hasTag("maxspeed:motorcar")) {
-      speed = SpeedParser.getMetersSecondFromSpeed(way.getTag("maxspeed:motorcar"));
+    var motorCar = way.getTag("maxspeed:motorcar");
+    if (motorCar != null) {
+      speed = SpeedParser.getMetersSecondFromSpeed(motorCar);
     }
 
     if (speed == null && direction == FORWARD && way.hasTag("maxspeed:forward")) {
@@ -234,8 +236,9 @@ public class WayPropertySet {
       }
     }
 
-    if (way.hasTag("maxspeed") && speed == null) {
-      speed = SpeedParser.getMetersSecondFromSpeed(way.getTag("maxspeed"));
+    var maxSpeed = way.getTag("maxspeed");
+    if (maxSpeed != null && speed == null) {
+      speed = SpeedParser.getMetersSecondFromSpeed(maxSpeed);
     }
 
     if (speed != null) {

@@ -11,12 +11,13 @@ import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.service.TransitRepository;
 
 /**
  * This test makes sure that one of the example feeds in the GTFS-Flex repo works. It's the City of
- * Aspen Downtown taxi service, which is a completely unscheduled trip that takes you door-to-door in
- * the city.
+ * Aspen Downtown taxi service, which is a completely unscheduled trip that takes you door-to-door
+ * in the city.
  * <p>
  * It only contains a single stop time which in GTFS static would not work but is valid in GTFS
  * Flex.
@@ -24,16 +25,18 @@ import org.opentripplanner.transit.service.TransitRepository;
 class GtfsFlexTest {
 
   private static TransitRepository transitRepository;
+  private static TimetableDataImport timetableDataImport;
 
   @BeforeAll
   static void setup() {
     TestOtpModel model = FlexIntegrationTestData.aspenGtfs();
     transitRepository = model.transitRepository();
+    timetableDataImport = model.timetableDataImport();
   }
 
   @Test
   void parseAspenTaxiAsUnscheduledTrip() {
-    var flexTrips = transitRepository.getAllFlexTrips();
+    var flexTrips = timetableDataImport.getAllFlexTrips();
     assertFalse(flexTrips.isEmpty());
     assertEquals(
       Set.of("t_1289262_b_29084_tn_0", "t_1289257_b_28352_tn_0"),
@@ -48,6 +51,6 @@ class GtfsFlexTest {
 
   @Test
   void shouldGeneratePatternForFlexTripWithSingleStop() {
-    assertFalse(transitRepository.getAllTripPatterns().isEmpty());
+    assertFalse(timetableDataImport.getAllTripPatterns().isEmpty());
   }
 }

@@ -2,17 +2,16 @@ package org.opentripplanner.updater.trip.gtfs;
 
 import java.time.LocalDate;
 import java.util.function.Supplier;
-import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
+import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.transit.repository.TimetableRepository;
-import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
-import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.trip.patterncache.TripPatternCache;
 import org.opentripplanner.updater.trip.patterncache.TripPatternIdGenerator;
 
 /**
  * Application-scoped factory for GTFS-RT trip update processing. Holds stable, application-lifetime
- * state and produces a per-task {@link GtfsRealTimeUpdateHandler} via {@link #forUpdate(TimetableRepository)}.
+ * state and produces a per-task {@link GtfsRealTimeUpdateHandler} via
+ * {@link #forUpdate(TimetableRepository)}.
  */
 public class GtfsRealTimeTripUpdateAdapter {
 
@@ -38,20 +37,18 @@ public class GtfsRealTimeTripUpdateAdapter {
   }
 
   /**
-   * Create an update-scoped task for applying GTFS-RT trip updates. The task holds sub-handlers
-   * backed by a {@link TransitService} constructed from
-   * the given buffer, so all pattern and trip lookups within the task see in-progress real-time
-   * additions.
+   * Create an update-scoped task for applying GTFS-RT trip updates. Entity lookups within the
+   * task go directly against the given mutable buffer (which falls back to scheduled data), so
+   * they see in-progress real-time additions not yet committed to a published snapshot.
    */
   public GtfsRealTimeUpdateHandler forUpdate(TimetableRepository buffer) {
-    var transitService = new DefaultTransitService(transitRepository, buffer);
     return new GtfsRealTimeUpdateHandler(
       buffer,
       localDateNow,
-      new ScheduledTripHandler(transitService, buffer, tripTimesUpdater, tripPatternCache),
-      new NewTripHandler(transitService, buffer, tripTimesUpdater, tripPatternCache),
-      new CanceledTripHandler(transitService, buffer),
-      new DuplicatedTripHandler(transitService, buffer, deduplicator)
+      new ScheduledTripHandler(transitRepository, buffer, tripTimesUpdater, tripPatternCache),
+      new NewTripHandler(transitRepository, buffer, tripTimesUpdater, tripPatternCache),
+      new CanceledTripHandler(buffer),
+      new DuplicatedTripHandler(buffer, deduplicator)
     );
   }
 }

@@ -2,9 +2,9 @@ package org.opentripplanner.updater;
 
 import java.util.concurrent.Future;
 import java.util.function.Function;
-import org.opentripplanner.framework.transaction.UpdateManager;
-import org.opentripplanner.framework.transaction.api.RepositoryHandle;
-import org.opentripplanner.framework.transaction.api.WriteContext;
+import org.opentripplanner.core.model.transaction.RepositoryHandle;
+import org.opentripplanner.core.model.transaction.UpdateManager;
+import org.opentripplanner.core.model.transaction.WriteContext;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySnapshot;
 import org.opentripplanner.street.graph.Graph;
@@ -21,7 +21,8 @@ import org.slf4j.LoggerFactory;
  * update context of its domain: transit tasks get access to the mutable realtime-timetable
  * repository, street tasks get access to the street model.
  * <p>
- * This class will eventually be removed once all updaters submit directly to {@link UpdateManager}.
+ * This class will eventually be removed once all updaters submit directly to
+ * {@link UpdateManager}.
  *
  * @param <C> the update context of this domain, see {@link GraphWriterRunnable}
  */
@@ -43,8 +44,8 @@ public class GraphWriterService<C> implements WriteToGraphCallback<C> {
   /**
    * Create the bridge for the transit write domain. Each task checks out the mutable
    * realtime-timetable repository for the current transaction. The realtime-vehicle repository is
-   * resolved lazily: only tasks that actually apply vehicle updates cause a new vehicle snapshot
-   * to be published at commit.
+   * resolved lazily: only tasks that actually apply vehicle updates cause a new vehicle snapshot to
+   * be published at commit.
    */
   public static GraphWriterService<TransitRealTimeUpdateContext> forTransitDomain(
     UpdateManager updateManager,

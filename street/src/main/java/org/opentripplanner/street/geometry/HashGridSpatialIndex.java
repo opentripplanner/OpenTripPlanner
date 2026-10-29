@@ -10,12 +10,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.function.Consumer;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.LineString;
-import org.locationtech.jts.index.ItemVisitor;
-import org.locationtech.jts.index.SpatialIndex;
 import org.opentripplanner.utils.lang.IntBox;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,13 +27,13 @@ import org.slf4j.LoggerFactory;
  * querying, and it's up to the client to filter them out (with whatever knowledge it has on the
  * location of the object).
  * <p>
- * Note: For performance reasons, write operation are not synchronized, it must be taken care by the
- * client. Read-only operation are multi-thread-safe though.
+ * Note: For performance reasons, write operation are not synchronized, it must be taken care by
+ * the client. Read-only operation are multi-thread-safe though.
  *
  * @param <T> Type of objects to be spatial indexed.
  * @author laurent
  */
-public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
+public class HashGridSpatialIndex<T> implements Serializable {
 
   @SuppressWarnings("unused")
   private static final Logger LOG = LoggerFactory.getLogger(HashGridSpatialIndex.class);
@@ -78,7 +77,6 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
     this(DEFAULT_X_BIN_SIZE, DEFAULT_Y_BIN_SIZE);
   }
 
-  @Override
   public final void insert(Envelope envelope, final Object item) {
     visit(envelope, true, (bin, mapKey) -> {
       /*
@@ -95,7 +93,6 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
     nObjects++;
   }
 
-  @Override
   public final List<T> query(Envelope envelope) {
     final Set<T> ret = new HashSet<>(1024);
     visit(envelope, false, (bin, mapKey) -> {
@@ -105,16 +102,23 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
     return new ArrayList<>(ret);
   }
 
-  @Override
-  public final void query(Envelope envelope, ItemVisitor visitor) {
-    // We are cheating a bit here... But who cares? Never called in OTP.
-    List<T> tlist = query(envelope);
-    for (T t : tlist) {
-      visitor.visitItem(t);
-    }
+  /**
+   * Pass every item stored in the bins touching the envelope to {@code consumer}, without
+   * deduplication. As with {@link #query(Envelope)} the result contains false positives (whole bins
+   * are returned), and in addition an item spanning several of the visited bins is passed once per
+   * bin. Use this instead of {@link #query(Envelope)} when only a few of many candidates are kept:
+   * the caller can discard candidates with a cheap geometric test before paying for a hash-based
+   * dedup of the survivors, rather than hashing and copying every item in the bins first.
+   */
+  public final void forEachCandidate(Envelope envelope, Consumer<? super T> consumer) {
+    visit(envelope, false, (bin, mapKey) -> {
+      for (int i = 0, n = bin.size(); i < n; i++) {
+        consumer.accept(bin.get(i));
+      }
+      return false;
+    });
   }
 
-  @Override
   public final boolean remove(Envelope envelope, final Object item) {
     // This iterates over the entire rectangular envelope of the edge rather than the segments
     // making it up. It will be inefficient for very long edges, but creating a new remove method
@@ -159,11 +163,10 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
   }
 
   /**
-   * Query all items near any segment of the given line strings. Collects the unique set of bin
-   * keys touched by every segment, then reads each bin exactly once. Avoids per-segment
-   * {@link Envelope} and lambda allocations, and the re-read of bins shared by consecutive
-   * segments (which is the common case — adjacent segments always share at least one bin via
-   * their shared endpoint).
+   * Query all items near any segment of the given line strings. Collects the unique set of bin keys
+   * touched by every segment, then reads each bin exactly once. Avoids per-segment {@link Envelope}
+   * and lambda allocations, and the re-read of bins shared by consecutive segments (which is the
+   * common case — adjacent segments always share at least one bin via their shared endpoint).
    */
   public Set<T> queryAlongLineStrings(Collection<LineString> lineStrings) {
     Set<T> result = new HashSet<>(1024);
@@ -185,9 +188,9 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
   }
 
   /**
-   * Collect the bin keys touched by a segment's axis-aligned bounding box into {@code out}.
-   * Mirrors the bin-key math in {@link #visit(Envelope, boolean, BinVisitor)} but operates on
-   * primitive coordinates so the hot query loop has no per-segment object allocations.
+   * Collect the bin keys touched by a segment's axis-aligned bounding box into {@code out}. Mirrors
+   * the bin-key math in {@link #visit(Envelope, boolean, BinVisitor)} but operates on primitive
+   * coordinates so the hot query loop has no per-segment object allocations.
    */
   private void collectBinKeys(double x1, double y1, double x2, double y2, TLongSet out) {
     double minX = clampLon(Math.min(x1, x2));
@@ -207,8 +210,8 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
 
   /**
    * Pack (xKey, yKey) into a single {@code long} hash key. The xKey halves are swapped so the
-   * default long {@code hashCode} ({@code (int) (v ^ (v >>> 32))}) distributes well — see the
-   * note in {@link #visit(Envelope, boolean, BinVisitor)}.
+   * default long {@code hashCode} ({@code (int) (v ^ (v >>> 32))}) distributes well — see the note
+   * in {@link #visit(Envelope, boolean, BinVisitor)}.
    */
   private static long binKey(long xKey, long yKey) {
     return (yKey << 32) | ((xKey & 0xFFFF) << 16) | ((xKey >> 16) & 0xFFFF);

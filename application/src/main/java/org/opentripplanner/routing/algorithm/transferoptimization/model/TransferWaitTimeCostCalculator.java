@@ -95,22 +95,13 @@ import static org.opentripplanner.raptor.spi.RaptorCostConverter.toRaptorCost;
  *
  * <b>Why use a 1/log function?</b>
  * <ol>
- *   <li>
- *     First of all we want to maximize the total transfers time across all transfers
- *     in the journey. This makes sure we do not stay on a trip longer than needed and
- *     avoid back-travel.
- *   </li>
- *   <li>
- *     Second, we want to avoid VERY short transfers. The function above favor the set
- *     of transfers [3,5] over [2,6] and [2,6] over [1,7] - a linear function would not.
- *   </li>
- *   <li>
- *     Any 1/logN would be suitable, but log with base 10 is chosen (Supported in Java).
- *   </li>
- *   <li>
- *     We use this only to adjust the transfers within a single itinerary, not to compare
- *     two itineraries with each other.
- *   </li>
+ *   <li>First of all we want to maximize the total transfers time across all transfers in the
+ *       journey. This makes sure we do not stay on a trip longer than needed and avoid back-travel.</li>
+ *   <li>Second, we want to avoid VERY short transfers. The function above favor the set of transfers
+ *       [3,5] over [2,6] and [2,6] over [1,7] - a linear function would not.</li>
+ *   <li>Any 1/logN would be suitable, but log with base 10 is chosen (Supported in Java).</li>
+ *   <li>We use this only to adjust the transfers within a single itinerary, not to compare two
+ *       itineraries with each other.</li>
  * </ol>
  */
 public class TransferWaitTimeCostCalculator {
@@ -186,8 +177,8 @@ public class TransferWaitTimeCostCalculator {
    * </pre>
    * So,
    * <ol>
-   *     <li>when arriving a stop D we want E-H to dominate G-I</li>
-   *     <li>when comparing the paths we want to eliminate the restricted transfers</li>
+   *   <li>when arriving a stop D we want E-H to dominate G-I</li>
+   *   <li>when comparing the paths we want to eliminate the restricted transfers</li>
    * </ol>
    * To achieve this we give a restricted transfer a big negative cost - bigger than any possible
    * optimized-wait-time cost (to achieve point 1 above), and we use a constant cost (to achieve

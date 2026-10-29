@@ -1,23 +1,19 @@
 package org.opentripplanner.netex.mapping;
 
 import jakarta.xml.bind.JAXBElement;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import javax.annotation.Nullable;
-import net.opengis.gml._3.DirectPositionType;
 import net.opengis.gml._3.LineStringType;
 import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
-import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.MissingProjectionInServiceLink;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
+import org.opentripplanner.street.geometry.DouglasPeuckerAlgorithm;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.transit.model.framework.ImmutableEntityById;
@@ -35,13 +31,14 @@ import org.rutebanken.netex.model.ServiceLinkInJourneyPattern_VersionedChildStru
  */
 class ServiceLinkMapper {
 
-  private static final GeometryFactory GEOMETRY_FACTORY = GeometryUtils.getGeometryFactory();
   private final FeedScopedIdFactory idFactory;
   private final ReadOnlyHierarchicalMapById<ServiceLink> serviceLinkById;
   private final ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef;
   private final ImmutableEntityById<RegularStop> stopById;
   private final DataImportIssueStore issueStore;
   private final double maxStopToShapeSnapDistance;
+  private final double transitShapeSimplificationToleranceMeters;
+  private final LineStringMapper lineStringMapper;
 
   ServiceLinkMapper(
     FeedScopedIdFactory idFactory,
@@ -49,7 +46,8 @@ class ServiceLinkMapper {
     ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef,
     ImmutableEntityById<RegularStop> stopById,
     DataImportIssueStore issueStore,
-    double maxStopToShapeSnapDistance
+    double maxStopToShapeSnapDistance,
+    double transitShapeSimplificationToleranceMeters
   ) {
     this.idFactory = idFactory;
     this.serviceLinkById = serviceLinkById;
@@ -57,6 +55,8 @@ class ServiceLinkMapper {
     this.stopById = stopById;
     this.issueStore = issueStore;
     this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
+    this.transitShapeSimplificationToleranceMeters = transitShapeSimplificationToleranceMeters;
+    this.lineStringMapper = new LineStringMapper(issueStore);
   }
 
   List<LineString> getGeometriesByJourneyPattern(
@@ -71,7 +71,11 @@ class ServiceLinkMapper {
         geometries[i] = createSimpleGeometry(stopPattern.getStop(i), stopPattern.getStop(i + 1));
       }
     }
-    return Arrays.asList(geometries);
+    return transitShapeSimplificationToleranceMeters <= 0
+      ? Arrays.asList(geometries)
+      : Arrays.stream(geometries)
+          .map(l -> DouglasPeuckerAlgorithm.of(l, transitShapeSimplificationToleranceMeters))
+          .toList();
   }
 
   private LineString[] generateGeometriesFromServiceLinks(
@@ -126,45 +130,45 @@ class ServiceLinkMapper {
     StopPattern stopPattern,
     int stopIndex
   ) {
+    if (!isFromToPointRefsValid(serviceLink, stopPattern, stopIndex)) {
+      return null;
+    }
+    // in EPIP the line string is a direct property on the service link
+    if (serviceLink.getLineString() != null) {
+      LineString ret = mapLineString(
+        serviceLink.getLineString(),
+        stopPattern,
+        stopIndex,
+        serviceLink.getId()
+      );
+
+      return ret;
+    }
     if (
       serviceLink.getProjections() == null ||
       serviceLink.getProjections().getProjectionRefOrProjection() == null
     ) {
       issueStore.add(new MissingProjectionInServiceLink(serviceLink.getId()));
       return null;
-    } else if (!isFromToPointRefsValid(serviceLink, stopPattern, stopIndex)) {
-      return null;
     }
 
+    // in the Nordic profile the line string is wrapped in a projection collection
     for (JAXBElement<?> projectionElement : serviceLink
       .getProjections()
       .getProjectionRefOrProjection()) {
       Object projectionObj = projectionElement.getValue();
       if (projectionObj instanceof LinkSequenceProjection_VersionStructure linkSequenceProjection) {
         LineStringType lineString = linkSequenceProjection.getLineString();
-        if (!isProjectionValid(lineString, serviceLink.getId())) {
+        if (lineString == null) {
+          issueStore.add(
+            "ServiceLinkWithoutLineString",
+            "Ignore linkSequenceProjection without linestring for: %s",
+            linkSequenceProjection.getId()
+          );
           return null;
         }
 
-        List<Double> positionList = getLineStringCoordinates(lineString);
-        Coordinate[] coordinates = new Coordinate[positionList.size() / 2];
-        for (int i = 0; i < positionList.size(); i += 2) {
-          coordinates[i / 2] = new Coordinate(positionList.get(i + 1), positionList.get(i));
-        }
-        final LineString geometry = GEOMETRY_FACTORY.createLineString(coordinates);
-
-        if (
-          !isGeometryValid(geometry, serviceLink.getId()) ||
-          !areEndpointsWithinTolerance(
-            geometry,
-            stopPattern.getStop(stopIndex),
-            stopPattern.getStop(stopIndex + 1),
-            serviceLink.getId()
-          )
-        ) {
-          return null;
-        }
-        return geometry;
+        return mapLineString(lineString, stopPattern, stopIndex, serviceLink.getId());
       }
     }
 
@@ -176,15 +180,39 @@ class ServiceLinkMapper {
     return null;
   }
 
+  @Nullable
+  private LineString mapLineString(
+    LineStringType lineString,
+    StopPattern stopPattern,
+    int stopIndex,
+    String id
+  ) {
+    var geometry = lineStringMapper.mapLineString(lineString, id);
+    if (geometry == null) {
+      return null;
+    }
+
+    if (
+      !areEndpointsWithinTolerance(
+        geometry,
+        stopPattern.getStop(stopIndex),
+        stopPattern.getStop(stopIndex + 1),
+        id
+      )
+    ) {
+      return null;
+    }
+    return geometry;
+  }
+
   /** create a 2-point linestring (a straight line segment) between the two stops */
   private LineString createSimpleGeometry(StopLocation s0, StopLocation s1) {
-    Coordinate[] coordinates = new Coordinate[] {
-      s0.getCoordinate().asJtsCoordinate(),
-      s1.getCoordinate().asJtsCoordinate(),
-    };
-    CoordinateSequence sequence = new PackedCoordinateSequence.Double(coordinates, 2);
+    return GeometryUtils.makeLineString(s0.getCoordinate(), s1.getCoordinate());
+  }
 
-    return GEOMETRY_FACTORY.createLineString(sequence);
+  @Nullable
+  private RegularStop findStop(@Nullable String quayId) {
+    return quayId == null ? null : stopById.get(idFactory.createId(quayId));
   }
 
   private boolean isFromToPointRefsValid(
@@ -193,10 +221,10 @@ class ServiceLinkMapper {
     int stopIndex
   ) {
     String fromPointQuayId = quayIdByStopPointRef.lookup(serviceLink.getFromPointRef().getRef());
-    RegularStop fromPointStop = stopById.get(idFactory.createId(fromPointQuayId));
+    RegularStop fromPointStop = findStop(fromPointQuayId);
 
     String toPointQuayId = quayIdByStopPointRef.lookup(serviceLink.getToPointRef().getRef());
-    RegularStop toPointStop = stopById.get(idFactory.createId(toPointQuayId));
+    RegularStop toPointStop = findStop(toPointQuayId);
 
     if (fromPointStop == null || toPointStop == null) {
       issueStore.add(
@@ -210,8 +238,8 @@ class ServiceLinkMapper {
         "ServiceLinkQuayMismatch",
         "Service link %s with quays different from point in journey pattern. Link point: %s, journey pattern point: %s",
         serviceLink,
-        stopPattern.getStop(stopIndex).getId().getId(),
-        fromPointQuayId
+        fromPointQuayId,
+        stopPattern.getStop(stopIndex).getId().getId()
       );
       return false;
     } else if (!toPointStop.equals(stopPattern.getStop(stopIndex + 1))) {
@@ -219,96 +247,13 @@ class ServiceLinkMapper {
         "ServiceLinkQuayMismatch",
         "Service link %s with quays different to point in journey pattern. Link point: %s, journey pattern point: %s",
         serviceLink,
-        stopPattern.getStop(stopIndex).getId().getId(),
-        toPointQuayId
+        toPointQuayId,
+        stopPattern
+          .getStop(stopIndex + 1)
+          .getId()
+          .getId()
       );
       return false;
-    }
-    return true;
-  }
-
-  private List<Double> getLineStringCoordinates(LineStringType lineString) {
-    if (lineString.getPosList() != null) {
-      return lineString.getPosList().getValue();
-    }
-    var list = new ArrayList<Double>();
-    for (Object o : lineString.getPosOrPointProperty()) {
-      if (o instanceof DirectPositionType directPosition) {
-        var values = directPosition.getValue();
-        if (values == null || values.size() != 2) {
-          continue;
-        }
-        list.addAll(values);
-      } else {
-        issueStore.add(
-          "BadLineStringElementType",
-          "Unhandled and unknown lineString element type: %s",
-          o.getClass().getName()
-        );
-      }
-    }
-    return list;
-  }
-
-  private boolean isProjectionValid(LineStringType lineString, String id) {
-    if (lineString == null) {
-      issueStore.add(
-        "ServiceLinkWithoutLineString",
-        "Ignore linkSequenceProjection without linestring for: %s",
-        id
-      );
-      return false;
-    }
-    List<Double> coordinates = getLineStringCoordinates(lineString);
-    if (coordinates.size() < 4) {
-      issueStore.add(
-        "ServiceLinkGeometryError",
-        "Ignore linkSequenceProjection with invalid linestring, " +
-          "containing fewer than two coordinates for: %s",
-        id
-      );
-      return false;
-    } else if (coordinates.size() % 2 != 0) {
-      issueStore.add(
-        "ServiceLinkGeometryError",
-        "Ignore linkSequenceProjection with invalid linestring, " +
-          "containing odd number of values for coordinates: %s",
-        id
-      );
-      return false;
-    }
-    return true;
-  }
-
-  private boolean isGeometryValid(Geometry geometry, String id) {
-    Coordinate[] coordinates = geometry.getCoordinates();
-    if (coordinates.length < 2) {
-      issueStore.add(
-        "ServiceLinkGeometryError",
-        "Ignore linkSequenceProjection with invalid linestring, " +
-          "containing fewer than two coordinates for: %s",
-        id
-      );
-      return false;
-    }
-    if (geometry.getLength() == 0) {
-      issueStore.add(
-        "ServiceLinkGeometryError",
-        "Ignore linkSequenceProjection with invalid linestring, having distance of 0 for: %s",
-        id
-      );
-      return false;
-    }
-    for (Coordinate coordinate : coordinates) {
-      if (Double.isNaN(coordinate.x) || Double.isNaN(coordinate.y)) {
-        issueStore.add(
-          "ServiceLinkGeometryError",
-          "Ignore linkSequenceProjection with invalid linestring, " +
-            "containing coordinate with NaN for: %s",
-          id
-        );
-        return false;
-      }
     }
     return true;
   }

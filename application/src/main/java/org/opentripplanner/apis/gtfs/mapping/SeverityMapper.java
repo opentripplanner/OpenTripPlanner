@@ -10,8 +10,8 @@ import org.opentripplanner.routing.alertpatch.AlertSeverity;
 public class SeverityMapper {
 
   /**
-   * Returns GraphQL API counterpart for internal {@link AlertSeverity} enum. Defaults
-   * to returning UNKNOWN_SEVERITY.
+   * Returns GraphQL API counterpart for internal {@link AlertSeverity} enum. Defaults to returning
+   * UNKNOWN_SEVERITY.
    */
   public static GraphQLAlertSeverityLevelType getGraphQLSeverity(AlertSeverity severity) {
     if (severity == null) {

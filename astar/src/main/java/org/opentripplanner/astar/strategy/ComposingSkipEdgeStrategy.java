@@ -6,8 +6,8 @@ import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 
 /**
  * Use several strategies in composition with each other, for example by limiting by time and number
- * of stops visited. Only one needs to be skipped in order for {@link
- * SkipEdgeStrategy#shouldSkipEdge(State, Edge)} to return null.
+ * of stops visited. Only one needs to be skipped in order for
+ * {@link SkipEdgeStrategy#shouldSkipEdge(State, Edge)} to return null.
  */
 public record ComposingSkipEdgeStrategy<
   State extends AStarState<State, Edge, ?>,

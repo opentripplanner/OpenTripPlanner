@@ -10,6 +10,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import org.opentripplanner.core.model.transaction.UpdateManager;
 import org.opentripplanner.model.projectinfo.OtpProjectInfo;
 import org.opentripplanner.updater.spi.GraphUpdater;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
@@ -25,10 +26,9 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Write tasks submitted by updaters are serialised per {@link WriteDomain} by the
  * {@link WriteToGraphCallback}s passed at construction — currently {@link GraphWriterService}
- * instances, which will be replaced by the new
- * {@link org.opentripplanner.framework.transaction.UpdateManager} framework. Each updater is
- * routed to the callback of its declared write domain, so updaters working on unrelated domains
- * run in parallel.
+ * instances, which will be replaced by the new {@link UpdateManager} framework. Each updater is
+ * routed to the callback of its declared write domain, so updaters working on unrelated domains run
+ * in parallel.
  */
 public class GraphUpdaterManager implements GraphUpdaterStatus {
 
@@ -122,18 +122,16 @@ public class GraphUpdaterManager implements GraphUpdaterStatus {
   }
 
   /**
-   * Initiate the graceful shutdown of thread pools.
-   * Running tasks will be cancelled.
-   * Pending tasks will be ignored.
+   * Initiate the graceful shutdown of thread pools. Running tasks will be cancelled. Pending tasks
+   * will be ignored.
    */
   public void stop() {
     stop(true);
   }
 
   /**
-   * Initiate the graceful shutdown of thread pools.
-   * Optionally wait for running tasks to be processed before stopping (useful in tests).
-   * Pending tasks will be ignored.
+   * Initiate the graceful shutdown of thread pools. Optionally wait for running tasks to be
+   * processed before stopping (useful in tests). Pending tasks will be ignored.
    */
   public void stop(boolean cancelRunningTasks) {
     // TODO: find a better way to stop these threads

@@ -1,32 +1,29 @@
 package org.opentripplanner.ext.carpooling.routing;
 
-import static org.opentripplanner.ext.carpooling.util.GraphPathUtils.calculateCumulativeDurations;
+import static org.opentripplanner.ext.carpooling.util.StreetPathUtils.calculateCumulativeDurations;
 
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nullable;
-import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.ext.carpooling.constraints.PassengerDelayConstraints;
 import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
-import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.street.search.state.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Evaluates pre-filtered insertion positions using A* routing.
  * <p>
- * This class is a pure evaluator that takes positions identified by heuristic
- * filtering and evaluates them using expensive A* street routing. It selects
- * the insertion that minimizes additional travel time while satisfying
- * passenger delay constraints.
+ * This class is a pure evaluator that takes positions identified by heuristic filtering and
+ * evaluates them using expensive A* street routing. It selects the insertion that minimizes
+ * additional travel time while satisfying passenger delay constraints.
  * <p>
- * This follows the established OTP pattern of separating candidate generation
- * from evaluation, similar to {@code TransferGenerator} and {@code OptimizePathDomainService}.
+ * This follows the established OTP pattern of separating candidate generation from evaluation,
+ * similar to {@code TransferGenerator} and {@code OptimizePathDomainService}.
  */
 public class InsertionEvaluator {
 
@@ -41,32 +38,34 @@ public class InsertionEvaluator {
 
   /**
    * @param carpoolRouter routes a single street segment between two vertices in the candidate
-   *        carpool route — used both to build the baseline route and to re-route only the
-   *        segments that change when a passenger pickup/dropoff is inserted.
-   * @param stopDuration duration added at each intermediate stop (from the car {@code pickupTime}
-   *        preference); applied between consecutive segments when computing total trip and
-   *        passenger-ride durations.
+   *                      carpool route — used both to build the baseline route and to re-route only
+   *                      the segments that change when a passenger pickup/dropoff is inserted.
+   * @param stopDuration  duration added at each intermediate stop (from the car {@code pickupTime}
+   *                      preference); applied between consecutive segments when computing total
+   *                      trip and passenger-ride durations.
    */
   public InsertionEvaluator(CarpoolRouter carpoolRouter, Duration stopDuration) {
     this(carpoolRouter, null, stopDuration);
   }
 
   /**
-   * @param carpoolRouter routes a single street segment between two vertices in the candidate
-   *        carpool route — used both to build the baseline route and to re-route only the
-   *        segments that change when a passenger pickup/dropoff is inserted.
-   * @param baselineFallbackRouter re-routes a baseline leg that {@code carpoolRouter} could not,
-   *        or {@code null} for no fallback. Only the baseline route falls back. When
-   *        {@code carpoolRouter} is a tree router whose per-leg trees are sized to a bounded
-   *        per-leg limit, an underestimate of that limit would leave a waypoint outside its tree
-   *        and drop the whole trip; a goal-directed fallback re-routes just that leg instead.
-   *        Inserted passenger
-   *        segments deliberately do not fall back — a segment that cannot be routed within the
-   *        tree is an insertion the delay constraints reject anyway, so failing fast there is
-   *        correct and avoids a goal-directed search per nearby stop.
-   * @param stopDuration duration added at each intermediate stop (from the car {@code pickupTime}
-   *        preference); applied between consecutive segments when computing total trip and
-   *        passenger-ride durations.
+   * @param carpoolRouter          routes a single street segment between two vertices in the
+   *                               candidate carpool route — used both to build the baseline route
+   *                               and to re-route only the segments that change when a passenger
+   *                               pickup/dropoff is inserted.
+   * @param baselineFallbackRouter re-routes a baseline leg that {@code carpoolRouter} could not, or
+   *                               {@code null} for no fallback. Only the baseline route falls back.
+   *                               When {@code carpoolRouter} is a tree router whose per-leg trees
+   *                               are sized to a bounded per-leg limit, an underestimate of that
+   *                               limit would leave a waypoint outside its tree and drop the whole
+   *                               trip; a goal-directed fallback re-routes just that leg instead.
+   *                               Inserted passenger segments deliberately do not fall back — a
+   *                               segment that cannot be routed within the tree is an insertion the
+   *                               delay constraints reject anyway, so failing fast there is correct
+   *                               and avoids a goal-directed search per nearby stop.
+   * @param stopDuration           duration added at each intermediate stop (from the car
+   *                               {@code pickupTime} preference); applied between consecutive
+   *                               segments when computing total trip and passenger-ride durations.
    */
   public InsertionEvaluator(
     CarpoolRouter carpoolRouter,
@@ -83,15 +82,14 @@ public class InsertionEvaluator {
    *
    * @return Array of routed segments, or null if any segment fails to route
    */
-  @SuppressWarnings("unchecked")
-  private GraphPath<State, Edge, Vertex>[] routeSegments(List<Vertex> routePoints) {
-    GraphPath<State, Edge, Vertex>[] segments = new GraphPath[routePoints.size() - 1];
+  private StreetPath[] routeSegments(List<Vertex> routePoints) {
+    StreetPath[] segments = new StreetPath[routePoints.size() - 1];
 
     for (int i = 0; i < routePoints.size() - 1; i++) {
       var from = routePoints.get(i);
       var to = routePoints.get(i + 1);
 
-      GraphPath<State, Edge, Vertex> segment = carpoolRouter.route(from, to);
+      StreetPath segment = carpoolRouter.route(from, to);
       if (segment == null && baselineFallbackRouter != null) {
         segment = baselineFallbackRouter.route(from, to);
         if (segment != null) {
@@ -110,9 +108,9 @@ public class InsertionEvaluator {
   }
 
   /**
-   * @return A list containing the best insertion that can be found for every NearbyStop in
-   * the list tripWithViableAccessEgress.viableAccessEgress. If there are no valid insertions
-   * for a NearbyStop, then no candidate for that stop will be returned.
+   * @return A list containing the best insertion that can be found for every NearbyStop in the list
+   *         tripWithViableAccessEgress.viableAccessEgress. If there are no valid insertions for a
+   *         NearbyStop, then no candidate for that stop will be returned.
    */
   public List<InsertionCandidate> findBestInsertions(
     TripWithViableAccessEgress tripWithViableAccessEgress
@@ -127,7 +125,7 @@ public class InsertionEvaluator {
       return List.of();
     }
 
-    GraphPath<State, Edge, Vertex>[] baselineSegments = routeSegments(tripWithVertices.vertices());
+    StreetPath[] baselineSegments = routeSegments(tripWithVertices.vertices());
     if (baselineSegments == null) {
       LOG.info("Could not route baseline segments for trip {}", tripWithVertices.trip().getId());
       return List.of();
@@ -172,15 +170,14 @@ public class InsertionEvaluator {
   /**
    * Evaluates pre-filtered insertion positions using A* routing.
    * <p>
-   * This method assumes the provided positions have already passed heuristic
-   * validation (capacity, direction, beeline delay). It performs expensive
-   * A* routing for each position and selects the one with minimum additional
-   * duration that satisfies delay constraints.
+   * This method assumes the provided positions have already passed heuristic validation
+   * (capacity, direction, beeline delay). It performs expensive A* routing for each position and
+   * selects the one with minimum additional duration that satisfies delay constraints.
    *
    * @param tripWithVertices The carpool trip with resolved vertices
-   * @param viablePositions Positions that passed heuristic checks (from InsertionPositionFinder)
-   * @param snap Pickup/dropoff vertices (already snapped to car-reachable vertices by the
-   *        caller) and the optional walk paths bracketing the carpool ride
+   * @param viablePositions  Positions that passed heuristic checks (from InsertionPositionFinder)
+   * @param snap             Pickup/dropoff vertices (already snapped to car-reachable vertices by
+   *                         the caller) and the optional walk paths bracketing the carpool ride
    * @return The best insertion candidate, or null if none are viable after routing
    */
   @Nullable
@@ -189,7 +186,7 @@ public class InsertionEvaluator {
     List<InsertionPosition> viablePositions,
     PassengerSnap snap
   ) {
-    GraphPath<State, Edge, Vertex>[] baselineSegments = routeSegments(tripWithVertices.vertices());
+    StreetPath[] baselineSegments = routeSegments(tripWithVertices.vertices());
     if (baselineSegments == null) {
       LOG.info("Could not route baseline for trip {}", tripWithVertices.trip().getId());
       return null;
@@ -212,7 +209,7 @@ public class InsertionEvaluator {
     CarpoolTripWithVertices tripWithVertices,
     List<InsertionPosition> viablePositions,
     PassengerSnap snap,
-    GraphPath<State, Edge, Vertex>[] baselineSegments,
+    StreetPath[] baselineSegments,
     Duration[] cumulativeDurations,
     NearbyStop transitStop
   ) {
@@ -251,19 +248,19 @@ public class InsertionEvaluator {
   }
 
   /**
-   * Evaluates a specific insertion configuration.
-   * Reuses cached baseline segments and only routes new segments involving the passenger.
+   * Evaluates a specific insertion configuration. Reuses cached baseline segments and only routes
+   * new segments involving the passenger.
    */
   private InsertionCandidate evaluateInsertion(
     CarpoolTripWithVertices tripWithVertices,
     int pickupPos,
     int dropoffPos,
     PassengerSnap snap,
-    GraphPath<State, Edge, Vertex>[] baselineSegments,
+    StreetPath[] baselineSegments,
     Duration[] originalCumulativeDurations,
     NearbyStop transitStop
   ) {
-    List<GraphPath<State, Edge, Vertex>> modifiedSegments = buildModifiedSegments(
+    List<StreetPath> modifiedSegments = buildModifiedSegments(
       tripWithVertices.vertices(),
       baselineSegments,
       pickupPos,
@@ -277,7 +274,7 @@ public class InsertionEvaluator {
     }
 
     Duration[] modifiedCumulativeDurations = calculateCumulativeDurations(
-      modifiedSegments.toArray(new GraphPath[modifiedSegments.size()]),
+      modifiedSegments.toArray(new StreetPath[modifiedSegments.size()]),
       stopDuration
     );
     if (
@@ -309,22 +306,22 @@ public class InsertionEvaluator {
     );
   }
 
-  private List<GraphPath<State, Edge, Vertex>> buildModifiedSegments(
+  private List<StreetPath> buildModifiedSegments(
     List<Vertex> originalPoints,
-    GraphPath<State, Edge, Vertex>[] baselineSegments,
+    StreetPath[] baselineSegments,
     int pickupPos,
     int dropoffPos,
     Vertex passengerPickup,
     Vertex passengerDropoff
   ) {
-    List<GraphPath<State, Edge, Vertex>> segments = new ArrayList<>();
+    List<StreetPath> segments = new ArrayList<>();
 
     List<Vertex> modifiedPoints = new ArrayList<>(originalPoints);
     modifiedPoints.add(pickupPos, passengerPickup);
     modifiedPoints.add(dropoffPos, passengerDropoff);
 
     for (int i = 0; i < modifiedPoints.size() - 1; i++) {
-      GraphPath<State, Edge, Vertex> segment;
+      StreetPath segment;
 
       int baselineIndex = baselineSegmentIndex(i, pickupPos, dropoffPos);
       if (baselineIndex >= 0 && baselineIndex < baselineSegments.length) {
@@ -349,15 +346,14 @@ public class InsertionEvaluator {
   }
 
   /**
-   * Maps a modified-route segment index to the corresponding baseline segment index, or
-   * {@code -1} if the modified segment touches the inserted pickup or dropoff and so cannot be
-   * reused.
+   * Maps a modified-route segment index to the corresponding baseline segment index, or {@code -1}
+   * if the modified segment touches the inserted pickup or dropoff and so cannot be reused.
    * <p>
    * The modified route is the original route with two insertions: pickup at {@code pickupPos}
-   * and dropoff at {@code dropoffPos} (List.add semantics, dropoffPos interpreted after the
-   * pickup insertion). A modified segment {@code [i, i+1)} either reuses an original segment
-   * (when both endpoints fall in original points) or is one of the four newly created segments
-   * around the inserted points.
+   * and dropoff at {@code dropoffPos} (List.add semantics, dropoffPos interpreted after the pickup
+   * insertion). A modified segment {@code [i, i+1)} either reuses an original segment (when both
+   * endpoints fall in original points) or is one of the four newly created segments around the
+   * inserted points.
    * <p>
    * Requires {@code pickupPos < dropoffPos} — the shift arithmetic depends on the pickup being
    * strictly before the dropoff, otherwise the result would silently describe a route with the

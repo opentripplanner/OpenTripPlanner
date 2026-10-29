@@ -91,9 +91,11 @@ public class AtlantaFareService extends DefaultFareService {
 
     /**
      * Adds a leg to this transfer.
-     * @param leg Ride to be added
+     *
+     * @param leg         Ride to be added
      * @param defaultFare Default fare to use for transfer calculations (usually from GTFS)
-     * @return Whether the added ride is valid or not. If invalid, then this transfer has ended and a new one is needed for the ride.
+     * @return Whether the added ride is valid or not. If invalid, then this transfer has ended and
+     *         a new one is needed for the ride.
      */
     public boolean addLeg(Leg leg, Money defaultFare) {
       // A transfer will always contain at least one ride.
@@ -168,8 +170,8 @@ public class AtlantaFareService extends DefaultFareService {
   }
 
   /**
-   * Get the leg price for a single leg. If testing, this class is being called directly so the required agency cash
-   * values are not available therefore the default test price is used instead.
+   * Get the leg price for a single leg. If testing, this class is being called directly so the
+   * required agency cash values are not available therefore the default test price is used instead.
    */
   protected Money getLegPrice(Leg leg, FareType fareType, Collection<FareRuleSet> fareRules) {
     return calculateCost(fareType, List.of(leg), fareRules).orElse(Money.ZERO_USD);
@@ -183,8 +185,9 @@ public class AtlantaFareService extends DefaultFareService {
 
     /**
      * Create a TransferMeta
-     * @param type Type of transfer
-     * @param upcharge Upcharge for the transfer in cents
+     *
+     * @param type      Type of transfer
+     * @param upcharge  Upcharge for the transfer in cents
      * @param payOnExit Whether the fare is charged at end of leg
      */
     public TransferMeta(TransferType type, Money upcharge, boolean payOnExit) {
@@ -381,8 +384,8 @@ public class AtlantaFareService extends DefaultFareService {
   }
 
   /**
-   * In the base class only the rules for a specific feed are selected and then passed to the
-   * fare engine, however here we want to explicitly compute fares across feed boundaries.
+   * In the base class only the rules for a specific feed are selected and then passed to the fare
+   * engine, however here we want to explicitly compute fares across feed boundaries.
    */
   @Nullable
   @Override

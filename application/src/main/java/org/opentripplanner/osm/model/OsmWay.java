@@ -136,7 +136,8 @@ public class OsmWay extends OsmEntity {
   }
 
   /**
-   * Whether a way is an entrance or an exit of a freeway/motorway or similar access-controlled, car-only road.
+   * Whether a way is an entrance or an exit of a freeway/motorway or similar access-controlled,
+   * car-only road.
    */
   public boolean isMotorwayRamp() {
     return isTag("highway", "motorway_link");

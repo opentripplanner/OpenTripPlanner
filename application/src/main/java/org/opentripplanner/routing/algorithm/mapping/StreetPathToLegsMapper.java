@@ -6,7 +6,6 @@ import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nullable;
@@ -38,7 +37,7 @@ import org.opentripplanner.transit.SiteResolver;
 import org.opentripplanner.utils.lang.IntUtils;
 
 /**
- * A mapper class used in converting internal GraphPaths to Itineraries, which are returned by the
+ * A mapper class used in converting internal StreetPaths to Itineraries, which are returned by the
  * OTP APIs. This only produces itineraries for non-transit searches, as well as the non-transit
  * parts of itineraries containing transit, while the whole transit itinerary is produced by
  * {@link RaptorPathToItineraryMapper}.
@@ -158,7 +157,7 @@ public class StreetPathToLegsMapper {
       return List.of();
     }
 
-    List<StreetPath> subPaths = new LinkedList<>();
+    List<StreetPath> subPaths = new ArrayList<>();
 
     int previousBreak = 0;
 
@@ -292,7 +291,7 @@ public class StreetPathToLegsMapper {
   /**
    * Generate one leg of an itinerary from a list of {@link State}.
    *
-   * @param subPath       The street path to base the leg on
+   * @param subPath      The street path to base the leg on
    * @param previousStep the previous walk step, so that the first relative turn direction is
    *                     calculated correctly
    * @return The generated leg

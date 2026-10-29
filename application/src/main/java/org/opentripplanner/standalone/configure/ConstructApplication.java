@@ -1,17 +1,19 @@
 package org.opentripplanner.standalone.configure;
 
 import jakarta.ws.rs.core.Application;
+import java.util.Objects;
 import javax.annotation.Nullable;
-import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
+import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
+import org.opentripplanner.core.model.transaction.RepositoryHandle;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.routing.CarpoolTripVertexResolver;
 import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayRepository;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
+import org.opentripplanner.ext.taxi.TaxiRepository;
 import org.opentripplanner.framework.application.LogMDCSupport;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
@@ -42,6 +44,8 @@ import org.opentripplanner.street.StreetRepository;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.transfer.regular.TransferRepository;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
+import org.opentripplanner.transit.repository.ScheduledTimetableData;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.configure.UpdaterConfigurator;
 import org.opentripplanner.utils.logging.ProgressTracker;
@@ -55,10 +59,9 @@ import org.slf4j.LoggerFactory;
  * running the application. The whole idea of this class is to separate application construction
  * from running it.
  * <p>
- * The top level construction class(this class) may delegate to other construction classes
- * to inject configuration and services into submodules. An instance of this class is created
- * using the {@link LoadApplication} - An application is constructed AFTER config and input files
- * are loaded.
+ * The top level construction class(this class) may delegate to other construction classes to
+ * inject configuration and services into submodules. An instance of this class is created using the
+ * {@link LoadApplication} - An application is constructed AFTER config and input files are loaded.
  * <p>
  * THIS CLASS IS NOT THREAD SAFE - THE APPLICATION SHOULD BE CREATED IN ONE THREAD. The
  * constructor performs the heavy Raptor data mapping before handing results to Dagger; all other
@@ -71,11 +74,19 @@ public class ConstructApplication {
   private final CommandLineParameters cli;
   private final GraphBuilderDataSources graphBuilderDataSources;
   /**
-   * The OSM Info is injected into the graph-builder, but not the web-server; Hence not part of
-   * the application context.
+   * The OSM Info is injected into the graph-builder, but not the web-server; Hence not part of the
+   * application context.
    */
   private final OsmInfoGraphBuildRepository osmInfoGraphBuildRepository;
   private final ConstructApplicationFactory factory;
+
+  /**
+   * The mutable scheduled data of the graph build. Only kept if a graph is going to be built (and
+   * saved); otherwise it is converted into the immutable scheduled data and released, so the
+   * scheduled data is not held twice while the server runs.
+   */
+  @Nullable
+  private final TimetableDataImport timetableDataImport;
 
   /**
    * Create a new OTP configuration instance for a given directory.
@@ -86,12 +97,14 @@ public class ConstructApplication {
     OsmInfoGraphBuildRepository osmInfoGraphBuildRepository,
     StreetDetailsRepository streetDetailsRepository,
     TransitRepository transitRepository,
+    TimetableDataImport timetableDataImport,
     TransferRepository transferRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     ConfigModel config,
     GraphBuilderDataSources graphBuilderDataSources,
     DataImportIssueSummary issueSummary,
     @Nullable EmissionRepository emissionRepository,
+    @Nullable TaxiRepository taxiRepository,
     @Nullable EmpiricalDelayRepository empiricalDelayRepository,
     VehicleParkingRepository vehicleParkingRepository,
     @Nullable StopConsolidationRepository stopConsolidationRepository,
@@ -99,6 +112,8 @@ public class ConstructApplication {
     FareServiceFactory fareServiceFactory
   ) {
     this.cli = cli;
+    boolean buildGraph = cli.doBuildStreet() || cli.doBuildTransit();
+    this.timetableDataImport = buildGraph ? timetableDataImport : null;
     this.graphBuilderDataSources = graphBuilderDataSources;
     this.osmInfoGraphBuildRepository = osmInfoGraphBuildRepository;
 
@@ -106,19 +121,30 @@ public class ConstructApplication {
     // This is intentionally done here rather than in a Dagger provider because the mapping
     // is heavy and should not run inside the DI container's initialization.
     var tuningParameters = config.routerConfig().transitTuningConfig();
-    if (!transitRepository.hasTransit() || !transitRepository.isIndexed()) {
+    // The immutable scheduled data.
+    // Converting freezes the timetable data import, so when a graph is going to be built it is not
+    // converted: it is still empty here and must stay modifiable for the graph build. The server
+    // then starts without scheduled data, like it starts without Raptor data, see #7948.
+    var scheduledTimetableData = buildGraph
+      ? ScheduledTimetableData.empty()
+      : timetableDataImport.toScheduledTimetableData();
+    if (scheduledTimetableData.getTripCalendars().isEmpty() || !transitRepository.isIndexed()) {
       LOG.warn(
         "Cannot create Raptor data, that requires the graph to have transit data and be indexed."
       );
     }
     LOG.info("Creating transit layer for Raptor routing.");
     transitRepository.initRaptorTransitData(
-      RaptorTransitDataMapper.map(tuningParameters, transitRepository, transferRepository)
+      RaptorTransitDataMapper.map(
+        tuningParameters,
+        transitRepository,
+        scheduledTimetableData,
+        transferRepository
+      )
     );
     var scheduledRaptorTransitData = new RaptorTransitData(
       transitRepository.getRaptorTransitData()
     );
-    var scheduledTripCalendars = transitRepository.getTripCalendar();
 
     ConstructApplicationFactory.Builder builder = DaggerConstructApplicationFactory.builder();
     this.factory = builder
@@ -126,10 +152,12 @@ public class ConstructApplication {
       .graph(graph)
       .streetDetailsRepository(streetDetailsRepository)
       .transitRepository(transitRepository)
+      .scheduledTimetableData(scheduledTimetableData)
       .transferRepository(transferRepository)
       .worldEnvelopeRepository(worldEnvelopeRepository)
       .vehicleParkingRepository(vehicleParkingRepository)
       .emissionRepository(emissionRepository)
+      .taxiRepository(taxiRepository)
       .empiricalDelayRepository(empiricalDelayRepository)
       .dataImportIssueSummary(issueSummary)
       .stopConsolidationRepository(stopConsolidationRepository)
@@ -137,7 +165,6 @@ public class ConstructApplication {
       .schema(config.routerConfig().routingRequestDefaults())
       .fareServiceFactory(fareServiceFactory)
       .scheduledRaptorTransitData(scheduledRaptorTransitData)
-      .scheduledTripCalendars(scheduledTripCalendars)
       .build();
   }
 
@@ -172,10 +199,12 @@ public class ConstructApplication {
       fareServiceFactory(),
       factory.streetRepository(),
       factory.transitRepository(),
+      timetableDataImport(),
       factory.transferRepository(),
       factory.worldEnvelopeRepository(),
       factory.vehicleParkingRepository(),
       factory.emissionRepository(),
+      factory.taxiRepository(),
       factory.empiricalDelayRepository(),
       factory.stopConsolidationRepository(),
       cli.doLoadStreetGraph(),
@@ -217,6 +246,7 @@ public class ConstructApplication {
       vehicleRentalRepository(),
       vehicleParkingRepository(),
       transitRepository(),
+      factory.transitService(),
       carpoolingRepository(),
       carpoolTripVertexResolver(),
       factory.transitUpdateManager(),
@@ -278,6 +308,13 @@ public class ConstructApplication {
 
   public TransitRepository transitRepository() {
     return factory.transitRepository();
+  }
+
+  public TimetableDataImport timetableDataImport() {
+    return Objects.requireNonNull(
+      timetableDataImport,
+      "The timetable data import is only available when building a graph."
+    );
   }
 
   public TransferRepository transferRepository() {
@@ -382,6 +419,11 @@ public class ConstructApplication {
   @Nullable
   public EmissionRepository emissionRepository() {
     return factory.emissionRepository();
+  }
+
+  @Nullable
+  public TaxiRepository taxiRepository() {
+    return factory.taxiRepository();
   }
 
   public StreetDetailsRepository streetDetailsRepository() {

@@ -33,7 +33,7 @@ import org.opentripplanner.utils.time.ServiceDateUtils;
  */
 class ModifiedTripBuilder {
 
-  private final TripTimes existingTripTimes;
+  private final TripTimes<?> existingTripTimes;
   private final TripPattern pattern;
   private final LocalDate serviceDate;
   private final ZoneId zoneId;
@@ -50,7 +50,7 @@ class ModifiedTripBuilder {
   private final String vehicleRef;
 
   public ModifiedTripBuilder(
-    TripTimes existingTripTimes,
+    TripTimes<?> existingTripTimes,
     TripPattern pattern,
     EstimatedVehicleJourneyWrapper journey,
     LocalDate serviceDate,
@@ -76,7 +76,7 @@ class ModifiedTripBuilder {
    * Constructor for tests
    */
   public ModifiedTripBuilder(
-    TripTimes existingTripTimes,
+    TripTimes<?> existingTripTimes,
     TripPattern pattern,
     LocalDate serviceDate,
     ZoneId zoneId,
@@ -208,9 +208,8 @@ class ModifiedTripBuilder {
   }
 
   /**
-   * Applies real-time updates from the calls into newTimes.
-   * Precondition: the number of calls is equal to the number of stops in the pattern (this is
-   * verified before calling this method).
+   * Applies real-time updates from the calls into newTimes. Precondition: the number of calls is
+   * equal to the number of stops in the pattern (this is verified before calling this method).
    */
   private void applyUpdates(RealTimeTripTimesBuilder builder) {
     ZonedDateTime startOfService = ServiceDateUtils.asStartOfService(serviceDate, zoneId);
@@ -258,9 +257,8 @@ class ModifiedTripBuilder {
 
   /**
    * Creates a new StopPattern, based on an existing pattern, and list of calls. The stops can be
-   * replaced with stops belonging to the same Station/StopPlace. The PickDrop values are updated
-   * as well.
-   * Precondition: the number of calls is equal to the number of stops in the pattern (this is
+   * replaced with stops belonging to the same Station/StopPlace. The PickDrop values are updated as
+   * well. Precondition: the number of calls is equal to the number of stops in the pattern (this is
    * verified before calling this method).
    */
   static StopPattern createStopPattern(

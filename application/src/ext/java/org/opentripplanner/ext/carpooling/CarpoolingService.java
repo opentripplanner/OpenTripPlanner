@@ -10,10 +10,11 @@ import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.transit.service.TransitServiceResolver;
 
 /**
- * Service for finding carpooling options by matching passenger requests with available driver trips.
+ * Service for finding carpooling options by matching passenger requests with available driver
+ * trips.
  * <p>
- * Carpooling enables passengers to join existing driver journeys by being picked up and dropped off
- * along the driver's route. The service finds optimal insertion points for new passengers while
+ * Carpooling enables passengers to join existing driver journeys by being picked up and dropped
+ * off along the driver's route. The service finds optimal insertion points for new passengers while
  * respecting capacity constraints, time windows, and route deviation budgets.
  */
 public interface CarpoolingService {

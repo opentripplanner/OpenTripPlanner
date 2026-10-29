@@ -63,8 +63,10 @@ class ExtraThenCanceledJourneyTest implements RealtimeTestConstants {
   }
 
   /**
+   * <pre>
    * TODO RT_VP: This is a non-regression test that captures the existing behavior.
    *             We should verify that this behavior is acceptable/correct.
+   * </pre>
    */
   @Test
   void testAddJourneyWithAllStopsCancelledIsImplicitlyCancelled() {

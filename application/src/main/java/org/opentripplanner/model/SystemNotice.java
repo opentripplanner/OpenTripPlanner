@@ -7,9 +7,9 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 /**
  * A system notice is used to tag elements with system information.
  * <p>
- * One use-case is to run a routing search in debug-filter-mode and instead of removing itineraries
- * from the result, the itineraries could be tagged instead. These notices are meant for system
- * testers and developers and should not be used for end user notification or alerts.
+ * One use-case is to run a routing search in debug-filter-mode and instead of removing
+ * itineraries from the result, the itineraries could be tagged instead. These notices are meant for
+ * system testers and developers and should not be used for end user notification or alerts.
  *
  * @see TransitAlert for end user alerts
  * @see Notice for end user notices

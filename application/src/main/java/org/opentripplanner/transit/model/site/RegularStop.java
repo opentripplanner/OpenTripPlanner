@@ -119,26 +119,25 @@ public final class RegularStop
 
   /**
    * Indicates whether this stop might be used by real-time updated trips, even though it is NOT
-   * used by regular scheduled trips. OTP sometimes filters out unused stops during graph build
-   * or as a performance optimization. If this happens before real-time updates are applied, then
-   * the routing for these stops will not work. For example this is the case with transfers
-   * generation.
+   * used by regular scheduled trips. OTP sometimes filters out unused stops during graph build or
+   * as a performance optimization. If this happens before real-time updates are applied, then the
+   * routing for these stops will not work. For example this is the case with transfers generation.
    * <p>
    * Common use cases:
    * <ul>
    *   <li><b>Rail platform assignment:</b> Scheduled trips may reference a limited set of platforms,
-   *       while real-time updates assign trips to all available platforms. This is common when the
-   *       actual platform is assigned AFTER the trips are planned.</li>
-   *   <li><b>Rail Replacement Bus Services:</b> Some stops are reserved for replacement services that are
-   *       added via real-time updates rather than scheduled in advance.</li>
+   *       while real-time updates assign trips to all available platforms. This is common when the actual
+   *       platform is assigned AFTER the trips are planned.</li>
+   *   <li><b>Rail Replacement Bus Services:</b> Some stops are reserved for replacement services that
+   *       are added via real-time updates rather than scheduled in advance.</li>
    * </ul>
    * <p>
    * <b>FOR INTERNAL USE ONLY</b>
    * <p>
-   * DO NOT EXPOSE THIS PARAMETER ON ANY API. Business logic using this feature should only use it
-   * to improve routing by including these stops when stops with no trip patterns would otherwise be
-   * excluded for performance reasons. Incorrectly tagging stops with this flag is not critical, it
-   * will only degrade performance.
+   * DO NOT EXPOSE THIS PARAMETER ON ANY API. Business logic using this feature should only use
+   * it to improve routing by including these stops when stops with no trip patterns would otherwise
+   * be excluded for performance reasons. Incorrectly tagging stops with this flag is not critical,
+   * it will only degrade performance.
    *
    * @return {@code true} if this stop may be used by real-time trips despite having no scheduled
    *         patterns, {@code false} otherwise

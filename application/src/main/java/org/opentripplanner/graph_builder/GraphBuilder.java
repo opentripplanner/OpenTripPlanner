@@ -3,14 +3,15 @@ package org.opentripplanner.graph_builder;
 import java.io.Closeable;
 import java.io.IOException;
 import java.time.Duration;
-import java.util.LinkedList;
+import java.util.ArrayDeque;
 import java.util.Objects;
 import java.util.Queue;
 import javax.annotation.Nullable;
-import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
+import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayRepository;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
+import org.opentripplanner.ext.taxi.TaxiRepository;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.gbfs.network.GbfsNetworkOverrides;
@@ -29,6 +30,7 @@ import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.street.StreetRepository;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transfer.regular.TransferRepository;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.utils.lang.OtpNumberFormat;
 import org.opentripplanner.utils.time.DurationUtils;
@@ -43,9 +45,10 @@ public class GraphBuilder implements Runnable {
 
   private static final Logger LOG = LoggerFactory.getLogger(GraphBuilder.class);
 
-  private final Queue<GraphBuilderModule> graphBuilderModules = new LinkedList<>();
+  private final Queue<GraphBuilderModule> graphBuilderModules = new ArrayDeque<>();
   private final Graph graph;
   private final TransitRepository transitRepository;
+  private final TimetableDataImport timetableDataImport;
   private final DataImportIssueStore issueStore;
   private final Closeable closeDataSourcesHandle;
   private final DeduplicatorService deduplicator;
@@ -57,6 +60,7 @@ public class GraphBuilder implements Runnable {
     Graph baseGraph,
     DeduplicatorService deduplicator,
     TransitRepository transitRepository,
+    TimetableDataImport timetableDataImport,
     DataImportIssueStore issueStore,
     Closeable closeDataSourcesHandle,
     GraphBuildCacheManager cacheManager
@@ -64,6 +68,7 @@ public class GraphBuilder implements Runnable {
     this.graph = baseGraph;
     this.deduplicator = deduplicator;
     this.transitRepository = transitRepository;
+    this.timetableDataImport = timetableDataImport;
     this.issueStore = issueStore;
     this.closeDataSourcesHandle = closeDataSourcesHandle;
     this.cacheManager = cacheManager;
@@ -83,10 +88,12 @@ public class GraphBuilder implements Runnable {
     FareServiceFactory fareServiceFactory,
     StreetRepository streetRepository,
     TransitRepository transitRepository,
+    TimetableDataImport timetableDataImport,
     TransferRepository transferRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository vehicleParkingService,
     @Nullable EmissionRepository emissionRepository,
+    @Nullable TaxiRepository taxiRepository,
     @Nullable EmpiricalDelayRepository empiricalDelayRepository,
     @Nullable StopConsolidationRepository stopConsolidationRepository,
     boolean loadStreetGraph,
@@ -103,11 +110,13 @@ public class GraphBuilder implements Runnable {
       .streetDetailsRepository(streetDetailsRepository)
       .streetRepository(streetRepository)
       .transitRepository(transitRepository)
+      .timetableDataImport(timetableDataImport)
       .transferRepository(transferRepository)
       .worldEnvelopeRepository(worldEnvelopeRepository)
       .vehicleParkingRepository(vehicleParkingService)
       .stopConsolidationRepository(stopConsolidationRepository)
       .emissionRepository(emissionRepository)
+      .taxiRepository(taxiRepository)
       .empiricalDelayRepository(empiricalDelayRepository)
       .fareServiceFactory(fareServiceFactory)
       .dataSources(dataSources)
@@ -185,6 +194,8 @@ public class GraphBuilder implements Runnable {
       );
     }
 
+    graphBuilder.addModuleOptional(factory.taxiGraphBuilder(), OTPFeature.TaxiRouting);
+
     if (loadStreetGraph || dataSources.hasOsm()) {
       graphBuilder.addModuleOptional(factory.vehicleRentalGeofencingGraphBuilder());
       graphBuilder.addModule(factory.graphCoherencyCheckerModule());
@@ -224,7 +235,13 @@ public class GraphBuilder implements Runnable {
       new DataImportIssueSummary(issueStore.listIssues()).logSummary();
 
       // Log before we validate, this way we have more information if the validation fails
-      logGraphBuilderCompleteStatus(startTime, graph, transitRepository, deduplicator);
+      logGraphBuilderCompleteStatus(
+        startTime,
+        graph,
+        transitRepository,
+        timetableDataImport,
+        deduplicator
+      );
 
       validate();
     } finally {
@@ -270,7 +287,7 @@ public class GraphBuilder implements Runnable {
    * configuration, for example, then this function will throw a {@link OtpAppException}.
    */
   private void validate() {
-    if (hasTransitData() && !transitRepository.hasTransit()) {
+    if (hasTransitData() && timetableDataImport.getTripCalendars().isEmpty()) {
       throw new OtpAppException(
         "The provided transit data have no trips within the configured transit service period. " +
           "There is something wrong with your data - see the log above. Another possibility is that the " +
@@ -291,13 +308,14 @@ public class GraphBuilder implements Runnable {
     long startTime,
     Graph graph,
     TransitRepository transitRepository,
+    TimetableDataImport timetableDataImport,
     DeduplicatorService deduplicator
   ) {
     long endTime = System.currentTimeMillis();
     String time = DurationUtils.durationToStr(Duration.ofMillis(endTime - startTime));
     var f = new OtpNumberFormat();
     var nStops = f.formatNumber(transitRepository.getSiteRepository().stopIndexSize());
-    var nPatterns = f.formatNumber(transitRepository.getAllTripPatterns().size());
+    var nPatterns = f.formatNumber(timetableDataImport.getAllTripPatterns().size());
     var nTransfers = f.formatNumber(
       transitRepository.getConstrainedTransferService().listAll().size()
     );

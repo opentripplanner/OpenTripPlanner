@@ -15,18 +15,18 @@ import org.opentripplanner.transit.model.network.TripPattern;
 
 /**
  * A Timetable is a TripTimes (stop-level details like arrival and departure times) for each of the
- * trips on a particular TripPattern.
- * Timetables provide most of the TripPattern functionality. Each TripPattern may possess more than
- * one Timetable when stop time updates are being applied: one for the scheduled stop times, one for
- * each snapshot of updated stop times, another for a working buffer of updated stop times, etc.
+ * trips on a particular TripPattern. Timetables provide most of the TripPattern functionality. Each
+ * TripPattern may possess more than one Timetable when stop time updates are being applied: one for
+ * the scheduled stop times, one for each snapshot of updated stop times, another for a working
+ * buffer of updated stop times, etc.
  */
 public class Timetable implements Serializable {
 
   private final TripPattern pattern;
 
-  private List<TripTimes> tripTimes;
+  private List<TripTimes<?>> tripTimes;
 
-  private Map<FeedScopedId, TripTimes> tripTimesIndex;
+  private Map<FeedScopedId, TripTimes<?>> tripTimesIndex;
 
   private List<FrequencyEntry> frequencyEntries;
 
@@ -57,12 +57,12 @@ public class Timetable implements Serializable {
   }
 
   @Nullable
-  public TripTimes getTripTimes(Trip trip) {
+  public TripTimes<?> getTripTimes(Trip trip) {
     return getTripTimes(trip.getId());
   }
 
   @Nullable
-  public TripTimes getTripTimes(FeedScopedId tripId) {
+  public TripTimes<?> getTripTimes(FeedScopedId tripId) {
     return tripTimesIndex.get(tripId);
   }
 
@@ -75,7 +75,7 @@ public class Timetable implements Serializable {
   public void setServiceCodes(Map<FeedScopedId, Integer> serviceCodes) {
     tripTimes = tripTimes
       .stream()
-      .map(tt -> tt.withServiceCode(serviceCodes.get(tt.getTrip().getServiceId())))
+      .<TripTimes<?>>map(tt -> withServiceCode(tt, serviceCodes.get(tt.getTrip().getServiceId())))
       .toList();
     tripTimesIndex = tripTimes
       .stream()
@@ -98,7 +98,7 @@ public class Timetable implements Serializable {
    * Contains one TripTimes object for each scheduled trip (even cancelled ones) and possibly
    * additional TripTimes objects for unscheduled trips. Frequency entries are stored separately.
    */
-  public List<TripTimes> getTripTimes() {
+  public List<TripTimes<?>> getTripTimes() {
     return tripTimes;
   }
 
@@ -129,38 +129,38 @@ public class Timetable implements Serializable {
   }
 
   /**
-   * Return the direction for all the trips in this timetable.
-   * By construction, all trips in a timetable have the same direction.
+   * Return the direction for all the trips in this timetable. By construction, all trips in a
+   * timetable have the same direction.
    */
   public Direction getDirection() {
     return getDirection(tripTimes, frequencyEntries);
   }
 
   /**
-   * Return an arbitrary TripTimes in this Timetable.
-   * Return a scheduled trip times if it exists, otherwise return a frequency-based trip times.
+   * Return an arbitrary TripTimes in this Timetable. Return a scheduled trip times if it exists,
+   * otherwise return a frequency-based trip times.
    */
-  public TripTimes getRepresentativeTripTimes() {
+  public TripTimes<?> getRepresentativeTripTimes() {
     return getRepresentativeTripTimes(tripTimes, frequencyEntries);
   }
 
   /**
-   * @return true if the timetable was created by a real-time update, false if this
-   * timetable is based on scheduled data.
-   * Only real-time timetables have a service date.
+   * @return true if the timetable was created by a real-time update, false if this timetable is
+   *         based on scheduled data. Only real-time timetables have a service date.
    */
   public boolean isCreatedByRealTimeUpdater() {
     return serviceDate != null;
   }
 
   /**
-   * The direction for the given collections of trip times.
-   * The method assumes that all trip times have the same directions and picks up one arbitrarily.
+   * The direction for the given collections of trip times. The method assumes that all trip times
+   * have the same directions and picks up one arbitrarily.
+   *
    * @param scheduledTripTimes all the scheduled-based trip times in a timetable.
-   * @param frequencies all the frequency-based trip times in a timetable.
+   * @param frequencies        all the frequency-based trip times in a timetable.
    */
   static Direction getDirection(
-    Collection<TripTimes> scheduledTripTimes,
+    Collection<TripTimes<?>> scheduledTripTimes,
     Collection<FrequencyEntry> frequencies
   ) {
     return Optional.ofNullable(getRepresentativeTripTimes(scheduledTripTimes, frequencies))
@@ -171,12 +171,13 @@ public class Timetable implements Serializable {
 
   /**
    * Return an arbitrary TripTimes.
+   *
    * @param scheduledTripTimes all the scheduled-based trip times in a timetable.
-   * @param frequencies all the frequency-based trip times in a timetable.
+   * @param frequencies        all the frequency-based trip times in a timetable.
    *
    */
-  private static TripTimes getRepresentativeTripTimes(
-    Collection<TripTimes> scheduledTripTimes,
+  private static TripTimes<?> getRepresentativeTripTimes(
+    Collection<TripTimes<?>> scheduledTripTimes,
     Collection<FrequencyEntry> frequencies
   ) {
     if (!scheduledTripTimes.isEmpty()) {
@@ -201,12 +202,15 @@ public class Timetable implements Serializable {
     return copyOf().withServiceDate(date).build();
   }
 
+  private static TripTimes<?> withServiceCode(TripTimes<?> tt, int serviceCode) {
+    return tt.withServiceCode(serviceCode);
+  }
+
   /**
-   * Compute the maximum number of whole days a trip schedule lasts. This method
-   * will use the last stop arrival time of the last trip. Return zero if the
-   * arrival time is negative.
+   * Compute the maximum number of whole days a trip schedule lasts. This method will use the last
+   * stop arrival time of the last trip. Return zero if the arrival time is negative.
    */
-  private static int computeMaxTripSpanDays(List<TripTimes> tripTimes) {
+  private static int computeMaxTripSpanDays(List<TripTimes<?>> tripTimes) {
     if (tripTimes.isEmpty()) {
       return 0;
     }

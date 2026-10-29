@@ -62,9 +62,9 @@ public class TripPatternForDateMapper {
       return null;
     }
 
-    List<TripTimes> times = new ArrayList<>();
+    List<TripTimes<?>> times = new ArrayList<>();
 
-    for (TripTimes tripTimes : timetable.getTripTimes()) {
+    for (TripTimes<?> tripTimes : timetable.getTripTimes()) {
       if (!serviceCodesRunning.contains(tripTimes.getServiceCode())) {
         continue;
       }
@@ -104,8 +104,8 @@ public class TripPatternForDateMapper {
 
   /**
    * Calls {@link TripPatternForDateMapper#map(Timetable, LocalDate)} and validates that the result
-   * is valid. Since it would cause exceptions with flex trips during start up this method should
-   * be used during real-time updates as flex trip cannot have real-time (as of now).
+   * is valid. Since it would cause exceptions with flex trips during start up this method should be
+   * used during real-time updates as flex trip cannot have real-time (as of now).
    *
    * @throws IllegalArgumentException
    */

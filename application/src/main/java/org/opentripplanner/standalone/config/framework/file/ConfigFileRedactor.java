@@ -1,8 +1,8 @@
 package org.opentripplanner.standalone.config.framework.file;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.TextNode;
 import java.util.Set;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.StringNode;
 
 /**
  * Redacts secret values from JSON configuration nodes before they are logged. This prevents
@@ -37,7 +37,7 @@ public class ConfigFileRedactor {
         if (entry.getValue().isObject() || entry.getValue().isArray()) {
           redactSecretsRecursive(entry.getValue());
         } else if (REDACT_KEYS.contains(entry.getKey())) {
-          entry.setValue(new TextNode("********"));
+          entry.setValue(new StringNode("********"));
         }
       });
     } else if (node.isArray()) {

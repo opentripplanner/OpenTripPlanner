@@ -8,9 +8,9 @@ import java.util.stream.Collectors;
 import org.opentripplanner.utils.lang.Sandbox;
 
 /**
- * An interface for expressing the fares offered to a passenger. They can be straightforward,
- * like a single ticket, but also more complicated like tickets that are only valid when purchased
- * together with another one.
+ * An interface for expressing the fares offered to a passenger. They can be straightforward, like a
+ * single ticket, but also more complicated like tickets that are only valid when purchased together
+ * with another one.
  */
 @Sandbox
 public sealed interface FareOffer permits FareOffer.DefaultFareOffer, FareOffer.DependentFareOffer {
@@ -54,8 +54,8 @@ public sealed interface FareOffer permits FareOffer.DefaultFareOffer, FareOffer.
   }
 
   /**
-   * A fare product that is only valid together when purchased together with any of the products
-   * in {@code dependencies}. These dependencies can also have dependencies on their own.
+   * A fare product that is only valid together when purchased together with any of the products in
+   * {@code dependencies}. These dependencies can also have dependencies on their own.
    */
   record DependentFareOffer(
     ZonedDateTime startTime,

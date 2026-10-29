@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.fares.service.gtfs.v1.custom;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.core.model.id.FeedScopedId;
@@ -8,6 +7,7 @@ import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.fares.model.FareRulesData;
 import org.opentripplanner.ext.fares.service.gtfs.v1.GtfsFareServiceFactory;
 import org.opentripplanner.routing.fares.FareService;
+import tools.jackson.databind.JsonNode;
 
 public class OrcaFareFactory extends GtfsFareServiceFactory {
 
@@ -29,7 +29,8 @@ public class OrcaFareFactory extends GtfsFareServiceFactory {
   }
 
   /**
-   * There is no configuration code in DefaultFareServiceFactory. We override the super class's method just in case it changes.
+   * There is no configuration code in DefaultFareServiceFactory. We override the super class's
+   * method just in case it changes.
    */
   @Override
   public void configure(JsonNode config) {

@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
+import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.ext.fares.service.gtfs.v1.GtfsFareServiceFactory;
@@ -30,6 +30,7 @@ import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.slf4j.Logger;
@@ -47,17 +48,20 @@ public class GtfsModule implements GraphBuilderModule {
   private final FareServiceFactory fareServiceFactory;
 
   private final TransitRepository transitRepository;
+  private final TimetableDataImport timetableDataImport;
   private final StreetDetailsRepository streetDetailsRepository;
   private final Graph graph;
   private final DataImportIssueStore issueStore;
   private final DeduplicatorService deduplicator;
 
   private final double maxStopToShapeSnapDistance;
+  private final double transitShapeSimplificationToleranceMeters;
   private final int subwayAccessTime_s;
 
   public GtfsModule(
     List<GtfsBundle> bundles,
     TransitRepository transitRepository,
+    TimetableDataImport timetableDataImport,
     StreetDetailsRepository streetDetailsRepository,
     Graph graph,
     DeduplicatorService deduplicator,
@@ -65,10 +69,12 @@ public class GtfsModule implements GraphBuilderModule {
     LocalDateRange transitPeriodLimit,
     FareServiceFactory fareServiceFactory,
     double maxStopToShapeSnapDistance,
+    double transitShapeSimplificationToleranceMeters,
     int subwayAccessTime_s
   ) {
     this.gtfsBundles = bundles;
     this.transitRepository = transitRepository;
+    this.timetableDataImport = timetableDataImport;
     this.streetDetailsRepository = streetDetailsRepository;
     this.graph = graph;
     this.deduplicator = deduplicator;
@@ -76,6 +82,7 @@ public class GtfsModule implements GraphBuilderModule {
     this.transitPeriodLimit = transitPeriodLimit;
     this.fareServiceFactory = fareServiceFactory;
     this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
+    this.transitShapeSimplificationToleranceMeters = transitShapeSimplificationToleranceMeters;
     this.subwayAccessTime_s = subwayAccessTime_s;
   }
 
@@ -85,12 +92,14 @@ public class GtfsModule implements GraphBuilderModule {
   public static GtfsModule forTest(
     List<GtfsBundle> bundles,
     TransitRepository transitRepository,
+    TimetableDataImport timetableDataImport,
     Graph graph,
     LocalDateRange transitPeriodLimit
   ) {
     return new GtfsModule(
       bundles,
       transitRepository,
+      timetableDataImport,
       new DefaultStreetDetailsRepository(),
       graph,
       new Deduplicator(),
@@ -98,6 +107,7 @@ public class GtfsModule implements GraphBuilderModule {
       transitPeriodLimit,
       new GtfsFareServiceFactory(),
       150.0,
+      0.0,
       120
     );
   }
@@ -151,6 +161,7 @@ public class GtfsModule implements GraphBuilderModule {
         GeometryProcessor geometryProcessor = new GeometryProcessor(
           builder,
           maxStopToShapeSnapDistance,
+          transitShapeSimplificationToleranceMeters,
           issueStore
         );
 
@@ -184,7 +195,7 @@ public class GtfsModule implements GraphBuilderModule {
       throw new RuntimeException(e);
     }
 
-    transitRepository.updateCalendarServiceData(calendarServiceData);
+    timetableDataImport.updateCalendarServiceData(calendarServiceData);
     TransitWithFutureDateValidator.validate(
       calendarServiceData,
       issueStore,
@@ -196,10 +207,11 @@ public class GtfsModule implements GraphBuilderModule {
    * Verifies that a feed id is not assigned twice.
    * <p>
    * Duplicates can happen in the following cases:
+   * <pre>
    *  - the feed id is configured twice in build-config.json
    *  - two GTFS feeds have the same feed_info.feed_id
    *  - a GTFS feed defines a feed_info.feed_id like '3' that collides with an auto-generated one
-   * <p>
+   * </pre>
    * Debugging these cases is very confusing, so we prevent it from happening.
    */
   private static void verifyUniqueFeedId(
@@ -270,7 +282,11 @@ public class GtfsModule implements GraphBuilderModule {
     StreetDetailsRepository streetDetailsRepository,
     TransitDataImport dataImport
   ) {
-    AddTransitEntitiesToTimetable.addToTimetable(dataImport, transitRepository);
+    AddTransitEntitiesToTimetable.addToTimetable(
+      dataImport,
+      transitRepository,
+      timetableDataImport
+    );
     AddTransitEntitiesToGraph.addToGraph(
       dataImport,
       subwayAccessTime_s,
