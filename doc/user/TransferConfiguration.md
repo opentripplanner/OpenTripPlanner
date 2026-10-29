@@ -35,12 +35,14 @@ logs and in the issues it reports, for example `Created 101785 regular transfers
 'walk'`. Any string is allowed.
 
 **User preferences.** The preferences of a traveler, like walking speed, that are used to search
-for and cost the transfers. A profile without `userPreferences` gets them from its `routingRequest`,
-or from the default request if it has none. The user preferences of the profiles must be unique.
+for and cost the transfers. A profile without `userPreferences` gets the ones of its parent of the
+same type, or the defaults. The user preferences of the profiles must be unique.
 
-**Default request.** The default request is the request with the default values of the code. It is
-not the `routingDefaults` of `router-config.json`, since the router configuration is not available
-when the graph is built.
+**Street parameters.** The parameters of the street search that are not user preferences, like the
+stairs reluctance, are set in the block of the profile type, for example `walk.stairsReluctance`.
+They are shared by all the profiles of the type. See [Street parameters](#street-parameters). They
+are not the `routingDefaults` of `router-config.json`, since the router configuration is not
+available when the graph is built.
 
 **Warmup.** The transfers for the preferences of a routing request are created the first time a
 request needs them, and cached. OTP creates them for the preferences of every profile when the
@@ -48,8 +50,8 @@ server starts. A warmup entry does the same for other preferences that are commo
 but are not worth a profile of their own. See [Warmup](#warmup).
 
 **Parent.** A profile can be based on another profile, its `parent`. If the parent is of the same
-type, the profile inherits the `routingRequest` and the `userPreferences` of the parent, and only
-has to set what is different. The transfers the profile and its parent have in common are stored
+type, the profile inherits the `userPreferences` of the parent, and only has to set what is
+different. The transfers the profile and its parent have in common are stored
 once, which saves memory. See [Parent and deduplication](#parent-and-deduplication).
 
 ## Example
@@ -112,7 +114,6 @@ that is not configured has no transfers to use, so configure all the types the c
 | &nbsp;&nbsp;`id`              | `string`   | **Required.** The id of the profile, unique among all profiles.                     |                   |
 | &nbsp;&nbsp;`parent`          | `string`   | The `id` of the profile this profile is based on. See below.                        |                   |
 | &nbsp;&nbsp;`userPreferences` | `object`   | The preferences the profile is searched with. See below.                            |                   |
-| &nbsp;&nbsp;`routingRequest`  | `object`   | A [routing request](RouteRequest.md) the search is based on. See below.             |                   |
 | `walk.maxDuration`            | `duration` | How far from a stop the walk transfers are searched. See below.                 | `30m`             |
 | `walk.warmup`                 | `object[]` | Preferences to create transfers for when the server starts. See below.              |                   |
 | &nbsp;&nbsp;`id`              | `string`   | **Required.** The id of the entry, unique among all profiles and warmup entries.    |                   |
@@ -153,18 +154,37 @@ are `0.0`, so `optimize: { time: 0.1 }` is `time: 1.0`, `slope: 0.0` and `safety
 not set in a profile, the profile inherits it from a parent of the same type, and a root gets it
 from the request. The default is the safest streets (`safety: 1.0`).
 
-The stairs reluctance is not a user preference, since no API takes it as an input of a routing
-search. It is a `routingRequest` parameter of the profile, for example `walk.stairsReluctance`,
-`wheelchair.stairsReluctance` or `bicycle.walking.stairsReluctance`. It is the value of the
-configuration of the profile, not the one in `routingDefaults` of the `router-config.json`, so
-copy it to the `routingRequest` of the profiles if it is not the default.
+### Street parameters
 
-### Routing request
+The parameters of the street search that are not user preferences, since no API takes them as an
+input of a routing search, are set in the block of the profile type. They are the same for all the
+profiles of the type, and the default is the default of the route request. The value in
+`routingDefaults` of `router-config.json` is not used for the transfers.
 
-`routingRequest` takes the same parameters as the [route request](RouteRequest.md), and is the base
-the transfer search is made with. It is there so existing behavior can be kept. The values in
-`userPreferences` override the equivalent values of the request. The goal is to move all the
-relevant parameters to `userPreferences`, and drop `routingRequest` in the future.
+| Block        | Parameters                                                                                                    |
+|--------------|---------------------------------------------------------------------------------------------------------------|
+| `walk`       | `stairsReluctance`, `stairsTimeFactor` and `escalator` (`speed`, `reluctance`).                               |
+| `wheelchair` | `stop` and `elevator` (`onlyConsiderAccessible`, `unknownCost`, `inaccessibleCost`), `inaccessibleStreetReluctance`, `maxSlope`, `slopeExceededReluctance` and `stairsReluctance`. |
+| `bicycle`    | `walking` (`stairsReluctance`, `mountDismountCost` and `mountDismountTime`): walking with the bicycle.        |
+| `car`        | None.                                                                                                         |
+
+The elevator settings of the street search (`ElevatorPreferences`), the street-level settings like
+`turnReluctance` and `drivingDirection`, and the wheelchair `stairsTimeFactor` are not configurable
+for the transfers, they have the default values.
+
+By default the `wheelchair` profile only uses the stops that are marked as wheelchair accessible.
+If the accessibility data of the stops is incomplete, almost all the transfers are lost. Set
+`unknownCost` and `inaccessibleCost` of `wheelchair.stop` to use the other stops with a cost:
+
+```json
+{
+  "transfers": {
+    "wheelchair": {
+      "stop": { "unknownCost": 600, "inaccessibleCost": 3600 }
+    }
+  }
+}
+```
 
 ### Parent and deduplication
 
@@ -174,12 +194,12 @@ declared in any order. A parent can be of another type, for example a `wheelchai
 `walk` profile as its parent. The paths are then stored once, but no values are inherited.
 
 **Inheritance.** Values are only inherited within a profile type. If the parent is a profile of the
-same type, the profile inherits the `routingRequest` and the `userPreferences` of the parent.
+same type, the profile inherits the `userPreferences` of the parent.
 Everything that is set on the profile overrides the inherited value, and everything that is not set
 is the value of the parent. A profile with a parent and without `userPreferences` of its own would
 get the same preferences as the parent, and is rejected, since the profiles must be unique. A
 profile without a parent of the same type is the root of its type, and the values it does not set
-are the ones of the request, see [Routing request](#routing-request). A parent of another type is
+are the defaults. A parent of another type is
 not inherited from, it is only used for the deduplication below.
 
 **Deduplication.** Each profile still searches for its own transfers, but the transfers that are

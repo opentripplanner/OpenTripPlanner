@@ -85,16 +85,15 @@ class TransferProfilesConfigMapperTest {
   }
 
   @Test
-  void mapsTheRoutingRequestOfAWalkProfile() {
+  void theWalkSectionSetsTheStairsAndEscalatorOfTheRequest() {
     var subject = map(
       """
       {
         transfers: {
-          walk: { maxDuration: '30m',
-            profiles: [{
-              id: "wheelchair-walk",
-              routingRequest: { wheelchairAccessibility: { enabled: true } }
-            }]
+          walk: {
+            stairsReluctance: 3.0,
+            stairsTimeFactor: 2.0,
+            escalator: { speed: 0.5, reluctance: 1.5 }
           }
         }
       }
@@ -102,7 +101,103 @@ class TransferProfilesConfigMapperTest {
     );
 
     var request = subject.profiles().getFirst().routingRequest();
-    assertThat(request.journey().wheelchair()).isTrue();
+    var walk = request.preferences().walk();
+    assertThat(walk.stairsReluctance()).isEqualTo(3.0);
+    assertThat(walk.stairsTimeFactor()).isEqualTo(2.0);
+    assertThat(walk.escalator().speed()).isEqualTo(0.5);
+    assertThat(walk.escalator().reluctance()).isEqualTo(1.5);
+    assertThat(request.journey().wheelchair()).isFalse();
+  }
+
+  @Test
+  void theWheelchairSectionSetsTheWheelchairPreferencesOfTheRequest() {
+    var subject = map(
+      """
+      {
+        transfers: {
+          wheelchair: {
+            stop: { unknownCost: 100, inaccessibleCost: 1000 },
+            elevator: { onlyConsiderAccessible: true },
+            inaccessibleStreetReluctance: 10.0,
+            maxSlope: 0.1,
+            slopeExceededReluctance: 2.0,
+            stairsReluctance: 50.0
+          }
+        }
+      }
+      """
+    );
+
+    var wheelchair = subject.profiles().getFirst().routingRequest().preferences().wheelchair();
+    assertThat(wheelchair.stop().onlyConsiderAccessible()).isFalse();
+    assertThat(wheelchair.stop().unknownCost()).isEqualTo(100);
+    assertThat(wheelchair.stop().inaccessibleCost()).isEqualTo(1000);
+    assertThat(wheelchair.elevator().onlyConsiderAccessible()).isTrue();
+    assertThat(wheelchair.inaccessibleStreetReluctance()).isEqualTo(10.0);
+    assertThat(wheelchair.maxSlope()).isEqualTo(0.1);
+    assertThat(wheelchair.slopeExceededReluctance()).isEqualTo(2.0);
+    assertThat(wheelchair.stairsReluctance()).isEqualTo(50.0);
+  }
+
+  @Test
+  void theWheelchairStopsAreStrictByDefault() {
+    var subject = map("{ transfers: { wheelchair: {} } }");
+
+    var wheelchair = subject.profiles().getFirst().routingRequest().preferences().wheelchair();
+    assertThat(wheelchair.stop().onlyConsiderAccessible()).isTrue();
+  }
+
+  @Test
+  void theBicycleSectionSetsTheWalkingWithTheBicycleOfTheRequest() {
+    var subject = map(
+      """
+      {
+        transfers: {
+          bicycle: {
+            walking: { stairsReluctance: 4.0, mountDismountCost: 5, mountDismountTime: "10s" }
+          }
+        }
+      }
+      """
+    );
+
+    var walking = subject.profiles().getFirst().routingRequest().preferences().bike().walking();
+    assertThat(walking.stairsReluctance()).isEqualTo(4.0);
+    assertThat(walking.mountDismountCost().toSeconds()).isEqualTo(5);
+    assertThat(walking.mountDismountTime()).isEqualTo(Duration.ofSeconds(10));
+  }
+
+  @Test
+  void theCarSectionHasNoRequestParameters() {
+    var subject = map("{ transfers: { car: {} } }");
+
+    assertThat(subject.profiles().getFirst().routingRequest().preferences().car()).isEqualTo(
+      RouteRequest.defaultValue().preferences().car()
+    );
+  }
+
+  @Test
+  void allTheProfilesOfATypeShareTheRequestOfTheTypeSection() {
+    var subject = map(
+      """
+      {
+        transfers: {
+          walk: {
+            stairsReluctance: 3.0,
+            profiles: [
+              { id: "walk", userPreferences: { speed: 1.1 } },
+              { id: "slow", parent: "walk", userPreferences: { reluctance: 5.0 } }
+            ]
+          }
+        }
+      }
+      """
+    );
+
+    for (var id : List.of("walk", "slow")) {
+      var request = profile(subject, id).routingRequest();
+      assertThat(request.preferences().walk().stairsReluctance()).isEqualTo(3.0);
+    }
   }
 
   @Test
@@ -235,32 +330,6 @@ class TransferProfilesConfigMapperTest {
       WalkPreferences.DEFAULT.speed()
     );
     assertThat(slow.userPreferences().reluctance().value()).isEqualTo(5.0);
-  }
-
-  @Test
-  void aChildInheritsTheRoutingRequestOfItsParentWithTheParentsPreferencesApplied() {
-    var subject = map(
-      """
-      {
-        transfers: {
-          walk: { maxDuration: '30m',
-            profiles: [
-              {
-                id: "walk",
-                userPreferences: { speed: 1.1 },
-                routingRequest: { numItineraries: 7 }
-              },
-              { id: "slow", parent: "walk", userPreferences: { reluctance: 5.0 } }
-            ]
-          }
-        }
-      }
-      """
-    );
-
-    var request = profile(subject, "slow").routingRequest();
-    assertThat(request.numItineraries()).isEqualTo(7);
-    assertThat(request.preferences().walk().speed()).isWithin(0.001).of(1.1);
   }
 
   @Test

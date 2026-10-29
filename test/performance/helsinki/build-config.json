@@ -12,15 +12,7 @@
   "fares": "hsl",
   "transfers": {
     "walk": { "maxDuration": "26m" },
-    "wheelchair": {
-      "maxDuration": "26m",
-      "profiles": [
-        {
-          "id": "wheelchair",
-          "routingRequest": { "wheelchairAccessibility": { "enabled": true, "maxSlope": 0.125 } }
-        }
-      ]
-    },
+    "wheelchair": { "maxDuration": "26m", "maxSlope": 0.125 },
     "bicycle": { "maxDuration": "26m" },
     "via": { "maxDuration": "26m" }
   },
