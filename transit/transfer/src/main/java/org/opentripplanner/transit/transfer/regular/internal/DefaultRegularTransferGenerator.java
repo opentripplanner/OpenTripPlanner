@@ -3,7 +3,6 @@ package org.opentripplanner.transit.transfer.regular.internal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -15,6 +14,7 @@ import org.opentripplanner.raptor.data.stop.RaptorStopIndex;
 import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferGenerator;
+import org.opentripplanner.transit.transfer.regular.RegularTransferPathCounts;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferParameters;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPath;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
@@ -75,7 +75,7 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
       progress.step(m -> LOG.info(m));
     });
     LOG.info(progress.completeMessage());
-    logSummary(stops.size());
+    logSummary();
   }
 
   @Override
@@ -95,35 +95,39 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
     return stops;
   }
 
-  private void logSummary(int numberOfStops) {
-    int sum = 0;
+  /** The size of each profile, and the number of the transfers that share the path of a parent. */
+  List<ProfileStatistics> profileStatistics() {
+    var result = new ArrayList<ProfileStatistics>();
     for (var profile : profiles) {
-      int size = buildRepository.calculateNumberOfTransferPaths(profile.userPreferences());
-      LOG.info(
-        "Created {} regular transfers for profile '{}', {}.",
-        size,
-        profile.id(),
-        profile.userPreferences()
-      );
-      if (profile.parent() != null) {
-        long shared = sharedPaths.getOrDefault(profile.id(), new LongAdder()).sum();
-        LOG.info(
-          "Profile '{}': {} of {} paths ({}%) are the paths of the parent '{}', they are stored once.",
+      result.add(
+        new ProfileStatistics(
           profile.id(),
-          shared,
-          size,
-          size == 0 ? "0" : String.format(Locale.ROOT, "%.1f", (100.0 * shared) / size),
-          profile.parent().id()
-        );
-      }
-      sum += size;
+          profile.userPreferences().toString(),
+          profile.parent() == null ? null : profile.parent().id(),
+          buildRepository.calculateNumberOfTransferPaths(profile.userPreferences()),
+          sharedPaths.getOrDefault(profile.id(), new LongAdder()).sum()
+        )
+      );
     }
-    LOG.info(
-      "Done generating regular transfers. paths: {}, profiles: {} stops: {}",
-      sum,
-      profiles.size(),
-      numberOfStops
-    );
+    return result;
+  }
+
+  @Override
+  public RegularTransferPathCounts pathCounts() {
+    long paths = 0;
+    long stored = 0;
+    for (var statistics : profileStatistics()) {
+      paths += statistics.transfers();
+      stored += statistics.streetPaths();
+    }
+    return new RegularTransferPathCounts(paths, stored, profiles.size());
+  }
+
+  /** Log the size of each profile, the totals are logged with the statistics of the stops. */
+  private void logSummary() {
+    for (var statistics : profileStatistics()) {
+      LOG.info(statistics.message());
+    }
   }
 
   /**

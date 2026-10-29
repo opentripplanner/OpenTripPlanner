@@ -18,4 +18,8 @@ public interface RegularTransferGenerator {
   /// profile. Empty until
   /// [#generateTransfersForAllStops()] has run.
   Set<FeedScopedId> listAllStopsUsedInTransfers();
+
+  /// The number of paths of all the profiles, and how many of them are stored. Empty (zero paths)
+  /// until [#generateTransfersForAllStops()] has run.
+  RegularTransferPathCounts pathCounts();
 }

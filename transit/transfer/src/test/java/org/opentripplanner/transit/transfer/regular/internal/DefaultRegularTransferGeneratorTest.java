@@ -3,6 +3,7 @@ package org.opentripplanner.transit.transfer.regular.internal;
 import static com.google.common.truth.Truth.assertThat;
 
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -215,6 +216,35 @@ class DefaultRegularTransferGeneratorTest {
         .findPath(stopIndex.toStopIndex(A), stopIndex.toStopIndex(B));
     }
 
+    DefaultRegularTransferGenerator<FakeTransferPathProvider.FakePath, WalkPreferences> generator(
+      List<TransferProfile<WalkPreferences>> profiles,
+      CostLinearFunction limit
+    ) {
+      return new DefaultRegularTransferGenerator<>(
+        stopIndex(),
+        new TransferParameters<>(
+          profiles,
+          Map.of(TransferProfileType.WALK, MaxDurationsPreference.DEFAULT),
+          limit
+        ),
+        provider,
+        FakeRequestMapper.INSTANCE,
+        new DefaultRegularTransferBuildRepository<FakeTransferPathProvider.FakePath>()
+      );
+    }
+
+    /** The statistics of each profile after the transfers are generated, by profile id. */
+    Map<String, ProfileStatistics> generateStatistics(
+      List<TransferProfile<WalkPreferences>> profiles,
+      CostLinearFunction limit
+    ) {
+      var generator = generator(profiles, limit);
+      generator.generateTransfersForAllStops();
+      var result = new HashMap<String, ProfileStatistics>();
+      generator.profileStatistics().forEach(statistics -> result.put(statistics.id(), statistics));
+      return result;
+    }
+
     TransferProfile<WalkPreferences> parentProfile() {
       return new TransferProfile<>("parent", TransferProfileType.WALK, null, parent, parent);
     }
@@ -288,5 +318,52 @@ class DefaultRegularTransferGeneratorTest {
     );
 
     assertThat(path).isSameInstanceAs(test.p1);
+  }
+
+  @Test
+  void theStatisticsCountTheSharedPathsOfAChild() {
+    var test = new ParentAndChild();
+
+    var statistics = test.generateStatistics(
+      List.of(test.parentProfile(), test.childProfile("parent")),
+      TransferParameters.DEFAULT_DEDUPLICATION_LIMIT
+    );
+
+    assertThat(statistics.get("parent").transfers()).isEqualTo(1);
+    assertThat(statistics.get("parent").sharedWithParent()).isEqualTo(0);
+    assertThat(statistics.get("child").transfers()).isEqualTo(1);
+    assertThat(statistics.get("child").sharedWithParent()).isEqualTo(1);
+    assertThat(statistics.get("child").streetPaths()).isEqualTo(0);
+    assertThat(statistics.get("child").parentId()).isEqualTo("parent");
+  }
+
+  @Test
+  void theStatisticsOfAChildWithItsOwnPathHaveNoSharedPaths() {
+    var test = new ParentAndChild();
+
+    var statistics = test.generateStatistics(
+      List.of(test.parentProfile(), test.childProfile("parent")),
+      CostLinearFunction.of(Cost.ZERO, 0.0)
+    );
+
+    assertThat(statistics.get("child").sharedWithParent()).isEqualTo(0);
+    assertThat(statistics.get("child").streetPaths()).isEqualTo(1);
+  }
+
+  @Test
+  void thePathCountsTellHowManyPathsAreReused() {
+    var test = new ParentAndChild();
+    var generator = test.generator(
+      List.of(test.parentProfile(), test.childProfile("parent")),
+      TransferParameters.DEFAULT_DEDUPLICATION_LIMIT
+    );
+
+    generator.generateTransfersForAllStops();
+
+    var counts = generator.pathCounts();
+    assertThat(counts.paths()).isEqualTo(2);
+    assertThat(counts.stored()).isEqualTo(1);
+    assertThat(counts.reused()).isEqualTo(1);
+    assertThat(counts.profiles()).isEqualTo(2);
   }
 }
