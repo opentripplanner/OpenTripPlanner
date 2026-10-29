@@ -1,4 +1,4 @@
-package org.rutebanken.netex.model;
+package org.entur.netex2.model;
 
 import java.util.Collection;
 import org.opentripplanner.netex.mapping.MappingSupport;

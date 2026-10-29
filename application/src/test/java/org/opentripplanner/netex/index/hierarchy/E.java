@@ -1,7 +1,7 @@
 package org.opentripplanner.netex.index.hierarchy;
 
-import org.rutebanken.netex.model.EntityInVersionStructure;
-import org.rutebanken.netex.model.EntityStructure;
+import org.entur.netex2.model.EntityInVersionStructure;
+import org.entur.netex2.model.EntityStructure;
 
 /**
  * Create some entities. The classes under test is generic classes so we have used american acters

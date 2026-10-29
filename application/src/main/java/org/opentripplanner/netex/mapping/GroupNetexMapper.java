@@ -5,11 +5,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.entur.netex2.model.ServiceJourneyInterchange;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
-import org.rutebanken.netex.model.ServiceJourneyInterchange;
 
 /**
  * Entities x-referencing entries in more than on independent file must be mapped AFTER all

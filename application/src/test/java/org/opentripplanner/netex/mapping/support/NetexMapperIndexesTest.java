@@ -9,10 +9,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.entur.netex2.model.DatedServiceJourney;
+import org.entur.netex2.model.EntityStructure;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
-import org.rutebanken.netex.model.DatedServiceJourney;
-import org.rutebanken.netex.model.EntityStructure;
 
 class NetexMapperIndexesTest {
 

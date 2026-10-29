@@ -1,18 +1,18 @@
 package org.opentripplanner.netex.mapping;
 
-import static org.rutebanken.netex.model.WaterSubmodeEnumeration.HIGH_SPEED_VEHICLE_SERVICE;
-import static org.rutebanken.netex.model.WaterSubmodeEnumeration.LOCAL_CAR_FERRY;
-import static org.rutebanken.netex.model.WaterSubmodeEnumeration.NATIONAL_CAR_FERRY;
-import static org.rutebanken.netex.model.WaterSubmodeEnumeration.REGIONAL_CAR_FERRY;
+import static org.entur.netex2.model.WaterSubmodeEnumeration.HIGH_SPEED_VEHICLE_SERVICE;
+import static org.entur.netex2.model.WaterSubmodeEnumeration.LOCAL_CAR_FERRY;
+import static org.entur.netex2.model.WaterSubmodeEnumeration.NATIONAL_CAR_FERRY;
+import static org.entur.netex2.model.WaterSubmodeEnumeration.REGIONAL_CAR_FERRY;
 
 import java.util.Set;
 import javax.annotation.Nullable;
+import org.entur.netex2.model.AllPublicTransportModesEnumeration;
+import org.entur.netex2.model.TransportSubmodeStructure;
 import org.opentripplanner.netex.mapping.support.NetexMainAndSubMode;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.CarAccess;
-import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
-import org.rutebanken.netex.model.TransportSubmodeStructure;
 
 /**
  * This is a best-effort at mapping the NeTEx transport modes to the OTP route codes which are
@@ -30,17 +30,17 @@ class TransportModeMapper {
   );
 
   public NetexMainAndSubMode map(
-    AllVehicleModesOfTransportEnumeration netexMode,
+    AllPublicTransportModesEnumeration netexMode,
     TransportSubmodeStructure submode
   ) throws UnsupportedModeException {
     if (submode == null) {
-      return new NetexMainAndSubMode(mapAllVehicleModesOfTransport(netexMode));
+      return new NetexMainAndSubMode(mapAllPublicTransportModes(netexMode));
     } else {
       return getSubmodeAsString(submode);
     }
   }
 
-  public TransitMode mapAllVehicleModesOfTransport(AllVehicleModesOfTransportEnumeration mode)
+  public TransitMode mapAllPublicTransportModes(AllPublicTransportModesEnumeration mode)
     throws UnsupportedModeException {
     if (mode == null) {
       throw new UnsupportedModeException(null);
@@ -112,9 +112,9 @@ class TransportModeMapper {
 
   static class UnsupportedModeException extends Exception {
 
-    final AllVehicleModesOfTransportEnumeration mode;
+    final AllPublicTransportModesEnumeration mode;
 
-    public UnsupportedModeException(AllVehicleModesOfTransportEnumeration mode) {
+    public UnsupportedModeException(AllPublicTransportModesEnumeration mode) {
       this.mode = mode;
     }
   }

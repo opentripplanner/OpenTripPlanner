@@ -7,10 +7,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nullable;
+import org.entur.netex2.model.DatedServiceJourney;
+import org.entur.netex2.model.OperatingDay;
+import org.entur.netex2.model.OperatingDayRefStructure;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
-import org.rutebanken.netex.model.DatedServiceJourney;
-import org.rutebanken.netex.model.OperatingDay;
-import org.rutebanken.netex.model.OperatingDayRefStructure;
 
 /**
  * This class is responsible for indexing and mapping {@link DatedServiceJourney}.

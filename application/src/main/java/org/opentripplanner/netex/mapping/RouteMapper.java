@@ -6,6 +6,14 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nullable;
+import org.entur.netex2.model.AllPublicTransportModesEnumeration;
+import org.entur.netex2.model.BrandingRefStructure;
+import org.entur.netex2.model.FlexibleLine_VersionStructure;
+import org.entur.netex2.model.GroupOfLinesRefStructure;
+import org.entur.netex2.model.Line_VersionStructure;
+import org.entur.netex2.model.Network;
+import org.entur.netex2.model.OperatorRefStructure;
+import org.entur.netex2.model.PresentationStructure;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -20,14 +28,6 @@ import org.opentripplanner.transit.model.network.RouteBuilder;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Branding;
 import org.opentripplanner.transit.model.organization.Operator;
-import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
-import org.rutebanken.netex.model.BrandingRefStructure;
-import org.rutebanken.netex.model.FlexibleLine_VersionStructure;
-import org.rutebanken.netex.model.GroupOfLinesRefStructure;
-import org.rutebanken.netex.model.Line_VersionStructure;
-import org.rutebanken.netex.model.Network;
-import org.rutebanken.netex.model.OperatorRefStructure;
-import org.rutebanken.netex.model.PresentationStructure;
 
 /**
  * Maps NeTEx line to OTP Route.
@@ -79,9 +79,11 @@ class RouteMapper {
     builder.withAgency(findOrCreateAuthority(line));
     builder.withOperator(findOperator(line));
     builder.withBranding(findBranding(line));
-    NonLocalizedString longName = NonLocalizedString.ofNullable(line.getName().getValue());
+    NonLocalizedString longName = NonLocalizedString.ofNullable(
+      MultilingualStringMapper.getStringValue(line.getName())
+    );
     builder.withLongName(longName);
-    builder.withShortName(line.getPublicCode());
+    builder.withShortName(line.getPublicCode() != null ? line.getPublicCode().getValue() : null);
 
     NetexMainAndSubMode mode;
     try {
@@ -124,7 +126,7 @@ class RouteMapper {
     // but currently it doesn't look it is being parsed.
     // until there is better information from the operators we assume that all ferries allow
     // bicycles on board.
-    if (line.getTransportMode().equals(AllVehicleModesOfTransportEnumeration.WATER)) {
+    if (line.getTransportMode().equals(AllPublicTransportModesEnumeration.WATER)) {
       if (ferryIdsNotAllowedForBicycle.contains(line.getId())) {
         builder.withBikesAllowed(BikeAccess.NOT_ALLOWED);
       } else {

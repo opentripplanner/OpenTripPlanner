@@ -5,9 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDateTime;
 import java.time.Month;
+import org.entur.netex2.model.TariffZone;
+import org.entur.netex2.model.ValidBetween;
 import org.junit.jupiter.api.Test;
-import org.rutebanken.netex.model.TariffZone;
-import org.rutebanken.netex.model.ValidBetween;
 
 class ValidOnDateTest {
 

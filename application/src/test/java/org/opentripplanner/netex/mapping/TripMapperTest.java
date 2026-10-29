@@ -9,6 +9,18 @@ import static org.opentripplanner.netex.mapping.MappingSupport.createWrappedRef;
 import jakarta.xml.bind.JAXBElement;
 import java.util.List;
 import java.util.Map;
+import org.entur.netex2.model.AccessibilityAssessment;
+import org.entur.netex2.model.AccessibilityLimitation;
+import org.entur.netex2.model.AccessibilityLimitations_RelStructure;
+import org.entur.netex2.model.JourneyPattern;
+import org.entur.netex2.model.JourneyPatternRefStructure;
+import org.entur.netex2.model.JourneyPattern_VersionStructure;
+import org.entur.netex2.model.LimitationStatusEnumeration;
+import org.entur.netex2.model.LineRefStructure;
+import org.entur.netex2.model.Route;
+import org.entur.netex2.model.RouteRefStructure;
+import org.entur.netex2.model.ServiceJourney;
+import org.entur.netex2.model.VehicleTypeRefStructure;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.id.FeedScopedId;
@@ -23,18 +35,6 @@ import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.VehicleAssignment;
 import org.opentripplanner.transit.service.SiteRepository;
-import org.rutebanken.netex.model.AccessibilityAssessment;
-import org.rutebanken.netex.model.AccessibilityLimitation;
-import org.rutebanken.netex.model.AccessibilityLimitations_RelStructure;
-import org.rutebanken.netex.model.JourneyPattern;
-import org.rutebanken.netex.model.JourneyPatternRefStructure;
-import org.rutebanken.netex.model.JourneyPattern_VersionStructure;
-import org.rutebanken.netex.model.LimitationStatusEnumeration;
-import org.rutebanken.netex.model.LineRefStructure;
-import org.rutebanken.netex.model.Route;
-import org.rutebanken.netex.model.RouteRefStructure;
-import org.rutebanken.netex.model.ServiceJourney;
-import org.rutebanken.netex.model.VehicleTypeRefStructure;
 
 class TripMapperTest {
 

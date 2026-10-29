@@ -4,17 +4,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.netex.NetexTestDataSupport.createQuay;
 import static org.opentripplanner.netex.NetexTestDataSupport.createStopPlace;
 
-import jakarta.xml.bind.JAXBElement;
 import java.util.Collection;
 import java.util.Set;
+import org.entur.netex2.model.ObjectFactory;
+import org.entur.netex2.model.Quay;
+import org.entur.netex2.model.SiteFrame;
+import org.entur.netex2.model.StopPlace;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.netex.NetexTestDataSupport;
 import org.opentripplanner.netex.index.NetexEntityIndex;
-import org.rutebanken.netex.model.ObjectFactory;
-import org.rutebanken.netex.model.Quay;
-import org.rutebanken.netex.model.SiteFrame;
-import org.rutebanken.netex.model.Site_VersionStructure;
-import org.rutebanken.netex.model.StopPlace;
 
 class SiteFrameParserTest {
 
@@ -28,12 +26,9 @@ class SiteFrameParserTest {
 
     Quay quay = createQuay();
     StopPlace stopPlace = createStopPlace(quay);
-    JAXBElement<? extends Site_VersionStructure> jaxbStopPlace = OBJECT_FACTORY.createStopPlace(
-      stopPlace
-    );
 
     siteFrame.setStopPlaces(OBJECT_FACTORY.createStopPlacesInFrame_RelStructure());
-    siteFrame.getStopPlaces().getStopPlace_().add(jaxbStopPlace);
+    siteFrame.getStopPlaces().getStopPlace().add(stopPlace);
 
     siteFrameParser.parse(siteFrame);
     siteFrameParser.setResultOnIndex(netexEntityIndex);
