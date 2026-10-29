@@ -47,6 +47,29 @@ class RaptorTransferStoreTest {
     assertThat(subject.getTransfersFromStop(STOP_C).hasNext()).isFalse();
   }
 
+  @Test
+  void toStringDoesNotListTheTransfers() {
+    RaptorTransferStore subject = RaptorTransferStore.of(3)
+      .addTransfer(STOP_A, STOP_B, TIME_AB, C1_AB)
+      .build();
+
+    assertThat(subject.toString()).isEqualTo(
+      "RaptorTransferStore{fromStops: RaptorTransfers{size: 3}, toStops: RaptorTransfers{size: 3}}"
+    );
+  }
+
+  @Test
+  void equalsAndHashCodeAreTheIdentityOfTheStore() {
+    var a = RaptorTransferStore.of(3).addTransfer(STOP_A, STOP_B, TIME_AB, C1_AB).build();
+    var sameTransfers = RaptorTransferStore.of(3)
+      .addTransfer(STOP_A, STOP_B, TIME_AB, C1_AB)
+      .build();
+
+    assertThat(a).isEqualTo(a);
+    assertThat(a.hashCode()).isEqualTo(a.hashCode());
+    assertThat(a).isNotEqualTo(sameTransfers);
+  }
+
   private static List<TxEntry> collect(Iterator<? extends RaptorTransfer> it) {
     List<TxEntry> result = new ArrayList<>();
     while (it.hasNext()) {

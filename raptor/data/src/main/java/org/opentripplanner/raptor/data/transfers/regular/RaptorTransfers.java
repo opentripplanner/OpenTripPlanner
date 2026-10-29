@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Iterator;
 import java.util.Map;
 import org.opentripplanner.raptor.spi.RaptorTransfer;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * Stores transfers as one array of {@link DefaultRaptorTransfer} per stop, avoiding pointer-chasing
@@ -43,22 +44,8 @@ final class RaptorTransfers implements Serializable {
   }
 
   @Override
-  public boolean equals(Object o) {
-    throw new UnsupportedOperationException(
-      "RaptorTransfers does not support equals() & hashCode()"
-    );
-  }
-
-  @Override
-  public int hashCode() {
-    throw new UnsupportedOperationException(
-      "RaptorTransfers does not support equals() & hashCode()"
-    );
-  }
-
-  @Override
   public String toString() {
-    throw new UnsupportedOperationException("RaptorTransfers does not support toString()");
+    return ToStringBuilder.of(RaptorTransfers.class).addNum("size", transfers.length).toString();
   }
 
   private static final class LightweightTransferIterator implements Iterator<RaptorTransfer> {
