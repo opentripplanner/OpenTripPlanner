@@ -5,6 +5,7 @@ import org.opentripplanner.ext.empiricaldelay.internal.DefaultEmpiricalDelayRepo
 import org.opentripplanner.ext.fares.model.FareRulesData;
 import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareService;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
+import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.fares.FareServiceFactory;
@@ -17,6 +18,8 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.internal.DefaultStreetRepository;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
+import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
+import org.opentripplanner.transit.transfer.regular.configure.RegularTransferFactory;
 import tools.jackson.databind.JsonNode;
 
 /**
@@ -36,14 +39,26 @@ import tools.jackson.databind.JsonNode;
  */
 public final class TestConstructApplicationFactoryBuilder {
 
+  private RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository =
+    RegularTransferFactory.createBuildRepository();
+
   private TestConstructApplicationFactoryBuilder() {}
 
   public static TestConstructApplicationFactoryBuilder of() {
     return new TestConstructApplicationFactoryBuilder();
   }
 
+  public TestConstructApplicationFactoryBuilder withRegularTransferBuildRepository(
+    RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository
+  ) {
+    this.regularTransferBuildRepository = regularTransferBuildRepository;
+    return this;
+  }
+
   public ConstructApplicationFactory build() {
-    var env = TransitTestEnvironment.of().build();
+    // Two stops, so the stop indexes 0 and 1 used by the regular transfers of a test exist. The
+    // Raptor transfers of the profiles are created when the repository is registered.
+    var env = TransitTestEnvironment.of().addStops("A", "B").build();
     var transitRepository = env.transitRepository();
 
     return DaggerConstructApplicationFactory.builder()
@@ -52,6 +67,7 @@ public final class TestConstructApplicationFactoryBuilder {
       .transitRepository(transitRepository)
       .scheduledTimetableData(env.scheduledTimetableData())
       .transferRepository(TransferServiceTestFactory.defaultTransferRepository())
+      .regularTransferBuildRepository(regularTransferBuildRepository)
       .worldEnvelopeRepository(new DefaultWorldEnvelopeRepository())
       .stopConsolidationRepository(null)
       .vehicleParkingRepository(new DefaultVehicleParkingRepository())

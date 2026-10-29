@@ -35,6 +35,7 @@ import org.opentripplanner.ext.taxi.TaxiRepository;
 import org.opentripplanner.ext.taxi.configure.TaxiServiceModule;
 import org.opentripplanner.framework.transaction.configure.TransactionModule;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
+import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -69,6 +70,7 @@ import org.opentripplanner.street.StreetRepository;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.service.StreetLimitationParametersServiceModule;
+import org.opentripplanner.transfer.configure.RegularTransferRepositoryModule;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.configure.TransferServiceModule;
 import org.opentripplanner.transit.configure.StaticTransitService;
@@ -78,6 +80,9 @@ import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
+import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
+import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 import org.opentripplanner.warmup.WarmupLauncher;
 import org.opentripplanner.warmup.configure.WarmupModule;
 
@@ -101,6 +106,7 @@ import org.opentripplanner.warmup.configure.WarmupModule;
     StreetDetailsServiceModule.class,
     LinkingServiceModule.class,
     RealtimeVehicleRepositoryModule.class,
+    RegularTransferRepositoryModule.class,
     RideHailingServicesModule.class,
     GtfsSchemaModule.class,
     TransmodelSchemaModule.class,
@@ -128,6 +134,13 @@ public interface ConstructApplicationFactory {
   TransitRepository transitRepository();
 
   TransferRepository transferRepository();
+  RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository();
+
+  RepositoryHandle<
+    RegularTransferRepositorySnapshot<NearbyStop, RouteRequest>,
+    RegularTransferRepository<NearbyStop>
+  > regularTransferRepositoryHandle();
+
   WorldEnvelopeRepository worldEnvelopeRepository();
   WorldEnvelopeService worldEnvelopeService();
   RepositoryHandle<
@@ -227,6 +240,11 @@ public interface ConstructApplicationFactory {
 
     @BindsInstance
     Builder transferRepository(TransferRepository transferRepository);
+
+    @BindsInstance
+    Builder regularTransferBuildRepository(
+      RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository
+    );
 
     @BindsInstance
     Builder worldEnvelopeRepository(WorldEnvelopeRepository worldEnvelopeRepository);

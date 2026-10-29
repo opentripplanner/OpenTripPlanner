@@ -83,27 +83,36 @@ Other parameters are:
 By default OTP only pre-calculates transfers between stops for able-bodied walkers. If they have no
 obstacles wheelchair users can use them, too, but there won't be guaranteed to be one.
 
-If you want OTP to also pre-generate wheelchair-accessible transfers use the following configuration
-in `build-config.json`:
+If you want OTP to also pre-generate wheelchair-accessible transfers add a `wheelchair` profile type
+to the `transfers` section in `build-config.json`, see [Transfer configuration](TransferConfiguration.md):
 
 ```json
 {
-  "transferRequests": [
-    {
-      "modes": "WALK"
-    },
-    {
-      "modes": "WALK",
-      "wheelchairAccessibility": {
-        "enabled": true
-      }
-    }
-  ]
+  "transfers": {
+    "walk": { "maxDuration": "30m" },
+    "wheelchair": { "maxDuration": "30m" }
+  }
 }
 ```
 
-This results in OTP calculating an accessible transfer if the default one is found to be
-inaccessible to wheelchair users.
+A routing request for a wheelchair accessible trip then uses the transfers of the `wheelchair`
+profiles.
+
+By default the `wheelchair` transfers only use the stops that are marked as wheelchair accessible.
+If the accessibility data of your stops is incomplete, almost all the wheelchair transfers are lost.
+Set the costs of unknown and inaccessible stops, like in `routingDefaults` above, in the `wheelchair`
+block of the `transfers`, see [Street parameters](TransferConfiguration.md#street-parameters):
+
+```json
+{
+  "transfers": {
+    "wheelchair": {
+      "maxDuration": "30m",
+      "stop": { "unknownCost": 600, "inaccessibleCost": 3600 }
+    }
+  }
+}
+```
 
 ## Example
 
