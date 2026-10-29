@@ -653,6 +653,17 @@ class TransferProfilesConfigMapperTest {
   }
 
   @Test
+  void aTransfersSectionWithOnlyFlexOrViaGetsOnlyTheDefaultWalkProfile() {
+    for (var json : List.of(
+      "{ transfers: { flex: { maxDuration: '10m' } } }",
+      "{ transfers: { via: { maxDuration: '10m' } } }",
+      "{ transfers: { flex: { maxDuration: '10m' }, via: { maxDuration: '10m' } } }"
+    )) {
+      assertThat(profileIds(map(json))).containsExactly("walk");
+    }
+  }
+
+  @Test
   void theFlexAndViaBlocksDoNotCreateAProfile() {
     var subject = map("{ transfers: { flex: { maxDuration: '10m' } } }");
 

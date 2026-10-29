@@ -102,8 +102,11 @@ of the type as its id and the default preferences. This configures a `wheelchair
 }
 ```
 
-The `walk` profile is only the default if no profile type is configured. A request for a profile type
-that is not configured has no transfers to use, so configure all the types the clients ask for.
+The `walk` profile is only the default if no profile type is configured, which is also the case
+with a `transfers` section that only has `flex` or `via`. Then only walking is supported: a request
+for another profile type, like wheelchair or bicycle, has no transfers to use and fails. This is
+the same if a profile type is configured: a request for a type that is not configured fails, so
+configure all the types the clients ask for.
 
 ## Parameters
 
