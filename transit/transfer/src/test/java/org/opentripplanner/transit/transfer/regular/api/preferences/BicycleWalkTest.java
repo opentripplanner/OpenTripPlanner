@@ -37,7 +37,7 @@ class BicycleWalkTest {
   void theDistanceIsTheSumOfTheDistancesOfTheSpeedAndTheReluctance() {
     var other = BicycleWalk.of(Speed.ofMetersPerSecond(1.5), Reluctance.of(6.0));
 
-    assertThat(SUBJECT.normalizedDistance(SUBJECT)).isEqualTo(0f);
+    assertThat(SUBJECT.normalizedDistance(SUBJECT)).isEqualTo(0.0);
     assertThat(SUBJECT.normalizedDistance(other)).isEqualTo(
       SUBJECT.speed().normalizedDistance(other.speed()) +
         SUBJECT.reluctance().normalizedDistance(other.reluctance())

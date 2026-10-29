@@ -35,8 +35,8 @@ class BicyclePreferencesTest {
   void distanceToSelfIsZero() {
     var subject = preferences(1.3, 2.0);
 
-    assertThat(subject.normalizedDistance(subject)).isEqualTo(0f);
-    assertThat(subject.normalizedDistance(preferences(1.3, 2.0))).isEqualTo(0f);
+    assertThat(subject.normalizedDistance(subject)).isEqualTo(0.0);
+    assertThat(subject.normalizedDistance(preferences(1.3, 2.0))).isEqualTo(0.0);
   }
 
   @Test
@@ -46,8 +46,8 @@ class BicyclePreferencesTest {
     AbstractUserPreferences<?> sameReluctance = preferences(1.5, 2.0);
     AbstractUserPreferences<?> bothDiffer = preferences(1.5, 3.0);
 
-    assertThat(subject.normalizedDistance(sameSpeed)).isGreaterThan(0f);
-    assertThat(subject.normalizedDistance(sameReluctance)).isGreaterThan(0f);
+    assertThat(subject.normalizedDistance(sameSpeed)).isGreaterThan(0.0);
+    assertThat(subject.normalizedDistance(sameReluctance)).isGreaterThan(0.0);
     assertThat(subject.normalizedDistance(bothDiffer)).isGreaterThan(
       subject.normalizedDistance(sameSpeed)
     );
@@ -74,7 +74,7 @@ class BicyclePreferencesTest {
 
     assertThat(subject).isNotEqualTo(walk);
     assertThat(subject.type()).isEqualTo(TransferProfileType.BICYCLE);
-    assertThat(subject.normalizedDistance(walk)).isGreaterThan(100f);
+    assertThat(subject.normalizedDistance(walk)).isGreaterThan(100.0);
   }
 
   @Test
@@ -88,7 +88,7 @@ class BicyclePreferencesTest {
 
     assertThat(slowWalk).isNotEqualTo(subject);
     assertThat(sameWalk).isEqualTo(subject);
-    assertThat(subject.normalizedDistance(slowWalk)).isGreaterThan(0f);
+    assertThat(subject.normalizedDistance(slowWalk)).isGreaterThan(0.0);
   }
 
   @Test
@@ -109,7 +109,7 @@ class BicyclePreferencesTest {
 
     assertThat(fastest).isNotEqualTo(subject);
     assertThat(same).isEqualTo(subject);
-    assertThat(subject.normalizedDistance(fastest)).isGreaterThan(0f);
+    assertThat(subject.normalizedDistance(fastest)).isGreaterThan(0.0);
   }
 
   @Test

@@ -38,7 +38,7 @@ public final class BicycleWalk implements NormalizedDistance<BicycleWalk>, Seria
   }
 
   @Override
-  public float normalizedDistance(BicycleWalk other) {
+  public double normalizedDistance(BicycleWalk other) {
     return speed.normalizedDistance(other.speed) + reluctance.normalizedDistance(other.reluctance);
   }
 

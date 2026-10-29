@@ -68,8 +68,8 @@ public final class WalkPreferences
   }
 
   @Override
-  public float normalizedDistance(AbstractUserPreferences other) {
-    float distance = super.normalizedDistance(other);
+  public double normalizedDistance(AbstractUserPreferences other) {
+    double distance = super.normalizedDistance(other);
     if (other instanceof WalkPreferences that) {
       distance += speed.normalizedDistance(that.speed);
       distance += safetyFactor.normalizedDistance(that.safetyFactor);

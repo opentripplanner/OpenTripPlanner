@@ -77,7 +77,7 @@ public class Reluctance
   }
 
   @Override
-  public float normalizedDistance(Reluctance other) {
+  public double normalizedDistance(Reluctance other) {
     return LN_SCALE.normalizedDistance(this.value, other.value);
   }
 }
