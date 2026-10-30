@@ -18,6 +18,7 @@ import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
+import org.opentripplanner.routing.refetch.RefetchItineraryService;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
@@ -103,6 +104,8 @@ public interface RequestScopedFactory {
   TransmodelGraphQLRequestContext transmodelRequestContext();
 
   GtfsGraphQLRequestContext gtfsRequestContext();
+
+  RefetchItineraryService refetchItineraryService();
 
   @Subcomponent.Builder
   interface Builder {

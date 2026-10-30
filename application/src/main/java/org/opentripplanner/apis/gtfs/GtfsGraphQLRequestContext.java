@@ -6,6 +6,7 @@ import org.opentripplanner.place.NearbyStopFinder;
 import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
+import org.opentripplanner.routing.refetch.RefetchItineraryService;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
@@ -51,4 +52,7 @@ public interface GtfsGraphQLRequestContext {
    * can lead to several GraphQL queries, for example through batch or alias queries.
    */
   RouteRequest defaultRouteRequest();
+
+  /** Shared by every data fetcher that refetches an itinerary from a client-supplied id. */
+  RefetchItineraryService refetchItineraryService();
 }
