@@ -1,5 +1,7 @@
 package org.opentripplanner.transit.repository;
 
+import static org.opentripplanner.utils.collection.CollectionUtils.getByNullableKey;
+
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ListMultimap;
 import java.time.LocalDate;
@@ -89,7 +91,7 @@ public final class ScheduledTimetableData {
 
   @Nullable
   public TripPattern getTripPatternForId(FeedScopedId id) {
-    return tripPatternForId.get(id);
+    return getByNullableKey(id, tripPatternForId);
   }
 
   public Collection<TripPattern> getAllTripPatterns() {
@@ -98,7 +100,7 @@ public final class ScheduledTimetableData {
 
   @Nullable
   public TripOnServiceDate getTripOnServiceDateById(FeedScopedId id) {
-    return tripOnServiceDateById.get(id);
+    return getByNullableKey(id, tripOnServiceDateById);
   }
 
   public Collection<TripOnServiceDate> getAllTripsOnServiceDate() {
