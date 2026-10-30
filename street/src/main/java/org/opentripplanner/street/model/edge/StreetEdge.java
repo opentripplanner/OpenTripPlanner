@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.Optional;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
+import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType.PropulsionType;
 import org.opentripplanner.service.vehiclerental.street.geofencing.GeofencingInterceptor;
@@ -21,6 +22,7 @@ import org.opentripplanner.street.model.vertex.BarrierVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
@@ -44,6 +46,13 @@ public class StreetEdge
   private static final Logger LOG = LoggerFactory.getLogger(StreetEdge.class);
 
   private static final double SAFEST_STREETS_SAFETY_FACTOR = 0.1;
+
+  /**
+   * Fixed extra weight (about 10 minutes of walking) added once when a wheelchair user crosses a
+   * wheelchair-inaccessible barrier vertex, e.g. a raised kerb. It is a point obstacle, so the
+   * cost does not depend on the length of the adjacent edges.
+   */
+  private static final double WHEELCHAIR_INACCESSIBLE_BARRIER_COST = 600;
 
   /** If you have more than 16 flags, increase flags to short or int */
   static final int BACK_FLAG_INDEX = 0;
@@ -1041,6 +1050,9 @@ public class StreetEdge
           isWheelchairAccessible(),
           isStairs()
         );
+      if (isWheelchairInaccessibleBarrier(tov)) {
+        weight += WHEELCHAIR_INACCESSIBLE_BARRIER_COST;
+      }
     } else {
       if (walkingBike) {
         // take slopes into account when walking bikes
@@ -1063,6 +1075,19 @@ public class StreetEdge
     }
 
     return new TraversalCosts(time, weight);
+  }
+
+  /**
+   * Checks if the vertex is a {@link BarrierVertex} that is wheelchair-inaccessible, e.g. a
+   * {@code barrier=kerb} node without a {@code kerb=flush/lowered/no} tag. Only the edge ending
+   * at the vertex is charged, so that crossing the barrier is penalised once, not once per
+   * adjacent edge.
+   */
+  private static boolean isWheelchairInaccessibleBarrier(Vertex vertex) {
+    return (
+      vertex instanceof BarrierVertex bv &&
+      bv.wheelchairAccessibility() == Accessibility.NOT_POSSIBLE
+    );
   }
 
   /* The no-thru traffic support works by not allowing a transition from a no-thru area out of it.
