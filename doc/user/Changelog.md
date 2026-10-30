@@ -38,6 +38,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Encapsulate Scheduled Timetable Data and move Ownership to TimetableRepository [#8074](https://github.com/opentripplanner/OpenTripPlanner/pull/8074)
 - Improve vertex linking filtering logic [#7994](https://github.com/opentripplanner/OpenTripPlanner/pull/7994)
 - Test Dependency Injection in request scope [#7987](https://github.com/opentripplanner/OpenTripPlanner/pull/7987)
+- Reject unknown transport mode in TransModel filters instead of failing with ClassCastException [#8064](https://github.com/opentripplanner/OpenTripPlanner/pull/8064)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.10.0 (2026-09-09)
