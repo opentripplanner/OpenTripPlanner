@@ -23,8 +23,7 @@ final class AccessStopArrivalC2<T extends RaptorTripSchedule> extends AbstractSt
   AccessStopArrivalC2(int departureTime, RaptorAccessEgress access) {
     super(
       access.stop(),
-      departureTime,
-      access.durationInSeconds(),
+      departureTime + access.durationInSeconds(),
       access.numberOfRides(),
       access.c1(),
       RaptorCostCalculator.ZERO_COST

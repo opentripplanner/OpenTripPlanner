@@ -39,24 +39,12 @@ abstract sealed class AbstractStopArrivalC2<T extends RaptorTripSchedule>
   /**
    * Initial state - first stop visited during the RAPTOR algorithm.
    */
-  AbstractStopArrivalC2(
-    int stop,
-    int departureTime,
-    int travelDuration,
-    int round,
-    int c1,
-    int c2
-  ) {
-    super(stop, departureTime, travelDuration, c1, round);
+  AbstractStopArrivalC2(int stop, int arrivalTime, int round, int c1, int c2) {
+    super(stop, arrivalTime, round, c1);
     this.c2 = c2;
   }
 
   public final int c2() {
     return c2;
-  }
-
-  @Override
-  public String toString() {
-    return asString();
   }
 }

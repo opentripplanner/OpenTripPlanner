@@ -55,13 +55,7 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
     if (heuristics == null || paths.isEmpty()) {
       return false;
     }
-    boolean rejected = !qualify(
-      arrival.stop(),
-      arrival.arrivalTime(),
-      arrival.travelDuration(),
-      arrival.c1(),
-      arrival.c2()
-    );
+    boolean rejected = !qualify(arrival.stop(), arrival.arrivalTime(), arrival.c1(), arrival.c2());
 
     if (rejected) {
       debugRejectByOptimization(arrival);
@@ -94,8 +88,7 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
    * The C2 value is passed through since we don't have any clue on what it's used for. There is
    * no heuristic calculation for the C2 value. Destination pruning can only be used if this is ok.
    */
-  // TODO R - The "travelDuration" looks unused?
-  private boolean qualify(int stop, int arrivalTime, int travelDuration, int cost, int c2) {
+  private boolean qualify(int stop, int arrivalTime, int cost, int c2) {
     HeuristicAtStop h = get(stop);
 
     if (h == HeuristicAtStop.UNREACHED) {
