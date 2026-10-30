@@ -4,12 +4,13 @@ import org.opentripplanner.core.model.transaction.RepositoryHandle;
 import org.opentripplanner.core.model.transaction.RepositoryRegistry;
 import org.opentripplanner.raptor.data.stop.RaptorStopIndex;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
+import org.opentripplanner.transit.transfer.regular.RegularTransferGenerator;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
-import org.opentripplanner.transit.transfer.regular.TransferGenerator;
-import org.opentripplanner.transit.transfer.regular.api.TransferProfilesParameters;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfilesParameters;
 import org.opentripplanner.transit.transfer.regular.internal.DefaultRegularTransferBuildRepository;
-import org.opentripplanner.transit.transfer.regular.internal.DefaultTransferGenerator;
+import org.opentripplanner.transit.transfer.regular.internal.DefaultRegularTransferGenerator;
+import org.opentripplanner.transit.transfer.regular.internal.ProfileUserPreferences;
 import org.opentripplanner.transit.transfer.regular.internal.RegularTransferRepositoryLifecycle;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
 import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
@@ -23,6 +24,21 @@ public final class RegularTransferFactory {
 
   private RegularTransferFactory() {}
 
+  /**
+   * Check the profiles that can not be checked when the parameters are created: the user
+   * preferences of the profiles must be unique, and a profile without preferences gets them from
+   * its request with the {@code mapper}. Call it when the configuration is read, to fail before
+   * the graph build starts.
+   *
+   * @throws IllegalArgumentException if two profiles have equal user preferences
+   */
+  public static <R> void validate(
+    TransferProfilesParameters<R> parameters,
+    TransferRequestMapper<R> mapper
+  ) {
+    ProfileUserPreferences.resolveAll(parameters, mapper);
+  }
+
   /** Create an empty build repository, populated at graph build. */
   public static <P> RegularTransferBuildRepository<P> createBuildRepository() {
     return new DefaultRegularTransferBuildRepository<>();
@@ -34,14 +50,14 @@ public final class RegularTransferFactory {
    * @param <P> the street path type
    * @param <R> the request type
    */
-  public static <P, R> TransferGenerator createTransferGenerator(
+  public static <P, R> RegularTransferGenerator createTransferGenerator(
     RaptorStopIndex stopIndex,
     TransferProfilesParameters<R> parameters,
     TransferPathProvider<P, R> pathProvider,
     TransferRequestMapper<R> mapper,
     RegularTransferBuildRepository<P> buildRepository
   ) {
-    return new DefaultTransferGenerator<>(
+    return new DefaultRegularTransferGenerator<>(
       stopIndex,
       parameters,
       pathProvider,
@@ -72,9 +88,12 @@ public final class RegularTransferFactory {
     TransferRequestMapper<R> mapper,
     int numberOfStops
   ) {
-    return repositoryRegistry.registerRepository(
+    var handle = repositoryRegistry.registerRepository(
       buildRepository.createRuntimeRepository(),
       new RegularTransferRepositoryLifecycle<>(pathProvider, mapper, parameters, numberOfStops)
     );
+    // Create the Raptor transfers of the warmup entries before the first request
+    handle.repositorySnapshot(repositoryRegistry.scope()).warmUp();
+    return handle;
   }
 }

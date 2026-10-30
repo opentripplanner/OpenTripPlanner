@@ -12,9 +12,11 @@ import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
 import org.opentripplanner.ext.dataoverlay.configure.DataOverlayFactory;
+import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationModule;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
@@ -64,7 +66,7 @@ import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
-import org.opentripplanner.transit.transfer.regular.TransferGenerator;
+import org.opentripplanner.transit.transfer.regular.RegularTransferGenerator;
 
 /**
  * Configure all modules that are not simple enough to be injected.
@@ -327,19 +329,25 @@ public class GraphBuilderModules {
 
   @Provides
   @Singleton
-  static TransferGenerator provideRegularTransferGenerator(
+  static RegularTransferGenerator provideRegularTransferGenerator(
     BuildConfig config,
     Graph graph,
     TransitRepository transitRepository,
     StopsVisitedByPatterns stopsVisitedByPatterns,
+    TimetableDataImport timetableDataImport,
     RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository
   ) {
+    // The generator is created when the transfers are generated, after the transit data import
+    var flexIndex = OTPFeature.FlexRouting.isOn()
+      ? new FlexIndex(timetableDataImport.getAllFlexTrips(), timetableDataImport.getTripCalendars())
+      : null;
     return StreetTransferFactory.createGenerator(
       graph,
       transitRepository,
       config.transferProfiles(),
       regularTransferBuildRepository,
-      stopsVisitedByPatterns::contains
+      stopsVisitedByPatterns,
+      flexIndex
     );
   }
 
@@ -354,7 +362,7 @@ public class GraphBuilderModules {
   @Provides
   @Singleton
   static RegularTransitTransferGenerator provideRegularTransitTransferGenerator(
-    Provider<TransferGenerator> transferGenerator,
+    Provider<RegularTransferGenerator> transferGenerator,
     Graph graph,
     TransitRepository transitRepository,
     StopsVisitedByPatterns stopsVisitedByPatterns,

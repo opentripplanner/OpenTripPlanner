@@ -37,11 +37,11 @@ import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
 import org.opentripplanner.standalone.configure.DaggerBindingKey.GenericType;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
-import org.opentripplanner.transfer.regular.RegularTransferService;
+import org.opentripplanner.transfer.regular.FlexTransferService;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
-import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
+import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.configure.RegularTransferFactory;
 
 /**
@@ -79,7 +79,7 @@ class RequestScopedFactoryIntegrationTest {
     of(GraphQLSchema.class, GtfsSchema.class),
     of(GraphQLSchema.class, TransmodelSchema.class),
     of(GtfsApiParameters.class),
-    of(RegularTransferService.class),
+    of(FlexTransferService.class),
     // Without a commit in between, both requests read the same snapshot
     of(new GenericType<RegularTransferRepositorySnapshot<NearbyStop, RouteRequest>>() {}),
     of(RouteRequest.class),

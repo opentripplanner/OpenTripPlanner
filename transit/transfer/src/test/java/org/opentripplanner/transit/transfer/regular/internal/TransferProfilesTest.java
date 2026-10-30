@@ -1,20 +1,36 @@
 package org.opentripplanner.transit.transfer.regular.internal;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.transit.transfer.regular.FakeRequestMapper;
 import org.opentripplanner.transit.transfer.regular.FakeTransferPathProvider;
-import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
-import org.opentripplanner.transit.transfer.regular.api.WalkProfileParameters;
+import org.opentripplanner.transit.transfer.regular.api.parameters.DeduplicationLimit;
+import org.opentripplanner.transit.transfer.regular.api.parameters.MaxDurationsPreference;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileParameters;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfilesParameters;
+import org.opentripplanner.transit.transfer.regular.api.parameters.WarmupParameters;
+import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 
 class TransferProfilesTest {
 
   @Test
   void ofWrapsTheGivenProfilesPreservingOrder() {
     var walk = new TransferProfile<>(
-      new WalkProfileParameters<>(WalkPreferences.DEFAULT, WalkPreferences.DEFAULT),
+      new TransferProfileParameters<>(
+        "walk",
+        TransferProfileType.WALK,
+        WalkPreferences.DEFAULT,
+        WalkPreferences.DEFAULT
+      ),
+      MaxDurationsPreference.DEFAULT,
       new FakeTransferPathProvider(),
       FakeRequestMapper.INSTANCE
     );
@@ -22,5 +38,193 @@ class TransferProfilesTest {
     var profiles = TransferProfiles.of(List.of(walk));
 
     assertThat(profiles).containsExactly(walk);
+  }
+
+  @Test
+  void aProfileWithoutUserPreferencesGetsThemFromItsRoutingRequest() {
+    var request = WalkPreferences.of().withReluctance(Reluctance.of(7.0)).build();
+    var parameters = new TransferProfilesParameters<>(
+      List.of(new TransferProfileParameters<>("derived", TransferProfileType.WALK, null, request))
+    );
+
+    var profiles = TransferProfiles.of(
+      parameters,
+      new FakeTransferPathProvider(),
+      FakeRequestMapper.INSTANCE
+    );
+
+    var profile = profiles.iterator().next();
+    assertThat(profile.id()).isEqualTo("derived");
+    assertThat(profile.userPreferences()).isEqualTo(request);
+  }
+
+  @Test
+  void profilesWithEqualUserPreferencesAreRejectedAndNamed() {
+    var parameters = new TransferProfilesParameters<>(
+      List.of(
+        new TransferProfileParameters<>(
+          "a",
+          TransferProfileType.WALK,
+          WalkPreferences.DEFAULT,
+          WalkPreferences.DEFAULT
+        ),
+        // No preferences of its own: they come from the request, which equals the default
+        new TransferProfileParameters<>(
+          "b",
+          TransferProfileType.WALK,
+          null,
+          WalkPreferences.DEFAULT
+        )
+      )
+    );
+
+    var ex = assertThrows(IllegalArgumentException.class, () ->
+      TransferProfiles.of(parameters, new FakeTransferPathProvider(), FakeRequestMapper.INSTANCE)
+    );
+    assertThat(ex).hasMessageThat().contains("'a'");
+    assertThat(ex).hasMessageThat().contains("'b'");
+  }
+
+  @Test
+  void theProfileKeepsItsId() {
+    var walk = new TransferProfile<>(
+      new TransferProfileParameters<>(
+        "my-walk",
+        TransferProfileType.WALK,
+        WalkPreferences.DEFAULT,
+        WalkPreferences.DEFAULT
+      ),
+      MaxDurationsPreference.DEFAULT,
+      new FakeTransferPathProvider(),
+      FakeRequestMapper.INSTANCE
+    );
+
+    assertThat(walk.id()).isEqualTo("my-walk");
+    assertThat(walk.toString()).contains("my-walk");
+  }
+
+  @Test
+  void aParentIsBeforeItsChildrenWhateverTheDeclaredOrder() {
+    var parameters = new TransferProfilesParameters<>(
+      List.of(
+        new TransferProfileParameters<>(
+          "child",
+          TransferProfileType.WALK,
+          "parent",
+          withReluctance(3.0),
+          withReluctance(3.0)
+        ),
+        new TransferProfileParameters<>(
+          "other",
+          TransferProfileType.WALK,
+          null,
+          withReluctance(4.0),
+          withReluctance(4.0)
+        ),
+        new TransferProfileParameters<>(
+          "parent",
+          TransferProfileType.WALK,
+          null,
+          withReluctance(2.0),
+          withReluctance(2.0)
+        )
+      )
+    );
+
+    var profiles = TransferProfiles.of(
+      parameters,
+      new FakeTransferPathProvider(),
+      FakeRequestMapper.INSTANCE
+    );
+
+    var ids = new ArrayList<String>();
+    profiles.forEach(p -> ids.add(p.id()));
+    assertThat(ids).containsExactly("parent", "child", "other").inOrder();
+  }
+
+  @Test
+  void aChildKnowsItsParent() {
+    var parameters = new TransferProfilesParameters<>(
+      List.of(
+        new TransferProfileParameters<>(
+          "parent",
+          TransferProfileType.WALK,
+          null,
+          withReluctance(2.0),
+          withReluctance(2.0)
+        ),
+        new TransferProfileParameters<>(
+          "child",
+          TransferProfileType.WALK,
+          "parent",
+          withReluctance(3.0),
+          withReluctance(3.0)
+        )
+      )
+    );
+
+    var profiles = TransferProfiles.of(
+      parameters,
+      new FakeTransferPathProvider(),
+      FakeRequestMapper.INSTANCE
+    );
+
+    var byId = new HashMap<String, TransferProfile<?, ?>>();
+    profiles.forEach(p -> byId.put(p.id(), p));
+    assertThat(byId.get("child").parent()).isSameInstanceAs(byId.get("parent"));
+    assertThat(byId.get("parent").parent()).isNull();
+  }
+
+  private static WalkPreferences withReluctance(double reluctance) {
+    return WalkPreferences.of().withReluctance(Reluctance.of(reluctance)).build();
+  }
+
+  @Test
+  void aWarmupEntryWithTheUserPreferencesOfAProfileIsRejectedAndNamed() {
+    var parameters = new TransferProfilesParameters<>(
+      List.of(
+        new TransferProfileParameters<>(
+          "walk",
+          TransferProfileType.WALK,
+          withReluctance(2.0),
+          withReluctance(2.0)
+        )
+      ),
+      MaxDurationsPreference.DEFAULT,
+      Map.of(),
+      DeduplicationLimit.DEFAULT,
+      List.of(new WarmupParameters("same", "walk", withReluctance(2.0)))
+    );
+
+    var ex = assertThrows(IllegalArgumentException.class, () ->
+      TransferProfiles.of(parameters, new FakeTransferPathProvider(), FakeRequestMapper.INSTANCE)
+    );
+    assertThat(ex).hasMessageThat().contains("'walk'");
+    assertThat(ex).hasMessageThat().contains("'same'");
+  }
+
+  @Test
+  void warmupEntriesWithTheSameUserPreferencesAreRejected() {
+    var parameters = new TransferProfilesParameters<>(
+      List.of(
+        new TransferProfileParameters<>(
+          "walk",
+          TransferProfileType.WALK,
+          withReluctance(2.0),
+          withReluctance(2.0)
+        )
+      ),
+      MaxDurationsPreference.DEFAULT,
+      Map.of(),
+      DeduplicationLimit.DEFAULT,
+      List.of(
+        new WarmupParameters("a", "walk", withReluctance(5.0)),
+        new WarmupParameters("b", "walk", withReluctance(5.0))
+      )
+    );
+
+    assertThrows(IllegalArgumentException.class, () ->
+      TransferProfiles.of(parameters, new FakeTransferPathProvider(), FakeRequestMapper.INSTANCE)
+    );
   }
 }

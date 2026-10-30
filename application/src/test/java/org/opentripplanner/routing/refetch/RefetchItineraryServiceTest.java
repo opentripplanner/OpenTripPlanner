@@ -39,7 +39,7 @@ import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
 import org.opentripplanner.transfer.constrained.model.TransferConstraint;
 import org.opentripplanner.transfer.constrained.model.TripTransferPoint;
-import org.opentripplanner.transfer.regular.RegularTransferService;
+import org.opentripplanner.transfer.regular.FlexTransferService;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transfer.regular.model.PathTransfer;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
@@ -106,7 +106,7 @@ public class RefetchItineraryServiceTest {
   private static final Graph GRAPH = G.build();
 
   // Setup transfers
-  private static final RegularTransferService TRANSFER_SERVICE = createTransferService(
+  private static final FlexTransferService TRANSFER_SERVICE = createTransferService(
     List.of(makeTransfer(STOP_B, STOP_C, GRAPH))
   );
 
@@ -449,7 +449,7 @@ public class RefetchItineraryServiceTest {
     );
   }
 
-  public static RegularTransferService createTransferService(List<PathTransfer> transfers) {
+  public static FlexTransferService createTransferService(List<PathTransfer> transfers) {
     var transferRepo = TransferServiceTestFactory.defaultTransferRepository();
     ImmutableMultimap.Builder<StopLocation, PathTransfer> builder = ImmutableMultimap.builder();
     transfers.forEach(transfer -> builder.put(transfer.from, transfer));

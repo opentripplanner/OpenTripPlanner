@@ -1,8 +1,10 @@
 package org.opentripplanner.transit.transfer.regular.internal;
 
 import java.util.Objects;
-import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
-import org.opentripplanner.transit.transfer.regular.api.WalkProfileParameters;
+import javax.annotation.Nullable;
+import org.opentripplanner.transit.transfer.regular.api.parameters.MaxDurationsPreference;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileParameters;
+import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
 import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
 import org.opentripplanner.transit.transfer.regular.spi.TransferSearch;
@@ -24,28 +26,71 @@ import org.opentripplanner.transit.transfer.regular.spi.TransferSearch;
  */
 final class TransferProfile<P, R> {
 
+  private final String id;
+
+  @Nullable
+  private final TransferProfile<P, R> parent;
+
   private final AbstractUserPreferences<?> userPreferences;
+  private final MaxDurationsPreference maxDurations;
   private final TransferSearch<P> search;
 
   /**
    * @param parameters   the configuration of the profile
+   * @param maxDurations the max durations of the type of the profile
+   * @param parent       the profile this profile is based on, {@code null} if there is none
    * @param pathProvider creates the search of this profile
    * @param mapper       applies the user preferences of the profile on its routing request
    */
   TransferProfile(
-    WalkProfileParameters<R> parameters,
+    TransferProfileParameters<R> parameters,
+    MaxDurationsPreference maxDurations,
+    @Nullable TransferProfile<P, R> parent,
     TransferPathProvider<P, R> pathProvider,
     TransferRequestMapper<R> mapper
   ) {
-    this.userPreferences = Objects.requireNonNull(parameters.userPreferences());
+    this.id = parameters.id();
+    this.parent = parent;
+    this.userPreferences = ProfileUserPreferences.resolve(parameters, mapper);
+    this.maxDurations = Objects.requireNonNull(maxDurations);
     this.search = pathProvider.searchFor(
       mapper.toRequest(userPreferences, parameters.routingRequest())
     );
   }
 
+  /** A profile without a parent. */
+  TransferProfile(
+    TransferProfileParameters<R> parameters,
+    MaxDurationsPreference maxDurations,
+    TransferPathProvider<P, R> pathProvider,
+    TransferRequestMapper<R> mapper
+  ) {
+    this(parameters, maxDurations, null, pathProvider, mapper);
+  }
+
+  /**
+   * The profile this profile is based on, {@code null} if there is none. The parent is generated
+   * before this profile, and the paths of this profile that are equivalent to the paths of the
+   * parent are the paths of the parent.
+   */
+  @Nullable
+  TransferProfile<P, R> parent() {
+    return parent;
+  }
+
+  /** The id of the profile, for the logs and the issues reported. */
+  String id() {
+    return id;
+  }
+
   /** The traveler preferences the paths of this profile are found and stored under. */
   AbstractUserPreferences<?> userPreferences() {
     return userPreferences;
+  }
+
+  /** How far the discovery search of this profile looks, the limit of the type of the profile. */
+  MaxDurationsPreference maxDurations() {
+    return maxDurations;
   }
 
   /** The street search of this profile, for its discovery search and re-costing its paths. */
@@ -72,6 +117,6 @@ final class TransferProfile<P, R> {
 
   @Override
   public String toString() {
-    return "TransferProfile[userPreferences=" + userPreferences + ']';
+    return "TransferProfile[id=" + id + ", userPreferences=" + userPreferences + ']';
   }
 }

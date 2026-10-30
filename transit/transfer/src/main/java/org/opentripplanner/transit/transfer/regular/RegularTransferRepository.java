@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.transfer.regular;
 
 import java.util.Map;
-import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
+import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 
 /**
  * Mutable side of the regular-transfer repository. It holds every {@code P} path template, keyed

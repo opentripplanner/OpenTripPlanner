@@ -16,7 +16,7 @@ import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
  *
  * @param <P> the street path type
  */
-public interface RegularTransfers<P> {
+public interface RegularTransfersService<P> {
   /**
    * The Raptor transfers for the request: the paths stored under the profile closest to the user
    * preferences of the request, re-costed under the user preferences of the request.

@@ -1,0 +1,270 @@
+package org.opentripplanner.transit.transfer.regular.api.parameters;
+
+import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.time.Duration;
+import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.basic.Reluctance;
+import org.opentripplanner.core.model.basic.Speed;
+import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
+
+class TransferProfilesParametersTest {
+
+  private static final WalkPreferences WALK = WalkPreferences.DEFAULT;
+  private static final WalkPreferences OTHER_WALK = WalkPreferences.of()
+    .withReluctance(Reluctance.of(5.0))
+    .build();
+
+  @Test
+  void keepsTheProfilesInTheDeclaredOrder() {
+    var first = new TransferProfileParameters<>(
+      "first",
+      TransferProfileType.WALK,
+      OTHER_WALK,
+      "first"
+    );
+    var second = new TransferProfileParameters<>(
+      "second",
+      TransferProfileType.WALK,
+      WALK,
+      "second"
+    );
+
+    var subject = new TransferProfilesParameters<>(List.of(first, second));
+
+    assertThat(subject.profiles()).containsExactly(first, second).inOrder();
+  }
+
+  @Test
+  void requiresAtLeastOneProfile() {
+    assertThrows(IllegalArgumentException.class, () ->
+      new TransferProfilesParameters<String>(List.of())
+    );
+  }
+
+  @Test
+  void rejectsProfilesWithTheSameId() {
+    var profiles = List.of(
+      new TransferProfileParameters<>("walk", TransferProfileType.WALK, WALK, "first"),
+      new TransferProfileParameters<>("walk", TransferProfileType.WALK, OTHER_WALK, "second")
+    );
+
+    var ex = assertThrows(IllegalArgumentException.class, () ->
+      new TransferProfilesParameters<>(profiles)
+    );
+    assertThat(ex).hasMessageThat().contains("walk");
+  }
+
+  @Test
+  void aProfileNeedsAnId() {
+    assertThrows(IllegalArgumentException.class, () ->
+      new TransferProfileParameters<>(" ", TransferProfileType.WALK, WALK, "request")
+    );
+    assertThrows(NullPointerException.class, () ->
+      new TransferProfileParameters<>(null, TransferProfileType.WALK, WALK, "request")
+    );
+  }
+
+  @Test
+  void anyNonBlankIdIsAccepted() {
+    var profile = new TransferProfileParameters<>(
+      "Walk: 1.3 m/s (åre) #1",
+      TransferProfileType.WALK,
+      WALK,
+      "request"
+    );
+
+    assertThat(profile.id()).isEqualTo("Walk: 1.3 m/s (åre) #1");
+  }
+
+  @Test
+  void aProfileMayHaveNoUserPreferences() {
+    var profile = new TransferProfileParameters<>(
+      "walk",
+      TransferProfileType.WALK,
+      null,
+      "request"
+    );
+
+    assertThat(profile.userPreferences()).isNull();
+  }
+
+  @Test
+  void rejectsAProfileWithoutARoutingRequest() {
+    assertThrows(NullPointerException.class, () ->
+      new TransferProfileParameters<String>("walk", TransferProfileType.WALK, WALK, null)
+    );
+  }
+
+  @Test
+  void aTypeWithoutAnOverrideUsesTheDefaultMaxDurations() {
+    var profiles = List.of(
+      new TransferProfileParameters<>("walk", TransferProfileType.WALK, WALK, "walk")
+    );
+
+    var subject = new TransferProfilesParameters<>(
+      profiles,
+      MaxDurationsPreference.of(Duration.ofMinutes(20)),
+      Map.of()
+    );
+
+    assertThat(subject.maxDurations(TransferProfileType.WALK).maxDuration()).isEqualTo(
+      Duration.ofMinutes(20)
+    );
+  }
+
+  @Test
+  void anOverrideReplacesTheDefaultMaxDurationsOfTheType() {
+    var profiles = List.of(
+      new TransferProfileParameters<>("walk", TransferProfileType.WALK, WALK, "walk")
+    );
+
+    var subject = new TransferProfilesParameters<>(
+      profiles,
+      MaxDurationsPreference.of(Duration.ofMinutes(20)),
+      Map.of(TransferProfileType.WALK, MaxDurationsPreference.of(Duration.ofMinutes(45)))
+    );
+
+    assertThat(subject.maxDurations(TransferProfileType.WALK).maxDuration()).isEqualTo(
+      Duration.ofMinutes(45)
+    );
+  }
+
+  @Test
+  void theDefaultMaxDurationsAreThirtyMinutes() {
+    var subject = new TransferProfilesParameters<>(
+      List.of(new TransferProfileParameters<>("walk", TransferProfileType.WALK, WALK, "w"))
+    );
+
+    assertThat(subject.maxDurations(TransferProfileType.WALK)).isEqualTo(
+      MaxDurationsPreference.DEFAULT
+    );
+    assertThat(MaxDurationsPreference.DEFAULT.maxDuration()).isEqualTo(Duration.ofMinutes(30));
+  }
+
+  @Test
+  void aParentThatDoesNotExistIsRejectedAndNamed() {
+    var profiles = List.of(
+      new TransferProfileParameters<>("walk", TransferProfileType.WALK, null, WALK, "walk"),
+      new TransferProfileParameters<>(
+        "slow",
+        TransferProfileType.WALK,
+        "missing",
+        OTHER_WALK,
+        "slow"
+      )
+    );
+
+    var ex = assertThrows(IllegalArgumentException.class, () ->
+      new TransferProfilesParameters<>(profiles)
+    );
+    assertThat(ex).hasMessageThat().contains("'missing'");
+    assertThat(ex).hasMessageThat().contains("'slow'");
+  }
+
+  @Test
+  void aCycleOfParentsIsRejected() {
+    var profiles = List.of(
+      new TransferProfileParameters<>("a", TransferProfileType.WALK, "b", WALK, "a"),
+      new TransferProfileParameters<>("b", TransferProfileType.WALK, "a", OTHER_WALK, "b")
+    );
+
+    var ex = assertThrows(IllegalArgumentException.class, () ->
+      new TransferProfilesParameters<>(profiles)
+    );
+    assertThat(ex).hasMessageThat().contains("cycle");
+  }
+
+  @Test
+  void aProfileCanNotBeItsOwnParent() {
+    var profiles = List.of(
+      new TransferProfileParameters<>("a", TransferProfileType.WALK, "a", WALK, "a")
+    );
+
+    assertThrows(IllegalArgumentException.class, () -> new TransferProfilesParameters<>(profiles));
+  }
+
+  @Test
+  void aBlankParentIsRejected() {
+    assertThrows(IllegalArgumentException.class, () ->
+      new TransferProfileParameters<>("a", TransferProfileType.WALK, " ", WALK, "a")
+    );
+  }
+
+  @Test
+  void theDeduplicationLimitIsTheDefaultIfNotGiven() {
+    var subject = new TransferProfilesParameters<>(
+      List.of(new TransferProfileParameters<>("w", TransferProfileType.WALK, WALK, "w"))
+    );
+
+    assertThat(subject.deduplicationLimit()).isEqualTo(DeduplicationLimit.DEFAULT);
+  }
+
+  private static TransferProfilesParameters<String> withWarmup(WarmupParameters... warmup) {
+    return new TransferProfilesParameters<>(
+      List.of(new TransferProfileParameters<>("walk", TransferProfileType.WALK, WALK, "walk")),
+      MaxDurationsPreference.DEFAULT,
+      Map.of(),
+      DeduplicationLimit.DEFAULT,
+      List.of(warmup)
+    );
+  }
+
+  @Test
+  void keepsTheWarmupEntries() {
+    var entry = new WarmupParameters("avoid", "walk", OTHER_WALK);
+
+    assertThat(withWarmup(entry).warmup()).containsExactly(entry);
+  }
+
+  @Test
+  void theParentOfAWarmupEntryMustBeAProfile() {
+    var ex = assertThrows(IllegalArgumentException.class, () ->
+      withWarmup(new WarmupParameters("avoid", "missing", OTHER_WALK))
+    );
+    assertThat(ex).hasMessageThat().contains("'missing'");
+    assertThat(ex).hasMessageThat().contains("'avoid'");
+  }
+
+  @Test
+  void aWarmupEntryCanNotBeTheParentOfAnotherWarmupEntry() {
+    assertThrows(IllegalArgumentException.class, () ->
+      withWarmup(
+        new WarmupParameters("a", "walk", OTHER_WALK),
+        new WarmupParameters(
+          "b",
+          "a",
+          WalkPreferences.of().withReluctance(Reluctance.of(7.0)).build()
+        )
+      )
+    );
+  }
+
+  @Test
+  void aWarmupIdMustBeUniqueAmongTheProfilesAndTheWarmupEntries() {
+    var ex = assertThrows(IllegalArgumentException.class, () ->
+      withWarmup(new WarmupParameters("walk", "walk", OTHER_WALK))
+    );
+    assertThat(ex).hasMessageThat().contains("walk");
+    assertThrows(IllegalArgumentException.class, () ->
+      withWarmup(
+        new WarmupParameters("a", "walk", OTHER_WALK),
+        new WarmupParameters(
+          "a",
+          "walk",
+          WalkPreferences.of().withSpeed(Speed.ofMetersPerSecond(1.0)).build()
+        )
+      )
+    );
+  }
+
+  @Test
+  void aWarmupEntryNeedsAnIdAParentAndPreferences() {
+    assertThrows(IllegalArgumentException.class, () -> new WarmupParameters(" ", "walk", WALK));
+    assertThrows(IllegalArgumentException.class, () -> new WarmupParameters("a", " ", WALK));
+    assertThrows(NullPointerException.class, () -> new WarmupParameters("a", "walk", null));
+  }
+}

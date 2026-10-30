@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
-import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
+import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 
 /**
  * Default {@link RegularTransferRepository}: the mutable paths of one transaction, only accessed

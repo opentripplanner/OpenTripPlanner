@@ -9,7 +9,7 @@ import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.TransitRepository;
-import org.opentripplanner.transit.transfer.regular.TransferGenerator;
+import org.opentripplanner.transit.transfer.regular.RegularTransferGenerator;
 
 /**
  * {@link GraphBuilderModule} that generates regular (non-constrained) transfers through the
@@ -23,10 +23,10 @@ import org.opentripplanner.transit.transfer.regular.TransferGenerator;
  * flex {@code AreaStop}/{@code GroupStop}s) - regular transfers between {@code RegularStop}s are
  * exclusively this pipeline's responsibility.
  * <p>
- * The injected {@link TransferGenerator} populates the {@code RegularTransferBuildRepository} in
- * place, so the same instance can be threaded through {@code SerializedGraphObject} and survive a
- * build-then-load-later-process deployment. At runtime it is converted into the initial snapshot of
- * the transactional repository.
+ * The injected {@link RegularTransferGenerator} populates the
+ * {@code RegularTransferBuildRepository} in place, so the same instance can be threaded through
+ * {@code SerializedGraphObject} and survive a build-then-load-later-process deployment. At runtime
+ * it is converted into the initial snapshot of the transactional repository.
  */
 public class RegularTransitTransferGenerator implements GraphBuilderModule {
 
@@ -34,14 +34,14 @@ public class RegularTransitTransferGenerator implements GraphBuilderModule {
    * The generator is only created when this module runs, after the transit data is imported: it
    * holds the site repository, which the import replaces.
    */
-  private final Provider<TransferGenerator> transferGenerator;
+  private final Provider<RegularTransferGenerator> transferGenerator;
   private final Graph graph;
   private final TransitRepository transitRepository;
   private final StopsVisitedByPatterns stopsVisitedByPatterns;
   private final DataImportIssueStore issueStore;
 
   public RegularTransitTransferGenerator(
-    Provider<TransferGenerator> transferGenerator,
+    Provider<RegularTransferGenerator> transferGenerator,
     Graph graph,
     TransitRepository transitRepository,
     StopsVisitedByPatterns stopsVisitedByPatterns,
@@ -62,7 +62,7 @@ public class RegularTransitTransferGenerator implements GraphBuilderModule {
     reportStopsWithoutTransfers(generator);
   }
 
-  private void reportStopsWithoutTransfers(TransferGenerator generator) {
+  private void reportStopsWithoutTransfers(RegularTransferGenerator generator) {
     if (OTPFeature.ConsiderPatternsForDirectTransfers.isOn()) {
       return;
     }

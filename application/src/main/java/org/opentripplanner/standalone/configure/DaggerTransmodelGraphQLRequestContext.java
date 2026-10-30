@@ -17,7 +17,7 @@ import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
-import org.opentripplanner.transfer.regular.RegularTransferService;
+import org.opentripplanner.transfer.regular.FlexTransferService;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
@@ -76,7 +76,7 @@ final class DaggerTransmodelGraphQLRequestContext implements TransmodelGraphQLRe
   }
 
   @Override
-  public RegularTransferService transferService() {
+  public FlexTransferService transferService() {
     return factory.transferService();
   }
 

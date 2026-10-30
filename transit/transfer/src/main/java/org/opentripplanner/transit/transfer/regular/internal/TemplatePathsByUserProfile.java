@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import javax.annotation.Nullable;
-import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
+import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 
 /**
  * The {@code P} path templates generated at graph build, keyed by
@@ -82,18 +82,31 @@ final class TemplatePathsByUserProfile<P> implements Serializable {
 
   /**
    * The profile closest to the given user preferences: the preferences themselves if paths are
-   * stored under them, otherwise the profile with the smallest
+   * stored under them, otherwise the profile of the same type with the smallest
    * {@link AbstractUserPreferences#normalizedDistance}. {@code null} if no paths are stored.
+   *
+   * @throws IllegalArgumentException if paths are stored, but not for the type of the preferences.
+   *                                  A request can only use the transfers of a configured type.
    */
   @Nullable
   AbstractUserPreferences<?> closestProfile(AbstractUserPreferences<?> userPreferences) {
     if (pathsByUserPreferences.containsKey(userPreferences)) {
       return userPreferences;
     }
+    if (pathsByUserPreferences.isEmpty()) {
+      return null;
+    }
     return pathsByUserPreferences
       .keySet()
       .stream()
+      .filter(profile -> profile.type() == userPreferences.type())
       .min(Comparator.comparingDouble(userPreferences::normalizedDistance))
-      .orElse(null);
+      .orElseThrow(() ->
+        new IllegalArgumentException(
+          "There is no transfer profile of the type " +
+            userPreferences.type() +
+            ", the transfers of that type are not configured."
+        )
+      );
   }
 }

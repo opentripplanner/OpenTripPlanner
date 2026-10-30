@@ -3,7 +3,7 @@ package org.opentripplanner.transit.transfer.regular.internal;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Nullable;
-import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
+import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 
 /**
  * The runtime path templates: the paths generated at graph build (the base), with the transfers
@@ -77,6 +77,11 @@ final class OverlaidTemplatePaths<P> {
       overlay.remove(profile);
     }
     return true;
+  }
+
+  /** Were transfers generated under {@code profile} at graph build? */
+  boolean hasProfile(AbstractUserPreferences<?> profile) {
+    return base.profiles().contains(profile);
   }
 
   /** See {@link TemplatePathsByUserProfile#closestProfile}. */

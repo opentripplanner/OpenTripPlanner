@@ -20,10 +20,14 @@ import org.opentripplanner.transit.transfer.regular.FakeRequestMapper;
 import org.opentripplanner.transit.transfer.regular.FakeTransferPathProvider;
 import org.opentripplanner.transit.transfer.regular.FakeTransferPathProvider.FakePath;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
-import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
-import org.opentripplanner.transit.transfer.regular.api.TransferProfilesParameters;
-import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
-import org.opentripplanner.transit.transfer.regular.api.WalkProfileParameters;
+import org.opentripplanner.transit.transfer.regular.api.parameters.DeduplicationLimit;
+import org.opentripplanner.transit.transfer.regular.api.parameters.MaxDurationsPreference;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileParameters;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfilesParameters;
+import org.opentripplanner.transit.transfer.regular.api.parameters.WarmupParameters;
+import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
+import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.spi.PathCriteria;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPath;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
@@ -64,7 +68,9 @@ class DefaultRegularTransferRepositorySnapshotTest {
     lifecycle = new RegularTransferRepositoryLifecycle<>(
       provider,
       FakeRequestMapper.INSTANCE,
-      new TransferProfilesParameters<>(List.of(new WalkProfileParameters<>(PROFILE, PROFILE))),
+      new TransferProfilesParameters<>(
+        List.of(new TransferProfileParameters<>("walk", TransferProfileType.WALK, PROFILE, PROFILE))
+      ),
       stopIndex().size()
     );
     initial = freeze();
@@ -102,7 +108,9 @@ class DefaultRegularTransferRepositorySnapshotTest {
     var lifecycle = new RegularTransferRepositoryLifecycle<>(
       provider,
       mapper,
-      new TransferProfilesParameters<>(List.of(new WalkProfileParameters<>(PROFILE, PROFILE))),
+      new TransferProfilesParameters<>(
+        List.of(new TransferProfileParameters<>("walk", TransferProfileType.WALK, PROFILE, PROFILE))
+      ),
       stopIndex().size()
     );
     var snapshot = lifecycle.freeze(buildRepository.createRuntimeRepository());
@@ -114,6 +122,109 @@ class DefaultRegularTransferRepositorySnapshotTest {
     assertThat(transfers.findPath(A, C)).isNull();
 
     assertThat(mapper.toUserPreferencesCalls).isEqualTo(1);
+  }
+
+  /**
+   * Two profiles with their own paths: {@code far} (reluctance 10) has the path A -> C, and
+   * {@code near} (reluctance 1) has the path A -> B. The warmup entry, with the reluctance 3 and
+   * {@code far} as its parent, is closer to a request with the reluctance 2.5 than {@code near}.
+   */
+  private RegularTransferRepositorySnapshot<FakePath, WalkPreferences> snapshotWithWarmup(
+    boolean withWarmupEntry
+  ) {
+    var near = withReluctance(1.0);
+    var far = withReluctance(10.0);
+    var buildRepository = new DefaultRegularTransferBuildRepository<FakePath>();
+    buildRepository.setPaths(near, A, Map.of(B, path(A, B, 100)));
+    buildRepository.setPaths(far, A, Map.of(C, path(A, C, 200)));
+    var warmup = withWarmupEntry
+      ? List.of(new WarmupParameters("warm", "far", withReluctance(3.0)))
+      : List.<WarmupParameters>of();
+    var lifecycle = new RegularTransferRepositoryLifecycle<>(
+      provider,
+      FakeRequestMapper.INSTANCE,
+      new TransferProfilesParameters<>(
+        List.of(
+          new TransferProfileParameters<>("near", TransferProfileType.WALK, near, near),
+          new TransferProfileParameters<>("far", TransferProfileType.WALK, far, far)
+        ),
+        MaxDurationsPreference.DEFAULT,
+        Map.of(),
+        DeduplicationLimit.DEFAULT,
+        warmup
+      ),
+      stopIndex().size()
+    );
+    return lifecycle.freeze(buildRepository.createRuntimeRepository());
+  }
+
+  @Test
+  void warmUpCreatesTheTransfersOfTheProfilesAndTheWarmupEntriesBeforeTheFirstRequest() {
+    var snapshot = snapshotWithWarmup(true);
+    assertThat(provider.searches).isEqualTo(0);
+
+    snapshot.warmUp();
+
+    // The profiles 'near' and 'far', and the warmup entry
+    assertThat(provider.searches).isEqualTo(3);
+    // The first request with the preferences of the entry does not create the transfers again
+    var transfers = snapshot.forRequest(withReluctance(3.0)).raptorTransfers();
+    assertThat(from(transfers, A)).containsExactly(tx(C, 600));
+    assertThat(provider.searches).isEqualTo(3);
+  }
+
+  @Test
+  void warmUpCreatesTheTransfersOfTheProfilesEvenWithoutWarmupEntries() {
+    var snapshot = snapshotWithWarmup(false);
+
+    snapshot.warmUp();
+
+    assertThat(provider.searches).isEqualTo(2);
+    // A request with the preferences of a profile does not create the transfers again
+    var near = snapshot.forRequest(withReluctance(1.0)).raptorTransfers();
+    var far = snapshot.forRequest(withReluctance(10.0)).raptorTransfers();
+    assertThat(provider.searches).isEqualTo(2);
+    assertThat(from(near, A)).containsExactly(tx(B, 100));
+    assertThat(from(far, A)).containsExactly(tx(C, 2000));
+  }
+
+  @Test
+  void withoutWarmUpTheTransfersAreCreatedByTheFirstRequest() {
+    var snapshot = snapshotWithWarmup(true);
+
+    snapshot.forRequest(withReluctance(1.0)).raptorTransfers();
+
+    assertThat(provider.searches).isEqualTo(1);
+  }
+
+  @Test
+  void aRequestCloserToAWarmupEntryThanToAProfileUsesTheParentsPaths() {
+    var snapshot = snapshotWithWarmup(true);
+
+    var transfers = snapshot.forRequest(withReluctance(2.5));
+
+    // The warmup entry (reluctance 3) is closer than the profile 'near' (reluctance 1)
+    assertThat(transfers.findPath(A, C)).isEqualTo(path(A, C, 200));
+    assertThat(transfers.findPath(A, B)).isNull();
+  }
+
+  @Test
+  void withoutTheWarmupEntryTheClosestProfileIsUsed() {
+    var snapshot = snapshotWithWarmup(false);
+
+    var transfers = snapshot.forRequest(withReluctance(2.5));
+
+    assertThat(transfers.findPath(A, B)).isEqualTo(path(A, B, 100));
+    assertThat(transfers.findPath(A, C)).isNull();
+  }
+
+  @Test
+  void aProfileThatMatchesExactlyIsUsedEvenIfAWarmupEntryIsClose() {
+    var snapshot = snapshotWithWarmup(true);
+
+    var transfers = snapshot.forRequest(withReluctance(1.0));
+
+    assertThat(transfers.findPath(A, B)).isEqualTo(path(A, B, 100));
   }
 
   @Test
@@ -332,6 +443,14 @@ class DefaultRegularTransferRepositorySnapshotTest {
       ++toUserPreferencesCalls;
       return FakeRequestMapper.INSTANCE.toUserPreferences(request);
     }
+
+    @Override
+    public AbstractUserPreferences<?> toUserPreferences(
+      TransferProfileType type,
+      WalkPreferences request
+    ) {
+      return FakeRequestMapper.INSTANCE.toUserPreferences(type, request);
+    }
   }
 
   /** Counts the created searches and the re-costed paths. */
@@ -349,8 +468,11 @@ class DefaultRegularTransferRepositorySnapshotTest {
       var search = delegate.searchFor(request);
       return new TransferSearch<>() {
         @Override
-        public Collection<TransferPath<FakePath>> findNearbyStops(FeedScopedId fromStop) {
-          return search.findNearbyStops(fromStop);
+        public Collection<TransferPath<FakePath>> findNearbyStops(
+          FeedScopedId fromStop,
+          MaxDurationsPreference maxDurations
+        ) {
+          return search.findNearbyStops(fromStop, maxDurations);
         }
 
         @Override

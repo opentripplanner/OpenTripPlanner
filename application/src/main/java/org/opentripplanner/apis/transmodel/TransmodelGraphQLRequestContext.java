@@ -13,7 +13,7 @@ import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
-import org.opentripplanner.transfer.regular.RegularTransferService;
+import org.opentripplanner.transfer.regular.FlexTransferService;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.utils.lang.Sandbox;
 
@@ -46,7 +46,7 @@ public interface TransmodelGraphQLRequestContext {
 
   Graph graph();
 
-  RegularTransferService transferService();
+  FlexTransferService transferService();
 
   StreetDetailsService streetDetailsService();
 

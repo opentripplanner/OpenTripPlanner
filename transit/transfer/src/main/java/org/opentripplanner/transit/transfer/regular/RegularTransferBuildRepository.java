@@ -2,12 +2,12 @@ package org.opentripplanner.transit.transfer.regular;
 
 import java.io.Serializable;
 import java.util.Map;
-import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
+import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 
 /**
  * The regular-transfer path templates generated at graph build, keyed by
  * {@code (userPreferences, fromStop, toStop)}, and serialized with the graph. Written by the
- * {@link TransferGenerator}.
+ * {@link RegularTransferGenerator}.
  * <p>
  * This repository is only used at graph build, it is not the runtime repository. When the
  * application starts, it is converted into the {@link RegularTransferRepository}, which is then

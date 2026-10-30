@@ -16,10 +16,12 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 ///    1. If part of a station - rebuild transfers for all stops in the station
 ///    2. Else - rebuild transfers for all stops nearby (within half the max transfer duration)
 ///
-/// @param <P> the street path type
-/// @see TransferGenerator for the graph-build-time counterpart
+/// TODO: This is not implemented yet, see the module package.md.
 ///
-public interface TransferRealtimeUpdater<P> {
+/// @param <P> the street path type
+/// @see RegularTransferGenerator for the graph-build-time counterpart
+///
+public interface RegularTransferRealtimeUpdater<P> {
   /**
    * Typically done when a new stop is used by a new pattern as part of an extra journey or
    * platform change. Lightweight no-op if the stop already has transfers.
