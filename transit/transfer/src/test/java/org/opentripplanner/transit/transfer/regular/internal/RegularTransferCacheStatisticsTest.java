@@ -29,6 +29,26 @@ class RegularTransferCacheStatisticsTest {
       .toList();
   }
 
+  private static void record(
+    RegularTransferCacheStatistics subject,
+    AbstractUserPreferences<?> key,
+    int times
+  ) {
+    for (int i = 0; i < times; ++i) {
+      subject.record(key);
+    }
+  }
+
+  private static boolean isTracked(
+    RegularTransferCacheStatistics subject,
+    AbstractUserPreferences<?> key
+  ) {
+    return subject
+      .entries(k -> false, k -> ON_DEMAND)
+      .stream()
+      .anyMatch(entry -> entry.userPreferences().equals(key.toString()));
+  }
+
   @Test
   void theRequestsOfAKeyAreCountedAndTheMostUsedKeyIsFirst() {
     var subject = RegularTransferCacheStatistics.withCapacity(10);
@@ -96,36 +116,31 @@ class RegularTransferCacheStatisticsTest {
   }
 
   @Test
-  void whenTheLimitIsReachedTheKeysWithOneHitAreDropped() {
+  void whenTheLimitIsReachedTheKeyWithTheFewestHitsIsDropped() {
     var subject = RegularTransferCacheStatistics.withCapacity(3);
-    // Two hits for the first key, one for the others
-    subject.record(key(1.0));
-    subject.record(key(1.0));
-    subject.record(key(2.0));
-    subject.record(key(3.0));
+    record(subject, key(1.0), 3);
+    record(subject, key(2.0), 1);
+    record(subject, key(3.0), 2);
 
     subject.record(key(4.0));
 
-    // The keys with one hit are dropped, the new key has one hit
-    assertThat(hits(subject)).containsExactly(2L, 1L).inOrder();
-    assertThat(subject.entries(k -> false, k -> ON_DEMAND)).hasSize(2);
+    // Only the key with one hit is dropped, the new key has one hit
+    assertThat(hits(subject)).containsExactly(3L, 2L, 1L).inOrder();
+    assertThat(isTracked(subject, key(2.0))).isFalse();
+    assertThat(isTracked(subject, key(4.0))).isTrue();
   }
 
   @Test
-  void ifNoKeyHasOneHitTheKeysWithTwoHitsOrLessAreDropped() {
+  void ifAllKeysHaveManyHitsOnlyTheKeyWithTheFewestHitsIsDropped() {
     var subject = RegularTransferCacheStatistics.withCapacity(3);
-    for (int hits = 0; hits < 2; ++hits) {
-      subject.record(key(1.0));
-      subject.record(key(2.0));
-    }
-    for (int hits = 0; hits < 3; ++hits) {
-      subject.record(key(3.0));
-    }
+    record(subject, key(1.0), 10_000);
+    record(subject, key(2.0), 9_999);
+    record(subject, key(3.0), 10_001);
 
     subject.record(key(4.0));
 
-    // The keys with two hits are dropped, the key with three hits is kept
-    assertThat(hits(subject)).containsExactly(3L, 1L).inOrder();
+    assertThat(hits(subject)).containsExactly(10_001L, 10_000L, 1L).inOrder();
+    assertThat(isTracked(subject, key(2.0))).isFalse();
   }
 
   @Test

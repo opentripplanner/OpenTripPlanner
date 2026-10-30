@@ -16,10 +16,9 @@ import org.opentripplanner.transit.transfer.regular.api.report.UserPreferenceSou
  * of the cache. The statistics outlive the snapshots, the keys of all snapshots are counted
  * together.
  * <p>
- * The number of keys is bounded: if the limit is reached, all keys with one hit are dropped. If that
- * does not make room, the keys with two hits or less are dropped, and so on until there is room. A
- * dropped key starts again with a count of one if it is used again, so the counts are approximate
- * if there are many different keys.
+ * The number of keys is bounded: if the limit is reached, the key with the fewest hits is dropped
+ * to make room for a new key. A dropped key starts again with a count of one if it is used again,
+ * so the counts are approximate if there are many different keys.
  * <p>
  * Counting is not on the lock path of the requests: a request does a lookup and increments a
  * counter. The statistics can be {@link #NONE}, which does nothing.
@@ -131,14 +130,16 @@ abstract class RegularTransferCacheStatistics {
     }
 
     /**
-     * Drop the keys with the fewest hits: all keys with one hit, and if that does not make room,
-     * all keys with two hits or less, and so on. A hit counted while the keys are dropped may be
-     * lost, the counts are approximate.
+     * Drop the key with the fewest hits until there is room. A hit counted while a key is dropped
+     * may be lost, the counts are approximate.
      */
     private void makeRoom() {
-      for (long limit = 1; counters.size() >= capacity; ++limit) {
-        final long hitsLimit = limit;
-        counters.values().removeIf(counter -> counter.hits.sum() <= hitsLimit);
+      while (counters.size() >= capacity) {
+        counters
+          .entrySet()
+          .stream()
+          .min(Comparator.comparingLong(e -> e.getValue().hits.sum()))
+          .ifPresent(e -> counters.remove(e.getKey(), e.getValue()));
       }
     }
   }
