@@ -2,6 +2,7 @@ package org.opentripplanner.apis.transmodel.mapping;
 
 import static java.util.Map.entry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner.apis.transmodel._support.RequestHelper.list;
 import static org.opentripplanner.apis.transmodel._support.RequestHelper.map;
 
@@ -11,6 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.api.model.transit.DefaultFeedIdMapper;
+import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.apis.transmodel.model.TransmodelTransportSubmode;
 import org.opentripplanner.apis.transmodel.support.DataFetcherDecorator;
 import org.opentripplanner.routing.api.request.request.TransitRequest;
@@ -200,6 +202,28 @@ class TransitFilterOldWayMapperTest {
     assertEquals(
       "(filters: [(select: [(transportModes: [RAIL])])])",
       transitBuilder.build().toString()
+    );
+  }
+
+  @Test
+  void rejectUnknownTransportMode() {
+    // The GraphQL TransportMode enum maps "unknown" to a String, not to a TransitMode
+    var env = envOf(
+      map(
+        entry(
+          "modes",
+          map(
+            entry(
+              "transportModes",
+              list(map("transportMode", TransitMode.BUS), map("transportMode", "unknown"))
+            )
+          )
+        )
+      )
+    );
+
+    assertThrows(InvalidInputException.class, () ->
+      MAPPER.mapFilter(env, new DataFetcherDecorator(env), transitBuilder)
     );
   }
 
