@@ -1,17 +1,15 @@
 package org.opentripplanner.transit.transfer.regular.api.preferences;
 
 import java.util.Objects;
-import javax.annotation.Nullable;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.core.model.basic.Speed;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
-import org.opentripplanner.transit.transfer.regular.api.ways.StreetSegmentTypeUsage;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * The preferences of the bicycle transfers: speed, reluctance and stairs for a traveler that rides
- * a bicycle, and pushes it on stairs. The values are normalized(rounded) so the class can used as a
- * cache key.
+ * The preferences of the bicycle transfers: speed and reluctance for a traveler that rides
+ * a bicycle, how the route is optimized, and the preferences for walking with it. The values are normalized(rounded) so the
+ * class can used as a cache key.
  * <p>
  * See the configuration for documentation of each field.
  * <p>
@@ -19,24 +17,27 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  */
 public final class BicyclePreferences
   extends AbstractUserPreferences<BicyclePreferences>
-  implements WithSpeed, WithStairs
+  implements WithSpeed
 {
 
   public static final BicyclePreferences DEFAULT = new BicyclePreferences();
 
   private final Speed speed;
-  private final StreetSegmentTypeUsage stairs;
+  private final TimeSlopeSafetyTrianglePreference optimize;
+  private final BicycleWalk walk;
 
   private BicyclePreferences() {
     super(Reluctance.of(2.0));
     this.speed = Speed.ofMetersPerSecond(5.0);
-    this.stairs = StreetSegmentTypeUsage.ALLOWED;
+    this.optimize = TimeSlopeSafetyTrianglePreference.of(0.0, 0.0, 1.0);
+    this.walk = BicycleWalk.of(Speed.ofMetersPerSecond(1.35), Reluctance.of(5.0));
   }
 
   private BicyclePreferences(Builder builder) {
     super(builder);
     this.speed = Objects.requireNonNull(builder.speed);
-    this.stairs = Objects.requireNonNull(builder.stairs);
+    this.optimize = Objects.requireNonNull(builder.optimize);
+    this.walk = Objects.requireNonNull(builder.walk);
   }
 
   public static Builder of() {
@@ -45,21 +46,6 @@ public final class BicyclePreferences
 
   public Builder copyOf() {
     return new Builder(this);
-  }
-
-  /**
-   * The preferences a profile starts with: the defaults, with the values the {@code parent} has in
-   * common, see {@link AbstractUserPreferences.Builder#inheritFrom}. The parent itself if it is
-   * bicycle preferences, the defaults if there is no parent.
-   */
-  public static BicyclePreferences inheritedFrom(@Nullable AbstractUserPreferences<?> parent) {
-    if (parent == null) {
-      return DEFAULT;
-    }
-    if (parent instanceof BicyclePreferences bicycle) {
-      return bicycle;
-    }
-    return of().inheritFrom(parent).build();
   }
 
   @Override
@@ -72,9 +58,14 @@ public final class BicyclePreferences
     return speed;
   }
 
-  @Override
-  public StreetSegmentTypeUsage stairs() {
-    return stairs;
+  /** How the route is optimized: the importance of the time, the slope and the safety. */
+  public TimeSlopeSafetyTrianglePreference optimize() {
+    return optimize;
+  }
+
+  /** The preferences for walking with the bicycle. */
+  public BicycleWalk walk() {
+    return walk;
   }
 
   @Override
@@ -87,7 +78,8 @@ public final class BicyclePreferences
     float distance = super.normalizedDistance(other);
     if (other instanceof BicyclePreferences that) {
       distance += speed.normalizedDistance(that.speed);
-      distance += stairs.normalizedDistance(that.stairs);
+      distance += optimize.normalizedDistance(that.optimize);
+      distance += walk.normalizedDistance(that.walk);
     }
     return distance;
   }
@@ -97,12 +89,17 @@ public final class BicyclePreferences
     if (!(obj instanceof BicyclePreferences that)) {
       return false;
     }
-    return super.equals(obj) && speed.equals(that.speed) && stairs == that.stairs;
+    return (
+      super.equals(obj) &&
+      speed.equals(that.speed) &&
+      optimize.equals(that.optimize) &&
+      walk.equals(that.walk)
+    );
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), speed, stairs);
+    return Objects.hash(super.hashCode(), speed, optimize, walk);
   }
 
   @Override
@@ -110,19 +107,22 @@ public final class BicyclePreferences
     return super
       .appendToString(ToStringBuilder.of(BicyclePreferences.class))
       .addObj("speed", speed, DEFAULT.speed)
-      .addObj("stairs", stairs, DEFAULT.stairs)
+      .addObj("optimize", optimize, DEFAULT.optimize)
+      .addObj("walk", walk, DEFAULT.walk)
       .toString();
   }
 
   public static class Builder extends AbstractUserPreferences.Builder<BicyclePreferences, Builder> {
 
     private Speed speed;
-    private StreetSegmentTypeUsage stairs;
+    private TimeSlopeSafetyTrianglePreference optimize;
+    private BicycleWalk walk;
 
     public Builder(BicyclePreferences original) {
       super(original);
       this.speed = original.speed;
-      this.stairs = original.stairs;
+      this.optimize = original.optimize;
+      this.walk = original.walk;
     }
 
     public Builder withSpeed(Speed speed) {
@@ -130,20 +130,13 @@ public final class BicyclePreferences
       return this;
     }
 
-    public Builder withStairs(StreetSegmentTypeUsage stairs) {
-      this.stairs = stairs;
+    public Builder withOptimize(TimeSlopeSafetyTrianglePreference optimize) {
+      this.optimize = optimize;
       return this;
     }
 
-    @Override
-    public Builder inheritFrom(AbstractUserPreferences<?> parent) {
-      super.inheritFrom(parent);
-      if (parent instanceof WithSpeed withSpeed) {
-        this.speed = withSpeed.speed();
-      }
-      if (parent instanceof WithStairs withStairs) {
-        this.stairs = withStairs.stairs();
-      }
+    public Builder withWalk(BicycleWalk walk) {
+      this.walk = walk;
       return this;
     }
 

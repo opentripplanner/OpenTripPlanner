@@ -8,10 +8,12 @@ import java.time.Duration;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Cost;
+import org.opentripplanner.core.model.basic.Ratio;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.core.model.basic.Speed;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.transfer.streetadapter.RegularTransferPreferencesMapper;
 import org.opentripplanner.transit.transfer.regular.api.maxduration.BicycleMaxDurations;
 import org.opentripplanner.transit.transfer.regular.api.maxduration.CarMaxDuration;
 import org.opentripplanner.transit.transfer.regular.api.parameters.DeduplicationLimit;
@@ -19,10 +21,11 @@ import org.opentripplanner.transit.transfer.regular.api.parameters.TransferParam
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfile;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
 import org.opentripplanner.transit.transfer.regular.api.preferences.BicyclePreferences;
+import org.opentripplanner.transit.transfer.regular.api.preferences.BicycleWalk;
 import org.opentripplanner.transit.transfer.regular.api.preferences.CarPreferences;
+import org.opentripplanner.transit.transfer.regular.api.preferences.TimeSlopeSafetyTrianglePreference;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WheelchairPreferences;
-import org.opentripplanner.transit.transfer.regular.api.ways.StreetSegmentTypeUsage;
 
 class TransferProfilesConfigMapperTest {
 
@@ -54,7 +57,7 @@ class TransferProfilesConfigMapperTest {
           walk: { maxDuration: '30m',
             profiles: [{
               id: "slow walk",
-              userPreferences: { speed: 1.1, reluctance: 3.0, stairs: "FORBIDDEN" }
+              userPreferences: { speed: 1.1, reluctance: 3.0 }
             }]
           }
         }
@@ -69,7 +72,6 @@ class TransferProfilesConfigMapperTest {
       WalkPreferences.of()
         .withSpeed(Speed.ofMetersPerSecond(1.1))
         .withReluctance(Reluctance.of(3.0))
-        .withStairs(StreetSegmentTypeUsage.FORBIDDEN)
         .build()
     );
   }
@@ -719,7 +721,7 @@ class TransferProfilesConfigMapperTest {
           wheelchair: { maxDuration: '30m',
             profiles: [{
               id: "wheelchair",
-              userPreferences: { speed: 0.9, reluctance: 4.0, stairs: "FORBIDDEN" }
+              userPreferences: { speed: 0.9, reluctance: 4.0 }
             }],
             maxDuration: "45m"
           }
@@ -735,7 +737,6 @@ class TransferProfilesConfigMapperTest {
       WheelchairPreferences.of()
         .withSpeed(Speed.ofMetersPerSecond(0.9))
         .withReluctance(Reluctance.of(4.0))
-        .withStairs(StreetSegmentTypeUsage.FORBIDDEN)
         .build()
     );
     assertThat(subject.maxDurations(TransferProfileType.WHEELCHAIR).longestDuration()).isEqualTo(
@@ -747,7 +748,7 @@ class TransferProfilesConfigMapperTest {
   }
 
   @Test
-  void aWheelchairProfileInheritsTheValuesInCommonFromAWalkParent() {
+  void aWheelchairProfileDoesNotInheritFromAWalkParentButTakesTheValuesOfTheRequest() {
     var subject = map(
       """
       {
@@ -755,7 +756,7 @@ class TransferProfilesConfigMapperTest {
           walk: { maxDuration: '30m',
             profiles: [{
               id: "walk",
-              userPreferences: { speed: 1.1, reluctance: 3.0, stairs: "DISCOURAGED" }
+              userPreferences: { speed: 1.1, reluctance: 3.0 }
             }]
           },
           wheelchair: { maxDuration: '30m',
@@ -771,9 +772,12 @@ class TransferProfilesConfigMapperTest {
     );
 
     var wheelchair = (WheelchairPreferences) profile(subject, "wheelchair").userPreferences();
-    assertThat(wheelchair.speed()).isEqualTo(Speed.ofMetersPerSecond(1.1));
+    var request = new RegularTransferPreferencesMapper().toUserPreferences(
+      TransferProfileType.WHEELCHAIR,
+      RouteRequest.defaultValue()
+    );
+    assertThat(wheelchair.speed()).isEqualTo(((WheelchairPreferences) request).speed());
     assertThat(wheelchair.reluctance()).isEqualTo(Reluctance.of(5.0));
-    assertThat(wheelchair.stairs()).isEqualTo(StreetSegmentTypeUsage.DISCOURAGED);
   }
 
   @Test
@@ -838,7 +842,7 @@ class TransferProfilesConfigMapperTest {
           bicycle: { maxDuration: '30m',
             profiles: [{
               id: "bicycle",
-              userPreferences: { speed: 6.0, reluctance: 3.0, stairs: "DISCOURAGED" }
+              userPreferences: { speed: 6.0, reluctance: 3.0 }
             }],
             maxDuration: "20m"
           }
@@ -853,7 +857,6 @@ class TransferProfilesConfigMapperTest {
       BicyclePreferences.of()
         .withSpeed(Speed.ofMetersPerSecond(6.0))
         .withReluctance(Reluctance.of(3.0))
-        .withStairs(StreetSegmentTypeUsage.DISCOURAGED)
         .build()
     );
     assertThat(subject.maxDurations(TransferProfileType.BICYCLE).longestDuration()).isEqualTo(
@@ -862,7 +865,7 @@ class TransferProfilesConfigMapperTest {
   }
 
   @Test
-  void aBicycleProfileInheritsTheValuesInCommonFromAWalkParent() {
+  void aBicycleProfileDoesNotInheritFromAWalkParentButTakesTheValuesOfTheRequest() {
     var subject = map(
       """
       {
@@ -870,7 +873,7 @@ class TransferProfilesConfigMapperTest {
           walk: { maxDuration: '30m',
             profiles: [{
               id: "walk",
-              userPreferences: { speed: 1.1, reluctance: 3.0, stairs: "DISCOURAGED" }
+              userPreferences: { speed: 1.1, reluctance: 3.0 }
             }]
           },
           bicycle: { maxDuration: '30m',
@@ -886,9 +889,40 @@ class TransferProfilesConfigMapperTest {
     );
 
     var bicycle = (BicyclePreferences) profile(subject, "bicycle").userPreferences();
+    var request = new RegularTransferPreferencesMapper().toUserPreferences(
+      TransferProfileType.BICYCLE,
+      RouteRequest.defaultValue()
+    );
     assertThat(bicycle.speed()).isEqualTo(Speed.ofMetersPerSecond(5.5));
-    assertThat(bicycle.reluctance()).isEqualTo(Reluctance.of(3.0));
-    assertThat(bicycle.stairs()).isEqualTo(StreetSegmentTypeUsage.DISCOURAGED);
+    assertThat(bicycle.reluctance()).isEqualTo(request.reluctance());
+  }
+
+  @Test
+  void aProfileInheritsFromAParentOfTheSameTypeAndTheRootTakesTheValuesOfTheRequest() {
+    var subject = map(
+      """
+      {
+        transfers: {
+          bicycle: { maxDuration: '30m',
+            profiles: [
+              { id: "root", userPreferences: { speed: 6.0 } },
+              { id: "child", parent: "root", userPreferences: { reluctance: 7.0 } }
+            ]
+          }
+        }
+      }
+      """
+    );
+
+    var root = (BicyclePreferences) profile(subject, "root").userPreferences();
+    var child = (BicyclePreferences) profile(subject, "child").userPreferences();
+    var request = new RegularTransferPreferencesMapper().toUserPreferences(
+      TransferProfileType.BICYCLE,
+      RouteRequest.defaultValue()
+    );
+    assertThat(root.reluctance()).isEqualTo(request.reluctance());
+    assertThat(child.speed()).isEqualTo(Speed.ofMetersPerSecond(6.0));
+    assertThat(child.reluctance()).isEqualTo(Reluctance.of(7.0));
   }
 
   @Test
@@ -915,6 +949,172 @@ class TransferProfilesConfigMapperTest {
     assertThat(subject.maxDurations(TransferProfileType.CAR).longestDuration()).isEqualTo(
       Duration.ofHours(3)
     );
+  }
+
+  @Test
+  void theWalkingWithTheBicycleIsSetWithTheWalkSpeedAndReluctance() {
+    var subject = map(
+      """
+      {
+        transfers: {
+          bicycle: {
+            maxDuration: '30m',
+            profiles: [
+              { id: "root", userPreferences: { walk: { speed: 1.0 } } },
+              { id: "child", parent: "root", userPreferences: { walk: { reluctance: 8.0 } } }
+            ]
+          }
+        }
+      }
+      """
+    );
+
+    var root = (BicyclePreferences) profile(subject, "root").userPreferences();
+    var child = (BicyclePreferences) profile(subject, "child").userPreferences();
+    assertThat(root.walk().speed()).isEqualTo(Speed.ofMetersPerSecond(1.0));
+    assertThat(root.walk().reluctance()).isEqualTo(BicyclePreferences.DEFAULT.walk().reluctance());
+    // The child inherits the unset values of the parent of the same type
+    assertThat(child.walk()).isEqualTo(
+      BicycleWalk.of(Speed.ofMetersPerSecond(1.0), Reluctance.of(8.0))
+    );
+  }
+
+  @Test
+  void theSafetyFactorOfAWalkAndAWheelchairProfileIsSet() {
+    var subject = map(
+      """
+      {
+        transfers: {
+          walk: {
+            maxDuration: '30m',
+            profiles: [
+              { id: "walk", userPreferences: { safetyFactor: 0.5 } },
+              { id: "child", parent: "walk", userPreferences: { reluctance: 3.0 } }
+            ]
+          },
+          wheelchair: {
+            maxDuration: '30m',
+            profiles: [{ id: "wheelchair", userPreferences: { safetyFactor: 0.3 } }]
+          }
+        }
+      }
+      """
+    );
+
+    var walk = (WalkPreferences) profile(subject, "walk").userPreferences();
+    var child = (WalkPreferences) profile(subject, "child").userPreferences();
+    var wheelchair = (WheelchairPreferences) profile(subject, "wheelchair").userPreferences();
+    assertThat(walk.safetyFactor()).isEqualTo(Ratio.of(0.5).normalize());
+    assertThat(child.safetyFactor()).isEqualTo(Ratio.of(0.5).normalize());
+    assertThat(wheelchair.safetyFactor()).isEqualTo(Ratio.of(0.3).normalize());
+  }
+
+  @Test
+  void aSafetyFactorOutsideTheRangeIsRejected() {
+    var root = newNodeAdapterForTest(
+      """
+      {
+        transfers: {
+          walk: {
+            maxDuration: '30m',
+            profiles: [{ id: "walk", userPreferences: { safetyFactor: 1.5 } }]
+          }
+        }
+      }
+      """
+    );
+
+    var ex = assertThrows(OtpAppException.class, () -> TransferProfilesConfigMapper.map(root));
+    assertThat(ex).hasMessageThat().contains("safetyFactor");
+  }
+
+  @Test
+  void theOptimizationOfABicycleIsSetWithTheTimeTheSlopeAndTheSafety() {
+    var subject = map(
+      """
+      {
+        transfers: {
+          bicycle: {
+            maxDuration: '30m',
+            profiles: [
+              { id: "time", userPreferences: { optimize: { time: 0.1 } } },
+              { id: "mix", userPreferences: { optimize: { time: 2.0, slope: 3.0, safety: 5.0 } } },
+              { id: "child", parent: "mix", userPreferences: { reluctance: 3.0 } },
+              { id: "reset", parent: "mix", userPreferences: { optimize: { slope: 1.0 } } }
+            ]
+          }
+        }
+      }
+      """
+    );
+
+    assertThat(optimize(subject, "time")).isEqualTo(
+      TimeSlopeSafetyTrianglePreference.of(1.0, 0.0, 0.0)
+    );
+    assertThat(optimize(subject, "mix")).isEqualTo(
+      TimeSlopeSafetyTrianglePreference.of(0.2, 0.3, 0.5)
+    );
+    // Inherited when it is not set, the values that are not set are 0.0 when it is set
+    assertThat(optimize(subject, "child")).isEqualTo(optimize(subject, "mix"));
+    assertThat(optimize(subject, "reset")).isEqualTo(
+      TimeSlopeSafetyTrianglePreference.of(0.0, 1.0, 0.0)
+    );
+  }
+
+  @Test
+  void theOptimizationOfARootIsTheOptimizationOfTheRequestIfNotSet() {
+    var subject = map(
+      "{ transfers: { bicycle: { maxDuration: '30m', profiles: [{ id: 'b', userPreferences: { speed: 6.0 } }] } } }"
+    );
+
+    assertThat(optimize(subject, "b")).isEqualTo(
+      TimeSlopeSafetyTrianglePreference.of(0.0, 0.0, 1.0)
+    );
+  }
+
+  @Test
+  void anOptimizationWithoutAnyValueIsRejected() {
+    var root = newNodeAdapterForTest(
+      """
+      {
+        transfers: {
+          bicycle: {
+            maxDuration: '30m',
+            profiles: [{ id: "b", userPreferences: { optimize: {} } }]
+          }
+        }
+      }
+      """
+    );
+
+    var ex = assertThrows(OtpAppException.class, () -> TransferProfilesConfigMapper.map(root));
+    assertThat(ex).hasMessageThat().contains("optimize");
+  }
+
+  @Test
+  void anOptimizationWithANegativeValueIsRejected() {
+    var root = newNodeAdapterForTest(
+      """
+      {
+        transfers: {
+          bicycle: {
+            maxDuration: '30m',
+            profiles: [{ id: "b", userPreferences: { optimize: { time: -1.0 } } }]
+          }
+        }
+      }
+      """
+    );
+
+    var ex = assertThrows(OtpAppException.class, () -> TransferProfilesConfigMapper.map(root));
+    assertThat(ex).hasMessageThat().contains("optimize");
+  }
+
+  private static TimeSlopeSafetyTrianglePreference optimize(
+    TransferParameters<RouteRequest> parameters,
+    String id
+  ) {
+    return ((BicyclePreferences) profile(parameters, id).userPreferences()).optimize();
   }
 
   private static TransferParameters<RouteRequest> map(String json) {

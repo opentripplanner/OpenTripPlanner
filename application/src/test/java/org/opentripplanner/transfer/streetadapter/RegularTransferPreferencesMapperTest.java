@@ -4,17 +4,20 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.basic.Ratio;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.core.model.basic.Speed;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.street.model.StreetMode;
+import org.opentripplanner.street.model.VehicleRoutingOptimizeType;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
 import org.opentripplanner.transit.transfer.regular.api.preferences.BicyclePreferences;
+import org.opentripplanner.transit.transfer.regular.api.preferences.BicycleWalk;
 import org.opentripplanner.transit.transfer.regular.api.preferences.CarPreferences;
+import org.opentripplanner.transit.transfer.regular.api.preferences.TimeSlopeSafetyTrianglePreference;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WheelchairPreferences;
-import org.opentripplanner.transit.transfer.regular.api.ways.StreetSegmentTypeUsage;
 
 class RegularTransferPreferencesMapperTest {
 
@@ -155,7 +158,6 @@ class RegularTransferPreferencesMapperTest {
     var preferences = BicyclePreferences.of()
       .withSpeed(Speed.ofMetersPerSecond(6.0))
       .withReluctance(Reluctance.of(3.0))
-      .withStairs(StreetSegmentTypeUsage.FORBIDDEN)
       .build();
 
     var request = SUBJECT.toRequest(preferences, RouteRequest.defaultValue());
@@ -164,10 +166,7 @@ class RegularTransferPreferencesMapperTest {
     assertThat(request.journey().wheelchair()).isFalse();
     assertThat(request.preferences().bike().speed()).isEqualTo(6.0);
     assertThat(request.preferences().bike().reluctance()).isEqualTo(3.0);
-    assertThat(request.preferences().walk().stairsReluctance()).isEqualTo(1000.0);
-    assertThat(SUBJECT.toUserPreferences(request)).isEqualTo(
-      preferences.copyOf().withStairs(StreetSegmentTypeUsage.ALLOWED).build()
-    );
+    assertThat(SUBJECT.toUserPreferences(request)).isEqualTo(preferences);
   }
 
   @Test
@@ -211,5 +210,127 @@ class RegularTransferPreferencesMapperTest {
     assertThat(request.journey().wheelchair()).isFalse();
     assertThat(request.preferences().car().reluctance()).isEqualTo(3.0);
     assertThat(SUBJECT.toUserPreferences(request)).isEqualTo(preferences);
+  }
+
+  @Test
+  void theWalkingWithTheBicycleIsTheWalkingOfTheBikePreferences() {
+    var request = RouteRequest.defaultValue()
+      .copyOf()
+      .withJourney(j -> j.withTransfer(StreetMode.BIKE))
+      .withPreferences(p ->
+        p
+          .withWalk(w -> w.withSpeed(1.0).withReluctance(9.0))
+          .withBike(b -> b.withWalking(w -> w.withSpeed(0.9).withReluctance(7.0)))
+      )
+      .buildDefault();
+
+    var bicycle = (BicyclePreferences) SUBJECT.toUserPreferences(request);
+
+    assertThat(bicycle.walk()).isEqualTo(
+      BicycleWalk.of(Speed.ofMetersPerSecond(0.9), Reluctance.of(7.0))
+    );
+  }
+
+  @Test
+  void theWalkingWithTheBicycleMakesTheWalkingOfTheBikePreferences() {
+    var preferences = BicyclePreferences.of()
+      .withWalk(BicycleWalk.of(Speed.ofMetersPerSecond(0.9), Reluctance.of(7.0)))
+      .build();
+
+    var request = SUBJECT.toRequest(preferences, RouteRequest.defaultValue());
+
+    assertThat(request.preferences().bike().walking().speed()).isEqualTo(0.9);
+    assertThat(request.preferences().bike().walking().reluctance()).isEqualTo(7.0);
+    assertThat(SUBJECT.toUserPreferences(request)).isEqualTo(preferences);
+  }
+
+  @Test
+  void theSafetyFactorOfAWalkAndAWheelchairRequestIsTheSafetyFactorOfTheWalkPreferences() {
+    var walkRequest = RouteRequest.defaultValue()
+      .copyOf()
+      .withPreferences(p -> p.withWalk(w -> w.withSafetyFactor(0.4)))
+      .buildDefault();
+    var wheelchairRequest = walkRequest
+      .copyOf()
+      .withJourney(j -> j.withWheelchair(true))
+      .buildDefault();
+
+    var walk = (WalkPreferences) SUBJECT.toUserPreferences(walkRequest);
+    var wheelchair = (WheelchairPreferences) SUBJECT.toUserPreferences(wheelchairRequest);
+
+    assertThat(walk.safetyFactor()).isEqualTo(Ratio.of(0.4).normalize());
+    assertThat(wheelchair.safetyFactor()).isEqualTo(Ratio.of(0.4).normalize());
+  }
+
+  @Test
+  void theSafetyFactorMakesTheSafetyFactorOfTheWalkPreferencesOfTheRequest() {
+    var walk = WalkPreferences.of().withSafetyFactor(Ratio.of(0.4).normalize()).build();
+    var wheelchair = WheelchairPreferences.of().withSafetyFactor(Ratio.of(0.6).normalize()).build();
+
+    var walkRequest = SUBJECT.toRequest(walk, RouteRequest.defaultValue());
+    var wheelchairRequest = SUBJECT.toRequest(wheelchair, RouteRequest.defaultValue());
+
+    assertThat(walkRequest.preferences().walk().safetyFactor()).isEqualTo(0.4);
+    assertThat(wheelchairRequest.preferences().walk().safetyFactor()).isEqualTo(0.6);
+    assertThat(SUBJECT.toUserPreferences(walkRequest)).isEqualTo(walk);
+    assertThat(SUBJECT.toUserPreferences(wheelchairRequest)).isEqualTo(wheelchair);
+  }
+
+  @Test
+  void theOptimizationTypesOfABikeRequestAreTrianglesWithOneValueOfOne() {
+    assertThat(optimizeOf(VehicleRoutingOptimizeType.SHORTEST_DURATION)).isEqualTo(
+      TimeSlopeSafetyTrianglePreference.of(1.0, 0.0, 0.0)
+    );
+    assertThat(optimizeOf(VehicleRoutingOptimizeType.FLAT_STREETS)).isEqualTo(
+      TimeSlopeSafetyTrianglePreference.of(0.0, 1.0, 0.0)
+    );
+    assertThat(optimizeOf(VehicleRoutingOptimizeType.SAFE_STREETS)).isEqualTo(
+      TimeSlopeSafetyTrianglePreference.of(0.0, 0.0, 1.0)
+    );
+  }
+
+  @Test
+  void theTriangleOfABikeRequestIsNormalized() {
+    var request = RouteRequest.defaultValue()
+      .copyOf()
+      .withJourney(j -> j.withTransfer(StreetMode.BIKE))
+      .withPreferences(p ->
+        p.withBike(b ->
+          b
+            .withOptimizeType(VehicleRoutingOptimizeType.TRIANGLE)
+            .withOptimizeTriangle(t -> t.withTime(2.0).withSlope(3.0).withSafety(5.0))
+        )
+      )
+      .buildDefault();
+
+    var bicycle = (BicyclePreferences) SUBJECT.toUserPreferences(request);
+
+    assertThat(bicycle.optimize()).isEqualTo(TimeSlopeSafetyTrianglePreference.of(0.2, 0.3, 0.5));
+  }
+
+  @Test
+  void theOptimizationMakesATriangleRequestAndIsReadBack() {
+    var preferences = BicyclePreferences.of()
+      .withOptimize(TimeSlopeSafetyTrianglePreference.of(0.2, 0.3, 0.5))
+      .build();
+
+    var request = SUBJECT.toRequest(preferences, RouteRequest.defaultValue());
+
+    assertThat(request.preferences().bike().optimizeType()).isEqualTo(
+      VehicleRoutingOptimizeType.TRIANGLE
+    );
+    assertThat(request.preferences().bike().optimizeTriangle().time()).isEqualTo(0.2);
+    assertThat(request.preferences().bike().optimizeTriangle().slope()).isEqualTo(0.3);
+    assertThat(request.preferences().bike().optimizeTriangle().safety()).isEqualTo(0.5);
+    assertThat(SUBJECT.toUserPreferences(request)).isEqualTo(preferences);
+  }
+
+  private static TimeSlopeSafetyTrianglePreference optimizeOf(VehicleRoutingOptimizeType type) {
+    var request = RouteRequest.defaultValue()
+      .copyOf()
+      .withJourney(j -> j.withTransfer(StreetMode.BIKE))
+      .withPreferences(p -> p.withBike(b -> b.withOptimizeType(type)))
+      .buildDefault();
+    return ((BicyclePreferences) SUBJECT.toUserPreferences(request)).optimize();
   }
 }

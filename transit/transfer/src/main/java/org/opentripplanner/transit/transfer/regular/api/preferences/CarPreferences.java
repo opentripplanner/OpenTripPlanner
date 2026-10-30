@@ -1,6 +1,5 @@
 package org.opentripplanner.transit.transfer.regular.api.preferences;
 
-import javax.annotation.Nullable;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
@@ -32,21 +31,6 @@ public final class CarPreferences extends AbstractUserPreferences<CarPreferences
 
   public Builder copyOf() {
     return new Builder(this);
-  }
-
-  /**
-   * The preferences a profile starts with: the defaults, with the values the {@code parent} has in
-   * common, see {@link AbstractUserPreferences.Builder#inheritFrom}. The parent itself if it is
-   * car preferences, the defaults if there is no parent.
-   */
-  public static CarPreferences inheritedFrom(@Nullable AbstractUserPreferences<?> parent) {
-    if (parent == null) {
-      return DEFAULT;
-    }
-    if (parent instanceof CarPreferences car) {
-      return car;
-    }
-    return of().inheritFrom(parent).build();
   }
 
   @Override

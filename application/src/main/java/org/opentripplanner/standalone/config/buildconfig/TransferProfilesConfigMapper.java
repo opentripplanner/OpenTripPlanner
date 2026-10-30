@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
+import org.opentripplanner.core.model.basic.NormalizedRatio;
+import org.opentripplanner.core.model.basic.Ratio;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.core.model.basic.Speed;
 import org.opentripplanner.framework.application.OtpAppException;
@@ -26,12 +28,13 @@ import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfi
 import org.opentripplanner.transit.transfer.regular.api.parameters.WarmupParameters;
 import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.BicyclePreferences;
+import org.opentripplanner.transit.transfer.regular.api.preferences.BicycleWalk;
 import org.opentripplanner.transit.transfer.regular.api.preferences.CarPreferences;
+import org.opentripplanner.transit.transfer.regular.api.preferences.TimeSlopeSafetyTrianglePreference;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WheelchairPreferences;
+import org.opentripplanner.transit.transfer.regular.api.preferences.WithSafetyFactor;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WithSpeed;
-import org.opentripplanner.transit.transfer.regular.api.preferences.WithStairs;
-import org.opentripplanner.transit.transfer.regular.api.ways.StreetSegmentTypeUsage;
 import org.opentripplanner.transit.transfer.regular.configure.RegularTransferFactory;
 import org.opentripplanner.utils.collection.ParentOrder;
 
@@ -341,7 +344,11 @@ public class TransferProfilesConfigMapper {
     var resolved = new HashMap<String, ResolvedProfile>();
     var mapped = new HashMap<String, TransferProfile<RouteRequest>>();
     for (var profile : parentsFirst) {
+      // Only a parent of the same type is inherited from. A parent of another type is only used to
+      // store the paths that are the same once, see the deduplication.
       var parent = profile.parent() == null ? null : resolved.get(profile.parent());
+      var inherited =
+        parent != null && parent.userPreferences().type() == profile.type() ? parent : null;
       var request = RouteRequestConfig.mapRouteRequest(
         profile
           .node()
@@ -352,7 +359,7 @@ public class TransferProfilesConfigMapper {
             "Preferences in `userPreferences` override the equivalent parameters of the request."
           )
           .asObject(),
-        parent == null ? RouteRequest.defaultValue() : parent.request()
+        inherited == null ? RouteRequest.defaultValue() : inherited.request()
       );
       AbstractUserPreferences<?> own = null;
       if (profile.node().exist("userPreferences")) {
@@ -367,7 +374,9 @@ public class TransferProfilesConfigMapper {
               "Optional. If it is not set, the preferences of the `routingRequest` are used."
             )
             .asObject(),
-          parent == null ? null : parent.userPreferences()
+          inherited == null
+            ? mapper.toUserPreferences(profile.type(), request)
+            : inherited.userPreferences()
         );
       }
       var effective = own != null ? own : mapper.toUserPreferences(profile.type(), request);
@@ -505,10 +514,13 @@ public class TransferProfilesConfigMapper {
         .summary("The id of the profile this profile is based on.")
         .description(
           """
-          The profile inherits the `routingRequest` and the `userPreferences` of the parent. Values
-          set on the profile override the inherited ones. The parent is generated first, and the
-          paths of the profile that are equivalent to the paths of the parent are stored once, see
-          `deduplicationLimit`. The parents must not form a cycle.
+          If the parent is a profile of the same type, the profile inherits the `routingRequest` and
+          the `userPreferences` of the parent, and values set on the profile override the inherited
+          ones. The root of a type gets the values that are not set from the request. The parent is
+          generated first, and the paths of the profile that are equivalent to the paths of the
+          parent are stored once, see `deduplicationLimit`. The parent can be of another type, but
+          nothing is inherited from it, it is only used to store the paths once. The parents must
+          not form a cycle.
           """
         )
         .asString();
@@ -517,20 +529,20 @@ public class TransferProfilesConfigMapper {
   }
 
   /**
-   * Map the user preferences of a profile type. Unset values are the values of {@code parent}, the
-   * preferences of the parent profile or the warmup, or else the defaults of the type. A parent of
-   * another type gives the values the two types have in common.
+   * Map the user preferences of a profile type. Unset values are the values of {@code base}, the
+   * preferences of the parent of the same type, or the ones of the request if there is none. The
+   * base is of the type of the profile.
    */
   private static AbstractUserPreferences<?> mapPreferences(
     TransferProfileType type,
     NodeAdapter p,
-    @Nullable AbstractUserPreferences<?> parent
+    AbstractUserPreferences<?> base
   ) {
     return switch (type) {
-      case WALK -> mapWalkPreferences(p, WalkPreferences.inheritedFrom(parent));
-      case WHEELCHAIR -> mapWheelchairPreferences(p, WheelchairPreferences.inheritedFrom(parent));
-      case BICYCLE -> mapBicyclePreferences(p, BicyclePreferences.inheritedFrom(parent));
-      case CAR -> mapCarPreferences(p, CarPreferences.inheritedFrom(parent));
+      case WALK -> mapWalkPreferences(p, (WalkPreferences) base);
+      case WHEELCHAIR -> mapWheelchairPreferences(p, (WheelchairPreferences) base);
+      case BICYCLE -> mapBicyclePreferences(p, (BicyclePreferences) base);
+      case CAR -> mapCarPreferences(p, (CarPreferences) base);
     };
   }
 
@@ -538,7 +550,7 @@ public class TransferProfilesConfigMapper {
     var builder = base.copyOf();
     builder.withSpeed(mapSpeed(p, "Walking speed, in meters per second.", base));
     builder.withReluctance(mapReluctance(p, "A multiplier for the cost of walking.", base));
-    builder.withStairs(mapStairs(p, base));
+    builder.withSafetyFactor(mapSafetyFactor(p, base));
     return builder.build();
   }
 
@@ -553,8 +565,32 @@ public class TransferProfilesConfigMapper {
     builder.withReluctance(
       mapReluctance(p, "A multiplier for the cost of traveling in a wheelchair.", base)
     );
-    builder.withStairs(mapStairs(p, base));
+    builder.withSafetyFactor(mapSafetyFactor(p, base));
     return builder.build();
+  }
+
+  private static <
+    T extends AbstractUserPreferences<T> & WithSafetyFactor
+  > NormalizedRatio mapSafetyFactor(NodeAdapter p, T base) {
+    var value = p
+      .of("safetyFactor")
+      .since(V2_10)
+      .summary("How much the safety of the streets is considered.")
+      .description(
+        """
+        A value between 0.0 and 1.0. If it is 0.0, the safety is ignored. If it is 1.0, the safety
+        factor of the street is applied in whole as a multiplier on the cost, on top of the
+        reluctance.
+        """
+      )
+      .asDouble(base.safetyFactor().asDouble());
+    try {
+      return Ratio.of(value).normalize();
+    } catch (IllegalArgumentException e) {
+      throw new OtpAppException(
+        "Invalid transfer configuration in " + p.contextPath() + ": safetyFactor. " + e.getMessage()
+      );
+    }
   }
 
   private static BicyclePreferences mapBicyclePreferences(NodeAdapter p, BicyclePreferences base) {
@@ -563,8 +599,88 @@ public class TransferProfilesConfigMapper {
     builder.withReluctance(
       mapReluctance(p, "A multiplier for the cost of riding a bicycle.", base)
     );
-    builder.withStairs(mapStairs(p, base));
+    builder.withOptimize(mapOptimize(p, base.optimize()));
+    builder.withWalk(mapBicycleWalk(p, base.walk()));
     return builder.build();
+  }
+
+  private static TimeSlopeSafetyTrianglePreference mapOptimize(
+    NodeAdapter p,
+    TimeSlopeSafetyTrianglePreference base
+  ) {
+    if (!p.exist("optimize")) {
+      return base;
+    }
+    var optimize = p
+      .of("optimize")
+      .since(V2_10)
+      .summary("How the route of the bicycle is optimized.")
+      .description(
+        """
+        The importance of the `time`, the `slope` and the `safety`. At least one must be set, and
+        the values that are not set are 0.0. The values are relative to each other, for example
+        `time: 0.1` is the same as `time: 1.0`, and they are rounded so they sum to 1.0. A `time` of
+        1.0 is the shortest duration, a `slope` of 1.0 is the flattest streets, and a `safety` of
+        1.0 is the safest streets.
+        """
+      )
+      .asObject();
+    if (!optimize.exist("time") && !optimize.exist("slope") && !optimize.exist("safety")) {
+      throw new OtpAppException(
+        "Invalid transfer configuration in " +
+          optimize.contextPath() +
+          ": at least one of time, slope and safety must be set."
+      );
+    }
+    try {
+      return TimeSlopeSafetyTrianglePreference.of(
+        optimize
+          .of("time")
+          .since(V2_10)
+          .summary("The importance of the time, the shortest duration.")
+          .asDouble(0.0),
+        optimize
+          .of("slope")
+          .since(V2_10)
+          .summary("The importance of the slope, the flattest streets.")
+          .asDouble(0.0),
+        optimize
+          .of("safety")
+          .since(V2_10)
+          .summary("The importance of the safety, the safest streets.")
+          .asDouble(0.0)
+      );
+    } catch (IllegalArgumentException e) {
+      throw new OtpAppException(
+        "Invalid transfer configuration in " + optimize.contextPath() + ": " + e.getMessage()
+      );
+    }
+  }
+
+  private static BicycleWalk mapBicycleWalk(NodeAdapter p, BicycleWalk base) {
+    var walk = p
+      .of("walk")
+      .since(V2_10)
+      .summary("The preferences for walking with the bicycle.")
+      .description("Used when the traveler pushes the bicycle, for example on stairs.")
+      .asObject();
+    return BicycleWalk.of(
+      Speed.ofMetersPerSecond(
+        walk
+          .of("speed")
+          .since(V2_10)
+          .summary("The speed of walking with the bicycle, in meters per second.")
+          .asDouble(base.speed().toMetersPerSecond())
+      ),
+      Reluctance.of(
+        walk
+          .of("reluctance")
+          .since(V2_10)
+          .summary("A multiplier for the cost of walking with the bicycle.")
+          .description("A higher value avoids walking with the bicycle.")
+          .asDouble(base.reluctance().value())
+      )
+    );
   }
 
   private static CarPreferences mapCarPreferences(NodeAdapter p, CarPreferences base) {
@@ -591,15 +707,5 @@ public class TransferProfilesConfigMapper {
     return Reluctance.of(
       p.of("reluctance").since(V2_10).summary(summary).asDouble(base.reluctance().value())
     );
-  }
-
-  private static <
-    T extends AbstractUserPreferences<T> & WithStairs
-  > StreetSegmentTypeUsage mapStairs(NodeAdapter p, T base) {
-    return p
-      .of("stairs")
-      .since(V2_10)
-      .summary("Whether stairs are allowed, discouraged, or forbidden for this profile.")
-      .asEnum(base.stairs());
   }
 }

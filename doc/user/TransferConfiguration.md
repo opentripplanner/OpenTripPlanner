@@ -46,10 +46,10 @@ request needs them, and cached. OTP creates them for the preferences of every pr
 server starts. A warmup entry does the same for other preferences that are common in the requests,
 but are not worth a profile of their own. See [Warmup](#warmup).
 
-**Parent.** A profile can be based on another profile, its `parent`. The profile inherits the
-`routingRequest` and the `userPreferences` of the parent, and only has to set what is different. The
-transfers the profile and its parent have in common are stored once, which saves memory. See
-[Parent and deduplication](#parent-and-deduplication).
+**Parent.** A profile can be based on another profile, its `parent`. If the parent is of the same
+type, the profile inherits the `routingRequest` and the `userPreferences` of the parent, and only
+has to set what is different. The transfers the profile and its parent have in common are stored
+once, which saves memory. See [Parent and deduplication](#parent-and-deduplication).
 
 ## Example
 
@@ -67,7 +67,7 @@ transfers the profile and its parent have in common are stored once, which saves
         {
           "id": "slow-walk",
           "parent": "walk",
-          "userPreferences": { "speed": 0.9, "reluctance": 4.0, "stairs": "DISCOURAGED" }
+          "userPreferences": { "speed": 0.9, "reluctance": 4.0 }
         }
       ],
       "maxDuration": "40m",
@@ -113,12 +113,35 @@ two more parameters, see [Max durations](#max-durations).
 |---------------|----------|-------------------------------------------------------------------------------------|----------|
 | `speed`       | `double` | The speed in meters per second. Not for `car`, it drives the speed of the streets.  | `1.35`   |
 | `reluctance`  | `double` | A multiplier for the cost of the transfer. A higher value avoids the transfer.      | `2.0`    |
-| `stairs`      | `enum`   | `ALLOWED`, `DISCOURAGED` or `FORBIDDEN`. Not for `car`. A bicycle is pushed.        | `ALLOWED`|
+| `safetyFactor` | `double` | `walk` and `wheelchair` only. How much the safety of the streets is considered, from 0.0 (ignored) to 1.0. | `1.0` |
 
-The `walk`, `wheelchair` and `bicycle` types have all three, and the `car` type only has
-`reluctance`. The defaults of `walk` and `wheelchair` are the same, and the default `speed` of
+The `walk`, `wheelchair` and `bicycle` types have `speed` and `reluctance`, and the `car` type only
+has `reluctance`. The defaults of `walk` and `wheelchair` are the same, and the default `speed` of
 `bicycle` is `5.0`. The street model decides which streets and elevators a wheelchair can use, and
-where a bicycle or a car can go.
+where a bicycle or a car can go. The `bicycle` type also has the preferences for walking with the
+bicycle, when it is pushed, and how the route is optimized:
+
+| Parameter                | Type     | Description                                                      | Default |
+|--------------------------|----------|------------------------------------------------------------------|---------|
+| `bicycle.optimize`       | `object` | How the route is optimized. At least one value is required.      |         |
+| &nbsp;&nbsp;`time`       | `double` | The importance of the time. `1.0` is the shortest duration.      | `0.0`   |
+| &nbsp;&nbsp;`slope`      | `double` | The importance of the slope. `1.0` is the flattest streets.      | `0.0`   |
+| &nbsp;&nbsp;`safety`     | `double` | The importance of the safety. `1.0` is the safest streets.       | `0.0`   |
+| `bicycle.walk`           | `object` | The preferences for walking with the bicycle.                    |         |
+| &nbsp;&nbsp;`speed`      | `double` | The speed in meters per second.                                  | `1.35`  |
+| &nbsp;&nbsp;`reluctance` | `double` | A multiplier for the cost of walking with the bicycle.           | `5.0`   |
+
+The `optimize` values are relative to each other, for example `time: 0.1` is the same as
+`time: 1.0`. They are rounded so they sum to 1.0. If `optimize` is set, the values that are not set
+are `0.0`, so `optimize: { time: 0.1 }` is `time: 1.0`, `slope: 0.0` and `safety: 0.0`. If it is
+not set in a profile, the profile inherits it from a parent of the same type, and a root gets it
+from the request. The default is the safest streets (`safety: 1.0`).
+
+The stairs reluctance is not a user preference, since no API takes it as an input of a routing
+search. It is a `routingRequest` parameter of the profile, for example `walk.stairsReluctance`,
+`wheelchair.stairsReluctance` or `bicycle.walking.stairsReluctance`. It is the value of the
+configuration of the profile, not the one in `routingDefaults` of the `router-config.json`, so
+copy it to the `routingRequest` of the profiles if it is not the default.
 
 ### Routing request
 
@@ -132,17 +155,16 @@ relevant parameters to `userPreferences`, and drop `routingRequest` in the futur
 A profile can name another profile as its `parent` with the `id` of the parent. The `parent` must be
 a profile of the same configuration, and the parents must not form a cycle. The profiles can be
 declared in any order. A parent can be of another type, for example a `wheelchair` profile with the
-`walk` profile as its parent.
+`walk` profile as its parent. The paths are then stored once, but no values are inherited.
 
-**Inheritance.** The profile inherits the `routingRequest` and the `userPreferences` of the parent.
+**Inheritance.** Values are only inherited within a profile type. If the parent is a profile of the
+same type, the profile inherits the `routingRequest` and the `userPreferences` of the parent.
 Everything that is set on the profile overrides the inherited value, and everything that is not set
 is the value of the parent. A profile with a parent and without `userPreferences` of its own would
-get the same preferences as the parent, and is rejected, since the profiles must be unique. If the
-parent is of another type, the profile inherits the preferences the two types have in common, for
-example the speed and the reluctance of a `walk` parent for a `wheelchair` profile. A `bicycle`
-profile with a `walk` parent would get the walking speed unless it sets its own, and a `car`
-profile only inherits the `reluctance`. Check that these
-are meaningful for the type of the profile, and set them in its `userPreferences` if they are not.
+get the same preferences as the parent, and is rejected, since the profiles must be unique. A
+profile without a parent of the same type is the root of its type, and the values it does not set
+are the ones of the request, see [Routing request](#routing-request). A parent of another type is
+not inherited from, it is only used for the deduplication below.
 
 **Deduplication.** Each profile still searches for its own transfers, but the transfers that are
 the same, or almost the same, as the transfers of the parent are only stored once. For each pair of
@@ -179,7 +201,8 @@ different enough from a profile to be worth a profile of their own. A warmup ent
 
 - an `id`, unique among all profiles and warmup entries. It is used in the logs.
 - a `parent`, the `id` of a profile. The transfers are created from the stored transfers of the
-  parent, and the entry inherits the preferences of the parent. A warmup entry can not be a parent.
+  parent of the same type, and the entry inherits the preferences of the parent. A warmup entry can
+  not be a parent.
 - `userPreferences`. They must be different from the preferences of every profile and every other
   warmup entry.
 

@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.core.model.basic.Speed;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
-import org.opentripplanner.transit.transfer.regular.api.ways.StreetSegmentTypeUsage;
 
 class BicyclePreferencesTest {
 
@@ -30,13 +29,6 @@ class BicyclePreferencesTest {
 
     assertThat(preferences(1.3, 3.0)).isNotEqualTo(subject);
     assertThat(preferences(1.5, 2.0)).isNotEqualTo(subject);
-    assertThat(
-      BicyclePreferences.of()
-        .withSpeed(Speed.ofMetersPerSecond(1.3))
-        .withReluctance(Reluctance.of(2.0))
-        .withStairs(StreetSegmentTypeUsage.FORBIDDEN)
-        .build()
-    ).isNotEqualTo(subject);
   }
 
   @Test
@@ -86,26 +78,45 @@ class BicyclePreferencesTest {
   }
 
   @Test
-  void inheritedFromAParentOfTheSameTypeIsTheParent() {
-    var parent = preferences(1.1, 5.0);
+  void thePreferencesForWalkingWithTheBicycleAreAPartOfTheEquality() {
+    var subject = preferences(1.3, 2.0);
+    var slowWalk = subject
+      .copyOf()
+      .withWalk(BicycleWalk.of(Speed.ofMetersPerSecond(0.9), Reluctance.of(5.0)))
+      .build();
+    var sameWalk = subject.copyOf().withWalk(subject.walk()).build();
 
-    assertThat(BicyclePreferences.inheritedFrom(parent)).isSameInstanceAs(parent);
-    assertThat(BicyclePreferences.inheritedFrom(null)).isEqualTo(BicyclePreferences.DEFAULT);
+    assertThat(slowWalk).isNotEqualTo(subject);
+    assertThat(sameWalk).isEqualTo(subject);
+    assertThat(subject.normalizedDistance(slowWalk)).isGreaterThan(0f);
   }
 
   @Test
-  void inheritedFromAParentOfAnotherTypeTakesTheValuesTheyHaveInCommon() {
-    var walk = WalkPreferences.of()
-      .withSpeed(Speed.ofMetersPerSecond(1.1))
-      .withReluctance(Reluctance.of(5.0))
-      .withStairs(StreetSegmentTypeUsage.FORBIDDEN)
+  void theDefaultWalkingWithTheBicycleIsTheDefaultOfTheRequest() {
+    assertThat(BicyclePreferences.DEFAULT.walk()).isEqualTo(
+      BicycleWalk.of(Speed.ofMetersPerSecond(1.35), Reluctance.of(5.0))
+    );
+  }
+
+  @Test
+  void theOptimizationIsAPartOfTheEqualityAndTheDistance() {
+    var subject = preferences(1.3, 2.0);
+    var fastest = subject
+      .copyOf()
+      .withOptimize(TimeSlopeSafetyTrianglePreference.of(1, 0, 0))
       .build();
+    var same = subject.copyOf().withOptimize(subject.optimize()).build();
 
-    var subject = BicyclePreferences.inheritedFrom(walk);
+    assertThat(fastest).isNotEqualTo(subject);
+    assertThat(same).isEqualTo(subject);
+    assertThat(subject.normalizedDistance(fastest)).isGreaterThan(0f);
+  }
 
-    assertThat(subject.speed()).isEqualTo(walk.speed());
-    assertThat(subject.reluctance()).isEqualTo(walk.reluctance());
-    assertThat(subject.stairs()).isEqualTo(StreetSegmentTypeUsage.FORBIDDEN);
+  @Test
+  void theDefaultOptimizationIsTheSafestStreets() {
+    assertThat(BicyclePreferences.DEFAULT.optimize()).isEqualTo(
+      TimeSlopeSafetyTrianglePreference.of(0.0, 0.0, 1.0)
+    );
   }
 
   private static BicyclePreferences preferences(double speed, double reluctance) {

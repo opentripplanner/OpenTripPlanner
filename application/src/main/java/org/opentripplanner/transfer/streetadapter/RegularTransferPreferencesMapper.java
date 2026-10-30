@@ -1,18 +1,22 @@
 package org.opentripplanner.transfer.streetadapter;
 
+import org.opentripplanner.core.model.basic.Ratio;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.core.model.basic.Speed;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.preference.BikePreferences;
 import org.opentripplanner.street.model.StreetMode;
+import org.opentripplanner.street.model.VehicleRoutingOptimizeType;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
 import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.BicyclePreferences;
+import org.opentripplanner.transit.transfer.regular.api.preferences.BicycleWalk;
 import org.opentripplanner.transit.transfer.regular.api.preferences.CarPreferences;
+import org.opentripplanner.transit.transfer.regular.api.preferences.TimeSlopeSafetyTrianglePreference;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WheelchairPreferences;
+import org.opentripplanner.transit.transfer.regular.api.preferences.WithSafetyFactor;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WithSpeed;
-import org.opentripplanner.transit.transfer.regular.api.preferences.WithStairs;
-import org.opentripplanner.transit.transfer.regular.api.ways.StreetSegmentTypeUsage;
 import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
 
 /**
@@ -42,18 +46,31 @@ public final class RegularTransferPreferencesMapper implements TransferRequestMa
     var appWalk = request.preferences().walk();
     var speed = Speed.ofMetersPerSecond(appWalk.speed());
     var reluctance = Reluctance.of(appWalk.reluctance());
+    var safetyFactor = Ratio.of(appWalk.safetyFactor()).normalize();
     var appBike = request.preferences().bike();
     var appCar = request.preferences().car();
 
     return switch (type) {
-      case WALK -> WalkPreferences.of().withSpeed(speed).withReluctance(reluctance).build();
+      case WALK -> WalkPreferences.of()
+        .withSpeed(speed)
+        .withReluctance(reluctance)
+        .withSafetyFactor(safetyFactor)
+        .build();
       case WHEELCHAIR -> WheelchairPreferences.of()
         .withSpeed(speed)
         .withReluctance(reluctance)
+        .withSafetyFactor(safetyFactor)
         .build();
       case BICYCLE -> BicyclePreferences.of()
         .withSpeed(Speed.ofMetersPerSecond(appBike.speed()))
         .withReluctance(Reluctance.of(appBike.reluctance()))
+        .withOptimize(optimize(appBike))
+        .withWalk(
+          BicycleWalk.of(
+            Speed.ofMetersPerSecond(appBike.walking().speed()),
+            Reluctance.of(appBike.walking().reluctance())
+          )
+        )
         .build();
       case CAR -> CarPreferences.of().withReluctance(Reluctance.of(appCar.reluctance())).build();
     };
@@ -90,7 +107,7 @@ public final class RegularTransferPreferencesMapper implements TransferRequestMa
 
   /** A walking request, for a traveler in a wheelchair or not. */
   private static <
-    T extends AbstractUserPreferences<T> & WithSpeed & WithStairs
+    T extends AbstractUserPreferences<T> & WithSpeed & WithSafetyFactor
   > RouteRequest walkRequest(T userPreferences, RouteRequest base, boolean wheelchair) {
     return base
       .copyOf()
@@ -99,9 +116,7 @@ public final class RegularTransferPreferencesMapper implements TransferRequestMa
         routingPrefs.withWalk(walk -> {
           walk.withSpeed(userPreferences.speed().toMetersPerSecond());
           walk.withReluctance(userPreferences.reluctance().value());
-          walk.withStairsReluctance(
-            stairsReluctance(userPreferences.stairs(), walk.stairsReluctance())
-          );
+          walk.withSafetyFactor(userPreferences.safetyFactor().asDouble());
         })
       )
       .buildDefault();
@@ -116,16 +131,21 @@ public final class RegularTransferPreferencesMapper implements TransferRequestMa
       .copyOf()
       .withJourney(jb -> jb.withTransfer(StreetMode.BIKE))
       .withPreferences(rb ->
-        rb
-          .withWalk(walk ->
-            walk.withStairsReluctance(
-              stairsReluctance(userPreferences.stairs(), walk.stairsReluctance())
-            )
-          )
-          .withBike(bike -> {
-            bike.withSpeed(userPreferences.speed().toMetersPerSecond());
-            bike.withReluctance(userPreferences.reluctance().value());
-          })
+        rb.withBike(bike -> {
+          bike.withSpeed(userPreferences.speed().toMetersPerSecond());
+          bike.withReluctance(userPreferences.reluctance().value());
+          // The triangle is the same as the shortest, flattest or safest type with one value of 1.0
+          bike.withOptimizeType(VehicleRoutingOptimizeType.TRIANGLE);
+          bike.withOptimizeTriangle(triangle -> {
+            triangle.withTime(userPreferences.optimize().time().asDouble());
+            triangle.withSlope(userPreferences.optimize().slope().asDouble());
+            triangle.withSafety(userPreferences.optimize().safety().asDouble());
+          });
+          bike.withWalking(walking -> {
+            walking.withSpeed(userPreferences.walk().speed().toMetersPerSecond());
+            walking.withReluctance(userPreferences.walk().reluctance().value());
+          });
+        })
       )
       .buildDefault();
   }
@@ -141,12 +161,22 @@ public final class RegularTransferPreferencesMapper implements TransferRequestMa
       .buildDefault();
   }
 
-  /** Interim mapping until the traveler-preferences design (stairs as a 3-way enum) is finalized. */
-  private static double stairsReluctance(StreetSegmentTypeUsage stairs, double defaultReluctance) {
-    return switch (stairs) {
-      case ALLOWED -> defaultReluctance;
-      case DISCOURAGED -> 10.0;
-      case FORBIDDEN -> 1000.0;
+  /** The optimization of a bike request as a triangle: the other types have one value of 1.0. */
+  private static TimeSlopeSafetyTrianglePreference optimize(BikePreferences bike) {
+    return switch (bike.optimizeType()) {
+      case SHORTEST_DURATION -> TimeSlopeSafetyTrianglePreference.of(1.0, 0.0, 0.0);
+      case FLAT_STREETS -> TimeSlopeSafetyTrianglePreference.of(0.0, 1.0, 0.0);
+      case SAFE_STREETS -> TimeSlopeSafetyTrianglePreference.of(0.0, 0.0, 1.0);
+      case TRIANGLE -> {
+        var triangle = bike.optimizeTriangle();
+        yield triangle.time() + triangle.slope() + triangle.safety() > 0.0
+          ? TimeSlopeSafetyTrianglePreference.of(
+              triangle.time(),
+              triangle.slope(),
+              triangle.safety()
+            )
+          : TimeSlopeSafetyTrianglePreference.of(0.0, 0.0, 1.0);
+      }
     };
   }
 }

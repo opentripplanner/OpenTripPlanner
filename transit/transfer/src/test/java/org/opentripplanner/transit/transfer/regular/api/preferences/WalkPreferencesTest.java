@@ -3,9 +3,9 @@ package org.opentripplanner.transit.transfer.regular.api.preferences;
 import static com.google.common.truth.Truth.assertThat;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.basic.Ratio;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.core.model.basic.Speed;
-import org.opentripplanner.transit.transfer.regular.api.ways.StreetSegmentTypeUsage;
 
 class WalkPreferencesTest {
 
@@ -29,13 +29,6 @@ class WalkPreferencesTest {
 
     assertThat(preferences(1.3, 3.0)).isNotEqualTo(subject);
     assertThat(preferences(1.5, 2.0)).isNotEqualTo(subject);
-    assertThat(
-      WalkPreferences.of()
-        .withSpeed(Speed.ofMetersPerSecond(1.3))
-        .withReluctance(Reluctance.of(2.0))
-        .withStairs(StreetSegmentTypeUsage.FORBIDDEN)
-        .build()
-    ).isNotEqualTo(subject);
   }
 
   @Test
@@ -72,18 +65,19 @@ class WalkPreferencesTest {
   }
 
   @Test
-  void inheritedFromAParentOfAnotherTypeTakesTheValuesTheyHaveInCommon() {
-    var wheelchair = WheelchairPreferences.of()
-      .withSpeed(Speed.ofMetersPerSecond(0.9))
-      .withReluctance(Reluctance.of(4.0))
-      .withStairs(StreetSegmentTypeUsage.DISCOURAGED)
-      .build();
+  void theSafetyFactorIsAPartOfTheEqualityAndTheDistance() {
+    var subject = preferences(1.3, 2.0);
+    var lessSafe = subject.copyOf().withSafetyFactor(Ratio.of(0.5).normalize()).build();
+    var same = subject.copyOf().withSafetyFactor(subject.safetyFactor()).build();
 
-    var subject = WalkPreferences.inheritedFrom(wheelchair);
+    assertThat(lessSafe).isNotEqualTo(subject);
+    assertThat(same).isEqualTo(subject);
+    assertThat(subject.normalizedDistance(lessSafe)).isGreaterThan(0f);
+  }
 
-    assertThat(subject.speed()).isEqualTo(wheelchair.speed());
-    assertThat(subject.reluctance()).isEqualTo(wheelchair.reluctance());
-    assertThat(subject.stairs()).isEqualTo(StreetSegmentTypeUsage.DISCOURAGED);
+  @Test
+  void theDefaultSafetyFactorIsOne() {
+    assertThat(WalkPreferences.DEFAULT.safetyFactor().asDouble()).isEqualTo(1.0);
   }
 
   private static WalkPreferences preferences(double speed, double reluctance) {

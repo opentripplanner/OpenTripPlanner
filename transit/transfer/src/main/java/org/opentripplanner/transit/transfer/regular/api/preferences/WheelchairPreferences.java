@@ -1,15 +1,15 @@
 package org.opentripplanner.transit.transfer.regular.api.preferences;
 
 import java.util.Objects;
-import javax.annotation.Nullable;
+import org.opentripplanner.core.model.basic.NormalizedRatio;
+import org.opentripplanner.core.model.basic.Ratio;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.core.model.basic.Speed;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
-import org.opentripplanner.transit.transfer.regular.api.ways.StreetSegmentTypeUsage;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * The preferences of the wheelchair transfers: speed, reluctance and stairs for a traveler in a
+ * The preferences of the wheelchair transfers: speed and reluctance for a traveler in a
  * wheelchair. The values are normalized(rounded) so the class can used as a cache key.
  * <p>
  * See the configuration for documentation of each field.
@@ -18,24 +18,24 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  */
 public final class WheelchairPreferences
   extends AbstractUserPreferences<WheelchairPreferences>
-  implements WithSpeed, WithStairs
+  implements WithSpeed, WithSafetyFactor
 {
 
   public static final WheelchairPreferences DEFAULT = new WheelchairPreferences();
 
   private final Speed speed;
-  private final StreetSegmentTypeUsage stairs;
+  private final NormalizedRatio safetyFactor;
 
   private WheelchairPreferences() {
     super(Reluctance.of(2.0));
     this.speed = Speed.ofMetersPerSecond(1.35);
-    this.stairs = StreetSegmentTypeUsage.ALLOWED;
+    this.safetyFactor = Ratio.of(1.0).normalize();
   }
 
   private WheelchairPreferences(Builder builder) {
     super(builder);
     this.speed = Objects.requireNonNull(builder.speed);
-    this.stairs = Objects.requireNonNull(builder.stairs);
+    this.safetyFactor = Objects.requireNonNull(builder.safetyFactor);
   }
 
   public static Builder of() {
@@ -44,21 +44,6 @@ public final class WheelchairPreferences
 
   public Builder copyOf() {
     return new Builder(this);
-  }
-
-  /**
-   * The preferences a profile starts with: the defaults, with the values the {@code parent} has in
-   * common, see {@link AbstractUserPreferences.Builder#inheritFrom}. The parent itself if it is
-   * wheelchair preferences, the defaults if there is no parent.
-   */
-  public static WheelchairPreferences inheritedFrom(@Nullable AbstractUserPreferences<?> parent) {
-    if (parent == null) {
-      return DEFAULT;
-    }
-    if (parent instanceof WheelchairPreferences wheelchair) {
-      return wheelchair;
-    }
-    return of().inheritFrom(parent).build();
   }
 
   @Override
@@ -72,8 +57,8 @@ public final class WheelchairPreferences
   }
 
   @Override
-  public StreetSegmentTypeUsage stairs() {
-    return stairs;
+  public NormalizedRatio safetyFactor() {
+    return safetyFactor;
   }
 
   @Override
@@ -86,7 +71,7 @@ public final class WheelchairPreferences
     float distance = super.normalizedDistance(other);
     if (other instanceof WheelchairPreferences that) {
       distance += speed.normalizedDistance(that.speed);
-      distance += stairs.normalizedDistance(that.stairs);
+      distance += safetyFactor.normalizedDistance(that.safetyFactor);
     }
     return distance;
   }
@@ -96,12 +81,12 @@ public final class WheelchairPreferences
     if (!(obj instanceof WheelchairPreferences that)) {
       return false;
     }
-    return super.equals(obj) && speed.equals(that.speed) && stairs == that.stairs;
+    return super.equals(obj) && speed.equals(that.speed) && safetyFactor.equals(that.safetyFactor);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), speed, stairs);
+    return Objects.hash(super.hashCode(), speed, safetyFactor);
   }
 
   @Override
@@ -109,7 +94,7 @@ public final class WheelchairPreferences
     return super
       .appendToString(ToStringBuilder.of(WheelchairPreferences.class))
       .addObj("speed", speed, DEFAULT.speed)
-      .addObj("stairs", stairs, DEFAULT.stairs)
+      .addObj("safetyFactor", safetyFactor, DEFAULT.safetyFactor)
       .toString();
   }
 
@@ -118,12 +103,12 @@ public final class WheelchairPreferences
   {
 
     private Speed speed;
-    private StreetSegmentTypeUsage stairs;
+    private NormalizedRatio safetyFactor;
 
     public Builder(WheelchairPreferences original) {
       super(original);
       this.speed = original.speed;
-      this.stairs = original.stairs;
+      this.safetyFactor = original.safetyFactor;
     }
 
     public Builder withSpeed(Speed speed) {
@@ -131,20 +116,8 @@ public final class WheelchairPreferences
       return this;
     }
 
-    public Builder withStairs(StreetSegmentTypeUsage stairs) {
-      this.stairs = stairs;
-      return this;
-    }
-
-    @Override
-    public Builder inheritFrom(AbstractUserPreferences<?> parent) {
-      super.inheritFrom(parent);
-      if (parent instanceof WithSpeed withSpeed) {
-        this.speed = withSpeed.speed();
-      }
-      if (parent instanceof WithStairs withStairs) {
-        this.stairs = withStairs.stairs();
-      }
+    public Builder withSafetyFactor(NormalizedRatio safetyFactor) {
+      this.safetyFactor = safetyFactor;
       return this;
     }
 

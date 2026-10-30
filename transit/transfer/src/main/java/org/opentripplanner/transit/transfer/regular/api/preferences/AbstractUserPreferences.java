@@ -14,7 +14,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * <p>
  * Each {@link TransferProfileType} has its own preferences class, with the preferences that are
  * meaningful for the type. The only preference all types share is the reluctance, a car has no
- * speed or stairs of its own, see {@link WithSpeed} and {@link WithStairs}.
+ * speed of its own, see {@link WithSpeed}.
  * <p>
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */
@@ -91,18 +91,6 @@ public abstract sealed class AbstractUserPreferences<S extends AbstractUserPrefe
     @SuppressWarnings("unchecked")
     public T withReluctance(Reluctance reluctance) {
       this.reluctance = reluctance;
-      return (T) this;
-    }
-
-    /**
-     * Use the values of {@code parent} for the preferences both have, even if the parent is of
-     * another type. A value that only exists for one of the types is not changed. The values of
-     * another type are only a starting point, and should be overridden where they are not
-     * meaningful for this type.
-     */
-    @SuppressWarnings("unchecked")
-    public T inheritFrom(AbstractUserPreferences<?> parent) {
-      this.reluctance = parent.reluctance();
       return (T) this;
     }
 
