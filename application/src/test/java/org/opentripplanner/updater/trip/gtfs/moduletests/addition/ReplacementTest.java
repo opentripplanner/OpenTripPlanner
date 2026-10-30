@@ -123,6 +123,11 @@ public class ReplacementTest implements RealtimeTestConstants {
       assertEquals(I18NString.of("New Headsign"), tripTimes.getHeadsign(0));
       assertEquals(I18NString.of("Changed Headsign"), tripTimes.getHeadsign(1));
       assertEquals(I18NString.of("New Headsign"), tripTimes.getHeadsign(2));
+
+      // C was added to the end of the scheduled trip, GTFS-RT cannot flag it, so we derive it
+      assertFalse(tripTimes.isExtraCall(0));
+      assertFalse(tripTimes.isExtraCall(1));
+      assertTrue(tripTimes.isExtraCall(2));
     }
   }
 
