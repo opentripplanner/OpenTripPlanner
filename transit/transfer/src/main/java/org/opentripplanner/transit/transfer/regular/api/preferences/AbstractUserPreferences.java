@@ -72,7 +72,7 @@ public abstract sealed class AbstractUserPreferences<S extends AbstractUserPrefe
   @Override
   public double normalizedDistance(AbstractUserPreferences other) {
     if (getClass() != other.getClass()) {
-      return type().normalizedDistance(other.type());
+      return 1000.0;
     }
     return RELUCTANCE_WEIGHT * reluctance.normalizedDistance(other.reluctance);
   }

@@ -90,45 +90,23 @@ final class TemplatePathsByUserProfile<P> implements Serializable {
    */
   @Nullable
   AbstractUserPreferences<?> closestProfile(AbstractUserPreferences<?> userPreferences) {
-    return closestProfile(userPreferences, false);
-  }
-
-  /**
-   * Like {@link #closestProfile(AbstractUserPreferences)}, but if no profile of the type of the
-   * preferences exists and {@code fallbackToClosestType} is {@code true}, the closest profile of
-   * another type is used instead of failing. The distance between two types is
-   * {@link TransferProfileType#normalizedDistance}.
-   */
-  @Nullable
-  AbstractUserPreferences<?> closestProfile(
-    AbstractUserPreferences<?> userPreferences,
-    boolean fallbackToClosestType
-  ) {
     if (pathsByUserPreferences.containsKey(userPreferences)) {
       return userPreferences;
     }
     if (pathsByUserPreferences.isEmpty()) {
       return null;
     }
-    var sameType = pathsByUserPreferences
+    return pathsByUserPreferences
       .keySet()
       .stream()
       .filter(profile -> profile.type() == userPreferences.type())
-      .min(Comparator.comparingDouble(userPreferences::normalizedDistance));
-    if (sameType.isPresent()) {
-      return sameType.get();
-    }
-    if (fallbackToClosestType) {
-      return pathsByUserPreferences
-        .keySet()
-        .stream()
-        .min(Comparator.comparingDouble(userPreferences::normalizedDistance))
-        .orElseThrow();
-    }
-    throw new IllegalArgumentException(
-      "There is no transfer profile of the type " +
-        userPreferences.type() +
-        ", the transfers of that type are not configured."
-    );
+      .min(Comparator.comparingDouble(userPreferences::normalizedDistance))
+      .orElseThrow(() ->
+        new IllegalArgumentException(
+          "There is no transfer profile of the type " +
+            userPreferences.type() +
+            ", the transfers of that type are not configured."
+        )
+      );
   }
 }

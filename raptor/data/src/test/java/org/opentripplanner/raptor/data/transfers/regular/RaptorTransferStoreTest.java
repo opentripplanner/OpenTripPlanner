@@ -39,6 +39,18 @@ class RaptorTransferStoreTest {
   }
 
   @Test
+  void transfersAreSortedByDuration() {
+    RaptorTransferStore subject = RaptorTransferStore.of(3)
+      .addTransfer(STOP_A, STOP_C, TIME_AC, C1_AC)
+      .addTransfer(STOP_A, STOP_B, TIME_AB, C1_AB)
+      .build();
+
+    assertThat(collect(subject.getTransfersFromStop(STOP_A)))
+      .containsExactly(TX_AB, TX_AC)
+      .inOrder();
+  }
+
+  @Test
   void testIteratorHasNextForEmptySet() {
     RaptorTransferStore subject = RaptorTransferStore.of(3)
       .addTransfer(STOP_A, STOP_B, 100, 10)

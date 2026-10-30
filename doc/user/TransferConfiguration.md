@@ -1,10 +1,10 @@
 # Transfer configuration
 
-Transfers are the walks between two stops that Raptor uses to change from one trip to another. OTP
-calculates them when the graph is built, and stores them in the graph. This page describes the
-`transfers` section of `build-config.json`, which controls the *regular* transfers between stops.
-The transfers of flex routing and of via coordinates are configured in the `transfers.flex` and
-`transfers.via` blocks, see [Flex and via transfers](#flex-and-via-transfers).
+Transfers are the walks between two stops that transit routing uses to change from one trip to
+another. OTP calculates them when the graph is built, and stores them in the serialized graph. This
+page describes the `transfers` section of `build-config.json`, which controls the *regular*
+transfers between stops. The transfers of flex routing and of via coordinates are configured in the
+`transfers.flex` and `transfers.via` blocks, see [Flex and via transfers](#flex-and-via-transfers).
 
 !!! note
 
@@ -102,8 +102,11 @@ of the type as its id and the default preferences. This configures a `wheelchair
 }
 ```
 
-The `walk` profile is only the default if no profile type is configured. A request for a profile type
-that is not configured has no transfers to use, so configure all the types the clients ask for.
+The `walk` profile is only the default if no profile type is configured, which is also the case
+with a `transfers` section that only has `flex` or `via`. Then only walking is supported: a request
+for another profile type, like wheelchair or bicycle, has no transfers to use and fails. This is
+the same if a profile type is configured: a request for a type that is not configured fails, so
+configure all the types the clients ask for.
 
 ## Parameters
 
@@ -189,18 +192,6 @@ If the accessibility data of the stops is incomplete, almost all the transfers a
   }
 }
 ```
-
-### Requests for a type that is not configured
-
-If a profile type is configured, each type that the requests use must be configured too. A request
-for a transfer mode without a profile, for example bicycle when only `walk` is configured, fails.
-
-If no profile type is configured, which is also the case without a `transfers` section or with a
-`transfers` section that only has `flex` or `via`, OTP
-generates the default `walk` profile. A wheelchair or a bicycle request then uses the stored paths
-of the walk profile, and re-calculates them with the preferences of the request. The result is
-added to the cache, so the first request with new preferences is a little slower, see
-[Warmup](#warmup). A path that the mode cannot use is dropped. A car request fails.
 
 ### Parent and deduplication
 
@@ -375,8 +366,7 @@ is where each old setting went:
 | `transit.transferCacheRequests` of `router-config.json`                  | `warmup` entries, see [Warmup](#warmup)                                     |
 
 **Configure every profile type that the clients use.** A request for a transfer mode that is not
-configured is not supported. It fails with an error. The exception is a configuration without any
-profile type, see [Requests for a type that is not configured](#requests-for-a-type-that-is-not-configured). If clients ask for
+configured is not supported. It fails with an error, there is no fallback. If clients ask for
 bicycle transfers, add a bicycle profile, for example a small set of paths between all stops:
 
 ```json

@@ -126,7 +126,7 @@ public class TestServerContext {
 
   /** The transfer parameters used if none are configured: the default walk profile only. */
   public static TransferParameters<RouteRequest> defaultTransferParameters() {
-    return TransferParameters.defaultConfiguration(StreetTransferFactory.defaultWalkProfile());
+    return new TransferParameters<>(List.of(StreetTransferFactory.defaultWalkProfile()));
   }
 
   /**

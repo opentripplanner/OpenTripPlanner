@@ -1,9 +1,7 @@
 package org.opentripplanner.transit.transfer.regular.internal;
 
 import java.util.Map;
-import java.util.Set;
 import javax.annotation.Nullable;
-import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
 import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 
 /**
@@ -21,23 +19,16 @@ import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUser
 final class ProfileMatcher {
 
   /** No warmup entries: the closest profile. */
-  static final ProfileMatcher NO_WARMUP = new ProfileMatcher(Map.of(), Set.of());
+  static final ProfileMatcher NO_WARMUP = new ProfileMatcher(Map.of());
 
   private final Map<AbstractUserPreferences<?>, AbstractUserPreferences<?>> parentsOfWarmup;
-  private final Set<TransferProfileType> fallbackToClosestType;
 
   /**
-   * @param parentsOfWarmup       the user preferences of the parent profile, by the user
-   *                              preferences of each warmup entry
-   * @param fallbackToClosestType the types that use the closest profile of another type if there is
-   *                              no profile of the type
+   * @param parentsOfWarmup the user preferences of the parent profile, by the user preferences of
+   *                        each warmup entry
    */
-  ProfileMatcher(
-    Map<AbstractUserPreferences<?>, AbstractUserPreferences<?>> parentsOfWarmup,
-    Set<TransferProfileType> fallbackToClosestType
-  ) {
+  ProfileMatcher(Map<AbstractUserPreferences<?>, AbstractUserPreferences<?>> parentsOfWarmup) {
     this.parentsOfWarmup = Map.copyOf(parentsOfWarmup);
-    this.fallbackToClosestType = Set.copyOf(fallbackToClosestType);
   }
 
   /**
@@ -49,10 +40,7 @@ final class ProfileMatcher {
     OverlaidTemplatePaths<?> paths,
     AbstractUserPreferences<?> userPreferences
   ) {
-    var profile = paths.closestProfile(
-      userPreferences,
-      fallbackToClosestType.contains(userPreferences.type())
-    );
+    var profile = paths.closestProfile(userPreferences);
     if (parentsOfWarmup.isEmpty() || userPreferences.equals(profile)) {
       return profile;
     }

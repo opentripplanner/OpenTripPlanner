@@ -1,14 +1,11 @@
 package org.opentripplanner.transit.transfer.regular.api.parameters;
 
 import java.time.Duration;
-import java.util.Collections;
 import java.util.EnumMap;
-import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentripplanner.core.model.basic.CostLinearFunction;
 import org.opentripplanner.transit.transfer.regular.api.maxduration.BicycleMaxDurations;
@@ -40,15 +37,6 @@ public final class TransferParameters<R> {
   );
 
   /**
-   * The profile types that use the closest profile of another type, if they have no profile, in the
-   * default configuration of a single walk profile: a request for a wheelchair or a bicycle uses the
-   * paths of the walk profile, and creates its own entries in the cache.
-   */
-  public static final Set<TransferProfileType> DEFAULT_FALLBACK_TYPES = Collections.unmodifiableSet(
-    EnumSet.of(TransferProfileType.WHEELCHAIR, TransferProfileType.BICYCLE)
-  );
-
-  /**
    * The max duration of the transfers of a profile type, if it is not set: how far from a stop the
    * transfers are searched.
    */
@@ -57,7 +45,6 @@ public final class TransferParameters<R> {
   private final List<TransferProfile<R>> profiles;
   private final Map<TransferProfileType, MaxDurationsPreference> maxDurations;
   private final List<WarmupParameters> warmup;
-  private final Set<TransferProfileType> fallbackToClosestType;
 
   /**
    * @param profiles           the profiles of all types, in the order declared in the
@@ -70,9 +57,6 @@ public final class TransferParameters<R> {
    *                           of the type: {@link BicycleMaxDurations} for bicycle and
    *                           {@link CarMaxDuration} for car, and {@link PlainMaxDuration} for the
    *                           other types.
-   * @param fallbackToClosestType the profile types that use the stored paths of the closest profile
-   *                           of another type if they have no profile. A request for any other
-   *                           type without a profile fails, there are no transfers for the type.
    * @param warmup             the preferences to create Raptor transfers for when the server
    *                           starts, see {@link WarmupParameters}. The ids must be unique among
    *                           the profiles and the warmup entries, and the parent of an entry must
@@ -81,12 +65,10 @@ public final class TransferParameters<R> {
   public TransferParameters(
     List<TransferProfile<R>> profiles,
     Map<TransferProfileType, MaxDurationsPreference> maxDurations,
-    List<WarmupParameters> warmup,
-    Set<TransferProfileType> fallbackToClosestType
+    List<WarmupParameters> warmup
   ) {
     this.profiles = List.copyOf(profiles);
     this.warmup = List.copyOf(warmup);
-    this.fallbackToClosestType = Set.copyOf(fallbackToClosestType);
     this.maxDurations = maxDurations.isEmpty() ? Map.of() : Map.copyOf(new EnumMap<>(maxDurations));
     this.maxDurations.forEach(TransferParameters::validateMaxDurationsOfType);
     validateProfiles(this.profiles, this.warmup);
@@ -110,46 +92,12 @@ public final class TransferParameters<R> {
     this(profiles, maxDurations, List.of());
   }
 
-  /** The profiles and the warmup entries, a request for a type without profiles fails. */
-  public TransferParameters(
-    List<TransferProfile<R>> profiles,
-    Map<TransferProfileType, MaxDurationsPreference> maxDurations,
-    List<WarmupParameters> warmup
-  ) {
-    this(profiles, maxDurations, warmup, Set.of());
-  }
-
-  /**
-   * The default configuration of a single walk profile, used if no profile type is configured. A
-   * request for a wheelchair or a bicycle falls back to the paths of the walk profile, see
-   * {@link #DEFAULT_FALLBACK_TYPES}.
-   */
-  public static <R> TransferParameters<R> defaultConfiguration(TransferProfile<R> walk) {
-    var profiles = List.of(walk);
-    return new TransferParameters<>(
-      profiles,
-      defaultMaxDurations(profiles),
-      List.of(),
-      DEFAULT_FALLBACK_TYPES
-    );
-  }
-
   public List<TransferProfile<R>> profiles() {
     return profiles;
   }
 
   public List<WarmupParameters> warmup() {
     return warmup;
-  }
-
-  /**
-   * The profile types that use the stored paths of the closest profile of another type, see
-   * {@link TransferProfileType#normalizedDistance}, if they have no profile. A request for any
-   * other type without a profile fails. Empty if a profile type is configured: each type used by
-   * the requests must be configured then.
-   */
-  public Set<TransferProfileType> fallbackToClosestType() {
-    return fallbackToClosestType;
   }
 
   /**
@@ -259,14 +207,13 @@ public final class TransferParameters<R> {
     return (
       profiles.equals(that.profiles) &&
       maxDurations.equals(that.maxDurations) &&
-      warmup.equals(that.warmup) &&
-      fallbackToClosestType.equals(that.fallbackToClosestType)
+      warmup.equals(that.warmup)
     );
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(profiles, maxDurations, warmup, fallbackToClosestType);
+    return Objects.hash(profiles, maxDurations, warmup);
   }
 
   @Override
@@ -275,7 +222,6 @@ public final class TransferParameters<R> {
       .addCol("profiles", profiles)
       .addObj("maxDurations", maxDurations)
       .addCol("warmup", warmup)
-      .addCol("fallbackToClosestType", fallbackToClosestType)
       .toString();
   }
 }
