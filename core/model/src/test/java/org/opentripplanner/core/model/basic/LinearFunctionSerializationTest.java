@@ -42,7 +42,7 @@ class LinearFunctionSerializationTest {
       Arguments.of("PT7s + 10.1 x", "7s", 10.0, "7s + 10 t"),
       Arguments.of("0.1 + 10.1 x", "0s", 10.0, "0s + 10 t"),
       Arguments.of("0.5 + 10.1 x", "1s", 10.0, "1s + 10 t"),
-      Arguments.of("1h + 234 x", "1h", 230.0, "1h + 230 t")
+      Arguments.of("1h + 93 x", "1h", 95.0, "1h + 95 t")
     );
   }
 

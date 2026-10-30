@@ -16,7 +16,7 @@ import org.opentripplanner.utils.lang.DoubleUtils;
 public abstract class AbstractLinearFunction<T> implements Serializable {
 
   private static final double COEFFICIENT_MIN = 0.0;
-  private static final double COEFFICIENT_MAX = 1_000.0;
+  private static final double COEFFICIENT_MAX = 100.0;
 
   /**
    * The step the coefficient are rounded to, as rows of {@code {upper limit, step}}, see
