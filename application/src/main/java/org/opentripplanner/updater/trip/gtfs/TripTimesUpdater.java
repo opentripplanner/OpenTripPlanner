@@ -7,15 +7,18 @@ import static org.opentripplanner.updater.spi.UpdateErrorType.TRIP_NOT_FOUND_IN_
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import javax.annotation.Nullable;
 import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.network.StopPattern;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 import org.opentripplanner.transit.model.timetable.Timetable;
@@ -167,6 +170,8 @@ class TripTimesUpdater {
    * @param stopAndStopTimeUpdates updates for the stops
    * @param added                  whether this trip was added (extra Trip)
    * @param tripPatternModified    whether the trip Pattern was tripPatternModified
+   * @param scheduledPattern       the scheduled pattern of the trip, used to find the extra calls of
+   *                               a replacement trip. Null for other trips.
    * @param serviceCode            serviceCode of the trip
    * @throws UpdateException if there are any errors with the TripUpdate
    */
@@ -176,6 +181,7 @@ class TripTimesUpdater {
     List<StopAndStopTimeUpdate> stopAndStopTimeUpdates,
     boolean added,
     boolean tripPatternModified,
+    @Nullable TripPattern scheduledPattern,
     int serviceCode
   ) throws UpdateException {
     // Calculate seconds since epoch on GTFS midnight (noon minus 12h) of service date
@@ -228,12 +234,24 @@ class TripTimesUpdater {
       deduplicator
     ).createRealTimeFromScheduledTimes();
 
+    // GTFS-RT cannot flag extra calls, so find the stops that were inserted into the scheduled trip
+    final BitSet extraCalls =
+      scheduledPattern == null
+        ? new BitSet()
+        : ReplacementExtraCalls.find(
+            scheduledPattern.getStops(),
+            stopAndStopTimeUpdates.stream().map(StopAndStopTimeUpdate::stop).toList()
+          );
+
     // Update all times to mark trip times as realtime
     for (int stopIndex = 0; stopIndex < builder.numberOfStops(); stopIndex++) {
       final var addedStopTime = stopAndStopTimeUpdates.get(stopIndex).stopTimeUpdate();
 
       if (addedStopTime.isSkipped()) {
         builder.withCanceled(stopIndex);
+      }
+      if (extraCalls.get(stopIndex)) {
+        builder.withExtraCall(stopIndex, true);
       }
 
       setArrivalAndDeparture(builder, stopIndex, addedStopTime, midnightSecondsSinceEpoch);
