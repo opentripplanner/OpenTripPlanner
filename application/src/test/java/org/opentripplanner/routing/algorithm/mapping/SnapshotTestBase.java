@@ -96,7 +96,12 @@ public abstract class SnapshotTestBase {
       routingService = TestServerContext.createRoutingService(
         model.graph(),
         transitService,
-        model.transferRepository()
+        model.transferRepository(),
+        TestServerContext.createRegularTransfers(
+          model.graph(),
+          model.transitRepository(),
+          model.timetableDataImport()
+        )
       );
     }
   }

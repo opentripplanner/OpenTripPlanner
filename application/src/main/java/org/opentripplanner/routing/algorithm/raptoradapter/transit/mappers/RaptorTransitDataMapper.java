@@ -65,6 +65,12 @@ public class RaptorTransitDataMapper {
     this.transferRepository = transferRepository;
   }
 
+  /**
+   * {@code FlexTransferGenerator} no longer generates regular (non-FLEX) transfers, so the
+   * {@code RaptorTransferIndex} built from {@code transferRepository} holds none. Routing gets
+   * the regular transfers from the request-scoped regular-transfer pipeline instead, see
+   * {@code RaptorRoutingRequestTransitData}.
+   */
   public static RaptorTransitData map(
     TransitTuningParameters tuningParameters,
     TransitRepository transitRepository,

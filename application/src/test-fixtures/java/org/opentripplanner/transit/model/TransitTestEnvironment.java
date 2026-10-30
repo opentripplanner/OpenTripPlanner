@@ -27,6 +27,7 @@ import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.transit.transfer.regular.NoRegularTransfers;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 /**
@@ -219,6 +220,7 @@ public final class TransitTestEnvironment {
     );
     return new RaptorRoutingRequestTransitData(
       transitRepository.getRaptorTransitData(),
+      NoRegularTransfers.service(),
       TransitGroupPriorityService.empty(),
       transitSearchTimeZero,
       0,

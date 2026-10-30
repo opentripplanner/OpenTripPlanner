@@ -14,7 +14,6 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.transit.model.calendar.TripCalendars;
-import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.CarAccess;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.GroupStop;
@@ -132,16 +131,6 @@ public class TimetableDataImport {
   public Set<StopLocation> getStopLocationsUsedForCarsAllowedTrips() {
     return getStopLocationsUsedByTripTimes(
       tt -> tt.getTrip().getCarsAllowed() == CarAccess.ALLOWED
-    );
-  }
-
-  /**
-   * The stops used by scheduled trips that allow bikes, including the regular stops of group
-   * stops.
-   */
-  public Set<StopLocation> getStopLocationsUsedForBikesAllowedTrips() {
-    return getStopLocationsUsedByTripTimes(
-      tt -> tt.getTrip().getBikesAllowed() == BikeAccess.ALLOWED
     );
   }
 

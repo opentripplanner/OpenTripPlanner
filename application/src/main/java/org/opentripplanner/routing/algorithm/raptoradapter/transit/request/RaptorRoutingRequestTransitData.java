@@ -6,8 +6,10 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.raptor.data.transfers.regular.RaptorRegularTransferService;
 import org.opentripplanner.raptor.spi.IntIterator;
 import org.opentripplanner.raptor.spi.IntIterators;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
@@ -31,7 +33,6 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.transfer.constrained.ConstrainedTransferService;
 import org.opentripplanner.transfer.constrained.raptoradaptor.ConstrainedBoardingSearch;
 import org.opentripplanner.transfer.constrained.raptoradaptor.ConstrainedTransfersForPatterns;
-import org.opentripplanner.transfer.regular.index.RaptorTransferIndex;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
 import org.opentripplanner.utils.time.ServiceDateUtils;
@@ -63,9 +64,10 @@ public class RaptorRoutingRequestTransitData
   private final List<TripPatternForDates> patternIndex;
 
   /**
-   * Transfers by stop index
+   * The regular transfers of this request, built from the regular-transfer snapshot of the
+   * request.
    */
-  private final RaptorTransferIndex transferIndex;
+  private final RaptorRegularTransferService regularTransferService;
 
   private final ConstrainedTransfersForPatterns constrainedTransfers;
 
@@ -81,6 +83,7 @@ public class RaptorRoutingRequestTransitData
 
   public RaptorRoutingRequestTransitData(
     RaptorTransitData raptorTransitData,
+    RaptorRegularTransferService regularTransferService,
     TransitGroupPriorityService transitGroupPriorityService,
     ZonedDateTime transitSearchTimeZero,
     int additionalPastSearchDays,
@@ -107,7 +110,7 @@ public class RaptorRoutingRequestTransitData
     );
     this.patternIndex = transitDataCreator.createPatternIndex(tripPatterns);
     this.activeTripPatternsPerStop = transitDataCreator.createTripPatternsPerStop(tripPatterns);
-    this.transferIndex = raptorTransitData.getRaptorTransfersForRequest(request);
+    this.regularTransferService = Objects.requireNonNull(regularTransferService);
     this.constrainedTransfers = raptorTransitData.getConstrainedTransfers();
 
     var mcCostParams = GeneralizedCostParametersMapper.map(
@@ -147,7 +150,7 @@ public class RaptorRoutingRequestTransitData
     this.transitSearchTimeZero = original.transitSearchTimeZero;
     this.activeTripPatternsPerStop = original.activeTripPatternsPerStop;
     this.patternIndex = original.patternIndex;
-    this.transferIndex = original.transferIndex;
+    this.regularTransferService = original.regularTransferService;
     this.transferService = original.transferService;
     this.constrainedTransfers = original.constrainedTransfers;
     this.validTransitDataStartTime = original.validTransitDataStartTime;
@@ -158,12 +161,12 @@ public class RaptorRoutingRequestTransitData
 
   @Override
   public Iterator<? extends RaptorTransfer> getTransfersFromStop(int stopIndex) {
-    return transferIndex.getForwardTransfers(stopIndex).iterator();
+    return regularTransferService.getTransfersFromStop(stopIndex);
   }
 
   @Override
   public Iterator<? extends RaptorTransfer> getTransfersToStop(int stopIndex) {
-    return transferIndex.getReversedTransfers(stopIndex).iterator();
+    return regularTransferService.getTransfersToStop(stopIndex);
   }
 
   @Override
