@@ -58,6 +58,19 @@ class ScheduledTimetableDataTest {
   }
 
   @Test
+  void lookupsByNullId() {
+    var dataImport = new TimetableDataImport();
+    var pattern = pattern("P1", trip("T1"));
+    dataImport.addTripPattern(pattern.getId(), pattern);
+
+    var subject = dataImport.toScheduledTimetableData();
+
+    assertNull(subject.getTripPatternForId(null));
+    assertNull(subject.getTripOnServiceDateById(null));
+    assertThat(subject.getReplacedByTripOnServiceDate(null)).isEmpty();
+  }
+
+  @Test
   void calendars() {
     var dataImport = new TimetableDataImport();
     var pattern = pattern("P1", trip("T1"));

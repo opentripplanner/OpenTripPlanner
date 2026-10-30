@@ -196,6 +196,23 @@ public class DefaultTimetableRepositoryTest {
   }
 
   @Test
+  void lookupsByNullIdReturnNothing() {
+    var trip = TransitRepositoryForTest.trip("T1").build();
+    var dataImport = new TimetableDataImport();
+    dataImport.addTripOnServiceDate(
+      TripOnServiceDate.of(trip.getId()).withTrip(trip).withServiceDate(SERVICE_DATE).build()
+    );
+    var subject = new DefaultTimetableRepository(
+      RaptorTransitDataTestFactory.empty(),
+      dataImport.toScheduledTimetableData()
+    );
+
+    assertNull(subject.getTripOnServiceDate((FeedScopedId) null));
+    assertNull(subject.getTripPattern(null));
+    assertThat(subject.findReplacedBy(null)).isEmpty();
+  }
+
+  @Test
   void testClear() {
     DefaultTimetableRepository snapshot = new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),
