@@ -16,7 +16,6 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.transfer.streetadapter.RegularTransferPreferencesMapper;
 import org.opentripplanner.transit.transfer.regular.api.maxduration.BicycleMaxDurations;
 import org.opentripplanner.transit.transfer.regular.api.maxduration.CarMaxDuration;
-import org.opentripplanner.transit.transfer.regular.api.parameters.DeduplicationLimit;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferParameters;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfile;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
@@ -347,7 +346,9 @@ class TransferProfilesConfigMapperTest {
 
   @Test
   void theDeduplicationLimitIsTheDefaultIfNotConfigured() {
-    assertThat(map("{}").deduplicationLimit()).isEqualTo(DeduplicationLimit.DEFAULT);
+    assertThat(map("{}").deduplicationLimit()).isEqualTo(
+      TransferParameters.DEFAULT_DEDUPLICATION_LIMIT
+    );
   }
 
   @Test
@@ -356,6 +357,13 @@ class TransferProfilesConfigMapperTest {
 
     assertThat(subject.deduplicationLimit().constant()).isEqualTo(Cost.costOfSeconds(10));
     assertThat(subject.deduplicationLimit().coefficient()).isEqualTo(0.01);
+  }
+
+  @Test
+  void theDeduplicationLimitHasTheConstantFirst() {
+    var root = newNodeAdapterForTest("{ transfers: { deduplicationLimit: '0.01x + 10s' } }");
+
+    assertThrows(OtpAppException.class, () -> TransferProfilesConfigMapper.map(root));
   }
 
   @Test

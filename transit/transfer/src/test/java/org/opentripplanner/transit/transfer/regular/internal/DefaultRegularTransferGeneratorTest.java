@@ -7,13 +7,13 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Cost;
+import org.opentripplanner.core.model.basic.CostLinearFunction;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.raptor.data.stop.RaptorStopIndex;
 import org.opentripplanner.transit.transfer.regular.FakeRequestMapper;
 import org.opentripplanner.transit.transfer.regular.FakeTransferPathProvider;
 import org.opentripplanner.transit.transfer.regular.api.maxduration.MaxDurationsPreference;
-import org.opentripplanner.transit.transfer.regular.api.parameters.DeduplicationLimit;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferParameters;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfile;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
@@ -193,7 +193,7 @@ class DefaultRegularTransferGeneratorTest {
     /** The path from A to B found for the preferences, after the transfers are generated. */
     FakeTransferPathProvider.FakePath generateAndFindPath(
       List<TransferProfile<WalkPreferences>> profiles,
-      DeduplicationLimit limit,
+      CostLinearFunction limit,
       WalkPreferences forPreferences
     ) {
       var stopIndex = stopIndex();
@@ -230,7 +230,7 @@ class DefaultRegularTransferGeneratorTest {
 
     var path = test.generateAndFindPath(
       List.of(test.parentProfile(), test.childProfile("parent")),
-      DeduplicationLimit.DEFAULT,
+      TransferParameters.DEFAULT_DEDUPLICATION_LIMIT,
       test.child
     );
 
@@ -244,7 +244,7 @@ class DefaultRegularTransferGeneratorTest {
     // p1 costs 10 more for the child, the limit does not accept any difference
     var path = test.generateAndFindPath(
       List.of(test.parentProfile(), test.childProfile("parent")),
-      new DeduplicationLimit(Cost.ZERO, 0.0),
+      CostLinearFunction.of(Cost.ZERO, 0.0),
       test.child
     );
 
@@ -257,7 +257,7 @@ class DefaultRegularTransferGeneratorTest {
 
     var path = test.generateAndFindPath(
       List.of(test.parentProfile(), test.childProfile(null)),
-      DeduplicationLimit.DEFAULT,
+      TransferParameters.DEFAULT_DEDUPLICATION_LIMIT,
       test.child
     );
 
@@ -270,7 +270,7 @@ class DefaultRegularTransferGeneratorTest {
 
     var path = test.generateAndFindPath(
       List.of(test.parentProfile(), test.childProfile("parent")),
-      DeduplicationLimit.DEFAULT,
+      TransferParameters.DEFAULT_DEDUPLICATION_LIMIT,
       test.parent
     );
 
@@ -283,7 +283,7 @@ class DefaultRegularTransferGeneratorTest {
 
     var path = test.generateAndFindPath(
       List.of(test.childProfile("parent"), test.parentProfile()),
-      DeduplicationLimit.DEFAULT,
+      TransferParameters.DEFAULT_DEDUPLICATION_LIMIT,
       test.child
     );
 

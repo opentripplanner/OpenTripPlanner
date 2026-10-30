@@ -27,6 +27,7 @@ import org.opentripplanner.standalone.configure.RequestScopedFactory;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transfer.regular.FlexTransferService;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.transit.transfer.regular.api.report.RegularTransferCacheReport;
 
 /**
  * Bridges the Dagger-managed {@link RequestScopedFactory} into HK2/Jersey: the component itself,
@@ -74,6 +75,11 @@ final class DaggerToJerseyBridge extends BlindBinder {
     bridge(factory, RequestScopedFactory::vehicleRentalService, VehicleRentalService.class);
     bridge(factory, RequestScopedFactory::streetDetailsService, StreetDetailsService.class);
     bridge(factory, RequestScopedFactory::transferService, FlexTransferService.class);
+    bridge(
+      factory,
+      RequestScopedFactory::regularTransferCacheReport,
+      RegularTransferCacheReport.class
+    );
     bridge(factory, RequestScopedFactory::vectorTileConfig, VectorTileConfig.class);
     bridge(factory, RequestScopedFactory::gtfsApiParameters, GtfsApiParameters.class);
     bridge(factory, RequestScopedFactory::transmodelAPIParameters, TransmodelAPIParameters.class);

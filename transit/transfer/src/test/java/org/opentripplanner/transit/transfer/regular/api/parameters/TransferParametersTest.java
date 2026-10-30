@@ -235,14 +235,16 @@ class TransferParametersTest {
       List.of(new TransferProfile<>("w", TransferProfileType.WALK, WALK, "w"))
     );
 
-    assertThat(subject.deduplicationLimit()).isEqualTo(DeduplicationLimit.DEFAULT);
+    assertThat(subject.deduplicationLimit()).isEqualTo(
+      TransferParameters.DEFAULT_DEDUPLICATION_LIMIT
+    );
   }
 
   private static TransferParameters<String> withWarmup(WarmupParameters... warmup) {
     return new TransferParameters<>(
       List.of(new TransferProfile<>("walk", TransferProfileType.WALK, WALK, "walk")),
       Map.of(TransferProfileType.WALK, MaxDurationsPreference.DEFAULT),
-      DeduplicationLimit.DEFAULT,
+      TransferParameters.DEFAULT_DEDUPLICATION_LIMIT,
       List.of(warmup)
     );
   }

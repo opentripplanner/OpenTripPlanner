@@ -15,7 +15,7 @@ import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUser
  * @param parent          the id of the profile this profile is based on, {@code null} if there is
  *                        none. The parent can be of another type. The paths of the profile that are
  *                        equivalent to the paths of the parent are not stored again, see
- *                        {@link DeduplicationLimit}. The parent is generated first.
+ *                        {@link TransferParameters#DEFAULT_DEDUPLICATION_LIMIT}. The parent is generated first.
  * @param userPreferences the traveler preferences the paths of the profile are found and stored
  *                        under. They override the equivalent values of the {@code routingRequest}.
  *                        {@code null} if the profile has no preferences of its own: the user

@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
+import org.opentripplanner.core.model.basic.CostLinearFunction;
 import org.opentripplanner.core.model.basic.NormalizedRatio;
 import org.opentripplanner.core.model.basic.Ratio;
 import org.opentripplanner.core.model.basic.Reluctance;
@@ -21,7 +22,6 @@ import org.opentripplanner.transit.transfer.regular.api.maxduration.BicycleMaxDu
 import org.opentripplanner.transit.transfer.regular.api.maxduration.CarMaxDuration;
 import org.opentripplanner.transit.transfer.regular.api.maxduration.MaxDurationsPreference;
 import org.opentripplanner.transit.transfer.regular.api.maxduration.PlainMaxDuration;
-import org.opentripplanner.transit.transfer.regular.api.parameters.DeduplicationLimit;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferParameters;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfile;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
@@ -124,7 +124,7 @@ public class TransferProfilesConfigMapper {
   private static TransferParameters<RouteRequest> createParameters(
     List<TransferProfile<RouteRequest>> profiles,
     Map<TransferProfileType, MaxDurationsPreference> maxDurations,
-    DeduplicationLimit deduplicationLimit,
+    CostLinearFunction deduplicationLimit,
     List<WarmupParameters> warmup
   ) {
     try {
@@ -246,8 +246,8 @@ public class TransferProfilesConfigMapper {
     );
   }
 
-  private static DeduplicationLimit mapDeduplicationLimit(NodeAdapter transfers) {
-    var text = transfers
+  private static CostLinearFunction mapDeduplicationLimit(NodeAdapter transfers) {
+    var builder = transfers
       .of("deduplicationLimit")
       .since(V2_10)
       .summary("How much more the path of a parent profile may cost, to be used by its children.")
@@ -256,16 +256,12 @@ public class TransferProfilesConfigMapper {
         A profile with a `parent` finds its own paths, but if the path of the parent costs about the
         same for the profile, it uses the path of the parent instead of storing its own. This saves
         memory. The paths are equivalent if the difference in generalized cost is within this limit,
-        a linear function of the cost `x` of the path of the parent, for example `0.005x + 30s`. The
+        a linear function of the cost `x` of the path of the parent, for example `30s + 0.005x`. The
         limit applies to cost only, not to duration. A report is logged when the graph is built.
         """
-      )
-      .asString(null);
-    if (text == null) {
-      return DeduplicationLimit.DEFAULT;
-    }
+      );
     try {
-      return DeduplicationLimitParser.parse(text);
+      return builder.asCostLinearFunction(TransferParameters.DEFAULT_DEDUPLICATION_LIMIT);
     } catch (IllegalArgumentException e) {
       throw new OtpAppException("Invalid transfer configuration: " + e.getMessage());
     }

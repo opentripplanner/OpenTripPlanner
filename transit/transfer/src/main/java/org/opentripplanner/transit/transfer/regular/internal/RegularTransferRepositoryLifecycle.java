@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.opentripplanner.core.model.transaction.RepositoryLifecycle;
 import org.opentripplanner.raptor.data.transfers.regular.RaptorTransferStore;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
@@ -32,7 +33,8 @@ import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
  * transaction failed before or after it was frozen. The next transaction gets a new repository
  * continuing from the last published snapshot.
  * <p>
- * This class is stateless and only accessed on the writer thread.
+ * This class is only accessed on the writer thread, except the statistics of the cache. They are
+ * shared by all snapshots, and are thread-safe.
  *
  * @param <P> the street path type
  * @param <R> the request type
@@ -46,11 +48,16 @@ public class RegularTransferRepositoryLifecycle<
   private final RaptorTransfersFactory<P, R> raptorTransfersFactory;
   private final TransferRequestMapper<R> mapper;
   private final ProfileMatcher matcher;
-  private final List<DefaultRegularTransferRepositorySnapshot.WarmupEntry> warmup;
+  private final List<WarmupEntry> warmup;
+  private final RegularTransferCacheStatistics statistics;
+  private final int cacheMaxSize;
+  private final Set<AbstractUserPreferences<?>> retainedKeys;
+  private final RegularTransferCacheCounters cacheCounters = new RegularTransferCacheCounters();
 
   /**
-   * @param profiles the configuration of the profiles the paths are stored under, the Raptor
-   *                 transfers are derived with the request of the profile closest to the request
+   * The statistics of the cache are not collected, and the cache has the default size, see
+   * {@link #RegularTransferRepositoryLifecycle(TransferPathProvider, TransferRequestMapper,
+   * TransferParameters, int, int, boolean)}.
    */
   public RegularTransferRepositoryLifecycle(
     TransferPathProvider<P, R> pathProvider,
@@ -61,10 +68,41 @@ public class RegularTransferRepositoryLifecycle<
     this(
       pathProvider,
       mapper,
+      profiles,
+      numberOfStops,
+      RegularTransferServiceCache.DEFAULT_MAX_SIZE,
+      false
+    );
+  }
+
+  /**
+   * @param profiles               the configuration of the profiles the paths are stored under, the
+   *                               Raptor transfers are derived with the request of the profile
+   *                               closest to the request
+   * @param cacheMaxSize           the max number of Raptor transfers cached for other preferences
+   *                               than the ones of the profiles and the warmup entries, which are
+   *                               always cached
+   * @param collectCacheStatistics whether to count the requests that use each key of the cache,
+   *                               for the report of the cache, see
+   *                               {@link RegularTransferRepositorySnapshot#cacheReport}
+   */
+  public RegularTransferRepositoryLifecycle(
+    TransferPathProvider<P, R> pathProvider,
+    TransferRequestMapper<R> mapper,
+    TransferParameters<R> profiles,
+    int numberOfStops,
+    int cacheMaxSize,
+    boolean collectCacheStatistics
+  ) {
+    this(
+      pathProvider,
+      mapper,
       requestsByProfile(profiles, mapper),
       new ProfileMatcher(ProfileUserPreferences.warmupParents(profiles, mapper)),
       warmupEntries(profiles, mapper),
-      numberOfStops
+      numberOfStops,
+      cacheMaxSize,
+      collectCacheStatistics
     );
   }
 
@@ -74,7 +112,16 @@ public class RegularTransferRepositoryLifecycle<
     Map<AbstractUserPreferences<?>, R> profileRequests,
     int numberOfStops
   ) {
-    this(pathProvider, mapper, profileRequests, ProfileMatcher.NO_WARMUP, List.of(), numberOfStops);
+    this(
+      pathProvider,
+      mapper,
+      profileRequests,
+      ProfileMatcher.NO_WARMUP,
+      List.of(),
+      numberOfStops,
+      RegularTransferServiceCache.DEFAULT_MAX_SIZE,
+      false
+    );
   }
 
   private RegularTransferRepositoryLifecycle(
@@ -82,11 +129,21 @@ public class RegularTransferRepositoryLifecycle<
     TransferRequestMapper<R> mapper,
     Map<AbstractUserPreferences<?>, R> profileRequests,
     ProfileMatcher matcher,
-    List<DefaultRegularTransferRepositorySnapshot.WarmupEntry> warmup,
-    int numberOfStops
+    List<WarmupEntry> warmup,
+    int numberOfStops,
+    int cacheMaxSize,
+    boolean collectCacheStatistics
   ) {
     this.matcher = matcher;
     this.warmup = warmup;
+    this.cacheMaxSize = cacheMaxSize;
+    this.retainedKeys = warmup
+      .stream()
+      .map(WarmupEntry::userPreferences)
+      .collect(Collectors.toUnmodifiableSet());
+    this.statistics = collectCacheStatistics
+      ? RegularTransferCacheStatistics.of(cacheMaxSize)
+      : RegularTransferCacheStatistics.NONE;
     this.mapper = Objects.requireNonNull(mapper);
     this.raptorTransfersFactory = new RaptorTransfersFactory<>(
       numberOfStops,
@@ -111,24 +168,16 @@ public class RegularTransferRepositoryLifecycle<
    * The user preferences to create the Raptor transfers for at start: the preferences of every
    * profile, and then the ones of the warmup entries.
    */
-  private static <R> List<DefaultRegularTransferRepositorySnapshot.WarmupEntry> warmupEntries(
+  private static <R> List<WarmupEntry> warmupEntries(
     TransferParameters<R> parameters,
     TransferRequestMapper<R> mapper
   ) {
-    var result = new ArrayList<DefaultRegularTransferRepositorySnapshot.WarmupEntry>();
+    var result = new ArrayList<WarmupEntry>();
     ProfileUserPreferences.resolveAll(parameters, mapper).forEach((preferences, profile) ->
-      result.add(
-        new DefaultRegularTransferRepositorySnapshot.WarmupEntry(profile.id(), null, preferences)
-      )
+      result.add(new WarmupEntry(profile.id(), null, preferences))
     );
     for (var warmup : parameters.warmup()) {
-      result.add(
-        new DefaultRegularTransferRepositorySnapshot.WarmupEntry(
-          warmup.id(),
-          warmup.parent(),
-          warmup.userPreferences()
-        )
-      );
+      result.add(new WarmupEntry(warmup.id(), warmup.parent(), warmup.userPreferences()));
     }
     return List.copyOf(result);
   }
@@ -149,18 +198,24 @@ public class RegularTransferRepositoryLifecycle<
     var frozen = ((DefaultRegularTransferRepository<P>) repository).freeze();
     var cache =
       frozen.base() == null
-        ? new RegularTransferServiceCache<RaptorTransferStore>()
+        ? new RegularTransferServiceCache<RaptorTransferStore>(
+            cacheMaxSize,
+            retainedKeys,
+            cacheCounters
+          )
         : frozen
             .base()
             .cache()
             .carryForward(userPreferences -> changedFromStops(frozen, userPreferences));
+    cacheCounters.setLatest(cache);
     return new DefaultRegularTransferRepositorySnapshot<>(
       frozen.paths(),
       cache,
       raptorTransfersFactory,
       mapper,
       matcher,
-      warmup
+      warmup,
+      statistics
     );
   }
 

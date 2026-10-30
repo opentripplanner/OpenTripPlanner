@@ -86,8 +86,7 @@ public class FlexIntegrationTest {
     );
     var transitService = TestServerContext.createTransitService(
       transitRepository,
-      timetableDataImport,
-      transferRepository
+      timetableDataImport
     );
     service = TestServerContext.createRoutingService(
       graph,

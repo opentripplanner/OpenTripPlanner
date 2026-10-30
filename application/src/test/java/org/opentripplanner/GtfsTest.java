@@ -221,8 +221,7 @@ public abstract class GtfsTest {
     var scheduledRaptorData = RaptorTransitDataMapper.map(
       tuningParameters,
       transitRepository,
-      scheduledTimetableData,
-      transferRepository
+      scheduledTimetableData
     );
     transitRepository.initRaptorTransitData(scheduledRaptorData);
     var registry = TransactionFactory.createRepositoryRegistry();

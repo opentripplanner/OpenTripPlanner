@@ -8,6 +8,8 @@ import org.opentripplanner.raptor.data.transfers.regular.RaptorRegularTransferSe
 import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.transit.transfer.regular.api.RegularTransfersService;
+import org.opentripplanner.transit.transfer.regular.api.report.RegularTransferCacheMetrics;
+import org.opentripplanner.transit.transfer.regular.api.report.RegularTransferCacheReport;
 
 /**
  * A regular-transfer snapshot without any transfers, for tests that route without regular
@@ -65,5 +67,50 @@ public final class NoRegularTransfers {
 
       @Override
       public void warmUp() {}
+
+      @Override
+      public RegularTransferCacheReport cacheReport() {
+        return RegularTransferCacheReport.DISABLED;
+      }
+
+      @Override
+      public RegularTransferCacheMetrics cacheMetrics() {
+        return new RegularTransferCacheMetrics() {
+          @Override
+          public long size() {
+            return 0;
+          }
+
+          @Override
+          public long hitCount() {
+            return 0;
+          }
+
+          @Override
+          public long missCount() {
+            return 0;
+          }
+
+          @Override
+          public long putCount() {
+            return 0;
+          }
+
+          @Override
+          public long evictionCount() {
+            return 0;
+          }
+
+          @Override
+          public long loadFailureCount() {
+            return 0;
+          }
+
+          @Override
+          public long totalLoadTimeNanos() {
+            return 0;
+          }
+        };
+      }
     };
 }

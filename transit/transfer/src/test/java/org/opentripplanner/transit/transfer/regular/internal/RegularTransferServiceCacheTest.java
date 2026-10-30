@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -208,6 +209,171 @@ class RegularTransferServiceCacheTest {
       releaseCreation.countDown();
       executor.shutdownNow();
     }
+  }
+
+  @Test
+  void retainedKeysAreNeverEvictedAndNotCountedInTheMaxSize() {
+    var cache = new RegularTransferServiceCache<String>(1, Set.of(PREFS_1, PREFS_4));
+    var factory = new TestFactory();
+    cache.get(PREFS_1, factory);
+    cache.get(PREFS_4, factory);
+
+    // Fill and churn the bounded part of the cache
+    cache.get(PREFS_2, factory);
+    cache.get(PREFS_3, factory);
+    factory.created.clear();
+
+    cache.get(PREFS_1, factory);
+    cache.get(PREFS_4, factory);
+    assertThat(factory.created).isEmpty();
+    assertThat(cache.contains(PREFS_1)).isTrue();
+    assertThat(cache.contains(PREFS_2)).isFalse();
+    assertThat(cache.contains(PREFS_3)).isTrue();
+  }
+
+  @Test
+  void aFailedCreationOfARetainedKeyIsRetried() {
+    var cache = new RegularTransferServiceCache<String>(1, Set.of(PREFS_1));
+    var failing = new TestFactory(() -> {
+      throw new IllegalStateException("Expected failure");
+    });
+
+    assertThrows(IllegalStateException.class, () -> cache.get(PREFS_1, failing));
+
+    assertThat(cache.contains(PREFS_1)).isFalse();
+    assertThat(cache.get(PREFS_1, new TestFactory())).isEqualTo("create " + PREFS_1);
+  }
+
+  @Test
+  void carryForwardKeepsTheRetainedKeys() {
+    var cache = new RegularTransferServiceCache<String>(1, Set.of(PREFS_1, PREFS_4));
+    var factory = new TestFactory();
+    var value1 = cache.get(PREFS_1, factory);
+    // PREFS_4 is never used, so there is no value to carry forward
+
+    var next = cache.carryForward(NOTHING_CHANGED);
+    next.get(PREFS_2, factory);
+    next.get(PREFS_3, factory);
+    factory.created.clear();
+
+    assertThat(next.get(PREFS_1, factory)).isSameInstanceAs(value1);
+    assertThat(next.get(PREFS_4, factory)).isEqualTo("create " + PREFS_4);
+    assertThat(factory.created).containsExactly("create " + PREFS_4);
+  }
+
+  @Test
+  void carryForwardPatchesTheValuesOfChangedRetainedKeys() {
+    var cache = new RegularTransferServiceCache<String>(1, Set.of(PREFS_1));
+    var factory = new TestFactory();
+    cache.get(PREFS_1, factory);
+
+    var next = cache.carryForward(changed(PROFILE_1, 7));
+    factory.created.clear();
+
+    assertThat(next.get(PREFS_1, factory)).isEqualTo("patch " + PREFS_1 + " " + Set.of(7));
+  }
+
+  @Test
+  void countsHitsMissesPutsAndEvictions() {
+    var cache = new RegularTransferServiceCache<String>(1);
+    var metrics = cache.metrics();
+    var factory = new TestFactory();
+
+    cache.get(PREFS_1, factory);
+    cache.get(PREFS_1, factory);
+    // Evicts PREFS_1, the cache holds one value
+    cache.get(PREFS_2, factory);
+
+    assertThat(metrics.missCount()).isEqualTo(2);
+    assertThat(metrics.hitCount()).isEqualTo(1);
+    assertThat(metrics.putCount()).isEqualTo(2);
+    assertThat(metrics.evictionCount()).isEqualTo(1);
+    assertThat(metrics.loadFailureCount()).isEqualTo(0);
+    // No snapshot has published its cache yet
+    assertThat(metrics.size()).isEqualTo(0);
+  }
+
+  @Test
+  void countsFailedCreationsAndDoesNotCountThemAsPuts() {
+    var cache = new RegularTransferServiceCache<String>();
+    var failing = new TestFactory(() -> {
+      throw new IllegalStateException("Expected failure");
+    });
+
+    assertThrows(IllegalStateException.class, () -> cache.get(PREFS_1, failing));
+
+    assertThat(cache.metrics().loadFailureCount()).isEqualTo(1);
+    assertThat(cache.metrics().putCount()).isEqualTo(0);
+    assertThat(cache.size()).isEqualTo(0);
+  }
+
+  @Test
+  void theSizeCountsRetainedAndBoundedValuesButNotValuesStillBeingCreated() {
+    var cache = new RegularTransferServiceCache<String>(2, Set.of(PREFS_1));
+    var factory = new TestFactory();
+    assertThat(cache.size()).isEqualTo(0);
+
+    cache.get(PREFS_1, factory);
+    cache.get(PREFS_2, factory);
+    cache.get(PREFS_3, factory);
+    cache.get(PREFS_4, factory);
+
+    assertThat(cache.size()).isEqualTo(3);
+  }
+
+  @Test
+  void theCountersAreSharedWithTheCacheOfTheNextSnapshot() {
+    var counters = new RegularTransferCacheCounters();
+    var cache = new RegularTransferServiceCache<String>(2, Set.of(), counters);
+    var factory = new TestFactory();
+    cache.get(PREFS_1, factory);
+
+    var next = cache.carryForward(NOTHING_CHANGED);
+    next.get(PREFS_1, factory);
+
+    assertThat(next.metrics()).isSameInstanceAs(cache.metrics());
+    assertThat(counters.missCount()).isEqualTo(1);
+    assertThat(counters.hitCount()).isEqualTo(1);
+    counters.setLatest(next);
+    assertThat(counters.size()).isEqualTo(1);
+  }
+
+  @Test
+  void everyRequestIsCountedOnceWhenManyThreadsUseTheCache() throws Exception {
+    int threads = 8;
+    int requestsPerThread = 2_000;
+    var keys = List.of(PREFS_1, PREFS_2, PREFS_3, PREFS_4);
+    var cache = new RegularTransferServiceCache<String>(2, Set.of(PREFS_1));
+    var factory = new TestFactory();
+    var executor = Executors.newFixedThreadPool(threads);
+    try {
+      var futures = new ArrayList<Future<?>>();
+      for (int t = 0; t < threads; t++) {
+        int offset = t;
+        futures.add(
+          executor.submit(() -> {
+            for (int i = 0; i < requestsPerThread; i++) {
+              cache.get(keys.get((i + offset) % keys.size()), factory);
+            }
+          })
+        );
+      }
+      for (var future : futures) {
+        future.get(30, TimeUnit.SECONDS);
+      }
+    } finally {
+      executor.shutdownNow();
+    }
+
+    var metrics = cache.metrics();
+    assertThat(metrics.hitCount() + metrics.missCount()).isEqualTo(
+      (long) threads * requestsPerThread
+    );
+    // Every created value was counted once, whether it stayed in the cache or was evicted
+    assertThat(metrics.putCount()).isEqualTo(factory.created.size());
+    assertThat(metrics.loadFailureCount()).isEqualTo(0);
+    // The bounded part never holds more than the max size, and the retained key is one more
+    assertThat(cache.size()).isAtMost(3);
   }
 
   private static void awaitOrFail(CountDownLatch latch) {

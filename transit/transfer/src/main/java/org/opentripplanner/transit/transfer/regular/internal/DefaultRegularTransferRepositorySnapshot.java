@@ -1,12 +1,17 @@
 package org.opentripplanner.transit.transfer.regular.internal;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.data.transfers.regular.RaptorTransferStore;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 import org.opentripplanner.transit.transfer.regular.api.RegularTransfersService;
 import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
+import org.opentripplanner.transit.transfer.regular.api.report.RegularTransferCacheMetrics;
+import org.opentripplanner.transit.transfer.regular.api.report.RegularTransferCacheReport;
+import org.opentripplanner.transit.transfer.regular.api.report.UserPreferenceSource;
 import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,18 +41,8 @@ class DefaultRegularTransferRepositorySnapshot<
   private final TransferRequestMapper<R> mapper;
   private final ProfileMatcher matcher;
   private final List<WarmupEntry> warmup;
-
-  /**
-   * The user preferences to create the Raptor transfers for when the server starts: the
-   * preferences of a profile, or of a warmup entry.
-   *
-   * @param parent the parent profile of a warmup entry, {@code null} for a profile
-   */
-  record WarmupEntry(
-    String id,
-    @Nullable String parent,
-    AbstractUserPreferences<?> userPreferences
-  ) {}
+  private final Map<AbstractUserPreferences<?>, WarmupEntry> entryByPreferences;
+  private final RegularTransferCacheStatistics statistics;
 
   DefaultRegularTransferRepositorySnapshot(
     OverlaidTemplatePaths<P> paths,
@@ -55,13 +50,17 @@ class DefaultRegularTransferRepositorySnapshot<
     RaptorTransfersFactory<P, R> raptorTransfersFactory,
     TransferRequestMapper<R> mapper,
     ProfileMatcher matcher,
-    List<WarmupEntry> warmup
+    List<WarmupEntry> warmup,
+    RegularTransferCacheStatistics statistics
   ) {
     this.paths = paths;
     this.cache = cache;
     this.mapper = mapper;
     this.matcher = matcher;
     this.warmup = List.copyOf(warmup);
+    this.entryByPreferences = new HashMap<>();
+    warmup.forEach(entry -> entryByPreferences.put(entry.userPreferences(), entry));
+    this.statistics = statistics;
     this.cacheFactory = new CacheFactory(raptorTransfersFactory);
   }
 
@@ -91,13 +90,60 @@ class DefaultRegularTransferRepositorySnapshot<
   @Override
   public RegularTransfersService<P> forRequest(R request) {
     var userPreferences = mapper.toUserPreferences(request);
+    var profile = matcher.closestProfile(paths, userPreferences);
+    statistics.record(userPreferences);
     return new DefaultRegularTransfersService<>(
       paths,
       cache,
       cacheFactory,
       userPreferences,
-      matcher.closestProfile(paths, userPreferences)
+      profile
     );
+  }
+
+  @Override
+  public RegularTransferCacheReport cacheReport() {
+    return () -> statistics.entries(cache::contains, this::keyInfo);
+  }
+
+  @Override
+  public RegularTransferCacheMetrics cacheMetrics() {
+    return cache.metrics();
+  }
+
+  /**
+   * How a key of the cache came to be: a profile, a warmup entry, or on demand. It is only called
+   * when the report is built.
+   */
+  private RegularTransferCacheStatistics.KeyInfo keyInfo(
+    AbstractUserPreferences<?> userPreferences
+  ) {
+    var entry = entryByPreferences.get(userPreferences);
+    if (entry != null) {
+      return new RegularTransferCacheStatistics.KeyInfo(
+        entry.parent() == null ? UserPreferenceSource.PROFILE : UserPreferenceSource.WARMUP,
+        entry.id(),
+        entry.parent() == null ? entry.id() : entry.parent()
+      );
+    }
+    var closestProfile = closestProfileOrNull(userPreferences);
+    var closest = closestProfile == null ? null : entryByPreferences.get(closestProfile);
+    return new RegularTransferCacheStatistics.KeyInfo(
+      UserPreferenceSource.ON_DEMAND,
+      null,
+      closest == null ? null : closest.id()
+    );
+  }
+
+  /** The profile closest to the key in this snapshot, {@code null} if there is none. */
+  @Nullable
+  private AbstractUserPreferences<?> closestProfileOrNull(AbstractUserPreferences<?> key) {
+    try {
+      return matcher.closestProfile(paths, key);
+    } catch (IllegalArgumentException e) {
+      // The paths of the snapshot have no profile of the type of the key
+      return null;
+    }
   }
 
   /** The paths of this snapshot, for the lifecycle. */

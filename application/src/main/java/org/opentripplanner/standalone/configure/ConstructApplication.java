@@ -20,7 +20,6 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RaptorTransitDataMapper;
 import org.opentripplanner.routing.fares.FareServiceFactory;
@@ -50,7 +49,6 @@ import org.opentripplanner.transit.repository.ScheduledTimetableData;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.updater.configure.UpdaterConfigurator;
-import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -138,12 +136,7 @@ public class ConstructApplication {
     }
     LOG.info("Creating transit layer for Raptor routing.");
     transitRepository.initRaptorTransitData(
-      RaptorTransitDataMapper.map(
-        tuningParameters,
-        transitRepository,
-        scheduledTimetableData,
-        transferRepository
-      )
+      RaptorTransitDataMapper.map(tuningParameters, transitRepository, scheduledTimetableData)
     );
     var scheduledRaptorTransitData = new RaptorTransitData(
       transitRepository.getRaptorTransitData()
@@ -271,8 +264,6 @@ public class ConstructApplication {
 
     initEllipsoidToGeoidDifference();
 
-    initializeTransferCache(routerConfig().transitTuningConfig(), transitRepository());
-
     if (OTPFeature.SandboxAPIGeocoder.isOn()) {
       LOG.info("Initializing geocoder");
       // eagerly initialize the geocoder
@@ -287,31 +278,6 @@ public class ConstructApplication {
       graph().initEllipsoidToGeoidDifference(value, c.latitude(), c.longitude());
     } catch (Exception e) {
       LOG.error("Error computing ellipsoid/geoid difference");
-    }
-  }
-
-  public static void initializeTransferCache(
-    TransitTuningParameters transitTuningConfig,
-    TransitRepository transitRepository
-  ) {
-    var transferCacheRequests = transitTuningConfig.transferCacheRequests();
-    if (!transferCacheRequests.isEmpty()) {
-      var progress = ProgressTracker.track(
-        "Creating initial raptor transfer cache",
-        1,
-        transferCacheRequests.size()
-      );
-
-      LOG.info(progress.startMessage());
-
-      transferCacheRequests.forEach(request -> {
-        transitRepository.getRaptorTransitData().initTransferCacheForRequest(request);
-
-        //noinspection Convert2MethodRef
-        progress.step(s -> LOG.info(s));
-      });
-
-      LOG.info(progress.completeMessage());
     }
   }
 

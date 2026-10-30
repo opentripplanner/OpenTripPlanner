@@ -102,8 +102,7 @@ class ScheduledDeviatedTripIntegrationTest {
 
     var transitService = TestServerContext.createTransitService(
       transitRepository,
-      timetableDataImport,
-      transferRepository
+      timetableDataImport
     );
 
     // from zone 3 to zone 2
@@ -150,8 +149,7 @@ class ScheduledDeviatedTripIntegrationTest {
 
     var transitService = TestServerContext.createTransitService(
       transitRepository,
-      timetableDataImport,
-      transferRepository
+      timetableDataImport
     );
 
     var from = GenericLocation.fromStopId(

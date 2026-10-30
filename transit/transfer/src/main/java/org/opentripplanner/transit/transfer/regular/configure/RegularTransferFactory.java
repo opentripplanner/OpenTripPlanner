@@ -76,6 +76,8 @@ public final class RegularTransferFactory {
    *                      number of regular stops. The index space is shared with the flex stops,
    *                      which do not take part in Raptor, so the Raptor transfer data is larger
    *                      than needed. This goes away when the stop index moves into Raptor.
+   * @param cacheMaxSize  the max number of Raptor transfers cached for other user preferences than
+   *                      the ones of the profiles and the warmup entries, which are always cached
    */
   public static <P, R> RepositoryHandle<
     RegularTransferRepositorySnapshot<P, R>,
@@ -86,11 +88,20 @@ public final class RegularTransferFactory {
     TransferParameters<R> parameters,
     TransferPathProvider<P, R> pathProvider,
     TransferRequestMapper<R> mapper,
-    int numberOfStops
+    int numberOfStops,
+    int cacheMaxSize,
+    boolean collectCacheStatistics
   ) {
     var handle = repositoryRegistry.registerRepository(
       buildRepository.createRuntimeRepository(),
-      new RegularTransferRepositoryLifecycle<>(pathProvider, mapper, parameters, numberOfStops)
+      new RegularTransferRepositoryLifecycle<>(
+        pathProvider,
+        mapper,
+        parameters,
+        numberOfStops,
+        cacheMaxSize,
+        collectCacheStatistics
+      )
     );
     // Create the Raptor transfers of the warmup entries before the first request
     handle.repositorySnapshot(repositoryRegistry.scope()).warmUp();

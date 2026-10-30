@@ -42,6 +42,7 @@ import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
+import org.opentripplanner.transit.transfer.regular.api.report.RegularTransferCacheReport;
 import org.opentripplanner.transit.transfer.regular.configure.RegularTransferFactory;
 
 /**
@@ -104,6 +105,7 @@ class RequestScopedFactoryIntegrationTest {
   private static final List<DaggerBindingKey> REQUEST_SCOPED = List.of(
     of(GtfsGraphQLRequestContext.class),
     of(RealtimeVehicleService.class),
+    of(RegularTransferCacheReport.class),
     of(RoutingService.class),
     of(TransactionScope.class),
     of(TransitService.class),
