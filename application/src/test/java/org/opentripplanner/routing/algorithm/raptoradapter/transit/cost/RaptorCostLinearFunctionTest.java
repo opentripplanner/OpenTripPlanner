@@ -11,12 +11,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.core.model.basic.Cost;
-import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
+import org.opentripplanner.core.model.basic.CostLinearFunction;
 import org.opentripplanner.test.support.TestTableParser;
 
 class RaptorCostLinearFunctionTest {
 
-  private static final double COEFFICIENT = 2.5;
+  private static final double COEFFICIENT = 2.4;
   private static final int CONSTANT_SECONDS = 17;
 
   private final CostLinearFunction sameInOtpDomain = CostLinearFunction.of(
@@ -34,11 +34,11 @@ class RaptorCostLinearFunctionTest {
       """
       # expectedRaptorCost | timeSeconds
         1700               | 0
-        1950               | 1
-        2200               | 2
-        5450               | 15
-        5700               | 16
-       16950               | 61
+        1940               | 1
+        2180               | 2
+        5300               | 15
+        5540               | 16
+       16340               | 61
       """
     );
   }
@@ -84,7 +84,7 @@ class RaptorCostLinearFunctionTest {
 
   @Test
   void testToString() {
-    assertEquals("17s + 2.5 t", subject.toString());
+    assertEquals("17s + 2.4 t", subject.toString());
     assertEquals("ZERO FUNCTION", RaptorCostLinearFunction.ZERO_FUNCTION.toString());
   }
 }

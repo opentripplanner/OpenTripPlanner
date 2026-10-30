@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.api.request.framework;
+package org.opentripplanner.core.model.basic;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -6,14 +6,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.opentripplanner.core.model.basic.Cost;
-import org.opentripplanner.test.support.TestTableParser;
 import org.opentripplanner.utils.time.DurationUtils;
 
 class CostLinearFunctionTest {
@@ -51,12 +49,13 @@ class CostLinearFunctionTest {
   }
 
   @Test
-  void parsePenaltyTimeCoefficientMustBeAtLeastZeroAndLessThanTen() {
+  void coefficientMustBeInTheSanityRange() {
     assertThrows(IllegalArgumentException.class, () -> CostLinearFunction.of(D2_m, -0.01));
     var ex = assertThrows(IllegalArgumentException.class, () ->
       CostLinearFunction.of(Duration.ZERO, 100.1)
     );
     assertEquals("The value is not in range[0.0, 100.0]: 100.1", ex.getMessage());
+    assertEquals(100.0, CostLinearFunction.of(Duration.ZERO, 100.0).coefficient());
   }
 
   @Test
@@ -74,18 +73,14 @@ class CostLinearFunctionTest {
     assertFalse(CostLinearFunction.of("0s + 0.1t").isZero());
   }
 
-  static Stream<Arguments> calculateTestCases() {
-    return TestTableParser.of(
-      """
-      #  function  ||          expected values
-      #            ||    0s |    1s |    2s |    10s |   11s |   61s
-       0s + 0.0 t  ||     0 |     0 |     0 |     0  |     0 |     0
-       7s + 0.0 t  ||   700 |   700 |   700 |   700  |   700 |   700
-       0s + 1.0 t  ||   000 |   100 |   200 |  1000  |  1100 |  6100
-       0s + 1.06 t ||   000 |   110 |   220 |  1100  |  1210 |  6710
-       8s + 2.0 t  ||   800 |  1000 |  1200 |  2800  |  3000 | 13000
-       8s + 2.04 t ||   800 |  1000 |  1200 |  2800  |  3000 | 13000
-      """
+  static List<Arguments> calculateTestCases() {
+    return List.of(
+      Arguments.of("0s + 0.0 t", 0, 0, 0, 0, 0, 0),
+      Arguments.of("7s + 0.0 t", 700, 700, 700, 700, 700, 700),
+      Arguments.of("0s + 1.0 t", 000, 100, 200, 1000, 1100, 6100),
+      Arguments.of("0s + 1.06 t", 000, 110, 220, 1100, 1210, 6710),
+      Arguments.of("8s + 2.0 t", 800, 1000, 1200, 2800, 3000, 13000),
+      Arguments.of("8s + 2.04 t", 800, 1000, 1200, 2800, 3000, 13000)
     );
   }
 

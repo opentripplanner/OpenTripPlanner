@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.api.request.framework;
+package org.opentripplanner.core.model.time;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -34,7 +34,7 @@ class TimePenaltyTest {
   }
 
   @Test
-  void parsePenaltyTimeCoefficientMustBeAtLeastZeroAndLessThanTen() {
+  void coefficientMustBeInTheSanityRange() {
     assertThrows(IllegalArgumentException.class, () -> TimePenalty.of(D2_m, -0.01));
     var ex = assertThrows(IllegalArgumentException.class, () ->
       TimePenalty.of(Duration.ZERO, 100.1)

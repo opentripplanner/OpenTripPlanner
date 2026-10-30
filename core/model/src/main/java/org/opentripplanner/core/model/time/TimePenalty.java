@@ -1,6 +1,8 @@
-package org.opentripplanner.routing.api.request.framework;
+package org.opentripplanner.core.model.time;
 
 import java.time.Duration;
+import org.opentripplanner.core.model.basic.AbstractLinearFunction;
+import org.opentripplanner.core.model.basic.LinearFunctionSerialization;
 import org.opentripplanner.utils.lang.StringUtils;
 import org.opentripplanner.utils.time.DurationUtils;
 
