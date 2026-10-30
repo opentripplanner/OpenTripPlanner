@@ -63,15 +63,16 @@ public class TransferProfilesConfigMapper {
     return root
       .of("transfers")
       .since(V2_10)
-      .summary("Transfer profiles for the raptor-data regular-transfer pipeline.")
+      .summary("The transfer profiles, the walks between stops that transit routing uses.")
       .description(
         """
         The configuration of a profile type is a block named after the type, with its `profiles`,
         its `maxDuration` and its `warmup` entries. The types `walk`, `wheelchair`, `bicycle` and
         `car` are supported for now. If no profile is configured, a single default `walk` profile
-        with a max duration of 30 minutes is used. Each profile type with profiles must set its
-        `maxDuration`. The `flex` and `via` blocks configure the transfers of flex routing and of
-        the via coordinates, they replace the old `transferRequests` and `maxTransferDuration`.
+        with a max duration of 30 minutes is used. The `maxDuration` of a profile type is optional,
+        the default is 30 minutes. The `flex` and `via` blocks configure the transfers of flex
+        routing and of the via coordinates, they replace the old `transferRequests` and
+        `maxTransferDuration`.
         """
       )
       .asObject();
@@ -414,14 +415,12 @@ public class TransferProfilesConfigMapper {
         block
           .of("warmup")
           .since(V2_10)
-          .summary(
-            "The user preferences to create the Raptor transfers for when the server starts."
-          )
+          .summary("The user preferences to create the transfers for when the server starts.")
           .description(
             """
             Each entry needs an `id`, a `parent` and `userPreferences`. The `id` must be unique
             among all the profiles and warmup entries, and the `parent` is the `id` of a profile of
-            the same type. The Raptor transfers for the `userPreferences` are created from the
+            the same type. The transfers for the `userPreferences` are created from the
             paths of the parent when the server starts, so the first request with these preferences
             does not wait for them. No paths are searched for or stored for a warmup entry. Use
             warmup for preferences that are common in the requests, but are not worth a profile of
@@ -448,7 +447,7 @@ public class TransferProfilesConfigMapper {
     var parent = entry
       .of("parent")
       .since(V2_10)
-      .summary("The id of the profile the Raptor transfers are created from.")
+      .summary("The id of the profile the transfers are created from.")
       .asString();
     var parentPreferences = preferencesById.get(parent);
     if (parentPreferences == null) {
