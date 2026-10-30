@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.apis.transmodel._support.TestDataFetcherDecorator;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
+import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 
 class WalkPreferencesMapperTest {
 
@@ -27,5 +28,24 @@ class WalkPreferencesMapperTest {
       TestDataFetcherDecorator.of(field, value)
     );
     assertEquals(expected, preferences.build().toString());
+  }
+
+  @ParameterizedTest
+  @MethodSource("mapWalkPreferencesTestCases")
+  void mapWheelchairPreferences(String field, Object value) {
+    var preferences = WheelchairPreferences.of();
+    WalkPreferencesMapper.mapWheelchairPreferences(
+      preferences,
+      TestDataFetcherDecorator.of(field, value)
+    );
+    var result = preferences.build();
+    assertEquals(
+      field.equals("walkReluctance") ? value : WheelchairPreferences.DEFAULT.reluctance(),
+      result.reluctance()
+    );
+    assertEquals(
+      field.equals("walkSpeed") ? value : WheelchairPreferences.DEFAULT.speed(),
+      result.speed()
+    );
   }
 }
