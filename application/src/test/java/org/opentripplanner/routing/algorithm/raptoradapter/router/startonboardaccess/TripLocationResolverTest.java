@@ -3,6 +3,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.router.startonboarda
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
+import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 import static org.opentripplanner.utils.time.TimeUtils.hm2time;
 
 import java.time.LocalDate;
@@ -15,6 +16,7 @@ import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model.TripInput;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.updater.trip.gtfs.GtfsRtTestHelper;
 
 class TripLocationResolverTest {
 
@@ -63,6 +65,47 @@ class TripLocationResolverTest {
     );
 
     assertEquals(new LocationInTripPatternReference(STOP_B.getIndex(), 1, T10_05), result);
+  }
+
+  @Test
+  void resolvesRealTimeBoardingTimeForDelayedTrip() {
+    var env = ENV_BUILDER.addTrip(
+      TripInput.of("T1").addStop(STOP_A, "10:00").addStop(STOP_B, "10:05").addStop(STOP_C, "10:10")
+    ).build();
+    var rt = GtfsRtTestHelper.of(env);
+    assertSuccess(
+      rt.applyTripUpdate(rt.tripUpdateScheduled("T1").addDelayedStopTime(1, 90).build())
+    );
+
+    // The aimed departure time matches the scheduled time, while boarding happens at the delayed time
+    var tripAndServiceDate = new TripAndServiceDate(env.tripData("T1").trip(), SERVICE_DATE);
+    var result = new TripLocationResolver(env.transitService()).resolve(
+      tripAndServiceDate,
+      STOP_B.getId(),
+      T10_05
+    );
+
+    assertEquals(new LocationInTripPatternReference(STOP_B.getIndex(), 1, T10_05 + 90), result);
+  }
+
+  @Test
+  void resolvesRealTimeBoardingTimeForEarlyTrip() {
+    var env = ENV_BUILDER.addTrip(
+      TripInput.of("T1").addStop(STOP_A, "10:00").addStop(STOP_B, "10:05").addStop(STOP_C, "10:10")
+    ).build();
+    var rt = GtfsRtTestHelper.of(env);
+    assertSuccess(
+      rt.applyTripUpdate(rt.tripUpdateScheduled("T1").addDelayedStopTime(1, -90).build())
+    );
+
+    var tripAndServiceDate = new TripAndServiceDate(env.tripData("T1").trip(), SERVICE_DATE);
+    var result = new TripLocationResolver(env.transitService()).resolve(
+      tripAndServiceDate,
+      STOP_B.getId(),
+      T10_05
+    );
+
+    assertEquals(new LocationInTripPatternReference(STOP_B.getIndex(), 1, T10_05 - 90), result);
   }
 
   @Test
