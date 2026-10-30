@@ -67,7 +67,6 @@ A full list of them can be found in the [RouteRequest](RouteRequest.md).
 |       [stepMinutes](#transit_dynamicSearchWindow_stepMinutes)                             |       `integer`       | Used to set the steps the search-window is rounded to.                                                                                                                                                               | *Optional* | `10`           |  2.1  |
 |    [pagingSearchWindowAdjustments](#transit_pagingSearchWindowAdjustments)                |      `duration[]`     | The provided array of durations is used to increase the search-window for the next/previous page.                                                                                                                    | *Optional* |                |   na  |
 |    [stopBoardAlightDuringTransferCost](#transit_stopBoardAlightDuringTransferCost)        | `enum map of integer` | Costs for boarding and alighting during transfers at stops with a given transfer priority.                                                                                                                           | *Optional* |                |  2.0  |
-|    [transferCacheRequests](#transit_transferCacheRequests)                                |       `object[]`      | Routing requests to use for pre-filling the stop-to-stop transfer cache.                                                                                                                                             | *Optional* |                |  2.3  |
 | transmodelApi                                                                             |        `object`       | Configuration for the Transmodel GraphQL API.                                                                                                                                                                        | *Optional* |                |  2.1  |
 |    [hideFeedId](#transmodelApi_hideFeedId)                                                |       `boolean`       | Hide the FeedId in all API output, and add it to input.                                                                                                                                                              | *Optional* | `false`        |   na  |
 |    [maxNumberOfResultFields](#transmodelApi_maxNumberOfResultFields)                      |       `integer`       | The maximum number of fields in a GraphQL result                                                                                                                                                                     | *Optional* | `1000000`      |  2.6  |
@@ -315,7 +314,10 @@ no extra threads are started and the search is done in one thread.
 
 The maximum number of distinct transfers parameters to cache pre-calculated transfers for.
 
- If too low, requests may be slower. If too high, more memory may be used then required.
+The transfers of the profiles and the warmup entries in the `transfers` section of the
+build config are always cached, they are not counted. If too low, requests may be slower.
+If too high, more memory may be used then required.
+
 
 <h3 id="transit_dynamicSearchWindow">dynamicSearchWindow</h3>
 
@@ -455,31 +457,6 @@ The cost is a scalar, but is equivalent to the felt cost of riding a transit tri
 
 Use values in a range from `0` to `100 000`. **All key/value pairs are required if the
 `stopBoardAlightDuringTransferCost` is listed.**
-
-
-<h3 id="transit_transferCacheRequests">transferCacheRequests</h3>
-
-**Since version:** `2.3` ∙ **Type:** `object[]` ∙ **Cardinality:** `Optional`   
-**Path:** /transit ∙ **See:** [RouteRequest.md](RouteRequest.md) 
-
-Routing requests to use for pre-filling the stop-to-stop transfer cache.
-
-If not set, the default behavior is to cache stop-to-stop transfers using the default route request
-(`routingDefaults`). Use this to change the default or specify more than one `RouteRequest`.
-
-**Example**
-
-```JSON
-// router-config.json
-{
-  "transit": {
-    "transferCacheRequests": [
-      { "modes": "WALK"                                                     },
-      { "modes": "WALK",    "wheelchairAccessibility": { "enabled": true  } }
-    ]
-  }
-}
-```
 
 
 <h3 id="transmodelApi_hideFeedId">hideFeedId</h3>
@@ -835,18 +812,7 @@ Ordered list of `StreetMode` values used as egress modes. Each entry is paired w
       "ALLOWED" : 75,
       "RECOMMENDED" : 30,
       "PREFERRED" : 0
-    },
-    "transferCacheRequests" : [
-      {
-        "modes" : "WALK"
-      },
-      {
-        "modes" : "WALK",
-        "wheelchairAccessibility" : {
-          "enabled" : true
-        }
-      }
-    ]
+    }
   },
   "vehicleRentalServiceDirectory" : {
     "url" : "https://entur.no/bikeRentalServiceDirectory/manifest.json",
