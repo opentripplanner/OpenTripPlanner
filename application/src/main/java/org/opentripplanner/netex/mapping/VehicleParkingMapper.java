@@ -6,11 +6,15 @@ import static org.rutebanken.netex.model.ParkingVehicleEnumeration.PEDAL_CYCLE;
 
 import java.util.Set;
 import javax.annotation.Nullable;
+import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.netex.mapping.WgsCoordinateMapper.InvalidCoordinateException;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingSpaces;
+import org.opentripplanner.street.geometry.WgsCoordinate;
+import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.Parking;
 import org.rutebanken.netex.model.ParkingVehicleEnumeration;
 
@@ -43,15 +47,63 @@ class VehicleParkingMapper {
       );
       return null;
     }
+    WgsCoordinate coordinate = mapCoordinate(parking);
+    if (coordinate == null) {
+      return null;
+    }
     return VehicleParking.of()
       .id(idFactory.createId(parking.getId()))
-      .name(NonLocalizedString.ofNullable(parking.getName().getValue()))
-      .coordinate(WgsCoordinateMapper.mapToDomain(parking.getCentroid()))
+      .name(mapName(parking))
+      .coordinate(coordinate)
       .capacity(mapCapacity(parking))
       .bicyclePlaces(hasBikes(parking))
       .carPlaces(!hasBikes(parking))
-      .entrance(mapEntrance(parking))
+      .entrance(mapEntrance(parking, coordinate))
       .build();
+  }
+
+  /**
+   * The name is required by the APIs, so a missing name is reported and replaced by "N/A".
+   */
+  private I18NString mapName(Parking parking) {
+    MultilingualString name = parking.getName();
+    if (name != null && name.getValue() != null) {
+      return new NonLocalizedString(name.getValue());
+    }
+    issueStore.add(
+      "MissingParkingName",
+      "NeTEx Parking '%s' does not contain a name",
+      parkingDebugId(parking)
+    );
+    return new NonLocalizedString("N/A");
+  }
+
+  /**
+   * Map the centroid to a coordinate. A parking lot without a valid coordinate cannot be linked
+   * to the street network, so a missing or invalid centroid is reported and {@code null} is
+   * returned.
+   */
+  @Nullable
+  private WgsCoordinate mapCoordinate(Parking parking) {
+    try {
+      WgsCoordinate coordinate = WgsCoordinateMapper.mapToDomain(parking.getCentroid());
+      if (coordinate == null) {
+        issueStore.add(
+          "MissingParkingCoordinates",
+          "NeTEx Parking '%s' does not contain a centroid",
+          parkingDebugId(parking)
+        );
+      }
+      return coordinate;
+    } catch (InvalidCoordinateException e) {
+      issueStore.add(
+        "InvalidParkingCoordinates",
+        "NeTEx Parking '%s' has invalid coordinates. %s",
+        parkingDebugId(parking),
+        e.getMessage()
+      );
+      return null;
+    }
   }
 
   /**
@@ -70,11 +122,14 @@ class VehicleParkingMapper {
     }
   }
 
-  private VehicleParking.VehicleParkingEntranceCreator mapEntrance(Parking parking) {
+  private VehicleParking.VehicleParkingEntranceCreator mapEntrance(
+    Parking parking,
+    WgsCoordinate coordinate
+  ) {
     return builder ->
       builder
         .entranceId(idFactory.createId(parking.getId() + "/entrance"))
-        .coordinate(WgsCoordinateMapper.mapToDomain(parking.getCentroid()))
+        .coordinate(coordinate)
         .walkAccessible(true)
         .carAccessible(true);
   }

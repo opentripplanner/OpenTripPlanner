@@ -19,7 +19,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.core.model.accessibility.Accessibility;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalVersionMapById;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
@@ -310,8 +312,72 @@ class StopAndStationMapperTest {
     assertFalse(stations.get(1).shouldRouteToCentroid());
   }
 
+  /**
+   * A quay with a coordinate outside the WGS84 range is skipped, the other quays of the stop
+   * place are mapped.
+   */
+  @Test
+  void testQuayWithInvalidCoordinatesIsSkipped() {
+    var stopPlace = createStopPlace("ST:StopPlace:1", "A", "1", 55.707005, 13.186816, TRAM);
+    var validQuay = createQuay("ST:Quay:1", "Quay1", "1", 55.706063, 13.186708, "a");
+    var invalidQuay = createQuay("ST:Quay:2", "Quay2", "1", 56162332.0, 13.186708, "b");
+    stopPlace.setQuays(
+      new Quays_RelStructure()
+        .withQuayRefOrQuay(objectFactory.createQuay(validQuay))
+        .withQuayRefOrQuay(objectFactory.createQuay(invalidQuay))
+    );
+    var issueStore = new DefaultDataImportIssueStore();
+    var stopMapper = createStopAndStationMapper(SiteRepository.of(), issueStore);
+
+    stopMapper.mapParentAndChildStops(List.of(stopPlace));
+
+    assertThat(stopMapper.resultStations).hasSize(1);
+    assertThat(
+      stopMapper.resultStops
+        .stream()
+        .map(s -> s.getId().getId())
+        .toList()
+    ).containsExactly("ST:Quay:1");
+    assertThat(issueTypes(issueStore)).containsExactly("QuayInvalidCoordinates");
+  }
+
+  /**
+   * A stop place without any valid coordinates, neither on the stop place nor on its quays, is
+   * skipped together with its quays.
+   */
+  @Test
+  void testStopPlaceWithoutValidCoordinatesIsSkipped() {
+    var stopPlace = createStopPlace("ST:StopPlace:1", "A", "1", 56162332.0, 13.186816, TRAM);
+    var invalidQuay = createQuay("ST:Quay:1", "Quay1", "1", 56162332.0, 13.186708, "a");
+    stopPlace.setQuays(
+      new Quays_RelStructure().withQuayRefOrQuay(objectFactory.createQuay(invalidQuay))
+    );
+    var issueStore = new DefaultDataImportIssueStore();
+    var stopMapper = createStopAndStationMapper(SiteRepository.of(), issueStore);
+
+    stopMapper.mapParentAndChildStops(List.of(stopPlace));
+
+    assertThat(stopMapper.resultStations).isEmpty();
+    assertThat(stopMapper.resultStops).isEmpty();
+    assertThat(issueTypes(issueStore)).containsExactly(
+      "StationInvalidCoordinates",
+      "StationWithoutValidCoordinates"
+    );
+  }
+
+  private static List<String> issueTypes(DataImportIssueStore issueStore) {
+    return issueStore.listIssues().stream().map(DataImportIssue::getType).toList();
+  }
+
   private static StopAndStationMapper createStopAndStationMapper(
     SiteRepositoryBuilder siteRepositoryBuilder
+  ) {
+    return createStopAndStationMapper(siteRepositoryBuilder, DataImportIssueStore.NOOP);
+  }
+
+  private static StopAndStationMapper createStopAndStationMapper(
+    SiteRepositoryBuilder siteRepositoryBuilder,
+    DataImportIssueStore issueStore
   ) {
     return new StopAndStationMapper(
       MappingSupport.ID_FACTORY,
@@ -319,7 +385,7 @@ class StopAndStationMapperTest {
       null,
       siteRepositoryBuilder,
       DEFAULT_TIME_ZONE,
-      DataImportIssueStore.NOOP,
+      issueStore,
       false,
       Set.of()
     );
