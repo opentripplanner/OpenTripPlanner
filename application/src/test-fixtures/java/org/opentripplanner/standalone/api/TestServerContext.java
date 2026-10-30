@@ -50,6 +50,7 @@ import org.opentripplanner.street.service.DefaultStreetLimitationParametersServi
 import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transfer.configure.StreetTransferFactory;
 import org.opentripplanner.transfer.dataimport.RegularTransitTransferGenerator;
+import org.opentripplanner.transfer.dataimport.StopsAllowedForModes;
 import org.opentripplanner.transfer.dataimport.StopsVisitedByPatterns;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
@@ -164,6 +165,7 @@ public class TestServerContext {
       StreetTransferFactory.defaultParameters(),
       regularTransferBuildRepository,
       stopsVisitedByPatterns,
+      new StopsAllowedForModes(timetableDataImport, stopsVisitedByPatterns),
       null
     );
     new RegularTransitTransferGenerator(

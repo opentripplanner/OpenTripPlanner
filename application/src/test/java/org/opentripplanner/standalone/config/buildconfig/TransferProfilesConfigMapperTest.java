@@ -5,16 +5,19 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner.standalone.config.framework.json.JsonSupport.newNodeAdapterForTest;
 
 import java.time.Duration;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.core.model.basic.Speed;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.transit.transfer.regular.api.maxduration.BicycleMaxDurations;
+import org.opentripplanner.transit.transfer.regular.api.maxduration.CarMaxDuration;
 import org.opentripplanner.transit.transfer.regular.api.parameters.DeduplicationLimit;
-import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileParameters;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferParameters;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfile;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
-import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfilesParameters;
 import org.opentripplanner.transit.transfer.regular.api.preferences.BicyclePreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.CarPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
@@ -36,7 +39,7 @@ class TransferProfilesConfigMapperTest {
 
   @Test
   void aWalkBlockWithoutProfilesUsesTheDefaultProfile() {
-    var subject = map("{ transfers: { walk: {} } }");
+    var subject = map("{ transfers: { walk: { maxDuration: '30m' } } }");
 
     assertThat(subject.profiles()).hasSize(1);
     assertThat(subject.profiles().getFirst().id()).isEqualTo("walk");
@@ -48,7 +51,7 @@ class TransferProfilesConfigMapperTest {
       """
       {
         transfers: {
-          walk: {
+          walk: { maxDuration: '30m',
             profiles: [{
               id: "slow walk",
               userPreferences: { speed: 1.1, reluctance: 3.0, stairs: "FORBIDDEN" }
@@ -73,7 +76,9 @@ class TransferProfilesConfigMapperTest {
 
   @Test
   void aProfileMayHaveNoUserPreferences() {
-    var subject = map("{ transfers: { walk: { profiles: [{ id: 'walk' }] } } }");
+    var subject = map(
+      "{ transfers: { walk: { maxDuration: '30m', profiles: [{ id: 'walk' }] } } }"
+    );
 
     assertThat(subject.profiles().getFirst().userPreferences()).isNull();
   }
@@ -84,7 +89,7 @@ class TransferProfilesConfigMapperTest {
       """
       {
         transfers: {
-          walk: {
+          walk: { maxDuration: '30m',
             profiles: [{
               id: "wheelchair-walk",
               routingRequest: { wheelchairAccessibility: { enabled: true } }
@@ -105,7 +110,7 @@ class TransferProfilesConfigMapperTest {
       """
       {
         transfers: {
-          walk: {
+          walk: { maxDuration: '30m',
             profiles: [
               { id: "b", userPreferences: { reluctance: 3.0 } },
               { id: "a", userPreferences: { reluctance: 5.0 } }
@@ -129,7 +134,7 @@ class TransferProfilesConfigMapperTest {
   @Test
   void aProfileWithoutAnIdIsRejected() {
     var root = newNodeAdapterForTest(
-      "{ transfers: { walk: { profiles: [{ userPreferences: { reluctance: 3.0 } }] } } }"
+      "{ transfers: { walk: { maxDuration: '30m', profiles: [{ userPreferences: { reluctance: 3.0 } }] } } }"
     );
 
     assertThrows(OtpAppException.class, () -> TransferProfilesConfigMapper.map(root));
@@ -141,7 +146,7 @@ class TransferProfilesConfigMapperTest {
       """
       {
         transfers: {
-          walk: {
+          walk: { maxDuration: '30m',
             profiles: [
               { id: "walk", userPreferences: { reluctance: 3.0 } },
               { id: "walk", userPreferences: { reluctance: 5.0 } }
@@ -163,7 +168,7 @@ class TransferProfilesConfigMapperTest {
       """
       {
         transfers: {
-          walk: {
+          walk: { maxDuration: '30m',
             profiles: [
               { id: "a" },
               { id: "b", userPreferences: { speed: 1.35, reluctance: 2.0 } }
@@ -185,7 +190,7 @@ class TransferProfilesConfigMapperTest {
       """
       {
         transfers: {
-          walk: {
+          walk: { maxDuration: '30m',
             profiles: [
               { id: "walk", userPreferences: { speed: 1.1, reluctance: 3.0 } },
               { id: "slow", parent: "walk", userPreferences: { reluctance: 5.0 } }
@@ -213,7 +218,7 @@ class TransferProfilesConfigMapperTest {
       """
       {
         transfers: {
-          walk: {
+          walk: { maxDuration: '30m',
             profiles: [
               { id: "walk" },
               { id: "slow", parent: "walk", userPreferences: { reluctance: 5.0 } }
@@ -237,7 +242,7 @@ class TransferProfilesConfigMapperTest {
       """
       {
         transfers: {
-          walk: {
+          walk: { maxDuration: '30m',
             profiles: [
               {
                 id: "walk",
@@ -263,7 +268,7 @@ class TransferProfilesConfigMapperTest {
       """
       {
         transfers: {
-          walk: {
+          walk: { maxDuration: '30m',
             profiles: [
               { id: "slow", parent: "walk", userPreferences: { reluctance: 5.0 } },
               { id: "walk", userPreferences: { speed: 1.1, reluctance: 3.0 } }
@@ -295,7 +300,7 @@ class TransferProfilesConfigMapperTest {
       """
       {
         transfers: {
-          walk: { profiles: [{ id: "walk" }, { id: "copy", parent: "walk" }] }
+          walk: { maxDuration: '30m', profiles: [{ id: "walk" }, { id: "copy", parent: "walk" }] }
         }
       }
       """
@@ -309,7 +314,7 @@ class TransferProfilesConfigMapperTest {
   @Test
   void aParentThatDoesNotExistIsRejectedAndNamed() {
     var root = newNodeAdapterForTest(
-      "{ transfers: { walk: { profiles: [{ id: 'a', parent: 'missing' }] } } }"
+      "{ transfers: { walk: { maxDuration: '30m', profiles: [{ id: 'a', parent: 'missing' }] } } }"
     );
 
     var ex = assertThrows(OtpAppException.class, () -> TransferProfilesConfigMapper.map(root));
@@ -323,7 +328,7 @@ class TransferProfilesConfigMapperTest {
       """
       {
         transfers: {
-          walk: {
+          walk: { maxDuration: '30m',
             profiles: [
               { id: "a", parent: "b", userPreferences: { reluctance: 3.0 } },
               { id: "b", parent: "a", userPreferences: { reluctance: 4.0 } }
@@ -357,7 +362,7 @@ class TransferProfilesConfigMapperTest {
       """
       {
         transfers: {
-          walk: {
+          walk: { maxDuration: '30m',
             profiles: [{ id: "walk", userPreferences: { speed: 1.1, reluctance: 3.0 } }],
             warmup: [{ id: "avoid", parent: "walk", userPreferences: { reluctance: 9.0 } }]
           }
@@ -383,7 +388,7 @@ class TransferProfilesConfigMapperTest {
       """
       {
         transfers: {
-          walk: {
+          walk: { maxDuration: '30m',
             profiles: [{ id: "walk" }],
             warmup: [{ id: "avoid", parent: "walk", userPreferences: { reluctance: 9.0 } }]
           }
@@ -404,7 +409,7 @@ class TransferProfilesConfigMapperTest {
       """
       {
         transfers: {
-          walk: { warmup: [{ id: "avoid", parent: "walk", userPreferences: { reluctance: 9.0 } }] }
+          walk: { maxDuration: '30m', warmup: [{ id: "avoid", parent: "walk", userPreferences: { reluctance: 9.0 } }] }
         }
       }
       """
@@ -422,7 +427,7 @@ class TransferProfilesConfigMapperTest {
   @Test
   void aWarmupEntryNeedsAnId() {
     var root = newNodeAdapterForTest(
-      "{ transfers: { walk: { warmup: [{ parent: 'walk', userPreferences: { reluctance: 9.0 } }] } } }"
+      "{ transfers: { walk: { maxDuration: '30m', warmup: [{ parent: 'walk', userPreferences: { reluctance: 9.0 } }] } } }"
     );
 
     assertThrows(OtpAppException.class, () -> TransferProfilesConfigMapper.map(root));
@@ -431,7 +436,7 @@ class TransferProfilesConfigMapperTest {
   @Test
   void aWarmupEntryNeedsAParent() {
     var root = newNodeAdapterForTest(
-      "{ transfers: { walk: { warmup: [{ id: 'a', userPreferences: { reluctance: 9.0 } }] } } }"
+      "{ transfers: { walk: { maxDuration: '30m', warmup: [{ id: 'a', userPreferences: { reluctance: 9.0 } }] } } }"
     );
 
     assertThrows(OtpAppException.class, () -> TransferProfilesConfigMapper.map(root));
@@ -440,7 +445,7 @@ class TransferProfilesConfigMapperTest {
   @Test
   void aWarmupEntryNeedsUserPreferences() {
     var root = newNodeAdapterForTest(
-      "{ transfers: { walk: { warmup: [{ id: 'a', parent: 'walk' }] } } }"
+      "{ transfers: { walk: { maxDuration: '30m', warmup: [{ id: 'a', parent: 'walk' }] } } }"
     );
 
     var ex = assertThrows(OtpAppException.class, () -> TransferProfilesConfigMapper.map(root));
@@ -454,7 +459,7 @@ class TransferProfilesConfigMapperTest {
       """
       {
         transfers: {
-          walk: {
+          walk: { maxDuration: '30m',
             profiles: [{ id: "walk" }],
             warmup: [
               { id: "a", parent: "walk", userPreferences: { reluctance: 9.0 } },
@@ -477,7 +482,7 @@ class TransferProfilesConfigMapperTest {
       """
       {
         transfers: {
-          walk: {
+          walk: { maxDuration: '30m',
             profiles: [{ id: "walk" }],
             warmup: [{ id: "walk", parent: "walk", userPreferences: { reluctance: 9.0 } }]
           }
@@ -496,7 +501,7 @@ class TransferProfilesConfigMapperTest {
       """
       {
         transfers: {
-          walk: {
+          walk: { maxDuration: '30m',
             profiles: [{ id: "walk", userPreferences: { reluctance: 3.0 } }],
             warmup: [{ id: "copy", parent: "walk", userPreferences: { reluctance: 3.0 } }]
           }
@@ -516,26 +521,28 @@ class TransferProfilesConfigMapperTest {
   }
 
   @Test
-  void defaultMaxDurationAppliesToTypesWithoutAnOverride() {
-    var subject = map("{ transfers: { defaultMaxDuration: '20m' } }");
+  void theMaxDurationOfATypeIsRequiredIfItHasProfiles() {
+    var root = newNodeAdapterForTest(
+      "{ transfers: { wheelchair: { profiles: [{ id: 'wheelchair' }] } } }"
+    );
 
-    assertThat(maxDuration(subject)).isEqualTo(Duration.ofMinutes(20));
+    var ex = assertThrows(OtpAppException.class, () -> TransferProfilesConfigMapper.map(root));
+    assertThat(ex).hasMessageThat().contains("wheelchair");
+    assertThat(ex).hasMessageThat().contains("max duration");
   }
 
   @Test
-  void maxDurationsOfATypeReplaceTheDefault() {
-    var subject = map(
-      """
-      {
-        transfers: {
-          defaultMaxDuration: '20m',
-          walk: { maxDurations: [{ maxDuration: '45m' }] }
-        }
-      }
-      """
-    );
+  void theMaxDurationOfATypeIsUsedByTheImplicitWalkProfile() {
+    var subject = map("{ transfers: { walk: { maxDuration: '45m' } } }");
 
     assertThat(maxDuration(subject)).isEqualTo(Duration.ofMinutes(45));
+  }
+
+  @Test
+  void theDefaultMaxDurationParameterIsNotSupported() {
+    var subject = map("{ transfers: { defaultMaxDuration: '20m' } }");
+
+    assertThat(maxDuration(subject)).isEqualTo(Duration.ofMinutes(30));
   }
 
   @Test
@@ -545,7 +552,7 @@ class TransferProfilesConfigMapperTest {
       {
         transfers: {
           walk: {
-            maxDurations: [{ maxDuration: '10m' }],
+            maxDuration: '10m',
             profiles: [
               { id: "a", userPreferences: { reluctance: 3.0 } },
               { id: "b", userPreferences: { reluctance: 5.0 } }
@@ -566,33 +573,140 @@ class TransferProfilesConfigMapperTest {
   }
 
   @Test
-  void moreThanOneMaxDurationForATypeIsRejected() {
-    var root = newNodeAdapterForTest(
-      """
-      {
-        transfers: { walk: { maxDurations: [{ maxDuration: '10m' }, { maxDuration: '20m' }] } }
-      }
-      """
-    );
-
-    var ex = assertThrows(OtpAppException.class, () -> TransferProfilesConfigMapper.map(root));
-    assertThat(ex).hasMessageThat().contains("walk");
-  }
-
-  @Test
-  void allowedModesAreNotSupportedYet() {
-    var root = newNodeAdapterForTest(
+  void theMaxDurationIsNotInheritedFromAParentProfile() {
+    var subject = map(
       """
       {
         transfers: {
-          walk: { maxDurations: [{ maxDuration: '10m', allowedModes: ['CAR'] }] }
+          walk: { maxDuration: '45m', profiles: [{ id: "walk" }] },
+          bicycle: { maxDuration: '20m', profiles: [{ id: "bicycle", parent: "walk" }] }
         }
       }
       """
     );
 
-    var ex = assertThrows(OtpAppException.class, () -> TransferProfilesConfigMapper.map(root));
-    assertThat(ex).hasMessageThat().contains("allowedModes");
+    assertThat(subject.maxDurations(TransferProfileType.WALK).longestDuration()).isEqualTo(
+      Duration.ofMinutes(45)
+    );
+    assertThat(subject.maxDurations(TransferProfileType.BICYCLE).longestDuration()).isEqualTo(
+      Duration.ofMinutes(20)
+    );
+  }
+
+  @Test
+  void aBicycleHasLimitsForAllStopsBicycleStopsAndCarStops() {
+    var subject = map(
+      """
+      {
+        transfers: {
+          bicycle: {
+            profiles: [{ id: "bicycle" }],
+            maxDurationAllowAllModes: '20m',
+            maxDuration: '40m',
+            maxDurationAllowsCar: '60m'
+          }
+        }
+      }
+      """
+    );
+
+    assertThat(subject.maxDurations(TransferProfileType.BICYCLE)).isEqualTo(
+      new BicycleMaxDurations(
+        Duration.ofMinutes(20),
+        Duration.ofMinutes(40),
+        Duration.ofMinutes(60)
+      )
+    );
+  }
+
+  @Test
+  void aBicycleWithoutTheAllStopsLimitHasTransfersBetweenAllowedStopsOnly() {
+    var subject = map(
+      """
+      {
+        transfers: {
+          bicycle: { profiles: [{ id: "bicycle" }], maxDurationAllowsCar: '3h' }
+        }
+      }
+      """
+    );
+
+    assertThat(subject.maxDurations(TransferProfileType.BICYCLE)).isEqualTo(
+      new BicycleMaxDurations(null, null, Duration.ofHours(3))
+    );
+  }
+
+  @Test
+  void theBicycleLimitsOfAllowedStopsMustBeLongerThanTheLimitForAllStops() {
+    for (var parameter : List.of("maxDuration", "maxDurationAllowsCar")) {
+      var root = newNodeAdapterForTest(
+        "{ transfers: { bicycle: { maxDuration: '30m', profiles: [{ id: 'b' }], maxDurationAllowAllModes: '20m', " +
+          parameter +
+          ": '20m' } } }"
+      );
+
+      var ex = assertThrows(OtpAppException.class, () -> TransferProfilesConfigMapper.map(root));
+      assertThat(ex).hasMessageThat().contains(parameter);
+    }
+  }
+
+  @Test
+  void theBicycleLimitsOfAllowedStopsAreIndependent() {
+    var subject = map(
+      """
+      {
+        transfers: {
+          bicycle: {
+            profiles: [{ id: "bicycle" }],
+            maxDurationAllowAllModes: '10m',
+            maxDuration: '60m',
+            maxDurationAllowsCar: '30m'
+          }
+        }
+      }
+      """
+    );
+
+    assertThat(subject.maxDurations(TransferProfileType.BICYCLE)).isEqualTo(
+      new BicycleMaxDurations(
+        Duration.ofMinutes(10),
+        Duration.ofMinutes(60),
+        Duration.ofMinutes(30)
+      )
+    );
+  }
+
+  @Test
+  void theBicycleOnlyLimitsAreNotSupportedForOtherTypes() {
+    for (var parameter : List.of("maxDurationAllowAllModes", "maxDurationAllowsCar")) {
+      for (var type : List.of("walk", "wheelchair", "car")) {
+        var root = newNodeAdapterForTest(
+          "{ transfers: { " + type + ": { " + parameter + ": '40m' } } }"
+        );
+
+        var ex = assertThrows(OtpAppException.class, () -> TransferProfilesConfigMapper.map(root));
+        assertThat(ex).hasMessageThat().contains(parameter);
+        assertThat(ex).hasMessageThat().contains(type);
+      }
+    }
+  }
+
+  @Test
+  void theOldMaxDurationsListIsNotUsed() {
+    var subject = map("{ transfers: { walk: { maxDurations: [{ maxDuration: '45m' }] } } }");
+
+    assertThat(maxDuration(subject)).isEqualTo(Duration.ofMinutes(30));
+  }
+
+  @Test
+  void aCarHasTransfersBetweenStopsThatAllowCarsOnly() {
+    var subject = map(
+      "{ transfers: { car: { maxDuration: '30m', profiles: [{ id: 'car' }], maxDuration: '3h' } } }"
+    );
+
+    assertThat(subject.maxDurations(TransferProfileType.CAR)).isEqualTo(
+      new CarMaxDuration(Duration.ofHours(3))
+    );
   }
 
   @Test
@@ -601,13 +715,13 @@ class TransferProfilesConfigMapperTest {
       """
       {
         transfers: {
-          walk: { profiles: [{ id: "walk" }] },
-          wheelchair: {
+          walk: { maxDuration: '30m', profiles: [{ id: "walk" }] },
+          wheelchair: { maxDuration: '30m',
             profiles: [{
               id: "wheelchair",
               userPreferences: { speed: 0.9, reluctance: 4.0, stairs: "FORBIDDEN" }
             }],
-            maxDurations: [{ maxDuration: "45m" }]
+            maxDuration: "45m"
           }
         }
       }
@@ -624,10 +738,10 @@ class TransferProfilesConfigMapperTest {
         .withStairs(StreetSegmentTypeUsage.FORBIDDEN)
         .build()
     );
-    assertThat(subject.maxDurations(TransferProfileType.WHEELCHAIR).maxDuration()).isEqualTo(
+    assertThat(subject.maxDurations(TransferProfileType.WHEELCHAIR).longestDuration()).isEqualTo(
       Duration.ofMinutes(45)
     );
-    assertThat(subject.maxDurations(TransferProfileType.WALK).maxDuration()).isEqualTo(
+    assertThat(subject.maxDurations(TransferProfileType.WALK).longestDuration()).isEqualTo(
       Duration.ofMinutes(30)
     );
   }
@@ -638,13 +752,13 @@ class TransferProfilesConfigMapperTest {
       """
       {
         transfers: {
-          walk: {
+          walk: { maxDuration: '30m',
             profiles: [{
               id: "walk",
               userPreferences: { speed: 1.1, reluctance: 3.0, stairs: "DISCOURAGED" }
             }]
           },
-          wheelchair: {
+          wheelchair: { maxDuration: '30m',
             profiles: [{
               id: "wheelchair",
               parent: "walk",
@@ -668,8 +782,8 @@ class TransferProfilesConfigMapperTest {
       """
       {
         transfers: {
-          walk: { profiles: [{ id: "walk", parent: "wheelchair" }] },
-          wheelchair: { profiles: [{ id: "wheelchair" }] }
+          walk: { maxDuration: '30m', profiles: [{ id: "walk", parent: "wheelchair" }] },
+          wheelchair: { maxDuration: '30m', profiles: [{ id: "wheelchair" }] }
         }
       }
       """
@@ -691,8 +805,8 @@ class TransferProfilesConfigMapperTest {
         """
         {
           transfers: {
-            walk: { profiles: [{ id: "walk" }] },
-            wheelchair: {
+            walk: { maxDuration: '30m', profiles: [{ id: "walk" }] },
+            wheelchair: { maxDuration: '30m',
               profiles: [{ id: "wheelchair" }],
               warmup: [{ id: "w", parent: "walk", userPreferences: { speed: 1.0 } }]
             }
@@ -706,7 +820,9 @@ class TransferProfilesConfigMapperTest {
 
   @Test
   void noDefaultProfileIsAddedIfOnlyAWheelchairProfileIsConfigured() {
-    var subject = map("{ transfers: { wheelchair: { profiles: [{ id: \"wheelchair\" }] } } }");
+    var subject = map(
+      "{ transfers: { wheelchair: { maxDuration: '30m', profiles: [{ id: \"wheelchair\" }] } } }"
+    );
 
     assertThat(subject.profiles()).hasSize(1);
     assertThat(subject.profiles().getFirst().type()).isEqualTo(TransferProfileType.WHEELCHAIR);
@@ -718,13 +834,13 @@ class TransferProfilesConfigMapperTest {
       """
       {
         transfers: {
-          walk: { profiles: [{ id: "walk" }] },
-          bicycle: {
+          walk: { maxDuration: '30m', profiles: [{ id: "walk" }] },
+          bicycle: { maxDuration: '30m',
             profiles: [{
               id: "bicycle",
               userPreferences: { speed: 6.0, reluctance: 3.0, stairs: "DISCOURAGED" }
             }],
-            maxDurations: [{ maxDuration: "20m" }]
+            maxDuration: "20m"
           }
         }
       }
@@ -740,7 +856,7 @@ class TransferProfilesConfigMapperTest {
         .withStairs(StreetSegmentTypeUsage.DISCOURAGED)
         .build()
     );
-    assertThat(subject.maxDurations(TransferProfileType.BICYCLE).maxDuration()).isEqualTo(
+    assertThat(subject.maxDurations(TransferProfileType.BICYCLE).longestDuration()).isEqualTo(
       Duration.ofMinutes(20)
     );
   }
@@ -751,13 +867,13 @@ class TransferProfilesConfigMapperTest {
       """
       {
         transfers: {
-          walk: {
+          walk: { maxDuration: '30m',
             profiles: [{
               id: "walk",
               userPreferences: { speed: 1.1, reluctance: 3.0, stairs: "DISCOURAGED" }
             }]
           },
-          bicycle: {
+          bicycle: { maxDuration: '30m',
             profiles: [{
               id: "bicycle",
               parent: "walk",
@@ -781,10 +897,10 @@ class TransferProfilesConfigMapperTest {
       """
       {
         transfers: {
-          walk: { profiles: [{ id: "walk" }] },
-          car: {
+          walk: { maxDuration: '30m', profiles: [{ id: "walk" }] },
+          car: { maxDuration: '30m',
             profiles: [{ id: "car", userPreferences: { reluctance: 3.0 } }],
-            maxDurations: [{ maxDuration: "3h" }]
+            maxDuration: "3h"
           }
         }
       }
@@ -796,21 +912,21 @@ class TransferProfilesConfigMapperTest {
     assertThat(car.userPreferences()).isEqualTo(
       CarPreferences.of().withReluctance(Reluctance.of(3.0)).build()
     );
-    assertThat(subject.maxDurations(TransferProfileType.CAR).maxDuration()).isEqualTo(
+    assertThat(subject.maxDurations(TransferProfileType.CAR).longestDuration()).isEqualTo(
       Duration.ofHours(3)
     );
   }
 
-  private static TransferProfilesParameters<RouteRequest> map(String json) {
+  private static TransferParameters<RouteRequest> map(String json) {
     return TransferProfilesConfigMapper.map(newNodeAdapterForTest(json));
   }
 
-  private static Duration maxDuration(TransferProfilesParameters<RouteRequest> parameters) {
-    return parameters.maxDurations(TransferProfileType.WALK).maxDuration();
+  private static Duration maxDuration(TransferParameters<RouteRequest> parameters) {
+    return parameters.maxDurations(TransferProfileType.WALK).longestDuration();
   }
 
-  private static TransferProfileParameters<RouteRequest> profile(
-    TransferProfilesParameters<RouteRequest> parameters,
+  private static TransferProfile<RouteRequest> profile(
+    TransferParameters<RouteRequest> parameters,
     String id
   ) {
     return parameters

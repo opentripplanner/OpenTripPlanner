@@ -17,7 +17,8 @@ import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.EdgeTraverser;
 import org.opentripplanner.street.search.state.StateEditor;
 import org.opentripplanner.streetadapter.StreetSearchRequestMapper;
-import org.opentripplanner.transit.transfer.regular.api.parameters.MaxDurationsPreference;
+import org.opentripplanner.transit.transfer.regular.api.maxduration.MaxDurationsPreference;
+import org.opentripplanner.transit.transfer.regular.spi.AllowedModesLookup;
 import org.opentripplanner.transit.transfer.regular.spi.PathCriteria;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPath;
 import org.opentripplanner.transit.transfer.regular.spi.TransferSearch;
@@ -32,8 +33,11 @@ import org.opentripplanner.transit.transfer.regular.spi.TransferSearch;
  * {@link EdgeTraverser#traverseEdges}, or estimates its duration from distance and speed when it
  * has no edges, like {@code PathTransfer.asRaptorTransfer}.
  * <p>
- * The max duration of the profile type bounds the street search that discovers the transfers, see
- * {@link TransferSearch#findNearbyStops}. Re-costing a path is not limited.
+ * The max durations of the profile type bound the street search that discovers the transfers, see
+ * {@link TransferSearch#findNearbyStops}: the street search from a stop is limited by the longest
+ * duration that applies to the stop, and the paths found are dropped if they are too long for the
+ * two stops they connect. There is no street search from a stop without transfers. Re-costing a
+ * path is not limited.
  */
 final class DefaultTransferSearch implements TransferSearch<NearbyStop> {
 
@@ -42,22 +46,33 @@ final class DefaultTransferSearch implements TransferSearch<NearbyStop> {
   private final Graph graph;
   private final NearbyStopFinder nearbyStopFinder;
   private final Predicate<FeedScopedId> isTransferSource;
+  private final Predicate<FeedScopedId> isTransferTarget;
+  private final AllowedModesLookup allowedModes;
   private final RouteRequest routeRequest;
   private final StreetSearchRequest streetSearchRequest;
 
   /**
    * @param isTransferSource only the stops accepted by this predicate have transfers from them, no
    *                         paths are found for the others.
+   * @param isTransferTarget only the stops accepted by this predicate have transfers to them, the
+   *                         paths to the others are dropped.
+   * @param allowedModes     the modes the stops are allowed for, used to find the max duration of
+   *                         the transfers from a stop and of each transfer, see
+   *                         {@link MaxDurationsPreference}
    */
   DefaultTransferSearch(
     Graph graph,
     NearbyStopFinder nearbyStopFinder,
     Predicate<FeedScopedId> isTransferSource,
+    Predicate<FeedScopedId> isTransferTarget,
+    AllowedModesLookup allowedModes,
     RouteRequest routeRequest
   ) {
     this.graph = graph;
     this.nearbyStopFinder = nearbyStopFinder;
     this.isTransferSource = isTransferSource;
+    this.isTransferTarget = isTransferTarget;
+    this.allowedModes = allowedModes;
     this.routeRequest = routeRequest;
     this.streetSearchRequest = streetSearchRequest(routeRequest);
   }
@@ -70,6 +85,13 @@ final class DefaultTransferSearch implements TransferSearch<NearbyStop> {
     if (!isTransferSource.test(fromStop)) {
       return List.of();
     }
+    // Check the stop before the street search, there may be no transfers from the stop at all, for
+    // example, there are no car transfers from a stop that does not allow cars.
+    var modesAtSource = allowedModes.modesAt(fromStop);
+    var searchLimit = maxDurations.searchLimit(modesAtSource);
+    if (searchLimit.isEmpty()) {
+      return List.of();
+    }
     TransitStopVertex vertex = graph.getStopVertex(fromStop);
     if (vertex == null) {
       return List.of();
@@ -79,17 +101,24 @@ final class DefaultTransferSearch implements TransferSearch<NearbyStop> {
       routeRequest,
       mode(routeRequest),
       false,
-      maxDurations.maxDuration(),
+      searchLimit.get(),
       NO_STOP_COUNT_LIMIT
     );
     return nearbyStops
       .stream()
       .filter(nearbyStop -> !nearbyStop.stopId().equals(fromStop))
+      .filter(nearbyStop -> isTransferTarget.test(nearbyStop.stopId()))
       .map(DefaultTransferSearch::stripState)
       .<TransferPath<NearbyStop>>mapMulti((path, consumer) ->
-        computePathCriteria(path).ifPresent(criteria ->
-          consumer.accept(new TransferPath<>(path.stopId(), path, criteria))
-        )
+        computePathCriteria(path)
+          .filter(criteria ->
+            maxDurations.accepts(
+              criteria.durationInSeconds(),
+              modesAtSource,
+              allowedModes.modesAt(path.stopId())
+            )
+          )
+          .ifPresent(criteria -> consumer.accept(new TransferPath<>(path.stopId(), path, criteria)))
       )
       .toList();
   }

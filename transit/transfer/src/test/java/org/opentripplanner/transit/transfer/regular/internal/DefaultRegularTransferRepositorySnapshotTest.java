@@ -20,11 +20,11 @@ import org.opentripplanner.transit.transfer.regular.FakeRequestMapper;
 import org.opentripplanner.transit.transfer.regular.FakeTransferPathProvider;
 import org.opentripplanner.transit.transfer.regular.FakeTransferPathProvider.FakePath;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
+import org.opentripplanner.transit.transfer.regular.api.maxduration.MaxDurationsPreference;
 import org.opentripplanner.transit.transfer.regular.api.parameters.DeduplicationLimit;
-import org.opentripplanner.transit.transfer.regular.api.parameters.MaxDurationsPreference;
-import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileParameters;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferParameters;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfile;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
-import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfilesParameters;
 import org.opentripplanner.transit.transfer.regular.api.parameters.WarmupParameters;
 import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
@@ -68,8 +68,8 @@ class DefaultRegularTransferRepositorySnapshotTest {
     lifecycle = new RegularTransferRepositoryLifecycle<>(
       provider,
       FakeRequestMapper.INSTANCE,
-      new TransferProfilesParameters<>(
-        List.of(new TransferProfileParameters<>("walk", TransferProfileType.WALK, PROFILE, PROFILE))
+      new TransferParameters<>(
+        List.of(new TransferProfile<>("walk", TransferProfileType.WALK, PROFILE, PROFILE))
       ),
       stopIndex().size()
     );
@@ -108,8 +108,8 @@ class DefaultRegularTransferRepositorySnapshotTest {
     var lifecycle = new RegularTransferRepositoryLifecycle<>(
       provider,
       mapper,
-      new TransferProfilesParameters<>(
-        List.of(new TransferProfileParameters<>("walk", TransferProfileType.WALK, PROFILE, PROFILE))
+      new TransferParameters<>(
+        List.of(new TransferProfile<>("walk", TransferProfileType.WALK, PROFILE, PROFILE))
       ),
       stopIndex().size()
     );
@@ -143,13 +143,12 @@ class DefaultRegularTransferRepositorySnapshotTest {
     var lifecycle = new RegularTransferRepositoryLifecycle<>(
       provider,
       FakeRequestMapper.INSTANCE,
-      new TransferProfilesParameters<>(
+      new TransferParameters<>(
         List.of(
-          new TransferProfileParameters<>("near", TransferProfileType.WALK, near, near),
-          new TransferProfileParameters<>("far", TransferProfileType.WALK, far, far)
+          new TransferProfile<>("near", TransferProfileType.WALK, near, near),
+          new TransferProfile<>("far", TransferProfileType.WALK, far, far)
         ),
-        MaxDurationsPreference.DEFAULT,
-        Map.of(),
+        Map.of(TransferProfileType.WALK, MaxDurationsPreference.DEFAULT),
         DeduplicationLimit.DEFAULT,
         warmup
       ),

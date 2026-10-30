@@ -2,6 +2,7 @@ package org.opentripplanner.transfer.configure;
 
 import java.util.List;
 import javax.annotation.Nullable;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.transaction.RepositoryHandle;
 import org.opentripplanner.core.model.transaction.RepositoryRegistry;
 import org.opentripplanner.ext.flex.FlexIndex;
@@ -17,10 +18,11 @@ import org.opentripplanner.transit.transfer.regular.RegularTransferBuildReposito
 import org.opentripplanner.transit.transfer.regular.RegularTransferGenerator;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
-import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileParameters;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferParameters;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfile;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
-import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfilesParameters;
 import org.opentripplanner.transit.transfer.regular.configure.RegularTransferFactory;
+import org.opentripplanner.transit.transfer.regular.spi.AllowedModesLookup;
 
 /**
  * Connects the regular-transfer module to the street graph: creates the module's generator and
@@ -34,15 +36,10 @@ public final class StreetTransferFactory {
   private StreetTransferFactory() {}
 
   /** The profiles used if none are configured: a single default walk profile. */
-  public static TransferProfilesParameters<RouteRequest> defaultParameters() {
-    return new TransferProfilesParameters<>(
+  public static TransferParameters<RouteRequest> defaultParameters() {
+    return new TransferParameters<>(
       List.of(
-        new TransferProfileParameters<>(
-          "walk",
-          TransferProfileType.WALK,
-          null,
-          RouteRequest.defaultValue()
-        )
+        new TransferProfile<>("walk", TransferProfileType.WALK, null, RouteRequest.defaultValue())
       )
     );
   }
@@ -55,15 +52,18 @@ public final class StreetTransferFactory {
    *                     have transfers from them, and with the feature
    *                     {@code ConsiderPatternsForDirectTransfers} only the closest stop of each
    *                     pattern is a transfer to
+   * @param allowedModes the modes the stops are allowed for, to select the max duration of the
+   *                     transfers, see {@code MaxDurationsPreference}
    * @param flexIndex    the flex trips to consider when the transfer stops are found, or
    *                     {@code null} to ignore flex trips
    */
   public static RegularTransferGenerator createGenerator(
     Graph graph,
     TransitRepository transitRepository,
-    TransferProfilesParameters<RouteRequest> parameters,
+    TransferParameters<RouteRequest> parameters,
     RegularTransferBuildRepository<NearbyStop> buildRepository,
     StopsVisitedByPatterns stopPatterns,
+    AllowedModesLookup allowedModes,
     @Nullable FlexIndex flexIndex
   ) {
     return RegularTransferFactory.createTransferGenerator(
@@ -77,7 +77,9 @@ public final class StreetTransferFactory {
           stopPatterns,
           flexIndex
         ),
-        stopPatterns::contains
+        stopId -> stopPatterns.contains(stopId) && transfersAllowed(transitRepository, stopId),
+        stopId -> transfersAllowed(transitRepository, stopId),
+        allowedModes
       ),
       new RegularTransferPreferencesMapper(),
       buildRepository
@@ -98,7 +100,7 @@ public final class StreetTransferFactory {
   > registerRepository(
     RepositoryRegistry repositoryRegistry,
     RegularTransferBuildRepository<NearbyStop> buildRepository,
-    TransferProfilesParameters<RouteRequest> parameters,
+    TransferParameters<RouteRequest> parameters,
     Graph graph,
     TransitRepository transitRepository
   ) {
@@ -121,5 +123,14 @@ public final class StreetTransferFactory {
       graph,
       StreetTransferPathProvider.createNearbyStopFinder(graph, transitRepository)
     );
+  }
+
+  /** A stop of a station that does not allow transfers has no transfers from or to it. */
+  private static boolean transfersAllowed(
+    TransitRepository transitRepository,
+    FeedScopedId stopId
+  ) {
+    var stop = transitRepository.getSiteRepository().getStopLocation(stopId);
+    return stop != null && !stop.transfersNotAllowed();
   }
 }

@@ -6,8 +6,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import org.opentripplanner.transit.transfer.regular.api.parameters.DeduplicationLimit;
-import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileParameters;
-import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfilesParameters;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferParameters;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfile;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
 import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
 import org.opentripplanner.utils.collection.ParentOrder;
@@ -18,13 +18,13 @@ import org.opentripplanner.utils.collection.ParentOrder;
  * @param <P> the street path type
  * @param <R> the request type
  */
-final class TransferProfiles<P, R> implements Iterable<TransferProfile<P, R>> {
+final class TransferProfiles<P, R> implements Iterable<TransferProfileState<P, R>> {
 
-  private final List<TransferProfile<P, R>> profiles;
+  private final List<TransferProfileState<P, R>> profiles;
   private final DeduplicationLimit deduplicationLimit;
 
   private TransferProfiles(
-    Collection<TransferProfile<P, R>> profiles,
+    Collection<TransferProfileState<P, R>> profiles,
     DeduplicationLimit deduplicationLimit
   ) {
     this.profiles = List.copyOf(profiles);
@@ -32,7 +32,7 @@ final class TransferProfiles<P, R> implements Iterable<TransferProfile<P, R>> {
   }
 
   /** The profiles in the given order, with the default deduplication limit. */
-  static <P, R> TransferProfiles<P, R> of(Collection<TransferProfile<P, R>> profiles) {
+  static <P, R> TransferProfiles<P, R> of(Collection<TransferProfileState<P, R>> profiles) {
     return new TransferProfiles<>(profiles, DeduplicationLimit.DEFAULT);
   }
 
@@ -41,20 +41,20 @@ final class TransferProfiles<P, R> implements Iterable<TransferProfile<P, R>> {
    * before its children, and the order is the declared order otherwise.
    */
   static <P, R> TransferProfiles<P, R> of(
-    TransferProfilesParameters<R> parameters,
+    TransferParameters<R> parameters,
     TransferPathProvider<P, R> pathProvider,
     TransferRequestMapper<R> mapper
   ) {
     // Reject profiles with equal user preferences
     ProfileUserPreferences.resolveAll(parameters, mapper);
-    var byId = new HashMap<String, TransferProfile<P, R>>();
-    var result = new ArrayList<TransferProfile<P, R>>();
+    var byId = new HashMap<String, TransferProfileState<P, R>>();
+    var result = new ArrayList<TransferProfileState<P, R>>();
     for (var p : ParentOrder.parentsFirst(
       parameters.profiles(),
-      TransferProfileParameters::id,
-      TransferProfileParameters::parent
+      TransferProfile::id,
+      TransferProfile::parent
     )) {
-      var profile = new TransferProfile<>(
+      var profile = new TransferProfileState<>(
         p,
         parameters.maxDurations(p.type()),
         p.parent() == null ? null : byId.get(p.parent()),
@@ -77,7 +77,7 @@ final class TransferProfiles<P, R> implements Iterable<TransferProfile<P, R>> {
   }
 
   @Override
-  public Iterator<TransferProfile<P, R>> iterator() {
+  public Iterator<TransferProfileState<P, R>> iterator() {
     return profiles.iterator();
   }
 }

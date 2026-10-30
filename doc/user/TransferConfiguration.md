@@ -57,7 +57,6 @@ transfers the profile and its parent have in common are stored once, which saves
 // build-config.json
 {
   "transfers": {
-    "defaultMaxDuration": "30m",
     "deduplicationLimit": "0.005x + 30s",
     "walk": {
       "profiles": [
@@ -71,7 +70,7 @@ transfers the profile and its parent have in common are stored once, which saves
           "userPreferences": { "speed": 0.9, "reluctance": 4.0, "stairs": "DISCOURAGED" }
         }
       ],
-      "maxDurations": [{ "maxDuration": "40m" }],
+      "maxDuration": "40m",
       "warmup": [
         {
           "id": "avoid-walking",
@@ -85,28 +84,28 @@ transfers the profile and its parent have in common are stored once, which saves
 ```
 
 If the `transfers` section is left out, a single `walk` profile with the preferences of the default
-request and a max duration of 30 minutes is used.
+request and a max duration of 30 minutes is used. Each profile type with profiles must set its
+`maxDuration`, there is no default.
 
 ## Parameters
 
 | Parameter                     | Type       | Description                                                                         | Default           |
 |-------------------------------|------------|-------------------------------------------------------------------------------------|-------------------|
-| `defaultMaxDuration`          | `duration` | The max duration of all profile types that do not have `maxDurations`.              | `"30m"`           |
 | `deduplicationLimit`          | `string`   | How much more the path of a parent may cost to be used by a child. See below.       | `"0.005x + 30s"`  |
 | `walk.profiles`               | `object[]` | The walk profiles. If none is configured, one with the id `walk` is used.           |                   |
 | &nbsp;&nbsp;`id`              | `string`   | **Required.** The id of the profile, unique among all profiles.                     |                   |
 | &nbsp;&nbsp;`parent`          | `string`   | The `id` of the profile this profile is based on. See below.                        |                   |
 | &nbsp;&nbsp;`userPreferences` | `object`   | The preferences the profile is searched with. See below.                            |                   |
 | &nbsp;&nbsp;`routingRequest`  | `object`   | A [routing request](RouteRequest.md) the search is based on. See below.             |                   |
-| `walk.maxDurations`           | `object[]` | The max duration of the walk transfers. One entry. See below.                       |                   |
-| &nbsp;&nbsp;`maxDuration`     | `duration` | **Required** in the entry. How far from a stop the transfers are searched.          |                   |
+| `walk.maxDuration`            | `duration` | **Required** if there are walk profiles. How far from a stop the walk transfers are searched. See below. |                   |
 | `walk.warmup`                 | `object[]` | Preferences to create transfers for when the server starts. See below.              |                   |
 | &nbsp;&nbsp;`id`              | `string`   | **Required.** The id of the entry, unique among all profiles and warmup entries.    |                   |
 | &nbsp;&nbsp;`parent`          | `string`   | **Required.** The `id` of a profile of the same type the transfers are created from.|                   |
 | &nbsp;&nbsp;`userPreferences` | `object`   | **Required.** The preferences to warm up. Unset values are the ones of the parent.  |                   |
 
 The `wheelchair`, `bicycle` and `car` blocks have the same parameters as the `walk` block, for
-example `wheelchair.profiles`, `bicycle.maxDurations` and `car.warmup`.
+example `wheelchair.profiles`, `wheelchair.maxDuration` and `car.warmup`. The `bicycle` block has
+two more parameters, see [Max durations](#max-durations).
 
 ### User preferences
 
@@ -204,26 +203,75 @@ number of warmup entries and profiles may drop the first ones.
 
 The max duration is how far from a stop the transfers are searched when the graph is built, measured
 with the user preferences of the profile. A longer duration finds more transfers and makes the graph
-larger and slower to build. There is one configuration for each profile type, and it is shared by all
-the profiles of the type. It replaces `defaultMaxDuration` for the type:
+larger and slower to build. There is one `maxDuration` for each profile type, and it is shared by
+all the profiles of the type. It is required for each type with profiles, and it is not inherited
+from another type or from a parent profile. There is no default, except the 30 minutes of the
+implicit `walk` profile when the `transfers` section is left out:
 
 ```json
-"walk": { "maxDurations": [{ "maxDuration": "40m" }] }
+"walk": { "maxDuration": "40m" }
 ```
+
+`maxDuration` is the duration between the stops the mode can use:
+
+| Type                  | `maxDuration` is the max duration between          |
+|-----------------------|----------------------------------------------------|
+| `walk`, `wheelchair`  | all stops                                          |
+| `bicycle`             | stops that allow bicycles                          |
+| `car`                 | stops that allow cars                              |
+
+The wheelchair is treated as walking for now. A stop allows bicycles or cars if a trip that allows
+them visits the stop, for example a ferry. Both stops of a transfer must allow the mode.
+
+A bicycle can cover a much longer distance than a walker, so the `bicycle` type has two more
+parameters, and all three are independent of each other. The longest limit that applies to a
+transfer is used:
+
+| Parameter                            | Type       | Description                                                       |
+|--------------------------------------|------------|-------------------------------------------------------------------|
+| `bicycle.maxDurationAllowAllModes`   | `duration` | The max duration between all stops. Shorter than the two others.  |
+| `bicycle.maxDuration`                | `duration` | The max duration between stops that allow bicycles.               |
+| `bicycle.maxDurationAllowsCar`       | `duration` | The max duration between stops that allow cars.                   |
+
+At least one of them is required. `maxDurationAllowAllModes` must be shorter than `maxDuration` and
+`maxDurationAllowsCar`, if they are set. If `maxDurationAllowAllModes` is left out, there are only
+transfers between the stops that allow bicycles or cars:
+
+```json
+"bicycle": {
+  "maxDurationAllowAllModes": "20m",
+  "maxDuration": "45m",
+  "maxDurationAllowsCar": "2h"
+}
+```
+
+The `car` type only has transfers between stops that allow cars, and none from or to other stops.
+No search is made from the other stops, which makes the graph faster to build:
+
+```json
+"car": { "maxDuration": "3h" }
+```
+
+A car reaches a lot of stops in a short time, so a car search from all stops does not work, even
+for small deployments. If there are too many stops that allow cars, fix the data, or let the OTP
+developers know the use case.
 
 The max duration only limits the search. A stored transfer is never dropped when it is
 re-calculated for a routing request, even if the request walks slower than the profile.
 
+Stops of a station that does not allow transfers have no transfers from or to them.
+
 !!! note
 
-    The old `maxTransferDuration` is not used by the `transfers` configuration. Use
-    `defaultMaxDuration` or `maxDurations`.
+    The old `maxTransferDuration` is not used by the `transfers` configuration, use `maxDuration`.
+    The old per mode `transferParametersForMode` is replaced by the profile types:
+    `carsAllowedStopMaxTransferDuration` of the `CAR` mode is the `car` type, and the
+    `bicycle` type has `maxDurationAllowsCar` and `maxDuration` (the old
+    `bikesAllowedStopMaxTransferDuration`). The `disableDefaultTransfers` is replaced by leaving out
+    `bicycle.maxDurationAllowAllModes`. The wheelchair no longer shares the walk max duration, set
+    `wheelchair.maxDuration` too.
 
 ## What is not supported yet
-
-These parameters are reserved for later. OTP stops with an error if they are used:
-
-- `allowedModes` in `maxDurations`, to give stops that car or bicycle can use a longer duration.
 
 The profile type `scooter` is not read yet. It is reported as an unexpected parameter.
 

@@ -12,11 +12,11 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.raptor.data.stop.RaptorStopIndex;
 import org.opentripplanner.transit.transfer.regular.FakeRequestMapper;
 import org.opentripplanner.transit.transfer.regular.FakeTransferPathProvider;
+import org.opentripplanner.transit.transfer.regular.api.maxduration.MaxDurationsPreference;
 import org.opentripplanner.transit.transfer.regular.api.parameters.DeduplicationLimit;
-import org.opentripplanner.transit.transfer.regular.api.parameters.MaxDurationsPreference;
-import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileParameters;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferParameters;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfile;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
-import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfilesParameters;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 
 class DefaultRegularTransferGeneratorTest {
@@ -29,20 +29,19 @@ class DefaultRegularTransferGeneratorTest {
     return TestStopIndex.of(A, B, C);
   }
 
-  private static TransferProfilesParameters<WalkPreferences> parameters(WalkPreferences walk) {
-    return new TransferProfilesParameters<>(
-      List.of(new TransferProfileParameters<>("walk", TransferProfileType.WALK, walk, walk))
+  private static TransferParameters<WalkPreferences> parameters(WalkPreferences walk) {
+    return new TransferParameters<>(
+      List.of(new TransferProfile<>("walk", TransferProfileType.WALK, walk, walk))
     );
   }
 
-  private static TransferProfilesParameters<WalkPreferences> parameters(
+  private static TransferParameters<WalkPreferences> parameters(
     WalkPreferences walk,
     Duration maxDuration
   ) {
-    return new TransferProfilesParameters<>(
-      List.of(new TransferProfileParameters<>("walk", TransferProfileType.WALK, walk, walk)),
-      MaxDurationsPreference.of(maxDuration),
-      Map.of()
+    return new TransferParameters<>(
+      List.of(new TransferProfile<>("walk", TransferProfileType.WALK, walk, walk)),
+      Map.of(TransferProfileType.WALK, MaxDurationsPreference.of(maxDuration))
     );
   }
 
@@ -193,7 +192,7 @@ class DefaultRegularTransferGeneratorTest {
 
     /** The path from A to B found for the preferences, after the transfers are generated. */
     FakeTransferPathProvider.FakePath generateAndFindPath(
-      List<TransferProfileParameters<WalkPreferences>> profiles,
+      List<TransferProfile<WalkPreferences>> profiles,
       DeduplicationLimit limit,
       WalkPreferences forPreferences
     ) {
@@ -202,7 +201,11 @@ class DefaultRegularTransferGeneratorTest {
         new DefaultRegularTransferBuildRepository<FakeTransferPathProvider.FakePath>();
       new DefaultRegularTransferGenerator<>(
         stopIndex,
-        new TransferProfilesParameters<>(profiles, MaxDurationsPreference.DEFAULT, Map.of(), limit),
+        new TransferParameters<>(
+          profiles,
+          Map.of(TransferProfileType.WALK, MaxDurationsPreference.DEFAULT),
+          limit
+        ),
         provider,
         FakeRequestMapper.INSTANCE,
         buildRepository
@@ -212,24 +215,12 @@ class DefaultRegularTransferGeneratorTest {
         .findPath(stopIndex.toStopIndex(A), stopIndex.toStopIndex(B));
     }
 
-    TransferProfileParameters<WalkPreferences> parentProfile() {
-      return new TransferProfileParameters<>(
-        "parent",
-        TransferProfileType.WALK,
-        null,
-        parent,
-        parent
-      );
+    TransferProfile<WalkPreferences> parentProfile() {
+      return new TransferProfile<>("parent", TransferProfileType.WALK, null, parent, parent);
     }
 
-    TransferProfileParameters<WalkPreferences> childProfile(String parentId) {
-      return new TransferProfileParameters<>(
-        "child",
-        TransferProfileType.WALK,
-        parentId,
-        child,
-        child
-      );
+    TransferProfile<WalkPreferences> childProfile(String parentId) {
+      return new TransferProfile<>("child", TransferProfileType.WALK, parentId, child, child);
     }
   }
 

@@ -11,11 +11,11 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.transit.transfer.regular.FakeRequestMapper;
 import org.opentripplanner.transit.transfer.regular.FakeTransferPathProvider;
+import org.opentripplanner.transit.transfer.regular.api.maxduration.MaxDurationsPreference;
 import org.opentripplanner.transit.transfer.regular.api.parameters.DeduplicationLimit;
-import org.opentripplanner.transit.transfer.regular.api.parameters.MaxDurationsPreference;
-import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileParameters;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferParameters;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfile;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
-import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfilesParameters;
 import org.opentripplanner.transit.transfer.regular.api.parameters.WarmupParameters;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 
@@ -23,8 +23,8 @@ class TransferProfilesTest {
 
   @Test
   void ofWrapsTheGivenProfilesPreservingOrder() {
-    var walk = new TransferProfile<>(
-      new TransferProfileParameters<>(
+    var walk = new TransferProfileState<>(
+      new TransferProfile<>(
         "walk",
         TransferProfileType.WALK,
         WalkPreferences.DEFAULT,
@@ -43,8 +43,8 @@ class TransferProfilesTest {
   @Test
   void aProfileWithoutUserPreferencesGetsThemFromItsRoutingRequest() {
     var request = WalkPreferences.of().withReluctance(Reluctance.of(7.0)).build();
-    var parameters = new TransferProfilesParameters<>(
-      List.of(new TransferProfileParameters<>("derived", TransferProfileType.WALK, null, request))
+    var parameters = new TransferParameters<>(
+      List.of(new TransferProfile<>("derived", TransferProfileType.WALK, null, request))
     );
 
     var profiles = TransferProfiles.of(
@@ -60,21 +60,16 @@ class TransferProfilesTest {
 
   @Test
   void profilesWithEqualUserPreferencesAreRejectedAndNamed() {
-    var parameters = new TransferProfilesParameters<>(
+    var parameters = new TransferParameters<>(
       List.of(
-        new TransferProfileParameters<>(
+        new TransferProfile<>(
           "a",
           TransferProfileType.WALK,
           WalkPreferences.DEFAULT,
           WalkPreferences.DEFAULT
         ),
         // No preferences of its own: they come from the request, which equals the default
-        new TransferProfileParameters<>(
-          "b",
-          TransferProfileType.WALK,
-          null,
-          WalkPreferences.DEFAULT
-        )
+        new TransferProfile<>("b", TransferProfileType.WALK, null, WalkPreferences.DEFAULT)
       )
     );
 
@@ -87,8 +82,8 @@ class TransferProfilesTest {
 
   @Test
   void theProfileKeepsItsId() {
-    var walk = new TransferProfile<>(
-      new TransferProfileParameters<>(
+    var walk = new TransferProfileState<>(
+      new TransferProfile<>(
         "my-walk",
         TransferProfileType.WALK,
         WalkPreferences.DEFAULT,
@@ -105,23 +100,23 @@ class TransferProfilesTest {
 
   @Test
   void aParentIsBeforeItsChildrenWhateverTheDeclaredOrder() {
-    var parameters = new TransferProfilesParameters<>(
+    var parameters = new TransferParameters<>(
       List.of(
-        new TransferProfileParameters<>(
+        new TransferProfile<>(
           "child",
           TransferProfileType.WALK,
           "parent",
           withReluctance(3.0),
           withReluctance(3.0)
         ),
-        new TransferProfileParameters<>(
+        new TransferProfile<>(
           "other",
           TransferProfileType.WALK,
           null,
           withReluctance(4.0),
           withReluctance(4.0)
         ),
-        new TransferProfileParameters<>(
+        new TransferProfile<>(
           "parent",
           TransferProfileType.WALK,
           null,
@@ -144,16 +139,16 @@ class TransferProfilesTest {
 
   @Test
   void aChildKnowsItsParent() {
-    var parameters = new TransferProfilesParameters<>(
+    var parameters = new TransferParameters<>(
       List.of(
-        new TransferProfileParameters<>(
+        new TransferProfile<>(
           "parent",
           TransferProfileType.WALK,
           null,
           withReluctance(2.0),
           withReluctance(2.0)
         ),
-        new TransferProfileParameters<>(
+        new TransferProfile<>(
           "child",
           TransferProfileType.WALK,
           "parent",
@@ -169,7 +164,7 @@ class TransferProfilesTest {
       FakeRequestMapper.INSTANCE
     );
 
-    var byId = new HashMap<String, TransferProfile<?, ?>>();
+    var byId = new HashMap<String, TransferProfileState<?, ?>>();
     profiles.forEach(p -> byId.put(p.id(), p));
     assertThat(byId.get("child").parent()).isSameInstanceAs(byId.get("parent"));
     assertThat(byId.get("parent").parent()).isNull();
@@ -181,17 +176,16 @@ class TransferProfilesTest {
 
   @Test
   void aWarmupEntryWithTheUserPreferencesOfAProfileIsRejectedAndNamed() {
-    var parameters = new TransferProfilesParameters<>(
+    var parameters = new TransferParameters<>(
       List.of(
-        new TransferProfileParameters<>(
+        new TransferProfile<>(
           "walk",
           TransferProfileType.WALK,
           withReluctance(2.0),
           withReluctance(2.0)
         )
       ),
-      MaxDurationsPreference.DEFAULT,
-      Map.of(),
+      Map.of(TransferProfileType.WALK, MaxDurationsPreference.DEFAULT),
       DeduplicationLimit.DEFAULT,
       List.of(new WarmupParameters("same", "walk", withReluctance(2.0)))
     );
@@ -205,17 +199,16 @@ class TransferProfilesTest {
 
   @Test
   void warmupEntriesWithTheSameUserPreferencesAreRejected() {
-    var parameters = new TransferProfilesParameters<>(
+    var parameters = new TransferParameters<>(
       List.of(
-        new TransferProfileParameters<>(
+        new TransferProfile<>(
           "walk",
           TransferProfileType.WALK,
           withReluctance(2.0),
           withReluctance(2.0)
         )
       ),
-      MaxDurationsPreference.DEFAULT,
-      Map.of(),
+      Map.of(TransferProfileType.WALK, MaxDurationsPreference.DEFAULT),
       DeduplicationLimit.DEFAULT,
       List.of(
         new WarmupParameters("a", "walk", withReluctance(5.0)),

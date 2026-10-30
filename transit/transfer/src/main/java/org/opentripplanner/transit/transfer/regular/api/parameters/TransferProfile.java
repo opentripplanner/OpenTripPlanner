@@ -24,14 +24,14 @@ import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUser
  * @param routingRequest  the request the street search of the profile is based on
  * @param <R>             the request type, opaque to the module
  */
-public record TransferProfileParameters<R>(
+public record TransferProfile<R>(
   String id,
   TransferProfileType type,
   @Nullable String parent,
   @Nullable AbstractUserPreferences<?> userPreferences,
   R routingRequest
 ) {
-  public TransferProfileParameters {
+  public TransferProfile {
     Objects.requireNonNull(id);
     Objects.requireNonNull(type);
     if (id.isBlank()) {
@@ -54,7 +54,7 @@ public record TransferProfileParameters<R>(
   }
 
   /** A profile without a parent. */
-  public TransferProfileParameters(
+  public TransferProfile(
     String id,
     TransferProfileType type,
     @Nullable AbstractUserPreferences<?> userPreferences,

@@ -60,6 +60,7 @@ import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.transfer.configure.StreetTransferFactory;
 import org.opentripplanner.transfer.dataimport.FlexTransferGenerator;
 import org.opentripplanner.transfer.dataimport.RegularTransitTransferGenerator;
+import org.opentripplanner.transfer.dataimport.StopsAllowedForModes;
 import org.opentripplanner.transfer.dataimport.StopsVisitedByPatterns;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
@@ -334,6 +335,7 @@ public class GraphBuilderModules {
     Graph graph,
     TransitRepository transitRepository,
     StopsVisitedByPatterns stopsVisitedByPatterns,
+    StopsAllowedForModes stopsAllowedForModes,
     TimetableDataImport timetableDataImport,
     RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository
   ) {
@@ -347,6 +349,7 @@ public class GraphBuilderModules {
       config.transferProfiles(),
       regularTransferBuildRepository,
       stopsVisitedByPatterns,
+      stopsAllowedForModes,
       flexIndex
     );
   }
@@ -357,6 +360,15 @@ public class GraphBuilderModules {
     TimetableDataImport timetableDataImport
   ) {
     return new StopsVisitedByPatterns(timetableDataImport);
+  }
+
+  @Provides
+  @Singleton
+  static StopsAllowedForModes provideStopsAllowedForModes(
+    TimetableDataImport timetableDataImport,
+    StopsVisitedByPatterns stopsVisitedByPatterns
+  ) {
+    return new StopsAllowedForModes(timetableDataImport, stopsVisitedByPatterns);
   }
 
   @Provides

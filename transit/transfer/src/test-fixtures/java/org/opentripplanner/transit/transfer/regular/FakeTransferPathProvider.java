@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.transit.transfer.regular.api.parameters.MaxDurationsPreference;
+import org.opentripplanner.transit.transfer.regular.api.maxduration.MaxDurationsPreference;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.spi.PathCriteria;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPath;
@@ -57,7 +57,7 @@ public class FakeTransferPathProvider
         return byStop
           .getOrDefault(fromStop, List.of())
           .stream()
-          .filter(p -> p.baseDurationSeconds() <= maxDurations.maxDuration().toSeconds())
+          .filter(p -> p.baseDurationSeconds() <= maxDurations.longestDuration().toSeconds())
           .<TransferPath<FakePath>>mapMulti((p, consumer) ->
             computePathCriteria(p).ifPresent(criteria ->
               consumer.accept(new TransferPath<>(p.to(), p, criteria))

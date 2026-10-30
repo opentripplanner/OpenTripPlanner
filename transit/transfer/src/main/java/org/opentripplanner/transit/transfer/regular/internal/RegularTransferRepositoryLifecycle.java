@@ -10,7 +10,7 @@ import org.opentripplanner.core.model.transaction.RepositoryLifecycle;
 import org.opentripplanner.raptor.data.transfers.regular.RaptorTransferStore;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
-import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfilesParameters;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferParameters;
 import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
 import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
@@ -55,7 +55,7 @@ public class RegularTransferRepositoryLifecycle<
   public RegularTransferRepositoryLifecycle(
     TransferPathProvider<P, R> pathProvider,
     TransferRequestMapper<R> mapper,
-    TransferProfilesParameters<R> profiles,
+    TransferParameters<R> profiles,
     int numberOfStops
   ) {
     this(
@@ -97,7 +97,7 @@ public class RegularTransferRepositoryLifecycle<
   }
 
   private static <R> Map<AbstractUserPreferences<?>, R> requestsByProfile(
-    TransferProfilesParameters<R> parameters,
+    TransferParameters<R> parameters,
     TransferRequestMapper<R> mapper
   ) {
     var result = new LinkedHashMap<AbstractUserPreferences<?>, R>();
@@ -112,7 +112,7 @@ public class RegularTransferRepositoryLifecycle<
    * profile, and then the ones of the warmup entries.
    */
   private static <R> List<DefaultRegularTransferRepositorySnapshot.WarmupEntry> warmupEntries(
-    TransferProfilesParameters<R> parameters,
+    TransferParameters<R> parameters,
     TransferRequestMapper<R> mapper
   ) {
     var result = new ArrayList<DefaultRegularTransferRepositorySnapshot.WarmupEntry>();
