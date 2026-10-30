@@ -4,7 +4,6 @@ import graphql.schema.GraphQLSchema;
 import org.opentripplanner.apis.gtfs.GtfsGraphQLRequestContext;
 import org.opentripplanner.place.NearbyPlaceFinder;
 import org.opentripplanner.place.NearbyStopFinder;
-import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.place.nearbystopfinder.StraightLineNearbyStopFinder;
 import org.opentripplanner.place.nearbystopfinder.StreetNearbyStopFinder;
 import org.opentripplanner.place.placefinder.StreetNearbyPlaceFinder;
@@ -15,9 +14,8 @@ import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
-import org.opentripplanner.transfer.regular.FlexTransferService;
+import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 
 /**
  * Production {@link GtfsGraphQLRequestContext}: every accessor delegates to the enclosing
@@ -49,13 +47,8 @@ final class DaggerGtfsGraphQLRequestContext implements GtfsGraphQLRequestContext
   }
 
   @Override
-  public FlexTransferService transferService() {
+  public RegularTransferService transferService() {
     return factory.transferService();
-  }
-
-  @Override
-  public RegularTransferRepositorySnapshot<NearbyStop, RouteRequest> regularTransfers() {
-    return factory.regularTransfers();
   }
 
   @Override

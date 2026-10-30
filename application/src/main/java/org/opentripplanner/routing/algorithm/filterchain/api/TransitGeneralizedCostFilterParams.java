@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.algorithm.filterchain.api;
 
-import org.opentripplanner.core.model.basic.CostLinearFunction;
+import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.utils.lang.DoubleUtils;
 
 /**

@@ -14,7 +14,6 @@ import org.opentripplanner.ext.taxi.TaxiService;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.framework.time.ZoneIdFallback;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.RequestPreProcessor;
@@ -36,9 +35,8 @@ import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
-import org.opentripplanner.transfer.regular.FlexTransferService;
+import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 import org.opentripplanner.utils.tostring.MultiLineToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,8 +58,7 @@ public class DefaultRoutingService implements RoutingService {
   private final StreetLimitationParametersService streetLimitationParametersService;
   private final VehicleRentalService vehicleRentalService;
   private final StreetDetailsService streetDetailsService;
-  private final FlexTransferService transferService;
-  private final RegularTransferRepositorySnapshot<NearbyStop, RouteRequest> regularTransfers;
+  private final RegularTransferService transferService;
   private final FlexParameters flexParameters;
   private final List<RideHailingService> rideHailingServices;
   private final ViaCoordinateTransferFactory viaTransferResolver;
@@ -102,8 +99,7 @@ public class DefaultRoutingService implements RoutingService {
     StreetLimitationParametersService streetLimitationParametersService,
     VehicleRentalService vehicleRentalService,
     StreetDetailsService streetDetailsService,
-    FlexTransferService transferService,
-    RegularTransferRepositorySnapshot<NearbyStop, RouteRequest> regularTransfers,
+    RegularTransferService transferService,
     TransitAlertService transitAlertService,
     FlexParameters flexParameters,
     List<RideHailingService> rideHailingServices,
@@ -128,7 +124,6 @@ public class DefaultRoutingService implements RoutingService {
     this.vehicleRentalService = vehicleRentalService;
     this.streetDetailsService = streetDetailsService;
     this.transferService = transferService;
-    this.regularTransfers = regularTransfers;
     this.flexParameters = flexParameters;
     this.rideHailingServices = rideHailingServices;
     this.dataOverlayParameterBindings = dataOverlayParameterBindings;
@@ -185,7 +180,6 @@ public class DefaultRoutingService implements RoutingService {
       vehicleRentalService,
       streetDetailsService,
       transferService,
-      regularTransfers,
       flexParameters,
       rideHailingServices,
       dataOverlayParameterBindings,

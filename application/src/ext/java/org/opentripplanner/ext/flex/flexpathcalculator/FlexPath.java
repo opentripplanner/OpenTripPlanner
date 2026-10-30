@@ -4,7 +4,7 @@ import java.time.Duration;
 import java.util.function.Supplier;
 import javax.annotation.concurrent.Immutable;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.core.model.time.TimePenalty;
+import org.opentripplanner.routing.api.request.framework.TimePenalty;
 import org.opentripplanner.utils.lang.IntUtils;
 
 /**

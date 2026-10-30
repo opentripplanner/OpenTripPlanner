@@ -8,9 +8,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.transfercache.RaptorRequestTransferCache;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.transfer.constrained.ConstrainedTransferService;
 import org.opentripplanner.transfer.constrained.raptoradaptor.ConstrainedTransfersForPatterns;
 import org.opentripplanner.transfer.constrained.raptoradaptor.TransferIndexGenerator;
+import org.opentripplanner.transfer.regular.index.RaptorTransferIndex;
+import org.opentripplanner.transfer.regular.model.PathTransfer;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.SiteRepository;
 
@@ -31,11 +35,19 @@ public class RaptorTransitData {
   private final HashMap<LocalDate, List<TripPatternForDate>> tripPatternsRunningOnDate;
 
   /**
+   * Index of outer list is from stop index, inner list index has no specific meaning. To stop index
+   * is a field of the Transfer object.
+   */
+  private final List<List<PathTransfer>> transfersByStopIndex;
+
+  /**
    * Trip to trip transfers like with properties like guaranteedTransfer, staySeated and priority.
    */
   private final ConstrainedTransferService transferService;
 
   private final SiteRepository siteRepository;
+
+  private final RaptorRequestTransferCache transferCache;
 
   private ConstrainedTransfersForPatterns constrainedTransfers;
 
@@ -52,8 +64,10 @@ public class RaptorTransitData {
   public RaptorTransitData(RaptorTransitData raptorTransitData) {
     this(
       raptorTransitData.tripPatternsRunningOnDate,
+      raptorTransitData.transfersByStopIndex,
       raptorTransitData.transferService,
       raptorTransitData.siteRepository,
+      raptorTransitData.transferCache,
       raptorTransitData.constrainedTransfers,
       raptorTransitData.transferIndexGenerator,
       raptorTransitData.stopBoardAlightTransferCosts
@@ -62,15 +76,19 @@ public class RaptorTransitData {
 
   public RaptorTransitData(
     Map<LocalDate, List<TripPatternForDate>> tripPatternsRunningOnDate,
+    List<List<PathTransfer>> transfersByStopIndex,
     ConstrainedTransferService transferService,
     SiteRepository siteRepository,
+    RaptorRequestTransferCache transferCache,
     ConstrainedTransfersForPatterns constrainedTransfers,
     TransferIndexGenerator transferIndexGenerator,
     @Nullable int[] stopBoardAlightTransferCosts
   ) {
     this.tripPatternsRunningOnDate = new HashMap<>(tripPatternsRunningOnDate);
+    this.transfersByStopIndex = transfersByStopIndex;
     this.transferService = transferService;
     this.siteRepository = siteRepository;
+    this.transferCache = transferCache;
     this.constrainedTransfers = constrainedTransfers;
     this.transferIndexGenerator = transferIndexGenerator;
     this.stopBoardAlightTransferCosts = stopBoardAlightTransferCosts;
@@ -122,6 +140,18 @@ public class RaptorTransitData {
 
   public ConstrainedTransferService getTransferService() {
     return transferService;
+  }
+
+  public RaptorTransferIndex getRaptorTransfersForRequest(RouteRequest request) {
+    return transferCache.get(transfersByStopIndex, request);
+  }
+
+  public void initTransferCacheForRequest(RouteRequest request) {
+    transferCache.put(transfersByStopIndex, request);
+  }
+
+  public RaptorRequestTransferCache getTransferCache() {
+    return transferCache;
   }
 
   @Nullable

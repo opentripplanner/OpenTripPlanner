@@ -136,7 +136,16 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
     }
 
     var subject = new RaptorRoutingRequestTransitDataCreator(
-      new RaptorTransitData(tripPatternsRunningOnDate, null, null, null, null, null),
+      new RaptorTransitData(
+        tripPatternsRunningOnDate,
+        List.of(),
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ),
       ZonedDateTime.of(date, LocalTime.MIDNIGHT, ZoneIds.UTC)
     );
     var result = subject.createTripPatterns(

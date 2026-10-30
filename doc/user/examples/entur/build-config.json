@@ -12,9 +12,7 @@
     "islandWithoutStopsMaxSize": 5,
     "islandWithStopsMaxSize": 5
   },
-  "transfers": {
-    "walk": { "maxDuration": "30m" }
-  },
+  "maxTransferDuration": "30m",
   "distanceBetweenElevationSamples": 25,
   "multiThreadElevationCalculations": true,
   "streetGraph": "gs://${OTP_GCS_BUCKET}/${OTP_GCS_BASE_GRAPH_PATH}",

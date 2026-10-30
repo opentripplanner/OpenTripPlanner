@@ -6,18 +6,18 @@ import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.apis.vectortiles.model.LayerType;
 import org.opentripplanner.inspector.vector.LayerBuilder;
 import org.opentripplanner.inspector.vector.LayerParameters;
-import org.opentripplanner.transfer.regular.FlexTransferService;
+import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transfer.regular.model.PathTransfer;
 import org.opentripplanner.transit.service.TransitService;
 
 public class TransfersLayerBuilder extends LayerBuilder<PathTransfer> {
 
   private final TransitService transitService;
-  private final FlexTransferService transferService;
+  private final RegularTransferService transferService;
 
   public TransfersLayerBuilder(
     TransitService siteRepo,
-    FlexTransferService transferService,
+    RegularTransferService transferService,
     LayerParameters<LayerType> layerParameters
   ) {
     super(

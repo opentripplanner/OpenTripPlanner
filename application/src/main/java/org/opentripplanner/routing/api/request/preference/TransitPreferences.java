@@ -8,7 +8,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import org.opentripplanner.core.model.basic.Cost;
-import org.opentripplanner.core.model.basic.CostLinearFunction;
+import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.framework.DurationForEnum;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.utils.tostring.ToStringBuilder;

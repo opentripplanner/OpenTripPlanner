@@ -1,8 +1,8 @@
 package org.opentripplanner.apis.transmodel.model.scalars;
 
 import java.time.Duration;
-import org.opentripplanner.core.model.basic.CostLinearFunction;
-import org.opentripplanner.core.model.time.TimePenalty;
+import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
+import org.opentripplanner.routing.api.request.framework.TimePenalty;
 
 /**
  * Small DTO class used to map between the OTP Domain model and Transmodel API.

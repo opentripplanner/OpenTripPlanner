@@ -8,9 +8,9 @@ import java.time.Duration;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Cost;
-import org.opentripplanner.core.model.basic.CostLinearFunction;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
+import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 
 public class TransitGeneralizedCostFilterTest implements PlanTestConstants {
 

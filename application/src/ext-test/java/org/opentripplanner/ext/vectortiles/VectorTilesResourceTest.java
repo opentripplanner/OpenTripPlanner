@@ -9,6 +9,7 @@ import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.standalone.api.TestServerContext;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.test.support.HttpForTest;
+import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.service.TransitRepository;
 
@@ -20,7 +21,8 @@ class VectorTilesResourceTest {
     var grizzlyRequest = Mockito.mock(Request.class);
     var transitService = TestServerContext.createTransitService(
       new TransitRepository(),
-      new TimetableDataImport()
+      new TimetableDataImport(),
+      TransferServiceTestFactory.defaultTransferRepository()
     );
     var resource = new VectorTilesResource(
       transitService,

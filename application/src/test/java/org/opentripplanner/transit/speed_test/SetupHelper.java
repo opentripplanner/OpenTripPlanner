@@ -43,7 +43,6 @@ class SetupHelper {
       transitRepository,
       serializedGraphObject.timetableDataImport,
       transferRepository,
-      serializedGraphObject.regularTransferBuildRepository,
       serializedGraphObject.buildConfig
     );
   }

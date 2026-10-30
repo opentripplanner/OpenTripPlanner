@@ -44,11 +44,6 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>transit-transfer</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.opentripplanner.core</groupId>
             <artifactId>framework</artifactId>
             <version>${project.version}</version>
@@ -61,11 +56,6 @@
         <dependency>
             <groupId>org.opentripplanner.raptor</groupId>
             <artifactId>router</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.opentripplanner.raptor</groupId>
-            <artifactId>data</artifactId>
             <version>${project.version}</version>
         </dependency>
 

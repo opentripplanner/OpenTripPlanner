@@ -34,7 +34,8 @@ class DebugVectorTilesResourceTest {
     var transferRepository = TransferServiceTestFactory.defaultTransferRepository();
     var transitService = TestServerContext.createTransitService(
       new TransitRepository(),
-      new TimetableDataImport()
+      new TimetableDataImport(),
+      transferRepository
     );
     var resource = new DebugVectorTilesResource(
       transitService,

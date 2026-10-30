@@ -7,10 +7,10 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
-import org.opentripplanner.core.model.time.TimePenalty;
 import org.opentripplanner.routing.api.request.framework.DurationForEnum;
 import org.opentripplanner.routing.api.request.framework.TimeAndCostPenalty;
 import org.opentripplanner.routing.api.request.framework.TimeAndCostPenaltyForEnum;
+import org.opentripplanner.routing.api.request.framework.TimePenalty;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 

@@ -4,10 +4,10 @@ import java.util.List;
 import java.util.OptionalInt;
 import java.util.stream.Collectors;
 import org.opentripplanner.core.model.basic.Cost;
-import org.opentripplanner.core.model.basic.CostLinearFunction;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.TransitGeneralizedCostFilter;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;
+import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
 
 /**

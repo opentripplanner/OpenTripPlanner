@@ -5,7 +5,7 @@ import java.util.Map;
 import org.opentripplanner.apis.transmodel.model.TransportModeSlack;
 import org.opentripplanner.apis.transmodel.model.plan.RelaxCostType;
 import org.opentripplanner.apis.transmodel.support.DataFetcherDecorator;
-import org.opentripplanner.core.model.basic.CostLinearFunction;
+import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.preference.TransitPreferences;
 
 public class TransitPreferencesMapper {

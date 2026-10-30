@@ -13,7 +13,6 @@ import org.opentripplanner.raptor.extensions.extrasearch.ExtraMcRouterSearch;
 import org.opentripplanner.raptor.service.DefaultStopArrivals;
 import org.opentripplanner.raptor.service.HeuristicSearchTask;
 import org.opentripplanner.raptor.service.RangeRaptorDynamicSearch;
-import org.opentripplanner.raptor.spi.RaptorDataProvider;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.slf4j.Logger;
@@ -42,16 +41,24 @@ public class RaptorService<T extends RaptorTripSchedule> {
     this(config, null);
   }
 
-  public RaptorResponse<T> route(RaptorRequest<T> request, RaptorDataProvider<T> data) {
+  public RaptorResponse<T> route(
+    RaptorRequest<T> request,
+    RaptorTransitDataProvider<T> transitData
+  ) {
     logRequest(request);
     RaptorResponse<T> response;
 
     if (request.isDynamicSearch()) {
-      response = new RangeRaptorDynamicSearch<>(config, data, extraMcSearch, request).route();
+      response = new RangeRaptorDynamicSearch<>(
+        config,
+        transitData,
+        extraMcSearch,
+        request
+      ).route();
     } else {
-      response = routeUsingStdWorker(data, request);
+      response = routeUsingStdWorker(transitData, request);
     }
-    logResponse(data.transitData(), response);
+    logResponse(transitData, response);
     return response;
   }
 
@@ -77,10 +84,10 @@ public class RaptorService<T extends RaptorTripSchedule> {
   public void compareHeuristics(
     RaptorRequest<T> r1,
     RaptorRequest<T> r2,
-    RaptorDataProvider<T> data
+    RaptorTransitDataProvider<T> transitData
   ) {
-    HeuristicSearchTask<T> fwdHeur = new HeuristicSearchTask<>(r1, config, data);
-    HeuristicSearchTask<T> revHeur = new HeuristicSearchTask<>(r2, config, data);
+    HeuristicSearchTask<T> fwdHeur = new HeuristicSearchTask<>(r1, config, transitData);
+    HeuristicSearchTask<T> revHeur = new HeuristicSearchTask<>(r2, config, transitData);
 
     fwdHeur.forceRun();
     revHeur.forceRun();
@@ -91,7 +98,7 @@ public class RaptorService<T extends RaptorTripSchedule> {
   /* private methods */
 
   private RaptorResponse<T> routeUsingStdWorker(
-    RaptorDataProvider<T> transitData,
+    RaptorTransitDataProvider<T> transitData,
     RaptorRequest<T> request
   ) {
     var rangeRaptorRouter = config.createRangeRaptorWithStdWorker(transitData, request);

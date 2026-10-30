@@ -2,9 +2,7 @@ package org.opentripplanner.graph_builder.module.configure;
 
 import dagger.Module;
 import dagger.Provides;
-import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
@@ -13,11 +11,9 @@ import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
 import org.opentripplanner.ext.dataoverlay.configure.DataOverlayFactory;
-import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationModule;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
-import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
@@ -40,6 +36,7 @@ import org.opentripplanner.graph_builder.module.osm.EdgeNamer;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
 import org.opentripplanner.graph_builder.module.stopconnectivity.StopConnectivityModule;
+import org.opentripplanner.graph_builder.module.transfer.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
@@ -47,7 +44,6 @@ import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.netex.configure.NetexConfigure;
 import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.osm.OsmProvider;
-import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
@@ -58,29 +54,16 @@ import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.street.StreetRepository;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VertexLinker;
-import org.opentripplanner.transfer.configure.StreetTransferFactory;
-import org.opentripplanner.transfer.dataimport.FlexTransferGenerator;
-import org.opentripplanner.transfer.dataimport.RegularTransitTransferGenerator;
-import org.opentripplanner.transfer.dataimport.StopsAllowedForModes;
-import org.opentripplanner.transfer.dataimport.StopsVisitedByPatterns;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.TransitRepository;
-import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
-import org.opentripplanner.transit.transfer.regular.RegularTransferGenerator;
 
 /**
  * Configure all modules that are not simple enough to be injected.
  */
 @Module
 public class GraphBuilderModules {
-
-  /**
-   * TODO: The transfer analyzer should have its own search radius, it should not be a transfer
-   *       duration, since it is only used to find the nearby stops it analyzes.
-   */
-  private static final Duration ANALYZER_MAX_DURATION = Duration.ofMinutes(30);
 
   @Provides
   @Singleton
@@ -319,99 +302,28 @@ public class GraphBuilderModules {
 
   @Provides
   @Singleton
-  static FlexTransferGenerator provideFlexTransferGenerator(
+  static DirectTransferGenerator provideDirectTransferGenerator(
     BuildConfig config,
     Graph graph,
     TransitRepository transitRepository,
     TimetableDataImport timetableDataImport,
     TransferRepository transferRepository,
-    Provider<FlexIndex> flexIndex
+    DataImportIssueStore issueStore
   ) {
-    return new FlexTransferGenerator(
+    return new DirectTransferGenerator(
       graph,
       transitRepository,
       timetableDataImport,
       transferRepository,
-      flexIndex,
-      config.flexTransferParameters()
-    );
-  }
-
-  /**
-   * The flex trips of the imported transit data, shared by the transfer generators. It is created
-   * on first use, so it must not be requested before the transit data is imported. {@code null} if
-   * flex routing is off.
-   */
-  @Provides
-  @Singleton
-  @Nullable
-  static FlexIndex provideFlexIndex(TimetableDataImport timetableDataImport) {
-    return OTPFeature.FlexRouting.isOn()
-      ? new FlexIndex(timetableDataImport.getAllFlexTrips(), timetableDataImport.getTripCalendars())
-      : null;
-  }
-
-  @Provides
-  @Singleton
-  static RegularTransferGenerator provideRegularTransferGenerator(
-    BuildConfig config,
-    Graph graph,
-    TransitRepository transitRepository,
-    StopsVisitedByPatterns stopsVisitedByPatterns,
-    StopsAllowedForModes stopsAllowedForModes,
-    RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository,
-    @Nullable FlexIndex flexIndex
-  ) {
-    // The generator is created when the transfers are generated, after the transit data import
-    return StreetTransferFactory.createGenerator(
-      graph,
-      transitRepository,
-      config.transferProfiles(),
-      regularTransferBuildRepository,
-      stopsVisitedByPatterns,
-      stopsAllowedForModes,
-      flexIndex
-    );
-  }
-
-  @Provides
-  @Singleton
-  static StopsVisitedByPatterns provideStopsVisitedByPatterns(
-    TimetableDataImport timetableDataImport
-  ) {
-    return new StopsVisitedByPatterns(timetableDataImport);
-  }
-
-  @Provides
-  @Singleton
-  static StopsAllowedForModes provideStopsAllowedForModes(
-    TimetableDataImport timetableDataImport,
-    StopsVisitedByPatterns stopsVisitedByPatterns
-  ) {
-    return new StopsAllowedForModes(timetableDataImport, stopsVisitedByPatterns);
-  }
-
-  @Provides
-  @Singleton
-  static RegularTransitTransferGenerator provideRegularTransitTransferGenerator(
-    Provider<RegularTransferGenerator> transferGenerator,
-    Graph graph,
-    TransitRepository transitRepository,
-    StopsVisitedByPatterns stopsVisitedByPatterns,
-    DataImportIssueStore issueStore
-  ) {
-    return new RegularTransitTransferGenerator(
-      transferGenerator,
-      graph,
-      transitRepository,
-      stopsVisitedByPatterns,
-      issueStore
+      issueStore,
+      config.regularTransferParameters()
     );
   }
 
   @Provides
   @Singleton
   static DirectTransferAnalyzer provideDirectTransferAnalyzer(
+    BuildConfig config,
     Graph graph,
     VertexLinker linker,
     TransitRepository transitRepository,
@@ -422,7 +334,7 @@ public class GraphBuilderModules {
       linker,
       transitRepository,
       issueStore,
-      ANALYZER_MAX_DURATION.toSeconds() * WalkPreferences.DEFAULT.speed()
+      config.regularTransferParameters().maxDuration().toSeconds() * WalkPreferences.DEFAULT.speed()
     );
   }
 

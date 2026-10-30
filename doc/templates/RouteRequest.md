@@ -9,7 +9,7 @@
 
 The RouteRequest is the type for the
 [routingDefaults in router-config.json](RouterConfiguration.md#routingDefaults) and in the
-[transfers.flex.requests in build-config.json](TransferConfiguration.md#flex-and-via-transfers).
+[transferRequests in build-config.json](BuildConfiguration.md#transferRequests).
 
 <!-- INSERT: PARAMETERS-TABLE -->
 
