@@ -1,5 +1,6 @@
 package org.opentripplanner.core.model.basic;
 
+import java.io.Serializable;
 import java.util.Optional;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
@@ -9,11 +10,11 @@ import org.opentripplanner.utils.lang.DoubleUtils;
  * Represents a ratio within the range [0.0, 1.0]. The class ensures that the ratio value,
  * represented as a double, falls withing the specified range.
  */
-public class Ratio {
+public sealed class Ratio implements Serializable permits NormalizedRatio {
 
   private final double ratio;
 
-  private Ratio(double ratio) {
+  protected Ratio(double ratio) {
     this.ratio = DoubleUtils.roundTo3Decimals(ratio);
   }
 
@@ -44,6 +45,10 @@ public class Ratio {
       return Optional.empty();
     }
     return of(ratio, validationErrorHandler);
+  }
+
+  public NormalizedRatio normalize() {
+    return new NormalizedRatio(ratio);
   }
 
   @Override
