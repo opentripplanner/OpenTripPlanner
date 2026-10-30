@@ -83,7 +83,9 @@ nav:
     - Transmodel (NeTEx) GraphQL API: 'apis/TransmodelApi.md'
 - Configuration:
     - Introduction: 'Configuration.md'
-    - Build: 'BuildConfiguration.md'
+    - Build:
+      - Build: 'BuildConfiguration.md'
+      - Transfers: 'TransferConfiguration.md'
     - OSM Tag Mapping:
         - Default: 'osm/OsmTag.md'
         - Finland: 'osm/Finland.md'

@@ -1,9 +1,11 @@
 package org.opentripplanner.core.model.basic;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.util.Objects;
 import org.opentripplanner.utils.lang.DoubleUtils;
+import org.opentripplanner.utils.time.DurationUtils;
 
 /**
  * This is a data-transfer-object representing a linear function(constant and coefficient) of time.
@@ -91,6 +93,18 @@ public abstract class AbstractLinearFunction<T> implements Serializable {
   @Override
   public final String toString() {
     return serialize();
+  }
+
+  /**
+   * Same as {@link #serialize()}, but the coefficient is written as a percentage, for example
+   * {@code 15s + 2%}. This reads better when the function is a limit relative to the input. The
+   * text cannot be parsed back.
+   */
+  public final String toStringWPercentage() {
+    var percentage = BigDecimal.valueOf(coefficient).movePointRight(2).stripTrailingZeros();
+    return (
+      DurationUtils.durationToStr(constantAsDuration()) + " + " + percentage.toPlainString() + "%"
+    );
   }
 
   @Override

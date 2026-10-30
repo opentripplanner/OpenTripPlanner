@@ -1,8 +1,8 @@
 package org.opentripplanner.transfer.regular;
 
 import org.opentripplanner.ext.flex.FlexTransferIndex;
+import org.opentripplanner.transfer.regular.internal.DefaultFlexTransferService;
 import org.opentripplanner.transfer.regular.internal.DefaultTransferRepository;
-import org.opentripplanner.transfer.regular.internal.DefaultTransferService;
 import org.opentripplanner.transfer.regular.internal.TransferIndex;
 
 /**
@@ -13,12 +13,12 @@ import org.opentripplanner.transfer.regular.internal.TransferIndex;
  */
 public class TransferServiceTestFactory {
 
-  public static RegularTransferService defaultTransferService() {
-    return new DefaultTransferService(defaultTransferRepository());
+  public static FlexTransferService defaultTransferService() {
+    return new DefaultFlexTransferService(defaultTransferRepository());
   }
 
-  public static RegularTransferService transferService(TransferRepository transferRepository) {
-    return new DefaultTransferService(transferRepository);
+  public static FlexTransferService transferService(TransferRepository transferRepository) {
+    return new DefaultFlexTransferService(transferRepository);
   }
 
   public static TransferRepository defaultTransferRepository() {

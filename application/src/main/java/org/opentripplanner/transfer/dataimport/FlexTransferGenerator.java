@@ -1,0 +1,346 @@
+package org.opentripplanner.transfer.dataimport;
+
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
+import jakarta.inject.Provider;
+import java.time.Duration;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
+import javax.annotation.Nullable;
+import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.ext.flex.FlexIndex;
+import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.graph_builder.model.GraphBuilderModule;
+import org.opentripplanner.place.NearbyStopFinder;
+import org.opentripplanner.place.api.NearbyStop;
+import org.opentripplanner.place.nearbystopfinder.PatternConsideringNearbyStopFinder;
+import org.opentripplanner.place.nearbystopfinder.StraightLineNearbyStopFinder;
+import org.opentripplanner.place.nearbystopfinder.StreetNearbyStopFinder;
+import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.street.model.StreetMode;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.vertex.TransitStopVertex;
+import org.opentripplanner.transfer.dataimport.api.FlexTransferParameters;
+import org.opentripplanner.transfer.regular.TransferRepository;
+import org.opentripplanner.transfer.regular.model.PathTransfer;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
+import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.utils.collection.StreamUtils;
+import org.opentripplanner.utils.logging.ProgressTracker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * {@link GraphBuilderModule} module that generates the transfers used by FLEX routing: walking
+ * connectors between {@link RegularStop}s and the flex {@code AreaStop}/{@code GroupStop}s, in
+ * both directions - stop-to-flex-stop (used for flex egress) and flex-stop-to-stop (used for flex
+ * access).
+ * <p>
+ * It will use the street network if OSM data has already been loaded into the graph. Otherwise it
+ * will use straight-line distance between stops.
+ * <p>
+ * It assumes that flex routing is on, and always generates the flex transfers.
+ */
+public class FlexTransferGenerator implements GraphBuilderModule {
+
+  private static final Logger LOG = LoggerFactory.getLogger(FlexTransferGenerator.class);
+
+  private static final int NO_STOP_COUNT_LIMIT = 0;
+
+  private final Duration maxTransferDuration;
+  private final List<RouteRequest> transferRequests;
+  private final Graph graph;
+  private final TransitRepository transitRepository;
+  private final TimetableDataImport timetableDataImport;
+
+  /** The flex trips, used to find the flex stops of the trips. Created when this module runs. */
+  private final Provider<FlexIndex> flexIndex;
+
+  /**
+   * The scheduled trip patterns visiting each stop, by stop id. Built on first access, see {@link
+   * #patternsForStop()}.
+   */
+  @Nullable
+  private Multimap<FeedScopedId, TripPattern> patternsForStop;
+
+  private final TransferRepository transferRepository;
+
+  /**
+   * Constructor used in tests. The flex index is created from the flex trips of
+   * {@code timetableDataImport} when the module runs.
+   */
+  public FlexTransferGenerator(
+    Graph graph,
+    TransitRepository transitRepository,
+    TimetableDataImport timetableDataImport,
+    TransferRepository transferRepository,
+    Duration maxTransferDuration,
+    List<RouteRequest> transferRequests
+  ) {
+    this(
+      graph,
+      transitRepository,
+      timetableDataImport,
+      transferRepository,
+      () ->
+        new FlexIndex(
+          timetableDataImport.getAllFlexTrips(),
+          timetableDataImport.getTripCalendars()
+        ),
+      maxTransferDuration,
+      transferRequests
+    );
+  }
+
+  /**
+   * @param flexIndex the flex trips of the imported transit data, only requested when the module
+   *                  runs
+   */
+  public FlexTransferGenerator(
+    Graph graph,
+    TransitRepository transitRepository,
+    TimetableDataImport timetableDataImport,
+    TransferRepository transferRepository,
+    Provider<FlexIndex> flexIndex,
+    FlexTransferParameters parameters
+  ) {
+    this(
+      graph,
+      transitRepository,
+      timetableDataImport,
+      transferRepository,
+      flexIndex,
+      parameters.maxDuration(),
+      parameters.requests()
+    );
+  }
+
+  private FlexTransferGenerator(
+    Graph graph,
+    TransitRepository transitRepository,
+    TimetableDataImport timetableDataImport,
+    TransferRepository transferRepository,
+    Provider<FlexIndex> flexIndex,
+    Duration maxTransferDuration,
+    List<RouteRequest> transferRequests
+  ) {
+    this.graph = graph;
+    this.transitRepository = transitRepository;
+    this.timetableDataImport = timetableDataImport;
+    this.transferRepository = transferRepository;
+    this.flexIndex = flexIndex;
+    this.maxTransferDuration = maxTransferDuration;
+    this.transferRequests = transferRequests;
+  }
+
+  @Override
+  public void buildGraph() {
+    // Initialize transit model index which is needed by the nearby stop finder.
+    transitRepository.index();
+
+    // The linker will use streets if they are available, or straight-line distance otherwise.
+    NearbyStopFinder nearbyStopFinder = createNearbyStopFinder();
+
+    var stops = graph.findVertices(TransitStopVertex.class);
+
+    // Flex transfers only use the WALK mode.
+    List<RouteRequest> flexTransferRequests = transferRequests
+      .stream()
+      .filter(transferProfile -> transferProfile.journey().transfer().mode() == StreetMode.WALK)
+      .toList();
+
+    LOG.info("Creating flex transfers based on requests:");
+    flexTransferRequests.forEach(transferProfile -> LOG.info(transferProfile.toString()));
+
+    ProgressTracker progress = ProgressTracker.track(
+      "Create transfer edges for stops",
+      1000,
+      transitRepository.getSiteRepository().listRegularStops().size()
+    );
+
+    AtomicInteger nTransfersTotal = new AtomicInteger();
+    AtomicInteger nLinkedStops = new AtomicInteger();
+
+    // This is a synchronizedMultimap so that a parallel stream may be used to insert elements.
+    var transfersByStop = Multimaps.<StopLocation, PathTransfer>synchronizedMultimap(
+      HashMultimap.create()
+    );
+
+    StreamUtils.ofIterable(stops)
+      .parallel()
+      .forEach(ts0 -> {
+        /* Use a map based on the list of edges, so that only distinct transfers are stored. */
+        Map<TransferKey, PathTransfer> distinctTransfers = new HashMap<>();
+        RegularStop stop = Objects.requireNonNull(
+          transitRepository.getSiteRepository().getRegularStop(ts0.getId())
+        );
+
+        if (stop.transfersNotAllowed()) {
+          return;
+        }
+
+        LOG.debug("Linking stop '{}' {}", stop, ts0);
+
+        calculateFlexTransfers(
+          nearbyStopFinder,
+          flexTransferRequests,
+          ts0,
+          stop,
+          distinctTransfers
+        );
+
+        LOG.debug("Linked stop {} with {} flex transfers.", stop, distinctTransfers.size());
+        if (!distinctTransfers.isEmpty()) {
+          distinctTransfers
+            .values()
+            .forEach(transfer -> transfersByStop.put(transfer.from, transfer));
+          nLinkedStops.incrementAndGet();
+          nTransfersTotal.addAndGet(distinctTransfers.size());
+        }
+
+        //Keep lambda! A method-ref would causes incorrect class and line number to be logged
+        //noinspection Convert2MethodRef
+        progress.step(m -> LOG.info(m));
+      });
+
+    transferRepository.addAllTransfersByStops(transfersByStop);
+
+    LOG.info(progress.completeMessage());
+    LOG.info(
+      "Done connecting stops to one another. Created a total of {} flex transfers from {} stops.",
+      nTransfersTotal,
+      nLinkedStops
+    );
+  }
+
+  /**
+   * The scheduled trip patterns visiting each stop, by stop id. The index is built on the first
+   * access and then cached, so it assumes that no scheduled patterns are added afterwards.
+   * <p>
+   * Not thread-safe: only call it from the thread running {@link #buildGraph()}. The parallel
+   * transfer search gets the built index, which it only reads.
+   */
+  private Multimap<FeedScopedId, TripPattern> patternsForStop() {
+    if (patternsForStop == null) {
+      Multimap<FeedScopedId, TripPattern> index = ArrayListMultimap.create();
+      for (TripPattern pattern : timetableDataImport.getAllTripPatterns()) {
+        for (StopLocation stop : pattern.getStops()) {
+          index.put(stop.getId(), pattern);
+        }
+      }
+      patternsForStop = index;
+    }
+    return patternsForStop;
+  }
+
+  /**
+   * Factory method for creating a NearbyStopFinder. Will create different finders depending on
+   * whether the graph has a street network and if ConsiderPatternsForDirectTransfers feature is
+   * enabled.
+   */
+  private NearbyStopFinder createNearbyStopFinder() {
+    var siteRepository = transitRepository.getSiteRepository();
+    NearbyStopFinder finder;
+    if (!graph.hasStreets) {
+      LOG.info(
+        "Creating flex transfer edges between stops using straight line distance (not streets)..."
+      );
+      finder = new StraightLineNearbyStopFinder(siteRepository::findRegularStops);
+    } else {
+      LOG.info("Creating flex transfer edges between stops using the street network from OSM...");
+      finder = StreetNearbyStopFinder.of(null).build();
+    }
+
+    if (OTPFeature.ConsiderPatternsForDirectTransfers.isOn()) {
+      return new PatternConsideringNearbyStopFinder(
+        siteRepository,
+        patternsForStop()::get,
+        flexIndex.get(),
+        finder
+      );
+    } else {
+      return finder;
+    }
+  }
+
+  private void createPathTransfer(
+    StopLocation from,
+    StopLocation to,
+    NearbyStop sd,
+    Map<TransferKey, PathTransfer> distinctTransfers,
+    StreetMode mode
+  ) {
+    TransferKey transferKey = new TransferKey(from, to, sd.edges());
+    PathTransfer pathTransfer = distinctTransfers.get(transferKey);
+    if (pathTransfer == null) {
+      // If the PathTransfer can't be found, it is created.
+      distinctTransfers.put(
+        transferKey,
+        new PathTransfer(from, to, sd.distance(), sd.edges(), EnumSet.of(mode))
+      );
+    } else {
+      // If the PathTransfer is found, a new PathTransfer with the added mode is created.
+      distinctTransfers.put(transferKey, pathTransfer.withAddedMode(mode));
+    }
+  }
+
+  /**
+   * Generates the flex transfers for a stop, in both directions: {@code Stop -> AreaStop/GroupStop}
+   * (used for flex egress) and {@code AreaStop/GroupStop -> Stop} (used for flex access).
+   */
+  private void calculateFlexTransfers(
+    NearbyStopFinder nearbyStopFinder,
+    List<RouteRequest> flexTransferRequests,
+    TransitStopVertex ts0,
+    RegularStop stop,
+    Map<TransferKey, PathTransfer> distinctTransfers
+  ) {
+    var repository = transitRepository.getSiteRepository();
+    for (RouteRequest transferProfile : flexTransferRequests) {
+      // Flex transfer requests only use the WALK mode.
+      StreetMode mode = StreetMode.WALK;
+
+      for (NearbyStop sd : nearbyStopFinder.findNearbyStops(
+        ts0,
+        transferProfile,
+        mode,
+        false,
+        maxTransferDuration,
+        NO_STOP_COUNT_LIMIT
+      )) {
+        var nearbyStop = repository.getStopLocation(sd.stopId());
+        if (nearbyStop.equals(stop) || nearbyStop instanceof RegularStop) {
+          continue;
+        }
+        createPathTransfer(stop, nearbyStop, sd, distinctTransfers, mode);
+      }
+
+      for (NearbyStop sd : nearbyStopFinder.findNearbyStops(
+        ts0,
+        transferProfile,
+        mode,
+        true,
+        maxTransferDuration,
+        NO_STOP_COUNT_LIMIT
+      )) {
+        var nearbyStop = repository.getStopLocation(sd.stopId());
+        if (nearbyStop.equals(stop) || nearbyStop instanceof RegularStop) {
+          continue;
+        }
+        createPathTransfer(nearbyStop, stop, sd, distinctTransfers, mode);
+      }
+    }
+  }
+
+  private record TransferKey(StopLocation source, StopLocation target, List<Edge> edges) {}
+}
