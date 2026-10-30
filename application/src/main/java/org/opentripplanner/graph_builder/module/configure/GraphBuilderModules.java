@@ -4,6 +4,7 @@ import dagger.Module;
 import dagger.Provides;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
@@ -74,6 +75,12 @@ import org.opentripplanner.transit.transfer.regular.RegularTransferGenerator;
  */
 @Module
 public class GraphBuilderModules {
+
+  /**
+   * TODO: The transfer analyzer should have its own search radius, it should not be a transfer
+   *       duration, since it is only used to find the nearby stops it analyzes.
+   */
+  private static final Duration ANALYZER_MAX_DURATION = Duration.ofMinutes(30);
 
   @Provides
   @Singleton
@@ -324,7 +331,7 @@ public class GraphBuilderModules {
       transitRepository,
       timetableDataImport,
       transferRepository,
-      config.regularTransferParameters()
+      config.flexTransferParameters()
     );
   }
 
@@ -392,7 +399,6 @@ public class GraphBuilderModules {
   @Provides
   @Singleton
   static DirectTransferAnalyzer provideDirectTransferAnalyzer(
-    BuildConfig config,
     Graph graph,
     VertexLinker linker,
     TransitRepository transitRepository,
@@ -403,7 +409,7 @@ public class GraphBuilderModules {
       linker,
       transitRepository,
       issueStore,
-      config.regularTransferParameters().maxDuration().toSeconds() * WalkPreferences.DEFAULT.speed()
+      ANALYZER_MAX_DURATION.toSeconds() * WalkPreferences.DEFAULT.speed()
     );
   }
 

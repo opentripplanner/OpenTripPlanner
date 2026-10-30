@@ -578,11 +578,6 @@ class TransferProfilesConfigMapperTest {
   }
 
   @Test
-  void theOldMaxTransferDurationIsNotUsed() {
-    assertThat(maxDuration(map("{ maxTransferDuration: '5m' }"))).isEqualTo(Duration.ofMinutes(30));
-  }
-
-  @Test
   void theMaxDurationIsNotInheritedFromAParentProfile() {
     var subject = map(
       """

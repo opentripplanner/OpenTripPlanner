@@ -3,7 +3,8 @@
 Transfers are the walks between two stops that Raptor uses to change from one trip to another. OTP
 calculates them when the graph is built, and stores them in the graph. This page describes the
 `transfers` section of `build-config.json`, which controls the *regular* transfers between stops.
-Flex transfers are still configured with [`transferRequests`](BuildConfiguration.md).
+The transfers of flex routing and of via coordinates are configured in the `transfers.flex` and
+`transfers.via` blocks, see [Flex and via transfers](#flex-and-via-transfers).
 
 !!! note
 
@@ -286,13 +287,27 @@ Stops of a station that does not allow transfers have no transfers from or to th
 
 !!! note
 
-    The old `maxTransferDuration` is not used by the `transfers` configuration, use `maxDuration`.
+    The old `maxTransferDuration` and `transferRequests` of the build config are not read any more,
+    OTP reports them as unexpected parameters. Use `maxDuration` of each profile type for the regular
+    transfers, and `transfers.flex` and `transfers.via` for the rest, see
+    [Flex and via transfers](#flex-and-via-transfers).
     The old per mode `transferParametersForMode` is replaced by the profile types:
     `carsAllowedStopMaxTransferDuration` of the `CAR` mode is the `car` type, and the
     `bicycle` type has `maxDurationAllowsCar` and `maxDuration` (the old
     `bikesAllowedStopMaxTransferDuration`). The `disableDefaultTransfers` is replaced by leaving out
     `bicycle.maxDurationAllowAllModes`. The wheelchair no longer shares the walk max duration, set
     `wheelchair.maxDuration` too.
+
+## Flex and via transfers
+
+| Parameter          | Type       | Description                                                                 | Default                 |
+|--------------------|------------|-----------------------------------------------------------------------------|-------------------------|
+| `flex.maxDuration` | `duration` | The longest transfer between two stops, created for flex routing.           | `"30m"`                 |
+| `flex.requests`    | `object[]` | The [routing requests](RouteRequest.md) the flex transfers are created with. Only requests with street mode `WALK` are used. | the default request |
+| `via.maxDuration`  | `duration` | The longest transfer between a via coordinate and a stop.                   | `"30m"`                 |
+
+They replace the old `transferRequests` and `maxTransferDuration` of the build config, which are
+not read any more. The flex transfers are only created if the sandbox feature `FlexRouting` is on.
 
 ## What is not supported yet
 
@@ -301,8 +316,10 @@ The profile type `scooter` is not read yet. It is reported as an unexpected para
 ## Compatibility with older versions
 
 Older versions of OTP do not know the `transfers` section. They report it as an unexpected
-parameter and otherwise ignore it, so the same `build-config.json` can be used with both. Only if
-OTP is started with `--abortOnUnknownConfig` does an unknown parameter stop the start.
+parameter and otherwise ignore it. They also do not read `transfers.flex` and `transfers.via`, so
+the flex and via settings of a `build-config.json` that is used with both must be set in the old
+`transferRequests` and `maxTransferDuration` too. Only if OTP is started with
+`--abortOnUnknownConfig` does an unknown parameter stop the start.
 
 ## Related issues
 

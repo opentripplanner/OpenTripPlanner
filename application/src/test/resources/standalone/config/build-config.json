@@ -66,17 +66,27 @@
       //"ferryIdsNotAllowedForBicycle" : ["RUT:B107", "RUT:B209"]
     }
   ],
-  "transferRequests": [
-    {
-      "modes": "WALK"
+  "transfers": {
+    "walk": {
+      "maxDuration": "30m"
     },
-    {
-      "modes": "WALK",
-      "wheelchairAccessibility": {
-        "enabled": true
-      }
+    "wheelchair": {
+      "maxDuration": "30m"
+    },
+    "flex": {
+      "requests": [
+        {
+          "modes": "WALK"
+        },
+        {
+          "modes": "WALK",
+          "wheelchairAccessibility": {
+            "enabled": true
+          }
+        }
+      ]
     }
-  ],
+  },
   "stopConsolidationFile": "consolidated-stops.csv",
   "cache": {
     "enabled": true
