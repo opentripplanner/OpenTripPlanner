@@ -189,7 +189,8 @@ public class CarpoolSiriMapper {
       .withEndTime(endTime)
       .withProvider(journey.getOperatorRef().getValue())
       .withTotalCapacity(totalCapacity)
-      .withStops(stops);
+      .withStops(stops)
+      .withRecordedAt(journey.getRecordedAtTime());
 
     var publicContact = journey.getPublicContact();
     if (publicContact != null) {
