@@ -122,6 +122,8 @@ class RegularTransferServiceCache<V> {
     var entry = entries.get(userPreferences);
     if (entry == null) {
       var created = Entry.<V>missing();
+      // Stamp the entry before it is visible, or a concurrent eviction takes it for the eldest
+      created.lastUse = useCounter.incrementAndGet();
       entry = entries.putIfAbsent(userPreferences, created);
       if (entry == null) {
         entry = created;
