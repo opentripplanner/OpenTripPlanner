@@ -11,8 +11,9 @@ import org.opentripplanner.transit.transfer.regular.spi.TransferSearch;
 
 /**
  * Derives the Raptor transfers from the path templates: each path stored under a profile is
- * re-costed under the request-time user preferences. Paths exceeding the duration limit of the
- * preferences are left out.
+ * re-costed under the request-time user preferences. Paths that can not be traversed under the
+ * preferences are left out. The max duration of the profile type is not applied, it only bounds
+ * the search that discovers the paths.
  * <p>
  * The transfers are either created from scratch, re-costing every path of the profile, or patched:
  * only the paths from the stops whose transfers changed are re-costed, and the rows of all other
