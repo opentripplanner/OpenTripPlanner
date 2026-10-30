@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.transfer.regular.internal;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Nullable;
@@ -86,8 +87,11 @@ final class OverlaidTemplatePaths<P> {
 
   /** See {@link TemplatePathsByUserProfile#closestProfile}. */
   @Nullable
-  AbstractUserPreferences<?> closestProfile(AbstractUserPreferences<?> userPreferences) {
-    return base.closestProfile(userPreferences);
+  AbstractUserPreferences<?> closestProfile(
+    AbstractUserPreferences<?> userPreferences,
+    Comparator<AbstractUserPreferences<?>> declarationOrder
+  ) {
+    return base.closestProfile(userPreferences, declarationOrder);
   }
 
   /**

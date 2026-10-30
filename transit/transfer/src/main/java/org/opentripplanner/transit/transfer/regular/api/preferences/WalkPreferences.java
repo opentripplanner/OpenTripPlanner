@@ -22,6 +22,18 @@ public final class WalkPreferences
   implements WithSpeed, WithSafetyFactor
 {
 
+  /** A change of the speed from 1.3 to 1.4 m/s has the reference distance. */
+  private static final double SPEED_WEIGHT = DistanceWeight.of(
+    Speed.ofMetersPerSecond(1.3),
+    Speed.ofMetersPerSecond(1.4)
+  );
+
+  /** A change of the safety factor from 0.5 to 0.6 has the reference distance. */
+  private static final double SAFETY_FACTOR_WEIGHT = DistanceWeight.of(
+    Ratio.of(0.5).normalize(),
+    Ratio.of(0.6).normalize()
+  );
+
   public static final WalkPreferences DEFAULT = new WalkPreferences();
 
   private final Speed speed;
@@ -68,11 +80,11 @@ public final class WalkPreferences
   }
 
   @Override
-  public float normalizedDistance(AbstractUserPreferences other) {
-    float distance = super.normalizedDistance(other);
+  public double normalizedDistance(AbstractUserPreferences other) {
+    double distance = super.normalizedDistance(other);
     if (other instanceof WalkPreferences that) {
-      distance += speed.normalizedDistance(that.speed);
-      distance += safetyFactor.normalizedDistance(that.safetyFactor);
+      distance += SPEED_WEIGHT * speed.normalizedDistance(that.speed);
+      distance += SAFETY_FACTOR_WEIGHT * safetyFactor.normalizedDistance(that.safetyFactor);
     }
     return distance;
   }

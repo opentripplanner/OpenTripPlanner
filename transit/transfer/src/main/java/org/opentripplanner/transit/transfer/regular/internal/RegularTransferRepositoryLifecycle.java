@@ -98,7 +98,10 @@ public class RegularTransferRepositoryLifecycle<
       pathProvider,
       mapper,
       requestsByProfile(profiles, mapper),
-      new ProfileMatcher(ProfileUserPreferences.warmupParents(profiles, mapper)),
+      new ProfileMatcher(
+        ProfileUserPreferences.warmupParents(profiles, mapper),
+        List.copyOf(ProfileUserPreferences.resolveAll(profiles, mapper).keySet())
+      ),
       warmupEntries(profiles, mapper),
       numberOfStops,
       cacheMaxSize,

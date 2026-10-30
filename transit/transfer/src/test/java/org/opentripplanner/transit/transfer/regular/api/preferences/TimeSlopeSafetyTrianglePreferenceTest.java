@@ -102,8 +102,8 @@ class TimeSlopeSafetyTrianglePreferenceTest {
     var time = TimeSlopeSafetyTrianglePreference.of(1.0, 0.0, 0.0);
     var slope = TimeSlopeSafetyTrianglePreference.of(0.0, 1.0, 0.0);
 
-    assertThat(time.normalizedDistance(time)).isEqualTo(0f);
-    assertThat(time.normalizedDistance(slope)).isWithin(0.0001f).of(2.0f);
+    assertThat(time.normalizedDistance(time)).isEqualTo(0.0);
+    assertThat(time.normalizedDistance(slope)).isWithin(0.0001f).of(2.0);
     assertThat(time.normalizedDistance(slope)).isEqualTo(slope.normalizedDistance(time));
   }
 

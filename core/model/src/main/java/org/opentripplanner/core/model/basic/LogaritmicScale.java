@@ -13,9 +13,9 @@ final class LogaritmicScale {
     this.lnMax = Math.log(max + offset);
   }
 
-  final float normalizedDistance(double a, double b) {
+  final double normalizedDistance(double a, double b) {
     double u = Math.log(a + offset);
     double v = Math.log(b + offset);
-    return (float) (Math.abs(u - v) / lnMax);
+    return Math.abs(u - v) / lnMax;
   }
 }

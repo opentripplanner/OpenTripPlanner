@@ -3,6 +3,7 @@ package org.opentripplanner.raptor.data.transfers.regular;
 import java.io.Serializable;
 import java.util.Iterator;
 import org.opentripplanner.raptor.spi.RaptorTransfer;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * Stores transfers as one array of {@link DefaultRaptorTransfer} per stop, avoiding pointer-chasing
@@ -60,20 +61,19 @@ public final class RaptorTransferStore implements RaptorRegularTransferService, 
 
   @Override
   public boolean equals(Object o) {
-    throw new UnsupportedOperationException(
-      "RaptorTransferStore does not support equals() & hashCode()"
-    );
+    return super.equals(o);
   }
 
   @Override
   public int hashCode() {
-    throw new UnsupportedOperationException(
-      "RaptorTransferStore does not support equals() & hashCode()"
-    );
+    return super.hashCode();
   }
 
   @Override
   public String toString() {
-    throw new UnsupportedOperationException("RaptorTransfers does not support toString()");
+    return ToStringBuilder.of(RaptorTransferStore.class)
+      .addObj("fromStops", fromStops)
+      .addObj("toStops", toStops)
+      .toString();
   }
 }

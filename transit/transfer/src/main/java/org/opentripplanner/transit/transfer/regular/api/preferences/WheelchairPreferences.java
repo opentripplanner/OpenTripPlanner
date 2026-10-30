@@ -20,6 +20,12 @@ public final class WheelchairPreferences
   implements WithSpeed
 {
 
+  /** A change of the speed from 1.3 to 1.4 m/s has the reference distance. */
+  private static final double SPEED_WEIGHT = DistanceWeight.of(
+    Speed.ofMetersPerSecond(1.3),
+    Speed.ofMetersPerSecond(1.4)
+  );
+
   public static final WheelchairPreferences DEFAULT = new WheelchairPreferences();
 
   private final Speed speed;
@@ -58,10 +64,10 @@ public final class WheelchairPreferences
   }
 
   @Override
-  public float normalizedDistance(AbstractUserPreferences other) {
-    float distance = super.normalizedDistance(other);
+  public double normalizedDistance(AbstractUserPreferences other) {
+    double distance = super.normalizedDistance(other);
     if (other instanceof WheelchairPreferences that) {
-      distance += speed.normalizedDistance(that.speed);
+      distance += SPEED_WEIGHT * speed.normalizedDistance(that.speed);
     }
     return distance;
   }

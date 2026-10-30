@@ -1,5 +1,10 @@
 package org.opentripplanner.transit.transfer.regular.internal;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
@@ -19,16 +24,31 @@ import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUser
 final class ProfileMatcher {
 
   /** No warmup entries: the closest profile. */
-  static final ProfileMatcher NO_WARMUP = new ProfileMatcher(Map.of());
+  static final ProfileMatcher NO_WARMUP = new ProfileMatcher(Map.of(), List.of());
 
   private final Map<AbstractUserPreferences<?>, AbstractUserPreferences<?>> parentsOfWarmup;
+  private final Comparator<AbstractUserPreferences<?>> declarationOrder;
 
   /**
-   * @param parentsOfWarmup the user preferences of the parent profile, by the user preferences of
-   *                        each warmup entry
+   * If two profiles, or two warmup entries, are the same distance from the user preferences, the
+   * one that is declared first in the configuration is chosen. A profile wins a tie against a warmup
+   * entry.
+   *
+   * @param parentsOfWarmup  the user preferences of the parent profile, by the user preferences of
+   *                         each warmup entry, in the order the entries are declared in
+   * @param declaredProfiles the user preferences of the profiles in the order they are declared in
    */
-  ProfileMatcher(Map<AbstractUserPreferences<?>, AbstractUserPreferences<?>> parentsOfWarmup) {
-    this.parentsOfWarmup = Map.copyOf(parentsOfWarmup);
+  ProfileMatcher(
+    Map<AbstractUserPreferences<?>, AbstractUserPreferences<?>> parentsOfWarmup,
+    List<AbstractUserPreferences<?>> declaredProfiles
+  ) {
+    // Keep the order of the entries, Map.copyOf has a different order from run to run
+    this.parentsOfWarmup = Collections.unmodifiableMap(new LinkedHashMap<>(parentsOfWarmup));
+    var order = new HashMap<AbstractUserPreferences<?>, Integer>();
+    for (var profile : declaredProfiles) {
+      order.putIfAbsent(profile, order.size());
+    }
+    this.declarationOrder = Comparator.comparingInt(p -> order.getOrDefault(p, Integer.MAX_VALUE));
   }
 
   /**
@@ -40,7 +60,7 @@ final class ProfileMatcher {
     OverlaidTemplatePaths<?> paths,
     AbstractUserPreferences<?> userPreferences
   ) {
-    var profile = paths.closestProfile(userPreferences);
+    var profile = paths.closestProfile(userPreferences, declarationOrder);
     if (parentsOfWarmup.isEmpty() || userPreferences.equals(profile)) {
       return profile;
     }
@@ -53,8 +73,8 @@ final class ProfileMatcher {
         continue;
       }
       double distance = userPreferences.normalizedDistance(warmup.getKey());
-      // A profile wins a tie
-      if (distance < bestDistance) {
+      // A profile wins a tie, and the first declared warmup entry wins a tie between entries
+      if (distance < bestDistance - TemplatePathsByUserProfile.DISTANCE_EPSILON) {
         bestDistance = distance;
         profile = warmup.getValue();
       }

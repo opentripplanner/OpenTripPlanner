@@ -9,7 +9,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 class ReluctanceTest {
 
-  private static final float EPSILON = 0.001f;
+  private static final double EPSILON = 0.001;
 
   // The reluctance is rounded to a step that grows with the value. The tests below check the
   // result for the edges of the range and of the buckets, not how the steps are defined.
@@ -175,10 +175,10 @@ class ReluctanceTest {
   void normalizedDistance() {
     var min = Reluctance.of(0.0);
     var max = Reluctance.of(1_000_000.0);
-    assertThat(min.normalizedDistance(min)).isWithin(EPSILON).of(0.0f);
-    assertThat(min.normalizedDistance(max)).isWithin(EPSILON).of(1.0f);
-    assertThat(max.normalizedDistance(min)).isWithin(EPSILON).of(1.0f);
-    assertThat(max.normalizedDistance(max)).isWithin(EPSILON).of(0.0f);
+    assertThat(min.normalizedDistance(min)).isWithin(EPSILON).of(0.0);
+    assertThat(min.normalizedDistance(max)).isWithin(EPSILON).of(1.0);
+    assertThat(max.normalizedDistance(min)).isWithin(EPSILON).of(1.0);
+    assertThat(max.normalizedDistance(max)).isWithin(EPSILON).of(0.0);
     // A reluctance an order of magnitude higher is "further" than one twice as high.
     var double_ = Reluctance.of(2.0);
     var tenX = Reluctance.of(10.0);

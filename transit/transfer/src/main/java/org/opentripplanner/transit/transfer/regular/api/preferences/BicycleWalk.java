@@ -18,6 +18,17 @@ public final class BicycleWalk implements NormalizedDistance<BicycleWalk>, Seria
   private final Speed speed;
   private final Reluctance reluctance;
 
+  /**
+   * Walking with the bicycle counts a third of what the speed and the reluctance of the bicycle
+   * count. The speed and the reluctance have the reference distance for a change of 1.3 to 1.4 m/s
+   * and 2.0 to 2.5, like the walking.
+   */
+  private static final double SPEED_WEIGHT =
+    DistanceWeight.of(Speed.ofMetersPerSecond(1.3), Speed.ofMetersPerSecond(1.4)) / 3.0;
+
+  private static final double RELUCTANCE_WEIGHT =
+    DistanceWeight.of(Reluctance.of(2.0), Reluctance.of(2.5)) / 3.0;
+
   private BicycleWalk(Speed speed, Reluctance reluctance) {
     this.speed = Objects.requireNonNull(speed);
     this.reluctance = Objects.requireNonNull(reluctance);
@@ -38,8 +49,11 @@ public final class BicycleWalk implements NormalizedDistance<BicycleWalk>, Seria
   }
 
   @Override
-  public float normalizedDistance(BicycleWalk other) {
-    return speed.normalizedDistance(other.speed) + reluctance.normalizedDistance(other.reluctance);
+  public double normalizedDistance(BicycleWalk other) {
+    return (
+      SPEED_WEIGHT * speed.normalizedDistance(other.speed) +
+      RELUCTANCE_WEIGHT * reluctance.normalizedDistance(other.reluctance)
+    );
   }
 
   @Override

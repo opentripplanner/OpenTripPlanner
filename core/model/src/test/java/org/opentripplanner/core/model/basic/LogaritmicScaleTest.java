@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 class LogaritmicScaleTest {
 
-  private static final float EPSILON = 0.00001f;
+  private static final double EPSILON = 0.00001;
 
   @Test
   void constructorRejectsMinNotLessThanMax() {
@@ -26,12 +26,12 @@ class LogaritmicScaleTest {
     assertThat(subject.normalizedDistance(10.0, 10.0)).isZero();
     assertThat(subject.normalizedDistance(25.0, 25.0)).isZero();
 
-    assertThat(subject.normalizedDistance(0.0, 25.0)).isWithin(EPSILON).of(1.0f);
-    assertThat(subject.normalizedDistance(25.0, 0.0)).isWithin(EPSILON).of(1.0f);
+    assertThat(subject.normalizedDistance(0.0, 25.0)).isWithin(EPSILON).of(1.0);
+    assertThat(subject.normalizedDistance(25.0, 0.0)).isWithin(EPSILON).of(1.0);
 
-    assertThat(subject.normalizedDistance(0.0, half)).isWithin(EPSILON).of(0.5f);
-    assertThat(subject.normalizedDistance(half, 0.0)).isWithin(EPSILON).of(0.5f);
-    assertThat(subject.normalizedDistance(half, 25.0)).isWithin(EPSILON).of(0.5f);
-    assertThat(subject.normalizedDistance(25.0, half)).isWithin(EPSILON).of(0.5f);
+    assertThat(subject.normalizedDistance(0.0, half)).isWithin(EPSILON).of(0.5);
+    assertThat(subject.normalizedDistance(half, 0.0)).isWithin(EPSILON).of(0.5);
+    assertThat(subject.normalizedDistance(half, 25.0)).isWithin(EPSILON).of(0.5);
+    assertThat(subject.normalizedDistance(25.0, half)).isWithin(EPSILON).of(0.5);
   }
 }

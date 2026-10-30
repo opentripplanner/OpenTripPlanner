@@ -74,7 +74,7 @@ public final class TimeSlopeSafetyTrianglePreference
   }
 
   @Override
-  public float normalizedDistance(TimeSlopeSafetyTrianglePreference other) {
+  public double normalizedDistance(TimeSlopeSafetyTrianglePreference other) {
     return (
       time.normalizedDistance(other.time) +
       slope.normalizedDistance(other.slope) +
