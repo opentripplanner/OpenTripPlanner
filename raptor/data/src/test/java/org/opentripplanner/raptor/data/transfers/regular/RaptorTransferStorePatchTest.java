@@ -48,6 +48,23 @@ class RaptorTransferStorePatchTest {
   }
 
   @Test
+  void theTransfersOfAPatchedStopAreSortedByDuration() {
+    var patched = original()
+      .patch()
+      .replaceTransfersFrom(A)
+      .addTransfer(A, D, 400, 40)
+      .addTransfer(A, C, 250, 25)
+      .build();
+
+    assertThat(from(patched, A))
+      .containsExactly(tx(C, 250, 25), tx(D, 400, 40))
+      .inOrder();
+    assertThat(to(patched, C))
+      .containsExactly(tx(A, 250, 25), tx(B, 300, 30))
+      .inOrder();
+  }
+
+  @Test
   void aReplacedStopWithoutTransfersHasNone() {
     var patched = original().patch().replaceTransfersFrom(A).build();
 
