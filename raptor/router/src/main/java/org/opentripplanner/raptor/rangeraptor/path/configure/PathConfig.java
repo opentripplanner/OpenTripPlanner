@@ -94,7 +94,7 @@ public class PathConfig<T extends RaptorTripSchedule> {
       ctx.raptorSlackProvider(),
       includeCost ? ctx.costCalculator() : null,
       ctx.stopNameResolver(),
-      ctx.transferData().transferConstraintsSearch(),
+      ctx.transitData().transferConstraintsSearch(),
       ctx.lifeCycle()
     );
   }

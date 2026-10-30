@@ -17,9 +17,9 @@ import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
-import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RaptorTransitDataMapper;
 import org.opentripplanner.routing.fares.FareServiceFactory;
@@ -47,8 +47,8 @@ import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.repository.ScheduledTimetableData;
 import org.opentripplanner.transit.service.TransitRepository;
-import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.updater.configure.UpdaterConfigurator;
+import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -99,7 +99,6 @@ public class ConstructApplication {
     TransitRepository transitRepository,
     TimetableDataImport timetableDataImport,
     TransferRepository transferRepository,
-    RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     ConfigModel config,
     GraphBuilderDataSources graphBuilderDataSources,
@@ -136,7 +135,12 @@ public class ConstructApplication {
     }
     LOG.info("Creating transit layer for Raptor routing.");
     transitRepository.initRaptorTransitData(
-      RaptorTransitDataMapper.map(tuningParameters, transitRepository, scheduledTimetableData)
+      RaptorTransitDataMapper.map(
+        tuningParameters,
+        transitRepository,
+        scheduledTimetableData,
+        transferRepository
+      )
     );
     var scheduledRaptorTransitData = new RaptorTransitData(
       transitRepository.getRaptorTransitData()
@@ -150,7 +154,6 @@ public class ConstructApplication {
       .transitRepository(transitRepository)
       .scheduledTimetableData(scheduledTimetableData)
       .transferRepository(transferRepository)
-      .regularTransferBuildRepository(regularTransferBuildRepository)
       .worldEnvelopeRepository(worldEnvelopeRepository)
       .vehicleParkingRepository(vehicleParkingRepository)
       .emissionRepository(emissionRepository)
@@ -198,7 +201,6 @@ public class ConstructApplication {
       factory.transitRepository(),
       timetableDataImport(),
       factory.transferRepository(),
-      factory.regularTransferBuildRepository(),
       factory.worldEnvelopeRepository(),
       factory.vehicleParkingRepository(),
       factory.emissionRepository(),
@@ -235,10 +237,6 @@ public class ConstructApplication {
     enableRequestTraceLogging();
     createMetricsLogging();
 
-    // Repositories must be registered before the updaters start writing, not lazily by the first
-    // request - registration is not thread-safe.
-    factory.regularTransferRepositoryHandle();
-
     /* Create updater modules from JSON config. */
     UpdaterConfigurator.configure(
       graph(),
@@ -264,6 +262,8 @@ public class ConstructApplication {
 
     initEllipsoidToGeoidDifference();
 
+    initializeTransferCache(routerConfig().transitTuningConfig(), transitRepository());
+
     if (OTPFeature.SandboxAPIGeocoder.isOn()) {
       LOG.info("Initializing geocoder");
       // eagerly initialize the geocoder
@@ -281,6 +281,31 @@ public class ConstructApplication {
     }
   }
 
+  public static void initializeTransferCache(
+    TransitTuningParameters transitTuningConfig,
+    TransitRepository transitRepository
+  ) {
+    var transferCacheRequests = transitTuningConfig.transferCacheRequests();
+    if (!transferCacheRequests.isEmpty()) {
+      var progress = ProgressTracker.track(
+        "Creating initial raptor transfer cache",
+        1,
+        transferCacheRequests.size()
+      );
+
+      LOG.info(progress.startMessage());
+
+      transferCacheRequests.forEach(request -> {
+        transitRepository.getRaptorTransitData().initTransferCacheForRequest(request);
+
+        //noinspection Convert2MethodRef
+        progress.step(s -> LOG.info(s));
+      });
+
+      LOG.info(progress.completeMessage());
+    }
+  }
+
   public TransitRepository transitRepository() {
     return factory.transitRepository();
   }
@@ -294,10 +319,6 @@ public class ConstructApplication {
 
   public TransferRepository transferRepository() {
     return factory.transferRepository();
-  }
-
-  public RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository() {
-    return factory.regularTransferBuildRepository();
   }
 
   @Nullable

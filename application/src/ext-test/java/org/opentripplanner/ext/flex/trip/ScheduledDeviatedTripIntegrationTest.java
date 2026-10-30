@@ -102,7 +102,8 @@ class ScheduledDeviatedTripIntegrationTest {
 
     var transitService = TestServerContext.createTransitService(
       transitRepository,
-      timetableDataImport
+      timetableDataImport,
+      transferRepository
     );
 
     // from zone 3 to zone 2
@@ -149,7 +150,8 @@ class ScheduledDeviatedTripIntegrationTest {
 
     var transitService = TestServerContext.createTransitService(
       transitRepository,
-      timetableDataImport
+      timetableDataImport,
+      transferRepository
     );
 
     var from = GenericLocation.fromStopId(
@@ -245,7 +247,6 @@ class ScheduledDeviatedTripIntegrationTest {
         Metrics.globalRegistry,
         TestServerContext.createStreetDetailsService(),
         TransferServiceTestFactory.transferService(transferRepository),
-        TestServerContext.createRegularTransfers(graph, transitRepository, timetableDataImport),
         RouterConfig.DEFAULT.flexParameters(),
         List.of(),
         null,

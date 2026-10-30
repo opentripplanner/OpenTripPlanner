@@ -21,7 +21,7 @@ public abstract class ViaModule {
     return new DefaultViaCoordinateTransferFactory(
       graph,
       transitService,
-      buildConfig.viaTransferMaxDuration()
+      buildConfig.regularTransferParameters().maxDuration()
     );
   }
 }

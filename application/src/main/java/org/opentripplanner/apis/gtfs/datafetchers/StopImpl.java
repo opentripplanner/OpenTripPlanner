@@ -33,6 +33,7 @@ import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.EntitySelector.StopAndRoute;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -479,38 +480,27 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
             environment.getArguments()
           ).getGraphQLMaxDistance();
 
-          return findTransfers(environment.getContext(), stop)
-            .filter(transfer -> maxDistance == null || transfer.distance() < maxDistance)
-            .sorted(Comparator.comparingDouble(NearbyStop::distance))
+          return getTransferService(environment)
+            .findTransfersByStop(stop)
+            .stream()
+            .filter(transfer -> maxDistance == null || transfer.getDistanceMeters() < maxDistance)
+            .filter(transfer -> transfer.to instanceof RegularStop)
+            .map(transfer ->
+              new NearbyStop(
+                transfer.to.getId(),
+                transfer.getDistanceMeters(),
+                transfer.getEdges(),
+                null
+              )
+            )
             .collect(Collectors.toList());
         },
         station -> null
       );
   }
 
-  /**
-   * The transfers from {@code stop} to regular stops. A regular stop has the regular transfers of
-   * the default route request; an area or group stop only has the flex transfers.
-   */
-  private static Stream<NearbyStop> findTransfers(
-    GtfsGraphQLRequestContext context,
-    StopLocation stop
-  ) {
-    if (stop instanceof RegularStop) {
-      return context
-        .regularTransfers()
-        .forRequest(context.defaultRouteRequest())
-        .findPathsFrom(stop.getIndex())
-        .stream();
-    }
-    return context
-      .transferService()
-      .findTransfersByStop(stop)
-      .stream()
-      .filter(transfer -> transfer.to instanceof RegularStop)
-      .map(transfer ->
-        new NearbyStop(transfer.to.getId(), transfer.getDistanceMeters(), transfer.getEdges(), null)
-      );
+  private RegularTransferService getTransferService(DataFetchingEnvironment environment) {
+    return environment.<GtfsGraphQLRequestContext>getContext().transferService();
   }
 
   @Override

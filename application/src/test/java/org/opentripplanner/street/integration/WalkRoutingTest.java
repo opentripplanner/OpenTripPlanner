@@ -19,6 +19,7 @@ import org.opentripplanner.standalone.api.TestServerContext;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.TemporaryVerticesContainer;
 import org.opentripplanner.test.support.ResourceLoader;
+import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.service.TransitRepository;
 
@@ -72,7 +73,8 @@ class WalkRoutingTest {
       var linkingContext = linkingContextFactory.create(temporaryVerticesContainer, linkingRequest);
       var transitService = TestServerContext.createTransitService(
         new TransitRepository(),
-        new TimetableDataImport()
+        new TimetableDataImport(),
+        TransferServiceTestFactory.defaultTransferRepository()
       );
       return DirectStreetRouter.route(
         graph,

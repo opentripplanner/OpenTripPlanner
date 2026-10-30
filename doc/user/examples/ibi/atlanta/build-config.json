@@ -2,8 +2,5 @@
   "osmDefaults": {
     "osmTagMapping": "atlanta" 
   },
-  "transfers": {
-    "walk": { "maxDuration": "30m" },
-    "wheelchair": { "maxDuration": "30m" }
-  }
+  "transferRequests": [ { "modes": "WALK" }, { "modes": "WALK", "wheelchairAccessibility": { "enabled": true }} ]
 }

@@ -216,7 +216,7 @@ public class RefetchTripPatternQuery {
       ctx.graph(),
       ctx.transitService(),
       ctx.transitAlertService(),
-      ctx.regularTransfers(),
+      ctx.transferService(),
       ctx.streetDetailsService(),
       ctx.linkingContextFactory(),
       ctx.streetLimitationParametersService()

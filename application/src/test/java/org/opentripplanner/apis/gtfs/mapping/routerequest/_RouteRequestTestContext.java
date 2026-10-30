@@ -38,7 +38,6 @@ import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
-import org.opentripplanner.transit.transfer.regular.NoRegularTransfers;
 
 class _RouteRequestTestContext {
 
@@ -72,6 +71,7 @@ class _RouteRequestTestContext {
       transitRepository,
       DefaultTimetableRepository.scheduledOnly(timetableDataImport.toScheduledTimetableData())
     );
+    var transferService = TransferServiceTestFactory.defaultTransferService();
     var routeRequest = RouteRequest.defaultValue();
     var vertexLinker = VertexLinkerTestFactory.of(graph);
     var vertexCreationService = new VertexCreationService(vertexLinker);
@@ -88,8 +88,7 @@ class _RouteRequestTestContext {
       new TestRoutingService(List.of()),
       transitService,
       new TransitAlertServiceImpl(),
-      TransferServiceTestFactory.defaultTransferService(),
-      NoRegularTransfers.snapshot(),
+      transferService,
       new DefaultFareService(),
       new DefaultVehicleRentalService(new DefaultVehicleRentalRepository()),
       new DefaultVehicleParkingService(new DefaultVehicleParkingRepository()),

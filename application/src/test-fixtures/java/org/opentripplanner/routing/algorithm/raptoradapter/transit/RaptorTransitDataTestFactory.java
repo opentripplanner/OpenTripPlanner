@@ -13,6 +13,8 @@ public class RaptorTransitDataTestFactory {
       null,
       null,
       null,
+      null,
+      null,
       null
     );
   }
