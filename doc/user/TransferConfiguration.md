@@ -35,12 +35,14 @@ logs and in the issues it reports, for example `Created 101785 regular transfers
 'walk'`. Any string is allowed.
 
 **User preferences.** The preferences of a traveler, like walking speed, that are used to search
-for and cost the transfers. A profile without `userPreferences` gets them from its `routingRequest`,
-or from the default request if it has none. The user preferences of the profiles must be unique.
+for and cost the transfers. A profile without `userPreferences` gets the ones of its parent of the
+same type, or the defaults. The user preferences of the profiles must be unique.
 
-**Default request.** The default request is the request with the default values of the code. It is
-not the `routingDefaults` of `router-config.json`, since the router configuration is not available
-when the graph is built.
+**Street parameters.** The parameters of the street search that are not user preferences, like the
+stairs reluctance, are set in the block of the profile type, for example `walk.stairsReluctance`.
+They are shared by all the profiles of the type. See [Street parameters](#street-parameters). They
+are not the `routingDefaults` of `router-config.json`, since the router configuration is not
+available when the graph is built.
 
 **Warmup.** The transfers for the preferences of a routing request are created the first time a
 request needs them, and cached. OTP creates them for the preferences of every profile when the
@@ -48,8 +50,8 @@ server starts. A warmup entry does the same for other preferences that are commo
 but are not worth a profile of their own. See [Warmup](#warmup).
 
 **Parent.** A profile can be based on another profile, its `parent`. If the parent is of the same
-type, the profile inherits the `routingRequest` and the `userPreferences` of the parent, and only
-has to set what is different. The transfers the profile and its parent have in common are stored
+type, the profile inherits the `userPreferences` of the parent, and only has to set what is
+different. The transfers the profile and its parent have in common are stored
 once, which saves memory. See [Parent and deduplication](#parent-and-deduplication).
 
 ## Example
@@ -58,7 +60,6 @@ once, which saves memory. See [Parent and deduplication](#parent-and-deduplicati
 // build-config.json
 {
   "transfers": {
-    "deduplicationLimit": "30s + 0.005x",
     "walk": {
       "profiles": [
         {
@@ -68,6 +69,7 @@ once, which saves memory. See [Parent and deduplication](#parent-and-deduplicati
         {
           "id": "slow-walk",
           "parent": "walk",
+          "reuseLimit": "30s + 0.05x",
           "userPreferences": { "speed": 0.9, "reluctance": 4.0 }
         }
       ],
@@ -85,20 +87,34 @@ once, which saves memory. See [Parent and deduplication](#parent-and-deduplicati
 ```
 
 If the `transfers` section is left out, a single `walk` profile with the preferences of the default
-request and a max duration of 30 minutes is used. Each profile type with profiles must set its
-`maxDuration`, there is no default.
+request and a max duration of 30 minutes is used. The `maxDuration` of a profile type is optional,
+the default is 30 minutes.
+
+A profile type with a block and without `profiles`, also an empty one, gets one profile with the name
+of the type as its id and the default preferences. This configures a `wheelchair` profile and no
+`walk` profile:
+
+```json
+{
+  "transfers": {
+    "wheelchair": {}
+  }
+}
+```
+
+The `walk` profile is only the default if no profile type is configured. A request for a profile type
+that is not configured has no transfers to use, so configure all the types the clients ask for.
 
 ## Parameters
 
 | Parameter                     | Type       | Description                                                                         | Default           |
 |-------------------------------|------------|-------------------------------------------------------------------------------------|-------------------|
-| `deduplicationLimit`          | `string`   | How much more the path of a parent may cost to be used by a child. See below.       | `"30s + 0.005x"`  |
 | `walk.profiles`               | `object[]` | The walk profiles. If none is configured, one with the id `walk` is used.           |                   |
 | &nbsp;&nbsp;`id`              | `string`   | **Required.** The id of the profile, unique among all profiles.                     |                   |
 | &nbsp;&nbsp;`parent`          | `string`   | The `id` of the profile this profile is based on. See below.                        |                   |
 | &nbsp;&nbsp;`userPreferences` | `object`   | The preferences the profile is searched with. See below.                            |                   |
-| &nbsp;&nbsp;`routingRequest`  | `object`   | A [routing request](RouteRequest.md) the search is based on. See below.             |                   |
-| `walk.maxDuration`            | `duration` | **Required** if there are walk profiles. How far from a stop the walk transfers are searched. See below. |                   |
+| &nbsp;&nbsp;`reuseLimit`      | `string`   | How much more the path of the parent may cost to be used by this profile. See below.| `"15s + 0.02x"`   |
+| `walk.maxDuration`            | `duration` | How far from a stop the walk transfers are searched. See below.                 | `30m`             |
 | `walk.warmup`                 | `object[]` | Preferences to create transfers for when the server starts. See below.              |                   |
 | &nbsp;&nbsp;`id`              | `string`   | **Required.** The id of the entry, unique among all profiles and warmup entries.    |                   |
 | &nbsp;&nbsp;`parent`          | `string`   | **Required.** The `id` of a profile of the same type the transfers are created from.|                   |
@@ -114,7 +130,7 @@ two more parameters, see [Max durations](#max-durations).
 |---------------|----------|-------------------------------------------------------------------------------------|----------|
 | `speed`       | `double` | The speed in meters per second. Not for `car`, it drives the speed of the streets.  | `1.35`   |
 | `reluctance`  | `double` | A multiplier for the cost of the transfer. A higher value avoids the transfer.      | `2.0`    |
-| `safetyFactor` | `double` | `walk` and `wheelchair` only. How much the safety of the streets is considered, from 0.0 (ignored) to 1.0. | `1.0` |
+| `safetyFactor` | `double` | `walk` only, the street search does not use it for a wheelchair. How much the safety of the streets is considered, from 0.0 (ignored) to 1.0. | `1.0` |
 
 The `walk`, `wheelchair` and `bicycle` types have `speed` and `reluctance`, and the `car` type only
 has `reluctance`. The defaults of `walk` and `wheelchair` are the same, and the default `speed` of
@@ -138,18 +154,41 @@ are `0.0`, so `optimize: { time: 0.1 }` is `time: 1.0`, `slope: 0.0` and `safety
 not set in a profile, the profile inherits it from a parent of the same type, and a root gets it
 from the request. The default is the safest streets (`safety: 1.0`).
 
-The stairs reluctance is not a user preference, since no API takes it as an input of a routing
-search. It is a `routingRequest` parameter of the profile, for example `walk.stairsReluctance`,
-`wheelchair.stairsReluctance` or `bicycle.walking.stairsReluctance`. It is the value of the
-configuration of the profile, not the one in `routingDefaults` of the `router-config.json`, so
-copy it to the `routingRequest` of the profiles if it is not the default.
+### Street parameters
 
-### Routing request
+The parameters of the street search that are not user preferences, since no API takes them as an
+input of a routing search, are set in the block of the profile type. They are the same for all the
+profiles of the type, and the default is the default of the route request. The value in
+`routingDefaults` of `router-config.json` is not used for the transfers.
 
-`routingRequest` takes the same parameters as the [route request](RouteRequest.md), and is the base
-the transfer search is made with. It is there so existing behavior can be kept. The values in
-`userPreferences` override the equivalent values of the request. The goal is to move all the
-relevant parameters to `userPreferences`, and drop `routingRequest` in the future.
+| Block        | Parameters                                                                                                    |
+|--------------|---------------------------------------------------------------------------------------------------------------|
+| `walk`       | `stairsReluctance`, `stairsTimeFactor` and `escalator` (`speed`, `reluctance`).                               |
+| `wheelchair` | `stop` and `elevator` (`onlyConsiderAccessible`, `unknownCost`, `inaccessibleCost`), `inaccessibleStreetReluctance`, `maxSlope`, `slopeExceededReluctance` and `stairsReluctance`. |
+| `bicycle`    | `walking` (`stairsReluctance`, `mountDismountCost` and `mountDismountTime`): walking with the bicycle.        |
+| `car`        | None.                                                                                                         |
+
+When the server starts, OTP logs a warning for each profile type that has one of these parameters
+different from the same parameter in `routingDefaults` of `router-config.json`. The user
+preferences, like the walking speed, are not compared, they are set by each request.
+
+The elevator settings of the street search (`ElevatorPreferences`), the street-level settings like
+`turnReluctance` and `drivingDirection`, and the wheelchair `stairsTimeFactor` are not configurable
+for the transfers, they have the default values.
+
+By default the `wheelchair` profile only uses the stops that are marked as wheelchair accessible.
+If the accessibility data of the stops is incomplete, almost all the transfers are lost. Set
+`unknownCost` and `inaccessibleCost` of `wheelchair.stop` to use the other stops with a cost:
+
+```json
+{
+  "transfers": {
+    "wheelchair": {
+      "stop": { "unknownCost": 600, "inaccessibleCost": 3600 }
+    }
+  }
+}
+```
 
 ### Parent and deduplication
 
@@ -159,12 +198,12 @@ declared in any order. A parent can be of another type, for example a `wheelchai
 `walk` profile as its parent. The paths are then stored once, but no values are inherited.
 
 **Inheritance.** Values are only inherited within a profile type. If the parent is a profile of the
-same type, the profile inherits the `routingRequest` and the `userPreferences` of the parent.
+same type, the profile inherits the `userPreferences` and the `reuseLimit` of the parent.
 Everything that is set on the profile overrides the inherited value, and everything that is not set
 is the value of the parent. A profile with a parent and without `userPreferences` of its own would
 get the same preferences as the parent, and is rejected, since the profiles must be unique. A
 profile without a parent of the same type is the root of its type, and the values it does not set
-are the ones of the request, see [Routing request](#routing-request). A parent of another type is
+are the defaults. A parent of another type is
 not inherited from, it is only used for the deduplication below.
 
 **Deduplication.** Each profile still searches for its own transfers, but the transfers that are
@@ -173,15 +212,19 @@ stops, OTP calculates the cost of the path of the parent with the preferences of
 is close enough to the cost of the best path the profile found itself, the profile uses the path of
 the parent. This makes the graph smaller, and the graph file too.
 
-"Close enough" is set with `deduplicationLimit`. It is a linear function of the cost `x` of the
-path of the parent, for example `30s + 0.005x`: a path that costs up to 0.5% and 30 seconds more
+"Close enough" is set with `reuseLimit` of the profile that reuses the path, and it is optional. A
+profile inherits the `reuseLimit` of its parent of the same type, for example from `walk` to
+`slow-walk`, but not from a parent of another type: a `wheelchair` profile with the `walk` profile
+as its parent does not get the limit of `walk`. A profile that has none of its own and does not
+inherit one uses the default. It is a linear function of the cost `x` of the
+path of the parent, for example `15s + 0.02x`: a path that costs up to 2% and 15 seconds more
 than the best path is used. Both terms are required, the constant first, like the other linear
 functions of the configuration. A limit of `0s + 0x` only shares the paths with the same cost. The
 limit applies to the generalized cost only, not to the duration. The graph build logs how many of the paths of each profile are the
 paths of its parent:
 
 ```
-Profile 'slow-walk': 84788 of 85142 paths (99.6%) are the paths of the parent 'walk', they are stored once.
+Profile 'slow-walk' paths: 85 142, 84 788 (100%) reused 'walk' - WalkPreferences{speed: 0.9m/s}.
 ```
 
 Use a parent for profiles that are close to another profile, like a slightly slower walker. A
@@ -257,7 +300,7 @@ transfer is used:
 | `bicycle.maxDuration`                | `duration` | The max duration between stops that allow bicycles.               |
 | `bicycle.maxDurationAllowsCar`       | `duration` | The max duration between stops that allow cars.                   |
 
-At least one of them is required. `maxDurationAllowAllModes` must be shorter than `maxDuration` and
+If none of them is set, `maxDuration` is 30 minutes. `maxDurationAllowAllModes` must be shorter than `maxDuration` and
 `maxDurationAllowsCar`, if they are set. If `maxDurationAllowAllModes` is left out, there are only
 transfers between the stops that allow bicycles or cars:
 
@@ -287,16 +330,8 @@ Stops of a station that does not allow transfers have no transfers from or to th
 
 !!! note
 
-    The old `maxTransferDuration` and `transferRequests` of the build config are not read any more,
-    OTP reports them as unexpected parameters. Use `maxDuration` of each profile type for the regular
-    transfers, and `transfers.flex` and `transfers.via` for the rest, see
-    [Flex and via transfers](#flex-and-via-transfers).
-    The old per mode `transferParametersForMode` is replaced by the profile types:
-    `carsAllowedStopMaxTransferDuration` of the `CAR` mode is the `car` type, and the
-    `bicycle` type has `maxDurationAllowsCar` and `maxDuration` (the old
-    `bikesAllowedStopMaxTransferDuration`). The `disableDefaultTransfers` is replaced by leaving out
-    `bicycle.maxDurationAllowAllModes`. The wheelchair no longer shares the walk max duration, set
-    `wheelchair.maxDuration` too.
+    The old transfer settings are replaced by the profile types, see
+    [Migrating from the old configuration](#migrating-from-the-old-configuration).
 
 ## Flex and via transfers
 
@@ -308,6 +343,49 @@ Stops of a station that does not allow transfers have no transfers from or to th
 
 They replace the old `transferRequests` and `maxTransferDuration` of the build config, which are
 not read any more. The flex transfers are only created if the sandbox feature `FlexRouting` is on.
+
+## Migrating from the old configuration
+
+The old transfer settings are not read any more. OTP reports them as unexpected parameters when it
+starts, and creates the transfers with the defaults of the new configuration, so check the log. This
+is where each old setting went:
+
+| Old setting                                                              | New setting                                                                 |
+|--------------------------------------------------------------------------|-----------------------------------------------------------------------------|
+| `maxTransferDuration`                                                    | `walk.maxDuration`, and `wheelchair.maxDuration` too: the wheelchair does not share the walk limit. For flex: `flex.maxDuration`. |
+| `transferRequests` with the mode `WALK`                                  | the `walk` block                                                            |
+| `transferRequests` with `wheelchairAccessibility: { enabled: true }`     | the `wheelchair` block                                                      |
+| `transferRequests` with the mode `BICYCLE` or `CAR`                      | the `bicycle` or `car` block                                                |
+| other parameters of a request in `transferRequests`                      | the [street parameters](#street-parameters) of the type, only those can be set |
+| `transferParametersForMode.CAR.carsAllowedStopMaxTransferDuration`       | `car.maxDuration`                                                           |
+| `transferParametersForMode.BICYCLE.bikesAllowedStopMaxTransferDuration`  | `bicycle.maxDuration`                                                       |
+| `disableDefaultTransfers`                                                | leave out `bicycle.maxDurationAllowAllModes`                                |
+| `transit.transferCacheRequests` of `router-config.json`                  | `warmup` entries, see [Warmup](#warmup)                                     |
+
+**Configure every profile type that the clients use.** A request for a transfer mode that is not
+configured is not supported. It fails with an error, there is no fallback. If clients ask for
+bicycle transfers, add a bicycle profile, for example a small set of paths between all stops:
+
+```json
+"bicycle": {
+  "maxDurationAllowAllModes": "10m",
+  "profiles": [{ "id": "bicycle", "parent": "walk", "reuseLimit": "15s + 0.05x" }]
+}
+```
+
+Bicycle is the most expensive type, so check the build time and the memory first. The default
+`walk` profile is only used if no profile type is configured at all. If you only configure
+`wheelchair` or `car`, there are no walk transfers.
+
+**The flex limit is separate now.** The flex transfers used the walk limit, and now they use
+`transfers.flex.maxDuration`, `30m` by default. If your walk limit was longer, set it for flex too.
+
+**The wheelchair only uses the stops that are marked accessible** by default. If the accessibility
+data of the stops is incomplete, most wheelchair transfers are lost, see
+[Street parameters](#street-parameters).
+
+When the server starts, OTP also warns about the street parameters of the transfers that differ from
+`routingDefaults` of `router-config.json`.
 
 ## What is not supported yet
 

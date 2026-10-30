@@ -17,6 +17,8 @@ import org.opentripplanner.transit.transfer.regular.RegularTransferBuildReposito
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 import org.opentripplanner.transit.transfer.regular.api.report.RegularTransferCacheMetrics;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Wires the regular-transfer repository for routing. The runtime repository is created from the
@@ -26,6 +28,8 @@ import org.opentripplanner.transit.transfer.regular.api.report.RegularTransferCa
 @Module
 public class RegularTransferRepositoryModule {
 
+  private static final Logger LOG = LoggerFactory.getLogger(RegularTransferRepositoryModule.class);
+
   /**
    * Converts the build repository into the runtime repository, and seals it. From now on regular
    * transfers are only updated through the handle. See
@@ -33,6 +37,9 @@ public class RegularTransferRepositoryModule {
    * <p>
    * Registration is not thread-safe, so the handle must be created at startup, before the updaters
    * start - not lazily by the first request. The transit repository must be indexed.
+   * <p>
+   * The street parameters of the transfers that are different from the {@code routingDefaults} of
+   * the router configuration are logged as a warning for each profile type.
    */
   @Provides
   @Singleton
@@ -47,6 +54,12 @@ public class RegularTransferRepositoryModule {
     Graph graph,
     TransitRepository transitRepository
   ) {
+    for (var warning : TransferRequestDifferences.warnings(
+      buildConfig.transferProfiles(),
+      routerConfig.routingRequestDefaults()
+    )) {
+      LOG.warn(warning);
+    }
     return StreetTransferFactory.registerRepository(
       repositoryRegistry,
       buildRepository,

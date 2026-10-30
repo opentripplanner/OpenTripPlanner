@@ -1,5 +1,6 @@
 package org.opentripplanner.transfer.streetadapter;
 
+import java.util.function.Consumer;
 import org.opentripplanner.core.model.basic.Ratio;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.core.model.basic.Speed;
@@ -15,7 +16,6 @@ import org.opentripplanner.transit.transfer.regular.api.preferences.CarPreferenc
 import org.opentripplanner.transit.transfer.regular.api.preferences.TimeSlopeSafetyTrianglePreference;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WheelchairPreferences;
-import org.opentripplanner.transit.transfer.regular.api.preferences.WithSafetyFactor;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WithSpeed;
 import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
 
@@ -59,7 +59,6 @@ public final class RegularTransferPreferencesMapper implements TransferRequestMa
       case WHEELCHAIR -> WheelchairPreferences.of()
         .withSpeed(speed)
         .withReluctance(reluctance)
-        .withSafetyFactor(safetyFactor)
         .build();
       case BICYCLE -> BicyclePreferences.of()
         .withSpeed(Speed.ofMetersPerSecond(appBike.speed()))
@@ -79,8 +78,8 @@ public final class RegularTransferPreferencesMapper implements TransferRequestMa
   @Override
   public RouteRequest toRequest(AbstractUserPreferences<?> userPreferences, RouteRequest base) {
     return switch (userPreferences) {
-      case WalkPreferences walk -> walkRequest(walk, base, false);
-      case WheelchairPreferences wheelchair -> walkRequest(wheelchair, base, true);
+      case WalkPreferences walk -> walkRequest(walk, base);
+      case WheelchairPreferences wheelchair -> wheelchairRequest(wheelchair, base);
       case BicyclePreferences bicycle -> bicycleRequest(bicycle, base);
       case CarPreferences car -> carRequest(car, base);
     };
@@ -105,10 +104,30 @@ public final class RegularTransferPreferencesMapper implements TransferRequestMa
     };
   }
 
-  /** A walking request, for a traveler in a wheelchair or not. */
-  private static <
-    T extends AbstractUserPreferences<T> & WithSpeed & WithSafetyFactor
-  > RouteRequest walkRequest(T userPreferences, RouteRequest base, boolean wheelchair) {
+  /** A walking request for a traveler that is not in a wheelchair. */
+  private static RouteRequest walkRequest(WalkPreferences userPreferences, RouteRequest base) {
+    return walkingRequest(userPreferences, base, false, walk ->
+      walk.withSafetyFactor(userPreferences.safetyFactor().asDouble())
+    );
+  }
+
+  /**
+   * A walking request for a traveler in a wheelchair. The street search does not use the safety
+   * factor for a wheelchair, so it is the one of the base request.
+   */
+  private static RouteRequest wheelchairRequest(
+    WheelchairPreferences userPreferences,
+    RouteRequest base
+  ) {
+    return walkingRequest(userPreferences, base, true, walk -> {});
+  }
+
+  private static <T extends AbstractUserPreferences<T> & WithSpeed> RouteRequest walkingRequest(
+    T userPreferences,
+    RouteRequest base,
+    boolean wheelchair,
+    Consumer<org.opentripplanner.routing.api.request.preference.WalkPreferences.Builder> other
+  ) {
     return base
       .copyOf()
       .withJourney(jb -> jb.withTransfer(StreetMode.WALK).withWheelchair(wheelchair))
@@ -116,7 +135,7 @@ public final class RegularTransferPreferencesMapper implements TransferRequestMa
         routingPrefs.withWalk(walk -> {
           walk.withSpeed(userPreferences.speed().toMetersPerSecond());
           walk.withReluctance(userPreferences.reluctance().value());
-          walk.withSafetyFactor(userPreferences.safetyFactor().asDouble());
+          other.accept(walk);
         })
       )
       .buildDefault();

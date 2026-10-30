@@ -4,9 +4,11 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.basic.CostLinearFunction;
 import org.opentripplanner.core.model.basic.NormalizedRatio;
@@ -16,7 +18,6 @@ import org.opentripplanner.core.model.basic.Speed;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
-import org.opentripplanner.standalone.config.routerequest.RouteRequestConfig;
 import org.opentripplanner.transfer.configure.StreetTransferFactory;
 import org.opentripplanner.transfer.streetadapter.RegularTransferPreferencesMapper;
 import org.opentripplanner.transit.transfer.regular.api.maxduration.BicycleMaxDurations;
@@ -38,6 +39,7 @@ import org.opentripplanner.transit.transfer.regular.api.preferences.WithSafetyFa
 import org.opentripplanner.transit.transfer.regular.api.preferences.WithSpeed;
 import org.opentripplanner.transit.transfer.regular.configure.RegularTransferFactory;
 import org.opentripplanner.utils.collection.ParentOrder;
+import tools.jackson.databind.node.JsonNodeFactory;
 
 /**
  * Parses the {@code transfers:} build-config block, see {@code doc/user/TransferConfiguration.md},
@@ -77,29 +79,27 @@ public class TransferProfilesConfigMapper {
 
   /** Map the regular transfer profiles of the {@code transfers} node. */
   public static TransferParameters<RouteRequest> mapTransfers(NodeAdapter transfers) {
-    var deduplicationLimit = mapDeduplicationLimit(transfers);
-
     var typeBlocks = new EnumMap<TransferProfileType, NodeAdapter>(TransferProfileType.class);
+    var configuredTypes = EnumSet.noneOf(TransferProfileType.class);
+    var requests = new EnumMap<TransferProfileType, RouteRequest>(TransferProfileType.class);
     var maxDurations = new EnumMap<TransferProfileType, MaxDurationsPreference>(
       TransferProfileType.class
     );
     for (var type : TransferProfileType.values()) {
+      if (transfers.exist(typeName(type))) {
+        configuredTypes.add(type);
+      }
       var block = mapTypeBlock(transfers, type);
       typeBlocks.put(type, block);
-      var typeMaxDurations = mapMaxDurations(block, type);
-      if (typeMaxDurations != null) {
-        maxDurations.put(type, typeMaxDurations);
-      }
+      requests.put(type, TransferRequestConfig.mapRequest(block, type));
+      maxDurations.put(type, mapMaxDurations(block, type));
     }
 
-    var mappedProfiles = mapProfiles(typeBlocks);
+    var mappedProfiles = mapProfiles(typeBlocks, requests, configuredTypes);
     var profiles = mappedProfiles.profiles();
     var warmup = mapWarmup(typeBlocks, mappedProfiles.preferencesById());
-    if (mappedProfiles.isDefaultWalkProfile()) {
-      maxDurations.putIfAbsent(TransferProfileType.WALK, MaxDurationsPreference.DEFAULT);
-    }
 
-    return createParameters(profiles, maxDurations, deduplicationLimit, warmup);
+    return createParameters(profiles, maxDurations, warmup);
   }
 
   /** The block of a profile type, for example {@code walk}. An empty block if it is not set. */
@@ -129,11 +129,10 @@ public class TransferProfilesConfigMapper {
   private static TransferParameters<RouteRequest> createParameters(
     List<TransferProfile<RouteRequest>> profiles,
     Map<TransferProfileType, MaxDurationsPreference> maxDurations,
-    CostLinearFunction deduplicationLimit,
     List<WarmupParameters> warmup
   ) {
     try {
-      var parameters = new TransferParameters<>(profiles, maxDurations, deduplicationLimit, warmup);
+      var parameters = new TransferParameters<>(profiles, maxDurations, warmup);
       RegularTransferFactory.validate(parameters, new RegularTransferPreferencesMapper());
       return parameters;
     } catch (IllegalArgumentException e) {
@@ -142,10 +141,9 @@ public class TransferProfilesConfigMapper {
   }
 
   /**
-   * The max durations of a profile type, shared by all its profiles. {@code null} if the type has
-   * none, which is an error if the type has profiles.
+   * The max durations of a profile type, shared by all its profiles. The default is
+   * {@link TransferParameters#DEFAULT_MAX_DURATION}.
    */
-  @Nullable
   private static MaxDurationsPreference mapMaxDurations(
     NodeAdapter typeNode,
     TransferProfileType type
@@ -156,14 +154,13 @@ public class TransferProfilesConfigMapper {
       .since(V2_10)
       .summary("The longest " + name + " transfer, measured with the user preferences.")
       .description(maxDurationDescription(type))
-      .asDuration(null);
+      .asDuration(
+        type == TransferProfileType.BICYCLE ? null : TransferParameters.DEFAULT_MAX_DURATION
+      );
 
     if (type != TransferProfileType.BICYCLE) {
       rejectBicycleOnly(typeNode, "maxDurationAllowAllModes", name);
       rejectBicycleOnly(typeNode, "maxDurationAllowsCar", name);
-      if (maxDuration == null) {
-        return null;
-      }
       return type == TransferProfileType.CAR
         ? new CarMaxDuration(maxDuration)
         : new PlainMaxDuration(maxDuration);
@@ -195,7 +192,7 @@ public class TransferProfilesConfigMapper {
       )
       .asDuration(null);
     if (maxDuration == null && allowAllModes == null && allowsCar == null) {
-      return null;
+      return MaxDurationsPreference.defaultFor(type);
     }
     try {
       return new BicycleMaxDurations(allowAllModes, maxDuration, allowsCar);
@@ -210,7 +207,7 @@ public class TransferProfilesConfigMapper {
     var description = """
     How far from a stop the transfers are searched when the transfers are generated. It is
     shared by all the profiles of the type, and is not inherited from another type or from a
-    parent profile. Each type with profiles must set it.
+    parent profile. The default is 30 minutes.
     """;
     return switch (type) {
       case WALK, WHEELCHAIR -> description +
@@ -241,24 +238,38 @@ public class TransferProfilesConfigMapper {
     }
   }
 
-  private static CostLinearFunction mapDeduplicationLimit(NodeAdapter transfers) {
-    var builder = transfers
-      .of("deduplicationLimit")
+  /**
+   * The reuse limit of a profile, {@code null} if it is not set. The limit is the one of the parent
+   * of the same type, or the default, if the profile has none, see {@code TransferProfileState}.
+   */
+  @Nullable
+  private static CostLinearFunction mapReuseLimit(ConfiguredProfile profile) {
+    if (!profile.node().exist("reuseLimit")) {
+      return null;
+    }
+    var builder = profile
+      .node()
+      .of("reuseLimit")
       .since(V2_10)
-      .summary("How much more the path of a parent profile may cost, to be used by its children.")
+      .summary("How much more the path of the parent may cost, to be used by this profile.")
       .description(
         """
         A profile with a `parent` finds its own paths, but if the path of the parent costs about the
         same for the profile, it uses the path of the parent instead of storing its own. This saves
         memory. The paths are equivalent if the difference in generalized cost is within this limit,
-        a linear function of the cost `x` of the path of the parent, for example `30s + 0.005x`. The
+        a linear function of the cost `x` of the path of the parent, for example `15s + 0.02x`. The
         limit applies to cost only, not to duration. A report is logged when the graph is built.
+
+        Optional. A profile inherits the limit of its parent of the same type, not of a parent of
+        another type. If there is none, the default is `15s + 0.02x`.
         """
       );
     try {
-      return builder.asCostLinearFunction(TransferParameters.DEFAULT_DEDUPLICATION_LIMIT);
+      return builder.asCostLinearFunction(TransferParameters.DEFAULT_REUSE_LIMIT);
     } catch (IllegalArgumentException e) {
-      throw new OtpAppException("Invalid transfer configuration: " + e.getMessage());
+      throw new OtpAppException(
+        "Invalid transfer configuration in " + profile.node().contextPath() + ": " + e.getMessage()
+      );
     }
   }
 
@@ -268,12 +279,6 @@ public class TransferProfilesConfigMapper {
     TransferProfileType type,
     @Nullable String parent,
     NodeAdapter node
-  ) {}
-
-  /** A profile with the values that are inherited by its children. */
-  private record ResolvedProfile(
-    RouteRequest request,
-    AbstractUserPreferences<?> userPreferences
   ) {}
 
   /** The mapped profiles, and the user preferences of each profile, by id, after inheritance. */
@@ -286,28 +291,38 @@ public class TransferProfilesConfigMapper {
   /**
    * Map the profiles of all the types. A profile inherits unset values from its parent, so the
    * parents are mapped first, whatever order they are declared in, and the parent can be of
-   * another type. If no profile is configured, a default walk profile is used.
+   * another type. A type with a block and without profiles, for example {@code "wheelchair": {}},
+   * gets one profile with the name of the type as its id. If no type is configured, a default walk
+   * profile is used.
+   *
+   * @param requests the request of the profiles of each type, see {@link TransferRequestConfig}
+   * @param configuredTypes the types that have a block in the configuration, also an empty one
    */
-  private static MappedProfiles mapProfiles(Map<TransferProfileType, NodeAdapter> typeBlocks) {
+  private static MappedProfiles mapProfiles(
+    Map<TransferProfileType, NodeAdapter> typeBlocks,
+    Map<TransferProfileType, RouteRequest> requests,
+    Set<TransferProfileType> configuredTypes
+  ) {
     var configured = new ArrayList<ConfiguredProfile>();
-    typeBlocks.forEach((type, block) ->
-      configured.addAll(
-        block
-          .of("profiles")
-          .since(V2_10)
-          .summary("The " + typeName(type) + " transfer profiles.")
-          .description(
-            """
-            Each profile needs an `id`, unique among all the profiles. The `userPreferences` of the
-            profiles must be unique. A profile without `userPreferences` gets them from its
-            `routingRequest`. A profile with a `parent` inherits the `routingRequest` and the
-            `userPreferences` of the parent, and the paths it has in common with the parent are
-            stored once.
-            """
-          )
-          .asObjects(List.of(), node -> readConfiguredProfile(node, type))
-      )
-    );
+    typeBlocks.forEach((type, block) -> {
+      var profiles = block
+        .of("profiles")
+        .since(V2_10)
+        .summary("The " + typeName(type) + " transfer profiles.")
+        .description(
+          """
+          Each profile needs an `id`, unique among all the profiles. The `userPreferences` of the
+          profiles must be unique. A profile without `userPreferences` gets the default ones. A
+          profile with a `parent` of the same type inherits the `userPreferences` of the parent, and
+          the paths it has in common with the parent are stored once.
+          """
+        )
+        .asObjects(List.of(), node -> readConfiguredProfile(node, type));
+      if (profiles.isEmpty() && configuredTypes.contains(type)) {
+        profiles = List.of(implicitProfile(type, block));
+      }
+      configured.addAll(profiles);
+    });
     if (configured.isEmpty()) {
       var profile = StreetTransferFactory.defaultWalkProfile();
       return new MappedProfiles(
@@ -332,26 +347,14 @@ public class TransferProfilesConfigMapper {
     }
 
     var mapper = new RegularTransferPreferencesMapper();
-    var resolved = new HashMap<String, ResolvedProfile>();
+    var resolved = new HashMap<String, AbstractUserPreferences<?>>();
     var mapped = new HashMap<String, TransferProfile<RouteRequest>>();
     for (var profile : parentsFirst) {
       // Only a parent of the same type is inherited from. A parent of another type is only used to
       // store the paths that are the same once, see the deduplication.
       var parent = profile.parent() == null ? null : resolved.get(profile.parent());
-      var inherited =
-        parent != null && parent.userPreferences().type() == profile.type() ? parent : null;
-      var request = RouteRequestConfig.mapRouteRequest(
-        profile
-          .node()
-          .of("routingRequest")
-          .since(V2_10)
-          .summary("The routing request parameters the street search of this profile is based on.")
-          .description(
-            "Preferences in `userPreferences` override the equivalent parameters of the request."
-          )
-          .asObject(),
-        inherited == null ? RouteRequest.defaultValue() : inherited.request()
-      );
+      var inherited = parent != null && parent.type() == profile.type() ? parent : null;
+      var request = requests.get(profile.type());
       AbstractUserPreferences<?> own = null;
       if (profile.node().exist("userPreferences")) {
         own = mapPreferences(
@@ -362,28 +365,31 @@ public class TransferProfilesConfigMapper {
             .since(V2_10)
             .summary("Street-search preferences used to discover and cost this profile's paths.")
             .description(
-              "Optional. If it is not set, the preferences of the `routingRequest` are used."
+              "Optional. If it is not set, the preferences of the parent of the same type are used, or the defaults."
             )
             .asObject(),
-          inherited == null
-            ? mapper.toUserPreferences(profile.type(), request)
-            : inherited.userPreferences()
+          inherited == null ? mapper.toUserPreferences(profile.type(), request) : inherited
         );
       }
-      var effective = own != null ? own : mapper.toUserPreferences(profile.type(), request);
-      // The children inherit the request with the preferences of this profile applied
       resolved.put(
         profile.id(),
-        new ResolvedProfile(mapper.toRequest(effective, request), effective)
+        own != null ? own : mapper.toUserPreferences(profile.type(), request)
       );
       mapped.put(
         profile.id(),
-        new TransferProfile<>(profile.id(), profile.type(), profile.parent(), own, request)
+        new TransferProfile<>(
+          profile.id(),
+          profile.type(),
+          profile.parent(),
+          own,
+          request,
+          mapReuseLimit(profile)
+        )
       );
     }
     // Keep the declared order
     var preferencesById = new HashMap<String, AbstractUserPreferences<?>>();
-    resolved.forEach((id, profile) -> preferencesById.put(id, profile.userPreferences()));
+    preferencesById.putAll(resolved);
     return new MappedProfiles(
       configured
         .stream()
@@ -505,11 +511,11 @@ public class TransferProfilesConfigMapper {
         .summary("The id of the profile this profile is based on.")
         .description(
           """
-          If the parent is a profile of the same type, the profile inherits the `routingRequest` and
-          the `userPreferences` of the parent, and values set on the profile override the inherited
-          ones. The root of a type gets the values that are not set from the request. The parent is
+          If the parent is a profile of the same type, the profile inherits the `userPreferences` of
+          the parent, and values set on the profile override the inherited ones. The root of a type
+          gets the values that are not set from the defaults. The parent is
           generated first, and the paths of the profile that are equivalent to the paths of the
-          parent are stored once, see `deduplicationLimit`. The parent can be of another type, but
+          parent are stored once, see `reuseLimit`. The parent can be of another type, but
           nothing is inherited from it, it is only used to store the paths once. The parents must
           not form a cycle.
           """
@@ -517,6 +523,15 @@ public class TransferProfilesConfigMapper {
         .asString();
     }
     return new ConfiguredProfile(id, type, parent, p);
+  }
+
+  /**
+   * The profile of a type that has a block without profiles. It has no parent and no settings of
+   * its own, so it is the default profile of the type, and its id is the name of the type.
+   */
+  private static ConfiguredProfile implicitProfile(TransferProfileType type, NodeAdapter block) {
+    var emptyNode = new NodeAdapter(JsonNodeFactory.instance.objectNode(), block.contextPath());
+    return new ConfiguredProfile(typeName(type), type, null, emptyNode);
   }
 
   /**
@@ -556,7 +571,6 @@ public class TransferProfilesConfigMapper {
     builder.withReluctance(
       mapReluctance(p, "A multiplier for the cost of traveling in a wheelchair.", base)
     );
-    builder.withSafetyFactor(mapSafetyFactor(p, base));
     return builder.build();
   }
 

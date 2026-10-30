@@ -1,6 +1,7 @@
 package org.opentripplanner.transfer.dataimport;
 
 import jakarta.inject.Provider;
+import java.time.Duration;
 import java.util.Set;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.application.OTPFeature;
@@ -10,6 +11,8 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferGenerator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link GraphBuilderModule} that generates regular (non-constrained) transfers through the
@@ -29,6 +32,8 @@ import org.opentripplanner.transit.transfer.regular.RegularTransferGenerator;
  * it is converted into the initial snapshot of the transactional repository.
  */
 public class RegularTransitTransferGenerator implements GraphBuilderModule {
+
+  private static final Logger LOG = LoggerFactory.getLogger(RegularTransitTransferGenerator.class);
 
   /**
    * The generator is only created when this module runs, after the transit data is imported: it
@@ -58,8 +63,29 @@ public class RegularTransitTransferGenerator implements GraphBuilderModule {
   public void buildGraph() {
     transitRepository.index();
     var generator = transferGenerator.get();
+    long start = System.nanoTime();
     generator.generateTransfersForAllStops();
+    var time = Duration.ofNanos(System.nanoTime() - start);
+    logStatistics(generator, time);
     reportStopsWithoutTransfers(generator);
+  }
+
+  private void logStatistics(RegularTransferGenerator generator, Duration time) {
+    var stopIds = transitRepository
+      .getSiteRepository()
+      .listRegularStops()
+      .stream()
+      .map(RegularStop::getId)
+      .toList();
+    var statistics = RegularTransferStatistics.of(
+      stopIds,
+      stopsVisitedByPatterns.stopsOfEachPattern(),
+      generator.listAllStopsUsedInTransfers(),
+      generator.profileStatistics()
+    );
+    for (var message : statistics.messages(time)) {
+      LOG.info(message);
+    }
   }
 
   private void reportStopsWithoutTransfers(RegularTransferGenerator generator) {

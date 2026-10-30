@@ -2,6 +2,7 @@ package org.opentripplanner.transit.transfer.regular.api.parameters;
 
 import java.util.Objects;
 import javax.annotation.Nullable;
+import org.opentripplanner.core.model.basic.CostLinearFunction;
 import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 
 /**
@@ -22,6 +23,11 @@ import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUser
  *                        preferences of the {@code routingRequest} are used then, see
  *                        {@link org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper#toUserPreferences}.
  * @param routingRequest  the request the street search of the profile is based on
+ * @param reuseLimit      when the path of the parent is used instead of a path found by this
+ *                        profile, see {@link TransferParameters#DEFAULT_REUSE_LIMIT}. {@code null}
+ *                        if the profile has none of its own: it is the limit of the parent of the
+ *                        same type, and the default if there is none. A limit is not inherited from
+ *                        a parent of another type.
  * @param <R>             the request type, opaque to the module
  */
 public record TransferProfile<R>(
@@ -29,7 +35,8 @@ public record TransferProfile<R>(
   TransferProfileType type,
   @Nullable String parent,
   @Nullable AbstractUserPreferences<?> userPreferences,
-  R routingRequest
+  R routingRequest,
+  @Nullable CostLinearFunction reuseLimit
 ) {
   public TransferProfile {
     Objects.requireNonNull(id);
@@ -51,6 +58,17 @@ public record TransferProfile<R>(
           type
       );
     }
+  }
+
+  /** A profile without a limit of its own. */
+  public TransferProfile(
+    String id,
+    TransferProfileType type,
+    @Nullable String parent,
+    @Nullable AbstractUserPreferences<?> userPreferences,
+    R routingRequest
+  ) {
+    this(id, type, parent, userPreferences, routingRequest, null);
   }
 
   /** A profile without a parent. */

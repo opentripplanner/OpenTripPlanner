@@ -2,6 +2,7 @@ package org.opentripplanner.transfer.dataimport;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
@@ -47,6 +48,14 @@ class StopsVisitedByPatternsTest {
     assertThat(subject.findPatterns(A.getId())).containsExactly(P1);
     assertThat(subject.findPatterns(B.getId())).containsExactly(P1, P2);
     assertThat(subject.findPatterns(D.getId())).isEmpty();
+  }
+
+  @Test
+  void listsTheStopsOfEachPattern() {
+    assertThat(subject.stopsOfEachPattern()).containsExactly(
+      List.of(A.getId(), B.getId()),
+      List.of(B.getId(), C.getId())
+    );
   }
 
   private static StopsVisitedByPatterns createSubject() {

@@ -7,6 +7,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.core.model.basic.Speed;
 import org.opentripplanner.transit.transfer.regular.api.maxduration.BicycleMaxDurations;
@@ -229,22 +230,10 @@ class TransferParametersTest {
     );
   }
 
-  @Test
-  void theDeduplicationLimitIsTheDefaultIfNotGiven() {
-    var subject = new TransferParameters<>(
-      List.of(new TransferProfile<>("w", TransferProfileType.WALK, WALK, "w"))
-    );
-
-    assertThat(subject.deduplicationLimit()).isEqualTo(
-      TransferParameters.DEFAULT_DEDUPLICATION_LIMIT
-    );
-  }
-
   private static TransferParameters<String> withWarmup(WarmupParameters... warmup) {
     return new TransferParameters<>(
       List.of(new TransferProfile<>("walk", TransferProfileType.WALK, WALK, "walk")),
       Map.of(TransferProfileType.WALK, MaxDurationsPreference.DEFAULT),
-      TransferParameters.DEFAULT_DEDUPLICATION_LIMIT,
       List.of(warmup)
     );
   }
@@ -302,5 +291,14 @@ class TransferParametersTest {
     assertThrows(IllegalArgumentException.class, () -> new WarmupParameters(" ", "walk", WALK));
     assertThrows(IllegalArgumentException.class, () -> new WarmupParameters("a", " ", WALK));
     assertThrows(NullPointerException.class, () -> new WarmupParameters("a", "walk", null));
+  }
+
+  @Test
+  void theDefaultReuseLimitIsFifteenSecondsAndTwoPercent() {
+    var limit = TransferParameters.DEFAULT_REUSE_LIMIT;
+
+    assertThat(limit.calculate(Cost.ZERO).toSeconds()).isEqualTo(15);
+    // 15 seconds + 2% of 1000 seconds
+    assertThat(limit.calculate(Cost.costOfSeconds(1000)).toSeconds()).isEqualTo(35);
   }
 }

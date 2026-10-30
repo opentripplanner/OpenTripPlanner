@@ -1,8 +1,6 @@
 package org.opentripplanner.transit.transfer.regular.api.preferences;
 
 import java.util.Objects;
-import org.opentripplanner.core.model.basic.NormalizedRatio;
-import org.opentripplanner.core.model.basic.Ratio;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.core.model.basic.Speed;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
@@ -10,7 +8,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * The preferences of the wheelchair transfers: speed and reluctance for a traveler in a
- * wheelchair. The values are normalized(rounded) so the class can used as a cache key.
+ * wheelchair. The values are normalized(rounded) so the class can used as a cache key. There is no
+ * safety factor, the street search does not use it for a wheelchair.
  * <p>
  * See the configuration for documentation of each field.
  * <p>
@@ -18,24 +17,21 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  */
 public final class WheelchairPreferences
   extends AbstractUserPreferences<WheelchairPreferences>
-  implements WithSpeed, WithSafetyFactor
+  implements WithSpeed
 {
 
   public static final WheelchairPreferences DEFAULT = new WheelchairPreferences();
 
   private final Speed speed;
-  private final NormalizedRatio safetyFactor;
 
   private WheelchairPreferences() {
     super(Reluctance.of(2.0));
     this.speed = Speed.ofMetersPerSecond(1.35);
-    this.safetyFactor = Ratio.of(1.0).normalize();
   }
 
   private WheelchairPreferences(Builder builder) {
     super(builder);
     this.speed = Objects.requireNonNull(builder.speed);
-    this.safetyFactor = Objects.requireNonNull(builder.safetyFactor);
   }
 
   public static Builder of() {
@@ -57,11 +53,6 @@ public final class WheelchairPreferences
   }
 
   @Override
-  public NormalizedRatio safetyFactor() {
-    return safetyFactor;
-  }
-
-  @Override
   WheelchairPreferences defaultInstance() {
     return DEFAULT;
   }
@@ -71,7 +62,6 @@ public final class WheelchairPreferences
     float distance = super.normalizedDistance(other);
     if (other instanceof WheelchairPreferences that) {
       distance += speed.normalizedDistance(that.speed);
-      distance += safetyFactor.normalizedDistance(that.safetyFactor);
     }
     return distance;
   }
@@ -81,12 +71,12 @@ public final class WheelchairPreferences
     if (!(obj instanceof WheelchairPreferences that)) {
       return false;
     }
-    return super.equals(obj) && speed.equals(that.speed) && safetyFactor.equals(that.safetyFactor);
+    return super.equals(obj) && speed.equals(that.speed);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), speed, safetyFactor);
+    return Objects.hash(super.hashCode(), speed);
   }
 
   @Override
@@ -94,7 +84,6 @@ public final class WheelchairPreferences
     return super
       .appendToString(ToStringBuilder.of(WheelchairPreferences.class))
       .addObj("speed", speed, DEFAULT.speed)
-      .addObj("safetyFactor", safetyFactor, DEFAULT.safetyFactor)
       .toString();
   }
 
@@ -103,21 +92,14 @@ public final class WheelchairPreferences
   {
 
     private Speed speed;
-    private NormalizedRatio safetyFactor;
 
     public Builder(WheelchairPreferences original) {
       super(original);
       this.speed = original.speed;
-      this.safetyFactor = original.safetyFactor;
     }
 
     public Builder withSpeed(Speed speed) {
       this.speed = speed;
-      return this;
-    }
-
-    public Builder withSafetyFactor(NormalizedRatio safetyFactor) {
-      this.safetyFactor = safetyFactor;
       return this;
     }
 

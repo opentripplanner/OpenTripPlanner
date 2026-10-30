@@ -3,7 +3,6 @@ package org.opentripplanner.transit.transfer.regular.internal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -15,6 +14,7 @@ import org.opentripplanner.raptor.data.stop.RaptorStopIndex;
 import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferGenerator;
+import org.opentripplanner.transit.transfer.regular.RegularTransferProfileStatistics;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferParameters;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPath;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
@@ -41,6 +41,9 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
 
   /** The number of paths of a profile (by id) that are the paths of its parent. */
   private final Map<String, LongAdder> sharedPaths = new ConcurrentHashMap<>();
+
+  /** The stops that are the start or the end of a path of a profile (by id). */
+  private final Map<String, Set<Integer>> stopsUsedByProfile = new ConcurrentHashMap<>();
 
   public DefaultRegularTransferGenerator(
     RaptorStopIndex stopIndex,
@@ -75,7 +78,6 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
       progress.step(m -> LOG.info(m));
     });
     LOG.info(progress.completeMessage());
-    logSummary(stops.size());
   }
 
   @Override
@@ -95,35 +97,28 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
     return stops;
   }
 
-  private void logSummary(int numberOfStops) {
-    int sum = 0;
+  @Override
+  public List<RegularTransferProfileStatistics> profileStatistics() {
+    var result = new ArrayList<RegularTransferProfileStatistics>();
     for (var profile : profiles) {
-      int size = buildRepository.calculateNumberOfTransferPaths(profile.userPreferences());
-      LOG.info(
-        "Created {} regular transfers for profile '{}', {}.",
-        size,
-        profile.id(),
-        profile.userPreferences()
-      );
-      if (profile.parent() != null) {
-        long shared = sharedPaths.getOrDefault(profile.id(), new LongAdder()).sum();
-        LOG.info(
-          "Profile '{}': {} of {} paths ({}%) are the paths of the parent '{}', they are stored once.",
+      var stops = stopsUsedByProfile
+        .getOrDefault(profile.id(), Set.of())
+        .stream()
+        .map(stopIndex::toStopId)
+        .collect(Collectors.toSet());
+      result.add(
+        new RegularTransferProfileStatistics(
           profile.id(),
-          shared,
-          size,
-          size == 0 ? "0" : String.format(Locale.ROOT, "%.1f", (100.0 * shared) / size),
-          profile.parent().id()
-        );
-      }
-      sum += size;
+          profile.userPreferences().toString(),
+          profile.reuseLimit(),
+          profile.parent() == null ? null : profile.parent().id(),
+          buildRepository.calculateNumberOfTransferPaths(profile.userPreferences()),
+          sharedPaths.getOrDefault(profile.id(), new LongAdder()).sum(),
+          stops
+        )
+      );
     }
-    LOG.info(
-      "Done generating regular transfers. paths: {}, profiles: {} stops: {}",
-      sum,
-      profiles.size(),
-      numberOfStops
-    );
+    return result;
   }
 
   /**
@@ -135,7 +130,7 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
    * <p>
    * If the profile has a parent, the path of the parent is used instead of the path found for a
    * target stop if it is equivalent: re-costed with the preferences of this profile, it costs
-   * about the same, see {@link TransferParameters#DEFAULT_DEDUPLICATION_LIMIT}. The path is then stored once, for both
+   * about the same, see {@link TransferParameters#DEFAULT_REUSE_LIMIT}. The path is then stored once, for both
    * profiles.
    *
    * @param pathsOfThisStop the paths found for this stop so far, by profile and target stop
@@ -179,6 +174,11 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
     if (!pathsByToStop.isEmpty()) {
       stopsUsedInTransfers.add(fromStop);
       stopsUsedInTransfers.addAll(pathsByToStop.keySet());
+      var stopsOfProfile = stopsUsedByProfile.computeIfAbsent(profile.id(), id ->
+        ConcurrentHashMap.newKeySet()
+      );
+      stopsOfProfile.add(fromStop);
+      stopsOfProfile.addAll(pathsByToStop.keySet());
     }
     // Stops are generated in parallel, the build repository is not thread-safe
     synchronized (this) {
@@ -199,18 +199,18 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
     return profile
       .search()
       .computePathCriteria(parentPath)
-      .map(criteria -> isWithinLimit(criteria.c1(), own.criteria().c1()))
+      .map(criteria -> isWithinLimit(profile, criteria.c1(), own.criteria().c1()))
       .orElse(false);
   }
 
   /**
    * Is the cost of the path of the parent within the tolerance of the cost of the path of the
-   * profile? The tolerance is the deduplication limit of the cost of the path of the parent. Both
-   * costs are in Raptor cost units (centi-seconds).
+   * profile? The tolerance is the reuse limit of the profile of the cost of the path of the parent.
+   * Both costs are in Raptor cost units (centi-seconds).
    */
-  private boolean isWithinLimit(int parentPathC1, int ownC1) {
-    var tolerance = profiles
-      .deduplicationLimit()
+  private boolean isWithinLimit(TransferProfileState<P, R> profile, int parentPathC1, int ownC1) {
+    var tolerance = profile
+      .reuseLimit()
       .calculate(Cost.costOfCentiSeconds(parentPathC1))
       .toCentiSeconds();
     return Math.abs(parentPathC1 - ownC1) <= tolerance;

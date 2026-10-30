@@ -26,18 +26,24 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 public final class TransferParameters<R> {
 
   /**
-   * A path of the parent within 30 seconds, and 0.5% of its cost, of the best path of a profile is
+   * A path of the parent within 15 seconds, and 2% of its cost, of the best path of a profile is
    * equivalent: the function is the tolerance, in generalized cost, of a path of the parent that
-   * costs {@code x}, see {@code deduplicationLimit}.
+   * costs {@code x}, see {@link TransferProfile#reuseLimit()}. This is the limit of a profile that
+   * has none of its own and does not inherit one.
    */
-  public static final CostLinearFunction DEFAULT_DEDUPLICATION_LIMIT = CostLinearFunction.of(
-    Duration.ofSeconds(30),
-    0.005
+  public static final CostLinearFunction DEFAULT_REUSE_LIMIT = CostLinearFunction.of(
+    Duration.ofSeconds(15),
+    0.02
   );
+
+  /**
+   * The max duration of the transfers of a profile type, if it is not set: how far from a stop the
+   * transfers are searched.
+   */
+  public static final Duration DEFAULT_MAX_DURATION = Duration.ofMinutes(30);
 
   private final List<TransferProfile<R>> profiles;
   private final Map<TransferProfileType, MaxDurationsPreference> maxDurations;
-  private final CostLinearFunction deduplicationLimit;
   private final List<WarmupParameters> warmup;
 
   /**
@@ -51,8 +57,6 @@ public final class TransferParameters<R> {
    *                           of the type: {@link BicycleMaxDurations} for bicycle and
    *                           {@link CarMaxDuration} for car, and {@link PlainMaxDuration} for the
    *                           other types.
-   * @param deduplicationLimit when the path of a parent profile is used instead of a path of the
-   *                           profile itself, see {@link #DEFAULT_DEDUPLICATION_LIMIT}
    * @param warmup             the preferences to create Raptor transfers for when the server
    *                           starts, see {@link WarmupParameters}. The ids must be unique among
    *                           the profiles and the warmup entries, and the parent of an entry must
@@ -61,12 +65,10 @@ public final class TransferParameters<R> {
   public TransferParameters(
     List<TransferProfile<R>> profiles,
     Map<TransferProfileType, MaxDurationsPreference> maxDurations,
-    CostLinearFunction deduplicationLimit,
     List<WarmupParameters> warmup
   ) {
     this.profiles = List.copyOf(profiles);
     this.warmup = List.copyOf(warmup);
-    this.deduplicationLimit = Objects.requireNonNull(deduplicationLimit);
     this.maxDurations = maxDurations.isEmpty() ? Map.of() : Map.copyOf(new EnumMap<>(maxDurations));
     this.maxDurations.forEach(TransferParameters::validateMaxDurationsOfType);
     validateProfiles(this.profiles, this.warmup);
@@ -75,36 +77,23 @@ public final class TransferParameters<R> {
 
   /**
    * The profiles with the 30 minute max duration of each type, see
-   * {@link MaxDurationsPreference#defaultFor}, and the default deduplication limit. This is the
-   * implicit configuration of a single walk profile.
+   * {@link MaxDurationsPreference#defaultFor}. This is the implicit configuration of a single walk
+   * profile.
    */
   public TransferParameters(List<TransferProfile<R>> profiles) {
     this(profiles, defaultMaxDurations(profiles));
   }
 
-  /** The profiles with the default deduplication limit. */
+  /** The profiles without warmup entries. */
   public TransferParameters(
     List<TransferProfile<R>> profiles,
     Map<TransferProfileType, MaxDurationsPreference> maxDurations
   ) {
-    this(profiles, maxDurations, DEFAULT_DEDUPLICATION_LIMIT);
-  }
-
-  /** The profiles without warmup entries. */
-  public TransferParameters(
-    List<TransferProfile<R>> profiles,
-    Map<TransferProfileType, MaxDurationsPreference> maxDurations,
-    CostLinearFunction deduplicationLimit
-  ) {
-    this(profiles, maxDurations, deduplicationLimit, List.of());
+    this(profiles, maxDurations, List.of());
   }
 
   public List<TransferProfile<R>> profiles() {
     return profiles;
-  }
-
-  public CostLinearFunction deduplicationLimit() {
-    return deduplicationLimit;
   }
 
   public List<WarmupParameters> warmup() {
@@ -218,14 +207,13 @@ public final class TransferParameters<R> {
     return (
       profiles.equals(that.profiles) &&
       maxDurations.equals(that.maxDurations) &&
-      deduplicationLimit.equals(that.deduplicationLimit) &&
       warmup.equals(that.warmup)
     );
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(profiles, maxDurations, deduplicationLimit, warmup);
+    return Objects.hash(profiles, maxDurations, warmup);
   }
 
   @Override
@@ -233,7 +221,6 @@ public final class TransferParameters<R> {
     return ToStringBuilder.of(TransferParameters.class)
       .addCol("profiles", profiles)
       .addObj("maxDurations", maxDurations)
-      .addObj("deduplicationLimit", deduplicationLimit)
       .addCol("warmup", warmup)
       .toString();
   }

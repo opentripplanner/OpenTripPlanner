@@ -98,6 +98,22 @@ to the `transfers` section in `build-config.json`, see [Transfer configuration](
 A routing request for a wheelchair accessible trip then uses the transfers of the `wheelchair`
 profiles.
 
+By default the `wheelchair` transfers only use the stops that are marked as wheelchair accessible.
+If the accessibility data of your stops is incomplete, almost all the wheelchair transfers are lost.
+Set the costs of unknown and inaccessible stops, like in `routingDefaults` above, in the `wheelchair`
+block of the `transfers`, see [Street parameters](TransferConfiguration.md#street-parameters):
+
+```json
+{
+  "transfers": {
+    "wheelchair": {
+      "maxDuration": "30m",
+      "stop": { "unknownCost": 600, "inaccessibleCost": 3600 }
+    }
+  }
+}
+```
+
 ## Example
 
 A full configuration example is available at

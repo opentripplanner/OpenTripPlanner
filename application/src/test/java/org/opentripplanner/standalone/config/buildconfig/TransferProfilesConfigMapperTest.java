@@ -85,16 +85,15 @@ class TransferProfilesConfigMapperTest {
   }
 
   @Test
-  void mapsTheRoutingRequestOfAWalkProfile() {
+  void theWalkSectionSetsTheStairsAndEscalatorOfTheRequest() {
     var subject = map(
       """
       {
         transfers: {
-          walk: { maxDuration: '30m',
-            profiles: [{
-              id: "wheelchair-walk",
-              routingRequest: { wheelchairAccessibility: { enabled: true } }
-            }]
+          walk: {
+            stairsReluctance: 3.0,
+            stairsTimeFactor: 2.0,
+            escalator: { speed: 0.5, reluctance: 1.5 }
           }
         }
       }
@@ -102,7 +101,103 @@ class TransferProfilesConfigMapperTest {
     );
 
     var request = subject.profiles().getFirst().routingRequest();
-    assertThat(request.journey().wheelchair()).isTrue();
+    var walk = request.preferences().walk();
+    assertThat(walk.stairsReluctance()).isEqualTo(3.0);
+    assertThat(walk.stairsTimeFactor()).isEqualTo(2.0);
+    assertThat(walk.escalator().speed()).isEqualTo(0.5);
+    assertThat(walk.escalator().reluctance()).isEqualTo(1.5);
+    assertThat(request.journey().wheelchair()).isFalse();
+  }
+
+  @Test
+  void theWheelchairSectionSetsTheWheelchairPreferencesOfTheRequest() {
+    var subject = map(
+      """
+      {
+        transfers: {
+          wheelchair: {
+            stop: { unknownCost: 100, inaccessibleCost: 1000 },
+            elevator: { onlyConsiderAccessible: true },
+            inaccessibleStreetReluctance: 10.0,
+            maxSlope: 0.1,
+            slopeExceededReluctance: 2.0,
+            stairsReluctance: 50.0
+          }
+        }
+      }
+      """
+    );
+
+    var wheelchair = subject.profiles().getFirst().routingRequest().preferences().wheelchair();
+    assertThat(wheelchair.stop().onlyConsiderAccessible()).isFalse();
+    assertThat(wheelchair.stop().unknownCost()).isEqualTo(100);
+    assertThat(wheelchair.stop().inaccessibleCost()).isEqualTo(1000);
+    assertThat(wheelchair.elevator().onlyConsiderAccessible()).isTrue();
+    assertThat(wheelchair.inaccessibleStreetReluctance()).isEqualTo(10.0);
+    assertThat(wheelchair.maxSlope()).isEqualTo(0.1);
+    assertThat(wheelchair.slopeExceededReluctance()).isEqualTo(2.0);
+    assertThat(wheelchair.stairsReluctance()).isEqualTo(50.0);
+  }
+
+  @Test
+  void theWheelchairStopsAreStrictByDefault() {
+    var subject = map("{ transfers: { wheelchair: {} } }");
+
+    var wheelchair = subject.profiles().getFirst().routingRequest().preferences().wheelchair();
+    assertThat(wheelchair.stop().onlyConsiderAccessible()).isTrue();
+  }
+
+  @Test
+  void theBicycleSectionSetsTheWalkingWithTheBicycleOfTheRequest() {
+    var subject = map(
+      """
+      {
+        transfers: {
+          bicycle: {
+            walking: { stairsReluctance: 4.0, mountDismountCost: 5, mountDismountTime: "10s" }
+          }
+        }
+      }
+      """
+    );
+
+    var walking = subject.profiles().getFirst().routingRequest().preferences().bike().walking();
+    assertThat(walking.stairsReluctance()).isEqualTo(4.0);
+    assertThat(walking.mountDismountCost().toSeconds()).isEqualTo(5);
+    assertThat(walking.mountDismountTime()).isEqualTo(Duration.ofSeconds(10));
+  }
+
+  @Test
+  void theCarSectionHasNoRequestParameters() {
+    var subject = map("{ transfers: { car: {} } }");
+
+    assertThat(subject.profiles().getFirst().routingRequest().preferences().car()).isEqualTo(
+      RouteRequest.defaultValue().preferences().car()
+    );
+  }
+
+  @Test
+  void allTheProfilesOfATypeShareTheRequestOfTheTypeSection() {
+    var subject = map(
+      """
+      {
+        transfers: {
+          walk: {
+            stairsReluctance: 3.0,
+            profiles: [
+              { id: "walk", userPreferences: { speed: 1.1 } },
+              { id: "slow", parent: "walk", userPreferences: { reluctance: 5.0 } }
+            ]
+          }
+        }
+      }
+      """
+    );
+
+    for (var id : List.of("walk", "slow")) {
+      var request = profile(subject, id).routingRequest();
+      assertThat(request.preferences().walk().stairsReluctance()).isEqualTo(3.0);
+    }
   }
 
   @Test
@@ -238,32 +333,6 @@ class TransferProfilesConfigMapperTest {
   }
 
   @Test
-  void aChildInheritsTheRoutingRequestOfItsParentWithTheParentsPreferencesApplied() {
-    var subject = map(
-      """
-      {
-        transfers: {
-          walk: { maxDuration: '30m',
-            profiles: [
-              {
-                id: "walk",
-                userPreferences: { speed: 1.1 },
-                routingRequest: { numItineraries: 7 }
-              },
-              { id: "slow", parent: "walk", userPreferences: { reluctance: 5.0 } }
-            ]
-          }
-        }
-      }
-      """
-    );
-
-    var request = profile(subject, "slow").routingRequest();
-    assertThat(request.numItineraries()).isEqualTo(7);
-    assertThat(request.preferences().walk().speed()).isWithin(0.001).of(1.1);
-  }
-
-  @Test
   void aChildDeclaredBeforeItsParentIsMappedAndTheDeclaredOrderIsKept() {
     var subject = map(
       """
@@ -345,25 +414,42 @@ class TransferProfilesConfigMapperTest {
   }
 
   @Test
-  void theDeduplicationLimitIsTheDefaultIfNotConfigured() {
-    assertThat(map("{}").deduplicationLimit()).isEqualTo(
-      TransferParameters.DEFAULT_DEDUPLICATION_LIMIT
+  void aProfileWithoutAReuseLimitHasNone() {
+    var subject = map("{ transfers: { walk: { profiles: [{ id: 'walk' }] } } }");
+
+    // The limit is the default, or the one of the parent, see TransferProfileState
+    assertThat(subject.profiles().getFirst().reuseLimit()).isNull();
+  }
+
+  @Test
+  void mapsTheReuseLimitOfAProfile() {
+    var subject = map(
+      """
+      {
+        transfers: {
+          walk: { profiles: [
+            { id: "walk" },
+            { id: "child", parent: "walk", reuseLimit: "10s + 0.01 x", userPreferences: { reluctance: 3.0 } }
+          ] }
+        }
+      }
+      """
     );
+
+    var limit = profile(subject, "child").reuseLimit();
+    assertThat(limit.constant()).isEqualTo(Cost.costOfSeconds(10));
+    assertThat(limit.coefficient()).isEqualTo(0.01);
+    assertThat(profile(subject, "walk").reuseLimit()).isNull();
   }
 
   @Test
-  void mapsTheDeduplicationLimit() {
-    var subject = map("{ transfers: { deduplicationLimit: '10s + 0.01 x' } }");
+  void theReuseLimitHasTheConstantFirst() {
+    var root = newNodeAdapterForTest(
+      "{ transfers: { walk: { profiles: [{ id: 'walk', reuseLimit: '0.01x + 10s' }] } } }"
+    );
 
-    assertThat(subject.deduplicationLimit().constant()).isEqualTo(Cost.costOfSeconds(10));
-    assertThat(subject.deduplicationLimit().coefficient()).isEqualTo(0.01);
-  }
-
-  @Test
-  void theDeduplicationLimitHasTheConstantFirst() {
-    var root = newNodeAdapterForTest("{ transfers: { deduplicationLimit: '0.01x + 10s' } }");
-
-    assertThrows(OtpAppException.class, () -> TransferProfilesConfigMapper.map(root));
+    var ex = assertThrows(OtpAppException.class, () -> TransferProfilesConfigMapper.map(root));
+    assertThat(ex).hasMessageThat().contains("walk");
   }
 
   @Test
@@ -531,14 +617,68 @@ class TransferProfilesConfigMapperTest {
   }
 
   @Test
-  void theMaxDurationOfATypeIsRequiredIfItHasProfiles() {
-    var root = newNodeAdapterForTest(
-      "{ transfers: { wheelchair: { profiles: [{ id: 'wheelchair' }] } } }"
-    );
+  void anEmptyBlockOfATypeCreatesAProfileWithTheNameOfTheType() {
+    var subject = map("{ transfers: { wheelchair: {} } }");
 
-    var ex = assertThrows(OtpAppException.class, () -> TransferProfilesConfigMapper.map(root));
-    assertThat(ex).hasMessageThat().contains("wheelchair");
-    assertThat(ex).hasMessageThat().contains("max duration");
+    assertThat(profileIds(subject)).containsExactly("wheelchair");
+    assertThat(subject.profiles().getFirst().type()).isEqualTo(TransferProfileType.WHEELCHAIR);
+    assertThat(subject.profiles().getFirst().parent()).isNull();
+    assertThat(subject.maxDurations(TransferProfileType.WHEELCHAIR).longestDuration()).isEqualTo(
+      TransferParameters.DEFAULT_MAX_DURATION
+    );
+  }
+
+  @Test
+  void aBlockWithOnlyAMaxDurationCreatesAProfileWithTheNameOfTheType() {
+    var subject = map("{ transfers: { wheelchair: { maxDuration: '20m' } } }");
+
+    assertThat(profileIds(subject)).containsExactly("wheelchair");
+    assertThat(subject.maxDurations(TransferProfileType.WHEELCHAIR).longestDuration()).isEqualTo(
+      Duration.ofMinutes(20)
+    );
+  }
+
+  @Test
+  void everyTypeWithABlockGetsAProfileAndTheOthersDoNot() {
+    var subject = map("{ transfers: { walk: {}, car: {} } }");
+
+    assertThat(profileIds(subject)).containsExactly("walk", "car");
+  }
+
+  @Test
+  void aTypeWithProfilesDoesNotGetAnImplicitProfile() {
+    var subject = map("{ transfers: { walk: { profiles: [{ id: 'my-walk' }] }, car: {} } }");
+
+    assertThat(profileIds(subject)).containsExactly("my-walk", "car");
+  }
+
+  @Test
+  void theFlexAndViaBlocksDoNotCreateAProfile() {
+    var subject = map("{ transfers: { flex: { maxDuration: '10m' } } }");
+
+    assertThat(profileIds(subject)).containsExactly("walk");
+  }
+
+  @Test
+  void theMaxDurationOfATypeWithProfilesDefaultsToTheDefaultMaxDuration() {
+    var subject = map("{ transfers: { wheelchair: { profiles: [{ id: 'wheelchair' }] } } }");
+
+    assertThat(subject.maxDurations(TransferProfileType.WHEELCHAIR).longestDuration()).isEqualTo(
+      TransferParameters.DEFAULT_MAX_DURATION
+    );
+  }
+
+  @Test
+  void theMaxDurationOfEveryTypeHasADefault() {
+    var subject = map("{ transfers: { walk: { maxDuration: '45m' } } }");
+
+    for (var type : TransferProfileType.values()) {
+      var expected =
+        type == TransferProfileType.WALK
+          ? Duration.ofMinutes(45)
+          : TransferParameters.DEFAULT_MAX_DURATION;
+      assertThat(subject.maxDurations(type).longestDuration()).isEqualTo(expected);
+    }
   }
 
   @Test
@@ -983,7 +1123,7 @@ class TransferProfilesConfigMapperTest {
   }
 
   @Test
-  void theSafetyFactorOfAWalkAndAWheelchairProfileIsSet() {
+  void theSafetyFactorOfAWalkProfileIsSet() {
     var subject = map(
       """
       {
@@ -994,10 +1134,6 @@ class TransferProfilesConfigMapperTest {
               { id: "walk", userPreferences: { safetyFactor: 0.5 } },
               { id: "child", parent: "walk", userPreferences: { reluctance: 3.0 } }
             ]
-          },
-          wheelchair: {
-            maxDuration: '30m',
-            profiles: [{ id: "wheelchair", userPreferences: { safetyFactor: 0.3 } }]
           }
         }
       }
@@ -1006,10 +1142,8 @@ class TransferProfilesConfigMapperTest {
 
     var walk = (WalkPreferences) profile(subject, "walk").userPreferences();
     var child = (WalkPreferences) profile(subject, "child").userPreferences();
-    var wheelchair = (WheelchairPreferences) profile(subject, "wheelchair").userPreferences();
     assertThat(walk.safetyFactor()).isEqualTo(Ratio.of(0.5).normalize());
     assertThat(child.safetyFactor()).isEqualTo(Ratio.of(0.5).normalize());
-    assertThat(wheelchair.safetyFactor()).isEqualTo(Ratio.of(0.3).normalize());
   }
 
   @Test
@@ -1126,6 +1260,10 @@ class TransferProfilesConfigMapperTest {
 
   private static Duration maxDuration(TransferParameters<RouteRequest> parameters) {
     return parameters.maxDurations(TransferProfileType.WALK).longestDuration();
+  }
+
+  private static List<String> profileIds(TransferParameters<RouteRequest> parameters) {
+    return parameters.profiles().stream().map(TransferProfile::id).toList();
   }
 
   private static TransferProfile<RouteRequest> profile(
