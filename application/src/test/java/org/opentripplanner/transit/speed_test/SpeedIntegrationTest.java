@@ -20,7 +20,6 @@ import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.standalone.api.TestServerContext;
 import org.opentripplanner.standalone.config.OtpConfigLoader;
-import org.opentripplanner.transfer.configure.StreetTransferFactory;
 import org.opentripplanner.transit.speed_test.model.SpeedTestProfile;
 import org.opentripplanner.transit.speed_test.model.testcase.TestStatus;
 import org.opentripplanner.transit.speed_test.options.SpeedTestCmdLineOpts;
@@ -110,7 +109,7 @@ public class SpeedIntegrationTest {
       model.transitRepository(),
       model.timetableDataImport(),
       model.transferRepository(),
-      StreetTransferFactory.defaultParameters(),
+      TestServerContext.defaultTransferParameters(),
       regularTransferBuildRepository
     );
 

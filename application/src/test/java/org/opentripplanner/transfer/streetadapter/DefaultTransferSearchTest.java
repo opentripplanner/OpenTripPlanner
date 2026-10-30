@@ -2,6 +2,7 @@ package org.opentripplanner.transfer.streetadapter;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
+import static org.opentripplanner.street.model.StreetModelForTest.intersectionVertex;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -10,21 +11,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner._support.geometry.Coordinates;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.place.NearbyStopFinder;
 import org.opentripplanner.place.api.NearbyStop;
+import org.opentripplanner.raptor.spi.RaptorCostConverter;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.cost.CostLimit;
 import org.opentripplanner.routing.linking.TransitStopVertexBuilderFactory;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetMode;
+import org.opentripplanner.street.model.StreetModelForTest;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.transfer.regular.api.maxduration.AllowedMode;
 import org.opentripplanner.transit.transfer.regular.api.maxduration.BicycleMaxDurations;
 import org.opentripplanner.transit.transfer.regular.api.maxduration.CarMaxDuration;
 import org.opentripplanner.transit.transfer.regular.api.maxduration.MaxDurationsPreference;
 import org.opentripplanner.transit.transfer.regular.spi.AllowedModesLookup;
+import org.opentripplanner.transit.transfer.regular.spi.PathCriteria;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPath;
 
 class DefaultTransferSearchTest {
@@ -148,6 +155,68 @@ class DefaultTransferSearchTest {
     var result = subject.findNearbyStops(FROM, MaxDurationsPreference.of(Duration.ofMinutes(30)));
 
     assertThat(stopIds(result)).containsExactly(CAR);
+  }
+
+  /** The cost of a path is capped at the max cost Raptor accepts. */
+  @Nested
+  class CostLimitOfAPath {
+
+    private static final int MAX_RAPTOR_C1 = RaptorCostConverter.toRaptorCost(
+      (double) CostLimit.MAX_COST
+    );
+
+    private final DefaultTransferSearch subject = subject(StreetMode.WALK, Map.of(), FROM);
+
+    @Test
+    void theCostOfAVeryLongPathWithEdgesIsCapped() {
+      // A single edge from Berlin to Boston
+      var edge = StreetModelForTest.streetEdge(
+        intersectionVertex(Coordinates.BERLIN),
+        intersectionVertex(Coordinates.BOSTON)
+      );
+      var path = new NearbyStop(PLAIN, edge.getDistanceMeters(), List.of(edge), null);
+
+      assertThat(criteria(path).c1()).isEqualTo(MAX_RAPTOR_C1);
+    }
+
+    @Test
+    void theCostOfAShortPathWithEdgesIsNotCapped() {
+      var edge = StreetModelForTest.streetEdge(
+        intersectionVertex(Coordinates.BERLIN),
+        intersectionVertex(Coordinates.BERLIN_BRANDENBURG_GATE)
+      );
+      var path = new NearbyStop(PLAIN, edge.getDistanceMeters(), List.of(edge), null);
+
+      assertThat(criteria(path).c1()).isLessThan(MAX_RAPTOR_C1);
+    }
+
+    @Test
+    void theCostOfAVeryLongPathWithoutEdgesIsCapped() {
+      assertThat(criteria(withoutEdges(8_000_000)).c1()).isEqualTo(MAX_RAPTOR_C1);
+    }
+
+    @Test
+    void theCostOfAPathWithoutEdgesDoesNotOverflow() {
+      assertThat(criteria(withoutEdges(Integer.MAX_VALUE)).c1()).isEqualTo(MAX_RAPTOR_C1);
+    }
+
+    @Test
+    void aNegativeCostOfAPathWithoutEdgesIsCapped() {
+      assertThat(criteria(withoutEdges(-5)).c1()).isEqualTo(MAX_RAPTOR_C1);
+    }
+
+    @Test
+    void theCostOfAShortPathWithoutEdgesIsNotCapped() {
+      assertThat(criteria(withoutEdges(200)).c1()).isLessThan(MAX_RAPTOR_C1);
+    }
+
+    private PathCriteria criteria(NearbyStop path) {
+      return subject.computePathCriteria(path).orElseThrow();
+    }
+
+    private static NearbyStop withoutEdges(double distanceMeters) {
+      return new NearbyStop(PLAIN, distanceMeters, List.of(), null);
+    }
   }
 
   private DefaultTransferSearch subject(

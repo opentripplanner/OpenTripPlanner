@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.transfer.regular.internal;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -354,6 +355,42 @@ class DefaultRegularTransferRepositorySnapshotTest {
     assertThat(next.forRequest(REQUEST).findPath(A, D)).isSameInstanceAs(newPath);
     assertThat(next.forRequest(REQUEST).findPath(A, B)).isNull();
     assertThat(initial.forRequest(REQUEST).findPath(A, B)).isEqualTo(path(A, B, 100));
+  }
+
+  @Test
+  void findPathsFromReadsAllPathsFromTheStop() {
+    var transfers = initial.forRequest(REQUEST);
+
+    assertThat(transfers.findPathsFrom(A)).containsExactly(path(A, B, 100), path(A, C, 200));
+    assertThat(transfers.findPathsFrom(C)).isEmpty();
+  }
+
+  @Test
+  void findPathsFromCannotModifyTheStoredPaths() {
+    var paths = initial.forRequest(REQUEST).findPathsFrom(A);
+
+    assertThrows(UnsupportedOperationException.class, paths::clear);
+    assertThat(initial.forRequest(REQUEST).findPath(A, B)).isEqualTo(path(A, B, 100));
+  }
+
+  @Test
+  void findPathsFromReadsTheReplacedPaths() {
+    var newPath = path(A, D, 50);
+
+    repository.replaceTransfersFrom(PROFILE, A, Map.of(D, newPath));
+    var next = freeze();
+
+    assertThat(next.forRequest(REQUEST).findPathsFrom(A)).containsExactly(newPath);
+    assertThat(initial.forRequest(REQUEST).findPathsFrom(A)).contains(path(A, B, 100));
+  }
+
+  @Test
+  void findPathsFromIsEmptyWithoutStoredPaths() {
+    var snapshot = lifecycle.freeze(
+      new DefaultRegularTransferBuildRepository<FakePath>().createRuntimeRepository()
+    );
+
+    assertThat(snapshot.forRequest(REQUEST).findPathsFrom(A)).isEmpty();
   }
 
   /**

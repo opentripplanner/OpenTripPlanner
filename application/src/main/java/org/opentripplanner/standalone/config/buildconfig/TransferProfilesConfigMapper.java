@@ -17,6 +17,7 @@ import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.routerequest.RouteRequestConfig;
+import org.opentripplanner.transfer.configure.StreetTransferFactory;
 import org.opentripplanner.transfer.streetadapter.RegularTransferPreferencesMapper;
 import org.opentripplanner.transit.transfer.regular.api.maxduration.BicycleMaxDurations;
 import org.opentripplanner.transit.transfer.regular.api.maxduration.CarMaxDuration;
@@ -50,9 +51,6 @@ import org.opentripplanner.utils.collection.ParentOrder;
  * deliberately deferred.
  */
 public class TransferProfilesConfigMapper {
-
-  /** The id of the profile used if no profile is configured. */
-  static final String DEFAULT_WALK_PROFILE_ID = "walk";
 
   public static TransferParameters<RouteRequest> map(NodeAdapter root) {
     return mapTransfers(transfersNode(root));
@@ -243,16 +241,6 @@ public class TransferProfilesConfigMapper {
     }
   }
 
-  /** The profile used if no profile is configured: its preferences are the ones of the request. */
-  private static TransferProfile<RouteRequest> defaultWalkProfile() {
-    return new TransferProfile<>(
-      DEFAULT_WALK_PROFILE_ID,
-      TransferProfileType.WALK,
-      null,
-      RouteRequest.defaultValue()
-    );
-  }
-
   private static CostLinearFunction mapDeduplicationLimit(NodeAdapter transfers) {
     var builder = transfers
       .of("deduplicationLimit")
@@ -321,7 +309,7 @@ public class TransferProfilesConfigMapper {
       )
     );
     if (configured.isEmpty()) {
-      var profile = defaultWalkProfile();
+      var profile = StreetTransferFactory.defaultWalkProfile();
       return new MappedProfiles(
         List.of(profile),
         Map.of(

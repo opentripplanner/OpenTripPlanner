@@ -4,6 +4,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
+import jakarta.inject.Provider;
 import java.time.Duration;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -47,6 +48,8 @@ import org.slf4j.LoggerFactory;
  * <p>
  * It will use the street network if OSM data has already been loaded into the graph. Otherwise it
  * will use straight-line distance between stops.
+ * <p>
+ * It assumes that flex routing is on, and always generates the flex transfers.
  */
 public class FlexTransferGenerator implements GraphBuilderModule {
 
@@ -60,6 +63,9 @@ public class FlexTransferGenerator implements GraphBuilderModule {
   private final TransitRepository transitRepository;
   private final TimetableDataImport timetableDataImport;
 
+  /** The flex trips, used to find the flex stops of the trips. Created when this module runs. */
+  private final Provider<FlexIndex> flexIndex;
+
   /**
    * The scheduled trip patterns visiting each stop, by stop id. Built on first access, see {@link
    * #patternsForStop()}.
@@ -70,7 +76,8 @@ public class FlexTransferGenerator implements GraphBuilderModule {
   private final TransferRepository transferRepository;
 
   /**
-   * Constructor used in tests.
+   * Constructor used in tests. The flex index is created from the flex trips of
+   * {@code timetableDataImport} when the module runs.
    */
   public FlexTransferGenerator(
     Graph graph,
@@ -80,19 +87,31 @@ public class FlexTransferGenerator implements GraphBuilderModule {
     Duration maxTransferDuration,
     List<RouteRequest> transferRequests
   ) {
-    this.graph = graph;
-    this.transitRepository = transitRepository;
-    this.timetableDataImport = timetableDataImport;
-    this.maxTransferDuration = maxTransferDuration;
-    this.transferRequests = transferRequests;
-    this.transferRepository = transferRepository;
+    this(
+      graph,
+      transitRepository,
+      timetableDataImport,
+      transferRepository,
+      () ->
+        new FlexIndex(
+          timetableDataImport.getAllFlexTrips(),
+          timetableDataImport.getTripCalendars()
+        ),
+      maxTransferDuration,
+      transferRequests
+    );
   }
 
+  /**
+   * @param flexIndex the flex trips of the imported transit data, only requested when the module
+   *                  runs
+   */
   public FlexTransferGenerator(
     Graph graph,
     TransitRepository transitRepository,
     TimetableDataImport timetableDataImport,
     TransferRepository transferRepository,
+    Provider<FlexIndex> flexIndex,
     FlexTransferParameters parameters
   ) {
     this(
@@ -100,9 +119,28 @@ public class FlexTransferGenerator implements GraphBuilderModule {
       transitRepository,
       timetableDataImport,
       transferRepository,
+      flexIndex,
       parameters.maxDuration(),
       parameters.requests()
     );
+  }
+
+  private FlexTransferGenerator(
+    Graph graph,
+    TransitRepository transitRepository,
+    TimetableDataImport timetableDataImport,
+    TransferRepository transferRepository,
+    Provider<FlexIndex> flexIndex,
+    Duration maxTransferDuration,
+    List<RouteRequest> transferRequests
+  ) {
+    this.graph = graph;
+    this.transitRepository = transitRepository;
+    this.timetableDataImport = timetableDataImport;
+    this.transferRepository = transferRepository;
+    this.flexIndex = flexIndex;
+    this.maxTransferDuration = maxTransferDuration;
+    this.transferRequests = transferRequests;
   }
 
   @Override
@@ -115,13 +153,11 @@ public class FlexTransferGenerator implements GraphBuilderModule {
 
     var stops = graph.findVertices(TransitStopVertex.class);
 
-    // Flex transfers only use the WALK mode, and are only needed when flex routing is enabled.
-    List<RouteRequest> flexTransferRequests = OTPFeature.FlexRouting.isOn()
-      ? transferRequests
-          .stream()
-          .filter(transferProfile -> transferProfile.journey().transfer().mode() == StreetMode.WALK)
-          .toList()
-      : List.of();
+    // Flex transfers only use the WALK mode.
+    List<RouteRequest> flexTransferRequests = transferRequests
+      .stream()
+      .filter(transferProfile -> transferProfile.journey().transfer().mode() == StreetMode.WALK)
+      .toList();
 
     LOG.info("Creating flex transfers based on requests:");
     flexTransferRequests.forEach(transferProfile -> LOG.info(transferProfile.toString()));
@@ -226,16 +262,10 @@ public class FlexTransferGenerator implements GraphBuilderModule {
     }
 
     if (OTPFeature.ConsiderPatternsForDirectTransfers.isOn()) {
-      var flexIndex = OTPFeature.FlexRouting.isOn()
-        ? new FlexIndex(
-            timetableDataImport.getAllFlexTrips(),
-            timetableDataImport.getTripCalendars()
-          )
-        : null;
       return new PatternConsideringNearbyStopFinder(
         siteRepository,
         patternsForStop()::get,
-        flexIndex,
+        flexIndex.get(),
         finder
       );
     } else {

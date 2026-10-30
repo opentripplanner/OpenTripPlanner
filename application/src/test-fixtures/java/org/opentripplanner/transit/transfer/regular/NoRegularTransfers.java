@@ -1,7 +1,9 @@
 package org.opentripplanner.transit.transfer.regular;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.raptor.data.transfers.regular.RaptorRegularTransferService;
@@ -55,6 +57,11 @@ public final class NoRegularTransfers {
       @Override
       public NearbyStop findPath(int fromStop, int toStop) {
         return null;
+      }
+
+      @Override
+      public Collection<NearbyStop> findPathsFrom(int fromStop) {
+        return List.of();
       }
     };
 

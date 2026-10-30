@@ -66,6 +66,7 @@ import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.transit.transfer.regular.NoRegularTransfers;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferParameters;
 import org.opentripplanner.transit.transfer.regular.configure.RegularTransferFactory;
 
 public class TestServerContext {
@@ -123,6 +124,11 @@ public class TestServerContext {
     );
   }
 
+  /** The transfer parameters used if none are configured: the default walk profile only. */
+  public static TransferParameters<RouteRequest> defaultTransferParameters() {
+    return new TransferParameters<>(List.of(StreetTransferFactory.defaultWalkProfile()));
+  }
+
   /**
    * Generate the regular transfers through the raptor-data pipeline, mirroring production graph
    * builds, register them on a new transaction registry, and return the current snapshot. The
@@ -137,7 +143,7 @@ public class TestServerContext {
     var handle = StreetTransferFactory.registerRepository(
       registry,
       createRegularTransferBuildRepository(graph, transitRepository, timetableDataImport),
-      StreetTransferFactory.defaultParameters(),
+      defaultTransferParameters(),
       graph,
       transitRepository,
       TEST_TRANSFER_CACHE_MAX_SIZE,
@@ -162,7 +168,7 @@ public class TestServerContext {
     var transferGenerator = StreetTransferFactory.createGenerator(
       graph,
       transitRepository,
-      StreetTransferFactory.defaultParameters(),
+      defaultTransferParameters(),
       regularTransferBuildRepository,
       stopsVisitedByPatterns,
       new StopsAllowedForModes(timetableDataImport, stopsVisitedByPatterns),

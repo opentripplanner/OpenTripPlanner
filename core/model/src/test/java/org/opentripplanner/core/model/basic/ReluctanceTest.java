@@ -16,6 +16,9 @@ class ReluctanceTest {
 
   @ParameterizedTest(name = "of({0}) = {1}")
   @CsvSource({
+    "0.0, 0.0",
+    "0.02, 0.0",
+    "0.03, 0.05",
     "0.1, 0.1",
     "0.12, 0.1",
     "0.13, 0.15",
@@ -135,14 +138,14 @@ class ReluctanceTest {
   }
 
   @Test
-  void ofRejectsValuesOutsideOneTenthToOneMillion() {
-    assertThrows(IllegalArgumentException.class, () -> Reluctance.of(0.09));
+  void ofRejectsValuesOutsideZeroToOneMillion() {
+    assertThrows(IllegalArgumentException.class, () -> Reluctance.of(-0.01));
     assertThrows(IllegalArgumentException.class, () -> Reluctance.of(1_000_000.01));
   }
 
   @Test
   void ofAcceptsTheInclusiveBoundaries() {
-    assertThat(Reluctance.of(0.1).value()).isWithin(EPSILON).of(0.1);
+    assertThat(Reluctance.of(0.0).value()).isWithin(EPSILON).of(0.0);
     assertThat(Reluctance.of(1_000_000.0).value()).isWithin(EPSILON).of(1_000_000.0);
   }
 
@@ -170,7 +173,7 @@ class ReluctanceTest {
 
   @Test
   void normalizedDistance() {
-    var min = Reluctance.of(0.1);
+    var min = Reluctance.of(0.0);
     var max = Reluctance.of(1_000_000.0);
     assertThat(min.normalizedDistance(min)).isWithin(EPSILON).of(0.0f);
     assertThat(min.normalizedDistance(max)).isWithin(EPSILON).of(1.0f);

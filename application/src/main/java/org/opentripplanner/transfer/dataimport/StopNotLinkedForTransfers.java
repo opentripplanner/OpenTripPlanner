@@ -24,7 +24,6 @@ class StopNotLinkedForTransfers implements DataImportIssue {
     this.longitude = stop.getLon();
     this.name = stop.getDefaultName();
     this.id = stop.getId();
-    stop.getCoordinate();
   }
 
   @Override

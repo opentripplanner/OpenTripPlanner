@@ -188,14 +188,17 @@ public class ConstantsForTests {
       addPortlandVehicleRentals(graph);
 
       var transferRepository = TransferServiceTestFactory.defaultTransferRepository();
-      new FlexTransferGenerator(
-        graph,
-        transitRepository,
-        timetableDataImport,
-        transferRepository,
-        Duration.ofMinutes(30),
-        List.of(RouteRequest.defaultValue())
-      ).buildGraph();
+      // Like the graph builder, only generate the flex transfers if flex routing is on
+      if (OTPFeature.FlexRouting.isOn()) {
+        new FlexTransferGenerator(
+          graph,
+          transitRepository,
+          timetableDataImport,
+          transferRepository,
+          Duration.ofMinutes(30),
+          List.of(RouteRequest.defaultValue())
+        ).buildGraph();
+      }
 
       graph.index();
 

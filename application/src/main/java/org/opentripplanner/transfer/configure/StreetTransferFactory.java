@@ -1,11 +1,11 @@
 package org.opentripplanner.transfer.configure;
 
-import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.transaction.RepositoryHandle;
 import org.opentripplanner.core.model.transaction.RepositoryRegistry;
 import org.opentripplanner.ext.flex.FlexIndex;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.street.graph.Graph;
@@ -13,6 +13,8 @@ import org.opentripplanner.transfer.dataimport.StopsVisitedByPatterns;
 import org.opentripplanner.transfer.streetadapter.RaptorStopIndexAdaptor;
 import org.opentripplanner.transfer.streetadapter.RegularTransferPreferencesMapper;
 import org.opentripplanner.transfer.streetadapter.StreetTransferPathProvider;
+import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferGenerator;
@@ -35,12 +37,16 @@ public final class StreetTransferFactory {
 
   private StreetTransferFactory() {}
 
-  /** The profiles used if none are configured: a single default walk profile. */
-  public static TransferParameters<RouteRequest> defaultParameters() {
-    return new TransferParameters<>(
-      List.of(
-        new TransferProfile<>("walk", TransferProfileType.WALK, null, RouteRequest.defaultValue())
-      )
+  /**
+   * The profile used if no profile is configured: a walk profile with id {@code walk}, its
+   * preferences are the ones of the default request.
+   */
+  public static TransferProfile<RouteRequest> defaultWalkProfile() {
+    return new TransferProfile<>(
+      "walk",
+      TransferProfileType.WALK,
+      null,
+      RouteRequest.defaultValue()
     );
   }
 
@@ -51,7 +57,7 @@ public final class StreetTransferFactory {
    * @param stopPatterns the trip patterns visiting the stops, only the stops visited by a pattern
    *                     have transfers from them, and with the feature
    *                     {@code ConsiderPatternsForDirectTransfers} only the closest stop of each
-   *                     pattern is a transfer to
+   *                     pattern is a transfer to; see {@link #isTransferSource}
    * @param allowedModes the modes the stops are allowed for, to select the max duration of the
    *                     transfers, see {@code MaxDurationsPreference}
    * @param flexIndex    the flex trips to consider when the transfer stops are found, or
@@ -77,8 +83,8 @@ public final class StreetTransferFactory {
           stopPatterns,
           flexIndex
         ),
-        stopId -> stopPatterns.contains(stopId) && transfersAllowed(transitRepository, stopId),
-        stopId -> transfersAllowed(transitRepository, stopId),
+        stopId -> isTransferSource(transitRepository.getSiteRepository(), stopPatterns, stopId),
+        stopId -> transfersAllowed(transitRepository.getSiteRepository(), stopId),
         allowedModes
       ),
       new RegularTransferPreferencesMapper(),
@@ -134,12 +140,31 @@ public final class StreetTransferFactory {
     );
   }
 
-  /** A stop of a station that does not allow transfers has no transfers from or to it. */
-  private static boolean transfersAllowed(
-    TransitRepository transitRepository,
+  /**
+   * A stop has transfers from it if it is visited by a scheduled pattern, or, with the feature
+   * {@link OTPFeature#IncludeStopsUsedRealTimeInTransfers}, it is likely to be used by real-time
+   * trips, and its station allows transfers.
+   */
+  static boolean isTransferSource(
+    SiteRepository siteRepository,
+    StopsVisitedByPatterns stopPatterns,
     FeedScopedId stopId
   ) {
-    var stop = transitRepository.getSiteRepository().getStopLocation(stopId);
+    var visited = stopPatterns.contains(stopId) || isUsedRealtime(siteRepository, stopId);
+    return visited && transfersAllowed(siteRepository, stopId);
+  }
+
+  private static boolean isUsedRealtime(SiteRepository siteRepository, FeedScopedId stopId) {
+    return (
+      OTPFeature.IncludeStopsUsedRealTimeInTransfers.isOn() &&
+      siteRepository.getRegularStop(stopId) instanceof RegularStop stop &&
+      stop.isSometimesUsedRealtime()
+    );
+  }
+
+  /** A stop of a station that does not allow transfers has no transfers from or to it. */
+  private static boolean transfersAllowed(SiteRepository siteRepository, FeedScopedId stopId) {
+    var stop = siteRepository.getStopLocation(stopId);
     return stop != null && !stop.transfersNotAllowed();
   }
 }

@@ -324,15 +324,31 @@ public class GraphBuilderModules {
     Graph graph,
     TransitRepository transitRepository,
     TimetableDataImport timetableDataImport,
-    TransferRepository transferRepository
+    TransferRepository transferRepository,
+    Provider<FlexIndex> flexIndex
   ) {
     return new FlexTransferGenerator(
       graph,
       transitRepository,
       timetableDataImport,
       transferRepository,
+      flexIndex,
       config.flexTransferParameters()
     );
+  }
+
+  /**
+   * The flex trips of the imported transit data, shared by the transfer generators. It is created
+   * on first use, so it must not be requested before the transit data is imported. {@code null} if
+   * flex routing is off.
+   */
+  @Provides
+  @Singleton
+  @Nullable
+  static FlexIndex provideFlexIndex(TimetableDataImport timetableDataImport) {
+    return OTPFeature.FlexRouting.isOn()
+      ? new FlexIndex(timetableDataImport.getAllFlexTrips(), timetableDataImport.getTripCalendars())
+      : null;
   }
 
   @Provides
@@ -343,13 +359,10 @@ public class GraphBuilderModules {
     TransitRepository transitRepository,
     StopsVisitedByPatterns stopsVisitedByPatterns,
     StopsAllowedForModes stopsAllowedForModes,
-    TimetableDataImport timetableDataImport,
-    RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository
+    RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository,
+    @Nullable FlexIndex flexIndex
   ) {
     // The generator is created when the transfers are generated, after the transit data import
-    var flexIndex = OTPFeature.FlexRouting.isOn()
-      ? new FlexIndex(timetableDataImport.getAllFlexTrips(), timetableDataImport.getTripCalendars())
-      : null;
     return StreetTransferFactory.createGenerator(
       graph,
       transitRepository,
