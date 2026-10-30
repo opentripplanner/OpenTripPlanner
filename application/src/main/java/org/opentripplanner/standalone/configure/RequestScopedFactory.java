@@ -14,6 +14,7 @@ import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayService;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.ojp.parameters.OjpApiParameters;
 import org.opentripplanner.ext.ojp.parameters.TriasApiParameters;
+import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
@@ -29,8 +30,10 @@ import org.opentripplanner.standalone.config.DebugUiConfig;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
-import org.opentripplanner.transfer.regular.RegularTransferService;
+import org.opentripplanner.transfer.regular.FlexTransferService;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
+import org.opentripplanner.transit.transfer.regular.api.report.RegularTransferCacheReport;
 
 /**
  * A Dagger subcomponent scoped to the lifetime of one HTTP request. Every binding here is derived
@@ -65,7 +68,11 @@ public interface RequestScopedFactory {
 
   StreetDetailsService streetDetailsService();
 
-  RegularTransferService transferService();
+  FlexTransferService transferService();
+
+  RegularTransferRepositorySnapshot<NearbyStop, RouteRequest> regularTransfers();
+
+  RegularTransferCacheReport regularTransferCacheReport();
 
   VectorTileConfig vectorTileConfig();
 

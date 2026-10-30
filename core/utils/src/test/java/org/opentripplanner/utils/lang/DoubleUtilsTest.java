@@ -84,4 +84,56 @@ class DoubleUtilsTest {
     assertTrue(DoubleUtils.doubleEquals(1.2, 1.2));
     assertTrue(DoubleUtils.doubleEquals(-1.2, -1.2));
   }
+
+  /** The buckets: [0, 1)->0.1, [1, 10)->1.0, [10, 100)->10.0, and 10.0 from 100 and up. */
+  private static final double[][] STEPS = { { 1.0, 0.1 }, { 10.0, 1.0 }, { 100.0, 10.0 } };
+
+  @Test
+  void roundToStepUsesTheStepOfTheBucketOfTheValue() {
+    assertEquals(0.4, DoubleUtils.roundToStep(0.37, STEPS));
+    assertEquals(3.0, DoubleUtils.roundToStep(3.4, STEPS));
+    assertEquals(10.0, DoubleUtils.roundToStep(9.99, STEPS));
+    assertEquals(10.0, DoubleUtils.roundToStep(14.0, STEPS));
+    assertEquals(20.0, DoubleUtils.roundToStep(16.0, STEPS));
+  }
+
+  @Test
+  void roundToStepPutsAValueEqualToALimitInTheNextBucket() {
+    // 1.0 is in [1, 10) with the step 1.0 - not in [0, 1) with the step 0.1
+    assertEquals(1.0, DoubleUtils.roundToStep(1.0, STEPS));
+    assertEquals(3.0, DoubleUtils.roundToStep(2.95, STEPS));
+    // The same value rounded with the step 0.1 would be 2.9
+    assertEquals(0.9, DoubleUtils.roundToStep(0.94, STEPS));
+  }
+
+  @Test
+  void roundToStepUsesTheLastStepFromTheLastLimitAndUp() {
+    assertEquals(100.0, DoubleUtils.roundToStep(100.0, STEPS));
+    assertEquals(1230.0, DoubleUtils.roundToStep(1234.0, STEPS));
+  }
+
+  @Test
+  void roundToStepBreaksTiesTowardsTheEvenNeighbour() {
+    // 0.25 / 0.1 = 2.5, a tie - rounds to 2, not 3
+    assertEquals(0.2, DoubleUtils.roundToStep(0.25, STEPS));
+    // 0.35 / 0.1 = 3.5, a tie - rounds to 4, not 3
+    assertEquals(0.4, DoubleUtils.roundToStep(0.35, STEPS));
+  }
+
+  @Test
+  void roundToStepKeepsZeroAndTheSpecialValues() {
+    assertEquals(0.0, DoubleUtils.roundToStep(0.0, STEPS));
+    assertEquals(Double.NaN, DoubleUtils.roundToStep(Double.NaN, STEPS));
+    assertEquals(
+      Double.POSITIVE_INFINITY,
+      DoubleUtils.roundToStep(Double.POSITIVE_INFINITY, STEPS)
+    );
+  }
+
+  @Test
+  void roundToStepRejectsAnEmptyTable() {
+    assertThrows(IllegalArgumentException.class, () ->
+      DoubleUtils.roundToStep(1.0, new double[][] {})
+    );
+  }
 }

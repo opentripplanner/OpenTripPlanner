@@ -128,6 +128,7 @@ import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.transit.transfer.regular.NoRegularTransfers;
 import org.opentripplanner.utils.collection.ListUtils;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.node.ArrayNode;
@@ -582,6 +583,7 @@ class GraphQLIntegrationTest {
       transitService,
       transitAlertService,
       TransferServiceTestFactory.defaultTransferService(),
+      NoRegularTransfers.snapshot(),
       fareService,
       defaultVehicleRentalService,
       new DefaultVehicleParkingService(PARKING_REPOSITORY),
