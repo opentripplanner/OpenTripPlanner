@@ -34,20 +34,14 @@ import org.opentripplanner.street.search.strategy.DominanceFunctions;
  * dropoff is a mid-route insertion the driver has to arrive at and continue from. Each direction is
  * checked in two stages: a cheap local pre-filter (a car-permitting street edge in that direction)
  * then a bounded {@link StreetMode#CAR} probe that a car can drive at least the minimum escape
- * distance in it (set per instance — see the constructor and {@link #createDefault()}). The probe
- * catches car edges that permit cars "on paper" but are stranded on a one-way stub, barrier pocket,
- * or disconnected island. Verdicts are cached per vertex.
+ * distance in it (set per instance — see the constructor). The probe catches car edges that permit
+ * cars "on paper" but are stranded on a one-way stub, barrier pocket, or disconnected island.
+ * Verdicts are cached per vertex.
  * <p>
  * {@link #snapPickup}/{@link #snapDropoff} walk from/to {@code vertexToSnap};
  * {@link #snapToPermanentVertex} accepts only permanent vertices.
  */
 public final class CarReachableVertexSnapper {
-
-  /**
-   * Default escape distance: large enough to clear a connected vertex, small enough to reject a
-   * stranded stub or island.
-   */
-  private static final double DEFAULT_MIN_CAR_ESCAPE_METERS = 500;
 
   private static final StreetSearchRequest CAR_DEPART = StreetSearchRequest.of()
     .withMode(StreetMode.CAR)
@@ -65,18 +59,8 @@ public final class CarReachableVertexSnapper {
    */
   private final Map<Vertex, Boolean> carReachableCache = new ConcurrentHashMap<>();
 
-  /**
-   * @param minCarEscapeMeters straight-line distance, in metres, a car must be able to drive both
-   *                           to and from a candidate for it to be accepted; also caps the probe's
-   *                           exploration.
-   */
   public CarReachableVertexSnapper(double minCarEscapeMeters) {
     this.minCarEscapeMeters = minCarEscapeMeters;
-  }
-
-  /** Creates a snapper with the default escape distance. */
-  public static CarReachableVertexSnapper createDefault() {
-    return new CarReachableVertexSnapper(DEFAULT_MIN_CAR_ESCAPE_METERS);
   }
 
   /**

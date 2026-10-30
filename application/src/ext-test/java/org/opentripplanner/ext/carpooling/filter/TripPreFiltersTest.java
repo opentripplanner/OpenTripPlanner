@@ -11,18 +11,21 @@ import static org.opentripplanner.ext.carpooling.CarpoolingRequestTestData.direc
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.ext.carpooling.RoutableCarpoolTripTestData;
 
 class TripPreFiltersTest {
 
   @Test
   void anyRejectingFilter_failsTheTrip() {
-    CarpoolTripFilter accept = (trip, request) -> true;
-    CarpoolTripFilter reject = (trip, request) -> false;
-    var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
-    var request = directRequest(OSLO_EAST, OSLO_WEST);
+    CarpoolTripFilter accept = (trip, passenger) -> true;
+    CarpoolTripFilter reject = (trip, passenger) -> false;
+    var trip = RoutableCarpoolTripTestData.withDummyVertices(
+      createSimpleTrip(OSLO_CENTER, OSLO_NORTH)
+    );
+    var passenger = new SnappedPassenger(directRequest(OSLO_EAST, OSLO_WEST), null, null);
 
-    assertTrue(new TripPreFilters(List.of(accept, accept)).isCandidateTrip(trip, request));
-    assertFalse(new TripPreFilters(List.of(accept, reject)).isCandidateTrip(trip, request));
+    assertTrue(new TripPreFilters(List.of(accept, accept)).isCandidateTrip(trip, passenger));
+    assertFalse(new TripPreFilters(List.of(accept, reject)).isCandidateTrip(trip, passenger));
   }
 
   @Test
@@ -31,8 +34,8 @@ class TripPreFiltersTest {
 
     assertTrue(
       preFilter.isCandidateTrip(
-        createSimpleTrip(OSLO_CENTER, OSLO_NORTH),
-        directRequest(OSLO_EAST, OSLO_WEST)
+        RoutableCarpoolTripTestData.withDummyVertices(createSimpleTrip(OSLO_CENTER, OSLO_NORTH)),
+        new SnappedPassenger(directRequest(OSLO_EAST, OSLO_WEST), null, null)
       )
     );
   }

@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.opentripplanner.ext.carpooling.CarpoolBookingUrlTestData.bookingUrlTemplate;
 import static org.opentripplanner.ext.carpooling.CarpoolBookingUrlTestData.expectedExpandedUrl;
+import static org.opentripplanner.ext.carpooling.CarpoolStreetPathBuilder.createSegment;
 import static org.opentripplanner.ext.carpooling.CarpoolStreetPathBuilder.createStreetPath;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_CENTER;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_NORTH;
@@ -362,7 +363,7 @@ class CarpoolItineraryMapperTest {
       createSimpleTrip(OSLO_CENTER, OSLO_NORTH),
       PICKUP_POSITION,
       DROPOFF_POSITION,
-      List.of(createStreetPath(PICKUP_SEGMENT_DURATION), createStreetPath(SHARED_SEGMENT_DURATION)),
+      List.of(createSegment(PICKUP_SEGMENT_DURATION), createSegment(SHARED_SEGMENT_DURATION)),
       STOP_DURATION,
       null,
       walkToPickup,

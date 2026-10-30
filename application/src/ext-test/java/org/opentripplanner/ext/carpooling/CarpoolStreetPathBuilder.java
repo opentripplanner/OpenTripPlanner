@@ -3,6 +3,7 @@ package org.opentripplanner.ext.carpooling;
 import java.time.Duration;
 import java.util.List;
 import java.util.stream.IntStream;
+import org.opentripplanner.ext.carpooling.routing.RoutedSegment;
 import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 
@@ -38,6 +39,16 @@ public class CarpoolStreetPathBuilder {
     builder.streetEdge("segment-0", distanceMeters);
 
     return new StreetPath(builder.build());
+  }
+
+  /** A driver route segment of the given duration, wrapping {@link #createStreetPath(Duration)}. */
+  public static RoutedSegment createSegment(Duration duration) {
+    return RoutedSegment.of(createStreetPath(duration));
+  }
+
+  /** {@link #createStreetPaths(int)} wrapped as driver route segments. */
+  public static List<RoutedSegment> createSegments(int count) {
+    return createStreetPaths(count).stream().map(RoutedSegment::of).toList();
   }
 
   /**
