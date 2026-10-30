@@ -1,21 +1,19 @@
 package org.opentripplanner.raptor.rangeraptor.internalapi;
 
 /**
- * These are the different time configurations Raptor supports. Each configuration will be used to
- * change the pareto-function.
+ * The time criteria used in the pareto-function. This describes which time values the search
+ * compares, nothing else. How the time criteria are combined with the other criteria and the
+ * search direction is described in {@code DestinationArrivalParetoSetComparators} and in the
+ * "Destination pareto-set" section of {@code org/opentripplanner/raptor/package.md}.
  */
 public enum ParetoSetTime {
   /**
-   * Uses iteration-departure-time and arrival-time as criteria in pareto function. Note!
-   * iteration-departure-time is slightly different from the more precise departure-time.
+   * Uses iteration-departure-time and arrival-time. Note! The iteration-departure-time is slightly
+   * different from the more precise departure-time.
    */
   USE_TIMETABLE,
-  /**
-   * Uses arrival-time as criteria in pareto function.
-   */
+  /** Uses arrival-time. */
   USE_ARRIVAL_TIME,
-  /**
-   * Uses departure-time as criteria in pareto function.
-   */
+  /** Uses the time-shifted departure-time. */
   USE_DEPARTURE_TIME,
 }

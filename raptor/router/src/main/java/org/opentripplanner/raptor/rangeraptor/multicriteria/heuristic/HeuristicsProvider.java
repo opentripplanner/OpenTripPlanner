@@ -3,11 +3,11 @@ package org.opentripplanner.raptor.rangeraptor.multicriteria.heuristic;
 import java.util.Objects;
 import org.opentripplanner.raptor.api.request.Optimization;
 import org.opentripplanner.raptor.rangeraptor.debug.DebugHandlerFactory;
+import org.opentripplanner.raptor.rangeraptor.destination.DestinationArrivalPaths;
 import org.opentripplanner.raptor.rangeraptor.internalapi.HeuristicAtStop;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.stop.McStopArrival;
-import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
@@ -55,13 +55,7 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
     if (heuristics == null || paths.isEmpty()) {
       return false;
     }
-    boolean rejected = !qualify(
-      arrival.stop(),
-      arrival.arrivalTime(),
-      arrival.travelDuration(),
-      arrival.c1(),
-      arrival.c2()
-    );
+    boolean rejected = !qualify(arrival.stop(), arrival.arrivalTime(), arrival.c1(), arrival.c2());
 
     if (rejected) {
       debugRejectByOptimization(arrival);
@@ -94,7 +88,7 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
    * The C2 value is passed through since we don't have any clue on what it's used for. There is
    * no heuristic calculation for the C2 value. Destination pruning can only be used if this is ok.
    */
-  private boolean qualify(int stop, int arrivalTime, int travelDuration, int cost, int c2) {
+  private boolean qualify(int stop, int arrivalTime, int cost, int c2) {
     HeuristicAtStop h = get(stop);
 
     if (h == HeuristicAtStop.UNREACHED) {
@@ -102,10 +96,8 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
     }
     int minArrivalTime = arrivalTime + h.minTravelDuration();
     int minNumberOfTransfers = round - 1 + h.minNumTransfers();
-    int minTravelDuration = travelDuration + h.minTravelDuration();
     int minCost = cost + h.minCost();
-    int departureTime = minArrivalTime - minTravelDuration;
-    return paths.qualify(departureTime, minArrivalTime, minNumberOfTransfers, minCost, c2);
+    return paths.qualify(minArrivalTime, minNumberOfTransfers, minCost, c2);
   }
 
   private String rejectErrorMessage(int stop) {

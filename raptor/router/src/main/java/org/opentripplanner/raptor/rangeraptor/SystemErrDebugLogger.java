@@ -16,16 +16,13 @@ import org.opentripplanner.raptor.api.debug.DebugEvent;
 import org.opentripplanner.raptor.api.debug.DebugLogger;
 import org.opentripplanner.raptor.api.debug.DebugTopic;
 import org.opentripplanner.raptor.api.path.PathStringBuilder;
-import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.request.DebugRequestBuilder;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.api.view.PatternRideView;
 import org.opentripplanner.raptor.rangeraptor.transit.TripTimesSearch;
 import org.opentripplanner.raptor.spi.RaptorStopNameResolver;
-import org.opentripplanner.utils.lang.OtpNumberFormat;
 import org.opentripplanner.utils.lang.StringUtils;
 import org.opentripplanner.utils.text.Table;
-import org.opentripplanner.utils.time.DurationUtils;
 
 /**
  * A debug logger which can be plugged into Raptor to do debug logging to standard error. This is
@@ -45,10 +42,10 @@ public class SystemErrDebugLogger implements DebugLogger {
     .withHeaders("ARRIVAL", "LEG", "RND", "STOP", "ARRIVE", "C₁", "TRIP", "DETAILS")
     .withMinWidths(9, 7, 3, 5, 11, 9, 24, 0)
     .build();
-  private final Table pathTable = Table.of()
-    .withAlights(Center, Center, Right, Right, Right, Right, Right, Right, Left)
-    .withHeaders(">>> PATH", "TR", "FROM", "TO", "START", "END", "DURATION", "C₁", "DETAILS")
-    .withMinWidths(9, 2, 5, 5, 11, 11, 8, 9, 0)
+  private final Table destinationTable = Table.of()
+    .withAlights(Center, Center, Right, Right, Right, Left)
+    .withHeaders(">>> DEST", "TR", "STOP", "ARRIVE", "C₁", "DETAILS")
+    .withMinWidths(9, 2, 5, 11, 9, 0)
     .build();
   private boolean forwardSearch = true;
   private int lastIterationTime = NOT_SET;
@@ -95,31 +92,28 @@ public class SystemErrDebugLogger implements DebugLogger {
   }
 
   /**
-   * This should be passed into the {@link DebugRequestBuilder#withPathFilteringListener(Consumer)}
-   * using a lambda to enable debugging paths put in the final result pareto-set.
+   * This should be passed into the {@link DebugRequestBuilder#withDestinationArrivalListener}
+   * using a lambda to enable debugging destination arrivals put in the final result pareto-set.
    */
-  public void pathFilteringListener(DebugEvent<RaptorPath<?>> e) {
+  public void destinationArrivalListener(DebugEvent<ArrivalView<?>> e) {
     if (printPathHeader) {
       println();
-      println(pathTable.headerRow());
+      println(destinationTable.headerRow());
       printPathHeader = false;
     }
 
-    RaptorPath<?> p = e.element();
-    var aLeg = p.accessLeg();
-    var eLeg = p.egressLeg();
+    ArrivalView<?> a = e.element();
+    var buf = path(a.previous(), new PathStringBuilder(stopNameResolver));
+    buf.accessEgress(a.egressPath().egress());
 
     println(
-      pathTable.rowAsText(
+      destinationTable.rowAsText(
         e.action().toString(),
-        p.numberOfTransfers(),
-        aLeg != null ? aLeg.toStop() : null,
-        eLeg != null ? eLeg.fromStop() : null,
-        aLeg != null ? timeToStrLong(aLeg.fromTime()) : null,
-        eLeg != null ? timeToStrLong(eLeg.toTime()) : null,
-        DurationUtils.durationToStr(p.durationInSeconds()),
-        OtpNumberFormat.formatCostCenti(p.c1()),
-        details(e.action().toString(), e.reason(), e.element().toString())
+        a.numberOfTransfers(),
+        stop(a.previous().stop()),
+        timeToStrLong(a.arrivalTime()),
+        numFormat.format(a.c1()),
+        details(e.action().toString(), e.reason(), buf.summary(a.c1(), a.c2()).toString())
       )
     );
   }
