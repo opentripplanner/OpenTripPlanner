@@ -10,6 +10,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.i18n.I18NString;
@@ -20,9 +21,11 @@ import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.netex.support.JourneyPatternHelper;
 import org.opentripplanner.transit.model.framework.ImmutableEntityById;
+import org.opentripplanner.transit.model.framework.TransitEntity;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
@@ -44,7 +47,7 @@ import org.rutebanken.netex.model.Vias_RelStructure;
 /**
  * This maps a list of TimetabledPassingTimes to a list of StopTimes. It also makes sure the
  * StopTime has a reference to the correct stop. DestinationDisplay is mapped to HeadSign. There is
- * logic to take care of the the fact that DestinationsDisplay is also valid for each subsequent
+ * logic to take care of the fact that DestinationsDisplay is also valid for each subsequent
  * TimeTabledPassingTime, while HeadSign has to be explicitly defined for each StopTime. This class
  * does not take Daylight Saving Time transitions into account, this is an error and should be
  * fixed. See https://github.com/opentripplanner/OpenTripPlanner/issues/5109
@@ -57,12 +60,14 @@ class StopTimesMapper {
 
   private final ReadOnlyHierarchicalMap<String, DestinationDisplay> destinationDisplayById;
 
+  private final ImmutableEntityById<Station> stationsById;
   private final ImmutableEntityById<RegularStop> stopsById;
 
   private final ImmutableEntityById<AreaStop> flexibleStopLocationsById;
 
   private final ImmutableEntityById<GroupStop> groupStopById;
 
+  private final ReadOnlyHierarchicalMap<String, String> stopPlaceIdByStopPointRef;
   private final ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef;
 
   private final ReadOnlyHierarchicalMap<String, String> flexibleStopPlaceIdByStopPointRef;
@@ -76,13 +81,22 @@ class StopTimesMapper {
 
   private List<String> currentHeadSignVias;
 
+  /**
+   * @param stopPlaceIdByStopPointRef Generally speaking, scheduled stop points can only refer to quays.
+   *                                  However, some profiles - like EPIP - allow you also use stop places.
+   *                                  If you activate this feature (stopPlaceAsPassengerStopAssignment)
+   *                                  then this collection is non-empty. In such a case a child stop
+   *                                  is used as a fallback.
+   */
   StopTimesMapper(
     DataImportIssueStore issueStore,
     FeedScopedIdFactory idFactory,
     ImmutableEntityById<RegularStop> stopsById,
+    ImmutableEntityById<Station> stationsById,
     ImmutableEntityById<AreaStop> areaStopById,
     ImmutableEntityById<GroupStop> groupStopById,
     ReadOnlyHierarchicalMap<String, DestinationDisplay> destinationDisplayById,
+    ReadOnlyHierarchicalMap<String, String> stopPlaceIdByStopPointRef,
     ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef,
     ReadOnlyHierarchicalMap<String, String> flexibleStopPlaceIdByStopPointRef,
     ReadOnlyHierarchicalMapById<FlexibleLine> flexibleLinesById,
@@ -92,8 +106,10 @@ class StopTimesMapper {
     this.idFactory = idFactory;
     this.destinationDisplayById = destinationDisplayById;
     this.stopsById = stopsById;
+    this.stationsById = stationsById;
     this.flexibleStopLocationsById = areaStopById;
     this.groupStopById = groupStopById;
+    this.stopPlaceIdByStopPointRef = stopPlaceIdByStopPointRef;
     this.quayIdByStopPointRef = quayIdByStopPointRef;
     this.flexibleStopPlaceIdByStopPointRef = flexibleStopPlaceIdByStopPointRef;
     this.flexibleLinesById = flexibleLinesById;
@@ -373,22 +389,25 @@ class StopTimesMapper {
 
     String stopPointRef = stopPointInJourneyPattern.getScheduledStopPointRef().getValue().getRef();
 
-    String stopId = quayIdByStopPointRef.lookup(stopPointRef);
-    String flexibleStopPlaceId = flexibleStopPlaceIdByStopPointRef.lookup(stopPointRef);
-
-    if (stopId == null && flexibleStopPlaceId == null) {
-      issueStore.add(
-        "PassengerStopAssignmentNotFound",
-        "No passengerStopAssignment found for %s",
-        stopPointRef
-      );
-      return null;
-    }
-
-    StopLocation stopLocation;
-    if (stopId != null) {
-      stopLocation = stopsById.get(idFactory.createId(stopId));
-    } else {
+    var quayId = quayIdByStopPointRef.lookup(stopPointRef);
+    var stopPlaceId = stopPlaceIdByStopPointRef.lookup(stopPointRef);
+    var flexibleStopPlaceId = flexibleStopPlaceIdByStopPointRef.lookup(stopPointRef);
+    StopLocation stopLocation = null;
+    if (quayId != null) {
+      stopLocation = stopsById.get(idFactory.createId(quayId));
+    } else if (stopPlaceId != null) {
+      // the validation takes care of checking that the stop place exists and that it has at
+      // least one quay
+      var station = stationsById.get(idFactory.createId(stopPlaceId));
+      stopLocation =
+        pickAnyChildStop(station)
+          // if you see this exception then the validation didn't filter out the passenger stop assignment
+          .orElseThrow(() ->
+            new RuntimeException(
+              "Stop place %s has no quays. This indicates a bug.".formatted(stopPlaceId)
+            )
+          );
+    } else if (flexibleStopPlaceId != null) {
       AreaStop areaStop = flexibleStopLocationsById.get(idFactory.createId(flexibleStopPlaceId));
       GroupStop groupStop = groupStopById.get(idFactory.createId(flexibleStopPlaceId));
 
@@ -402,12 +421,21 @@ class StopTimesMapper {
     if (stopLocation == null) {
       issueStore.add(
         "StopPointInJourneyPatternMissingStopLocation",
-        "No Quay or FlexibleStopPlace found for %s",
+        "No Quay, StopPlace or FlexibleStopPlace mapping found for stop point ref %s",
         stopPointRef
       );
     }
 
     return stopLocation;
+  }
+
+  /**
+   * Pick a child stop of the station for the assignment. Sorts by stop ID and picks the first
+   * so that this method is deterministic even though there is no guarantee that any specific stop is
+   * picked.
+   */
+  private static Optional<StopLocation> pickAnyChildStop(Station station) {
+    return station.getChildStops().stream().min(TransitEntity.idComparator());
   }
 
   private FlexibleLine lookUpFlexibleLine(
