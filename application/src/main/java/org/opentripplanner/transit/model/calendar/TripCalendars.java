@@ -238,11 +238,8 @@ public class TripCalendars implements Serializable {
   }
 
   /**
-   * Assign each of the given service ids the next free service code, in iteration order: the code
-   * is the number of service codes registered before it. Used during graph build only.
-   * <p>
-   * Registering many ids through {@link #withServiceCode} copies the whole service code map once
-   * per id, which is quadratic, so bulk registration should use this method instead.
+   * Efficiently assign each of the given service ids the next free service code, in iteration order:
+   * the code is the number of service codes registered before it. Used during graph build only.
    *
    * @return a new instance with the service codes registered.
    */

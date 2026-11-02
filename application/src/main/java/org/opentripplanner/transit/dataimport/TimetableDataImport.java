@@ -114,7 +114,7 @@ public class TimetableDataImport {
 
   /**
    * Assign each of the given service ids the next free service code, in iteration order. Prefer
-   * this over {@link #putServiceCode} for bulk registration, which would be quadratic.
+   * this over {@link #putServiceCode} for efficient bulk registration.
    */
   public void addNextServiceCodes(Collection<FeedScopedId> serviceIds) {
     assertModificationsAllowed();
