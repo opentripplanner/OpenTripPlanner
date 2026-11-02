@@ -1,8 +1,10 @@
 package org.opentripplanner.routing.linking;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -48,6 +50,18 @@ class LinkingContextRequestTest {
   }
 
   @Test
+  void isViaSearch() {
+    assertTrue(subject.isViaSearch());
+
+    var noVia = subject.copyOf().withViaLocationsWithCoordinates(List.of()).build();
+    assertFalse(noVia.isViaSearch());
+
+    // Via locations without coordinates are not part of the request, but still make it a via search
+    var viaWithoutCoordinates = noVia.copyOf().withViaSearch(true).build();
+    assertTrue(viaWithoutCoordinates.isViaSearch());
+  }
+
+  @Test
   void accessMode() {
     assertEquals(ACCESS_MODE, subject.accessMode());
   }
@@ -90,6 +104,7 @@ class LinkingContextRequestTest {
         "from: (1.0, 2.0), " +
         "to: (3.0, 4.0), " +
         "viaLocationsWithCoordinates: [(5.0, 6.0), (7.0, 8.0)], " +
+        "viaSearch, " +
         "accessMode: WALK, " +
         "egressMode: BIKE_RENTAL, " +
         "directMode: CAR, " +

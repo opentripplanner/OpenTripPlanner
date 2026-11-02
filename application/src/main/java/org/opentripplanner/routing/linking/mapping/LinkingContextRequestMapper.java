@@ -16,6 +16,7 @@ public class LinkingContextRequestMapper {
       .withFrom(request.from())
       .withTo(request.to())
       .withViaLocationsWithCoordinates(request.listViaLocationsWithCoordinates())
+      .withViaSearch(request.isViaSearch())
       .withAccessMode(request.journey().access().mode())
       .withEgressMode(request.journey().egress().mode())
       .withDirectMode(directMode)

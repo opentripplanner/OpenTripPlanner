@@ -2,6 +2,9 @@ package org.opentripplanner.routing.linking.mapping;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -47,9 +50,27 @@ class LinkingContextRequestMapperTest {
       VIA.getFirst().coordinate().map(WgsCoordinate::asJtsCoordinate).get(),
       subject.viaLocationsWithCoordinates().getFirst().getCoordinate()
     );
+    assertTrue(subject.isViaSearch());
     assertEquals(DIRECT_MODE, subject.directMode());
     assertEquals(ACCESS_MODE, subject.accessMode());
     assertEquals(EGRESS_MODE, subject.egressMode());
     assertEquals(TRANSFER_MODE, subject.transferMode());
+  }
+
+  @Test
+  void mapViaLocationWithoutCoordinates() {
+    var request = REQUEST.copyOf()
+      .withViaLocations(List.of(new VisitViaLocation("via", null, List.of(id("stop")), null)))
+      .buildRequest();
+    var subject = LinkingContextRequestMapper.map(request);
+    assertThat(subject.viaLocationsWithCoordinates()).isEmpty();
+    assertTrue(subject.isViaSearch());
+  }
+
+  @Test
+  void mapNoViaLocations() {
+    var request = REQUEST.copyOf().withViaLocations(List.of()).buildRequest();
+    var subject = LinkingContextRequestMapper.map(request);
+    assertFalse(subject.isViaSearch());
   }
 }

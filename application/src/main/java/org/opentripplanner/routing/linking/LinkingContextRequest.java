@@ -14,6 +14,7 @@ public class LinkingContextRequest {
   private final GenericLocation from;
   private final GenericLocation to;
   private final List<GenericLocation> viaLocationsWithCoordinates;
+  private final boolean viaSearch;
   private final StreetMode accessMode;
   private final StreetMode egressMode;
   private final StreetMode directMode;
@@ -23,6 +24,7 @@ public class LinkingContextRequest {
     this.from = null;
     this.to = null;
     this.viaLocationsWithCoordinates = List.of();
+    this.viaSearch = false;
     this.accessMode = StreetMode.NOT_SET;
     this.egressMode = StreetMode.NOT_SET;
     this.directMode = StreetMode.NOT_SET;
@@ -33,6 +35,7 @@ public class LinkingContextRequest {
     this.from = Objects.requireNonNull(builder.from());
     this.to = builder.to();
     this.viaLocationsWithCoordinates = builder.viaLocationsWithCoordinates();
+    this.viaSearch = builder.viaSearch() || !viaLocationsWithCoordinates.isEmpty();
     this.accessMode = builder.accessMode();
     this.egressMode = builder.egressMode();
     this.directMode = builder.directMode();
@@ -58,6 +61,15 @@ public class LinkingContextRequest {
 
   public List<GenericLocation> viaLocationsWithCoordinates() {
     return viaLocationsWithCoordinates;
+  }
+
+  /**
+   * Return {@code true} if the route request has any via locations. This includes the via
+   * locations without coordinates (pass-through and stop only), which are not linked here, but
+   * still separate the origin from the destination.
+   */
+  public boolean isViaSearch() {
+    return viaSearch;
   }
 
   public StreetMode accessMode() {
@@ -86,6 +98,7 @@ public class LinkingContextRequest {
       Objects.equals(from, other.from) &&
       Objects.equals(to, other.to) &&
       Objects.equals(viaLocationsWithCoordinates, other.viaLocationsWithCoordinates) &&
+      viaSearch == other.viaSearch &&
       accessMode == other.accessMode &&
       egressMode == other.egressMode &&
       directMode == other.directMode &&
@@ -99,6 +112,7 @@ public class LinkingContextRequest {
       from,
       to,
       viaLocationsWithCoordinates,
+      viaSearch,
       accessMode,
       egressMode,
       directMode,
@@ -112,6 +126,7 @@ public class LinkingContextRequest {
       .addObj("from", from, DEFAULT.from)
       .addObj("to", to, DEFAULT.to)
       .addCol("viaLocationsWithCoordinates", viaLocationsWithCoordinates)
+      .addBoolIfTrue("viaSearch", viaSearch)
       .addEnum("accessMode", accessMode, DEFAULT.accessMode)
       .addEnum("egressMode", egressMode, DEFAULT.egressMode)
       .addEnum("directMode", directMode, DEFAULT.directMode)

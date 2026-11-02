@@ -10,6 +10,7 @@ public class LinkingContextRequestBuilder {
   private GenericLocation from;
   private GenericLocation to;
   private List<GenericLocation> viaLocationsWithCoordinates;
+  private boolean viaSearch;
   private StreetMode accessMode;
   private StreetMode egressMode;
   private StreetMode directMode;
@@ -20,6 +21,7 @@ public class LinkingContextRequestBuilder {
     this.from = original.from();
     this.to = original.to();
     this.viaLocationsWithCoordinates = original.viaLocationsWithCoordinates();
+    this.viaSearch = original.isViaSearch();
     this.accessMode = original.accessMode();
     this.egressMode = original.egressMode();
     this.directMode = original.directMode();
@@ -40,6 +42,15 @@ public class LinkingContextRequestBuilder {
     List<GenericLocation> viaLocationsWithCoordinates
   ) {
     this.viaLocationsWithCoordinates = viaLocationsWithCoordinates;
+    return this;
+  }
+
+  /**
+   * Set to {@code true} if the route request has any via locations, also the ones without
+   * coordinates. Via locations with coordinates make the request a via search regardless of this.
+   */
+  public LinkingContextRequestBuilder withViaSearch(boolean viaSearch) {
+    this.viaSearch = viaSearch;
     return this;
   }
 
@@ -73,6 +84,10 @@ public class LinkingContextRequestBuilder {
 
   public List<GenericLocation> viaLocationsWithCoordinates() {
     return viaLocationsWithCoordinates;
+  }
+
+  public boolean viaSearch() {
+    return viaSearch;
   }
 
   public StreetMode accessMode() {
