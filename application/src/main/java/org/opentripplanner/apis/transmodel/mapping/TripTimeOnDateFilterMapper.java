@@ -8,7 +8,6 @@ import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.apis.transmodel.model.TransmodelTransportSubmode;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.SubMode;
-import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.filter.selector.FilterRequest;
 import org.opentripplanner.transit.model.filter.transit.TripTimeOnDateSelectRequest;
 
@@ -85,7 +84,9 @@ public class TripTimeOnDateFilterMapper {
       for (Map<String, ?> modeWithSubModes : transportModes) {
         validateMainModePresent(modeWithSubModes);
 
-        var mainMode = (TransitMode) modeWithSubModes.get("transportMode");
+        var mainMode = TransportModeInputMapper.mapTransitMode(
+          modeWithSubModes.get("transportMode")
+        );
         if (modeWithSubModes.containsKey("transportSubModes")) {
           var transportSubModes = (List<TransmodelTransportSubmode>) modeWithSubModes.get(
             "transportSubModes"

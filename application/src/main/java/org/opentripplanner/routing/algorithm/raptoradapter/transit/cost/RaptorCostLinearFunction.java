@@ -2,9 +2,9 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
 import java.util.Objects;
 import org.opentripplanner.core.model.basic.Cost;
+import org.opentripplanner.core.model.basic.CostLinearFunction;
+import org.opentripplanner.core.model.basic.LinearFunctionSerialization;
 import org.opentripplanner.raptor.spi.RaptorCostConverter;
-import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
-import org.opentripplanner.routing.api.request.framework.LinearFunctionSerialization;
 
 /**
  * Use primitive types to calculate the cost in Raptor cost-units. This is used to avoid boxing and
@@ -12,9 +12,9 @@ import org.opentripplanner.routing.api.request.framework.LinearFunctionSerializa
  * critical.
  * <p>
  * This is used with Raptor, in other places the general-purpose
- * {@link org.opentripplanner.routing.api.request.framework.CostLinearFunction} is preferred. Be
+ * {@link CostLinearFunction} is preferred. Be
  * aware, the {@link #calculateRaptorCost(int)} slightly differs from
- * {@link org.opentripplanner.routing.api.request.framework.CostLinearFunction#calculate(Cost)} due
+ * {@link CostLinearFunction#calculate(Cost)} due
  * to rounding.
  */
 class RaptorCostLinearFunction {
