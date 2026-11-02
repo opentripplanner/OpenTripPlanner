@@ -25,8 +25,8 @@ public class ShapeDataImport implements Serializable {
     new HashMap<>();
 
   /**
-   * Set when the content has been converted to {@link ScheduledShapeData}. Not serialized: a
-   * deserialized import has not been converted yet.
+   * Set when the content is converted to {@link ScheduledShapeData}. Not serialized, so a
+   * deserialized data import can be modified.
    */
   private transient boolean frozen = false;
 

@@ -9,7 +9,6 @@ import java.util.Map;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.core.model.time.LocalDateRange;
-import org.opentripplanner.ext.fares.service.gtfs.v1.GtfsFareServiceFactory;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundleTestFactory;
@@ -70,8 +69,7 @@ public final class FlexIntegrationTestData {
       transitRepository,
       timetableDataImport,
       shapeDataImport,
-      TransferServiceTestFactory.withFlex(),
-      new GtfsFareServiceFactory()
+      TransferServiceTestFactory.withFlex()
     );
   }
 }

@@ -93,11 +93,9 @@ public class GenerateTripPatternsOperation {
       }
     }
 
-    tripPatternBuilders
-      .values()
-      .stream()
-      .map(TripPatternBuilder::build)
-      .forEach(this::registerTripPattern);
+    for (TripPatternBuilder builder : tripPatternBuilders.values()) {
+      registerTripPattern(builder.build());
+    }
 
     LOG.info(progressLogger.completeMessage());
     LOG.info(
