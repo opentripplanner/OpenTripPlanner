@@ -75,7 +75,7 @@ public class AddTransitEntitiesToTimetable {
 
   private void addServices() {
     /* Assign 0-based numeric codes to all GTFS service IDs. */
-    transitRepository.addNextServiceCodes(dataImport.getAllServiceIds());
+    timetableDataImport.addNextServiceCodes(dataImport.getAllServiceIds());
   }
 
   private void addTripPatterns() {

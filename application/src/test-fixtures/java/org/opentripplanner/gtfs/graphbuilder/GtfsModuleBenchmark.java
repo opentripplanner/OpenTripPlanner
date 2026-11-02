@@ -14,6 +14,7 @@ import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.utils.time.DurationUtils;
@@ -51,9 +52,11 @@ public class GtfsModuleBenchmark {
 
     var graph = new Graph();
     var transitRepository = new TransitRepository(new SiteRepository());
+    var timetableDataImport = new TimetableDataImport();
     var module = GtfsModuleTestFactory.forTest(
       List.of(GtfsBundleTestFactory.forTest(gtfsFile)),
       transitRepository,
+      timetableDataImport,
       graph,
       LocalDateRange.ofUnbounded()
     );
@@ -70,7 +73,7 @@ public class GtfsModuleBenchmark {
     System.gc();
     long heapAfterGc = usedHeapBytes();
 
-    var patterns = transitRepository.getAllTripPatterns();
+    var patterns = timetableDataImport.getAllTripPatterns();
     long trips = patterns
       .stream()
       .mapToLong(p -> p.scheduledTripsAsStream().count())

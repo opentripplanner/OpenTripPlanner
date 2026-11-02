@@ -112,6 +112,15 @@ public class TimetableDataImport {
     tripCalendars = tripCalendars.withServiceCode(serviceId, code);
   }
 
+  /**
+   * Assign each of the given service ids the next free service code, in iteration order. Prefer
+   * this over {@link #putServiceCode} for bulk registration, which would be quadratic.
+   */
+  public void addNextServiceCodes(Collection<FeedScopedId> serviceIds) {
+    assertModificationsAllowed();
+    tripCalendars = tripCalendars.withNextServiceCodes(serviceIds);
+  }
+
   /** The service code of each scheduled service id. */
   public Map<FeedScopedId, Integer> getServiceCodes() {
     return tripCalendars.getServiceCodes();
