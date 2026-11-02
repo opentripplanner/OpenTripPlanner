@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.carpooling.routing;
 
 import java.util.Objects;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.transit.model.site.StopLocation;
 

@@ -2,8 +2,8 @@ package org.opentripplanner.ext.vehiclerentalgeofencing.configure;
 
 import dagger.Module;
 import dagger.Provides;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Singleton;
-import javax.annotation.Nullable;
 import org.opentripplanner.ext.vehiclerentalgeofencing.internal.graphbuilder.VehicleRentalGeofencingGraphBuilder;
 import org.opentripplanner.gbfs.network.GbfsNetworkOverrides;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;

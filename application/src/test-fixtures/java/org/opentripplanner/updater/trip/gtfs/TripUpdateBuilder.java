@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.updater.trip.gtfs.model.TripDescriptor;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 import org.opentripplanner.utils.time.TimeUtils;
@@ -431,7 +431,7 @@ public class TripUpdateBuilder {
     int departureDelay,
     StopTimeUpdate.ScheduleRelationship scheduleRelationShip,
     @Nullable DropOffPickupType pickDrop,
-    @Nullable StopTimeUpdate.StopTimeProperties.DropOffPickupType gtfsPickDrop,
+    StopTimeUpdate.StopTimeProperties.@Nullable DropOffPickupType gtfsPickDrop,
     @Nullable String headsign,
     @Nullable String scheduledArrivalTime,
     @Nullable String scheduledDepartureTime,

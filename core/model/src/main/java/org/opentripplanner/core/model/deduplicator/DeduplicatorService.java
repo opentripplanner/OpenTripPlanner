@@ -2,7 +2,7 @@ package org.opentripplanner.core.model.deduplicator;
 
 import java.util.BitSet;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The deduplication service is used to reduce memory consumption by returning the same instance if

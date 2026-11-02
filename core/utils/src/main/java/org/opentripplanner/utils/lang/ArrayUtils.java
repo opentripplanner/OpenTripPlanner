@@ -1,6 +1,6 @@
 package org.opentripplanner.utils.lang;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class ArrayUtils {
 

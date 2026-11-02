@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.vehiclerentalservicedirectory.api;
 
 import java.net.URI;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.framework.io.HttpHeaders;
 
 /**

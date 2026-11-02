@@ -11,7 +11,7 @@ import static org.opentripplanner.utils.time.TimeUtils.timeToStrLong;
 import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.function.Consumer;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.raptor.api.debug.DebugEvent;
 import org.opentripplanner.raptor.api.debug.DebugLogger;
 import org.opentripplanner.raptor.api.debug.DebugTopic;

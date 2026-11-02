@@ -12,7 +12,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.event.DomainEvent;
 import org.opentripplanner.core.model.event.EventHandler;
 import org.opentripplanner.core.model.transaction.RepositoryHandle;

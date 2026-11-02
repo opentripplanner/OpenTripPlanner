@@ -2,7 +2,7 @@ package org.opentripplanner.gtfs.config;
 
 import java.net.URI;
 import java.util.Objects;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.graph_builder.model.DataSourceConfig;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.opentripplanner.utils.tostring.ToStringBuilder;

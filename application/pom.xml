@@ -13,6 +13,14 @@
 
     <dependencyManagement>
         <dependencies>
+        <dependency>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jspecify</groupId>
+            <artifactId>jspecify</artifactId>
+        </dependency>
             <!--
              Not declared directly; pulled in transitively by both com.google.truth:truth and
              com.google.cloud:google-cloud-pubsub. Pinned so the resolved version doesn't depend

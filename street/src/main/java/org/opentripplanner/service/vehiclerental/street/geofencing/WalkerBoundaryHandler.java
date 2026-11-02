@@ -1,7 +1,7 @@
 package org.opentripplanner.service.vehiclerental.street.geofencing;
 
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.VehicleRentalState;
 

@@ -3,7 +3,7 @@ package org.opentripplanner.ext.carpooling;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Collection;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.ext.carpooling.routing.CarpoolTripWithVertices;

@@ -1,13 +1,12 @@
 package org.opentripplanner.apis.gtfs.mapping;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.model.PickDrop;
 
 public final class PickDropMapper {
 
-  @Nullable
-  public static GraphQLTypes.GraphQLPickupDropoffType map(PickDrop pickDrop) {
+  public static GraphQLTypes.@Nullable GraphQLPickupDropoffType map(PickDrop pickDrop) {
     return switch (pickDrop) {
       case SCHEDULED -> GraphQLTypes.GraphQLPickupDropoffType.SCHEDULED;
       case NONE -> GraphQLTypes.GraphQLPickupDropoffType.NONE;

@@ -3,7 +3,7 @@ package org.opentripplanner.transit.speed_test.model.testcase.io;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;

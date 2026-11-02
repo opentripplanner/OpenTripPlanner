@@ -2,7 +2,7 @@ package org.opentripplanner.graph_builder.module.islandpruning;
 
 import java.util.Arrays;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Breadth-first search for connected subgraphs over an {@link Adjacency}. Keeps its scratch arrays
