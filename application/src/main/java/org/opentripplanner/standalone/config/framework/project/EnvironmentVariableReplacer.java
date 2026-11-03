@@ -6,7 +6,7 @@ import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.regex.Pattern;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.utils.text.TextVariablesSubstitution;
 

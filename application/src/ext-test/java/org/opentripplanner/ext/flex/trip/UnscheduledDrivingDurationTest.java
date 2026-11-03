@@ -9,11 +9,11 @@ import java.time.Duration;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.geometry.LineStrings;
+import org.opentripplanner.core.model.time.TimePenalty;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPath;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.model.FlexStopTimesFactory;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.routing.api.request.framework.TimePenalty;
 
 class UnscheduledDrivingDurationTest {
 

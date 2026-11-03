@@ -3,7 +3,7 @@ package org.opentripplanner.datastore.api;
 import java.net.URI;
 import java.util.List;
 import java.util.regex.Pattern;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.datastore.OtpDataStore;
 
 /**

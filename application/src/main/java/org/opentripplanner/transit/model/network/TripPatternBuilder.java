@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.UnaryOperator;
 import java.util.stream.IntStream;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.core.model.id.FeedScopedId;

@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.updater.TransitRealTimeUpdateContext;
 import org.opentripplanner.updater.spi.ResultLogger;
 import org.opentripplanner.updater.spi.UpdateResult;

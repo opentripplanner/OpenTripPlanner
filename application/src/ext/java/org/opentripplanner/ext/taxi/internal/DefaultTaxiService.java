@@ -3,7 +3,7 @@ package org.opentripplanner.ext.taxi.internal;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
 import org.opentripplanner.ext.taxi.TaxiRouteIndex;
 import org.opentripplanner.ext.taxi.TaxiService;

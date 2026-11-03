@@ -7,7 +7,7 @@ import gnu.trove.set.hash.TIntHashSet;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.Collection;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.gtfs.mapping.DirectionMapper;

@@ -6,7 +6,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.raptor.api.path.AccessPathLeg;
 import org.opentripplanner.raptor.api.path.EgressPathLeg;
 import org.opentripplanner.raptor.api.path.PathLeg;

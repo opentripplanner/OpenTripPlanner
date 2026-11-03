@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This {@link java.util.Collection} stores all pareto-optimal elements. The {@link #add(Object)}
@@ -147,7 +147,6 @@ public sealed class ParetoSet<T> extends AbstractCollection<T> permits ParetoSet
 
     // Quick shortcut, one element probably dominate most of the new elements
     if (goodElement != null && leftVectorDominatesRightVector(goodElement, newValue)) {
-      notifyElementRejected(newValue, goodElement);
       return false;
     }
 

@@ -3,7 +3,7 @@ package org.opentripplanner.ext.empiricaldelay.internal.csvinput.delay;
 import com.csvreader.CsvReader;
 import java.time.Duration;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.csv.parser.AbstractCsvParser;
 import org.opentripplanner.framework.csv.parser.HandledCsvParseException;

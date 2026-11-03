@@ -3,7 +3,7 @@ package org.opentripplanner.raptor.rangeraptor.destination;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.view.ArrivalView;

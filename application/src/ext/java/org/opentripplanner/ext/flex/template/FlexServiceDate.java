@@ -7,7 +7,7 @@ import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfo;
 import org.opentripplanner.utils.time.ServiceDateUtils;

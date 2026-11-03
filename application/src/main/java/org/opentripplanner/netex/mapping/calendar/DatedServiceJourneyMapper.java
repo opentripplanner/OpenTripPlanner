@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
 import org.rutebanken.netex.model.DatedServiceJourney;
 import org.rutebanken.netex.model.OperatingDay;

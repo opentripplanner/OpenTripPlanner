@@ -6,7 +6,7 @@ import static org.opentripplanner.raptor.api.view.PathLegType.TRANSIT;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorStartOnBoardAccess;
 import org.opentripplanner.raptor.api.model.RaptorTripScheduleStopPosition;

@@ -14,7 +14,6 @@ import org.opentripplanner.routing.api.request.request.TransitRequestBuilder;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.SubMode;
-import org.opentripplanner.transit.model.basic.TransitMode;
 
 class TransitFilterOldWayMapper {
 
@@ -109,8 +108,9 @@ class TransitFilterOldWayMapper {
 
     for (Map<String, ?> modeWithSubmodes : transportModes) {
       if (modeWithSubmodes.containsKey("transportMode")) {
-        var mainMode = (TransitMode) modeWithSubmodes.get("transportMode");
-
+        var mainMode = TransportModeInputMapper.mapTransitMode(
+          modeWithSubmodes.get("transportMode")
+        );
         var transportSubModes = (List<TransmodelTransportSubmode>) modeWithSubmodes.get(
           "transportSubModes"
         );

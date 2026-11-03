@@ -3,7 +3,7 @@ package org.opentripplanner.apis.transmodel.model.plan;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.model.plan.Itinerary;
 

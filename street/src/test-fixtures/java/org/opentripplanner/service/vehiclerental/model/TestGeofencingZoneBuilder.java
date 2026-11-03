@@ -1,7 +1,7 @@
 package org.opentripplanner.service.vehiclerental.model;
 
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.id.FeedScopedId;

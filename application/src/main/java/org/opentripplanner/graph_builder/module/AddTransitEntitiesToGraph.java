@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.model.TransitDataImport;

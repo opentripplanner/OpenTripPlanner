@@ -6,7 +6,7 @@ import static org.opentripplanner.raptor.rangeraptor.path.PathParetoSetComparato
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
 import org.opentripplanner.raptor.rangeraptor.destination.DestinationArrivalPaths;
 import org.opentripplanner.raptor.rangeraptor.destination.configure.DestinationArrivalConfig;

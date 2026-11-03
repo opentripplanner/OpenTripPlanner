@@ -2,7 +2,7 @@ package org.opentripplanner.gbfs.v3;
 
 import static org.opentripplanner.gbfs.v3.GbfsFeedMapper.optionalLocalizedString;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.mobilitydata.gbfs.v3_0.vehicle_types.GBFSName;
 import org.mobilitydata.gbfs.v3_0.vehicle_types.GBFSVehicleType;
 import org.opentripplanner.core.model.id.FeedScopedId;

@@ -1,6 +1,6 @@
 package org.opentripplanner.netex.index.hierarchy;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This is a hierarchical wrapper around a singe element which provide the ability to create

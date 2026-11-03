@@ -1,6 +1,6 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.tagmapping.OsmTagMapper;
 import org.opentripplanner.osm.wayproperty.WayProperties;

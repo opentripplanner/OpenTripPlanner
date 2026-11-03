@@ -3,7 +3,7 @@ package org.opentripplanner.graph_builder.module.cache;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A generic key-value cache that supports storing and retrieving serialized data. This class

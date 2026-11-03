@@ -2,7 +2,7 @@ package org.opentripplanner.core.model.deduplicator;
 
 import java.util.BitSet;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 class DeduplicatorNoop implements DeduplicatorService {
 
