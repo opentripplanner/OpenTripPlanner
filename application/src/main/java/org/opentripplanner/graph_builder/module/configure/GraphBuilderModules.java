@@ -2,10 +2,10 @@ package org.opentripplanner.graph_builder.module.configure;
 
 import dagger.Module;
 import dagger.Provides;
-import jakarta.annotation.Nullable;
 import jakarta.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;

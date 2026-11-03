@@ -183,11 +183,6 @@
             <artifactId>micrometer-registry-prometheus</artifactId>
             <version>${micrometer.version}</version>
         </dependency>
-        <!-- nullability annotations, see the root pom for when to use which -->
-        <dependency>
-            <groupId>jakarta.annotation</groupId>
-            <artifactId>jakarta.annotation-api</artifactId>
-        </dependency>
         <!-- Used in DegreeGridNEDTileSource to fetch tiles from Amazon S3 -->
         <dependency>
             <groupId>net.java.dev.jets3t</groupId>
@@ -433,6 +428,10 @@
                             <version>${google.dagger.version}</version>
                         </path>
                     </annotationProcessorPaths>
+                    <compilerArgs>
+                        <!-- Make Dagger honour JSpecify's type-use @Nullable on its binding sites -->
+                        <arg>-Adagger.nullableTypeAnnotations=ENABLED</arg>
+                    </compilerArgs>
                 </configuration>
             </plugin>
             <plugin>
