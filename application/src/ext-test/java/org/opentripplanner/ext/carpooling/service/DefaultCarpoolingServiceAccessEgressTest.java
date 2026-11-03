@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.ext.carpooling.CarpoolTripTestData;
 import org.opentripplanner.ext.carpooling.internal.CarpoolItineraryMapper;
 import org.opentripplanner.ext.carpooling.model.CarpoolLeg;
@@ -52,8 +53,8 @@ import org.opentripplanner.transit.service.TransitServiceResolver;
  *                    / \     / \     / \      :
  *                    |   |   |   |   |   |    : (PEDESTRIAN only)
  *   P1 ---------- A ----- B ----- C ----- D ---------- P3
- *                    \ /             \ /
- *                    T2              T4
+ *                    \ /             \ /      :
+ *                    T2              T4       T6 (walk-only side branch)
  *
  *   Carpool trip: A -> (B -> C) -> D  (2 or 4 stops)
  *   Transit stops: T1..T4 connected to the drivable network with all-permission streets;
@@ -63,7 +64,8 @@ import org.opentripplanner.transit.service.TransitServiceResolver;
  *     T2 = south of A-B midpoint (connected to A and B)
  *     T3 = north of C-D midpoint (connected to C and D)
  *     T4 = south of C-D midpoint (connected to C and D)
- *     T5 = north of D, reachable from D only via a walk-only side branch
+ *     T5 = north of D, reachable from D only via a walk-only side branch; accessibility unknown
+ *     T6 = south of D, a copy of T5 that is wheelchair accessible
  *   Passenger locations:
  *     P1 = 50km west of A (connected to A)
  *     P2 = between B and C, north (connected to B and C)
@@ -89,6 +91,7 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
   private TransitStopVertex stopT3;
   private TransitStopVertex stopT4;
   private TransitStopVertex stopT5;
+  private TransitStopVertex stopT6;
 
   // Carpool trip waypoints
   private WgsCoordinate coordA;
@@ -160,8 +163,27 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
             StreetTraversalPermission.PEDESTRIAN,
             StreetTraversalPermission.PEDESTRIAN
           );
-          stopT5 = stop("T5", iT5.toWgsCoordinate());
+          stopT5 = stop("T5", b ->
+            b
+              .withCoordinate(iT5.toWgsCoordinate())
+              .withWheelchairAccessibility(Accessibility.NO_INFORMATION)
+          );
           biLink(iT5, stopT5);
+
+          var iT6 = intersection("iT6", ORIGIN.moveEastMeters(2000).moveSouthMeters(200));
+          street(
+            D,
+            iT6,
+            200,
+            StreetTraversalPermission.PEDESTRIAN,
+            StreetTraversalPermission.PEDESTRIAN
+          );
+          stopT6 = stop("T6", b ->
+            b
+              .withCoordinate(iT6.toWgsCoordinate())
+              .withWheelchairAccessibility(Accessibility.POSSIBLE)
+          );
+          biLink(iT6, stopT6);
 
           // Passenger locations
           var iP1 = intersection("P1", ORIGIN.moveWestMeters(50000));
@@ -614,6 +636,32 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
     int stopT5Index = transitServiceResolver.getStop(stopT5.getId()).getIndex();
     assertTrue(results.stream().anyMatch(r -> r.stop() == stopT3Index), "T3 needs no walk");
     assertTrue(results.stream().noneMatch(r -> r.stop() == stopT5Index));
+  }
+
+  @Test
+  void aStopWhoseWalkThePassengerCannotTakeIsLeftOut() {
+    context.upsertTrip(
+      CarpoolTripTestData.createSimpleTripWithTime(coordA, coordD, SEARCH_TIME.plusMinutes(30))
+    );
+    // T5 and T6 are both a walk from D, ending on the link into the stop. A wheelchair user
+    // cannot take that link at T5, whose accessibility is unknown, but can at T6.
+    var request = buildCarpoolRequest(coordP2, coordP3, SEARCH_TIME)
+      .copyOf()
+      .withJourney(j -> j.withWheelchair(true))
+      .buildRequest();
+
+    var results = service.routeAccessEgress(
+      request,
+      new StreetRequest(StreetMode.CARPOOL),
+      AccessEgressType.ACCESS,
+      transitServiceResolver,
+      SEARCH_TIME
+    );
+
+    int stopT5Index = transitServiceResolver.getStop(stopT5.getId()).getIndex();
+    int stopT6Index = transitServiceResolver.getStop(stopT6.getId()).getIndex();
+    assertTrue(results.stream().noneMatch(r -> r.stop() == stopT5Index));
+    assertTrue(results.stream().anyMatch(r -> r.stop() == stopT6Index));
   }
 
   @Test
