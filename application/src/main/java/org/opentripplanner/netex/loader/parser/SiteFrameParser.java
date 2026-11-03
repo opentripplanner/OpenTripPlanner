@@ -110,6 +110,8 @@ class SiteFrameParser extends NetexParser<Site_VersionFrameStructure> {
     for (JAXBElement<? extends Site_VersionStructure> jaxbParking : parkingList) {
       if (jaxbParking.getValue() instanceof Parking parking) {
         parkings.add(parking);
+      } else {
+        warnOnMissingMapping(LOG, jaxbParking.getValue());
       }
     }
   }
