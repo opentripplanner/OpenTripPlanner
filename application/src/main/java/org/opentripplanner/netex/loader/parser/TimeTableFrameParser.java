@@ -2,15 +2,15 @@ package org.opentripplanner.netex.loader.parser;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.entur.netex2.model.DatedServiceJourney;
+import org.entur.netex2.model.Interchange_VersionStructure;
+import org.entur.netex2.model.JourneyInterchangesInFrame_RelStructure;
+import org.entur.netex2.model.Journey_VersionStructure;
+import org.entur.netex2.model.JourneysInFrame_RelStructure;
+import org.entur.netex2.model.ServiceJourney;
+import org.entur.netex2.model.ServiceJourneyInterchange;
+import org.entur.netex2.model.Timetable_VersionFrameStructure;
 import org.opentripplanner.netex.index.NetexEntityIndex;
-import org.rutebanken.netex.model.DatedServiceJourney;
-import org.rutebanken.netex.model.Interchange_VersionStructure;
-import org.rutebanken.netex.model.JourneyInterchangesInFrame_RelStructure;
-import org.rutebanken.netex.model.Journey_VersionStructure;
-import org.rutebanken.netex.model.JourneysInFrame_RelStructure;
-import org.rutebanken.netex.model.ServiceJourney;
-import org.rutebanken.netex.model.ServiceJourneyInterchange;
-import org.rutebanken.netex.model.Timetable_VersionFrameStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

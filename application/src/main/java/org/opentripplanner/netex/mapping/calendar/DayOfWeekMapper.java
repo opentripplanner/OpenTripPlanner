@@ -4,7 +4,7 @@ import java.time.DayOfWeek;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Set;
-import org.rutebanken.netex.model.DayOfWeekEnumeration;
+import org.entur.netex2.model.DayOfWeekEnumeration;
 
 /**
  * Map between NeTEx {@link DayOfWeekEnumeration} to Java {@link DayOfWeek}. The NeTEx version have

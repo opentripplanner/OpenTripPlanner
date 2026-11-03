@@ -3,11 +3,11 @@ package org.opentripplanner.netex.mapping;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import org.entur.netex2.model.GroupOfLines;
+import org.entur.netex2.model.MultilingualString;
+import org.entur.netex2.model.PrivateCodeStructure;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
-import org.rutebanken.netex.model.GroupOfLines;
-import org.rutebanken.netex.model.MultilingualString;
-import org.rutebanken.netex.model.PrivateCodeStructure;
 
 public class GroupOfRoutesMapperTest {
 
@@ -34,8 +34,8 @@ public class GroupOfRoutesMapperTest {
     return new GroupOfLines()
       .withId(ID)
       .withPrivateCode(new PrivateCodeStructure().withValue(PRIVATE_CODE))
-      .withName(new MultilingualString().withValue(NAME))
-      .withShortName(new MultilingualString().withValue(SHORT_NAME))
-      .withDescription(new MultilingualString().withValue(DESCRIPTION));
+      .withName(new MultilingualString().withContent(NAME))
+      .withShortName(new MultilingualString().withContent(SHORT_NAME))
+      .withDescription(new MultilingualString().withContent(DESCRIPTION));
   }
 }

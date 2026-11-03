@@ -2,11 +2,11 @@ package org.opentripplanner.netex.mapping;
 
 import static org.opentripplanner.netex.mapping.support.NetexObjectDecorator.withOptional;
 
+import org.entur.netex2.model.Authority;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.AgencyBuilder;
 import org.opentripplanner.utils.lang.StringUtils;
-import org.rutebanken.netex.model.Authority;
 
 /**
  * NeTEx authority is mapped to OTP agency. An authority is defined as "A company or organisation
