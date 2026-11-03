@@ -9,11 +9,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.entur.netex2.model.DatedServiceJourney;
+import org.entur.netex2.model.OperatingDay;
+import org.entur.netex2.model.ServiceAlterationEnumeration;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
-import org.rutebanken.netex.model.DatedServiceJourney;
-import org.rutebanken.netex.model.OperatingDay;
-import org.rutebanken.netex.model.ServiceAlterationEnumeration;
 
 public class DatedServiceJourneyMapperTest {
 

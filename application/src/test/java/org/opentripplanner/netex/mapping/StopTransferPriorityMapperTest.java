@@ -3,9 +3,9 @@ package org.opentripplanner.netex.mapping;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+import org.entur.netex2.model.InterchangeWeightingEnumeration;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
-import org.rutebanken.netex.model.InterchangeWeightingEnumeration;
 
 public class StopTransferPriorityMapperTest {
 
