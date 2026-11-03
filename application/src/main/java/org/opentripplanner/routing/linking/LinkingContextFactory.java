@@ -30,6 +30,7 @@ import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.transit.service.GenericLocationHelper;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
@@ -336,7 +337,7 @@ public class LinkingContextFactory {
     LocationType type
   ) {
     assertTransitServiceAvailable();
-    var coordinate = transitService.findCoordinate(location);
+    var coordinate = GenericLocationHelper.findCoordinate(transitService, location);
     if (coordinate == null) {
       return Optional.empty();
     }
