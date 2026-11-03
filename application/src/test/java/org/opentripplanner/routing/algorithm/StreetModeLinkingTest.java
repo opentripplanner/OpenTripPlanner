@@ -16,7 +16,6 @@ import static org.opentripplanner.street.model.StreetMode.WALK;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -29,7 +28,6 @@ import org.opentripplanner.routing.linking.LinkingContextRequest;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.street.geometry.GeometryUtils;
-import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.TemporaryVerticesContainer;
 import org.opentripplanner.street.model.StreetMode;
@@ -37,6 +35,9 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.transit.repository.DefaultTimetableRepository;
+import org.opentripplanner.transit.service.DefaultTransitService;
+import org.opentripplanner.transit.service.TransitService;
 
 /**
  * This tests linking of GenericLocations to streets for each StreetMode. The test has 5 parallel
@@ -94,6 +95,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
   );
 
   private Graph graph;
+  private TransitService transitService;
   private TransitStopVertex stop;
   private GenericLocation stopLocation;
 
@@ -137,6 +139,10 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
       }
     );
     graph = otpModel.graph();
+    transitService = new DefaultTransitService(
+      otpModel.transitRepository(),
+      DefaultTimetableRepository.scheduledOnly(otpModel.scheduledTimetableData())
+    );
 
     graph.hasStreets = true;
     TestStreetLinkerModule.link(
@@ -239,8 +245,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
         var linkingContextFactory = new LinkingContextFactory(
           graph,
           vertexCreationService,
-          id -> Set.of(),
-          ignored -> new WgsCoordinate(stop.getCoordinate())
+          transitService
         );
         var request = LinkingContextRequest.of()
           .withFrom(location)

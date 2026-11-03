@@ -8,7 +8,6 @@ import static org.opentripplanner.test.support.PolylineAssert.assertThatPolyline
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -192,12 +191,7 @@ public class BarrierRoutingTest {
     var request = builder.buildRequest();
     var vertexLinker = VertexLinkerTestFactory.of(graph);
     var vertexCreationService = new VertexCreationService(vertexLinker);
-    var linkingContextFactory = new LinkingContextFactory(
-      graph,
-      vertexCreationService,
-      id -> Set.of(),
-      GenericLocation::wgsCoordinate
-    );
+    var linkingContextFactory = new LinkingContextFactory(graph, vertexCreationService, null);
     var linkingRequest = LinkingContextRequestMapper.map(request);
     var linkingContext = linkingContextFactory.create(temporaryVerticesContainer, linkingRequest);
     var transitService = TestServerContext.createTransitService(

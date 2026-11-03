@@ -210,8 +210,7 @@ public class TestServerContext {
     return new LinkingContextFactory(
       graph,
       new VertexCreationService(vertexLinker),
-      transitService::findStopOrChildIds,
-      transitService::findCoordinate
+      transitService
     );
   }
 }

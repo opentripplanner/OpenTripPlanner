@@ -272,8 +272,7 @@ class AccessEgressRouterTest extends GraphRoutingTest {
       var linkingContextFactory = new LinkingContextFactory(
         graph,
         vertexCreationService,
-        transitService::findStopOrChildIds,
-        transitService::findCoordinate
+        transitService
       );
       var linkingRequest = LinkingContextRequestMapper.map(request);
       var linkingContext = linkingContextFactory.create(verticesContainer, linkingRequest);

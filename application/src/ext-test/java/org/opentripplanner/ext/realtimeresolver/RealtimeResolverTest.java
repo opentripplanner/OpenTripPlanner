@@ -12,7 +12,6 @@ import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.model.GenericLocation;
@@ -465,8 +464,7 @@ class RealtimeResolverTest {
     LinkingContextFactory linkingContextFactory = new LinkingContextFactory(
       GRAPH,
       vertexCreationService,
-      id -> Set.of(),
-      GenericLocation::wgsCoordinate
+      null
     );
 
     var streetLimitationParametersService = new StreetLimitationParametersService() {

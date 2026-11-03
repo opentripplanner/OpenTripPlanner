@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.opentripplanner.test.support.PolylineAssert.assertThatPolylinesAreEqual;
 
 import java.time.Instant;
-import java.util.Set;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -143,12 +142,7 @@ public class CarRoutingTest {
     var temporaryVerticesContainer = new TemporaryVerticesContainer();
     var vertexLinker = VertexLinkerTestFactory.of(graph);
     var vertexCreationService = new VertexCreationService(vertexLinker);
-    var linkingContextFactory = new LinkingContextFactory(
-      graph,
-      vertexCreationService,
-      id -> Set.of(),
-      GenericLocation::wgsCoordinate
-    );
+    var linkingContextFactory = new LinkingContextFactory(graph, vertexCreationService, null);
     var linkingRequest = LinkingContextRequestMapper.map(request);
     var linkingContext = linkingContextFactory.create(temporaryVerticesContainer, linkingRequest);
     var transitService = TestServerContext.createTransitService(

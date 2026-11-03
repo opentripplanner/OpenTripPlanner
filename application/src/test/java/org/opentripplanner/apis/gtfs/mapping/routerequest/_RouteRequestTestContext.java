@@ -77,8 +77,7 @@ class _RouteRequestTestContext {
     var linkingContextFactory = new LinkingContextFactory(
       graph,
       vertexCreationService,
-      transitService::findStopOrChildIds,
-      transitService::findCoordinate
+      transitService
     );
     this.context = new TestGtfsGraphQLRequestContext(
       new TestRoutingService(List.of()),

@@ -43,11 +43,6 @@ public class LinkingServiceModule {
     @StaticTransitService TransitService transitService,
     VertexCreationService vertexCreationService
   ) {
-    return new LinkingContextFactory(
-      graph,
-      vertexCreationService,
-      transitService::findStopOrChildIds,
-      transitService::findCoordinate
-    );
+    return new LinkingContextFactory(graph, vertexCreationService, transitService);
   }
 }

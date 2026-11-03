@@ -10,7 +10,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.linearref.LinearLocation;
@@ -288,12 +287,7 @@ public class EdgeSplittingTest {
     try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
       var vertexLinker = VertexLinkerTestFactory.of(graph);
       var vertexCreationService = new VertexCreationService(vertexLinker);
-      var linkingContextFactory = new LinkingContextFactory(
-        graph,
-        vertexCreationService,
-        id -> Set.of(),
-        GenericLocation::wgsCoordinate
-      );
+      var linkingContextFactory = new LinkingContextFactory(graph, vertexCreationService, null);
       var linkingRequest = LinkingContextRequestMapper.map(walking);
       var linkingContext = linkingContextFactory.create(temporaryVerticesContainer, linkingRequest);
       var fromVertices = linkingContext.findVertices(from);

@@ -2,7 +2,6 @@ package org.opentripplanner.routing.linking;
 
 import com.google.common.collect.Sets;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -11,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
@@ -26,13 +24,13 @@ import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.routing.linking.internal.VertexCreationService.LocationType;
 import org.opentripplanner.street.geometry.GeometryUtils;
-import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.TemporaryVerticesContainer;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.transit.service.TransitService;
 
 /**
  * This is a factory that is responsible for linking origin, destination and visit via locations
@@ -45,27 +43,22 @@ public class LinkingContextFactory {
 
   private final Graph graph;
   private final VertexCreationService vertexCreationService;
-  private final Function<FeedScopedId, Collection<FeedScopedId>> resolveSiteIds;
-  /**
-   * Resolves the coordinate of a location, which may be an explicit coordinate, a stop, a station,
-   * a multi-modal station or a group of stations given by id. Returns {@code null} if it cannot be
-   * resolved.
-   */
-  private final Function<GenericLocation, WgsCoordinate> findCoordinate;
 
   /**
-   * Construct a factory when stop locations are potentially used for locations.
+   * Resolves stop, station, and group ids to child stops and coordinates. Non-null during runtime
+   * only, it is {@code null} during graph build.
    */
+  @Nullable
+  private final TransitService transitService;
+
   public LinkingContextFactory(
     Graph graph,
     VertexCreationService vertexCreationService,
-    Function<FeedScopedId, Collection<FeedScopedId>> resolveSiteIds,
-    Function<GenericLocation, WgsCoordinate> findCoordinate
+    @Nullable TransitService transitService
   ) {
     this.graph = graph;
     this.vertexCreationService = vertexCreationService;
-    this.resolveSiteIds = resolveSiteIds;
-    this.findCoordinate = findCoordinate;
+    this.transitService = transitService;
   }
 
   /**
@@ -342,7 +335,8 @@ public class LinkingContextFactory {
     GenericLocation location,
     LocationType type
   ) {
-    var coordinate = findCoordinate.apply(location);
+    assertTransitServiceAvailable();
+    var coordinate = transitService.findCoordinate(location);
     if (coordinate == null) {
       return Optional.empty();
     }
@@ -439,10 +433,19 @@ public class LinkingContextFactory {
   }
 
   private Set<TransitStopVertex> findStopOrChildStopVertices(FeedScopedId stopId) {
-    return resolveSiteIds
-      .apply(stopId)
+    assertTransitServiceAvailable();
+    return transitService
+      .findStopOrChildIds(stopId)
       .stream()
       .flatMap(id -> graph.findStopVertex(id).stream())
       .collect(Collectors.toUnmodifiableSet());
+  }
+
+  private void assertTransitServiceAvailable() {
+    if (transitService == null) {
+      throw new IllegalStateException(
+        "A TransitService is required to resolve stop or station ids, but none was provided."
+      );
+    }
   }
 }
