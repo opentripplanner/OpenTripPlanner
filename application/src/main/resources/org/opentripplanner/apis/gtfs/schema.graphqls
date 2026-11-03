@@ -465,7 +465,7 @@ type Cluster implements Node {
   "ID of the cluster"
   gtfsId: String! @deprecated(reason : "Not implemented")
   "Global object ID provided by Relay. This value can be used to refetch this object using **node** query."
-  id: ID! @deprecated(reason : "Not implemented")
+  id: ID!
   "Latitude of the center of this cluster (i.e. average latitude of stops in this cluster)"
   lat: Float! @deprecated(reason : "Not implemented")
   "Longitude of the center of this cluster (i.e. average longitude of stops in this cluster)"
