@@ -176,7 +176,7 @@ class CrosswalkNamerTest {
           way.isFootway() ? StreetTraversalPermission.PEDESTRIAN : StreetTraversalPermission.CAR
         )
         .withName(Objects.requireNonNullElse(way.getAssumedName(), I18NString.of("path")))
-        .withBogusName(!way.isNamed())
+        .withNameIsDerived(!way.isNamed())
         .buildAndConnect();
 
       var p = new EdgePair(way, edge);

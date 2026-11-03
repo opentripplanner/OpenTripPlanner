@@ -738,7 +738,7 @@ public class OsmModule implements GraphBuilderModule {
       .withSlopeOverride(way.getOsmProvider().getWayPropertySet().getSlopeOverride(way))
       .withStairs(way.isStairs())
       .withWheelchairAccessible(way.isWheelchairAccessible())
-      .withBogusName(way.hasNoName());
+      .withNameIsDerived(way.hasNoName());
 
     return seb.buildAndConnect();
   }
