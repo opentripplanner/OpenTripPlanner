@@ -70,6 +70,7 @@ import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.filter.transit.DefaultTransitAlertEntityResolver;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
@@ -121,7 +122,10 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
     return environment -> {
       var args = new GraphQLTypes.GraphQLQueryTypeAlertsConnectionArgs(environment.getArguments());
       var request = AlertsConnectionFilterMapper.map(args.getGraphQLFilters());
-      var alerts = getTransitAlertService(environment).findAlerts(request);
+      var alerts = getTransitAlertService(environment).findAlerts(
+        request,
+        DefaultTransitAlertEntityResolver.of(getTransitService(environment))
+      );
       return new SimpleCountedListConnection<>(AlertsConnectionOrdering.sort(alerts)).get(
         environment
       );

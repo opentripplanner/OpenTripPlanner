@@ -1,0 +1,29 @@
+{
+  alertsConnection(
+    filters: [
+      {
+        include: [
+          {
+            entities: [
+              {
+                stopsOrStations: [
+                  { ids: ["F:Omega"], includeChildStopAlerts: true }
+                ]
+              }
+            ]
+            effects: [NO_SERVICE]
+          }
+        ]
+      }
+    ]
+  ) {
+    totalCount
+    edges {
+      node {
+        id
+        headerDefault: alertHeaderText
+        effect: alertEffect
+      }
+    }
+  }
+}

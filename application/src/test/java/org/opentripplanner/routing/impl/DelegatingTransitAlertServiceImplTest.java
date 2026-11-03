@@ -5,6 +5,7 @@ import static com.google.common.truth.Truth.assertThat;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.routing.alertpatch.EntityKey;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 
@@ -48,6 +49,25 @@ class DelegatingTransitAlertServiceImplTest {
     assertThat(
       new DelegatingTransitAlertServiceImpl().getStopLocationsAlerts(List.of(id(STOP_ID)))
     ).isEmpty();
+  }
+
+  @Test
+  void listEntityKeysCombinesKeysOfAllDelegates() {
+    var iut = delegatingService(List.of(STOP_ALERT), List.of(STATION_ALERT));
+
+    assertThat(iut.listEntityKeys()).containsExactly(
+      new EntityKey.Stop(id(STOP_ID)),
+      new EntityKey.Stop(id(STATION_ID))
+    );
+  }
+
+  @Test
+  void findAlertsForEntitiesFromMultipleDelegates() {
+    var iut = delegatingService(List.of(STOP_ALERT), List.of(STATION_ALERT));
+
+    assertThat(
+      iut.findAlerts(List.of(new EntityKey.Stop(id(STOP_ID)), new EntityKey.Stop(id(STATION_ID))))
+    ).containsExactly(STOP_ALERT, STATION_ALERT);
   }
 
   @SafeVarargs

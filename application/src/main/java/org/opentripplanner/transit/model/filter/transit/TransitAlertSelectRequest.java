@@ -22,6 +22,7 @@ public class TransitAlertSelectRequest {
   private final FilterValues<AlertCause> causes;
   private final FilterValues<AlertEffect> effects;
   private final FilterValues<TimePeriod> timePeriods;
+  private final FilterValues<TransitAlertEntitySelectRequest> entities;
 
   private TransitAlertSelectRequest(Builder builder) {
     this.feeds = FilterValues.ofNullIsEverything("feeds", builder.feeds);
@@ -29,6 +30,7 @@ public class TransitAlertSelectRequest {
     this.causes = FilterValues.ofNullIsEverything("causes", builder.causes);
     this.effects = FilterValues.ofNullIsEverything("effects", builder.effects);
     this.timePeriods = FilterValues.ofNullIsEverything("timePeriods", builder.timePeriods);
+    this.entities = FilterValues.ofNullIsEverything("entities", builder.entities);
   }
 
   public static Builder of() {
@@ -55,6 +57,14 @@ public class TransitAlertSelectRequest {
     return timePeriods;
   }
 
+  /**
+   * Selects the entities which the alerts affect. The alerts are matched if they affect an entity
+   * selected by any of the entity selectors.
+   */
+  public FilterValues<TransitAlertEntitySelectRequest> entities() {
+    return entities;
+  }
+
   @Override
   public String toString() {
     var builder = ToStringBuilder.ofEmbeddedType();
@@ -72,6 +82,9 @@ public class TransitAlertSelectRequest {
     }
     if (!timePeriods.includeEverything()) {
       builder.addCol("timePeriods", timePeriods.get());
+    }
+    if (!entities.includeEverything()) {
+      builder.addCol("entities", entities.get());
     }
     return builder.toString();
   }
@@ -92,6 +105,9 @@ public class TransitAlertSelectRequest {
 
     @Nullable
     private List<TimePeriod> timePeriods;
+
+    @Nullable
+    private List<TransitAlertEntitySelectRequest> entities;
 
     public Builder withFeeds(@Nullable List<String> feeds) {
       this.feeds = feeds;
@@ -115,6 +131,11 @@ public class TransitAlertSelectRequest {
 
     public Builder withTimePeriods(@Nullable List<TimePeriod> timePeriods) {
       this.timePeriods = timePeriods;
+      return this;
+    }
+
+    public Builder withEntities(@Nullable List<TransitAlertEntitySelectRequest> entities) {
+      this.entities = entities;
       return this;
     }
 

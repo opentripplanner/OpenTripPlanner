@@ -58,6 +58,18 @@ public class TransitAlertServiceImpl implements TransitAlertService {
   }
 
   @Override
+  public Collection<EntityKey> listEntityKeys() {
+    return List.copyOf(alerts.keySet());
+  }
+
+  @Override
+  public Collection<TransitAlert> findAlerts(Collection<EntityKey> entityKeys) {
+    // read the field once, as it can be replaced concurrently
+    var index = alerts;
+    return entityKeys.stream().map(index::get).flatMap(Collection::stream).distinct().toList();
+  }
+
+  @Override
   public TransitAlert getAlertById(FeedScopedId id) {
     return alerts
       .values()
