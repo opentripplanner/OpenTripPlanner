@@ -13,14 +13,6 @@
 
     <dependencyManagement>
         <dependencies>
-        <dependency>
-            <groupId>jakarta.annotation</groupId>
-            <artifactId>jakarta.annotation-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jspecify</groupId>
-            <artifactId>jspecify</artifactId>
-        </dependency>
             <!--
              Not declared directly; pulled in transitively by both com.google.truth:truth and
              com.google.cloud:google-cloud-pubsub. Pinned so the resolved version doesn't depend
@@ -191,6 +183,11 @@
             <artifactId>micrometer-registry-prometheus</artifactId>
             <version>${micrometer.version}</version>
         </dependency>
+        <!-- nullability annotations, see the root pom for when to use which -->
+        <dependency>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+        </dependency>
         <!-- Used in DegreeGridNEDTileSource to fetch tiles from Amazon S3 -->
         <dependency>
             <groupId>net.java.dev.jets3t</groupId>
@@ -301,6 +298,10 @@
             <groupId>org.glassfish.jersey.media</groupId>
             <artifactId>jersey-media-json-jackson3</artifactId>
             <version>${jersey.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jspecify</groupId>
+            <artifactId>jspecify</artifactId>
         </dependency>
         <dependency>
             <groupId>org.mobilitydata</groupId>
