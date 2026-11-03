@@ -6,8 +6,7 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
 
 /**
- * OSM way properties for the Atlanta, Georgia, USA area.
- * The differences compared to the default
+ * OSM way properties for the Atlanta, Georgia, USA area. The differences compared to the default
  * property set are: In Atlanta "trunk" is used for the most important primary thoroughfares, but
  * these roads typically still allow pedestrian traffic and often include bus service / stops.
  *

@@ -3,11 +3,11 @@ package org.opentripplanner.ext.flex;
 import java.time.Duration;
 
 /**
- * Define parameters used to configure flex. For further documentation on these parameters, look
- * at the {@link org.opentripplanner.standalone.config.sandbox.FlexConfig} class which implements
- * this interface. The flex package does not use all parameters defined here. Some parameters are
- * passed into the street search(AStar) as part of a flex use-case. We keep them here for
- * completeness and simplicity (just one interface).
+ * Define parameters used to configure flex. For further documentation on these parameters, look at
+ * the {@link org.opentripplanner.standalone.config.sandbox.FlexConfig} class which implements this
+ * interface. The flex package does not use all parameters defined here. Some parameters are passed
+ * into the street search(AStar) as part of a flex use-case. We keep them here for completeness and
+ * simplicity (just one interface).
  */
 public interface FlexParameters {
   /**
@@ -37,8 +37,8 @@ public interface FlexParameters {
   double reluctance();
 
   /**
-   * This defines the default values. This will be used by the OTP configuration and by tests,
-   * avoid using this directly.
+   * This defines the default values. This will be used by the OTP configuration and by tests, avoid
+   * using this directly.
    */
   static FlexParameters defaultValues() {
     return new FlexParameters() {

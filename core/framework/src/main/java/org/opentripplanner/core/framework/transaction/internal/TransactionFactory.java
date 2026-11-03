@@ -8,7 +8,8 @@ import org.opentripplanner.core.model.transaction.UpdateManager;
 /**
  * Factory for creating instances of the transaction framework.
  *
- * <p>Use this as the entry point for wiring the framework in a Dagger module or similar setup.
+ * <p>
+ * Use this as the entry point for wiring the framework in a Dagger module or similar setup.
  * Create a {@link RepositoryRegistry} first, register repositories on it, then create an
  * {@link UpdateManager} bound to the same registry.
  */

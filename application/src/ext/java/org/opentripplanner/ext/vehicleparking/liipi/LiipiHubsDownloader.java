@@ -1,13 +1,11 @@
 package org.opentripplanner.ext.vehicleparking.liipi;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.function.Function;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.io.HttpHeaders;
@@ -17,11 +15,15 @@ import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 public class LiipiHubsDownloader {
 
   private static final Logger LOG = LoggerFactory.getLogger(LiipiHubsDownloader.class);
-  private static final ObjectMapper MAPPER = new ObjectMapper();
+  private static final ObjectMapper MAPPER = new JsonMapper();
 
   private final String jsonParsePath;
   private final Function<JsonNode, Map<FeedScopedId, VehicleParkingGroup>> hubsParser;
@@ -51,7 +53,7 @@ public class LiipiHubsDownloader {
           return parseJSON(response.body());
         } catch (IllegalArgumentException e) {
           LOG.warn("Error parsing hubs from {}", url, e);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
           LOG.warn("Error parsing hubs from {} (bad JSON of some sort)", url, e);
         } catch (IOException e) {
           LOG.warn("Error reading hubs from {}", url, e);
@@ -64,8 +66,8 @@ public class LiipiHubsDownloader {
     }
   }
 
-  private static String convertStreamToString(java.io.InputStream is) {
-    try (java.util.Scanner scanner = new java.util.Scanner(is).useDelimiter("\\A")) {
+  private static String convertStreamToString(InputStream is) {
+    try (Scanner scanner = new Scanner(is).useDelimiter("\\A")) {
       return scanner.hasNext() ? scanner.next() : "";
     }
   }

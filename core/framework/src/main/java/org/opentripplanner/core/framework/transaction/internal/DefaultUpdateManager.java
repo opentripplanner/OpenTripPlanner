@@ -12,7 +12,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.event.DomainEvent;
 import org.opentripplanner.core.model.event.EventHandler;
 import org.opentripplanner.core.model.transaction.RepositoryHandle;
@@ -22,10 +22,10 @@ import org.opentripplanner.core.model.transaction.WriteContext;
 /**
  * Default implementation of {@link UpdateManager}.
  *
- * <p>Owns a single-threaded {@link ExecutorService} that serialises all submitted tasks.
- * After each task completes, changes are committed via the
- * {@link TransactionManager}. The transaction manager is package-private and
- * never exposed to callers — commit is an internal implementation detail.
+ * <p>
+ * Owns a single-threaded {@link ExecutorService} that serialises all submitted tasks. After each
+ * task completes, changes are committed via the {@link TransactionManager}. The transaction manager
+ * is package-private and never exposed to callers — commit is an internal implementation detail.
  */
 class DefaultUpdateManager implements UpdateManager {
 

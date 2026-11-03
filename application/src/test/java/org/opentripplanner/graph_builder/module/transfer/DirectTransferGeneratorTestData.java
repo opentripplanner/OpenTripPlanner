@@ -87,6 +87,7 @@ class DirectTransferGeneratorTestData extends GraphRoutingTest {
     new DirectTransferGenerator(
       model.graph(),
       model.transitRepository(),
+      model.timetableDataImport(),
       model.transferRepository(),
       DataImportIssueStore.NOOP,
       regularTransferParameters.build()

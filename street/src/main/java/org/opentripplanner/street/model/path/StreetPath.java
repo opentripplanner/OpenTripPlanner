@@ -31,8 +31,8 @@ public class StreetPath {
   /**
    * Build a chronologically ordered path by following the back-state chain of {@code finalState}
    * all the way back to the origin of the search. When {@code finalState} comes from an arriveBy
-   * search, the chain is reversed first, since the back-state chain otherwise runs the "wrong"
-   * way for that search direction.
+   * search, the chain is reversed first, since the back-state chain otherwise runs the "wrong" way
+   * for that search direction.
    */
   public StreetPath(State finalState) {
     var state = finalState.getRequest().arriveBy() ? finalState.reverse() : finalState;
@@ -156,7 +156,7 @@ public class StreetPath {
   /// Get a specific section of this path as a new path.
   ///
   /// @param startIdx the first state index (inclusive)
-  /// @param endIdx the end state index (exclusive)
+  /// @param endIdx   the end state index (exclusive)
   public StreetPath subPath(int startIdx, int endIdx) {
     var subStates = states.subList(startIdx, endIdx);
     var subEdges = edges.subList(startIdx, endIdx - 1);

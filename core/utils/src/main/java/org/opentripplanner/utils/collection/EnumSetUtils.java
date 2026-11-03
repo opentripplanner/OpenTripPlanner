@@ -13,8 +13,8 @@ public class EnumSetUtils {
   private EnumSetUtils() {}
 
   /**
-   * Create an {@link EnumSet} wrapped using {@link Collections#unmodifiableSet(Set)}. The
-   * returned set has almost the same efficiency as EnumSet and is immutable, which EnumSet is not.
+   * Create an {@link EnumSet} wrapped using {@link Collections#unmodifiableSet(Set)}. The returned
+   * set has almost the same efficiency as EnumSet and is immutable, which EnumSet is not.
    */
   public static <E extends Enum> Set<E> unmodifiableEnumSet(Collection<E> values, Class<E> type) {
     var enumSet = values.isEmpty() ? EnumSet.noneOf(type) : EnumSet.copyOf(values);

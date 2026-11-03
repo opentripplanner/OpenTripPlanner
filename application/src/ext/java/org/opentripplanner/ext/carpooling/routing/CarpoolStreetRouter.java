@@ -2,18 +2,15 @@ package org.opentripplanner.ext.carpooling.routing;
 
 import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
-import org.opentripplanner.ext.carpooling.model.GraphPath;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.street.model.StreetMode;
-import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
-import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
-import org.opentripplanner.utils.collection.ListUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,14 +42,15 @@ public class CarpoolStreetRouter implements CarpoolRouter {
   /**
    * Creates a new carpool street router.
    *
-   * @param streetLimitationParametersService provides street routing parameters (speed limits, etc.)
+   * @param streetLimitationParametersService provides street routing parameters (speed limits,
+   *                                          etc.)
    */
   public CarpoolStreetRouter(StreetLimitationParametersService streetLimitationParametersService) {
     this.streetLimitationParametersService = streetLimitationParametersService;
   }
 
   @Override
-  public GraphPath<State, Edge, Vertex> route(Vertex from, Vertex to) {
+  public StreetPath route(Vertex from, Vertex to) {
     try {
       return carpoolRouting(from, to);
     } catch (OTPRequestTimeoutException e) {
@@ -75,11 +73,11 @@ public class CarpoolStreetRouter implements CarpoolRouter {
    * </ul>
    *
    * @param fromVertex the origin vertex
-   * @param toVertex the destination vertex
+   * @param toVertex   the destination vertex
    * @return the first (best) path found, or null if no path reaches the destination within
    *         {@link CarpoolTrip#MAX_TRIP_DURATION}
    */
-  private GraphPath<State, Edge, Vertex> carpoolRouting(Vertex fromVertex, Vertex toVertex) {
+  private StreetPath carpoolRouting(Vertex fromVertex, Vertex toVertex) {
     var request = StreetSearchRequest.of().withMode(StreetMode.CAR).build();
     var streetSearch = StreetSearchBuilder.of()
       .withPreStartHook(OTPRequestTimeoutException::checkForTimeout)
@@ -99,8 +97,6 @@ public class CarpoolStreetRouter implements CarpoolRouter {
       return null;
     }
 
-    var streetPath = paths.getFirst();
-    var edges = ListUtils.ofIterable(streetPath.lastState().listBackEdges());
-    return new GraphPath<>(streetPath.states(), edges);
+    return paths.getFirst();
   }
 }

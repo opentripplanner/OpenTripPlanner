@@ -30,10 +30,10 @@ import org.opentripplanner.transit.service.SiteRepository;
  * A in-memory implementation of {@link TransitDataImport}. It's super fast for most methods, but
  * only if you have enough memory to load your entire {@link TransitDataImport} into memory.
  * <p>
- * This class is read only, to enforce consistency after generating indexes and ids. You will get an
- * exception if you try to add entities to one of the collections. If you need to modify a {@link
- * TransitDataImport}, you can create a new {@link TransitDataImportBuilder} based on your old data,
- * do your modification and create a new unmodifiable instance.
+ * This class is read only, to enforce consistency after generating indexes and ids. You will get
+ * an exception if you try to add entities to one of the collections. If you need to modify a
+ * {@link TransitDataImport}, you can create a new {@link TransitDataImportBuilder} based on your
+ * old data, do your modification and create a new unmodifiable instance.
  */
 class DefaultTransitDataImport implements TransitDataImport {
 

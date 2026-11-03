@@ -26,10 +26,10 @@ public class GraphQLTutorialDocTest {
 
   /**
    * NOTE! This test updates the {@code doc/user/GraphQlTutorial.md} document based on the latest
-   * version of the code.
-   * This test fails if the document have changed. This make sure that this test fails in the
-   * CI pipeline if config file changes is not committed. Manually inspect the changes in the
-   * configuration, commit the configuration document, and run the test again to pass.
+   * version of the code. This test fails if the document have changed. This make sure that this
+   * test fails in the CI pipeline if config file changes is not committed. Manually inspect the
+   * changes in the configuration, commit the configuration document, and run the test again to
+   * pass.
    */
   @Test
   public void updateTutorialDoc() throws IOException {

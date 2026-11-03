@@ -17,10 +17,7 @@ class IdFactoryTest {
 
   @Test
   void createIdFromAgencyAndId() {
-    org.onebusaway.gtfs.model.AgencyAndId inputId = new org.onebusaway.gtfs.model.AgencyAndId(
-      "A",
-      "1"
-    );
+    AgencyAndId inputId = new AgencyAndId("A", "1");
 
     FeedScopedId mappedId = FACTORY.createNullableId(inputId);
 
@@ -30,9 +27,7 @@ class IdFactoryTest {
 
   @Test
   void emptyAgencyAndId() {
-    assertThrows(IllegalArgumentException.class, () ->
-      FACTORY.createNullableId(new org.onebusaway.gtfs.model.AgencyAndId())
-    );
+    assertThrows(IllegalArgumentException.class, () -> FACTORY.createNullableId(new AgencyAndId()));
   }
 
   @Test

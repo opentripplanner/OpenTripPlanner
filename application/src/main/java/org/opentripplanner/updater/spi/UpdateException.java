@@ -1,6 +1,6 @@
 package org.opentripplanner.updater.spi;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 
 /// An exception for indicating various issues with realtime data. It can be thrown anywhere in the
@@ -66,8 +66,8 @@ public class UpdateException extends RuntimeException {
     return new UpdateException(this.tripId, this.errorType, this.stopPosition, tripReference);
   }
 
-  /// The position of the GTFS-RT stop time update or SIRI call in the list of updates, which
-  /// does not necessarily correspond to the stop position in pattern.
+  /// The position of the GTFS-RT stop time update or SIRI call in the list of updates, which does
+  /// not necessarily correspond to the stop position in pattern.
   @Nullable
   public Integer stopPosition() {
     return stopPosition;

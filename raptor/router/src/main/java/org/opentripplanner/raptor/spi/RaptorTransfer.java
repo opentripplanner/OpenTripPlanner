@@ -3,14 +3,12 @@ package org.opentripplanner.raptor.spi;
 import org.opentripplanner.utils.time.DurationUtils;
 
 /**
- * Encapsulate information about a transfer path.
- * Time dependent transfers are not supported.
+ * Encapsulate information about a transfer path. Time dependent transfers are not supported.
  */
 public interface RaptorTransfer {
   /**
-   * Stop index where the path arrives at.
-   * The journey origin, destination and transit path board stop must be part of the context;
-   * hence not a member attribute of this type.
+   * Stop index where the path arrives at. The journey origin, destination and transit path board
+   * stop must be part of the context; hence not a member attribute of this type.
    */
   int stop();
 

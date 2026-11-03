@@ -4,8 +4,8 @@ import org.opentripplanner.street.geometry.WgsCoordinate;
 
 /**
  * A vertex that represents an OSM elevator node in conjunction with a connected OSM entity. This
- * class can almost be described as representing one level of an elevator vertex. However, due to
- * a lack of level information in OSM for entities connected to an elevator node, going by the data
+ * class can almost be described as representing one level of an elevator vertex. However, due to a
+ * lack of level information in OSM for entities connected to an elevator node, going by the data
  * means that two of these vertices could be on the same level.
  * <p>
  * Two OSM elevator vertices on the same level need to be separate! The reason for this is that

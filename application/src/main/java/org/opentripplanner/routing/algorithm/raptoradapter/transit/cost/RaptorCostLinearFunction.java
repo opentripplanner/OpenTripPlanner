@@ -2,20 +2,20 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
 import java.util.Objects;
 import org.opentripplanner.core.model.basic.Cost;
+import org.opentripplanner.core.model.basic.CostLinearFunction;
+import org.opentripplanner.core.model.basic.LinearFunctionSerialization;
 import org.opentripplanner.raptor.spi.RaptorCostConverter;
-import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
-import org.opentripplanner.routing.api.request.framework.LinearFunctionSerialization;
 
 /**
- * Use primitive types to calculate the cost in Raptor cost-units. This is used to avoid
- * boxing and unboxing as well as casting between different primitive types. This should
- * be fast, but it is not critical.
+ * Use primitive types to calculate the cost in Raptor cost-units. This is used to avoid boxing and
+ * unboxing as well as casting between different primitive types. This should be fast, but it is not
+ * critical.
  * <p>
  * This is used with Raptor, in other places the general-purpose
- * {@link org.opentripplanner.routing.api.request.framework.CostLinearFunction} is preferred.
- * Be aware, the {@link #calculateRaptorCost(int)} slightly differs from
- * {@link org.opentripplanner.routing.api.request.framework.CostLinearFunction#calculate(Cost)}
- * due to rounding.
+ * {@link CostLinearFunction} is preferred. Be
+ * aware, the {@link #calculateRaptorCost(int)} slightly differs from
+ * {@link CostLinearFunction#calculate(Cost)} due
+ * to rounding.
  */
 class RaptorCostLinearFunction {
 

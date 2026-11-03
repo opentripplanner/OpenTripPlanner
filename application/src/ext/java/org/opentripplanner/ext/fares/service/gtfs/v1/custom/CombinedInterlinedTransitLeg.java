@@ -5,7 +5,7 @@ import static org.opentripplanner.model.plan.Itinerary.UNKNOWN;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.plan.Emission;

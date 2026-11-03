@@ -14,8 +14,8 @@ import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.graph.summary.GraphSummarizer;
 
-/// Tests that an entrance vertex is created for parking lots that are not connected to the rest
-/// of the street network.
+/// Tests that an entrance vertex is created for parking lots that are not connected to the rest of
+/// the street network.
 class UnconnectedParkAndRideTest {
 
   @Test

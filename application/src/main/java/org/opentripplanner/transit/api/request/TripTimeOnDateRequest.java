@@ -7,7 +7,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.core.model.time.TimePeriod;
@@ -115,10 +115,9 @@ public class TripTimeOnDateRequest {
   }
 
   /**
-   * Limit the returned output to the defined periods of time based on when the vehicle is
-   * scheduled to visit the stop. At least one of the periods has to overlap with the visit at the
-   * stop, which lasts from the scheduled arrival at the stop until the scheduled departure from
-   * it.
+   * Limit the returned output to the defined periods of time based on when the vehicle is scheduled
+   * to visit the stop. At least one of the periods has to overlap with the visit at the stop, which
+   * lasts from the scheduled arrival at the stop until the scheduled departure from it.
    */
   public FilterValues<TimePeriod> includeCallTimePeriods() {
     return includeCallTimePeriods;

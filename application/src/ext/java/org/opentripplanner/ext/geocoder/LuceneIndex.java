@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.analysis.miscellaneous.PerFieldAnalyzerWrapper;
@@ -44,13 +43,12 @@ import org.apache.lucene.search.suggest.document.CompletionAnalyzer;
 import org.apache.lucene.search.suggest.document.ContextSuggestField;
 import org.apache.lucene.search.suggest.document.SuggestIndexSearcher;
 import org.apache.lucene.store.ByteBuffersDirectory;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.site.StopType;
-import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
 
 public class LuceneIndex implements Serializable {
@@ -73,21 +71,10 @@ public class LuceneIndex implements Serializable {
   private final StopClusterMapper stopClusterMapper;
 
   /**
-   * Since the {@link TransitService} is request scoped, we don't inject it into this class.
-   * However, we do need some methods in the service and that's why we instantiate it manually in this
-   * constructor.
+   * @param transitService a service without real-time data, the index is built once from the
+   *                       scheduled data.
    */
   public LuceneIndex(
-    TransitRepository transitRepository,
-    StopConsolidationService stopConsolidationService
-  ) {
-    this(new DefaultTransitService(transitRepository), stopConsolidationService);
-  }
-
-  /**
-   * This method is only visible for testing.
-   */
-  LuceneIndex(
     TransitService transitService,
     @Nullable StopConsolidationService stopConsolidationService
   ) {
@@ -143,10 +130,11 @@ public class LuceneIndex implements Serializable {
    * Return all "stop clusters" for a given query.
    * <p>
    * Stop clusters are defined as follows.
-   * <p>
+   * <pre>
    *  - If a stop has a parent station, only the parent is returned.
    *  - If two stops have the same name *and* are less than 10 meters from each other, only
    *    one of those is chosen at random and returned.
+   * </pre>
    */
   public Stream<StopCluster> queryStopClusters(String query, @Nullable WgsCoordinate focusPoint) {
     return findDocuments(query, focusPoint).map(this::toStopCluster);

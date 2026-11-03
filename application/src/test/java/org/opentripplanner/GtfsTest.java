@@ -17,6 +17,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
 import org.junit.jupiter.api.BeforeEach;
 import org.opentripplanner.core.framework.transaction.internal.TransactionFactory;
 import org.opentripplanner.core.model.id.FeedScopedId;
@@ -42,9 +43,12 @@ import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.repository.DefaultTimetableRepository;
+import org.opentripplanner.transit.repository.TimetableRepositoryLifecycle;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TransitRepository;
@@ -57,13 +61,16 @@ import org.opentripplanner.updater.trip.gtfs.interpolation.BackwardsDelayPropaga
 import org.opentripplanner.updater.trip.gtfs.interpolation.ForwardsDelayPropagationType;
 import org.opentripplanner.utils.lang.RunnableUtils;
 
-/** Common base class for many test classes which need to load a GTFS feed in preparation for tests. */
+/**
+ * Common base class for many test classes which need to load a GTFS feed in preparation for tests.
+ */
 public abstract class GtfsTest {
 
   protected static final String FEED_ID = "FEED";
 
   public Graph graph;
   public TransitRepository transitRepository;
+  public TimetableDataImport timetableDataImport;
 
   AlertsUpdateHandler alertsUpdateHandler;
   GtfsRealTimeTripUpdateAdapter tripUpdateAdapter;
@@ -189,6 +196,7 @@ public abstract class GtfsTest {
     alertsUpdateHandler = new AlertsUpdateHandler(false);
     graph = new Graph();
     transitRepository = new TransitRepository(new SiteRepository());
+    timetableDataImport = new TimetableDataImport();
     transitRepository.initUpdaterManager(
       new GraphUpdaterManager(new WriteToGraphCallbacks(), RunnableUtils.NOOP, List.of())
     );
@@ -197,6 +205,7 @@ public abstract class GtfsTest {
     GtfsModule gtfsGraphBuilderImpl = GtfsModule.forTest(
       gtfsBundleList,
       transitRepository,
+      timetableDataImport,
       graph,
       LocalDateRange.ofUnbounded()
     );
@@ -206,29 +215,28 @@ public abstract class GtfsTest {
     graph.index();
 
     TransitTuningParameters tuningParameters = RouterConfig.DEFAULT.transitTuningConfig();
+    // Converted once, as on server startup, and shared by the Raptor mapping and the services
+    var scheduledTimetableData = timetableDataImport.toScheduledTimetableData();
     var scheduledRaptorData = RaptorTransitDataMapper.map(
       tuningParameters,
       transitRepository,
+      scheduledTimetableData,
       transferRepository
     );
     transitRepository.initRaptorTransitData(scheduledRaptorData);
     var registry = TransactionFactory.createRepositoryRegistry();
-    var timetableSnapshot = new org.opentripplanner.transit.repository.DefaultTimetableRepository(
+    var timetableSnapshot = new DefaultTimetableRepository(
       new RaptorTransitData(scheduledRaptorData),
-      transitRepository.getTripCalendar()
+      scheduledTimetableData
     );
     var timetableHandle = registry.registerRepositorySnapshot(
       timetableSnapshot,
-      new org.opentripplanner.transit.repository.TimetableRepositoryLifecycle(
-        timetableSnapshot,
-        false,
-        LocalDate::now
-      )
+      new TimetableRepositoryLifecycle(timetableSnapshot, false, LocalDate::now)
     );
     var updateManager = TransactionFactory.createUpdateManagerWithAtomicCommits(
       "test",
       registry,
-      java.util.concurrent.Executors.defaultThreadFactory()
+      Executors.defaultThreadFactory()
     );
 
     tripUpdateAdapter = new GtfsRealTimeTripUpdateAdapter(

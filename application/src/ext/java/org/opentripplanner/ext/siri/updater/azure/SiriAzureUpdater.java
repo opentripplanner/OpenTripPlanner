@@ -22,10 +22,10 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
-import javax.annotation.Nullable;
 import javax.xml.stream.XMLStreamException;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.entur.siri21.util.SiriXml;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.framework.application.ApplicationShutdownSupport;
 import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
@@ -452,8 +452,8 @@ public class SiriAzureUpdater implements GraphUpdater<TransitRealTimeUpdateConte
 
   /**
    * Make some sensible logging on error and if Service Bus is busy, sleep for some time before try
-   * again to get messages. This code snippet is taken from Microsoft example <a
-   * href="https://docs.microsoft.com/sv-se/azure/service-bus-messaging/service-bus-java-how-to-use-queues">...</a>.
+   * again to get messages. This code snippet is taken from Microsoft example <a href=
+   * "https://docs.microsoft.com/sv-se/azure/service-bus-messaging/service-bus-java-how-to-use-queues">...</a>.
    *
    * @param errorContext Context for errors handled by the ServiceBusProcessorClient.
    */

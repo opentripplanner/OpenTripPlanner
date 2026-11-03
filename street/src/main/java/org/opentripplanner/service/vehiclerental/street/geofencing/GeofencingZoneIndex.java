@@ -16,8 +16,8 @@ import org.opentripplanner.street.geometry.GeometryUtils;
 
 /**
  * Spatial index for efficient geofencing zone containment queries. Uses an STRtree for
- * envelope-based candidate filtering, then precise geometry containment checks via
- * PreparedGeometry for performance.
+ * envelope-based candidate filtering, then precise geometry containment checks via PreparedGeometry
+ * for performance.
  */
 public class GeofencingZoneIndex {
 

@@ -14,12 +14,14 @@ import org.opentripplanner.street.graph.summary.GraphSummarizer;
 /**
  * Tests that {@code wheelchair=no} on an area propagates to all generated ring edges.
  *
- * <p>The accessibility flag is set in {@code createSegments} from
- * {@code parent.isWheelchairAccessible()}, so every AreaEdge produced for a
- * {@code wheelchair=no} area should carry {@code ♿❌}.
+ * <p>
+ * The accessibility flag is set in {@code createSegments} from
+ * {@code parent.isWheelchairAccessible()}, so every AreaEdge produced for a {@code wheelchair=no}
+ * area should carry {@code ♿❌}.
  *
- * <p>Visibility is disabled so the expected edges are simply the four ring segments.
- * The connecting footway is accessible and retains {@code ♿✅}.
+ * <p>
+ * Visibility is disabled so the expected edges are simply the four ring segments. The connecting
+ * footway is accessible and retains {@code ♿✅}.
  */
 class WheelchairInaccessibleAreaTest {
 

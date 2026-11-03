@@ -13,9 +13,9 @@ import org.opentripplanner.transit.model.site.StopTransferPriority;
  * <p>
  * NOTE! This class has state. This class also holds a index of all mapped stops to avoid mapping
  * the same stop twice. We do this because the library (onebusaway) return transfers with Stop
- * object references, not stop ids. Instead of looking up the Stops by id in the {@link
- * TransferMapper} we just use the this class to cache stops. This way, the order of which stops and
- * transfers are mapped does not matter.
+ * object references, not stop ids. Instead of looking up the Stops by id in the
+ * {@link TransferMapper} we just use the this class to cache stops. This way, the order of which
+ * stops and transfers are mapped does not matter.
  */
 class StationMapper {
 

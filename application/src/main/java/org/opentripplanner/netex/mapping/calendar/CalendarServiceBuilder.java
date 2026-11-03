@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.model.calendar.ServiceCalendar;
@@ -52,7 +52,7 @@ public class CalendarServiceBuilder {
 
   /**
    * Generate service calendar.
-   * <p/>
+   * <p>
    * THIS METHOD IS NOT THREAD-SAFE, AND SHOULD ONLY BE CALLED ONCE FOR EACH BUNDLE.
    */
   public Collection<ServiceCalendarDate> createServiceCalendar() {

@@ -14,9 +14,7 @@ class TestPagingUtils {
    * This method removes everything but the time of day from a DateTime string for each found
    * occurrence. It also removes leading zeros and seconds if they are zero.
    *
-   * For example:
-   *     2020-02-01T09:00:00Z -> 9:00
-   *     2020-02-01T12:00:30Z -> 12:00:30
+   * For example: 2020-02-01T09:00:00Z -> 9:00 2020-02-01T12:00:30Z -> 12:00:30
    */
   static String cleanStr(Object value) {
     if (value == null) {

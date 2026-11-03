@@ -27,7 +27,7 @@ public class RoutingTag implements Serializable {
     public final boolean micrometerTiming;
   }
 
-  /** Tags are categorized in groups, this allow  */
+  /** Tags are categorized in groups, this allow */
   private final Category category;
 
   /** We only need one set of tags since we support timingTags only */

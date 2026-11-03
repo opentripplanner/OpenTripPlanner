@@ -3,7 +3,7 @@ package org.opentripplanner.transit.model.basic;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This is used as a data container for when we want more accurate mode matching than is available
@@ -82,8 +82,8 @@ public class NarrowedTransitMode {
   }
 
   /**
-   * Make sure the String serialization is deterministic by sorting the elements in
-   * alphabetic order.
+   * Make sure the String serialization is deterministic by sorting the elements in alphabetic
+   * order.
    *
    * @see MainAndSubMode#toString(Collection)
    */

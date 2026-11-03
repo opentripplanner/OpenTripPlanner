@@ -7,7 +7,7 @@ import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.plan.Leg;
 
 /**
- * @param legProducts       The fare products that cover only individual legs.
+ * @param legProducts The fare products that cover only individual legs.
  */
 public record FareResult(Multimap<Leg, FareOffer> legProducts) {
   public FareResult {

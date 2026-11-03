@@ -2,6 +2,7 @@ package org.opentripplanner.street.graph;
 
 import java.util.Collection;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.LineString;
@@ -12,23 +13,24 @@ import org.opentripplanner.street.model.edge.Edge;
 /**
  * Manages edge spatial indexes by scope. When linking vertices, visibility is as follows:
  * <p>
- * PERMANENT: Looks at the permanent index and inserts into the permanent index REALTIME: Looks and
- * the permanent index and inserts into the realtime index REQUEST: Looks at both the permanent and
- * realtime indexes and does not insert into any index
+ * PERMANENT: Looks at the permanent index and inserts into the permanent index REALTIME: Looks
+ * and the permanent index and inserts into the realtime index REQUEST: Looks at both the permanent
+ * and realtime indexes and does not insert into any index
  * <p>
  * NOTES ON CONCURRENCY: It is possible that an A Star search would find an edge in the
  * realTimeIndex which is then removed before the actual routing starts. This could result in a
  * NullPointerException on the from/to vertex of the Edge being routed on. This happens seldom
  * enough that we have not accounted for it.
  * <p>
- * A simple way to solve this, if needed, would be to just rerun the search in case on an exception.
- * A more complete solution would have to take into account concurrency not only for the spatial
- * index, but for the entire street graph, as an edge could be removed in the middle of routing.
+ * A simple way to solve this, if needed, would be to just rerun the search in case on an
+ * exception. A more complete solution would have to take into account concurrency not only for the
+ * spatial index, but for the entire street graph, as an edge could be removed in the middle of
+ * routing.
  * <p>
- * It is also worth noting that the entire reason we have the realTimeIndex in the first place is so
- * that the origin/destination coordinates of a search can connect directly to the edges being split
- * by a realtime update. This is so that we would not have to walk all the way to the end of the
- * edge then back again to where the realtime element was connected.
+ * It is also worth noting that the entire reason we have the realTimeIndex in the first place is
+ * so that the origin/destination coordinates of a search can connect directly to the edges being
+ * split by a realtime update. This is so that we would not have to walk all the way to the end of
+ * the edge then back again to where the realtime element was connected.
  * <p>
  * See #3351
  */
@@ -72,6 +74,20 @@ class EdgeSpatialIndex {
         realTimeEdgeIndex.query(envelope).stream()
       );
     };
+  }
+
+  /**
+   * Visit the candidate edges for the envelope in the indexes visible to the scope, without
+   * deduplication. See {@link HashGridSpatialIndex#forEachCandidate(Envelope, Consumer)}.
+   */
+  public void forEachCandidate(Envelope envelope, Scope scope, Consumer<? super Edge> consumer) {
+    switch (scope) {
+      case PERMANENT, REALTIME -> permanentEdgeIndex.forEachCandidate(envelope, consumer);
+      case REQUEST -> {
+        permanentEdgeIndex.forEachCandidate(envelope, consumer);
+        realTimeEdgeIndex.forEachCandidate(envelope, consumer);
+      }
+    }
   }
 
   public Set<Edge> queryAlongLineStrings(Collection<LineString> lineStrings, Scope scope) {

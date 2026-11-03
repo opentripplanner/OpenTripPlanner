@@ -1,6 +1,6 @@
 package org.opentripplanner.raptorlegacy._data.transit;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
 import org.opentripplanner.raptor.spi.RaptorConstrainedTransfer;
 import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
@@ -9,8 +9,8 @@ import org.opentripplanner.transfer.constrained.raptoradaptor.ConstrainedTransfe
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * @deprecated This was earlier part of Raptor and should not be used outside the Raptor
- *             module. Use the OTP model entities instead.
+ * @deprecated This was earlier part of Raptor and should not be used outside the Raptor module. Use
+ *             the OTP model entities instead.
  */
 @Deprecated
 class TestConstrainedTransfer implements RaptorConstrainedTransfer {

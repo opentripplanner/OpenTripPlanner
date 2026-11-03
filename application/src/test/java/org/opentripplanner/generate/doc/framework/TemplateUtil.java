@@ -1,8 +1,8 @@
 package org.opentripplanner.generate.doc.framework;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.standalone.config.framework.json.JsonSupport;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
+import tools.jackson.databind.JsonNode;
 
 /**
  * Replace a text in a file wrapped using HTML comments
@@ -79,7 +79,7 @@ public class TemplateUtil {
   }
 
   /**
-   * Create a JSON example for the node. The given source  from the node
+   * Create a JSON example for the node. The given source from the node
    */
   public static String jsonExample(NodeAdapter nodeAdapter, String source) {
     return jsonExample(nodeAdapter.rawNode(), source);

@@ -5,7 +5,7 @@ import static org.opentripplanner.model.plan.Itinerary.UNKNOWN;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.plan.Emission;
@@ -18,9 +18,9 @@ import org.opentripplanner.utils.time.TimeUtils;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * A transit search may return an unknown transit path. A path consisting of a mix of
- * access, transit , transfers and egress - but where the specific legs are unknown.
- * This leg represent such path.
+ * A transit search may return an unknown transit path. A path consisting of a mix of access,
+ * transit , transfers and egress - but where the specific legs are unknown. This leg represent such
+ * path.
  */
 public class UnknownPathLeg implements Leg {
 

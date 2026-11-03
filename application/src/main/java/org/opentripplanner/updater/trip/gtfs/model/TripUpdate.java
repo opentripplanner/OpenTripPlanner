@@ -21,13 +21,13 @@ import org.opentripplanner.updater.spi.UpdateException;
 import org.opentripplanner.utils.lang.StringUtils;
 
 /**
- * A real-time update for trip, which may contain updated stop times and trip properties.
- * Instances of this class are validated and ready for further processing.
+ * A real-time update for trip, which may contain updated stop times and trip properties. Instances
+ * of this class are validated and ready for further processing.
  */
 public final class TripUpdate {
 
   private final String feedId;
-  private final com.google.transit.realtime.GtfsRealtime.TripUpdate tripUpdate;
+  private final GtfsRealtime.TripUpdate tripUpdate;
   private final TripDescriptor tripDescriptor;
   private final Supplier<LocalDate> localDateNow;
   private LocalDate startDate;

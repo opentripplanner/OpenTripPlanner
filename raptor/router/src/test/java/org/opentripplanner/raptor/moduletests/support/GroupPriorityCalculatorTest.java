@@ -11,8 +11,8 @@ import org.opentripplanner.raptor.api.request.RaptorTransitGroupPriorityCalculat
 import org.opentripplanner.raptor.api.request.TestGroupPriorityCalculator;
 
 /**
- * Note! This is testing a test-fixture, not the Raptor code. This is a prerequesit for other
- * tests using the {@link TestGroupPriorityCalculator}.
+ * Note! This is testing a test-fixture, not the Raptor code. This is a prerequesit for other tests
+ * using the {@link TestGroupPriorityCalculator}.
  */
 public class GroupPriorityCalculatorTest {
 

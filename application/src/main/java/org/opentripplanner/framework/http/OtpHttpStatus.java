@@ -3,8 +3,8 @@ package org.opentripplanner.framework.http;
 import jakarta.ws.rs.core.Response;
 
 /**
- * Enumeration for HTTP status codes that are not otherwise listed in usual frameworks/APIs
- * like jakarta.ws.rs.core.Response.{@link jakarta.ws.rs.core.Response.Status}
+ * Enumeration for HTTP status codes that are not otherwise listed in usual frameworks/APIs like
+ * jakarta.ws.rs.core.Response.{@link jakarta.ws.rs.core.Response.Status}
  */
 public enum OtpHttpStatus implements Response.StatusType {
   STATUS_UNPROCESSABLE_ENTITY(422, "Unprocessable Content");

@@ -6,6 +6,7 @@ import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 public interface BackwardsDelayInterpolator {
   /**
    * Propagate backwards from the first stop with real-time information
+   *
    * @return The first stop position with given time if propagation is done.
    */
   OptionalInt propagateBackwards(RealTimeTripTimesBuilder builder);

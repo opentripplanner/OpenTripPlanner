@@ -77,8 +77,8 @@ public class ZipFileDataSource
   }
 
   /**
-   * Map ZipEntries into a DataSource. This does not read the content of each zip entry, only create a
-   * {@link DataSource} around it.
+   * Map ZipEntries into a DataSource. This does not read the content of each zip entry, only create
+   * a {@link DataSource} around it.
    */
   private static Collection<DataSource> listZipEntries(ZipFileEntryParent parent, ZipFile zipFile)
     throws IOException, ZipException {

@@ -10,7 +10,6 @@ import java.time.Month;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitDataTestFactory;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
-import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -18,10 +17,11 @@ import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
+import org.opentripplanner.transit.repository.ScheduledTimetableData;
 
 /**
- * Tests for {@link TripUpdateApplier}, covering the three-phase update logic that was
- * previously in {@code TimetableSnapshotManager.updateBuffer()}.
+ * Tests for {@link TripUpdateApplier}, covering the three-phase update logic that was previously in
+ * {@code TimetableSnapshotManager.updateBuffer()}.
  */
 class TripUpdateApplierTest {
 
@@ -41,8 +41,8 @@ class TripUpdateApplierTest {
     .build();
 
   /**
-   * Scheduled pattern (stops S1, S2) with the trip in its scheduled timetable. Phase 2 of
-   * apply() reads from the scheduled timetable to create a DELETED entry.
+   * Scheduled pattern (stops S1, S2) with the trip in its scheduled timetable. Phase 2 of apply()
+   * reads from the scheduled timetable to create a DELETED entry.
    */
   private static final TripPattern SCHEDULED_PATTERN = TransitRepositoryForTest.tripPattern(
     "sched",
@@ -75,7 +75,7 @@ class TripUpdateApplierTest {
   private static DefaultTimetableRepository createBuffer() {
     return new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),
-      TripCalendars.empty()
+      ScheduledTimetableData.empty()
     );
   }
 
@@ -138,8 +138,8 @@ class TripUpdateApplierTest {
   }
 
   /**
-   * Phase 1 + Phase 3: revert a previous pattern modification and update the trip on the
-   * scheduled pattern.
+   * Phase 1 + Phase 3: revert a previous pattern modification and update the trip on the scheduled
+   * pattern.
    */
   @Test
   void phase1And3() {
@@ -229,8 +229,7 @@ class TripUpdateApplierTest {
   }
 
   /**
-   * Cancel a scheduled trip: build canceled trip times before calling apply, as the
-   * adapter does.
+   * Cancel a scheduled trip: build canceled trip times before calling apply, as the adapter does.
    */
   @Test
   void cancelScheduledTrip() {
@@ -253,8 +252,7 @@ class TripUpdateApplierTest {
   }
 
   /**
-   * Delete a scheduled trip: build deleted trip times before calling apply, as the
-   * adapter does.
+   * Delete a scheduled trip: build deleted trip times before calling apply, as the adapter does.
    */
   @Test
   void deleteScheduledTrip() {

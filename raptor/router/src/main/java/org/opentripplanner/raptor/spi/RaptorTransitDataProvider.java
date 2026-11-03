@@ -3,10 +3,10 @@ package org.opentripplanner.raptor.spi;
 import java.util.Iterator;
 
 /**
- * This interface defines the data needed by Raptor. It is the main/top-level interface and
- * together with the {@code RaptorRequest} if provide all information needed by Raptor to perform
- * the search. It makes it possible to write small adapter between the "OTP Transit Layer" and the
- * Raptor algorithm.
+ * This interface defines the data needed by Raptor. It is the main/top-level interface and together
+ * with the {@code RaptorRequest} if provide all information needed by Raptor to perform the search.
+ * It makes it possible to write small adapter between the "OTP Transit Layer" and the Raptor
+ * algorithm.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
@@ -34,12 +34,12 @@ public interface RaptorTransitDataProvider<T extends RaptorTripSchedule> {
   /**
    * This method is responsible for providing all transfers from a given stop to all possible stops
    * around that stop.
-   * <p/>
+   * <p>
    * The implementation may implement a lightweight {@link RaptorTransfer} representation. The
    * iterator element only needs to be valid for the duration og a single iterator step. Hence; It
    * is safe to use a cursor/flyweight pattern to represent both the Transfer and the
    * Iterator<Transfer> - this will most likely be the best performing implementation.
-   * <p/>
+   * <p>
    * Example:
    * <pre>
    * class LightweightTransferIterator implements Iterator&lt;RaptorTransfer&gt;, RaptorTransfer {
@@ -82,9 +82,10 @@ public interface RaptorTransitDataProvider<T extends RaptorTripSchedule> {
 
   /**
    * Returns the raptor route for a specific route index
-   * <p/>
+   * <p>
    * The implementation may implement a lightweight {@link RaptorTripPattern} representation. See
    * {@link #getTransfersFromStop(int)} for detail on how to implement this.
+   *
    * @throws IndexOutOfBoundsException if routeIndex not found
    */
   RaptorRoute<T> getRouteForIndex(int routeIndex);
@@ -159,8 +160,8 @@ public interface RaptorTransitDataProvider<T extends RaptorTripSchedule> {
    * Raptor uses this to fetch information in places where the original Raptor routing context
    * (iterating over the stop of a pattern) is no longer available. Raptor could pass this
    * information down the call stack, but that would have an effect on the performance. An other
-   * alternative is to add methods for this to the {@link RaptorTripSchedule}, but that would
-   * couple the trip schedule to the route and trip-pattern.
+   * alternative is to add methods for this to the {@link RaptorTripSchedule}, but that would couple
+   * the trip schedule to the route and trip-pattern.
    * <p>
    * This method is <em>NOT</em> performance critical, but it should not be slow.
    */

@@ -32,14 +32,13 @@ class LocalizedStringMapper {
   /**
    * Creates String which can be localized.
    * <p>
-   * Uses {@link #getTagNames(String) } to get which tag values are needed for this key. For each of
-   * this tag names tag value is read from OSM way. If tag value is missing it is added as empty
+   * Uses {@link #getTagNames(String) } to get which tag values are needed for this key. For each
+   * of this tag names tag value is read from OSM way. If tag value is missing it is added as empty
    * string.
    * <p>
-   * For example. If key platform has key {ref} current value of tag ref in way is saved to be used
-   * in localizations. It currently assumes that tag exists in way. (otherwise this namer wouldn't
-   * be used)
-   * </p>
+   * For example. If key platform has key {ref} current value of tag ref in way is saved to be
+   * used in localizations. It currently assumes that tag exists in way. (otherwise this namer
+   * wouldn't be used)
    *
    * @param key key of translation for this way set in the WayPropertyMapper and translations read
    *            from properties Files
@@ -64,8 +63,6 @@ class LocalizedStringMapper {
    * brackets.
    * <p>
    * For example "Platform {ref}" ref is way tagname.
-   *
-   * </p>
    */
   private List<String> getTagNames(String key) {
     //TODO: after finding all keys for replacements replace strings to normal java strings

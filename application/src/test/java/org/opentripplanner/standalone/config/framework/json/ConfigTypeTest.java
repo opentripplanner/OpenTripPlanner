@@ -13,13 +13,13 @@ import static org.opentripplanner.standalone.config.framework.json.ConfigType.LO
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.OBJECT;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.STRING;
 
-import com.fasterxml.jackson.databind.node.BooleanNode;
-import com.fasterxml.jackson.databind.node.DoubleNode;
-import com.fasterxml.jackson.databind.node.IntNode;
-import com.fasterxml.jackson.databind.node.LongNode;
-import com.fasterxml.jackson.databind.node.TextNode;
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.node.BooleanNode;
+import tools.jackson.databind.node.DoubleNode;
+import tools.jackson.databind.node.IntNode;
+import tools.jackson.databind.node.LongNode;
+import tools.jackson.databind.node.StringNode;
 
 class ConfigTypeTest {
 
@@ -77,10 +77,10 @@ class ConfigTypeTest {
   void getParameter() {
     assertTrue(BOOLEAN.<Boolean>valueOf(BooleanNode.getTrue()));
     assertEquals(2.2, DOUBLE.valueOf(DoubleNode.valueOf(2.2)));
-    assertEquals(Duration.ofSeconds(3), DURATION.valueOf(TextNode.valueOf("3s")));
+    assertEquals(Duration.ofSeconds(3), DURATION.valueOf(StringNode.valueOf("3s")));
     assertEquals(12, INTEGER.<Integer>valueOf(IntNode.valueOf(12)));
     assertEquals(123L, LONG.<Long>valueOf(LongNode.valueOf(123L)));
-    assertEquals("Test", STRING.valueOf(TextNode.valueOf("Test")));
-    assertThrows(IllegalArgumentException.class, () -> OBJECT.valueOf(TextNode.valueOf("Test")));
+    assertEquals("Test", STRING.valueOf(StringNode.valueOf("Test")));
+    assertThrows(IllegalArgumentException.class, () -> OBJECT.valueOf(StringNode.valueOf("Test")));
   }
 }

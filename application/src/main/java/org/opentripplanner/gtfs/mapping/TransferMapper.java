@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
+import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Transfer;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.IgnoredGtfsTransfer;
@@ -30,8 +31,9 @@ import org.opentripplanner.transit.model.timetable.Trip;
 /**
  * Responsible for mapping GTFS Transfer into the OTP model.
  *
- * <p>This mapper is stateful and not thread safe. Create a new mapper for every set
- * of transfers you want to map.
+ * <p>
+ * This mapper is stateful and not thread safe. Create a new mapper for every set of transfers
+ * you want to map.
  */
 class TransferMapper {
 
@@ -122,7 +124,7 @@ class TransferMapper {
     throw new IllegalArgumentException("Mapping missing for type: " + type);
   }
 
-  TransferMappingResult map(Collection<org.onebusaway.gtfs.model.Transfer> allTransfers) {
+  TransferMappingResult map(Collection<Transfer> allTransfers) {
     setup(!allTransfers.isEmpty());
 
     List<ConstrainedTransfer> constrainedTransfers = allTransfers
@@ -150,7 +152,7 @@ class TransferMapper {
     }
   }
 
-  ConstrainedTransfer map(org.onebusaway.gtfs.model.Transfer rhs) {
+  ConstrainedTransfer map(Transfer rhs) {
     Trip fromTrip = tripMapper.map(rhs.getFromTrip());
     Trip toTrip = tripMapper.map(rhs.getToTrip());
 
@@ -214,7 +216,7 @@ class TransferMapper {
   }
 
   private TransferPoint mapTransferPoint(
-    org.onebusaway.gtfs.model.Stop rhsStopOrStation,
+    Stop rhsStopOrStation,
     org.onebusaway.gtfs.model.Route rhsRoute,
     Trip trip,
     boolean boardTrip

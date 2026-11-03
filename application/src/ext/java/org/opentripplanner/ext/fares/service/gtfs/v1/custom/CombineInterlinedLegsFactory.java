@@ -1,11 +1,11 @@
 package org.opentripplanner.ext.fares.service.gtfs.v1.custom;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.ext.fares.service.gtfs.v1.GtfsFareServiceFactory;
 import org.opentripplanner.ext.fares.service.gtfs.v1.custom.CombinedInterlinedLegsFareService.CombinationMode;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
+import tools.jackson.databind.JsonNode;
 
 public class CombineInterlinedLegsFactory extends GtfsFareServiceFactory {
 

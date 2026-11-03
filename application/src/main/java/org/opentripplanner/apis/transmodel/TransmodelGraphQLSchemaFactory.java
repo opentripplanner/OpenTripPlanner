@@ -42,7 +42,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
@@ -51,6 +51,7 @@ import org.opentripplanner.apis.support.graphql.injectdoc.ApiDocumentationProfil
 import org.opentripplanner.apis.support.graphql.injectdoc.CustomDocumentation;
 import org.opentripplanner.apis.support.graphql.injectdoc.InjectCustomDocumentation;
 import org.opentripplanner.apis.transmodel.mapping.PlaceMapper;
+import org.opentripplanner.apis.transmodel.mapping.TransportModeInputMapper;
 import org.opentripplanner.apis.transmodel.model.DefaultRouteRequestType;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.TransmodelPlaceType;
@@ -823,11 +824,12 @@ public class TransmodelGraphQLSchemaFactory {
                 .filter(
                   stopAtDistance ->
                     environment.getArgument("authority") == null ||
-                    stopAtDistance.stopId
+                    stopAtDistance
+                      .stopId()
                       .getFeedId()
                       .equalsIgnoreCase(environment.getArgument("authority"))
                 )
-                .sorted(Comparator.comparing(s -> s.distance))
+                .sorted(Comparator.comparing(s -> s.distance()))
                 .collect(Collectors.toList());
             } catch (RoutingValidationException e) {
               LOG.warn(
@@ -1193,7 +1195,7 @@ public class TransmodelGraphQLSchemaFactory {
             );
             var transportModes = FilterValues.ofEmptyIsEverything(
               "transportModes",
-              environment.<List<TransitMode>>getArgument("transportModes")
+              TransportModeInputMapper.mapTransitModes(environment.getArgument("transportModes"))
             );
             var authorities = FilterValues.ofEmptyIsEverything(
               "authorities",

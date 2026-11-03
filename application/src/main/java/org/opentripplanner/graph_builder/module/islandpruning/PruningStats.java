@@ -1,8 +1,8 @@
 package org.opentripplanner.graph_builder.module.islandpruning;
 
 /**
- * Mutable counters tracked while {@link IslandPruningModule} processes islands and decides
- * whether to isolate, remove, restrict or convert edges to noThruTraffic.
+ * Mutable counters tracked while {@link IslandPruningModule} processes islands and decides whether
+ * to isolate, remove, restrict or convert edges to noThruTraffic.
  */
 class PruningStats {
 

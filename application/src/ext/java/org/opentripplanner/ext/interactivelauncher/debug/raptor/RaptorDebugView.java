@@ -17,8 +17,8 @@ import javax.swing.JTextField;
 import org.opentripplanner.routing.api.request.DebugEventType;
 
 /**
- * This UI is used to set Raptor debug parameters, instrument the Raptor
- * search, and log event at decision points during routing.
+ * This UI is used to set Raptor debug parameters, instrument the Raptor search, and log event at
+ * decision points during routing.
  */
 public class RaptorDebugView {
 

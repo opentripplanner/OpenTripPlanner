@@ -5,7 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.astar.AStar;
 import org.opentripplanner.astar.AStarBuilder;
 import org.opentripplanner.astar.model.ShortestPathTree;
@@ -95,8 +95,8 @@ public class StreetSearchBuilder {
   }
 
   /**
-   * Set a function that will be called before the search begins. Useful for checking that
-   * a timeout has not been reached before the search begins.
+   * Set a function that will be called before the search begins. Useful for checking that a timeout
+   * has not been reached before the search begins.
    */
   public StreetSearchBuilder withPreStartHook(Runnable hook) {
     aStarBuilder.withPreStartHook(hook);

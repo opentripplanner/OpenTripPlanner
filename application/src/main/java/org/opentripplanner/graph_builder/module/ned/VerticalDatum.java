@@ -6,7 +6,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * A Vertical datum specified as a grid of offsets from NAD83 http://vdatum.noaa.gov/dev/gtx_info.html
+ * A Vertical datum specified as a grid of offsets from NAD83
+ * http://vdatum.noaa.gov/dev/gtx_info.html
  *
  * @author novalis
  */

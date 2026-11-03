@@ -13,10 +13,10 @@ import org.opentripplanner.standalone.config.framework.file.ConfigFileLoader;
  * serialize the build config. We serialize the JsonNode to a String and that is serialized instead
  * of the graph builder POJO it self. This make it easy to deserialize it by using the constructor.
  * <p>
- * We serialize the JsonNode, not the original JSON String, because we do not want the environment
- * variables to be resolved twice. They are resolved for the raw JSON string when it is read from
- * the file system, then the string is mapped to a JsonNode. Also, the JSON graph serialized string
- * is normalized without comments, and extra whitespace.
+ * We serialize the JsonNode, not the original JSON String, because we do not want the
+ * environment variables to be resolved twice. They are resolved for the raw JSON string when it is
+ * read from the file system, then the string is mapped to a JsonNode. Also, the JSON graph
+ * serialized string is normalized without comments, and extra whitespace.
  */
 public class BuildConfigSerializer extends Serializer<BuildConfig> {
 

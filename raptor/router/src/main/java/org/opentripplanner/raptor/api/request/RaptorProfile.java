@@ -15,7 +15,7 @@ public enum RaptorProfile {
   /**
    * Used by Range Raptor finding the earliest-arrival-time, the shortest travel duration and the
    * fewest transfers. Generalized-cost is not used.
-   * <p/>
+   * <p>
    * Computes result paths.
    */
   STANDARD("Standard", true),
@@ -27,9 +27,9 @@ public enum RaptorProfile {
 
   /**
    * Used by Raptor to find the shortest travel duration ignoring wait-time. It also finds the
-   * number of transfers. This profile can only be used with one Raptor iteration - no
-   * {code searchWindow}. The path is not kept because this potentially creates paths, which are
-   * not possible; Hence, cannot be constructed.
+   * number of transfers. This profile can only be used with one Raptor iteration - no {code
+   * searchWindow}. The path is not kept because this potentially creates paths, which are not
+   * possible; Hence, cannot be constructed.
    */
   MIN_TRAVEL_DURATION("MinTravelDuration", true);
 

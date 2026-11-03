@@ -96,3 +96,4 @@ of several popular multi-city mobile trip planning applications.
 - [Aubin](https://aubin.app/) is a country-wide journey planner in Great Britain, with a mobile
   application which focuses on personalized, need-based travel planning using the capability offered
   by OpenTripPlanner.
+- [**InfoPlaza Mobility**](https://www.infoplaza.com/en/mobility) has been providing nation wide a trip planner based on OTP for [Transdev Netherlands](https://www.transdev.nl/nl/) and it's subsidiaries since 2025, including full support for nation-wide flex and shared-mobility.

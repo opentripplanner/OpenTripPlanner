@@ -30,6 +30,10 @@ public class DataImportIssueReporter implements GraphBuilderModule {
   //Path to output folder
   private final CompositeDataSource reportDirectory;
 
+  //Only this number of issues of each type, with the highest priority, are written to the report.
+  //A negative value means no limit.
+  private final int maxNumberOfIssuesPerType;
+
   //If there are more then this number of issues the report are split into multiple files
   //This is because browsers aren't made for giant HTML files which can be made with 500k lines
   private final int maxNumberOfIssuesPerFile;
@@ -39,10 +43,12 @@ public class DataImportIssueReporter implements GraphBuilderModule {
   public DataImportIssueReporter(
     DataImportIssueStore issueStore,
     CompositeDataSource reportDirectory,
+    int maxNumberOfIssuesPerType,
     int maxNumberOfIssuesPerFile
   ) {
     this.issueStore = issueStore;
     this.reportDirectory = reportDirectory;
+    this.maxNumberOfIssuesPerType = maxNumberOfIssuesPerType;
     this.maxNumberOfIssuesPerFile = maxNumberOfIssuesPerFile;
   }
 
@@ -53,7 +59,11 @@ public class DataImportIssueReporter implements GraphBuilderModule {
       if (!deleteReportDirectoryAndContent()) {
         return;
       }
-      List<Bucket> buckets = partitionIssues(issueStore.listIssues(), maxNumberOfIssuesPerFile);
+      List<Bucket> buckets = partitionIssues(
+        issueStore.listIssues(),
+        maxNumberOfIssuesPerType,
+        maxNumberOfIssuesPerFile
+      );
       List<BucketKey> keys = buckets.stream().map(Bucket::key).sorted().toList();
 
       var progress = ProgressTracker.track("Creating data import issue report", 50, buckets.size());
@@ -62,14 +72,13 @@ public class DataImportIssueReporter implements GraphBuilderModule {
 
       for (Bucket bucket : buckets) {
         boolean addGeoJSONLink = new GeoJsonWriter(reportDirectory, bucket).writeFile();
-        new HTMLWriter(reportDirectory, bucket, keys, addGeoJSONLink).writeFile();
+        HTMLWriter.forIssueType(reportDirectory, bucket, keys, addGeoJSONLink).writeFile();
         //noinspection Convert2MethodRef
         progress.step(m -> LOG.info(m));
       }
 
       try {
-        HTMLWriter indexFileWriter = new HTMLWriter(reportDirectory, "index", keys);
-        indexFileWriter.writeFile();
+        HTMLWriter.forIndex(reportDirectory, keys, buckets).writeFile();
       } catch (Exception e) {
         LOG.error("Index file couldn't be created:{}", e.getMessage());
       }
@@ -115,9 +124,14 @@ public class DataImportIssueReporter implements GraphBuilderModule {
 
   /**
    * Creates buckets, where each bucket has only a single issue type and max approximately
-   * {@link this#maxNumberOfIssuesPerFile} issues
+   * {@link this#maxNumberOfIssuesPerFile} issues. Only the {@link this#maxNumberOfIssuesPerType}
+   * issues of each type with the highest priority are kept, unless the limit is negative.
    */
-  static List<Bucket> partitionIssues(List<DataImportIssue> issues, int maxNumberOfIssuesPerFile) {
+  static List<Bucket> partitionIssues(
+    List<DataImportIssue> issues,
+    int maxNumberOfIssuesPerType,
+    int maxNumberOfIssuesPerFile
+  ) {
     //Groups issues according to issue type
     Map<String, List<DataImportIssue>> issuesByType = issues
       .stream()
@@ -134,18 +148,30 @@ public class DataImportIssueReporter implements GraphBuilderModule {
         .stream()
         .sorted(Comparator.comparing(DataImportIssue::getPriority, Comparator.reverseOrder()))
         .toList();
+      int total = sortedIssues.size();
+
+      if (maxNumberOfIssuesPerType >= 0 && total > maxNumberOfIssuesPerType) {
+        sortedIssues = sortedIssues.subList(0, maxNumberOfIssuesPerType);
+        LOG.info(
+          "Issue type {} has {} issues, only the {} with the highest priority are written to the report.",
+          key,
+          total,
+          maxNumberOfIssuesPerType
+        );
+      }
+      int reported = sortedIssues.size();
 
       // Split the issues to buckets if needed
-      if (sortedIssues.size() > 1.2 * maxNumberOfIssuesPerFile) {
+      if (reported > 1.2 * maxNumberOfIssuesPerFile) {
         List<List<DataImportIssue>> partitions = ListUtils.partition(
           sortedIssues,
           maxNumberOfIssuesPerFile
         );
         for (int i = 0; i < partitions.size(); i++) {
-          buckets.add(new Bucket(new BucketKey(key, i + 1), partitions.get(i)));
+          buckets.add(new Bucket(new BucketKey(key, i + 1), partitions.get(i), reported, total));
         }
       } else {
-        buckets.add(new Bucket(new BucketKey(key, null), sortedIssues));
+        buckets.add(new Bucket(new BucketKey(key, null), sortedIssues, reported, total));
       }
     }
 

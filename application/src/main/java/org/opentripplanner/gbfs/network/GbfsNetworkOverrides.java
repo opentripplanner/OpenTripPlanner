@@ -8,15 +8,17 @@ import java.util.Optional;
  * The per-network GBFS configuration shared by the vehicle rental graph builder and the vehicle
  * rental service directory, mapped from the {@code gbfs} section of {@code otp-config.json}.
  * <p>
- * Field inheritance is resolved when the configuration is parsed, so the parameters held here are
- * already complete: a listed network's entry has the {@code defaults} filled in for every field it
- * did not name.
+ * Field inheritance is resolved when the configuration is parsed, so the parameters held here
+ * are already complete: a listed network's entry has the {@code defaults} filled in for every field
+ * it did not name.
  *
- * @param defaults the values applied to a network that is not listed
+ * @param defaults                the values applied to a network that is not listed
  * @param includeUnlistedNetworks whether a network present in the GBFS manifest but absent from
- *   {@code networks} is loaded at all. Kept separate from {@code defaults} so that adding defaults
- *   to avoid repetition cannot silently widen which networks OTP loads.
- * @param byNetwork the resolved parameters for each listed network, keyed by GBFS {@code system_id}
+ *                                {@code networks} is loaded at all. Kept separate from
+ *                                {@code defaults} so that adding defaults to avoid repetition
+ *                                cannot silently widen which networks OTP loads.
+ * @param byNetwork               the resolved parameters for each listed network, keyed by GBFS
+ *                                {@code system_id}
  */
 public record GbfsNetworkOverrides(
   GbfsNetworkParameters defaults,

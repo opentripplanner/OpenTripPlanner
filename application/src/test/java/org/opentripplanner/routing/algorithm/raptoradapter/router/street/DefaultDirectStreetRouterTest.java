@@ -17,6 +17,7 @@ import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.standalone.api.TestServerContext;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.service.TransitRepository;
 
 class DefaultDirectStreetRouterTest {
@@ -52,6 +53,7 @@ class DefaultDirectStreetRouterTest {
 
     var transitService = TestServerContext.createTransitService(
       new TransitRepository(),
+      new TimetableDataImport(),
       TransferServiceTestFactory.defaultTransferRepository()
     );
 

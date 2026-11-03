@@ -2,7 +2,7 @@ package org.opentripplanner.transit.model.timetable;
 
 import java.time.LocalDate;
 import java.util.Objects;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.transit.model.network.TripPattern;
 
 /**
@@ -58,8 +58,8 @@ public final class RealTimeTripUpdate {
    * @param pattern          the pattern to which the updated trip belongs. This can be a new
    *                         pattern created in real-time.
    * @param updatedTripTimes the new trip times for the updated trip.
-   * @param serviceDate      the service date for which this update applies (updates are valid
-   *                         only for one service date).
+   * @param serviceDate      the service date for which this update applies (updates are valid only
+   *                         for one service date).
    */
   public static Builder of(
     TripPattern pattern,

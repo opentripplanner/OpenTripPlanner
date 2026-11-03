@@ -22,8 +22,8 @@ public interface EmpiricalDelayRepository extends Serializable {
   );
 
   /**
-   * Add a calendar for the given feed-id to the repository. The calendar MUST be added
-   * BEFORE any trip-time-delays for the same feed is added.
+   * Add a calendar for the given feed-id to the repository. The calendar MUST be added BEFORE any
+   * trip-time-delays for the same feed is added.
    */
   void addEmpiricalDelayServiceCalendar(String feedId, EmpiricalDelayCalendar calendar);
 

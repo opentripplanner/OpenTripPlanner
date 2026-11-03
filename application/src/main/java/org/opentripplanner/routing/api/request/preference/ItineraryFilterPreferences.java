@@ -3,8 +3,8 @@ package org.opentripplanner.routing.api.request.preference;
 import java.time.Duration;
 import java.util.Objects;
 import java.util.function.Consumer;
+import org.opentripplanner.core.model.basic.CostLinearFunction;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
-import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.utils.lang.Units;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 

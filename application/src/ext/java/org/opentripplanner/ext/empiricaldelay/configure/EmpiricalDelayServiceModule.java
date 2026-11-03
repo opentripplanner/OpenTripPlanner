@@ -2,15 +2,15 @@ package org.opentripplanner.ext.empiricaldelay.configure;
 
 import dagger.Module;
 import dagger.Provides;
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayRepository;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayService;
 import org.opentripplanner.ext.empiricaldelay.internal.DefaultEmpiricalDelayService;
 import org.opentripplanner.framework.application.OTPFeature;
 
 /**
- * The service is used during application serve phase, not loading, so we need to provide
- * a module for the service without the repository, which is injected from the loading phase.
+ * The service is used during application serve phase, not loading, so we need to provide a module
+ * for the service without the repository, which is injected from the loading phase.
  */
 @Module
 public class EmpiricalDelayServiceModule {

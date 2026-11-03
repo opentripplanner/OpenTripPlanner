@@ -39,7 +39,8 @@ public enum AlertSeverity {
   /**
    * Return the sorting index for severity ordering.
    *
-   * <p>This index is based on the enum declaration order via {@link #ordinal()}. A lower index
+   * <p>
+   * This index is based on the enum declaration order via {@link #ordinal()}. A lower index
    * means lower severity when sorting.
    */
   public int sortingIndex() {

@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This class contains temporary vertices and edges that are used in A-Star searches. After they
- * are no longer needed, this class removes the temporary vertices and edges. It implements
+ * This class contains temporary vertices and edges that are used in A-Star searches. After they are
+ * no longer needed, this class removes the temporary vertices and edges. It implements
  * AutoCloseable and the cleanup is automatically done with a try-with-resources statement.
  */
 public class TemporaryVerticesContainer implements AutoCloseable {

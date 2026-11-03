@@ -4,8 +4,8 @@ import org.locationtech.jts.geom.Geometry;
 
 /**
  * Represents noteworthy data import issues that occur during the graph building process. These
- * issues should be passed on the the {@link DataImportIssueStore}
- * which will be responsible for logging, summarizing and reporting the issue.
+ * issues should be passed on the the {@link DataImportIssueStore} which will be responsible for
+ * logging, summarizing and reporting the issue.
  * <p>
  * Do NOT log the issue in the class where the issue is detected/created.
  *

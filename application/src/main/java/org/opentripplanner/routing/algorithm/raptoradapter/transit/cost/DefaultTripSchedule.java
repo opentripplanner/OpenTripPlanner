@@ -10,8 +10,8 @@ public interface DefaultTripSchedule extends RaptorTripSchedule {
   int transitReluctanceFactorIndex();
 
   /**
-   * This is not used by the default calculator, but by the {@link WheelchairCostCalculator} to
-   * give non-wheelchair friendly trips a generalized-cost penalty.
+   * This is not used by the default calculator, but by the {@link WheelchairCostCalculator} to give
+   * non-wheelchair friendly trips a generalized-cost penalty.
    */
   Accessibility wheelchairBoarding();
 }

@@ -11,9 +11,9 @@ import static org.opentripplanner.ext.carpooling.CarpoolingRequestTestData.depar
 import org.junit.jupiter.api.Test;
 
 /**
- * Itinerary departs at 11:00 UTC, arrives at 11:55 UTC on {@code SERVICE_DAY}. The filter does
- * not read {@code accessOrEgress}, so direct/access/egress tests would all exercise the same code
- * path — covering direct alone is sufficient.
+ * Itinerary departs at 11:00 UTC, arrives at 11:55 UTC on {@code SERVICE_DAY}. The filter does not
+ * read {@code accessOrEgress}, so direct/access/egress tests would all exercise the same code path
+ * — covering direct alone is sufficient.
  */
 class TimeItineraryFilterTest {
 

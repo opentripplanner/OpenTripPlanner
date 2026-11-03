@@ -3,6 +3,7 @@ package org.opentripplanner._support.arch;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 
 import com.tngtech.archunit.lang.ArchRule;
+import dagger.internal.Factory;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -51,7 +52,7 @@ public class Package implements ArchComponent {
       .that()
       .resideInAPackage(packageIdentifier)
       .and()
-      .doNotImplement(dagger.internal.Factory.class)
+      .doNotImplement(Factory.class)
       .should()
       .onlyDependOnClassesThat()
       .resideInAnyPackage(allAllowedPackages());

@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.vehiclerentalgeofencing.parameters;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.gbfs.GbfsDataSourceParameters;
 
@@ -9,8 +9,8 @@ import org.opentripplanner.gbfs.GbfsDataSourceParameters;
  * discovered in the manifest so it can be handed to
  * {@link org.opentripplanner.gbfs.GbfsFeedLoaderAndMapper}.
  * <p>
- * Only geofencing zones are loaded here: vehicles and stations are realtime data supplied
- * by the vehicle rental updater, so the rental-related flags are all off.
+ * Only geofencing zones are loaded here: vehicles and stations are realtime data supplied by the
+ * vehicle rental updater, so the rental-related flags are all off.
  */
 public record VehicleRentalNetworkDataSourceParameters(
   String url,

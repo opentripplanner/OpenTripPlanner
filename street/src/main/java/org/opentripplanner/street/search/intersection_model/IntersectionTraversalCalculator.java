@@ -7,8 +7,8 @@ import org.opentripplanner.street.search.TraverseMode;
 /**
  * An interface to a model that computes the duration of turns.
  * <p>
- * Turn durations are given in seconds - they represent the expected amount of time it would take to
- * make a turn.
+ * Turn durations are given in seconds - they represent the expected amount of time it would take
+ * to make a turn.
  *
  * @author avi
  */

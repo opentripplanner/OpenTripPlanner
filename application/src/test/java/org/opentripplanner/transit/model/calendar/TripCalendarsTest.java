@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.function.Consumer;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.model.calendar.CalendarServiceData;
@@ -76,7 +77,7 @@ class TripCalendarsTest {
     return TripCalendars.empty().merge(data);
   }
 
-  private static java.util.function.Consumer<TripCalendars> throwOnUpdate() {
+  private static Consumer<TripCalendars> throwOnUpdate() {
     return updated -> {
       throw new AssertionError("onUpdate must not be called for a date outside the service period");
     };

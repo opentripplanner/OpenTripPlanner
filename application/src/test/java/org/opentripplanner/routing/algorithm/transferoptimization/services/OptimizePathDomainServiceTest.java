@@ -6,7 +6,7 @@ import static org.opentripplanner.routing.algorithm.transferoptimization.service
 import static org.opentripplanner.utils.time.TimeUtils.time;
 
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
@@ -213,8 +213,8 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
    * Trip 1    10:02  10:10  10:15
    * Trip 2           10:13  10:17  10:30
    * </pre>
-   * Case: Transfer at stop B is returned, but transfer at stop C i guaranteed
-   * Expect: Transfer at C and transfer info attached
+   * Case: Transfer at stop B is returned, but transfer at stop C i guaranteed Expect:
+   * Transfer at C and transfer info attached
    */
   @Test
   public void testConstrainedTransferIsPreferred() {
@@ -269,10 +269,10 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
    * Trip 1    10:10  10:10  10:15
    * Trip 2           10:13  10:13  10:30
    * </pre>
-   * Case: A trip may have the exact same times for more than one stop. This is a regression test
-   *       see https://github.com/opentripplanner/OpenTripPlanner/issues/5444.
-   *       The following transfers exist: A-B, A-C, B-B, B-C, C-B and C-C.
-   * Expect: Transfer B-B, the earliest transfer with the lowest transfer time and cost.
+   * Case: A trip may have the exact same times for more than one stop. This is a regression
+   * test see https://github.com/opentripplanner/OpenTripPlanner/issues/5444. The following
+   * transfers exist: A-B, A-C, B-B, B-C, C-B and C-C. Expect: Transfer B-B, the earliest transfer
+   * with the lowest transfer time and cost.
    */
   @Test
   public void testSameStopTimesInPattern() {

@@ -3,7 +3,7 @@ package org.opentripplanner.core.model.time;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.Optional;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**

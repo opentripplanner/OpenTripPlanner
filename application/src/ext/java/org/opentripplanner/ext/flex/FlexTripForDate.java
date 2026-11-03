@@ -26,7 +26,7 @@ public final class FlexTripForDate {
     return serviceDate;
   }
 
-  /** The running date on which the last trip arrives.  */
+  /** The running date on which the last trip arrives. */
   public LocalDate endOfRunningPeriod() {
     return endOfRunningPeriod;
   }

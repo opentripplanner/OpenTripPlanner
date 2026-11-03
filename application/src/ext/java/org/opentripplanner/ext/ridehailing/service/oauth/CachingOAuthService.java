@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.ridehailing.service.oauth;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -9,6 +8,7 @@ import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.framework.json.ObjectMappers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * A base class for OAuth implementations for retrieving and caching access tokens.
@@ -21,7 +21,9 @@ public abstract class CachingOAuthService implements OAuthService {
 
   /**
    * Obtains and caches an OAuth API access token.
-   * @return A token holder with the token value (including null token values if the call was unsuccessful).
+   *
+   * @return A token holder with the token value (including null token values if the call was
+   *         unsuccessful).
    */
   @Override
   public String getToken() throws IOException {

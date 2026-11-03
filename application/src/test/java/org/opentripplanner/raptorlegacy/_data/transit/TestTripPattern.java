@@ -6,8 +6,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  *
- * @deprecated This was earlier part of Raptor and should not be used outside the Raptor
- *             module. Use the OTP model entities instead.
+ * @deprecated This was earlier part of Raptor and should not be used outside the Raptor module. Use
+ *             the OTP model entities instead.
  */
 @Deprecated
 public class TestTripPattern implements RaptorTripPattern {
@@ -19,8 +19,8 @@ public class TestTripPattern implements RaptorTripPattern {
   private final String name;
   private final int[] stopIndexes;
   /**
-   * By caching the index, we avoid looking up the pattern during routing, this reduces memory lookups and
-   * improves the performance.
+   * By caching the index, we avoid looking up the pattern during routing, this reduces memory
+   * lookups and improves the performance.
    */
   private int slackIndex = 0;
 

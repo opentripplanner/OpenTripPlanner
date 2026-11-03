@@ -33,9 +33,9 @@ import org.opentripplanner.raptor.spi.TestSlackProvider;
  * get both paths (start with flex access or trip R1) as optimal results by changing the egress,
  * then we have proven that both these results are kept in stop arrival at stop C.
  * <p>
- * Further this test also makes sure the path is constructed correctly when we have a mix of access,
- * transfer and transit at the same stop, in the same Raptor round. Two walking legs are not allowed
- * after each other.
+ * Further this test also makes sure the path is constructed correctly when we have a mix of
+ * access, transfer and transit at the same stop, in the same Raptor round. Two walking legs are not
+ * allowed after each other.
  * <p>
  * <img src="images/F11.svg" width="548" height="206"/>
  * <p>

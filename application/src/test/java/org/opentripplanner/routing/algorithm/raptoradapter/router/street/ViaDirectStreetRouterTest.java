@@ -36,6 +36,7 @@ import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.service.TransitRepository;
 
 class ViaDirectStreetRouterTest {
@@ -136,6 +137,7 @@ class ViaDirectStreetRouterTest {
 
     var transitService = TestServerContext.createTransitService(
       new TransitRepository(),
+      new TimetableDataImport(),
       TransferServiceTestFactory.defaultTransferRepository()
     );
 

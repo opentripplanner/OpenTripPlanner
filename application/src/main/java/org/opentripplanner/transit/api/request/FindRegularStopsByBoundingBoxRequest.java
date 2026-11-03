@@ -1,14 +1,14 @@
 package org.opentripplanner.transit.api.request;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.transit.model.site.RegularStop;
 
 /**
  * A request for {@link RegularStop}s within a bounding box.
- * <p/>
- * This request is used to retrieve {@link RegularStop}s that are within a provided bounding box and
- * match the other criteria.
+ * <p>
+ * This request is used to retrieve {@link RegularStop}s that are within a provided bounding box
+ * and match the other criteria.
  */
 public class FindRegularStopsByBoundingBoxRequest {
 

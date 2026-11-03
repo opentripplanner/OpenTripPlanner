@@ -9,8 +9,7 @@ import org.opentripplanner.street.model.edge.StreetEdge;
  * <p>
  * On this vertex geometry is split and two new edges are created.
  * <p>
- * If start/end vertex of {@link StreetEdge} is BarrierVertex
- * edge isn't traversable with CAR.
+ * If start/end vertex of {@link StreetEdge} is BarrierVertex edge isn't traversable with CAR.
  */
 public class BarrierVertex extends OsmVertex {
 

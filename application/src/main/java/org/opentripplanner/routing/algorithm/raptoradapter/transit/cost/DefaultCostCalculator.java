@@ -1,14 +1,14 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorCostConverter;
 import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
 import org.opentripplanner.transfer.constrained.model.TransferConstraint;
 
 /**
- * The responsibility for the cost calculator is to calculate the default  multi-criteria cost.
- * <p/>
+ * The responsibility for the cost calculator is to calculate the default multi-criteria cost.
+ * <p>
  * This class is immutable and thread safe.
  */
 public final class DefaultCostCalculator<T extends DefaultTripSchedule> implements
@@ -21,26 +21,26 @@ public final class DefaultCostCalculator<T extends DefaultTripSchedule> implemen
   private final FactorStrategy transitFactors;
 
   /**
-   * Costs for boarding and alighting at a given stop during transfer.
-   * See RaptorTransitData.getStopBoardAlightTransferCosts()
+   * Costs for boarding and alighting at a given stop during transfer. See
+   * RaptorTransitData.getStopBoardAlightTransferCosts()
    */
-  @Nullable
-  private final int[] stopBoardAlightTransferCosts;
+  private final int @Nullable [] stopBoardAlightTransferCosts;
 
   /**
    * Cost unit: SECONDS - The unit for all input parameters are in the OTP TRANSIT model cost unit
    * (in Raptor the unit for cost is centi-seconds).
    *
    * @param stopBoardAlightTransferCosts Unit centi-seconds. This parameter is used "as-is" and not
-   *                      transformed into the Raptor cast unit to avoid the transformation for each
-   *                      request. Use {@code null} to ignore stop cost.
+   *                                     transformed into the Raptor cast unit to avoid the
+   *                                     transformation for each request. Use {@code null} to ignore
+   *                                     stop cost.
    */
   public DefaultCostCalculator(
     int boardCost,
     int transferCost,
     double waitReluctanceFactor,
-    @Nullable double[] transitReluctanceFactors,
-    @Nullable int[] stopBoardAlightTransferCosts
+    double @Nullable [] transitReluctanceFactors,
+    int @Nullable [] stopBoardAlightTransferCosts
   ) {
     this.boardCostOnly = RaptorCostConverter.toRaptorCost(boardCost);
     this.transferCostOnly = RaptorCostConverter.toRaptorCost(transferCost);
@@ -57,7 +57,7 @@ public final class DefaultCostCalculator<T extends DefaultTripSchedule> implemen
 
   public DefaultCostCalculator(
     GeneralizedCostParameters params,
-    @Nullable int[] stopBoardAlightTransferCosts
+    int @Nullable [] stopBoardAlightTransferCosts
   ) {
     this(
       params.boardCost(),

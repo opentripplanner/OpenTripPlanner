@@ -55,8 +55,8 @@ public final class Area implements Serializable {
   }
 
   /**
-   * We use this class as a map key, but it has no clear equality operation so we delegate to
-   * object identity instead.
+   * We use this class as a map key, but it has no clear equality operation so we delegate to object
+   * identity instead.
    */
   @Override
   public final boolean equals(Object obj) {
@@ -64,8 +64,8 @@ public final class Area implements Serializable {
   }
 
   /**
-   * We use this class as a map key, but it has no clear hashcode so we delegate to
-   * object identity instead.
+   * We use this class as a map key, but it has no clear hashcode so we delegate to object identity
+   * instead.
    */
   @Override
   public final int hashCode() {

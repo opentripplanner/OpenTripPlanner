@@ -34,7 +34,8 @@ public class TripScheduleIndexResolver {
    * {@link InvalidRoutingInputException} is thrown.
    *
    * @param tripAndServiceDate the trip and service date to look up
-   * @param location the resolved boarding location, containing the stop index and stop position
+   * @param location           the resolved boarding location, containing the stop index and stop
+   *                           position
    */
   public RaptorTripScheduleReference resolve(
     TripAndServiceDate tripAndServiceDate,

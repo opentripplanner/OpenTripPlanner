@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.street.model.RentalFormFactor.BICYCLE;
 import static org.opentripplanner.street.model.RentalFormFactor.SCOOTER;
 
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.TestVehicleRentalStationBuilder;
@@ -50,7 +51,7 @@ class VehicleRentalEdgeFactoryTest {
       .getOutgoing()
       .stream()
       .map(e -> ((VehicleRentalEdge) e).formFactor)
-      .collect(java.util.stream.Collectors.toSet());
+      .collect(Collectors.toSet());
     assertTrue(formFactors.contains(BICYCLE));
     assertTrue(formFactors.contains(SCOOTER));
   }
@@ -91,7 +92,7 @@ class VehicleRentalEdgeFactoryTest {
       .getOutgoing()
       .stream()
       .map(e -> ((VehicleRentalEdge) e).formFactor)
-      .collect(java.util.stream.Collectors.toSet());
+      .collect(Collectors.toSet());
     assertTrue(formFactors.contains(RentalFormFactor.BICYCLE));
   }
 }

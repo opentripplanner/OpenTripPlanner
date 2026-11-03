@@ -3,8 +3,8 @@ package org.opentripplanner.service.worldenvelope.model;
 import java.util.Arrays;
 
 /**
- * Calculate the median for a large set of doubles. This class is package local; It is only used
- * by the builder.
+ * Calculate the median for a large set of doubles. This class is package local; It is only used by
+ * the builder.
  */
 class MedianCalcForDoubles {
 
@@ -22,7 +22,9 @@ class MedianCalcForDoubles {
     array[index++] = v;
   }
 
-  /** Reset the index, so a new dataset with the same size can be added and then median calculated. */
+  /**
+   * Reset the index, so a new dataset with the same size can be added and then median calculated.
+   */
   public void reset() {
     index = 0;
   }

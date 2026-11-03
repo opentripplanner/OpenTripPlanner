@@ -1,7 +1,7 @@
 package org.opentripplanner.gtfs.mapping;
 
 import java.util.Objects;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.utils.lang.StringUtils;
@@ -19,6 +19,7 @@ class IdFactory {
 
   /**
    * Maps from OBA AgencyAndId to feed-scoped ids. Values must not be null.
+   *
    * @param entityName The name of the entity being mapped. Improves the error message being thrown
    *                   in case of invalid values.
    */
@@ -29,6 +30,7 @@ class IdFactory {
 
   /**
    * Maps from OBA strings to feed-scoped ids. Parameter must not be null.
+   *
    * @param entityName The name of the entity being mapped. Improves the error message being thrown
    *                   in case of invalid values.
    */
@@ -46,7 +48,8 @@ class IdFactory {
   }
 
   /**
-   * Maps from OBA strings to feed-scoped ids. Parameter may be null and returns null in such a case.
+   * Maps from OBA strings to feed-scoped ids. Parameter may be null and returns null in such a
+   * case.
    */
   @Nullable
   FeedScopedId createNullableId(@Nullable String id) {

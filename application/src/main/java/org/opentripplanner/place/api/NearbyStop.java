@@ -16,11 +16,11 @@ import org.opentripplanner.street.search.state.State;
  */
 public class NearbyStop implements Comparable<NearbyStop> {
 
-  public final FeedScopedId stopId;
-  public final double distance;
+  private final FeedScopedId stopId;
+  private final double distance;
 
-  public final List<Edge> edges;
-  public final State state;
+  private final List<Edge> edges;
+  private final State state;
 
   public NearbyStop(FeedScopedId stopId, double distance, List<Edge> edges, State state) {
     this.stopId = Objects.requireNonNull(stopId);
@@ -46,9 +46,9 @@ public class NearbyStop implements Comparable<NearbyStop> {
   }
 
   /**
-   * Return {@code true} if this instance has a lower weight/cost than the given {@code other}.
-   * If the state is not set, the distance is used for comparison instead. If the
-   * weight/cost/distance is equals (or worse) this method returns {@code false}.
+   * Return {@code true} if this instance has a lower weight/cost than the given {@code other}. If
+   * the state is not set, the distance is used for comparison instead. If the weight/cost/distance
+   * is equals (or worse) this method returns {@code false}.
    */
   public boolean isBetter(NearbyStop other) {
     return compareTo(other) < 0;
@@ -106,5 +106,21 @@ public class NearbyStop implements Comparable<NearbyStop> {
       edges != null ? " (" + edges.size() + " edges)" : "",
       state != null ? " w/state" : ""
     );
+  }
+
+  public FeedScopedId stopId() {
+    return stopId;
+  }
+
+  public double distance() {
+    return distance;
+  }
+
+  public List<Edge> edges() {
+    return edges;
+  }
+
+  public State state() {
+    return state;
   }
 }

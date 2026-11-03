@@ -1,6 +1,6 @@
 package org.opentripplanner.street.model.elevation;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
@@ -10,9 +10,9 @@ public final class ElevationProfileSlicer {
   private ElevationProfileSlicer() {}
 
   /**
-   * Slice an elevation profile to {@code [start, end]} along the edge. Returns {@code null}
-   * when the resulting sub-profile would have fewer than two coordinates (e.g. a zero-length
-   * slice or a slice that falls entirely between two coordinate samples).
+   * Slice an elevation profile to {@code [start, end]} along the edge. Returns {@code null} when
+   * the resulting sub-profile would have fewer than two coordinates (e.g. a zero-length slice or a
+   * slice that falls entirely between two coordinate samples).
    */
   public static PackedCoordinateSequence slice(
     PackedCoordinateSequence elevationProfile,
@@ -37,7 +37,7 @@ public final class ElevationProfileSlicer {
 
     boolean started = false;
     Coordinate lastCoord = null;
-    List<Coordinate> coordList = new LinkedList<>();
+    List<Coordinate> coordList = new ArrayList<>();
     for (Coordinate coord : coordinateArray) {
       if (coord.x >= start && !started) {
         started = true;

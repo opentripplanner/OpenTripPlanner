@@ -110,14 +110,14 @@ public class TransferIndexGenerator {
   }
 
   /**
-   * The cache is valid if it is not null, not dirty and no other component created new patterns.
-   * In theory all real-time pattern creations should be done through the TimetableRepository and would
-   * be detected by the dirty flag.
-   * But since the TripPattern builder is publicly accessible, there is no strong guarantee about this.
-   * The risk is IndexOutOfBoundsException: The cached ConstrainedTransfersForPatterns wraps arrays
-   * sized by the old nPatterns. If a new RoutingTripPattern is created (index = N), and routing tries
-   * result.toStop(N) on a cached array of size N, it throws IndexOutOfBoundsException.
-   * Hence, the additional check against the previous processed number of patterns.
+   * The cache is valid if it is not null, not dirty and no other component created new patterns. In
+   * theory all real-time pattern creations should be done through the TimetableRepository and would
+   * be detected by the dirty flag. But since the TripPattern builder is publicly accessible, there
+   * is no strong guarantee about this. The risk is IndexOutOfBoundsException: The cached
+   * ConstrainedTransfersForPatterns wraps arrays sized by the old nPatterns. If a new
+   * RoutingTripPattern is created (index = N), and routing tries result.toStop(N) on a cached array
+   * of size N, it throws IndexOutOfBoundsException. Hence, the additional check against the
+   * previous processed number of patterns.
    *
    */
   private boolean isCacheValid(int nPatterns) {
@@ -149,7 +149,7 @@ public class TransferIndexGenerator {
 
   /**
    * @return true if any new entries were added to the lookup maps, false if all entries already
-   * existed.
+   *         existed.
    */
   private boolean setupPattern(TripPattern tripPattern, List<Trip> trips) {
     boolean added = false;

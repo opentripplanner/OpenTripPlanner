@@ -42,8 +42,8 @@ public class TimetableBuilder {
 
   /**
    * Add a new trip-times to the timetable. If the associated trip already exists, an exception is
-   * thrown. This is considered a programming error. Use {@link #addOrUpdateTripTimes(TripTimes)}
-   * if you want to replace an existing trip.
+   * thrown. This is considered a programming error. Use {@link #addOrUpdateTripTimes(TripTimes)} if
+   * you want to replace an existing trip.
    */
   public TimetableBuilder addTripTimes(TripTimes<?> tripTimes) {
     var trip = tripTimes.getTrip();
@@ -56,9 +56,8 @@ public class TimetableBuilder {
   }
 
   /**
-   * Add or update the trip-times. If the trip has an associated trip-times, then the trip-times
-   * are replaced. If not, the trip-times it is added. Consider using
-   * {@link #addTripTimes(TripTimes)}.
+   * Add or update the trip-times. If the trip has an associated trip-times, then the trip-times are
+   * replaced. If not, the trip-times it is added. Consider using {@link #addTripTimes(TripTimes)}.
    */
   public TimetableBuilder addOrUpdateTripTimes(TripTimes<?> tripTimes) {
     this.tripTimes.put(tripTimes.getTrip().getId(), tripTimes);
@@ -85,8 +84,7 @@ public class TimetableBuilder {
   }
 
   /**
-   * Apply the same update to all trip-times including scheduled and frequency based
-   * trip times.
+   * Apply the same update to all trip-times including scheduled and frequency based trip times.
    * <p>
    */
   public TimetableBuilder withAdjustedTimes(Duration timeshift) {

@@ -19,6 +19,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.opentripplanner.core.model.basic.CostLinearFunction;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
@@ -27,7 +28,6 @@ import org.opentripplanner.model.plan.TestItineraryBuilder;
 import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.algorithm.filterchain.api.GroupBySimilarity;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
-import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.services.TransitAlertService;
@@ -373,7 +373,8 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
 
     /**
      * When the filtering of direct flex by the transit search window is deactivated, the direct
-     * flex result should _not_ be filtered even though it starts before the earliest departure time.
+     * flex result should _not_ be filtered even though it starts before the earliest departure
+     * time.
      */
     @Test
     void keepDirectFlexWhenFilteringByEarliestDepartureIsDisabled() {

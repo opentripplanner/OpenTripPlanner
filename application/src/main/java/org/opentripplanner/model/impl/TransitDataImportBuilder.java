@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.time.LocalDateRange;
+import org.opentripplanner.core.model.time.TimePenalty;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.gtfs.mapping.StaySeatedNotAllowed;
@@ -23,7 +24,6 @@ import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceCalendar;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.model.calendar.impl.CalendarServiceDataFactoryImpl;
-import org.opentripplanner.routing.api.request.framework.TimePenalty;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
 import org.opentripplanner.transfer.constrained.model.TransferPoint;
@@ -258,8 +258,8 @@ public class TransitDataImportBuilder {
   }
 
   /**
-   * The list of parking lots contained in the transit data (so far only NeTEx).
-   * Note that parking lots can also be sourced from OSM data as well as realtime updaters.
+   * The list of parking lots contained in the transit data (so far only NeTEx). Note that parking
+   * lots can also be sourced from OSM data as well as realtime updaters.
    */
   public List<VehicleParking> vehicleParkings() {
     return vehicleParkings;
@@ -450,8 +450,7 @@ public class TransitDataImportBuilder {
   }
 
   /**
-   * Return {@code true} if the point is a trip-transfer-point and the trip reference is
-   * missing.
+   * Return {@code true} if the point is a trip-transfer-point and the trip reference is missing.
    */
   private boolean transferPointTripReferenceDoesNotExist(TransferPoint point) {
     if (!point.isTripTransferPoint()) {

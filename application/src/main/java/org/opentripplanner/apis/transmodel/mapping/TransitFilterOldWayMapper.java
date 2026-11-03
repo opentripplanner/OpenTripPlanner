@@ -14,7 +14,6 @@ import org.opentripplanner.routing.api.request.request.TransitRequestBuilder;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.SubMode;
-import org.opentripplanner.transit.model.basic.TransitMode;
 
 class TransitFilterOldWayMapper {
 
@@ -91,9 +90,9 @@ class TransitFilterOldWayMapper {
   }
 
   /**
-   * Return transit modes. If this method returns empty the transit search should be disabled.
-   * This happens is the transit "modes" is defined and empty. If not defined the default is
-   * ALL transit modes.
+   * Return transit modes. If this method returns empty the transit search should be disabled. This
+   * happens is the transit "modes" is defined and empty. If not defined the default is ALL transit
+   * modes.
    */
   private static List<MainAndSubMode> mapTransitModes(DataFetchingEnvironment environment) {
     final List<MainAndSubMode> tModes = new ArrayList<>();
@@ -109,8 +108,9 @@ class TransitFilterOldWayMapper {
 
     for (Map<String, ?> modeWithSubmodes : transportModes) {
       if (modeWithSubmodes.containsKey("transportMode")) {
-        var mainMode = (TransitMode) modeWithSubmodes.get("transportMode");
-
+        var mainMode = TransportModeInputMapper.mapTransitMode(
+          modeWithSubmodes.get("transportMode")
+        );
         var transportSubModes = (List<TransmodelTransportSubmode>) modeWithSubmodes.get(
           "transportSubModes"
         );
@@ -127,8 +127,8 @@ class TransitFilterOldWayMapper {
   }
 
   /**
-   * Finish building the selectors. Add modes to all existing selectors, or create a new
-   * selector using the provided modes.
+   * Finish building the selectors. Add modes to all existing selectors, or create a new selector
+   * using the provided modes.
    */
   private static List<SelectRequest> buildFiltersWithModes(
     ArrayList<SelectRequest.Builder> selectors,

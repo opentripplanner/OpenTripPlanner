@@ -8,13 +8,12 @@ import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.apis.transmodel.model.TransmodelTransportSubmode;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.SubMode;
-import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.filter.selector.FilterRequest;
 import org.opentripplanner.transit.model.filter.transit.TripTimeOnDateSelectRequest;
 
 /**
- * Maps GraphQL {@code EstimatedCallFilterInput} to a list of {@link FilterRequest}
- * objects by extracting the {@code select} and {@code not} criteria from the GraphQL input.
+ * Maps GraphQL {@code EstimatedCallFilterInput} to a list of {@link FilterRequest} objects by
+ * extracting the {@code select} and {@code not} criteria from the GraphQL input.
  * <p>
  * Each filter has {@code select} and {@code not} arrays of select criteria.
  * <p>
@@ -85,7 +84,9 @@ public class TripTimeOnDateFilterMapper {
       for (Map<String, ?> modeWithSubModes : transportModes) {
         validateMainModePresent(modeWithSubModes);
 
-        var mainMode = (TransitMode) modeWithSubModes.get("transportMode");
+        var mainMode = TransportModeInputMapper.mapTransitMode(
+          modeWithSubModes.get("transportMode")
+        );
         if (modeWithSubModes.containsKey("transportSubModes")) {
           var transportSubModes = (List<TransmodelTransportSubmode>) modeWithSubModes.get(
             "transportSubModes"

@@ -1,6 +1,9 @@
 package org.opentripplanner.updater.trip.siri.moduletests.update;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
 import org.junit.jupiter.api.Test;
@@ -12,10 +15,11 @@ import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.siri.SiriTestHelper;
 
 /**
- * Tests for the handling of SIRI ET updates where real-time times are partially or fully absent
- * for stops in a trip.
+ * Tests for the handling of SIRI ET updates where real-time times are partially or fully absent for
+ * stops in a trip.
  *
- * <p>The key behaviours under test:
+ * <p>
+ * The key behaviours under test:
  * <ul>
  *   <li>A stop that receives only one of arrival/departure time must NOT be marked NO_DATA.</li>
  *   <li>A stop with no real-time times at all must be marked NO_DATA.</li>
@@ -27,8 +31,9 @@ class MissingRealtimeTest implements RealtimeTestConstants {
 
   private final TransitTestEnvironmentBuilder ENV_BUILDER = TransitTestEnvironment.of();
   private final RegularStop STOP_A = ENV_BUILDER.stop(STOP_A_ID);
-  private final RegularStop STOP_B = ENV_BUILDER.stop(STOP_B_ID);
+  private final RegularStop STOP_B = ENV_BUILDER.stopAtStation(STOP_B_ID, STATION_OMEGA_ID);
   private final RegularStop STOP_C = ENV_BUILDER.stop(STOP_C_ID);
+  private final RegularStop STOP_D = ENV_BUILDER.stopAtStation(STOP_D_ID, STATION_OMEGA_ID);
 
   private final TripInput TWO_STOP_TRIP = TripInput.of(TRIP_1_ID)
     .withWithTripOnServiceDate(TRIP_1_ID)
@@ -43,8 +48,8 @@ class MissingRealtimeTest implements RealtimeTestConstants {
 
   /**
    * An intermediate stop that provides only a departure time (no arrival) must be treated as a
-   * real-time update, not NO_DATA. The missing arrival falls back to the scheduled arrival
-   * (delay = 0), while the departure carries the provided delay.
+   * real-time update, not NO_DATA. The missing arrival falls back to the scheduled arrival (delay =
+   * 0), while the departure carries the provided delay.
    */
   @Test
   void intermediateStop_withOnlyDepartureTime_isNotNoData() {
@@ -78,8 +83,8 @@ class MissingRealtimeTest implements RealtimeTestConstants {
 
   /**
    * An intermediate stop that provides only an arrival time (no departure) must be treated as a
-   * real-time update. The missing departure falls back to the scheduled departure (delay = 0).
-   * The real-time arrival must not exceed the scheduled departure to avoid a negative dwell time.
+   * real-time update. The missing departure falls back to the scheduled departure (delay = 0). The
+   * real-time arrival must not exceed the scheduled departure to avoid a negative dwell time.
    */
   @Test
   void intermediateStop_withOnlyArrivalTime_isNotNoData() {
@@ -235,12 +240,13 @@ class MissingRealtimeTest implements RealtimeTestConstants {
   }
 
   /**
-   * A journey-level cancellation with no stop times provided must set {@code isCanceled = true}
-   * and leave {@code timesModified = false}. The trip is "updated" because it is cancelled
-   * (prefix "C U"), but no time modifications were made, so the scheduled times are shown.
+   * A journey-level cancellation with no stop times provided must set {@code isCanceled = true} and
+   * leave {@code timesModified = false}. The trip is "updated" because it is cancelled (prefix "C
+   * U"), but no time modifications were made, so the scheduled times are shown.
    *
-   * <p>This verifies that {@code hasAnyUpdates()} is driven by the cancellation flag alone and
-   * does not require {@code timesModified} to be {@code true}.
+   * <p>
+   * This verifies that {@code hasAnyUpdates()} is driven by the cancellation flag alone and does
+   * not require {@code timesModified} to be {@code true}.
    */
   @Test
   void journeyLevelCancellation_withNoTimes_isCanceled_butTimesNotModified() {
@@ -262,5 +268,38 @@ class MissingRealtimeTest implements RealtimeTestConstants {
       "C U | A 0:00:10 0:00:11 | B 0:00:20 0:00:21",
       env.tripData(TRIP_1_ID).showTimetable()
     );
+  }
+
+  /**
+   * Change quay on a trip without setting times should not mark times as updated.
+   */
+  @Test
+  void testChangeQuayWithoutTimes() {
+    var env = ENV_BUILDER.addTrip(TWO_STOP_TRIP).build();
+    assertThat(env.raptorData().summarizePatterns()).containsExactly("F:Pattern1[S]");
+    var siri = SiriTestHelper.of(env);
+
+    var updates = siri
+      .etBuilder()
+      .withDatedVehicleJourneyRef(TRIP_1_ID)
+      .withEstimatedCalls(builder ->
+        builder
+          .call(STOP_A)
+          .departAimedExpected("00:00:11", null)
+          .call(STOP_D)
+          .arriveAimedExpected("00:00:20", null)
+      )
+      .buildEstimatedTimetableDeliveries();
+
+    var result = siri.applyEstimatedTimetable(updates);
+
+    assertSuccess(result);
+    var trip = env.tripData(TRIP_1_ID);
+    assertEquals("P U | A [ND] 0:00:10 0:00:11 | D [ND] 0:00:20 0:00:21", trip.showTimetable());
+
+    assertFalse(trip.tripTimes().isTimesModified());
+    assertTrue(trip.tripTimes().isTripPatternModified());
+
+    assertThat(env.raptorData().summarizePatterns()).containsExactly("F:Route1::001:RT[P U]");
   }
 }

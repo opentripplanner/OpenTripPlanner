@@ -11,9 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Loads taxi routes from GTFS feeds explicitly flagged with
- * {@code transitFeeds[].isTaxiData: true} and stores them in the
- * {@link TaxiRepository}.
+ * Loads taxi routes from GTFS feeds explicitly flagged with {@code transitFeeds[].isTaxiData: true}
+ * and stores them in the {@link TaxiRepository}.
  */
 public class TaxiGraphBuilder implements GraphBuilderModule {
 

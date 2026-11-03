@@ -148,9 +148,9 @@ public class SpeedTestTimer {
   }
 
   /**
-   * Calculate the total time mean for the given timer. If the timer is not
-   * found {@link #NOT_AVAILABLE} is returned. This can be the case in unit tests,
-   * where not all parts of the code is run.
+   * Calculate the total time mean for the given timer. If the timer is not found
+   * {@link #NOT_AVAILABLE} is returned. This can be the case in unit tests, where not all parts of
+   * the code is run.
    */
   public int totalTimerMean(String timerName) {
     long count = getTotalTimers(timerName).mapToLong(Timer::count).sum();

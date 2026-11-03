@@ -40,7 +40,7 @@ public class DefaultEntityById<E extends TransitEntity> implements EntityById<E>
   /**
    * @param id the id whose associated value is to be returned
    * @return the value to which the specified key is mapped, or {@code null} if this map contains no
-   * mapping for the key
+   *         mapping for the key
    */
   @Override
   public E get(FeedScopedId id) {

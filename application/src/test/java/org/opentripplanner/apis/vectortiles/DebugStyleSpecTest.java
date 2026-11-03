@@ -6,7 +6,6 @@ import static org.opentripplanner.framework.io.FileUtils.writeFile;
 import static org.opentripplanner.test.support.JsonAssertions.assertEqualJson;
 import static org.opentripplanner.test.support.JsonAssertions.isEqualJson;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.apis.vectortiles.model.StyleSpec;
@@ -15,6 +14,7 @@ import org.opentripplanner.apis.vectortiles.model.VectorSourceLayer;
 import org.opentripplanner.framework.json.ObjectMappers;
 import org.opentripplanner.standalone.config.framework.json.JsonSupport;
 import org.opentripplanner.test.support.ResourceLoader;
+import tools.jackson.databind.JsonNode;
 
 class DebugStyleSpecTest {
 
@@ -46,7 +46,7 @@ class DebugStyleSpecTest {
   void allFiltersUseExpressionSyntax() {
     var json = ObjectMappers.ignoringExtraFields().valueToTree(buildSpec());
 
-    for (JsonNode layer : json.path("layers")) {
+    for (var layer : json.path("layers")) {
       var filter = layer.path("filter");
       if (!filter.isMissingNode()) {
         assertWithMessage("layer '%s' has a legacy filter: %s", layer.path("id").asText(), filter)

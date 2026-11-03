@@ -3,13 +3,13 @@ package org.opentripplanner.routing.algorithm.filterchain.filters.system.mcmax;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.SingleCriteriaComparator;
 
 /**
- * Keep a list of items, groups and the result in progress. This is just a class for
- * simple bookkeeping for the state of the filter.
+ * Keep a list of items, groups and the result in progress. This is just a class for simple
+ * bookkeeping for the state of the filter.
  */
 class State {
 

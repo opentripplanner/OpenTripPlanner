@@ -41,11 +41,11 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultC
  *   Transfers: 2
  *   Generalized-cost: $8154
  * </pre>
- * The Trip has 2 transfers, 1 connected by walking and without. The trip start at 10:00 and ends at
- * 12:00, total 2 hours.
+ * The Trip has 2 transfers, 1 connected by walking and without. The trip start at 10:00 and
+ * ends at 12:00, total 2 hours.
  *
- * @deprecated This was earlier part of Raptor and should not be used outside the Raptor
- *             module. Use the OTP model entities instead.
+ * @deprecated This was earlier part of Raptor and should not be used outside the Raptor module. Use
+ *             the OTP model entities instead.
  */
 @Deprecated
 public class BasicPathTestCase implements RaptorTestConstants {
@@ -242,6 +242,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
     PathLeg<TestTripSchedule> leg3 = new TransferPathLeg<>(
       STOP_B,
       TX_START,
+      STOP_C,
       TX_END,
       transfer.c1(),
       transfer,
@@ -273,6 +274,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
     PathLeg<TestTripSchedule> leg3 = new TransferPathLeg<>(
       STOP_B,
       TX_START,
+      STOP_E,
       TX_END,
       transfer.c1(),
       transfer,

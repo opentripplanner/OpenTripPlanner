@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.BitSet;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.raptor.spi.IntIterator;
@@ -129,7 +129,7 @@ public class TripPatternForDates
 
   /**
    * @deprecated This is exposed because it is needed in the TripFrequencyNnnSearch classes, but is
-   * an implementation detail that should not leak outside the class.
+   *             an implementation detail that should not leak outside the class.
    */
   @Deprecated
   public int tripPatternForDateOffsets(int dayIndex) {
@@ -228,11 +228,11 @@ public class TripPatternForDates
   }
 
   /**
-   * Raptor provides a trips search for regular trip schedules, but in some cases it makes
-   * sense to be able to override this - for example for frequency based trips.
+   * Raptor provides a trips search for regular trip schedules, but in some cases it makes sense to
+   * be able to override this - for example for frequency based trips.
    *
-   * @return {@code true} If you do not want to use the built-in trip search and instead
-   *         will provide your own. Make sure to implement the
+   * @return {@code true} If you do not want to use the built-in trip search and instead will
+   *         provide your own. Make sure to implement the
    *         {@link #createCustomizedTripSearch(SearchDirection)} for both forward and reverse
    *         searches.
    */
@@ -242,6 +242,7 @@ public class TripPatternForDates
 
   /**
    * Factory method to provide an alternative trip search in Raptor.
+   *
    * @see #useCustomizedTripSearch()
    */
   public RaptorTripScheduleSearch<TripSchedule> createCustomizedTripSearch(
@@ -268,22 +269,21 @@ public class TripPatternForDates
   /**
    * Return a list with all departure times for the first stop for each trip per day.
    *
-   * There are no unit-tests on this method, so the surface to {@link TripPatternForDate}
-   * should be kept as thin as possible.
+   * There are no unit-tests on this method, so the surface to {@link TripPatternForDate} should be
+   * kept as thin as possible.
    */
   private static TripTimesForDaysIndex createTripTimesForDaysIndex(
     TripPatternForDate[] tripPatternForDates,
     int[] offsets
   ) {
-    var departureTimes = Arrays.stream(tripPatternForDates)
-      .map(TripPatternForDate::tripTimes)
-      .map(l ->
-        l
-          .stream()
-          .mapToInt(t -> t.getDepartureTime(FIRST_STOP_POS_IN_PATTERN))
-          .toArray()
-      )
-      .toList();
+    var departureTimes = new ArrayList<int[]>(tripPatternForDates.length);
+    for (var tripPatternForDate : tripPatternForDates) {
+      var times = new int[tripPatternForDate.numberOfTripSchedules()];
+      for (int i = 0; i < times.length; i++) {
+        times[i] = tripPatternForDate.getTripTimes(i).getDepartureTime(FIRST_STOP_POS_IN_PATTERN);
+      }
+      departureTimes.add(times);
+    }
     return TripTimesForDaysIndex.ofTripTimesForDay(departureTimes, offsets);
   }
 }

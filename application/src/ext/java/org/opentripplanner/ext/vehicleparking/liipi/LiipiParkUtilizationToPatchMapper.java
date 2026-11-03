@@ -1,8 +1,8 @@
 package org.opentripplanner.ext.vehicleparking.liipi;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.JsonNode;
 
 /**
  * Mapper for parsing a utilization into an {@link LiipiParkPatch}.
@@ -26,7 +26,7 @@ public class LiipiParkUtilizationToPatchMapper {
       feedId
     );
     try {
-      String capacityType = jsonNode.path("capacityType").asText();
+      String capacityType = jsonNode.path("capacityType").asString();
       Integer spacesAvailable = LiipiParkToVehicleParkingMapper.parseIntegerValue(
         jsonNode,
         "spacesAvailable"

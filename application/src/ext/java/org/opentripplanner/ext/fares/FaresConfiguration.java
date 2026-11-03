@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.fares;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.ext.fares.service.NoopFareServiceFactory;
 import org.opentripplanner.ext.fares.service.gtfs.v1.GtfsFareServiceFactory;
 import org.opentripplanner.ext.fares.service.gtfs.v1.custom.AtlantaFareServiceFactory;
@@ -12,6 +11,7 @@ import org.opentripplanner.ext.fares.service.gtfs.v2.custom.OregonHopFareFactory
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.framework.json.OtpVersion;
+import tools.jackson.databind.JsonNode;
 
 public class FaresConfiguration {
 
@@ -49,12 +49,12 @@ public class FaresConfiguration {
     if (config == null) {
       /* Empty block, fallback to default */
       type = null;
-    } else if (config.isTextual()) {
+    } else if (config.isString()) {
       /* Simplest form: { fares : "seattle" } */
-      type = config.asText();
+      type = config.asString();
     } else if (config.has("type")) {
       /* Fare with a type: { fares : { type : "foobar", param1 : 42 } } */
-      type = config.path("type").asText(null);
+      type = config.path("type").asString(null);
     }
 
     if (type == null) {

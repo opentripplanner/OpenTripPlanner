@@ -29,7 +29,7 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
@@ -213,8 +213,7 @@ class RealtimeVehiclePatternMatcher {
   }
 
   /**
-   * Converts GtfsRealtime vehicle position to the OTP RealtimeVehicle which can be used by
-   * the API.
+   * Converts GtfsRealtime vehicle position to the OTP RealtimeVehicle which can be used by the API.
    *
    * @param stopIndexOfGtfsSequence A function that takes a GTFS stop_sequence and returns the index
    *                                of the stop in the trip.

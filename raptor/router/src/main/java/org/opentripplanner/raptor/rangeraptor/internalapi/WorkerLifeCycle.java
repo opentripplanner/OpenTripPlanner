@@ -8,18 +8,17 @@ import java.util.function.IntConsumer;
  * listeners add them self to this class an receive a callbacks on the subscribed event. The
  * listener is notified when thise Range Raptor events occur:
  * <ol>
- *     <li><b>setupIteration</b> with iteration departureTime</li>
- *     <li><b>prepareForNextRound</b></li>
- *     <li><b>transitsForRoundComplete</b></li>
- *     <li><b>transfersForRoundComplete</b></li>
- *     <li><b>roundComplete</b> with flag to indicate if the destination is reached</li>
- *     <li><b>iterationComplete</b></li>
+ *   <li><b>setupIteration</b> with iteration departureTime</li>
+ *   <li><b>prepareForNextRound</b></li>
+ *   <li><b>transitsForRoundComplete</b></li>
+ *   <li><b>transfersForRoundComplete</b></li>
+ *   <li><b>roundComplete</b> with flag to indicate if the destination is reached</li>
+ *   <li><b>iterationComplete</b></li>
  * </ol>
- * By providing the ability to subscribe to such events each class can decide
- * independently of its relations to subscribe. For example can the DestinationArrivals
- * class subscribe to any events, without relying on its parent (WorkerState)
- * to delegate these events down the relationship three. This decouples the
- * code.
+ * By providing the ability to subscribe to such events each class can decide independently of its
+ * relations to subscribe. For example can the DestinationArrivals class subscribe to any events,
+ * without relying on its parent (WorkerState) to delegate these events down the relationship three.
+ * This decouples the code.
  */
 public interface WorkerLifeCycle {
   /**
@@ -30,9 +29,9 @@ public interface WorkerLifeCycle {
   void onRouteSearch(Consumer<Boolean> routeSearchWithDirectionSubscriber);
 
   /**
-   * Subscribe to 'setup iteration' events by register an int consumer. Every time an iteration start
-   * the listener(the input parameter) is notified with the {@code iterationDepartureTime} passed in
-   * as an argument.
+   * Subscribe to 'setup iteration' events by register an int consumer. Every time an iteration
+   * start the listener(the input parameter) is notified with the {@code iterationDepartureTime}
+   * passed in as an argument.
    *
    * @param setupIterationWithDepartureTime if {@code null} nothing is added to the publisher.
    */

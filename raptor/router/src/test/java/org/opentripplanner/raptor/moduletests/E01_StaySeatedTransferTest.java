@@ -24,8 +24,8 @@ import org.opentripplanner.raptor.spi.TestSlackProvider;
  * <p>
  * Raptor should return a path if it exists when a transfer is only possible because it is
  * guaranteed/stay-seated. A stay-seated transfer should be possible even if there is zero time to
- * do the transfer. In these cases the transfer-slack should be ignored and the connection should
- * be possible.
+ * do the transfer. In these cases the transfer-slack should be ignored and the connection should be
+ * possible.
  */
 public class E01_StaySeatedTransferTest implements RaptorTestConstants {
 

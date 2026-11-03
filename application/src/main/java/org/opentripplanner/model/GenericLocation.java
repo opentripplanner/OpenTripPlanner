@@ -1,7 +1,7 @@
 package org.opentripplanner.model;
 
 import java.util.Objects;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.routing.api.request.TripLocation;
@@ -113,9 +113,9 @@ public class GenericLocation {
   }
 
   /**
-   * Returns true if this location represents a position on-board a transit vehicle
-   * rather than a geographic location. On-board locations have no coordinates and
-   * are not linked to the street network.
+   * Returns true if this location represents a position on-board a transit vehicle rather than a
+   * geographic location. On-board locations have no coordinates and are not linked to the street
+   * network.
    */
   public boolean isOnBoard() {
     return tripLocation != null;

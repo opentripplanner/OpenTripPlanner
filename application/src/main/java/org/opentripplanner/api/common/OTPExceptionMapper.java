@@ -1,7 +1,5 @@
 package org.opentripplanner.api.common;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.WebApplicationException;
@@ -13,6 +11,8 @@ import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.framework.http.OtpHttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.core.exc.StreamReadException;
+import tools.jackson.databind.exc.MismatchedInputException;
 
 @Provider
 public class OTPExceptionMapper implements ExceptionMapper<Exception> {
@@ -43,7 +43,7 @@ public class OTPExceptionMapper implements ExceptionMapper<Exception> {
         .type("text/plain")
         .build();
     }
-    if (ex instanceof JsonParseException || ex instanceof MismatchedInputException) {
+    if (ex instanceof StreamReadException || ex instanceof MismatchedInputException) {
       return Response.status(Response.Status.BAD_REQUEST)
         .entity(ex.getMessage())
         .type("text/plain")

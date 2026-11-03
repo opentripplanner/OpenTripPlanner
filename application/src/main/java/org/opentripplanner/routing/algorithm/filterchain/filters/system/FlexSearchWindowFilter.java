@@ -8,12 +8,12 @@ import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;
 
 /**
- * The flex router doesn't use the transit router's  search-window, but nevertheless using it
- * for filtering is useful when combining flex with transit.
+ * The flex router doesn't use the transit router's search-window, but nevertheless using it for
+ * filtering is useful when combining flex with transit.
  * <p>
- * The flex router also searches the previous day (arrive by) or the next one (depart after).
- * If you didn't filter the flex results by something you could get yesterday's or tomorrow's
- * trips where you would not expect it.
+ * The flex router also searches the previous day (arrive by) or the next one (depart after). If
+ * you didn't filter the flex results by something you could get yesterday's or tomorrow's trips
+ * where you would not expect it.
  */
 public class FlexSearchWindowFilter implements RemoveItineraryFlagger {
 

@@ -65,7 +65,7 @@ public class FlexDirectPathFactory {
     ).calculateFlexEgressTemplates(streetEgresses, dates);
 
     Multimap<FeedScopedId, NearbyStop> streetEgressByStopId = HashMultimap.create();
-    streetEgresses.forEach(it -> streetEgressByStopId.put(it.stopId, it));
+    streetEgresses.forEach(it -> streetEgressByStopId.put(it.stopId(), it));
 
     for (FlexAccessTemplate template : flexAccessTemplates) {
       var transferStopId = template.getTransferStopId();
@@ -105,21 +105,21 @@ public class FlexDirectPathFactory {
     int accessAlightStopPosition = accessTemplate.alightStopPosition;
     int requestedBookingTime = accessTemplate.requestedBookingTime;
 
-    var flexToVertex = egress.state.getVertex();
+    var flexToVertex = egress.state().getVertex();
 
     if (!isRouteable(accessTemplate, flexToVertex)) {
       return Optional.empty();
     }
 
-    var flexEdge = accessTemplate.getFlexEdge(flexToVertex, egress.stopId);
+    var flexEdge = accessTemplate.getFlexEdge(flexToVertex, egress.stopId());
 
     if (flexEdge == null) {
       return Optional.empty();
     }
 
-    final State[] afterFlexState = flexEdge.traverse(accessNearbyStop.state);
+    final State[] afterFlexState = flexEdge.traverse(accessNearbyStop.state());
 
-    var finalStateOpt = EdgeTraverser.traverseEdges(afterFlexState[0], egress.edges);
+    var finalStateOpt = EdgeTraverser.traverseEdges(afterFlexState[0], egress.edges());
 
     if (finalStateOpt.isEmpty()) {
       return Optional.empty();
@@ -183,12 +183,12 @@ public class FlexDirectPathFactory {
   }
 
   protected boolean isRouteable(FlexAccessTemplate accessTemplate, Vertex flexVertex) {
-    if (accessTemplate.accessEgress.state.getVertex() == flexVertex) {
+    if (accessTemplate.accessEgress.state().getVertex() == flexVertex) {
       return false;
     } else {
       return (
         accessTemplate.calculator.calculateFlexPath(
-          accessTemplate.accessEgress.state.getVertex(),
+          accessTemplate.accessEgress.state().getVertex(),
           flexVertex,
           accessTemplate.boardStopPosition,
           accessTemplate.alightStopPosition

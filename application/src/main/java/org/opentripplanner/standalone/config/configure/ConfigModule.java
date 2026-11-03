@@ -14,8 +14,8 @@ import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.config.routerconfig.RaptorEnvironmentFactory;
 
 /**
- * Map {@link ConfigModel} into more specific types like {@link BuildConfig} to simplify
- * DI in other modules.
+ * Map {@link ConfigModel} into more specific types like {@link BuildConfig} to simplify DI in other
+ * modules.
  */
 @Module
 public class ConfigModule {

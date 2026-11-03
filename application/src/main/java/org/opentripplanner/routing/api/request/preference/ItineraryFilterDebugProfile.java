@@ -4,8 +4,8 @@ import org.opentripplanner.core.model.doc.DocumentedEnum;
 
 /**
  * This enum controls the number of itineraries returned with debug information - itineraries
- * deleted by the itinerary filter chain. When listing all itineraries, including the deleted
- * ones, the filter-chain sometimes return too many itineraries for practical usage.
+ * deleted by the itinerary filter chain. When listing all itineraries, including the deleted ones,
+ * the filter-chain sometimes return too many itineraries for practical usage.
  */
 public enum ItineraryFilterDebugProfile implements DocumentedEnum<ItineraryFilterDebugProfile> {
   OFF("By default, the debug itinerary filters is turned off."),
@@ -34,8 +34,8 @@ public enum ItineraryFilterDebugProfile implements DocumentedEnum<ItineraryFilte
   }
 
   /**
-   * This method is used to map to the new enum type from the old boolean type, still
-   * present in some APIs.
+   * This method is used to map to the new enum type from the old boolean type, still present in
+   * some APIs.
    */
   public static ItineraryFilterDebugProfile ofDebugEnabled(boolean enabled) {
     return enabled ? LIST_ALL : OFF;

@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.plan.Emission;
@@ -81,8 +81,8 @@ public class TaxiLeg implements Leg {
 
   /**
    * Taxi trips always consist of exactly one pickup stop and one drop-off stop (see
-   * {@link org.opentripplanner.ext.taxi.internal.graphbuilder.TaxiBuilder}), so these
-   * positions are fixed.
+   * {@link org.opentripplanner.ext.taxi.internal.graphbuilder.TaxiBuilder}), so these positions are
+   * fixed.
    */
   @Override
   public Integer boardStopPosInPattern() {
@@ -91,8 +91,8 @@ public class TaxiLeg implements Leg {
 
   /**
    * Taxi trips always consist of exactly one pickup stop and one drop-off stop (see
-   * {@link org.opentripplanner.ext.taxi.internal.graphbuilder.TaxiBuilder}), so these
-   * positions are fixed.
+   * {@link org.opentripplanner.ext.taxi.internal.graphbuilder.TaxiBuilder}), so these positions are
+   * fixed.
    */
   @Override
   public Integer alightStopPosInPattern() {

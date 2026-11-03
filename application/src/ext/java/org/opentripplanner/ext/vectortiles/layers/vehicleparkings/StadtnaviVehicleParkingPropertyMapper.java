@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.vectortiles.layers.vehicleparkings;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
@@ -11,6 +10,7 @@ import org.opentripplanner.inspector.vector.KeyValue;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingSpaces;
 import org.opentripplanner.street.model.openinghours.OsmOpeningHoursSupport;
+import tools.jackson.databind.ObjectMapper;
 
 public class StadtnaviVehicleParkingPropertyMapper extends PropertyMapper<VehicleParking> {
 

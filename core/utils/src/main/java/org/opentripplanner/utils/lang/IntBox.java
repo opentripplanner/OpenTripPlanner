@@ -1,9 +1,8 @@
 package org.opentripplanner.utils.lang;
 
 /**
- * An IntBox is a writable container for an int. The most common use-case for this class is to
- * be able to set an integer value inside a lambda callback where local variables is not
- * accessible.
+ * An IntBox is a writable container for an int. The most common use-case for this class is to be
+ * able to set an integer value inside a lambda callback where local variables is not accessible.
  */
 public final class IntBox {
 

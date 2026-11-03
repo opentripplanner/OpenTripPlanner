@@ -22,9 +22,9 @@ import org.opentripplanner.transit.model.site.StopLocation;
 /**
  * Map an Itinerary to a result instance. We do this to normalize the Itinerary for the purpose of
  * testing, and serialization of the results.
- * <p/>
- * This way we do not need to change the Itinerary class to fit our needs and we avoid the 'feature
- * envy' anti pattern.
+ * <p>
+ * This way we do not need to change the Itinerary class to fit our needs and we avoid the
+ * 'feature envy' anti pattern.
  */
 class ItineraryResultMapper {
 
@@ -100,10 +100,7 @@ class ItineraryResultMapper {
     return buf.toString();
   }
 
-  static Collection<Result> map(
-    final String testCaseId,
-    Collection<org.opentripplanner.model.plan.Itinerary> itineraries
-  ) {
+  static Collection<Result> map(final String testCaseId, Collection<Itinerary> itineraries) {
     var mapper = new ItineraryResultMapper(testCaseId);
     return itineraries.stream().map(mapper::map).collect(Collectors.toList());
   }

@@ -84,11 +84,11 @@ class StreetNearbyStopFinderMultipleLinksTest extends GraphRoutingTest {
    * Verify that the nearby stop is zero distance and corresponds to the expected vertex
    */
   void assertZeroDistanceStop(TransitStopVertex expected, NearbyStop nearbyStop) {
-    assertEquals(expected.getId(), nearbyStop.stopId);
-    assertEquals(0, nearbyStop.distance);
-    assertEquals(0, nearbyStop.edges.size());
-    assertEquals(expected, nearbyStop.state.getVertex());
-    assertNull(nearbyStop.state.getBackState());
+    assertEquals(expected.getId(), nearbyStop.stopId());
+    assertEquals(0, nearbyStop.distance());
+    assertEquals(0, nearbyStop.edges().size());
+    assertEquals(expected, nearbyStop.state().getVertex());
+    assertNull(nearbyStop.state().getBackState());
   }
 
   /**
@@ -99,10 +99,10 @@ class StreetNearbyStopFinderMultipleLinksTest extends GraphRoutingTest {
     double expectedDistance,
     NearbyStop nearbyStop
   ) {
-    assertEquals(expected.getId(), nearbyStop.stopId);
-    assertEquals(expectedDistance, nearbyStop.distance);
-    assertEquals(expected, nearbyStop.state.getVertex());
-    assertFalse(nearbyStop.edges.isEmpty());
-    assertNotNull(nearbyStop.state.getBackState());
+    assertEquals(expected.getId(), nearbyStop.stopId());
+    assertEquals(expectedDistance, nearbyStop.distance());
+    assertEquals(expected, nearbyStop.state().getVertex());
+    assertFalse(nearbyStop.edges().isEmpty());
+    assertNotNull(nearbyStop.state().getBackState());
   }
 }

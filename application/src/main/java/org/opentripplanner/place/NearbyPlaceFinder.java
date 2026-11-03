@@ -19,8 +19,7 @@ public interface NearbyPlaceFinder {
    * @param lat                        Origin latitude
    * @param lon                        Origin longitude
    * @param radiusMeters               Search radius from the origin in meters
-   * @param maxResults                 Maximum number of results to return within the search
-   *                                   radius.
+   * @param maxResults                 Maximum number of results to return within the search radius.
    * @param filterByModes              A list of TransitModes for which to find Stops and
    *                                   PatternAtStops. Use null to disable the filtering.
    * @param filterByPlaceTypes         A list of PlaceTypes to search for. Use null to disable the

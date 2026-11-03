@@ -39,8 +39,8 @@ import org.opentripplanner.raptor.configure.RaptorTestFactory;
  * stop of one of the trips in the path.
  *
  * It should be possible to specify more than one connection. The result should include the via
- * locations in the order as they were specified in the request. Only alternatives that pass
- * through all via locations should be included in the result.
+ * locations in the order as they were specified in the request. Only alternatives that pass through
+ * all via locations should be included in the result.
  *
  * To support stations and other collections of stops, Raptor should also support multiple via
  * connections in one via location.

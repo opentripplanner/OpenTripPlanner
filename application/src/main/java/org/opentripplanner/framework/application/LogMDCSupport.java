@@ -1,14 +1,14 @@
 package org.opentripplanner.framework.application;
 
 import java.util.Map;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.utils.lang.StringUtils;
 import org.slf4j.MDC;
 
 /**
- * This class is used to copy the log MDC(Mapped Diagnostic Context) from a parent thread to
- * its children. The slf4j Mapped Diagnostic Context uses the thread local to store
- * context properties like a correlation-id or http request trace information.
+ * This class is used to copy the log MDC(Mapped Diagnostic Context) from a parent thread to its
+ * children. The slf4j Mapped Diagnostic Context uses the thread local to store context properties
+ * like a correlation-id or http request trace information.
  */
 public class LogMDCSupport {
 

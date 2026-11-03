@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
@@ -43,11 +43,12 @@ class StopClusterMapper {
 
   /**
    * De-duplicates collections of {@link StopLocation} and {@link StopLocationsGroup} into a stream
-   * of {@link StopCluster}.
-   * Deduplication means
+   * of {@link StopCluster}. Deduplication means
+   * <pre>
    * - stop/station relationships are resolved and only the station returned
    * - of "identical" stops which are very close to each other and have an identical name, only one
    *   is chosen (at random)
+   * </pre>
    */
   Iterable<LuceneStopCluster> generateStopClusters(
     Collection<StopLocation> stopLocations,

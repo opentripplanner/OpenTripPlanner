@@ -8,9 +8,9 @@ import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTail
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * This class takes a list of transit legs and returns the best leg based on the {@link
- * org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilter} and
- * the earliest-boarding-time. The filter is used to pick the best leg from the legs which can be
+ * This class takes a list of transit legs and returns the best leg based on the
+ * {@link org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilter} and the
+ * earliest-boarding-time. The filter is used to pick the best leg from the legs which can be
  * boarded after the earliest-boarding-time.
  * <p>
  * HOW IT WORKS
@@ -22,8 +22,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * selected set is filtered, and are elements dropped. Dropped elements represent none optimal
  * paths.
  * <p>
- * Elements in the reminding set which can not be boarded is kept in the remaining set for the next
- * call to the {@link #next(int)} method.
+ * Elements in the reminding set which can not be boarded is kept in the remaining set for the
+ * next call to the {@link #next(int)} method.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */

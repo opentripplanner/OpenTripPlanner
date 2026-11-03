@@ -38,8 +38,8 @@ public interface TripSchedule extends DefaultTripSchedule {
 
   /**
    * Return the {@code headway} for a frequency based trip. {@code -999} is returned for "normal"
-   * scheduled trips, but you should not relay on this. Instead, use the {@link
-   * #isFrequencyBasedTrip()} method to determine the trip type.
+   * scheduled trips, but you should not relay on this. Instead, use the
+   * {@link #isFrequencyBasedTrip()} method to determine the trip type.
    */
   default int frequencyHeadwayInSeconds() {
     return -999;

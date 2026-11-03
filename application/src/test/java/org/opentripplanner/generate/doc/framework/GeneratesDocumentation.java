@@ -18,8 +18,8 @@ import org.junit.jupiter.api.condition.EnabledIf;
  * </pre>
  * <p>
  * Accessing files that are not on class-path is error prune and should be avoided. This
- * annotation will prevent the test from failing and only log a WARNING if the test is run
- * in a different environment.
+ * annotation will prevent the test from failing and only log a WARNING if the test is run in a
+ * different environment.
  * <p>
  * See {@link DocsTestConstants#docsExistOrWarn}
  */

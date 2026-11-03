@@ -6,7 +6,8 @@ import org.opentripplanner.raptor.spi.RaptorCostConverter;
  * This {@link FactorStrategy} keep a single value and use it every time the factor is needed. The
  * {@link #minFactor()} return the same value.
  * <p>
- * The class and methods are {@code final} to help the JIT compiler optimize the use of this class.
+ * The class and methods are {@code final} to help the JIT compiler optimize the use of this
+ * class.
  */
 final class SingleValueFactorStrategy implements FactorStrategy {
 

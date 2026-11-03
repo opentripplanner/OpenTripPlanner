@@ -68,8 +68,8 @@ public class PassThroughNoTransfersTest implements RaptorTestConstants {
    * <pre>
    * Origin ~ walk ~ B ~ Trip 1 ~ D ~ walk ~ Destination
    * </pre>
-   * Note! Stop A and E is not visited. Stop I is part of one transfer-point, but not part of the
-   * trip.
+   * Note! Stop A and E is not visited. Stop I is part of one transfer-point, but not part of
+   * the trip.
    */
   @ParameterizedTest
   @MethodSource("tripWithoutTransfersTestCases")

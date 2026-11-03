@@ -2,7 +2,6 @@ package org.opentripplanner.ext.fares.service.gtfs.v1.custom;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,6 +11,7 @@ import org.opentripplanner.ext.fares.model.FareRulesData;
 import org.opentripplanner.ext.fares.service.gtfs.v1.GtfsFareServiceFactory;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
+import tools.jackson.databind.JsonNode;
 
 /**
  * This fare service allows transfers between operators and, if the route transferred to is run by
@@ -19,10 +19,10 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
  * fare is used up until the end of the free transfer window. The length of the free transfer window
  * is configurable, but defaults to 2.5 hours.
  * <p>
- * Additionally, there is an option to treat interlined transfers as actual transfers (with respect
- * to fares). This means that interlining between two routes with different fares will result in the
- * higher fare being charged. This is a work-around for transit agencies that choose to code their
- * fares in a route-based fashion instead of a zone-based fashion.
+ * Additionally, there is an option to treat interlined transfers as actual transfers (with
+ * respect to fares). This means that interlining between two routes with different fares will
+ * result in the higher fare being charged. This is a work-around for transit agencies that choose
+ * to code their fares in a route-based fashion instead of a zone-based fashion.
  * <p>
  * This calculator is maintained by IBI Group.
  */

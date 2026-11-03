@@ -12,14 +12,14 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * Object deduplicator used to reduce memory footprint.
- * Deduplication is based on the hashcode/equals method of the target object. Some Java data
- * structures that do not have proper native equality (int[], ...) are wrapped.
+ * Object deduplicator used to reduce memory footprint. Deduplication is based on the
+ * hashcode/equals method of the target object. Some Java data structures that do not have proper
+ * native equality (int[], ...) are wrapped.
  * <p>
  * In older JVMs, this deduplicator used to be more efficient for deduplicating String than
  * String.intern() (not tested with recent JVMs).
@@ -69,8 +69,7 @@ public class Deduplicator implements DeduplicatorService, Serializable {
   }
 
   @Override
-  @Nullable
-  public int[] deduplicateIntArray(int[] original) {
+  public int @Nullable [] deduplicateIntArray(int[] original) {
     if (original == null) {
       return null;
     }
@@ -96,8 +95,7 @@ public class Deduplicator implements DeduplicatorService, Serializable {
   }
 
   @Override
-  @Nullable
-  public String[] deduplicateStringArray(String[] original) {
+  public String @Nullable [] deduplicateStringArray(String[] original) {
     if (original == null) {
       return null;
     }
@@ -111,8 +109,7 @@ public class Deduplicator implements DeduplicatorService, Serializable {
   }
 
   @Override
-  @Nullable
-  public String[][] deduplicateString2DArray(String[][] original) {
+  public String @Nullable [][] deduplicateString2DArray(String[][] original) {
     if (original == null) {
       return null;
     }
@@ -142,8 +139,7 @@ public class Deduplicator implements DeduplicatorService, Serializable {
   }
 
   @Override
-  @Nullable
-  public <T> T[] deduplicateObjectArray(Class<T> type, T[] original) {
+  public <T> T @Nullable [] deduplicateObjectArray(Class<T> type, T[] original) {
     if (original == null) {
       return null;
     }
@@ -287,8 +283,8 @@ public class Deduplicator implements DeduplicatorService, Serializable {
   }
 
   /**
-   * A wrapper around an arrays. Use {@code deepDeduplicateOf()} to deduplicate the elements
-   * as well.
+   * A wrapper around an arrays. Use {@code deepDeduplicateOf()} to deduplicate the elements as
+   * well.
    */
   private record ObjArray<T>(T[] array) implements Serializable {
     private static <E> ObjArray<E> deepDeduplicateOf(

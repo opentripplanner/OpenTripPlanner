@@ -36,6 +36,7 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.TemporaryVerticesContainer;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
@@ -53,13 +54,14 @@ class ScheduledDeviatedTripIntegrationTest {
 
   static Graph graph;
   static TransitRepository transitRepository;
+  static TimetableDataImport timetableDataImport;
   static TransferRepository transferRepository;
 
   float delta = 0.01f;
 
   @Test
   void parseCobbCountyAsScheduledDeviatedTrip() {
-    var flexTrips = transitRepository.getAllFlexTrips();
+    var flexTrips = timetableDataImport.getAllFlexTrips();
     assertFalse(flexTrips.isEmpty());
     assertEquals(72, flexTrips.size());
 
@@ -100,6 +102,7 @@ class ScheduledDeviatedTripIntegrationTest {
 
     var transitService = TestServerContext.createTransitService(
       transitRepository,
+      timetableDataImport,
       transferRepository
     );
 
@@ -147,6 +150,7 @@ class ScheduledDeviatedTripIntegrationTest {
 
     var transitService = TestServerContext.createTransitService(
       transitRepository,
+      timetableDataImport,
       transferRepository
     );
 
@@ -181,15 +185,15 @@ class ScheduledDeviatedTripIntegrationTest {
   /**
    * We add flex trips, that can potentially not have a departure and arrival time, to the trip.
    * <p>
-   * Normally these trip times are interpolated/repaired during the graph build but for flex this is
-   * exactly what we don't want. Here we check that the interpolation process is skipped.
+   * Normally these trip times are interpolated/repaired during the graph build but for flex this
+   * is exactly what we don't want. Here we check that the interpolation process is skipped.
    *
    * @see ValidateAndInterpolateStopTimesForEachTrip#interpolateStopTimes(List)
    */
   @Test
   void shouldNotInterpolateFlexTimes() {
     var feedId = transitRepository.getFeedIds().iterator().next();
-    var pattern = transitRepository.getTripPatternForId(new FeedScopedId(feedId, "090z:0:01"));
+    var pattern = timetableDataImport.getTripPatternForId(new FeedScopedId(feedId, "090z:0:01"));
 
     assertEquals(4, pattern.numberOfStops());
 
@@ -204,6 +208,7 @@ class ScheduledDeviatedTripIntegrationTest {
     TestOtpModel model = FlexIntegrationTestData.cobbFlexGtfs();
     graph = model.graph();
     transitRepository = model.transitRepository();
+    timetableDataImport = model.timetableDataImport();
     transferRepository = TransferServiceTestFactory.defaultTransferRepository();
   }
 
@@ -263,6 +268,6 @@ class ScheduledDeviatedTripIntegrationTest {
   private static FlexTrip<?, ?> getFlexTrip() {
     var feedId = transitRepository.getFeedIds().iterator().next();
     var tripId = new FeedScopedId(feedId, "a326c618-d42c-4bd1-9624-c314fbf8ecd8");
-    return transitRepository.getFlexTrip(tripId);
+    return timetableDataImport.getFlexTrip(tripId);
   }
 }

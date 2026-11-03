@@ -1,6 +1,6 @@
 package org.opentripplanner.model.plan.leg;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 

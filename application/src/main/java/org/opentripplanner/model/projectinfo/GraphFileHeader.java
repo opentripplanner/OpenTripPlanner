@@ -84,8 +84,8 @@ public class GraphFileHeader implements Serializable {
    * The OTP serialization version id. If OTP and a Graph.obj file have the same id, then OTP is
    * compatible with the graph and should be able to deserialize it.
    * <p>
-   * The returned id do NOT include the prefix '0's. In the serialized form as bytes it have a fixed
-   * length {@link #ID_LENGTH} and is padded with {@link #ID_PREFIX}.
+   * The returned id do NOT include the prefix '0's. In the serialized form as bytes it have a
+   * fixed length {@link #ID_LENGTH} and is padded with {@link #ID_PREFIX}.
    */
   public String otpSerializationVersionId() {
     return otpSerializationVersionId;
@@ -126,8 +126,8 @@ public class GraphFileHeader implements Serializable {
   }
 
   /**
-   * Pad the given text until it have the expected length {@link #ID_LENGTH} using the {@link
-   * #ID_PREFIX}.
+   * Pad the given text until it have the expected length {@link #ID_LENGTH} using the
+   * {@link #ID_PREFIX}.
    */
   static String padId(String text) {
     StringBuilder buf = new StringBuilder();
@@ -139,7 +139,7 @@ public class GraphFileHeader implements Serializable {
   }
 
   /**
-   * Strip of  any {@link #ID_PREFIX} characters form the beginning of the given text.
+   * Strip of any {@link #ID_PREFIX} characters form the beginning of the given text.
    */
   static String stripId(String text) {
     int pos = 0;
@@ -149,7 +149,7 @@ public class GraphFileHeader implements Serializable {
     return text.substring(pos);
   }
 
-  /** Example: 41 6C 66 61 2D 31  "Alfa-1" */
+  /** Example: 41 6C 66 61 2D 31 "Alfa-1" */
   static String prettyBytesToString(byte[] text) {
     if (text == null || text.length == 0) {
       return "[empty]";

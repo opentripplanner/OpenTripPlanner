@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.opentripplanner.framework.application.OtpFileNames.BUILD_CONFIG_FILENAME;
 import static org.opentripplanner.framework.application.OtpFileNames.ROUTER_CONFIG_FILENAME;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -17,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.standalone.config.framework.file.ConfigFileLoader;
 import org.opentripplanner.utils.lang.StringUtils;
+import tools.jackson.databind.JsonNode;
 
 public class OtpConfigLoaderTest {
 
@@ -105,7 +105,7 @@ public class OtpConfigLoaderTest {
     JsonNode node = ConfigFileLoader.nodeFromString(json, "test");
 
     // Then: verify that the JSON node have the expected value
-    String actualValue = node.path("key").asText(null);
+    String actualValue = node.path("key").asString(null);
 
     assertEquals(expectedValue, actualValue);
   }

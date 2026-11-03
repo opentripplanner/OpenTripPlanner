@@ -55,9 +55,8 @@ public class TableBuilder {
   }
 
   /**
-   * Return the width needed for each column. The which is calculated by taking
-   * the maximum of the {@code minWidth}, header width and the maximum width for all
-   * cells in the column.
+   * Return the width needed for each column. The which is calculated by taking the maximum of the
+   * {@code minWidth}, header width and the maximum width for all cells in the column.
    */
   List<Integer> calculateWidths() {
     var widths = new ArrayList<Integer>(numberOfColumns());
@@ -68,11 +67,11 @@ public class TableBuilder {
   }
 
   /**
-   * Set minimum width for each column. This is not necessary if all values are added to the
-   * table before printing it. But, if the table is used to format e.g. log lines and created
-   * before the logging start, then you can set the minimum column widths. If the header is wider
-   * the width of the header is used. If a cell is wider than the width used, then the cell is
-   * expanded to fit the content - the row will not match the header.
+   * Set minimum width for each column. This is not necessary if all values are added to the table
+   * before printing it. But, if the table is used to format e.g. log lines and created before the
+   * logging start, then you can set the minimum column widths. If the header is wider the width of
+   * the header is used. If a cell is wider than the width used, then the cell is expanded to fit
+   * the content - the row will not match the header.
    */
   public TableBuilder withMinWidths(int... widths) {
     return withMinWidths(IntStream.of(widths).boxed().toList());

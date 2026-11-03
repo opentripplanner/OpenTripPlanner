@@ -13,8 +13,8 @@ import org.opentripplanner.graph_builder.module.islandpruning.IslandPruningParam
 /**
  * A dead-end street network that is too small to stand on its own, but is reachable from the main
  * street network via a "no thru traffic" connector (e.g. `foot=destination`), is not removed.
- * Instead its own edges are converted to no-thru-traffic, so it remains reachable as a
- * destination without becoming a shortcut for through traffic.
+ * Instead its own edges are converted to no-thru-traffic, so it remains reachable as a destination
+ * without becoming a shortcut for through traffic.
  */
 class DeadEndBecomesNoThruTest {
 

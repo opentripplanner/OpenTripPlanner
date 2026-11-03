@@ -2,7 +2,7 @@ package org.opentripplanner.netex.mapping;
 
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.config.SwissProfile;

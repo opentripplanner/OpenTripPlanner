@@ -12,8 +12,8 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.graph.summary.GraphSummarizer;
 
 /**
- * Checks that a platform (area) connects correctly to a stairway entering from outside.
- * The stair rises from below and meets the bottom-left corner of a square platform.
+ * Checks that a platform (area) connects correctly to a stairway entering from outside. The stair
+ * rises from below and meets the bottom-left corner of a square platform.
  */
 class PlatformWithStairsTest {
 

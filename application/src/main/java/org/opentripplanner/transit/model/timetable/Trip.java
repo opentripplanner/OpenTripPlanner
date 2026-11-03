@@ -6,7 +6,7 @@ import static java.util.Objects.requireNonNullElse;
 import static org.opentripplanner.utils.lang.ObjectUtils.ifNotNull;
 
 import java.util.Objects;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.id.FeedScopedId;
@@ -23,15 +23,19 @@ import org.opentripplanner.utils.lang.StringUtils;
 /**
  * A Trip represents the movement of a public transport vehicle on a given {@link Route}, using a
  * given {@link TransitMode}, on a given sequence of stops served at given passing times.
- * <p>A scheduled Trip can run at most once per service date,
- * while a frequency-based Trip runs several times on a given service date.
- * <p>A Trip can run on multiple service dates.
- * <p>The service dates on which a trip is running are identified
- * by its service id and can be looked up with
- * {@link org.opentripplanner.model.calendar.CalendarService}.
- * <p>Trips that follow the same sequence of stops are grouped under a {@link org.opentripplanner.transit.model.network.TripPattern}
- * via a {@link Timetable}
- * <p>A Trip is equivalent to the TransModel concept of SERVICE JOURNEY.
+ * <p>
+ * A scheduled Trip can run at most once per service date, while a frequency-based Trip runs
+ * several times on a given service date.
+ * <p>
+ * A Trip can run on multiple service dates.
+ * <p>
+ * The service dates on which a trip is running are identified by its service id and can be
+ * looked up with {@link org.opentripplanner.model.calendar.CalendarService}.
+ * <p>
+ * Trips that follow the same sequence of stops are grouped under a
+ * {@link org.opentripplanner.transit.model.network.TripPattern} via a {@link Timetable}
+ * <p>
+ * A Trip is equivalent to the TransModel concept of SERVICE JOURNEY.
  */
 public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> implements LogInfo {
 
@@ -206,8 +210,8 @@ public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> impleme
   }
 
   /**
-   * Return human friendly name to identify the trip when mode, from/to stop and times are
-   * known. This method is meant for debug/logging, and should not be exposed in any API.
+   * Return human friendly name to identify the trip when mode, from/to stop and times are known.
+   * This method is meant for debug/logging, and should not be exposed in any API.
    */
   public String logName() {
     if (StringUtils.hasValue(shortName)) {

@@ -218,6 +218,7 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
    * Scan through the given list of stoptimes, interpolating the missing (unset) ones. This is
    * currently done by assuming equidistant stops and constant speed. While we may not be able to
    * improve the constant speed assumption, we can
+   * <p>
    * TODO: use route matching (or shape distance etc.) to improve inter-stop distances
    *
    * @param stopTimes the stoptimes (from a single trip) to be interpolated

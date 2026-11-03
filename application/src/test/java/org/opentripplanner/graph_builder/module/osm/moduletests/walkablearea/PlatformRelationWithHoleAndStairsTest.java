@@ -13,22 +13,25 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.graph.summary.GraphSummarizer;
 
 /**
- * Checks that a platform defined as a multipolygon relation (with an inner hole) connects
- * correctly when entries share a node with the platform boundary.
+ * Checks that a platform defined as a multipolygon relation (with an inner hole) connects correctly
+ * when entries share a node with the platform boundary.
  *
- * <p>The platform is a square "donut" roughly 100 m across (0.0009° ≈ 100 m at the equator): a
+ * <p>
+ * The platform is a square "donut" roughly 100 m across (0.0009° ≈ 100 m at the equator): a
  * large outer ring with a smaller square hole cut out of the middle. The inner ring's south side is
  * split with an intermediate node (innerS) where a stairway terminates.
  *
- * <p>A stairway from the south terminates at innerS on the inner hole boundary. Because innerS
- * lies on the inner hole boundary the donut polygon's strict contains() check fails, so innerS is
- * NOT a platformLinkingPoint. However, innerS is shared with the stair way, so
- * {@code isStartingNode} returns true, adding it to visibilityVertices.
+ * <p>
+ * A stairway from the south terminates at innerS on the inner hole boundary. Because innerS lies
+ * on the inner hole boundary the donut polygon's strict contains() check fails, so innerS is NOT a
+ * platformLinkingPoint. However, innerS is shared with the stair way, so {@code isStartingNode}
+ * returns true, adding it to visibilityVertices.
  *
- * <p>A pedestrian footway from the north terminates at {@code ped}, a node on the outer ring's
- * north side that is shared with the footway. Like innerS, ped becomes a startingNode, so it
- * enters visibilityVertices. The SPT from {ped, innerS} finds a path via ped↔innerTR visibility
- * edges, keeping them alive after pruning.
+ * <p>
+ * A pedestrian footway from the north terminates at {@code ped}, a node on the outer ring's
+ * north side that is shared with the footway. Like innerS, ped becomes a startingNode, so it enters
+ * visibilityVertices. The SPT from {ped, innerS} finds a path via ped↔innerTR visibility edges,
+ * keeping them alive after pruning.
  */
 class PlatformRelationWithHoleAndStairsTest {
 

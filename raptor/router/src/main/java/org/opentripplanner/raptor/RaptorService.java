@@ -2,7 +2,7 @@ package org.opentripplanner.raptor;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.api.response.RaptorResponse;
@@ -63,9 +63,9 @@ public class RaptorService<T extends RaptorTripSchedule> {
   }
 
   /**
-   * Find all transit options for the given request. The result should contain ALL options,
-   * not just the parato-optimal result return by the {@link #route(RaptorRequest, RaptorTransitDataProvider)}
-   * method.
+   * Find all transit options for the given request. The result should contain ALL options, not just
+   * the parato-optimal result return by the
+   * {@link #route(RaptorRequest, RaptorTransitDataProvider)} method.
    */
   public Collection<RaptorPath<T>> findAllDirectTransit(
     RaptorDirectTransitRequest request,
@@ -75,8 +75,10 @@ public class RaptorService<T extends RaptorTripSchedule> {
   }
 
   /**
+   * <pre>
    * TODO Add back the possibility to compare heuristics using a test - like the SpeedTest,
    *      but maybe better to make a separate test.
+   * </pre>
    */
   @SuppressWarnings("unused")
   public void compareHeuristics(

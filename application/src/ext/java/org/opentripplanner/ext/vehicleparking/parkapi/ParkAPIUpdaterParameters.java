@@ -10,8 +10,8 @@ import org.opentripplanner.updater.vehicle_parking.VehicleParkingSourceType;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters;
 
 /**
- * Class that extends {@link VehicleParkingUpdaterParameters} with parameters required by {@link
- * ParkAPIUpdater}.
+ * Class that extends {@link VehicleParkingUpdaterParameters} with parameters required by
+ * {@link ParkAPIUpdater}.
  */
 public record ParkAPIUpdaterParameters(
   String configRef,

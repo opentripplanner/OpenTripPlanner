@@ -218,9 +218,9 @@ class DirectTransferGeneratorCarTest extends GraphRoutingTest {
   }
 
   /**
-   * Testing Car Transfer Generation should be done with the street-graph and using the patterns
-   * for "tagging" stops with CAR_ALLOWED. Using "line-of-sight" street routing does not add much
-   * to this test. It is covered by the {@link DirectTransferGeneratorTest}.
+   * Testing Car Transfer Generation should be done with the street-graph and using the patterns for
+   * "tagging" stops with CAR_ALLOWED. Using "line-of-sight" street routing does not add much to
+   * this test. It is covered by the {@link DirectTransferGeneratorTest}.
    */
   private static DirectTransferGeneratorTestData testDataWithStreetFraphAndPatterns() {
     return DirectTransferGeneratorTestData.of().withPatterns().withStreetGraph();

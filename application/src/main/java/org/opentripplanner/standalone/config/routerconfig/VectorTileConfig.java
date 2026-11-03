@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource.LayerType;
 import org.opentripplanner.ext.vectortiles.layers.LayerFilters;
@@ -164,14 +164,16 @@ public class VectorTileConfig implements VectorTilesResource.LayersParameters<La
   }
 
   /**
-   * The lowest configured minZoom value of the requested layers or the fallback of {@link LayerParameters#MIN_ZOOM}
+   * The lowest configured minZoom value of the requested layers or the fallback of
+   * {@link LayerParameters#MIN_ZOOM}
    */
   public int minZoom(Set<String> requestedLayers) {
     return selectLayers(requestedLayers).mapToInt(LayerParameters::minZoom).min().orElse(MIN_ZOOM);
   }
 
   /**
-   * The highest configured maxZoom value of the requested layers or the fallback of {@link LayerParameters#MAX_ZOOM}
+   * The highest configured maxZoom value of the requested layers or the fallback of
+   * {@link LayerParameters#MAX_ZOOM}
    */
   public int maxZoom(Set<String> requestedLayers) {
     return selectLayers(requestedLayers).mapToInt(LayerParameters::maxZoom).max().orElse(MAX_ZOOM);

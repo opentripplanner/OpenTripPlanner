@@ -10,7 +10,8 @@ import org.opentripplanner.street.geometry.HashGridSpatialIndex;
 import org.opentripplanner.street.model.edge.StreetEdge;
 
 /**
- * Helper class for collecting {@link OsmWay}/{@link StreetEdge} pairs in a {@link HashGridSpatialIndex}.
+ * Helper class for collecting {@link OsmWay}/{@link StreetEdge} pairs in a
+ * {@link HashGridSpatialIndex}.
  */
 class StreetEdgeIndex {
 

@@ -20,8 +20,8 @@ import org.opentripplanner.updater.trip.siri.SiriEtBuilder;
 import org.opentripplanner.updater.trip.siri.SiriTestHelper;
 import uk.org.siri.siri21.EstimatedTimetableDeliveryStructure;
 
-/// This test adds an extra journey on a service date where the original pattern is not running.
-/// It correctly ends up in the API queries but the RAPTOR transit data drops it.
+/// This test adds an extra journey on a service date where the original pattern is not running. It
+/// correctly ends up in the API queries but the RAPTOR transit data drops it.
 @Disabled("Not supported right now but should be fixed")
 class ExtraJourneyOnServiceDateTest implements RealtimeTestConstants {
 

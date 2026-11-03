@@ -3,7 +3,7 @@ package org.opentripplanner.ext.carpooling.routing;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Objects;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.ext.carpooling.util.CarReachableVertexSnapper;
 import org.opentripplanner.ext.carpooling.util.StreetVertexUtils;
@@ -49,7 +49,9 @@ public class CarpoolTripVertexResolver {
     );
   }
 
-  /** Resolves every route point to a permanent vertex, or {@code null} if any cannot be resolved. */
+  /**
+   * Resolves every route point to a permanent vertex, or {@code null} if any cannot be resolved.
+   */
   @Nullable
   public CarpoolTripWithVertices resolve(CarpoolTrip trip) {
     try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {

@@ -2,16 +2,16 @@ package org.opentripplanner.ext.taxi.model;
 
 import java.io.Serializable;
 import java.util.Objects;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * A {@link Route} served by a taxi provider, with its service area geometry and booking
- * info. Equality is based on {@link #route} alone, assuming a one-to-one mapping between a
- * route and its {@code TaxiRoute} (enforced by the graph builder).
+ * A {@link Route} served by a taxi provider, with its service area geometry and booking info.
+ * Equality is based on {@link #route} alone, assuming a one-to-one mapping between a route and its
+ * {@code TaxiRoute} (enforced by the graph builder).
  */
 public final class TaxiRoute implements Serializable {
 

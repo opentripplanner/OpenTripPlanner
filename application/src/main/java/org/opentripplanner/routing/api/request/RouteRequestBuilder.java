@@ -8,7 +8,7 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.function.Consumer;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.paging.cursor.PageCursor;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
@@ -105,9 +105,10 @@ public class RouteRequestBuilder implements Serializable {
   }
 
   /**
-   * The dateTime will be set to a whole number of seconds. We don't do sub-second accuracy,
-   * and if we set the millisecond part to a non-zero value, rounding will not be guaranteed
-   * to be the same for departAt and arriveBy queries.
+   * The dateTime will be set to a whole number of seconds. We don't do sub-second accuracy, and if
+   * we set the millisecond part to a non-zero value, rounding will not be guaranteed to be the same
+   * for departAt and arriveBy queries.
+   *
    * @param dateTime Either a departAt time or an arriveBy time, one second's accuracy
    */
   public RouteRequestBuilder withDateTime(Instant dateTime) {

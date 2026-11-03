@@ -28,15 +28,15 @@ import org.slf4j.LoggerFactory;
  * Graph builder module that loads GBFS geofencing zones during graph build and applies them to
  * edges.
  * <p>
- * The networks to load are discovered from a GBFS v3 manifest: a dataset is loaded when the shared
- * {@code gbfs} configuration puts it in the {@link GeofencingZoneOtpPhase#GRAPH_BUILD} phase and its
- * feed actually publishes a {@code geofencing_zones} feed. Zones are applied per
- * network, so {@code requireDropOffInsideBusinessArea} takes effect for exactly the networks that
- * enable it.
+ * The networks to load are discovered from a GBFS v3 manifest: a dataset is loaded when the
+ * shared {@code gbfs} configuration puts it in the {@link GeofencingZoneOtpPhase#GRAPH_BUILD} phase
+ * and its feed actually publishes a {@code geofencing_zones} feed. Zones are applied per network,
+ * so {@code requireDropOffInsideBusinessArea} takes effect for exactly the networks that enable it.
  *
- * <p>The zones are recorded on the {@link Graph}, which carries them into the serialized graph.
- * The serve phase indexes them when it creates the vehicle rental repository; nothing indexes
- * them here, because nothing in the build reads them back.
+ * <p>
+ * The zones are recorded on the {@link Graph}, which carries them into the serialized graph. The
+ * serve phase indexes them when it creates the vehicle rental repository; nothing indexes them
+ * here, because nothing in the build reads them back.
  */
 public class VehicleRentalGeofencingGraphBuilder implements GraphBuilderModule {
 

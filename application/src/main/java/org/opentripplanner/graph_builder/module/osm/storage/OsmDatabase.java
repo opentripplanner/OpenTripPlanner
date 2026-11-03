@@ -91,11 +91,10 @@ public class OsmDatabase {
   private final TLongSet areaNodeIds = new TLongHashSet();
 
   /**
-   * Track which vertical levels OSM entities belong to.
-   * Level information can be set for ways, nodes and relations.
-   * An entity only has an entry if at least one level is defined in OSM.
-   * The ordering is important because it is used for building stairs and escalators.
-   * The level is also used e.g. for building elevators and connecting areas.
+   * Track which vertical levels OSM entities belong to. Level information can be set for ways,
+   * nodes and relations. An entity only has an entry if at least one level is defined in OSM. The
+   * ordering is important because it is used for building stairs and escalators. The level is also
+   * used e.g. for building elevators and connecting areas.
    */
   private final ArrayListMultimap<OsmEntity, OsmLevel> entityLevels = ArrayListMultimap.create();
 
@@ -128,8 +127,9 @@ public class OsmDatabase {
   }
 
   /**
-   * Returns just the coordinate of the given node. Cheaper than {@code getNode(nodeId).getCoordinate()}
-   * for call sites that don't need the node's tags or provider.
+   * Returns just the coordinate of the given node. Cheaper than
+   * {@code getNode(nodeId).getCoordinate()} for call sites that don't need the node's tags or
+   * provider.
    */
   public Coordinate getNodeCoordinate(long nodeId) {
     return nodes.getCoordinate(nodeId);
@@ -196,8 +196,8 @@ public class OsmDatabase {
   }
 
   /**
-   * @return If a single level is defined for an entity return that level,
-   * otherwise the default level is returned.
+   * @return If a single level is defined for an entity return that level, otherwise the default
+   *         level is returned.
    */
   public OsmLevel findSingleLevelForEntity(OsmEntity entity) {
     List<OsmLevel> levels = entityLevels.get(entity);
@@ -209,8 +209,8 @@ public class OsmDatabase {
   }
 
   /**
-   * @return All defined levels for an entity. If no levels are found a list with the default
-   * level is returned.
+   * @return All defined levels for an entity. If no levels are found a list with the default level
+   *         is returned.
    */
   public List<OsmLevel> getLevelsForEntity(OsmEntity entity) {
     if (entityLevels.containsKey(entity)) {
@@ -222,7 +222,7 @@ public class OsmDatabase {
 
   /**
    * @return A set of all defined levels for an entity. If no levels are found a set with the
-   * default level is returned.
+   *         default level is returned.
    */
   public Set<OsmLevel> getLevelSetForEntity(OsmEntity entity) {
     if (entityLevels.containsKey(entity)) {
@@ -644,10 +644,11 @@ public class OsmDatabase {
   /**
    * Process an OSM public transport stop area relation.
    * <p>
-   * This goes through all public_transport=stop_area relations and adds the parent (either an area
-   * or multipolygon relation) as the key and a Set of transit stop nodes that should be included in
-   * the parent area as the value into stopsInAreas. This improves {@link org.opentripplanner.graph_builder.module.OsmBoardingLocationsModule}
-   * by enabling us to have unconnected stop nodes within the areas by creating relations.
+   * This goes through all public_transport=stop_area relations and adds the parent (either an
+   * area or multipolygon relation) as the key and a Set of transit stop nodes that should be
+   * included in the parent area as the value into stopsInAreas. This improves
+   * {@link org.opentripplanner.graph_builder.module.OsmBoardingLocationsModule} by enabling us to
+   * have unconnected stop nodes within the areas by creating relations.
    *
    * @author hannesj
    * @see "http://wiki.openstreetmap.org/wiki/Tag:public_transport%3Dstop_area"

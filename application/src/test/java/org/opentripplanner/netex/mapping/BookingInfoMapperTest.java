@@ -78,9 +78,8 @@ class BookingInfoMapperTest {
   }
 
   /**
-   * When the contact details are set at the flexible line level, and bookWhen information is
-   * set at StopPoint level, the BookingInfo should contain both contact details and bookWhen
-   * information
+   * When the contact details are set at the flexible line level, and bookWhen information is set at
+   * StopPoint level, the BookingInfo should contain both contact details and bookWhen information
    */
   @Test
   void testBookingInfoMergingAndOverriding() {

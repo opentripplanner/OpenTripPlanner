@@ -20,9 +20,9 @@ import org.opentripplanner.gbfs.GbfsAutoConfiguration;
 import org.slf4j.LoggerFactory;
 
 /**
- * This tests that {@link GbfsFeedLoader} handles loading of different versions of GBFS
- * correctly, that the optional language parameter works correctly, and that the different files in
- * a GBFS bundle are all included, with all information in them.
+ * This tests that {@link GbfsFeedLoader} handles loading of different versions of GBFS correctly,
+ * that the optional language parameter works correctly, and that the different files in a GBFS
+ * bundle are all included, with all information in them.
  */
 class GbfsFeedLoaderTest {
 

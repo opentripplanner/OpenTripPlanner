@@ -453,9 +453,11 @@ public class OregonHopFareFactory extends GtfsFareServiceFactory {
   }
 
   /**
-   * Pulls out a desired fare product by ID from the fare leg rule table. Otherwise, generates a $0 fare as a null.
+   * Pulls out a desired fare product by ID from the fare leg rule table. Otherwise, generates a $0
+   * fare as a null.
+   *
    * @param fareProductId The fare product to find
-   * @return              The fare product from the GTFS, or a generated $0 fare product.
+   * @return The fare product from the GTFS, or a generated $0 fare product.
    */
   private Money findFareProduct(FeedScopedId fareProductId) {
     Optional<FareLegRule> potentialRuleMatch = this.fareLegRules
@@ -481,8 +483,8 @@ public class OregonHopFareFactory extends GtfsFareServiceFactory {
   }
 
   /**
-   * Generates fare products based on C-TRAN/TriMet data. Relies on 2 fares per rider category.
-   * To calculate the effective fare, the second fare is subtracted from the first.
+   * Generates fare products based on C-TRAN/TriMet data. Relies on 2 fares per rider category. To
+   * calculate the effective fare, the second fare is subtracted from the first.
    */
   private Collection<FareProduct> generateHopFareProducts(
     Money adultLarger,

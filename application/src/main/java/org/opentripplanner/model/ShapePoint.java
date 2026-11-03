@@ -2,7 +2,7 @@
 package org.opentripplanner.model;
 
 import java.util.Objects;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.utils.lang.DoubleUtils;
 import org.opentripplanner.utils.tostring.ValueObjectToStringBuilder;
@@ -36,7 +36,7 @@ public final class ShapePoint implements Comparable<ShapePoint> {
 
   /**
    * @return the distance traveled along the shape path. If no distance was specified, the value is
-   * undefined. Check first with {@link #isDistTraveledSet()}
+   *         undefined. Check first with {@link #isDistTraveledSet()}
    */
   public double distTraveled() {
     return distTraveled;

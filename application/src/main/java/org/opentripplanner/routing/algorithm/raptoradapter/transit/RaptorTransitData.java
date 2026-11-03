@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.transfercache.RaptorRequestTransferCache;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.transfer.constrained.ConstrainedTransferService;
@@ -19,9 +19,9 @@ import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.SiteRepository;
 
 /**
- * This is a replica of public transportation data already present in TransitRepository, but rearranged
- * and indexed differently for efficient use by the Raptor router. Patterns and trips are split out
- * by days, retaining only the services actually running on any particular day.
+ * This is a replica of public transportation data already present in TransitRepository, but
+ * rearranged and indexed differently for efficient use by the Raptor router. Patterns and trips are
+ * split out by days, retaining only the services actually running on any particular day.
  *
  */
 public class RaptorTransitData {
@@ -53,13 +53,12 @@ public class RaptorTransitData {
 
   private final TransferIndexGenerator transferIndexGenerator;
 
-  @Nullable
-  private final int[] stopBoardAlightTransferCosts;
+  private final int @Nullable [] stopBoardAlightTransferCosts;
 
   /**
-   * Makes a shallow copy of the RaptorTransitData, except for the tripPatternsForDate, where a shallow
-   * copy of the HashMap is made. This is sufficient, as the RealTimeRaptorTransitDataUpdater will replace entire
-   * keys and their values in the map.
+   * Makes a shallow copy of the RaptorTransitData, except for the tripPatternsForDate, where a
+   * shallow copy of the HashMap is made. This is sufficient, as the
+   * RealTimeRaptorTransitDataUpdater will replace entire keys and their values in the map.
    */
   public RaptorTransitData(RaptorTransitData raptorTransitData) {
     this(
@@ -82,7 +81,7 @@ public class RaptorTransitData {
     RaptorRequestTransferCache transferCache,
     ConstrainedTransfersForPatterns constrainedTransfers,
     TransferIndexGenerator transferIndexGenerator,
-    @Nullable int[] stopBoardAlightTransferCosts
+    int @Nullable [] stopBoardAlightTransferCosts
   ) {
     this.tripPatternsRunningOnDate = new HashMap<>(tripPatternsRunningOnDate);
     this.transfersByStopIndex = transfersByStopIndex;
@@ -100,8 +99,8 @@ public class RaptorTransitData {
   }
 
   /**
-   * Returns trip patterns for the given running date. Running date is not necessarily the same
-   * as the service date. A Trip "runs through" a date if any of its arrivals or departures is
+   * Returns trip patterns for the given running date. Running date is not necessarily the same as
+   * the service date. A Trip "runs through" a date if any of its arrivals or departures is
    * happening on that date. Trip pattern can have multiple running dates.
    */
   public Collection<TripPatternForDate> getTripPatternsForRunningDate(LocalDate date) {
@@ -167,8 +166,7 @@ public class RaptorTransitData {
    * Costs for both boarding and alighting at a given stop during transfer. Note that this is in
    * raptor centi-second units.
    */
-  @Nullable
-  public int[] getStopBoardAlightTransferCosts() {
+  public int @Nullable [] getStopBoardAlightTransferCosts() {
     return stopBoardAlightTransferCosts;
   }
 

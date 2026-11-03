@@ -1,10 +1,10 @@
 package org.opentripplanner.updater.spi;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
- * The result of a successful application of a realtime update, for example for trips or
- * vehicle positions. Its extra information is the provider of the update.
+ * The result of a successful application of a realtime update, for example for trips or vehicle
+ * positions. Its extra information is the provider of the update.
  */
 public record UpdateSuccess(@Nullable String producer) {
   /**

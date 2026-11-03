@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.model.filter.transit;
 
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.core.model.time.TimePeriod;
@@ -11,9 +11,9 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * Represents a single selection criterion for filtering
- * {@link org.opentripplanner.transit.model.timetable.TripOnServiceDate} objects.
- * Criteria within a single request are combined with AND logic: all specified criteria must
- * match for the request to match. Unset (null) criteria are ignored (match everything).
+ * {@link org.opentripplanner.transit.model.timetable.TripOnServiceDate} objects. Criteria within a
+ * single request are combined with AND logic: all specified criteria must match for the request to
+ * match. Unset (null) criteria are ignored (match everything).
  */
 public class TripOnServiceDateSelectRequest {
 

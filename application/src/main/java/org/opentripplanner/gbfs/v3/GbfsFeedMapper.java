@@ -2,13 +2,13 @@ package org.opentripplanner.gbfs.v3;
 
 import static java.util.stream.Collectors.toMap;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.mobilitydata.gbfs.v3_0.geofencing_zones.GBFSGeofencingZones;
 import org.mobilitydata.gbfs.v3_0.station_information.GBFSStationInformation;
 import org.mobilitydata.gbfs.v3_0.station_status.GBFSStation;
@@ -55,7 +55,7 @@ public class GbfsFeedMapper implements org.opentripplanner.gbfs.GbfsFeedMapper {
     // Get vehicle types
     final Map<String, RentalVehicleType> vehicleTypes = getVehicleTypes(system);
 
-    List<VehicleRentalPlace> stations = new LinkedList<>();
+    List<VehicleRentalPlace> stations = new ArrayList<>();
     if (params.allowStationRental()) {
       // Both station information and status are required for all systems using stations
       var stationInformation = loader.getFeed(GBFSStationInformation.class);

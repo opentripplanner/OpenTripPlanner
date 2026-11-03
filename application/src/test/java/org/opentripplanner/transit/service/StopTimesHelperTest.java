@@ -18,7 +18,9 @@ import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.api.request.CancellationPolicy;
 import org.opentripplanner.transit.api.request.TripTimeOnDateRequest;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 
 class StopTimesHelperTest {
 
@@ -34,12 +36,17 @@ class StopTimesHelperTest {
   public static void setUp() throws Exception {
     TestOtpModel model = ConstantsForTests.buildGtfsGraph(ConstantsForTests.SIMPLE_GTFS);
     TransitRepository transitRepository = model.transitRepository();
-    transitService = new DefaultTransitService(transitRepository);
+    TimetableDataImport timetableDataImport = model.timetableDataImport();
     feedId = transitRepository.getFeedIds().iterator().next();
     stopId = new FeedScopedId(feedId, "J");
-    var originalPattern = transitService.findPattern(
-      transitService.getTrip(new FeedScopedId(feedId, "5.1"))
-    );
+    var tripId = new FeedScopedId(feedId, "5.1");
+    // Converting freezes the timetable data import, so look the pattern up before converting
+    var originalPattern = timetableDataImport
+      .getAllTripPatterns()
+      .stream()
+      .filter(p -> p.scheduledTripsAsStream().anyMatch(t -> t.getId().equals(tripId)))
+      .findFirst()
+      .orElseThrow();
     var tt = originalPattern.getScheduledTimetable();
     var newTripTimes = tt.getTripTimes().getFirst().createRealTimeFromScheduledTimes();
     newTripTimes.withCanceled();
@@ -48,9 +55,12 @@ class StopTimesHelperTest {
       .withScheduledTimeTableBuilder(builder -> builder.addOrUpdateTripTimes(newTripTimes.build()))
       .build();
     // replace the original pattern by the updated pattern in the transit model
-    transitRepository.addTripPattern(pattern.getId(), pattern);
+    timetableDataImport.addTripPattern(pattern.getId(), pattern);
     transitRepository.index();
-    transitService = new DefaultTransitService(transitRepository);
+    transitService = new DefaultTransitService(
+      transitRepository,
+      DefaultTimetableRepository.scheduledOnly(timetableDataImport.toScheduledTimetableData())
+    );
     stopTimesHelper = new StopTimesHelper(transitService);
   }
 

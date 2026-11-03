@@ -7,7 +7,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.LocalTimeParser;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -573,7 +573,7 @@ public class SiriEtBuilder {
       return this;
     }
 
-    public EstimatedCallsBuilder withOccupancy(uk.org.siri.siri21.OccupancyEnumeration occupancy) {
+    public EstimatedCallsBuilder withOccupancy(OccupancyEnumeration occupancy) {
       var call = calls.getLast();
       call.setOccupancy(occupancy);
       return this;

@@ -35,8 +35,8 @@ public final class RiderCategory implements Serializable {
   }
 
   /**
-   * Returns true if this is the default category, for example "Adult" or "Regular". What is considered
-   * the default varies from location to location.
+   * Returns true if this is the default category, for example "Adult" or "Regular". What is
+   * considered the default varies from location to location.
    * <p>
    * The source of this (optional) information is the GTFS feeds (no inference).
    */

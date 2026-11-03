@@ -6,7 +6,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -18,8 +18,8 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
 public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>> {
 
   /**
-   * The position in pattern is initialized to a negative value. Negative valued are not allowed,
-   * so if not set by the caller the build() method will fail.
+   * The position in pattern is initialized to a negative value. Negative valued are not allowed, so
+   * if not set by the caller the build() method will fail.
    */
   private static final int POS_NOT_SET = -1;
 

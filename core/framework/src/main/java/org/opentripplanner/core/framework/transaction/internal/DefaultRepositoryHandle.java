@@ -5,9 +5,9 @@ import org.opentripplanner.core.model.transaction.TransactionScope;
 
 /**
  * Package-private implementation of {@link RepositoryHandle} that additionally exposes
- * {@link #repository()} for write access within the package. {@link DefaultWriteContext}
- * casts to this type to obtain the mutable repository without exposing write access on the
- * public {@link RepositoryHandle} API.
+ * {@link #repository()} for write access within the package. {@link DefaultWriteContext} casts to
+ * this type to obtain the mutable repository without exposing write access on the public
+ * {@link RepositoryHandle} API.
  */
 class DefaultRepositoryHandle<S, M> implements RepositoryHandle<S, M> {
 

@@ -22,16 +22,14 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 /**
  * This class turns a {@link TransitGroupSelect} into a matcher.
  * <p>
- * Design: It uses the composite design pattern. A matcher is created for each
- * value in the "select", then the list of non-empty matchers is merged into
- * a `CompositeMatcher`. So, a new matcher is only created if the field in the
- * select is present.
+ * Design: It uses the composite design pattern. A matcher is created for each value in the
+ * "select", then the list of non-empty matchers is merged into a `CompositeMatcher`. So, a new
+ * matcher is only created if the field in the select is present.
  * <p>
- * THE MATCHERS PRODUCED BY THIS CLASS ARE NOT THREAD-SAFE. The regex matcher
- * keeps a reusable {@link java.util.regex.Matcher} per pattern that is mutated
- * on each {@code match} call; concurrent invocation would corrupt its state.
- * The enclosing {@link TransitGroupPriorityService} is request-scoped and
- * single-threaded, which is what makes this safe.
+ * THE MATCHERS PRODUCED BY THIS CLASS ARE NOT THREAD-SAFE. The regex matcher keeps a reusable
+ * {@link java.util.regex.Matcher} per pattern that is mutated on each {@code match} call;
+ * concurrent invocation would corrupt its state. The enclosing {@link TransitGroupPriorityService}
+ * is request-scoped and single-threaded, which is what makes this safe.
  */
 final class Matchers {
 

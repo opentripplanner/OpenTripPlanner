@@ -52,8 +52,8 @@ class FuzzyTripMatchingTest implements RealtimeTestConstants {
   }
 
   /**
-   * Update calls without changing the pattern. Fuzzy matching.
-   * Edge case: invalid reference to vehicle journey and missing aimed departure time.
+   * Update calls without changing the pattern. Fuzzy matching. Edge case: invalid reference to
+   * vehicle journey and missing aimed departure time.
    */
   @Test
   void testUpdateJourneyWithFuzzyMatchingAndMissingAimedDepartureTime() {
@@ -80,9 +80,9 @@ class FuzzyTripMatchingTest implements RealtimeTestConstants {
   }
 
   /**
-   * Two RAIL trips with identical stops and times but different internalPlanningCodes.
-   * The SIRI update has a non-matching VehicleJourneyRef but includes a VehicleRef that
-   * corresponds to one trip's planning code. The matcher should disambiguate using VehicleRef.
+   * Two RAIL trips with identical stops and times but different internalPlanningCodes. The SIRI
+   * update has a non-matching VehicleJourneyRef but includes a VehicleRef that corresponds to one
+   * trip's planning code. The matcher should disambiguate using VehicleRef.
    */
   @Test
   void testFuzzyMatchByVehicleRefForRailTrip() {
@@ -129,8 +129,8 @@ class FuzzyTripMatchingTest implements RealtimeTestConstants {
   }
 
   /**
-   * The fuzzy matcher should still resolve the trip via VehicleRef → internalPlanningCode
-   * when only DatedVehicleJourneyRef is provided.
+   * The fuzzy matcher should still resolve the trip via VehicleRef → internalPlanningCode when only
+   * DatedVehicleJourneyRef is provided.
    */
   @Test
   void testFuzzyMatchByVehicleRefWithDatedVehicleJourneyRefOnly() {

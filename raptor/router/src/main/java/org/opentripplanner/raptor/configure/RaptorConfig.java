@@ -1,7 +1,7 @@
 package org.opentripplanner.raptor.configure;
 
 import java.util.concurrent.ExecutorService;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.raptor.api.request.RaptorEnvironment;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
@@ -27,7 +27,7 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * This class is responsible for creating a new search and holding application-scoped Raptor state.
- * <p/>
+ * <p>
  * This class should have APPLICATION scope. It keeps a reference to the environment and the
  * tuning parameters. The environment has a thread-pool, which should be APPLICATION scope.
  *

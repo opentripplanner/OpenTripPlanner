@@ -7,7 +7,7 @@ import static org.opentripplanner.model.plan.walkstep.RelativeDirection.FOLLOW_S
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.core.model.i18n.I18NString;
@@ -331,10 +331,12 @@ public class StatesToWalkStepsMapper {
   }
 
   /**
-   * Determines whether a set of three consecutive instances of {@link WalkStepBuilder} refer to the same street.
-   * The purposes of this check are (i) to give a separate instruction when crossing to the other side of the same street, if a crosswalk namer is iin use
-   * (an instruction can be given to cross at a particular location because others may not be accessible, practical, etc.),
-   * and (ii) to remove trivial turns when a given street briefly merges with another.
+   * Determines whether a set of three consecutive instances of {@link WalkStepBuilder} refer to the
+   * same street. The purposes of this check are (i) to give a separate instruction when crossing to
+   * the other side of the same street, if a crosswalk namer is iin use (an instruction can be given
+   * to cross at a particular location because others may not be accessible, practical, etc.), and
+   * (ii) to remove trivial turns when a given street briefly merges with another.
+   *
    * @return true if the walk steps refer to the same street, false otherwise.
    */
   public static boolean isOnSameStreet(
@@ -499,7 +501,7 @@ public class StatesToWalkStepsMapper {
   private boolean continueOnSameStreet(Edge edge, String streetNameNoParens) {
     return !(
       current.directionText().toString() != null &&
-      !java.util.Objects.equals(current.directionTextNoParens(), streetNameNoParens) &&
+      !Objects.equals(current.directionTextNoParens(), streetNameNoParens) &&
       (!current.nameIsDerived() || !edge.nameIsDerived())
     );
   }

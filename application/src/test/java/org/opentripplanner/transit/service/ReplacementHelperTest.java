@@ -100,6 +100,10 @@ public class ReplacementHelperTest implements RealtimeTestConstants {
     // fails because there is no synthetic TOSD for TRIP_1_ID
     // assertTrue(replacementHelper.replacementsExist(transitService.getTrip(id(TRIP_1_ID))));
 
+    // The first added trip is replaced by the second one, the second one is not replaced
+    assertTrue(replacementHelper.replacementsExist(transitService.getTrip(id(ADDED_TRIP_ID))));
+    assertFalse(replacementHelper.replacementsExist(transitService.getTrip(id(ADDED_TRIP_2_ID))));
+
     assertThat(
       StreamSupport.stream(
         replacementHelper.getReplacedBy(addedTripOnServiceDate).spliterator(),

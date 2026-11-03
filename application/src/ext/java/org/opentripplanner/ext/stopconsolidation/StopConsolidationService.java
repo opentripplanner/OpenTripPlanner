@@ -2,7 +2,7 @@ package org.opentripplanner.ext.stopconsolidation;
 
 import java.util.List;
 import java.util.Optional;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.stopconsolidation.model.StopReplacement;
 import org.opentripplanner.transit.model.organization.Agency;
@@ -15,8 +15,8 @@ public interface StopConsolidationService {
   List<StopReplacement> replacements();
 
   /**
-   * Returns the list of secondary stops that need to be replaced in TripPatterns with their
-   * primary equivalent.
+   * Returns the list of secondary stops that need to be replaced in TripPatterns with their primary
+   * equivalent.
    */
   List<FeedScopedId> secondaryStops();
 
@@ -36,7 +36,8 @@ public interface StopConsolidationService {
   boolean isActive();
 
   /**
-   * For a given primary stop look up secondary feed as it was originally defined in the agency's feed.
+   * For a given primary stop look up secondary feed as it was originally defined in the agency's
+   * feed.
    */
   StopLocation agencySpecificStop(StopLocation stop, Agency agency);
 

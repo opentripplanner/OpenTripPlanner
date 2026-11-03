@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- * This class encapsulate a simplified version of  Mave version number. It has logic to parse any
+ * This class encapsulate a simplified version of Mave version number. It has logic to parse any
  * version string that follow the Maven standard.
  */
 public class MavenProjectVersion implements Serializable {

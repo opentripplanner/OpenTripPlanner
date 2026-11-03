@@ -4,9 +4,9 @@ import static org.opentripplanner.utils.lang.DoubleUtils.doubleEquals;
 
 /**
  * Sets the (bicycle or scooter) triangle routing parameters -- the relative importance of safety,
- * flatness, and speed. These three fields _should_ have values between 0 and 1, and _should_ add up to
- * 1, these constraints are not enforced in this class, however, and any value is accepted. Instead,
- * the values are normalized in the domain layer.
+ * flatness, and speed. These three fields _should_ have values between 0 and 1, and _should_ add up
+ * to 1, these constraints are not enforced in this class, however, and any value is accepted.
+ * Instead, the values are normalized in the domain layer.
  * <p>
  * This class is currently only used with bicycle routing, but is not limited to that.
  * <p>

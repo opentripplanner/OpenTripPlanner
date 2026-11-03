@@ -2,7 +2,7 @@ package org.opentripplanner.gbfs.v3;
 
 import static org.opentripplanner.gbfs.v3.GbfsFeedMapper.optionalLocalizedString;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.mobilitydata.gbfs.v3_0.vehicle_types.GBFSName;
 import org.mobilitydata.gbfs.v3_0.vehicle_types.GBFSVehicleType;
 import org.opentripplanner.core.model.id.FeedScopedId;
@@ -27,11 +27,12 @@ class GbfsVehicleTypeMapper {
    * Maps a GBFS vehicle type to the OTP model, or returns {@code null} when it cannot be mapped and
    * should be ignored.
    * <p>
-   * {@code form_factor} and {@code propulsion_type} are required by the GBFS specification. When a
-   * feed omits one, or sends a value the GBFS model does not recognize, it is deserialized to
-   * {@code null}. Rather than guess a substitute we skip the vehicle type so that a single malformed
-   * entry does not abort the whole feed update. Downstream consumers already treat an unknown vehicle
-   * type id as either filtered out (stations) or the system default (free-floating vehicles).
+   * {@code form_factor} and {@code propulsion_type} are required by the GBFS specification. When
+   * a feed omits one, or sends a value the GBFS model does not recognize, it is deserialized to
+   * {@code null}. Rather than guess a substitute we skip the vehicle type so that a single
+   * malformed entry does not abort the whole feed update. Downstream consumers already treat an
+   * unknown vehicle type id as either filtered out (stations) or the system default (free-floating
+   * vehicles).
    */
   @Nullable
   public RentalVehicleType mapRentalVehicleType(GBFSVehicleType vehicleType) {

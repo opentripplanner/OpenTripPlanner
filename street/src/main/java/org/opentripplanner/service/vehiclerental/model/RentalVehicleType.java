@@ -4,16 +4,17 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * @see <a href="https://github.com/NABSA/gbfs/blob/master/gbfs.md#vehicle_typesjson-added-in-v21">GBFS
- * Specification</a>
- * <p>
+ * @see <a href=
+ *      "https://github.com/NABSA/gbfs/blob/master/gbfs.md#vehicle_typesjson-added-in-v21">GBFS
+ *      Specification</a>
+ *      <p>
  */
 public final class RentalVehicleType implements Serializable, Comparable<RentalVehicleType> {
 

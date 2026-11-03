@@ -1,6 +1,6 @@
 package org.opentripplanner.transfer.constrained.raptoradaptor;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
 import org.opentripplanner.transit.model.timetable.Trip;
 

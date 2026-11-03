@@ -2,7 +2,7 @@ package org.opentripplanner.model.plan.paging.cursor;
 
 import java.time.Duration;
 import java.time.Instant;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
@@ -14,8 +14,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * as base64 when passed on to the client. The base64 encoding is done to prevent the client from
  * using the information inside the cursor.
  * <p>
- * The PageCursor class is internal to the router, only the serialized string is passed to/from the
- * clients.
+ * The PageCursor class is internal to the router, only the serialized string is passed to/from
+ * the clients.
  * <p>
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE
  *

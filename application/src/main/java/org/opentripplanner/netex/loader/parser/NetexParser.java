@@ -9,8 +9,8 @@ import org.slf4j.Logger;
 /**
  * An abstract parser of given type T. Enforce two steps parsing:
  * <ol>
- *     <li>parse(...)</li>
- *     <li>setResultOnIndex(...)</li>
+ *   <li>parse(...)</li>
+ *   <li>setResultOnIndex(...)</li>
  * </ol>
  */
 @SuppressWarnings("SameParameterValue")
@@ -43,8 +43,8 @@ abstract class NetexParser<T> {
    * element should be relevant to OTP. OTP does not support NeTEx 100%, but elements in the Nordic
    * profile, see https://enturas.atlassian.net/wiki/spaces/PUBLIC/overview should be supported.
    * <p>
-   * If you see this warning and think the element should be mapped, please feel free to report an
-   * issue on GitHub.
+   * If you see this warning and think the element should be mapped, please feel free to report
+   * an issue on GitHub.
    */
   static void warnOnMissingMapping(Logger log, Object rel) {
     if (rel == null) {
@@ -80,8 +80,9 @@ abstract class NetexParser<T> {
   /**
    * Resolve the type name of the element for printing in the log.
    * <p>
-   * Generally this is just the Java class name, but JAXB sometimes wraps them in a JAXBElement which
-   * would log as "JAXBElement". In such a case, the class name of the wrapped object is returned.
+   * Generally this is just the Java class name, but JAXB sometimes wraps them in a JAXBElement
+   * which would log as "JAXBElement". In such a case, the class name of the wrapped object is
+   * returned.
    */
   private static String resolveXmlTypeName(Object rel) {
     if (rel instanceof JAXBElement<?> jaxb) {

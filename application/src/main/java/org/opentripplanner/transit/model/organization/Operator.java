@@ -3,7 +3,7 @@ package org.opentripplanner.transit.model.organization;
 import static org.opentripplanner.utils.lang.StringUtils.assertHasValue;
 
 import java.util.Objects;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.LogInfo;
@@ -11,7 +11,7 @@ import org.opentripplanner.transit.model.framework.LogInfo;
 /**
  * A company which is responsible for operating public transport services. The operator will often
  * operate under contract with an Authority (Agency).
- * <p/>
+ * <p>
  * Netex ONLY. Operators are available only if the data source is Netex, not GTFS.
  *
  * @see Agency

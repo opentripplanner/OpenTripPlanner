@@ -16,9 +16,9 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.site.AreaStop;
 
 /**
- * Converts a collection of {@link FlexTrip}s from a taxi provider feed into
- * {@link TaxiRoute} objects. Trips that do not satisfy the data requirements are skipped
- * and reported as {@link TaxiTripSkipped} data import issues.
+ * Converts a collection of {@link FlexTrip}s from a taxi provider feed into {@link TaxiRoute}
+ * objects. Trips that do not satisfy the data requirements are skipped and reported as
+ * {@link TaxiTripSkipped} data import issues.
  */
 public class TaxiBuilder {
 

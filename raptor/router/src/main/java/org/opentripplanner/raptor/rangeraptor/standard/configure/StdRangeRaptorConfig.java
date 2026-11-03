@@ -6,7 +6,7 @@ import static org.opentripplanner.raptor.rangeraptor.path.PathParetoSetComparato
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost;
@@ -124,7 +124,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
   }
 
   /**
-   *  Cache best times; request scope
+   * Cache best times; request scope
    */
   private BestTimes resolveBestTimes() {
     if (bestTimes == null) {

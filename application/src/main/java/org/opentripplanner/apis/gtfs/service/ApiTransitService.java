@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.apis.gtfs.model.StopCallOnTripOnServiceDate;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.time.LocalDateRange;
@@ -100,8 +100,8 @@ public class ApiTransitService {
    * whose trip's service date is within any of the given service date ranges are returned. If
    * {@code callTimePeriods} is non-null, only calls where the vehicle is scheduled to visit the
    * stop during one of the periods are returned. The {@code arrivalDeparture} parameter controls
-   * whether drop-off-only calls are included. Each call is paired with the {@link TripOnServiceDate}
-   * it belongs to, which is synthesized when no real one exists.
+   * whether drop-off-only calls are included. Each call is paired with the
+   * {@link TripOnServiceDate} it belongs to, which is synthesized when no real one exists.
    */
   public List<StopCallOnTripOnServiceDate> findCanceledStopCalls(
     StopLocation stop,
@@ -125,9 +125,9 @@ public class ApiTransitService {
   }
 
   /**
-   * Find the {@link TripOnServiceDate} for the given trip and service date. A real one (e.g. a NeTEx
-   * dated service journey or a real-time added trip) is preferred if it exists. Otherwise one is
-   * synthesized from the scheduled trip, but only if the trip actually runs on the given date.
+   * Find the {@link TripOnServiceDate} for the given trip and service date. A real one (e.g. a
+   * NeTEx dated service journey or a real-time added trip) is preferred if it exists. Otherwise one
+   * is synthesized from the scheduled trip, but only if the trip actually runs on the given date.
    */
   public Optional<TripOnServiceDate> findOrCreateTripOnServiceDate(
     FeedScopedId tripId,

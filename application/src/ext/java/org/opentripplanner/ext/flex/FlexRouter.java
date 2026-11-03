@@ -9,7 +9,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
@@ -216,8 +216,8 @@ public class FlexRouter {
   }
 
   /**
-   * This class work as an adaptor around OTP services. This allows us to pass in this instance
-   * and not the implementations (graph, transitService, flexIndex). We can easily mock this in
+   * This class work as an adaptor around OTP services. This allows us to pass in this instance and
+   * not the implementations (graph, transitService, flexIndex). We can easily mock this in
    * unit-tests. This also serves as documentation of which services the flex access/egress
    * generation logic needs.
    */

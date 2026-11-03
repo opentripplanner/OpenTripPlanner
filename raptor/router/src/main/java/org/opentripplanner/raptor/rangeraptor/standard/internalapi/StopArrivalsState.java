@@ -1,7 +1,7 @@
 package org.opentripplanner.raptor.rangeraptor.standard.internalapi;
 
 import java.util.Collection;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.view.TransitArrival;
@@ -13,12 +13,12 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  * This interface define a superset of operations to maintain the stop arrivals state, and for the
  * implementation to compute results. The Range Raptor algorithm do NOT depend on the state, only on
  * the {@link BestTimes} - with one exception the {@link #bestTimePreviousRound(int)}.
- * <p/>
+ * <p>
  * Different implementations may implement this to:
  * <ul>
- *     <li>Compute paths
- *     <li>Enable debugging
- *     <li>Compute heuristics
+ *   <li>Compute paths
+ *   <li>Enable debugging
+ *   <li>Compute heuristics
  * </ul>
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.

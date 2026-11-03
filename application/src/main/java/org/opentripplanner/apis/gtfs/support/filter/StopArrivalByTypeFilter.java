@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.model.plan.leg.StopArrival;
 import org.opentripplanner.transit.model.site.StopType;
@@ -25,9 +25,9 @@ public class StopArrivalByTypeFilter {
   }
 
   /**
-   * Filters a list of {@link StopArrival} objects based on allowed stop types.
-   * If the list of arrivals is null or no allowed stop types are configured, the
-   * original list of arrivals is returned.
+   * Filters a list of {@link StopArrival} objects based on allowed stop types. If the list of
+   * arrivals is null or no allowed stop types are configured, the original list of arrivals is
+   * returned.
    */
   public List<StopArrival> filter(@Nullable List<StopArrival> arrivals) {
     if (allowedTypes == null || arrivals == null) {

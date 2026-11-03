@@ -10,15 +10,16 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * Holds all on-board trip access arrivals for a single route, indexed by the stop position in the
- * route's stop pattern where the ride must be injected. This is not the same as the board
- * position. For example for a pass-through stop, the board position is where the route was
- * boarded, but the ride is not injected into the algorithm before the pass-through stop. This
- * prevents alighting the trip before the pass-through stop is visited.
+ * route's stop pattern where the ride must be injected. This is not the same as the board position.
+ * For example for a pass-through stop, the board position is where the route was boarded, but the
+ * ride is not injected into the algorithm before the pass-through stop. This prevents alighting the
+ * trip before the pass-through stop is visited.
  *
- * <p>An on-board trip access represents a passenger who is already on board a vehicle at the
- * start of the search — i.e., their "access leg" is the ride itself rather than a walk to a
- * stop. Each such arrival carries a {@code RaptorTripScheduleStopPosition}
- * that identifies exactly which route, trip, and stop position the passenger must board from.
+ * <p>
+ * An on-board trip access represents a passenger who is already on board a vehicle at the start
+ * of the search — i.e., their "access leg" is the ride itself rather than a walk to a stop. Each
+ * such arrival carries a {@code RaptorTripScheduleStopPosition} that identifies exactly which
+ * route, trip, and stop position the passenger must board from.
  */
 public final class OnTripAccessArrivals<T extends RaptorTripSchedule> {
 
@@ -38,9 +39,11 @@ public final class OnTripAccessArrivals<T extends RaptorTripSchedule> {
   /// Adds an on-board arrival, indexing it by its boarding stop position in the pattern.
   ///
   /// @param startRoutingAtStopPosition The stop position in trip pattern where the algorithm will
-  ///   inject the boarding. The boarding position can be any position BEFORE or equal to this. The
-  ///   effect is that the algorithm will not alight before the next stop after this. This is used
-  ///   to support pass-through where we do not want to alight before the pass-through stop.
+  ///                                   inject the boarding. The boarding position can be any
+  ///                                   position BEFORE or equal to this. The effect is that the
+  ///                                   algorithm will not alight before the next stop after this.
+  ///                                   This is used to support pass-through where we do not want to
+  ///                                   alight before the pass-through stop.
   public void add(
     ArrivalView<T> accessStopArrival,
     int startRoutingAtStopPosition,

@@ -8,7 +8,7 @@ import graphql.schema.DataFetchingEnvironment;
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.mapping.TransitModeMapper;
 import org.opentripplanner.apis.support.InvalidInputException;
@@ -100,7 +100,7 @@ public class ModePreferencesMapper {
   }
 
   private static ReplacementRequirement map(
-    @Nullable GraphQLTypes.GraphQLReplacementFilterInput input
+    GraphQLTypes.@Nullable GraphQLReplacementFilterInput input
   ) {
     if (input == null || input.getGraphQLRequirement() == null) {
       return ReplacementRequirement.IGNORED;
@@ -125,9 +125,9 @@ public class ModePreferencesMapper {
   }
 
   /**
-   * It may be a little surprising that the transit filters are mapped here. This
-   * is because the mapping function needs to know the modes to build the correct
-   * select request as it needs to be the first one in each transit filter request.
+   * It may be a little surprising that the transit filters are mapped here. This is because the
+   * mapping function needs to know the modes to build the correct select request as it needs to be
+   * the first one in each transit filter request.
    */
   private static void setTransitFilters(
     JourneyRequestBuilder journey,
@@ -153,8 +153,8 @@ public class ModePreferencesMapper {
   }
 
   /**
-   * return car rental duration, if it was set in graphql query.
-   * This method exist, to handle all the null checks.
+   * return car rental duration, if it was set in graphql query. This method exist, to handle all
+   * the null checks.
    */
   @Nullable
   private static Duration getRentalDurationByQueryArgs(

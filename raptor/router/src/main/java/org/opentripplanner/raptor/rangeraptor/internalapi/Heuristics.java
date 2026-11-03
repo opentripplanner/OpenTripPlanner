@@ -57,7 +57,8 @@ public interface Heuristics {
    * because there most likely exist journeys with a lower wait-time. The access is NOT time-shift
    * before computing this value.
    *
-   * <p>This would be suitable for calculating a search-time-window, because it gives an estimate
+   * <p>
+   * This would be suitable for calculating a search-time-window, because it gives an estimate
    * for the expected wait-time. In a low frequency transit area the wait-time might be much larger
    * than the {@link #bestOverallJourneyTravelDuration()}, and in these cases this gives a better
    * starting point for the search-time-window calculation.

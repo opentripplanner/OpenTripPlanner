@@ -2,7 +2,7 @@ package org.opentripplanner.updater.trip.siri.updater.google;
 
 import java.time.Duration;
 import java.util.Objects;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.updater.trip.UrlUpdaterParameters;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
@@ -46,6 +46,7 @@ public record SiriETGooglePubsubUpdaterParameters(
   }
 
   @Override
+  @Nullable
   public String url() {
     return dataInitializationUrl;
   }

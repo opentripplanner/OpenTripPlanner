@@ -20,8 +20,8 @@ import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 
 /**
  * Trip runs from 10:00+01:00 to 11:00+01:00. Slack constants used in the filter:
- * {@code W = DEFAULT_MAX_WALK_TIME = 15 min}, {@code T = MAX_TOTAL_TRAVEL_TIME = 24 h}.
- * The search window is {@code DEFAULT_SEARCH_WINDOW = 30 min}.
+ * {@code W = DEFAULT_MAX_WALK_TIME = 15 min}, {@code T = MAX_TOTAL_TRAVEL_TIME = 24 h}. The search
+ * window is {@code DEFAULT_SEARCH_WINDOW = 30 min}.
  * <p>
  * Coverage strategy: direct exercises the {@code W}-slack branches; access and egress have tests
  * only on the cells where they use the {@code T} fallback instead of {@code W} (the cells where

@@ -1,7 +1,8 @@
 package org.opentripplanner.place.placefinder;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static com.google.common.truth.Truth.assertThat;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,6 +26,7 @@ import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -126,7 +128,10 @@ class StreetNearbyPlaceFinderTest extends GraphRoutingTest {
       }
     );
 
-    transitService = new DefaultTransitService(otpModel.transitRepository());
+    transitService = new DefaultTransitService(
+      otpModel.transitRepository(),
+      DefaultTimetableRepository.scheduledOnly(otpModel.scheduledTimetableData())
+    );
     var vertexLinker = VertexLinkerTestFactory.of(otpModel.graph());
     var linkingContextFactory = new LinkingContextFactory(
       otpModel.graph(),
@@ -147,7 +152,7 @@ class StreetNearbyPlaceFinderTest extends GraphRoutingTest {
     var ps11 = new PlaceAtDistance(new PatternAtStop(stop(S1), TP1), 0);
     var ps21 = new PlaceAtDistance(new PatternAtStop(stop(S1), TP2), 0);
 
-    assertEquals(
+    assertPlaces(
       List.of(ns1, ps21, ps11, br1),
       nearbyPlaceFinder.findClosestPlaces(
         47.500,
@@ -165,7 +170,7 @@ class StreetNearbyPlaceFinderTest extends GraphRoutingTest {
       )
     );
 
-    assertEquals(
+    assertPlaces(
       List.of(ns1, ps21, ps11, br1, carParking, ns2, bikeParking, ns3, br2),
       nearbyPlaceFinder.findClosestPlaces(
         47.500,
@@ -189,7 +194,7 @@ class StreetNearbyPlaceFinderTest extends GraphRoutingTest {
       )
     );
 
-    assertEquals(
+    assertPlaces(
       List.of(ns1, ps21, ps11),
       nearbyPlaceFinder.findClosestPlaces(
         47.500,
@@ -214,7 +219,7 @@ class StreetNearbyPlaceFinderTest extends GraphRoutingTest {
     var ns2 = new PlaceAtDistance(stop(S2), 100);
     var ns3 = new PlaceAtDistance(stop(S3), 200);
 
-    assertEquals(
+    assertPlaces(
       List.of(ns1, ns2, ns3),
       nearbyPlaceFinder.findClosestPlaces(
         47.500,
@@ -232,7 +237,7 @@ class StreetNearbyPlaceFinderTest extends GraphRoutingTest {
       )
     );
 
-    assertEquals(
+    assertPlaces(
       List.of(ns1, ns2),
       nearbyPlaceFinder.findClosestPlaces(
         47.500,
@@ -258,7 +263,7 @@ class StreetNearbyPlaceFinderTest extends GraphRoutingTest {
     var ps11 = new PlaceAtDistance(new PatternAtStop(stop(S1), TP1), 0);
     var ps21 = new PlaceAtDistance(new PatternAtStop(stop(S1), TP2), 0);
 
-    assertEquals(
+    assertPlaces(
       List.of(ns1, ps21, ps11, ns2),
       nearbyPlaceFinder.findClosestPlaces(
         47.500,
@@ -276,7 +281,7 @@ class StreetNearbyPlaceFinderTest extends GraphRoutingTest {
       )
     );
 
-    assertEquals(
+    assertPlaces(
       List.of(ps21, ps11, ns2),
       nearbyPlaceFinder.findClosestPlaces(
         47.500,
@@ -302,7 +307,7 @@ class StreetNearbyPlaceFinderTest extends GraphRoutingTest {
     var ps11 = new PlaceAtDistance(new PatternAtStop(stop(S1), TP1), 0);
     var ps21 = new PlaceAtDistance(new PatternAtStop(stop(S1), TP2), 0);
 
-    assertEquals(
+    assertPlaces(
       List.of(ns1, ps21, ps11, ns2),
       nearbyPlaceFinder.findClosestPlaces(
         47.500,
@@ -320,7 +325,7 @@ class StreetNearbyPlaceFinderTest extends GraphRoutingTest {
       )
     );
 
-    assertEquals(
+    assertPlaces(
       List.of(ps11, ns2),
       nearbyPlaceFinder.findClosestPlaces(
         47.500,
@@ -347,7 +352,7 @@ class StreetNearbyPlaceFinderTest extends GraphRoutingTest {
     var ps11 = new PlaceAtDistance(new PatternAtStop(stop(S1), TP1), 0);
     var ps21 = new PlaceAtDistance(new PatternAtStop(stop(S1), TP2), 0);
 
-    assertEquals(
+    assertPlaces(
       List.of(ns1, ps21, ps11, ns2, ns3),
       nearbyPlaceFinder.findClosestPlaces(
         47.500,
@@ -365,7 +370,7 @@ class StreetNearbyPlaceFinderTest extends GraphRoutingTest {
       )
     );
 
-    assertEquals(
+    assertPlaces(
       List.of(ns1, ps21, ns2, ns3),
       nearbyPlaceFinder.findClosestPlaces(
         47.500,
@@ -389,7 +394,7 @@ class StreetNearbyPlaceFinderTest extends GraphRoutingTest {
     var br1 = new PlaceAtDistance(BR1.getStation(), 0);
     var br2 = new PlaceAtDistance(BR2.getStation(), 200);
 
-    assertEquals(
+    assertPlaces(
       List.of(br1, br2),
       nearbyPlaceFinder.findClosestPlaces(
         47.500,
@@ -407,7 +412,7 @@ class StreetNearbyPlaceFinderTest extends GraphRoutingTest {
       )
     );
 
-    assertEquals(
+    assertPlaces(
       List.of(br2),
       nearbyPlaceFinder.findClosestPlaces(
         47.500,
@@ -430,7 +435,7 @@ class StreetNearbyPlaceFinderTest extends GraphRoutingTest {
   void findClosestPlacesWithABikeParkFilter() {
     var bikeParking = new PlaceAtDistance(BP1, 200);
 
-    assertEquals(
+    assertPlaces(
       List.of(bikeParking),
       nearbyPlaceFinder.findClosestPlaces(
         47.500,
@@ -453,7 +458,7 @@ class StreetNearbyPlaceFinderTest extends GraphRoutingTest {
   void findClosestPlacesWithACarParkFilter() {
     var parkAndRides = List.of(new PlaceAtDistance(PR1, 100), new PlaceAtDistance(PR2, 300));
 
-    assertEquals(
+    assertPlaces(
       parkAndRides,
       nearbyPlaceFinder.findClosestPlaces(
         47.500,
@@ -474,5 +479,13 @@ class StreetNearbyPlaceFinderTest extends GraphRoutingTest {
 
   private StopLocation stop(TransitStopVertex v) {
     return Objects.requireNonNull(transitService.getRegularStop(v.getId()));
+  }
+
+  /**
+   * The places are sorted by distance, places at the same distance have no defined order.
+   */
+  private static void assertPlaces(List<PlaceAtDistance> expected, List<PlaceAtDistance> actual) {
+    assertThat(actual).containsExactlyElementsIn(expected);
+    assertThat(actual).isInOrder(Comparator.comparingDouble(PlaceAtDistance::distance));
   }
 }

@@ -4,17 +4,17 @@ import java.time.Duration;
 import java.util.BitSet;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.raptor.spi.RaptorStopNameResolver;
 import org.opentripplanner.raptor.util.paretoset.ParetoDominance;
 import org.opentripplanner.utils.lang.IntUtils;
 
 /**
- * Defines a via location which Raptor will force the path through. The concrete location is
- * called a connection. A location must have at least one connection, but can have more than
- * one alternative. Raptor will force the path through one of the connections. So, if there
- * are two connections, stop A and B, then Raptor will force the path through A or B. If the
- * path goes through A, it may or may not go through B.
+ * Defines a via location which Raptor will force the path through. The concrete location is called
+ * a connection. A location must have at least one connection, but can have more than one
+ * alternative. Raptor will force the path through one of the connections. So, if there are two
+ * connections, stop A and B, then Raptor will force the path through A or B. If the path goes
+ * through A, it may or may not go through B.
  */
 public final class RaptorViaLocation {
 

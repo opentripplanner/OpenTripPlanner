@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.network.StopPattern;
@@ -208,9 +208,8 @@ class ModifiedTripBuilder {
   }
 
   /**
-   * Applies real-time updates from the calls into newTimes.
-   * Precondition: the number of calls is equal to the number of stops in the pattern (this is
-   * verified before calling this method).
+   * Applies real-time updates from the calls into newTimes. Precondition: the number of calls is
+   * equal to the number of stops in the pattern (this is verified before calling this method).
    */
   private void applyUpdates(RealTimeTripTimesBuilder builder) {
     ZonedDateTime startOfService = ServiceDateUtils.asStartOfService(serviceDate, zoneId);
@@ -258,9 +257,8 @@ class ModifiedTripBuilder {
 
   /**
    * Creates a new StopPattern, based on an existing pattern, and list of calls. The stops can be
-   * replaced with stops belonging to the same Station/StopPlace. The PickDrop values are updated
-   * as well.
-   * Precondition: the number of calls is equal to the number of stops in the pattern (this is
+   * replaced with stops belonging to the same Station/StopPlace. The PickDrop values are updated as
+   * well. Precondition: the number of calls is equal to the number of stops in the pattern (this is
    * verified before calling this method).
    */
   static StopPattern createStopPattern(

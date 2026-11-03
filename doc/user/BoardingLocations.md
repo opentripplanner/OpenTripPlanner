@@ -58,7 +58,9 @@ therefore if you want to use it to match stops
 
 ```json
 {
-  "boardingLocationTags": ["ref", "ref:IFOPT"]
+  "boardingLocations": {
+    "refTags": ["ref", "ref:IFOPT"]
+  }
 }
 ```
 
@@ -71,6 +73,29 @@ possibilities:
   [this example](https://www.openstreetmap.org/way/27558650).
 - Use several ways tagged with `railway=platform_edge` as seen
   [here](https://www.openstreetmap.org/way/1420108957).
+
+## Where the stop ends up
+
+A matched stop has two candidate positions: the one in the OSM data and the one in the transit data.
+By default OTP uses the OSM one, so every stop matching a platform shares a single point at its
+centre. Walking between those stops is then free however far apart they really are, and every walk
+to or from the platform starts at that centre rather than at the stop.
+
+Set `coordinateSource` to `transit` to keep each stop where the transit data puts it, connected to
+the platform by a walk of the real distance:
+
+```json
+{
+  "boardingLocations": {
+    "refTags": ["ref", "ref:IFOPT"],
+    "coordinateSource": "transit"
+  }
+}
+```
+
+This is only worth doing where the stop coordinates in your transit data are at least as accurate as
+the OSM features. A stop more than 5 m from the feature it matches is reported as a data import
+issue, which is a good way to find out which of the two is misplaced.
 
 ## Related chat threads
 

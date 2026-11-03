@@ -1,6 +1,6 @@
 package org.opentripplanner.service.vehiclerental.street.geofencing;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
@@ -21,8 +21,11 @@ final class RestrictedZoneEnforcement implements GeofencingBoundaryEnforcement {
    * no-traversal zones since they can't legally drop mid-street.
    */
   @Override
-  @Nullable
-  public State[] forwardApproachingEntry(GeofencingZone zone, State state, EdgeTraversal edge) {
+  public State @Nullable [] forwardApproachingEntry(
+    GeofencingZone zone,
+    State state,
+    EdgeTraversal edge
+  ) {
     if (!state.isRentingVehicle()) {
       return null;
     }
@@ -43,17 +46,21 @@ final class RestrictedZoneEnforcement implements GeofencingBoundaryEnforcement {
   }
 
   /**
-   * ArriveBy search: a committed renting state was inside the zone (current edge crosses
-   * outward in forward time). For a no-traversal zone that's illegal — a rented vehicle
-   * couldn't legally have been there. Block.
+   * ArriveBy search: a committed renting state was inside the zone (current edge crosses outward in
+   * forward time). For a no-traversal zone that's illegal — a rented vehicle couldn't legally have
+   * been there. Block.
    *
-   * <p>Only committed (network-bound) states are checked here. HAVE_RENTED walkers are handled
-   * by {@link #arriveByAtBoundary}; generic (null-network) renting states by
+   * <p>
+   * Only committed (network-bound) states are checked here. HAVE_RENTED walkers are handled by
+   * {@link #arriveByAtBoundary}; generic (null-network) renting states by
    * {@link NetworkCommitmentHandler}.
    */
   @Override
-  @Nullable
-  public State[] arriveByCrossingExit(GeofencingZone zone, State state, EdgeTraversal edge) {
+  public State @Nullable [] arriveByCrossingExit(
+    GeofencingZone zone,
+    State state,
+    EdgeTraversal edge
+  ) {
     if (
       state.isRentingVehicle() &&
       state.getVehicleRentalNetwork() != null &&
@@ -65,14 +72,17 @@ final class RestrictedZoneEnforcement implements GeofencingBoundaryEnforcement {
   }
 
   /**
-   * ArriveBy search: a HAVE_RENTED walker is at a boundary they crossed in forward time
-   * (rider dropped outside the restricted zone then walked into it to reach a destination
-   * inside). Produce a walking continuation; renting branches are deferred to the next edge
-   * by {@link DeferredForkHandler}.
+   * ArriveBy search: a HAVE_RENTED walker is at a boundary they crossed in forward time (rider
+   * dropped outside the restricted zone then walked into it to reach a destination inside). Produce
+   * a walking continuation; renting branches are deferred to the next edge by
+   * {@link DeferredForkHandler}.
    */
   @Override
-  @Nullable
-  public State[] arriveByAtBoundary(GeofencingZone zone, State state, EdgeTraversal edge) {
+  public State @Nullable [] arriveByAtBoundary(
+    GeofencingZone zone,
+    State state,
+    EdgeTraversal edge
+  ) {
     if (state.getVehicleRentalState() != VehicleRentalState.HAVE_RENTED) {
       return null;
     }
@@ -84,10 +94,10 @@ final class RestrictedZoneEnforcement implements GeofencingBoundaryEnforcement {
   }
 
   /**
-   * Fork at a no-traversal zone entry: drop branch + ride branch. The ride branch keeps the
-   * renting option open so the search can route AROUND the zone; if it enters the zone it
-   * dies on the next edge in {@link TraversalBanHandler}. The drop is vetoed if the landing
-   * vertex is itself drop-banned (e.g. a no-drop-off boundary coinciding with this one).
+   * Fork at a no-traversal zone entry: drop branch + ride branch. The ride branch keeps the renting
+   * option open so the search can route AROUND the zone; if it enters the zone it dies on the next
+   * edge in {@link TraversalBanHandler}. The drop is vetoed if the landing vertex is itself
+   * drop-banned (e.g. a no-drop-off boundary coinciding with this one).
    */
   private State[] forwardEnteringNoTraversal(State state, EdgeTraversal edge) {
     if (state.isDropOffBannedByCurrentZones()) {
@@ -113,12 +123,11 @@ final class RestrictedZoneEnforcement implements GeofencingBoundaryEnforcement {
   }
 
   /**
-   * Fork at a no-drop-off zone entry: drop branch + ride branch. Returns {@code null} if drop
-   * is already banned (passes through). Post-traversal veto discards the drop branch if the
-   * edge itself crossed into a no-drop-off zone.
+   * Fork at a no-drop-off zone entry: drop branch + ride branch. Returns {@code null} if drop is
+   * already banned (passes through). Post-traversal veto discards the drop branch if the edge
+   * itself crossed into a no-drop-off zone.
    */
-  @Nullable
-  private State[] forwardEnteringNoDropOff(State state, EdgeTraversal edge) {
+  private State @Nullable [] forwardEnteringNoDropOff(State state, EdgeTraversal edge) {
     if (state.isDropOffBannedByCurrentZones()) {
       return null;
     }

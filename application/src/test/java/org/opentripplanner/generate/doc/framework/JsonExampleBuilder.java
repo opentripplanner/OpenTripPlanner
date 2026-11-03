@@ -1,16 +1,18 @@
 package org.opentripplanner.generate.doc.framework;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Objects;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
- * Helper class to build up JSON nodes that can be pretty-printed and inserted into the documentation.
+ * Helper class to build up JSON nodes that can be pretty-printed and inserted into the
+ * documentation.
  *
  */
 public class JsonExampleBuilder {
 
-  private static final ObjectMapper MAPPER = new ObjectMapper();
+  private static final ObjectMapper MAPPER = new JsonMapper();
   private JsonNode node;
 
   JsonExampleBuilder(JsonNode node) {
@@ -20,7 +22,7 @@ public class JsonExampleBuilder {
 
   public JsonExampleBuilder wrapInObject(String propName) {
     var obj = MAPPER.createObjectNode();
-    obj.put(propName, node);
+    obj.set(propName, node);
     node = obj;
     return this;
   }

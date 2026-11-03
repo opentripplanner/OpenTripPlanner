@@ -6,7 +6,7 @@ import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.regex.Pattern;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.utils.text.TextVariablesSubstitution;
 
@@ -17,7 +17,8 @@ import org.opentripplanner.utils.text.TextVariablesSubstitution;
  * The following OTP Project info is also available in addition to system environment variables:
  *
  * <ul>
- *   <li>{@code maven.version} - Full Maven version string, including the SNAPSHOT qualifier if present.</li>
+ *   <li>{@code maven.version} - Full Maven version string, including the SNAPSHOT qualifier if
+ *       present.</li>
  *   <li>{@code maven.version.short} - Maven version without the SNAPSHOT qualifier</li>
  *   <li>{@code maven.version.major} - Major version number</li>
  *   <li>{@code maven.version.minor} - Minor version number</li>
@@ -58,8 +59,8 @@ public class EnvironmentVariableReplacer {
    * Search for {@link #PATTERN}s and replace each placeholder with the value of the corresponding
    * environment variable.
    *
-   * @param source is used only to generate a human friendly error message in case the text
-   *               contains a placeholder which cannot be found.
+   * @param source is used only to generate a human friendly error message in case the text contains
+   *               a placeholder which cannot be found.
    * @throws IllegalArgumentException if a placeholder exists in the {@code text}, but the
    *                                  environment variable does not exist.
    */

@@ -2,10 +2,10 @@ package org.opentripplanner.graph_builder.module.configure;
 
 import dagger.BindsInstance;
 import dagger.Component;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Singleton;
 import java.time.ZoneId;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
 import org.opentripplanner.ext.dataoverlay.configure.DataOverlayParameterBindingsModule;
 import org.opentripplanner.ext.edgenaming.configure.EdgeNamerModule;
@@ -56,6 +56,7 @@ import org.opentripplanner.street.StreetRepository;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.transfer.regular.TransferRepository;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.service.TransitRepository;
 
 @Singleton
@@ -132,6 +133,9 @@ public interface GraphBuilderFactory {
 
     @BindsInstance
     Builder transitRepository(TransitRepository transitRepository);
+
+    @BindsInstance
+    Builder timetableDataImport(TimetableDataImport timetableDataImport);
 
     @BindsInstance
     Builder transferRepository(TransferRepository transferRepository);

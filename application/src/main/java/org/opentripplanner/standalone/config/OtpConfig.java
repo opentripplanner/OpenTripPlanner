@@ -38,20 +38,19 @@ public class OtpConfig {
   public final Map<OTPFeature, Boolean> otpFeatures;
 
   /**
-   * Per-network GBFS configuration shared by the vehicle rental graph builder (build phase) and
-   * the vehicle rental service directory (serve phase). It lives here because this is the only
-   * config file read in both phases.
+   * Per-network GBFS configuration shared by the vehicle rental graph builder (build phase) and the
+   * vehicle rental service directory (serve phase). It lives here because this is the only config
+   * file read in both phases.
    */
   public final GbfsNetworkOverrides gbfsNetworks;
 
   /**
    * The config-version is a parameter which each OTP deployment may set to be able to query the OTP
    * server and verify that it uses the correct version of the config. The version must be injected
-   * into the config in the operation deployment pipeline. How this is done is up to the
-   * deployment.
+   * into the config in the operation deployment pipeline. How this is done is up to the deployment.
    * <p>
-   * The config-version have no effect on OTP, and is provided as is on the API. There is not syntax
-   * or format check on the version and it can be any string.
+   * The config-version have no effect on OTP, and is provided as is on the API. There is not
+   * syntax or format check on the version and it can be any string.
    * <p>
    * This parameter is optional, and the default is {@code null}.
    */

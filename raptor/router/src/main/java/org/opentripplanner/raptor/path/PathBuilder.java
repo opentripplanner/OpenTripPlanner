@@ -2,7 +2,7 @@ package org.opentripplanner.raptor.path;
 
 import java.util.Objects;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.path.AccessPathLeg;
 import org.opentripplanner.raptor.api.path.PathStringBuilder;
@@ -24,23 +24,24 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  * <p>
  * The path builder enforces the same logic as Raptor and generates information like the
  * generalized-cost instead of getting it from the stop-arrivals. This is convenient if a path is
- * created OUTSIDE Raptor, which is the case in the {@link
- * org.opentripplanner.routing.algorithm.transferoptimization.OptimizeTransferService}.
+ * created OUTSIDE Raptor, which is the case in the
+ * {@link org.opentripplanner.routing.algorithm.transferoptimization.OptimizeTransferService}.
  * <p>
- * The path builder comes in two versions. One which adds new legs to the tail of the path, allowing
- * us to add legs starting with the access leg and ending with the egress leg. The other adds legs
- * in the opposite order, from egress to access. Hence, the forward and reverse mappers are
- * simplified using the head and tail builder respectively. See {@link #headPathBuilder(
- * RaptorSlackProvider, int, RaptorCostCalculator, RaptorStopNameResolver,
- * RaptorPathConstrainedTransferSearch)} and {@link #tailPathBuilder(RaptorSlackProvider, int,
- * RaptorCostCalculator, RaptorStopNameResolver, RaptorPathConstrainedTransferSearch)}.
+ * The path builder comes in two versions. One which adds new legs to the tail of the path,
+ * allowing us to add legs starting with the access leg and ending with the egress leg. The other
+ * adds legs in the opposite order, from egress to access. Hence, the forward and reverse mappers
+ * are simplified using the head and tail builder respectively. See
+ * {@link #headPathBuilder( RaptorSlackProvider, int, RaptorCostCalculator, RaptorStopNameResolver, RaptorPathConstrainedTransferSearch)}
+ * and
+ * {@link #tailPathBuilder(RaptorSlackProvider, int, RaptorCostCalculator, RaptorStopNameResolver, RaptorPathConstrainedTransferSearch)}.
  * <p>
  * The builder is also used for creating test data in unit test.
  * <p>
- * The {@code PathBuilder} can be extended to override specific things. The {@link
- * org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail} does this to
- * be able to create {@link org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedPath}
- * instead of regular {@link RaptorPath} objects.
+ * The {@code PathBuilder} can be extended to override specific things. The
+ * {@link org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail} does
+ * this to be able to create
+ * {@link org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedPath} instead of
+ * regular {@link RaptorPath} objects.
  */
 public abstract class PathBuilder<T extends RaptorTripSchedule> {
 

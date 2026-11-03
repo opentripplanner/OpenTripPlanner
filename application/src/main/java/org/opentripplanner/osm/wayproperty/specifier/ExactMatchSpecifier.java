@@ -9,11 +9,11 @@ import org.opentripplanner.osm.model.TraverseDirection;
  * This specifier allows you to specify a very precise match. It will only result in a positive when
  * _all_ key/value pairs match exactly.
  * <p>
- * It's useful when you want to have a long, very specific specifier that should only match a very
- * limited number of ways.
+ * It's useful when you want to have a long, very specific specifier that should only match a
+ * very limited number of ways.
  * <p>
- * If you'd use a {@link BestMatchSpecifier} then the likelihood of the long spec matching unwanted
- * ways would be high.
+ * If you'd use a {@link BestMatchSpecifier} then the likelihood of the long spec matching
+ * unwanted ways would be high.
  *
  * @see org.opentripplanner.osm.tagmapping.HoustonMapper
  */

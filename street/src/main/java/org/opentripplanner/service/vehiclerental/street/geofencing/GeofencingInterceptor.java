@@ -1,20 +1,19 @@
 package org.opentripplanner.service.vehiclerental.street.geofencing;
 
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.street.search.state.State;
 
 /**
  * Intercepts rental edge traversals to enforce geofencing zone restrictions. Called from
- * {@code StreetEdge.traverse()} — returns {@code State[]} to override the normal traversal,
- * or {@code null} to let it proceed.
+ * {@code StreetEdge.traverse()} — returns {@code State[]} to override the normal traversal, or
+ * {@code null} to let it proceed.
  */
 public class GeofencingInterceptor {
 
   private GeofencingInterceptor() {}
 
-  @Nullable
-  public static State[] apply(
+  public static State @Nullable [] apply(
     State s0,
     List<GeofencingBoundaryExtension> fromBoundaries,
     List<GeofencingBoundaryExtension> toBoundaries,
@@ -32,8 +31,7 @@ public class GeofencingInterceptor {
     }
   }
 
-  @Nullable
-  private static State[] evaluateForward(
+  private static State @Nullable [] evaluateForward(
     State s0,
     List<GeofencingBoundaryExtension> fromBoundaries,
     List<GeofencingBoundaryExtension> toBoundaries,
@@ -78,8 +76,7 @@ public class GeofencingInterceptor {
     return null;
   }
 
-  @Nullable
-  private static State[] evaluateArriveBy(
+  private static State @Nullable [] evaluateArriveBy(
     State s0,
     List<GeofencingBoundaryExtension> fromBoundaries,
     List<GeofencingBoundaryExtension> toBoundaries,

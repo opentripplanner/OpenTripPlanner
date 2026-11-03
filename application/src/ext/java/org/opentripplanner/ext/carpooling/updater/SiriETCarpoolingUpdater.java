@@ -5,7 +5,7 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
@@ -149,9 +149,9 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
   }
 
   /**
-   * Maps a journey to a carpool trip, resolves its route points, and upserts the result. Removes the
-   * trip instead when the journey is cancelled, has fewer than 2 non-cancelled calls, or fails to
-   * resolve.
+   * Maps a journey to a carpool trip, resolves its route points, and upserts the result. Removes
+   * the trip instead when the journey is cancelled, has fewer than 2 non-cancelled calls, or fails
+   * to resolve.
    */
   void processEstimatedVehicleJourney(EstimatedVehicleJourney estimatedVehicleJourney) {
     try {

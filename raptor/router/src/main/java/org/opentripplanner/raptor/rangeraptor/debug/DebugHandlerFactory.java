@@ -1,6 +1,6 @@
 package org.opentripplanner.raptor.rangeraptor.debug;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.raptor.api.debug.DebugLogger;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.request.DebugRequest;
@@ -16,8 +16,8 @@ import org.opentripplanner.raptor.util.paretoset.ParetoSetEventListener;
  * null} is returned. Use the {@link #isDebugStopArrival(int)} like methods before retrieving a
  * handler.
  * <p>
- * See the <b>package.md</b> for Debugging implementation notes in the raptor root package {@link
- * org.opentripplanner.transit}.
+ * See the <b>package.md</b> for Debugging implementation notes in the raptor root package
+ * {@link org.opentripplanner.transit}.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */

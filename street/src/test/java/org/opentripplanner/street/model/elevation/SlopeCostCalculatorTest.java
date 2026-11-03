@@ -88,9 +88,9 @@ class SlopeCostCalculatorTest {
   }
 
   /**
-   * Walking effective length is computed via Tobler's hiking function, which has its own
-   * cap. On a steep but genuine profile it must produce a penalty greater than on a flat
-   * profile of the same horizontal length.
+   * Walking effective length is computed via Tobler's hiking function, which has its own cap. On a
+   * steep but genuine profile it must produce a penalty greater than on a flat profile of the same
+   * horizontal length.
    */
   @Test
   void effectiveWalkFactorPenalisesGenuineSteepProfile() {
@@ -108,9 +108,8 @@ class SlopeCostCalculatorTest {
   }
 
   /**
-   * The {@code flattened} flag means "this segment was discarded as bad data". It must fire
-   * only above the 100% glitch threshold, not for genuinely steep terrain in the 35–100%
-   * band.
+   * The {@code flattened} flag means "this segment was discarded as bad data". It must fire only
+   * above the 100% glitch threshold, not for genuinely steep terrain in the 35–100% band.
    */
   @Test
   void flattenedFlagSetOnlyAbove100Percent() {

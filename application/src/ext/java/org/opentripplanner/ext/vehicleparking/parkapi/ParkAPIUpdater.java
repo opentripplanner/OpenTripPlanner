@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.vehicleparking.parkapi;
 
 import ch.poole.openinghoursparser.OpeningHoursParseException;
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -23,6 +22,7 @@ import org.opentripplanner.updater.spi.GenericJsonDataSource;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.JsonNode;
 
 /**
  * Vehicle parking updater class for https://github.com/offenesdresden/ParkAPI format APIs.
@@ -60,11 +60,11 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
 
     I18NString note = null;
     if (jsonNode.has("notes") && !jsonNode.get("notes").isEmpty()) {
-      var noteFieldIterator = jsonNode.path("notes").fields();
+      var noteFieldIterator = jsonNode.path("notes").properties().iterator();
       Map<String, String> noteLocalizations = new HashMap<>();
       while (noteFieldIterator.hasNext()) {
         var noteFiled = noteFieldIterator.next();
-        noteLocalizations.put(noteFiled.getKey(), noteFiled.getValue().asText());
+        noteLocalizations.put(noteFiled.getKey(), noteFiled.getValue().asString());
       }
       note = TranslatedString.getI18NString(noteLocalizations, false);
     }
@@ -76,12 +76,12 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
     VehicleParking.VehicleParkingEntranceCreator entrance = builder ->
       builder
         .entranceId(new FeedScopedId(feedId, vehicleParkId.getId() + "/entrance"))
-        .name(new NonLocalizedString(jsonNode.path("name").asText()))
+        .name(new NonLocalizedString(jsonNode.path("name").asString()))
         .coordinate(new WgsCoordinate(y, x))
         .walkAccessible(true)
         .carAccessible(true);
 
-    var stateText = jsonNode.get("state").asText();
+    var stateText = jsonNode.get("state").asString();
     var state = stateText.equals("closed")
       ? VehicleParkingState.CLOSED
       : VehicleParkingState.OPERATIONAL;
@@ -100,12 +100,12 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
 
     return VehicleParking.of()
       .id(vehicleParkId)
-      .name(new NonLocalizedString(jsonNode.path("name").asText()))
+      .name(new NonLocalizedString(jsonNode.path("name").asString()))
       .state(state)
       .coordinate(new WgsCoordinate(y, x))
       .openingHoursCalendar(parseOpeningHours(jsonNode.path("opening_hours"), vehicleParkId))
-      .detailsUrl(jsonNode.has("url") ? jsonNode.get("url").asText() : null)
-      .imageUrl(jsonNode.has("image_url") ? jsonNode.get("image_url").asText() : null)
+      .detailsUrl(jsonNode.has("url") ? jsonNode.get("url").asString() : null)
+      .imageUrl(jsonNode.has("image_url") ? jsonNode.get("image_url").asString() : null)
       .note(note)
       .capacity(capacity)
       .availability(availability)
@@ -155,12 +155,12 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
   }
 
   private OHCalendar parseOpeningHours(JsonNode jsonNode, FeedScopedId id) {
-    if (jsonNode == null || jsonNode.asText().isBlank()) {
+    if (jsonNode == null || jsonNode.asString().isBlank()) {
       return null;
     }
 
     try {
-      return osmOpeningHoursParser.parseOpeningHours(jsonNode.asText(), id.toString(), null);
+      return osmOpeningHoursParser.parseOpeningHours(jsonNode.asString(), id.toString(), null);
     } catch (OpeningHoursParseException e) {
       LOG.info("Parsing of opening hours failed for park {}, it is now always open:\n{}", id, e);
       return null;
@@ -177,7 +177,7 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
   private FeedScopedId createIdForNode(JsonNode jsonNode) {
     String id;
     if (jsonNode.has("id")) {
-      id = jsonNode.path("id").asText();
+      id = jsonNode.path("id").asString();
     } else {
       id = String.format(
         "%s/%f/%f",
@@ -193,7 +193,7 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
     var tagList = new ArrayList<String>();
     for (var tagName : tagNames) {
       if (node.has(tagName)) {
-        tagList.add(tagName + ":" + node.get(tagName).asText());
+        tagList.add(tagName + ":" + node.get(tagName).asString());
       }
     }
     return tagList;

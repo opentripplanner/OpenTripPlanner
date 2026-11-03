@@ -11,10 +11,10 @@ import org.opentripplanner.raptor.spi.SearchDirection;
 /**
  * This is a Request builder to help construct valid requests. Se the request classes for
  * documentation on each parameter.
- * <p/>
+ * <p>
  * <ul>
- *     <li>{@link RaptorRequest}
- *     <li>{@link DebugRequest}
+ *   <li>{@link RaptorRequest}
+ *   <li>{@link DebugRequest}
  * </ul>
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
@@ -130,11 +130,11 @@ public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
   }
 
   /**
-   * Generate a name to the RaptorRouting request that can be used in debugging, logging
-   * and/or performance monitoring.
+   * Generate a name to the RaptorRouting request that can be used in debugging, logging and/or
+   * performance monitoring.
    * <p>
-   * Note! The {@code profile}, {@code searchDirection}, {@code optimizations} is used to
-   * make a unique alias - so set them before calling this method, if not an exception is thrown.
+   * Note! The {@code profile}, {@code searchDirection}, {@code optimizations} is used to make a
+   * unique alias - so set them before calling this method, if not an exception is thrown.
    */
   public String generateAlias() {
     this.freezeAliasFields = true;

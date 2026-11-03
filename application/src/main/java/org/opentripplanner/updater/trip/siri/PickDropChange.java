@@ -15,10 +15,10 @@ import uk.org.siri.siri21.DepartureBoardingActivityEnumeration;
  * The pick/drop intent of a single call end (arrival or departure), captured from the SIRI data but
  * resolved to an OTP {@link PickDrop} only later, once the scheduled value is known.
  * <p>
- * This decouples the {@link CallWrapper} from the point where the scheduled pick/drop is available:
- * a caller can hold a {@code PickDropChange} and invoke {@link #applyTo(PickDrop)} whenever it has
- * the scheduled value, without keeping the wrapper (or any SIRI/JAXB type) in scope. The SIRI
- * enumerations are normalized away at construction, so this object carries no JAXB.
+ * This decouples the {@link CallWrapper} from the point where the scheduled pick/drop is
+ * available: a caller can hold a {@code PickDropChange} and invoke {@link #applyTo(PickDrop)}
+ * whenever it has the scheduled value, without keeping the wrapper (or any SIRI/JAXB type) in
+ * scope. The SIRI enumerations are normalized away at construction, so this object carries no JAXB.
  */
 public final class PickDropChange {
 

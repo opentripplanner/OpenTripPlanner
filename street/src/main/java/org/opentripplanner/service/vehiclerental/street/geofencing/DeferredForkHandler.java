@@ -3,29 +3,31 @@ package org.opentripplanner.service.vehiclerental.street.geofencing;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.street.mapping.StreetModeToRentalTraverseModeMapper;
+import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.VehicleRentalState;
 
 /**
- * Creates the deferred RENTING_FLOATING fork one edge after a zone boundary, so the renting
- * state's backEdge is safely outside the zone in the forward itinerary.
+ * Creates the deferred RENTING_FLOATING fork one edge after a zone boundary, so the renting state's
+ * backEdge is safely outside the zone in the forward itinerary.
  *
- * <p>Forking at the boundary itself would attach the drop event to an edge pointing into the
- * zone (the renting state's backEdge would be the boundary edge), so the rendered itinerary
- * would show the drop on the wrong side. Instead, the strategy returns only the walking branch
- * at the boundary; this handler creates the renting branches on the next edge, where the
- * backEdge is safely outside.
+ * <p>
+ * Forking at the boundary itself would attach the drop event to an edge pointing into the zone
+ * (the renting state's backEdge would be the boundary edge), so the rendered itinerary would show
+ * the drop on the wrong side. Instead, the strategy returns only the walking branch at the
+ * boundary; this handler creates the renting branches on the next edge, where the backEdge is
+ * safely outside.
  */
 class DeferredForkHandler {
 
   private DeferredForkHandler() {}
 
   /** If the previous edge deferred a renting fork, create the branches now. */
-  @Nullable
-  public static State[] applyDeferredFork(State s0, EdgeTraversal edge) {
+  public static State @Nullable [] applyDeferredFork(State s0, EdgeTraversal edge) {
     if (!isDeferredRentingForkTrigger(s0)) {
       return null;
     }
@@ -34,8 +36,8 @@ class DeferredForkHandler {
 
   /**
    * Trigger when a HAVE_RENTED walker just crossed a zone boundary the previous edge deferred:
-   * restricted-zone loss (walker exited in arriveBy) or BA gain (walker entered BA in arriveBy
-   * = exited in forward time).
+   * restricted-zone loss (walker exited in arriveBy) or BA gain (walker entered BA in arriveBy =
+   * exited in forward time).
    */
   private static boolean isDeferredRentingForkTrigger(State s0) {
     if (s0.getVehicleRentalState() != VehicleRentalState.HAVE_RENTED) {
@@ -71,7 +73,7 @@ class DeferredForkHandler {
     var request = s0.getRequest();
     var states = new ArrayList<State>();
 
-    var walking = edge.traverse(s0, org.opentripplanner.street.search.TraverseMode.WALK);
+    var walking = edge.traverse(s0, TraverseMode.WALK);
     if (walking != null) {
       var walkState = walking.makeState();
       if (walkState != null) {
@@ -160,10 +162,7 @@ class DeferredForkHandler {
     return forkNetworks;
   }
 
-  private static boolean isNetworkAllowedByRequest(
-    String network,
-    org.opentripplanner.street.search.request.StreetSearchRequest request
-  ) {
+  private static boolean isNetworkAllowedByRequest(String network, StreetSearchRequest request) {
     return NetworkCommitmentHandler.isNetworkAllowedByRequest(network, request);
   }
 }

@@ -1,8 +1,9 @@
 package org.opentripplanner.framework.graphql;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import graphql.ExecutionResult;
 import jakarta.ws.rs.core.StreamingOutput;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * This class is responsible for serializing a GraphQL {@link ExecutionResult} by streaming it
@@ -10,7 +11,7 @@ import jakarta.ws.rs.core.StreamingOutput;
  */
 public class GraphQLResponseSerializer {
 
-  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+  private static final ObjectMapper OBJECT_MAPPER = new JsonMapper();
 
   /**
    * Serialize the execution result as a {@link StreamingOutput} that writes JSON directly to the

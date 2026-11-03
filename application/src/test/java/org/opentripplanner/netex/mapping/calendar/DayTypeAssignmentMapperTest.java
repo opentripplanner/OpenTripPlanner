@@ -400,8 +400,8 @@ class DayTypeAssignmentMapperTest {
   }
 
   /**
-   * An explicitly stated NONE is not the same as an unstated day of week - it states that no day
-   * of the week applies.
+   * An explicitly stated NONE is not the same as an unstated day of week - it states that no day of
+   * the week applies.
    */
   @Test
   void periodWithExplicitNoneDayOfWeekHasNoDates() {

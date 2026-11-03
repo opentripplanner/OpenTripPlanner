@@ -33,8 +33,8 @@ class J08_PassThroughWithConstrainedTransferTest implements RaptorTestConstants 
   private final RaptorService<TestTripSchedule> raptorService = RaptorTestFactory.raptorService();
 
   /**
-   * Stay-seated pass-through: a feeder trip (R1) connects via a stay-seated transfer to a main
-   * trip (R2). The main trip passes through the via point C before reaching the destination D.
+   * Stay-seated pass-through: a feeder trip (R1) connects via a stay-seated transfer to a main trip
+   * (R2). The main trip passes through the via point C before reaching the destination D.
    */
   @Test
   void staySeatedTransferWithPassThrough() {

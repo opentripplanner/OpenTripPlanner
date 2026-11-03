@@ -246,13 +246,13 @@ public class EdgeVertexTileRenderer implements TileRenderer {
 
     /**
      * @param e The edge being rendered.
-     * @return  edge to render, or empty otherwise.
+     * @return edge to render, or empty otherwise.
      */
     Optional<EdgeVisualAttributes> renderEdge(Edge e);
 
     /**
      * @param v The vertex being rendered.
-     * @return  vertex to render, or empty otherwise.
+     * @return vertex to render, or empty otherwise.
      */
     Optional<VertexVisualAttributes> renderVertex(Vertex v);
 

@@ -28,8 +28,8 @@ import org.opentripplanner.netex.index.api.HMapValidationRule;
  * <b>Schwarzenegger</b> to <b>state</b> and <em>mayor</em> <b>Eastwood</b> to <b>City</b>.
  * <p>
  * We also add an <em>actor</em> for each level, but this time <b>Eastwood</b> is added to the
- * <b>country</b> level (clearly the best actor ;-). <b>Schwarzenegger</b> is
- * added to the <b>state</b> level, and <b>Reagan</b> to <b>City</b>.
+ * <b>country</b> level (clearly the best actor ;-). <b>Schwarzenegger</b> is added to the
+ * <b>state</b> level, and <b>Reagan</b> to <b>City</b>.
  * <pre>
  *            |                        R o l e                         |
  * Level      | President | Governor       | Mayor    | Actor          |
@@ -38,8 +38,8 @@ import org.opentripplanner.netex.index.api.HMapValidationRule;
  *  State     |           | Schwarzenegger |          | Schwarzenegger |
  *  City      |           |                | Eastwood | Reagan         |
  * </pre>
- * Now we use this test setup to test the {@link HierarchicalMap} and {@link
- * AbstractHierarchicalMap} class.
+ * Now we use this test setup to test the {@link HierarchicalMap} and
+ * {@link AbstractHierarchicalMap} class.
  */
 public class HierarchicalMapTest {
 

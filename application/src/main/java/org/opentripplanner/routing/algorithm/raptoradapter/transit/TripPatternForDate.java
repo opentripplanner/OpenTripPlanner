@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.model.timetable.FrequencyEntry;
 import org.opentripplanner.transit.model.timetable.TripTimes;
@@ -217,9 +217,8 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
 
   /**
    * Asserts that the running period is valid and throws an {@link IllegalArgumentException} if it
-   * is not.
-   * This validation is only needed for real-time updates and should not be applied to flex trips
-   * where it would fail.
+   * is not. This validation is only needed for real-time updates and should not be applied to flex
+   * trips where it would fail.
    */
   public void assertValidRunningPeriod() throws IllegalArgumentException {
     if (startOfRunningPeriod.isAfter(endOfRunningPeriod)) {

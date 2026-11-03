@@ -5,9 +5,9 @@ import java.util.Optional;
 import java.util.function.IntFunction;
 
 /**
- * An integer range is an ordered tuple of integers where the 'start' is less than or equal
- * to the 'end'. The responsibility of this class is to perform various mathematical
- * operation on an ordered range/tuple of integers.
+ * An integer range is an ordered tuple of integers where the 'start' is less than or equal to the
+ * 'end'. The responsibility of this class is to perform various mathematical operation on an
+ * ordered range/tuple of integers.
  */
 public class IntRange {
 
@@ -42,24 +42,24 @@ public class IntRange {
   }
 
   /**
-   * Add a constant value to both the start and end value of the range. This is the
-   * same as shifting/transforming the "range" up.
+   * Add a constant value to both the start and end value of the range. This is the same as
+   * shifting/transforming the "range" up.
    */
   public IntRange plus(int delta) {
     return new IntRange(startInclusive + delta, endInclusive + delta);
   }
 
   /**
-   * Subtract a constant value from both the start and end value of the range. This is the
-   * same as shifting/transforming the "range" down.
+   * Subtract a constant value from both the start and end value of the range. This is the same as
+   * shifting/transforming the "range" down.
    */
   public IntRange minus(int value) {
     return plus(-value);
   }
 
   /**
-   * Return the intersection between {@code this} and the {@code other} range. Two ranges
-   * intersect if at least one value is in both. If not, {@code empty} is returned.
+   * Return the intersection between {@code this} and the {@code other} range. Two ranges intersect
+   * if at least one value is in both. If not, {@code empty} is returned.
    */
   public Optional<IntRange> intersect(IntRange other) {
     int s = Math.max(startInclusive, other.startInclusive);

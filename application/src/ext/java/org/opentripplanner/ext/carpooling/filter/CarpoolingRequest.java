@@ -60,17 +60,17 @@ public class CarpoolingRequest {
   }
 
   /**
-   * Returns {@code true} if this is an access-egress request (the carpool leg connects to a
-   * transit stop), determined by the presence of {@code accessOrEgress}.
-   * Returns {@code false} for direct routing (origin to destination without transit).
+   * Returns {@code true} if this is an access-egress request (the carpool leg connects to a transit
+   * stop), determined by the presence of {@code accessOrEgress}. Returns {@code false} for direct
+   * routing (origin to destination without transit).
    */
   public boolean isAccessEgressRequest() {
     return accessOrEgress != null;
   }
 
   /**
-   * Returns {@code true} if this is an access leg (passenger origin to transit stop).
-   * Returns {@code false} for egress legs and for direct routing (where {@code accessOrEgress} is
+   * Returns {@code true} if this is an access leg (passenger origin to transit stop). Returns
+   * {@code false} for egress legs and for direct routing (where {@code accessOrEgress} is
    * {@code null}).
    */
   public boolean isAccessRequest() {
@@ -78,8 +78,8 @@ public class CarpoolingRequest {
   }
 
   /**
-   * Returns {@code true} if this is an egress leg (transit stop to passenger destination).
-   * Returns {@code false} for access legs and for direct routing (where {@code accessOrEgress} is
+   * Returns {@code true} if this is an egress leg (transit stop to passenger destination). Returns
+   * {@code false} for access legs and for direct routing (where {@code accessOrEgress} is
    * {@code null}).
    */
   public boolean isEgressRequest() {

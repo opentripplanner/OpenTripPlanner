@@ -1,25 +1,25 @@
 package org.opentripplanner.framework.json;
 
 import com.bedatadriven.jackson.datatype.jts.JtsModule;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.opentripplanner.street.geometry.GeometryUtils;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 public class ObjectMappers {
 
   /**
    * Returns a mapper that doesn't fail on unknown properties.
    */
-  public static ObjectMapper ignoringExtraFields() {
-    var mapper = new ObjectMapper();
-    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    return mapper;
+  public static JsonMapper ignoringExtraFields() {
+    return new JsonMapper();
   }
 
   /**
    * Returns a mapper that can serialize JTS geometries into GeoJSON.
    */
   public static ObjectMapper geoJson() {
-    return new ObjectMapper().registerModule(new JtsModule(GeometryUtils.getGeometryFactory()));
+    return JsonMapper.builder()
+      .addModule(new JtsModule(GeometryUtils.getGeometryFactory()))
+      .build();
   }
 }

@@ -3,7 +3,7 @@ package org.opentripplanner.raptor.rangeraptor.internalapi;
 /**
  * This interface serve as a debug handler for the Worker and State classes. They ues this interface
  * to report stop arrival events, pattern ride events and destination arrival events.
- * <p/>
+ * <p>
  * The implementation of this interface will take these events and report them back to the API
  * listeners, passed in as part of the debug request.
  *
@@ -18,15 +18,15 @@ public interface DebugHandler<T> {
   /**
    * Callback to notify that the given element is accepted into the given collection. For example
    * this happens when a new stop arrival is accepted at a particular stop.
-   * <p/>
-   * The handler will do the last check to see if this stop is in the request stop list or in debug
-   * request path.
+   * <p>
+   * The handler will do the last check to see if this stop is in the request stop list or in
+   * debug request path.
    */
   void accept(T element);
 
   /**
    * Callback to notify that the given element is rejected by the given collection.
-   * <p/>
+   * <p>
    * The same check as in {@link #accept(Object)} is performed before reporting back to the API
    * listeners.
    *
@@ -38,7 +38,7 @@ public interface DebugHandler<T> {
   /**
    * Callback to notify that the given element is dropped, because a new and even more shiny element
    * is found.
-   * <p/>
+   * <p>
    * The same check as in {@link #accept(Object)} is performed before reporting back to the API
    * listeners.
    */

@@ -1,5 +1,7 @@
 package org.opentripplanner.osm;
 
+import static org.opentripplanner.osm.model.NodeBuilder.node;
+
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,6 +17,7 @@ import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.osm.model.OsmWayBuilder;
 import org.opentripplanner.osm.tagmapping.OsmTagMapper;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 
 public class TestOsmProvider implements OsmProvider {
 
@@ -75,7 +78,12 @@ public class TestOsmProvider implements OsmProvider {
 
   public static class Builder {
 
+    /** How far either side of a node {@link #addWayThroughNode(OsmNode)} puts the way's ends. */
+    private static final double WAY_ARM_LENGTH_METERS = 30;
+
     private final AtomicLong counter = new AtomicLong();
+    /** Ids for nodes the builder makes up, high enough not to collide with caller-chosen ones. */
+    private final AtomicLong generatedNodeIds = new AtomicLong(1_000_000);
     private final List<OsmNode> nodes = new ArrayList<>();
     private final List<OsmWay> ways = new ArrayList<>();
     private final List<OsmRelation> relations = new ArrayList<>();
@@ -132,6 +140,20 @@ public class TestOsmProvider implements OsmProvider {
 
     public Builder addWayFromNodes(OsmNode... nodes) {
       return addWayFromNodes(counter.incrementAndGet(), Arrays.stream(nodes).toList());
+    }
+
+    /**
+     * Add a way running through {@code middle}, with a node {@link #WAY_ARM_LENGTH_METERS} to either
+     * side of it. A tagged node only becomes a vertex when a routable way uses it, so this is the
+     * smallest way that makes one linkable.
+     */
+    public Builder addWayThroughNode(OsmNode middle) {
+      var coordinate = new WgsCoordinate(middle.lat, middle.lon);
+      return addWayFromNodes(
+        node(generatedNodeIds.incrementAndGet(), coordinate.moveWestMeters(WAY_ARM_LENGTH_METERS)),
+        middle,
+        node(generatedNodeIds.incrementAndGet(), coordinate.moveEastMeters(WAY_ARM_LENGTH_METERS))
+      );
     }
 
     public Builder addWayFromNodes(long id, List<OsmNode> nodes) {

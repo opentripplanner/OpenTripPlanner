@@ -15,7 +15,9 @@
   },
   "distanceBetweenElevationSamples": 25,
   "multiThreadElevationCalculations": true,
-  "boardingLocationTags": [],
+  "boardingLocations": {
+    "refTags": []
+  },
   "transitModelTimeZone": "Europe/Oslo",
   "osmDefaults": {
     "osmTagMapping": "norway",

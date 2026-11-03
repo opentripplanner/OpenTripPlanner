@@ -55,9 +55,9 @@ class WalkerBoundaryHandlerTest {
   }
 
   /**
-   * An arrive-by HAVE_RENTED walker — represents the walker walking back from the destination
-   * to a pickup point. State is placed at v3 (the to-vertex of testEdge) so that editing
-   * testEdge traverses backward to v2, matching the arrive-by search direction.
+   * An arrive-by HAVE_RENTED walker — represents the walker walking back from the destination to a
+   * pickup point. State is placed at v3 (the to-vertex of testEdge) so that editing testEdge
+   * traverses backward to v2, matching the arrive-by search direction.
    */
   private State createArriveByHaveRentedWalker() {
     var req = StreetSearchRequest.of()

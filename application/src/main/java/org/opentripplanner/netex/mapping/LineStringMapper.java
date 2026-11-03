@@ -1,9 +1,9 @@
 package org.opentripplanner.netex.mapping;
 
 import gnu.trove.list.array.TDoubleArrayList;
-import javax.annotation.Nullable;
 import net.opengis.gml._3.DirectPositionType;
 import net.opengis.gml._3.LineStringType;
+import org.jspecify.annotations.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -68,9 +68,9 @@ class LineStringMapper {
   }
 
   /**
-   * NeTEx posList/pos coordinates are ordered (latitude, longitude), but JTS
-   * {@link Coordinate}s are always (x=longitude, y=latitude). Swap each pair in place so the
-   * resulting array can be fed directly into {@link GeometryUtils#makeLineString(double...)}.
+   * NeTEx posList/pos coordinates are ordered (latitude, longitude), but JTS {@link Coordinate}s
+   * are always (x=longitude, y=latitude). Swap each pair in place so the resulting array can be fed
+   * directly into {@link GeometryUtils#makeLineString(double...)}.
    */
   private static double[] swapLatLon(double[] coords) {
     for (int i = 0; i + 1 < coords.length; i += 2) {

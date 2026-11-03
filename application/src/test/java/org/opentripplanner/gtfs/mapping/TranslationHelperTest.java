@@ -93,14 +93,14 @@ public class TranslationHelperTest {
 
     for (Stop stop : stops) {
       I18NString nameTranslation = HELPER.getTranslation(
-        org.onebusaway.gtfs.model.Stop.class,
+        Stop.class,
         "name",
         stop.getId().getId(),
         stop.getName()
       );
 
       I18NString urlTranslation = HELPER.getTranslation(
-        org.onebusaway.gtfs.model.Stop.class,
+        Stop.class,
         "url",
         stop.getId().getId(),
         stop.getUrl()
@@ -148,14 +148,14 @@ public class TranslationHelperTest {
     feed.setPublisherUrl("http://feed-url");
 
     I18NString nameTranslation = HELPER.getTranslation(
-      org.onebusaway.gtfs.model.FeedInfo.class,
+      FeedInfo.class,
       "publisherName",
       feed.getId(),
       feed.getPublisherName()
     );
 
     I18NString urlTranslation = HELPER.getTranslation(
-      org.onebusaway.gtfs.model.FeedInfo.class,
+      FeedInfo.class,
       "publisherUrl",
       feed.getId(),
       feed.getPublisherUrl()
@@ -204,7 +204,7 @@ public class TranslationHelperTest {
       );
 
       I18NString headSignTranslation = HELPER.getTranslation(
-        org.onebusaway.gtfs.model.StopTime.class,
+        StopTime.class,
         "stopHeadsign",
         id,
         stopTime.getStopHeadsign()

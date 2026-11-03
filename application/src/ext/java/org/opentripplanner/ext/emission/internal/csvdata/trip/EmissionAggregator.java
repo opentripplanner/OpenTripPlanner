@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.emission.model.TripPatternEmission;
 import org.opentripplanner.framework.error.OtpError;
@@ -17,10 +17,10 @@ import org.opentripplanner.utils.lang.IntRange;
 
 /**
  * This class is responsible for merging duplicates by calculating the average. This can be
- * problematic, since the rows in the CSV file might not represent the same "volume" of
- * samples. For example if the feed contains samples for each day a trip runs, but the
- * the trip is crouded during weekdays and almost empty on weekends, then just adding the
- * days together and taking the average does not produce the average emission per passenger.
+ * problematic, since the rows in the CSV file might not represent the same "volume" of samples. For
+ * example if the feed contains samples for each day a trip runs, but the the trip is crouded during
+ * weekdays and almost empty on weekends, then just adding the days together and taking the average
+ * does not produce the average emission per passenger.
  */
 class EmissionAggregator {
 
@@ -145,8 +145,8 @@ class EmissionAggregator {
 
   /**
    * Perform semantic validation AFTER all data is added. Currently all semantic issues are
-   * warnings, not errors. The subclass is used to scope the semantic validation and make sure it
-   * is performed once.
+   * warnings, not errors. The subclass is used to scope the semantic validation and make sure it is
+   * performed once.
    */
   class SemanticValidation {
 

@@ -22,7 +22,7 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.apis.gtfs.GraphQLUtils;
@@ -297,11 +297,13 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
 
       TransitService transitService = getTransitService(environment);
 
-      return new GtfsRealtimeFuzzyTripMatcher(transitService).getTrip(
-        transitService.getRoute(FeedScopedId.parseStrict(args.getGraphQLRoute())),
+      var route = transitService.getRoute(FeedScopedId.parseStrict(args.getGraphQLRoute()));
+      var date = ServiceDateUtils.parseString(args.getGraphQLDate());
+      return GtfsRealtimeFuzzyTripMatcher.findTrip(
+        transitService.findPatterns(route),
+        transitService.getServiceCodesRunningForDate(date),
         DIRECTION_MAPPER.map(args.getGraphQLDirection()),
-        args.getGraphQLTime(),
-        ServiceDateUtils.parseString(args.getGraphQLDate())
+        args.getGraphQLTime()
       );
     };
   }

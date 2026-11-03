@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.opentripplanner</groupId>
+        <artifactId>otp</artifactId>
+        <version>2.11.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>container</artifactId>
+    <name>OpenTripPlanner - Container Image</name>
+
+    <properties>
+        <!-- The container image is only built in CI, which passes -Djib.skip=false -->
+        <jib.skip>true</jib.skip>
+    </properties>
+
+    <dependencies>
+        <!-- project dependencies -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>application</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>3.5.2</version>
+                <executions>
+                    <execution>
+                        <id>build-container-image</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <container>
+                        <mainClass>org.opentripplanner.standalone.OTPMain</mainClass>
+                        <entrypoint>/docker-entrypoint.sh</entrypoint>
+                        <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
+                        <volumes>
+                            <volume>
+                                /var/opentripplanner/
+                            </volume>
+                        </volumes>
+                        <ports>
+                            <port>8080</port>
+                            <port>8081</port>
+                        </ports>
+                    </container>
+                    <from>
+                        <image>eclipse-temurin:25-jre</image>
+                        <platforms>
+                            <platform>
+                                <architecture>amd64</architecture>
+                                <os>linux</os>
+                            </platform>
+                            <platform>
+                                <architecture>arm64</architecture>
+                                <os>linux</os>
+                            </platform>
+                        </platforms>
+                    </from>
+                    <to>
+                        <image>${env.CONTAINER_REPO}</image>
+                        <auth>
+                            <username>${env.CONTAINER_REGISTRY_USER}</username>
+                            <password>${env.CONTAINER_REGISTRY_PASSWORD}</password>
+                        </auth>
+                    </to>
+                    <extraDirectories>
+                        <permissions>
+                            <permission>
+                                <file>/docker-entrypoint.sh</file>
+                                <mode>755</mode>
+                            </permission>
+                            <permission>
+                                <file>/var/opentripplanner/</file>
+                                <mode>755</mode>
+                            </permission>
+                        </permissions>
+                    </extraDirectories>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

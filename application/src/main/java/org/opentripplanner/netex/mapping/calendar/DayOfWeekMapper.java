@@ -33,11 +33,11 @@ class DayOfWeekMapper {
   /**
    * Maps given {@code value} into a set of Java DayOfWeek.
    * <ul>
-   * <li>MONDAY to SUNDAY is mapped to a Set with one element
-   * <li>NONE is mapped to an empty set
-   * <li>WEEKDAYS is mapped to a set of MONDAY..FRIDAY
-   * <li>WEEKEND is mapped to a set of SATURDAY..SUNDAY
-   * <li>EVERYDAY is mapped to a set of MONDAY..SUNDAY
+   *   <li>MONDAY to SUNDAY is mapped to a Set with one element
+   *   <li>NONE is mapped to an empty set
+   *   <li>WEEKDAYS is mapped to a set of MONDAY..FRIDAY
+   *   <li>WEEKEND is mapped to a set of SATURDAY..SUNDAY
+   *   <li>EVERYDAY is mapped to a set of MONDAY..SUNDAY
    * </ul>
    */
   static Set<DayOfWeek> mapDayOfWeek(DayOfWeekEnumeration value) {

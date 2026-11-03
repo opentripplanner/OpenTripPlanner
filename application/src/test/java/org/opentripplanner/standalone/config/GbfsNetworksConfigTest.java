@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.standalone.config.framework.json.JsonSupport.newNodeAdapterForTest;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.gbfs.network.GbfsNetworkOverrides;
 import org.opentripplanner.gbfs.network.GeofencingZoneOtpPhase;
 
 class GbfsNetworksConfigTest {
@@ -153,7 +154,7 @@ class GbfsNetworksConfigTest {
     );
   }
 
-  private static org.opentripplanner.gbfs.network.GbfsNetworkOverrides map(String json) {
+  private static GbfsNetworkOverrides map(String json) {
     return GbfsNetworksConfig.map("gbfs", newNodeAdapterForTest(json));
   }
 }

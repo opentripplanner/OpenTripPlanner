@@ -80,8 +80,8 @@ class CarpoolTripVertexResolverTest extends GraphRoutingTest {
   }
 
   /**
-   * A route point whose own linking offers no car-reachable vertex falls back to the walk search and
-   * relocates onto the drivable network. Both ends of a one-way corridor are car-permitting but
+   * A route point whose own linking offers no car-reachable vertex falls back to the walk search
+   * and relocates onto the drivable network. Both ends of a one-way corridor are car-permitting but
    * neither can be both arrived at and departed from, so both points walk ~56 m to M, the only
    * vertex that can. Graph (one-way car forward, reverse pedestrian):
    * <pre>

@@ -29,8 +29,8 @@ import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.search.TraverseModeSet;
 
 /**
- * Tests that split vertices on boundary-crossing edges get spatially correct
- * geofencing boundary extensions instead of blind-copied ones from parent vertices.
+ * Tests that split vertices on boundary-crossing edges get spatially correct geofencing boundary
+ * extensions instead of blind-copied ones from parent vertices.
  */
 class VertexLinkerGeofencingTest {
 
@@ -85,10 +85,10 @@ class VertexLinkerGeofencingTest {
   }
 
   /**
-   * When a split vertex is created inside a zone on a boundary-crossing edge, the parent
-   * edge's fromVertex must NOT get a boundary extension added. Only the split vertex itself
-   * should receive a boundary — fromVertex may be an interior vertex with no boundary crossings,
-   * and adding one would break zone tracking during traversal.
+   * When a split vertex is created inside a zone on a boundary-crossing edge, the parent edge's
+   * fromVertex must NOT get a boundary extension added. Only the split vertex itself should receive
+   * a boundary — fromVertex may be an interior vertex with no boundary crossings, and adding one
+   * would break zone tracking during traversal.
    */
   @Test
   void splitVertexInsideZoneDoesNotAddBoundaryToParentFromVertex() {

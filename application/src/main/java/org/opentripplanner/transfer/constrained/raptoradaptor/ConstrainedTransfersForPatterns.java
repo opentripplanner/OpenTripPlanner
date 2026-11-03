@@ -5,8 +5,8 @@ import java.util.Objects;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * This is a container for returning transfers from and to stop-positions indexed by
- * the route index.
+ * This is a container for returning transfers from and to stop-positions indexed by the route
+ * index.
  */
 public class ConstrainedTransfersForPatterns {
 

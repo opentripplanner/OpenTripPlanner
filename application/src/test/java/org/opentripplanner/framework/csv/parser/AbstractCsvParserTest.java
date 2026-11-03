@@ -9,7 +9,7 @@ import com.csvreader.CsvReader;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;

@@ -18,9 +18,9 @@ import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
  * Shared boarding logic for all time-dependent {@link RoutingStrategy}s.
  * <p>
  * Handles trip search creation and earliest-board-time calculation for both regular and
- * constrained (guaranteed/stay-seated) boardings. The choice between an exact trip search
- * and a standard trip search depends on whether this is the first iteration and the first
- * round, and whether time-dependent access is in use.
+ * constrained (guaranteed/stay-seated) boardings. The choice between an exact trip search and a
+ * standard trip search depends on whether this is the first iteration and the first round, and
+ * whether time-dependent access is in use.
  */
 public final class TimeBasedBoardingSupport<T extends RaptorTripSchedule> {
 
@@ -34,8 +34,8 @@ public final class TimeBasedBoardingSupport<T extends RaptorTripSchedule> {
   private int round;
 
   /**
-   * @param hasTimeDependentAccess {@code true} if any access path is time-dependent, which
-   *                               disables the exact-trip-search optimisation in round 1
+   * @param hasTimeDependentAccess {@code true} if any access path is time-dependent, which disables
+   *                               the exact-trip-search optimisation in round 1
    * @param calculator             direction-aware arithmetic for forward/reverse searches
    * @param subscriptions          worker lifecycle hooks used to track iteration and round state
    */
@@ -54,8 +54,8 @@ public final class TimeBasedBoardingSupport<T extends RaptorTripSchedule> {
   }
 
   /**
-   * Set the timetable for the pattern about to be boarded and create a suitable trip search.
-   * Must be called once per pattern before any {@code searchForBoarding} calls.
+   * Set the timetable for the pattern about to be boarded and create a suitable trip search. Must
+   * be called once per pattern before any {@code searchForBoarding} calls.
    */
   public void prepareForTransitWith(RaptorTimeTable<T> timeTable) {
     this.timeTable = timeTable;
@@ -63,8 +63,8 @@ public final class TimeBasedBoardingSupport<T extends RaptorTripSchedule> {
   }
 
   /**
-   * Same as {@link #searchForRegularBoarding(int, int, int, int)}, but with
-   * {@code onTripIndex} unbounded.
+   * Same as {@link #searchForRegularBoarding(int, int, int, int)}, but with {@code onTripIndex}
+   * unbounded.
    */
   public RaptorBoardOrAlightEvent<T> searchForRegularBoarding(
     int prevArrivalTime,
@@ -81,8 +81,8 @@ public final class TimeBasedBoardingSupport<T extends RaptorTripSchedule> {
    * @param prevArrivalTime the time at which the traveller arrives at the board stop
    * @param stopPos         the stop position within the pattern's stop sequence
    * @param boardSlack      minimum seconds between arrival and boarding
-   * @param onTripIndex     upper bound on the trip index (used when already on a trip);
-   *                        pass {@link RaptorTripScheduleSearch#UNBOUNDED_TRIP_INDEX} for no bound
+   * @param onTripIndex     upper bound on the trip index (used when already on a trip); pass
+   *                        {@link RaptorTripScheduleSearch#UNBOUNDED_TRIP_INDEX} for no bound
    * @return the board event, or an empty event if no trip is found
    */
   public RaptorBoardOrAlightEvent<T> searchForRegularBoarding(
@@ -161,8 +161,8 @@ public final class TimeBasedBoardingSupport<T extends RaptorTripSchedule> {
    * For every iteration after the first, and only in round 1, an <em>exact</em> trip search is
    * used when there is no time-dependent access. This restricts the first departure to fall within
    * the iteration's time-window — preventing the access path from being time-shifted past the
-   * previous iteration's departure time. The restriction also enables departure-time to be used
-   * as a pareto criterion in timetable view.
+   * previous iteration's departure time. The restriction also enables departure-time to be used as
+   * a pareto criterion in timetable view.
    * <p>
    * The optimisation is skipped for the first iteration because a traveller could board a bus,
    * ride one stop, walk back to the origin, and then wait to board a later trip — results that

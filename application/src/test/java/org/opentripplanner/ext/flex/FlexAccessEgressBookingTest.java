@@ -15,6 +15,7 @@ import org.opentripplanner.street.search.state.TestStateBuilder;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
+import org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfo;
 
 class FlexAccessEgressBookingTest {
 
@@ -100,10 +101,7 @@ class FlexAccessEgressBookingTest {
 
     // try to arrive at 10:30 (within notice -> should be rejected)
     int arrivalTooEarly = T10_00 + 30 * 60;
-    assertEquals(
-      org.opentripplanner.model.StopTime.MISSING_VALUE,
-      flex.latestArrivalTime(arrivalTooEarly)
-    );
+    assertEquals(StopTime.MISSING_VALUE, flex.latestArrivalTime(arrivalTooEarly));
 
     // 10:50 should be allowed (>= 10:45)
     int arrivalOk = T10_00 + 50 * 60;
@@ -118,12 +116,7 @@ class FlexAccessEgressBookingTest {
     var st0 = stopWithWindow(T10_00, T12_00);
     var st1 = stopWithWindow(T10_00, T12_00);
 
-    var flex = buildFlexAccessEgress(
-      List.of(st0, st1),
-      0,
-      1,
-      org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfo.NOT_SET
-    );
+    var flex = buildFlexAccessEgress(List.of(st0, st1), 0, 1, RoutingBookingInfo.NOT_SET);
 
     int requestedArrival = T11_00;
     assertEquals(requestedArrival, flex.latestArrivalTime(requestedArrival));

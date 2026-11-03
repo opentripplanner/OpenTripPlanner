@@ -2,7 +2,7 @@ package org.opentripplanner.standalone.config.routerconfig;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.framework.concurrent.OtpRequestThreadFactory;
 import org.opentripplanner.raptor.api.request.RaptorEnvironment;
@@ -20,9 +20,9 @@ public class RaptorEnvironmentFactory {
       }
 
       /**
-       * OTP web server will interrupt all request threads in case of a timeout. In OTP
-       * such events should be mapped to {@link OTPRequestTimeoutException}, which will
-       * later be mapped to the right API response.
+       * OTP web server will interrupt all request threads in case of a timeout. In OTP such events
+       * should be mapped to {@link OTPRequestTimeoutException}, which will later be mapped to the
+       * right API response.
        */
       @Override
       public RuntimeException mapInterruptedException(InterruptedException e) {

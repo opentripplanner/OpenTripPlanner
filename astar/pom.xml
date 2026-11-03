@@ -22,6 +22,10 @@
     </build>
 
     <dependencies>
+        <dependency>
+            <groupId>org.jspecify</groupId>
+            <artifactId>jspecify</artifactId>
+        </dependency>
         <!-- project dependencies -->
         <dependency>
             <groupId>org.opentripplanner.core</groupId>
@@ -46,7 +50,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>5.23.0</version>
+            <version>5.24.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

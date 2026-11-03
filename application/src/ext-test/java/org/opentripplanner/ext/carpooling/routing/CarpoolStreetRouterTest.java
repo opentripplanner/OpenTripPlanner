@@ -3,6 +3,7 @@ package org.opentripplanner.ext.carpooling.routing;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,7 @@ class CarpoolStreetRouterTest extends GraphRoutingTest {
   );
 
   private IntersectionVertex vertexA;
+  private IntersectionVertex vertexB;
   private IntersectionVertex vertexC;
   private IntersectionVertex vertexDisconnected;
 
@@ -40,6 +42,7 @@ class CarpoolStreetRouterTest extends GraphRoutingTest {
           // Z has no edges — disconnected from the rest of the graph
 
           vertexA = A;
+          vertexB = B;
           vertexC = C;
           vertexDisconnected = Z;
         }
@@ -61,6 +64,16 @@ class CarpoolStreetRouterTest extends GraphRoutingTest {
     assertThat(ROUTER.route(vertexA, vertexC)).isNotNull();
   }
 
+  /** The itinerary mapper draws the leg from this geometry, so it must run in travel order. */
+  @Test
+  void geometryIsInTravelOrder() {
+    var path = ROUTER.route(vertexA, vertexC);
+
+    assertThat(List.of(path.geometry().getCoordinates()))
+      .containsExactly(vertexA.getCoordinate(), vertexB.getCoordinate(), vertexC.getCoordinate())
+      .inOrder();
+  }
+
   @Test
   void returnNullWhenNoPathExists() {
     assertThat(ROUTER.route(vertexA, vertexDisconnected)).isNull();
@@ -69,8 +82,8 @@ class CarpoolStreetRouterTest extends GraphRoutingTest {
   /**
    * A cancelled search has no verdict on whether the leg is routable, so it must not be reported as
    * a routing failure: the caller memoizes a null return as "unroutable" for every later request.
-   * The router carries no state between calls, so the pair routes for real once the cancellation
-   * is over.
+   * The router carries no state between calls, so the pair routes for real once the cancellation is
+   * over.
    */
   @Test
   void propagateCancellationInsteadOfReturningNull() {

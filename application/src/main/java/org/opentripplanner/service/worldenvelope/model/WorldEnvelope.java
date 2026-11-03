@@ -53,8 +53,8 @@ public class WorldEnvelope implements Serializable {
   }
 
   /**
-   * If transit data exist, then this is the median center of the transit stops. The median
-   * is computed independently for the longitude and latitude.
+   * If transit data exist, then this is the median center of the transit stops. The median is
+   * computed independently for the longitude and latitude.
    * <p>
    * If not transit data exist this return `empty`.
    */
@@ -63,8 +63,8 @@ public class WorldEnvelope implements Serializable {
   }
 
   /**
-   * This is the center of the Envelope including both street vertexes and transit stops
-   * if they exist.
+   * This is the center of the Envelope including both street vertexes and transit stops if they
+   * exist.
    */
   public WgsCoordinate meanCenter() {
     return meanCenter;

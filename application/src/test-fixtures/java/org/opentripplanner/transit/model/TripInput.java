@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.model.PickDrop;
@@ -20,8 +20,8 @@ import org.opentripplanner.utils.collection.ListUtils;
 import org.opentripplanner.utils.time.TimeUtils;
 
 /**
- * A simple data structure that is used by the {@link TransitTestEnvironment} to create
- * trips, trips on date and patterns.
+ * A simple data structure that is used by the {@link TransitTestEnvironment} to create trips, trips
+ * on date and patterns.
  */
 public class TripInput {
 

@@ -16,7 +16,7 @@ import static org.opentripplanner.routing.api.request.preference.ItineraryFilter
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.model.SystemNotice;

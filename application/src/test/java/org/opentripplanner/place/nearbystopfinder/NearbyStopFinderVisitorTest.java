@@ -48,10 +48,10 @@ class NearbyStopFinderVisitorTest {
   }
 
   @Test
-  void skipsIgnoreVertices() {
+  void skipsIgnoreStops() {
     var state = TestStateBuilder.ofWalking().streetEdge().stop(STOP).build();
-    var ignoreVertices = Set.of(state.getVertex());
-    var visitor = new NearbyStopFinderVisitor(Set.of(), ignoreVertices, false);
+    var ignoreStops = Set.of(STOP.getId());
+    var visitor = new NearbyStopFinderVisitor(Set.of(), ignoreStops, false);
 
     visitor.visitVertex(state);
 

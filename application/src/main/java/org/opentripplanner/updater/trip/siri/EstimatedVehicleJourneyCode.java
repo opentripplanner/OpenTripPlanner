@@ -4,14 +4,14 @@ import java.util.Arrays;
 
 /**
  * The {@code EstimatedVehicleJourneyCode} of a SIRI estimated journey, able to present itself as
- * either a {@code ServiceJourney} id (identifying the added {@link
- * org.opentripplanner.transit.model.timetable.Trip}) or a {@code DatedServiceJourney} id
+ * either a {@code ServiceJourney} id (identifying the added
+ * {@link org.opentripplanner.transit.model.timetable.Trip}) or a {@code DatedServiceJourney} id
  * (identifying the added {@link org.opentripplanner.transit.model.timetable.TripOnServiceDate}).
  * <p>
- * Expected format: {@code codespace:entityType:sequenceNumber} (e.g. {@code RUT:ServiceJourney:1234}).
- * Codes with 3 or more colon-separated parts whose second part is {@code ServiceJourney} or
- * {@code DatedServiceJourney} are normalized to the requested entity type; any other format is
- * returned unchanged.
+ * Expected format: {@code codespace:entityType:sequenceNumber} (e.g.
+ * {@code RUT:ServiceJourney:1234}). Codes with 3 or more colon-separated parts whose second part is
+ * {@code ServiceJourney} or {@code DatedServiceJourney} are normalized to the requested entity
+ * type; any other format is returned unchanged.
  */
 class EstimatedVehicleJourneyCode {
 

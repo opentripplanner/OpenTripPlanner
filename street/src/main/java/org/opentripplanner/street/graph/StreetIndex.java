@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
@@ -18,6 +19,7 @@ import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.StationCentroidVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.utils.collection.StreamUtils;
 import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,8 +28,8 @@ import org.slf4j.LoggerFactory;
  * Indexes all edges and transit vertices of the graph spatially. Has a variety of query methods
  * used during network linking and trip planning.
  * <p>
- * Instantiating this class is expensive, because it creates a spatial index of all the intersections
- * in the graph.
+ * Instantiating this class is expensive, because it creates a spatial index of all the
+ * intersections in the graph.
  */
 class StreetIndex {
 
@@ -36,7 +38,8 @@ class StreetIndex {
   private final Map<FeedScopedId, TransitStopVertex> stopVertices;
 
   /**
-   * This list contains transitStationVertices for the stations that are configured to route to centroid
+   * This list contains transitStationVertices for the stations that are configured to route to
+   * centroid
    */
   private final Map<FeedScopedId, StationCentroidVertex> stationCentroidVertices;
 
@@ -80,9 +83,8 @@ class StreetIndex {
   }
 
   /**
-   * Return the edges whose geometry intersect with the specified envelope.
-   * Warning: edges disconnected from the graph
-   * will not be indexed.
+   * Return the edges whose geometry intersect with the specified envelope. Warning: edges
+   * disconnected from the graph will not be indexed.
    */
   Collection<Edge> findEdges(Envelope envelope) {
     return edgeIndex
@@ -97,6 +99,10 @@ class StreetIndex {
 
   Collection<Edge> findEdges(Envelope env, Scope scope) {
     return edgeIndex.query(env, scope).toList();
+  }
+
+  void forEachEdgeCandidate(Envelope env, Scope scope, Consumer<? super Edge> consumer) {
+    edgeIndex.forEachCandidate(env, scope, consumer);
   }
 
   Set<Edge> findEdgesAlongLineStrings(Collection<LineString> lineStrings, Scope scope) {
@@ -157,7 +163,7 @@ class StreetIndex {
   }
 
   private static Map<FeedScopedId, TransitStopVertex> indexStopIds(Graph graph) {
-    var vertices = graph.getVerticesOfType(TransitStopVertex.class);
+    var vertices = graph.findVertices(TransitStopVertex.class);
     var map = new HashMap<FeedScopedId, TransitStopVertex>();
     for (TransitStopVertex it : vertices) {
       map.put(it.getId(), it);
@@ -166,9 +172,9 @@ class StreetIndex {
   }
 
   private static Map<FeedScopedId, StationCentroidVertex> indexStationCentroids(Graph graph) {
-    return graph
-      .getVerticesOfType(StationCentroidVertex.class)
-      .stream()
-      .collect(Collectors.toUnmodifiableMap(StationCentroidVertex::getId, v -> v));
+    var vertices = graph.findVertices(StationCentroidVertex.class);
+    return StreamUtils.ofIterable(vertices).collect(
+      Collectors.toUnmodifiableMap(StationCentroidVertex::getId, v -> v)
+    );
   }
 }

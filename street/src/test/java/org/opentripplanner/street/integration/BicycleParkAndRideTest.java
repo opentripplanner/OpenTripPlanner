@@ -10,8 +10,13 @@ import org.opentripplanner.street.model.vertex.StreetVertex;
 public class BicycleParkAndRideTest extends ParkAndRideTest {
 
   /**
-   * B+C Park                          Car Park |    ALL        WALK        WALK    |   ALL A
-   * <-------> B --------> C --------> D ---------> E | Bike Park
+   * <pre>
+   * B+C Park                          Car Park
+   *  |    ALL        WALK        WALK    |   ALL
+   *  A <-------> B --------> C --------> D ---------> E
+   *                          |
+   *                      Bike Park
+   * </pre>
    */
 
   private StreetVertex A;

@@ -11,10 +11,9 @@ import org.opentripplanner.standalone.OTPMain;
  * The UI allows the user to select the OTP configuration dataset. The list of data locations is
  * created by searching the root data source directory.
  * <p>
- * The user then selects what he/she wants OTP to do.
- * The settings are stored in the
- * <code>.interactive_otp_main.json</code> file in the folder InteractiveOtpMain is started.
- * The settings from the last run are loaded the next time InteractiveOtpMain is started.
+ * The user then selects what he/she wants OTP to do. The settings are stored in the
+ * <code>.interactive_otp_main.json</code> file in the folder InteractiveOtpMain is started. The
+ * settings from the last run are loaded the next time InteractiveOtpMain is started.
  */
 public class InteractiveOtpMain {
 

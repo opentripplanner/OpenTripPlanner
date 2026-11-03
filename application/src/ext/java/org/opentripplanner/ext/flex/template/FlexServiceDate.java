@@ -7,7 +7,7 @@ import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfo;
 import org.opentripplanner.utils.time.ServiceDateUtils;
@@ -28,8 +28,8 @@ public class FlexServiceDate {
   private final int secondsFromStartOfTime;
 
   /**
-   * The requested booking time as seconds since the start of service for this date.
-   * Calculated relative to this specific service date's start-of-service.
+   * The requested booking time as seconds since the start of service for this date. Calculated
+   * relative to this specific service date's start-of-service.
    */
   private final int requestedBookingTime;
 

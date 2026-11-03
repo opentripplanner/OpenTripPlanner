@@ -6,7 +6,7 @@ import static org.rutebanken.netex.model.WaterSubmodeEnumeration.NATIONAL_CAR_FE
 import static org.rutebanken.netex.model.WaterSubmodeEnumeration.REGIONAL_CAR_FERRY;
 
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.netex.mapping.support.NetexMainAndSubMode;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -62,10 +62,9 @@ class TransportModeMapper {
   }
 
   /**
-   * Use submode to determine if a trip/ServiceJourney is allowed for car or not. There are
-   * probably other ways to specify this in NeTEx. The list of included submodes
-   * {@link #CARS_ALLOWED_WATER_SUBMODES} are not complete, feel free to request
-   * changes.
+   * Use submode to determine if a trip/ServiceJourney is allowed for car or not. There are probably
+   * other ways to specify this in NeTEx. The list of included submodes
+   * {@link #CARS_ALLOWED_WATER_SUBMODES} are not complete, feel free to request changes.
    */
   public CarAccess mapCarsAllowed(@Nullable TransportSubmodeStructure submode) {
     if (submode == null || submode.getWaterSubmode() == null) {

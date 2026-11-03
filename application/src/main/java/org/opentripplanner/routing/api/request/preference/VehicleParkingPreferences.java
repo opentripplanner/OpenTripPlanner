@@ -73,10 +73,11 @@ public final class VehicleParkingPreferences implements Serializable {
   }
 
   /**
-   * Which vehicle parking tags are preferred. Vehicle parking facilities that don't have one of these
-   * tags receive an extra cost.
+   * Which vehicle parking tags are preferred. Vehicle parking facilities that don't have one of
+   * these tags receive an extra cost.
    * <p>
-   * This is useful if you want to use certain kind of facilities, like lockers for expensive e-bikes.
+   * This is useful if you want to use certain kind of facilities, like lockers for expensive
+   * e-bikes.
    */
   public VehicleParkingFilter preferred() {
     return preferred;

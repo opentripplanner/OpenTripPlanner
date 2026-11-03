@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
@@ -56,13 +56,14 @@ public class GtfsRealTimeUpdateHandler {
    * Method to apply a trip update list to the most recent version of the timetable snapshot. A
    * GTFS-RT feed is always applied against a single static feed (indicated by feedId).
    * <p>
-   * However, multi-feed support is not completed, and we currently assume there is only one static
-   * feed when matching IDs.
+   * However, multi-feed support is not completed, and we currently assume there is only one
+   * static feed when matching IDs.
    *
    * @param backwardsDelayPropagationType Defines when delays are propagated to previous stops and
    *                                      if these stops are given the NO_DATA flag.
-   * @param updateIncrementality          Determines the incrementality of the updates. FULL updates clear the buffer
-   *                                      of all previous updates for the given feed id.
+   * @param updateIncrementality          Determines the incrementality of the updates. FULL updates
+   *                                      clear the buffer of all previous updates for the given
+   *                                      feed id.
    * @param updates                       GTFS-RT TripUpdate's that should be applied atomically
    */
   public UpdateResult applyTripUpdates(

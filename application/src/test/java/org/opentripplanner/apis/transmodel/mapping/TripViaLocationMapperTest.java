@@ -229,8 +229,8 @@ class TripViaLocationMapperTest {
   }
 
   /**
-   * Create a new HashMap with the {@code key} and {@code value}, the value may be {@code null}.
-   * The {@link Map#of(Object, Object)} does not support {@code null} values.
+   * Create a new HashMap with the {@code key} and {@code value}, the value may be {@code null}. The
+   * {@link Map#of(Object, Object)} does not support {@code null} values.
    */
   private static Map<String, Object> mapOf(String key, Object value) {
     var map = new HashMap<String, Object>();

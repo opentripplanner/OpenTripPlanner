@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.core.model.i18n.I18NString;
@@ -602,7 +602,7 @@ public class OsmModule implements GraphBuilderModule {
   }
 
   private void validateBarriers() {
-    List<BarrierVertex> vertices = graph.getVerticesOfType(BarrierVertex.class);
+    var vertices = graph.findVertices(BarrierVertex.class);
     vertices.forEach(bv -> bv.makeBarrierAtEndReachable());
   }
 

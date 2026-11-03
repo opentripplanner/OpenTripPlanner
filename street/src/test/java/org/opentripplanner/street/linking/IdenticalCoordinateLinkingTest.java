@@ -10,9 +10,8 @@ import org.opentripplanner.street.model.StreetModelFactory;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 
 /// Tests that linking a vertex with identical coordinates results in the same vertex being re-used
-/// and no split edges/vertices being created.
-/// It also repeats this with very small variations to ensure that very small distances still re-use
-/// the vertex.
+/// and no split edges/vertices being created. It also repeats this with very small variations to
+/// ensure that very small distances still re-use the vertex.
 class IdenticalCoordinateLinkingTest {
 
   @ParameterizedTest

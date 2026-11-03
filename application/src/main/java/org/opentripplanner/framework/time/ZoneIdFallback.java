@@ -1,14 +1,14 @@
 package org.opentripplanner.framework.time;
 
 import java.time.ZoneId;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.utils.logging.Throttle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class provides a fallback mechanism for retrieving a zone id (=time zone).
- * If a ZoneId is not provided, it returns a default fallback ZoneId (UTC).
+ * This class provides a fallback mechanism for retrieving a zone id (=time zone). If a ZoneId is
+ * not provided, it returns a default fallback ZoneId (UTC).
  * <p>
  * This situation happens when you don't load any transit data into the graph but want to route
  * anyway, perhaps only on the street network.

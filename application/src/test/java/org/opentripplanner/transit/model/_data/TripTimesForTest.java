@@ -41,11 +41,11 @@ public class TripTimesForTest {
   }
 
   /**
-   * A {@link org.opentripplanner.transit.model.timetable.RealTimeTripTimes} built from a
-   * minimal scheduled base with additional state applied via {@code customizer}.
+   * A {@link org.opentripplanner.transit.model.timetable.RealTimeTripTimes} built from a minimal
+   * scheduled base with additional state applied via {@code customizer}.
    *
-   * <p>Example:
-   * <pre>{@code
+   * <p>
+   * Example: <pre>{@code
    * TripTimesForTest.realTime(builder -> builder.addTrip())
    * }</pre>
    */

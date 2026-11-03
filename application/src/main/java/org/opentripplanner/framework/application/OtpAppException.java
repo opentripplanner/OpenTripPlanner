@@ -12,22 +12,17 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Typical use cases for this exception is:
  * <ul>
- *     <li>The configuration is not correct.</li>
- *     <li>
- *         The input data is missing or have severe errors and can not be processed. The later
- *         may be difficult to verify, in which case another exception would be a better choice.
- *      </li>
- *      <li>The command line parameters don´t match the input files.</li>
- *      <li>
- *          When a exception occurs it is preferable to catch it at the right level, were most
- *          context information is available. At this point the exception should be logged
- *          with a stacktrace. Then this exception can be re-thrown to terminate the application
- *          or request.
- *      </li>
+ *   <li>The configuration is not correct.</li>
+ *   <li>The input data is missing or have severe errors and can not be processed. The later may be
+ *       difficult to verify, in which case another exception would be a better choice.</li>
+ *   <li>The command line parameters don´t match the input files.</li>
+ *   <li>When a exception occurs it is preferable to catch it at the right level, were most context
+ *       information is available. At this point the exception should be logged with a stacktrace. Then
+ *       this exception can be re-thrown to terminate the application or request.</li>
  * </ul>
  * <p>
- * Do not use this exception to terminate OTP in case of an unknown/unexpected event, then
- * the {@link IllegalArgumentException}, {@link IllegalStateException} or {@link RuntimeException}
+ * Do not use this exception to terminate OTP in case of an unknown/unexpected event, then the
+ * {@link IllegalArgumentException}, {@link IllegalStateException} or {@link RuntimeException}
  * should be used. These will be logged with a stacktrace.
  */
 public class OtpAppException extends RuntimeException {

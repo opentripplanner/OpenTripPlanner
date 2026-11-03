@@ -3,20 +3,21 @@ package org.opentripplanner.apis.gtfs.model;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.Comparator;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.time.TimePeriod;
 
 /**
  * A range of time with inclusive start and exclusive end {@code [start, end)}. Both bounds are
  * optional.
  * <p>
- * A {@code null} start means that the range extends indefinitely into the past and a {@code null}
- * end means that it extends indefinitely into the future.
+ * A {@code null} start means that the range extends indefinitely into the past and a
+ * {@code null} end means that it extends indefinitely into the future.
  * <p>
- * This is a general purpose API model which is not tied to any specific domain concept, so it can
- * be used whenever an unbounded range of instants needs to be returned by the GTFS GraphQL API.
+ * This is a general purpose API model which is not tied to any specific domain concept, so it
+ * can be used whenever an unbounded range of instants needs to be returned by the GTFS GraphQL API.
  * <p>
- * TODO we can consider using this for use cases where the range is always required to be bounded in one or both directions.
+ * TODO we can consider using this for use cases where the range is always required to be bounded
+ * in one or both directions.
  */
 public record OffsetDateTimeRange(@Nullable OffsetDateTime start, @Nullable OffsetDateTime end) {
   /**

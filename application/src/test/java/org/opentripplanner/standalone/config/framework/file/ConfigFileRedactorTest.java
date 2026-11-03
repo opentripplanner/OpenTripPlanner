@@ -2,8 +2,8 @@ package org.opentripplanner.standalone.config.framework.file;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.JsonNode;
 
 class ConfigFileRedactorTest {
 
@@ -25,11 +25,11 @@ class ConfigFileRedactorTest {
 
     JsonNode redacted = parseRedacted(node);
 
-    assertEquals(REDACTED, redacted.path("secretKey").asText());
-    assertEquals(REDACTED, redacted.path("accessKey").asText());
-    assertEquals(REDACTED, redacted.path("gsCredentials").asText());
-    assertEquals(REDACTED, redacted.path("password").asText());
-    assertEquals("visible", redacted.path("normalKey").asText());
+    assertEquals(REDACTED, redacted.path("secretKey").asString());
+    assertEquals(REDACTED, redacted.path("accessKey").asString());
+    assertEquals(REDACTED, redacted.path("gsCredentials").asString());
+    assertEquals(REDACTED, redacted.path("password").asString());
+    assertEquals("visible", redacted.path("normalKey").asString());
   }
 
   @Test
@@ -47,8 +47,8 @@ class ConfigFileRedactorTest {
 
     JsonNode redacted = parseRedacted(node);
 
-    assertEquals(REDACTED, redacted.path("storage").path("secretKey").asText());
-    assertEquals("my-bucket", redacted.path("storage").path("bucket").asText());
+    assertEquals(REDACTED, redacted.path("storage").path("secretKey").asString());
+    assertEquals("my-bucket", redacted.path("storage").path("bucket").asString());
   }
 
   @Test
@@ -67,10 +67,10 @@ class ConfigFileRedactorTest {
     JsonNode redacted = parseRedacted(node);
 
     JsonNode updaters = redacted.path("updaters");
-    assertEquals("siri", updaters.get(0).path("type").asText());
-    assertEquals(REDACTED, updaters.get(0).path("secretKey").asText());
-    assertEquals("gtfs-rt", updaters.get(1).path("type").asText());
-    assertEquals(REDACTED, updaters.get(1).path("password").asText());
+    assertEquals("siri", updaters.get(0).path("type").asString());
+    assertEquals(REDACTED, updaters.get(0).path("secretKey").asString());
+    assertEquals("gtfs-rt", updaters.get(1).path("type").asString());
+    assertEquals(REDACTED, updaters.get(1).path("password").asString());
   }
 
   @Test
@@ -93,8 +93,8 @@ class ConfigFileRedactorTest {
     JsonNode redacted = parseRedacted(node);
 
     JsonNode endpoint = redacted.path("services").get(0).path("endpoints").get(0);
-    assertEquals("https://example.com", endpoint.path("url").asText());
-    assertEquals(REDACTED, endpoint.path("accessKey").asText());
+    assertEquals("https://example.com", endpoint.path("url").asString());
+    assertEquals(REDACTED, endpoint.path("accessKey").asString());
   }
 
   @Test
@@ -112,11 +112,11 @@ class ConfigFileRedactorTest {
 
     JsonNode redacted = parseRedacted(node);
 
-    assertEquals("test", redacted.path("name").asText());
+    assertEquals("test", redacted.path("name").asString());
     assertEquals(42, redacted.path("count").asInt());
     assertEquals(true, redacted.path("enabled").asBoolean());
-    assertEquals("a", redacted.path("items").get(0).asText());
-    assertEquals("b", redacted.path("items").get(1).asText());
+    assertEquals("a", redacted.path("items").get(0).asString());
+    assertEquals("b", redacted.path("items").get(1).asString());
   }
 
   @Test
@@ -129,7 +129,7 @@ class ConfigFileRedactorTest {
 
     ConfigFileRedactor.toRedactedString(node);
 
-    assertEquals("original-value", node.path("secretKey").asText());
+    assertEquals("original-value", node.path("secretKey").asString());
   }
 
   private static JsonNode parse(String json) {

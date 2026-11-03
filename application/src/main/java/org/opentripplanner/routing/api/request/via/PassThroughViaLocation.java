@@ -1,13 +1,13 @@
 package org.opentripplanner.routing.api.request.via;
 
 import java.util.Collection;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * One of the listed stop locations or one of its children must be visited. An on-board
- * intermediate stop visit is ok, as well as boarding or alighting at one of the stops.
+ * One of the listed stop locations or one of its children must be visited. An on-board intermediate
+ * stop visit is ok, as well as boarding or alighting at one of the stops.
  */
 public class PassThroughViaLocation extends AbstractViaLocation {
 

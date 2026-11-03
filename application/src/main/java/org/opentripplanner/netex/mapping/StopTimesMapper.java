@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
@@ -45,9 +45,9 @@ import org.rutebanken.netex.model.Vias_RelStructure;
  * This maps a list of TimetabledPassingTimes to a list of StopTimes. It also makes sure the
  * StopTime has a reference to the correct stop. DestinationDisplay is mapped to HeadSign. There is
  * logic to take care of the the fact that DestinationsDisplay is also valid for each subsequent
- * TimeTabledPassingTime, while HeadSign has to be explicitly defined for each StopTime.
- * This class does not take Daylight Saving Time transitions into account, this is an error and
- * should be fixed. See https://github.com/opentripplanner/OpenTripPlanner/issues/5109
+ * TimeTabledPassingTime, while HeadSign has to be explicitly defined for each StopTime. This class
+ * does not take Daylight Saving Time transitions into account, this is an error and should be
+ * fixed. See https://github.com/opentripplanner/OpenTripPlanner/issues/5109
  */
 class StopTimesMapper {
 

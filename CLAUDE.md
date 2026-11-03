@@ -1,11 +1,8 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this
-repository.
-
 ## Project Overview
 
-OTP2 (OpenTripPlanner), active development branch `dev-2.x`.
+OpenTripPlanner (OTP) is a multimodal trip planner.
 
 **Tech Stack:** Java 25, Maven, GraphQL API, GTFS/NeTEx transit data, OpenStreetMap
 
@@ -40,6 +37,9 @@ violations:
   2-space indent; the options are configured in the root `pom.xml`). Spotless also removes unused
   imports (Javadoc-only references are kept). Requires `node`/`npm` on the `PATH`. CI enforces it;
   check with `mvn spotless:check`, format with `mvn spotless:apply`. Skip locally with `-Dps`.
+- **Javadoc** formatting is opt-in: run Maven with `-DjavadocFormattingSkip=false` to format Javadoc
+  with the Eclipse JDT formatter (plus some regex fixes), run as a Spotless step before Prettier.
+  The settings live in `eclipse-formatter.properties`.
 - **Checkstyle** runs against `checkstyle.xml` in the `process-sources` phase (after Spotless). Skip
   with `-Dcs` (or `-PcheckstyleSkip`).
 
@@ -184,8 +184,8 @@ work on a feature branch, and **ask which remote to use before pushing**.
 **Creating a cross-fork PR:**
 
 ```bash
-git push -u entur my-feature
-gh pr create --repo opentripplanner/OpenTripPlanner --head entur:my-feature --base dev-2.x
+git push -u <remote> my-feature
+gh pr create --repo opentripplanner/OpenTripPlanner --head <fork-owner>:my-feature --base dev-2.x
 ```
 
 ## Documentation
@@ -216,8 +216,9 @@ https://otp-performance.leonard.io/.
 
 ## Project Structure Notes
 
-- Serialization version ID is the `pom.xml` property `otp.serialization.version.id` — **bump it when
-  changing the graph format**, or previously-built graphs fail to load.
+- Serialization version ID is the `pom.xml` property `otp.serialization.version.id`. Never bump it
+  manually; when a change alters the graph format, add the `+Bump Serialization Id` label to the PR,
+  and a bot bumps it after merge.
 - Client code: `client/src/` (MapLibre-based JS test client)
 
 ## Key Dependencies

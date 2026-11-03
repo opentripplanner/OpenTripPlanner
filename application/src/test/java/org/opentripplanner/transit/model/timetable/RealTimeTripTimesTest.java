@@ -9,7 +9,7 @@ import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.transit.model.timetable.TimetableValidationError.ErrorCode.NEGATIVE_DWELL_TIME;
 import static org.opentripplanner.transit.model.timetable.TimetableValidationError.ErrorCode.NEGATIVE_HOP_TIME;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -42,7 +42,7 @@ class RealTimeTripTimesTest {
   static TripTimes createInitialTripTimes() {
     Trip trip = TransitRepositoryForTest.trip(TRIP_ID).build();
 
-    List<StopTime> stopTimes = new LinkedList<>();
+    List<StopTime> stopTimes = new ArrayList<>();
 
     for (int i = 0; i < STOP_IDS.size(); ++i) {
       StopTime stopTime = new StopTime();
@@ -197,9 +197,11 @@ class RealTimeTripTimesTest {
 
   /**
    * Test hop time with stop cancellations when buses run late.
+   * <pre>
    * Scheduled: 5 at 300, 6 at 360, 7 at 420
    * Test case: 5 at 421, 6 cancelled (with delay passing through skipped stop at 481), 7 at 420
    * Result: Error to be present at stop 7, due to negative hop time.
+   * </pre>
    */
   @Test
   public void testNegativeHopTimeWithStopCancellations() {
@@ -220,9 +222,11 @@ class RealTimeTripTimesTest {
 
   /**
    * Test hop time with stop cancellations when buses run early.
+   * <pre>
    * Scheduled: 5 at 300, 6 at 360, 7 at 420
    * Test case: 5 at 300, 6 cancelled (without delay from schedule), 7 at 320.
    * Result: Expect error at stop 7, due to negative hop time.
+   * </pre>
    */
   @Test
   public void testPositiveHopTimeWithStopCancellationsEarly() {
@@ -241,9 +245,11 @@ class RealTimeTripTimesTest {
 
   /**
    * Test positive hop time with stop cancellations at the beginning of the trip.
+   * <pre>
    * Scheduled: 0 at 0, 1 at 60, 2 at 120, 3 at 180, 4 at 240, 5 at 300, 6 at 360, 7 at 420
    * Test case: 0 and 1 cancelled, start trip at stop 2 at time 0.
    * Result: Expect error, since the arrival time at 2 is earlier than the departure time at 1.
+   * </pre>
    */
   @Test
   public void testPositiveHopTimeWithTerminalCancellation() {
@@ -263,9 +269,11 @@ class RealTimeTripTimesTest {
 
   /**
    * Test multiple cancelled stops together.
+   * <pre>
    * Scheduled: 0 at 0, 1 at 60, 2 at 120, 3 at 180, 4 at 240, 5 at 300, 6 at 360, 7 at 420
    * Test case: 0 at 0, 1 to 6 are cancelled, 7 at time 350.
    * Result: Expect errors, since 7 is less than the scheduled time at 6.
+   * </pre>
    */
   @Test
   public void testMultipleStopCancellations() {
@@ -289,9 +297,11 @@ class RealTimeTripTimesTest {
 
   /**
    * Test multiple cancelled stops together.
+   * <pre>
    * Scheduled: 0 at 0, 1 at 60, 2 at 120, 3 at 180, 4 at 240, 5 at 300, 6 at 360, 7 at 420
    * Test case: 0 at 0, 1 2 cancelled, 3 at 90, 4 5 6 cancelled, 7 at time 240.
    * Result: Expect errors, since 3 is less than scheduled time at 2.
+   * </pre>
    */
   @Test
   public void testMultipleStopCancellations2() {

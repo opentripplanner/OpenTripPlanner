@@ -2,7 +2,7 @@ package org.opentripplanner.utils.lang;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Simple generic utility functions.
@@ -10,8 +10,8 @@ import javax.annotation.Nullable;
 public class ObjectUtils {
 
   /**
-   * Similar to the {@link java.util.Objects#requireNonNullElse(Object, Object)}, but allow
-   * the defaultValue to be {@code null}.
+   * Similar to the {@link java.util.Objects#requireNonNullElse(Object, Object)}, but allow the
+   * defaultValue to be {@code null}.
    */
   @Nullable
   public static <T> T ifNotNull(@Nullable T value, @Nullable T defaultValue) {
@@ -19,9 +19,9 @@ public class ObjectUtils {
   }
 
   /**
-   * Similar to {@link #ifNotNull(Object, Object)}, but take a function to access the
-   * entity field. The given {@code defaultValue} can be {@code null}.
-   * */
+   * Similar to {@link #ifNotNull(Object, Object)}, but take a function to access the entity field.
+   * The given {@code defaultValue} can be {@code null}.
+   */
   @Nullable
   public static <E, T> T ifNotNull(
     @Nullable E entity,
@@ -35,8 +35,8 @@ public class ObjectUtils {
   }
 
   /**
-   * Get the value or {@code null}, ignore any exceptions. This is useful if you must traverse
-   * a long call-chain like {@code a.b().c().d()...} when e.g. logging.
+   * Get the value or {@code null}, ignore any exceptions. This is useful if you must traverse a
+   * long call-chain like {@code a.b().c().d()...} when e.g. logging.
    */
   @Nullable
   public static <T> T safeGetOrNull(Supplier<T> body) {

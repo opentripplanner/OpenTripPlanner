@@ -183,7 +183,8 @@ class ServiceLinkMapperTest {
       quayIdByStopPointRef,
       stopsById,
       issueStore,
-      150
+      150,
+      0.0
     );
   }
 
@@ -380,7 +381,8 @@ class ServiceLinkMapperTest {
       quayIdByStopPointRef,
       stopsById,
       issueStore,
-      150
+      150,
+      0.0
     );
 
     var shape = mapper.getGeometriesByJourneyPattern(
@@ -439,7 +441,8 @@ class ServiceLinkMapperTest {
       quayIdByStopPointRef,
       stopsById,
       issueStore,
-      150
+      150,
+      0.0
     );
 
     var shape = mapper.getGeometriesByJourneyPattern(
@@ -533,8 +536,8 @@ class ServiceLinkMapperTest {
   }
 
   /**
-   * Some NeTEx producers put the {@link LineStringType} directly on the {@link ServiceLink}
-   * instead of wrapping it in a {@code Projections_RelStructure}.
+   * Some NeTEx producers put the {@link LineStringType} directly on the {@link ServiceLink} instead
+   * of wrapping it in a {@code Projections_RelStructure}.
    */
   private ServiceLink createServiceLinkWithDirectLineString(
     String id,

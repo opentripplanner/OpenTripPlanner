@@ -1,14 +1,14 @@
 package org.opentripplanner.service.vehiclerental.model;
 
 import java.util.Objects;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.basic.Distance;
 import org.opentripplanner.core.model.basic.Ratio;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * Contains information about the current battery or fuel status.
- * See the <a href="https://github.com/MobilityData/gbfs/blob/v3.0/gbfs.md#vehicle_statusjson">GBFS
+ * Contains information about the current battery or fuel status. See the
+ * <a href="https://github.com/MobilityData/gbfs/blob/v3.0/gbfs.md#vehicle_statusjson">GBFS
  * vehicle_status specification</a> for more details.
  * <p>
  */

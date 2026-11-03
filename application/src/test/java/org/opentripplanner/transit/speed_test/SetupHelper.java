@@ -2,7 +2,7 @@ package org.opentripplanner.transit.speed_test;
 
 import java.io.File;
 import java.net.URI;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
 import org.opentripplanner.standalone.config.ConfigModel;
@@ -41,6 +41,7 @@ class SetupHelper {
     return new LoadModel(
       graph,
       transitRepository,
+      serializedGraphObject.timetableDataImport,
       transferRepository,
       serializedGraphObject.buildConfig
     );

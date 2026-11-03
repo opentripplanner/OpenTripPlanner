@@ -10,6 +10,7 @@ public class TransfersMapper {
 
   /**
    * Copy pre-calculated transfers from the original graph
+   *
    * @return a list where each element is a list of transfers for the corresponding stop index
    */
   public static List<List<PathTransfer>> mapTransfers(

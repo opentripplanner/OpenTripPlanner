@@ -1,6 +1,6 @@
 package org.opentripplanner.service.vehiclerental.street.geofencing;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
@@ -9,8 +9,8 @@ import org.opentripplanner.street.search.state.VehicleRentalState;
 /**
  * Enforcement for business area geofencing zones. The logic is inverted compared to restricted
  * zones: exiting the BA is restricted (the rider can't leave the operating area on the vehicle),
- * while entering is allowed. Station rentals can't legally drop mid-street and are blocked
- * at any BA exit.
+ * while entering is allowed. Station rentals can't legally drop mid-street and are blocked at any
+ * BA exit.
  */
 final class BusinessAreaEnforcement implements GeofencingBoundaryEnforcement {
 
@@ -23,8 +23,11 @@ final class BusinessAreaEnforcement implements GeofencingBoundaryEnforcement {
    * leaving the operating area. Station rentals are blocked (can't drop mid-street).
    */
   @Override
-  @Nullable
-  public State[] forwardApproachingExit(GeofencingZone zone, State state, EdgeTraversal edge) {
+  public State @Nullable [] forwardApproachingExit(
+    GeofencingZone zone,
+    State state,
+    EdgeTraversal edge
+  ) {
     if (!state.isRentingVehicle()) {
       return null;
     }
@@ -36,13 +39,16 @@ final class BusinessAreaEnforcement implements GeofencingBoundaryEnforcement {
 
   /**
    * Forward search: fallback for renting states placed at the boundary vertex itself, where no
-   * prior edge could fire {@link #forwardApproachingExit}. The renting branch is blocked
-   * — pure walking from the corresponding {@code BEFORE_RENTING} branch dominates the
-   * walk-and-drop alternative in any reasonable cost model.
+   * prior edge could fire {@link #forwardApproachingExit}. The renting branch is blocked — pure
+   * walking from the corresponding {@code BEFORE_RENTING} branch dominates the walk-and-drop
+   * alternative in any reasonable cost model.
    */
   @Override
-  @Nullable
-  public State[] forwardCrossingExit(GeofencingZone zone, State state, EdgeTraversal edge) {
+  public State @Nullable [] forwardCrossingExit(
+    GeofencingZone zone,
+    State state,
+    EdgeTraversal edge
+  ) {
     if (!state.isRentingVehicle()) {
       return null;
     }
@@ -50,14 +56,16 @@ final class BusinessAreaEnforcement implements GeofencingBoundaryEnforcement {
   }
 
   /**
-   * ArriveBy search: a HAVE_RENTED walker is at a boundary they crossed in forward time
-   * (rider dropped inside the BA then walked out to the destination). Produce a walking
-   * continuation; renting branches are deferred to the next edge by
-   * {@link DeferredForkHandler}.
+   * ArriveBy search: a HAVE_RENTED walker is at a boundary they crossed in forward time (rider
+   * dropped inside the BA then walked out to the destination). Produce a walking continuation;
+   * renting branches are deferred to the next edge by {@link DeferredForkHandler}.
    */
   @Override
-  @Nullable
-  public State[] arriveByAtBoundary(GeofencingZone zone, State state, EdgeTraversal edge) {
+  public State @Nullable [] arriveByAtBoundary(
+    GeofencingZone zone,
+    State state,
+    EdgeTraversal edge
+  ) {
     if (state.getVehicleRentalState() != VehicleRentalState.HAVE_RENTED) {
       return null;
     }
@@ -68,7 +76,10 @@ final class BusinessAreaEnforcement implements GeofencingBoundaryEnforcement {
     return State.empty();
   }
 
-  /** Ride to the last in-zone vertex in the rider's current mode and drop the floating vehicle there. */
+  /**
+   * Ride to the last in-zone vertex in the rider's current mode and drop the floating vehicle
+   * there.
+   */
   private State[] forwardExit(State state, EdgeTraversal edge) {
     if (state.isDropOffBannedByCurrentZones()) {
       return State.empty();

@@ -5,7 +5,6 @@ import static jakarta.ws.rs.core.HttpHeaders.AUTHORIZATION;
 import static jakarta.ws.rs.core.HttpHeaders.CONTENT_TYPE;
 import static java.util.Map.entry;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.net.URI;
@@ -30,6 +29,7 @@ import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.basic.Money;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Implementation of a ride hailing service for Uber.
@@ -47,8 +47,8 @@ public class UberService extends CachingRideHailingService {
   private final String priceEstimateUri;
   private final List<String> bannedTypes;
   /**
-   * Only a single product ID can be classified as wheelchair-accessible, but it would not
-   * be hard to change it, should the need arise.
+   * Only a single product ID can be classified as wheelchair-accessible, but it would not be hard
+   * to change it, should the need arise.
    */
   private final String wheelchairAccessibleProductId;
   private final OtpHttpClient otpHttpClient;

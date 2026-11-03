@@ -51,8 +51,8 @@ class PathTailC2Calculator {
   }
 
   /**
-   * Find the first leg that has the c2 value set - starting with the given leg and ending with
-   * the egress leg. If no c2 value is set in the tail, then the egress leg is returned.
+   * Find the first leg that has the c2 value set - starting with the given leg and ending with the
+   * egress leg. If no c2 value is set in the tail, then the egress leg is returned.
    */
   private PathBuilderLeg<?> findFirstLegWithC2Set(PathBuilderLeg<?> tail) {
     while (!tail.isEgress()) {

@@ -225,8 +225,8 @@ public class OsmAreaGroup {
   }
 
   /**
-   * Check if area group has a trivial geometry of one boundary ring and one respective area
-   * In such a case it is known that the area and the boundary ring match
+   * Check if area group has a trivial geometry of one boundary ring and one respective area In such
+   * a case it is known that the area and the boundary ring match
    *
    * @return true if area group consists of one polygion only
    */
@@ -262,10 +262,10 @@ public class OsmAreaGroup {
   }
 
   /**
-   * Compute a stable hash key for an {@link OsmAreaGroup} that is used to look up and store
-   * cached visibility computation results. The hash incorporates the sorted OSM entity IDs forming
-   * the group and the coordinates of all ring polygons, so that any change to the underlying OSM
-   * data produces a different key and forces a cache miss.
+   * Compute a stable hash key for an {@link OsmAreaGroup} that is used to look up and store cached
+   * visibility computation results. The hash incorporates the sorted OSM entity IDs forming the
+   * group and the coordinates of all ring polygons, so that any change to the underlying OSM data
+   * produces a different key and forces a cache miss.
    */
   public long cacheKey() {
     long hash = 1L;

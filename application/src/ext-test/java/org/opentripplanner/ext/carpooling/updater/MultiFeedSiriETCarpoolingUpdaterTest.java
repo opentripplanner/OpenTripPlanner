@@ -23,15 +23,16 @@ import org.opentripplanner.updater.trip.siri.updater.DefaultSiriETUpdaterParamet
 
 /**
  * Verifies that two {@link SiriETCarpoolingUpdater} instances can share a single
- * {@link DefaultCarpoolingRepository} without colliding when both receive a SIRI journey
- * with the same {@code EstimatedVehicleJourneyCode}. The two updaters represent two
- * independent SIRI-ET feeds; their feedIds are the only thing that should keep their
- * trips apart in the shared repository.
+ * {@link DefaultCarpoolingRepository} without colliding when both receive a SIRI journey with the
+ * same {@code EstimatedVehicleJourneyCode}. The two updaters represent two independent SIRI-ET
+ * feeds; their feedIds are the only thing that should keep their trips apart in the shared
+ * repository.
  *
- * <p>The {@code processEstimatedTimetableDeliveries} pipeline is called once per updater
- * per polling cycle and receives only the deliveries fetched from that updater's source
- * URL — there is no per-call feed multiplexing inside a single delivery list, so the
- * tests below invoke each updater explicitly.
+ * <p>
+ * The {@code processEstimatedTimetableDeliveries} pipeline is called once per updater per
+ * polling cycle and receives only the deliveries fetched from that updater's source URL — there is
+ * no per-call feed multiplexing inside a single delivery list, so the tests below invoke each
+ * updater explicitly.
  */
 class MultiFeedSiriETCarpoolingUpdaterTest {
 

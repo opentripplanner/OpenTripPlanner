@@ -32,10 +32,10 @@ import org.rutebanken.netex.model.UicOperatingPeriod;
  * <p>
  * <b>DESIGN</b>
  * <p>
- * To simplify the logic in this class and avoid passing input parameters down the call chain this
- * class perform the mapping by first creating an instance with READ-ONLY input members. The result
- * is added to {@link #dates} and {@link #datesToRemove} during the mapping process. As a final
- * step, the two collections are merged (dates-datesToRemove) and then mapped to
+ * To simplify the logic in this class and avoid passing input parameters down the call chain
+ * this class perform the mapping by first creating an instance with READ-ONLY input members. The
+ * result is added to {@link #dates} and {@link #datesToRemove} during the mapping process. As a
+ * final step, the two collections are merged (dates-datesToRemove) and then mapped to
  * {@link LocalDate}s.
  * <p>
  * This class is THREAD-SAFE. A static mapping method is the single point of entry and a private
@@ -71,8 +71,7 @@ public class DayTypeAssignmentMapper {
   }
 
   /**
-   * Map all given {@code dayTypeAssignments} into a map of {@link LocalDate} by
-   * {@code dayTypeId}s.
+   * Map all given {@code dayTypeAssignments} into a map of {@link LocalDate} by {@code dayTypeId}s.
    */
   public static Map<String, Set<LocalDate>> mapDayTypes(
     ReadOnlyHierarchicalMapById<DayType> dayTypes,
@@ -113,11 +112,11 @@ public class DayTypeAssignmentMapper {
    * Resolve the days of the week an operating period assigned to the given {@code dayType} is
    * restricted to.
    * <p>
-   * The NeTEx profile makes both {@code properties} and {@code DaysOfWeek} optional.
-   * A day type which does not state any days of the week therefore constrains nothing and is valid
-   * for <em>every</em> day in the period.
+   * The NeTEx profile makes both {@code properties} and {@code DaysOfWeek} optional. A day type
+   * which does not state any days of the week therefore constrains nothing and is valid for
+   * <em>every</em> day in the period.
    * <p>
-   * */
+   */
   private static Set<DayOfWeek> daysOfWeekForDayType(DayType dayType) {
     if (dayType.getProperties() == null) {
       return EVERY_DAY_OF_WEEK;
@@ -153,8 +152,8 @@ public class DayTypeAssignmentMapper {
    * When mapping two lists of dates are created internally in this class, these are merged as a
    * final step in the mapping process.
    * <p>
-   * Do not call this method before you want to retrieve the result. Calling this method more than
-   * once, may have unexpected effects.
+   * Do not call this method before you want to retrieve the result. Calling this method more
+   * than once, may have unexpected effects.
    * <p>
    *
    * @return the set of service dates for all dayTypes mapped.

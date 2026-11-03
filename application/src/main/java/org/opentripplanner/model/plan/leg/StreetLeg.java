@@ -5,7 +5,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.plan.Emission;
@@ -208,8 +208,8 @@ public class StreetLeg implements Leg {
   /**
    * Should be used for debug logging only.
    * <p>
-   * The {@code legGeometry}, {@code elevationProfile}, and {@code walkSteps} are skipped to avoid
-   * spamming logs. Explicit access should be used if needed.
+   * The {@code legGeometry}, {@code elevationProfile}, and {@code walkSteps} are skipped to
+   * avoid spamming logs. Explicit access should be used if needed.
    */
   @Override
   public String toString() {

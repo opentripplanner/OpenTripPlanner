@@ -5,9 +5,9 @@ import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateEditor;
 
 /**
- * Abstraction over edge traversal for geofencing enforcement. Allows enforcement implementations
- * to traverse the current edge in any mode without depending on StreetEdge or exposing its
- * private methods.
+ * Abstraction over edge traversal for geofencing enforcement. Allows enforcement implementations to
+ * traverse the current edge in any mode without depending on StreetEdge or exposing its private
+ * methods.
  */
 @FunctionalInterface
 public interface EdgeTraversal {

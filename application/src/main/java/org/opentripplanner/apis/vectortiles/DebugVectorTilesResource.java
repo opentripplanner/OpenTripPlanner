@@ -243,8 +243,10 @@ public class DebugVectorTilesResource {
     };
   }
 
-  /** The subset of services {@link #createLayerBuilder} needs, passed through {@link
-   * VectorTileResponseFactory#create} as its generic context parameter. */
+  /**
+   * The subset of services {@link #createLayerBuilder} needs, passed through
+   * {@link VectorTileResponseFactory#create} as its generic context parameter.
+   */
   private record LayerBuilderContext(
     TransitService transitService,
     VehicleRentalService vehicleRentalService,

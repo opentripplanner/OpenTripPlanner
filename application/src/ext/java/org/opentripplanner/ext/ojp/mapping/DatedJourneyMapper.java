@@ -11,7 +11,7 @@ import de.vdv.ojp20.siri.LineRefStructure;
 import de.vdv.ojp20.siri.OperatorRefStructure;
 import java.time.LocalDate;
 import java.util.Objects;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.model.network.Route;

@@ -5,6 +5,7 @@ import static org.opentripplanner.utils.lang.StringUtils.quoteReplace;
 
 import graphql.ExecutionResult;
 import graphql.GraphQLError;
+import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -95,7 +96,7 @@ class ExecutionResultMapperTest {
     assertEquals(SYSTEM_ERROR_RESPONSE, readEntity(response));
   }
 
-  private static String readEntity(jakarta.ws.rs.core.Response response) throws IOException {
+  private static String readEntity(Response response) throws IOException {
     var streaming = (StreamingOutput) response.getEntity();
     var baos = new ByteArrayOutputStream();
     streaming.write(baos);

@@ -11,8 +11,8 @@ import org.opentripplanner.service.worldenvelope.model.WorldEnvelope;
 public class DefaultWorldEnvelopeRepository implements WorldEnvelopeRepository, Serializable {
 
   /**
-   * The volatile keyword is used to eventually propagate to other threads when updated.
-   * This is thread-safe, because we can use an old instance for a while - it does not hurt.
+   * The volatile keyword is used to eventually propagate to other threads when updated. This is
+   * thread-safe, because we can use an old instance for a while - it does not hurt.
    */
   private volatile WorldEnvelope envelope = null;
 

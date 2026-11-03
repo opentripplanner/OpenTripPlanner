@@ -2,15 +2,12 @@ package org.opentripplanner.place.nearbystopfinder;
 
 import static org.opentripplanner.place.api.NearbyStop.ofZeroDistance;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
-import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.streetadapter.StreetSearchRequestMapper;
 
@@ -38,24 +35,5 @@ public class NearbyStopFactory {
       .stream()
       .map(s -> ofZeroDistance(s.getId(), new State(s, streetSearchRequest)))
       .toList();
-  }
-
-  /**
-   * Given a list of Vertices, find the TransitStopVertices and create zero distance NearbyStops
-   * for them.
-   */
-  public static List<NearbyStop> nearbyStopsForTransitStopVerticesFiltered(
-    Collection<? extends Vertex> vertices,
-    boolean reverseDirection,
-    RouteRequest routeRequest,
-    StreetMode mode
-  ) {
-    var transitStops = vertices
-      .stream()
-      .filter(v -> v instanceof TransitStopVertex)
-      .map(v -> (TransitStopVertex) v)
-      .collect(Collectors.toSet());
-
-    return nearbyStopsForTransitStopVertices(transitStops, reverseDirection, routeRequest, mode);
   }
 }

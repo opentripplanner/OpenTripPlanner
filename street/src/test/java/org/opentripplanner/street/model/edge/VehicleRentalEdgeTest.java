@@ -37,6 +37,7 @@ import org.opentripplanner.street.search.request.RentalPeriod;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.request.StreetSearchRequestBuilder;
 import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.street.search.state.StateEditor;
 
 class VehicleRentalEdgeTest {
 
@@ -274,7 +275,7 @@ class VehicleRentalEdgeTest {
     initFreeFloatingEdgeAndRequest(SCOOTER_RENTAL, SCOOTER, false);
 
     var arriveByReq = StreetSearchRequest.copyOf(request).withArriveBy(true).build();
-    var editor = new org.opentripplanner.street.search.state.StateEditor(vertex, arriveByReq);
+    var editor = new StateEditor(vertex, arriveByReq);
     editor.dropFloatingVehicle(SCOOTER, ELECTRIC, null, true);
     editor.addCommittedNetwork(vertex.getStation().network());
     var genericState = editor.makeState();
@@ -286,15 +287,15 @@ class VehicleRentalEdgeTest {
   }
 
   /**
-   * When a generic RENTING_FLOATING state does NOT have the network committed,
-   * VehicleRentalEdge should allow picking up the vehicle.
+   * When a generic RENTING_FLOATING state does NOT have the network committed, VehicleRentalEdge
+   * should allow picking up the vehicle.
    */
   @Test
   void uncommittedNetworkAllowsGenericPickup() {
     initFreeFloatingEdgeAndRequest(SCOOTER_RENTAL, SCOOTER, false);
 
     var arriveByReq = StreetSearchRequest.copyOf(request).withArriveBy(true).build();
-    var editor = new org.opentripplanner.street.search.state.StateEditor(vertex, arriveByReq);
+    var editor = new StateEditor(vertex, arriveByReq);
     editor.dropFloatingVehicle(SCOOTER, ELECTRIC, null, true);
     editor.addCommittedNetwork("some-other-network");
     var genericState = editor.makeState();
@@ -306,8 +307,8 @@ class VehicleRentalEdgeTest {
   }
 
   /**
-   * When a floating vehicle is at a no-traversal zone boundary vertex, pickup should produce
-   * both RENTING_FLOATING (for riding away from zone) and HAVE_RENTED (for walking into zone).
+   * When a floating vehicle is at a no-traversal zone boundary vertex, pickup should produce both
+   * RENTING_FLOATING (for riding away from zone) and HAVE_RENTED (for walking into zone).
    */
   @Test
   void pickupAtNoTraversalBoundaryVertexShouldFork() {

@@ -2,7 +2,7 @@ package org.opentripplanner.raptor._data.api;
 
 import java.util.List;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.raptor.api.path.AccessPathLeg;
 import org.opentripplanner.raptor.api.path.EgressPathLeg;
 import org.opentripplanner.raptor.api.path.PathLeg;
@@ -14,8 +14,7 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * This can be used to test the comparators and ParetoSet. Please use the real
- * {@link org.opentripplanner.raptor.path.Path} implementation if other
- * functionality is needed.
+ * {@link org.opentripplanner.raptor.path.Path} implementation if other functionality is needed.
  */
 public record TestRaptorPath(
   int rangeRaptorIterationDepartureTime,

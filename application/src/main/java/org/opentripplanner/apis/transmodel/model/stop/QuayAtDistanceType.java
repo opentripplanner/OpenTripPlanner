@@ -32,7 +32,9 @@ public class QuayAtDistanceType {
             relay.toGlobalId(
               "QAD",
               Optional.ofNullable((NearbyStop) environment.getSource())
-                .map(nearbyStop -> nearbyStop.distance + ";" + idMapper.mapToApi(nearbyStop.stopId))
+                .map(
+                  nearbyStop -> nearbyStop.distance() + ";" + idMapper.mapToApi(nearbyStop.stopId())
+                )
                 .orElse(null)
             )
           )
@@ -44,7 +46,7 @@ public class QuayAtDistanceType {
           .type(quayType)
           .dataFetcher(environment ->
             getTransitService(environment).getStopLocation(
-              ((NearbyStop) environment.getSource()).stopId
+              ((NearbyStop) environment.getSource()).stopId()
             )
           )
           .build()
@@ -54,7 +56,7 @@ public class QuayAtDistanceType {
           .name("distance")
           .type(Scalars.GraphQLFloat)
           .description("The distance in meters to the given quay.")
-          .dataFetcher(environment -> ((NearbyStop) environment.getSource()).distance)
+          .dataFetcher(environment -> ((NearbyStop) environment.getSource()).distance())
           .build()
       )
       .build();

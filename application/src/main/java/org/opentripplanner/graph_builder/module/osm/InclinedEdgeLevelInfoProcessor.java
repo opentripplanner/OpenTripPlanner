@@ -1,7 +1,7 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import java.util.Optional;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.graph_builder.module.osm.internal.edgelevelinfo.NoopInclinedEdgeLevelInfoProcessor;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
@@ -9,8 +9,7 @@ import org.opentripplanner.service.streetdetails.model.InclinedEdgeLevelInfo;
 import org.opentripplanner.street.model.edge.Edge;
 
 /**
- * Contains logic for storing edge level info in the
- * {@link StreetDetailsRepository}.
+ * Contains logic for storing edge level info in the {@link StreetDetailsRepository}.
  */
 public interface InclinedEdgeLevelInfoProcessor {
   InclinedEdgeLevelInfoProcessor NOOP = new NoopInclinedEdgeLevelInfoProcessor();

@@ -1,7 +1,5 @@
 package org.opentripplanner.ext.vectortiles.layers.vehicleparkings;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
@@ -9,6 +7,8 @@ import org.opentripplanner.apis.support.mapping.PropertyMapper;
 import org.opentripplanner.core.model.i18n.I18NStringMapper;
 import org.opentripplanner.framework.json.ObjectMappers;
 import org.opentripplanner.inspector.vector.KeyValue;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 public class DigitransitVehicleParkingGroupPropertyMapper
   extends PropertyMapper<VehicleParkingAndGroup>
@@ -47,7 +47,7 @@ public class DigitransitVehicleParkingGroupPropertyMapper
         new KeyValue("name", i18NStringMapper.mapToApi(group.name())),
         new KeyValue("vehicleParking", string)
       );
-    } catch (JsonProcessingException e) {
+    } catch (JacksonException e) {
       throw new RuntimeException(e);
     }
   }

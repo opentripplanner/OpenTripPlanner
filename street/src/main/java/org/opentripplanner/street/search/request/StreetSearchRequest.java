@@ -8,7 +8,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.astar.spi.AStarRequest;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
@@ -174,8 +174,9 @@ public class StreetSearchRequest implements AStarRequest {
   }
 
   /**
-   * An assumed rental period of a car rental trip, to make sure the vehicle is available during this period.
-   * The rentalPeriod only apply to free-floating vehicles in a direct search. Access and egress is not supported.
+   * An assumed rental period of a car rental trip, to make sure the vehicle is available during
+   * this period. The rentalPeriod only apply to free-floating vehicles in a direct search. Access
+   * and egress is not supported.
    */
   @Nullable
   public RentalPeriod rentalPeriod() {

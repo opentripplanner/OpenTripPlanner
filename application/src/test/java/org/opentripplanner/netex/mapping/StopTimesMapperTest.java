@@ -81,8 +81,9 @@ public class StopTimesMapperTest {
   }
 
   /**
-   * Test StopTime.timepoint mapping from NeTEx. Should be true if StopPointInJourneyPattern.isIsWaitPoint
-   * is true and corresponding TimetabledPassingTime.waitingTime is defined
+   * Test StopTime.timepoint mapping from NeTEx. Should be true if
+   * StopPointInJourneyPattern.isIsWaitPoint is true and corresponding
+   * TimetabledPassingTime.waitingTime is defined
    * <p>
    * The sample has 4 StopPointInJourneyPattern points with corresponding TimetabledPassingTime
    * objects. The two last StopPointInJourneyPattern has withIsWaitPoint and undefined, so they

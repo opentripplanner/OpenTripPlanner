@@ -69,9 +69,9 @@ class CostedTransferInNetworkTest implements PlanTestConstants, FareTestConstant
   }
 
   /**
-   * Tests that a transfer product is correctly applied to three consecutive legs of the same network:
-   * Transfers are one dollar but unlimited, so you need to either product a or b plus a single
-   * transfer for the last two legs.
+   * Tests that a transfer product is correctly applied to three consecutive legs of the same
+   * network: Transfers are one dollar but unlimited, so you need to either product a or b plus a
+   * single transfer for the last two legs.
    */
   @Test
   void threeLegs() {

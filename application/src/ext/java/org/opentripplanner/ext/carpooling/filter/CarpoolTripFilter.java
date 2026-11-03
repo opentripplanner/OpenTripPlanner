@@ -7,13 +7,14 @@ import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
  * <p>
  * Filters are applied as a pre-screening mechanism to quickly eliminate incompatible trips using
  * estimated times and distances, limiting the computational cost of routing. Implementations are
- * intentionally loose (necessary conditions only), because passengers board and alight mid-route
- * — using trip endpoints as tight bounds causes false negatives. Tight enforcement of actual times
- * is delegated to post-filters on the complete itinerary.
+ * intentionally loose (necessary conditions only), because passengers board and alight mid-route —
+ * using trip endpoints as tight bounds causes false negatives. Tight enforcement of actual times is
+ * delegated to post-filters on the complete itinerary.
  * <p>
  * Supports direct routing (pickup + dropoff) and access/egress routing (single passenger
  * coordinate near a transit stop). The routing mode is communicated via
- * {@link CarpoolingRequest#isAccessEgressRequest()} and {@link CarpoolingRequest#isAccessRequest()}.
+ * {@link CarpoolingRequest#isAccessEgressRequest()} and
+ * {@link CarpoolingRequest#isAccessRequest()}.
  */
 public interface CarpoolTripFilter {
   /**

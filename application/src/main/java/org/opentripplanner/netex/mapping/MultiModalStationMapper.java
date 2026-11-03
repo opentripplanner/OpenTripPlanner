@@ -1,7 +1,7 @@
 package org.opentripplanner.netex.mapping;
 
 import java.util.Collection;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;

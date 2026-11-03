@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.UnaryOperator;
 import java.util.stream.IntStream;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.core.model.id.FeedScopedId;
@@ -119,18 +119,17 @@ public final class TripPatternBuilder
    * Indicate that this TripPattern is created in RealTime, and that the stop pattern of the
    * original scheduled trip is changed.
    * <p>
-   *  TODO - ENCAPSULATE realTimeTripPattern & stopPatternModifiedInRealTime initialization
-   *    The next 2 methods (withRealTimeTripPattern() and withStopPatternModifiedInRealTime()) are
-   *    internal domain business rules, and should be enforced by the aggregate root, not delegated
-   *    to the creators(updaters) and unit-tests. A better solution to this would be to make static
-   *    factory methods, but it does not make the problem go away. If, e.g. the Route is chosen as
-   *    the aggregate root, then the logic would be in the Route class - totally hidden for all
-   *    users of Route/TripPattern/Trip and so on.
+   * TODO - ENCAPSULATE realTimeTripPattern & stopPatternModifiedInRealTime initialization The
+   * next 2 methods (withRealTimeTripPattern() and withStopPatternModifiedInRealTime()) are internal
+   * domain business rules, and should be enforced by the aggregate root, not delegated to the
+   * creators(updaters) and unit-tests. A better solution to this would be to make static factory
+   * methods, but it does not make the problem go away. If, e.g. the Route is chosen as the
+   * aggregate root, then the logic would be in the Route class - totally hidden for all users of
+   * Route/TripPattern/Trip and so on.
    *
    * @see #withRealTimeAddedTrip() as an alternative
    * @see TripPattern#isRealTimeTripPattern()
    * @see TripPattern#isStopPatternModifiedInRealTime()
-   *
    */
   public TripPatternBuilder withRealTimeStopPatternModified() {
     this.realTimeTripPattern = true;
@@ -141,6 +140,7 @@ public final class TripPatternBuilder
   /**
    * Indicate that this TripPattern is created in RealTime for a new trip (GTFS ADDED trip/NeTEx
    * ExtraJourney).
+   *
    * @see #withRealTimeStopPatternModified() as an alternative
    * @see TripPattern#isRealTimeTripPattern()
    * @see TripPattern#isStopPatternModifiedInRealTime()
@@ -232,8 +232,8 @@ public final class TripPatternBuilder
 
   /**
    * Build the compacted per-hop geometry sequence for a pattern, along with its cumulative
-   * arc-length table. When {@code hopGeometries} is non-null each hop's distance is the planar
-   * sum of its {@link LineString} coordinates ({@link GeometryUtils#sumDistances}); when it is
+   * arc-length table. When {@code hopGeometries} is non-null each hop's distance is the planar sum
+   * of its {@link LineString} coordinates ({@link GeometryUtils#sumDistances}); when it is
    * {@code null} each hop is synthesized as a straight line between consecutive stops and the
    * distance is measured with {@link SphericalDistanceLibrary} (haversine).
    * <p>

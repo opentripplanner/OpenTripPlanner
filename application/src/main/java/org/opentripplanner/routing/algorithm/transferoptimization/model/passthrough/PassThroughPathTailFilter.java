@@ -14,16 +14,16 @@ import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTail
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * Create a filter chain function and find the best combination of transfers for the journey
- * that also includes all pass-through points.
+ * Create a filter chain function and find the best combination of transfers for the journey that
+ * also includes all pass-through points.
  * <p>
- * The algorithm starts with the last trip in the journey, then goes backwards looping through all
- * possible transfers for each transit leg. For each possible transfer stop position the C2-value
- * is calculated. The filter chain function is going  to use the c2-value and the cost function to
- * determine whether the tail should be included or excluded from result.
- *<p>
- *<b>Example:</b>
- *<p>
+ * The algorithm starts with the last trip in the journey, then goes backwards looping through
+ * all possible transfers for each transit leg. For each possible transfer stop position the
+ * C2-value is calculated. The filter chain function is going to use the c2-value and the cost
+ * function to determine whether the tail should be included or excluded from result.
+ * <p>
+ * <b>Example:</b>
+ * <p>
  * Let's say we have a trip with 2 transit legs and 3 possible transfer points: AD, BE and CF.
  * <p>
  * There are 3 possible transfer combination with the first and second transit:

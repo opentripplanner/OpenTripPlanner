@@ -13,7 +13,7 @@ class OtpProjectInfoParser {
   static OtpProjectInfo loadFromProperties() {
     try {
       InputStream in = OtpProjectInfo.class.getClassLoader().getResourceAsStream(FILENAME);
-      Properties props = new java.util.Properties();
+      Properties props = new Properties();
       props.load(in);
 
       OtpProjectInfo version = new OtpProjectInfo(

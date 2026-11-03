@@ -113,8 +113,7 @@ public class SchemaFactory {
 
   /**
    * Creates schema from schema file without injecting default values from code/configuration. This
-   * is meant for formatting the schema without editing it or for testing without default
-   * injection.
+   * is meant for formatting the schema without editing it or for testing without default injection.
    */
   public static GraphQLSchema createSchema() {
     try {

@@ -7,7 +7,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.transit.model.timetable.FrequencyEntry;
 import org.opentripplanner.transit.model.timetable.Timetable;
@@ -104,8 +104,8 @@ public class TripPatternForDateMapper {
 
   /**
    * Calls {@link TripPatternForDateMapper#map(Timetable, LocalDate)} and validates that the result
-   * is valid. Since it would cause exceptions with flex trips during start up this method should
-   * be used during real-time updates as flex trip cannot have real-time (as of now).
+   * is valid. Since it would cause exceptions with flex trips during start up this method should be
+   * used during real-time updates as flex trip cannot have real-time (as of now).
    *
    * @throws IllegalArgumentException
    */

@@ -19,8 +19,8 @@ public class OtpRetry {
   private final Runnable onRetry;
 
   /**
-   * A predicate to determine whether a particular exception should end the retry cycle or not.
-   * If the predicate returns true, retries will continue. False, and the retry cycle is broken.
+   * A predicate to determine whether a particular exception should end the retry cycle or not. If
+   * the predicate returns true, retries will continue. False, and the retry cycle is broken.
    */
   private final Predicate<Exception> retryableException;
 

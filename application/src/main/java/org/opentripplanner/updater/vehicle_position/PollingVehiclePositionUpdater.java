@@ -13,9 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Map vehicle positions to
- * {@link RealtimeVehicle} and add them to OTP
- * patterns via a GTFS-RT source.
+ * Map vehicle positions to {@link RealtimeVehicle} and add them to OTP patterns via a GTFS-RT
+ * source.
  */
 public class PollingVehiclePositionUpdater
   extends PollingGraphUpdater<TransitRealTimeUpdateContext>
@@ -55,8 +54,8 @@ public class PollingVehiclePositionUpdater
   }
 
   /**
-   * Repeatedly makes blocking calls to a source to retrieve new stop time updates, and
-   * applies those updates to the graph.
+   * Repeatedly makes blocking calls to a source to retrieve new stop time updates, and applies
+   * those updates to the graph.
    */
   @Override
   public void runPolling() {

@@ -82,9 +82,9 @@ public class StreetEdge
   private float bicycleSafetyFactor;
 
   /**
-   * walkSafetyFactor = length * walkSafetyFactor. For example, a 100m street with a safety
-   * factor of 2.0 will be considered in terms of safety cost as the same as a 200m street with a
-   * safety factor of 1.0.
+   * walkSafetyFactor = length * walkSafetyFactor. For example, a 100m street with a safety factor
+   * of 2.0 will be considered in terms of safety cost as the same as a 200m street with a safety
+   * factor of 1.0.
    */
   private float walkSafetyFactor;
 
@@ -148,8 +148,8 @@ public class StreetEdge
    * This checks if start or end vertex is bollard If it is it creates intersection of street edge
    * permissions and from/to barriers. Then it checks if mode is allowed to traverse the edge.
    * <p>
-   * By default CAR isn't allowed to traverse barrier but foot and bicycle are. This can be changed
-   * with different tags
+   * By default CAR isn't allowed to traverse barrier but foot and bicycle are. This can be
+   * changed with different tags
    * <p>
    * If start/end isn't bollard it just checks the street permissions.
    * <p>
@@ -368,9 +368,10 @@ public class StreetEdge
   }
 
   /**
-   * Update the name of the edge after it has been constructed. This method also sets the nameIsDerived
-   * property to false, indicating to the code that maps from edges to steps that this is a real
-   * street name.
+   * Update the name of the edge after it has been constructed. This method also sets the
+   * nameIsDerived property to false, indicating to the code that maps from edges to steps that this
+   * is a real street name.
+   *
    * @see Edge#nameIsDerived()
    */
   public void setName(I18NString name) {
@@ -398,9 +399,10 @@ public class StreetEdge
   /**
    * Squared distance (in projected latitude degrees squared) from the point {@code (lon, lat)} to
    * this edge's geometry, using the linker's local equirectangular projection. Computed directly on
-   * the packed geometry without materializing a {@link LineString}; see {@link
-   * EndpointContextLineString#squaredEquirectangularDistanceToPoint}. The square is returned because
-   * the linker only orders and thresholds by distance, so the per-candidate {@code sqrt} is avoided.
+   * the packed geometry without materializing a {@link LineString}; see
+   * {@link EndpointContextLineString#squaredEquirectangularDistanceToPoint}. The square is returned
+   * because the linker only orders and thresholds by distance, so the per-candidate {@code sqrt} is
+   * avoided.
    */
   public double squaredEquirectangularDistanceToPoint(double lon, double lat, double xscale) {
     return EndpointContextLineString.squaredEquirectangularDistanceToPoint(
@@ -969,9 +971,8 @@ public class StreetEdge
   /**
    * Calculate effective distance for time/speed based on propulsion type.
    *
-   * For ELECTRIC (e-scooters): constant speed, ignore slope
-   * For ELECTRIC_ASSIST (e-bikes): reduced slope sensitivity (motor helps uphill)
-   * For HUMAN and others: full slope effect
+   * For ELECTRIC (e-scooters): constant speed, ignore slope For ELECTRIC_ASSIST (e-bikes): reduced
+   * slope sensitivity (motor helps uphill) For HUMAN and others: full slope effect
    */
   private double getEffectiveDistanceForPropulsion(
     PropulsionType propulsion,
@@ -1011,10 +1012,10 @@ public class StreetEdge
   }
 
   /**
-   * Interpolate between flat distance and slope-adjusted distance.
-   * Formula: flat + (sloped - flat) × sensitivity = flat × (1 - sensitivity) + sloped × sensitivity
+   * Interpolate between flat distance and slope-adjusted distance. Formula: flat + (sloped - flat)
+   * × sensitivity = flat × (1 - sensitivity) + sloped × sensitivity
    *
-   * @param slopedDistance the slope-adjusted effective distance
+   * @param slopedDistance   the slope-adjusted effective distance
    * @param slopeSensitivity 0.0 = ignore slope (use flat distance), 1.0 = full slope effect
    */
   private double interpolateSlopeEffect(double slopedDistance, double slopeSensitivity) {
@@ -1128,8 +1129,8 @@ public class StreetEdge
     /**
      * Conversion from radians to internal representation as a single signed byte.
      * <p>
-     * Range restriction happens automatically due to Java signed overflow behavior.
-     * 180 degrees exists as a negative rather than a positive due to the integer range.
+     * Range restriction happens automatically due to Java signed overflow behavior. 180 degrees
+     * exists as a negative rather than a positive due to the integer range.
      */
     private static byte convertRadianToByte(double angleRadians) {
       return (byte) Math.round((angleRadians * 128) / Math.PI);

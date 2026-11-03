@@ -1,6 +1,6 @@
 package org.opentripplanner.apis.gtfs.mapping;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLArrivalDeparture;
 import org.opentripplanner.transit.service.ArrivalDeparture;
 
@@ -10,8 +10,8 @@ import org.opentripplanner.transit.service.ArrivalDeparture;
 public final class ArrivalDepartureMapper {
 
   /**
-   * Maps the API enum to the internal one. If no value is given, calls that either allow pickup
-   * or drop off are included by returning {@link ArrivalDeparture#BOTH}.
+   * Maps the API enum to the internal one. If no value is given, calls that either allow pickup or
+   * drop off are included by returning {@link ArrivalDeparture#BOTH}.
    */
   public static ArrivalDeparture map(@Nullable GraphQLArrivalDeparture arrivalDeparture) {
     if (arrivalDeparture == null) {
