@@ -18,8 +18,10 @@ import org.opentripplanner.routing.api.request.request.TransitRequestBuilder;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
 import org.opentripplanner.street.model.StreetMode;
+import org.opentripplanner.transit.model.basic.GeographicalScope;
 import org.opentripplanner.transit.model.basic.NarrowedTransitMode;
 import org.opentripplanner.transit.model.basic.ReplacementRequirement;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.utils.collection.CollectionUtils;
 import org.opentripplanner.utils.time.DurationUtils;
 
@@ -112,15 +114,93 @@ public class ModePreferencesMapper {
     };
   }
 
+  @Nullable
+  private static GeographicalScope map(@Nullable GraphQLTypes.GraphQLGeographicalScope input) {
+    if (input == null) {
+      return null;
+    }
+    return switch (input) {
+      case SUBURBAN -> GeographicalScope.SUBURBAN;
+      case REGIONAL -> GeographicalScope.REGIONAL;
+      case LONG_DISTANCE -> GeographicalScope.LONG_DISTANCE;
+    };
+  }
+
   private static NarrowedTransitMode map(GraphQLTypes.GraphQLPlanTransitModePreferenceInput input) {
     if (input != null) {
-      return new NarrowedTransitMode(
-        TransitModeMapper.map(input.getGraphQLMode()),
-        null,
-        map(input.getGraphQLReplacement())
-      );
+      var mode = TransitModeMapper.map(input.getGraphQLMode());
+      var replacement = map(input.getGraphQLReplacement());
+      var geographicalScope = map(input.getGraphQLGeographicalScope());
+      var excludedScopes = input.getGraphQLExcludedGeographicalScopes();
+      if (geographicalScope != null) {
+        validateGeographicalScope(mode, replacement, excludedScopes);
+      } else if (excludedScopes != null) {
+        validateExcludedGeographicalScopes(mode, excludedScopes);
+      }
+      return NarrowedTransitMode.of(mode)
+        .withReplacement(replacement)
+        .withGeographicalScope(geographicalScope)
+        .withExcludedGeographicalScopes(
+          excludedScopes == null
+            ? List.of()
+            : excludedScopes.stream().map(ModePreferencesMapper::map).toList()
+        )
+        .build();
     } else {
       return null;
+    }
+  }
+
+  /**
+   * Reject combinations which can never match a trip, so the client learns about the mistake
+   * instead of silently getting no results for the mode.
+   */
+  private static void validateGeographicalScope(
+    TransitMode mode,
+    ReplacementRequirement replacement,
+    @Nullable List<GraphQLTypes.GraphQLGeographicalScope> excludedScopes
+  ) {
+    if (excludedScopes != null) {
+      throw new InvalidInputException(
+        "geographicalScope and excludedGeographicalScopes can't be combined for %s.".formatted(mode)
+      );
+    }
+    validateScopeSupportedForMode("geographicalScope", mode);
+    if (replacement == ReplacementRequirement.REQUIRED) {
+      throw new InvalidInputException(
+        "geographicalScope can't be combined with replacement REQUIRED for %s, as replacement services have no geographical scope.".formatted(
+          mode
+        )
+      );
+    }
+  }
+
+  /**
+   * Excluding scopes on a mode without scopes would match all its trips, so it is almost certainly
+   * a client mistake. Combined with replacement REQUIRED it is redundant, but not empty, so that
+   * is allowed.
+   */
+  private static void validateExcludedGeographicalScopes(
+    TransitMode mode,
+    List<GraphQLTypes.GraphQLGeographicalScope> excludedScopes
+  ) {
+    if (excludedScopes.isEmpty()) {
+      throw new InvalidInputException(
+        "excludedGeographicalScopes must not be empty for %s.".formatted(mode)
+      );
+    }
+    validateScopeSupportedForMode("excludedGeographicalScopes", mode);
+  }
+
+  private static void validateScopeSupportedForMode(String field, TransitMode mode) {
+    if (!GeographicalScope.derivedForModes().contains(mode)) {
+      throw new InvalidInputException(
+        "%s is only supported for the transit modes %s, not for %s.".formatted(
+          field,
+          GeographicalScope.derivedForModes(),
+          mode
+        )
+      );
     }
   }
 

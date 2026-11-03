@@ -1,7 +1,7 @@
 package org.opentripplanner.model.modes;
 
-import java.util.Objects;
 import javax.annotation.Nullable;
+import org.opentripplanner.transit.model.basic.GeographicalScope;
 import org.opentripplanner.transit.model.basic.NarrowedTransitMode;
 import org.opentripplanner.transit.model.basic.ReplacementRequirement;
 import org.opentripplanner.transit.model.basic.SubMode;
@@ -11,7 +11,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 public class AllowNarrowedTransitModeFilter implements AllowTransitModeFilter {
 
-  NarrowedTransitMode mode;
+  private final NarrowedTransitMode mode;
 
   public AllowNarrowedTransitModeFilter(NarrowedTransitMode mode) {
     this.mode = mode;
@@ -35,6 +35,12 @@ public class AllowNarrowedTransitModeFilter implements AllowTransitModeFilter {
     if (mode.getMode() != transitMode) {
       return false;
     }
+    // The geographical scope is an additional requirement: a trip must always have the requested
+    // scope (or not have an excluded one), no matter how the submode and replacement conditions
+    // below are evaluated.
+    if (!geographicalScopeMatches(transitMode, netexSubmode, gtfsExtendedType)) {
+      return false;
+    }
     // Three-valued boolean logic here. If more dimensions are added to NarrowedTransitMode
     // (like express/local trains etc), they can be implemented symmetrically.
     // See truth table:
@@ -54,6 +60,24 @@ public class AllowNarrowedTransitModeFilter implements AllowTransitModeFilter {
     var isTripReplacement = isTripReplacement(netexSubmode, gtfsExtendedType);
     var replacementMatches = mode.getReplacement() == mapReplacement(isTripReplacement);
     return subModeMatches || replacementMatches;
+  }
+
+  private boolean geographicalScopeMatches(
+    TransitMode transitMode,
+    SubMode netexSubmode,
+    @Nullable Integer gtfsExtendedType
+  ) {
+    var scope = mode.getGeographicalScope();
+    var excludedScopes = mode.getExcludedGeographicalScopes();
+    if (scope == null && excludedScopes.isEmpty()) {
+      return true;
+    }
+    var tripScope = GeographicalScope.of(transitMode, netexSubmode, gtfsExtendedType);
+    if (scope != null) {
+      return tripScope == scope;
+    }
+    // Trips without a scope are not excluded
+    return tripScope == null || !excludedScopes.contains(tripScope);
   }
 
   private static ReplacementRequirement mapReplacement(boolean replacement) {
@@ -76,7 +100,7 @@ public class AllowNarrowedTransitModeFilter implements AllowTransitModeFilter {
 
   @Override
   public int hashCode() {
-    return Objects.hash(mode.getMode(), mode.getSubMode(), mode.getReplacement());
+    return mode.hashCode();
   }
 
   @Override
@@ -88,11 +112,7 @@ public class AllowNarrowedTransitModeFilter implements AllowTransitModeFilter {
       return false;
     }
     AllowNarrowedTransitModeFilter that = (AllowNarrowedTransitModeFilter) o;
-    return (
-      Objects.equals(mode.getMode(), that.mode.getMode()) &&
-      Objects.equals(mode.getSubMode(), that.mode.getSubMode()) &&
-      Objects.equals(mode.getReplacement(), that.mode.getReplacement())
-    );
+    return mode.equals(that.mode);
   }
 
   @Override
@@ -101,6 +121,8 @@ public class AllowNarrowedTransitModeFilter implements AllowTransitModeFilter {
       .addEnum("mode", mode.getMode())
       .addObj("subMode", mode.getSubMode())
       .addEnum("isReplacement", mode.getReplacement())
+      .addEnum("geographicalScope", mode.getGeographicalScope())
+      .addCol("excludedGeographicalScopes", mode.getExcludedGeographicalScopes())
       .toString();
   }
 }
