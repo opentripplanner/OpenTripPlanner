@@ -2,7 +2,6 @@ package org.opentripplanner.ext.flex.flexpathcalculator;
 
 import java.time.Duration;
 import java.util.function.Supplier;
-import javax.annotation.concurrent.Immutable;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.core.model.time.TimePenalty;
 import org.opentripplanner.utils.lang.IntUtils;
@@ -10,7 +9,6 @@ import org.opentripplanner.utils.lang.IntUtils;
 /**
  * This class contains the results from a FlexPathCalculator.
  */
-@Immutable
 public class FlexPath {
 
   private final Supplier<LineString> geometrySupplier;

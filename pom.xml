@@ -75,7 +75,7 @@
         <netex-java-model.version>2.0.16.3</netex-java-model.version>
         <netcdf4.version>5.6.0</netcdf4.version>
         <protobuf.version>4.36.2</protobuf.version>
-        <siri-java-model.version>2.0.9</siri-java-model.version>
+        <siri-java-model.version>2.0.10</siri-java-model.version>
         <slf4j.version>2.0.19</slf4j.version>
         <!-- Other properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -597,9 +597,20 @@
             </dependency>
 
             <!--
-             Not declared directly; pulled in transitively by both io.micrometer:micrometer-core
-             and com.google.truth:truth (via guava). Pinned so the resolved version doesn't depend
-             on the declaration order of those two dependencies.
+             Declaration-style @Nullable. Used only on Dagger sites (@Provides, @BindsInstance, @Inject
+             and component methods), because Dagger does not recognise the type-use @Nullable from
+             JSpecify. Everywhere else use org.jspecify.annotations.Nullable.
+            -->
+            <dependency>
+                <groupId>jakarta.annotation</groupId>
+                <artifactId>jakarta.annotation-api</artifactId>
+                <version>3.0.0</version>
+            </dependency>
+
+            <!--
+             Used directly for nullness annotations, and also pulled in transitively by both
+             io.micrometer:micrometer-core and com.google.truth:truth (via guava). Pinned so the
+             resolved version doesn't depend on the declaration order of those dependencies.
             -->
             <dependency>
                 <groupId>org.jspecify</groupId>
@@ -614,16 +625,6 @@
                 <version>${slf4j.version}</version>
             </dependency>
 
-            <dependency>
-                <!--
-                 This is implicitly used in the current OTP codebase. Should be disallowed and
-                 replaced with the standard annotation JARs. Leaving this for now to reduce number
-                 of changes.
-                -->
-                <groupId>com.google.code.findbugs</groupId>
-                <artifactId>jsr305</artifactId>
-                <version>3.0.2</version>
-            </dependency>
             <dependency>
                 <groupId>net.sf.trove4j</groupId>
                 <artifactId>trove4j</artifactId>

@@ -3,7 +3,7 @@ package org.opentripplanner.updater.trip.siri;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.Optional;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Operator;

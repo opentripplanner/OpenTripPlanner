@@ -1,6 +1,6 @@
 package org.opentripplanner.service.vehiclerental.street.geofencing;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.street.search.state.State;
 
@@ -34,26 +34,38 @@ sealed interface GeofencingBoundaryEnforcement
   permits BusinessAreaEnforcement, RestrictedZoneEnforcement
 {
   /** Forward search: current edge ends at the outside vertex; next edge will enter the zone. */
-  @Nullable
-  default State[] forwardApproachingEntry(GeofencingZone zone, State state, EdgeTraversal edge) {
+  default State @Nullable [] forwardApproachingEntry(
+    GeofencingZone zone,
+    State state,
+    EdgeTraversal edge
+  ) {
     return null;
   }
 
   /** Forward search: current edge ends at the inside vertex; next edge will exit the zone. */
-  @Nullable
-  default State[] forwardApproachingExit(GeofencingZone zone, State state, EdgeTraversal edge) {
+  default State @Nullable [] forwardApproachingExit(
+    GeofencingZone zone,
+    State state,
+    EdgeTraversal edge
+  ) {
     return null;
   }
 
   /** Forward search: current edge crosses outward (from the inside vertex to the outside). */
-  @Nullable
-  default State[] forwardCrossingExit(GeofencingZone zone, State state, EdgeTraversal edge) {
+  default State @Nullable [] forwardCrossingExit(
+    GeofencingZone zone,
+    State state,
+    EdgeTraversal edge
+  ) {
     return null;
   }
 
   /** ArriveBy search: current edge crosses outward (from the inside vertex to the outside). */
-  @Nullable
-  default State[] arriveByCrossingExit(GeofencingZone zone, State state, EdgeTraversal edge) {
+  default State @Nullable [] arriveByCrossingExit(
+    GeofencingZone zone,
+    State state,
+    EdgeTraversal edge
+  ) {
     return null;
   }
 
@@ -61,8 +73,11 @@ sealed interface GeofencingBoundaryEnforcement
    * ArriveBy search at a paired boundary on the rider's forward path between drop point and
    * destination. Direction varies by zone type — see {@link WalkerBoundaryHandler}.
    */
-  @Nullable
-  default State[] arriveByAtBoundary(GeofencingZone zone, State state, EdgeTraversal edge) {
+  default State @Nullable [] arriveByAtBoundary(
+    GeofencingZone zone,
+    State state,
+    EdgeTraversal edge
+  ) {
     return null;
   }
 

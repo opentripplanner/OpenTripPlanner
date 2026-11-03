@@ -1,7 +1,7 @@
 package org.opentripplanner.apis.gtfs.mapping;
 
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLAlertCauseType;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLAlertEffectType;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLAlertSeverityLevelType;
