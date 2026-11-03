@@ -52,7 +52,7 @@ class SidewalkNamerTest {
       var edge = edgeBuilder(coordinates)
         .withName(SIDEWALK)
         .withPermission(StreetTraversalPermission.PEDESTRIAN)
-        .withBogusName(true)
+        .withNameIsDerived(true)
         .buildAndConnect();
 
       var way = WayTestData.footwaySidewalk();

@@ -453,7 +453,7 @@ public class StreetEdgeTest {
       .withPermission(ALL)
       .withGeometry(GeometryUtils.makeLineString(v0.getCoordinate(), v1.getCoordinate()))
       .withName(path)
-      .withBogusName(true)
+      .withNameIsDerived(true)
       .buildAndConnect();
 
     assertEquals(path, edge.getName());
