@@ -2,9 +2,13 @@ package org.opentripplanner.netex.mapping;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
+import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.annotation.adapters.NormalizedStringAdapter;
 import org.entur.netex2.model.MultilingualString;
+import org.entur.netex2.model.ObjectFactory;
+import org.entur.netex2.model.TextType;
 import org.junit.jupiter.api.Test;
 
 class MultilingualStringMapperTest {
@@ -29,6 +33,52 @@ class MultilingualStringMapperTest {
     assertNull(MultilingualStringMapper.nullableValueOf(EMPTY));
     assertNull(MultilingualStringMapper.nullableValueOf(BLANK));
     assertEquals("Line 1   Line 2 ", MultilingualStringMapper.nullableValueOf(TEXT));
+  }
+
+  @Test
+  void plainTextIsReturnedAsIsWhenNoNormalizationIsNeeded() {
+    String text = "Oslo S";
+    assertSame(
+      text,
+      MultilingualStringMapper.getStringValue(new MultilingualString().withContent(text))
+    );
+  }
+
+  @Test
+  void textNodesAreConcatenated() {
+    var value = new MultilingualString().withContent("Oslo", " ", "S");
+    assertEquals("Oslo S", MultilingualStringMapper.getStringValue(value));
+  }
+
+  @Test
+  void nestedTextElementIsUsedWhenThereIsNoPlainText() {
+    // <Name>\n  <Text lang="en">Oslo Central</Text>\n</Name>
+    var value = new MultilingualString().withContent("\n  ", text("Oslo Central"), "\n");
+    assertEquals("Oslo Central", MultilingualStringMapper.getStringValue(value));
+    assertEquals("Oslo Central", MultilingualStringMapper.nullableValueOf(value));
+  }
+
+  @Test
+  void firstNonBlankNestedTextElementIsUsed() {
+    var value = new MultilingualString().withContent(text(" "), text("Oslo\tS"), text("Oslo S"));
+    assertEquals("Oslo S", MultilingualStringMapper.getStringValue(value));
+  }
+
+  @Test
+  void plainTextTakesPrecedenceOverNestedTextElements() {
+    var value = new MultilingualString().withContent("Oslo S", text("Oslo Central"));
+    assertEquals("Oslo S", MultilingualStringMapper.getStringValue(value));
+  }
+
+  @Test
+  void blankNestedTextElementsOnlyGiveAnEmptyString() {
+    var value = new MultilingualString().withContent(text(" "), text(null));
+    assertEquals("", MultilingualStringMapper.getStringValue(value));
+    assertNull(MultilingualStringMapper.nullableValueOf(value));
+  }
+
+  private static JAXBElement<TextType> text(String value) {
+    return new ObjectFactory().createMultilingualStringText(new TextType().withValue(value));
   }
 
   /**
