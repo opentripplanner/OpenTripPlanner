@@ -1,6 +1,6 @@
 package org.opentripplanner.apis.gtfs.mapping;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLArrivalDeparture;
 import org.opentripplanner.transit.service.ArrivalDeparture;
 

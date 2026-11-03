@@ -3,7 +3,7 @@ package org.opentripplanner.routing.api.request.preference;
 import java.time.Duration;
 import java.util.Objects;
 import java.util.Optional;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.core.model.basic.CostLinearFunction;
 import org.opentripplanner.utils.tostring.ToStringBuilder;

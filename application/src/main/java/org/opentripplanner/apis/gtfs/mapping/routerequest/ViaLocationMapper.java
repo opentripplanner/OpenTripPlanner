@@ -4,7 +4,7 @@ import static org.opentripplanner.apis.gtfs.mapping.CoordinateMapper.mapCoordina
 
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.core.model.id.FeedScopedId;

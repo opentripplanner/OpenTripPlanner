@@ -1,6 +1,6 @@
 package org.opentripplanner.model.plan.walkstep.verticaltransportation;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.service.streetdetails.model.Level;
 
 /**

@@ -1,7 +1,7 @@
 package org.opentripplanner.graph_builder.module.transfer.api;
 
 import java.time.Duration;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**

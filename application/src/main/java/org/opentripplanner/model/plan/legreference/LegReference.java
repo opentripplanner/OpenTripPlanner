@@ -1,6 +1,6 @@
 package org.opentripplanner.model.plan.legreference;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.service.TransitService;

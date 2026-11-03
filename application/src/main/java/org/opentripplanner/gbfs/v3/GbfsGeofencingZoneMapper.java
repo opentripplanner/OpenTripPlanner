@@ -4,8 +4,8 @@ import static org.opentripplanner.gbfs.v3.GbfsFeedMapper.optionalLocalizedString
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.geojson.MultiPolygon;
+import org.jspecify.annotations.Nullable;
 import org.mobilitydata.gbfs.v3_0.geofencing_zones.GBFSFeature;
 import org.mobilitydata.gbfs.v3_0.geofencing_zones.GBFSGeofencingZones;
 import org.mobilitydata.gbfs.v3_0.geofencing_zones.GBFSName;
