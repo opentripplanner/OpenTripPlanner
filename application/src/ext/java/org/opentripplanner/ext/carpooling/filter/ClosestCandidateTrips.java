@@ -32,7 +32,7 @@ public final class ClosestCandidateTrips {
     List<WgsCoordinate> passengerPoints,
     int max
   ) {
-    if (max < 1) {
+    if (max <= 0) {
       throw new IllegalArgumentException("max must be positive");
     }
     if (trips.size() <= max) {

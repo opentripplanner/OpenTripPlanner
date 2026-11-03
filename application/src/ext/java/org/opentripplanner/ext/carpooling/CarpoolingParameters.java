@@ -69,13 +69,13 @@ public record CarpoolingParameters(
   );
 
   public CarpoolingParameters {
-    if (maxCandidateTripsPerRequest < 1) {
+    if (maxCandidateTripsPerRequest <= 0) {
       throw new IllegalArgumentException("maxCandidateTripsPerRequest must be positive");
     }
-    if (maxTrips < 1) {
+    if (maxTrips <= 0) {
       throw new IllegalArgumentException("maxTrips must be positive");
     }
-    if (maxPagesPerPoll < 1) {
+    if (maxPagesPerPoll <= 0) {
       throw new IllegalArgumentException("maxPagesPerPoll must be positive");
     }
     requirePositive(maxStopWalk, "maxStopWalk");
@@ -90,7 +90,7 @@ public record CarpoolingParameters(
   }
 
   private static void requirePositive(Duration value, String name) {
-    if (value.isNegative() || value.isZero()) {
+    if (!value.isPositive()) {
       throw new IllegalArgumentException(name + " must be positive");
     }
   }
