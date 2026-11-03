@@ -2,14 +2,14 @@ package org.opentripplanner.netex.validation;
 
 import jakarta.xml.bind.JAXBElement;
 import java.util.Optional;
+import org.entur.netex2.model.LocationStructure;
+import org.entur.netex2.model.Quay;
+import org.entur.netex2.model.Quays_RelStructure;
+import org.entur.netex2.model.SimplePoint_VersionStructure;
+import org.entur.netex2.model.StopPlace;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.graph_builder.issue.api.Issue;
-import org.rutebanken.netex.model.LocationStructure;
-import org.rutebanken.netex.model.Quay;
-import org.rutebanken.netex.model.Quays_RelStructure;
-import org.rutebanken.netex.model.SimplePoint_VersionStructure;
-import org.rutebanken.netex.model.StopPlace;
 
 /**
  * Ensure stop place exists for PassengerStopAssignment.

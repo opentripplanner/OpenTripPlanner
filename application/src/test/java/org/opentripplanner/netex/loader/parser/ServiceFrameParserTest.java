@@ -5,17 +5,17 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import jakarta.xml.bind.JAXBElement;
+import org.entur.netex2.model.ObjectFactory;
+import org.entur.netex2.model.PassengerStopAssignment;
+import org.entur.netex2.model.QuayRefStructure;
+import org.entur.netex2.model.ScheduledStopPointRefStructure;
+import org.entur.netex2.model.Service_VersionFrameStructure;
+import org.entur.netex2.model.StopPlaceRefStructure;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.netex.index.NetexEntityIndex;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.netex.mapping.MappingSupport;
-import org.rutebanken.netex.model.ObjectFactory;
-import org.rutebanken.netex.model.PassengerStopAssignment;
-import org.rutebanken.netex.model.QuayRefStructure;
-import org.rutebanken.netex.model.ScheduledStopPointRefStructure;
-import org.rutebanken.netex.model.Service_VersionFrameStructure;
-import org.rutebanken.netex.model.StopPlaceRefStructure;
 
 class ServiceFrameParserTest {
 

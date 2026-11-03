@@ -6,15 +6,15 @@ import static org.opentripplanner.netex.index.api.HMapValidationRule.Status.OK;
 
 import java.math.BigDecimal;
 import net.opengis.gml._3.DirectPositionType;
+import org.entur.netex2.model.LocationStructure;
+import org.entur.netex2.model.ObjectFactory;
+import org.entur.netex2.model.QuayRefStructure;
+import org.entur.netex2.model.SimplePoint_VersionStructure;
+import org.entur.netex2.model.StopPlace;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.netex.NetexTestDataSupport;
 import org.opentripplanner.netex.index.NetexEntityIndex;
 import org.opentripplanner.netex.index.api.HMapValidationRule.Status;
-import org.rutebanken.netex.model.LocationStructure;
-import org.rutebanken.netex.model.ObjectFactory;
-import org.rutebanken.netex.model.QuayRefStructure;
-import org.rutebanken.netex.model.SimplePoint_VersionStructure;
-import org.rutebanken.netex.model.StopPlace;
 
 class PassengerStopAssignmentToQuaylessStopPlaceTest {
 
