@@ -118,14 +118,14 @@ public class CarpoolItineraryMapper {
     GenericLocation fromLocation,
     GenericLocation toLocation
   ) {
-    var sharedSegments = candidate.getSharedSegments();
-    if (sharedSegments.isEmpty()) {
+    var pathsWithNewPassenger = candidate.getPathsWithNewPassenger();
+    if (pathsWithNewPassenger.isEmpty()) {
       return null;
     }
     var carpoolStart = candidate.trip().startTime().plus(candidate.getDurationUntilPickupArrival());
     var carpoolEnd = carpoolStart.plus(candidate.getPassengerRideDuration());
     return buildItinerary(
-      sharedSegments,
+      pathsWithNewPassenger,
       candidate.walkToPickup(),
       candidate.walkFromDropoff(),
       carpoolStart,
@@ -136,14 +136,14 @@ public class CarpoolItineraryMapper {
       toBookingInfo(
         candidate.trip().publicContactInformation(),
         candidate.trip().startTime(),
-        boardingCoordinate(sharedSegments),
-        alightingCoordinate(sharedSegments)
+        boardingCoordinate(pathsWithNewPassenger),
+        alightingCoordinate(pathsWithNewPassenger)
       )
     );
   }
 
   private static CarpoolLeg buildCarpoolLeg(
-    List<StreetPath> sharedSegments,
+    List<StreetPath> pathsWithNewPassenger,
     ZonedDateTime startTime,
     ZonedDateTime endTime,
     double rideWeight,
@@ -156,8 +156,12 @@ public class CarpoolItineraryMapper {
       .withEndTime(endTime)
       .withFrom(fromPlace)
       .withTo(toPlace)
-      .withGeometry(GeometryUtils.concatenateLineStrings(sharedSegments, StreetPath::geometry))
-      .withDistanceMeters(sharedSegments.stream().mapToDouble(StreetPath::distanceMeters).sum())
+      .withGeometry(
+        GeometryUtils.concatenateLineStrings(pathsWithNewPassenger, StreetPath::geometry)
+      )
+      .withDistanceMeters(
+        pathsWithNewPassenger.stream().mapToDouble(StreetPath::distanceMeters).sum()
+      )
       .withGeneralizedCost((int) rideWeight)
       .withPickupBookingInfo(bookingInfo)
       .build();
@@ -194,12 +198,12 @@ public class CarpoolItineraryMapper {
    */
   @Nullable
   public Itinerary toItinerary(CarpoolAccessEgress accessEgress) {
-    var sharedSegments = accessEgress.sharedSegments();
-    if (sharedSegments.isEmpty()) {
+    var pathsWithNewPassenger = accessEgress.pathsWithNewPassenger();
+    if (pathsWithNewPassenger.isEmpty()) {
       return null;
     }
     return buildItinerary(
-      sharedSegments,
+      pathsWithNewPassenger,
       accessEgress.walkToPickup(),
       accessEgress.walkFromDropoff(),
       accessEgress.getCarpoolStart(),
@@ -210,8 +214,8 @@ public class CarpoolItineraryMapper {
       toBookingInfo(
         accessEgress.trip().publicContactInformation(),
         accessEgress.trip().startTime(),
-        boardingCoordinate(sharedSegments),
-        alightingCoordinate(sharedSegments)
+        boardingCoordinate(pathsWithNewPassenger),
+        alightingCoordinate(pathsWithNewPassenger)
       )
     );
   }
@@ -226,7 +230,7 @@ public class CarpoolItineraryMapper {
    * vertex-derived fallback name via {@link #makePlace(Vertex)}.
    */
   private static Itinerary buildItinerary(
-    List<StreetPath> sharedSegments,
+    List<StreetPath> pathsWithNewPassenger,
     @Nullable StreetPath walkToPickup,
     @Nullable StreetPath walkFromDropoff,
     ZonedDateTime carpoolStart,
@@ -236,8 +240,8 @@ public class CarpoolItineraryMapper {
     EndpointLabel endLabel,
     @Nullable BookingInfo bookingInfo
   ) {
-    Vertex pickupVertex = sharedSegments.getFirst().states().getFirst().getVertex();
-    Vertex dropoffVertex = sharedSegments.getLast().lastState().getVertex();
+    Vertex pickupVertex = pathsWithNewPassenger.getFirst().states().getFirst().getVertex();
+    Vertex dropoffVertex = pathsWithNewPassenger.getLast().lastState().getVertex();
     Place pickupPlace = makePlace(pickupVertex);
     Place dropoffPlace = makePlace(dropoffVertex);
 
@@ -259,7 +263,7 @@ public class CarpoolItineraryMapper {
     }
     legs.add(
       buildCarpoolLeg(
-        sharedSegments,
+        pathsWithNewPassenger,
         carpoolStart,
         carpoolEnd,
         rideWeight,
@@ -339,12 +343,12 @@ public class CarpoolItineraryMapper {
       .build();
   }
 
-  private static WgsCoordinate boardingCoordinate(List<StreetPath> sharedSegments) {
-    return sharedSegments.getFirst().states().getFirst().getVertex().toWgsCoordinate();
+  private static WgsCoordinate boardingCoordinate(List<StreetPath> pathsWithNewPassenger) {
+    return pathsWithNewPassenger.getFirst().states().getFirst().getVertex().toWgsCoordinate();
   }
 
-  private static WgsCoordinate alightingCoordinate(List<StreetPath> sharedSegments) {
-    return sharedSegments.getLast().lastState().getVertex().toWgsCoordinate();
+  private static WgsCoordinate alightingCoordinate(List<StreetPath> pathsWithNewPassenger) {
+    return pathsWithNewPassenger.getLast().lastState().getVertex().toWgsCoordinate();
   }
 
   /**

@@ -1,381 +1,361 @@
 package org.opentripplanner.ext.carpooling.routing;
 
-import static org.opentripplanner.ext.carpooling.util.StreetPathUtils.calculateCumulativeDurations;
-
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import javax.annotation.Nullable;
-import org.opentripplanner.ext.carpooling.constraints.PassengerDelayConstraints;
-import org.opentripplanner.place.api.NearbyStop;
+import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
-import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.utils.collection.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Evaluates pre-filtered insertion positions using A* routing.
+ * Finds the best insertion of a passenger into a carpool trip: the pickup leg and dropoff leg that
+ * add the least driving while every later stop stays within its deviation budget and a seat is free
+ * on every leg the passenger rides.
  * <p>
- * This class is a pure evaluator that takes positions identified by heuristic filtering and
- * evaluates them using expensive A* street routing. It selects the insertion that minimizes
- * additional travel time while satisfying passenger delay constraints.
+ * A point's detour in a leg is the drive via the point, minus the leg, plus the dwell. The
+ * pickup's detour delays every stop after the pickup, and both detours every stop after the
+ * dropoff.
  * <p>
- * This follows the established OTP pattern of separating candidate generation from evaluation,
- * similar to {@code TransferGenerator} and {@code OptimizePathDomainService}.
+ * Not thread-safe; one instance per request.
  */
 public class InsertionEvaluator {
 
   private static final Logger LOG = LoggerFactory.getLogger(InsertionEvaluator.class);
 
   private final CarpoolRouter carpoolRouter;
-
-  @Nullable
-  private final CarpoolRouter baselineFallbackRouter;
-
   private final Duration stopDuration;
+  private final Map<Pair<Vertex>, Optional<RoutedSegment>> pickupToDropoffSegments =
+    new HashMap<>();
 
   /**
-   * @param carpoolRouter routes a single street segment between two vertices in the candidate
-   *                      carpool route — used both to build the baseline route and to re-route only
-   *                      the segments that change when a passenger pickup/dropoff is inserted.
-   * @param stopDuration  duration added at each intermediate stop (from the car {@code pickupTime}
-   *                      preference); applied between consecutive segments when computing total
-   *                      trip and passenger-ride durations.
+   * @param carpoolRouter routes a street segment between two vertices of the candidate route
+   * @param stopDuration  dwell added at each intermediate stop, the passenger's included
    */
   public InsertionEvaluator(CarpoolRouter carpoolRouter, Duration stopDuration) {
-    this(carpoolRouter, null, stopDuration);
-  }
-
-  /**
-   * @param carpoolRouter          routes a single street segment between two vertices in the
-   *                               candidate carpool route — used both to build the baseline route
-   *                               and to re-route only the segments that change when a passenger
-   *                               pickup/dropoff is inserted.
-   * @param baselineFallbackRouter re-routes a baseline leg that {@code carpoolRouter} could not, or
-   *                               {@code null} for no fallback. Only the baseline route falls back.
-   *                               When {@code carpoolRouter} is a tree router whose per-leg trees
-   *                               are sized to a bounded per-leg limit, an underestimate of that
-   *                               limit would leave a waypoint outside its tree and drop the whole
-   *                               trip; a goal-directed fallback re-routes just that leg instead.
-   *                               Inserted passenger segments deliberately do not fall back — a
-   *                               segment that cannot be routed within the tree is an insertion the
-   *                               delay constraints reject anyway, so failing fast there is correct
-   *                               and avoids a goal-directed search per nearby stop.
-   * @param stopDuration           duration added at each intermediate stop (from the car
-   *                               {@code pickupTime} preference); applied between consecutive
-   *                               segments when computing total trip and passenger-ride durations.
-   */
-  public InsertionEvaluator(
-    CarpoolRouter carpoolRouter,
-    @Nullable CarpoolRouter baselineFallbackRouter,
-    Duration stopDuration
-  ) {
     this.carpoolRouter = carpoolRouter;
-    this.baselineFallbackRouter = baselineFallbackRouter;
     this.stopDuration = stopDuration;
   }
 
   /**
-   * Routes all segments of routePoints
-   *
-   * @return Array of routed segments, or null if any segment fails to route
-   */
-  private StreetPath[] routeSegments(List<Vertex> routePoints) {
-    StreetPath[] segments = new StreetPath[routePoints.size() - 1];
-
-    for (int i = 0; i < routePoints.size() - 1; i++) {
-      var from = routePoints.get(i);
-      var to = routePoints.get(i + 1);
-
-      StreetPath segment = carpoolRouter.route(from, to);
-      if (segment == null && baselineFallbackRouter != null) {
-        segment = baselineFallbackRouter.route(from, to);
-        if (segment != null) {
-          LOG.debug("Baseline segment {} → {} routed by the fallback router", i, i + 1);
-        }
-      }
-      if (segment == null) {
-        LOG.debug("Baseline routing failed for segment {} → {}", i, i + 1);
-        return null;
-      }
-
-      segments[i] = segment;
-    }
-
-    return segments;
-  }
-
-  /**
-   * @return A list containing the best insertion that can be found for every NearbyStop in the list
+   * @return A list containing the best insertion that can be found for every stop in the list
    *         tripWithViableAccessEgress.viableAccessEgress. If there are no valid insertions for a
-   *         NearbyStop, then no candidate for that stop will be returned.
+   *         stop, then no candidate for that stop will be returned.
    */
   public List<InsertionCandidate> findBestInsertions(
     TripWithViableAccessEgress tripWithViableAccessEgress
   ) {
-    var tripWithVertices = tripWithViableAccessEgress.tripWithVertices();
-
-    // No nearby stop produced a viable insertion position for this trip, so there is nothing to
-    // evaluate. Return before routing the baseline: that routing builds the trip's street trees,
-    // which are expensive for long trips — wasted work for a trip that cannot yield an
-    // access/egress leg.
-    if (tripWithViableAccessEgress.viableAccessEgress().isEmpty()) {
+    var viableStops = tripWithViableAccessEgress.viableAccessEgress();
+    if (viableStops.isEmpty()) {
       return List.of();
     }
-
-    StreetPath[] baselineSegments = routeSegments(tripWithVertices.vertices());
-    if (baselineSegments == null) {
-      LOG.info("Could not route baseline segments for trip {}", tripWithVertices.trip().getId());
+    var plan = plan(tripWithViableAccessEgress.routableTrip());
+    if (plan == null) {
       return List.of();
     }
-
-    Duration[] cumulativeDurations = calculateCumulativeDurations(baselineSegments, stopDuration);
-
-    return tripWithViableAccessEgress
-      .viableAccessEgress()
-      .stream()
-      .map(viableAccessEgress -> {
-        var snap = toPassengerSnap(viableAccessEgress);
-        return findBestInsertion(
-          tripWithVertices,
-          viableAccessEgress.insertionPositions(),
-          snap,
-          baselineSegments,
-          cumulativeDurations,
-          viableAccessEgress.transitStop()
-        );
-      })
-      .filter(Objects::nonNull)
-      .toList();
-  }
-
-  private static PassengerSnap toPassengerSnap(ViableAccessEgress viableAccessEgress) {
-    boolean isAccess = viableAccessEgress.accessEgress() == AccessEgressType.ACCESS;
-    var pickup = isAccess
-      ? viableAccessEgress.passengerVertex()
-      : viableAccessEgress.transitVertex();
-    var dropoff = isAccess
-      ? viableAccessEgress.transitVertex()
-      : viableAccessEgress.passengerVertex();
-    return new PassengerSnap(
-      pickup,
-      dropoff,
-      viableAccessEgress.walkToPickup(),
-      viableAccessEgress.walkFromDropoff()
-    );
+    var candidates = new ArrayList<InsertionCandidate>();
+    for (var viable : viableStops) {
+      var candidate = plan.best(toPassengerSnap(viable), viable.transitStop());
+      if (candidate != null) {
+        candidates.add(candidate);
+      }
+    }
+    return candidates;
   }
 
   /**
-   * Evaluates pre-filtered insertion positions using A* routing.
-   * <p>
-   * This method assumes the provided positions have already passed heuristic validation
-   * (capacity, direction, beeline delay). It performs expensive A* routing for each position and
-   * selects the one with minimum additional duration that satisfies delay constraints.
+   * The best insertion of one passenger ride into the trip, or {@code null} if no pair of legs can
+   * take it within the budgets and the capacity.
    *
-   * @param tripWithVertices The carpool trip with resolved vertices
-   * @param viablePositions  Positions that passed heuristic checks (from InsertionPositionFinder)
-   * @param snap             Pickup/dropoff vertices (already snapped to car-reachable vertices by
-   *                         the caller) and the optional walk paths bracketing the carpool ride
-   * @return The best insertion candidate, or null if none are viable after routing
+   * @param snap pickup/dropoff vertices (already snapped to car-reachable vertices by the caller)
+   *             and the optional walk paths bracketing the carpool ride
    */
   @Nullable
   public InsertionCandidate findBestInsertion(
-    CarpoolTripWithVertices tripWithVertices,
-    List<InsertionPosition> viablePositions,
+    RoutableCarpoolTrip routableTrip,
     PassengerSnap snap
   ) {
-    StreetPath[] baselineSegments = routeSegments(tripWithVertices.vertices());
-    if (baselineSegments == null) {
-      LOG.info("Could not route baseline for trip {}", tripWithVertices.trip().getId());
-      return null;
-    }
-
-    Duration[] cumulativeDurations = calculateCumulativeDurations(baselineSegments, stopDuration);
-
-    return findBestInsertion(
-      tripWithVertices,
-      viablePositions,
-      snap,
-      baselineSegments,
-      cumulativeDurations,
-      null
-    );
+    var plan = plan(routableTrip);
+    return plan == null ? null : plan.best(snap, null);
   }
 
   @Nullable
-  private InsertionCandidate findBestInsertion(
-    CarpoolTripWithVertices tripWithVertices,
-    List<InsertionPosition> viablePositions,
-    PassengerSnap snap,
-    StreetPath[] baselineSegments,
-    Duration[] cumulativeDurations,
-    NearbyStop transitStop
-  ) {
-    InsertionCandidate bestCandidate = null;
-
-    for (InsertionPosition position : viablePositions) {
-      InsertionCandidate candidate = evaluateInsertion(
-        tripWithVertices,
-        position.pickupPos(),
-        position.dropoffPos(),
-        snap,
-        baselineSegments,
-        cumulativeDurations,
-        transitStop
-      );
-
-      if (candidate == null) {
-        continue;
-      }
-
-      if (
-        bestCandidate == null ||
-        candidate.totalTripDuration().compareTo(bestCandidate.totalTripDuration()) < 0
-      ) {
-        bestCandidate = candidate;
-        LOG.debug(
-          "New best insertion: pickup@{}, dropoff@{}, duration={}s",
-          position.pickupPos(),
-          position.dropoffPos(),
-          candidate.totalTripDuration().getSeconds()
-        );
+  private TripInsertionPlan plan(RoutableCarpoolTrip routableTrip) {
+    var waypoints = routableTrip.vertices();
+    var baseline = new RoutedSegment[waypoints.size() - 1];
+    for (int leg = 0; leg < baseline.length; leg++) {
+      baseline[leg] = carpoolRouter.route(waypoints.get(leg), waypoints.get(leg + 1));
+      if (baseline[leg] == null) {
+        LOG.info("Could not route leg {} of carpool trip {}", leg, routableTrip.trip().getId());
+        return null;
       }
     }
-
-    return bestCandidate;
+    return new TripInsertionPlan(routableTrip, baseline);
   }
 
-  /**
-   * Evaluates a specific insertion configuration. Reuses cached baseline segments and only routes
-   * new segments involving the passenger.
-   */
-  private InsertionCandidate evaluateInsertion(
-    CarpoolTripWithVertices tripWithVertices,
-    int pickupPos,
-    int dropoffPos,
-    PassengerSnap snap,
-    StreetPath[] baselineSegments,
-    Duration[] originalCumulativeDurations,
-    NearbyStop transitStop
-  ) {
-    List<StreetPath> modifiedSegments = buildModifiedSegments(
-      tripWithVertices.vertices(),
-      baselineSegments,
-      pickupPos,
-      dropoffPos,
-      snap.pickupVertex(),
-      snap.dropoffVertex()
-    );
-
-    if (modifiedSegments == null) {
-      return null;
-    }
-
-    Duration[] modifiedCumulativeDurations = calculateCumulativeDurations(
-      modifiedSegments.toArray(new StreetPath[modifiedSegments.size()]),
-      stopDuration
-    );
-    if (
-      !PassengerDelayConstraints.satisfiesConstraints(
-        originalCumulativeDurations,
-        modifiedCumulativeDurations,
-        pickupPos,
-        dropoffPos,
-        tripWithVertices.trip().stops()
+  /** The passenger's own ride, pickup → dropoff, routed once per request. */
+  @Nullable
+  private RoutedSegment pickupToDropoff(Vertex pickup, Vertex dropoff) {
+    return pickupToDropoffSegments
+      .computeIfAbsent(new Pair<>(pickup, dropoff), pair ->
+        Optional.ofNullable(carpoolRouter.route(pickup, dropoff))
       )
-    ) {
-      LOG.trace(
-        "Insertion at pickup={}, dropoff={} rejected by delay constraints",
-        pickupPos,
-        dropoffPos
-      );
-      return null;
-    }
+      .orElse(null);
+  }
 
-    return new InsertionCandidate(
-      tripWithVertices.trip(),
-      pickupPos,
-      dropoffPos,
-      modifiedSegments,
-      stopDuration,
-      transitStop,
-      snap.walkToPickup(),
-      snap.walkFromDropoff()
+  private static PassengerSnap toPassengerSnap(ViableAccessEgress viable) {
+    boolean access = viable.accessEgress() == AccessEgressType.ACCESS;
+    return new PassengerSnap(
+      access ? viable.passengerVertex() : viable.transitVertex(),
+      access ? viable.transitVertex() : viable.passengerVertex(),
+      viable.walkToPickup(),
+      viable.walkFromDropoff()
     );
   }
 
-  private List<StreetPath> buildModifiedSegments(
-    List<Vertex> originalPoints,
-    StreetPath[] baselineSegments,
-    int pickupPos,
-    int dropoffPos,
-    Vertex passengerPickup,
-    Vertex passengerDropoff
-  ) {
-    List<StreetPath> segments = new ArrayList<>();
+  /**
+   * Everything about one trip that every insertion into it shares. Legs and waypoints are numbered
+   * from 0, and a leg runs from the waypoint with its number to the next one. A pickup in a leg is
+   * route position {@code leg + 1} and a dropoff route position {@code leg + 2}, in the conventions
+   * of {@link InsertionCandidate}.
+   */
+  private final class TripInsertionPlan {
 
-    List<Vertex> modifiedPoints = new ArrayList<>(originalPoints);
-    modifiedPoints.add(pickupPos, passengerPickup);
-    modifiedPoints.add(dropoffPos, passengerDropoff);
+    /** The trip the passenger is inserted into. */
+    private final RoutableCarpoolTrip routableTrip;
+    /** The trip's own legs, one segment per leg, used unchanged where the passenger is not. */
+    private final RoutedSegment[] baseline;
+    /** The number of legs in the trip. */
+    private final int legCount;
+    /** The driving time of each leg in seconds. */
+    private final long[] legSeconds;
+    /** The time in seconds the driver stops for each pickup and dropoff. */
+    private final long dwell;
+    /**
+     * {@code budgetFrom[stop]}: the smallest deviation budget of the stops from {@code stop} to the
+     * destination, for every stop after the origin.
+     */
+    private final long[] budgetFrom;
+    /**
+     * {@code capacityOk[firstLeg][lastLeg]}: one more passenger fits on every leg from
+     * {@code firstLeg} to {@code lastLeg}, both included.
+     */
+    private final boolean[][] capacityOk;
+    /** The driving times into and out of the legs for each pickup or dropoff point tried. */
+    private final Map<Vertex, LegTimes> legTimesByVertex = new HashMap<>();
 
-    for (int i = 0; i < modifiedPoints.size() - 1; i++) {
-      StreetPath segment;
-
-      int baselineIndex = baselineSegmentIndex(i, pickupPos, dropoffPos);
-      if (baselineIndex >= 0 && baselineIndex < baselineSegments.length) {
-        segment = baselineSegments[baselineIndex];
-        LOG.trace("Reusing baseline segment {} for modified position {}", baselineIndex, i);
-      } else {
-        var fromVertex = modifiedPoints.get(i);
-        var toVertex = modifiedPoints.get(i + 1);
-
-        segment = this.carpoolRouter.route(fromVertex, toVertex);
-        if (segment == null) {
-          LOG.trace("Routing failed for new segment {} → {}", i, i + 1);
-          return null;
-        }
-        LOG.trace("Routed new segment for modified position {}", i);
+    TripInsertionPlan(RoutableCarpoolTrip routableTrip, RoutedSegment[] baseline) {
+      this.routableTrip = routableTrip;
+      this.baseline = baseline;
+      this.dwell = stopDuration.toSeconds();
+      this.legCount = baseline.length;
+      this.legSeconds = new long[legCount];
+      for (int leg = 0; leg < legCount; leg++) {
+        legSeconds[leg] = baseline[leg].durationSeconds();
       }
-
-      segments.add(segment);
+      CarpoolTrip trip = routableTrip.trip();
+      int stopCount = legCount + 1;
+      this.budgetFrom = new long[stopCount];
+      long min = Long.MAX_VALUE;
+      for (int stop = stopCount - 1; stop >= 1; stop--) {
+        min = Math.min(min, trip.stops().get(stop).getDeviationBudget().toSeconds());
+        budgetFrom[stop] = min;
+      }
+      this.capacityOk = new boolean[legCount][legCount];
+      for (int firstLeg = 0; firstLeg < legCount; firstLeg++) {
+        boolean ok = true;
+        for (int lastLeg = firstLeg; lastLeg < legCount && ok; lastLeg++) {
+          ok = trip.getPassengerCountAtDepartureOfStop(lastLeg) + 1 <= trip.totalCapacity();
+          capacityOk[firstLeg][lastLeg] = ok;
+        }
+      }
     }
 
-    return segments;
-  }
+    @Nullable
+    InsertionCandidate best(PassengerSnap snap, @Nullable StopLocation transitStop) {
+      Vertex pickup = snap.pickupVertex();
+      Vertex dropoff = snap.dropoffVertex();
+      LegTimes pickupTimes = legTimes(pickup);
+      LegTimes dropoffTimes = legTimes(dropoff);
+      long bestDetour = Long.MAX_VALUE;
+      int bestPickupLeg = -1;
+      int bestDropoffLeg = -1;
 
-  /**
-   * Maps a modified-route segment index to the corresponding baseline segment index, or {@code -1}
-   * if the modified segment touches the inserted pickup or dropoff and so cannot be reused.
-   * <p>
-   * The modified route is the original route with two insertions: pickup at {@code pickupPos}
-   * and dropoff at {@code dropoffPos} (List.add semantics, dropoffPos interpreted after the pickup
-   * insertion). A modified segment {@code [i, i+1)} either reuses an original segment (when both
-   * endpoints fall in original points) or is one of the four newly created segments around the
-   * inserted points.
-   * <p>
-   * Requires {@code pickupPos < dropoffPos} — the shift arithmetic depends on the pickup being
-   * strictly before the dropoff, otherwise the result would silently describe a route with the
-   * dropoff before the pickup. Throws {@link IllegalArgumentException} if the precondition is
-   * violated.
-   */
-  private static int baselineSegmentIndex(int modifiedIndex, int pickupPos, int dropoffPos) {
-    if (pickupPos >= dropoffPos) {
-      throw new IllegalArgumentException(
-        "pickupPos (" + pickupPos + ") must be < dropoffPos (" + dropoffPos + ")"
+      for (int pickupLeg = 0; pickupLeg < legCount; pickupLeg++) {
+        if (!capacityOk[pickupLeg][pickupLeg]) {
+          // The car is full on the pickup's leg, so no dropoff leg works with a pickup in it.
+          continue;
+        }
+        RoutedSegment toPickup = pickupTimes.fromLegStart(pickupLeg);
+        if (toPickup == null) {
+          continue;
+        }
+        for (int dropoffLeg = pickupLeg; dropoffLeg < legCount; dropoffLeg++) {
+          if (!capacityOk[pickupLeg][dropoffLeg]) {
+            // The car is full somewhere between the two legs, so on every longer span too.
+            break;
+          }
+          long detour;
+          if (pickupLeg == dropoffLeg) {
+            // Pickup and dropoff in the same leg: leg start → pickup → dropoff → leg end.
+            RoutedSegment fromDropoff = dropoffTimes.toLegEnd(pickupLeg);
+            if (fromDropoff == null) {
+              continue;
+            }
+            RoutedSegment pickupToDropoff = pickupToDropoff(pickup, dropoff);
+            if (pickupToDropoff == null) {
+              continue;
+            }
+            detour =
+              toPickup.durationSeconds() +
+              pickupToDropoff.durationSeconds() +
+              fromDropoff.durationSeconds() -
+              legSeconds[pickupLeg] +
+              2 * dwell;
+            if (detour > budgetFrom[pickupLeg + 1]) {
+              continue;
+            }
+          } else {
+            RoutedSegment fromPickup = pickupTimes.toLegEnd(pickupLeg);
+            if (fromPickup == null) {
+              break;
+            }
+            long pickupDetour =
+              toPickup.durationSeconds() +
+              fromPickup.durationSeconds() -
+              legSeconds[pickupLeg] +
+              dwell;
+            if (pickupDetour > budgetFrom[pickupLeg + 1]) {
+              // The pickup's detour delays every later stop, so no later dropoff leg works either.
+              break;
+            }
+            RoutedSegment toDropoff = dropoffTimes.fromLegStart(dropoffLeg);
+            if (toDropoff == null) {
+              continue;
+            }
+            RoutedSegment fromDropoff = dropoffTimes.toLegEnd(dropoffLeg);
+            if (fromDropoff == null) {
+              continue;
+            }
+            long dropoffDetour =
+              toDropoff.durationSeconds() +
+              fromDropoff.durationSeconds() -
+              legSeconds[dropoffLeg] +
+              dwell;
+            detour = pickupDetour + dropoffDetour;
+            if (detour > budgetFrom[dropoffLeg + 1]) {
+              continue;
+            }
+          }
+          if (detour < bestDetour) {
+            bestDetour = detour;
+            bestPickupLeg = pickupLeg;
+            bestDropoffLeg = dropoffLeg;
+          }
+        }
+      }
+      if (bestPickupLeg < 0) {
+        return null;
+      }
+      var pickupToDropoff =
+        bestPickupLeg == bestDropoffLeg ? pickupToDropoff(pickup, dropoff) : null;
+      return new InsertionCandidate(
+        routableTrip.trip(),
+        bestPickupLeg + 1,
+        bestDropoffLeg + 2,
+        routeWith(bestPickupLeg, bestDropoffLeg, pickupTimes, dropoffTimes, pickupToDropoff),
+        stopDuration,
+        transitStop,
+        snap.walkToPickup(),
+        snap.walkFromDropoff()
       );
     }
-    int i = modifiedIndex;
-    if (i == pickupPos - 1 || i == pickupPos || i == dropoffPos - 1 || i == dropoffPos) {
-      return -1;
+
+    /**
+     * The trip's segments with the passenger's pickup and dropoff in the given legs.
+     *
+     * @param pickupToDropoff the segment from the pickup to the dropoff, the passenger's own ride;
+     *                        used, and non-null, only when both are in the same leg
+     */
+    private List<RoutedSegment> routeWith(
+      int pickupLeg,
+      int dropoffLeg,
+      LegTimes pickupTimes,
+      LegTimes dropoffTimes,
+      @Nullable RoutedSegment pickupToDropoff
+    ) {
+      var segments = new ArrayList<RoutedSegment>(legCount + 2);
+      for (int leg = 0; leg < legCount; leg++) {
+        if (leg == pickupLeg && leg == dropoffLeg) {
+          segments.add(Objects.requireNonNull(pickupTimes.fromLegStart(leg)));
+          segments.add(Objects.requireNonNull(pickupToDropoff));
+          segments.add(Objects.requireNonNull(dropoffTimes.toLegEnd(leg)));
+        } else if (leg == pickupLeg) {
+          segments.add(Objects.requireNonNull(pickupTimes.fromLegStart(leg)));
+          segments.add(Objects.requireNonNull(pickupTimes.toLegEnd(leg)));
+        } else if (leg == dropoffLeg) {
+          segments.add(Objects.requireNonNull(dropoffTimes.fromLegStart(leg)));
+          segments.add(Objects.requireNonNull(dropoffTimes.toLegEnd(leg)));
+        } else {
+          segments.add(baseline[leg]);
+        }
+      }
+      return segments;
     }
-    if (i < pickupPos) {
-      return i;
+
+    /** The driving times into and out of the legs for a point, kept for the rest of the trip. */
+    private LegTimes legTimes(Vertex point) {
+      return legTimesByVertex.computeIfAbsent(point, LegTimes::new);
     }
-    if (i < dropoffPos) {
-      return i - 1;
+
+    /**
+     * Per leg, the segment from the leg's start to a point and from the point to the leg's end,
+     * each routed the first time it is asked for; {@code null} means unroutable.
+     */
+    private final class LegTimes {
+
+      /** The pickup or dropoff point. */
+      private final Vertex point;
+      /** Per leg, the segment from the leg's start to the point, once asked for. */
+      private final RoutedSegment[] fromLegStart = new RoutedSegment[legCount];
+      /** Per leg, the segment from the point to the leg's end, once asked for. */
+      private final RoutedSegment[] toLegEnd = new RoutedSegment[legCount];
+      /** Per leg, whether {@code fromLegStart} was asked for, so a null is not routed again. */
+      private final boolean[] fromLegStartRouted = new boolean[legCount];
+      /** Per leg, whether {@code toLegEnd} was asked for, so a null is not routed again. */
+      private final boolean[] toLegEndRouted = new boolean[legCount];
+
+      LegTimes(Vertex point) {
+        this.point = point;
+      }
+
+      /** The segment from the leg's start to the point. */
+      @Nullable
+      RoutedSegment fromLegStart(int leg) {
+        if (!fromLegStartRouted[leg]) {
+          fromLegStartRouted[leg] = true;
+          fromLegStart[leg] = carpoolRouter.route(routableTrip.vertices().get(leg), point);
+        }
+        return fromLegStart[leg];
+      }
+
+      /** The segment from the point to the leg's end. */
+      @Nullable
+      RoutedSegment toLegEnd(int leg) {
+        if (!toLegEndRouted[leg]) {
+          toLegEndRouted[leg] = true;
+          toLegEnd[leg] = carpoolRouter.route(point, routableTrip.vertices().get(leg + 1));
+        }
+        return toLegEnd[leg];
+      }
     }
-    return i - 2;
   }
 }

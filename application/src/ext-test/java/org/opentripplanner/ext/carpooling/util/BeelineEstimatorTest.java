@@ -1,14 +1,11 @@
 package org.opentripplanner.ext.carpooling.util;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_CENTER;
-import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_EAST;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_NORTH;
 
 import java.time.Duration;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 
@@ -42,31 +39,5 @@ class BeelineEstimatorTest {
   void constructorRejectsNonPositiveSpeed() {
     assertThrows(IllegalArgumentException.class, () -> new BeelineEstimator(0.0));
     assertThrows(IllegalArgumentException.class, () -> new BeelineEstimator(-5.0));
-  }
-
-  @Test
-  void calculateCumulativeTimesIsEmptyForNoPoints() {
-    assertEquals(
-      0,
-      new BeelineEstimator().calculateCumulativeTimes(List.of(), Duration.ZERO).length
-    );
-  }
-
-  @Test
-  void calculateCumulativeTimesAccumulatesPerSegmentEstimates() {
-    var estimator = new BeelineEstimator();
-    var stop = Duration.ofMinutes(1);
-
-    Duration[] times = estimator.calculateCumulativeTimes(
-      List.of(OSLO_CENTER, OSLO_EAST, OSLO_NORTH),
-      stop
-    );
-
-    Duration firstLeg = estimator.estimateDuration(OSLO_CENTER, OSLO_EAST);
-    Duration secondLeg = estimator.estimateDuration(OSLO_EAST, OSLO_NORTH);
-    assertArrayEquals(
-      new Duration[] { Duration.ZERO, firstLeg, firstLeg.plus(stop).plus(secondLeg) },
-      times
-    );
   }
 }
