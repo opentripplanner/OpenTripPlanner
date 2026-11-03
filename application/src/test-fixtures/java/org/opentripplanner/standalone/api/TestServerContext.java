@@ -4,7 +4,6 @@ import io.micrometer.core.instrument.Metrics;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import org.opentripplanner.core.framework.transaction.internal.TransactionFactory;
 import org.opentripplanner.core.model.transaction.RepositoryHandle;
 import org.opentripplanner.core.model.transaction.RepositoryRegistry;
@@ -212,10 +211,7 @@ public class TestServerContext {
       graph,
       new VertexCreationService(vertexLinker),
       transitService::findStopOrChildIds,
-      id -> {
-        var group = transitService.getStopLocationsGroup(id);
-        return Optional.ofNullable(group).map(locationsGroup -> locationsGroup.getCoordinate());
-      }
+      transitService::findCoordinate
     );
   }
 }

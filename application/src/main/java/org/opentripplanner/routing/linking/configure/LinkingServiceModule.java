@@ -4,7 +4,6 @@ import static org.opentripplanner.street.linking.VisibilityMode.COMPUTE_AREA_VIS
 
 import dagger.Module;
 import dagger.Provides;
-import java.util.Optional;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
@@ -48,10 +47,7 @@ public class LinkingServiceModule {
       graph,
       vertexCreationService,
       transitService::findStopOrChildIds,
-      id -> {
-        var group = transitService.getStopLocationsGroup(id);
-        return Optional.ofNullable(group).map(locationsGroup -> locationsGroup.getCoordinate());
-      }
+      transitService::findCoordinate
     );
   }
 }

@@ -9,7 +9,6 @@ import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBin
 import org.opentripplanner.ext.taxi.TaxiRouteIndex;
 import org.opentripplanner.ext.taxi.model.TaxiLeg;
 import org.opentripplanner.ext.taxi.model.TaxiRoute;
-import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.leg.StreetLeg;
@@ -75,8 +74,8 @@ public class TaxiRouter {
     RouteRequest request,
     LinkingContext linkingContext
   ) {
-    WgsCoordinate pickup = resolveCoordinate(transitService, request.from());
-    WgsCoordinate dropoff = resolveCoordinate(transitService, request.to());
+    WgsCoordinate pickup = transitService.findCoordinate(request.from());
+    WgsCoordinate dropoff = transitService.findCoordinate(request.to());
     if (
       pickup == null || dropoff == null || taxiRouteIndex.findFirstRoute(pickup, dropoff).isEmpty()
     ) {
@@ -120,36 +119,10 @@ public class TaxiRouter {
     RouteRequest request
   ) {
     var location = type.isAccess() ? request.from() : request.to();
-    var coordinate = resolveCoordinate(transitService, location);
+    var coordinate = transitService.findCoordinate(location);
     return coordinate == null
       ? List.of()
       : filterNearbyStops(transitService, nearbyStops, coordinate);
-  }
-
-  /**
-   * Resolves the coordinate a taxi would pick up from or drop off at for the given request
-   * location. An explicit coordinate takes precedence; otherwise the coordinate of the stop is
-   * used, or the centroid of the station or group of stations if the id refers to one. Returns
-   * {@code null} if the location cannot be resolved.
-   */
-  @Nullable
-  public WgsCoordinate resolveCoordinate(TransitService transitService, GenericLocation location) {
-    if (location.wgsCoordinate() != null) {
-      return location.wgsCoordinate();
-    }
-    var id = location.stopId();
-    if (id == null) {
-      return null;
-    }
-    var stop = transitService.getStopLocation(id);
-    if (stop != null) {
-      return stop.getCoordinate();
-    }
-    var group = transitService.getStopLocationsGroup(id);
-    if (group != null) {
-      return group.getCoordinate();
-    }
-    return null;
   }
 
   private Collection<NearbyStop> filterNearbyStops(

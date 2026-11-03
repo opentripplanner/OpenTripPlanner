@@ -47,9 +47,11 @@ public class LinkingContextFactory {
   private final VertexCreationService vertexCreationService;
   private final Function<FeedScopedId, Collection<FeedScopedId>> resolveSiteIds;
   /**
-   * This can be either a station, a multi-modal station or a group of stations.
+   * Resolves the coordinate of a location, which may be an explicit coordinate, a stop, a station,
+   * a multi-modal station or a group of stations given by id. Returns {@code null} if it cannot be
+   * resolved.
    */
-  private final Function<FeedScopedId, Optional<WgsCoordinate>> findStopLocationsGroupCentroid;
+  private final Function<GenericLocation, WgsCoordinate> findCoordinate;
 
   /**
    * Construct a factory when stop locations are potentially used for locations.
@@ -58,19 +60,19 @@ public class LinkingContextFactory {
     Graph graph,
     VertexCreationService vertexCreationService,
     Function<FeedScopedId, Collection<FeedScopedId>> resolveSiteIds,
-    Function<FeedScopedId, Optional<WgsCoordinate>> findStopLocationsGroupCentroid
+    Function<GenericLocation, WgsCoordinate> findCoordinate
   ) {
     this.graph = graph;
     this.vertexCreationService = vertexCreationService;
     this.resolveSiteIds = resolveSiteIds;
-    this.findStopLocationsGroupCentroid = findStopLocationsGroupCentroid;
+    this.findCoordinate = findCoordinate;
   }
 
   /**
    * Construct a factory when stop locations are not used for locations.
    */
   public LinkingContextFactory(Graph graph, VertexCreationService vertexCreationService) {
-    this(graph, vertexCreationService, id -> Set.of(), id -> Optional.empty());
+    this(graph, vertexCreationService, id -> Set.of(), GenericLocation::wgsCoordinate);
   }
 
   /**
@@ -347,28 +349,14 @@ public class LinkingContextFactory {
     GenericLocation location,
     LocationType type
   ) {
-    Coordinate coordinate = location.getCoordinate();
-    // Fetch coordinate from stop, if not given in request
-    if (coordinate == null) {
-      var stopVertex = graph.getStopVertex(location.stopId());
-      if (stopVertex != null) {
-        coordinate = stopVertex.getCoordinate();
-      } else {
-        // For car routing, we use station's coordinate instead of child stops' if stop location is
-        // a station.
-        coordinate = findStopLocationsGroupCentroid
-          .apply(location.stopId())
-          .map(WgsCoordinate::asJtsCoordinate)
-          .orElse(null);
-      }
-    }
+    var coordinate = findCoordinate.apply(location);
     if (coordinate == null) {
       return Optional.empty();
     }
     return Optional.of(
       vertexCreationService.createVertexFromCoordinate(
         container,
-        coordinate,
+        coordinate.asJtsCoordinate(),
         location.label(),
         List.of(TraverseMode.CAR),
         type

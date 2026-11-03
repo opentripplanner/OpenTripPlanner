@@ -219,7 +219,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     if (taxiService != null && request.journey().access().mode() == StreetMode.TAXI) {
       return taxiService.decorateAccessEgressLegs(
         legs,
-        Objects.requireNonNull(taxiService.resolveCoordinate(transitService, request.from())),
+        Objects.requireNonNull(transitService.findCoordinate(request.from())),
         raptorTransitData.getStopByIndex(accessPathLeg.access().stop()).getCoordinate()
       );
     }
@@ -375,7 +375,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       return taxiService.decorateAccessEgressLegs(
         legs,
         raptorTransitData.getStopByIndex(egressPathLeg.egress().stop()).getCoordinate(),
-        Objects.requireNonNull(taxiService.resolveCoordinate(transitService, request.to()))
+        Objects.requireNonNull(transitService.findCoordinate(request.to()))
       );
     }
     return legs;

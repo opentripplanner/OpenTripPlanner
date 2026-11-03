@@ -13,7 +13,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
@@ -112,7 +111,7 @@ class LinkingContextFactoryTest {
       graph,
       new VertexCreationService(VertexLinkerTestFactory.of(graph)),
       Set::of,
-      id -> Optional.empty()
+      GenericLocation::wgsCoordinate
     );
     var container = new TemporaryVerticesContainer();
     var from = stopToLocation(stopA);
@@ -133,7 +132,7 @@ class LinkingContextFactoryTest {
       graph,
       new VertexCreationService(VertexLinkerTestFactory.of(graph)),
       Set::of,
-      id -> Optional.empty()
+      GenericLocation::wgsCoordinate
     );
     var container = new TemporaryVerticesContainer();
     var from = stopToLocation(stopA);
@@ -158,7 +157,7 @@ class LinkingContextFactoryTest {
       graph,
       new VertexCreationService(VertexLinkerTestFactory.of(graph)),
       mapping::get,
-      id -> Optional.empty()
+      GenericLocation::wgsCoordinate
     );
     var container = new TemporaryVerticesContainer();
     var from = GenericLocation.fromStopId(
@@ -185,13 +184,12 @@ class LinkingContextFactoryTest {
       graph,
       new VertexCreationService(VertexLinkerTestFactory.of(graph)),
       id -> Set.of(),
-      id -> {
+      location -> {
+        var id = location.stopId();
         if (id.equals(stationAlpha.getId())) {
-          return Optional.of(stationAlpha.getCoordinate());
+          return stationAlpha.getCoordinate();
         }
-        return id.equals(multiModalStation.getId())
-          ? Optional.of(multiModalStation.getCoordinate())
-          : Optional.empty();
+        return id.equals(multiModalStation.getId()) ? multiModalStation.getCoordinate() : null;
       }
     );
     var container = new TemporaryVerticesContainer();

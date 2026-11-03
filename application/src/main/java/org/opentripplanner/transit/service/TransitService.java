@@ -15,9 +15,11 @@ import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.model.FeedInfo;
+import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transfer.constrained.ConstrainedTransferService;
 import org.opentripplanner.transit.api.request.FindRegularStopsByBoundingBoxRequest;
 import org.opentripplanner.transit.api.request.FindRoutesRequest;
@@ -187,6 +189,32 @@ public interface TransitService {
   Collection<StopLocationsGroup> listStopLocationGroups();
 
   StopLocationsGroup getStopLocationsGroup(FeedScopedId id);
+
+  /**
+   * Resolves the coordinate of a generic location, which may be given as a stop or station id
+   * without coordinates. An explicit coordinate takes precedence; otherwise the coordinate of the
+   * stop is used, or the centroid of the station or group of stations if the id refers to one.
+   * Returns {@code null} if the location cannot be resolved.
+   */
+  @Nullable
+  default WgsCoordinate findCoordinate(GenericLocation location) {
+    if (location.wgsCoordinate() != null) {
+      return location.wgsCoordinate();
+    }
+    var id = location.stopId();
+    if (id == null) {
+      return null;
+    }
+    var stop = getStopLocation(id);
+    if (stop != null) {
+      return stop.getCoordinate();
+    }
+    var group = getStopLocationsGroup(id);
+    if (group != null) {
+      return group.getCoordinate();
+    }
+    return null;
+  }
 
   /**
    * Return the trip for the given id, including trips created in real time.

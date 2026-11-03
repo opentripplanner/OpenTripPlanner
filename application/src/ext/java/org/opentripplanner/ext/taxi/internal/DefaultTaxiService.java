@@ -9,7 +9,6 @@ import org.opentripplanner.ext.taxi.TaxiRouteIndex;
 import org.opentripplanner.ext.taxi.TaxiService;
 import org.opentripplanner.ext.taxi.model.TaxiRoute;
 import org.opentripplanner.ext.taxi.routing.TaxiRouter;
-import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.place.api.NearbyStop;
@@ -62,12 +61,6 @@ public class DefaultTaxiService implements TaxiService {
     RouteRequest request
   ) {
     return taxiRouter.filterNearbyStops(transitService, nearbyStops, type, request);
-  }
-
-  @Override
-  @Nullable
-  public WgsCoordinate resolveCoordinate(TransitService transitService, GenericLocation location) {
-    return taxiRouter.resolveCoordinate(transitService, location);
   }
 
   @Override

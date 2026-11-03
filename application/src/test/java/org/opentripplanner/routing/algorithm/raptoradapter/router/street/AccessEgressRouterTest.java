@@ -5,7 +5,6 @@ import static com.google.common.truth.Truth.assertThat;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -274,10 +273,7 @@ class AccessEgressRouterTest extends GraphRoutingTest {
         graph,
         vertexCreationService,
         transitService::findStopOrChildIds,
-        id -> {
-          var group = transitService.getStopLocationsGroup(id);
-          return Optional.ofNullable(group).map(locationsGroup -> locationsGroup.getCoordinate());
-        }
+        transitService::findCoordinate
       );
       var linkingRequest = LinkingContextRequestMapper.map(request);
       var linkingContext = linkingContextFactory.create(verticesContainer, linkingRequest);

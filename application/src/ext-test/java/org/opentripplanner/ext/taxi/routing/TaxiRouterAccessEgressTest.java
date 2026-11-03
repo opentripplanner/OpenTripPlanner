@@ -6,7 +6,6 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner._support.geometry.Polygons;
-import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.taxi.TaxiRouteIndex;
 import org.opentripplanner.ext.taxi.model.TaxiLeg;
 import org.opentripplanner.ext.taxi.model.TaxiRoute;
@@ -23,7 +22,6 @@ import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.model.site.Station;
 
 class TaxiRouterAccessEgressTest implements PlanTestConstants {
 
@@ -86,9 +84,6 @@ class TaxiRouterAccessEgressTest implements PlanTestConstants {
   private static final RegularStop UNCOVERED_STOP = TEST_ENV_BUILDER.stop("uncovered-stop", b ->
     b.withCoordinate(65.0, 20.0)
   );
-  private static final Station STATION = TEST_ENV_BUILDER.station("station", b ->
-    b.withCoordinate(TO_LAT, TO_LON)
-  );
   private static final TransitTestEnvironment TEST_ENV = TEST_ENV_BUILDER.build();
 
   @Test
@@ -126,54 +121,6 @@ class TaxiRouterAccessEgressTest implements PlanTestConstants {
     );
 
     assertThat(result).containsExactly(covered);
-  }
-
-  @Test
-  void resolveCoordinateUsesStopCoordinateWhenLocationHasOnlyStopId() {
-    var subject = new TaxiRouter(COVERING_INDEX);
-
-    var result = subject.resolveCoordinate(
-      TEST_ENV.transitService(),
-      GenericLocation.fromStopId(COVERED_STOP.getId())
-    );
-
-    assertThat(result).isEqualTo(COVERED_STOP.getCoordinate());
-  }
-
-  @Test
-  void resolveCoordinateUsesStationCoordinateWhenLocationIsStationId() {
-    var subject = new TaxiRouter(COVERING_INDEX);
-
-    var result = subject.resolveCoordinate(
-      TEST_ENV.transitService(),
-      GenericLocation.fromStopId(STATION.getId())
-    );
-
-    assertThat(result).isEqualTo(STATION.getCoordinate());
-  }
-
-  @Test
-  void resolveCoordinatePrefersExplicitCoordinateOverStopId() {
-    var subject = new TaxiRouter(COVERING_INDEX);
-
-    var result = subject.resolveCoordinate(
-      TEST_ENV.transitService(),
-      GenericLocation.fromStopIdWithFallback(COVERED_STOP.getId(), FROM_LAT, FROM_LON, null)
-    );
-
-    assertThat(result).isEqualTo(FROM_COORDINATE);
-  }
-
-  @Test
-  void resolveCoordinateReturnsNullForUnknownStopId() {
-    var subject = new TaxiRouter(COVERING_INDEX);
-
-    var result = subject.resolveCoordinate(
-      TEST_ENV.transitService(),
-      GenericLocation.fromStopId(new FeedScopedId("F", "unknown"))
-    );
-
-    assertThat(result).isNull();
   }
 
   @Test

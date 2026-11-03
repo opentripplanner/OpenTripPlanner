@@ -3,6 +3,7 @@ package org.opentripplanner.transit.service;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.transit.model._data.TransitRepositoryForTest.AGENCY;
@@ -24,6 +25,7 @@ import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.time.TimePeriod;
+import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitDataTestFactory;
@@ -527,5 +529,45 @@ class DefaultTransitServiceTest {
 
     assertThat(stops).containsAtLeast(STOP_A, STOP_B, STOP_C, STOP_ONE);
     assertThat(service.findRegularStopsByBoundingBox(new Envelope(170, 180, 80, 90))).isEmpty();
+  }
+
+  @Nested
+  class FindCoordinate {
+
+    private static final WgsCoordinate EXPLICIT = new WgsCoordinate(59.9, 10.7);
+
+    @Test
+    void explicitCoordinateTakesPrecedenceOverStopId() {
+      var location = GenericLocation.fromStopIdWithFallback(
+        STOP_A.getId(),
+        EXPLICIT.latitude(),
+        EXPLICIT.longitude(),
+        null
+      );
+      assertEquals(EXPLICIT, service.findCoordinate(location));
+    }
+
+    @Test
+    void stopIdResolvesToStopCoordinate() {
+      var result = service.findCoordinate(GenericLocation.fromStopId(STOP_A.getId()));
+      assertEquals(STOP_A.getCoordinate(), result);
+    }
+
+    @Test
+    void stationIdResolvesToStationCoordinate() {
+      var result = service.findCoordinate(GenericLocation.fromStopId(STATION.getId()));
+      assertEquals(STATION.getCoordinate(), result);
+    }
+
+    @Test
+    void groupOfStationsIdResolvesToGroupCoordinate() {
+      var result = service.findCoordinate(GenericLocation.fromStopId(GO_STATIONS.getId()));
+      assertEquals(GO_STATIONS.getCoordinate(), result);
+    }
+
+    @Test
+    void unknownStopIdResolvesToNull() {
+      assertNull(service.findCoordinate(GenericLocation.fromStopId(id("unknown"))));
+    }
   }
 }
