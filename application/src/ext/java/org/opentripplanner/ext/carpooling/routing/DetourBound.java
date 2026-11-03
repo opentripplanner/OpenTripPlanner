@@ -1,0 +1,120 @@
+package org.opentripplanner.ext.carpooling.routing;
+
+import static org.opentripplanner.ext.carpooling.util.BeelineEstimator.minDriveSeconds;
+
+import java.time.Duration;
+import org.locationtech.jts.geom.Envelope;
+import org.opentripplanner.astar.spi.SkipEdgeStrategy;
+import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.state.State;
+
+/**
+ * The bound on a detour through a point {@code v} on a driver leg from {@code a} to {@code b}: the
+ * leg can only pass through {@code v} if {@code t(a→v) + t(v→b)} is at most the leg's limit, see
+ * {@link DriverLegLimits}. A side whose drive is not known counts as its least possible drive, the
+ * beeline at the fastest car speed in the graph, so the bound never rules out a feasible detour.
+ */
+final class DetourBound {
+
+  /** Margin on the bounding box, against the approximations in degree conversion. */
+  private static final double ENVELOPE_MARGIN = 1.02;
+
+  private final Vertex start;
+  private final Vertex end;
+  private final Duration limit;
+  private final long limitSeconds;
+  private final double maxCarSpeed;
+
+  /** @param maxCarSpeed the fastest speed any street in the graph can be driven at, in m/s */
+  DetourBound(Vertex start, Vertex end, Duration limit, double maxCarSpeed) {
+    if (maxCarSpeed <= 0) {
+      throw new IllegalArgumentException("maxCarSpeed must be positive");
+    }
+    this.start = start;
+    this.end = end;
+    this.limit = limit;
+    this.limitSeconds = limit.toSeconds();
+    this.maxCarSpeed = maxCarSpeed;
+  }
+
+  /** Whether a detour through the point can fit, with both sides at their least drive. */
+  boolean mayPassThrough(Vertex point) {
+    return mayPassWithin(0, point);
+  }
+
+  /** Whether a detour can pass anywhere within {@code meters} of the point. */
+  boolean mayPassWithin(double meters, Vertex point) {
+    double slack = (2 * meters) / maxCarSpeed;
+    return leastDriveFromStart(point) + leastDriveToEnd(point) <= limitSeconds + slack;
+  }
+
+  /** Whether a detour whose two sides take these many seconds fits. */
+  boolean fits(long secondsFromStart, long secondsToEnd) {
+    return secondsFromStart + secondsToEnd <= limitSeconds;
+  }
+
+  /**
+   * A bounding box around every point a detour can pass through.
+   */
+  Envelope envelope() {
+    double halfMeters = ((limitSeconds * maxCarSpeed) / 2.0) * ENVELOPE_MARGIN;
+    double midLat = (start.getLat() + end.getLat()) / 2.0;
+    double midLon = (start.getLon() + end.getLon()) / 2.0;
+    return SphericalDistanceLibrary.bounds(midLat, midLon, halfMeters, halfMeters);
+  }
+
+  /** Whether a detour that reaches the point {@code secondsFromStart} into the leg can fit. */
+  boolean mayPassThroughAfter(long secondsFromStart, Vertex point) {
+    return secondsFromStart + leastDriveToEnd(point) <= limitSeconds;
+  }
+
+  /** Whether a detour that leaves the point {@code secondsToEnd} before the leg's end can fit. */
+  boolean mayPassThroughBefore(long secondsToEnd, Vertex point) {
+    return secondsToEnd + leastDriveFromStart(point) <= limitSeconds;
+  }
+
+  /**
+   * Skips every edge of a search of the leg into a vertex no detour can pass through, which keeps
+   * the search within an ellipse with the leg's ends as foci. A forward search is rooted at the
+   * leg's start, a reverse search at its end; the vertex an edge leads to is its from-vertex in a
+   * reverse search.
+   */
+  SkipEdgeStrategy<State, Edge> skipEdgeStrategy(boolean reverse) {
+    if (reverse) {
+      return (current, edge) ->
+        !mayPassThroughBefore(current.getElapsedTimeSeconds(), edge.getFromVertex());
+    }
+    return (current, edge) ->
+      !mayPassThroughAfter(current.getElapsedTimeSeconds(), edge.getToVertex());
+  }
+
+  /**
+   * The most the leg may take from the point on: the limit minus the least drive to the point.
+   */
+  Duration limitFrom(Vertex point) {
+    return limit.minusSeconds((long) leastDriveFromStart(point));
+  }
+
+  /**
+   * The most the leg may take up to the point: the limit minus the least drive from the point on.
+   */
+  Duration limitTo(Vertex point) {
+    return limit.minusSeconds((long) leastDriveToEnd(point));
+  }
+
+  private double leastDriveFromStart(Vertex point) {
+    return minDriveSeconds(
+      start.getLat(),
+      start.getLon(),
+      point.getLat(),
+      point.getLon(),
+      maxCarSpeed
+    );
+  }
+
+  private double leastDriveToEnd(Vertex point) {
+    return minDriveSeconds(point.getLat(), point.getLon(), end.getLat(), end.getLon(), maxCarSpeed);
+  }
+}

@@ -3,7 +3,6 @@ package org.opentripplanner.ext.carpooling.routing;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -173,19 +172,6 @@ class CorridorBuilderTest extends GraphRoutingTest {
     var leg = corridor.legDurations().getFirst().toSeconds();
     assertTrue(leg > 60, "A -> D is driven: " + leg);
     assertEquals(leg, corridorStop(corridor, t5).dropoffToStopSeconds());
-  }
-
-  @Test
-  void ellipseEnvelopeContainsBothFociAndTheMidpointNeighbourhood() {
-    var envelope = CorridorBuilder.ellipseEnvelope(a, d, 600, 40.0);
-    assertTrue(envelope.contains(a.getLon(), a.getLat()));
-    assertTrue(envelope.contains(d.getLon(), d.getLat()));
-    // 600 s at 40 m/s is 24 km of driving; the box reaches ~12 km from the midpoint.
-    var midpoint = ORIGIN.moveEastMeters(1000);
-    var farNorth = midpoint.moveNorthMeters(11_000);
-    assertTrue(envelope.contains(farNorth.longitude(), farNorth.latitude()));
-    var tooFar = midpoint.moveNorthMeters(14_000);
-    assertFalse(envelope.contains(tooFar.longitude(), tooFar.latitude()));
   }
 
   private CarpoolCorridor corridor(Duration budget) {

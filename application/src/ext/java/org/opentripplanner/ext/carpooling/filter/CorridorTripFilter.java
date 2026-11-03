@@ -4,7 +4,6 @@ import javax.annotation.Nullable;
 import org.opentripplanner.ext.carpooling.routing.CarpoolCorridor;
 import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTrip;
 import org.opentripplanner.ext.carpooling.util.CarReachableVertexSnapper.SnapResult;
-import org.opentripplanner.street.geometry.WgsCoordinate;
 
 /**
  * Pre-filters carpool trips by whether their corridor can reach the snapped passenger at all: see
@@ -29,7 +28,6 @@ public class CorridorTripFilter implements CarpoolTripFilter {
     if (snap == null) {
       return true;
     }
-    var point = new WgsCoordinate(snap.vertex().getCoordinate());
-    return trip.corridor().mayServe(trip.vertices(), point, maxCarSpeed);
+    return trip.corridor().mayServe(trip.vertices(), snap.vertex(), maxCarSpeed);
   }
 }

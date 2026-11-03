@@ -5,11 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nullable;
-import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.ext.carpooling.util.CarReachableVertexSnapper.SnapResult;
-import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.State;
@@ -26,12 +24,6 @@ import org.slf4j.LoggerFactory;
 public class CorridorBuilder {
 
   private static final Logger LOG = LoggerFactory.getLogger(CorridorBuilder.class);
-
-  /**
-   * Margin on the ellipse's bounding box, against the approximations in beeline and degree
-   * conversion.
-   */
-  private static final double ENVELOPE_MARGIN = 1.02;
 
   private final CarpoolStopIndex stopIndex;
   private final CarpoolStreetRouter baselineRouter;
@@ -77,31 +69,14 @@ public class CorridorBuilder {
       var to = vertices.get(leg + 1);
       var searchLimit =
         legLimits[leg].compareTo(maxTripDuration) <= 0 ? legLimits[leg] : maxTripDuration;
-      long bound = searchLimit.toSeconds();
-      var envelope = ellipseEnvelope(from, to, bound, maxCarSpeedMetersPerSecond);
+      var bound = new DetourBound(from, to, searchLimit, maxCarSpeedMetersPerSecond);
 
-      var forward = CarpoolTreeStreetRouter.carTree(
-        from,
-        false,
-        searchLimit,
-        new EllipseBounds(to.getCoordinate(), bound, maxCarSpeedMetersPerSecond),
-        null
-      );
-      var reverse = CarpoolTreeStreetRouter.carTree(
-        to,
-        true,
-        searchLimit,
-        new EllipseBounds(from.getCoordinate(), bound, maxCarSpeedMetersPerSecond),
-        null
-      );
-      double reachMeters = bound * maxCarSpeedMetersPerSecond + 2 * stopIndex.walkMeters();
-      for (var stop : stopIndex.stopsWithin(envelope)) {
-        // A stop's snap lies within a walk of it, so a stop farther than that off the ellipse has
-        // no snap the corridor could serve.
-        double viaStop =
-          SphericalDistanceLibrary.fastDistance(from.getCoordinate(), stop.getCoordinate()) +
-          SphericalDistanceLibrary.fastDistance(stop.getCoordinate(), to.getCoordinate());
-        if (viaStop > reachMeters) {
+      var forward = CarpoolTreeStreetRouter.carTree(from, false, searchLimit, bound, null);
+      var reverse = CarpoolTreeStreetRouter.carTree(to, true, searchLimit, bound, null);
+      for (var stop : stopIndex.stopsWithin(bound.envelope())) {
+        // A stop's snap lies within a walk of it, so a stop the detour cannot pass that close to
+        // has no snap the corridor could serve.
+        if (!bound.mayPassWithin(stopIndex.walkMeters(), stop)) {
           continue;
         }
         var dropoff = times(stopIndex.dropoffSnap(stop.getId()), forward, reverse, bound);
@@ -141,14 +116,14 @@ public class CorridorBuilder {
     @Nullable SnapResult snap,
     ShortestPathTree<State, Edge, Vertex> forward,
     ShortestPathTree<State, Edge, Vertex> reverse,
-    long bound
+    DetourBound bound
   ) {
     if (snap == null) {
       return null;
     }
     int toStop = elapsedSeconds(forward, snap.vertex());
     int fromStop = elapsedSeconds(reverse, snap.vertex());
-    if (toStop < 0 || fromStop < 0 || (long) toStop + fromStop > bound) {
+    if (toStop < 0 || fromStop < 0 || !bound.fits(toStop, fromStop)) {
       return null;
     }
     return new StopTimes(toStop, fromStop);
@@ -158,17 +133,5 @@ public class CorridorBuilder {
   private static int elapsedSeconds(ShortestPathTree<State, Edge, Vertex> tree, Vertex vertex) {
     var state = tree.getState(vertex);
     return state == null ? -1 : (int) state.getElapsedTimeSeconds();
-  }
-
-  /**
-   * A bounding box containing the ellipse with foci {@code from} and {@code to} whose
-   * sum-of-distances is {@code boundSeconds} of driving at the maximum car speed: every point of it
-   * lies within half that distance of the midpoint between the foci.
-   */
-  static Envelope ellipseEnvelope(Vertex from, Vertex to, long boundSeconds, double maxCarSpeed) {
-    double halfMeters = ((boundSeconds * maxCarSpeed) / 2.0) * ENVELOPE_MARGIN;
-    double midLat = (from.getLat() + to.getLat()) / 2.0;
-    double midLon = (from.getLon() + to.getLon()) / 2.0;
-    return SphericalDistanceLibrary.bounds(midLat, midLon, halfMeters, halfMeters);
   }
 }

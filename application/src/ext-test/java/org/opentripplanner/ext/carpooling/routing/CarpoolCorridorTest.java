@@ -27,19 +27,19 @@ class CarpoolCorridorTest {
   @Test
   void aPointTheDetourCanReachMayBeServed() {
     var nearTheLine = A.moveEastMeters(10_000).moveNorthMeters(5_000);
-    assertTrue(CORRIDOR.mayServe(WAYPOINTS, nearTheLine, 40.0));
-    assertTrue(CORRIDOR.mayServe(WAYPOINTS, A, 40.0), "the leg start itself");
+    assertTrue(CORRIDOR.mayServe(WAYPOINTS, vertex("p", nearTheLine), 40.0));
+    assertTrue(CORRIDOR.mayServe(WAYPOINTS, WAYPOINTS.getFirst(), 40.0), "the leg start itself");
   }
 
   @Test
   void aPointBeyondTheDetourBudgetMayNot() {
     var farNorth = A.moveEastMeters(10_000).moveNorthMeters(60_000);
-    assertFalse(CORRIDOR.mayServe(WAYPOINTS, farNorth, 40.0));
+    assertFalse(CORRIDOR.mayServe(WAYPOINTS, vertex("p", farNorth), 40.0));
     // Slower cars make the ellipse smaller: 30 min at 15 m/s is 27 km of driving, and a point
     // 12 km off the middle of the 20 km leg needs 2 x 15.6 km.
     var offTheLine = A.moveEastMeters(10_000).moveNorthMeters(12_000);
-    assertTrue(CORRIDOR.mayServe(WAYPOINTS, offTheLine, 40.0));
-    assertFalse(CORRIDOR.mayServe(WAYPOINTS, offTheLine, 15.0));
+    assertTrue(CORRIDOR.mayServe(WAYPOINTS, vertex("p", offTheLine), 40.0));
+    assertFalse(CORRIDOR.mayServe(WAYPOINTS, vertex("p", offTheLine), 15.0));
   }
 
   @Test

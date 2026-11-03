@@ -76,7 +76,7 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
 
   /**
    * A car shortest-path tree from {@code root}, or to it when {@code reverse}. Nothing is expanded
-   * past {@code searchLimit}, nor, if {@code bounds} is given, outside that ellipse or onto another
+   * past {@code searchLimit}, nor, if {@code bound} is given, where no detour can pass or onto another
    * request's temporary edges, nor, if {@code targets} are given, past the time the targets still
    * need (see {@link TargetReach}).
    */
@@ -84,20 +84,20 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
     Vertex root,
     boolean reverse,
     Duration searchLimit,
-    @Nullable EllipseBounds bounds,
+    @Nullable DetourBound bound,
     @Nullable Map<Vertex, Duration> targets
   ) {
     var streetSearchRequest = reverse
       ? StreetSearchRequest.of().withMode(StreetMode.CAR).withArriveBy(true).build()
       : StreetSearchRequest.of().withMode(StreetMode.CAR).build();
     SkipEdgeStrategy<State, Edge> skipEdgeStrategy = new DurationSkipEdgeStrategy<>(searchLimit);
-    if (bounds != null) {
+    if (bound != null) {
       // Never another request's temporary edges: what a corridor tree finds is kept for the trip's
       // lifetime.
       skipEdgeStrategy = new ComposingSkipEdgeStrategy<>(
         skipEdgeStrategy,
         TraversalScope.withOwnLinkingOf(root),
-        bounds.skipEdgeStrategy(reverse)
+        bound.skipEdgeStrategy(reverse)
       );
     }
     if (targets != null) {

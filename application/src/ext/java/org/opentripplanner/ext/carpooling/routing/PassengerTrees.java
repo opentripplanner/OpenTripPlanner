@@ -1,7 +1,5 @@
 package org.opentripplanner.ext.carpooling.routing;
 
-import static org.opentripplanner.ext.carpooling.util.BeelineEstimator.minDriveSeconds;
-
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
@@ -14,7 +12,7 @@ import org.opentripplanner.street.model.vertex.Vertex;
  * to it. A tree only has to reach as far as the trips' legs allow: in a leg, the driver also drives
  * from the leg's start to the point (outward) or from the point to the leg's end (inward), which
  * takes at least the beeline at the fastest speed in the graph, so the tree reaches no further than
- * the leg's limit minus that drive.
+ * the leg's limit minus that drive ({@link DetourBound}).
  * <p>
  * A tree that serves the segments between the point and the trips' waypoints stops once it has
  * them. The tree on the side of an access/egress passenger's ride stops at the longest ride the
@@ -132,21 +130,16 @@ public final class PassengerTrees {
     return reach;
   }
 
-  /** The leg's limit minus the drive on the other side of the point. */
+  /** The most the leg may take from the point on (outward) or up to it (inward). */
   private Duration legReach(RoutableCarpoolTrip trip, int leg, Vertex point, Direction direction) {
     var stops = trip.vertices();
-    var otherSide =
-      direction == Direction.FROM
-        ? minDrive(stops.get(leg), point)
-        : minDrive(point, stops.get(leg + 1));
-    return trip.corridor().legLimits().get(leg).minus(otherSide);
-  }
-
-  /** The beeline drive at the fastest speed in the graph, rounded down to stay a lower bound. */
-  private Duration minDrive(Vertex from, Vertex to) {
-    return Duration.ofSeconds(
-      (long) minDriveSeconds(from.getCoordinate(), to.getCoordinate(), maxCarSpeed)
+    var bound = new DetourBound(
+      stops.get(leg),
+      stops.get(leg + 1),
+      trip.corridor().legLimits().get(leg),
+      maxCarSpeed
     );
+    return direction == Direction.FROM ? bound.limitFrom(point) : bound.limitTo(point);
   }
 
   private static Duration min(Duration a, Duration b) {
