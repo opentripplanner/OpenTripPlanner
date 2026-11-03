@@ -24,8 +24,7 @@ class NetworkCommitmentHandler {
   private NetworkCommitmentHandler() {}
 
   /** Commit network branches if a generic arriveBy state crosses a zone boundary. */
-  @Nullable
-  public static State[] applyNetworkCommitment(
+  public static State @Nullable [] applyNetworkCommitment(
     State s0,
     List<GeofencingBoundaryExtension> fromBoundaries,
     EdgeTraversal edge
@@ -69,8 +68,7 @@ class NetworkCommitmentHandler {
     return networks != null ? networks : Set.of();
   }
 
-  @Nullable
-  private static State[] commitNetworks(State s0, EdgeTraversal edge) {
+  private static State @Nullable [] commitNetworks(State s0, EdgeTraversal edge) {
     var editor = edge.traverse(s0, s0.currentMode());
     var traversedState = editor != null ? editor.makeState() : null;
     if (traversedState == null) {

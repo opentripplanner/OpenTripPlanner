@@ -20,23 +20,19 @@ public interface DeduplicatorService {
   @Nullable
   BitSet deduplicateBitSet(BitSet original);
 
-  @Nullable
-  int[] deduplicateIntArray(int[] original);
+  int @Nullable [] deduplicateIntArray(int[] original);
 
   @Nullable
   String deduplicateString(String original);
 
-  @Nullable
-  String[] deduplicateStringArray(String[] original);
+  String @Nullable [] deduplicateStringArray(String[] original);
 
-  @Nullable
-  String[][] deduplicateString2DArray(String[][] original);
+  String @Nullable [][] deduplicateString2DArray(String[][] original);
 
   @Nullable
   <T> T deduplicateObject(Class<T> cl, T original);
 
-  @Nullable
-  <T> T[] deduplicateObjectArray(Class<T> type, T[] original);
+  <T> T @Nullable [] deduplicateObjectArray(Class<T> type, T[] original);
 
   @Nullable
   <T> List<T> deduplicateImmutableList(Class<T> clazz, List<T> original);

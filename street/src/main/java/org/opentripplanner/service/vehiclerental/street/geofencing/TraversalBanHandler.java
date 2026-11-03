@@ -16,8 +16,7 @@ class TraversalBanHandler {
   private TraversalBanHandler() {}
 
   /** Block if the state is renting and the resolved zones forbid traversal. */
-  @Nullable
-  public static State[] apply(State state) {
+  public static State @Nullable [] apply(State state) {
     if (state.isRentingVehicle() && state.isTraversalBannedByCurrentZones()) {
       return State.empty();
     }

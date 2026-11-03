@@ -185,8 +185,7 @@ public class RaptorTransitDataMapper {
   /**
    * Create static board/alight cost for Raptor to apply during transfer
    */
-  @Nullable
-  static int[] createStopBoardAlightTransferCosts(
+  static int @Nullable [] createStopBoardAlightTransferCosts(
     SiteRepository stops,
     TransitTuningParameters tuningParams
   ) {

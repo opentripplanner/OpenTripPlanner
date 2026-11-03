@@ -53,8 +53,7 @@ public class RaptorTransitData {
 
   private final TransferIndexGenerator transferIndexGenerator;
 
-  @Nullable
-  private final int[] stopBoardAlightTransferCosts;
+  private final int @Nullable [] stopBoardAlightTransferCosts;
 
   /**
    * Makes a shallow copy of the RaptorTransitData, except for the tripPatternsForDate, where a
@@ -82,7 +81,7 @@ public class RaptorTransitData {
     RaptorRequestTransferCache transferCache,
     ConstrainedTransfersForPatterns constrainedTransfers,
     TransferIndexGenerator transferIndexGenerator,
-    @Nullable int[] stopBoardAlightTransferCosts
+    int @Nullable [] stopBoardAlightTransferCosts
   ) {
     this.tripPatternsRunningOnDate = new HashMap<>(tripPatternsRunningOnDate);
     this.transfersByStopIndex = transfersByStopIndex;
@@ -167,8 +166,7 @@ public class RaptorTransitData {
    * Costs for both boarding and alighting at a given stop during transfer. Note that this is in
    * raptor centi-second units.
    */
-  @Nullable
-  public int[] getStopBoardAlightTransferCosts() {
+  public int @Nullable [] getStopBoardAlightTransferCosts() {
     return stopBoardAlightTransferCosts;
   }
 

@@ -31,8 +31,7 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
   private final ConstrainedTransferService transferService;
   private final RaptorTransitDataProvider<T> transitDataProvider;
 
-  @Nullable
-  private final int[] stopBoardAlightTransferCosts;
+  private final int @Nullable [] stopBoardAlightTransferCosts;
 
   private final TransferOptimizationParameters config;
   private final List<RaptorViaLocation> viaLocations;
@@ -63,7 +62,7 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
     RaptorStopNameResolver stopNameResolver,
     ConstrainedTransferService transferService,
     RaptorTransitDataProvider<T> transitDataProvider,
-    @Nullable int[] stopBoardAlightTransferCosts,
+    int @Nullable [] stopBoardAlightTransferCosts,
     TransferOptimizationParameters config,
     List<RaptorViaLocation> viaLocations
   ) {

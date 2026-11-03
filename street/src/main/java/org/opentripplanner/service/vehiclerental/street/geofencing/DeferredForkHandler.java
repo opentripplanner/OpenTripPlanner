@@ -27,8 +27,7 @@ class DeferredForkHandler {
   private DeferredForkHandler() {}
 
   /** If the previous edge deferred a renting fork, create the branches now. */
-  @Nullable
-  public static State[] applyDeferredFork(State s0, EdgeTraversal edge) {
+  public static State @Nullable [] applyDeferredFork(State s0, EdgeTraversal edge) {
     if (!isDeferredRentingForkTrigger(s0)) {
       return null;
     }

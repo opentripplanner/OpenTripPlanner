@@ -47,7 +47,7 @@ class SubgraphSearch {
   int collectSubGraphs(
     Adjacency neighbours,
     int[] newgraphs,
-    @Nullable int[] anchors,
+    int @Nullable [] anchors,
     @Nullable List<Subgraph> islands
   ) {
     int count = 0;
@@ -84,7 +84,7 @@ class SubgraphSearch {
   private Subgraph computeConnectedSubgraph(
     Adjacency neighbours,
     int startVertex,
-    @Nullable int[] anchors,
+    int @Nullable [] anchors,
     int[] alreadyMapped
   ) {
     int subgraphId = nextSubgraphId++;

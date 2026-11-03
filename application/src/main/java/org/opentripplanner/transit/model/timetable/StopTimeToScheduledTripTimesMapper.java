@@ -114,8 +114,7 @@ class StopTimeToScheduledTripTimesMapper {
    *         stop.
    * @see org.opentripplanner.transit.model.timetable.TripTimes#getHeadsignVias(int)
    */
-  @Nullable
-  private String[][] makeHeadsignViasArray(final Collection<StopTime> stopTimes) {
+  private String @Nullable [][] makeHeadsignViasArray(final Collection<StopTime> stopTimes) {
     if (
       stopTimes
         .stream()

@@ -46,7 +46,7 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
     RaptorCostCalculator<T> costCalculator,
     int iterationDepartureTime,
     TransferWaitTimeCostCalculator waitTimeCostCalculator,
-    @Nullable int[] stopBoardAlightTransferCosts,
+    int @Nullable [] stopBoardAlightTransferCosts,
     double extraStopBoardAlightCostsFactor,
     RaptorStopNameResolver stopNameResolver
   ) {

@@ -69,8 +69,7 @@ public class Deduplicator implements DeduplicatorService, Serializable {
   }
 
   @Override
-  @Nullable
-  public int[] deduplicateIntArray(int[] original) {
+  public int @Nullable [] deduplicateIntArray(int[] original) {
     if (original == null) {
       return null;
     }
@@ -96,8 +95,7 @@ public class Deduplicator implements DeduplicatorService, Serializable {
   }
 
   @Override
-  @Nullable
-  public String[] deduplicateStringArray(String[] original) {
+  public String @Nullable [] deduplicateStringArray(String[] original) {
     if (original == null) {
       return null;
     }
@@ -111,8 +109,7 @@ public class Deduplicator implements DeduplicatorService, Serializable {
   }
 
   @Override
-  @Nullable
-  public String[][] deduplicateString2DArray(String[][] original) {
+  public String @Nullable [][] deduplicateString2DArray(String[][] original) {
     if (original == null) {
       return null;
     }
@@ -142,8 +139,7 @@ public class Deduplicator implements DeduplicatorService, Serializable {
   }
 
   @Override
-  @Nullable
-  public <T> T[] deduplicateObjectArray(Class<T> type, T[] original) {
+  public <T> T @Nullable [] deduplicateObjectArray(Class<T> type, T[] original) {
     if (original == null) {
       return null;
     }

@@ -7,7 +7,7 @@ public class CostCalculatorFactory {
 
   public static <T extends DefaultTripSchedule> RaptorCostCalculator<T> createCostCalculator(
     GeneralizedCostParameters generalizedCostParameters,
-    @Nullable int[] stopBoardAlightTransferCosts
+    int @Nullable [] stopBoardAlightTransferCosts
   ) {
     RaptorCostCalculator<T> calculator = new DefaultCostCalculator<>(
       generalizedCostParameters,

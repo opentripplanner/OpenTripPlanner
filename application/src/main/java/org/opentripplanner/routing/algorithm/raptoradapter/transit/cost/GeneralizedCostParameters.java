@@ -78,8 +78,7 @@ public class GeneralizedCostParameters {
    * <p>
    * If {@code null} is returned the default reluctance 1.0 is used.
    */
-  @Nullable
-  public double[] transitReluctanceFactors() {
+  public double @Nullable [] transitReluctanceFactors() {
     return transitReluctanceFactors;
   }
 

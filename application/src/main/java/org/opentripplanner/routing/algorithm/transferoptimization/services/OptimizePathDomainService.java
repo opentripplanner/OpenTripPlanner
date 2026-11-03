@@ -81,8 +81,7 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
   /**
    * @see RaptorTransitData#getStopBoardAlightTransferCosts()
    */
-  @Nullable
-  private final int[] stopBoardAlightTransferCosts;
+  private final int @Nullable [] stopBoardAlightTransferCosts;
 
   private final double extraStopBoardAlightCostsFactor;
 
@@ -91,7 +90,7 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
     RaptorCostCalculator<T> costCalculator,
     RaptorSlackProvider slackProvider,
     @Nullable TransferWaitTimeCostCalculator waitTimeCostCalculator,
-    @Nullable int[] stopBoardAlightTransferCosts,
+    int @Nullable [] stopBoardAlightTransferCosts,
     double extraStopBoardAlightCostsFactor,
     PathTailFilter<T> filter,
     RaptorStopNameResolver stopNameTranslator

@@ -35,8 +35,7 @@ public class WalkerBoundaryHandler {
    *         HAVE_RENTED walker, no paired boundaries, or no boundary direction matched the
    *         walker-exit-in-forward condition).
    */
-  @Nullable
-  public static State[] apply(
+  public static State @Nullable [] apply(
     State s0,
     List<GeofencingBoundaryExtension> fromBoundaries,
     List<GeofencingBoundaryExtension> toBoundaries,
