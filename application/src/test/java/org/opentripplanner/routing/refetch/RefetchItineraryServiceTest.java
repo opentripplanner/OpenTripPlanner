@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.legreference.ScheduledTransitLegReference;
@@ -414,7 +415,9 @@ public class RefetchItineraryServiceTest {
     );
     LinkingContextFactory linkingContextFactory = new LinkingContextFactory(
       GRAPH,
-      vertexCreationService
+      vertexCreationService,
+      id -> Set.of(),
+      GenericLocation::wgsCoordinate
     );
 
     var streetLimitationParametersService = new StreetLimitationParametersService() {

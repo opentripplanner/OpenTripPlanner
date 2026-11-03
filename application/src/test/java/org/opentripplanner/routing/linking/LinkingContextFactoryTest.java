@@ -82,7 +82,9 @@ class LinkingContextFactoryTest {
   );
   private final LinkingContextFactory linkingContextFactory = new LinkingContextFactory(
     graph,
-    vertexCreationService
+    vertexCreationService,
+    id -> Set.of(),
+    GenericLocation::wgsCoordinate
   );
 
   private final SiteRepository siteRepository = testModel

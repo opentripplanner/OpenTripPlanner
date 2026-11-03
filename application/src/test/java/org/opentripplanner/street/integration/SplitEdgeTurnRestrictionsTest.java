@@ -6,6 +6,7 @@ import static org.opentripplanner.test.support.PolylineAssert.assertThatPolyline
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.ConstantsForTests;
@@ -175,7 +176,12 @@ public class SplitEdgeTurnRestrictionsTest {
     try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
       var vertexLinker = VertexLinkerTestFactory.of(graph);
       var vertexCreationService = new VertexCreationService(vertexLinker);
-      var linkingContextFactory = new LinkingContextFactory(graph, vertexCreationService);
+      var linkingContextFactory = new LinkingContextFactory(
+        graph,
+        vertexCreationService,
+        id -> Set.of(),
+        GenericLocation::wgsCoordinate
+      );
       var linkingRequest = LinkingContextRequestMapper.map(request);
       var linkingContext = linkingContextFactory.create(temporaryVerticesContainer, linkingRequest);
       var transitService = TestServerContext.createTransitService(

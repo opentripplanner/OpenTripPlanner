@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.core.model.id.FeedScopedId;
@@ -14,6 +15,7 @@ import org.opentripplanner.ext.transferanalyzer.annotations.TransferCouldNotBeRo
 import org.opentripplanner.ext.transferanalyzer.annotations.TransferRoutingDistanceTooLong;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
+import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.place.nearbystopfinder.StraightLineNearbyStopFinder;
 import org.opentripplanner.place.nearbystopfinder.StreetNearbyStopFinder;
@@ -78,7 +80,12 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
     var straightLineNearbyStopFinder = new StraightLineNearbyStopFinder(
       transitRepository.getSiteRepository()::findRegularStops
     );
-    var linkingContextFactory = new LinkingContextFactory(graph, new VertexCreationService(linker));
+    var linkingContextFactory = new LinkingContextFactory(
+      graph,
+      new VertexCreationService(linker),
+      id -> Set.of(),
+      GenericLocation::wgsCoordinate
+    );
     var streetNearbyStopFinder = StreetNearbyStopFinder.of(linkingContextFactory).build();
 
     int stopsAnalyzed = 0;

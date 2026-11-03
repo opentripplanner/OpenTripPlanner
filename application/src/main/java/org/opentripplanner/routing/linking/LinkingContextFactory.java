@@ -69,13 +69,6 @@ public class LinkingContextFactory {
   }
 
   /**
-   * Construct a factory when stop locations are not used for locations.
-   */
-  public LinkingContextFactory(Graph graph, VertexCreationService vertexCreationService) {
-    this(graph, vertexCreationService, id -> Set.of(), GenericLocation::wgsCoordinate);
-  }
-
-  /**
    * Links locations to the Graph used in the A-Star search. This method also validates that it was
    * possible to link the locations to the graph and throws {@link RoutingValidationException} if it
    * was not possible. The responsibility of cleaning up the temporary vertices and edges is on the

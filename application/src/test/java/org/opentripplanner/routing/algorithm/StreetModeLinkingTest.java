@@ -16,6 +16,7 @@ import static org.opentripplanner.street.model.StreetMode.WALK;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -28,6 +29,7 @@ import org.opentripplanner.routing.linking.LinkingContextRequest;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.street.geometry.GeometryUtils;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.TemporaryVerticesContainer;
 import org.opentripplanner.street.model.StreetMode;
@@ -234,7 +236,12 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
     for (final StreetMode streetMode : streetModes) {
       try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
         var vertexCreationService = new VertexCreationService(linker);
-        var linkingContextFactory = new LinkingContextFactory(graph, vertexCreationService);
+        var linkingContextFactory = new LinkingContextFactory(
+          graph,
+          vertexCreationService,
+          id -> Set.of(),
+          ignored -> new WgsCoordinate(stop.getCoordinate())
+        );
         var request = LinkingContextRequest.of()
           .withFrom(location)
           .withTo(ANY_PLACE)

@@ -135,7 +135,9 @@ class StreetNearbyPlaceFinderTest extends GraphRoutingTest {
     var vertexLinker = VertexLinkerTestFactory.of(otpModel.graph());
     var linkingContextFactory = new LinkingContextFactory(
       otpModel.graph(),
-      new VertexCreationService(vertexLinker)
+      new VertexCreationService(vertexLinker),
+      transitService::findStopOrChildIds,
+      transitService::findCoordinate
     );
     nearbyPlaceFinder = new StreetNearbyPlaceFinder(linkingContextFactory);
   }

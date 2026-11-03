@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -67,7 +68,9 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
           var vertexLinker = VertexLinkerTestFactory.of(graph());
           linkingContextFactory = new LinkingContextFactory(
             graph(),
-            new VertexCreationService(vertexLinker)
+            new VertexCreationService(vertexLinker),
+            id -> Set.of(),
+            GenericLocation::wgsCoordinate
           );
         }
       }
