@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
@@ -98,6 +99,10 @@ class StreetIndex {
 
   Collection<Edge> findEdges(Envelope env, Scope scope) {
     return edgeIndex.query(env, scope).toList();
+  }
+
+  void forEachEdgeCandidate(Envelope env, Scope scope, Consumer<? super Edge> consumer) {
+    edgeIndex.forEachCandidate(env, scope, consumer);
   }
 
   Set<Edge> findEdgesAlongLineStrings(Collection<LineString> lineStrings, Scope scope) {

@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.utils.lang.StringUtils;
 
 public final class FeedScopedId implements Serializable, Comparable<FeedScopedId> {

@@ -6,7 +6,7 @@ import static org.rutebanken.netex.model.WaterSubmodeEnumeration.NATIONAL_CAR_FE
 import static org.rutebanken.netex.model.WaterSubmodeEnumeration.REGIONAL_CAR_FERRY;
 
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.netex.mapping.support.NetexMainAndSubMode;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;

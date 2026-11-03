@@ -3,7 +3,7 @@ package org.opentripplanner.netex.mapping;
 import jakarta.xml.bind.JAXBElement;
 import java.util.Map;
 import java.util.function.Supplier;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.core.model.id.FeedScopedId;
@@ -176,8 +176,7 @@ class TripMapper {
     return null;
   }
 
-  @Nullable
-  private org.opentripplanner.transit.model.network.Route resolveRoute(
+  private org.opentripplanner.transit.model.network.@Nullable Route resolveRoute(
     ServiceJourney serviceJourney
   ) {
     String lineRef = null;

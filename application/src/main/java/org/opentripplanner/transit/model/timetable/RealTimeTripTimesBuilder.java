@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
 import java.util.stream.IntStream;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.id.FeedScopedId;
@@ -304,7 +304,7 @@ public class RealTimeTripTimesBuilder {
     return this;
   }
 
-  public @Nullable I18NString[] stopHeadsigns() {
+  public I18NString @Nullable [] stopHeadsigns() {
     var result = scheduledTripTimes.copyHeadsigns(
       () -> new I18NString[scheduledTripTimes.getNumStops()]
     );

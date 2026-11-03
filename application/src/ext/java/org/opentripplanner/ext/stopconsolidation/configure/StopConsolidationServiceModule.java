@@ -2,8 +2,8 @@ package org.opentripplanner.ext.stopconsolidation.configure;
 
 import dagger.Module;
 import dagger.Provides;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Singleton;
-import javax.annotation.Nullable;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidationService;

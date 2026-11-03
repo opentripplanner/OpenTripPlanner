@@ -6,7 +6,7 @@ import java.time.Duration;
 import java.util.ArrayDeque;
 import java.util.Objects;
 import java.util.Queue;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayRepository;

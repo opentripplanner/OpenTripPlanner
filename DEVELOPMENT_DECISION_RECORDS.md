@@ -29,8 +29,9 @@ Document the business intention and decisions in the relevant code. Do not repea
 expressed in the code. Use JavaDoc, you may have to refactor part of your code to encapsulate the
 business logic into a method or class to do this.
 
-Document all `public` types, methods and fields with JavaDoc. It is ok to document implementation
-notes on `private` members and as inline comments.
+Document `public` types, methods and fields with JavaDoc, unless the concept is already defined
+higher up in the hierarchy (interface, owning type or package) - then link to it instead of
+repeating it. It is ok to document implementation notes on `private` members and as inline comments.
 
 > If you decide to NOT follow these decision records, then you must document why.
 

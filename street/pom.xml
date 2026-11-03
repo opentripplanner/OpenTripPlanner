@@ -49,6 +49,10 @@
             <artifactId>geojson-jackson</artifactId>
         </dependency>
         <dependency>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+        </dependency>
+        <dependency>
             <groupId>net.sf.trove4j</groupId>
             <artifactId>trove4j</artifactId>
         </dependency>
@@ -61,6 +65,10 @@
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-geojson-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jspecify</groupId>
+            <artifactId>jspecify</artifactId>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
