@@ -3,7 +3,7 @@ package org.opentripplanner.ext.carpooling.routing;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Objects;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.ext.carpooling.util.CarReachableVertexSnapper;
 import org.opentripplanner.ext.carpooling.util.StreetVertexUtils;

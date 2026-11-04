@@ -2,7 +2,7 @@ package org.opentripplanner.standalone.configure;
 
 import dagger.Subcomponent;
 import graphql.schema.GraphQLSchema;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.apis.gtfs.GtfsApiParameters;
 import org.opentripplanner.apis.gtfs.GtfsGraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.configure.GtfsSchema;

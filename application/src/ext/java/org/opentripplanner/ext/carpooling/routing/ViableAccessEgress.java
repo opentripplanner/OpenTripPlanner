@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.carpooling.routing;
 
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
 import org.opentripplanner.street.model.path.StreetPath;

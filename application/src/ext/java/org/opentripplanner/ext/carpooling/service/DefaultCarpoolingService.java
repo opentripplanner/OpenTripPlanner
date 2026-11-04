@@ -9,7 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
@@ -673,8 +673,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
    * cache validates its entry against the trip's current route points, so a re-routed trip never
    * reads a stale verdict.
    */
-  @Nullable
-  private Duration[] resolveLegDurations(
+  private Duration @Nullable [] resolveLegDurations(
     CarpoolTripWithVertices tripWithVertices,
     CarpoolRouter baselineRouter
   ) {
@@ -695,8 +694,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
    * at — so a {@code null} here means the leg cannot be driven within the carpool bound: no tree
    * could route it either, and the trip is dropped.
    */
-  @Nullable
-  private static Duration[] routeBaselineLegDurations(
+  private static Duration @Nullable [] routeBaselineLegDurations(
     CarpoolTripWithVertices tripWithVertices,
     CarpoolRouter baselineRouter
   ) {

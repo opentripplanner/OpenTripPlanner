@@ -1,7 +1,7 @@
 package org.opentripplanner.raptor.rangeraptor.standard;
 
 import java.util.Iterator;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.view.TransitArrival;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouterResult;

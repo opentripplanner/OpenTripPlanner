@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
@@ -117,7 +117,7 @@ public class DefaultCarpoolingRepository implements CarpoolingRepository {
   }
 
   @Override
-  public void cacheBaselineRouting(CarpoolTrip trip, @Nullable Duration[] legDurations) {
+  public void cacheBaselineRouting(CarpoolTrip trip, Duration @Nullable [] legDurations) {
     // routePoints() already returns a fresh immutable snapshot, so it is safe to store directly.
     baselineRouting.put(
       trip.getId(),
@@ -130,5 +130,5 @@ public class DefaultCarpoolingRepository implements CarpoolingRepository {
    * so a trip whose geometry changed is treated as a miss on read. A {@code null}
    * {@code legDurations} marks the baseline as unroutable.
    */
-  private record CacheEntry(List<WgsCoordinate> routePoints, @Nullable Duration[] legDurations) {}
+  private record CacheEntry(List<WgsCoordinate> routePoints, Duration @Nullable [] legDurations) {}
 }

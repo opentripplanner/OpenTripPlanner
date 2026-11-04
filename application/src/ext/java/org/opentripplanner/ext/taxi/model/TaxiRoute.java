@@ -2,7 +2,7 @@ package org.opentripplanner.ext.taxi.model;
 
 import java.io.Serializable;
 import java.util.Objects;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;

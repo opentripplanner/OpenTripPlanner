@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.carpooling.util;
 
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.routing.linking.internal.VertexCreationService.LocationType;
 import org.opentripplanner.street.geometry.WgsCoordinate;

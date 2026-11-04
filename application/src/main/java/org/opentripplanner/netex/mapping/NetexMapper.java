@@ -11,6 +11,18 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import org.entur.netex2.model.Authority;
+import org.entur.netex2.model.Branding;
+import org.entur.netex2.model.FlexibleLine;
+import org.entur.netex2.model.FlexibleStopPlace;
+import org.entur.netex2.model.GroupOfStopPlaces;
+import org.entur.netex2.model.JourneyPattern_VersionStructure;
+import org.entur.netex2.model.Line;
+import org.entur.netex2.model.LineRefs_RelStructure;
+import org.entur.netex2.model.NoticeAssignment;
+import org.entur.netex2.model.Operator;
+import org.entur.netex2.model.StopPlace;
+import org.entur.netex2.model.VersionOfObjectRefStructure;
 import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -30,18 +42,6 @@ import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.rutebanken.netex.model.Authority;
-import org.rutebanken.netex.model.Branding;
-import org.rutebanken.netex.model.FlexibleLine;
-import org.rutebanken.netex.model.FlexibleStopPlace;
-import org.rutebanken.netex.model.GroupOfStopPlaces;
-import org.rutebanken.netex.model.JourneyPattern_VersionStructure;
-import org.rutebanken.netex.model.Line;
-import org.rutebanken.netex.model.LineRefs_RelStructure;
-import org.rutebanken.netex.model.NoticeAssignment;
-import org.rutebanken.netex.model.Operator;
-import org.rutebanken.netex.model.StopPlace;
-import org.rutebanken.netex.model.VersionOfObjectRefStructure;
 
 /**
  * This is the ROOT mapper to map from the Netex domin model into the OTP internal model. This class

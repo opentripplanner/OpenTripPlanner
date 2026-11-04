@@ -6,10 +6,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.math.BigDecimal;
 import net.opengis.gml._3.DirectPositionType;
+import org.entur.netex2.model.LocationStructure;
+import org.entur.netex2.model.SimplePoint_VersionStructure;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.street.geometry.WgsCoordinate;
-import org.rutebanken.netex.model.LocationStructure;
-import org.rutebanken.netex.model.SimplePoint_VersionStructure;
 
 class WgsCoordinateMapperTest {
 

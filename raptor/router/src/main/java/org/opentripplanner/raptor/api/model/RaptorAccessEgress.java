@@ -8,7 +8,7 @@ import static org.opentripplanner.raptor.spi.RaptorConstants.TIME_NOT_SET;
 
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.utils.time.DurationUtils;
 import org.opentripplanner.utils.time.TimeUtils;

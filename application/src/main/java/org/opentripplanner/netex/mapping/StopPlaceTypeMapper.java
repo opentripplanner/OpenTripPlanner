@@ -1,8 +1,8 @@
 package org.opentripplanner.netex.mapping;
 
+import org.entur.netex2.model.StopPlace;
 import org.opentripplanner.netex.mapping.support.NetexMainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.rutebanken.netex.model.StopPlace;
 
 /**
  * This is a best effort at mapping the NeTEx transport modes to the OTP route codes which are

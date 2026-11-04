@@ -11,6 +11,18 @@ import java.util.List;
 import net.opengis.gml._3.DirectPositionListType;
 import net.opengis.gml._3.DirectPositionType;
 import net.opengis.gml._3.LineStringType;
+import org.entur.netex2.model.JourneyPattern;
+import org.entur.netex2.model.LinkSequenceProjection;
+import org.entur.netex2.model.LinkSequenceProjection_VersionStructure;
+import org.entur.netex2.model.LinksInJourneyPattern_RelStructure;
+import org.entur.netex2.model.LocationStructure;
+import org.entur.netex2.model.Projections_RelStructure;
+import org.entur.netex2.model.Quay;
+import org.entur.netex2.model.ScheduledStopPointRefStructure;
+import org.entur.netex2.model.ServiceLink;
+import org.entur.netex2.model.ServiceLinkInJourneyPattern_VersionedChildStructure;
+import org.entur.netex2.model.ServiceLinkRefStructure;
+import org.entur.netex2.model.SimplePoint_VersionStructure;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
@@ -30,18 +42,6 @@ import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.service.SiteRepository;
-import org.rutebanken.netex.model.JourneyPattern;
-import org.rutebanken.netex.model.LinkSequenceProjection;
-import org.rutebanken.netex.model.LinkSequenceProjection_VersionStructure;
-import org.rutebanken.netex.model.LinksInJourneyPattern_RelStructure;
-import org.rutebanken.netex.model.LocationStructure;
-import org.rutebanken.netex.model.Projections_RelStructure;
-import org.rutebanken.netex.model.Quay;
-import org.rutebanken.netex.model.ScheduledStopPointRefStructure;
-import org.rutebanken.netex.model.ServiceLink;
-import org.rutebanken.netex.model.ServiceLinkInJourneyPattern_VersionedChildStructure;
-import org.rutebanken.netex.model.ServiceLinkRefStructure;
-import org.rutebanken.netex.model.SimplePoint_VersionStructure;
 
 class ServiceLinkMapperTest {
 

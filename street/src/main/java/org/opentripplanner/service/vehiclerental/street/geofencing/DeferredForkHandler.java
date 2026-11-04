@@ -3,7 +3,7 @@ package org.opentripplanner.service.vehiclerental.street.geofencing;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.street.mapping.StreetModeToRentalTraverseModeMapper;
 import org.opentripplanner.street.search.TraverseMode;
@@ -27,8 +27,7 @@ class DeferredForkHandler {
   private DeferredForkHandler() {}
 
   /** If the previous edge deferred a renting fork, create the branches now. */
-  @Nullable
-  public static State[] applyDeferredFork(State s0, EdgeTraversal edge) {
+  public static State @Nullable [] applyDeferredFork(State s0, EdgeTraversal edge) {
     if (!isDeferredRentingForkTrigger(s0)) {
       return null;
     }

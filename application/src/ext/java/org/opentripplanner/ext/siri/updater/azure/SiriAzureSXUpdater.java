@@ -2,7 +2,7 @@ package org.opentripplanner.ext.siri.updater.azure;
 
 import java.time.Duration;
 import java.util.concurrent.Future;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.updater.TransitRealTimeUpdateContext;
