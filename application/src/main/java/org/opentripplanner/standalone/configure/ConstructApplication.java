@@ -6,6 +6,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.transaction.RepositoryHandle;
 import org.opentripplanner.datastore.api.DataSource;
+import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTripResolver;
 import org.opentripplanner.ext.emission.EmissionRepository;
@@ -249,7 +250,7 @@ public class ConstructApplication {
       factory.transitService(),
       carpoolingRepository(),
       routableCarpoolTripResolver(),
-      factory.carpoolingParameters(),
+      carpoolingParameters(),
       factory.transitUpdateManager(),
       factory.streetUpdateManager(),
       factory.timetableRepositoryHandle(),
@@ -330,6 +331,11 @@ public class ConstructApplication {
   @Nullable
   public RoutableCarpoolTripResolver routableCarpoolTripResolver() {
     return factory.routableCarpoolTripResolver();
+  }
+
+  @Nullable
+  public CarpoolingParameters carpoolingParameters() {
+    return factory.carpoolingParameters();
   }
 
   public DataImportIssueSummary dataImportIssueSummary() {
