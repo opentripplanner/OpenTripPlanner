@@ -1,7 +1,7 @@
 package org.opentripplanner.netex.mapping.support;
 
 import java.time.LocalDateTime;
-import org.rutebanken.netex.model.ValidBetween;
+import org.entur.netex2.model.ValidBetween;
 
 /**
  * This helper class provides methods for checking if a period is valid now, in the past, or in the

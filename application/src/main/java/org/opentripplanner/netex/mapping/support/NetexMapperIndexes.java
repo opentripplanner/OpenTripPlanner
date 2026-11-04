@@ -3,13 +3,13 @@ package org.opentripplanner.netex.mapping.support;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import java.util.Map;
+import org.entur.netex2.model.DatedServiceJourney;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.netex.index.api.NetexEntityIndexReadOnlyView;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.transit.model.site.Station;
-import org.rutebanken.netex.model.DatedServiceJourney;
 
 /**
  * The responsibility of this class is to cache and index NeTEx entities used by more than one
