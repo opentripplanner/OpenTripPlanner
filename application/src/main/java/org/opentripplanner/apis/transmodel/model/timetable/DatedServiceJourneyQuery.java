@@ -37,7 +37,9 @@ public class DatedServiceJourneyQuery {
       .argument(GraphQLArgument.newArgument().name("id").type(Scalars.GraphQLString))
       .dataFetcher(environment -> {
         FeedScopedId id = idMapper.parseNullSafe(environment.getArgument("id")).orElse(null);
-
+        if (id == null) {
+          return null;
+        }
         return GqlUtil.getTransitService(environment).getTripOnServiceDate(id);
       })
       .build();
