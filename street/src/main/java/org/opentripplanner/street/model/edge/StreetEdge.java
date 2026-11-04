@@ -386,7 +386,7 @@ public class StreetEdge
   }
 
   /**
-   * Update the name of the edge after it has been constructed. This method also sets the
+   * Update the name of the edge after it has been constructed and set the
    * nameIsDerived property to false, indicating to the code that maps from edges to steps that this
    * is a real street name.
    *
@@ -397,6 +397,12 @@ public class StreetEdge
     this.flags = BitSetUtils.set(flags, NAME_IS_DERIVED_FLAG_INDEX, false);
   }
 
+  /**
+   * Update the name of the edge after it has been constructed and marking the name as derived,
+   * meaning that its name should be de-prioritized in walk steps.
+   *
+   * @see Edge#nameIsDerived()
+   */
   public void overrideDerivedName(I18NString name) {
     this.name = name;
     this.flags = BitSetUtils.set(flags, NAME_IS_DERIVED_FLAG_INDEX, true);

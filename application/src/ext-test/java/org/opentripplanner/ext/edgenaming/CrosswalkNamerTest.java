@@ -144,12 +144,11 @@ class CrosswalkNamerTest {
 
     namer.finalizeNames();
     assertEquals(String.format("crosswalk over %s", name), crosswalk.edge.getName().toString());
-    assertFalse(crosswalk.edge.nameIsDerived());
+    assertTrue(crosswalk.edge.nameIsDerived());
     assertEquals(
       String.format("crosswalk over %s", name),
       sidewalkToCrosswalk.edge.getName().toString()
     );
-    assertFalse(crosswalk.edge.nameIsDerived());
 
     // These sidewalks should not be renamed because they are adjacent
     // to the same crosswalk on the same side.
