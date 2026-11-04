@@ -31,8 +31,8 @@ public class VertexPropertyMapper extends PropertyMapper<Vertex> {
     );
     List<KeyValue> properties = switch (input) {
       case BarrierVertex v -> List.of(
-        kv("permission", v.getBarrierPermissions().toString()),
-        kv("wheelchair", v.wheelchairAccessibility().toString())
+        kv("permission", v.getBarrierPermissions()),
+        kv("wheelchair", v.wheelchairAccessibility())
       );
       case VehicleRentalPlaceVertex v -> List.of(kv("rentalId", v.getStation()));
       case VehicleParkingEntranceVertex v -> List.of(

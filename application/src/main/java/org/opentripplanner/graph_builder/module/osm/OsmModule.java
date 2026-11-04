@@ -446,7 +446,7 @@ public class OsmModule implements GraphBuilderModule {
           // split here too so a BarrierVertex is created for nodes that are
           // wheelchair-inaccessible without restricting any other travel mode,
           // e.g. barrier=kerb with a raised/rolled kerb value
-          !osmEndNode.isWheelchairAccessible() ||
+          osmEndNode.isWheelchairInaccessible() ||
           osmEndNode.isEntrance() ||
           vertexGenerator.nodesInBarrierWays().containsKey(osmEndNode)
         ) {

@@ -308,19 +308,19 @@ public class OsmEntityTest {
       Arguments.of(OsmNode.of().withTag("barrier", "kerb").withTag("kerb", "low").build(), true),
       Arguments.of(
         OsmNode.of().withTag("barrier", "kerb").withTag("kerb", "lowered_and_sloped").build(),
-        true
+        false
       ),
       Arguments.of(
         OsmNode.of().withTag("barrier", "kerb").withTag("kerb", "sloped_and_lowered").build(),
-        true
+        false
       ),
       Arguments.of(
         OsmNode.of().withTag("barrier", "kerb").withTag("kerb", "flush_and_lowered").build(),
-        true
+        false
       ),
       Arguments.of(
         OsmNode.of().withTag("barrier", "kerb").withTag("kerb", "lowered_sloped").build(),
-        true
+        false
       ),
       Arguments.of(
         OsmNode.of().withTag("barrier", "kerb").withTag("kerb", "regular").build(),

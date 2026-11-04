@@ -10,7 +10,6 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTR
 
 import java.time.Duration;
 import java.time.format.DateTimeParseException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -127,9 +126,8 @@ public abstract class OsmEntity {
   );
 
   // https://wiki.openstreetmap.org/wiki/Key:kerb documents flush/lowered/no as accessible, but
-  // real-world data (e.g. taginfo) also shows widely-used synonyms/compounds like "sloped",
-  // "none", "low", "lowered_and_sloped", "flush_and_lowered"; these are matched by splitting on
-  // "_" as well as the standard ";" alternatives, see #isWheelchairAccessible.
+  // real-world data (e.g. taginfo) also shows the widely-used synonyms "sloped", "none" and "low".
+  // Compound values like "flush_and_lowered" are considered tagging errors and not supported.
   private static final Set<String> WHEELCHAIR_ACCESSIBLE_KERBS = Set.of(
     "flush",
     "lowered",
@@ -909,6 +907,9 @@ public abstract class OsmEntity {
    *         information.
    */
   public boolean isWheelchairAccessible() {
+    if (this.isTagless()) {
+      return true;
+    }
     var wheelchairValue = getTag("wheelchair");
     if (isTrue(wheelchairValue)) {
       return true;
@@ -920,16 +921,17 @@ public abstract class OsmEntity {
       return false;
     }
     if (isTag("barrier", "kerb")) {
-      // kerb can have semicolon-separated alternative values, e.g. kerb=lowered;no, and
-      // underscore-joined compound values for the same point, e.g. kerb=lowered_and_sloped
-      // or kerb=flush_and_lowered; treat the node as accessible if any of the individual
-      // words indicates an accessible kerb.
+      // kerb can have semicolon-separated values, e.g. kerb=lowered;raised. The node is
+      // accessible if any of them indicates an accessible kerb.
       return getMultiTagValues(Set.of("kerb"))
         .stream()
-        .flatMap(value -> Arrays.stream(value.split("_")))
         .anyMatch(WHEELCHAIR_ACCESSIBLE_KERBS::contains);
     }
     return true;
+  }
+
+  public boolean isWheelchairInaccessible() {
+    return !isWheelchairAccessible();
   }
 
   /**

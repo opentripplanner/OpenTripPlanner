@@ -69,6 +69,11 @@ public class StreetEdge
   static final int WALK_NOTHRUTRAFFIC = 8;
   static final int CLASS_LINK = 9;
   static final int CROSSING_FLAG_INDEX = 10;
+  /**
+   * Set when the end vertex is a wheelchair-inaccessible {@link BarrierVertex}. Derived from the
+   * vertex in the constructor, so it is never copied from a builder.
+   */
+  static final int WHEELCHAIR_INACCESSIBLE_BARRIER_FLAG_INDEX = 11;
 
   private StreetEdgeCostExtension costExtension;
 
@@ -121,7 +126,11 @@ public class StreetEdge
 
   protected StreetEdge(StreetEdgeBuilder<?> builder) {
     super(builder.fromVertex(), builder.toVertex());
-    this.flags = builder.getFlags();
+    this.flags = BitSetUtils.set(
+      builder.getFlags(),
+      WHEELCHAIR_INACCESSIBLE_BARRIER_FLAG_INDEX,
+      isWheelchairInaccessibleBarrier(builder.toVertex())
+    );
     this.setGeometry(builder.geometry());
     this.length_mm = computeLength(builder);
     this.setBicycleSafetyFactor(builder.bicycleSafetyFactor());
@@ -1050,7 +1059,7 @@ public class StreetEdge
           isWheelchairAccessible(),
           isStairs()
         );
-      if (isWheelchairInaccessibleBarrier(tov)) {
+      if (BitSetUtils.get(flags, WHEELCHAIR_INACCESSIBLE_BARRIER_FLAG_INDEX)) {
         weight += WHEELCHAIR_INACCESSIBLE_BARRIER_COST;
       }
     } else {
