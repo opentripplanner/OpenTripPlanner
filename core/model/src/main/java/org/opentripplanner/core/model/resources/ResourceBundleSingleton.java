@@ -3,7 +3,6 @@ package org.opentripplanner.core.model.resources;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
-import java.util.ResourceBundle.Control;
 import java.util.Set;
 
 /**
@@ -12,9 +11,6 @@ import java.util.Set;
 public enum ResourceBundleSingleton {
   INSTANCE;
 
-  static final ResourceBundle.Control NO_FALLBACK_CONTROL = Control.getNoFallbackControl(
-    Control.FORMAT_PROPERTIES
-  );
   private static final Set<String> INTERNAL_KEYS = ResourceBundle.getBundle("internals").keySet();
 
   //in singleton because resurce bundles are cached based on calling class
@@ -29,13 +25,31 @@ public enum ResourceBundleSingleton {
     try {
       ResourceBundle resourceBundle;
       if (INTERNAL_KEYS.contains(key)) {
-        resourceBundle = ResourceBundle.getBundle("internals", locale, NO_FALLBACK_CONTROL);
+        resourceBundle = getBundleWithoutFallback("internals", locale);
       } else {
-        resourceBundle = ResourceBundle.getBundle("WayProperties", locale, NO_FALLBACK_CONTROL);
+        resourceBundle = getBundleWithoutFallback("WayProperties", locale);
       }
       return resourceBundle.getString(key);
     } catch (MissingResourceException e) {
       return key;
     }
+  }
+
+  /**
+   * Load a bundle for the given locale without falling back to the JVM default locale. If no
+   * bundle matches the requested language, the root bundle is returned.
+   * <p>
+   * The {@link ResourceBundle.Control} based {@code getBundle} overloads throw
+   * {@link UnsupportedOperationException} when called from a named module, so the no-fallback
+   * behavior is done here instead.
+   */
+  private static ResourceBundle getBundleWithoutFallback(String baseName, Locale locale) {
+    var bundle = ResourceBundle.getBundle(baseName, locale);
+    var found = bundle.getLocale();
+    // The JDK silently picks the default locale's bundle if the requested one does not exist.
+    if (!found.equals(Locale.ROOT) && !found.getLanguage().equals(locale.getLanguage())) {
+      return ResourceBundle.getBundle(baseName, Locale.ROOT);
+    }
+    return bundle;
   }
 }
