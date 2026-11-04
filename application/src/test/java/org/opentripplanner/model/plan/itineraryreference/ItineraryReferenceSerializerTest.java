@@ -333,26 +333,26 @@ class ItineraryReferenceSerializerTest {
 
   /**
    * Builds a token with otherwise-valid values for every field production uses, and no
-   * {@code toStopId}/{@code toLat}/{@code toLng} location - so a test only needs to pass in the
+   * {@code toStopId}/{@code toLat}/{@code toLon} location - so a test only needs to pass in the
    * one or two fields it wants to make malformed. Field names/order must match
-   * {@code ItineraryReferenceSerializer}'s schema exactly. {@code fromLat}/{@code fromLng}/
+   * {@code ItineraryReferenceSerializer}'s schema exactly. {@code fromLat}/{@code fromLon}/
    * {@code walkSpeed} are parameters (not later overrides) because {@link TokenBuilder} rejects
    * setting the same field twice.
    */
   private static String craftedToken(
     String legReferencesValue,
     String fromLat,
-    String fromLng,
+    String fromLon,
     String walkSpeed
   ) {
     var schema = TokenSchema.ofVersion(1)
       .addString("legReferences")
       .addString("fromStopId")
       .addString("fromLat")
-      .addString("fromLng")
+      .addString("fromLon")
       .addString("toStopId")
       .addString("toLat")
-      .addString("toLng")
+      .addString("toLon")
       .addString("accessMode")
       .addString("egressMode")
       .addString("transferMode")
@@ -368,10 +368,10 @@ class ItineraryReferenceSerializerTest {
       .withString("legReferences", legReferencesValue)
       .withString("fromStopId", null)
       .withString("fromLat", fromLat)
-      .withString("fromLng", fromLng)
+      .withString("fromLon", fromLon)
       .withString("toStopId", null)
       .withString("toLat", null)
-      .withString("toLng", null)
+      .withString("toLon", null)
       .withString("accessMode", StreetMode.WALK.name())
       .withString("egressMode", StreetMode.WALK.name())
       .withString("transferMode", StreetMode.WALK.name())

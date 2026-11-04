@@ -85,12 +85,8 @@ import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.trip.gtfs.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.utils.time.ServiceDateUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
-
-  private static final Logger LOG = LoggerFactory.getLogger(QueryTypeImpl.class);
 
   // TODO: figure out a runtime solution
   private static final DirectionMapper DIRECTION_MAPPER = new DirectionMapper(
@@ -428,7 +424,6 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
           )
           .build();
       } catch (RefetchItineraryException e) {
-        LOG.debug("Could not refetch itinerary for id {}", args.getGraphQLId(), e);
         return null;
       }
     };

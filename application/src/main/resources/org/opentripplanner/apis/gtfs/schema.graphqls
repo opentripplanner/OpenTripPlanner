@@ -835,6 +835,7 @@ type Itinerary {
   frequency-based trip). Only walk preferences are part of the identifier, so an itinerary
   that reaches transit by bicycle, car or scooter refetches its access and egress with the
   server's default preferences for those modes, and those legs may differ from the original.
+  We do not recommend storing ids for a long time.
   """
   id: String
   """
@@ -1656,7 +1657,10 @@ type QueryType {
   """
   Refetch a previously planned itinerary using its stable `id` (see `Itinerary.id`), with current
   realtime data applied. Returns `null` if the id is invalid, malformed, or refers to an
-  itinerary shape that cannot be refetched (for example, a street-only itinerary).
+  itinerary shape that cannot be refetched (for example, a street-only itinerary), or if a
+  transit entity it refers to (such as a trip or stop) no longer exists in the server's data.
+  The id is meant for refetching an itinerary during or shortly before travel, not for long-term
+  storage: refetching is likely to fail after the transit data has been updated.
   """
   itinerary(id: String!): Itinerary @timingData
   """

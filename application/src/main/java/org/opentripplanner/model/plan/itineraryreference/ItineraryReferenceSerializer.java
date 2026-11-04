@@ -15,8 +15,6 @@ import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.plan.legreference.LegReferenceSerializer;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.utils.time.DurationUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Serializer for {@link ItineraryReference}.
@@ -34,16 +32,14 @@ import org.slf4j.LoggerFactory;
  */
 public class ItineraryReferenceSerializer {
 
-  private static final Logger LOG = LoggerFactory.getLogger(ItineraryReferenceSerializer.class);
-
   private static final String LEG_REFERENCES_FIELD = "legReferences";
   private static final String LEG_REFERENCE_DELIMITER = "~";
   private static final String FROM_STOP_ID_FIELD = "fromStopId";
   private static final String FROM_LAT_FIELD = "fromLat";
-  private static final String FROM_LNG_FIELD = "fromLng";
+  private static final String FROM_LON_FIELD = "fromLon";
   private static final String TO_STOP_ID_FIELD = "toStopId";
   private static final String TO_LAT_FIELD = "toLat";
-  private static final String TO_LNG_FIELD = "toLng";
+  private static final String TO_LON_FIELD = "toLon";
   private static final String ACCESS_MODE_FIELD = "accessMode";
   private static final String EGRESS_MODE_FIELD = "egressMode";
   private static final String TRANSFER_MODE_FIELD = "transferMode";
@@ -65,10 +61,10 @@ public class ItineraryReferenceSerializer {
     .addString(LEG_REFERENCES_FIELD)
     .addString(FROM_STOP_ID_FIELD)
     .addString(FROM_LAT_FIELD)
-    .addString(FROM_LNG_FIELD)
+    .addString(FROM_LON_FIELD)
     .addString(TO_STOP_ID_FIELD)
     .addString(TO_LAT_FIELD)
-    .addString(TO_LNG_FIELD)
+    .addString(TO_LON_FIELD)
     .addString(ACCESS_MODE_FIELD)
     .addString(EGRESS_MODE_FIELD)
     .addString(TRANSFER_MODE_FIELD)
@@ -109,8 +105,8 @@ public class ItineraryReferenceSerializer {
       .withString(WALK_RELUCTANCE_FIELD, Double.toString(ref.walkReluctance()))
       .withBoolean(WHEELCHAIR_FIELD, ref.wheelchair());
 
-    withLocation(builder, FROM_STOP_ID_FIELD, FROM_LAT_FIELD, FROM_LNG_FIELD, ref.from());
-    withLocation(builder, TO_STOP_ID_FIELD, TO_LAT_FIELD, TO_LNG_FIELD, ref.to());
+    withLocation(builder, FROM_STOP_ID_FIELD, FROM_LAT_FIELD, FROM_LON_FIELD, ref.from());
+    withLocation(builder, TO_STOP_ID_FIELD, TO_LAT_FIELD, TO_LON_FIELD, ref.to());
 
     return builder.build();
   }
@@ -143,8 +139,8 @@ public class ItineraryReferenceSerializer {
         .map(Objects::requireNonNull)
         .toList();
 
-      var from = decodeLocation(token, FROM_STOP_ID_FIELD, FROM_LAT_FIELD, FROM_LNG_FIELD);
-      var to = decodeLocation(token, TO_STOP_ID_FIELD, TO_LAT_FIELD, TO_LNG_FIELD);
+      var from = decodeLocation(token, FROM_STOP_ID_FIELD, FROM_LAT_FIELD, FROM_LON_FIELD);
+      var to = decodeLocation(token, TO_STOP_ID_FIELD, TO_LAT_FIELD, TO_LON_FIELD);
 
       var accessMode = StreetMode.valueOf(token.getString(ACCESS_MODE_FIELD).orElseThrow());
       var egressMode = StreetMode.valueOf(token.getString(EGRESS_MODE_FIELD).orElseThrow());
@@ -178,7 +174,6 @@ public class ItineraryReferenceSerializer {
         wheelchair
       );
     } catch (RuntimeException e) {
-      LOG.debug("Unable to decode itinerary reference", e);
       return null;
     }
   }
@@ -214,12 +209,12 @@ public class ItineraryReferenceSerializer {
     TokenBuilder builder,
     String stopIdField,
     String latField,
-    String lngField,
+    String lonField,
     @Nullable GenericLocation location
   ) {
     String stopId = null;
     String lat = null;
-    String lng = null;
+    String lon = null;
 
     if (location != null) {
       var locationStopId = location.stopId();
@@ -230,11 +225,11 @@ public class ItineraryReferenceSerializer {
       var coordinate = location.wgsCoordinate();
       if (coordinate != null) {
         lat = Double.toString(coordinate.latitude());
-        lng = Double.toString(coordinate.longitude());
+        lon = Double.toString(coordinate.longitude());
       }
     }
 
-    builder.withString(stopIdField, stopId).withString(latField, lat).withString(lngField, lng);
+    builder.withString(stopIdField, stopId).withString(latField, lat).withString(lonField, lon);
   }
 
   /**
@@ -248,19 +243,19 @@ public class ItineraryReferenceSerializer {
     Token token,
     String stopIdField,
     String latField,
-    String lngField
+    String lonField
   ) {
     var stopId = token.getString(stopIdField).map(FeedScopedId::parseStrict).orElse(null);
     var lat = token.getString(latField).map(ItineraryReferenceSerializer::finiteDouble);
-    var lng = token.getString(lngField).map(ItineraryReferenceSerializer::finiteDouble);
+    var lon = token.getString(lonField).map(ItineraryReferenceSerializer::finiteDouble);
 
-    if (lat.isPresent() != lng.isPresent()) {
+    if (lat.isPresent() != lon.isPresent()) {
       throw new IllegalArgumentException("Location must contain both latitude and longitude");
     }
 
     if (lat.isPresent()) {
       double latitude = lat.orElseThrow();
-      double longitude = lng.orElseThrow();
+      double longitude = lon.orElseThrow();
 
       if (stopId != null) {
         return GenericLocation.fromStopIdWithFallback(stopId, latitude, longitude, null);
