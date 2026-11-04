@@ -10,7 +10,6 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import org.entur.netex2.model.DestinationDisplay;
 import org.entur.netex2.model.DestinationDisplay_VersionStructure;
@@ -395,17 +394,10 @@ class StopTimesMapper {
     if (quayId != null) {
       stopLocation = stopsById.get(idFactory.createId(quayId));
     } else if (stopPlaceId != null) {
-      // the validation takes care of checking that the stop place exists and that it has at
-      // least one quay
+      // The validation normally drops assignments to missing or quay-less stop places, but corner
+      // cases (e.g. a quay attached to two stop places) can still end up here, so we drop the stop.
       var station = stationsById.get(idFactory.createId(stopPlaceId));
-      stopLocation =
-        pickAnyChildStop(station)
-          // if you see this exception then the validation didn't filter out the passenger stop assignment
-          .orElseThrow(() ->
-            new RuntimeException(
-              "Stop place %s has no quays. This indicates a bug.".formatted(stopPlaceId)
-            )
-          );
+      stopLocation = pickAnyChildStop(station);
     } else if (flexibleStopPlaceId != null) {
       AreaStop areaStop = flexibleStopLocationsById.get(idFactory.createId(flexibleStopPlaceId));
       GroupStop groupStop = groupStopById.get(idFactory.createId(flexibleStopPlaceId));
@@ -429,12 +421,15 @@ class StopTimesMapper {
   }
 
   /**
-   * Pick a child stop of the station for the assignment. Sorts by stop ID and picks the first
-   * so that this method is deterministic even though there is no guarantee that any specific stop is
-   * picked.
+   * If possible, pick a child stop of the station for the assignment. The method is deterministic
+   * but there is no guarantee that any specific stop is picked.
    */
-  private static Optional<StopLocation> pickAnyChildStop(Station station) {
-    return station.getChildStops().stream().min(TransitEntity.idComparator());
+  @Nullable
+  private static StopLocation pickAnyChildStop(@Nullable Station station) {
+    if (station == null) {
+      return null;
+    }
+    return station.getChildStops().stream().min(TransitEntity.idComparator()).orElse(null);
   }
 
   private FlexibleLine lookUpFlexibleLine(
