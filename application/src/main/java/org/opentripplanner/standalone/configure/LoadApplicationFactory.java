@@ -2,8 +2,8 @@ package org.opentripplanner.standalone.configure;
 
 import dagger.BindsInstance;
 import dagger.Component;
-import jakarta.annotation.Nullable;
 import jakarta.inject.Singleton;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.datastore.configure.DataStoreModule;
 import org.opentripplanner.ext.datastore.gs.GsDataSourceModule;

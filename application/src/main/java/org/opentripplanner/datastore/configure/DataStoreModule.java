@@ -2,11 +2,11 @@ package org.opentripplanner.datastore.configure;
 
 import dagger.Module;
 import dagger.Provides;
-import jakarta.annotation.Nullable;
 import jakarta.inject.Singleton;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.FileType;
