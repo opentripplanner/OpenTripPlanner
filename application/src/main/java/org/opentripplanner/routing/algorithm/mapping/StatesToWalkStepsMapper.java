@@ -238,8 +238,8 @@ public class StatesToWalkStepsMapper {
       (isLink(edge) && !isLink(backState.getBackEdge()))
     ) {
       // Street name has changed, or we've gone on to or off of a roundabout.
-
       // if we were just on a roundabout, make note of which exit was taken in the existing step
+
       if (roundaboutExit > 0) {
         // ordinal numbers from
         current.withExit(Integer.toString(roundaboutExit));
@@ -342,7 +342,7 @@ public class StatesToWalkStepsMapper {
     State forwardState,
     RelativeDirection direction
   ) {
-    return direction == CONTINUE && forwardState.backEdge.getDistanceMeters() < 30;
+    return direction == CONTINUE && forwardState.backEdge.getDistanceMeters() < MAX_ZAG_DISTANCE;
   }
 
   /**
