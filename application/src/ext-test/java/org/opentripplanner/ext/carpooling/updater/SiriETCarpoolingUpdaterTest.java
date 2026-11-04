@@ -347,6 +347,34 @@ class SiriETCarpoolingUpdaterTest {
     assertTrue(held("c"));
   }
 
+  @Test
+  void aTripThatCannotBeResolvedHoldsASlot() {
+    var limited = updaterHoldingAtMost(1);
+    doReturn(null).when(resolver).resolve(any());
+
+    limited.processEstimatedVehicleJourney(journeyWithCode("a"));
+    limited.processEstimatedVehicleJourney(journeyWithCode("b"));
+
+    verify(resolver, times(1)).resolve(any());
+  }
+
+  @Test
+  void aCancellationFreesTheSlotOfATripThatCannotBeResolved() {
+    var limited = updaterHoldingAtMost(1);
+    var cancelledA = journeyWithCode("a");
+    cancelledA.setCancellation(true);
+    doReturn(null).when(resolver).resolve(any());
+    limited.processEstimatedVehicleJourney(journeyWithCode("a"));
+    limited.processEstimatedVehicleJourney(cancelledA);
+
+    doAnswer(invocation -> RoutableCarpoolTripTestData.withDummyVertices(invocation.getArgument(0)))
+      .when(resolver)
+      .resolve(any());
+    limited.processEstimatedVehicleJourney(journeyWithCode("b"));
+
+    assertTrue(held("b"));
+  }
+
   private FeedScopedId seedActiveTrip() {
     var journey = minimalCompleteJourney();
     updater.processEstimatedVehicleJourney(journey);

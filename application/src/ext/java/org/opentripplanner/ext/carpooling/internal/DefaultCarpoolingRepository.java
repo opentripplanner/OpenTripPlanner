@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
@@ -21,6 +22,9 @@ public class DefaultCarpoolingRepository implements CarpoolingRepository {
   private final Duration sweepInterval;
 
   private final Map<FeedScopedId, RoutableCarpoolTrip> trips = new ConcurrentHashMap<>();
+
+  /** The number of trips of each feed. */
+  private final Map<String, AtomicInteger> tripCounts = new ConcurrentHashMap<>();
 
   /** The earliest instant at which the next expiry sweep is allowed to run. */
   private final AtomicReference<Instant> nextSweep = new AtomicReference<>(Instant.MIN);
@@ -41,12 +45,19 @@ public class DefaultCarpoolingRepository implements CarpoolingRepository {
   }
 
   @Override
+  public int countCarpoolTrips(String feedId) {
+    var count = tripCounts.get(feedId);
+    return count == null ? 0 : count.get();
+  }
+
+  @Override
   public void upsertCarpoolTrip(RoutableCarpoolTrip routableTrip) {
     CarpoolTrip trip = routableTrip.trip();
     RoutableCarpoolTrip existing = trips.put(trip.getId(), routableTrip);
     if (existing != null) {
       LOG.debug("Updated carpool trip {} with {} stops", trip.getId(), trip.stops().size());
     } else {
+      changeTripCount(trip.getId(), 1);
       LOG.debug("Added new carpool trip {} with {} stops", trip.getId(), trip.stops().size());
     }
   }
@@ -55,6 +66,7 @@ public class DefaultCarpoolingRepository implements CarpoolingRepository {
   public void removeCarpoolTrip(FeedScopedId id) {
     RoutableCarpoolTrip removed = trips.remove(id);
     if (removed != null) {
+      changeTripCount(id, -1);
       LOG.debug("Removed carpool trip {}", id);
     } else {
       LOG.debug("Tried to remove unknown carpool trip {}", id);
@@ -76,6 +88,7 @@ public class DefaultCarpoolingRepository implements CarpoolingRepository {
         trip.latestEndTime().toInstant().isBefore(expiryThreshold) &&
         trips.remove(trip.getId(), routableTrip)
       ) {
+        changeTripCount(trip.getId(), -1);
         removed++;
       }
     }
@@ -83,5 +96,9 @@ public class DefaultCarpoolingRepository implements CarpoolingRepository {
       LOG.debug("Removed {} carpool trips that ended before {}", removed, expiryThreshold);
     }
     return removed;
+  }
+
+  private void changeTripCount(FeedScopedId id, int change) {
+    tripCounts.computeIfAbsent(id.getFeedId(), feedId -> new AtomicInteger()).addAndGet(change);
   }
 }

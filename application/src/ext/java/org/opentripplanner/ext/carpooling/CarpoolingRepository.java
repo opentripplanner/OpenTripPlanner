@@ -32,6 +32,9 @@ public interface CarpoolingRepository {
   @Nullable
   RoutableCarpoolTrip getCarpoolTrip(FeedScopedId id);
 
+  /** Returns the number of trips from the given feed. */
+  int countCarpoolTrips(String feedId);
+
   /**
    * Inserts a new carpooling trip or updates an existing trip with the same ID.
    * <p>

@@ -115,6 +115,37 @@ class DefaultCarpoolingRepositoryTest {
     assertThat(repository.getCarpoolTrips()).isEmpty();
   }
 
+  @Test
+  void countsTheTripsOfAFeed() {
+    var repository = new DefaultCarpoolingRepository(
+      CarpoolingParameters.DEFAULT.expirySweepInterval()
+    );
+    var trip = withDummyVertices(tripEndingAt(NOON));
+    repository.upsertCarpoolTrip(trip);
+    repository.upsertCarpoolTrip(trip);
+    repository.upsertCarpoolTrip(withDummyVertices(tripEndingAt(NOON)));
+
+    assertThat(repository.countCarpoolTrips("TEST")).isEqualTo(2);
+    assertThat(repository.countCarpoolTrips("OTHER")).isEqualTo(0);
+  }
+
+  @Test
+  void removedAndExpiredTripsAreNotCounted() {
+    var repository = new DefaultCarpoolingRepository(
+      CarpoolingParameters.DEFAULT.expirySweepInterval()
+    );
+    var removed = withDummyVertices(tripEndingAt(NOON.plusHours(2)));
+    repository.upsertCarpoolTrip(removed);
+    repository.upsertCarpoolTrip(withDummyVertices(tripEndingAt(NOON)));
+    repository.upsertCarpoolTrip(withDummyVertices(tripEndingAt(NOON.plusHours(2))));
+
+    repository.removeCarpoolTrip(removed.trip().getId());
+    repository.removeCarpoolTrip(removed.trip().getId());
+    repository.removeExpiredTrips(NOON.plusHours(1).toInstant(), Duration.ZERO);
+
+    assertThat(repository.countCarpoolTrips("TEST")).isEqualTo(1);
+  }
+
   private static CarpoolTrip tripEndingAt(ZonedDateTime endTime) {
     return CarpoolTripTestData.createSimpleTripWithTimes(
       OSLO_CENTER,
