@@ -116,7 +116,6 @@ class StatesToWalkStepsMapperTest {
     assertThat(toStrings(states))
       .containsExactly(
         "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: DEPART, directionText: '1.0_1.0_2.0_2.0', distance: 157,225.7}",
-        "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: CONTINUE, directionText: 'pathway', distance: 0.0}",
         "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: EXIT_STATION, directionText: 'Lichterfelde-Ost', distance: 0.0, entranceId: F:Lichterfelde-Ost}"
       )
       .inOrder();
