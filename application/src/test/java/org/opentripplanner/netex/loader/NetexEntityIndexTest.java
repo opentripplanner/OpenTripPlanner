@@ -5,16 +5,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.entur.netex2.model.DayTypeAssignment;
+import org.entur.netex2.model.JourneyPattern;
+import org.entur.netex2.model.OperatingPeriod;
+import org.entur.netex2.model.Quay;
+import org.entur.netex2.model.Route;
+import org.entur.netex2.model.ServiceJourney;
+import org.entur.netex2.model.StopPlace;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.netex.index.NetexEntityIndex;
-import org.rutebanken.netex.model.DayTypeAssignment;
-import org.rutebanken.netex.model.JourneyPattern;
-import org.rutebanken.netex.model.OperatingPeriod;
-import org.rutebanken.netex.model.Quay;
-import org.rutebanken.netex.model.Route;
-import org.rutebanken.netex.model.ServiceJourney;
-import org.rutebanken.netex.model.StopPlace;
 
 public class NetexEntityIndexTest {
 

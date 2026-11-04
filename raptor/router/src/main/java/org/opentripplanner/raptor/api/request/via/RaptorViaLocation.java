@@ -4,7 +4,7 @@ import java.time.Duration;
 import java.util.BitSet;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.raptor.spi.RaptorStopNameResolver;
 import org.opentripplanner.raptor.util.paretoset.ParetoDominance;
 import org.opentripplanner.utils.lang.IntUtils;

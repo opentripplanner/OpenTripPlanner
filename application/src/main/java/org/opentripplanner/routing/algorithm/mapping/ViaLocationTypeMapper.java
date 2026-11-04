@@ -2,7 +2,7 @@ package org.opentripplanner.routing.algorithm.mapping;
 
 import java.util.List;
 import java.util.Objects;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.model.plan.leg.ViaLocationType;
 import org.opentripplanner.routing.api.request.via.ViaLocation;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;

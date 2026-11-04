@@ -39,6 +39,11 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Improve vertex linking filtering logic [#7994](https://github.com/opentripplanner/OpenTripPlanner/pull/7994)
 - Test Dependency Injection in request scope [#7987](https://github.com/opentripplanner/OpenTripPlanner/pull/7987)
 - Reject unknown transport mode in TransModel filters instead of failing with ClassCastException [#8064](https://github.com/opentripplanner/OpenTripPlanner/pull/8064)
+- Un-deprecate Cluster.id so the GTFS GraphQL schema validates with graphql-js 17 [#8158](https://github.com/opentripplanner/OpenTripPlanner/pull/8158)
+- Add module test for SIRI-ET message without expected time [#7979](https://github.com/opentripplanner/OpenTripPlanner/pull/7979)
+- Retune cycleway bicycle safety multipliers toward pre-2.9 values [#8114](https://github.com/opentripplanner/OpenTripPlanner/pull/8114)
+- Update to netex2-java-model v3.0.0 (NeTEx 2.0) [#7259](https://github.com/opentripplanner/OpenTripPlanner/pull/7259)
+- Remove Thread.yield() from the request timeout check [#8147](https://github.com/opentripplanner/OpenTripPlanner/pull/8147)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.10.0 (2026-09-09)

@@ -1,7 +1,7 @@
 package org.opentripplanner.gtfs.graphbuilder;
 
 import java.io.File;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.datastore.api.DataSourceTestFactory;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.gtfs.config.GtfsDefaultParameters;

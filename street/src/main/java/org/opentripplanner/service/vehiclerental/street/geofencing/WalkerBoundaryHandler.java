@@ -1,7 +1,7 @@
 package org.opentripplanner.service.vehiclerental.street.geofencing;
 
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.VehicleRentalState;
 
@@ -35,8 +35,7 @@ public class WalkerBoundaryHandler {
    *         HAVE_RENTED walker, no paired boundaries, or no boundary direction matched the
    *         walker-exit-in-forward condition).
    */
-  @Nullable
-  public static State[] apply(
+  public static State @Nullable [] apply(
     State s0,
     List<GeofencingBoundaryExtension> fromBoundaries,
     List<GeofencingBoundaryExtension> toBoundaries,

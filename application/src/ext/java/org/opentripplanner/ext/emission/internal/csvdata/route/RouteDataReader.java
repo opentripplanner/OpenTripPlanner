@@ -3,7 +3,7 @@ package org.opentripplanner.ext.emission.internal.csvdata.route;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.framework.csv.HeadersDoNotMatch;

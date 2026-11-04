@@ -2,7 +2,7 @@ package org.opentripplanner.service.shape.internal;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.service.shape.ScheduledShapeData;
 import org.opentripplanner.service.shape.ShapeRepository;

@@ -2,7 +2,7 @@ package org.opentripplanner.service.shape.model;
 
 import java.io.Serializable;
 import java.util.Arrays;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.street.geometry.PackedLineStringCodec;
 

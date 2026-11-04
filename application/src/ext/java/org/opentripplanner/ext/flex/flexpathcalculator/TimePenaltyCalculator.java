@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.flex.flexpathcalculator;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.time.TimePenalty;
 import org.opentripplanner.street.model.vertex.Vertex;
 

@@ -2,7 +2,7 @@ package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals;
 
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.request.via.RaptorTransferViaConnection;
 import org.opentripplanner.raptor.rangeraptor.transit.AccessPaths;

@@ -183,6 +183,11 @@
             <artifactId>micrometer-registry-prometheus</artifactId>
             <version>${micrometer.version}</version>
         </dependency>
+        <!-- nullability annotations, see the root pom for when to use which -->
+        <dependency>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+        </dependency>
         <!-- Used in DegreeGridNEDTileSource to fetch tiles from Amazon S3 -->
         <dependency>
             <groupId>net.java.dev.jets3t</groupId>
@@ -237,8 +242,8 @@
          -->
         <dependency>
             <groupId>org.entur</groupId>
-            <artifactId>netex-java-model</artifactId>
-            <version>${netex-java-model.version}</version>
+            <artifactId>netex2-java-model</artifactId>
+            <version>${netex2-java-model.version}</version>
         </dependency>
         <dependency>
             <groupId>org.entur</groupId>
@@ -293,6 +298,10 @@
             <groupId>org.glassfish.jersey.media</groupId>
             <artifactId>jersey-media-json-jackson3</artifactId>
             <version>${jersey.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jspecify</groupId>
+            <artifactId>jspecify</artifactId>
         </dependency>
         <dependency>
             <groupId>org.mobilitydata</groupId>

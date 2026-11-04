@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.model.network;
 
 import java.util.function.UnaryOperator;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;

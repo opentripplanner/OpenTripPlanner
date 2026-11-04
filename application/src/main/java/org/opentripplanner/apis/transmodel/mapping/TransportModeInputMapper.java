@@ -1,7 +1,7 @@
 package org.opentripplanner.apis.transmodel.mapping;
 
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.transit.model.basic.TransitMode;
 

@@ -1,7 +1,7 @@
 package org.opentripplanner.service.shape;
 
 import java.util.Map;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.service.shape.model.CompactLineStringSequence;
 

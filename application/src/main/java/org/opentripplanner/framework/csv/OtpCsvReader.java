@@ -5,7 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.framework.csv.parser.AbstractCsvParser;
 import org.opentripplanner.utils.logging.ProgressTracker;

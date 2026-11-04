@@ -29,6 +29,13 @@
             <message key="import.illegal"
                      value="Everything not annotated with @Nullable is assumed to be non-null."/>
         </module>
+        <module name="IllegalImport">
+            <property name="illegalPkgs" value="javax.annotation.concurrent"/>
+            <property name="illegalClasses"
+                      value="javax.annotation.Nullable, javax.annotation.ParametersAreNonnullByDefault"/>
+            <message key="import.illegal"
+                     value="Use org.jspecify.annotations (@Nullable, @NullMarked) instead of JSR-305."/>
+        </module>
         <module name="NeedBraces"/>
         <module name="RedundantImport"/>
         <module name="SimplifyBooleanReturn"/>

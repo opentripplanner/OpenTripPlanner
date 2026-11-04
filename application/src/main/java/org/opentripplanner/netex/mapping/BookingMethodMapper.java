@@ -1,7 +1,7 @@
 package org.opentripplanner.netex.mapping;
 
+import org.entur.netex2.model.BookingMethodEnumeration;
 import org.opentripplanner.transit.model.timetable.booking.BookingMethod;
-import org.rutebanken.netex.model.BookingMethodEnumeration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

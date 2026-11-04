@@ -1,6 +1,6 @@
 package org.opentripplanner.updater.spi;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 
 /// An exception for indicating various issues with realtime data. It can be thrown anywhere in the

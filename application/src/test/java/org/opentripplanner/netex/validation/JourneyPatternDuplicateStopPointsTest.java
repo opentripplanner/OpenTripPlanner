@@ -5,14 +5,14 @@ import static org.opentripplanner.netex.index.api.HMapValidationRule.Status.DISC
 import static org.opentripplanner.netex.index.api.HMapValidationRule.Status.OK;
 
 import java.math.BigInteger;
+import org.entur.netex2.model.JourneyPatternRefStructure;
+import org.entur.netex2.model.PointsInJourneyPattern_RelStructure;
+import org.entur.netex2.model.ServiceJourney;
+import org.entur.netex2.model.ServiceJourneyPattern;
+import org.entur.netex2.model.StopPointInJourneyPattern;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.netex.index.NetexEntityIndex;
 import org.opentripplanner.netex.mapping.MappingSupport;
-import org.rutebanken.netex.model.JourneyPatternRefStructure;
-import org.rutebanken.netex.model.PointsInJourneyPattern_RelStructure;
-import org.rutebanken.netex.model.ServiceJourney;
-import org.rutebanken.netex.model.ServiceJourneyPattern;
-import org.rutebanken.netex.model.StopPointInJourneyPattern;
 
 class JourneyPatternDuplicateStopPointsTest {
 

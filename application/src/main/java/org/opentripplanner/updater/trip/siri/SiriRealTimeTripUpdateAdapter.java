@@ -1,7 +1,7 @@
 package org.opentripplanner.updater.trip.siri;
 
 import java.util.function.Supplier;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.service.shape.ShapeRepository;
 import org.opentripplanner.transit.repository.TimetableRepository;

@@ -2,8 +2,8 @@ package org.opentripplanner.ext.dataoverlay.configure;
 
 import dagger.Module;
 import dagger.Provides;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Singleton;
-import javax.annotation.Nullable;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
 import org.opentripplanner.standalone.config.BuildConfig;
 
