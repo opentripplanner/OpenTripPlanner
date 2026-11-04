@@ -4,6 +4,7 @@ import static org.opentripplanner._support.text.TextAssertions.assertLinesEquals
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.opentest4j.AssertionFailedError;
 
 public class TextAssertionsTest {
 
@@ -33,7 +34,7 @@ public class TextAssertionsTest {
 
   @Test
   void testEndOfText() {
-    var ex = Assertions.assertThrows(org.opentest4j.AssertionFailedError.class, () ->
+    var ex = Assertions.assertThrows(AssertionFailedError.class, () ->
       assertLinesEquals("A\n", "A\nExtra Line")
     );
     Assertions.assertTrue(

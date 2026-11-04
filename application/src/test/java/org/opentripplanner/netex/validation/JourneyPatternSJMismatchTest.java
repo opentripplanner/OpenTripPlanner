@@ -1,16 +1,16 @@
 package org.opentripplanner.netex.validation;
 
+import static org.entur.netex2.model.StopUseEnumeration.ACCESS;
+import static org.entur.netex2.model.StopUseEnumeration.PASSTHROUGH;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.netex.index.api.HMapValidationRule.Status.DISCARD;
 import static org.opentripplanner.netex.index.api.HMapValidationRule.Status.OK;
-import static org.rutebanken.netex.model.StopUseEnumeration.ACCESS;
-import static org.rutebanken.netex.model.StopUseEnumeration.PASSTHROUGH;
 
 import java.util.List;
+import org.entur.netex2.model.ServiceJourneyBuilder;
+import org.entur.netex2.model.ServiceJourneyPatternBuilder;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.netex.index.NetexEntityIndex;
-import org.rutebanken.netex.model.ServiceJourneyBuilder;
-import org.rutebanken.netex.model.ServiceJourneyPatternBuilder;
 
 class JourneyPatternSJMismatchTest {
 

@@ -9,6 +9,7 @@ import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidati
 import org.opentripplanner.ext.stopconsolidation.model.ConsolidatedStopGroup;
 import org.opentripplanner.ext.stopconsolidation.model.StopReplacement;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.slf4j.Logger;
@@ -29,14 +30,17 @@ public class StopConsolidationModule implements GraphBuilderModule {
 
   private final StopConsolidationRepository repository;
   private final TransitRepository transitRepository;
+  private final TimetableDataImport timetableDataImport;
   private final Collection<ConsolidatedStopGroup> groups;
 
   public StopConsolidationModule(
     TransitRepository transitRepository,
+    TimetableDataImport timetableDataImport,
     StopConsolidationRepository repository,
     Collection<ConsolidatedStopGroup> groups
   ) {
     this.transitRepository = Objects.requireNonNull(transitRepository);
+    this.timetableDataImport = Objects.requireNonNull(timetableDataImport);
     this.repository = Objects.requireNonNull(repository);
     this.groups = Objects.requireNonNull(groups);
   }
@@ -50,14 +54,14 @@ public class StopConsolidationModule implements GraphBuilderModule {
     var stopsToReplace = service.secondaryStops();
     var replacements = service.replacements();
 
-    transitRepository
+    timetableDataImport
       .getAllTripPatterns()
       .stream()
       .filter(pattern -> pattern.containsAnyStopId(stopsToReplace))
       .forEach(pattern -> {
         LOG.info("Replacing stop(s) in pattern {}", pattern);
         var modifiedPattern = modifyStopsInPattern(pattern, replacements);
-        transitRepository.addTripPattern(modifiedPattern.getId(), modifiedPattern);
+        timetableDataImport.addTripPattern(modifiedPattern.getId(), modifiedPattern);
       });
   }
 
@@ -72,13 +76,14 @@ public class StopConsolidationModule implements GraphBuilderModule {
 
   public static StopConsolidationModule of(
     TransitRepository transitRepository,
+    TimetableDataImport timetableDataImport,
     StopConsolidationRepository repo,
     DataSource ds
   ) {
     LOG.info("Reading stop consolidation information from '{}'", ds);
     try (var inputStream = ds.asInputStream()) {
       var groups = StopConsolidationParser.parseGroups(inputStream);
-      return new StopConsolidationModule(transitRepository, repo, groups);
+      return new StopConsolidationModule(transitRepository, timetableDataImport, repo, groups);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

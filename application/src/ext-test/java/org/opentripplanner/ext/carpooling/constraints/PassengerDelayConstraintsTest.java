@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.CarpoolStreetPathBuilder;
 import org.opentripplanner.ext.carpooling.model.CarpoolStop;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.path.StreetPath;
 
 class PassengerDelayConstraintsTest {
@@ -20,7 +21,7 @@ class PassengerDelayConstraintsTest {
 
   private static CarpoolStop stopWithBudget(Duration budget) {
     return CarpoolStop.of(FeedScopedId.ofNullable("TEST", "stop-" + STOP_COUNTER.incrementAndGet()))
-      .withCoordinate(new org.opentripplanner.street.geometry.WgsCoordinate(59.9, 10.7))
+      .withCoordinate(new WgsCoordinate(59.9, 10.7))
       .withDeviationBudget(budget)
       .build();
   }

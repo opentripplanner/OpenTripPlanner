@@ -32,6 +32,7 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
+import org.opentripplanner.street.search.state.State;
 
 /**
  * Integration test for geofencing zone enforcement with floating scooter rentals.
@@ -672,7 +673,7 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
       .collect(Collectors.toList());
   }
 
-  private String formatState(org.opentripplanner.street.search.state.State s) {
+  private String formatState(State s) {
     return String.format(
       Locale.ROOT,
       "%s - %s - %s (%,.2f, %d) zones=%s",

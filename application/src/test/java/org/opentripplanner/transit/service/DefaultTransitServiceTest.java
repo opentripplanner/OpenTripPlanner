@@ -17,7 +17,6 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -31,6 +30,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransit
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -165,12 +165,13 @@ class DefaultTransitServiceTest {
 
     var deduplicator = new Deduplicator();
     var transitRepository = new TransitRepository(siteRepository);
+    var timetableDataImport = new TimetableDataImport();
     var canceledStopTimes = TEST_MODEL.stopTimesEvery5Minutes(3, TRIP, "11:30");
     var canceledTripTimes = TripTimesFactory.tripTimes(TRIP, canceledStopTimes, deduplicator)
       .createRealTimeFromScheduledTimes()
       .withCanceled()
       .build();
-    transitRepository.addTripPattern(RAIL_PATTERN.getId(), RAIL_PATTERN);
+    timetableDataImport.addTripPattern(RAIL_PATTERN.getId(), RAIL_PATTERN);
 
     // Crate a calendar (needed for testing cancelled trips)
     CalendarServiceData calendarServiceData = new CalendarServiceData();
@@ -187,21 +188,22 @@ class DefaultTransitServiceTest {
       List.of(firstDate, secondDate)
     );
 
-    transitRepository.putServiceCode(SERVICE_ID, SERVICE_CODE);
-    transitRepository.putServiceCode(CALENDAR_ID, SERVICE_CODE);
-    transitRepository.putServiceCode(CALENDAR_ID_TWO, 1);
+    timetableDataImport.putServiceCode(SERVICE_ID, SERVICE_CODE);
+    timetableDataImport.putServiceCode(CALENDAR_ID, SERVICE_CODE);
+    timetableDataImport.putServiceCode(CALENDAR_ID_TWO, 1);
 
-    transitRepository.addTripPattern(RAIL_PATTERN.getId(), RAIL_PATTERN);
-    transitRepository.addTripPattern(BUS_PATTERN.getId(), BUS_PATTERN);
-    transitRepository.addTripPattern(BUS_PATTERN_TODAY.getId(), BUS_PATTERN_TODAY);
+    timetableDataImport.addTripPattern(RAIL_PATTERN.getId(), RAIL_PATTERN);
+    timetableDataImport.addTripPattern(BUS_PATTERN.getId(), BUS_PATTERN);
+    timetableDataImport.addTripPattern(BUS_PATTERN_TODAY.getId(), BUS_PATTERN_TODAY);
 
-    transitRepository.updateCalendarServiceData(calendarServiceData);
+    timetableDataImport.updateCalendarServiceData(calendarServiceData);
 
     transitRepository.index();
 
+    var scheduledTimetableData = timetableDataImport.toScheduledTimetableData();
     DefaultTimetableRepository timetableSnapshot = new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),
-      transitRepository.getTripCalendar()
+      scheduledTimetableData
     );
     TripTimes tripTimes = ScheduledTripTimes.of()
       .withTrip(TransitRepositoryForTest.trip("123").build())
@@ -256,18 +258,6 @@ class DefaultTransitServiceTest {
   void stationModes() {
     var modes = service.findTransitModes(STATION);
     assertEquals(List.of(RAIL, FERRY, TRAM), modes);
-  }
-
-  @Test
-  void getPatternForStopsWithoutRealTime() {
-    Collection<TripPattern> patternsForStop = service.findPatterns(STOP_B, false);
-    assertEquals(Set.of(FERRY_PATTERN, RAIL_PATTERN), patternsForStop);
-  }
-
-  @Test
-  void getPatternForStopsWithRealTime() {
-    Collection<TripPattern> patternsForStop = service.findPatterns(STOP_B, true);
-    assertEquals(Set.of(FERRY_PATTERN, RAIL_PATTERN, REAL_TIME_PATTERN), patternsForStop);
   }
 
   @Nested

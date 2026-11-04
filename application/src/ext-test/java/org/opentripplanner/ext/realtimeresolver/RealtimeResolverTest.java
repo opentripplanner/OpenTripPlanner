@@ -43,6 +43,8 @@ import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model.TripInput;
 import org.opentripplanner.transit.model.TripOnDateDataFetcher;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.repository.DefaultTimetableRepository;
+import org.opentripplanner.transit.repository.ScheduledTimetableData;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.spi.UpdateResult;
@@ -329,7 +331,10 @@ class RealtimeResolverTest {
 
     var model = new TransitRepository();
     model.index();
-    var transitService = new DefaultTransitService(model);
+    var transitService = new DefaultTransitService(
+      model,
+      DefaultTimetableRepository.scheduledOnly(ScheduledTimetableData.empty())
+    );
 
     var itineraries = List.of(itinerary);
     itineraries = RealtimeResolver.populateLegsWithRealtime(

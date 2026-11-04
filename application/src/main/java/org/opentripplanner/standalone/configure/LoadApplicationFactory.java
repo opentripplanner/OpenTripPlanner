@@ -2,8 +2,8 @@ package org.opentripplanner.standalone.configure;
 
 import dagger.BindsInstance;
 import dagger.Component;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Singleton;
-import javax.annotation.Nullable;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.datastore.configure.DataStoreModule;
 import org.opentripplanner.ext.datastore.gs.GsDataSourceModule;
@@ -35,6 +35,8 @@ import org.opentripplanner.street.configure.StreetRepositoryModule;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.configure.TransferRepositoryModule;
+import org.opentripplanner.transit.configure.TimetableDataImportModule;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.service.TransitRepository;
 
 /**
@@ -56,6 +58,7 @@ import org.opentripplanner.transit.service.TransitRepository;
     StopConsolidationRepositoryModule.class,
     StreetRepositoryModule.class,
     TransferRepositoryModule.class,
+    TimetableDataImportModule.class,
     VehicleParkingRepositoryModule.class,
     FareModule.class,
     DeduplicatorServiceModule.class,
@@ -77,6 +80,9 @@ public interface LoadApplicationFactory {
 
   @Singleton
   TransitRepository emptyTransitRepository();
+
+  @Singleton
+  TimetableDataImport emptyTimetableDataImport();
 
   @Singleton
   TransferRepository emptyTransferRepository();

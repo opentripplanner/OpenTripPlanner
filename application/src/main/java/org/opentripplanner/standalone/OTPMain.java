@@ -127,9 +127,7 @@ public class OTPMain {
 
     /* Load graph from disk if one is not present from build. */
     if (cli.doLoadGraph() || cli.doLoadStreetGraph()) {
-      SerializedGraphObject obj = SerializedGraphObject.load(loadApp.getInputGraphDataStore());
-      app = loadApp.appConstruction(obj);
-      config.updateConfigFromSerializedGraph(obj.buildConfig, obj.routerConfig);
+      app = loadGraph(loadApp, config);
       graphAvailable = true;
     } else {
       app = loadApp.appConstruction();
@@ -154,6 +152,7 @@ public class OTPMain {
         app.streetDetailsRepository(),
         app.streetRepository(),
         app.transitRepository(),
+        app.timetableDataImport(),
         app.transferRepository(),
         app.worldEnvelopeRepository(),
         app.vehicleParkingRepository(),
@@ -178,6 +177,18 @@ public class OTPMain {
     } else {
       LOG.info("Done building graph. Exiting.");
     }
+  }
+
+  /**
+   * Load the graph from disk and construct the application from it. The loaded {@link
+   * SerializedGraphObject} is only referenced inside this method, so the parts of it that the
+   * application does not keep can be garbage collected while the server runs.
+   */
+  private static ConstructApplication loadGraph(LoadApplication loadApp, ConfigModel config) {
+    SerializedGraphObject obj = SerializedGraphObject.load(loadApp.getInputGraphDataStore());
+    var app = loadApp.appConstruction(obj);
+    config.updateConfigFromSerializedGraph(obj.buildConfig, obj.routerConfig);
+    return app;
   }
 
   /**

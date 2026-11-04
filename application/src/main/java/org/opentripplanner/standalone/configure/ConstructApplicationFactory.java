@@ -3,8 +3,8 @@ package org.opentripplanner.standalone.configure;
 import dagger.BindsInstance;
 import dagger.Component;
 import graphql.schema.GraphQLSchema;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Singleton;
-import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.configure.GtfsSchema;
 import org.opentripplanner.apis.gtfs.configure.GtfsSchemaModule;
 import org.opentripplanner.apis.transmodel.configure.TransmodelSchema;
@@ -73,7 +73,7 @@ import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.configure.TransferServiceModule;
 import org.opentripplanner.transit.configure.StaticTransitService;
 import org.opentripplanner.transit.configure.TransitModule;
-import org.opentripplanner.transit.model.calendar.TripCalendars;
+import org.opentripplanner.transit.repository.ScheduledTimetableData;
 import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
 import org.opentripplanner.transit.service.TransitRepository;
@@ -126,6 +126,7 @@ public interface ConstructApplicationFactory {
   LinkingContextFactory linkingContextFactory();
   VertexLinker vertexLinker();
   TransitRepository transitRepository();
+
   TransferRepository transferRepository();
   WorldEnvelopeRepository worldEnvelopeRepository();
   WorldEnvelopeService worldEnvelopeService();
@@ -218,6 +219,12 @@ public interface ConstructApplicationFactory {
     @BindsInstance
     Builder transitRepository(TransitRepository transitRepository);
 
+    /**
+     * The immutable scheduled timetable data.
+     */
+    @BindsInstance
+    Builder scheduledTimetableData(ScheduledTimetableData scheduledTimetableData);
+
     @BindsInstance
     Builder transferRepository(TransferRepository transferRepository);
 
@@ -258,9 +265,6 @@ public interface ConstructApplicationFactory {
 
     @BindsInstance
     Builder scheduledRaptorTransitData(RaptorTransitData scheduledRaptorTransitData);
-
-    @BindsInstance
-    Builder scheduledTripCalendars(TripCalendars tripCalendars);
 
     ConstructApplicationFactory build();
   }

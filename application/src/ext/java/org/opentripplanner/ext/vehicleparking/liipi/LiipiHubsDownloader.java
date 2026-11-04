@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.function.Function;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.io.HttpHeaders;
@@ -65,8 +66,8 @@ public class LiipiHubsDownloader {
     }
   }
 
-  private static String convertStreamToString(java.io.InputStream is) {
-    try (java.util.Scanner scanner = new java.util.Scanner(is).useDelimiter("\\A")) {
+  private static String convertStreamToString(InputStream is) {
+    try (Scanner scanner = new Scanner(is).useDelimiter("\\A")) {
       return scanner.hasNext() ? scanner.next() : "";
     }
   }

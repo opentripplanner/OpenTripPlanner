@@ -20,12 +20,14 @@ import org.opentripplanner.street.model.edge.VehicleParkingEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.streetadapter.VertexFactory;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.service.TransitRepository;
 
 public class VehicleParkingLinkingTest {
 
   private Graph graph;
   private TransitRepository transitRepository;
+  private final TimetableDataImport timetableDataImport = new TimetableDataImport();
   private IntersectionVertex A;
   private IntersectionVertex B;
 
@@ -54,7 +56,7 @@ public class VehicleParkingLinkingTest {
       .build();
     var parkingVertex = vertexFactory.vehicleParkingEntrance(parking);
 
-    TestStreetLinkerModule.link(graph, transitRepository);
+    TestStreetLinkerModule.link(graph, transitRepository, timetableDataImport);
 
     assertEquals(1, parkingVertex.getOutgoing().size());
     parkingVertex.getOutgoing().forEach(e -> assertEquals(e.getToVertex(), A));
@@ -76,7 +78,7 @@ public class VehicleParkingLinkingTest {
       .build();
     var parkingVertex = vertexFactory.vehicleParkingEntrance(parking.getEntrances().get(0));
 
-    TestStreetLinkerModule.link(graph, transitRepository);
+    TestStreetLinkerModule.link(graph, transitRepository, timetableDataImport);
 
     assertThat(graph.findEdges(StreetVehicleParkingLink.class)).hasSize(2);
 
@@ -110,7 +112,7 @@ public class VehicleParkingLinkingTest {
       .build();
     var parkingVertex = vertexFactory.vehicleParkingEntrance(parking.getEntrances().get(0));
 
-    TestStreetLinkerModule.link(graph, transitRepository);
+    TestStreetLinkerModule.link(graph, transitRepository, timetableDataImport);
 
     assertThat(graph.findEdges(StreetVehicleParkingLink.class)).hasSize(4);
 
@@ -145,7 +147,7 @@ public class VehicleParkingLinkingTest {
 
     graph.remove(A);
 
-    TestStreetLinkerModule.link(graph, transitRepository);
+    TestStreetLinkerModule.link(graph, transitRepository, timetableDataImport);
 
     assertEquals(1, vehicleParking.getEntrances().size());
 
@@ -174,7 +176,12 @@ public class VehicleParkingLinkingTest {
 
     graph.remove(A);
 
-    TestStreetLinkerModule.link(graph, vehicleParkingService, transitRepository);
+    TestStreetLinkerModule.link(
+      graph,
+      vehicleParkingService,
+      transitRepository,
+      timetableDataImport
+    );
 
     assertThat(graph.findVertices(VehicleParkingEntranceVertex.class)).isEmpty();
 

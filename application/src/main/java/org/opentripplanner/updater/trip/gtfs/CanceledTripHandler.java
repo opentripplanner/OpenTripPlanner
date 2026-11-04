@@ -8,7 +8,6 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.repository.TimetableRepository;
-import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.spi.UpdateException;
 import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.opentripplanner.updater.trip.TripUpdateApplier;
@@ -22,11 +21,9 @@ import org.opentripplanner.updater.trip.gtfs.model.TripUpdate;
  */
 class CanceledTripHandler {
 
-  private final TransitService transitService;
   private final TimetableRepository buffer;
 
-  CanceledTripHandler(TransitService transitService, TimetableRepository buffer) {
-    this.transitService = transitService;
+  CanceledTripHandler(TimetableRepository buffer) {
     this.buffer = buffer;
   }
 
@@ -95,8 +92,8 @@ class CanceledTripHandler {
   }
 
   private TripPattern getPatternForTripId(FeedScopedId tripId) {
-    Trip trip = transitService.getTrip(tripId);
-    return transitService.findPattern(trip);
+    Trip trip = buffer.getTrip(tripId);
+    return buffer.findPattern(trip);
   }
 
   private enum CancelationType {

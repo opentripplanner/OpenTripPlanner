@@ -14,7 +14,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitDataTestFactory;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
-import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
@@ -86,7 +85,7 @@ class TimetableRepositoryLifecycleTest {
 
     var buffer = new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),
-      TripCalendars.empty()
+      ScheduledTimetableData.empty()
     );
     var lifecycle = new TimetableRepositoryLifecycle(buffer, purgeExpiredData, clock::get);
 

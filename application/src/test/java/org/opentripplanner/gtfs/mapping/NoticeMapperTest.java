@@ -7,16 +7,17 @@ import static org.onebusaway.gtfs.model.AgencyAndIdFactory.obaId;
 import static org.opentripplanner.transit.model._data.TransitRepositoryForTest.FEED_ID;
 
 import org.junit.jupiter.api.Test;
+import org.onebusaway.gtfs.model.Notice;
 
 class NoticeMapperTest {
 
   private static final String NOTICE_ID = "N1";
   private static final String DISPLAY_TEXT = "Platform change";
 
-  private static final org.onebusaway.gtfs.model.Notice GTFS_NOTICE;
+  private static final Notice GTFS_NOTICE;
 
   static {
-    GTFS_NOTICE = new org.onebusaway.gtfs.model.Notice();
+    GTFS_NOTICE = new Notice();
     GTFS_NOTICE.setId(obaId(NOTICE_ID));
     GTFS_NOTICE.setDisplayText(DISPLAY_TEXT);
   }

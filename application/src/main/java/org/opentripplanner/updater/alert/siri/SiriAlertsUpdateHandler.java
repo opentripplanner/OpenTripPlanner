@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.core.model.i18n.TranslatedString;
@@ -190,12 +190,19 @@ public class SiriAlertsUpdateHandler {
 
     var fuzzyTripMatcher =
       siriFuzzyTripMatcherCache != null
-        ? new SiriFuzzyTripMatcher(siriFuzzyTripMatcherCache, context.transitService())
+        ? new SiriFuzzyTripMatcher(
+            siriFuzzyTripMatcherCache,
+            context.timetableRepository(),
+            context.transitRepository()
+          )
         : null;
     alert.addEntites(
-      new AffectsMapper(feedId, fuzzyTripMatcher, context.transitService()).mapAffects(
-        situation.getAffects()
-      )
+      new AffectsMapper(
+        feedId,
+        fuzzyTripMatcher,
+        context.timetableRepository(),
+        context.transitRepository()
+      ).mapAffects(situation.getAffects())
     );
 
     if (alert.entities().isEmpty()) {

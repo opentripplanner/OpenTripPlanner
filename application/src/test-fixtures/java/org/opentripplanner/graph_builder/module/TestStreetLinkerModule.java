@@ -5,25 +5,32 @@ import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.service.TransitRepository;
 
 public class TestStreetLinkerModule {
 
   /** For test only */
-  public static void link(Graph graph, TransitRepository transitRepository) {
-    link(graph, new DefaultVehicleParkingRepository(), transitRepository);
+  public static void link(
+    Graph graph,
+    TransitRepository transitRepository,
+    TimetableDataImport timetableDataImport
+  ) {
+    link(graph, new DefaultVehicleParkingRepository(), transitRepository, timetableDataImport);
   }
 
   public static void link(
     Graph graph,
     VehicleParkingRepository parkingRepository,
-    TransitRepository transitRepository
+    TransitRepository transitRepository,
+    TimetableDataImport timetableDataImport
   ) {
     new StreetLinkerModule(
       graph,
       VertexLinkerTestFactory.of(graph),
       parkingRepository,
       transitRepository,
+      timetableDataImport,
       DataImportIssueStore.NOOP
     ).buildGraph();
   }

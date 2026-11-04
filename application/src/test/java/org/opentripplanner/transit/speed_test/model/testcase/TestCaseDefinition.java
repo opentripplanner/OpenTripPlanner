@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.speed_test.model.testcase;
 
 import java.time.Duration;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.via.VisitViaLocation;

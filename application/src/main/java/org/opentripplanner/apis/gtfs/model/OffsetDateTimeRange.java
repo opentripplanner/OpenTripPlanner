@@ -3,7 +3,7 @@ package org.opentripplanner.apis.gtfs.model;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.Comparator;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.time.TimePeriod;
 
 /**
