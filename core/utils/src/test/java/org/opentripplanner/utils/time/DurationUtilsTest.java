@@ -7,6 +7,7 @@ import static org.opentripplanner.utils.time.DurationUtils.requireNonNegative;
 import static org.opentripplanner.utils.time.DurationUtils.requireNonNegativeMax2days;
 import static org.opentripplanner.utils.time.DurationUtils.requireNonNegativeMax2hours;
 import static org.opentripplanner.utils.time.DurationUtils.requireNonNegativeMax30minutes;
+import static org.opentripplanner.utils.time.DurationUtils.requirePositive;
 import static org.opentripplanner.utils.time.DurationUtils.toIntMilliseconds;
 
 import java.time.Duration;
@@ -136,6 +137,16 @@ public class DurationUtilsTest {
   public void testRequireNonNegative() {
     assertThrows(NullPointerException.class, () -> requireNonNegative(null));
     assertThrows(IllegalArgumentException.class, () -> requireNonNegative(Duration.ofSeconds(-1)));
+  }
+
+  @Test
+  public void testRequirePositive() {
+    assertEquals(Duration.ofSeconds(1), requirePositive(Duration.ofSeconds(1), "test"));
+    assertThrows(NullPointerException.class, () -> requirePositive(null, "test"));
+    assertThrows(IllegalArgumentException.class, () -> requirePositive(Duration.ZERO, "test"));
+    assertThrows(IllegalArgumentException.class, () ->
+      requirePositive(Duration.ofSeconds(-1), "test")
+    );
   }
 
   @Test
