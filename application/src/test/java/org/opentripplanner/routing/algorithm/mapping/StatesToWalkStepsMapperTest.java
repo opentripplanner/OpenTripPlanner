@@ -2,10 +2,6 @@ package org.opentripplanner.routing.algorithm.mapping;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
-import static org.opentripplanner.model.plan.walkstep.RelativeDirection.ENTER_STATION;
-import static org.opentripplanner.model.plan.walkstep.RelativeDirection.FOLLOW_SIGNS;
 import static org.opentripplanner.routing.algorithm.mapping.StatesToWalkStepsMapper.isOnSameStreet;
 
 import java.util.List;
@@ -173,23 +169,6 @@ class StatesToWalkStepsMapperTest {
       .containsExactly(
         "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: DEPART, directionText: 'A Street', distance: 210.0}",
         "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: CONTINUE, directionText: 'B Street', distance: 100.0}"
-      )
-      .inOrder();
-  }
-
-  @Test
-  void shortMiddleSection() {
-    var states = TestStateBuilder.ofWalking()
-      .streetEdge("A Street", 100)
-      .unnamedStreetEdge(5)
-      .streetEdge("A Street", 100)
-      .unnamedStreetEdge(5)
-      .streetEdge("B Street", 100);
-
-    assertThat(toStrings(states))
-      .containsExactly(
-        "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: DEPART, streetName: 'A Street', distance: 210.0}",
-        "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: CONTINUE, streetName: 'B Street', distance: 100.0}"
       )
       .inOrder();
   }
