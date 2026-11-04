@@ -139,18 +139,12 @@ public class TripLocationResolver {
       if (
         stop.getId().equals(stopOrStationId) || stop.getStationOrStopId().equals(stopOrStationId)
       ) {
-        if (
-          targetSeconds != null && tripTimes.getScheduledDepartureTime(stopPos) != targetSeconds
-        ) {
+        int scheduledDepartureTime = tripTimes.getScheduledDepartureTime(stopPos);
+        if (targetSeconds != null && scheduledDepartureTime != targetSeconds) {
           continue;
         }
-        locations.add(
-          new LocationInTripPatternReference(
-            stop.getIndex(),
-            stopPos,
-            tripTimes.getDepartureTime(stopPos)
-          )
-        );
+        int departureTime = tripTimes.getDepartureTime(stopPos);
+        locations.add(new LocationInTripPatternReference(stop.getIndex(), stopPos, departureTime));
       }
     }
     return locations;
