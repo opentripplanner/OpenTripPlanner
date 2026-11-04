@@ -10,7 +10,6 @@ import org.opentripplanner.service.shape.ShapeRepository;
 import org.opentripplanner.service.shape.model.CompactLineStringSequence;
 import org.opentripplanner.service.shape.model.TripGeometryFactory;
 import org.opentripplanner.street.geometry.GeometryUtils;
-import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 
@@ -74,7 +73,7 @@ public class RealTimeShapeResolver {
   ) {
     var original = pattern.getOriginalTripPattern();
     if (original == null) {
-      return TripGeometryFactory.straightLines(stopCoordinates(pattern), deduplicator);
+      return TripGeometryFactory.straightLines(pattern.getStopPattern(), deduplicator);
     }
     // The original is either scheduled or a real-time pattern added earlier, possibly in this
     // same transaction; the repository sees both.
@@ -140,14 +139,5 @@ public class RealTimeShapeResolver {
       }
     }
     return hopGeometries;
-  }
-
-  private static List<WgsCoordinate> stopCoordinates(TripPattern pattern) {
-    var stopPattern = pattern.getStopPattern();
-    var coordinates = new ArrayList<WgsCoordinate>(stopPattern.getSize());
-    for (int i = 0; i < stopPattern.getSize(); i++) {
-      coordinates.add(stopPattern.getStop(i).getCoordinate());
-    }
-    return coordinates;
   }
 }

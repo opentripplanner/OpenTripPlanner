@@ -14,7 +14,10 @@ import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.routing.graph.kryosupport.KryoBuilder;
 import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.geometry.WgsCoordinate;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
  * Exercises {@link TripGeometryFactory} and the resulting {@link CompactLineStringSequence} (the
@@ -23,25 +26,26 @@ import org.opentripplanner.transit.model.framework.Deduplicator;
 class TripGeometryFactoryTest {
 
   // Three stops roughly 2 km apart along a north-south line at 60° N.
-  private static final WgsCoordinate A = new WgsCoordinate(60.0000, 10.0000);
-  private static final WgsCoordinate B = new WgsCoordinate(60.0180, 10.0000);
-  private static final WgsCoordinate C = new WgsCoordinate(60.0360, 10.0000);
+  private static final TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
+  private static final RegularStop STOP_A = TEST_MODEL.stop("A", 60.0000, 10.0000).build();
+  private static final RegularStop STOP_B = TEST_MODEL.stop("B", 60.0180, 10.0000).build();
+  private static final RegularStop STOP_C = TEST_MODEL.stop("C", 60.0360, 10.0000).build();
   // A point midway between A and B so the A→B hop is a polyline of three points.
   private static final WgsCoordinate MID_AB = new WgsCoordinate(60.0090, 10.0000);
 
   private static final List<LineString> HOP_GEOMETRIES = List.of(
-    makeLineString(A, MID_AB, B),
-    makeLineString(B, C)
+    makeLineString(STOP_A.getCoordinate(), MID_AB, STOP_B.getCoordinate()),
+    makeLineString(STOP_B.getCoordinate(), STOP_C.getCoordinate())
   );
 
   private static final DeduplicatorService NOOP = DeduplicatorService.NOOP;
 
-  private static double exactDistance(WgsCoordinate from, WgsCoordinate to) {
+  private static double exactDistance(StopLocation from, StopLocation to) {
     return SphericalDistanceLibrary.distance(
-      from.latitude(),
-      from.longitude(),
-      to.latitude(),
-      to.longitude()
+      from.getCoordinate().latitude(),
+      from.getCoordinate().longitude(),
+      to.getCoordinate().latitude(),
+      to.getCoordinate().longitude()
     );
   }
 
@@ -52,8 +56,8 @@ class TripGeometryFactoryTest {
     assertThat(subject.distanceBetween(0, 0)).isEqualTo(0);
 
     // Contract: any distanceBetween(board, alight) is within 1 m of the exact haversine sum.
-    double exactAtoB = exactDistance(A, B);
-    double exactBtoC = exactDistance(B, C);
+    double exactAtoB = exactDistance(STOP_A, STOP_B);
+    double exactBtoC = exactDistance(STOP_B, STOP_C);
 
     assertThat((double) subject.distanceBetween(0, 1))
       .isWithin(1.0)
@@ -68,15 +72,18 @@ class TripGeometryFactoryTest {
 
   @Test
   void distanceBetweenFallsBackToStraightLineWhenHopGeometriesAreNull() {
-    var subject = TripGeometryFactory.straightLines(List.of(A, B, C), NOOP);
+    var subject = TripGeometryFactory.straightLines(
+      TransitRepositoryForTest.stopPattern(STOP_A, STOP_B, STOP_C),
+      NOOP
+    );
 
     assertThat(subject.distanceBetween(0, 0)).isEqualTo(0);
     assertThat((double) subject.distanceBetween(0, 1))
       .isWithin(1.0)
-      .of(exactDistance(A, B));
+      .of(exactDistance(STOP_A, STOP_B));
     assertThat((double) subject.distanceBetween(1, 2))
       .isWithin(1.0)
-      .of(exactDistance(B, C));
+      .of(exactDistance(STOP_B, STOP_C));
   }
 
   @Test
@@ -85,13 +92,16 @@ class TripGeometryFactoryTest {
     // verify that accumulating in double and rounding once per entry keeps the error on the
     // full-pattern leg within 1 m.
     int numberOfStops = 20;
-    var stops = new ArrayList<WgsCoordinate>();
+    var stops = new ArrayList<StopLocation>();
     for (int i = 0; i < numberOfStops; i++) {
       // ~111 m spacing (at 60°N, 0.001° latitude ≈ 111 m).
-      stops.add(new WgsCoordinate(60.0 + i * 0.001, 10.0));
+      stops.add(TEST_MODEL.stop("S" + i, 60.0 + i * 0.001, 10.0).build());
     }
 
-    var subject = TripGeometryFactory.straightLines(stops, NOOP);
+    var subject = TripGeometryFactory.straightLines(
+      TransitRepositoryForTest.stopPattern(stops),
+      NOOP
+    );
 
     double exactSum = 0;
     for (int i = 0; i < numberOfStops - 1; i++) {
@@ -120,25 +130,28 @@ class TripGeometryFactoryTest {
 
     LineString hop0 = subject.get(0);
     assertThat(hop0.getNumPoints()).isEqualTo(3);
-    assertThat(hop0.getCoordinateN(0).y).isWithin(1e-4).of(A.latitude());
-    assertThat(hop0.getCoordinateN(0).x).isWithin(1e-4).of(A.longitude());
-    assertThat(hop0.getCoordinateN(2).y).isWithin(1e-4).of(B.latitude());
-    assertThat(hop0.getCoordinateN(2).x).isWithin(1e-4).of(B.longitude());
+    assertThat(hop0.getCoordinateN(0).y).isWithin(1e-4).of(STOP_A.getCoordinate().latitude());
+    assertThat(hop0.getCoordinateN(0).x).isWithin(1e-4).of(STOP_A.getCoordinate().longitude());
+    assertThat(hop0.getCoordinateN(2).y).isWithin(1e-4).of(STOP_B.getCoordinate().latitude());
+    assertThat(hop0.getCoordinateN(2).x).isWithin(1e-4).of(STOP_B.getCoordinate().longitude());
 
     LineString hop1 = subject.get(1);
     assertThat(hop1.getNumPoints()).isEqualTo(2);
-    assertThat(hop1.getCoordinateN(0).y).isWithin(1e-4).of(B.latitude());
-    assertThat(hop1.getCoordinateN(1).y).isWithin(1e-4).of(C.latitude());
+    assertThat(hop1.getCoordinateN(0).y).isWithin(1e-4).of(STOP_B.getCoordinate().latitude());
+    assertThat(hop1.getCoordinateN(1).y).isWithin(1e-4).of(STOP_C.getCoordinate().latitude());
   }
 
   @Test
   void hopGeometrySynthesizesStraightLineWhenHopGeometriesAreNull() {
-    var subject = TripGeometryFactory.straightLines(List.of(A, B, C), NOOP);
+    var subject = TripGeometryFactory.straightLines(
+      TransitRepositoryForTest.stopPattern(STOP_A, STOP_B, STOP_C),
+      NOOP
+    );
 
     LineString hop0 = subject.get(0);
     assertThat(hop0.getNumPoints()).isEqualTo(2);
-    assertThat(hop0.getCoordinateN(0).y).isEqualTo(A.latitude());
-    assertThat(hop0.getCoordinateN(1).y).isEqualTo(B.latitude());
+    assertThat(hop0.getCoordinateN(0).y).isEqualTo(STOP_A.getCoordinate().latitude());
+    assertThat(hop0.getCoordinateN(1).y).isEqualTo(STOP_B.getCoordinate().latitude());
   }
 
   @Test
@@ -148,8 +161,8 @@ class TripGeometryFactoryTest {
     LineString full = subject.concatenate(0, 2);
     // Hop 0: A, MID, B (3 points). Hop 1: B, C (2 points). Duplicate B at the join is dropped.
     assertThat(full.getNumPoints()).isEqualTo(4);
-    assertThat(full.getCoordinateN(0).y).isWithin(1e-4).of(A.latitude());
-    assertThat(full.getCoordinateN(3).y).isWithin(1e-4).of(C.latitude());
+    assertThat(full.getCoordinateN(0).y).isWithin(1e-4).of(STOP_A.getCoordinate().latitude());
+    assertThat(full.getCoordinateN(3).y).isWithin(1e-4).of(STOP_C.getCoordinate().latitude());
 
     assertThat(subject.concatenate(0, 1).getNumPoints()).isEqualTo(3);
     assertThat(subject.concatenate(1, 2).getNumPoints()).isEqualTo(2);
@@ -168,14 +181,17 @@ class TripGeometryFactoryTest {
   void concatenateAllSynthesizesStraightLineWhenShapeMissing() {
     // Shapeless patterns expose a non-null straight-line geometry made of one 2-point segment per
     // hop, rather than the historical null sentinel.
-    var subject = TripGeometryFactory.straightLines(List.of(A, B, C), NOOP);
+    var subject = TripGeometryFactory.straightLines(
+      TransitRepositoryForTest.stopPattern(STOP_A, STOP_B, STOP_C),
+      NOOP
+    );
 
     LineString full = subject.concatenate();
     assertThat(full).isNotNull();
     // Two hops of 2 points each, with the duplicated junction at B dropped → 3 points.
     assertThat(full.getNumPoints()).isEqualTo(3);
-    assertThat(full.getCoordinateN(0).y).isWithin(1e-4).of(A.latitude());
-    assertThat(full.getCoordinateN(2).y).isWithin(1e-4).of(C.latitude());
+    assertThat(full.getCoordinateN(0).y).isWithin(1e-4).of(STOP_A.getCoordinate().latitude());
+    assertThat(full.getCoordinateN(2).y).isWithin(1e-4).of(STOP_C.getCoordinate().latitude());
   }
 
   @Test
@@ -183,7 +199,7 @@ class TripGeometryFactoryTest {
     // Degenerate edge case: a pattern with zero stops has no hops and no meaningful vertex
     // positions. The factory must still produce a valid (empty) sequence whose cumulative table
     // has the contract-mandated single zero entry — even though numberOfStops is 0.
-    var subject = TripGeometryFactory.straightLines(List.of(), NOOP);
+    var subject = TripGeometryFactory.straightLines(TransitRepositoryForTest.stopPattern(), NOOP);
 
     assertThat(subject.size()).isEqualTo(0);
     assertThat(subject.distanceBetween(0, 0)).isEqualTo(0);
@@ -195,7 +211,10 @@ class TripGeometryFactoryTest {
     // Degenerate edge case: a pattern with a single stop has no hops. cumulative must still exist
     // and distanceBetween(0,0) must return 0 without throwing. concatenate(0, size) has nothing
     // to concatenate, so it returns an empty (but non-null) LineString.
-    var subject = TripGeometryFactory.straightLines(List.of(A), NOOP);
+    var subject = TripGeometryFactory.straightLines(
+      TransitRepositoryForTest.stopPattern(STOP_A),
+      NOOP
+    );
 
     assertThat(subject.distanceBetween(0, 0)).isEqualTo(0);
     LineString empty = subject.concatenate(0, subject.size());

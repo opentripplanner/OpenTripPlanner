@@ -7,6 +7,7 @@ import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.geometry.WgsCoordinate;
+import org.opentripplanner.transit.model.network.StopPattern;
 
 /**
  * Builds a {@link CompactLineStringSequence}, i.e. the per-hop geometries of a trip pattern and the
@@ -42,19 +43,19 @@ public final class TripGeometryFactory {
   }
 
   /**
-   * Build a sequence with a straight line between each pair of consecutive stops. Each hop's
-   * length is measured with {@link SphericalDistanceLibrary} (haversine).
+   * Build a sequence with a straight line between each pair of consecutive stops of the pattern.
+   * Each hop's length is measured with {@link SphericalDistanceLibrary} (haversine).
    */
   public static CompactLineStringSequence straightLines(
-    List<WgsCoordinate> stops,
+    StopPattern stopPattern,
     DeduplicatorService deduplicator
   ) {
-    int expectedHops = Math.max(stops.size() - 1, 0);
+    int expectedHops = Math.max(stopPattern.getSize() - 1, 0);
     double[] cumulativeMetersDouble = new double[expectedHops + 1];
     ArrayList<CompactLineString> hops = new ArrayList<CompactLineString>(expectedHops);
     for (int i = 0; i < expectedHops; i++) {
-      WgsCoordinate from = stops.get(i);
-      WgsCoordinate to = stops.get(i + 1);
+      WgsCoordinate from = stopPattern.getStop(i).getCoordinate();
+      WgsCoordinate to = stopPattern.getStop(i + 1).getCoordinate();
       LineString hop = GeometryUtils.makeLineString(from, to);
       cumulativeMetersDouble[i + 1] =
         cumulativeMetersDouble[i] +

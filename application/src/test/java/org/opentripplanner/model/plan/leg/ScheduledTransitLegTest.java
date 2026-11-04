@@ -16,11 +16,13 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.core.model.basic.Cost;
+import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
-import org.opentripplanner.service.shape.ShapeTestFactory;
+import org.opentripplanner.service.shape.model.CompactLineStringSequence;
+import org.opentripplanner.service.shape.model.TripGeometryFactory;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model.TripInput;
@@ -55,6 +57,8 @@ class ScheduledTransitLegTest {
   ).build();
   private static final TripOnDateDataFetcher TRIP_DATA = ENV.tripData("trip1");
   private static final TripPattern PATTERN = TRIP_DATA.tripPattern();
+  private static final CompactLineStringSequence PATTERN_GEOMETRY =
+    TripGeometryFactory.straightLines(PATTERN.getStopPattern(), DeduplicatorService.NOOP);
   private static final TripTimes TRIP_TIMES = TRIP_DATA.scheduledTripTimes();
 
   private static final double EXPECTED_DISTANCE = 1111.95;
@@ -87,7 +91,7 @@ class ScheduledTransitLegTest {
   private final ScheduledTransitLeg subject = new ScheduledTransitLegBuilder()
     .withTripTimes(REAL_TIME_TRIP_TIMES)
     .withTripPattern(PATTERN)
-    .withTripPatternGeometry(ShapeTestFactory.straightLines(PATTERN))
+    .withTripPatternGeometry(PATTERN_GEOMETRY)
     .withBoardStopIndexInPattern(BOARD_STOP_INDEX_IN_PATTERN)
     .withAlightStopIndexInPattern(ALIGHT_STOP_INDEX_IN_PATTERN)
     .withStartTime(START_TIME)
@@ -107,7 +111,7 @@ class ScheduledTransitLegTest {
     var subject = new ScheduledTransitLegBuilder()
       .withTripTimes(TRIP_TIMES)
       .withTripPattern(PATTERN)
-      .withTripPatternGeometry(ShapeTestFactory.straightLines(PATTERN))
+      .withTripPatternGeometry(PATTERN_GEOMETRY)
       .withBoardStopIndexInPattern(BOARD_STOP_INDEX_IN_PATTERN)
       .withAlightStopIndexInPattern(ALIGHT_STOP_INDEX_IN_PATTERN)
       .withStartTime(START_TIME)
