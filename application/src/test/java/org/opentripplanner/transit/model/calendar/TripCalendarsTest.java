@@ -5,12 +5,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.function.Consumer;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 
 class TripCalendarsTest {
@@ -71,9 +71,9 @@ class TripCalendarsTest {
 
   @Test
   void withNextServiceCodesAssignsSequentialCodesAfterExistingOnes() {
-    var a = FeedScopedIdForTestFactory.id("A");
-    var b = FeedScopedIdForTestFactory.id("B");
-    var c = FeedScopedIdForTestFactory.id("C");
+    var a = id("A");
+    var b = id("B");
+    var c = id("C");
     TripCalendars calendar = TripCalendars.empty().withNextServiceCodes(List.of(a));
 
     TripCalendars updated = calendar.withNextServiceCodes(List.of(b, c));
@@ -84,10 +84,7 @@ class TripCalendarsTest {
 
   private static TripCalendars calendarWithRange() {
     CalendarServiceData data = new CalendarServiceData();
-    data.putServiceDatesForServiceId(
-      FeedScopedIdForTestFactory.id("CAL_1"),
-      List.of(START, START.plusDays(1), END)
-    );
+    data.putServiceDatesForServiceId(id("CAL_1"), List.of(START, START.plusDays(1), END));
     return TripCalendars.empty().merge(data);
   }
 
