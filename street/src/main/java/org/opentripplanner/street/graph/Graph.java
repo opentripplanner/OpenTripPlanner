@@ -116,9 +116,7 @@ public class Graph implements Serializable {
   public long nextSplitNumber = 0;
 
   @Inject
-  public Graph(
-    @jakarta.annotation.Nullable OpeningHoursCalendarService openingHoursCalendarService
-  ) {
+  public Graph(@Nullable OpeningHoursCalendarService openingHoursCalendarService) {
     this.openingHoursCalendarService = openingHoursCalendarService;
   }
 
