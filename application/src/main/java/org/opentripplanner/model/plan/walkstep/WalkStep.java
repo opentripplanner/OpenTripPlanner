@@ -217,6 +217,13 @@ public final class WalkStep {
       .addEnum("relativeDirection", relativeDirection)
       .addStr("streetName", directionText.toString())
       .addNum("distance", distance)
+      .addObj("entranceId", entrance == null ? null : entrance.getId())
+      .addStr(
+        "verticalTransportation",
+        verticalTransportationUse == null
+          ? null
+          : verticalTransportationUse.getClass().getSimpleName()
+      )
       .toString();
   }
 }
