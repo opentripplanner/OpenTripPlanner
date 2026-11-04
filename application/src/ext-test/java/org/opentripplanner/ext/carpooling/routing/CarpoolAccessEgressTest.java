@@ -159,7 +159,7 @@ class CarpoolAccessEgressTest {
       EndpointLabel.forStop(stop)
     );
 
-    assertEquals(walkFromDropoff.lastState(), access.getFinalState());
+    assertEquals(walkFromDropoff.states().getLast(), access.getFinalStates().getFirst());
   }
 
   /**
@@ -182,7 +182,7 @@ class CarpoolAccessEgressTest {
       EndpointLabel.forLocation(GenericLocation.fromCoordinate(59.92, 10.75, "Office"))
     );
 
-    assertEquals(walkToPickup.states().getFirst(), egress.getFinalState());
+    assertEquals(walkToPickup.states().getFirst(), egress.getFinalStates().getFirst());
   }
 
   /**
@@ -201,7 +201,10 @@ class CarpoolAccessEgressTest {
       EndpointLabel.forStop(TransitRepositoryForTest.of().stop("Stop", 59.91, 10.74).build())
     );
 
-    assertEquals(access.sharedSegments().getLast().lastState(), access.getFinalState());
+    assertEquals(
+      access.sharedSegments().getLast().states().getLast(),
+      access.getFinalStates().getFirst()
+    );
   }
 
   /** A carpool passenger rides in the driver's car, never a station-rented vehicle. */
@@ -215,7 +218,7 @@ class CarpoolAccessEgressTest {
       1.0
     );
 
-    assertFalse(access.getFinalState().isRentingVehicleFromStation());
+    assertFalse(access.getFinalStates().getFirst().isRentingVehicleFromStation());
   }
 
   /**

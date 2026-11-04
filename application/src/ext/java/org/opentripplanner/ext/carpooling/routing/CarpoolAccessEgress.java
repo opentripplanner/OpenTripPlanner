@@ -247,7 +247,7 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
    *
    * <h4>Limitation: this state does not head a full-leg pointer chain</h4>
    * <p>
-   * The {@link RoutingAccessEgress#getFinalState()} contract expects the returned state to head
+   * The {@link RoutingAccessEgress#getFinalStates()} contract expects the returned state to head
    * a {@link State#getBackState()} chain that reconstructs the <em>entire</em> street search — that
    * is the assumption behind callers such as {@code RaptorPathToItineraryMapper}, which wrap the
    * state in a {@link org.opentripplanner.street.model.path.StreetPath} to rebuild the leg.
@@ -273,13 +273,13 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
    * that path would silently omit the ride and the other walk.
    */
   @Override
-  public State getFinalState() {
+  public List<State> getFinalStates() {
     if (startLabel.stop() != null) {
       var firstSegment = walkToPickup() != null ? walkToPickup() : sharedSegments().getFirst();
-      return firstSegment.states().getFirst();
+      return List.of(firstSegment.states().getFirst());
     }
     var lastSegment = walkFromDropoff() != null ? walkFromDropoff() : sharedSegments().getLast();
-    return lastSegment.lastState();
+    return List.of(lastSegment.states().getLast());
   }
 
   /** Always {@code false}: a carpool leg, by definition, contains a vehicle ride. */
