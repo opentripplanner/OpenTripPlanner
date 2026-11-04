@@ -37,6 +37,9 @@ public class DatedServiceJourneyQuery {
       .argument(GraphQLArgument.newArgument().name("id").type(Scalars.GraphQLString))
       .dataFetcher(environment -> {
         FeedScopedId id = idMapper.parseNullSafe(environment.getArgument("id")).orElse(null);
+
+        // For historical reasons, this id parameter is optional in the schema, but the API should
+        // not return an exception, so we return null instead.
         if (id == null) {
           return null;
         }
