@@ -161,6 +161,7 @@ public class NetexFeedParameters implements DataSourceConfig {
       sharedGroupFilePattern.equals(that.sharedGroupFilePattern) &&
       groupFilePattern.equals(that.groupFilePattern) &&
       ignoredFeatures.equals(that.ignoredFeatures) &&
+      allowStopPlaceAsPassengerStopAssignment == that.allowStopPlaceAsPassengerStopAssignment &&
       ferryIdsNotAllowedForBicycle.equals(that.ferryIdsNotAllowedForBicycle)
     );
   }
@@ -175,6 +176,7 @@ public class NetexFeedParameters implements DataSourceConfig {
       sharedGroupFilePattern,
       groupFilePattern,
       ignoredFeatures,
+      allowStopPlaceAsPassengerStopAssignment,
       ferryIdsNotAllowedForBicycle
     );
   }
@@ -189,6 +191,10 @@ public class NetexFeedParameters implements DataSourceConfig {
       .addStr("groupFilePattern", groupFilePattern, DEFAULT.groupFilePattern)
       .addStr("ignoreFilePattern", ignoreFilePattern, DEFAULT.ignoreFilePattern)
       .addCol("ignoredFeatures", ignoredFeatures)
+      .addBoolIfTrue(
+        "allowStopPlaceAsPassengerStopAssignment",
+        allowStopPlaceAsPassengerStopAssignment
+      )
       .addCol("ferryIdsNotAllowedForBicycle", ferryIdsNotAllowedForBicycle, Set.of())
       .toString();
   }
@@ -222,6 +228,8 @@ public class NetexFeedParameters implements DataSourceConfig {
       this.ignoreFilePattern = original.ignoreFilePattern;
       this.ferryIdsNotAllowedForBicycle.addAll(original.ferryIdsNotAllowedForBicycle);
       this.noTransfersOnIsolatedStops = original.noTransfersOnIsolatedStops;
+      this.allowStopPlaceAsPassengerStopAssignment =
+        original.allowStopPlaceAsPassengerStopAssignment;
       this.ignoredFeatures = new HashSet<>(original.ignoredFeatures);
     }
 
