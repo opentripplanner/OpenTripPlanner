@@ -460,7 +460,7 @@ public class StreetEdgeTest {
     assertTrue(edge.nameIsDerived());
 
     var mainStreet = I18NString.of("Main Street");
-    edge.overrideName(mainStreet, NameType.REAL);
+    edge.overrideName(mainStreet);
     assertEquals(mainStreet, edge.getName());
     assertFalse(edge.nameIsDerived());
   }

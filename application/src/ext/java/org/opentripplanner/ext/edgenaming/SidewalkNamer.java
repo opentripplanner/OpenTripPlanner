@@ -21,7 +21,6 @@ import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmLevel;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.street.geometry.GeometryUtils;
-import org.opentripplanner.street.model.edge.NameType;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,7 +115,7 @@ class SidewalkNamer implements EdgeNamer {
       .max(Comparator.comparingDouble(NamedEdgeGroup::percentInBuffer))
       .ifPresent(group -> {
         result.set(true);
-        sidewalk.overrideName(Objects.requireNonNull(group.name), NameType.REAL);
+        sidewalk.overrideName(Objects.requireNonNull(group.name));
       });
 
     return result.get();

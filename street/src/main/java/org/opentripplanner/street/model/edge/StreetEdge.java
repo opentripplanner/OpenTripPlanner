@@ -43,8 +43,6 @@ public class StreetEdge
 
   private static final Logger LOG = LoggerFactory.getLogger(StreetEdge.class);
 
-  private static final double SAFEST_STREETS_SAFETY_FACTOR = 0.1;
-
   /** If you have more than 16 flags, increase flags to short or int */
   static final int BACK_FLAG_INDEX = 0;
   static final int ROUNDABOUT_FLAG_INDEX = 1;
@@ -374,10 +372,14 @@ public class StreetEdge
    *
    * @see Edge#nameIsDerived()
    */
-  public void overrideName(I18NString name, NameType nt) {
+  public void overrideName(I18NString name) {
     this.name = name;
-    var isDerived = nt == NameType.DERIVED;
-    this.flags = BitSetUtils.set(flags, NAME_IS_DERIVED_FLAG_INDEX, isDerived);
+    this.flags = BitSetUtils.set(flags, NAME_IS_DERIVED_FLAG_INDEX, false);
+  }
+
+  public void overrideDerivedName(I18NString name) {
+    this.name = name;
+    this.flags = BitSetUtils.set(flags, NAME_IS_DERIVED_FLAG_INDEX, true);
   }
 
   @Override
