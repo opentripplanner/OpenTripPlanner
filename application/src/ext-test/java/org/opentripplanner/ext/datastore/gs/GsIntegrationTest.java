@@ -40,6 +40,7 @@ public class GsIntegrationTest {
   private static final String HOST = "<Insert host here>";
   private static final String BUCKET_NAME = "<Insert bucket name here>";
   private static final URI GTFS_URI = toUri(BUCKET_NAME, "gtfs.zip");
+  private static final URI LARGE_OBJECT_URI = toUri(BUCKET_NAME, "graph.obj");
   private static final String DATA = "{ \"key\" : \"data\" }";
 
   private static final GsParameters GS_PARAMETERS = new GsConfig(HOST, CREDENTIALS_FILE);
@@ -142,6 +143,48 @@ public class GsIntegrationTest {
     DataSource stops = ds.entry("stops.txt");
     String text = new String(stops.asInputStream().readAllBytes(), UTF_8);
     assertTrue(text.contains("stop"), text);
+  }
+
+  /**
+   * Verify against a real bucket that reading a large object as parallel byte-ranges returns
+   * exactly the same bytes as the sequential path, and report the wall time of each so the effect
+   * can be seen. Point {@link #LARGE_OBJECT_URI} at an object of at least a few hundred megabytes.
+   */
+  @Test
+  public void testParallelRangeReadMatchesSequentialRead() throws Exception {
+    var sequential = new GsDataSourceRepository(new GsConfig(HOST, CREDENTIALS_FILE, 0, 16, 32));
+    var parallel = new GsDataSourceRepository(new GsConfig(HOST, CREDENTIALS_FILE, 4, 16, 32));
+    sequential.open();
+    parallel.open();
+
+    byte[] sequentialDigest = digestOf(sequential, "sequential");
+    byte[] parallelDigest = digestOf(parallel, "parallel");
+
+    Assertions.assertArrayEquals(sequentialDigest, parallelDigest);
+  }
+
+  private byte[] digestOf(GsDataSourceRepository repo, String label) throws Exception {
+    DataSource source = repo.findSource(LARGE_OBJECT_URI, FileType.UNKNOWN);
+    var digest = java.security.MessageDigest.getInstance("SHA-256");
+    long start = System.nanoTime();
+    long bytes = 0;
+    byte[] buffer = new byte[1 << 16];
+    try (var in = source.asInputStream()) {
+      int n;
+      while ((n = in.read(buffer)) > 0) {
+        digest.update(buffer, 0, n);
+        bytes += n;
+      }
+    }
+    long ms = (System.nanoTime() - start) / 1_000_000;
+    System.out.printf(
+      "%s: %d bytes in %d ms (%.1f MB/s)%n",
+      label,
+      bytes,
+      ms,
+      bytes / 1_048_576.0 / (ms / 1000.0)
+    );
+    return digest.digest();
   }
 
   private void cleanUpDir(String dir) {
