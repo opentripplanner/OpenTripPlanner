@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  * Immutable snapshot of the trip service calendar: which service ids exist, which dates they run
  * on, and the small integer service codes used by Raptor.
  * <p>
- * There is no builder: every modification (see {@link #merge}, {@link #withServiceCode},
+ * There is no builder: every modification (see {@link #merge}, {@link #withNextServiceCodes},
  * {@link #initializeServiceCodesRunningForDate}, {@link #getOrCreateServiceIdForDate}) returns a
  * new instance rather than mutating this one, so callers that hold onto a {@code TripCalendars}
  * keep seeing a stable value even while another reference is evolving. A caller that needs a
@@ -214,26 +214,6 @@ public class TripCalendars implements Serializable {
       freezeServiceIds(newServiceIdsByDate),
       serviceCodesRunningForDate,
       serviceCodes
-    );
-  }
-
-  /**
-   * Register {@code code} as the service code for {@code serviceId}. Used during graph build only.
-   *
-   * @return a new instance with the service code registered, or this same instance if the service
-   *         id was already registered with this exact code.
-   */
-  public TripCalendars withServiceCode(FeedScopedId serviceId, int code) {
-    if (Integer.valueOf(code).equals(serviceCodes.get(serviceId))) {
-      return this;
-    }
-    Map<FeedScopedId, Integer> updated = new HashMap<>(serviceCodes);
-    updated.put(serviceId, code);
-    return new TripCalendars(
-      serviceDatesByServiceId,
-      serviceIdsByDate,
-      serviceCodesRunningForDate,
-      Collections.unmodifiableMap(updated)
     );
   }
 

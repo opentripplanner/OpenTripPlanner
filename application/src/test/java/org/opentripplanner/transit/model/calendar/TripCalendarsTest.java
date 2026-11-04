@@ -74,7 +74,7 @@ class TripCalendarsTest {
     var a = FeedScopedIdForTestFactory.id("A");
     var b = FeedScopedIdForTestFactory.id("B");
     var c = FeedScopedIdForTestFactory.id("C");
-    TripCalendars calendar = TripCalendars.empty().withServiceCode(a, 0);
+    TripCalendars calendar = TripCalendars.empty().withNextServiceCodes(List.of(a));
 
     TripCalendars updated = calendar.withNextServiceCodes(List.of(b, c));
 
