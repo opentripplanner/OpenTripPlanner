@@ -44,6 +44,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Retune cycleway bicycle safety multipliers toward pre-2.9 values [#8114](https://github.com/opentripplanner/OpenTripPlanner/pull/8114)
 - Update to netex2-java-model v3.0.0 (NeTEx 2.0) [#7259](https://github.com/opentripplanner/OpenTripPlanner/pull/7259)
 - Remove Thread.yield() from the request timeout check [#8147](https://github.com/opentripplanner/OpenTripPlanner/pull/8147)
+- Add tripPatternByLegIds as replacement for refetchTripPattern in Transmodel [#8111](https://github.com/opentripplanner/OpenTripPlanner/pull/8111)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.10.0 (2026-09-09)
