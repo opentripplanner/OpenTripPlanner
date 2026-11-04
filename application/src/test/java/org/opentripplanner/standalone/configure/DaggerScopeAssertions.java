@@ -253,7 +253,8 @@ final class DaggerScopeAssertions {
   /**
    * A {@code null} binding (typically a disabled sandbox feature) has no instance to compare, so
    * its scope cannot be checked and it is skipped. That is only accepted for accessors explicitly
-   * marked {@code @Nullable} on their return type; any other accessor returning {@code null} is reported as a failure.
+   * marked {@code @Nullable} on their return type; any other accessor returning {@code null} is
+   * reported as a failure.
    *
    * @return true if {@code value} is null, so the caller must skip the scope comparison
    */
