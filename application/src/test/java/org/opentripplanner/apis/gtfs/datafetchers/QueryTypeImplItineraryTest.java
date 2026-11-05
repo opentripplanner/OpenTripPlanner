@@ -1,6 +1,8 @@
 package org.opentripplanner.apis.gtfs.datafetchers;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.opentripplanner.apis.support.graphql.DataFetchingSupport.executionContext;
 
 import graphql.execution.DataFetcherResult;
@@ -84,7 +86,7 @@ class QueryTypeImplItineraryTest {
 
     Object result = SUBJECT.itinerary().get(environment(id, refetchService, routeRequest));
 
-    assertThat(itineraryOf(result).toStr()).isEqualTo("A ~ BUS tripX 10:00 11:00 ~ B []");
+    assertEquals("A ~ BUS tripX 10:00 11:00 ~ B []", itineraryOf(result).toStr());
   }
 
   /**
@@ -117,7 +119,7 @@ class QueryTypeImplItineraryTest {
         .localContext(localContext)
         .build()
     );
-    assertThat(secondId).isEqualTo(id);
+    assertEquals(id, secondId);
   }
 
   @SuppressWarnings("unchecked")
@@ -126,32 +128,35 @@ class QueryTypeImplItineraryTest {
   }
 
   /**
-   * The original {@code planConnection}/{@code plan} resolver puts {@code locale} into the local
-   * context ({@code QueryTypeImpl#getPlanResult}), which {@code GraphQLUtils} reads before falling
-   * back to {@code Accept-Language}. {@code itinerary(id:)} must do the same, or a trip planned
-   * with a non-default locale comes back with names in a different language on refetch.
+   * The id holds no locale. Names in the refetched itinerary must be in the language of the
+   * refetch request ({@code Accept-Language}), not the server default: {@code GraphQLUtils} reads
+   * the {@code locale} put into the local context before it falls back to {@code Accept-Language}.
    */
   @Test
   @SuppressWarnings("unchecked")
-  void refetchedItineraryPreservesLocale() throws Exception {
+  void refetchedItineraryUsesTheLocaleOfTheRefetchRequest() throws Exception {
     var refetchService = refetchItineraryService();
-    var routeRequest = routeRequest()
+    var serverDefault = routeRequest()
       .copyOf()
-      .withPreferences(p -> p.withLocale(Locale.GERMAN))
+      .withPreferences(p -> p.withLocale(Locale.ENGLISH))
       .buildRequest();
 
     var reference = ItineraryReferenceMapper.toItineraryReference(
-      refetchService.refetchItinerary(null, null, List.of(legRef()), routeRequest),
-      routeRequest
+      refetchService.refetchItinerary(null, null, List.of(legRef()), serverDefault),
+      serverDefault
     );
     var id = ItineraryReferenceSerializer.encode(reference);
 
-    Object result = SUBJECT.itinerary().get(environment(id, refetchService, routeRequest));
+    Object result = SUBJECT.itinerary().get(
+      environment(id, refetchService, serverDefault, Locale.GERMAN)
+    );
 
     Map<String, ?> localContext = (Map<String, ?>) (
       (DataFetcherResult<?>) result
     ).getLocalContext();
     assertThat(localContext).containsEntry("locale", Locale.GERMAN);
+    var routeRequest = (RouteRequest) localContext.get(ItineraryImpl.ROUTE_REQUEST_CONTEXT_KEY);
+    assertEquals(Locale.GERMAN, routeRequest.preferences().locale());
   }
 
   @Test
@@ -160,7 +165,7 @@ class QueryTypeImplItineraryTest {
       environment("this-is-not-a-valid-id", refetchItineraryService(), routeRequest())
     );
 
-    assertThat(itinerary).isNull();
+    assertNull(itinerary);
   }
 
   @Test
@@ -184,7 +189,7 @@ class QueryTypeImplItineraryTest {
       environment(id, refetchItineraryService(), routeRequest())
     );
 
-    assertThat(itinerary).isNull();
+    assertNull(itinerary);
   }
 
   private ScheduledTransitLegReference legRef() {
@@ -235,8 +240,23 @@ class QueryTypeImplItineraryTest {
     RefetchItineraryService refetchItineraryService,
     RouteRequest defaultRouteRequest
   ) {
+    return environment(
+      id,
+      refetchItineraryService,
+      defaultRouteRequest,
+      defaultRouteRequest.preferences().locale()
+    );
+  }
+
+  private static DataFetchingEnvironment environment(
+    String id,
+    RefetchItineraryService refetchItineraryService,
+    RouteRequest defaultRouteRequest,
+    Locale requestLocale
+  ) {
     return DataFetchingEnvironmentImpl.newDataFetchingEnvironment(executionContext())
       .arguments(Map.of("id", id))
+      .locale(requestLocale)
       .context(
         new TestGtfsGraphQLRequestContext(
           null,

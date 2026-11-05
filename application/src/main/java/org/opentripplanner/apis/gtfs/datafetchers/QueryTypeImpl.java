@@ -400,10 +400,16 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
         return null;
       }
       try {
+        // The id does not hold a locale: names are returned in the language of this request
+        // (Accept-Language, else the server default), as for the leg(id:) query.
+        var locale = environment.getLocale();
         var routeRequest = ItineraryReferenceMapper.toRouteRequest(
           reference,
           context.defaultRouteRequest()
-        );
+        )
+          .copyOf()
+          .withPreferences(preferences -> preferences.withLocale(locale))
+          .buildRequest();
         var itinerary = context
           .refetchItineraryService()
           .refetchItinerary(
@@ -415,12 +421,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
         return DataFetcherResult.<Itinerary>newResult()
           .data(itinerary)
           .localContext(
-            Map.of(
-              "locale",
-              routeRequest.preferences().locale(),
-              ItineraryImpl.ROUTE_REQUEST_CONTEXT_KEY,
-              routeRequest
-            )
+            Map.of("locale", locale, ItineraryImpl.ROUTE_REQUEST_CONTEXT_KEY, routeRequest)
           )
           .build();
       } catch (RefetchItineraryException e) {
