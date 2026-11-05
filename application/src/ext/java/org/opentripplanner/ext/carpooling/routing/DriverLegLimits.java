@@ -13,10 +13,6 @@ public final class DriverLegLimits {
    * after the leg. A detour on a leg delays every later stop, each of which allows at most its own
    * budget, so no feasible detour adds more than the smallest of them. A zero or negative budget
    * leaves the leg its own duration: only stops on the route itself remain.
-   * <p>
-   * The limits are not capped here; each search bounded by one caps it at the longest trip that
-   * is modelled, so that a trip with inconsistent geometry cannot demand a multi-hour street
-   * search.
    *
    * @param legDurations the travel duration of each leg, from the same routing model the searches
    *                     use
