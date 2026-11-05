@@ -1,6 +1,6 @@
 package org.opentripplanner.netex.mapping.support;
 
-import org.rutebanken.netex.model.ServiceAlterationEnumeration;
+import org.entur.netex2.model.ServiceAlterationEnumeration;
 
 public class ServiceAlterationFilter {
 

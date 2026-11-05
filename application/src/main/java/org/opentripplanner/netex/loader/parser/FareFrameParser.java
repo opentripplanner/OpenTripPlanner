@@ -3,10 +3,10 @@ package org.opentripplanner.netex.loader.parser;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import org.entur.netex2.model.FareFrame_VersionFrameStructure;
+import org.entur.netex2.model.FareZone;
+import org.entur.netex2.model.TariffZone_VersionStructure;
 import org.opentripplanner.netex.index.NetexEntityIndex;
-import org.rutebanken.netex.model.FareFrame_VersionFrameStructure;
-import org.rutebanken.netex.model.FareZone;
-import org.rutebanken.netex.model.TariffZone_VersionStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +38,7 @@ public class FareFrameParser extends NetexParser<FareFrame_VersionFrameStructure
     warnOnMissingMapping(LOG, frame.getGeographicalIntervals());
     warnOnMissingMapping(LOG, frame.getGeographicalStructureFactors());
     warnOnMissingMapping(LOG, frame.getGeographicalUnits());
-    warnOnMissingMapping(LOG, frame.getGroupOfDistributionAssignments());
+    warnOnMissingMapping(LOG, frame.getDistributionAssignments());
     warnOnMissingMapping(LOG, frame.getGroupsOfDistanceMatrixElements());
     warnOnMissingMapping(LOG, frame.getGroupsOfDistributionChannels());
     warnOnMissingMapping(LOG, frame.getGroupsOfSalesOfferPackages());

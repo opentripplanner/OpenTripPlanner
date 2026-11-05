@@ -510,7 +510,18 @@ public class EnumTypes {
     .value("monorail", TransitMode.MONORAIL)
     .value("coach", TransitMode.COACH)
     .value("carpool", TransitMode.CARPOOL)
-    .value("unknown", "unknown")
+    .value(
+      GraphQLEnumValueDefinition.newEnumValueDefinition()
+        .name("unknown")
+        .value("unknown")
+        .description("Unknown transport mode. No trip, line or stop has this mode.")
+        .deprecationReason(
+          "Matches nothing. Accepted in `whiteListedModes` and `filterByModes`, where it " +
+            "selects nothing, and rejected as invalid input in all other filters and in " +
+            "board/alight slack lists."
+        )
+        .build()
+    )
     .build();
 
   public static final GraphQLEnumType TRANSPORT_SUBMODE = createEnum(

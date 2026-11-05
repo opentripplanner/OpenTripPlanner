@@ -3,7 +3,7 @@ package org.opentripplanner.ext.carpooling;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Collection;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.ext.carpooling.routing.CarpoolTripWithVertices;
@@ -108,7 +108,7 @@ public interface CarpoolingRepository {
    * caller does not affect the cache. The entry is tagged with the trip's current route points and
    * is ignored once those change (see {@link #cachedBaselineRouting}).
    */
-  void cacheBaselineRouting(CarpoolTrip trip, @Nullable Duration[] legDurations);
+  void cacheBaselineRouting(CarpoolTrip trip, Duration @Nullable [] legDurations);
 
   /**
    * A trip's cached baseline-routing outcome, valid only for the geometry it was routed against. A
@@ -116,5 +116,5 @@ public interface CarpoolingRepository {
    * should be skipped without re-routing; otherwise the array holds one routed travel duration per
    * leg.
    */
-  record CachedBaselineRouting(@Nullable Duration[] legDurations) {}
+  record CachedBaselineRouting(Duration @Nullable [] legDurations) {}
 }

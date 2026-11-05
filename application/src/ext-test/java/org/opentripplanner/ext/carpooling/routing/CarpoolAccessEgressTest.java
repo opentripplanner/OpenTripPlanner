@@ -10,7 +10,7 @@ import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.createSimpl
 
 import java.time.Duration;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.framework.model.TimeAndCost;

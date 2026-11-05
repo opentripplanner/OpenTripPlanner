@@ -5,10 +5,10 @@ import static org.opentripplanner.netex.index.api.HMapValidationRule.Status.DISC
 import static org.opentripplanner.netex.index.api.HMapValidationRule.Status.OK;
 
 import java.util.List;
+import org.entur.netex2.model.ServiceJourneyBuilder;
+import org.entur.netex2.model.ServiceJourneyPatternBuilder;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.netex.index.NetexEntityIndex;
-import org.rutebanken.netex.model.ServiceJourneyBuilder;
-import org.rutebanken.netex.model.ServiceJourneyPatternBuilder;
 
 class InvalidPointInJourneyPatternRefTest {
 

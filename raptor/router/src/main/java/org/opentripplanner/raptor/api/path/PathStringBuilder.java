@@ -8,7 +8,7 @@ import static org.opentripplanner.raptor.api.model.RaptorValueType.WAIT_TIME_COS
 
 import java.time.ZonedDateTime;
 import java.util.function.Consumer;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;

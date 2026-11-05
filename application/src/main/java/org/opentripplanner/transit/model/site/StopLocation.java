@@ -4,7 +4,7 @@ import java.time.ZoneId;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.I18NString;
@@ -13,6 +13,7 @@ import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.LogInfo;
+import org.opentripplanner.transit.model.framework.TransitEntity;
 import org.opentripplanner.utils.lang.ObjectUtils;
 
 /**
@@ -20,7 +21,7 @@ import org.opentripplanner.utils.lang.ObjectUtils;
  * necessarily a marked stop, but can be of other shapes, such as a service area for flexible
  * transit. StopLocations are referred to in stop times.
  */
-public interface StopLocation extends LogInfo {
+public interface StopLocation extends LogInfo, TransitEntity {
   /** The ID for the StopLocation */
   FeedScopedId getId();
 

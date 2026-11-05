@@ -2,11 +2,11 @@ package org.opentripplanner.netex.index.api;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
-import org.rutebanken.netex.model.VersionOfObjectRefStructure;
+import org.entur.netex2.model.VersionOfObjectRefStructure;
 
 /**
  * A hierarchical read-only view on a multimap indexing a collections of
- * {@link org.rutebanken.netex.model.EntityInVersionStructure} values by their {@code id}. This is
+ * {@link org.entur.netex2.model.EntityInVersionStructure} values by their {@code id}. This is
  * used to lookup the correct version of the element for a given key.
  *
  * @param <V> the value type

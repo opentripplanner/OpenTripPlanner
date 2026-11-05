@@ -10,12 +10,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.function.Consumer;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.LineString;
-import org.locationtech.jts.index.ItemVisitor;
-import org.locationtech.jts.index.SpatialIndex;
 import org.opentripplanner.utils.lang.IntBox;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +33,7 @@ import org.slf4j.LoggerFactory;
  * @param <T> Type of objects to be spatial indexed.
  * @author laurent
  */
-public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
+public class HashGridSpatialIndex<T> implements Serializable {
 
   @SuppressWarnings("unused")
   private static final Logger LOG = LoggerFactory.getLogger(HashGridSpatialIndex.class);
@@ -78,7 +77,6 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
     this(DEFAULT_X_BIN_SIZE, DEFAULT_Y_BIN_SIZE);
   }
 
-  @Override
   public final void insert(Envelope envelope, final Object item) {
     visit(envelope, true, (bin, mapKey) -> {
       /*
@@ -95,7 +93,6 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
     nObjects++;
   }
 
-  @Override
   public final List<T> query(Envelope envelope) {
     final Set<T> ret = new HashSet<>(1024);
     visit(envelope, false, (bin, mapKey) -> {
@@ -105,16 +102,23 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
     return new ArrayList<>(ret);
   }
 
-  @Override
-  public final void query(Envelope envelope, ItemVisitor visitor) {
-    // We are cheating a bit here... But who cares? Never called in OTP.
-    List<T> tlist = query(envelope);
-    for (T t : tlist) {
-      visitor.visitItem(t);
-    }
+  /**
+   * Pass every item stored in the bins touching the envelope to {@code consumer}, without
+   * deduplication. As with {@link #query(Envelope)} the result contains false positives (whole bins
+   * are returned), and in addition an item spanning several of the visited bins is passed once per
+   * bin. Use this instead of {@link #query(Envelope)} when only a few of many candidates are kept:
+   * the caller can discard candidates with a cheap geometric test before paying for a hash-based
+   * dedup of the survivors, rather than hashing and copying every item in the bins first.
+   */
+  public final void forEachCandidate(Envelope envelope, Consumer<? super T> consumer) {
+    visit(envelope, false, (bin, mapKey) -> {
+      for (int i = 0, n = bin.size(); i < n; i++) {
+        consumer.accept(bin.get(i));
+      }
+      return false;
+    });
   }
 
-  @Override
   public final boolean remove(Envelope envelope, final Object item) {
     // This iterates over the entire rectangular envelope of the edge rather than the segments
     // making it up. It will be inefficient for very long edges, but creating a new remove method

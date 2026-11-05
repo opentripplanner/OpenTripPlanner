@@ -237,8 +237,8 @@
          -->
         <dependency>
             <groupId>org.entur</groupId>
-            <artifactId>netex-java-model</artifactId>
-            <version>${netex-java-model.version}</version>
+            <artifactId>netex2-java-model</artifactId>
+            <version>${netex2-java-model.version}</version>
         </dependency>
         <dependency>
             <groupId>org.entur</groupId>
@@ -293,6 +293,10 @@
             <groupId>org.glassfish.jersey.media</groupId>
             <artifactId>jersey-media-json-jackson3</artifactId>
             <version>${jersey.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jspecify</groupId>
+            <artifactId>jspecify</artifactId>
         </dependency>
         <dependency>
             <groupId>org.mobilitydata</groupId>
@@ -424,6 +428,10 @@
                             <version>${google.dagger.version}</version>
                         </path>
                     </annotationProcessorPaths>
+                    <compilerArgs>
+                        <!-- Make Dagger honour JSpecify's type-use @Nullable on its binding sites -->
+                        <arg>-Adagger.nullableTypeAnnotations=ENABLED</arg>
+                    </compilerArgs>
                 </configuration>
             </plugin>
             <plugin>

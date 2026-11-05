@@ -2,8 +2,8 @@ package org.opentripplanner.gbfs.v2;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.geojson.MultiPolygon;
+import org.jspecify.annotations.Nullable;
 import org.mobilitydata.gbfs.v2_3.geofencing_zones.GBFSFeature;
 import org.mobilitydata.gbfs.v2_3.geofencing_zones.GBFSGeofencingZones;
 import org.mobilitydata.gbfs.v2_3.geofencing_zones.GBFSRule;

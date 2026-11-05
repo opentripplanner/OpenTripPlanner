@@ -1,7 +1,7 @@
 package org.opentripplanner.raptor.configure;
 
 import java.util.concurrent.ExecutorService;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.raptor.api.request.RaptorEnvironment;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;

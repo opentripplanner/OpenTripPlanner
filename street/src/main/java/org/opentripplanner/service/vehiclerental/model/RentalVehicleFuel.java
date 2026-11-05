@@ -1,7 +1,7 @@
 package org.opentripplanner.service.vehiclerental.model;
 
 import java.util.Objects;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.basic.Distance;
 import org.opentripplanner.core.model.basic.Ratio;
 import org.opentripplanner.utils.tostring.ToStringBuilder;

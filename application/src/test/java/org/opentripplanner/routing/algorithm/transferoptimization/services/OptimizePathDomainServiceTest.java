@@ -6,7 +6,7 @@ import static org.opentripplanner.routing.algorithm.transferoptimization.service
 import static org.opentripplanner.utils.time.TimeUtils.time;
 
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;

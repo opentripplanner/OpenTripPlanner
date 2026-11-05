@@ -3,13 +3,13 @@ package org.opentripplanner.netex.mapping;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+import org.entur.netex2.model.ContactStructure;
+import org.entur.netex2.model.MultilingualString;
+import org.entur.netex2.model.Operator;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
-import org.rutebanken.netex.model.ContactStructure;
-import org.rutebanken.netex.model.MultilingualString;
-import org.rutebanken.netex.model.Operator;
 
 public class OperatorToAgencyMapperTest {
 
@@ -23,7 +23,7 @@ public class OperatorToAgencyMapperTest {
     // Given
     Operator operator = new Operator()
       .withId(ID)
-      .withName(new MultilingualString().withValue(NAME))
+      .withName(new MultilingualString().withContent(NAME))
       .withContactDetails(new ContactStructure().withUrl(URL).withPhone(PHONE));
 
     // When mapped
@@ -45,7 +45,7 @@ public class OperatorToAgencyMapperTest {
     // Given
     Operator operator = new Operator()
       .withId(ID)
-      .withName(new MultilingualString().withValue(NAME));
+      .withName(new MultilingualString().withContent(NAME));
 
     // When mapped
     org.opentripplanner.transit.model.organization.Operator o;

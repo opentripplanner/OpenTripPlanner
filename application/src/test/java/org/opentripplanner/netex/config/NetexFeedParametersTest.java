@@ -3,6 +3,7 @@ package org.opentripplanner.netex.config;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.netex.config.NetexFeedParameters.DEFAULT;
 
 import java.net.URI;
@@ -87,8 +88,34 @@ class NetexFeedParametersTest {
   }
 
   @Test
+  void allowStopPlaceAsPassengerStopAssignmentEqualsAndHashCode() {
+    var allowed = subject.copyOf().withAllowStopPlaceAsPassengerStopAssignment(true).build();
+    var sameAllowed = subject.copyOf().withAllowStopPlaceAsPassengerStopAssignment(true).build();
+    // Make a change and set it back again to force a copy of the flag via the builder
+    var copiedAllowed = allowed
+      .copyOf()
+      .withFeedId("FX")
+      .build()
+      .copyOf()
+      .withFeedId(FEED_ID)
+      .build();
+
+    assertTrue(allowed.allowStopPlaceAsPassengerStopAssignment());
+    assertEquals(allowed, sameAllowed);
+    assertEquals(allowed.hashCode(), sameAllowed.hashCode());
+    assertEquals(allowed, copiedAllowed);
+    assertEquals(allowed.hashCode(), copiedAllowed.hashCode());
+    assertNotEquals(subject, allowed);
+    assertNotEquals(subject.hashCode(), allowed.hashCode());
+  }
+
+  @Test
   void testToString() {
     assertEquals("NetexFeedParameters{ignoredFeatures: [PARKING]}", DEFAULT.toString());
+    assertEquals(
+      "NetexFeedParameters{ignoredFeatures: [PARKING], allowStopPlaceAsPassengerStopAssignment}",
+      DEFAULT.copyOf().withAllowStopPlaceAsPassengerStopAssignment(true).build().toString()
+    );
     assertEquals(
       "NetexFeedParameters{" +
         "source: https://my.test.com, " +
