@@ -46,6 +46,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Remove Thread.yield() from the request timeout check [#8147](https://github.com/opentripplanner/OpenTripPlanner/pull/8147)
 - Add tripPatternByLegIds as replacement for refetchTripPattern in Transmodel [#8111](https://github.com/opentripplanner/OpenTripPlanner/pull/8111)
 - Allow `PassengerStopAssignment` with `StopPlace` only [#8054](https://github.com/opentripplanner/OpenTripPlanner/pull/8054)
+- Don't penalize sidewalks designated for bikes [#8139](https://github.com/opentripplanner/OpenTripPlanner/pull/8139)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.10.0 (2026-09-09)
