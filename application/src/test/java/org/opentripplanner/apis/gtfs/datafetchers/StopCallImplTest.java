@@ -12,6 +12,7 @@ import org.opentripplanner.apis.gtfs.model.CallSchedule;
 import org.opentripplanner.apis.gtfs.model.CallScheduledTime.ArrivalDepartureTime;
 import org.opentripplanner.apis.gtfs.model.CallScheduledTime.TimeWindow;
 import org.opentripplanner.apis.support.graphql.DataFetchingSupport;
+import org.opentripplanner.core.model.i18n.TranslatedString;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
@@ -31,6 +32,7 @@ class StopCallImplTest {
   ).toInstant();
   private static final String TRIP_ID = "Trip1";
   private static final String FLEX_TRIP_ID = "FlexTrip1";
+  private static final String HEADSIGN_TRIP_ID = "HeadsignTrip1";
 
   private static final OffsetDateTime NOON = OffsetDateTime.parse("2023-06-03T12:00+02:00");
   private static final OffsetDateTime TEN_AM = NOON.minusHours(2);
@@ -44,6 +46,17 @@ class StopCallImplTest {
   private final TripInput TRIP_INPUT = TripInput.of(TRIP_ID)
     .addStop(STOP_A, "12:00:00", "12:00:00")
     .addStop(STOP_B, "12:30:00", "12:30:00")
+    .addStop(STOP_C, "13:00:00", "13:00:00");
+
+  private final TripInput HEADSIGN_TRIP_INPUT = TripInput.of(HEADSIGN_TRIP_ID)
+    .withHeadsign(TranslatedString.getI18NString("Ring", "de", "Ringlinie"))
+    .addStop(STOP_A, "12:00:00", "12:00:00")
+    .addStopWithHeadsign(
+      STOP_B,
+      "12:30:00",
+      "12:30:00",
+      TranslatedString.getI18NString("Ring via C", "de", "Ringlinie über C")
+    )
     .addStop(STOP_C, "13:00:00", "13:00:00");
 
   private final TripInput FLEX_TRIP_INPUT = TripInput.flex(FLEX_TRIP_ID)
@@ -68,6 +81,23 @@ class StopCallImplTest {
 
     var schedule = impl.schedule().get(env);
     assertEquals(new CallSchedule(new ArrivalDepartureTime(NOON, NOON, false)), schedule);
+  }
+
+  @Test
+  void headsign() throws Exception {
+    var transitEnv = envBuilder.addTrip(HEADSIGN_TRIP_INPUT).build();
+
+    assertEquals("Ring", headsign(transitEnv, 0, Map.of()));
+    assertEquals("Ring via C", headsign(transitEnv, 1, Map.of()));
+    assertEquals("Ring", headsign(transitEnv, 2, Map.of()));
+  }
+
+  @Test
+  void translatedHeadsign() throws Exception {
+    var transitEnv = envBuilder.addTrip(HEADSIGN_TRIP_INPUT).build();
+
+    assertEquals("Ringlinie", headsign(transitEnv, 0, Map.of("language", "de")));
+    assertEquals("Ringlinie über C", headsign(transitEnv, 1, Map.of("language", "de")));
   }
 
   @Test
@@ -96,5 +126,26 @@ class StopCallImplTest {
         throw new RuntimeException(e);
       }
     });
+  }
+
+  private String headsign(
+    TransitTestEnvironment transitEnv,
+    int stopPosition,
+    Map<String, Object> arguments
+  ) throws Exception {
+    var tripData = transitEnv.tripData(HEADSIGN_TRIP_ID);
+    var call = new TripTimeOnDate(
+      tripData.tripTimes(),
+      stopPosition,
+      tripData.tripPattern(),
+      SERVICE_DATE,
+      MIDNIGHT
+    );
+    var env = DataFetchingSupport.dataFetchingEnvironment(
+      call,
+      arguments,
+      transitEnv.transitService()
+    );
+    return new StopCallImpl().headsign().get(env);
   }
 }

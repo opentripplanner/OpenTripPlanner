@@ -980,6 +980,7 @@ public class GraphQLDataFetchers {
    * This may contain real-time information, if available.
    */
   public interface GraphQLStopCall {
+    public DataFetcher<String> headsign();
     public DataFetcher<Iterable<org.opentripplanner.transit.model.basic.Notice>> notices();
     public DataFetcher<CallRealTime> realTime();
     public DataFetcher<CallSchedule> schedule();

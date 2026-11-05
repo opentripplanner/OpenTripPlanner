@@ -5824,6 +5824,25 @@ public class GraphQLTypes {
     TRIPS,
   }
 
+  public static class GraphQLStopCallHeadsignArgs {
+
+    private String language;
+
+    public GraphQLStopCallHeadsignArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.language = (String) args.get("language");
+      }
+    }
+
+    public String getGraphQLLanguage() {
+      return this.language;
+    }
+
+    public void setGraphQLLanguage(String language) {
+      this.language = language;
+    }
+  }
+
   public enum GraphQLStopType {
     LOCATION,
     LOCATION_GROUP,
