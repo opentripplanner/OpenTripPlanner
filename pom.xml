@@ -106,6 +106,7 @@
         <module>astar</module>
         <module>container</module>
         <module>core</module>
+        <module>graphql-codegen</module>
         <module>gtfs-realtime-protobuf</module>
         <module>otp-shaded</module>
         <module>raptor</module>
@@ -583,6 +584,12 @@
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>33.7.2-jre</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.graphql-java</groupId>
+                <artifactId>graphql-java</artifactId>
+                <version>26.1</version>
             </dependency>
 
             <!--
