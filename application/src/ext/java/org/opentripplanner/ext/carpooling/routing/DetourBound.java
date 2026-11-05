@@ -11,8 +11,9 @@ import org.opentripplanner.street.search.state.State;
 /**
  * The bound on a detour through a point {@code v} on a driver leg from {@code a} to {@code b}: the
  * leg can only pass through {@code v} if {@code t(a→v) + t(v→b)} is at most the leg's limit, see
- * {@link DriverLegLimits}. A side whose drive is not known counts as its least possible drive, the
- * beeline at the fastest car speed in the graph, so the bound never rules out a feasible detour.
+ * {@link DriverLegLimits}. A side whose drive is not known counts as its fastest possible drive,
+ * the beeline at the fastest car speed in the graph, so the bound never rules out a feasible
+ * detour.
  */
 final class DetourBound {
 
@@ -37,7 +38,9 @@ final class DetourBound {
     this.maxCarSpeed = maxCarSpeed;
   }
 
-  /** Whether a detour through the point can fit, with both sides at their least drive. */
+  /**
+   * Whether a detour through the point can fit, with both sides at their fastest possible drive.
+   */
   boolean mayPassThrough(Vertex point) {
     return mayPassWithin(0, point);
   }
@@ -45,7 +48,8 @@ final class DetourBound {
   /** Whether a detour can pass anywhere within {@code meters} of the point. */
   boolean mayPassWithin(double meters, Vertex point) {
     double slack = (2 * meters) / maxCarSpeed;
-    return leastDriveFromStart(point) + leastDriveToEnd(point) <= limitSeconds + slack;
+    double drive = fastestPossibleDriveFromStart(point) + fastestPossibleDriveToEnd(point);
+    return drive <= limitSeconds + slack;
   }
 
   /** Whether a detour whose two sides take these many seconds fits. */
@@ -65,12 +69,12 @@ final class DetourBound {
 
   /** Whether a detour that reaches the point {@code secondsFromStart} into the leg can fit. */
   boolean mayPassThroughAfter(long secondsFromStart, Vertex point) {
-    return secondsFromStart + leastDriveToEnd(point) <= limitSeconds;
+    return secondsFromStart + fastestPossibleDriveToEnd(point) <= limitSeconds;
   }
 
   /** Whether a detour that leaves the point {@code secondsToEnd} before the leg's end can fit. */
   boolean mayPassThroughBefore(long secondsToEnd, Vertex point) {
-    return secondsToEnd + leastDriveFromStart(point) <= limitSeconds;
+    return secondsToEnd + fastestPossibleDriveFromStart(point) <= limitSeconds;
   }
 
   /**
@@ -89,29 +93,30 @@ final class DetourBound {
   }
 
   /**
-   * The most the leg may take from the point on: the limit minus the least drive to the point.
+   * The most the leg may take from the point on: the limit minus the fastest possible drive to the
+   * point.
    */
   Duration limitFrom(Vertex point) {
-    return limit.minusSeconds((long) leastDriveFromStart(point));
+    return limit.minusSeconds((long) fastestPossibleDriveFromStart(point));
   }
 
   /**
-   * The most the leg may take up to the point: the limit minus the least drive from the point on.
+   * The most the leg may take up to the point: the limit minus the fastest possible drive from the
+   * point on.
    */
   Duration limitTo(Vertex point) {
-    return limit.minusSeconds((long) leastDriveToEnd(point));
+    return limit.minusSeconds((long) fastestPossibleDriveToEnd(point));
   }
 
-  private double leastDriveFromStart(Vertex point) {
-    return leastDrive(start, point);
+  private double fastestPossibleDriveFromStart(Vertex point) {
+    return fastestPossibleDrive(start, point);
   }
 
-  private double leastDriveToEnd(Vertex point) {
-    return leastDrive(point, end);
+  private double fastestPossibleDriveToEnd(Vertex point) {
+    return fastestPossibleDrive(point, end);
   }
 
-  /** The beeline between the vertices, driven at the fastest car speed in the graph. */
-  private double leastDrive(Vertex from, Vertex to) {
+  private double fastestPossibleDrive(Vertex from, Vertex to) {
     double meters = SphericalDistanceLibrary.fastDistance(
       from.getLat(),
       from.getLon(),
