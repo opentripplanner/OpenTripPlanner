@@ -42,6 +42,15 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  */
 public final class ItineraryReference {
 
+  /**
+   * The maximum number of transit legs a reference can hold: one more than
+   * {@link org.opentripplanner.routing.api.request.preference.TransferPreferences}'s own hard
+   * ceiling on the number of transfers, so more legs than that are never part of a real plan
+   * response. Caps the work a single refetch can do, since it does a lookup, and possibly a
+   * transfer street search, per leg.
+   */
+  public static final int MAX_LEG_REFERENCES = 31;
+
   private final List<LegReference> legReferences;
 
   @Nullable
@@ -107,14 +116,17 @@ public final class ItineraryReference {
     return to;
   }
 
+  /** The street mode used to get from {@link #from()} to the first boarding stop. */
   public StreetMode accessMode() {
     return accessMode;
   }
 
+  /** The street mode used to get from the last alighting stop to {@link #to()}. */
   public StreetMode egressMode() {
     return egressMode;
   }
 
+  /** The street mode used for transfers between two transit legs at different stops. */
   public StreetMode transferMode() {
     return transferMode;
   }
@@ -129,14 +141,17 @@ public final class ItineraryReference {
     return alightSlack;
   }
 
+  /** The walk speed in meters per second. */
   public double walkSpeed() {
     return walkSpeed;
   }
 
+  /** The walk reluctance: the cost factor applied to time spent walking. */
   public double walkReluctance() {
     return walkReluctance;
   }
 
+  /** Whether the itinerary was planned as wheelchair accessible. */
   public boolean wheelchair() {
     return wheelchair;
   }

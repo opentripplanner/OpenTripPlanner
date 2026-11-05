@@ -1,6 +1,8 @@
 package org.opentripplanner.model.plan.itineraryreference;
 
-import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -70,7 +72,7 @@ class ItineraryReferenceSerializerTest {
 
     var decoded = ItineraryReferenceSerializer.decode(ItineraryReferenceSerializer.encode(ref));
 
-    assertThat(decoded).isEqualTo(ref);
+    assertEquals(ref, decoded);
   }
 
   @Test
@@ -79,7 +81,7 @@ class ItineraryReferenceSerializerTest {
 
     var decoded = ItineraryReferenceSerializer.decode(ItineraryReferenceSerializer.encode(ref));
 
-    assertThat(decoded).isEqualTo(ref);
+    assertEquals(ref, decoded);
   }
 
   @Test
@@ -100,7 +102,7 @@ class ItineraryReferenceSerializerTest {
 
     var decoded = ItineraryReferenceSerializer.decode(ItineraryReferenceSerializer.encode(ref));
 
-    assertThat(decoded).isEqualTo(ref);
+    assertEquals(ref, decoded);
   }
 
   @Test
@@ -121,7 +123,7 @@ class ItineraryReferenceSerializerTest {
 
     var decoded = ItineraryReferenceSerializer.decode(ItineraryReferenceSerializer.encode(ref));
 
-    assertThat(decoded).isEqualTo(ref);
+    assertEquals(ref, decoded);
   }
 
   @Test
@@ -130,10 +132,10 @@ class ItineraryReferenceSerializerTest {
 
     var decoded = ItineraryReferenceSerializer.decode(ItineraryReferenceSerializer.encode(ref));
 
-    assertThat(decoded).isNotNull();
-    assertThat(decoded).isEqualTo(ref);
-    assertThat(decoded.from()).isNull();
-    assertThat(decoded.to()).isNull();
+    assertNotNull(decoded);
+    assertEquals(ref, decoded);
+    assertNull(decoded.from());
+    assertNull(decoded.to());
   }
 
   @Test
@@ -154,27 +156,27 @@ class ItineraryReferenceSerializerTest {
 
     var decoded = ItineraryReferenceSerializer.decode(ItineraryReferenceSerializer.encode(ref));
 
-    assertThat(decoded).isEqualTo(ref);
+    assertEquals(ref, decoded);
   }
 
   @Test
   void nullInputEncodesToNull() {
-    assertThat(ItineraryReferenceSerializer.encode(null)).isNull();
+    assertNull(ItineraryReferenceSerializer.encode(null));
   }
 
   @Test
   void nullTokenDecodesToNull() {
-    assertThat(ItineraryReferenceSerializer.decode(null)).isNull();
+    assertNull(ItineraryReferenceSerializer.decode(null));
   }
 
   @Test
   void emptyTokenDecodesToNull() {
-    assertThat(ItineraryReferenceSerializer.decode("")).isNull();
+    assertNull(ItineraryReferenceSerializer.decode(""));
   }
 
   @Test
   void malformedTokenDecodesToNull() {
-    assertThat(ItineraryReferenceSerializer.decode("this-is-not-a-valid-token::")).isNull();
+    assertNull(ItineraryReferenceSerializer.decode("this-is-not-a-valid-token::"));
   }
 
   @Test
@@ -185,7 +187,7 @@ class ItineraryReferenceSerializerTest {
 
     var truncated = encoded.substring(0, encoded.length() / 2);
 
-    assertThat(ItineraryReferenceSerializer.decode(truncated)).isNull();
+    assertNull(ItineraryReferenceSerializer.decode(truncated));
   }
 
   /**
@@ -202,7 +204,7 @@ class ItineraryReferenceSerializerTest {
 
     String craftedToken = craftedToken(joinedWithTrailingDelimiter, null, null, "1.3");
 
-    assertThat(ItineraryReferenceSerializer.decode(craftedToken)).isNull();
+    assertNull(ItineraryReferenceSerializer.decode(craftedToken));
   }
 
   /**
@@ -215,7 +217,7 @@ class ItineraryReferenceSerializerTest {
 
     String craftedToken = craftedToken(validLegToken, "1.0", null, "1.3");
 
-    assertThat(ItineraryReferenceSerializer.decode(craftedToken)).isNull();
+    assertNull(ItineraryReferenceSerializer.decode(craftedToken));
   }
 
   @Test
@@ -224,7 +226,7 @@ class ItineraryReferenceSerializerTest {
 
     String craftedToken = craftedToken(validLegToken, null, "2.0", "1.3");
 
-    assertThat(ItineraryReferenceSerializer.decode(craftedToken)).isNull();
+    assertNull(ItineraryReferenceSerializer.decode(craftedToken));
   }
 
   @Test
@@ -233,7 +235,7 @@ class ItineraryReferenceSerializerTest {
 
     String craftedToken = craftedToken(validLegToken, null, null, "NaN");
 
-    assertThat(ItineraryReferenceSerializer.decode(craftedToken)).isNull();
+    assertNull(ItineraryReferenceSerializer.decode(craftedToken));
   }
 
   @Test
@@ -242,7 +244,7 @@ class ItineraryReferenceSerializerTest {
 
     String craftedToken = craftedToken(validLegToken, "Infinity", "2.0", "1.3");
 
-    assertThat(ItineraryReferenceSerializer.decode(craftedToken)).isNull();
+    assertNull(ItineraryReferenceSerializer.decode(craftedToken));
   }
 
   /**
@@ -267,9 +269,7 @@ class ItineraryReferenceSerializerTest {
       false
     );
 
-    assertThat(
-      ItineraryReferenceSerializer.decode(ItineraryReferenceSerializer.encode(ref))
-    ).isNull();
+    assertNull(ItineraryReferenceSerializer.decode(ItineraryReferenceSerializer.encode(ref)));
   }
 
   @Test
@@ -288,9 +288,7 @@ class ItineraryReferenceSerializerTest {
       false
     );
 
-    assertThat(
-      ItineraryReferenceSerializer.decode(ItineraryReferenceSerializer.encode(ref))
-    ).isNull();
+    assertNull(ItineraryReferenceSerializer.decode(ItineraryReferenceSerializer.encode(ref)));
   }
 
   @Test
@@ -309,26 +307,36 @@ class ItineraryReferenceSerializerTest {
       false
     );
 
-    assertThat(
-      ItineraryReferenceSerializer.decode(ItineraryReferenceSerializer.encode(ref))
-    ).isNull();
+    assertNull(ItineraryReferenceSerializer.decode(ItineraryReferenceSerializer.encode(ref)));
   }
 
   /**
    * A single {@code itinerary(id:)} call does a lookup, and possibly a transfer street search,
    * per leg reference - an id with an unbounded number of them lets a client make one call do an
-   * unbounded amount of work. The cap is one leg more than
-   * {@link org.opentripplanner.routing.api.request.preference.TransferPreferences}'s own hard
-   * ceiling on transfers, so a token with more legs than that can only be hand-crafted.
+   * unbounded amount of work - see {@link ItineraryReference#MAX_LEG_REFERENCES}.
    */
   @Test
   void tooManyLegReferencesDecodesToNull() {
     String validLegToken = LegReferenceSerializer.encode(LEG_A_TO_B);
-    String joinedTooManyLegs = String.join("~", Collections.nCopies(32, validLegToken));
+    String joinedTooManyLegs = String.join(
+      "~",
+      Collections.nCopies(ItineraryReference.MAX_LEG_REFERENCES + 1, validLegToken)
+    );
 
     String craftedToken = craftedToken(joinedTooManyLegs, null, null, "1.3");
 
-    assertThat(ItineraryReferenceSerializer.decode(craftedToken)).isNull();
+    assertNull(ItineraryReferenceSerializer.decode(craftedToken));
+  }
+
+  @Test
+  void maximumNumberOfLegReferencesRoundTrips() {
+    var ref = defaultReference(
+      Collections.nCopies(ItineraryReference.MAX_LEG_REFERENCES, LEG_A_TO_B)
+    );
+
+    var decoded = ItineraryReferenceSerializer.decode(ItineraryReferenceSerializer.encode(ref));
+
+    assertEquals(ref, decoded);
   }
 
   /**

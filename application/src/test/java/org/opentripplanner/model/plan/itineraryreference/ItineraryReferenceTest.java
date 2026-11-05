@@ -1,6 +1,8 @@
 package org.opentripplanner.model.plan.itineraryreference;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.Duration;
@@ -30,13 +32,13 @@ class ItineraryReferenceTest {
     var a = reference(List.of(LEG), 1.3);
     var b = reference(List.of(LEG), 1.3);
 
-    assertThat(a).isEqualTo(b);
-    assertThat(a.hashCode()).isEqualTo(b.hashCode());
+    assertEquals(a, b);
+    assertEquals(a.hashCode(), b.hashCode());
   }
 
   @Test
   void referencesDifferingInOneFieldAreNotEqual() {
-    assertThat(reference(List.of(LEG), 1.3)).isNotEqualTo(reference(List.of(LEG), 1.4));
+    assertNotEquals(reference(List.of(LEG), 1.3), reference(List.of(LEG), 1.4));
   }
 
   @Test

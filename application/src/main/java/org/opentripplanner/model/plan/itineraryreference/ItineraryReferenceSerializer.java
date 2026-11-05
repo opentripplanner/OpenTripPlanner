@@ -49,14 +49,6 @@ public class ItineraryReferenceSerializer {
   private static final String WALK_RELUCTANCE_FIELD = "walkReluctance";
   private static final String WHEELCHAIR_FIELD = "wheelchair";
 
-  /**
-   * {@link org.opentripplanner.routing.api.request.preference.TransferPreferences}'s own hard
-   * ceiling on the number of transfers a search can make; one more leg than that is already more
-   * than any real plan response could contain. Caps the work a single {@code itinerary(id:)} call
-   * can do, since the refetch does a lookup, and possibly a transfer street search, per leg.
-   */
-  private static final int MAX_LEG_REFERENCES = 31;
-
   private static final TokenSchema SCHEMA = TokenSchema.ofVersion(1)
     .addString(LEG_REFERENCES_FIELD)
     .addString(FROM_STOP_ID_FIELD)
@@ -130,7 +122,7 @@ public class ItineraryReferenceSerializer {
       String joinedLegReferences = token.getString(LEG_REFERENCES_FIELD).orElseThrow();
 
       String[] rawLegReferences = joinedLegReferences.split(LEG_REFERENCE_DELIMITER, -1);
-      if (rawLegReferences.length > MAX_LEG_REFERENCES) {
+      if (rawLegReferences.length > ItineraryReference.MAX_LEG_REFERENCES) {
         throw new IllegalArgumentException("Too many leg references: " + rawLegReferences.length);
       }
 

@@ -31,8 +31,8 @@ public final class ItineraryReferenceMapper {
    * {@link RouteRequest} that produced it.
    *
    * @throws UnsupportedItineraryReferenceException if {@code itinerary} has no supported transit
-   * leg reference, if any non-street leg has no {@link LegReference} at all, if
-   * {@code routeRequest}'s {@code from}/{@code to} is an on-board {@code TripLocation}, or if its
+   * leg reference or more than {@link ItineraryReference#MAX_LEG_REFERENCES}, if any non-street
+   * leg has no {@link LegReference} at all, if {@code routeRequest}'s {@code from}/{@code to} is an on-board {@code TripLocation}, or if its
    * access, egress or transfer mode is not {@link StreetMode#WALK}.
    */
   public static ItineraryReference toItineraryReference(
@@ -50,6 +50,11 @@ public final class ItineraryReferenceMapper {
     if (legReferences.isEmpty()) {
       throw new UnsupportedItineraryReferenceException(
         "Itinerary has no supported transit leg references"
+      );
+    }
+    if (legReferences.size() > ItineraryReference.MAX_LEG_REFERENCES) {
+      throw new UnsupportedItineraryReferenceException(
+        "Itinerary has more than " + ItineraryReference.MAX_LEG_REFERENCES + " transit legs"
       );
     }
 

@@ -1,12 +1,16 @@
 package org.opentripplanner.routing.refetch;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -86,9 +90,9 @@ class ItineraryReferenceMapperTest {
     var reference = ItineraryReferenceMapper.toItineraryReference(originalItinerary, routeRequest);
 
     var encoded = ItineraryReferenceSerializer.encode(reference);
-    assertThat(encoded).isNotNull();
+    assertNotNull(encoded);
     var decodedReference = ItineraryReferenceSerializer.decode(encoded);
-    assertThat(decodedReference).isNotNull();
+    assertNotNull(decodedReference);
 
     var refetchRouteRequest = ItineraryReferenceMapper.toRouteRequest(
       decodedReference,
@@ -101,8 +105,8 @@ class ItineraryReferenceMapperTest {
       refetchRouteRequest
     );
 
-    assertThat(refetchedItinerary.toStr()).isEqualTo(originalItinerary.toStr());
-    assertThat(refetchedItinerary.toStr()).isEqualTo("A ~ BUS tripX 10:00 11:00 ~ B []");
+    assertEquals(originalItinerary.toStr(), refetchedItinerary.toStr());
+    assertEquals("A ~ BUS tripX 10:00 11:00 ~ B []", refetchedItinerary.toStr());
   }
 
   @Test
@@ -131,7 +135,7 @@ class ItineraryReferenceMapperTest {
       .build();
 
     var expectedLegReference = itinerary.legs().get(1).legReference();
-    assertThat(expectedLegReference).isNotNull();
+    assertNotNull(expectedLegReference);
 
     var reference = ItineraryReferenceMapper.toItineraryReference(itinerary, routeRequest());
 
@@ -154,13 +158,7 @@ class ItineraryReferenceMapperTest {
       .withPreferences(preferences ->
         preferences
           .withTransit(transit ->
-            transit
-              .withBoardSlack(b ->
-                b.withDefaultSec(60).with(TransitMode.BUS, Duration.ofSeconds(90))
-              )
-              .withAlightSlack(b ->
-                b.withDefaultSec(30).with(TransitMode.RAIL, Duration.ofSeconds(45))
-              )
+            transit.withDefaultBoardSlackSec(60).withDefaultAlightSlackSec(30)
           )
           .withWalk(walk -> walk.withSpeed(2.5).withReluctance(3.0))
       )
@@ -168,25 +166,24 @@ class ItineraryReferenceMapperTest {
 
     var reference = ItineraryReferenceMapper.toItineraryReference(itinerary, customRouteRequest);
 
-    assertThat(reference.from()).isEqualTo(GenericLocation.fromStopId(STOP_A.getId()));
-    assertThat(reference.to()).isEqualTo(GenericLocation.fromStopId(STOP_B.getId()));
-    assertThat(reference.accessMode()).isEqualTo(StreetMode.WALK);
-    assertThat(reference.egressMode()).isEqualTo(StreetMode.WALK);
-    assertThat(reference.transferMode()).isEqualTo(StreetMode.WALK);
-    assertThat(reference.wheelchair()).isTrue();
-    assertThat(reference.boardSlack()).isEqualTo(Duration.ofSeconds(60));
-    assertThat(reference.alightSlack()).isEqualTo(Duration.ofSeconds(30));
-    assertThat(reference.walkSpeed()).isEqualTo(2.5);
-    assertThat(reference.walkReluctance()).isEqualTo(3.0);
+    assertEquals(GenericLocation.fromStopId(STOP_A.getId()), reference.from());
+    assertEquals(GenericLocation.fromStopId(STOP_B.getId()), reference.to());
+    assertEquals(StreetMode.WALK, reference.accessMode());
+    assertEquals(StreetMode.WALK, reference.egressMode());
+    assertEquals(StreetMode.WALK, reference.transferMode());
+    assertTrue(reference.wheelchair());
+    assertEquals(Duration.ofSeconds(60), reference.boardSlack());
+    assertEquals(Duration.ofSeconds(30), reference.alightSlack());
+    assertEquals(2.5, reference.walkSpeed());
+    assertEquals(3.0, reference.walkReluctance());
   }
 
   /**
-   * {@code customRouteRequest} above sets per-mode board/alight slack overrides
-   * ({@code TransitMode.BUS}/{@code TransitMode.RAIL}), which no supported API lets a client set.
+   * Per-mode board/alight slack overrides ({@code TransitMode.BUS}/{@code TransitMode.RAIL}) are
+   * server-only: no supported API lets a client set them.
    * {@link ItineraryReference#boardSlack()}/{@link ItineraryReference#alightSlack()} are plain
-   * {@link Duration}s, not {@link DurationForEnum}, so they cannot carry a per-mode override at
-   * all - confirming they only capture the client-settable default, per {@link ItineraryReference}'s
-   * class doc.
+   * {@link Duration}s, not {@code DurationForEnum}s, so they only capture the client-settable
+   * default, per {@link ItineraryReference}'s class doc.
    */
   @Test
   void toItineraryReferenceDropsServerOnlyPerModeSlackOverrides() {
@@ -211,11 +208,8 @@ class ItineraryReferenceMapperTest {
       routeRequestWithOverrides
     );
 
-    // Only the Duration type itself is asserted here - there is no override to read, because
-    // ItineraryReference has no field capable of holding one.
-    assertThat(reference.boardSlack()).isInstanceOf(Duration.class);
-    assertThat(reference.boardSlack()).isEqualTo(Duration.ofSeconds(60));
-    assertThat(reference.alightSlack()).isEqualTo(Duration.ofSeconds(30));
+    assertEquals(Duration.ofSeconds(60), reference.boardSlack());
+    assertEquals(Duration.ofSeconds(30), reference.alightSlack());
 
     // Rebuilding with a *different* default request that has its own per-mode overrides proves
     // those overrides - not the ones from routeRequestWithOverrides above - are what ends up on
@@ -233,8 +227,62 @@ class ItineraryReferenceMapperTest {
 
     var rebuilt = ItineraryReferenceMapper.toRouteRequest(reference, differentDefaultRequest);
 
-    assertThat(rebuilt.preferences().transit().boardSlack().valueOf(TransitMode.BUS)).isEqualTo(
-      Duration.ofSeconds(999)
+    assertEquals(
+      Duration.ofSeconds(999),
+      rebuilt.preferences().transit().boardSlack().valueOf(TransitMode.BUS)
+    );
+  }
+
+  /**
+   * The encoded values are the ones in effect when the itinerary was planned, so they replace the
+   * current server defaults on refetch. Server-only settings that are not encoded, such as
+   * {@code maxAccessEgressDuration}, keep the value of the current default request.
+   */
+  @Test
+  void toRouteRequestOverlaysEncodedValuesOnTheCurrentDefaultRequest() {
+    var reference = new ItineraryReference(
+      List.of(legRef()),
+      GenericLocation.fromStopId(STOP_A.getId()),
+      GenericLocation.fromStopId(STOP_B.getId()),
+      StreetMode.WALK,
+      StreetMode.WALK,
+      StreetMode.WALK,
+      Duration.ofSeconds(60),
+      Duration.ofSeconds(30),
+      2.5,
+      3.0,
+      true
+    );
+    var currentDefault = RouteRequest.defaultValue()
+      .copyOf()
+      .withJourney(journey -> journey.withWheelchair(false))
+      .withPreferences(preferences ->
+        preferences
+          .withTransit(transit ->
+            transit.withDefaultBoardSlackSec(120).withDefaultAlightSlackSec(90)
+          )
+          .withWalk(walk -> walk.withSpeed(1.0).withReluctance(5.0))
+          .withStreet(street ->
+            street.withAccessEgress(accessEgress ->
+              accessEgress.withMaxDuration(Duration.ofMinutes(12), Map.of())
+            )
+          )
+      )
+      .buildDefault();
+
+    var rebuilt = ItineraryReferenceMapper.toRouteRequest(reference, currentDefault);
+
+    var preferences = rebuilt.preferences();
+    assertEquals(reference.from(), rebuilt.from());
+    assertEquals(reference.to(), rebuilt.to());
+    assertTrue(rebuilt.journey().wheelchair());
+    assertEquals(Duration.ofSeconds(60), preferences.transit().boardSlack().defaultValue());
+    assertEquals(Duration.ofSeconds(30), preferences.transit().alightSlack().defaultValue());
+    assertEquals(2.5, preferences.walk().speed());
+    assertEquals(3.0, preferences.walk().reluctance());
+    assertEquals(
+      Duration.ofMinutes(12),
+      preferences.street().accessEgress().maxDuration().defaultValue()
     );
   }
 
@@ -269,7 +317,7 @@ class ItineraryReferenceMapperTest {
         routeRequest
       )
     );
-    assertThat(e.getMessage()).isEqualTo("Could not calculate access");
+    assertEquals("Could not calculate access", e.getMessage());
   }
 
   /**
@@ -369,8 +417,8 @@ class ItineraryReferenceMapperTest {
       RouteRequest.defaultValue()
     );
 
-    assertThat(routeRequest.from()).isEqualTo(reference.from());
-    assertThat(routeRequest.to()).isEqualTo(reference.to());
+    assertEquals(reference.from(), routeRequest.from());
+    assertEquals(reference.to(), routeRequest.to());
   }
 
   /**
@@ -398,21 +446,10 @@ class ItineraryReferenceMapperTest {
       RouteRequest.defaultValue()
     );
 
-    assertThat(routeRequest.from()).isEqualTo(GenericLocation.fromStopId(STOP_A.getId()));
-    assertThat(routeRequest.to()).isEqualTo(GenericLocation.fromStopId(STOP_B.getId()));
+    assertEquals(GenericLocation.fromStopId(STOP_A.getId()), routeRequest.from());
+    assertEquals(GenericLocation.fromStopId(STOP_B.getId()), routeRequest.to());
   }
 
-  /**
-   * Legs without a {@link org.opentripplanner.model.plan.legreference.LegReference} that are not
-   * street legs (flex, carpool) must make the itinerary unsupported rather than being silently
-   * dropped from the transit spine - a partially-encoded id would refetch a different trip.
-   */
-  /**
-   * A {@link org.opentripplanner.model.plan.leg.FrequencyTransitLeg} is a
-   * {@code ScheduledTransitLeg} and so passes the supported-leg-reference check, but frequency
-   * trips are not in the timetable's trip-times index, so the leg could never be looked up again
-   * on refetch. Such an itinerary must not get an id at all.
-   */
   /**
    * Only walk preferences are encoded, so a refetch with non-walk access, egress or transfer would
    * silently use the server's default bike/car preferences and could differ from the original
@@ -447,6 +484,12 @@ class ItineraryReferenceMapperTest {
     );
   }
 
+  /**
+   * A {@link org.opentripplanner.model.plan.leg.FrequencyTransitLeg} is a
+   * {@code ScheduledTransitLeg} and so passes the supported-leg-reference check, but frequency
+   * trips are not in the timetable's trip-times index, so the leg could never be looked up again
+   * on refetch. Such an itinerary must not get an id at all.
+   */
   @Test
   void frequencyLegIsUnsupported() {
     var itinerary = newItinerary(Place.forStop(STOP_A), 0)
@@ -458,6 +501,11 @@ class ItineraryReferenceMapperTest {
     );
   }
 
+  /**
+   * Legs without a {@link org.opentripplanner.model.plan.legreference.LegReference} that are not
+   * street legs (flex, carpool) must make the itinerary unsupported rather than being silently
+   * dropped from the transit spine - a partially-encoded id would refetch a different trip.
+   */
   @Test
   void nonStreetLegWithoutAReferenceIsUnsupported() {
     var boardPlace = Place.forStop(STOP_A);
@@ -467,6 +515,25 @@ class ItineraryReferenceMapperTest {
       .bus(1, 200, 300, alightPlace)
       .flex(400, 500, alightPlace)
       .build();
+
+    assertThrows(UnsupportedItineraryReferenceException.class, () ->
+      ItineraryReferenceMapper.toItineraryReference(itinerary, routeRequest())
+    );
+  }
+
+  /**
+   * An id with more legs than {@link ItineraryReference#MAX_LEG_REFERENCES} would be rejected when
+   * decoded, so such an itinerary must not get an id at all.
+   */
+  @Test
+  void itineraryWithTooManyTransitLegsIsUnsupported() {
+    var stopA = Place.forStop(STOP_A);
+    var stopB = Place.forStop(STOP_B);
+    var builder = newItinerary(stopA, 0);
+    for (int i = 0; i <= ItineraryReference.MAX_LEG_REFERENCES; i++) {
+      builder.bus(i, i * 100, i * 100 + 50, i % 2 == 0 ? stopB : stopA);
+    }
+    var itinerary = builder.build();
 
     assertThrows(UnsupportedItineraryReferenceException.class, () ->
       ItineraryReferenceMapper.toItineraryReference(itinerary, routeRequest())
