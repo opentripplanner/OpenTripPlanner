@@ -88,6 +88,9 @@ Multi-module Maven project (root `pom.xml` `<modules>`):
   `street/src/main/java/org/opentripplanner/street/` (`model/edge/StreetEdge`,
   `model/vertex/Vertex`, `linking/VertexLinker`, `search/`, `geometry/`) plus the
   `service/vehicleparking` and `service/vehiclerental` domain services
+- **graphql-codegen**: build-time generator for GraphQL API types/data fetcher interfaces; used by
+  `application` in `generate-sources` for the GTFS API (output in `target/`; mappings in
+  `application/src/build/gtfs-graphql-codegen.yml`)
 - **gtfs-realtime-protobuf**: GTFS-RT protocol buffer definitions
 - **application**: main OTP application — `application/src/main/java/org/opentripplanner/`. Key
   packages: `routing`, `transit`, `gtfs`, `netex`, `osm`, `graph_builder`, `apis`, `updater`,
