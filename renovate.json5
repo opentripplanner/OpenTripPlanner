@@ -144,7 +144,7 @@
     },
     {
       "groupName": "GTFS API code generation",
-      "matchFiles": ["application/src/main/java/org/opentripplanner/apis/gtfs/generated/package.json"],
+      "matchPackageNames": ["com.palantir.javapoet:javapoet"],
       "minimumReleaseAge": "4 days",
       "reviewers": ["optionsome", "leonardehrenfried"],
       "schedule": "on the 11th through 12th day of the month"

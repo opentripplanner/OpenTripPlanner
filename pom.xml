@@ -106,6 +106,7 @@
         <module>astar</module>
         <module>container</module>
         <module>core</module>
+        <module>graphql-codegen</module>
         <module>gtfs-realtime-protobuf</module>
         <module>otp-shaded</module>
         <module>raptor</module>
@@ -421,11 +422,6 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.15</version>
-                <configuration>
-                    <excludes>
-                        <exclude>org/opentripplanner/apis/gtfs/generated/**</exclude>
-                    </excludes>
-                </configuration>
             </plugin>
             <plugin>
                 <!-- Get current Git commit information for use in MavenVersion class.
@@ -467,8 +463,6 @@
                     </activeRecipes>
                     <exclusions>
                         <exclusion>**/package-info-template.java</exclusion>
-                        <!-- Generated GraphQL code for the GTFS API -->
-                        <exclusion>**/apis/gtfs/generated/**</exclusion>
                     </exclusions>
                     <sizeThresholdMb>0</sizeThresholdMb>
                     <runPerSubmodule>true</runPerSubmodule>
@@ -583,6 +577,12 @@
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>33.7.2-jre</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.graphql-java</groupId>
+                <artifactId>graphql-java</artifactId>
+                <version>26.1</version>
             </dependency>
 
             <!--

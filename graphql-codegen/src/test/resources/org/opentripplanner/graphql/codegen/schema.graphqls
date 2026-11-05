@@ -1,0 +1,45 @@
+"A thing that can be found"
+interface Node {
+  id: ID!
+}
+
+union StopOrStation = Stop | Station
+
+enum Mode {
+  BUS
+  CABLE_CAR
+}
+
+input FilterInput {
+  modes: [Mode]
+  name: String
+}
+
+input Nested {
+  filter: FilterInput
+}
+
+"A stop"
+type Stop implements Node {
+  id: ID!
+  "The name of the stop"
+  name: String
+  routes(modes: [Mode], filter: FilterInput, first: Int = 10): [Route]
+}
+
+type Station implements Node {
+  id: ID!
+}
+
+type Route {
+  mode: Mode
+}
+
+type QueryType {
+  node(id: ID!): Node
+  stop(id: String!): Stop
+}
+
+schema {
+  query: QueryType
+}
