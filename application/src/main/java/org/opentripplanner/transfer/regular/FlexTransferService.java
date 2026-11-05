@@ -9,7 +9,7 @@ import org.opentripplanner.transit.model.site.StopLocation;
  * point in time, which is not affected by ongoing transfer updates, allowing results to remain
  * stable over the course of a request.
  */
-public interface RegularTransferService {
+public interface FlexTransferService {
   /**
    * @param fromStop {@code StopLocation} that is set as a from-stop
    * @return all {@code PathTransfer}s with the specified {@code StopLocation} as a from-stop

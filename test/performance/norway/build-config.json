@@ -18,6 +18,10 @@
   "boardingLocations": {
     "refTags": []
   },
+  "transfers": {
+    "walk": {},
+    "car": {}
+  },
   "transitModelTimeZone": "Europe/Oslo",
   "osmDefaults": {
     "osmTagMapping": "norway",

@@ -18,6 +18,7 @@ import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.plan.legreference.ScheduledTransitLegReference;
+import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.routing.algorithm.mapping.StreetPathToLegsMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.via.ViaLocation;
@@ -39,11 +40,11 @@ import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.streetadapter.StreetSearchRequestMapper;
 import org.opentripplanner.transfer.constrained.ConstrainedTransferService;
 import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
-import org.opentripplanner.transfer.regular.RegularTransferService;
-import org.opentripplanner.transfer.regular.model.PathTransfer;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.transit.service.TransitServiceResolver;
+import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
+import org.opentripplanner.transit.transfer.regular.api.RegularTransfersService;
 import org.opentripplanner.utils.collection.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +56,7 @@ public class RefetchItineraryService {
   private final TransitService transitService;
   private final TransitAlertService transitAlertService;
   private final ConstrainedTransferService constrainedTransferService;
-  private final RegularTransferService transferService;
+  private final RegularTransferRepositorySnapshot<NearbyStop, RouteRequest> regularTransfers;
   private final Graph graph;
   private final LinkingContextFactory linkingContextFactory;
   private final StreetPathToLegsMapper streetPathToLegsMapper;
@@ -65,7 +66,7 @@ public class RefetchItineraryService {
     Graph graph,
     TransitService transitService,
     TransitAlertService transitAlertService,
-    RegularTransferService transferService,
+    RegularTransferRepositorySnapshot<NearbyStop, RouteRequest> regularTransfers,
     StreetDetailsService streetDetailsService,
     LinkingContextFactory linkingContextFactory,
     StreetLimitationParametersService streetLimitationParametersService
@@ -73,7 +74,7 @@ public class RefetchItineraryService {
     this.constrainedTransferService = transitService.getConstrainedTransferService();
     this.transitService = transitService;
     this.transitAlertService = transitAlertService;
-    this.transferService = transferService;
+    this.regularTransfers = regularTransfers;
     this.linkingContextFactory = linkingContextFactory;
     this.graph = graph;
     this.streetPathToLegsMapper = new StreetPathToLegsMapper(
@@ -180,6 +181,7 @@ public class RefetchItineraryService {
     RouteRequest routeRequest
   ) {
     var transferRequest = StreetSearchRequestMapper.mapToTransferRequest(routeRequest).build();
+    var transfers = regularTransfers.forRequest(routeRequest);
 
     var legs = new ArrayList<Leg>();
     if (fromVertices != null) {
@@ -245,7 +247,12 @@ public class RefetchItineraryService {
           .withStartTime(transferStartTime)
           .build();
 
-        var transferLegs = transfer(transferFromStop, transferToStop, request).orElseThrow(() ->
+        var transferLegs = transfer(
+          transfers,
+          transferFromStop,
+          transferToStop,
+          request
+        ).orElseThrow(() ->
           new RefetchItineraryException(
             "Could not transfer from " + transferFromStop.getId() + " to " + transferToStop.getId()
           )
@@ -349,32 +356,20 @@ public class RefetchItineraryService {
       .withTo(toVertices);
   }
 
+  /// The transfer is read from the regular transfers of the request, the same path that the
+  /// router uses for the itinerary.
   private Optional<List<Leg>> transfer(
+    RegularTransfersService<NearbyStop> transfers,
     StopLocation from,
     StopLocation to,
     StreetSearchRequest transferRequest
   ) {
-    var mode = transferRequest.mode();
-    return transferService
-      .findTransfersByStop(from)
-      .stream()
-      .filter(pathTransfer -> pathTransfer.to.equals(to) && pathTransfer.getModes().contains(mode))
-      .flatMap(pathTransfer -> mapPathTransferStreetPath(pathTransfer, transferRequest).stream())
-      .min(Comparator.comparing(StreetPath::weight))
-      .map(this::streetPathToLegs);
-  }
-
-  private Optional<StreetPath> mapPathTransferStreetPath(
-    PathTransfer pathTransfer,
-    StreetSearchRequest request
-  ) {
-    var edges = pathTransfer.getEdges();
-    if (CollectionUtils.isEmpty(edges)) {
+    var path = transfers.findPath(from.getIndex(), to.getIndex());
+    if (path == null || CollectionUtils.isEmpty(path.edges())) {
       // We don't support straight line transfers currently.
       return Optional.empty();
     }
-
-    return EdgeTraverser.createPath(pathTransfer.getEdges(), request);
+    return EdgeTraverser.createPath(path.edges(), transferRequest).map(this::streetPathToLegs);
   }
 
   private List<Leg> streetPathToLegs(StreetPath path) {

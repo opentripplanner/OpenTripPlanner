@@ -2,7 +2,6 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 
 import java.time.Duration;
 import java.util.List;
-import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
 
 public class TransitTuningParametersTestFactory {
@@ -54,11 +53,6 @@ public class TransitTuningParametersTestFactory {
       @Override
       public List<Duration> pagingSearchWindowAdjustments() {
         return PAGING_SEARCH_WINDOW_ADJUSTMENTS;
-      }
-
-      @Override
-      public List<RouteRequest> transferCacheRequests() {
-        return List.of();
       }
     };
   }
