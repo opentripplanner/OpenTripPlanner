@@ -3,7 +3,7 @@ package org.opentripplanner.model.plan.itineraryreference;
 import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.street.model.StreetMode;

@@ -2,7 +2,7 @@ package org.opentripplanner.ext.empiricaldelay.configure;
 
 import dagger.Module;
 import dagger.Provides;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayRepository;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayService;
 import org.opentripplanner.ext.empiricaldelay.internal.DefaultEmpiricalDelayService;

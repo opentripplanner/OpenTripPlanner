@@ -4,7 +4,7 @@ import dagger.BindsInstance;
 import dagger.Component;
 import graphql.schema.GraphQLSchema;
 import jakarta.inject.Singleton;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.apis.gtfs.configure.GtfsSchema;
 import org.opentripplanner.apis.gtfs.configure.GtfsSchemaModule;
 import org.opentripplanner.apis.transmodel.configure.TransmodelSchema;

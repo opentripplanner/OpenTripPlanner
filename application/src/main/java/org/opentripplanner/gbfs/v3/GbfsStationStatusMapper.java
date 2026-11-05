@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.mobilitydata.gbfs.v3_0.station_status.GBFSStation;
 import org.mobilitydata.gbfs.v3_0.station_status.GBFSVehicleTypesAvailable;
 import org.opentripplanner.gbfs.support.UnknownVehicleTypeFilter;

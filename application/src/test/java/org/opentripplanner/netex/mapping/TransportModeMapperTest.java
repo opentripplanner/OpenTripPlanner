@@ -1,6 +1,11 @@
 package org.opentripplanner.netex.mapping;
 
 import static java.util.Map.entry;
+import static org.entur.netex2.model.WaterSubmodeEnumeration.HIGH_SPEED_VEHICLE_SERVICE;
+import static org.entur.netex2.model.WaterSubmodeEnumeration.LOCAL_CAR_FERRY;
+import static org.entur.netex2.model.WaterSubmodeEnumeration.NATIONAL_CAR_FERRY;
+import static org.entur.netex2.model.WaterSubmodeEnumeration.POST_BOAT;
+import static org.entur.netex2.model.WaterSubmodeEnumeration.REGIONAL_CAR_FERRY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -8,15 +13,23 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.opentripplanner.transit.model.network.CarAccess.ALLOWED;
 import static org.opentripplanner.transit.model.network.CarAccess.NOT_ALLOWED;
-import static org.rutebanken.netex.model.WaterSubmodeEnumeration.HIGH_SPEED_VEHICLE_SERVICE;
-import static org.rutebanken.netex.model.WaterSubmodeEnumeration.LOCAL_CAR_FERRY;
-import static org.rutebanken.netex.model.WaterSubmodeEnumeration.NATIONAL_CAR_FERRY;
-import static org.rutebanken.netex.model.WaterSubmodeEnumeration.POST_BOAT;
-import static org.rutebanken.netex.model.WaterSubmodeEnumeration.REGIONAL_CAR_FERRY;
 
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import org.entur.netex2.model.AirSubmodeEnumeration;
+import org.entur.netex2.model.AllPublicTransportModesEnumeration;
+import org.entur.netex2.model.BusSubmodeEnumeration;
+import org.entur.netex2.model.CoachSubmodeEnumeration;
+import org.entur.netex2.model.FunicularSubmodeEnumeration;
+import org.entur.netex2.model.MetroSubmodeEnumeration;
+import org.entur.netex2.model.RailSubmodeEnumeration;
+import org.entur.netex2.model.SnowAndIceSubmodeEnumeration;
+import org.entur.netex2.model.TaxiSubmodeEnumeration;
+import org.entur.netex2.model.TelecabinSubmodeEnumeration;
+import org.entur.netex2.model.TramSubmodeEnumeration;
+import org.entur.netex2.model.TransportSubmodeStructure;
+import org.entur.netex2.model.WaterSubmodeEnumeration;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -24,89 +37,77 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.netex.mapping.TransportModeMapper.UnsupportedModeException;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.rutebanken.netex.model.AirSubmodeEnumeration;
-import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
-import org.rutebanken.netex.model.BusSubmodeEnumeration;
-import org.rutebanken.netex.model.CoachSubmodeEnumeration;
-import org.rutebanken.netex.model.FunicularSubmodeEnumeration;
-import org.rutebanken.netex.model.MetroSubmodeEnumeration;
-import org.rutebanken.netex.model.RailSubmodeEnumeration;
-import org.rutebanken.netex.model.SnowAndIceSubmodeEnumeration;
-import org.rutebanken.netex.model.TaxiSubmodeEnumeration;
-import org.rutebanken.netex.model.TelecabinSubmodeEnumeration;
-import org.rutebanken.netex.model.TramSubmodeEnumeration;
-import org.rutebanken.netex.model.TransportSubmodeStructure;
-import org.rutebanken.netex.model.WaterSubmodeEnumeration;
 
 class TransportModeMapperTest {
 
   private static final Map<
-    AllVehicleModesOfTransportEnumeration,
+    AllPublicTransportModesEnumeration,
     TransportSubmodeStructure
   > VALID_SUBMODE_STRUCTURES = Map.ofEntries(
     entry(
-      AllVehicleModesOfTransportEnumeration.AIR,
+      AllPublicTransportModesEnumeration.AIR,
       new TransportSubmodeStructure().withAirSubmode(AirSubmodeEnumeration.DOMESTIC_FLIGHT)
     ),
     entry(
-      AllVehicleModesOfTransportEnumeration.BUS,
+      AllPublicTransportModesEnumeration.BUS,
       new TransportSubmodeStructure().withBusSubmode(BusSubmodeEnumeration.LOCAL_BUS)
     ),
     entry(
-      AllVehicleModesOfTransportEnumeration.CABLEWAY,
+      AllPublicTransportModesEnumeration.CABLEWAY,
       new TransportSubmodeStructure().withTelecabinSubmode(TelecabinSubmodeEnumeration.TELECABIN)
     ),
     entry(
-      AllVehicleModesOfTransportEnumeration.COACH,
+      AllPublicTransportModesEnumeration.COACH,
       new TransportSubmodeStructure().withCoachSubmode(CoachSubmodeEnumeration.NATIONAL_COACH)
     ),
     entry(
-      AllVehicleModesOfTransportEnumeration.FUNICULAR,
+      AllPublicTransportModesEnumeration.FUNICULAR,
       new TransportSubmodeStructure().withFunicularSubmode(FunicularSubmodeEnumeration.FUNICULAR)
     ),
     entry(
-      AllVehicleModesOfTransportEnumeration.METRO,
+      AllPublicTransportModesEnumeration.METRO,
       new TransportSubmodeStructure().withMetroSubmode(MetroSubmodeEnumeration.METRO)
     ),
     entry(
-      AllVehicleModesOfTransportEnumeration.RAIL,
+      AllPublicTransportModesEnumeration.RAIL,
       new TransportSubmodeStructure().withRailSubmode(RailSubmodeEnumeration.LONG_DISTANCE)
     ),
     entry(
-      AllVehicleModesOfTransportEnumeration.SNOW_AND_ICE,
+      AllPublicTransportModesEnumeration.SNOW_AND_ICE,
       new TransportSubmodeStructure().withSnowAndIceSubmode(SnowAndIceSubmodeEnumeration.SNOW_COACH)
     ),
     entry(
-      AllVehicleModesOfTransportEnumeration.TAXI,
+      AllPublicTransportModesEnumeration.TAXI,
       new TransportSubmodeStructure().withTaxiSubmode(TaxiSubmodeEnumeration.COMMUNAL_TAXI)
     ),
     entry(
-      AllVehicleModesOfTransportEnumeration.TRAM,
+      AllPublicTransportModesEnumeration.TRAM,
       new TransportSubmodeStructure().withTramSubmode(TramSubmodeEnumeration.CITY_TRAM)
     ),
     entry(
-      AllVehicleModesOfTransportEnumeration.WATER,
+      AllPublicTransportModesEnumeration.WATER,
       new TransportSubmodeStructure().withWaterSubmode(
         WaterSubmodeEnumeration.INTERNATIONAL_PASSENGER_FERRY
       )
     )
   );
 
-  private static final EnumSet<AllVehicleModesOfTransportEnumeration> SUPPORTED_MODES =
-    EnumSet.copyOf(VALID_SUBMODE_STRUCTURES.keySet());
+  private static final EnumSet<AllPublicTransportModesEnumeration> SUPPORTED_MODES = EnumSet.copyOf(
+    VALID_SUBMODE_STRUCTURES.keySet()
+  );
 
   private final TransportModeMapper transportModeMapper = new TransportModeMapper();
 
   @Test
   void mapWithTransportModeOnly() throws UnsupportedModeException {
-    var transitMode = transportModeMapper.map(AllVehicleModesOfTransportEnumeration.BUS, null);
+    var transitMode = transportModeMapper.map(AllPublicTransportModesEnumeration.BUS, null);
     assertEquals(TransitMode.BUS, transitMode.mainMode());
     assertNull(transitMode.subMode());
   }
 
   @Test
   void mapCableway() throws UnsupportedModeException {
-    var transitMode = transportModeMapper.map(AllVehicleModesOfTransportEnumeration.CABLEWAY, null);
+    var transitMode = transportModeMapper.map(AllPublicTransportModesEnumeration.CABLEWAY, null);
     assertEquals(TransitMode.GONDOLA, transitMode.mainMode());
     assertNull(transitMode.subMode());
   }
@@ -114,8 +115,8 @@ class TransportModeMapperTest {
   @Test
   void mapWithSubMode() throws UnsupportedModeException {
     var transitMode = transportModeMapper.map(
-      AllVehicleModesOfTransportEnumeration.RAIL,
-      VALID_SUBMODE_STRUCTURES.get(AllVehicleModesOfTransportEnumeration.RAIL)
+      AllPublicTransportModesEnumeration.RAIL,
+      VALID_SUBMODE_STRUCTURES.get(AllPublicTransportModesEnumeration.RAIL)
     );
     assertEquals(TransitMode.RAIL, transitMode.mainMode());
     assertEquals("longDistance", transitMode.subMode());
@@ -124,7 +125,7 @@ class TransportModeMapperTest {
   @ParameterizedTest(name = "[{index}] {0}")
   @MethodSource("createSubModeTestCases")
   void acceptAllValidSubModes(
-    AllVehicleModesOfTransportEnumeration mode,
+    AllPublicTransportModesEnumeration mode,
     TransportSubmodeStructure submodeStructure
   ) throws UnsupportedModeException {
     assertNotNull(transportModeMapper.map(mode, submodeStructure));
@@ -133,7 +134,7 @@ class TransportModeMapperTest {
   @Test
   void checkSubModePrecedenceOverMainMode() throws UnsupportedModeException {
     var transitMode = transportModeMapper.map(
-      AllVehicleModesOfTransportEnumeration.BUS,
+      AllPublicTransportModesEnumeration.BUS,
       new TransportSubmodeStructure().withWaterSubmode(
         WaterSubmodeEnumeration.INTERNATIONAL_PASSENGER_FERRY
       )

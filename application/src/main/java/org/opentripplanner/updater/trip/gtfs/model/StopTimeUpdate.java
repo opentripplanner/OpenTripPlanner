@@ -6,7 +6,7 @@ import de.mfdz.MfdzRealtimeExtensions;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.gtfs.mapping.PickDropMapper;
 import org.opentripplanner.model.PickDrop;
@@ -176,8 +176,8 @@ public final class StopTimeUpdate {
   }
 
   private PickDrop getEffectivePickDrop(
-    @Nullable GtfsRealtime.TripUpdate.StopTimeUpdate.StopTimeProperties.DropOffPickupType dropOffPickupType,
-    @Nullable MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupType extensionDropOffPickup
+    GtfsRealtime.TripUpdate.StopTimeUpdate.StopTimeProperties.@Nullable DropOffPickupType dropOffPickupType,
+    MfdzRealtimeExtensions.StopTimePropertiesExtension.@Nullable DropOffPickupType extensionDropOffPickup
   ) {
     if (isSkipped()) {
       return PickDrop.CANCELLED;

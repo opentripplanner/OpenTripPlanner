@@ -3,13 +3,13 @@ package org.opentripplanner.netex.loader.parser;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import jakarta.xml.bind.JAXBElement;
+import org.entur.netex2.model.Authority;
+import org.entur.netex2.model.DataManagedObjectStructure;
+import org.entur.netex2.model.ObjectFactory;
+import org.entur.netex2.model.ResourceFrame;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.netex.index.NetexEntityIndex;
-import org.rutebanken.netex.model.Authority;
-import org.rutebanken.netex.model.DataManagedObjectStructure;
-import org.rutebanken.netex.model.ObjectFactory;
-import org.rutebanken.netex.model.ResourceFrame;
 
 class ResourceFrameParserTest {
 
@@ -32,7 +32,7 @@ class ResourceFrameParserTest {
       new Authority()
     );
     resourceFrame.setOrganisations(objectFactory.createOrganisationsInFrame_RelStructure());
-    resourceFrame.getOrganisations().getOrganisation_().add(organisation);
+    resourceFrame.getOrganisations().getOrganisation().add(organisation);
     resourceFrameParser.parse(resourceFrame);
     resourceFrameParser.setResultOnIndex(netexEntityIndex);
     assertEquals(1, netexEntityIndex.authoritiesById.size());

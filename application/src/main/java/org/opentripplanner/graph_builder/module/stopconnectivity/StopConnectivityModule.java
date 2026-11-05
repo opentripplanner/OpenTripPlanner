@@ -3,7 +3,7 @@ package org.opentripplanner.graph_builder.module.stopconnectivity;
 import java.time.Duration;
 import java.util.Objects;
 import java.util.function.IntSupplier;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.astar.strategy.DurationTerminationStrategy;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.IsolatedStop;

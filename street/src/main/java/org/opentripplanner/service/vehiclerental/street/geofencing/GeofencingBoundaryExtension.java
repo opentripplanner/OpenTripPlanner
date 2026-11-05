@@ -3,7 +3,7 @@ package org.opentripplanner.service.vehiclerental.street.geofencing;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 
 /**

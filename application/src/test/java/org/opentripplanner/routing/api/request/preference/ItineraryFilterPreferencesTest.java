@@ -6,8 +6,8 @@ import static org.opentripplanner.routing.api.request.preference.ImmutablePrefer
 
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.basic.CostLinearFunction;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
-import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 
 class ItineraryFilterPreferencesTest {
 
