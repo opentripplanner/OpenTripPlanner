@@ -460,14 +460,6 @@ public class TransmodelGraphQLSchemaFactory {
       locationInputType
     );
 
-    GraphQLFieldDefinition refetchTripPatternQuery =
-      tripPatternByLegIdsQueryFactory.createRefetchTripPattern(
-        routing,
-        tripPatternType,
-        durationPerStreetModeInput,
-        locationInputType
-      );
-
     GraphQLOutputType viaTripType = ViaTripType.create(tripPatternType, routingErrorType);
     GraphQLInputObjectType viaLocationInputType = ViaLocationInputType.create();
     GraphQLInputObjectType viaSegmentInputType = ViaSegmentInputType.create();
@@ -524,7 +516,6 @@ public class TransmodelGraphQLSchemaFactory {
       .name("QueryType")
       .field(tripQuery)
       .field(tripPatternByLegIdsQuery)
-      .field(refetchTripPatternQuery)
       .field(viaTripQuery)
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
