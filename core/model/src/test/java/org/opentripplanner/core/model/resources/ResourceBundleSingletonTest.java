@@ -1,9 +1,11 @@
 package org.opentripplanner.core.model.resources;
 
-import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Locale;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class ResourceBundleSingletonTest {
 
@@ -11,14 +13,22 @@ class ResourceBundleSingletonTest {
 
   @Test
   void translatesToRequestedLocale() {
-    assertThat(ResourceBundleSingleton.INSTANCE.localize(KEY, Locale.GERMAN)).isEqualTo(
-      "unbekannte Strasse"
+    assertEquals(
+      "unbekannte Strasse",
+      ResourceBundleSingleton.INSTANCE.localize(KEY, Locale.GERMAN)
     );
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = { "no", "no-NO", "nb", "nb-NO", "nn", "nn-NO" })
+  void norwegianVariantsUseNorwegianBundle(String languageTag) {
+    var locale = Locale.forLanguageTag(languageTag);
+    assertEquals("gate uten navn", ResourceBundleSingleton.INSTANCE.localize(KEY, locale));
   }
 
   @Test
   void usesRootBundleForNullLocale() {
-    assertThat(ResourceBundleSingleton.INSTANCE.localize(KEY, null)).isEqualTo("unnamed");
+    assertEquals("unnamed", ResourceBundleSingleton.INSTANCE.localize(KEY, null));
   }
 
   @Test
@@ -26,9 +36,7 @@ class ResourceBundleSingletonTest {
     var defaultLocale = Locale.getDefault();
     try {
       Locale.setDefault(Locale.GERMAN);
-      assertThat(ResourceBundleSingleton.INSTANCE.localize(KEY, Locale.CHINESE)).isEqualTo(
-        "unnamed"
-      );
+      assertEquals("unnamed", ResourceBundleSingleton.INSTANCE.localize(KEY, Locale.CHINESE));
     } finally {
       Locale.setDefault(defaultLocale);
     }

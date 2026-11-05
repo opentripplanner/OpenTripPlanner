@@ -11,6 +11,10 @@ import java.util.Set;
 public enum ResourceBundleSingleton {
   INSTANCE;
 
+  private static final ResourceBundle.Control CONTROL = ResourceBundle.Control.getControl(
+    ResourceBundle.Control.FORMAT_PROPERTIES
+  );
+
   private static final Set<String> INTERNAL_KEYS = ResourceBundle.getBundle("internals").keySet();
 
   //in singleton because resurce bundles are cached based on calling class
@@ -45,11 +49,12 @@ public enum ResourceBundleSingleton {
    */
   private static ResourceBundle getBundleWithoutFallback(String baseName, Locale locale) {
     var bundle = ResourceBundle.getBundle(baseName, locale);
-    var found = bundle.getLocale();
     // The JDK silently picks the default locale's bundle if the requested one does not exist.
-    if (!found.equals(Locale.ROOT) && !found.getLanguage().equals(locale.getLanguage())) {
-      return ResourceBundle.getBundle(baseName, Locale.ROOT);
+    // Accept the bundle only if it is in the JDK's own candidate list for the requested locale
+    // (e.g. nb -> [nb, no, ROOT]).
+    if (CONTROL.getCandidateLocales(baseName, locale).contains(bundle.getLocale())) {
+      return bundle;
     }
-    return bundle;
+    return ResourceBundle.getBundle(baseName, Locale.ROOT);
   }
 }
