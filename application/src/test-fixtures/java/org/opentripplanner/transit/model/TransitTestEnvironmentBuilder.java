@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.RouteBuilder;
@@ -45,7 +44,6 @@ public class TransitTestEnvironmentBuilder {
     return new TransitTestEnvironment(
       transitRepository,
       timetableDataImport.toScheduledTimetableData(),
-      TransferServiceTestFactory.defaultTransferRepository(),
       defaultServiceDate
     );
   }

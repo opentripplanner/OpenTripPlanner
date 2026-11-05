@@ -9,7 +9,10 @@
     "islandWithStopsMaxSize": 5
   },
   "dataImportReport": true,
-  "maxTransferDuration": "1h",
+  "transfers": {
+    "walk": { "maxDuration": "1h" },
+    "via": { "maxDuration": "1h" }
+  },
   "maxStopToShapeSnapDistance": 500,
   "osmDefaults": {
     "osmTagMapping": "norway",

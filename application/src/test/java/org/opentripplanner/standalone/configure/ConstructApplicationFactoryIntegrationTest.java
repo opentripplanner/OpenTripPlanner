@@ -22,8 +22,10 @@ import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.taxi.TaxiRepository;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
+import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
@@ -49,6 +51,9 @@ import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
+import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
+import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 import org.opentripplanner.warmup.WarmupLauncher;
 
 /**
@@ -77,6 +82,15 @@ class ConstructApplicationFactoryIntegrationTest {
       >() {}
     ),
     of(new GenericType<RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository>>() {}),
+    of(new GenericType<RegularTransferBuildRepository<NearbyStop>>() {}),
+    of(
+      new GenericType<
+        RepositoryHandle<
+          RegularTransferRepositorySnapshot<NearbyStop, RouteRequest>,
+          RegularTransferRepository<NearbyStop>
+        >
+      >() {}
+    ),
     of(StreetDetailsRepository.class),
     of(StreetRepository.class),
     of(TransferRepository.class),

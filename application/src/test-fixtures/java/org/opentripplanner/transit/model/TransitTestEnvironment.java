@@ -16,7 +16,6 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.Rapto
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.DefaultTransitDataProviderFilterBuilder;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
@@ -27,6 +26,7 @@ import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.transit.transfer.regular.NoRegularTransfers;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 /**
@@ -59,7 +59,6 @@ public final class TransitTestEnvironment {
   TransitTestEnvironment(
     TransitRepository transitRepository,
     ScheduledTimetableData scheduledTimetableData,
-    TransferRepository transferRepository,
     LocalDate defaultServiceDate
   ) {
     this.transitRepository = transitRepository;
@@ -70,8 +69,7 @@ public final class TransitTestEnvironment {
     var scheduledRaptorData = RaptorTransitDataMapper.map(
       new TestTransitTuningParameters(),
       transitRepository,
-      scheduledTimetableData,
-      transferRepository
+      scheduledTimetableData
     );
     this.transitRepository.initRaptorTransitData(scheduledRaptorData);
 
@@ -219,6 +217,7 @@ public final class TransitTestEnvironment {
     );
     return new RaptorRoutingRequestTransitData(
       transitRepository.getRaptorTransitData(),
+      NoRegularTransfers.service(),
       TransitGroupPriorityService.empty(),
       transitSearchTimeZero,
       0,
