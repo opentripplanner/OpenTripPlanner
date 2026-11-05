@@ -8,6 +8,8 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.itineraryreference.ItineraryReference;
@@ -145,8 +147,8 @@ class ItineraryReferenceMapperTest {
       .copyOf()
       .withJourney(journey ->
         journey
-          .withAccess(new StreetRequest(StreetMode.BIKE))
-          .withEgress(new StreetRequest(StreetMode.CAR))
+          .withAccess(new StreetRequest(StreetMode.WALK))
+          .withEgress(new StreetRequest(StreetMode.WALK))
           .withWheelchair(true)
       )
       .withPreferences(preferences ->
@@ -168,8 +170,8 @@ class ItineraryReferenceMapperTest {
 
     assertThat(reference.from()).isEqualTo(GenericLocation.fromStopId(STOP_A.getId()));
     assertThat(reference.to()).isEqualTo(GenericLocation.fromStopId(STOP_B.getId()));
-    assertThat(reference.accessMode()).isEqualTo(StreetMode.BIKE);
-    assertThat(reference.egressMode()).isEqualTo(StreetMode.CAR);
+    assertThat(reference.accessMode()).isEqualTo(StreetMode.WALK);
+    assertThat(reference.egressMode()).isEqualTo(StreetMode.WALK);
     assertThat(reference.transferMode()).isEqualTo(StreetMode.WALK);
     assertThat(reference.wheelchair()).isTrue();
     assertThat(reference.boardSlack()).isEqualTo(Duration.ofSeconds(60));
@@ -411,6 +413,40 @@ class ItineraryReferenceMapperTest {
    * trips are not in the timetable's trip-times index, so the leg could never be looked up again
    * on refetch. Such an itinerary must not get an id at all.
    */
+  /**
+   * Only walk preferences are encoded, so a refetch with non-walk access, egress or transfer would
+   * silently use the server's default bike/car preferences and could differ from the original
+   * itinerary. Such itineraries get no reference.
+   */
+  @ParameterizedTest
+  @CsvSource({
+    "BIKE, WALK, WALK",
+    "WALK, CAR, WALK",
+    "WALK, WALK, BIKE",
+    "BIKE_RENTAL, WALK, WALK",
+  })
+  void nonWalkStreetModeIsUnsupported(StreetMode access, StreetMode egress, StreetMode transfer) {
+    var itinerary = createRefetchService().refetchItinerary(
+      null,
+      null,
+      List.of(legRef()),
+      routeRequest()
+    );
+    var request = routeRequest()
+      .copyOf()
+      .withJourney(journey ->
+        journey
+          .withAccess(new StreetRequest(access))
+          .withEgress(new StreetRequest(egress))
+          .withTransfer(new StreetRequest(transfer))
+      )
+      .buildRequest();
+
+    assertThrows(UnsupportedItineraryReferenceException.class, () ->
+      ItineraryReferenceMapper.toItineraryReference(itinerary, request)
+    );
+  }
+
   @Test
   void frequencyLegIsUnsupported() {
     var itinerary = newItinerary(Place.forStop(STOP_A), 0)

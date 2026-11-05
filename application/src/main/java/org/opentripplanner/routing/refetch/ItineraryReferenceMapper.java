@@ -11,6 +11,7 @@ import org.opentripplanner.model.plan.legreference.ScheduledTransitLegReference;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.error.RoutingValidationException;
+import org.opentripplanner.street.model.StreetMode;
 
 /**
  * Maps an {@link Itinerary} and its original {@link RouteRequest} to a stable
@@ -30,8 +31,9 @@ public final class ItineraryReferenceMapper {
    * {@link RouteRequest} that produced it.
    *
    * @throws UnsupportedItineraryReferenceException if {@code itinerary} has no supported transit
-   * leg reference, if any non-street leg has no {@link LegReference} at all, or if
-   * {@code routeRequest}'s {@code from}/{@code to} is an on-board {@code TripLocation}.
+   * leg reference, if any non-street leg has no {@link LegReference} at all, if
+   * {@code routeRequest}'s {@code from}/{@code to} is an on-board {@code TripLocation}, or if its
+   * access, egress or transfer mode is not {@link StreetMode#WALK}.
    */
   public static ItineraryReference toItineraryReference(
     Itinerary itinerary,
@@ -53,6 +55,9 @@ public final class ItineraryReferenceMapper {
 
     requireSupportedLocation(routeRequest.from());
     requireSupportedLocation(routeRequest.to());
+    requireWalkMode(routeRequest.journey().access().mode(), "access");
+    requireWalkMode(routeRequest.journey().egress().mode(), "egress");
+    requireWalkMode(routeRequest.journey().transfer().mode(), "transfer");
 
     var preferences = routeRequest.preferences();
     return new ItineraryReference(
@@ -183,6 +188,20 @@ public final class ItineraryReferenceMapper {
     if (location != null && location.isOnBoard()) {
       throw new UnsupportedItineraryReferenceException(
         "On-board TripLocation is not supported in ItineraryReference: " + location
+      );
+    }
+  }
+
+  /**
+   * Only walk preferences are encoded, so refetching a non-walk street leg would silently use the
+   * server's default bike, car or scooter preferences and could return a different itinerary than
+   * the one originally planned. Such itineraries get no reference until those preferences are
+   * encoded too.
+   */
+  private static void requireWalkMode(StreetMode mode, String subject) {
+    if (mode != StreetMode.WALK) {
+      throw new UnsupportedItineraryReferenceException(
+        "Only walk " + subject + " is supported in ItineraryReference: " + mode
       );
     }
   }

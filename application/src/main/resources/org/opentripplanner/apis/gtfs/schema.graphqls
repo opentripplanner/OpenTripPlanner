@@ -831,11 +831,10 @@ type Itinerary {
   An opaque, versioned identifier for this itinerary. It can be used to refetch this exact
   itinerary later (with current realtime data applied) using the `itinerary` query, without
   resending the original search parameters. `null` if this itinerary cannot currently be
-  refetched (for example, if it contains no scheduled transit legs, or if it uses a
-  frequency-based trip). Only walk preferences are part of the identifier, so an itinerary
-  that reaches transit by bicycle, car or scooter refetches its access and egress with the
-  server's default preferences for those modes, and those legs may differ from the original.
-  We do not recommend storing ids for a long time.
+  refetched (for example, if it contains no scheduled transit legs, uses a frequency-based
+  trip, or uses bicycle, car or scooter for access, egress or transfers). The routing
+  preferences stored in the id are the ones in effect when the itinerary was planned. We do not
+  recommend storing ids for a long time.
   """
   id: String
   """
