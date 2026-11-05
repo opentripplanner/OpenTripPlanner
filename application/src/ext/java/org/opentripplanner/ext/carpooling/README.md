@@ -99,7 +99,6 @@ org.opentripplanner.ext.carpooling/
 │   └── SiriETCarpoolingUpdater.java  # SIRI-ET message processing
 │
 ├── util/                            # Utilities
-│   └── BeelineEstimator.java       # Straight-line distance estimation
 │
 └── configure/                       # Dependency injection
     └── CarpoolingModule.java       # Dagger module

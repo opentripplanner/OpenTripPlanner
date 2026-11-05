@@ -34,7 +34,6 @@ org.opentripplanner.ext.carpooling/
 │   ├── CorridorTripFilter   # Pre-filter: the trip's corridor reaches the passenger
 │   └── TimeItineraryFilter  # Post-filter: tight time-window enforcement
 ├── util/                     # Utilities
-│   └── BeelineEstimator     # Fast travel time estimates
 ├── updater/                  # Real-time updates
 │   ├── SiriETCarpoolingUpdater # SIRI-ET integration
 │   └── CarpoolSiriMapper    # Maps SIRI to domain model

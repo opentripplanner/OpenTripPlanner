@@ -19,8 +19,8 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.model.CarpoolStop;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.ext.carpooling.model.CarpoolTripBuilder;
-import org.opentripplanner.ext.carpooling.util.BeelineEstimator;
 import org.opentripplanner.ext.carpooling.util.BookingUrlTemplate;
+import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.StreetConstants;
 import org.opentripplanner.transit.model.organization.ContactInfo;
@@ -238,21 +238,16 @@ public class CarpoolSiriMapper {
 
   /**
    * Lower bound on the time needed to drive the trip's waypoints in order, summing the straight-
-   * line distance between consecutive stops at {@link StreetConstants#DEFAULT_MAX_CAR_SPEED}. No
-   * street route is shorter than the beeline and no car drives faster than the modelled maximum, so
-   * the real drive can only take longer; a value above the maximum trip duration therefore proves
-   * the trip cannot be driven within the cap whatever its claimed timetable says, with no risk of
-   * rejecting a trip that actually could.
+   * line distance between consecutive stops at {@link StreetConstants#DEFAULT_MAX_CAR_SPEED}.
    */
   private static Duration minimumDriveDuration(List<CarpoolStop> stops) {
-    var estimator = new BeelineEstimator();
-    var total = Duration.ZERO;
+    double meters = 0;
     for (int i = 1; i < stops.size(); i++) {
-      total = total.plus(
-        estimator.estimateDuration(stops.get(i - 1).getCoordinate(), stops.get(i).getCoordinate())
-      );
+      var from = stops.get(i - 1).getCoordinate();
+      var to = stops.get(i).getCoordinate();
+      meters += SphericalDistanceLibrary.fastDistance(from.asJtsCoordinate(), to.asJtsCoordinate());
     }
-    return total;
+    return Duration.ofSeconds((long) (meters / StreetConstants.DEFAULT_MAX_CAR_SPEED));
   }
 
   /**

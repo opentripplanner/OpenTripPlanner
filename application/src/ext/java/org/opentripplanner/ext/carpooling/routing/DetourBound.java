@@ -1,7 +1,5 @@
 package org.opentripplanner.ext.carpooling.routing;
 
-import static org.opentripplanner.ext.carpooling.util.BeelineEstimator.minDriveSeconds;
-
 import java.time.Duration;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
@@ -105,16 +103,21 @@ final class DetourBound {
   }
 
   private double leastDriveFromStart(Vertex point) {
-    return minDriveSeconds(
-      start.getLat(),
-      start.getLon(),
-      point.getLat(),
-      point.getLon(),
-      maxCarSpeed
-    );
+    return leastDrive(start, point);
   }
 
   private double leastDriveToEnd(Vertex point) {
-    return minDriveSeconds(point.getLat(), point.getLon(), end.getLat(), end.getLon(), maxCarSpeed);
+    return leastDrive(point, end);
+  }
+
+  /** The beeline between the vertices, driven at the fastest car speed in the graph. */
+  private double leastDrive(Vertex from, Vertex to) {
+    double meters = SphericalDistanceLibrary.fastDistance(
+      from.getLat(),
+      from.getLon(),
+      to.getLat(),
+      to.getLon()
+    );
+    return meters / maxCarSpeed;
   }
 }
