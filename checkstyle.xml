@@ -30,7 +30,8 @@
                      value="Everything not annotated with @Nullable is assumed to be non-null."/>
         </module>
         <module name="IllegalImport">
-            <property name="illegalClasses" value="org.mockito.*"/>
+            <property name="id" value="NoMockito"/>
+            <property name="illegalPkgs" value="org.mockito"/>
             <message key="import.illegal"
                      value="Use of mockito is highly discouraged."/>
         </module>
