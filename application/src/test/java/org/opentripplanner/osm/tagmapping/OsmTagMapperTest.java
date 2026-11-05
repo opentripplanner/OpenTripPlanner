@@ -133,25 +133,25 @@ class OsmTagMapperTest {
 
   @Test
   void bicycleSafetyOfRoundaboutOnSmallStreet() {
-    assertEquals(1, roundaboutSafetyFactor("residential"), EPSILON);
-    assertEquals(1, roundaboutSafetyFactor("living_street"), EPSILON);
-    assertEquals(1, roundaboutSafetyFactor("residential_link"), EPSILON);
-    assertEquals(1, roundaboutSafetyFactor("unclassified"), EPSILON);
-    assertEquals(1, roundaboutSafetyFactor("residential", "lanes", "1"), EPSILON);
+    assertEquals(0.9, roundaboutSafetyFactor("residential"), EPSILON);
+    assertEquals(0.9, roundaboutSafetyFactor("living_street"), EPSILON);
+    assertEquals(0.9, roundaboutSafetyFactor("residential_link"), EPSILON);
+    assertEquals(0.9, roundaboutSafetyFactor("unclassified"), EPSILON);
+    assertEquals(0.9, roundaboutSafetyFactor("residential", "lanes", "1"), EPSILON);
   }
 
   @Test
   void bicycleSafetyOfRoundaboutOnLargeRoad() {
-    assertEquals(1, roundaboutSafetyFactor("secondary"), EPSILON);
-    assertEquals(1, roundaboutSafetyFactor("primary"), EPSILON);
-    assertEquals(1, roundaboutSafetyFactor("trunk"), EPSILON);
-    assertEquals(1, roundaboutSafetyFactor("secondary", "lanes", "1"), EPSILON);
+    assertEquals(1.5, roundaboutSafetyFactor("secondary"), EPSILON);
+    assertEquals(1.5, roundaboutSafetyFactor("primary"), EPSILON);
+    assertEquals(1.5, roundaboutSafetyFactor("trunk"), EPSILON);
+    assertEquals(1.5, roundaboutSafetyFactor("secondary", "lanes", "1"), EPSILON);
   }
 
   @Test
   void bicycleSafetyOfMultiLaneRoundabout() {
-    assertEquals(1, roundaboutSafetyFactor("residential", "lanes", "2"), EPSILON);
-    assertEquals(1, roundaboutSafetyFactor("tertiary", "lanes", "2"), EPSILON);
+    assertEquals(1.5, roundaboutSafetyFactor("residential", "lanes", "2"), EPSILON);
+    assertEquals(1.5, roundaboutSafetyFactor("tertiary", "lanes", "2"), EPSILON);
   }
 
   @Test
@@ -162,7 +162,7 @@ class OsmTagMapperTest {
 
   @Test
   void bicycleSafetyOfMultiLaneRoundaboutOnLargeRoad() {
-    assertEquals(1, roundaboutSafetyFactor("secondary", "lanes", "2"), EPSILON);
+    assertEquals(1.5, roundaboutSafetyFactor("secondary", "lanes", "2"), EPSILON);
   }
 
   /** Bicycle safety of a roundabout, relative to the same street without the roundabout tag. */
