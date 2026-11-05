@@ -1033,8 +1033,13 @@ public class StreetEdge
     double time, weight;
     if (wheelchair) {
       time = getEffectiveWalkDistance() / speed;
+      // Use walk safety with the bike slope model.
+      double effectiveDistance = getEffectiveBikeDistance();
+      double safetyDistance = getWalkSafetyFactor() * effectiveDistance;
       weight =
-        (getEffectiveBikeDistance() / speed) *
+        ((safetyDistance * request.walk().safetyFactor() +
+          effectiveDistance * (1 - request.walk().safetyFactor())) /
+          speed) *
         StreetEdgeReluctanceCalculator.computeWheelchairReluctance(
           request,
           getMaxSlope(),
