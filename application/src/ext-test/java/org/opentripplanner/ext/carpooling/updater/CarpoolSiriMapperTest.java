@@ -306,6 +306,16 @@ public class CarpoolSiriMapperTest {
     assertEquals(Duration.ofMinutes(10), mapped.stops().get(2).getDeviationBudget());
   }
 
+  @Test
+  void mapSiriToCarpoolTrip_laterStopWithSmallerBudget_capsTheEarlierBudget() {
+    // The intermediate stop has 10 min slack, the last stop 3 min.
+    var mapped = mapper.mapSiriToCarpoolTrip(
+      journeyWithPerStopLatestExpectedArrivalTimes(20, 30, 45, 48)
+    );
+    assertEquals(Duration.ofMinutes(3), mapped.stops().get(1).getDeviationBudget());
+    assertEquals(Duration.ofMinutes(3), mapped.stops().get(2).getDeviationBudget());
+  }
+
   // -- publicContact tests --
 
   @Test

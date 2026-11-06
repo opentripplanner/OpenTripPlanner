@@ -15,8 +15,8 @@ import org.opentripplanner.street.model.vertex.Vertex;
  * trip and the static street graph alone, so the corridor holds them.
  *
  * @param legDurations routed driving time of each leg
- * @param legLimits    the most each leg may take once a passenger is inserted, see
- *                     {@link DriverLegLimits}
+ * @param legLimits    the most each leg may take once a passenger is inserted: its duration plus
+ *                     its deviation budget
  * @param stops        the stops a driver can serve, with per-leg driving times
  */
 public record CarpoolCorridor(

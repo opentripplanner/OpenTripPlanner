@@ -115,6 +115,14 @@ public class CarpoolSiriMapper {
       stops.add(stop);
     }
 
+    // A delay before a stop delays every later stop too, so cap each budget by the later ones.
+    for (int i = stops.size() - 2; i >= 0; i--) {
+      var laterBudget = stops.get(i + 1).getDeviationBudget();
+      if (stops.get(i).getDeviationBudget().compareTo(laterBudget) > 0) {
+        stops.set(i, stops.get(i).copy().withDeviationBudget(laterBudget).build());
+      }
+    }
+
     // Extract start/end times from first/last stops
     var firstStop = stops.getFirst();
     var lastStop = stops.getLast();

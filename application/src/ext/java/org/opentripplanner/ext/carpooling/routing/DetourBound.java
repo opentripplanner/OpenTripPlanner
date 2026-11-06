@@ -11,9 +11,9 @@ import org.opentripplanner.street.search.state.State;
 /**
  * The bound on a detour through a point {@code v} on a driver leg from {@code a} to {@code b}: the
  * leg can only pass through {@code v} if {@code t(a→v) + t(v→b)} is at most the leg's limit, see
- * {@link DriverLegLimits}. A side whose drive is not known counts as its fastest possible drive,
- * the beeline at the fastest car speed in the graph, so the bound never rules out a feasible
- * detour.
+ * {@link CarpoolCorridor#legLimits()}. A side whose drive is not known counts as its fastest
+ * possible drive, the beeline at the fastest car speed in the graph, so the bound never rules out a
+ * feasible detour.
  */
 final class DetourBound {
 

@@ -139,11 +139,8 @@ public class InsertionEvaluator {
     private final long[] legSeconds;
     /** The time in seconds the driver stops for each pickup and dropoff. */
     private final long dwell;
-    /**
-     * {@code budgetFrom[stop]}: the smallest deviation budget of the stops from {@code stop} to the
-     * destination, for every stop after the origin.
-     */
-    private final long[] budgetFrom;
+    /** {@code legBudget[leg]}: the leg's deviation budget in seconds. */
+    private final long[] legBudget;
     /**
      * {@code capacityOk[firstLeg][lastLeg]}: one more passenger fits on every leg from
      * {@code firstLeg} to {@code lastLeg}, both included.
@@ -162,12 +159,9 @@ public class InsertionEvaluator {
         legSeconds[leg] = baseline[leg].durationSeconds();
       }
       CarpoolTrip trip = routableTrip.trip();
-      int stopCount = legCount + 1;
-      this.budgetFrom = new long[stopCount];
-      long min = Long.MAX_VALUE;
-      for (int stop = stopCount - 1; stop >= 1; stop--) {
-        min = Math.min(min, trip.stops().get(stop).getDeviationBudget().toSeconds());
-        budgetFrom[stop] = min;
+      this.legBudget = new long[legCount];
+      for (int leg = 0; leg < legCount; leg++) {
+        legBudget[leg] = trip.legDeviationBudget(leg).toSeconds();
       }
       this.capacityOk = new boolean[legCount][legCount];
       for (int firstLeg = 0; firstLeg < legCount; firstLeg++) {
@@ -220,7 +214,7 @@ public class InsertionEvaluator {
               fromDropoff.durationSeconds() -
               legSeconds[pickupLeg] +
               2 * dwell;
-            if (detour > budgetFrom[pickupLeg + 1]) {
+            if (detour > legBudget[pickupLeg]) {
               continue;
             }
           } else {
@@ -233,7 +227,7 @@ public class InsertionEvaluator {
               fromPickup.durationSeconds() -
               legSeconds[pickupLeg] +
               dwell;
-            if (pickupDetour > budgetFrom[pickupLeg + 1]) {
+            if (pickupDetour > legBudget[pickupLeg]) {
               // The pickup's detour delays every later stop, so no later dropoff leg works either.
               break;
             }
@@ -251,7 +245,7 @@ public class InsertionEvaluator {
               legSeconds[dropoffLeg] +
               dwell;
             detour = pickupDetour + dropoffDetour;
-            if (detour > budgetFrom[dropoffLeg + 1]) {
+            if (detour > legBudget[dropoffLeg]) {
               continue;
             }
           }

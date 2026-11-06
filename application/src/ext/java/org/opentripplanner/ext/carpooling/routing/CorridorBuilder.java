@@ -53,6 +53,7 @@ public class CorridorBuilder {
     int legs = vertices.size() - 1;
 
     var legDurations = new Duration[legs];
+    var legLimits = new Duration[legs];
     for (int leg = 0; leg < legs; leg++) {
       var segment = baselineRouter.route(vertices.get(leg), vertices.get(leg + 1));
       if (segment == null) {
@@ -60,8 +61,8 @@ public class CorridorBuilder {
         return null;
       }
       legDurations[leg] = segment.duration();
+      legLimits[leg] = legDurations[leg].plus(trip.legDeviationBudget(leg));
     }
-    var legLimits = DriverLegLimits.legLimits(trip, legDurations);
 
     var stops = new ArrayList<CarpoolCorridor.CorridorStop>();
     for (int leg = 0; leg < legs; leg++) {

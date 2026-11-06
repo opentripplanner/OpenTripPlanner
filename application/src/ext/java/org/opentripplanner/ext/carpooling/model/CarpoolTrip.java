@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.carpooling.model;
 
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -176,6 +177,11 @@ public class CarpoolTrip
     }
 
     return stops.get(stopIndex).getOnboardCount();
+  }
+
+  /** The deviation budget of the leg from stop {@code leg}: the budget of the stop it ends at. */
+  public Duration legDeviationBudget(int leg) {
+    return stops.get(leg + 1).getDeviationBudget();
   }
 
   @Nullable
