@@ -240,7 +240,7 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
 
   @Override
   public int hashCode() {
-    return Objects.hash(priority, staySeated, guaranteed, maxWaitTime);
+    return Objects.hash(priority, staySeated, guaranteed, maxWaitTime, minTransferTime);
   }
 
   @Override
@@ -255,7 +255,8 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
       staySeated == that.staySeated &&
       guaranteed == that.guaranteed &&
       priority == that.priority &&
-      maxWaitTime == that.maxWaitTime
+      maxWaitTime == that.maxWaitTime &&
+      minTransferTime == that.minTransferTime
     );
   }
 
