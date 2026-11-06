@@ -2,6 +2,8 @@ package org.opentripplanner.osm;
 
 import crosby.binary.BinaryParser;
 import crosby.binary.Osmformat;
+import crosby.binary.file.FileBlockPosition;
+import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +28,23 @@ class OsmParser extends BinaryParser {
   private final Map<String, String> stringTable = new HashMap<>();
   private final DefaultOsmProvider provider;
   private OsmParserPhase parsePhase;
+
+  /**
+   * Which data blocks (by their index among the data blocks of the file) contain
+   * nodes/ways/relations. Recorded during the first, complete pass over the file and used to skip
+   * (without decompressing or parsing) the blocks that are irrelevant to the later phases.
+   * <p>
+   * No data block is skipped in the first pass, so there the n-th parsed block is the n-th data
+   * block in the file.
+   */
+  private final BitSet blocksWithNodes = new BitSet();
+  private final BitSet blocksWithWays = new BitSet();
+  private final BitSet blocksWithRelations = new BitSet();
+  private boolean blockContentKnown = false;
+  private int nextParsedBlockIndex = 0;
+
+  /** Index of the next data block read in the current phase. */
+  private int nextDataBlockIndex = 0;
 
   public OsmParser(OsmDatabase osmdb, DefaultOsmProvider provider) {
     this.osmdb = Objects.requireNonNull(osmdb);
@@ -54,7 +73,52 @@ class OsmParser extends BinaryParser {
    * Set the phase to be parsed
    */
   public void setPhase(OsmParserPhase phase) {
+    if (nextDataBlockIndex > 0) {
+      blockContentKnown = true;
+    }
+    nextDataBlockIndex = 0;
     this.parsePhase = phase;
+  }
+
+  @Override
+  public boolean skipBlock(FileBlockPosition block) {
+    if ("OSMData".equals(block.getType())) {
+      return skipDataBlock(nextDataBlockIndex++);
+    }
+    return super.skipBlock(block);
+  }
+
+  @Override
+  public void parse(Osmformat.PrimitiveBlock block) {
+    if (!blockContentKnown) {
+      int index = nextParsedBlockIndex++;
+      for (var group : block.getPrimitivegroupList()) {
+        if (group.hasDense() || group.getNodesCount() > 0) {
+          blocksWithNodes.set(index);
+        }
+        if (group.getWaysCount() > 0) {
+          blocksWithWays.set(index);
+        }
+        if (group.getRelationsCount() > 0) {
+          blocksWithRelations.set(index);
+        }
+      }
+    }
+    super.parse(block);
+  }
+
+  /**
+   * Whether the data block with the given index (among the data blocks) can be skipped in the current phase.
+   */
+  private boolean skipDataBlock(int index) {
+    if (!blockContentKnown) {
+      return false;
+    }
+    return !switch (parsePhase) {
+      case Relations -> blocksWithRelations.get(index);
+      case Ways -> blocksWithWays.get(index);
+      case Nodes -> blocksWithNodes.get(index);
+    };
   }
 
   @Override
