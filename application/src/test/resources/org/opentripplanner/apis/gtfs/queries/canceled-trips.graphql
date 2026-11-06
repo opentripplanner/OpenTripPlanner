@@ -64,6 +64,7 @@
           }
         }
         stopCalls {
+          headsign
           schedule {
             time {
               ... on ArrivalDepartureTime {

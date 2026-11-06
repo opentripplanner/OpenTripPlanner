@@ -59,6 +59,7 @@
               }
             },
             "stopCall": {
+              "headsign": "Trip Headsign",
               "stopLocation": {
                 "gtfsId": "F:B"
               },

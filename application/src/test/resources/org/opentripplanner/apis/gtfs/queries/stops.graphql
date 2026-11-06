@@ -35,6 +35,7 @@
         }
       }
       stopCall {
+        headsign
         stopLocation {
           ... on Stop {
             gtfsId
