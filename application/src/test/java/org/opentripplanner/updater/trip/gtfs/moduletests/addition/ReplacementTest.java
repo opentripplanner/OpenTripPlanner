@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.updater.spi.UpdateErrorType.UNKNOWN_STOP;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
+import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.i18n.I18NString;
@@ -123,7 +124,52 @@ public class ReplacementTest implements RealtimeTestConstants {
       assertEquals(I18NString.of("New Headsign"), tripTimes.getHeadsign(0));
       assertEquals(I18NString.of("Changed Headsign"), tripTimes.getHeadsign(1));
       assertEquals(I18NString.of("New Headsign"), tripTimes.getHeadsign(2));
+
+      // C was added to the end of the scheduled trip, GTFS-RT cannot flag it, so we derive it
+      assertFalse(tripTimes.isExtraCall(0));
+      assertFalse(tripTimes.isExtraCall(1));
+      assertTrue(tripTimes.isExtraCall(2));
     }
+  }
+
+  /**
+   * A diversion as recommended by the GTFS-RT specification: the stop that is no longer served is
+   * kept in the list and marked SKIPPED, and the stop that is served instead is inserted. Only the
+   * inserted stop is an extra call.
+   */
+  @Test
+  void replacementTripWithDiversion() {
+    var builder = TransitTestEnvironment.of();
+    var STOP_A = builder.stop(STOP_A_ID);
+    var STOP_B = builder.stop(STOP_B_ID);
+    var STOP_C = builder.stop(STOP_C_ID);
+    builder.stop(STOP_D_ID);
+    var TRIP_INPUT = TripInput.of(TRIP_1_ID)
+      .addStop(STOP_A, "8:30:00", "8:30:00")
+      .addStop(STOP_B, "8:40:00", "8:40:00")
+      .addStop(STOP_C, "8:50:00", "8:50:00");
+    var env = builder.addTrip(TRIP_INPUT).build();
+    var rt = GtfsRtTestHelper.of(env);
+
+    var tripUpdate = rt
+      .tripUpdate(TRIP_1_ID, REPLACEMENT)
+      .addStopTime(STOP_A_ID, "00:30")
+      .addSkippedStop(STOP_B_ID, "00:40")
+      .addStopTime(STOP_D_ID, "00:45")
+      .addStopTime(STOP_C_ID, "00:50")
+      .build();
+
+    assertSuccess(rt.applyTripUpdate(tripUpdate));
+
+    var tripTimes = env.tripData(TRIP_1_ID).tripTimes();
+    assertTrue(tripTimes.isTripPatternModified());
+    assertEquals(4, tripTimes.getNumStops());
+
+    assertFalse(tripTimes.isExtraCall(0), "A is scheduled");
+    assertFalse(tripTimes.isExtraCall(1), "B is skipped, not extra");
+    assertTrue(tripTimes.isCanceledStop(1), "B is skipped");
+    assertTrue(tripTimes.isExtraCall(2), "D is inserted");
+    assertFalse(tripTimes.isExtraCall(3), "C is scheduled");
   }
 
   @Test

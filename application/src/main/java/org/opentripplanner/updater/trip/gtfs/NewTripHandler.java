@@ -119,12 +119,16 @@ class NewTripHandler {
 
     var stopAndStopTimeUpdates = resolveStops(tripId, stopTimeUpdates);
 
+    // For a replacement the scheduled pattern is used to find the extra calls
+    TripPattern scheduledPattern = modified ? buffer.findPattern(trip) : null;
+
     var value = tripTimesUpdater.createNewTripTimesFromGtfsRt(
       trip,
       tripUpdate,
       stopAndStopTimeUpdates,
       added,
       modified,
+      scheduledPattern,
       buffer.getTripCalendars().getServiceCode(trip.getServiceId())
     );
 
