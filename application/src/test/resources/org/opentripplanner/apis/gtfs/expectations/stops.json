@@ -62,7 +62,15 @@
               "stopLocation": {
                 "gtfsId": "F:B"
               },
-              "realTime": null
+              "schedule": {
+                "canceled": false
+              },
+              "realTime": {
+                "arrival": {
+                  "delay": "PT0S"
+                },
+                "canceled": true
+              }
             }
           }
         ]

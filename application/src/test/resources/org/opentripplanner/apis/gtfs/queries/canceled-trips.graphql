@@ -65,6 +65,7 @@
         }
         stopCalls {
           schedule {
+            canceled
             time {
               ... on ArrivalDepartureTime {
                 arrival
@@ -78,6 +79,7 @@
               delay
               time
             }
+            canceled
             departure {
               delay
               time

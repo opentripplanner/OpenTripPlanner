@@ -321,13 +321,27 @@ public class TripTimeOnDate {
     return tripTimes.isPredictionInaccurate(stopPosition);
   }
 
-  /** Return {code true} if stop is cancelled, or trip is canceled/replaced */
+  /**
+   * Return {@code true} if the call is not served, because it has been canceled in the planned
+   * data or by a real-time update.
+   */
   public boolean isCanceledEffectively() {
-    return (
-      isCancelledStop() ||
-      tripTimes.isCanceledOrDeleted() ||
-      tripTimes.getTrip().getNetexAlteration().isCanceledOrReplaced()
-    );
+    return isCanceledInPlannedData() || isCanceledInRealTime();
+  }
+
+  /**
+   * Return {@code true} if the trip is canceled or replaced by another trip in the planned data.
+   */
+  public boolean isCanceledInPlannedData() {
+    return tripTimes.getTrip().getNetexAlteration().isCanceledOrReplaced();
+  }
+
+  /**
+   * Return {@code true} if a real-time update has canceled the stop, or has canceled or deleted
+   * the trip.
+   */
+  public boolean isCanceledInRealTime() {
+    return isCancelledStop() || tripTimes.isCanceledOrDeleted();
   }
 
   public boolean isNoDataStop() {

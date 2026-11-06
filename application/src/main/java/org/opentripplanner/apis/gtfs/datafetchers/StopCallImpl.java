@@ -23,7 +23,9 @@ public class StopCallImpl implements GraphQLDataFetchers.GraphQLStopCall {
   public DataFetcher<CallRealTime> realTime() {
     return environment -> {
       var tripTime = getSource(environment);
-      if (!tripTime.isRealtime()) {
+      var canceled = tripTime.isCanceledInRealTime();
+      // A canceled call is reported even if the trip times are not marked as updated
+      if (!tripTime.isRealtime() && !canceled) {
         return null;
       }
       var scheduledArrival = getZonedDateTime(environment, tripTime.getScheduledArrival());
@@ -36,7 +38,7 @@ public class StopCallImpl implements GraphQLDataFetchers.GraphQLStopCall {
         scheduledDeparture == null
           ? null
           : EstimatedTime.of(scheduledDeparture, tripTime.getDepartureDelay());
-      return new CallRealTime(estimatedArrival, estimatedDeparture);
+      return new CallRealTime(estimatedArrival, estimatedDeparture, canceled);
     };
   }
 
@@ -44,12 +46,14 @@ public class StopCallImpl implements GraphQLDataFetchers.GraphQLStopCall {
   public DataFetcher<CallSchedule> schedule() {
     return environment -> {
       var tripTime = getSource(environment);
+      var canceled = tripTime.isCanceledInPlannedData();
 
       if (tripTime.hasScheduledTimes()) {
         var scheduledArrival = getZonedDateTime(environment, tripTime.getScheduledArrival());
         var scheduledDeparture = getZonedDateTime(environment, tripTime.getScheduledDeparture());
         return new CallSchedule(
-          new ArrivalDepartureTime(scheduledArrival, scheduledDeparture, tripTime.isTimepoint())
+          new ArrivalDepartureTime(scheduledArrival, scheduledDeparture, tripTime.isTimepoint()),
+          canceled
         );
       } else {
         var transitService = getTransitService(environment);
@@ -65,7 +69,7 @@ public class StopCallImpl implements GraphQLDataFetchers.GraphQLStopCall {
         var start = ServiceDateUtils.toOffsetDateTime(serviceDay, timeZone, startSecs);
         var end = ServiceDateUtils.toOffsetDateTime(serviceDay, timeZone, endSecs);
 
-        return new CallSchedule(new TimeWindow(start, end));
+        return new CallSchedule(new TimeWindow(start, end), canceled);
       }
     };
   }

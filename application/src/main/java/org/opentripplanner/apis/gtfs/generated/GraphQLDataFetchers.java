@@ -226,11 +226,13 @@ public class GraphQLDataFetchers {
   /** Real-time estimates for arrival and departure times for a stop location. */
   public interface GraphQLCallRealTime {
     public DataFetcher<EstimatedTime> arrival();
+    public DataFetcher<Boolean> canceled();
     public DataFetcher<EstimatedTime> departure();
   }
 
   /** What is scheduled for a trip on a service date for a stop location. */
   public interface GraphQLCallSchedule {
+    public DataFetcher<Boolean> canceled();
     public DataFetcher<CallScheduledTime> time();
   }
 
