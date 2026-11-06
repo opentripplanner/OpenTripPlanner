@@ -299,6 +299,16 @@ public class TestStateBuilder {
     return this;
   }
 
+  public TestStateBuilder enterOsmStation(String b) {
+    count++;
+    var from = (StreetVertex) currentState.vertex;
+    var to = StreetModelForTest.stationEntranceVertex(b, count, count);
+    var edge = StreetModelForTest.streetEdge(from, to);
+    var states = edge.traverse(currentState);
+    currentState = requireSingleState(states);
+    return this;
+  }
+
   public TestStateBuilder exitStation(String id) {
     count++;
     var from = (StreetVertex) currentState.vertex;

@@ -173,6 +173,23 @@ class StatesToWalkStepsMapperTest {
       .inOrder();
   }
 
+  @Test
+  void unnamedPathIntoStation() {
+    var states = TestStateBuilder.ofWalking()
+      .streetEdge("A Street", 100)
+      .unnamedStreetEdge(5)
+      .enterOsmStation("B")
+      .unnamedStreetEdge(5);
+
+    assertThat(toStrings(states))
+      .containsExactly(
+        "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: DEPART, directionText: 'A Street', distance: 105.0}",
+        "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: CONTINUE, directionText: '3.0_3.0_osm:node:1', distance: 157,106.0}",
+        "WalkStep{relativeDirection: ENTER_OR_EXIT_STATION, directionText: 'station entrance', distance: 5.0, entranceId: osm:1}"
+      )
+      .inOrder();
+  }
+
   @ParameterizedTest
   @MethodSource("createIsOnSameStreetCases")
   void testIsOnSameStreet(List<String> streets, boolean expected, String message) {
