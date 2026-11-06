@@ -970,7 +970,8 @@ a plain walk itinerary, it will be removed even if the cost limit function would
 
 A relative limit for the generalized-cost for transit itineraries.
 
-The filter compares all itineraries against every other itinerary. If the generalized-cost plus a
+The filter compares all transit itineraries, except direct flex, against every other such
+itinerary. If the generalized-cost plus a
 `transitGeneralizedCostLimit` is higher than the other generalized-cost, then the itinerary is
 dropped. The `transitGeneralizedCostLimit` is calculated using the `costLimitFunction` plus a
 *relative cost* for the distance in time between the itineraries. The *relative cost* is the

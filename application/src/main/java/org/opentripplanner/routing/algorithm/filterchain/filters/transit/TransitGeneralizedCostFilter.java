@@ -13,6 +13,9 @@ import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveIti
  * This filter removes all transit results which have a generalized-cost higher than the max-limit
  * computed by the {@link #costLimitFunction} plus the wait cost given by
  * {@link TransitGeneralizedCostFilter#getWaitTimeCost}.
+ * <p>
+ * Does not apply to direct flex itineraries. They are not used in the comparison, and they can
+ * not get flagged for removal by this filter.
  */
 public class TransitGeneralizedCostFilter implements RemoveItineraryFlagger {
 
@@ -32,15 +35,20 @@ public class TransitGeneralizedCostFilter implements RemoveItineraryFlagger {
 
   @Override
   public List<Itinerary> flagForRemoval(List<Itinerary> itineraries) {
-    List<Itinerary> transitItineraries = itineraries
+    List<Itinerary> transitItinerariesExceptDirectFlex = itineraries
       .stream()
       .filter(Itinerary::hasTransit)
+      .filter(it -> !it.isDirectFlex())
       .sorted(Comparator.comparing(Itinerary::generalizedCostIncludingPenalty))
       .toList();
 
-    return transitItineraries
+    return transitItinerariesExceptDirectFlex
       .stream()
-      .filter(it -> transitItineraries.stream().anyMatch(t -> generalizedCostExceedsLimit(it, t)))
+      .filter(it ->
+        transitItinerariesExceptDirectFlex
+          .stream()
+          .anyMatch(t -> generalizedCostExceedsLimit(it, t))
+      )
       .collect(Collectors.toList());
   }
 

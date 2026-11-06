@@ -70,9 +70,11 @@ public class ItineraryFiltersInputType {
           // with value `false`, not the actual value. Hence; The default is added to the
           // description instead.
           .description(
-            "Set a relative limit for all transit itineraries. The limit is calculated based on " +
-              "the transit itinerary generalized-cost and the time between itineraries " +
-              "Itineraries without transit legs are excluded from this filter. Example: " +
+            "Set a relative limit for all transit itineraries, except direct flex. The limit is " +
+              "calculated based on " +
+              "the transit itinerary generalized-cost and the time between itineraries. " +
+              "Itineraries without transit legs and direct-flex itineraries are excluded from " +
+              "this filter. Example: " +
               "costLimitFunction(x) = 3600 + 2.0 x and intervalRelaxFactor = 0.5. " +
               "If the lowest cost returned is 10 000, then the limit " +
               "is set to: 3 600 + 2 * 10 000 = 26 600 plus half of the time between either departure" +
