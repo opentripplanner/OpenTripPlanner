@@ -88,6 +88,19 @@ class NetexFeedParametersTest {
   }
 
   @Test
+  void noTransfersOnIsolatedStopsEqualsAndHashCode() {
+    var changed = subject
+      .copyOf()
+      .withNoTransfersOnIsolatedStops(!subject.noTransfersOnIsolatedStops())
+      .build();
+
+    // The builder must not drop the change by returning the original instance
+    assertNotEquals(subject.noTransfersOnIsolatedStops(), changed.noTransfersOnIsolatedStops());
+    assertNotEquals(subject, changed);
+    assertNotEquals(subject.hashCode(), changed.hashCode());
+  }
+
+  @Test
   void allowStopPlaceAsPassengerStopAssignmentEqualsAndHashCode() {
     var allowed = subject.copyOf().withAllowStopPlaceAsPassengerStopAssignment(true).build();
     var sameAllowed = subject.copyOf().withAllowStopPlaceAsPassengerStopAssignment(true).build();
