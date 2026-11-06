@@ -21,6 +21,7 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.RouteRequestBuilder;
+import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.VehicleRoutingOptimizeType;
@@ -109,7 +110,7 @@ class StreetSearchRequestMapperTest {
       .withDateTime(INSTANT)
       .withFrom(from)
       .withTo(to)
-      .withPreferences(it -> it.withWalk(walk -> walk.withSpeed(2.4)))
+      .withPreferences(it -> it.withWheelchair(w -> w.withSpeed(2.4)))
       .withJourney(j -> j.withWheelchair(true));
 
     var request = builder.buildRequest();
@@ -123,6 +124,56 @@ class StreetSearchRequestMapperTest {
     assertEquals(Instant.EPOCH, subject.startTime());
     // arrive by must always be false for transfer requests
     assertFalse(subject.arriveBy());
+  }
+
+  @Test
+  void wheelchairValuesReplaceWalkValuesWhenWheelchairEnabled() {
+    var request = builder()
+      .withPreferences(it ->
+        it
+          .withWalk(walk -> walk.withSpeed(1.4).withReluctance(2.0).withStairsTimeFactor(3.0))
+          .withWheelchair(w -> w.withSpeed(0.8).withReluctance(4.0).withStairsTimeFactor(5.0))
+      )
+      .withJourney(j -> j.withWheelchair(true))
+      .buildRequest();
+
+    var subject = StreetSearchRequestMapper.map(request).build();
+
+    assertEquals(0.8, subject.walk().speed());
+    assertEquals(4.0, subject.walk().reluctance());
+    assertEquals(5.0, subject.walk().stairsTimeFactor());
+  }
+
+  @Test
+  void walkValuesAreNotUsedForWheelchair() {
+    var request = builder()
+      .withPreferences(it ->
+        it.withWalk(walk -> walk.withSpeed(1.4).withReluctance(7.0).withStairsTimeFactor(8.0))
+      )
+      .withJourney(j -> j.withWheelchair(true))
+      .buildRequest();
+
+    var subject = StreetSearchRequestMapper.map(request).build();
+
+    var dft = WheelchairPreferences.DEFAULT;
+    assertEquals(dft.speed(), subject.walk().speed());
+    assertEquals(dft.reluctance(), subject.walk().reluctance());
+    assertEquals(dft.stairsTimeFactor(), subject.walk().stairsTimeFactor());
+  }
+
+  @Test
+  void wheelchairValuesAreIgnoredWhenWheelchairDisabled() {
+    var request = builder()
+      .withPreferences(it ->
+        it
+          .withWalk(walk -> walk.withSpeed(1.4))
+          .withWheelchair(w -> w.withSpeed(0.8).withReluctance(4.0).withStairsTimeFactor(5.0))
+      )
+      .buildRequest();
+
+    var subject = StreetSearchRequestMapper.map(request).build();
+
+    assertEquals(1.4, subject.walk().speed());
   }
 
   @Test

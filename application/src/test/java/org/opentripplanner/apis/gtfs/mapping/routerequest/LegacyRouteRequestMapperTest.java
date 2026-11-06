@@ -318,6 +318,7 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
       CONTEXT
     );
     assertEquals(reluctance, routeRequest.preferences().walk().reluctance());
+    assertEquals(reluctance, routeRequest.preferences().wheelchair().reluctance());
 
     var noParamsRequest = LegacyRouteRequestMapper.toRouteRequest(
       executionContext(decorateWithRequiredParams(Map.of())),

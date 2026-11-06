@@ -807,7 +807,10 @@ Ordered list of `StreetMode` values used as egress modes. Each entry is paired w
       "inaccessibleStreetReluctance" : 25,
       "maxSlope" : 0.083,
       "slopeExceededReluctance" : 1,
-      "stairsReluctance" : 100
+      "stairsReluctance" : 100,
+      "speed" : 1.0,
+      "reluctance" : 3.0,
+      "stairsTimeFactor" : 4.0
     },
     "directTransitSearch" : {
       "enabled" : false,

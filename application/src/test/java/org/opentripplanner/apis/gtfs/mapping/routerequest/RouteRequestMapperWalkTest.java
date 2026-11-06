@@ -45,5 +45,9 @@ class RouteRequestMapperWalkTest {
     assertEquals(speed, walkPreferences.speed());
     assertEquals(boardCost.toSeconds(), walkPreferences.boardCost());
     assertEquals(safetyFactor, walkPreferences.safetyFactor());
+
+    var wheelchairPreferences = routeRequest.preferences().wheelchair();
+    assertEquals(reluctance, wheelchairPreferences.reluctance());
+    assertEquals(speed, wheelchairPreferences.speed());
   }
 }
