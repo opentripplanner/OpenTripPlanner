@@ -156,7 +156,14 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
 
   @Override
   public int hashCode() {
-    return Objects.hash(profile, searchParams, multiCriteria, debug);
+    return Objects.hash(
+      profile,
+      searchDirection,
+      optimizations,
+      searchParams,
+      multiCriteria,
+      debug
+    );
   }
 
   @Override
@@ -170,6 +177,8 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
     RaptorRequest<?> that = (RaptorRequest<?>) o;
     return (
       profile == that.profile &&
+      searchDirection == that.searchDirection &&
+      Objects.equals(optimizations, that.optimizations) &&
       Objects.equals(searchParams, that.searchParams) &&
       Objects.equals(multiCriteria, that.multiCriteria) &&
       Objects.equals(debug, that.debug)
