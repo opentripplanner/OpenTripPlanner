@@ -1,7 +1,5 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers;
 
-import static org.opentripplanner.transfer.regular.model.TransfersMapper.mapTransfers;
-
 import com.google.common.collect.ArrayListMultimap;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -17,11 +15,8 @@ import org.opentripplanner.raptor.spi.RaptorCostConverter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.transfercache.RaptorRequestTransferCache;
 import org.opentripplanner.transfer.constrained.raptoradaptor.ConstrainedTransfersForPatterns;
 import org.opentripplanner.transfer.constrained.raptoradaptor.TransferIndexGenerator;
-import org.opentripplanner.transfer.regular.TransferRepository;
-import org.opentripplanner.transfer.regular.model.PathTransfer;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
@@ -50,37 +45,34 @@ public class RaptorTransitDataMapper {
 
   private final TransitService transitService;
   private final SiteRepository siteRepository;
-  private final TransferRepository transferRepository;
 
   private RaptorTransitDataMapper(
     TransitRepository transitRepository,
-    ScheduledTimetableData scheduledTimetableData,
-    TransferRepository transferRepository
+    ScheduledTimetableData scheduledTimetableData
   ) {
     this.transitService = new DefaultTransitService(
       transitRepository,
       DefaultTimetableRepository.scheduledOnly(scheduledTimetableData)
     );
     this.siteRepository = transitRepository.getSiteRepository();
-    this.transferRepository = transferRepository;
   }
 
+  /**
+   * The regular transfers are not part of the Raptor transit data, routing gets them from the
+   * request-scoped regular-transfer pipeline, see {@code RaptorRoutingRequestTransitData}.
+   */
   public static RaptorTransitData map(
     TransitTuningParameters tuningParameters,
     TransitRepository transitRepository,
-    ScheduledTimetableData scheduledTimetableData,
-    TransferRepository transferRepository
+    ScheduledTimetableData scheduledTimetableData
   ) {
-    return new RaptorTransitDataMapper(
-      transitRepository,
-      scheduledTimetableData,
-      transferRepository
-    ).map(tuningParameters);
+    return new RaptorTransitDataMapper(transitRepository, scheduledTimetableData).map(
+      tuningParameters
+    );
   }
 
   private RaptorTransitData map(TransitTuningParameters tuningParameters) {
     HashMap<LocalDate, List<TripPatternForDate>> tripPatternsByStopByDate;
-    List<List<PathTransfer>> transfersByStopIndex;
     ConstrainedTransfersForPatterns constrainedTransfers = null;
 
     LOG.info("Mapping raptorTransitData from TransitRepository...");
@@ -88,8 +80,6 @@ public class RaptorTransitDataMapper {
     Collection<TripPattern> allTripPatterns = transitService.listTripPatterns();
 
     tripPatternsByStopByDate = mapTripPatterns(allTripPatterns);
-
-    transfersByStopIndex = mapTransfers(siteRepository, transferRepository);
 
     TransferIndexGenerator transferIndexGenerator = null;
     if (OTPFeature.TransferConstraints.isOn()) {
@@ -100,16 +90,12 @@ public class RaptorTransitDataMapper {
       constrainedTransfers = transferIndexGenerator.generateTransfers();
     }
 
-    var transferCache = new RaptorRequestTransferCache(tuningParameters.transferCacheMaxSize());
-
     LOG.info("Mapping complete.");
 
     return new RaptorTransitData(
       tripPatternsByStopByDate,
-      transfersByStopIndex,
       transitService.getConstrainedTransferService(),
       siteRepository,
-      transferCache,
       constrainedTransfers,
       transferIndexGenerator,
       createStopBoardAlightTransferCosts(siteRepository, tuningParameters)

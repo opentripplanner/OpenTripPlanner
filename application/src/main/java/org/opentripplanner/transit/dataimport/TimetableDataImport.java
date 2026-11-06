@@ -126,22 +126,21 @@ public class TimetableDataImport {
   }
 
   /**
+   * The stops used by scheduled trips that allow bikes, including the regular stops of group stops.
+   */
+  public Set<StopLocation> getStopLocationsUsedForBikesAllowedTrips() {
+    return getStopLocationsUsedByTripTimes(
+      tt -> tt.getTrip().getBikesAllowed() == BikeAccess.ALLOWED
+    );
+  }
+
+  /**
    * The stops used by scheduled trips that allow cars (e.g. car ferries), including the regular
    * stops of group stops.
    */
   public Set<StopLocation> getStopLocationsUsedForCarsAllowedTrips() {
     return getStopLocationsUsedByTripTimes(
       tt -> tt.getTrip().getCarsAllowed() == CarAccess.ALLOWED
-    );
-  }
-
-  /**
-   * The stops used by scheduled trips that allow bikes, including the regular stops of group
-   * stops.
-   */
-  public Set<StopLocation> getStopLocationsUsedForBikesAllowedTrips() {
-    return getStopLocationsUsedByTripTimes(
-      tt -> tt.getTrip().getBikesAllowed() == BikeAccess.ALLOWED
     );
   }
 

@@ -27,7 +27,6 @@ import org.opentripplanner.street.linking.TemporaryVerticesContainer;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.test.support.ResourceLoader;
-import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.service.TransitRepository;
 
@@ -147,8 +146,7 @@ public class CarRoutingTest {
     var linkingContext = linkingContextFactory.create(temporaryVerticesContainer, linkingRequest);
     var transitService = TestServerContext.createTransitService(
       new TransitRepository(),
-      new TimetableDataImport(),
-      TransferServiceTestFactory.defaultTransferRepository()
+      new TimetableDataImport()
     );
 
     var itineraries = DirectStreetRouter.route(
