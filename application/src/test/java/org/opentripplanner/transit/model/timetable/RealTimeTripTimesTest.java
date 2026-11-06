@@ -2,6 +2,7 @@ package org.opentripplanner.transit.model.timetable;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -459,5 +460,24 @@ class RealTimeTripTimesTest {
     assertEquals(NEGATIVE_HOP_TIME, error.code());
     assertEquals(expMsg, error.message());
     assertEquals(expMsg, ex.getMessage());
+  }
+
+  @Test
+  void stopFlagsArePartOfEqualsAndHashCode() {
+    var scheduled = createInitialTripTimes();
+    var subject = scheduled.createRealTimeFromScheduledTimes().build();
+    var same = scheduled.createRealTimeFromScheduledTimes().build();
+
+    assertEquals(subject, same);
+    assertEquals(subject.hashCode(), same.hashCode());
+
+    var extraCall = scheduled.createRealTimeFromScheduledTimes().withExtraCall(1, true).build();
+    var arrived = scheduled.createRealTimeFromScheduledTimes().withHasArrived(1, true).build();
+    var departed = scheduled.createRealTimeFromScheduledTimes().withHasDeparted(1, true).build();
+
+    assertNotEquals(subject, extraCall);
+    assertNotEquals(subject, arrived);
+    assertNotEquals(subject, departed);
+    assertNotEquals(arrived, departed);
   }
 }
