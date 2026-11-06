@@ -2,12 +2,14 @@ package org.opentripplanner.raptor.api.request;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.raptor.api.request.Optimization.PARALLEL;
 import static org.opentripplanner.raptor.api.request.Optimization.PARETO_CHECK_AGAINST_DESTINATION;
 import static org.opentripplanner.raptor.api.request.RaptorProfile.MULTI_CRITERIA;
 import static org.opentripplanner.raptor.api.request.RaptorProfile.STANDARD;
+import static org.opentripplanner.raptor.spi.SearchDirection.FORWARD;
 import static org.opentripplanner.raptor.spi.SearchDirection.REVERSE;
 
 import java.time.Duration;
@@ -74,5 +76,18 @@ class RaptorRequestTest {
   void runInParallel() {
     assertTrue(subject.optimizationEnabled(PARALLEL));
     assertFalse(subject.optimizationEnabled(PARETO_CHECK_AGAINST_DESTINATION));
+  }
+
+  @Test
+  void testEqualsAndHashCode() {
+    var same = subject.mutate().build();
+    assertEquals(subject, same);
+    assertEquals(subject.hashCode(), same.hashCode());
+
+    assertNotEquals(subject, subject.mutate().searchDirection(FORWARD).build());
+    assertNotEquals(
+      subject,
+      subject.mutate().enableOptimization(PARETO_CHECK_AGAINST_DESTINATION).build()
+    );
   }
 }

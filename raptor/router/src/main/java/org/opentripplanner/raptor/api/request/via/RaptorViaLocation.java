@@ -3,6 +3,7 @@ package org.opentripplanner.raptor.api.request.via;
 import java.time.Duration;
 import java.util.BitSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.raptor.spi.RaptorStopNameResolver;
@@ -112,12 +113,19 @@ public final class RaptorViaLocation {
 
   @Override
   public boolean equals(Object o) {
-    throw new UnsupportedOperationException("No need to compare " + getClass());
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    var that = (RaptorViaLocation) o;
+    return Objects.equals(label, that.label) && connections.equals(that.connections);
   }
 
   @Override
   public int hashCode() {
-    throw new UnsupportedOperationException("No need for hashCode of " + getClass());
+    return Objects.hash(label, connections);
   }
 
   @Override

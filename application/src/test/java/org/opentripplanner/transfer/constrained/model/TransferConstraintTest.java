@@ -2,6 +2,7 @@ package org.opentripplanner.transfer.constrained.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.framework.application.OTPFeature.MinimumTransferTimeIsDefinitive;
 import static org.opentripplanner.raptor.spi.SearchDirection.FORWARD;
@@ -35,6 +36,20 @@ public class TransferConstraintTest {
   private final TransferConstraint MIN_TX_TIME = TransferConstraint.of()
     .minTransferTime(D3m)
     .build();
+
+  @Test
+  public void testEqualsAndHashCode() {
+    var same = TransferConstraint.of().minTransferTime(D3m).build();
+    assertEquals(MIN_TX_TIME, same);
+    assertEquals(MIN_TX_TIME.hashCode(), same.hashCode());
+
+    var other = TransferConstraint.of()
+      .minTransferTime(D3m + 1)
+      .build();
+    assertNotEquals(MIN_TX_TIME, other);
+    assertNotEquals(MIN_TX_TIME.hashCode(), other.hashCode());
+    assertNotEquals(NO_CONSTRAINS, MIN_TX_TIME);
+  }
 
   @Test
   public void getPriority() {

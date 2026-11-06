@@ -137,35 +137,24 @@ class RaptorViaLocationTest implements RaptorTestConstants {
   }
 
   @Test
-  void testEquals() {
-    var ex = assertThrows(UnsupportedOperationException.class, () ->
-      subject.equals("<Any object>")
-    );
-    assertEquals(
-      "No need to compare class org.opentripplanner.raptor.api.request.via.RaptorViaLocation",
-      ex.getMessage()
-    );
-    ex = assertThrows(UnsupportedOperationException.class, () ->
-      subjectPassThrough.equals("<Any object>")
-    );
-    assertEquals(
-      "No need to compare class org.opentripplanner.raptor.api.request.via.RaptorViaLocation",
-      ex.getMessage()
-    );
-  }
+  void testEqualsAndHashCode() {
+    var same = RaptorViaLocation.viaVisit(VIA_LABEL, MINIMUM_WAIT_TIME)
+      .addTransfer(STOP_B, TRANSFER)
+      .addStop(STOP_A)
+      .build();
+    var otherLabel = RaptorViaLocation.viaVisit("Other", MINIMUM_WAIT_TIME)
+      .addTransfer(STOP_B, TRANSFER)
+      .addStop(STOP_A)
+      .build();
+    var otherConnections = RaptorViaLocation.viaVisit(VIA_LABEL, MINIMUM_WAIT_TIME)
+      .addStop(STOP_A)
+      .build();
 
-  @Test
-  void testHashCode() {
-    var ex = assertThrows(UnsupportedOperationException.class, () -> subject.hashCode());
-    assertEquals(
-      "No need for hashCode of class org.opentripplanner.raptor.api.request.via.RaptorViaLocation",
-      ex.getMessage()
-    );
-    ex = assertThrows(UnsupportedOperationException.class, () -> subjectPassThrough.hashCode());
-    assertEquals(
-      "No need for hashCode of class org.opentripplanner.raptor.api.request.via.RaptorViaLocation",
-      ex.getMessage()
-    );
+    assertEquals(subject, same);
+    assertEquals(subject.hashCode(), same.hashCode());
+    assertNotEquals(subject, otherLabel);
+    assertNotEquals(subject, otherConnections);
+    assertNotEquals(subject, subjectPassThrough);
   }
 
   @Test
