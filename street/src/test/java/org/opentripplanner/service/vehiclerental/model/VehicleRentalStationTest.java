@@ -1,6 +1,8 @@
 package org.opentripplanner.service.vehiclerental.model;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Map;
@@ -11,6 +13,18 @@ class VehicleRentalStationTest {
 
   private static final RentalVehicleType BICYCLE = RentalVehicleType.DEFAULT;
   private static final RentalFormFactor BICYCLE_FORM = RentalFormFactor.BICYCLE;
+
+  @Test
+  void returnPolicyIsPartOfEqualsAndHashCode() {
+    var anyType = VehicleRentalStation.of().withReturnPolicy(ReturnPolicy.ANY_TYPE).build();
+    var sameAnyType = VehicleRentalStation.of().withReturnPolicy(ReturnPolicy.ANY_TYPE).build();
+    var specific = VehicleRentalStation.of().withReturnPolicy(ReturnPolicy.SPECIFIC_TYPES).build();
+
+    assertEquals(anyType, sameAnyType);
+    assertEquals(anyType.hashCode(), sameAnyType.hashCode());
+    assertNotEquals(anyType, specific);
+    assertNotEquals(anyType.hashCode(), specific.hashCode());
+  }
 
   @Test
   void allowPickupNow_openStationWithVehicles() {
