@@ -2,6 +2,7 @@ package org.opentripplanner.routing.api.request.preference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner.routing.api.request.preference.ImmutablePreferencesAsserts.assertEqualsAndHashCode;
 
 import java.time.Duration;
@@ -83,6 +84,16 @@ class ItineraryFilterPreferencesTest {
   @Test
   void groupSimilarityKeepThree() {
     assertEquals(GROUP_SIMILARITY_KEEP_THREE, subject.groupSimilarityKeepThree());
+  }
+
+  @Test
+  void groupSimilarityAboveMaxIsRejected() {
+    assertThrows(IllegalArgumentException.class, () ->
+      ItineraryFilterPreferences.of().withGroupSimilarityKeepOne(1.0).build()
+    );
+    assertThrows(IllegalArgumentException.class, () ->
+      ItineraryFilterPreferences.of().withGroupSimilarityKeepThree(1.0).build()
+    );
   }
 
   @Test

@@ -1,5 +1,7 @@
 package org.opentripplanner.apis.transmodel.model.plan;
 
+import static org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences.MAX_GROUP_SIMILARITY;
+
 import graphql.Scalars;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLInputObjectField;
@@ -7,6 +9,7 @@ import graphql.schema.GraphQLInputObjectType;
 import graphql.schema.GraphQLNonNull;
 import java.util.Map;
 import java.util.function.Consumer;
+import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.apis.transmodel.model.scalars.DoubleFunction;
@@ -154,12 +157,20 @@ public class ItineraryFiltersInputType {
     if (!GqlUtil.hasArgument(environment, "itineraryFilters")) {
       return;
     }
-    setField(callWith, GROUP_SIMILARITY_KEEP_ONE, builder::withGroupSimilarityKeepOne);
+    setField(callWith, GROUP_SIMILARITY_KEEP_ONE, (Double v) ->
+      builder.withGroupSimilarityKeepOne(validateGroupSimilarity(GROUP_SIMILARITY_KEEP_ONE, v))
+    );
 
     // This is deprecated, sets same value as GROUP_SIMILARITY_KEEP_THREE
-    setField(callWith, GROUP_SIMILARITY_KEEP_N_ITINERARIES, builder::withGroupSimilarityKeepThree);
+    setField(callWith, GROUP_SIMILARITY_KEEP_N_ITINERARIES, (Double v) ->
+      builder.withGroupSimilarityKeepThree(
+        validateGroupSimilarity(GROUP_SIMILARITY_KEEP_N_ITINERARIES, v)
+      )
+    );
 
-    setField(callWith, GROUP_SIMILARITY_KEEP_THREE, builder::withGroupSimilarityKeepThree);
+    setField(callWith, GROUP_SIMILARITY_KEEP_THREE, (Double v) ->
+      builder.withGroupSimilarityKeepThree(validateGroupSimilarity(GROUP_SIMILARITY_KEEP_THREE, v))
+    );
     setField(
       callWith,
       GROUPED_OTHER_THAN_SAME_LEGS_MAX_COST_MULTIPLIER,
@@ -174,6 +185,19 @@ public class ItineraryFiltersInputType {
       )
     );
     setField(callWith, DEBUG, builder::withDebug);
+  }
+
+  private static double validateGroupSimilarity(String field, double value) {
+    if (value < 0.0 || value > MAX_GROUP_SIMILARITY) {
+      throw new InvalidInputException(
+        "The argument 'itineraryFilters.%s' must be in the range [0.0, %s], but was %s.".formatted(
+          field,
+          MAX_GROUP_SIMILARITY,
+          value
+        )
+      );
+    }
+    return value;
   }
 
   private static <T> void setField(

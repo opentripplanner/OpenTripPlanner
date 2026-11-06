@@ -136,7 +136,7 @@ public class GroupByDistance implements GroupId<GroupByDistance> {
 
   private void assertPIsValid(double p) {
     if (p > 0.99 || p < 0.50) {
-      throw new IllegalArgumentException("'p' is not between 0.01 and 0.99: " + p);
+      throw new IllegalArgumentException("'p' is not between 0.50 and 0.99: " + p);
     }
   }
 

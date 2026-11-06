@@ -225,6 +225,28 @@ public class TripRequestMapperTest implements PlanTestConstants {
     );
   }
 
+  @ParameterizedTest
+  @ValueSource(
+    strings = {
+      "groupSimilarityKeepOne",
+      "groupSimilarityKeepThree",
+      "groupSimilarityKeepNumOfItineraries",
+    }
+  )
+  public void testGroupSimilarityValidation(String field) {
+    Map<String, Object> arguments = arguments("itineraryFilters", Map.of(field, 1.0));
+
+    var ex = assertThrows(InvalidInputException.class, () ->
+      MAPPER.createRequest(executionContext(arguments))
+    );
+    assertEquals(
+      "The argument 'itineraryFilters." +
+        field +
+        "' must be in the range [0.0, 0.99], but was 1.0.",
+      ex.getMessage()
+    );
+  }
+
   @Test
   public void testMaxDirectDurationValidation() {
     var defaultValue = StreetPreferences.DEFAULT.maxDirectDuration().valueOf(StreetMode.WALK);
