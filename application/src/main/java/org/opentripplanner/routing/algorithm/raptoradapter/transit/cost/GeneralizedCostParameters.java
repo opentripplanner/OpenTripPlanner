@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Objects;
 import org.jspecify.annotations.Nullable;
@@ -104,7 +105,16 @@ public class GeneralizedCostParameters {
 
   @Override
   public int hashCode() {
-    return Objects.hash(boardCost, transferCost, waitReluctanceFactor);
+    return Objects.hash(
+      boardCost,
+      transferCost,
+      Arrays.hashCode(transitReluctanceFactors),
+      waitReluctanceFactor,
+      wheelchairEnabled,
+      wheelchairAccessibility,
+      unpreferredPatterns,
+      unpreferredCost
+    );
   }
 
   @Override
@@ -116,11 +126,15 @@ public class GeneralizedCostParameters {
       return false;
     }
     GeneralizedCostParameters that = (GeneralizedCostParameters) o;
-    // TODO - Why is not all parameters included here, doc if on purpose or add parameters
     return (
       boardCost == that.boardCost &&
       transferCost == that.transferCost &&
-      Double.compare(that.waitReluctanceFactor, waitReluctanceFactor) == 0
+      Arrays.equals(transitReluctanceFactors, that.transitReluctanceFactors) &&
+      Double.compare(that.waitReluctanceFactor, waitReluctanceFactor) == 0 &&
+      wheelchairEnabled == that.wheelchairEnabled &&
+      Objects.equals(wheelchairAccessibility, that.wheelchairAccessibility) &&
+      Objects.equals(unpreferredPatterns, that.unpreferredPatterns) &&
+      Objects.equals(unpreferredCost, that.unpreferredCost)
     );
   }
 
