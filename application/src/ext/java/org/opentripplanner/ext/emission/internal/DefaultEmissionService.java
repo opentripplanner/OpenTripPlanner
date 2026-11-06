@@ -47,10 +47,10 @@ public class DefaultEmissionService implements EmissionService {
     }
 
     // Calculate emissions based the emissions for each section of a trip, if not found
-    // zero is returned.
+    // empty is returned.
     var emission = emissionRepository.tripPatternEmissions(trip.getId());
     if (emission != null) {
-      return Optional.of(emission.section(boardStopPosInPattern, alightStopPosInPattern));
+      return emission.section(boardStopPosInPattern, alightStopPosInPattern);
     }
     return Optional.empty();
   }
