@@ -1,6 +1,7 @@
 package org.opentripplanner.raptor.api.request;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
 
@@ -8,6 +9,7 @@ import java.util.Collection;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.request.via.RaptorViaLocation;
 
 class SearchParamsTest {
@@ -86,6 +88,45 @@ class SearchParamsTest {
       "[RaptorViaLocation{pass-through Via : [(stop E)]}]",
       toString(passThrough.viaLocations())
     );
+  }
+
+  @Test
+  void testEqualsAndHashCode() {
+    var access = walk(1, 30);
+    var egress = walk(2, 20);
+    var subject = subjectBuilder(access, egress).buildSearchParam();
+    var same = subjectBuilder(access, egress).buildSearchParam();
+
+    assertEquals(subject, same);
+    assertEquals(subject.hashCode(), same.hashCode());
+
+    var otherVia = searchParamBuilder()
+      .addAccessPaths(access)
+      .addEgressPaths(egress)
+      .addViaLocation(RaptorViaLocation.viaVisit("Via").addStop(6).build())
+      .buildSearchParam();
+    var otherMaxTransfers = subjectBuilder(access, egress)
+      .maxNumberOfTransfers(3)
+      .buildSearchParam();
+    var otherTimetable = subjectBuilder(access, egress).timetable(true).buildSearchParam();
+    var otherConstrained = subjectBuilder(access, egress)
+      .constrainedTransfers(true)
+      .buildSearchParam();
+
+    assertNotEquals(subject, otherVia);
+    assertNotEquals(subject, otherMaxTransfers);
+    assertNotEquals(subject, otherTimetable);
+    assertNotEquals(subject, otherConstrained);
+  }
+
+  private static SearchParamsBuilder subjectBuilder(
+    RaptorAccessEgress access,
+    RaptorAccessEgress egress
+  ) {
+    return searchParamBuilder()
+      .addAccessPaths(access)
+      .addEgressPaths(egress)
+      .addViaLocation(RaptorViaLocation.viaVisit("Via").addStop(5).build());
   }
 
   @Test

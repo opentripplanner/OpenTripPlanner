@@ -232,6 +232,9 @@ public class SearchParams {
       searchWindowInSeconds,
       preferLateArrival,
       numberOfAdditionalTransfers,
+      maxNumberOfTransfers,
+      timetable,
+      constrainedTransfers,
       accessPaths,
       egressPaths,
       viaLocations
@@ -253,9 +256,12 @@ public class SearchParams {
       searchWindowInSeconds == that.searchWindowInSeconds &&
       preferLateArrival == that.preferLateArrival &&
       numberOfAdditionalTransfers == that.numberOfAdditionalTransfers &&
+      maxNumberOfTransfers == that.maxNumberOfTransfers &&
+      timetable == that.timetable &&
+      constrainedTransfers == that.constrainedTransfers &&
       accessPaths.equals(that.accessPaths) &&
       egressPaths.equals(that.egressPaths) &&
-      viaLocations.equals(viaLocations)
+      viaLocations.equals(that.viaLocations)
     );
   }
 
