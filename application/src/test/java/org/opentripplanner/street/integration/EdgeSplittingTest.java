@@ -287,7 +287,7 @@ public class EdgeSplittingTest {
     try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
       var vertexLinker = VertexLinkerTestFactory.of(graph);
       var vertexCreationService = new VertexCreationService(vertexLinker);
-      var linkingContextFactory = new LinkingContextFactory(graph, vertexCreationService);
+      var linkingContextFactory = new LinkingContextFactory(graph, vertexCreationService, null);
       var linkingRequest = LinkingContextRequestMapper.map(walking);
       var linkingContext = linkingContextFactory.create(temporaryVerticesContainer, linkingRequest);
       var fromVertices = linkingContext.findVertices(from);

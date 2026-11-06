@@ -2,7 +2,6 @@ package org.opentripplanner.routing.linking;
 
 import com.google.common.collect.Sets;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -11,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
@@ -26,13 +24,14 @@ import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.routing.linking.internal.VertexCreationService.LocationType;
 import org.opentripplanner.street.geometry.GeometryUtils;
-import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.TemporaryVerticesContainer;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.transit.service.GenericLocationHelper;
+import org.opentripplanner.transit.service.TransitService;
 
 /**
  * This is a factory that is responsible for linking origin, destination and visit via locations
@@ -45,32 +44,22 @@ public class LinkingContextFactory {
 
   private final Graph graph;
   private final VertexCreationService vertexCreationService;
-  private final Function<FeedScopedId, Collection<FeedScopedId>> resolveSiteIds;
-  /**
-   * This can be either a station, a multi-modal station or a group of stations.
-   */
-  private final Function<FeedScopedId, Optional<WgsCoordinate>> findStopLocationsGroupCentroid;
 
   /**
-   * Construct a factory when stop locations are potentially used for locations.
+   * Resolves stop, station, and group ids to child stops and coordinates. Non-null during runtime
+   * only, it is {@code null} during graph build.
    */
+  @Nullable
+  private final TransitService transitService;
+
   public LinkingContextFactory(
     Graph graph,
     VertexCreationService vertexCreationService,
-    Function<FeedScopedId, Collection<FeedScopedId>> resolveSiteIds,
-    Function<FeedScopedId, Optional<WgsCoordinate>> findStopLocationsGroupCentroid
+    @Nullable TransitService transitService
   ) {
     this.graph = graph;
     this.vertexCreationService = vertexCreationService;
-    this.resolveSiteIds = resolveSiteIds;
-    this.findStopLocationsGroupCentroid = findStopLocationsGroupCentroid;
-  }
-
-  /**
-   * Construct a factory when stop locations are not used for locations.
-   */
-  public LinkingContextFactory(Graph graph, VertexCreationService vertexCreationService) {
-    this(graph, vertexCreationService, id -> Set.of(), id -> Optional.empty());
+    this.transitService = transitService;
   }
 
   /**
@@ -347,28 +336,15 @@ public class LinkingContextFactory {
     GenericLocation location,
     LocationType type
   ) {
-    Coordinate coordinate = location.getCoordinate();
-    // Fetch coordinate from stop, if not given in request
-    if (coordinate == null) {
-      var stopVertex = graph.getStopVertex(location.stopId());
-      if (stopVertex != null) {
-        coordinate = stopVertex.getCoordinate();
-      } else {
-        // For car routing, we use station's coordinate instead of child stops' if stop location is
-        // a station.
-        coordinate = findStopLocationsGroupCentroid
-          .apply(location.stopId())
-          .map(WgsCoordinate::asJtsCoordinate)
-          .orElse(null);
-      }
-    }
+    assertTransitServiceAvailable();
+    var coordinate = GenericLocationHelper.findCoordinate(transitService, location);
     if (coordinate == null) {
       return Optional.empty();
     }
     return Optional.of(
       vertexCreationService.createVertexFromCoordinate(
         container,
-        coordinate,
+        coordinate.asJtsCoordinate(),
         location.label(),
         List.of(TraverseMode.CAR),
         type
@@ -458,10 +434,19 @@ public class LinkingContextFactory {
   }
 
   private Set<TransitStopVertex> findStopOrChildStopVertices(FeedScopedId stopId) {
-    return resolveSiteIds
-      .apply(stopId)
+    assertTransitServiceAvailable();
+    return transitService
+      .findStopOrChildIds(stopId)
       .stream()
       .flatMap(id -> graph.findStopVertex(id).stream())
       .collect(Collectors.toUnmodifiableSet());
+  }
+
+  private void assertTransitServiceAvailable() {
+    if (transitService == null) {
+      throw new IllegalStateException(
+        "A TransitService is required to resolve stop or station ids, but none was provided."
+      );
+    }
   }
 }

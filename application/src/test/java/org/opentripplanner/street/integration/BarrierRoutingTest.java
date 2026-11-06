@@ -191,7 +191,7 @@ public class BarrierRoutingTest {
     var request = builder.buildRequest();
     var vertexLinker = VertexLinkerTestFactory.of(graph);
     var vertexCreationService = new VertexCreationService(vertexLinker);
-    var linkingContextFactory = new LinkingContextFactory(graph, vertexCreationService);
+    var linkingContextFactory = new LinkingContextFactory(graph, vertexCreationService, null);
     var linkingRequest = LinkingContextRequestMapper.map(request);
     var linkingContext = linkingContextFactory.create(temporaryVerticesContainer, linkingRequest);
     var transitService = TestServerContext.createTransitService(

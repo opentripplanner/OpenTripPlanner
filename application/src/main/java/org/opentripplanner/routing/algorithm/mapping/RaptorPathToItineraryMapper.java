@@ -53,6 +53,7 @@ import org.opentripplanner.transfer.regular.model.DefaultRaptorTransfer;
 import org.opentripplanner.transfer.regular.model.PathTransfer;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
+import org.opentripplanner.transit.service.GenericLocationHelper;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.transit.service.TransitServiceResolver;
 import org.opentripplanner.utils.collection.ListUtils;
@@ -219,7 +220,9 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     if (taxiService != null && request.journey().access().mode() == StreetMode.TAXI) {
       return taxiService.decorateAccessEgressLegs(
         legs,
-        request.from().wgsCoordinate(),
+        Objects.requireNonNull(
+          GenericLocationHelper.findCoordinate(transitService, request.from())
+        ),
         raptorTransitData.getStopByIndex(accessPathLeg.access().stop()).getCoordinate()
       );
     }
@@ -375,7 +378,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       return taxiService.decorateAccessEgressLegs(
         legs,
         raptorTransitData.getStopByIndex(egressPathLeg.egress().stop()).getCoordinate(),
-        request.to().wgsCoordinate()
+        Objects.requireNonNull(GenericLocationHelper.findCoordinate(transitService, request.to()))
       );
     }
     return legs;

@@ -414,7 +414,8 @@ public class RefetchItineraryServiceTest {
     );
     LinkingContextFactory linkingContextFactory = new LinkingContextFactory(
       GRAPH,
-      vertexCreationService
+      vertexCreationService,
+      null
     );
 
     var streetLimitationParametersService = new StreetLimitationParametersService() {

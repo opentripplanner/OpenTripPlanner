@@ -104,6 +104,26 @@ class TaxiRouterAccessEgressTest implements PlanTestConstants {
   }
 
   @Test
+  void filterNearbyStopsResolvesCoordinateOfStopIdOrigin() {
+    var transitService = TEST_ENV.transitService();
+    var subject = new TaxiRouter(COVERING_INDEX);
+    var covered = nearbyStop(COVERED_STOP);
+    var request = RouteRequest.of()
+      .withFrom(GenericLocation.fromStopId(COVERED_STOP.getId()))
+      .withTo(GenericLocation.fromCoordinate(TO_COORDINATE))
+      .buildRequest();
+
+    var result = subject.filterNearbyStops(
+      transitService,
+      List.of(covered, nearbyStop(UNCOVERED_STOP)),
+      AccessEgressType.ACCESS,
+      request
+    );
+
+    assertThat(result).containsExactly(covered);
+  }
+
+  @Test
   void filterNearbyStopsKeepsOnlyEgressStopsSharingARouteWithTheDestination() {
     var transitService = TEST_ENV.transitService();
     var subject = new TaxiRouter(COVERING_INDEX);
@@ -166,10 +186,12 @@ class TaxiRouterAccessEgressTest implements PlanTestConstants {
       .legs()
       .getFirst();
     var subject = new TaxiRouter(COVERING_INDEX);
-    var pickup = FROM_COORDINATE;
-    var dropoff = TO_COORDINATE;
 
-    var result = subject.decorateAccessEgressLegs(List.of(walkLeg, driveLeg), pickup, dropoff);
+    var result = subject.decorateAccessEgressLegs(
+      List.of(walkLeg, driveLeg),
+      FROM_COORDINATE,
+      TO_COORDINATE
+    );
 
     assertThat(result.get(0)).isSameInstanceAs(walkLeg);
     assertThat(result.get(1)).isInstanceOf(TaxiLeg.class);

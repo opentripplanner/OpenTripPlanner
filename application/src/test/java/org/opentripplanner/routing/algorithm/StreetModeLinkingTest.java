@@ -35,6 +35,9 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.transit.repository.DefaultTimetableRepository;
+import org.opentripplanner.transit.service.DefaultTransitService;
+import org.opentripplanner.transit.service.TransitService;
 
 /**
  * This tests linking of GenericLocations to streets for each StreetMode. The test has 5 parallel
@@ -92,6 +95,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
   );
 
   private Graph graph;
+  private TransitService transitService;
   private TransitStopVertex stop;
   private GenericLocation stopLocation;
 
@@ -135,6 +139,10 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
       }
     );
     graph = otpModel.graph();
+    transitService = new DefaultTransitService(
+      otpModel.transitRepository(),
+      DefaultTimetableRepository.scheduledOnly(otpModel.scheduledTimetableData())
+    );
 
     graph.hasStreets = true;
     TestStreetLinkerModule.link(
@@ -234,7 +242,11 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
     for (final StreetMode streetMode : streetModes) {
       try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
         var vertexCreationService = new VertexCreationService(linker);
-        var linkingContextFactory = new LinkingContextFactory(graph, vertexCreationService);
+        var linkingContextFactory = new LinkingContextFactory(
+          graph,
+          vertexCreationService,
+          transitService
+        );
         var request = LinkingContextRequest.of()
           .withFrom(location)
           .withTo(ANY_PLACE)

@@ -24,6 +24,7 @@ import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
+import org.opentripplanner.transit.service.GenericLocationHelper;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.utils.lang.Sandbox;
 import org.slf4j.Logger;
@@ -74,9 +75,11 @@ public class TaxiRouter {
     RouteRequest request,
     LinkingContext linkingContext
   ) {
-    WgsCoordinate pickup = request.from().wgsCoordinate();
-    WgsCoordinate dropoff = request.to().wgsCoordinate();
-    if (taxiRouteIndex.findFirstRoute(pickup, dropoff).isEmpty()) {
+    WgsCoordinate pickup = GenericLocationHelper.findCoordinate(transitService, request.from());
+    WgsCoordinate dropoff = GenericLocationHelper.findCoordinate(transitService, request.to());
+    if (
+      pickup == null || dropoff == null || taxiRouteIndex.findFirstRoute(pickup, dropoff).isEmpty()
+    ) {
       return List.of();
     }
 
@@ -116,9 +119,11 @@ public class TaxiRouter {
     AccessEgressType type,
     RouteRequest request
   ) {
-    return type.isAccess()
-      ? filterNearbyStops(transitService, nearbyStops, request.from().wgsCoordinate())
-      : filterNearbyStops(transitService, nearbyStops, request.to().wgsCoordinate());
+    var location = type.isAccess() ? request.from() : request.to();
+    var coordinate = GenericLocationHelper.findCoordinate(transitService, location);
+    return coordinate == null
+      ? List.of()
+      : filterNearbyStops(transitService, nearbyStops, coordinate);
   }
 
   private Collection<NearbyStop> filterNearbyStops(

@@ -78,7 +78,11 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
     var straightLineNearbyStopFinder = new StraightLineNearbyStopFinder(
       transitRepository.getSiteRepository()::findRegularStops
     );
-    var linkingContextFactory = new LinkingContextFactory(graph, new VertexCreationService(linker));
+    var linkingContextFactory = new LinkingContextFactory(
+      graph,
+      new VertexCreationService(linker),
+      null
+    );
     var streetNearbyStopFinder = StreetNearbyStopFinder.of(linkingContextFactory).build();
 
     int stopsAnalyzed = 0;

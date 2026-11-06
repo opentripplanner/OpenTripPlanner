@@ -8,12 +8,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
-import com.google.common.collect.ImmutableMultimap;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
@@ -36,10 +34,16 @@ import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
+import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.transit.repository.DefaultTimetableRepository;
+import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.SiteRepository;
+import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.transit.service.TransitService;
 
 class LinkingContextFactoryTest {
 
@@ -61,6 +65,17 @@ class LinkingContextFactoryTest {
     .withShouldRouteToCentroid(true)
     .build();
 
+  private final Station stationOmega = testModel
+    .station("omega")
+    .withId(OMEGA_ID)
+    .withCoordinate(CENTER.moveEastMeters(DISTANCE))
+    .build();
+  private final MultiModalStation multiModalStation = testModel
+    .multiModalStation("MultiModal")
+    .withCoordinate(CENTER.moveEastMeters(DISTANCE))
+    .withChildStations(List.of(stationAlpha))
+    .build();
+
   private final RegularStop stopA = testModel
     .stop("A")
     .withCoordinate(CENTER.moveEastMeters(DISTANCE))
@@ -71,25 +86,35 @@ class LinkingContextFactoryTest {
     .build();
   private final RegularStop stopC = testModel
     .stop("C")
+    .withParentStation(stationOmega)
     .withCoordinate(CENTER.moveWestMeters(DISTANCE))
     .build();
   private final RegularStop stopD = testModel
     .stop("D")
+    .withParentStation(stationOmega)
     .withCoordinate(CENTER.moveNorthMeters(DISTANCE))
     .build();
+  private final SiteRepository siteRepository = testModel
+    .siteRepositoryBuilder()
+    .withRegularStops(List.of(stopA, stopB, stopC, stopD))
+    .withStation(stationAlpha)
+    .withStation(stationOmega)
+    .withMultiModalStation(multiModalStation)
+    .build();
+
+  private final TransitService transitService = new DefaultTransitService(
+    new TransitRepository(siteRepository),
+    DefaultTimetableRepository.scheduledOnly(new TimetableDataImport().toScheduledTimetableData())
+  );
   private final Graph graph = buildGraph(stationAlpha, stopA, stopB, stopC, stopD);
   private final VertexCreationService vertexCreationService = new VertexCreationService(
     VertexLinkerTestFactory.of(graph)
   );
   private final LinkingContextFactory linkingContextFactory = new LinkingContextFactory(
     graph,
-    vertexCreationService
+    vertexCreationService,
+    transitService
   );
-
-  private final SiteRepository siteRepository = testModel
-    .siteRepositoryBuilder()
-    .withRegularStops(List.of(stopA, stopB, stopC, stopD))
-    .build();
 
   @Test
   void coordinates() {
@@ -107,13 +132,25 @@ class LinkingContextFactoryTest {
   }
 
   @Test
-  void stopId() {
-    var stopLinkingContextFactory = new LinkingContextFactory(
+  void stopIdWithoutTransitServiceThrows() {
+    var container = new TemporaryVerticesContainer();
+    var request = LinkingContextRequest.of()
+      .withFrom(stopToLocation(stopA))
+      .withTo(stopToLocation(stopB))
+      .withDirectMode(StreetMode.WALK)
+      .build();
+    var factoryWithoutTransitService = new LinkingContextFactory(
       graph,
-      new VertexCreationService(VertexLinkerTestFactory.of(graph)),
-      Set::of,
-      id -> Optional.empty()
+      vertexCreationService,
+      null
     );
+    assertThrows(IllegalStateException.class, () ->
+      factoryWithoutTransitService.create(container, request)
+    );
+  }
+
+  @Test
+  void stopId() {
     var container = new TemporaryVerticesContainer();
     var from = stopToLocation(stopA);
     var to = stopToLocation(stopB);
@@ -122,19 +159,13 @@ class LinkingContextFactoryTest {
       .withTo(to)
       .withDirectMode(StreetMode.WALK)
       .build();
-    var linkingContext = stopLinkingContextFactory.create(container, request);
+    var linkingContext = linkingContextFactory.create(container, request);
     assertEquals(stopA, toStop(linkingContext.findVertices(from)));
     assertEquals(stopB, toStop(linkingContext.findVertices(to)));
   }
 
   @Test
   void stopIdNoStreet() {
-    var stopLinkingContextFactory = new LinkingContextFactory(
-      graph,
-      new VertexCreationService(VertexLinkerTestFactory.of(graph)),
-      Set::of,
-      id -> Optional.empty()
-    );
     var container = new TemporaryVerticesContainer();
     var from = stopToLocation(stopA);
     var to = stopToLocation(stopB);
@@ -143,7 +174,7 @@ class LinkingContextFactoryTest {
       .withTo(to)
       .withDirectMode(StreetMode.NOT_SET)
       .build();
-    var linkingContext = stopLinkingContextFactory.create(container, request);
+    var linkingContext = linkingContextFactory.create(container, request);
 
     assertEquals(stopA, toStop(linkingContext.fromStopVertices()));
     assertEquals(stopB, toStop(linkingContext.toStopVertices()));
@@ -151,15 +182,6 @@ class LinkingContextFactoryTest {
 
   @Test
   void stationId() {
-    var mapping = ImmutableMultimap.<FeedScopedId, FeedScopedId>builder()
-      .putAll(OMEGA_ID, stopC.getId(), stopD.getId())
-      .build();
-    var stopLinkingContextFactory = new LinkingContextFactory(
-      graph,
-      new VertexCreationService(VertexLinkerTestFactory.of(graph)),
-      mapping::get,
-      id -> Optional.empty()
-    );
     var container = new TemporaryVerticesContainer();
     var from = GenericLocation.fromStopId(
       new FeedScopedId(OMEGA_ID.getFeedId(), OMEGA_ID.getId()),
@@ -170,30 +192,12 @@ class LinkingContextFactoryTest {
       .withTo(stopToLocation(stopB))
       .withDirectMode(StreetMode.WALK)
       .build();
-    var linkingContext = stopLinkingContextFactory.create(container, request);
+    var linkingContext = linkingContextFactory.create(container, request);
     assertThat(toStops(linkingContext.findVertices(from))).containsExactly(stopC, stopD);
   }
 
   @Test
   void stationCentroidForCar() {
-    var multiModalStation = testModel
-      .multiModalStation("MultiModal")
-      .withCoordinate(CENTER.moveEastMeters(DISTANCE))
-      .withChildStations(List.of(stationAlpha))
-      .build();
-    var stopLinkingContextFactory = new LinkingContextFactory(
-      graph,
-      new VertexCreationService(VertexLinkerTestFactory.of(graph)),
-      id -> Set.of(),
-      id -> {
-        if (id.equals(stationAlpha.getId())) {
-          return Optional.of(stationAlpha.getCoordinate());
-        }
-        return id.equals(multiModalStation.getId())
-          ? Optional.of(multiModalStation.getCoordinate())
-          : Optional.empty();
-      }
-    );
     var container = new TemporaryVerticesContainer();
     String label1 = stationAlpha.getName().toString();
     var from = GenericLocation.fromStopId(
@@ -210,7 +214,7 @@ class LinkingContextFactoryTest {
       .withTo(to)
       .withDirectMode(StreetMode.CAR)
       .build();
-    var linkingContext = stopLinkingContextFactory.create(container, request);
+    var linkingContext = linkingContextFactory.create(container, request);
     var fromVertices = linkingContext.findVertices(from);
     var fromVertex = fromVertices.iterator().next();
     assertEquals(stationAlpha.getCoordinate(), fromVertex.toWgsCoordinate());

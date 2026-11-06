@@ -67,7 +67,8 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
           var vertexLinker = VertexLinkerTestFactory.of(graph());
           linkingContextFactory = new LinkingContextFactory(
             graph(),
-            new VertexCreationService(vertexLinker)
+            new VertexCreationService(vertexLinker),
+            null
           );
         }
       }
