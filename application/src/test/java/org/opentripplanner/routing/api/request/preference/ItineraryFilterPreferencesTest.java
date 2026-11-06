@@ -24,6 +24,8 @@ class ItineraryFilterPreferencesTest {
   private static final double PARK_AND_RIDE_DURATION_RATIO = 0.44;
   private static final TransitGeneralizedCostFilterParams TRANSIT_GENERALIZED_COST_LIMIT =
     new TransitGeneralizedCostFilterParams(CostLinearFunction.of(Duration.ofSeconds(4), 5.0), 3.0);
+  private static final TransitGeneralizedCostFilterParams DIRECT_FLEX_GENERALIZED_COST_LIMIT =
+    new TransitGeneralizedCostFilterParams(CostLinearFunction.of(Duration.ofSeconds(6), 2.0), 1.0);
   private static final CostLinearFunction TRANSIT_BEST_STREET_COST_LIMIT = CostLinearFunction.of(
     Duration.ofSeconds(30),
     1.3
@@ -41,6 +43,7 @@ class ItineraryFilterPreferencesTest {
     .withNonTransitGeneralizedCostLimit(NON_TRANSIT_GENERALIZED_COST_LIMIT)
     .withParkAndRideDurationRatio(PARK_AND_RIDE_DURATION_RATIO)
     .withTransitGeneralizedCostLimit(TRANSIT_GENERALIZED_COST_LIMIT)
+    .withDirectFlexGeneralizedCostLimit(DIRECT_FLEX_GENERALIZED_COST_LIMIT)
     .withRemoveTransitWithHigherCostThanBestOnStreetOnly(TRANSIT_BEST_STREET_COST_LIMIT)
     .build();
 
@@ -106,6 +109,11 @@ class ItineraryFilterPreferencesTest {
   }
 
   @Test
+  void directFlexGeneralizedCostLimit() {
+    assertEquals(DIRECT_FLEX_GENERALIZED_COST_LIMIT, subject.directFlexGeneralizedCostLimit());
+  }
+
+  @Test
   void removeTransitWithHigherCostThanBestOnStreetOnly() {
     assertEquals(
       TRANSIT_BEST_STREET_COST_LIMIT,
@@ -149,6 +157,7 @@ class ItineraryFilterPreferencesTest {
         "nonTransitGeneralizedCostLimit: 4s + 5.0 t, " +
         "parkAndRideDurationRatio: 0.44, " +
         "transitGeneralizedCostLimit: TransitGeneralizedCostFilterParams[costLimitFunction=4s + 5.0 t, intervalRelaxFactor=3.0], " +
+        "directFlexGeneralizedCostLimit: TransitGeneralizedCostFilterParams[costLimitFunction=6s + 2.0 t, intervalRelaxFactor=1.0], " +
         "removeTransitWithHigherCostThanBestOnStreetOnly: 30s + 1.3 t, " +
         "filterDirectFlexBySearchWindow" +
         "}",

@@ -435,19 +435,20 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
   }
 
   /**
-   * A direct-flex itinerary is never used as the reference when the transit cost limit is
-   * calculated, so a cheap direct flex does not remove transit.
+   * Direct flex and the other transit itineraries have separate cost limits. A direct-flex
+   * itinerary is never used as the reference when the transit cost limit is calculated, so a cheap
+   * direct flex does not remove transit.
    */
   @Nested
   class DirectFlexAndTransitCost {
 
-    private final ItineraryListFilterChainBuilder builder = createBuilder(
-      false,
-      false,
-      10
-    ).withTransitGeneralizedCostLimit(
-      ItineraryFilterPreferences.DEFAULT.transitGeneralizedCostLimit()
-    );
+    private final ItineraryListFilterChainBuilder builder = createBuilder(false, false, 10)
+      .withTransitGeneralizedCostLimit(
+        ItineraryFilterPreferences.DEFAULT.transitGeneralizedCostLimit()
+      )
+      .withDirectFlexGeneralizedCostLimit(
+        ItineraryFilterPreferences.DEFAULT.directFlexGeneralizedCostLimit()
+      );
 
     @Test
     void keepTransitWithHigherCostThanDirectFlex() {
@@ -459,6 +460,19 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
       var chain = builder.build();
 
       assertEquals(toStr(List.of(directFlex, bus)), toStr(chain.filter(List.of(bus, directFlex))));
+    }
+
+    @Test
+    void removeDirectFlexWithHigherCostThanTransit() {
+      // Limit: 900 + 1.5 * 1000 = 2400
+      var bus = newItinerary(A).bus(21, T11_00, T11_30, E).build(1000);
+
+      var directFlex = newItinerary(A, T11_00).flex(T11_00, T11_30, E).build(3000);
+
+      var chain = builder.withDebugEnabled(ofDebugEnabled(true)).build();
+
+      assertEquals(toStr(List.of(bus, directFlex)), toStr(chain.filter(List.of(bus, directFlex))));
+      assertEquals("[direct-flex-cost-filter]", toStringOfTags(directFlex.systemNotices()));
     }
   }
 

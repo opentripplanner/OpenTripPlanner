@@ -762,6 +762,10 @@ Ordered list of `StreetMode` values used as egress modes. Each entry is paired w
         "costLimitFunction" : "15m + 1.5 x",
         "intervalRelaxFactor" : 0.4
       },
+      "directFlexGeneralizedCostLimit" : {
+        "costLimitFunction" : "15m + 1.5 x",
+        "intervalRelaxFactor" : 0.4
+      },
       "nonTransitGeneralizedCostLimit" : "400 + 1.5x",
       "removeTransitWithHigherCostThanBestOnStreetOnly" : "60 + 1.3x",
       "bikeRentalDistanceRatio" : 0.3,

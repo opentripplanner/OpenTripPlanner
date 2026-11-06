@@ -33,6 +33,7 @@ import org.opentripplanner.routing.algorithm.filterchain.filters.system.SingleCr
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.mcmax.McMaxLimitFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.DecorateTransitAlert;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.KeepItinerariesWithFewestTransfers;
+import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveDirectFlexIfTransitIsBetter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveItinerariesWithShortStreetLeg;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfWalkingIsBetter;
@@ -76,6 +77,7 @@ public class ItineraryListFilterChainBuilder {
   private boolean removeWalkAllTheWayResults;
   private boolean sameFirstOrLastTripFilter;
   private TransitGeneralizedCostFilterParams transitGeneralizedCostFilterParams;
+  private TransitGeneralizedCostFilterParams directFlexGeneralizedCostFilterParams;
   private double bikeRentalDistanceRatio;
   private double parkAndRideDurationRatio;
   private CostLinearFunction nonTransitGeneralizedCostLimit;
@@ -176,6 +178,18 @@ public class ItineraryListFilterChainBuilder {
     TransitGeneralizedCostFilterParams transitGeneralizedCostFilterParams
   ) {
     this.transitGeneralizedCostFilterParams = transitGeneralizedCostFilterParams;
+    return this;
+  }
+
+  /**
+   * The same as {@link #withTransitGeneralizedCostLimit(TransitGeneralizedCostFilterParams)}, but
+   * the limit is applied to direct-flex itineraries. The limit is computed from the other transit
+   * itineraries.
+   */
+  public ItineraryListFilterChainBuilder withDirectFlexGeneralizedCostLimit(
+    TransitGeneralizedCostFilterParams directFlexGeneralizedCostFilterParams
+  ) {
+    this.directFlexGeneralizedCostFilterParams = directFlexGeneralizedCostFilterParams;
     return this;
   }
 
@@ -419,6 +433,17 @@ public class ItineraryListFilterChainBuilder {
         new TransitGeneralizedCostFilter(
           transitGeneralizedCostFilterParams.costLimitFunction(),
           transitGeneralizedCostFilterParams.intervalRelaxFactor()
+        )
+      );
+    }
+
+    // Filter direct-flex itineraries on generalized-cost
+    if (directFlexGeneralizedCostFilterParams != null) {
+      addRemoveFilter(
+        filters,
+        new RemoveDirectFlexIfTransitIsBetter(
+          directFlexGeneralizedCostFilterParams.costLimitFunction(),
+          directFlexGeneralizedCostFilterParams.intervalRelaxFactor()
         )
       );
     }
