@@ -18,6 +18,7 @@ import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyD
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.lessThanTwoStops;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.minimalCompleteJourney;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.minimalCompleteJourneyWithPolygon;
+import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.recordedAt;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.stopTimesAreOutOfOrder;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.tripExceedingMaxDuration;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.tripExceedingMaxDurationViaDefaultDeviationBudget;
@@ -29,6 +30,7 @@ import static org.opentripplanner.ext.carpooling.model.CarpoolStop.DEFAULT_ONBOA
 import static org.opentripplanner.ext.carpooling.model.CarpoolTrip.DEFAULT_TOTAL_CAPACITY;
 
 import java.time.Duration;
+import java.time.ZonedDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -38,6 +40,22 @@ import uk.org.siri.siri21.EstimatedCall;
 public class CarpoolSiriMapperTest {
 
   private final CarpoolSiriMapper mapper = new CarpoolSiriMapper("EN");
+
+  @Test
+  void mapSiriToCarpoolTrip_recordedAtTime_isCarriedOnTheTrip() {
+    var recordedAt = ZonedDateTime.parse("2026-10-23T09:39:45+02:00");
+
+    var trip = mapper.mapSiriToCarpoolTrip(recordedAt(minimalCompleteJourney(), recordedAt));
+
+    assertEquals(recordedAt, trip.recordedAt());
+  }
+
+  @Test
+  void mapSiriToCarpoolTrip_noRecordedAtTime_leavesTripUnstamped() {
+    var trip = mapper.mapSiriToCarpoolTrip(minimalCompleteJourney());
+
+    assertNull(trip.recordedAt());
+  }
 
   @Test
   void mapSiriToCarpoolTrip_arrivalIsAfterDepartureTime_throwsIllegalArgumentException() {

@@ -162,6 +162,17 @@ public class CarpoolEstimatedVehicleJourneyData {
   }
 
   /**
+   * The given journey with its {@code RecordedAtTime} set, returned for chaining.
+   */
+  public static EstimatedVehicleJourney recordedAt(
+    EstimatedVehicleJourney journey,
+    ZonedDateTime recordedAt
+  ) {
+    journey.setRecordedAtTime(recordedAt);
+    return journey;
+  }
+
+  /**
    * A minimal complete journey flagged as cancelled at the trip level.
    */
   public static EstimatedVehicleJourney cancelledJourney() {

@@ -79,6 +79,9 @@ public class CarpoolTrip
   @Nullable
   private final ContactInfo publicContactInformation;
 
+  @Nullable
+  private final ZonedDateTime recordedAt;
+
   public CarpoolTrip(CarpoolTripBuilder builder) {
     super(builder.getId());
     this.startTime = Objects.requireNonNull(builder.startTime());
@@ -92,6 +95,7 @@ public class CarpoolTrip
       );
     }
     this.publicContactInformation = builder.publicContactInformation();
+    this.recordedAt = builder.recordedAt();
   }
 
   /**
@@ -155,6 +159,18 @@ public class CarpoolTrip
   @Nullable
   public ContactInfo publicContactInformation() {
     return publicContactInformation;
+  }
+
+  /**
+   * When the source recorded the version of the trip this instance was built from (SIRI
+   * {@code RecordedAtTime}), or {@code null} when the source did not say. Compared only against
+   * other values from the same source, never against the local clock: the updater uses it to
+   * ignore an older version of the trip that arrives after a newer one. Not part of
+   * {@link #sameAs}, which compares what the trip is, not when it was recorded.
+   */
+  @Nullable
+  public ZonedDateTime recordedAt() {
+    return recordedAt;
   }
 
   /**

@@ -269,6 +269,7 @@ Represents a driver's journey offering carpool seats:
 - **totalCapacity**: Number of seats in the car, including the driver seat
 - **stops**: Ordered list of waypoints; the first stop is the origin, the last is the destination, and booked passenger stops are inserted in between
 - **provider**: Source system identifier
+- **recordedAt**: When the source recorded this version of the trip (SIRI `RecordedAtTime`), if it said; the updater ignores a version recorded before the one already applied
 
 ### CarpoolStop
 
