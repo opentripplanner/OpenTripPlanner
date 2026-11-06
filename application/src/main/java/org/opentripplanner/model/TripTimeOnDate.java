@@ -207,7 +207,11 @@ public class TripTimeOnDate {
       .count();
     var scheduledPos = stopPosition - extraCallsBefore;
     if (scheduledPos >= scheduledTripPattern.numberOfStops()) {
-      throw new IllegalStateException("Number of stops is inconsistent in scheduled trip pattern");
+      // The real-time pattern has more stops than the scheduled pattern, but the additional
+      // stops are not flagged as extra calls. This happens when a real-time update extends a trip
+      // beyond its scheduled terminus. There is no scheduled stop for this call, so fall back to
+      // the real-time stop, in the same way as for extra calls.
+      return getStop();
     }
     return scheduledTripPattern.getStop(scheduledPos);
   }
