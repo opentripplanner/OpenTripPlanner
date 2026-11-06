@@ -115,7 +115,7 @@ class SidewalkNamer implements EdgeNamer {
       .max(Comparator.comparingDouble(NamedEdgeGroup::percentInBuffer))
       .ifPresent(group -> {
         result.set(true);
-        sidewalk.setName(Objects.requireNonNull(group.name));
+        sidewalk.overrideName(Objects.requireNonNull(group.name));
       });
 
     return result.get();

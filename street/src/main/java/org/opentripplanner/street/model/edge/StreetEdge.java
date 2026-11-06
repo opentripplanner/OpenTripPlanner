@@ -43,8 +43,6 @@ public class StreetEdge
 
   private static final Logger LOG = LoggerFactory.getLogger(StreetEdge.class);
 
-  private static final double SAFEST_STREETS_SAFETY_FACTOR = 0.1;
-
   /** If you have more than 16 flags, increase flags to short or int */
   static final int BACK_FLAG_INDEX = 0;
   static final int ROUNDABOUT_FLAG_INDEX = 1;
@@ -368,15 +366,26 @@ public class StreetEdge
   }
 
   /**
-   * Update the name of the edge after it has been constructed. This method also sets the
+   * Update the name of the edge after it has been constructed and set the
    * nameIsDerived property to false, indicating to the code that maps from edges to steps that this
    * is a real street name.
    *
    * @see Edge#nameIsDerived()
    */
-  public void setName(I18NString name) {
+  public void overrideName(I18NString name) {
     this.name = name;
     this.flags = BitSetUtils.set(flags, NAME_IS_DERIVED_FLAG_INDEX, false);
+  }
+
+  /**
+   * Update the name of the edge after it has been constructed and marking the name as derived,
+   * meaning that its name should be de-prioritized in walk steps.
+   *
+   * @see Edge#nameIsDerived()
+   */
+  public void overrideDerivedName(I18NString name) {
+    this.name = name;
+    this.flags = BitSetUtils.set(flags, NAME_IS_DERIVED_FLAG_INDEX, true);
   }
 
   @Override
