@@ -179,6 +179,11 @@ public class CarpoolTrip
     return stops.get(stopIndex).getOnboardCount();
   }
 
+  /** Whether one more passenger fits on the leg from stop {@code leg} to the next. */
+  public boolean hasFreeSeat(int leg) {
+    return getPassengerCountAtDepartureOfStop(leg) < totalCapacity;
+  }
+
   /** The deviation budget of the leg from stop {@code leg}: the budget of the stop it ends at. */
   public Duration legDeviationBudget(int leg) {
     return stops.get(leg + 1).getDeviationBudget();

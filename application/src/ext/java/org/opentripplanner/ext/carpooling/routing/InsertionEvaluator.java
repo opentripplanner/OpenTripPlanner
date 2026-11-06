@@ -167,7 +167,7 @@ public class InsertionEvaluator {
       for (int firstLeg = 0; firstLeg < legCount; firstLeg++) {
         boolean ok = true;
         for (int lastLeg = firstLeg; lastLeg < legCount && ok; lastLeg++) {
-          ok = trip.getPassengerCountAtDepartureOfStop(lastLeg) + 1 <= trip.totalCapacity();
+          ok = trip.hasFreeSeat(lastLeg);
           capacityOk[firstLeg][lastLeg] = ok;
         }
       }

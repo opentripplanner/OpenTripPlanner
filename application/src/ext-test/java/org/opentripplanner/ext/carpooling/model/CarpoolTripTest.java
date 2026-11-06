@@ -12,6 +12,7 @@ import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_SOU
 import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.createSimpleTrip;
 import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.createStop;
 import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.createStopAt;
+import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.createTripWithCapacity;
 import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.createTripWithStops;
 
 import java.time.Duration;
@@ -55,6 +56,24 @@ class CarpoolTripTest {
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
     // Trip has 2 stops (Origin, Destination), valid indices are 0 and 1
     assertThrows(IllegalArgumentException.class, () -> trip.getPassengerCountAtDepartureOfStop(2));
+  }
+
+  // -- hasFreeSeat tests --
+
+  @Test
+  void hasFreeSeat_onlyOnALegThatIsNotFull() {
+    // Room for two: a seat free on the first leg, none on the second.
+    var trip = createTripWithCapacity(
+      2,
+      List.of(
+        createStopAt(1, OSLO_SOUTH),
+        createStopAt(2, OSLO_CENTER),
+        createStopAt(0, OSLO_NORTH)
+      )
+    );
+
+    assertTrue(trip.hasFreeSeat(0));
+    assertFalse(trip.hasFreeSeat(1));
   }
 
   // -- legDeviationBudget tests --
