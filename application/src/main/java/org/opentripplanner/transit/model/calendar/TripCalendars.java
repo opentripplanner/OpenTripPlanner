@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -221,12 +222,16 @@ public class TripCalendars implements Serializable {
    * Efficiently assign each of the given service ids the next free service code, in iteration order:
    * the code is the number of service codes registered before it. Used during graph build only.
    *
+   * @throws IllegalArgumentException if service id is added more than once.
    * @return a new instance with the service codes registered.
    */
   public TripCalendars withNextServiceCodes(Collection<FeedScopedId> serviceIds) {
     Map<FeedScopedId, Integer> updated = new HashMap<>(serviceCodes);
     for (FeedScopedId serviceId : serviceIds) {
-      updated.put(serviceId, updated.size());
+      var previousValue = updated.put(Objects.requireNonNull(serviceId), updated.size());
+      if (previousValue != null) {
+        throw new IllegalArgumentException("Duplicate service id '%s'".formatted(serviceId));
+      }
     }
     return new TripCalendars(
       serviceDatesByServiceId,

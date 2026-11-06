@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
 import java.time.LocalDate;
@@ -74,12 +75,26 @@ class TripCalendarsTest {
     var a = id("A");
     var b = id("B");
     var c = id("C");
-    TripCalendars calendar = TripCalendars.empty().withNextServiceCodes(List.of(a));
+    var calendar = TripCalendars.empty().withNextServiceCodes(List.of(a));
 
-    TripCalendars updated = calendar.withNextServiceCodes(List.of(b, c));
+    var updated = calendar.withNextServiceCodes(List.of(b, c));
 
     assertThat(updated.getServiceCodes()).containsExactly(a, 0, b, 1, c, 2);
     assertThat(calendar.getServiceCodes()).containsExactly(a, 0);
+  }
+
+  @Test
+  void withNextServiceCodesThrowsOnDuplicates() {
+    var a = id("A");
+    var b = id("B");
+    var calendar = TripCalendars.empty().withNextServiceCodes(List.of(a));
+
+    assertThat(calendar.getServiceCodes()).containsExactly(a, 0);
+
+    assertThrows(IllegalArgumentException.class, () -> calendar.withNextServiceCodes(List.of(a)));
+    assertThrows(IllegalArgumentException.class, () ->
+      calendar.withNextServiceCodes(List.of(a, b))
+    );
   }
 
   private static TripCalendars calendarWithRange() {
