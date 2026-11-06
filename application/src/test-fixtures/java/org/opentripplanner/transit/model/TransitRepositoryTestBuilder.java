@@ -94,12 +94,12 @@ public class TransitRepositoryTestBuilder {
     }
 
     var calendarServiceData = new CalendarServiceData();
-    int serviceCodeCounter = 0;
     for (var serviceCode : serviceCodes.values()) {
       calendarServiceData.putServiceDatesForServiceId(serviceCode.id(), serviceCode.serviceDates());
-      timetableDataImport.putServiceCode(serviceCode.id(), serviceCodeCounter);
-      serviceCodeCounter += 1;
     }
+    timetableDataImport.addNextServiceCodes(
+      serviceCodes.values().stream().map(ServiceCode::id).toList()
+    );
     timetableDataImport.updateCalendarServiceData(calendarServiceData);
 
     timetableDataImport
