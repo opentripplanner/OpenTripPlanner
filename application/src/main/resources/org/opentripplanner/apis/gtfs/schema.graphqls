@@ -2731,6 +2731,22 @@ from a specific stop location.
 This may contain real-time information, if available.
 """
 type StopCall {
+  """
+  The path of the vehicle from this call to the next call of the trip. Null for the last call, and
+  for all calls of flexible trips, where the path of the vehicle is not known.
+    
+  Paths are also returned for canceled calls: a path ends at the next call and starts at this call
+  even if one of them has been canceled. The vehicle only travels along the paths between the
+  first and the last call that it serves. For example, if a trip ends early, the paths after its
+  new last call are not traveled.
+    
+  If a real-time update has changed the stops of the trip, this is the geometry of the updated
+  trip. Its sections are compared with the scheduled trip position by position: a section keeps
+  its scheduled shape if the scheduled section at the same position is between the same stops, or
+  between other stops of the same stations. Other sections, and all sections of trips added by a
+  real-time update, are approximated by a straight line between the stops.
+  """
+  geometryToNextCall: Geometry
   "Notices of this call which are known ahead of time."
   notices: [Notice!]! @deprecated(reason : "Experimental API that can be changed without notice.")
   "Real-time estimates for arrival and departure times for this stop location."
