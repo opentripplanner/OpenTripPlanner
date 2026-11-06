@@ -1,0 +1,67 @@
+package org.opentripplanner.graph_builder.module.osm;
+
+import static org.opentripplanner.osm.model.TraverseDirection.BACKWARD;
+import static org.opentripplanner.osm.model.TraverseDirection.FORWARD;
+
+import gnu.trove.map.TLongFloatMap;
+import gnu.trove.map.hash.TLongFloatHashMap;
+import java.util.Collection;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.osm.model.OsmWay;
+import org.opentripplanner.utils.logging.ProgressTracker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/// Indexes the forward and backward car speed of every way in a collection, keyed by OSM way id.
+///
+/// A car speed only depends on the way and the direction, but matching a way against the speed
+/// pickers of the [org.opentripplanner.osm.wayproperty.WayPropertySet] is expensive. Computing it
+/// once per way and direction, in parallel across all available CPU cores, is much faster than
+/// computing it for every edge of the way.
+class CarSpeedIndex {
+
+  private static final Logger LOG = LoggerFactory.getLogger(CarSpeedIndex.class);
+
+  private final TLongFloatMap forward;
+  private final TLongFloatMap backward;
+
+  private CarSpeedIndex(TLongFloatMap forward, TLongFloatMap backward) {
+    this.forward = forward;
+    this.backward = backward;
+  }
+
+  /// Build the index for every way in `ways`, reporting speed issues to `issueStore`.
+  static CarSpeedIndex of(Collection<OsmWay> ways, DataImportIssueStore issueStore) {
+    var progress = ProgressTracker.track("Compute car speeds", 5_000, ways.size());
+    LOG.info(progress.startMessage());
+
+    TLongFloatMap forward = new TLongFloatHashMap(ways.size());
+    TLongFloatMap backward = new TLongFloatHashMap(ways.size());
+    ways.parallelStream().forEach(way -> {
+      var tagMapper = way.getOsmProvider().getOsmTagMapper();
+      float forwardSpeed = tagMapper.getCarSpeedForWay(way, FORWARD, issueStore);
+      float backwardSpeed = tagMapper.getCarSpeedForWay(way, BACKWARD, issueStore);
+      // Trove maps aren't thread-safe; one lock for both puts is cheaper than two synchronized maps.
+      synchronized (forward) {
+        forward.put(way.getId(), forwardSpeed);
+        backward.put(way.getId(), backwardSpeed);
+      }
+      //Keep lambda! A method-ref would log incorrect class and line number
+      //noinspection Convert2MethodRef
+      progress.step(m -> LOG.info(m));
+    });
+
+    LOG.info(progress.completeMessage());
+    return new CarSpeedIndex(forward, backward);
+  }
+
+  /// Return the car speed in the forward direction of the way with the given id.
+  float forward(long wayId) {
+    return forward.get(wayId);
+  }
+
+  /// Return the car speed in the backward direction of the way with the given id.
+  float backward(long wayId) {
+    return backward.get(wayId);
+  }
+}
