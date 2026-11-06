@@ -83,6 +83,11 @@ public class TripTimeOnDateRequest {
         "Either 'time' or 'serviceDateRanges' must be set as the time limitation, but not both."
       );
     }
+    if (numberOfDepartures < 0) {
+      throw new IllegalArgumentException(
+        "'numberOfDepartures' must not be negative: " + numberOfDepartures
+      );
+    }
   }
 
   public static TripTimeOnDateRequestBuilder of(Collection<StopLocation> stopLocations) {
