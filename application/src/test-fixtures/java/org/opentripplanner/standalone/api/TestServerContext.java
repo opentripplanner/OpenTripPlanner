@@ -25,6 +25,10 @@ import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.routing.service.DefaultRoutingService;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.routing.via.service.DefaultViaCoordinateTransferFactory;
+import org.opentripplanner.service.shape.ShapeService;
+import org.opentripplanner.service.shape.dataimport.ShapeDataImport;
+import org.opentripplanner.service.shape.internal.DefaultShapeRepository;
+import org.opentripplanner.service.shape.internal.DefaultShapeService;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRepository;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsService;
@@ -114,11 +118,21 @@ public class TestServerContext {
   }
 
   /**
+   * Create a {@link ShapeService} for unit testing, serving the scheduled content of the import.
+   */
+  public static ShapeService createShapeService(ShapeDataImport shapeDataImport) {
+    return new DefaultShapeService(
+      DefaultShapeRepository.scheduledOnly(shapeDataImport.toScheduledShapeData())
+    );
+  }
+
+  /**
    * Create a {@link RoutingService} for unit testing.
    */
   public static RoutingService createRoutingService(
     Graph graph,
     TransitService transitService,
+    ShapeService shapeService,
     TransferRepository transferRepository
   ) {
     var routerConfig = RouterConfig.DEFAULT;
@@ -127,6 +141,7 @@ public class TestServerContext {
 
     return new DefaultRoutingService(
       transitService,
+      shapeService,
       graph,
       raptorConfig,
       Metrics.globalRegistry,

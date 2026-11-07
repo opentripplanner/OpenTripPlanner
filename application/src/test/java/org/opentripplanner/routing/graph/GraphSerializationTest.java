@@ -2,6 +2,7 @@ package org.opentripplanner.routing.graph;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.conveyal.object_differ.ObjectDiffer;
 import java.io.File;
@@ -42,6 +43,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
+import org.opentripplanner.service.shape.dataimport.ShapeDataImport;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
@@ -101,6 +103,14 @@ public class GraphSerializationTest {
   @Test
   public void testRoundTripSerializationForGTFSGraph() throws Exception {
     TestOtpModel model = ConstantsForTests.buildNewPortlandGraph(true);
+    // Guard against the shape comparison being vacuous
+    assertTrue(
+      model
+        .timetableDataImport()
+        .getAllTripPatterns()
+        .stream()
+        .anyMatch(p -> model.shapeDataImport().getTripPatternGeometry(p.getId()) != null)
+    );
     var streetRepository = createStreetRepository();
     var osmGraphBuildRepository = new DefaultOsmInfoGraphBuildRepository();
     var streetDetailsRepository = new DefaultStreetDetailsRepository();
@@ -115,6 +125,7 @@ public class GraphSerializationTest {
       streetRepository,
       model.transitRepository(),
       model.timetableDataImport(),
+      model.shapeDataImport(),
       model.transferRepository(),
       weRepo,
       parkingRepository,
@@ -149,6 +160,7 @@ public class GraphSerializationTest {
       streetRepository,
       model.transitRepository(),
       model.timetableDataImport(),
+      model.shapeDataImport(),
       model.transferRepository(),
       worldEnvelopeRepository,
       parkingRepository,
@@ -243,6 +255,28 @@ public class GraphSerializationTest {
     assertEquals(original.getServiceCodes(), copy.getServiceCodes());
   }
 
+  private static void assertSameShapeData(
+    TimetableDataImport timetableDataImport,
+    ShapeDataImport original,
+    ShapeDataImport copy
+  ) {
+    for (var pattern : timetableDataImport.getAllTripPatterns()) {
+      var originalGeometry = original.getTripPatternGeometry(pattern.getId());
+      if (originalGeometry == null) {
+        continue;
+      }
+      var copiedGeometry = copy.getTripPatternGeometry(pattern.getId());
+      assertEquals(originalGeometry.size(), copiedGeometry.size());
+      for (int i = 0; i < originalGeometry.size(); i++) {
+        assertEquals(originalGeometry.get(i), copiedGeometry.get(i));
+        assertEquals(
+          originalGeometry.distanceBetween(i, i + 1),
+          copiedGeometry.distanceBetween(i, i + 1)
+        );
+      }
+    }
+  }
+
   private static void assertNoDifferences(Graph g1, Graph g2) {
     // Make some exclusions because some classes are inherently transient or contain unordered lists we can't yet compare.
     ObjectDiffer objectDiffer = new ObjectDiffer();
@@ -291,6 +325,7 @@ public class GraphSerializationTest {
     StreetRepository streetRepository,
     TransitRepository originalTransitRepository,
     TimetableDataImport originalTimetableDataImport,
+    ShapeDataImport originalShapeDataImport,
     TransferRepository originalTransferRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository vehicleParkingRepository,
@@ -307,6 +342,7 @@ public class GraphSerializationTest {
       streetRepository,
       originalTransitRepository,
       originalTimetableDataImport,
+      originalShapeDataImport,
       originalTransferRepository,
       worldEnvelopeRepository,
       vehicleParkingRepository,
@@ -324,6 +360,11 @@ public class GraphSerializationTest {
     Graph copiedGraph1 = deserializedGraph.graph;
     TransitRepository copiedTransitRepository1 = deserializedGraph.transitRepository;
     assertSameScheduledData(originalTimetableDataImport, deserializedGraph.timetableDataImport);
+    assertSameShapeData(
+      originalTimetableDataImport,
+      originalShapeDataImport,
+      deserializedGraph.shapeDataImport
+    );
     // Index both graph - we do no know if the original is indexed, because it is cached and
     // might be indexed by other tests.
 

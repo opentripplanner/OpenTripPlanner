@@ -30,6 +30,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.routing.linking.mapping.LinkingContextRequestMapper;
+import org.opentripplanner.service.shape.dataimport.ShapeDataImport;
 import org.opentripplanner.standalone.api.TestServerContext;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.street.graph.Graph;
@@ -55,6 +56,7 @@ class ScheduledDeviatedTripIntegrationTest {
   static Graph graph;
   static TransitRepository transitRepository;
   static TimetableDataImport timetableDataImport;
+  static ShapeDataImport shapeDataImport;
   static TransferRepository transferRepository;
 
   float delta = 0.01f;
@@ -209,6 +211,7 @@ class ScheduledDeviatedTripIntegrationTest {
     graph = model.graph();
     transitRepository = model.transitRepository();
     timetableDataImport = model.timetableDataImport();
+    shapeDataImport = model.shapeDataImport();
     transferRepository = TransferServiceTestFactory.defaultTransferRepository();
   }
 
@@ -242,6 +245,7 @@ class ScheduledDeviatedTripIntegrationTest {
       var result = TransitRouter.route(
         request,
         transitService,
+        TestServerContext.createShapeService(shapeDataImport),
         graph,
         TestServerContext.createRaptorConfig(),
         Metrics.globalRegistry,

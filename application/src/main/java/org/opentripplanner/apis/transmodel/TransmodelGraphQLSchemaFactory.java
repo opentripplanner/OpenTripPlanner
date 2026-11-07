@@ -1562,6 +1562,7 @@ public class TransmodelGraphQLSchemaFactory {
             }
             return ref.getLeg(
               GqlUtil.getTransitService(environment),
+              GqlUtil.getShapeService(environment),
               GqlUtil.getTransitAlertService(environment)
             );
           })

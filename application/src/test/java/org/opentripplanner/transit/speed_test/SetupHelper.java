@@ -42,6 +42,7 @@ class SetupHelper {
       graph,
       transitRepository,
       serializedGraphObject.timetableDataImport,
+      serializedGraphObject.shapeDataImport,
       transferRepository,
       serializedGraphObject.buildConfig
     );

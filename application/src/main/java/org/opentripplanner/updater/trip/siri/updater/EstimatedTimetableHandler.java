@@ -32,7 +32,7 @@ public class EstimatedTimetableHandler {
     TransitRealTimeUpdateContext context
   ) {
     return adapter
-      .forUpdate(context.timetableRepository())
+      .forUpdate(context.timetableRepository(), context::shapeRepository)
       .applyEstimatedTimetable(
         context.entityResolver(feedId),
         feedId,

@@ -9,12 +9,15 @@ import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
+import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.service.shape.model.CompactLineStringSequence;
+import org.opentripplanner.service.shape.model.TripGeometryFactory;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model.TripInput;
@@ -37,11 +40,14 @@ class ConsolidatedStopLegBuilderTest implements PlanTestConstants {
   ).build();
   private static final TripOnDateDataFetcher TRIP_DATA = ENV.tripData("test-trip");
   private static final TripPattern PATTERN = TRIP_DATA.tripPattern();
+  private static final CompactLineStringSequence PATTERN_GEOMETRY =
+    TripGeometryFactory.straightLines(PATTERN.getStopPattern(), DeduplicatorService.NOOP);
   private static final TripTimes TRIP_TIMES = TRIP_DATA.scheduledTripTimes();
   private static final ScheduledTransitLeg SCHEDULED_TRANSIT_LEG =
     new ScheduledTransitLegBuilder<>()
       .withTripTimes(TRIP_TIMES)
       .withTripPattern(PATTERN)
+      .withTripPatternGeometry(PATTERN_GEOMETRY)
       .withBoardStopIndexInPattern(0)
       .withAlightStopIndexInPattern(1)
       .withStartTime(TIME)

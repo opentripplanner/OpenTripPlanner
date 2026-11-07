@@ -13,6 +13,7 @@ import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.refetch.RefetchItineraryService;
 import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.service.shape.ShapeService;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -25,15 +26,18 @@ public class RealtimeResolver {
 
   private final RefetchItineraryService refetchItineraryService;
   private final TransitService transitService;
+  private final ShapeService shapeService;
   private final TransitAlertService transitAlertService;
 
   public RealtimeResolver(
     RefetchItineraryService refetchItineraryService,
     TransitService transitService,
+    ShapeService shapeService,
     TransitAlertService transitAlertService
   ) {
     this.refetchItineraryService = refetchItineraryService;
     this.transitService = transitService;
+    this.shapeService = shapeService;
     this.transitAlertService = transitAlertService;
   }
 
@@ -45,12 +49,14 @@ public class RealtimeResolver {
     List<Itinerary> itineraries,
     RefetchItineraryService refetchItineraryService,
     TransitService transitService,
+    ShapeService shapeService,
     TransitAlertService transitAlertService,
     RouteRequest routeRequest
   ) {
     return new RealtimeResolver(
       refetchItineraryService,
       transitService,
+      shapeService,
       transitAlertService
     ).addRealtimeInfo(itineraries, routeRequest);
   }
@@ -117,7 +123,7 @@ public class RealtimeResolver {
     if (!leg.isScheduledTransitLeg()) {
       return leg;
     }
-    var realTimeLeg = ref.getLeg(transitService, transitAlertService);
+    var realTimeLeg = ref.getLeg(transitService, shapeService, transitAlertService);
     if (realTimeLeg == null) {
       return leg;
     }

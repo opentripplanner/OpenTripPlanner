@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.basic.Cost;
+import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.FlexParameters;
@@ -31,6 +32,7 @@ import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
 import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.model.plan.walkstep.WalkStep;
+import org.opentripplanner.service.shape.model.TripGeometryFactory;
 import org.opentripplanner.street.model.StreetModelForTest;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
@@ -555,6 +557,10 @@ public class TestItineraryBuilder implements PlanTestConstants {
       .withStopPattern(stopPattern)
       .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(tripTimes))
       .build();
+    var tripPatternGeometry = TripGeometryFactory.straightLines(
+      tripPattern.getStopPattern(),
+      DeduplicatorService.NOOP
+    );
 
     ScheduledTransitLeg leg;
 
@@ -562,6 +568,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
       leg = new FrequencyTransitLegBuilder()
         .withTripTimes(tripTimes)
         .withTripPattern(tripPattern)
+        .withTripPatternGeometry(tripPatternGeometry)
         .withBoardStopIndexInPattern(fromStopIndex)
         .withAlightStopIndexInPattern(toStopIndex)
         .withStartTime(newTime(start))
@@ -577,6 +584,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
       leg = new ScheduledTransitLegBuilder()
         .withTripTimes(tripTimes)
         .withTripPattern(tripPattern)
+        .withTripPatternGeometry(tripPatternGeometry)
         .withBoardStopIndexInPattern(fromStopIndex)
         .withAlightStopIndexInPattern(toStopIndex)
         .withStartTime(newTime(start))

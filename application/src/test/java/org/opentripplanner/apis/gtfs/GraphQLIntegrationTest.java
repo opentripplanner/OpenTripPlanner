@@ -86,6 +86,7 @@ import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehi
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
 import org.opentripplanner.service.realtimevehicles.internal.RealtimeVehicleRepositoryLifecycle;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
+import org.opentripplanner.service.shape.ShapeTestFactory;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRepository;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsService;
 import org.opentripplanner.service.streetdetails.model.InclinedEdgeLevelInfo;
@@ -101,6 +102,7 @@ import org.opentripplanner.service.vehiclerental.model.TestFreeFloatingRentalVeh
 import org.opentripplanner.service.vehiclerental.model.TestVehicleRentalStationBuilder;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
+import org.opentripplanner.standalone.api.TestServerContext;
 import org.opentripplanner.standalone.config.framework.json.JsonSupport;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.edge.ElevatorAlightEdge;
@@ -370,22 +372,21 @@ class GraphQLIntegrationTest {
       .withRoute(busRoute)
       .build();
 
+    var tripPatterns = new ArrayList<>(scheduledTimetableData.getAllTripPatterns());
     for (var t : List.of(addedTrip, tripToBeReplaced)) {
       var realTimeTripTimes = TripTimesFactory.tripTimes(
         t,
         TEST_MODEL.stopTimesEvery5Minutes(4, t, "00:00"),
         new Deduplicator()
       ).withServiceCode(SERVICE_CODE);
+      var realTimePattern = TripPattern.of(new FeedScopedId(FEED_ID, "ADDED_TRIP_PATTERN"))
+        .withRoute(t.getRoute())
+        .withStopPattern(TransitRepositoryForTest.stopPattern(A.stop, B.stop, C.stop, D.stop))
+        .withRealTimeStopPatternModified()
+        .build();
+      tripPatterns.add(realTimePattern);
       timetableSnapshot.update(
-        RealTimeTripUpdate.of(
-          TripPattern.of(new FeedScopedId(FEED_ID, "ADDED_TRIP_PATTERN"))
-            .withRoute(t.getRoute())
-            .withStopPattern(TransitRepositoryForTest.stopPattern(A.stop, B.stop, C.stop, D.stop))
-            .withRealTimeStopPatternModified()
-            .build(),
-          realTimeTripTimes,
-          SERVICE_DATE
-        )
+        RealTimeTripUpdate.of(realTimePattern, realTimeTripTimes, SERVICE_DATE)
           .withTripCreation(t == addedTrip)
           .build()
       );
@@ -580,6 +581,7 @@ class GraphQLIntegrationTest {
     context = new TestGtfsGraphQLRequestContext(
       new TestRoutingService(List.of(i1)),
       transitService,
+      TestServerContext.createShapeService(ShapeTestFactory.shapeDataImport(tripPatterns)),
       transitAlertService,
       TransferServiceTestFactory.defaultTransferService(),
       fareService,

@@ -55,7 +55,7 @@ public class TripUpdateGraphWriterRunnable
   @Override
   public void run(TransitRealTimeUpdateContext context) {
     var result = adapter
-      .forUpdate(context.timetableRepository())
+      .forUpdate(context.timetableRepository(), context::shapeRepository)
       .applyTripUpdates(
         fuzzyTripMatching ? context.gtfsRealtimeFuzzyTripMatcher() : null,
         forwardsDelayPropagationType,

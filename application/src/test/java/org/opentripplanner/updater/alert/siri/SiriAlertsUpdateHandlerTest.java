@@ -98,6 +98,11 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
         throw new UnsupportedOperationException(
           "The realtime-vehicle repository is not available in this test context"
         );
+      },
+      () -> {
+        throw new UnsupportedOperationException(
+          "The shape repository is not available in this test context"
+        );
       }
     );
     if (transitService == null) {

@@ -68,7 +68,7 @@ public class SiriTestHelper {
           var feedId = transitTestEnvironment.feedId();
           resultRef.set(
             adapter
-              .forUpdate(buffer)
+              .forUpdate(buffer, () -> ctx.repository(transitTestEnvironment.shapeHandle()))
               .applyEstimatedTimetable(
                 new EntityResolver(buffer, transitTestEnvironment.transitRepository(), feedId),
                 feedId,

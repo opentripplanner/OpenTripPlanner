@@ -1,5 +1,6 @@
 package org.opentripplanner.model;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
@@ -18,8 +19,10 @@ public class ShapeGeometryTest {
     // data includes 2 trips, of which one has incorrect shape_dist_traveled parametrization in stop_times
     for (TripPattern pattern : timetableDataImport.getAllTripPatterns()) {
       // examine if shape extraction worked at first stop intervals, where dist parameter is wrong
-      assertTrue(pattern.getHopGeometry(0).getCoordinates().length > 2);
-      assertTrue(pattern.getHopGeometry(1).getCoordinates().length > 2);
+      var tripPatternGeometry = model.shapeDataImport().getTripPatternGeometry(pattern.getId());
+      assertNotNull(tripPatternGeometry);
+      assertTrue(tripPatternGeometry.get(0).getCoordinates().length > 2);
+      assertTrue(tripPatternGeometry.get(1).getCoordinates().length > 2);
     }
   }
 }

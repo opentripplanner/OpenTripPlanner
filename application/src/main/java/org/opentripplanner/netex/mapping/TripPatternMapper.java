@@ -29,6 +29,7 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
+import org.opentripplanner.service.shape.model.TripGeometryFactory;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.DataValidationException;
@@ -261,17 +262,20 @@ class TripPatternMapper {
           ? ""
           : MultilingualStringMapper.getStringValue(journeyPattern.getName())
       )
-      .withHopGeometries(
-        serviceLinkMapper.getGeometriesByJourneyPattern(journeyPattern, stopPattern)
-      )
       .withScheduledTimeTableBuilder(builder ->
         builder.addAllTripTimes(createTripTimes(trips, tripStopTimes))
       )
       .build();
 
+    var tripPatternGeometry = TripGeometryFactory.fromLineStrings(
+      serviceLinkMapper.getGeometriesByJourneyPattern(journeyPattern, stopPattern),
+      deduplicator
+    );
+
     return Optional.of(
       new TripPatternMapperResult(
         tripPattern,
+        tripPatternGeometry,
         scheduledStopPointsIndex,
         tripStopTimes,
         stopTimeByNetexId,

@@ -2,6 +2,7 @@ package org.opentripplanner.updater;
 
 import java.util.function.Supplier;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
+import org.opentripplanner.service.shape.ShapeRepository;
 import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.trip.gtfs.GtfsRealtimeFuzzyTripMatcher;
@@ -18,14 +19,21 @@ public class DefaultTransitRealTimeUpdateContext implements TransitRealTimeUpdat
    */
   private final Supplier<RealtimeVehicleRepository> realtimeVehicleRepository;
 
+  /**
+   * Resolved lazily for the same reason as the realtime vehicle repository.
+   */
+  private final Supplier<ShapeRepository> shapeRepository;
+
   public DefaultTransitRealTimeUpdateContext(
     TransitRepository transitRepository,
     TimetableRepository timetableRepository,
-    Supplier<RealtimeVehicleRepository> realtimeVehicleRepository
+    Supplier<RealtimeVehicleRepository> realtimeVehicleRepository,
+    Supplier<ShapeRepository> shapeRepository
   ) {
     this.transitRepository = transitRepository;
     this.timetableRepository = timetableRepository;
     this.realtimeVehicleRepository = realtimeVehicleRepository;
+    this.shapeRepository = shapeRepository;
   }
 
   @Override
@@ -41,6 +49,11 @@ public class DefaultTransitRealTimeUpdateContext implements TransitRealTimeUpdat
   @Override
   public RealtimeVehicleRepository realtimeVehicleRepository() {
     return realtimeVehicleRepository.get();
+  }
+
+  @Override
+  public ShapeRepository shapeRepository() {
+    return shapeRepository.get();
   }
 
   @Override

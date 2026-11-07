@@ -17,6 +17,7 @@ import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.service.shape.dataimport.ShapeDataImport;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking.VehicleParkingEntranceCreator;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
@@ -80,6 +81,7 @@ public abstract class GraphRoutingTest {
       graph,
       transitRepository,
       timetableDataImport,
+      new ShapeDataImport(),
       TransferServiceTestFactory.defaultTransferRepository()
     ).index();
   }

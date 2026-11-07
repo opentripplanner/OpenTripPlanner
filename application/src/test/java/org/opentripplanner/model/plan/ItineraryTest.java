@@ -15,10 +15,12 @@ import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Cost;
+import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
+import org.opentripplanner.service.shape.model.TripGeometryFactory;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -218,6 +220,10 @@ public class ItineraryTest implements PlanTestConstants {
     var tripPattern = TransitRepositoryForTest.tripPattern("p", trip.getRoute())
       .withStopPattern(stopPattern)
       .build();
+    var tripPatternGeometry = TripGeometryFactory.straightLines(
+      tripPattern.getStopPattern(),
+      DeduplicatorService.NOOP
+    );
 
     var tripTimes = ScheduledTripTimes.of().withArrivalTimes("13:00 14:00").withTrip(trip).build();
     var startTime = ZonedDateTime.of(2025, 10, 20, 13, 0, 0, 499_000_000, zoneId);
@@ -231,6 +237,7 @@ public class ItineraryTest implements PlanTestConstants {
           .withEndTime(endTime)
           .withTripTimes(tripTimes)
           .withTripPattern(tripPattern)
+          .withTripPatternGeometry(tripPatternGeometry)
           .withBoardStopIndexInPattern(0)
           .withAlightStopIndexInPattern(1)
           .withServiceDate(startTime.toLocalDate())

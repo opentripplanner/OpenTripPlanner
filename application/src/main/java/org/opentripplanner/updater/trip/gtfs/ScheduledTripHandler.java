@@ -20,6 +20,7 @@ import org.opentripplanner.updater.trip.TripUpdateApplier;
 import org.opentripplanner.updater.trip.gtfs.interpolation.BackwardsDelayPropagationType;
 import org.opentripplanner.updater.trip.gtfs.interpolation.ForwardsDelayPropagationType;
 import org.opentripplanner.updater.trip.gtfs.model.TripUpdate;
+import org.opentripplanner.updater.trip.patterncache.RealTimeShapeResolver;
 import org.opentripplanner.updater.trip.patterncache.TripPatternCache;
 
 /**
@@ -32,17 +33,20 @@ class ScheduledTripHandler {
   private final TimetableRepository buffer;
   private final TripTimesUpdater tripTimesUpdater;
   private final TripPatternCache tripPatternCache;
+  private final RealTimeShapeResolver shapeResolver;
 
   ScheduledTripHandler(
     TransitRepository transitRepository,
     TimetableRepository buffer,
     TripTimesUpdater tripTimesUpdater,
-    TripPatternCache tripPatternCache
+    TripPatternCache tripPatternCache,
+    RealTimeShapeResolver shapeResolver
   ) {
     this.transitRepository = transitRepository;
     this.buffer = buffer;
     this.tripTimesUpdater = tripTimesUpdater;
     this.tripPatternCache = tripPatternCache;
+    this.shapeResolver = shapeResolver;
   }
 
   UpdateSuccess handle(
@@ -106,6 +110,7 @@ class ScheduledTripHandler {
 
       return TripUpdateApplier.apply(
         buffer,
+        shapeResolver,
         RealTimeTripUpdate.of(newPattern, updatedTripTimes, tripUpdate.startDate())
           .withRevertPreviousRealTimeUpdates(true)
           .withHideTripInScheduledPattern(pattern)
@@ -114,6 +119,7 @@ class ScheduledTripHandler {
     } else {
       return TripUpdateApplier.apply(
         buffer,
+        shapeResolver,
         RealTimeTripUpdate.of(pattern, updatedTripTimes, tripUpdate.startDate())
           .withRevertPreviousRealTimeUpdates(true)
           .build()

@@ -26,6 +26,7 @@ import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.opentripplanner.updater.trip.TripUpdateApplier;
 import org.opentripplanner.updater.trip.gtfs.model.StopTimeUpdate;
 import org.opentripplanner.updater.trip.gtfs.model.TripUpdate;
+import org.opentripplanner.updater.trip.patterncache.RealTimeShapeResolver;
 import org.opentripplanner.updater.trip.patterncache.TripPatternCache;
 
 /**
@@ -39,17 +40,20 @@ class NewTripHandler {
   private final TimetableRepository buffer;
   private final TripTimesUpdater tripTimesUpdater;
   private final TripPatternCache tripPatternCache;
+  private final RealTimeShapeResolver shapeResolver;
 
   NewTripHandler(
     TransitRepository transitRepository,
     TimetableRepository buffer,
     TripTimesUpdater tripTimesUpdater,
-    TripPatternCache tripPatternCache
+    TripPatternCache tripPatternCache,
+    RealTimeShapeResolver shapeResolver
   ) {
     this.transitRepository = transitRepository;
     this.buffer = buffer;
     this.tripTimesUpdater = tripTimesUpdater;
     this.tripPatternCache = tripPatternCache;
+    this.shapeResolver = shapeResolver;
   }
 
   /**
@@ -173,7 +177,7 @@ class NewTripHandler {
         )
         .withTripCreation(true);
     }
-    return TripUpdateApplier.apply(buffer, builder.build());
+    return TripUpdateApplier.apply(buffer, shapeResolver, builder.build());
   }
 
   /**

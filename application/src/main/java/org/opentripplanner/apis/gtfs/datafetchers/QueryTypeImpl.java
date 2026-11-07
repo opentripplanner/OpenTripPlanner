@@ -63,6 +63,7 @@ import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.service.shape.ShapeService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
@@ -395,7 +396,11 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
       if (ref == null) {
         return null;
       }
-      return ref.getLeg(transitService, getTransitAlertService(environment));
+      return ref.getLeg(
+        transitService,
+        getShapeService(environment),
+        getTransitAlertService(environment)
+      );
     };
   }
 
@@ -1021,6 +1026,10 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
 
   private TransitAlertService getTransitAlertService(DataFetchingEnvironment environment) {
     return environment.<GtfsGraphQLRequestContext>getContext().transitAlertService();
+  }
+
+  private ShapeService getShapeService(DataFetchingEnvironment environment) {
+    return environment.<GtfsGraphQLRequestContext>getContext().shapeService();
   }
 
   private FareService getFareService(DataFetchingEnvironment environment) {

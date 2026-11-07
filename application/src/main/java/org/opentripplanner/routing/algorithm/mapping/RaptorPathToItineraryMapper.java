@@ -37,6 +37,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedPath;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.via.model.ViaCoordinateTransfer;
+import org.opentripplanner.service.shape.ShapeService;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.graph.Graph;
@@ -74,6 +75,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
   private final StreetPathToLegsMapper streetPathToLegsMapper;
   private final TransitService transitService;
+  private final ShapeService shapeService;
   private final CarpoolItineraryMapper carpoolItineraryMapper;
 
   @Nullable
@@ -90,6 +92,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
   public RaptorPathToItineraryMapper(
     Graph graph,
     TransitService transitService,
+    ShapeService shapeService,
     StreetDetailsService streetDetailsService,
     RaptorTransitData raptorTransitData,
     ZonedDateTime transitSearchTimeZero,
@@ -108,6 +111,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       graph.ellipsoidToGeoidDifference
     );
     this.transitService = transitService;
+    this.shapeService = shapeService;
     this.carpoolItineraryMapper = new CarpoolItineraryMapper();
     this.taxiService = taxiService;
   }
@@ -247,6 +251,9 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       return new FrequencyTransitLegBuilder()
         .withTripTimes(tripSchedule.getOriginalTripTimes())
         .withTripPattern(tripSchedule.getOriginalTripPattern())
+        .withTripPatternGeometry(
+          shapeService.getTripPatternGeometry(tripSchedule.getOriginalTripPattern().getId())
+        )
         .withBoardStopIndexInPattern(boardStopIndexInPattern)
         .withAlightStopIndexInPattern(alightStopIndexInPattern)
         .withStartTime(createZonedDateTime(pathLeg.fromTime() + frequencyHeadwayInSeconds))
@@ -279,6 +286,9 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     return new ScheduledTransitLegBuilder<>()
       .withTripTimes(tripSchedule.getOriginalTripTimes())
       .withTripPattern(tripSchedule.getOriginalTripPattern())
+      .withTripPatternGeometry(
+        shapeService.getTripPatternGeometry(tripSchedule.getOriginalTripPattern().getId())
+      )
       .withBoardStopIndexInPattern(boardStopIndexInPattern)
       .withAlightStopIndexInPattern(alightStopIndexInPattern)
       .withStartTime(createZonedDateTime(pathLeg.fromTime()))

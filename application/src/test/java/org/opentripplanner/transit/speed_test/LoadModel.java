@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.speed_test;
 
+import org.opentripplanner.service.shape.dataimport.ShapeDataImport;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transfer.regular.TransferRepository;
@@ -10,6 +11,7 @@ record LoadModel(
   Graph graph,
   TransitRepository transitRepository,
   TimetableDataImport timetableDataImport,
+  ShapeDataImport shapeDataImport,
   TransferRepository transferRepository,
   BuildConfig buildConfig
 ) {}

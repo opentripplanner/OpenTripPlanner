@@ -60,14 +60,21 @@ public class TransmodelAPITestContextBuilder {
 
   public TestTransmodelGraphQLRequestContext build() {
     var transitService = transitTestEnvironment.transitService();
+    var shapeService = transitTestEnvironment.shapeService();
     var transferRepository = transferRepository();
     var graph = graph();
 
     var vertexLinker = VertexLinkerTestFactory.of(graph);
 
     return new TestTransmodelGraphQLRequestContext(
-      TestServerContext.createRoutingService(graph, transitService, transferRepository),
+      TestServerContext.createRoutingService(
+        graph,
+        transitService,
+        shapeService,
+        transferRepository
+      ),
       transitService,
+      shapeService,
       null,
       null,
       defaultRequest(),
