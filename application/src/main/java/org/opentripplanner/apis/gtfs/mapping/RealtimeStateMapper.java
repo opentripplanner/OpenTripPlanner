@@ -1,6 +1,7 @@
 package org.opentripplanner.apis.gtfs.mapping;
 
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
+import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimes;
@@ -47,5 +48,29 @@ public class RealtimeStateMapper {
       return GraphQLTypes.GraphQLRealtimeState.UPDATED;
     }
     return GraphQLTypes.GraphQLRealtimeState.SCHEDULED;
+  }
+
+  /**
+   * The real-time state of a single stop of a trip. A canceled stop is {@code CANCELED}. Otherwise
+   * it is the trip state, except for trips with a modified stop pattern (e.g. a GTFS-RT
+   * {@code REPLACEMENT} trip), where each stop gets its own state: {@code ADDED} if the stop is not
+   * part of the scheduled trip, otherwise {@code UPDATED}, or {@code SCHEDULED} if there is no
+   * real-time data for the stop.
+   */
+  public static GraphQLTypes.GraphQLRealtimeState map(TripTimeOnDate stopTime) {
+    if (stopTime.isCanceledEffectively()) {
+      return GraphQLTypes.GraphQLRealtimeState.CANCELED;
+    }
+    var tripState = map(stopTime.getTripTimes());
+    if (tripState != GraphQLTypes.GraphQLRealtimeState.MODIFIED) {
+      return tripState;
+    }
+    if (stopTime.isExtraCall()) {
+      return GraphQLTypes.GraphQLRealtimeState.ADDED;
+    }
+    if (stopTime.isNoDataStop()) {
+      return GraphQLTypes.GraphQLRealtimeState.SCHEDULED;
+    }
+    return GraphQLTypes.GraphQLRealtimeState.UPDATED;
   }
 }

@@ -5,21 +5,26 @@ import static org.opentripplanner.updater.spi.UpdateErrorType.INVALID_DEPARTURE_
 import static org.opentripplanner.updater.spi.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
 
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.OptionalLong;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.network.StopPattern;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
@@ -31,6 +36,9 @@ import org.opentripplanner.updater.trip.gtfs.interpolation.ForwardsDelayPropagat
 import org.opentripplanner.updater.trip.gtfs.model.StopTimeUpdate;
 import org.opentripplanner.updater.trip.gtfs.model.TripTimesPatch;
 import org.opentripplanner.updater.trip.gtfs.model.TripUpdate;
+import org.opentripplanner.updater.trip.stoplistdiff.StopListDiff;
+import org.opentripplanner.updater.trip.stoplistdiff.StopListDiffComparand;
+import org.opentripplanner.updater.trip.stoplistdiff.StopListDiffEntry;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 class TripTimesUpdater {
@@ -230,10 +238,14 @@ class TripTimesUpdater {
 
     // Update all times to mark trip times as realtime
     for (int stopIndex = 0; stopIndex < builder.numberOfStops(); stopIndex++) {
-      final var addedStopTime = stopAndStopTimeUpdates.get(stopIndex).stopTimeUpdate();
+      final var item = stopAndStopTimeUpdates.get(stopIndex);
+      final var addedStopTime = item.stopTimeUpdate();
 
       if (addedStopTime.isSkipped()) {
         builder.withCanceled(stopIndex);
+      }
+      if (item.extraCall()) {
+        builder.withExtraCall(stopIndex, true);
       }
 
       setArrivalAndDeparture(builder, stopIndex, addedStopTime, midnightSecondsSinceEpoch);
@@ -262,6 +274,97 @@ class TripTimesUpdater {
 
     // Add new trip times to the buffer
     return new TripTimesWithStopPattern(tripTimes, new StopPattern(stopTimes));
+  }
+
+  /**
+   * Flag the stops of a replacement trip that are not part of the scheduled trip it replaces as
+   * extra calls, using {@link StopListDiff}. The result contains exactly the stops sent by the
+   * producer, in the same order: scheduled stops left out of the replacement are not added. A stop
+   * the producer sends as {@code SKIPPED} is canceled as usual.
+   * <p>
+   * The stops are returned unchanged if there is no scheduled pattern or the trip is not in its
+   * scheduled timetable (e.g. it was itself added in real time).
+   */
+  List<StopAndStopTimeUpdate> flagAddedStops(
+    Trip trip,
+    LocalDate serviceDate,
+    List<StopAndStopTimeUpdate> replacement,
+    @Nullable TripPattern scheduledPattern
+  ) {
+    if (scheduledPattern == null) {
+      return replacement;
+    }
+    var scheduledTripTimes = scheduledPattern.getScheduledTimetable().getTripTimes(trip);
+    if (scheduledTripTimes == null) {
+      return replacement;
+    }
+
+    final long midnightSecondsSinceEpoch = ServiceDateUtils.asStartOfService(
+      serviceDate,
+      timeZone
+    ).toEpochSecond();
+    var diff = StopListDiff.diff(
+      scheduledComparands(scheduledPattern, scheduledTripTimes, midnightSecondsSinceEpoch),
+      replacementComparands(replacement)
+    );
+
+    var result = new ArrayList<StopAndStopTimeUpdate>(replacement.size());
+    for (var entry : diff) {
+      switch (entry) {
+        case StopListDiffEntry.Kept kept -> result.add(replacement.get(kept.replacementIndex()));
+        case StopListDiffEntry.Added added -> {
+          var it = replacement.get(added.replacementIndex());
+          result.add(new StopAndStopTimeUpdate(it.stop(), it.stopTimeUpdate(), true));
+        }
+        case StopListDiffEntry.Removed _ -> {
+        }
+      }
+    }
+    return result;
+  }
+
+  /**
+   * The stops of the scheduled trip, with their scheduled arrival and departure times converted to
+   * seconds since the epoch so they can be compared with the GTFS-RT times of the replacement.
+   */
+  private static List<StopListDiffComparand> scheduledComparands(
+    TripPattern pattern,
+    TripTimes<?> tripTimes,
+    long midnightSecondsSinceEpoch
+  ) {
+    var comparands = new ArrayList<StopListDiffComparand>(pattern.numberOfStops());
+    for (int i = 0; i < pattern.numberOfStops(); i++) {
+      comparands.add(
+        new StopListDiffComparand(
+          pattern.getStop(i),
+          OptionalLong.of(midnightSecondsSinceEpoch + tripTimes.getScheduledArrivalTime(i)),
+          OptionalLong.of(midnightSecondsSinceEpoch + tripTimes.getScheduledDepartureTime(i))
+        )
+      );
+    }
+    return comparands;
+  }
+
+  /**
+   * The stops of the replacement trip, with their scheduled arrival and departure times. Each time
+   * is the scheduled time, or the real-time time if no scheduled time is given, and is empty if the
+   * stop has no such event (e.g. a skipped stop).
+   */
+  private static List<StopListDiffComparand> replacementComparands(
+    List<StopAndStopTimeUpdate> replacement
+  ) {
+    var comparands = new ArrayList<StopListDiffComparand>(replacement.size());
+    for (var it : replacement) {
+      var update = it.stopTimeUpdate();
+      comparands.add(
+        new StopListDiffComparand(
+          it.stop(),
+          update.scheduledArrivalTimeWithRealTimeFallback(),
+          update.scheduledDepartureTimeWithRealTimeFallback()
+        )
+      );
+    }
+    return comparands;
   }
 
   private static void setArrivalAndDeparture(
