@@ -40,7 +40,7 @@ public class DestinationArrivalTest {
   private static final int EXPECTED_TOTAL_COST = ACCESS_COST + TRANSIT_COST + DESTINATION_C1;
 
   private static final StopArrivalFactoryC1<RaptorTripSchedule> STOP_ARRIVAL_FACTORY =
-    new StopArrivalFactoryC1<RaptorTripSchedule>();
+    new StopArrivalFactoryC1<>();
 
   /**
    * Setup a simple journey with an access leg, one transit and a egress leg.
@@ -103,7 +103,7 @@ public class DestinationArrivalTest {
 
   @Test
   public void roundIncludesEgressRides() {
-    var withFlexEgress = new DestinationArrival<RaptorTripSchedule>(
+    var withFlexEgress = new DestinationArrival<>(
       TestAccessEgress.flex(TRANSIT_STOP, DESTINATION_DURATION_TIME, 2),
       TRANSIT_ARRIVAL,
       ACCESS_DEPARTURE_TIME,
@@ -118,12 +118,12 @@ public class DestinationArrivalTest {
 
   @Test
   public void probeHasNoArrivalChainAndTheGivenValues() {
-    var probe = DestinationArrival.<RaptorTripSchedule>createProbe();
-    probe.setProbeValues(1000, 1001, 2000, 3, 4000, 5);
+    var probe = DestinationArrival.createProbe();
+    probe.setProbeValues(1000, 2000, 3, 4000, 5);
 
     assertNull(probe.previous());
     assertEquals(1000, probe.iterationDepartureTime());
-    assertEquals(1001, probe.departureTime());
+    assertEquals(1000, probe.departureTime());
     assertEquals(2000, probe.arrivalTime());
     assertEquals(3, probe.numberOfTransfers());
     assertEquals(4, probe.round());
@@ -133,9 +133,9 @@ public class DestinationArrivalTest {
 
   @Test
   public void probeCanBeReused() {
-    var probe = DestinationArrival.<RaptorTripSchedule>createProbe();
-    probe.setProbeValues(1000, 1001, 2000, 3, 4000, 5);
-    probe.setProbeValues(1001, 1002, 2001, 0, 4001, 6);
+    var probe = DestinationArrival.createProbe();
+    probe.setProbeValues(1000, 2000, 3, 4000, 5);
+    probe.setProbeValues(1001, 2001, 0, 4001, 6);
 
     assertEquals(1001, probe.iterationDepartureTime());
     assertEquals(2001, probe.arrivalTime());
@@ -147,6 +147,6 @@ public class DestinationArrivalTest {
 
   @Test
   public void onlyAProbeCanBeModified() {
-    assertThrows(IllegalStateException.class, () -> subject.setProbeValues(1, 2, 3, 4, 5, 6));
+    assertThrows(IllegalStateException.class, () -> subject.setProbeValues(1, 3, 4, 5, 6));
   }
 }

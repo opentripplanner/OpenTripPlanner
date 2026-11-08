@@ -1,7 +1,9 @@
 package org.opentripplanner.raptor.rangeraptor.destination;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.raptor.rangeraptor.destination.DestinationArrivalParetoSetComparators.paretoComparator;
 import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost.NONE;
 import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost.USE_C1;
@@ -18,11 +20,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor.api.model.DominanceFunction;
 import org.opentripplanner.raptor.api.model.GeneralizedCostRelaxFunction;
 import org.opentripplanner.raptor.api.model.RelaxFunction;
+import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost;
 import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.stop.StopArrivalFactoryC1;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.PatternRideC1;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.spi.SearchDirection;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
@@ -36,6 +42,7 @@ import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
  */
 class DestinationArrivalParetoSetComparatorsTest {
 
+  private static final int STOP = 1;
   private static final DominanceFunction C2_COMP = (left, right) -> left < right;
   private static final RelaxFunction RELAX_FN = GeneralizedCostRelaxFunction.of(1.0, 3);
 
@@ -143,7 +150,7 @@ class DestinationArrivalParetoSetComparatorsTest {
     var base = arrival(10, 1, 20, 0, 5, 0);
     var shorter = arrival(10, 9, 20, 0, 5, 0);
 
-    assertEquals(false, subject.dominanceExist(base, shorter));
+    assertFalse(subject.dominanceExist(base, shorter));
   }
 
   /**
@@ -157,12 +164,12 @@ class DestinationArrivalParetoSetComparatorsTest {
     var shifted = arrival(11, 11, 21, 0, 5, 0);
 
     var timetable = comparator(USE_TIMETABLE, SearchDirection.FORWARD, USE_C1);
-    assertEquals(true, timetable.leftDominanceExist(shifted, first));
-    assertEquals(true, timetable.leftDominanceExist(first, shifted));
+    assertTrue(timetable.leftDominanceExist(shifted, first));
+    assertTrue(timetable.leftDominanceExist(first, shifted));
 
     var arrivalTimeSearch = comparator(USE_ARRIVAL_TIME, SearchDirection.FORWARD, USE_C1);
-    assertEquals(true, arrivalTimeSearch.leftDominanceExist(first, shifted));
-    assertEquals(false, arrivalTimeSearch.leftDominanceExist(shifted, first));
+    assertTrue(arrivalTimeSearch.leftDominanceExist(first, shifted));
+    assertFalse(arrivalTimeSearch.leftDominanceExist(shifted, first));
   }
 
   @Test
@@ -171,7 +178,18 @@ class DestinationArrivalParetoSetComparatorsTest {
     var longer = arrival(10, 1, 20, 0, 5, 0);
     var shorter = arrival(10, 9, 20, 0, 5, 0);
 
-    assertEquals(false, subject.dominanceExist(longer, shorter));
+    assertFalse(subject.dominanceExist(longer, shorter));
+  }
+
+  @Test
+  void durationIsACriterionForArrivalTimeSearchesWithCost() {
+    var subject = comparator(USE_ARRIVAL_TIME, SearchDirection.FORWARD, USE_C1);
+    // Same iteration, arrival, transfers and cost, but a different departure time
+    var longer = arrival(10, 1, 20, 0, 5, 0);
+    var shorter = arrival(10, 9, 20, 0, 5, 0);
+
+    assertTrue(subject.leftDominanceExist(shorter, longer));
+    assertFalse(subject.leftDominanceExist(longer, shorter));
   }
 
   @Test
@@ -245,6 +263,11 @@ class DestinationArrivalParetoSetComparatorsTest {
     return list;
   }
 
+  /**
+   * Create a real destination arrival, not a probe. A probe always has the iteration departure
+   * time as the departure time, so it cannot be used to test the departure time or duration
+   * criteria.
+   */
   private static DestinationArrival<RaptorTripSchedule> arrival(
     int iterationDepartureTime,
     int departureTime,
@@ -253,15 +276,31 @@ class DestinationArrivalParetoSetComparatorsTest {
     int c1,
     int c2
   ) {
-    var probe = DestinationArrival.<RaptorTripSchedule>createProbe();
-    probe.setProbeValues(
+    // The previous arrival is a round 1 arrival with c1 = 0, so the number of transfers is the
+    // number of egress rides, and the additional c1 is the c1 of the destination arrival.
+    var egress =
+      numberOfTransfers == 0
+        ? TestAccessEgress.walk(STOP, 10)
+        : TestAccessEgress.flex(STOP, 10, numberOfTransfers);
+    return new DestinationArrival<>(
+      egress,
+      previousArrival(),
       iterationDepartureTime,
       departureTime,
       arrivalTime,
-      numberOfTransfers,
       c1,
       c2
     );
-    return probe;
+  }
+
+  private static ArrivalView<RaptorTripSchedule> previousArrival() {
+    var factory = new StopArrivalFactoryC1<RaptorTripSchedule>();
+    var access = factory.createAccessStopArrival(0, TestAccessEgress.walk(STOP, 10));
+    return factory.createTransitStopArrival(
+      new PatternRideC1<>(access, 0, 0, 0, 0, 0, null),
+      STOP,
+      0,
+      0
+    );
   }
 }

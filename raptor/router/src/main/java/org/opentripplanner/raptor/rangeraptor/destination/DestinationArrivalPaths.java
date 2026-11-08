@@ -147,17 +147,13 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
    * probe per call.
    */
   public boolean qualify(int arrivalTime, int numberOfTransfers, int cost, int c2) {
-    // The probe uses the iteration departure time, which is the lower bound of the time-shifted
-    // departure time. This is the best estimate we have without searching, and it is slightly
-    // pessimistic for the duration criterion. This is consistent with the heuristic used.
-    probe.setProbeValues(
-      iterationDepartureTime,
-      iterationDepartureTime,
-      arrivalTime,
-      numberOfTransfers,
-      cost,
-      c2
-    );
+    // The probe uses the iteration departure time, which is never later than the actual
+    // (time-shifted) departure time. The duration of the probe is therefore too long, and it is
+    // not a lower bound. A journey that is optimal on duration can be pruned if a journey with
+    // fewer transfers is already in the result and the optimal departure is within the same
+    // iteration. This is a known limitation, see package.md, section "Destination pareto-set",
+    // and I03_SameIterationOptimalDepartureDroppedTest.
+    probe.setProbeValues(iterationDepartureTime, arrivalTime, numberOfTransfers, cost, c2);
     return arrivals.qualify(probe);
   }
 

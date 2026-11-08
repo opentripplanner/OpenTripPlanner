@@ -86,7 +86,6 @@ public class DestinationArrival<T extends RaptorTripSchedule> implements Arrival
    */
   void setProbeValues(
     int iterationDepartureTime,
-    int departureTime,
     int arrivalTime,
     int numberOfTransfers,
     int c1,
@@ -96,7 +95,7 @@ public class DestinationArrival<T extends RaptorTripSchedule> implements Arrival
       throw new IllegalStateException("Only a probe may be modified.");
     }
     this.iterationDepartureTime = iterationDepartureTime;
-    this.departureTime = departureTime;
+    this.departureTime = iterationDepartureTime;
     this.arrivalTime = arrivalTime;
     this.numberOfTransfers = numberOfTransfers;
     this.c1 = c1;

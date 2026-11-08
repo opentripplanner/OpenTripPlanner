@@ -124,35 +124,42 @@ changed by later iterations. A stop arrival can be dropped when it is not needed
 arrivals, a destination arrival that is dropped is a dropped result.
 
 Range Raptor finds journeys for many departure times. Without an extra criterion a journey that
-leaves later _and_ arrives later would be dominated by a journey that arrives earlier. Which of
+leaves later (earlier iteration) would be dominated by a journey that arrives earlier. Which of
 these journeys we want to keep depends on the use-case, and we have two ways to define the time
 criteria (in addition to number of transfers and cost):
 
-| Search                            | Time criteria                                                   | Result                                                                                             |
-| --------------------------------- | --------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| **Timetable** (`timetable=true`)  | iteration departure time, arrival time                          | Keep a journey that departs later, even if it takes longer. This gives a timetable view.           |
-| **Arrive-by** or **depart-after** | arrival time (or departure time) and duration (if cost is used) | Keep a journey only if it arrives earlier, departs later (arrive-by) or is faster than the others. |
+| Search            | Time criteria                                                              | Result                                                                                             |
+| ----------------- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `timetable=true`  | iteration departure time, arrival time                                     | Keep a journey that departs later, even if it takes longer. This gives a timetable view.           |
+| `timetable=false` | arrival time (or departure time `arriveBy`) and duration (if cost is used) | Keep a journey only if it arrives earlier, departs later (arrive-by) or is faster than the others. |
 
-Using _arrival time_ and _departure time_ is **not** the same as using _arrival time_ and _duration_
-(`duration = arrival - departure`). Given two journeys, both 10 minutes long, one departing 12:10
-and the other 12:11: with (arrival, departure) both are kept, since each is better in one criterion.
-With (arrival, duration) the second is dropped, since the duration is the same and the first arrives
-earlier. This is why a timetable search returns more journeys; it is the intention of that search.
-For the other searches we do not want a list of journeys that are all the same, only shifted by a
-minute.
+`timetable=false` was developed to support OTP 1.x, which only had this mode of operation. Most
+users/clients use `timetable=true`. There are use-cases for turning it off, but they are limited,
+and the amount of work to support them is not prioritized - for now.
 
 Some details:
 
-- The **iteration departure time** is the time of the Range Raptor iteration. It is not
-  time-shifted. The access is moved as late as possible to fit the first transit leg when the path
-  is built; the result is the _time-shifted departure time_. A path found in the first iteration
-  (the latest departure time in the search window) can be shifted far beyond the iteration time,
-  while the shift for the other iterations is less than one iteration step. This is because a later
-  boarding would have been found in the previous iteration.
-- The **duration** is the arrival time minus the time-shifted departure time. The time-shifted
-  departure is computed from the arrival chain by the `TimeShiftedDepartureTime` class, without
-  building the path. It is only computed when it is used. The departure used by the heuristic
-  `qualify` check is the iteration departure time, which is a lower bound (pessimistic).
+- The **iteration departure time** is the time of the Range Raptor iteration. It is not the actual
+  departure time of a journey, which is normally time-shifted to fit with the departure of the first
+  transit leg. The iteration step is 1 minute. A path found in the first iteration can be shifted
+  far beyond the iteration time, while the shift for the other iterations is less than one iteration
+  step. This is because a later boarding would have been found in the previous iteration. Paths
+  found in the first iteration should only be used to prune the search, not be treated as part of
+  the pareto-optimal result. Note! Raptor returns these paths because they can be used for other
+  purposes like transfer optimization or next/previous page navigation. **LIMITATION:** To find all
+  pareto-optimal journeys, the actual departure times for all accesses and possible first leg trips
+  could be found and used as the iteration departure times, instead of iterating over the minutes.
+  The performance cost is unknown.
+- The **duration** is the arrival time minus the (actual/time-shifted) departure time. Neither the
+  duration nor the departure time is stored in the state. Instead, the iteration departure time is
+  used, this is a _known limitation_.
+- **Known limitation, departure time within a search window** Raptor does not keep the actual
+  departure time in the state, only the iteration departure time. This means that a journey that
+  leaves after another journey, within the same iteration, can be dropped. We only keep the actual
+  departure time in the final destination arrival, not in the intermediate stop-arrival states.
+  Depending on the search type (`timetable=true/false` and departAfter/arriveBy) this can lead to a
+  path being dropped when arriving at a stop, as a result of the qualify operation for destination
+  pruning. The `I03_SameIterationOptimalDepartureDroppedTest` demonstrates this.
 - The **time-penalty** of the access and egress is part of the arrival- and departure times used for
   comparison. Raptor decorates the access and egress with the penalty (it becomes part of the
   duration), so it must not be added again. The real time (without penalty) is used to check the
