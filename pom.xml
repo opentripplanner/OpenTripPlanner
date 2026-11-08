@@ -276,16 +276,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.5.1</version>
-                <configuration>
-                    <archive>
-                        <manifestEntries>
-                            <!-- For Java 11 Modules, specify a module name. Do not create module-info.java until all
-                                 our dependencies specify a module name. -->
-                            <Automatic-Module-Name>org.opentripplanner.otp</Automatic-Module-Name>
-                            <OTP-Serialization-Version-Id>${otp.serialization.version.id}</OTP-Serialization-Version-Id>
-                        </manifestEntries>
-                    </archive>
-                </configuration>
                 <executions>
                     <execution>
                         <!-- OTP includes an empty javadoc.jar file. See doc/javadoc/README.md -->

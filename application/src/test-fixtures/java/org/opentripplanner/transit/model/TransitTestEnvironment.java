@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.concurrent.ExecutionException;
 import org.opentripplanner.LocalTimeParser;
-import org.opentripplanner.core.framework.transaction.internal.TransactionFactory;
+import org.opentripplanner.core.framework.transaction.configure.TransactionFactory;
 import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.core.model.transaction.RepositoryHandle;
 import org.opentripplanner.core.model.transaction.RepositoryRegistry;
