@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE suppressions PUBLIC
+    "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN"
+    "https://checkstyle.org/dtds/suppressions_1_2.dtd">
+<suppressions>
+    <!-- These files are allowed to use Mockito. Using Mockito is highly discouraged. -->
+    <suppress checks="IllegalImport" files="application/src/ext-test/java/org/opentripplanner/ext/siri/updater/azure/SiriAzureUpdaterTest.java"/>
+    <suppress checks="IllegalImport" files="application/src/ext-test/java/org/opentripplanner/ext/vectortiles/VectorTilesResourceTest.java"/>
+    <suppress checks="IllegalImport" files="application/src/ext-test/java/org/opentripplanner/ext/httpresponsetimemetrics/HttpResponseTimeMetricsFilterTest.java"/>
+    <suppress checks="IllegalImport" files="application/src/ext-test/java/org/opentripplanner/ext/carpooling/updater/MultiFeedSiriETCarpoolingUpdaterTest.java"/>
+    <suppress checks="IllegalImport" files="application/src/ext-test/java/org/opentripplanner/ext/carpooling/updater/SiriETCarpoolingUpdaterTest.java"/>
+    <suppress checks="IllegalImport" files="application/src/test/java/org/opentripplanner/standalone/server/DaggerToJerseyBridgeTest.java"/>
+    <suppress checks="IllegalImport" files="application/src/test/java/org/opentripplanner/routing/algorithm/filterchain/ItineraryListFilterChainTest.java"/>
+    <suppress checks="IllegalImport" files="application/src/test/java/org/opentripplanner/updater/vehicle_parking/VehicleParkingUpdaterTest.java"/>
+    <suppress checks="IllegalImport" files="application/src/test-fixtures/java/org/opentripplanner/framework/io/TestHttpClientFactory.java"/>
+</suppressions>
+
+
+

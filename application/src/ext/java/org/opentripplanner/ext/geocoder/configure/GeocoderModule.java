@@ -2,8 +2,8 @@ package org.opentripplanner.ext.geocoder.configure;
 
 import dagger.Module;
 import dagger.Provides;
-import jakarta.annotation.Nullable;
 import jakarta.inject.Singleton;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.framework.application.OTPFeature;

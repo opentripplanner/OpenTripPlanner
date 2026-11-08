@@ -30,11 +30,17 @@
                      value="Everything not annotated with @Nullable is assumed to be non-null."/>
         </module>
         <module name="IllegalImport">
+            <property name="id" value="NoMockito"/>
+            <property name="illegalPkgs" value="org.mockito"/>
+            <message key="import.illegal"
+                     value="Use of mockito is highly discouraged."/>
+        </module>
+        <module name="IllegalImport">
             <property name="illegalPkgs" value="javax.annotation.concurrent"/>
             <property name="illegalClasses"
-                      value="javax.annotation.Nullable, javax.annotation.ParametersAreNonnullByDefault"/>
+                      value="javax.annotation.Nullable, javax.annotation.ParametersAreNonnullByDefault, jakarta.annotation.Nullable"/>
             <message key="import.illegal"
-                     value="Use org.jspecify.annotations (@Nullable, @NullMarked) instead of JSR-305."/>
+                     value="Use org.jspecify.annotations (@Nullable, @NullMarked) instead of JSR-305 or Jakarta."/>
         </module>
         <module name="NeedBraces"/>
         <module name="RedundantImport"/>
