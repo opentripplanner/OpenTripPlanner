@@ -1,7 +1,5 @@
 package org.opentripplanner.apis.transmodel.model.plan;
 
-import static org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences.MAX_GROUP_SIMILARITY;
-
 import graphql.Scalars;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLInputObjectField;
@@ -9,12 +7,12 @@ import graphql.schema.GraphQLInputObjectType;
 import graphql.schema.GraphQLNonNull;
 import java.util.Map;
 import java.util.function.Consumer;
-import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.apis.transmodel.model.scalars.DoubleFunction;
 import org.opentripplanner.apis.transmodel.support.DataFetcherDecorator;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
+import org.opentripplanner.routing.algorithm.filterchain.api.GroupBySimilarity;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
 
@@ -188,16 +186,12 @@ public class ItineraryFiltersInputType {
   }
 
   private static double validateGroupSimilarity(String field, double value) {
-    if (value < 0.0 || value > MAX_GROUP_SIMILARITY) {
-      throw new InvalidInputException(
-        "The argument 'itineraryFilters.%s' must be in the range [0.0, %s], but was %s.".formatted(
-          field,
-          MAX_GROUP_SIMILARITY,
-          value
-        )
-      );
-    }
-    return value;
+    return GqlUtil.requireArgumentInRange(
+      "itineraryFilters." + field,
+      value,
+      0.0,
+      GroupBySimilarity.MAX_GROUP_BY_P
+    );
   }
 
   private static <T> void setField(

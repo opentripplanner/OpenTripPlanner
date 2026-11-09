@@ -143,6 +143,29 @@ public class GqlUtil {
   }
 
   /**
+   * Return the value or throw an exception if it is outside the range {@code [min, max]}. Both
+   * limits are inclusive.
+   */
+  public static double requireArgumentInRange(
+    String argumentName,
+    double value,
+    double min,
+    double max
+  ) {
+    if (value < min || value > max) {
+      throw new InvalidInputException(
+        "The argument '%s' must be in the range [%s, %s], but was %s.".formatted(
+          argumentName,
+          min,
+          max,
+          value
+        )
+      );
+    }
+    return value;
+  }
+
+  /**
    * Helper method to support the deprecated 'lang' argument.
    */
   public static Locale getLocale(DataFetchingEnvironment environment) {

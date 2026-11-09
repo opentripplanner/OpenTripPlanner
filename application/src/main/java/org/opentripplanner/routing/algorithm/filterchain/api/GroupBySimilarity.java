@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.algorithm.filterchain.api;
 
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder;
+import org.opentripplanner.routing.algorithm.filterchain.framework.groupids.GroupByDistance;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
@@ -35,10 +36,16 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  */
 public class GroupBySimilarity {
 
+  /** The lowest {@link #groupByP} supported. */
+  public static final double MIN_GROUP_BY_P = GroupByDistance.MIN_P;
+
+  /** The highest {@link #groupByP} supported. */
+  public static final double MAX_GROUP_BY_P = GroupByDistance.MAX_P;
+
   /**
    * The minimum similarity percentage used to group itineraries.
    * <p>
-   * The value must be a number between 0.01 (1%) and 0.99 (99%).
+   * The value must be a number between {@link #MIN_GROUP_BY_P} and {@link #MAX_GROUP_BY_P}.
    */
   public final double groupByP;
 

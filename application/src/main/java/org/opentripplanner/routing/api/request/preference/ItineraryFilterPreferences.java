@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.util.Objects;
 import java.util.function.Consumer;
 import org.opentripplanner.core.model.basic.CostLinearFunction;
+import org.opentripplanner.routing.algorithm.filterchain.api.GroupBySimilarity;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.utils.lang.DoubleUtils;
 import org.opentripplanner.utils.lang.Units;
@@ -18,12 +19,6 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 public final class ItineraryFilterPreferences {
 
   public static final ItineraryFilterPreferences DEFAULT = new ItineraryFilterPreferences();
-
-  /**
-   * The highest similarity the group-by-similarity filters accept. A value below 0.5 turns the
-   * filter off.
-   */
-  public static final double MAX_GROUP_SIMILARITY = 0.99;
 
   private final boolean accessibilityScore;
   private final double bikeRentalDistanceRatio;
@@ -158,7 +153,12 @@ public final class ItineraryFilterPreferences {
   }
 
   private static double groupSimilarity(double value, String field) {
-    return DoubleUtils.requireInRange(Units.ratio(value), 0.0, MAX_GROUP_SIMILARITY, field);
+    return DoubleUtils.requireInRange(
+      Units.ratio(value),
+      0.0,
+      GroupBySimilarity.MAX_GROUP_BY_P,
+      field
+    );
   }
 
   @Override

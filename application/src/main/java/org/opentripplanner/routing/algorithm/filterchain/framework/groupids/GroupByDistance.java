@@ -39,6 +39,12 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  */
 public class GroupByDistance implements GroupId<GroupByDistance> {
 
+  /** The lowest value of 'p' this group id supports. */
+  public static final double MIN_P = 0.50;
+
+  /** The highest value of 'p' this group id supports. */
+  public static final double MAX_P = 0.99;
+
   private final List<Leg> keySet;
   private final boolean streetOnly;
 
@@ -135,8 +141,10 @@ public class GroupByDistance implements GroupId<GroupByDistance> {
   }
 
   private void assertPIsValid(double p) {
-    if (p > 0.99 || p < 0.50) {
-      throw new IllegalArgumentException("'p' is not between 0.50 and 0.99: " + p);
+    if (p > MAX_P || p < MIN_P) {
+      throw new IllegalArgumentException(
+        "'p' is not between %s and %s: %s".formatted(MIN_P, MAX_P, p)
+      );
     }
   }
 
