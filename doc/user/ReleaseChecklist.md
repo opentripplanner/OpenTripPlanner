@@ -70,7 +70,10 @@ manually is more tedious, but keeps eyes on each step and is less prone to failu
     set up.
   - Apply the changes recorded in
     https://github.com/opentripplanner/OpenTripPlanner/tree/signed-deploy-to-central
-  - While still on the tag commit, run `mvn deploy -Prelease`.
+  - While still on the tag commit, run `mvn deploy -Prelease -Dplugin.frontend.skip=true`. The debug
+    client is already built by the test build above, so this keeps the npm toolchain out of the
+    deploy invocation. Don't run `mvn clean` in between, because then the artifacts are published
+    without the debug client.
 - Check that Maven artifact appears on Maven Central
   - [Directory listing of OTP releases on Maven Central](https://repo1.maven.org/maven2/org/opentripplanner/otp-shaded/)
   - It may take a while (half an hour) for releases to show up in the central repo after Travis

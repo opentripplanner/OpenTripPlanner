@@ -15,7 +15,11 @@
     <!--
     The debug client, built with the frontend-maven-plugin straight into target/classes/client, so
     that the jar contains it under client/ on the classpath, where the application serves it from.
-    Skip with -Dplugin.frontend.skip=true if you don't need it.
+
+    The build is bound to prepare-package, so compile and test don't pay for it, while every
+    package, install and deploy build still ships the UI. Skip with -Dplugin.frontend.skip=true if
+    you don't need it, or if target/classes/client is already there from an earlier build in the
+    same checkout, which is the case for the deploy steps that follow a package build.
     -->
     <build>
         <plugins>
@@ -31,6 +35,7 @@
                 <executions>
                     <execution>
                         <id>install-node-and-npm</id>
+                        <phase>prepare-package</phase>
                         <goals>
                             <goal>install-node-and-npm</goal>
                         </goals>
@@ -40,6 +45,7 @@
                     </execution>
                     <execution>
                         <id>npm-ci</id>
+                        <phase>prepare-package</phase>
                         <goals>
                             <goal>npm</goal>
                         </goals>
@@ -49,6 +55,7 @@
                     </execution>
                     <execution>
                         <id>npm-build-bundle</id>
+                        <phase>prepare-package</phase>
                         <goals>
                             <goal>npm</goal>
                         </goals>
