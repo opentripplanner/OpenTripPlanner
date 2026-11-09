@@ -64,6 +64,11 @@ public class DefaultTaxiService implements TaxiService {
   }
 
   @Override
+  public boolean isCoveredByCommonProvider(WgsCoordinate pickup, WgsCoordinate dropoff) {
+    return taxiRouteIndex.findFirstRoute(pickup, dropoff).isPresent();
+  }
+
+  @Override
   public List<Leg> decorateAccessEgressLegs(
     List<Leg> legs,
     WgsCoordinate pickup,

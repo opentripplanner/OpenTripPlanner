@@ -34,7 +34,7 @@ public class ViaDirectStreetRouter extends DirectStreetRouter {
     RouteRequest request
   ) {
     var paths = request.arriveBy()
-      ? findArriveByPaths(linkingContext, graphPathFinder, request, false, false)
+      ? findArriveByPaths(linkingContext, graphPathFinder, request, false, false, false)
       : findDepartAfterPaths(linkingContext, graphPathFinder, request, false, false);
     return mapToItineraries(graph, transitService, streetDetailsService, request, paths);
   }
@@ -75,12 +75,23 @@ public class ViaDirectStreetRouter extends DirectStreetRouter {
     return distance < maxDistanceLimit;
   }
 
+  /**
+   * Find the paths backwards in time from the destination through the via locations.
+   *
+   * @param skipLastLeg skip the leg from the origin to the first via location, which is the last
+   *                    leg to be routed.
+   * @param keepModeToDestination use the original mode, instead of the mode used after the first
+   *                              via location, for the leg from the last via location to the
+   *                              destination. This is used for egress, where the original mode is
+   *                              used next to the destination instead of next to the origin.
+   */
   List<StreetPath> findArriveByPaths(
     LinkingContext linkingContext,
     GraphPathFinder graphPathFinder,
     RouteRequest request,
     boolean allowPartialResults,
-    boolean skipLastLeg
+    boolean skipLastLeg,
+    boolean keepModeToDestination
   ) {
     var baseRequest = getViaFriendlyRequest(request);
     var mode = baseRequest.journey().direct().mode();
@@ -99,12 +110,13 @@ public class ViaDirectStreetRouter extends DirectStreetRouter {
       while (i >= 0 && maxDurationLeft.isPositive()) {
         var from = lastLocations.get(i);
         var to = lastLocations.get(i + 1);
+        var keepMode = keepModeToDestination && i == lastLocations.size() - 2;
         var patchedRequest = getRequest(
-          requestWithNewMode,
+          keepMode ? baseRequest : requestWithNewMode,
           from,
           to,
           newStartTime,
-          newStreetRequest.mode(),
+          keepMode ? mode : newStreetRequest.mode(),
           maxDurationLeft
         );
         var path = findPath(linkingContext, graphPathFinder, patchedRequest);

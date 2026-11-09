@@ -28,6 +28,14 @@ public interface TaxiService {
   );
 
   /**
+   * Returns {@code true} if a single taxi provider covers both the {@code pickup} and the
+   * {@code dropoff} coordinates. This is used to check if a taxi can be used for an access/egress
+   * segment that doesn't end at a stop, for example the segment between the origin and a via
+   * location.
+   */
+  boolean isCoveredByCommonProvider(WgsCoordinate pickup, WgsCoordinate dropoff);
+
+  /**
    * Decorates the {@link TraverseMode#CAR} leg among an access or egress leg chain with taxi
    * provider information, looking up the provider using the given logical {@code pickup} and
    * {@code dropoff} coordinates (the request origin/destination and the stop), rather than the

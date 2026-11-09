@@ -4,7 +4,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.OptionalInt;
 import java.util.Set;
 import org.opentripplanner.core.model.id.FeedScopedId;
@@ -73,12 +72,16 @@ public class ViaAccessEgressRouter extends AccessEgressRouter {
             request
           )
         : stopsFromFirstLocation;
-    if (filteredStopsFromFirstLocation.isEmpty()) {
-      return List.of();
-    }
     var lastViaWithCoordinates = lastCoordinateViaLocationIndex(request, accessOrEgress);
     // There are no coordinate locations to route to/from
     if (lastViaWithCoordinates.isEmpty()) {
+      return filteredStopsFromFirstLocation;
+    }
+    if (
+      taxiService != null &&
+      streetMode == StreetMode.TAXI &&
+      !isTaxiSegmentCovered(request, accessOrEgress, taxiService)
+    ) {
       return filteredStopsFromFirstLocation;
     }
     var graphPathFinder = new GraphPathFinder(
@@ -88,6 +91,7 @@ public class ViaAccessEgressRouter extends AccessEgressRouter {
     );
     var directRequest = getDirectRequest(
       request,
+      streetMode,
       accessOrEgress,
       lastViaWithCoordinates.getAsInt()
     );
@@ -158,7 +162,14 @@ public class ViaAccessEgressRouter extends AccessEgressRouter {
         .withIgnoreStops(ignoreStops)
         .withExtensionRequestContexts(extensionRequestContexts)
         .build()
-        .findNearbyStops(vertices, viaRequest, streetMode, false, durationLeft, maxStopCount);
+        .findNearbyStops(
+          vertices,
+          viaRequest,
+          getStreetModeFromVia(streetMode),
+          false,
+          durationLeft,
+          maxStopCount
+        );
       for (NearbyStop nearbyStop : stopsFromVia) {
         var distance = accumulatedDistance + nearbyStop.distance();
         var edges = ListUtils.combine(accumulatedEdges, nearbyStop.edges);
@@ -185,7 +196,7 @@ public class ViaAccessEgressRouter extends AccessEgressRouter {
   ) {
     var nearbyStops = new ArrayList<>(stopsFromFirstLocation);
     var paths = directRouter
-      .findArriveByPaths(linkingContext, graphPathFinder, directRequest, true, true)
+      .findArriveByPaths(linkingContext, graphPathFinder, directRequest, true, true, true)
       .reversed();
     var vias = accessEgressRequest.listViaLocationsWithCoordinates().reversed();
     var durationLeft = durationLimit;
@@ -207,7 +218,14 @@ public class ViaAccessEgressRouter extends AccessEgressRouter {
         .withIgnoreStops(ignoreStops)
         .withExtensionRequestContexts(extensionRequestContexts)
         .build()
-        .findNearbyStops(vertices, viaRequest, streetMode, true, durationLeft, maxStopCount);
+        .findNearbyStops(
+          vertices,
+          viaRequest,
+          getStreetModeFromVia(streetMode),
+          true,
+          durationLeft,
+          maxStopCount
+        );
       for (NearbyStop nearbyStop : stopsFromVia) {
         var distance = accumulatedDistance + nearbyStop.distance();
         var edges = ListUtils.combine(accumulatedEdges, nearbyStop.edges.reversed());
@@ -270,8 +288,31 @@ public class ViaAccessEgressRouter extends AccessEgressRouter {
       .buildRequest();
   }
 
+  /**
+   * A taxi is only used between the origin and the first via location (access) or between the last
+   * via location and the destination (egress), so a single taxi provider has to cover both ends of
+   * that segment.
+   */
+  private boolean isTaxiSegmentCovered(
+    RouteRequest request,
+    AccessEgressType type,
+    TaxiService taxiService
+  ) {
+    var vias = request.listViaLocations();
+    var via = (VisitViaLocation) (type.isAccess() ? vias.getFirst() : vias.getLast());
+    var viaCoordinate = via.coordinate().orElseThrow();
+    var endpoint = type.isAccess() ? request.from().wgsCoordinate() : request.to().wgsCoordinate();
+    if (endpoint == null) {
+      return false;
+    }
+    return type.isAccess()
+      ? taxiService.isCoveredByCommonProvider(endpoint, viaCoordinate)
+      : taxiService.isCoveredByCommonProvider(viaCoordinate, endpoint);
+  }
+
   private RouteRequest getDirectRequest(
     RouteRequest request,
+    StreetMode streetMode,
     AccessEgressType type,
     int lastViaWithCoordinates
   ) {
@@ -280,8 +321,8 @@ public class ViaAccessEgressRouter extends AccessEgressRouter {
     var vias = type.isAccess()
       ? originalVias.subList(0, lastViaWithCoordinates + 1)
       : originalVias.subList(originalVias.size() - lastViaWithCoordinates - 1, originalVias.size());
-    var mode = getStreetModeAfterOrigin(request.journey().access().mode());
-    var maxDuration = getMaxDuration(request);
+    var mode = getStreetModeAfterOrigin(streetMode);
+    var maxDuration = getMaxDuration(request, streetMode);
     return request
       .copyOf()
       .withJourney(journey -> journey.withDirect(new StreetRequest(mode)))
@@ -311,12 +352,16 @@ public class ViaAccessEgressRouter extends AccessEgressRouter {
     return mode;
   }
 
-  private Duration getMaxDuration(RouteRequest request) {
-    return request
-      .preferences()
-      .street()
-      .accessEgress()
-      .maxDuration()
-      .valueOf(request.journey().access().mode());
+  /**
+   * Pickup modes (e.g. taxi) are only used between the origin and the first via location (access)
+   * or between the last via location and the destination (egress), so the stops are reached from
+   * the via locations by walking.
+   */
+  private StreetMode getStreetModeFromVia(StreetMode mode) {
+    return mode.includesPickup() ? StreetMode.WALK : mode;
+  }
+
+  private Duration getMaxDuration(RouteRequest request, StreetMode streetMode) {
+    return request.preferences().street().accessEgress().maxDuration().valueOf(streetMode);
   }
 }
