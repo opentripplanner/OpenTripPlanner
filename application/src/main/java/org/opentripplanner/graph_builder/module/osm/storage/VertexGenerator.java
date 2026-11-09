@@ -159,7 +159,7 @@ public class VertexGenerator {
       // A node is relevant as a barrier either because it restricts the mode permission
       // (node.isBarrier()) or because it is wheelchair-inaccessible without affecting other
       // modes, e.g. barrier=kerb
-      if (iv == null && (node.isBarrier() || !node.isWheelchairAccessible())) {
+      if (iv == null && (node.isBarrier() || node.isWheelchairInaccessible())) {
         iv = vertexFactory.barrier(nid, coordinate, node.explicitWheelchairAccessibility());
       }
 
