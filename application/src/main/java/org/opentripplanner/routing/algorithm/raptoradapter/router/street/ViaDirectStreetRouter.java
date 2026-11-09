@@ -279,7 +279,9 @@ public class ViaDirectStreetRouter extends DirectStreetRouter {
    * TODO we might want to continue on a vehicle if there is no wait time defined for a via point.
    */
   private StreetRequest getStreetRequestAfterFirstVia(StreetMode mode) {
-    if (mode.includesParking() || mode.includesRenting()) {
+    // Pickup modes (e.g. taxi) are only used from the origin to the first via location, the rest
+    // is walked
+    if (mode.includesParking() || mode.includesRenting() || mode.includesPickup()) {
       return new StreetRequest(StreetMode.WALK);
     }
     return new StreetRequest(mode);

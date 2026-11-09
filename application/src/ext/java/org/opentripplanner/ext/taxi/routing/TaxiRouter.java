@@ -63,7 +63,8 @@ public class TaxiRouter {
 
   /**
    * Routes a direct taxi itinerary by delegating to {@link DirectStreetRouter} and decorating the
-   * resulting itineraries with taxi provider information.
+   * resulting itineraries with taxi provider information. If the request has via locations, the
+   * taxi is only used from the origin to the first via location, and the rest is walked.
    */
   public List<Itinerary> routeDirect(
     Graph graph,

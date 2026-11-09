@@ -11,6 +11,7 @@ import static org.opentripplanner.street.model.StreetModelForTest.intersectionVe
 import static org.opentripplanner.street.model.StreetModelForTest.streetEdge;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.Month;
@@ -18,13 +19,16 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.model.GenericLocation;
+import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.ItinerarySummarizer;
+import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.api.request.via.PassThroughViaLocation;
@@ -34,7 +38,9 @@ import org.opentripplanner.standalone.api.TestServerContext;
 import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.service.TransitRepository;
@@ -135,28 +141,79 @@ class ViaDirectStreetRouterTest {
       Set.of()
     );
 
-    var transitService = TestServerContext.createTransitService(
-      new TransitRepository(),
-      new TimetableDataImport(),
-      TransferServiceTestFactory.defaultTransferRepository()
-    );
-
-    var itineraries = new ViaDirectStreetRouter().route(
-      new Graph(),
-      transitService,
-      TestServerContext.createStreetLimitationParametersService(),
-      TestServerContext.createVehicleRentalService(),
-      TestServerContext.createStreetDetailsService(),
-      null,
-      request,
-      linkingContext
-    );
+    var itineraries = route(request, linkingContext);
 
     assertThat(itineraries).isNotEmpty();
 
     var itinerary = new ItinerarySummarizer(itineraries.getFirst());
 
     assertThat(itinerary.summarizeLegs()).containsExactlyElementsIn(legSummary);
+  }
+
+  static List<Arguments> pickupModeTestCases() {
+    return Stream.of(StreetMode.CAR_PICKUP, StreetMode.CAR_HAILING, StreetMode.TAXI)
+      .flatMap(mode -> Stream.of(of(mode, false), of(mode, true)))
+      .toList();
+  }
+
+  /**
+   * Pickup modes are only used from the origin to the first via location, after that the rest of
+   * the journey is walked.
+   */
+  @ParameterizedTest
+  @MethodSource("pickupModeTestCases")
+  void pickupModeIsOnlyUsedToTheFirstVia(StreetMode mode, boolean arriveBy) {
+    // The segments are long enough (> 500 m) for driving to be clearly faster than walking
+    var from = intersectionVertex("pickupFrom", 59.900, 10.700);
+    var via = intersectionVertex("pickupVia", 59.905, 10.700);
+    var to = intersectionVertex("pickupTo", 59.905, 10.720);
+    streetEdge(from, via);
+    streetEdge(via, from);
+    streetEdge(via, to);
+    streetEdge(to, via);
+
+    var fromLocation = GenericLocation.fromCoordinate(59.900, 10.700);
+    var toLocation = GenericLocation.fromCoordinate(59.905, 10.720);
+    var viaLocation = new VisitViaLocation(
+      "pickupVia",
+      Duration.ZERO,
+      List.of(),
+      new WgsCoordinate(59.905, 10.700)
+    );
+
+    var request = RouteRequest.of()
+      .withFrom(fromLocation)
+      .withTo(toLocation)
+      .withViaLocations(List.of(viaLocation))
+      .withJourney(jb -> jb.withDirect(new StreetRequest(mode)))
+      .withDateTime(Instant.parse("2026-05-12T20:30:00Z"))
+      .withArriveBy(arriveBy)
+      .buildRequest();
+
+    var linkingContext = new LinkingContext(
+      Map.ofEntries(
+        entry(fromLocation, Set.of(from)),
+        entry(viaLocation.coordinateLocation(), Set.of(via)),
+        entry(toLocation, Set.of(to))
+      ),
+      Set.of(),
+      Set.of()
+    );
+
+    var itineraries = route(request, linkingContext);
+
+    assertThat(itineraries).hasSize(1);
+    var legs = itineraries.getFirst().legs();
+    var carLegs = legs
+      .stream()
+      .filter(leg -> leg instanceof StreetLeg streetLeg && streetLeg.getMode() == TraverseMode.CAR)
+      .toList();
+    assertThat(carLegs).hasSize(1);
+    assertThat(carLegs.getFirst().to().coordinate.longitude()).isWithin(1e-6).of(10.700);
+    var lastLeg = (StreetLeg) legs.getLast();
+    assertThat(lastLeg.getMode()).isEqualTo(TraverseMode.WALK);
+    assertThat(lastLeg.from().coordinate.longitude()).isWithin(1e-6).of(10.700);
+    assertThat(lastLeg.to().coordinate.longitude()).isWithin(1e-6).of(10.720);
   }
 
   @Test
@@ -204,6 +261,25 @@ class ViaDirectStreetRouterTest {
     );
     assertFalse(
       router.isStraightLineDistanceWithinLimit(linkingContext, request, withoutViaDistance)
+    );
+  }
+
+  private static List<Itinerary> route(RouteRequest request, LinkingContext linkingContext) {
+    var transitService = TestServerContext.createTransitService(
+      new TransitRepository(),
+      new TimetableDataImport(),
+      TransferServiceTestFactory.defaultTransferRepository()
+    );
+
+    return new ViaDirectStreetRouter().route(
+      new Graph(),
+      transitService,
+      TestServerContext.createStreetLimitationParametersService(),
+      TestServerContext.createVehicleRentalService(),
+      TestServerContext.createStreetDetailsService(),
+      null,
+      request,
+      linkingContext
     );
   }
 }
