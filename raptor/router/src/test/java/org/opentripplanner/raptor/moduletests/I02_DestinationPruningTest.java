@@ -31,7 +31,7 @@ import org.opentripplanner.raptor.configure.RaptorTestFactory;
  * This test verifies that paths are correctly qualified based on c2 values when using
  * multi-criteria search with destination pruning optimization (PARETO_CHECK_AGAINST_DESTINATION).
  */
-public class I02_C2DestinationPruningTest implements RaptorTestConstants {
+public class I02_DestinationPruningTest implements RaptorTestConstants {
 
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =

@@ -1,7 +1,9 @@
-package org.opentripplanner.raptor.rangeraptor.path;
+package org.opentripplanner.raptor.rangeraptor.destination;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
@@ -29,6 +31,7 @@ public class DestinationArrivalTest {
   private static final RaptorTripSchedule A_TRIP = null;
   private static final int TRANSIT_COST = 84000;
 
+  private static final int JOURNEY_DEPARTURE_TIME = ACCESS_DEPARTURE_TIME + 30;
   private static final int DESTINATION_DURATION_TIME = 50;
   private static final int DESTINATION_C1 = 50000;
   private static final int DESTINATION_C2 = 5;
@@ -37,7 +40,7 @@ public class DestinationArrivalTest {
   private static final int EXPECTED_TOTAL_COST = ACCESS_COST + TRANSIT_COST + DESTINATION_C1;
 
   private static final StopArrivalFactoryC1<RaptorTripSchedule> STOP_ARRIVAL_FACTORY =
-    new StopArrivalFactoryC1<RaptorTripSchedule>();
+    new StopArrivalFactoryC1<>();
 
   /**
    * Setup a simple journey with an access leg, one transit and a egress leg.
@@ -56,6 +59,8 @@ public class DestinationArrivalTest {
   private final DestinationArrival<RaptorTripSchedule> subject = new DestinationArrival<>(
     TestAccessEgress.walk(TRANSIT_STOP, DESTINATION_DURATION_TIME),
     TRANSIT_ARRIVAL,
+    ACCESS_DEPARTURE_TIME,
+    JOURNEY_DEPARTURE_TIME,
     TRANSIT_ALIGHT_TIME + DESTINATION_DURATION_TIME,
     DESTINATION_C1,
     DESTINATION_C2
@@ -84,5 +89,64 @@ public class DestinationArrivalTest {
   @Test
   public void testToString() {
     assertEquals("Egress [8:14:50 Rₙ1 C₁1_484 C₂5] (Walk 50s C₁100 ~ 101)", subject.toString());
+  }
+
+  @Test
+  public void iterationDepartureTime() {
+    assertEquals(ACCESS_DEPARTURE_TIME, subject.iterationDepartureTime());
+  }
+
+  @Test
+  public void departureTimeIsNotTheIterationDepartureTime() {
+    assertEquals(JOURNEY_DEPARTURE_TIME, subject.departureTime());
+  }
+
+  @Test
+  public void roundIncludesEgressRides() {
+    var withFlexEgress = new DestinationArrival<>(
+      TestAccessEgress.flex(TRANSIT_STOP, DESTINATION_DURATION_TIME, 2),
+      TRANSIT_ARRIVAL,
+      ACCESS_DEPARTURE_TIME,
+      JOURNEY_DEPARTURE_TIME,
+      EXPECTED_ARRIVAL_TIME,
+      DESTINATION_C1,
+      DESTINATION_C2
+    );
+    assertEquals(3, withFlexEgress.round());
+    assertEquals(2, withFlexEgress.numberOfTransfers());
+  }
+
+  @Test
+  public void probeHasNoArrivalChainAndTheGivenValues() {
+    var probe = DestinationArrival.createProbe();
+    probe.setProbeValues(1000, 2000, 3, 4000, 5);
+
+    assertNull(probe.previous());
+    assertEquals(1000, probe.iterationDepartureTime());
+    assertEquals(1000, probe.departureTime());
+    assertEquals(2000, probe.arrivalTime());
+    assertEquals(3, probe.numberOfTransfers());
+    assertEquals(4, probe.round());
+    assertEquals(4000, probe.c1());
+    assertEquals(5, probe.c2());
+  }
+
+  @Test
+  public void probeCanBeReused() {
+    var probe = DestinationArrival.createProbe();
+    probe.setProbeValues(1000, 2000, 3, 4000, 5);
+    probe.setProbeValues(1001, 2001, 0, 4001, 6);
+
+    assertEquals(1001, probe.iterationDepartureTime());
+    assertEquals(2001, probe.arrivalTime());
+    assertEquals(0, probe.numberOfTransfers());
+    assertEquals(1, probe.round());
+    assertEquals(4001, probe.c1());
+    assertEquals(6, probe.c2());
+  }
+
+  @Test
+  public void onlyAProbeCanBeModified() {
+    assertThrows(IllegalStateException.class, () -> subject.setProbeValues(1, 3, 4, 5, 6));
   }
 }
