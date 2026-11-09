@@ -49,6 +49,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Don't penalize sidewalks designated for bikes [#8139](https://github.com/opentripplanner/OpenTripPlanner/pull/8139)
 - Fix exception on datedServiceJourney query without id [#8156](https://github.com/opentripplanner/OpenTripPlanner/pull/8156)
 - Fix on-board access not applying realtime boarding time [#8120](https://github.com/opentripplanner/OpenTripPlanner/pull/8120)
+- Cleanup Raptor destination arrivals - drop path creation during the search  [#8092](https://github.com/opentripplanner/OpenTripPlanner/pull/8092)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.10.0 (2026-09-09)
