@@ -316,7 +316,7 @@ class GraphQLIntegrationTest {
       cal_id,
       List.of(firstDate, secondDate, SERVICE_DATE)
     );
-    timetableDataImport.putServiceCode(cal_id, SERVICE_CODE);
+    timetableDataImport.addNextServiceCodes(List.of(cal_id));
     timetableDataImport.updateCalendarServiceData(calendarServiceData);
     transitRepository.index();
 
