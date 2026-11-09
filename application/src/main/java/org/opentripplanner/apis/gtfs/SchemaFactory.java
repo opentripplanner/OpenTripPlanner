@@ -16,6 +16,7 @@ import org.opentripplanner.apis.gtfs.datafetchers.BikeParkImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.BikeRentalStationImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.BookingInfoImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.BookingTimeImpl;
+import org.opentripplanner.apis.gtfs.datafetchers.CallScheduleImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.CallScheduledTimeTypeResolver;
 import org.opentripplanner.apis.gtfs.datafetchers.CallStopLocationTypeResolver;
 import org.opentripplanner.apis.gtfs.datafetchers.CarParkImpl;
@@ -206,6 +207,7 @@ public class SchemaFactory {
         .type(typeWiring.build(DefaultFareProductImpl.class))
         .type(typeWiring.build(DependentFareProductImpl.class))
         .type(typeWiring.build(TripOnServiceDateImpl.class))
+        .type(typeWiring.build(CallScheduleImpl.class))
         .type(typeWiring.build(StopCallImpl.class))
         .type(typeWiring.build(StopCallOnTripOnServiceDateImpl.class))
         .type(typeWiring.build(TripOccupancyImpl.class))

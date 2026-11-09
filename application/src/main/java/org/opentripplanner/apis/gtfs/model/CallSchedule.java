@@ -1,3 +1,5 @@
 package org.opentripplanner.apis.gtfs.model;
 
-public record CallSchedule(CallScheduledTime time) {}
+import org.opentripplanner.model.PickDrop;
+
+public record CallSchedule(CallScheduledTime time, PickDrop pickupType, PickDrop dropOffType) {}

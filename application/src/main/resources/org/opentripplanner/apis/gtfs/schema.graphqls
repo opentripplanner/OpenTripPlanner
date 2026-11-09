@@ -399,6 +399,10 @@ type CallRealTime {
 
 "What is scheduled for a trip on a service date for a stop location."
 type CallSchedule {
+  "The drop off type at this call."
+  dropOffType: PickupDropoffType
+  "The pick-up type at this call."
+  pickupType: PickupDropoffType
   "Scheduled time for a trip on a service date for a stop location."
   time: CallScheduledTime
 }
