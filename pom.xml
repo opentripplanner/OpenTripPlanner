@@ -69,14 +69,14 @@
         <junit.version>6.1.3</junit.version>
         <micrometer.version>1.14.1</micrometer.version>
         <netcdf4.version>5.6.0</netcdf4.version>
-        <logback.version>1.6.3</logback.version>
+        <logback.version>1.6.6</logback.version>
         <lucene.version>10.5.1</lucene.version>
         <micrometer.version>1.17.2</micrometer.version>
-        <netex-java-model.version>2.0.16.3</netex-java-model.version>
+        <netex2-java-model.version>3.0.0</netex2-java-model.version>
         <netcdf4.version>5.6.0</netcdf4.version>
         <protobuf.version>4.36.2</protobuf.version>
         <siri-java-model.version>2.0.10</siri-java-model.version>
-        <slf4j.version>2.0.19</slf4j.version>
+        <slf4j.version>2.0.20</slf4j.version>
         <!-- Other properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <GITHUB_REPOSITORY>opentripplanner/OpenTripPlanner</GITHUB_REPOSITORY>
@@ -276,16 +276,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.5.1</version>
-                <configuration>
-                    <archive>
-                        <manifestEntries>
-                            <!-- For Java 11 Modules, specify a module name. Do not create module-info.java until all
-                                 our dependencies specify a module name. -->
-                            <Automatic-Module-Name>org.opentripplanner.otp</Automatic-Module-Name>
-                            <OTP-Serialization-Version-Id>${otp.serialization.version.id}</OTP-Serialization-Version-Id>
-                        </manifestEntries>
-                    </archive>
-                </configuration>
                 <executions>
                     <execution>
                         <!-- OTP includes an empty javadoc.jar file. See doc/javadoc/README.md -->
@@ -547,7 +537,7 @@
                 <!-- This makes sure all google libraries are using compatible versions. -->
                 <groupId>com.google.cloud</groupId>
                 <artifactId>libraries-bom</artifactId>
-                <version>26.88.0</version>
+                <version>26.93.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -582,7 +572,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>33.7.2-jre</version>
+                <version>33.8.0-jre</version>
             </dependency>
 
             <!--
@@ -594,17 +584,6 @@
                 <groupId>com.azure</groupId>
                 <artifactId>azure-core-http-netty</artifactId>
                 <version>1.16.8</version>
-            </dependency>
-
-            <!--
-             Declaration-style @Nullable. Used only on Dagger sites (@Provides, @BindsInstance, @Inject
-             and component methods), because Dagger does not recognise the type-use @Nullable from
-             JSpecify. Everywhere else use org.jspecify.annotations.Nullable.
-            -->
-            <dependency>
-                <groupId>jakarta.annotation</groupId>
-                <artifactId>jakarta.annotation-api</artifactId>
-                <version>3.0.0</version>
             </dependency>
 
             <!--

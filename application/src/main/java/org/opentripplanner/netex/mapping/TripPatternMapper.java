@@ -12,6 +12,16 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.entur.netex2.model.DatedServiceJourney;
+import org.entur.netex2.model.DestinationDisplay;
+import org.entur.netex2.model.FlexibleLine;
+import org.entur.netex2.model.JourneyPattern_VersionStructure;
+import org.entur.netex2.model.OperatingDay;
+import org.entur.netex2.model.Route;
+import org.entur.netex2.model.RouteView;
+import org.entur.netex2.model.ServiceJourney;
+import org.entur.netex2.model.ServiceLink;
+import org.entur.netex2.model.VehicleJourneyRefStructure;
 import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -30,21 +40,12 @@ import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.model.timetable.VehicleAssignment;
-import org.rutebanken.netex.model.DatedServiceJourney;
-import org.rutebanken.netex.model.DestinationDisplay;
-import org.rutebanken.netex.model.FlexibleLine;
-import org.rutebanken.netex.model.JourneyPattern_VersionStructure;
-import org.rutebanken.netex.model.OperatingDay;
-import org.rutebanken.netex.model.Route;
-import org.rutebanken.netex.model.RouteView;
-import org.rutebanken.netex.model.ServiceJourney;
-import org.rutebanken.netex.model.ServiceLink;
-import org.rutebanken.netex.model.VehicleJourneyRefStructure;
 
 /**
  * Maps NeTEx JourneyPattern to OTP TripPattern. All ServiceJourneys in the same JourneyPattern
@@ -92,11 +93,13 @@ class TripPatternMapper {
     FeedScopedIdFactory idFactory,
     EntityById<Operator> operatorById,
     ImmutableEntityById<RegularStop> stopById,
+    ImmutableEntityById<Station> stationsById,
     ImmutableEntityById<AreaStop> areaStopById,
     ImmutableEntityById<GroupStop> groupStopById,
     EntityById<org.opentripplanner.transit.model.network.Route> otpRouteById,
     ReadOnlyHierarchicalMap<String, Route> routeById,
     ReadOnlyHierarchicalMap<String, JourneyPattern_VersionStructure> journeyPatternById,
+    ReadOnlyHierarchicalMap<String, String> stopPlaceByStopPointRef,
     ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef,
     ReadOnlyHierarchicalMap<String, String> flexibleStopPlaceIdByStopPointRef,
     ReadOnlyHierarchicalMap<String, DestinationDisplay> destinationDisplayById,
@@ -130,9 +133,11 @@ class TripPatternMapper {
       issueStore,
       idFactory,
       stopById,
+      stationsById,
       areaStopById,
       groupStopById,
       destinationDisplayById,
+      stopPlaceByStopPointRef,
       quayIdByStopPointRef,
       flexibleStopPlaceIdByStopPointRef,
       flexibleLineById,
@@ -251,7 +256,11 @@ class TripPatternMapper {
       .withMode(trips.get(0).getMode())
       .withNetexSubmode(trips.get(0).getNetexSubMode())
       .withContainsMultipleModes(hasMultipleModes || hasMultipleSubmodes)
-      .withName(journeyPattern.getName() == null ? "" : journeyPattern.getName().getValue())
+      .withName(
+        journeyPattern.getName() == null
+          ? ""
+          : MultilingualStringMapper.getStringValue(journeyPattern.getName())
+      )
       .withHopGeometries(
         serviceLinkMapper.getGeometriesByJourneyPattern(journeyPattern, stopPattern)
       )
@@ -298,7 +307,7 @@ class TripPatternMapper {
       return null;
     }
 
-    var serviceDate = opDay.getCalendarDate().toLocalDate();
+    var serviceDate = opDay.getCalendarDate();
     var id = idFactory.createId(datedServiceJourney.getId());
     var alteration = TripServiceAlterationMapper.mapAlteration(
       datedServiceJourney.getServiceAlteration()

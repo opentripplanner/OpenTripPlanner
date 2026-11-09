@@ -1,7 +1,9 @@
-package org.opentripplanner.core.framework.transaction.internal;
+package org.opentripplanner.core.framework.transaction.configure;
 
 import java.time.Duration;
 import java.util.concurrent.ThreadFactory;
+import org.opentripplanner.core.framework.transaction.internal.DefaultRepositoryRegistry;
+import org.opentripplanner.core.framework.transaction.internal.DefaultUpdateManager;
 import org.opentripplanner.core.model.transaction.RepositoryRegistry;
 import org.opentripplanner.core.model.transaction.UpdateManager;
 
@@ -24,12 +26,7 @@ public class TransactionFactory {
     RepositoryRegistry registry,
     ThreadFactory threadFactory
   ) {
-    return new DefaultUpdateManager(
-      name,
-      ((DefaultRepositoryRegistry) registry).transactionManager(),
-      threadFactory,
-      null
-    );
+    return new DefaultUpdateManager(name, registry, threadFactory, null);
   }
 
   public static UpdateManager createUpdateManagerWithPeriodicCommits(
@@ -38,11 +35,6 @@ public class TransactionFactory {
     ThreadFactory threadFactory,
     Duration commitInterval
   ) {
-    return new DefaultUpdateManager(
-      name,
-      ((DefaultRepositoryRegistry) registry).transactionManager(),
-      threadFactory,
-      commitInterval
-    );
+    return new DefaultUpdateManager(name, registry, threadFactory, commitInterval);
   }
 }

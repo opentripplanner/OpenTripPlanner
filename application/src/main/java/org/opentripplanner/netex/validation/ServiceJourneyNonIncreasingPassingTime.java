@@ -1,11 +1,11 @@
 package org.opentripplanner.netex.validation;
 
 import java.util.List;
+import org.entur.netex2.model.ServiceJourney;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.graph_builder.issue.api.Issue;
 import org.opentripplanner.netex.support.ServiceJourneyInfo;
 import org.opentripplanner.netex.support.stoptime.StopTimeAdaptor;
-import org.rutebanken.netex.model.ServiceJourney;
 
 /**
  * Ensure that passing times are increasing along the service journey.
