@@ -35,6 +35,9 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 24
+          # also caches the packages of the debug client, which the Maven build installs with npm
+          cache: npm
+          cache-dependency-path: client/package-lock.json
 
       # Java setup step completes very fast, no need to run in a preconfigured docker container
       - name: Set up JDK 25
@@ -224,6 +227,11 @@ jobs:
           java-version: 25
           distribution: temurin
           cache: maven
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: client/package-lock.json
       - name: Build the application, including the debug client
         # no registry credentials in this step, because it runs the npm build
         run: mvn -P prettierSkip,checkstyleSkip -Dmaven.test.skip=true -Dmaven.source.skip=true package
