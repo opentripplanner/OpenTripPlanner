@@ -142,8 +142,8 @@ public class ItineraryFiltersConfig {
             .description(
               """
               The filter compares each direct-flex itinerary against every other transit itinerary,
-              and drops it if its generalized-cost is higher than the limit. Direct-flex itineraries
-              are not used to calculate the limit. The limit is calculated in the same way as for
+              including other direct-flex itineraries, and drops it if its generalized-cost is higher
+              than the limit. The limit is calculated in the same way as for
               `transitGeneralizedCostLimit`, using the `costLimitFunction` plus a *relative cost*
               for the distance in time between the itineraries.
               """

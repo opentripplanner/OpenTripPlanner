@@ -2434,7 +2434,7 @@ input ItineraryFilters {
   itineraries are returned with a system notice, and not deleted.
   """
   debug: ItineraryFilterDebugProfile = off
-  "Set a relative limit for direct-flex itineraries. The limit is calculated in the same way as for `transitGeneralizedCostLimit`, based on the generalized-cost of the other transit itineraries and the time between itineraries. Only direct-flex itineraries are removed by this filter. Default: {\"costLimitFunction\": 15m + 1.5 t, \"intervalRelaxFactor\": 0.4}"
+  "Set a relative limit for direct-flex itineraries. The limit is calculated in the same way as for `transitGeneralizedCostLimit`, based on the generalized-cost of the other transit itineraries, including other direct-flex itineraries, and the time between itineraries. Only direct-flex itineraries are removed by this filter. Default: {\"costLimitFunction\": 15m + 1.5 t, \"intervalRelaxFactor\": 0.4}"
   directFlexGeneralizedCostLimit: TransitGeneralizedCostFilterParams
   groupSimilarityKeepNumOfItineraries: Float = 0.68 @deprecated(reason : "Use groupSimilarityKeepThree instead.")
   "Pick ONE itinerary from each group after putting itineraries that is 85% similar together."

@@ -7,8 +7,8 @@ import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveIti
 
 /**
  * This filter removes direct-flex itineraries which have a generalized-cost higher than the
- * {@link GeneralizedCostLimit} computed from any of the other transit itineraries. The limit is
- * the same as in {@link TransitGeneralizedCostFilter}.
+ * {@link GeneralizedCostLimit} computed from any of the other transit itineraries, including other
+ * direct-flex itineraries. The limit is the same as in {@link TransitGeneralizedCostFilter}.
  * <p>
  * Direct flex has its own filter, so that it can be weighted differently from other transit.
  */
@@ -30,19 +30,16 @@ public class RemoveDirectFlexIfTransitIsBetter implements RemoveItineraryFlagger
 
   @Override
   public List<Itinerary> flagForRemoval(List<Itinerary> itineraries) {
-    List<Itinerary> transitItinerariesExceptDirectFlex = itineraries
+    List<Itinerary> transitItineraries = itineraries
       .stream()
       .filter(Itinerary::hasTransit)
-      .filter(it -> !it.isDirectFlex())
       .toList();
 
     return itineraries
       .stream()
       .filter(Itinerary::hasTransit)
       .filter(Itinerary::isDirectFlex)
-      .filter(it ->
-        transitItinerariesExceptDirectFlex.stream().anyMatch(t -> costLimit.exceedsLimit(it, t))
-      )
+      .filter(it -> transitItineraries.stream().anyMatch(t -> costLimit.exceedsLimit(it, t)))
       .toList();
   }
 }

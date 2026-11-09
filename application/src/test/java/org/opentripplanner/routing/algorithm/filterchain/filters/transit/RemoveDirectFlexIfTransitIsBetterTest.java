@@ -59,23 +59,23 @@ class RemoveDirectFlexIfTransitIsBetterTest implements PlanTestConstants {
   }
 
   @Test
-  void directFlexIsNotUsedAsReference() {
+  void directFlexIsUsedAsReference() {
     // Create a filter with f(x) = 0 + 2x, without any penalty for waiting at the beginning or end.
     var subject = new RemoveDirectFlexIfTransitIsBetter(CostLinearFunction.of(Cost.ZERO, 2.0), 0.0);
 
-    // Direct flex. Cost: 100, would set a limit of 200 if used as reference
+    // Direct flex. Cost: 100 => Limit: 200
     Itinerary i1 = newItinerary(A, T11_00).flex(T11_00, T11_10, E).build(100);
 
-    // Direct flex. Cost: 1000
+    // Direct flex. Cost: 1000 -> Filtered by i1, but within the limit of the bus
     Itinerary i2 = newItinerary(A, T11_00).flex(T11_00, T11_10, E).build(1000);
 
-    // Bus ride, not touched by the filter. Cost: 120 + 10 * 60 = 720
+    // Bus ride, not touched by the filter. Cost: 120 + 10 * 60 = 720 => Limit: 1440
     Itinerary i3 = newItinerary(A).bus(21, T11_00, T11_10, E).build();
 
     var all = List.of(i1, i2, i3);
 
-    // Expect - nothing to be dropped
-    assertEquals(toStr(all), toStr(subject.removeMatchesForTest(all)));
+    // Expect - i2 to be dropped
+    assertEquals(toStr(List.of(i1, i3)), toStr(subject.removeMatchesForTest(all)));
   }
 
   @Test

@@ -96,7 +96,8 @@ public class ItineraryFiltersInputType {
           .description(
             "Set a relative limit for direct-flex itineraries. The limit is calculated in the " +
               "same way as for `transitGeneralizedCostLimit`, based on the generalized-cost of " +
-              "the other transit itineraries and the time between itineraries. Only " +
+              "the other transit itineraries, including other direct-flex itineraries, and the " +
+              "time between itineraries. Only " +
               "direct-flex itineraries are removed by this filter. " +
               "Default: {\"costLimitFunction\": " +
               dft.directFlexGeneralizedCostLimit().costLimitFunction().serialize() +

@@ -184,7 +184,7 @@ public class ItineraryListFilterChainBuilder {
   /**
    * The same as {@link #withTransitGeneralizedCostLimit(TransitGeneralizedCostFilterParams)}, but
    * the limit is applied to direct-flex itineraries. The limit is computed from the other transit
-   * itineraries.
+   * itineraries, including other direct-flex itineraries.
    */
   public ItineraryListFilterChainBuilder withDirectFlexGeneralizedCostLimit(
     TransitGeneralizedCostFilterParams directFlexGeneralizedCostFilterParams
