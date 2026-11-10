@@ -1,0 +1,24 @@
+schema: schema.graphqls
+
+generates:
+  TestTypes.java:
+    plugins:
+      - java
+    config:
+      className: TestTypes
+      listType: List
+  TestDataFetchers.java:
+    plugins:
+      - java-resolvers
+    config:
+      className: TestDataFetchers
+
+config:
+  package: org.example.generated
+  typesPrefix: GraphQL
+  scalars:
+    ID: graphql.relay.Relay.ResolvedGlobalId
+  mappers:
+    Stop: org.example.model.StopModel#StopModel
+    Route: org.example.model.Route#Route
+    Mode: org.example.model.TransitMode#TransitMode

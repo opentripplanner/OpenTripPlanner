@@ -150,7 +150,6 @@
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java</artifactId>
-            <version>26.1</version>
         </dependency>
         <dependency>
             <groupId>com.graphql-java</groupId>
@@ -435,6 +434,41 @@
                 </configuration>
             </plugin>
             <plugin>
+                <!--
+                  Generate the Java types and data fetcher interfaces of the GTFS GraphQL API from
+                  its schema. See src/build/gtfs-graphql-codegen.yml for the type mappings.
+                -->
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.6.4</version>
+                <executions>
+                    <execution>
+                        <id>gtfs-graphql-codegen</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>org.opentripplanner.graphql.codegen.GraphQLCodegen</mainClass>
+                            <includeProjectDependencies>false</includeProjectDependencies>
+                            <includePluginDependencies>true</includePluginDependencies>
+                            <cleanupDaemonThreads>false</cleanupDaemonThreads>
+                            <arguments>
+                                <argument>${project.basedir}/src/build/gtfs-graphql-codegen.yml</argument>
+                                <argument>${project.build.directory}/generated-sources/gtfs-graphql</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>${project.groupId}</groupId>
+                        <artifactId>graphql-codegen</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
                 <version>3.6.2</version>
@@ -450,6 +484,7 @@
                                 <source>src/main/java</source>
                                 <source>src/ext/java</source>
                                 <source>${project.build.directory}/generated-sources/annotations</source>
+                                <source>${project.build.directory}/generated-sources/gtfs-graphql</source>
                             </sources>
                         </configuration>
                     </execution>
