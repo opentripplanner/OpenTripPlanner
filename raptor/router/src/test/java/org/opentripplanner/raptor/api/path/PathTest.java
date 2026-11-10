@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
+import org.opentripplanner.raptor._data.api.TestRaptorPath;
 import org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransferConstraint;
@@ -133,12 +134,13 @@ public class PathTest implements RaptorTestConstants {
 
   @Test
   public void testCompareTo() {
-    var p0 = Path.dummyPath(0, 10, 20, 3, 40, 50);
-    var p1 = Path.dummyPath(0, 11, 20, 3, 40, 50);
-    var p2 = Path.dummyPath(0, 10, 19, 3, 40, 50);
-    var p3 = Path.dummyPath(0, 10, 20, 2, 40, 50);
-    var p4 = Path.dummyPath(0, 10, 20, 3, 39, 50);
-    var p5 = Path.dummyPath(0, 10, 20, 3, 40, 49);
+    // TestRaptorPath(iterDeptTime, startTimeInclusivePenalty, endTimeInclusivePenalty, numberOfTransfers, c1, c2)
+    var p0 = new TestRaptorPath(0, 10, 20, 3, 40, 50);
+    var p1 = new TestRaptorPath(0, 11, 20, 3, 40, 50);
+    var p2 = new TestRaptorPath(0, 10, 19, 3, 40, 50);
+    var p3 = new TestRaptorPath(0, 10, 20, 2, 40, 50);
+    var p4 = new TestRaptorPath(0, 10, 20, 3, 39, 50);
+    var p5 = new TestRaptorPath(0, 10, 20, 3, 40, 49);
 
     // Order: < EndTime, > StartTime, < Cost, < Transfers
     List<RaptorPath<?>> expected = List.of(p2, p1, p4, p3, p5, p0);

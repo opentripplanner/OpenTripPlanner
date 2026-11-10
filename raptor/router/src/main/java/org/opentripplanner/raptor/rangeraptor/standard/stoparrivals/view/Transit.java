@@ -15,13 +15,21 @@ final class Transit<T extends RaptorTripSchedule>
   implements TransitPathView<T>
 {
 
-  private final StopArrivalState<T> arrival;
-  private final StopsCursor<T> cursor;
+  private final int arrivalTime;
+  private final int boardStopPosition;
+  private final T trip;
+  private final ArrivalView<T> previous;
 
+  /**
+   * The values are copied from the mutable state, so the arrival and its chain stay valid after
+   * the state is overwritten by the following iterations.
+   */
   Transit(int round, int stop, StopArrivalState<T> arrival, StopsCursor<T> cursor) {
     super(round, stop);
-    this.arrival = arrival;
-    this.cursor = cursor;
+    this.arrivalTime = arrival.onBoardArrivalTime();
+    this.boardStopPosition = arrival.boardStopPosition();
+    this.trip = arrival.trip();
+    this.previous = cursor.stop(round() - 1, boardStopIndex(), this);
   }
 
   @Override
@@ -36,12 +44,12 @@ final class Transit<T extends RaptorTripSchedule>
 
   @Override
   public int arrivalTime() {
-    return arrival.onBoardArrivalTime();
+    return arrivalTime;
   }
 
   @Override
   public ArrivalView<T> previous() {
-    return cursor.stop(round() - 1, boardStopIndex(), this);
+    return previous;
   }
 
   @Override
@@ -56,16 +64,16 @@ final class Transit<T extends RaptorTripSchedule>
 
   @Override
   public int boardStopPosition() {
-    return arrival.boardStopPosition();
+    return boardStopPosition;
   }
 
   @Override
   public T trip() {
-    return arrival.trip();
+    return trip;
   }
 
   public int boardTime() {
-    return arrival.boardTime();
+    return trip.departure(boardStopPosition);
   }
 
   @Override
@@ -74,6 +82,6 @@ final class Transit<T extends RaptorTripSchedule>
   }
 
   private int boardStopIndex() {
-    return arrival.trip().pattern().stopIndex(boardStopPosition());
+    return trip.pattern().stopIndex(boardStopPosition);
   }
 }

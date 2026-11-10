@@ -58,7 +58,7 @@
 
 
     <properties>
-        <otp.serialization.version.id>288</otp.serialization.version.id>
+        <otp.serialization.version.id>289</otp.serialization.version.id>
 
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>35.2</geotools.version>
@@ -319,12 +319,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.5.3</version>
+                <version>3.6.1</version>
                 <dependencies>
                     <dependency>
                         <groupId>me.fabriciorby</groupId>
                         <artifactId>maven-surefire-junit5-tree-reporter</artifactId>
-                        <version>1.4.0</version>
+                        <version>2.2.0</version>
                     </dependency>
                 </dependencies>
                 <configuration>
@@ -410,7 +410,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.15</version>
+                <version>0.8.16</version>
                 <configuration>
                     <excludes>
                         <exclude>org/opentripplanner/apis/gtfs/generated/**</exclude>
@@ -546,7 +546,7 @@
                 <!-- This makes sure all Jackson libraries are using compatible versions. -->
                 <groupId>tools.jackson</groupId>
                 <artifactId>jackson-bom</artifactId>
-                <version>3.2.3</version>
+                <version>3.3.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -558,7 +558,7 @@
                 -->
                 <groupId>com.fasterxml.jackson</groupId>
                 <artifactId>jackson-bom</artifactId>
-                <version>2.22.3</version>
+                <version>2.23.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

@@ -13,7 +13,7 @@ public interface RaptorStartOnBoardAccess extends RaptorAccessEgress {
   RaptorTripScheduleStopPosition tripBoarding();
 
   /**
-   * The stop index corresponding to {@link #stopPositionInPattern()}. {@inheritDoc}
+   * The stop index corresponding to {@link #stopPositionInPattern()}.
    */
   @Override
   int stop();

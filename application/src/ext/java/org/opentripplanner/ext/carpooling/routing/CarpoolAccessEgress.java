@@ -270,12 +270,12 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
   }
 
   /**
-   * The carpool route segments traversed by the passenger between pickup and dropoff (inclusive of
-   * intermediate stops the driver makes along the way for other passengers). Never empty for a
-   * valid leg.
+   * The street paths of the carpool route segments traversed by the passenger between pickup and
+   * dropoff (inclusive of intermediate stops the driver makes along the way for other passengers).
+   * Never empty for a valid leg.
    */
-  public List<StreetPath> sharedSegments() {
-    return insertionCandidate.getSharedSegments();
+  public List<StreetPath> pathsWithNewPassenger() {
+    return insertionCandidate.getPathsWithNewPassenger();
   }
 
   /**
