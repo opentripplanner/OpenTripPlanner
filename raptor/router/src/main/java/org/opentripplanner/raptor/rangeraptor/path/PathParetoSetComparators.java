@@ -11,20 +11,26 @@ import java.util.Objects;
 import org.opentripplanner.raptor.api.model.DominanceFunction;
 import org.opentripplanner.raptor.api.model.RelaxFunction;
 import org.opentripplanner.raptor.api.path.RaptorPath;
+import org.opentripplanner.raptor.rangeraptor.destination.DestinationArrivalParetoSetComparators;
 import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost;
 import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 
 /**
- * List of different pareto set comparators. Earlier we created these dynamically, but that affect
- * the performance, so it is better to have one function for each use case.
+ * List of different pareto set comparators for {@link RaptorPath}. Earlier we created these
+ * dynamically, but that affect the performance, so it is better to have one function for each use
+ * case.
+ * <p>
+ * Note! The Raptor search does not use these comparators for the destination pareto-set, it uses
+ * the {@link DestinationArrivalParetoSetComparators}, which compares destination arrivals and
+ * avoids building paths during the search. The criteria are the same.
  * <p>
  * All comparators include the "standard" set of criteria:
  * <ul>
  *   <li>Arrival Time</li>
  *   <li>Number of transfers</li>
- *   <li>Total travel duration time</li>
+ *   <li>Total travel duration time (with cost)</li>
  * </ul>
  * Optional features are :
  * <ul>

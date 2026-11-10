@@ -81,7 +81,6 @@ class DefaultTransitServiceTest {
     .withName(I18NString.of("GOS"))
     .build();
 
-  private static final FeedScopedId SERVICE_ID = new FeedScopedId("FEED", "SERVICE");
   private static final int SERVICE_CODE = 0;
   private static final TripPattern FERRY_PATTERN = TEST_MODEL.pattern(FERRY).build();
   private static final TripPattern BUS_PATTERN = TEST_MODEL.pattern(BUS).build();
@@ -188,9 +187,7 @@ class DefaultTransitServiceTest {
       List.of(firstDate, secondDate)
     );
 
-    timetableDataImport.putServiceCode(SERVICE_ID, SERVICE_CODE);
-    timetableDataImport.putServiceCode(CALENDAR_ID, SERVICE_CODE);
-    timetableDataImport.putServiceCode(CALENDAR_ID_TWO, 1);
+    timetableDataImport.addNextServiceCodes(List.of(CALENDAR_ID, CALENDAR_ID_TWO));
 
     timetableDataImport.addTripPattern(RAIL_PATTERN.getId(), RAIL_PATTERN);
     timetableDataImport.addTripPattern(BUS_PATTERN.getId(), BUS_PATTERN);

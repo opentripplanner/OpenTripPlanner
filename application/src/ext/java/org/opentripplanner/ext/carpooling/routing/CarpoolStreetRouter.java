@@ -1,7 +1,9 @@
 package org.opentripplanner.ext.carpooling.routing;
 
+import java.time.Duration;
+import org.opentripplanner.astar.strategy.ComposingSkipEdgeStrategy;
 import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
-import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
+import org.opentripplanner.ext.carpooling.util.TraversalScope;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.path.StreetPath;
@@ -15,29 +17,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Street routing service for carpooling insertion evaluation.
- * <p>
- * This router encapsulates all dependencies needed for A* street routing between two street
- * vertices during carpool insertion optimization. It handles search configuration and path
- * selection for CAR mode routing.
+ * Finds the path of a corridor segment: an A* car search between its two vertices.
  *
  * <h2>Routing Strategy</h2>
  * <ul>
  *   <li><strong>Mode:</strong> CAR mode for both origin and destination</li>
  *   <li><strong>Algorithm:</strong> A* with Euclidean heuristic</li>
  *   <li><strong>Dominance:</strong> Minimum weight</li>
- *   <li><strong>Search Bound:</strong> {@link CarpoolTrip#MAX_TRIP_DURATION}</li>
+ *   <li><strong>Search Bound:</strong> the maximum trip duration</li>
  *   <li><strong>Error Handling:</strong> Returns null on routing failure (logged as warning); a
  *       cancelled request propagates, see {@link CarpoolRouter#route}</li>
  * </ul>
- *
- * @see InsertionEvaluator for usage in insertion evaluation
  */
 public class CarpoolStreetRouter implements CarpoolRouter {
 
   private static final Logger LOG = LoggerFactory.getLogger(CarpoolStreetRouter.class);
 
   private final StreetLimitationParametersService streetLimitationParametersService;
+  private final Duration maxTripDuration;
 
   /**
    * Creates a new carpool street router.
@@ -45,14 +42,19 @@ public class CarpoolStreetRouter implements CarpoolRouter {
    * @param streetLimitationParametersService provides street routing parameters (speed limits,
    *                                          etc.)
    */
-  public CarpoolStreetRouter(StreetLimitationParametersService streetLimitationParametersService) {
+  public CarpoolStreetRouter(
+    StreetLimitationParametersService streetLimitationParametersService,
+    Duration maxTripDuration
+  ) {
     this.streetLimitationParametersService = streetLimitationParametersService;
+    this.maxTripDuration = maxTripDuration;
   }
 
   @Override
-  public StreetPath route(Vertex from, Vertex to) {
+  public RoutedSegment route(Vertex from, Vertex to) {
     try {
-      return carpoolRouting(from, to);
+      var path = carpoolRouting(from, to);
+      return path == null ? null : RoutedSegment.of(path);
     } catch (OTPRequestTimeoutException e) {
       // Rethrown ahead of the catch-all below, which would turn a cancellation into a null return.
       throw e;
@@ -68,24 +70,27 @@ public class CarpoolStreetRouter implements CarpoolRouter {
    * Configures and executes an A* street search with settings optimized for carpooling:
    * <ul>
    *   <li><strong>Heuristic:</strong> Euclidean distance with max car speed</li>
-   *   <li><strong>Skip Strategy:</strong> Duration-based edge skipping</li>
+   *   <li><strong>Skip Strategy:</strong> Duration-based edge skipping, and no other request's
+   *       temporary edges</li>
    *   <li><strong>Dominance:</strong> Minimum weight</li>
    * </ul>
    *
    * @param fromVertex the origin vertex
    * @param toVertex   the destination vertex
-   * @return the first (best) path found, or null if no path reaches the destination within
-   *         {@link CarpoolTrip#MAX_TRIP_DURATION}
+   * @return the first (best) path found, or null if no path reaches the destination within the
+   *         maximum trip duration
    */
   private StreetPath carpoolRouting(Vertex fromVertex, Vertex toVertex) {
     var request = StreetSearchRequest.of().withMode(StreetMode.CAR).build();
     var streetSearch = StreetSearchBuilder.of()
       .withPreStartHook(OTPRequestTimeoutException::checkForTimeout)
       .withHeuristic(new EuclideanRemainingWeightHeuristic(streetLimitationParametersService))
-      // Bound the search at the carpool trip ceiling rather than the passenger request's
-      // maxDirectDuration: a driver leg is not a passenger direct trip, and a request-independent
-      // bound keeps the cached baseline leg durations request-independent too.
-      .withSkipEdgeStrategy(new DurationSkipEdgeStrategy<>(CarpoolTrip.MAX_TRIP_DURATION))
+      .withSkipEdgeStrategy(
+        new ComposingSkipEdgeStrategy<>(
+          TraversalScope.withOwnLinkingOf(fromVertex, toVertex),
+          new DurationSkipEdgeStrategy<>(maxTripDuration)
+        )
+      )
       .withDominanceFunction(new DominanceFunctions.MinimumWeight())
       .withRequest(request)
       .withFrom(fromVertex)

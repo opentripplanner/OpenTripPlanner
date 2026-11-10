@@ -45,6 +45,13 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Update to netex2-java-model v3.0.0 (NeTEx 2.0) [#7259](https://github.com/opentripplanner/OpenTripPlanner/pull/7259)
 - Remove Thread.yield() from the request timeout check [#8147](https://github.com/opentripplanner/OpenTripPlanner/pull/8147)
 - Add tripPatternByLegIds as replacement for refetchTripPattern in Transmodel [#8111](https://github.com/opentripplanner/OpenTripPlanner/pull/8111)
+- Allow `PassengerStopAssignment` with `StopPlace` only [#8054](https://github.com/opentripplanner/OpenTripPlanner/pull/8054)
+- Don't penalize sidewalks designated for bikes [#8139](https://github.com/opentripplanner/OpenTripPlanner/pull/8139)
+- Fix exception on datedServiceJourney query without id [#8156](https://github.com/opentripplanner/OpenTripPlanner/pull/8156)
+- Fix on-board access not applying realtime boarding time [#8120](https://github.com/opentripplanner/OpenTripPlanner/pull/8120)
+- Cleanup Raptor destination arrivals - drop path creation during the search  [#8092](https://github.com/opentripplanner/OpenTripPlanner/pull/8092)
+- Use `barrier=kerb` for wheelchair routing [#8106](https://github.com/opentripplanner/OpenTripPlanner/pull/8106)
+- Improve performance of GTFS import [#8100](https://github.com/opentripplanner/OpenTripPlanner/pull/8100)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.10.0 (2026-09-09)

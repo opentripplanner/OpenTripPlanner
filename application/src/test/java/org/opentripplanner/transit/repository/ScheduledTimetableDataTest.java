@@ -63,12 +63,12 @@ class ScheduledTimetableDataTest {
     var pattern = pattern("P1", trip("T1"));
     dataImport.addTripPattern(pattern.getId(), pattern);
     dataImport.updateCalendarServiceData(calendarData());
-    dataImport.putServiceCode(id("SID"), 7);
+    dataImport.addNextServiceCodes(List.of(id("SID")));
 
     var subject = dataImport.toScheduledTimetableData();
 
     var codes = subject.getTripCalendars().getServiceCodesRunningForDate().get(SERVICE_DATE);
-    assertThat(codes.toArray()).asList().containsExactly(7);
+    assertThat(codes.toArray()).asList().containsExactly(0);
     assertTrue(subject.hasScheduledServicesAfter(SERVICE_DATE, STOP_1));
     assertFalse(subject.hasScheduledServicesAfter(SERVICE_DATE.plusDays(1), STOP_1));
   }
