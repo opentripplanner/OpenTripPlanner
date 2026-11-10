@@ -18,18 +18,20 @@ import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.routing.linking.mapping.LinkingContextRequestMapper;
+import org.opentripplanner.service.vehiclerental.GeofencingZoneService;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.TemporaryVerticesContainer;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
 
-class AccessEgressRouterTest extends GraphRoutingTest {
+class DefaultAccessEgressRouterTest extends GraphRoutingTest {
 
   private Graph graph;
   private TransitRepository transitRepository;
@@ -236,7 +238,7 @@ class AccessEgressRouterTest extends GraphRoutingTest {
         "]"
       );
     } else {
-      return "street[" + stateDescription(nearbyStop.state()) + "]";
+      return "street" + nearbyStop.finalStates.stream().map(this::stateDescription).toList();
     }
   }
 
@@ -281,15 +283,20 @@ class AccessEgressRouterTest extends GraphRoutingTest {
       );
       var linkingRequest = LinkingContextRequestMapper.map(request);
       var linkingContext = linkingContextFactory.create(verticesContainer, linkingRequest);
+      var router = new DefaultAccessEgressRouter();
 
-      return AccessEgressRouter.findAccessEgresses(
+      return router.findAccessEgresses(
         request,
         StreetMode.WALK,
         List.of(),
         accessEgress,
         durationLimit,
         maxStopCount,
-        linkingContext
+        linkingContext,
+        StreetLimitationParametersService.DEFAULT,
+        GeofencingZoneService.EMPTY,
+        null,
+        null
       );
     }
   }

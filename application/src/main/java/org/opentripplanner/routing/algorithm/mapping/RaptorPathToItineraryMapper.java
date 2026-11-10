@@ -36,9 +36,12 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccess
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedPath;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.via.ViaLocation;
+import org.opentripplanner.routing.api.request.via.VisitViaLocation;
 import org.opentripplanner.routing.via.model.ViaCoordinateTransfer;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.street.geometry.GeometryUtils;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.edge.Edge;
@@ -175,7 +178,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       .egress()
       .findOriginal(RoutingAccessEgress.class)
       .stream()
-      .anyMatch(leg -> leg.getFinalState().isRentingVehicleFromStation());
+      .anyMatch(leg -> leg.getFinalStates().getFirst().isRentingVehicleFromStation());
     builder.withArrivedAtDestinationWithRentedVehicle(arrivedOnRental);
 
     if (optimizedPath != null) {
@@ -217,11 +220,12 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     int fromTime = accessPathLeg.fromTime();
     var legs = mapAccessEgressToLegs(accessPathLeg.access(), createZonedDateTime(fromTime));
     if (taxiService != null && request.journey().access().mode() == StreetMode.TAXI) {
-      return taxiService.decorateAccessEgressLegs(
-        legs,
-        request.from().wgsCoordinate(),
-        raptorTransitData.getStopByIndex(accessPathLeg.access().stop()).getCoordinate()
-      );
+      // The taxi is only used from the origin to the first via location, if any via is visited
+      var dropoff =
+        accessPathLeg.access().numberOfViaLocationsVisited() > 0
+          ? viaCoordinate(request.listViaLocations().getFirst())
+          : raptorTransitData.getStopByIndex(accessPathLeg.access().stop()).getCoordinate();
+      return taxiService.decorateAccessEgressLegs(legs, request.from().wgsCoordinate(), dropoff);
     }
     return legs;
   }
@@ -372,11 +376,12 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     var startTime = createZonedDateTime(egressPathLeg.fromTime());
     var legs = mapAccessEgressToLegs(egressPathLeg.egress(), startTime);
     if (taxiService != null && request.journey().egress().mode() == StreetMode.TAXI) {
-      return taxiService.decorateAccessEgressLegs(
-        legs,
-        raptorTransitData.getStopByIndex(egressPathLeg.egress().stop()).getCoordinate(),
-        request.to().wgsCoordinate()
-      );
+      // The taxi is only used from the last via location to the destination, if any via is visited
+      var pickup =
+        egressPathLeg.egress().numberOfViaLocationsVisited() > 0
+          ? viaCoordinate(request.listViaLocations().getLast())
+          : raptorTransitData.getStopByIndex(egressPathLeg.egress().stop()).getCoordinate();
+      return taxiService.decorateAccessEgressLegs(legs, pickup, request.to().wgsCoordinate());
     }
     return legs;
   }
@@ -499,12 +504,21 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     RaptorAccessEgress accessEgress,
     ZonedDateTime startTime
   ) {
-    return accessEgress
-      .findOriginal(RoutingAccessEgress.class)
-      .map(RoutingAccessEgress::getFinalState)
-      .map(StreetPath::new)
-      .map(path -> streetPathToLegsMapper.map(path, request, startTime))
-      .orElseThrow();
+    var routingAccessEgress = accessEgress.findOriginal(RoutingAccessEgress.class).orElseThrow();
+    var paths = routingAccessEgress.getFinalStates().stream().map(StreetPath::new).toList();
+    var delay = Duration.between(paths.getFirst().startTime(), startTime);
+    return paths
+      .stream()
+      .flatMap(path -> streetPathToLegsMapper.map(path, request, delay).stream())
+      .toList();
+  }
+
+  /**
+   * Via locations visited by an access/egress always have a coordinate, see
+   * {@code ViaAccessEgressRouter}.
+   */
+  private static WgsCoordinate viaCoordinate(ViaLocation via) {
+    return ((VisitViaLocation) via).coordinate().orElseThrow();
   }
 
   private TimeAndCost mapAccessEgressPenalty(RaptorAccessEgress accessEgress) {
