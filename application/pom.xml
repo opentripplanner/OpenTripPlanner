@@ -93,12 +93,17 @@
             <artifactId>jcommander</artifactId>
             <version>1.82</version>
         </dependency>
-        <!-- Provides some shared serializers for Kryo. Introduces transitive dependencies on Kryo, and Trove (used by its ObjectDiffer, not by OTP). -->
-        <!-- Also provides classes for testing that a round trip through serialization reproduces the same network. -->
+        <dependency>
+            <groupId>com.esotericsoftware</groupId>
+            <artifactId>kryo</artifactId>
+            <version>5.5.0</version>
+        </dependency>
+        <!-- Only used for the ObjectDiffer, which tests that a round trip through serialization reproduces the same network. -->
         <dependency>
             <groupId>com.conveyal</groupId>
             <artifactId>kryo-tools</artifactId>
             <version>1.6.0</version>
+            <scope>test</scope>
         </dependency>
         <!--
             jersey pulls in older versions of this dependency which are binary-incompatible
