@@ -23,7 +23,7 @@ import org.opentripplanner.raptor.api.request.Optimization;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.api.request.via.RaptorViaLocation;
-import org.opentripplanner.raptor.rangeraptor.SystemErrDebugLogger;
+import org.opentripplanner.raptor.debug.SystemErrDebugLogger;
 import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.raptor.spi.RaptorCostConverter;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
