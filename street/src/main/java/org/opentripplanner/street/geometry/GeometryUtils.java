@@ -2,8 +2,8 @@ package org.opentripplanner.street.geometry;
 
 import static org.opentripplanner.utils.lang.DoubleUtils.doubleEquals;
 
+import com.carrotsearch.hppc.DoubleArrayList;
 import com.google.common.collect.Iterables;
-import gnu.trove.list.array.TDoubleArrayList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -107,7 +107,7 @@ public class GeometryUtils {
   /// For the best performance and lowest number of allocations pass in an [Iterable] rather than a
   /// materialized [Collection].
   public static LineString concatenateLineStrings(Iterable<LineString> lineStrings) {
-    var coordinates = new TDoubleArrayList();
+    var coordinates = new DoubleArrayList();
 
     for (var ls : lineStrings) {
       if (ls == null || ls.isEmpty()) {

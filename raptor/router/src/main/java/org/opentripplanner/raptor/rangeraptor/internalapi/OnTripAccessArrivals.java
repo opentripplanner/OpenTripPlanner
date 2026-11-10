@@ -1,7 +1,7 @@
 package org.opentripplanner.raptor.rangeraptor.internalapi;
 
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
+import com.carrotsearch.hppc.IntObjectHashMap;
+import com.carrotsearch.hppc.IntObjectMap;
 import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.raptor.api.model.RaptorTripScheduleStopPosition;
@@ -23,8 +23,8 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  */
 public final class OnTripAccessArrivals<T extends RaptorTripSchedule> {
 
-  private final TIntObjectMap<List<OnTripAccessArrival<T>>> arrivalsForStopPosition =
-    new TIntObjectHashMap<>();
+  private final IntObjectMap<List<OnTripAccessArrival<T>>> arrivalsForStopPosition =
+    new IntObjectHashMap<>();
 
   /** Returns {@code true} if there are on-board arrivals waiting to board at {@code stopPos}. */
   public boolean arrivalExistForStopPosition(int stopPos) {

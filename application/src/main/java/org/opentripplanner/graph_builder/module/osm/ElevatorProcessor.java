@@ -1,6 +1,6 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import gnu.trove.list.TLongList;
+import com.carrotsearch.hppc.LongArrayList;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -358,7 +358,7 @@ class ElevatorProcessor {
       return false;
     }
 
-    TLongList nodeRefs = way.getNodeRefs();
+    LongArrayList nodeRefs = way.getNodeRefs();
     // A way whose first and last node are the same is probably an area, skip that.
     // https://www.openstreetmap.org/way/503412863
     // https://www.openstreetmap.org/way/187719215

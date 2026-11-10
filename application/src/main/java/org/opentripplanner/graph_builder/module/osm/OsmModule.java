@@ -6,11 +6,11 @@ import static org.opentripplanner.osm.model.TraverseDirection.BACKWARD;
 import static org.opentripplanner.osm.model.TraverseDirection.DIRECTIONLESS;
 import static org.opentripplanner.osm.model.TraverseDirection.FORWARD;
 
+import com.carrotsearch.hppc.DoubleArrayList;
+import com.carrotsearch.hppc.LongArrayList;
+import com.carrotsearch.hppc.cursors.LongCursor;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
-import gnu.trove.iterator.TLongIterator;
-import gnu.trove.list.array.TDoubleArrayList;
-import gnu.trove.list.array.TLongArrayList;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -358,13 +358,13 @@ public class OsmModule implements GraphBuilderModule {
 
       // handle duplicate nodes in OSM ways
       // this is a workaround for crappy OSM data quality
-      TLongArrayList nodes = new TLongArrayList(way.getNodeRefs().size());
+      LongArrayList nodes = new LongArrayList(way.getNodeRefs().size());
       long last = -1;
       double lastLat = -1;
       double lastLon = -1;
       String lastLevel = null;
-      for (TLongIterator iter = way.getNodeRefs().iterator(); iter.hasNext(); ) {
-        long nodeId = iter.next();
+      for (LongCursor c : way.getNodeRefs()) {
+        long nodeId = c.value;
         OsmNode node = osmdb.getNode(nodeId);
         if (node == null) {
           continue WAY;
@@ -392,7 +392,7 @@ public class OsmModule implements GraphBuilderModule {
       IntersectionVertex fromVertex = null;
       IntersectionVertex toVertex = null;
 
-      TDoubleArrayList segmentCoordinates = new TDoubleArrayList(100);
+      DoubleArrayList segmentCoordinates = new DoubleArrayList(100);
 
       /*
        * Traverse through all the nodes of this edge. For nodes which are not shared with any other edge, do not create endpoints -- just
@@ -439,7 +439,7 @@ public class OsmModule implements GraphBuilderModule {
         if (
           vertexGenerator.isIntersectionNode(endNode) ||
           i == nodes.size() - 2 ||
-          nodes.subList(0, i).contains(nodes.get(i)) ||
+          nodes.indexOf(nodes.get(i)) < i ||
           osmEndNode.hasTag("ele") ||
           osmEndNode.isBoardingLocation() ||
           osmEndNode.isBarrier() ||

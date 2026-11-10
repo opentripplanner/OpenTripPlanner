@@ -1,8 +1,7 @@
 package org.opentripplanner.transit.model.calendar;
 
-import gnu.trove.TCollections;
-import gnu.trove.set.TIntSet;
-import gnu.trove.set.hash.TIntHashSet;
+import com.carrotsearch.hppc.IntHashSet;
+import com.carrotsearch.hppc.IntSet;
 import java.io.Serializable;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -42,7 +41,7 @@ public class TripCalendars implements Serializable {
 
   private final Map<FeedScopedId, List<LocalDate>> serviceDatesByServiceId;
   private final Map<LocalDate, Set<FeedScopedId>> serviceIdsByDate;
-  private final Map<LocalDate, TIntSet> serviceCodesRunningForDate;
+  private final Map<LocalDate, IntSet> serviceCodesRunningForDate;
   private final Map<FeedScopedId, Integer> serviceCodes;
 
   @Nullable
@@ -54,7 +53,7 @@ public class TripCalendars implements Serializable {
   private TripCalendars(
     Map<FeedScopedId, List<LocalDate>> serviceDatesByServiceId,
     Map<LocalDate, Set<FeedScopedId>> serviceIdsByDate,
-    Map<LocalDate, TIntSet> serviceCodesRunningForDate,
+    Map<LocalDate, IntSet> serviceCodesRunningForDate,
     Map<FeedScopedId, Integer> serviceCodes
   ) {
     this.serviceDatesByServiceId = serviceDatesByServiceId;
@@ -142,10 +141,8 @@ public class TripCalendars implements Serializable {
     return serviceCodes;
   }
 
-  /**
-   * For all dates in the system get the service codes that run on it.
-   */
-  public Map<LocalDate, TIntSet> getServiceCodesRunningForDate() {
+  /** For all dates in the system get the service codes that run on it. */
+  public Map<LocalDate, IntSet> getServiceCodesRunningForDate() {
     return serviceCodesRunningForDate;
   }
 
@@ -249,7 +246,7 @@ public class TripCalendars implements Serializable {
    * @return a new instance with {@link #getServiceCodesRunningForDate()} computed.
    */
   public TripCalendars initializeServiceCodesRunningForDate() {
-    Map<LocalDate, TIntSet> newServiceCodesRunningForDate = new HashMap<>();
+    Map<LocalDate, IntSet> newServiceCodesRunningForDate = new HashMap<>();
     for (FeedScopedId serviceId : serviceDatesByServiceId.keySet()) {
       Integer code = serviceCodes.get(serviceId);
       if (code == null) {
@@ -258,7 +255,7 @@ public class TripCalendars implements Serializable {
       List<LocalDate> serviceDates = serviceDatesByServiceId.get(serviceId);
       for (LocalDate serviceDate : serviceDates) {
         newServiceCodesRunningForDate
-          .computeIfAbsent(serviceDate, ignored -> new TIntHashSet())
+          .computeIfAbsent(serviceDate, ignored -> new IntHashSet())
           .add(code);
       }
     }
@@ -316,7 +313,7 @@ public class TripCalendars implements Serializable {
     }
 
     Map<FeedScopedId, Integer> newServiceCodes = serviceCodes;
-    Map<LocalDate, TIntSet> newServiceCodesRunningForDate = serviceCodesRunningForDate;
+    Map<LocalDate, IntSet> newServiceCodesRunningForDate = serviceCodesRunningForDate;
     if (!serviceCodes.containsKey(serviceId)) {
       // Calculating new unique serviceCode based on size (!)
       int serviceCode = serviceCodes.size();
@@ -364,13 +361,11 @@ public class TripCalendars implements Serializable {
     return Collections.unmodifiableMap(frozen);
   }
 
-  private static Map<LocalDate, TIntSet> freezeServiceCodes(
-    Map<LocalDate, TIntSet> serviceCodesRunningForDate
+  private static Map<LocalDate, IntSet> freezeServiceCodes(
+    Map<LocalDate, IntSet> serviceCodesRunningForDate
   ) {
-    Map<LocalDate, TIntSet> frozen = new HashMap<>();
-    serviceCodesRunningForDate.forEach((date, codes) ->
-      frozen.put(date, TCollections.unmodifiableSet(codes))
-    );
+    Map<LocalDate, IntSet> frozen = new HashMap<>();
+    serviceCodesRunningForDate.forEach(frozen::put);
     return Collections.unmodifiableMap(frozen);
   }
 
@@ -393,16 +388,16 @@ public class TripCalendars implements Serializable {
     return Collections.unmodifiableMap(copy);
   }
 
-  private static Map<LocalDate, TIntSet> withAddedServiceCode(
-    Map<LocalDate, TIntSet> serviceCodesRunningForDate,
+  private static Map<LocalDate, IntSet> withAddedServiceCode(
+    Map<LocalDate, IntSet> serviceCodesRunningForDate,
     LocalDate date,
     int code
   ) {
-    Map<LocalDate, TIntSet> copy = new HashMap<>(serviceCodesRunningForDate);
-    TIntSet existing = copy.get(date);
-    TIntSet updated = existing == null ? new TIntHashSet() : new TIntHashSet(existing);
+    Map<LocalDate, IntSet> copy = new HashMap<>(serviceCodesRunningForDate);
+    IntSet existing = copy.get(date);
+    IntSet updated = existing == null ? new IntHashSet() : new IntHashSet(existing);
     updated.add(code);
-    copy.put(date, TCollections.unmodifiableSet(updated));
+    copy.put(date, updated);
     return Collections.unmodifiableMap(copy);
   }
 }

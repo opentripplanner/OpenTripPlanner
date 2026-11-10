@@ -1,22 +1,23 @@
 package org.opentripplanner.graph_builder.module.osm.model;
 
-import gnu.trove.list.TIntList;
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.TLongObjectMap;
-import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.hash.TLongObjectHashMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
+import com.carrotsearch.hppc.IntArrayList;
+import com.carrotsearch.hppc.LongObjectHashMap;
+import com.carrotsearch.hppc.LongObjectMap;
+import com.carrotsearch.hppc.ObjectIntHashMap;
+import com.carrotsearch.hppc.ObjectIntMap;
+import com.carrotsearch.hppc.cursors.ObjectCursor;
+import com.carrotsearch.hppc.procedures.ObjectIntProcedure;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import org.opentripplanner.framework.collection.TroveUtils;
+import org.opentripplanner.framework.collection.HPPCMapSetUtils;
 
 /** Basic union-find data structure with path compression */
 public class DisjointSet<T> {
 
-  TIntList sets = new TIntArrayList();
+  IntArrayList sets = new IntArrayList();
 
-  TObjectIntMap<T> setMapping = new TObjectIntHashMap<>();
+  ObjectIntMap<T> setMapping = new ObjectIntHashMap<>();
 
   public DisjointSet() {}
 
@@ -60,12 +61,15 @@ public class DisjointSet<T> {
   }
 
   public List<Set<T>> sets() {
-    TLongObjectMap<Set<T>> out = new TLongObjectHashMap<>();
-    setMapping.forEachEntry((k, v) -> {
-      TroveUtils.addToMapSet(out, compact(v), k);
-      return true;
-    });
-    return new ArrayList<>(out.valueCollection());
+    LongObjectMap<Set<T>> out = new LongObjectHashMap<>();
+    setMapping.forEach(
+      (ObjectIntProcedure<T>) (k, v) -> HPPCMapSetUtils.addToMapSet(out, compact(v), k)
+    );
+    List<Set<T>> result = new ArrayList<>();
+    for (ObjectCursor<Set<T>> c : out.values()) {
+      result.add(c.value);
+    }
+    return result;
   }
 
   public int size(int component) {

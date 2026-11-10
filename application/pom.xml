@@ -93,7 +93,7 @@
             <artifactId>jcommander</artifactId>
             <version>1.82</version>
         </dependency>
-        <!-- Provides some shared serializers for Kryo. Introduces transitive dependencies on Trove, and Kryo. -->
+        <!-- Provides some shared serializers for Kryo. Introduces transitive dependencies on Kryo, and Trove (used by its ObjectDiffer, not by OTP). -->
         <!-- Also provides classes for testing that a round trip through serialization reproduces the same network. -->
         <dependency>
             <groupId>com.conveyal</groupId>
@@ -201,8 +201,8 @@
             <version>0.4.8</version>
         </dependency>
         <dependency>
-            <groupId>net.sf.trove4j</groupId>
-            <artifactId>trove4j</artifactId>
+            <groupId>com.carrotsearch</groupId>
+            <artifactId>hppc</artifactId>
         </dependency>
         <dependency>
             <groupId>net.sourceforge.javacsv</groupId>

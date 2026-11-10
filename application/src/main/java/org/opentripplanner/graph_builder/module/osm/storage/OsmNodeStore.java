@@ -1,11 +1,11 @@
 package org.opentripplanner.graph_builder.module.osm.storage;
 
-import gnu.trove.map.TLongByteMap;
-import gnu.trove.map.TLongLongMap;
-import gnu.trove.map.TLongObjectMap;
-import gnu.trove.map.hash.TLongByteHashMap;
-import gnu.trove.map.hash.TLongLongHashMap;
-import gnu.trove.map.hash.TLongObjectHashMap;
+import com.carrotsearch.hppc.LongByteHashMap;
+import com.carrotsearch.hppc.LongByteMap;
+import com.carrotsearch.hppc.LongLongHashMap;
+import com.carrotsearch.hppc.LongLongMap;
+import com.carrotsearch.hppc.LongObjectHashMap;
+import com.carrotsearch.hppc.LongObjectMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -17,15 +17,15 @@ import org.opentripplanner.osm.model.OsmNode;
 
 /**
  * A memory-efficient store for the {@link OsmNode}s used in ways/areas, keyed by their OSM ID.
- * <p>
- * This is the single largest in-memory structure during OSM processing, so instead of a
- * {@code TLongObjectMap<OsmNode>} (which needs a full {@link OsmNode} object, including a nested
- * tags map, per node) node data is split into three parallel, node ID-keyed stores.
- * {@link #get(long)} reassembles an {@link OsmNode} on demand from these.
- * <p>
- * Because nodes are reassembled on every {@link #get(long)} call, two {@link OsmNode} instances
- * returned for the same ID are generally <b>not</b> the same object. Callers must rely on
- * {@link OsmEntity#equals} (which compares by ID and type) rather than reference equality.
+ *
+ * <p>This is the single largest in-memory structure during OSM processing, so instead of a {@code
+ * LongObjectMap<OsmNode>} (which needs a full {@link OsmNode} object, including a nested tags map,
+ * per node) node data is split into three parallel, node ID-keyed stores. {@link #get(long)}
+ * reassembles an {@link OsmNode} on demand from these.
+ *
+ * <p>Because nodes are reassembled on every {@link #get(long)} call, two {@link OsmNode} instances
+ * returned for the same ID are generally <b>not</b> the same object. Callers must rely on {@link
+ * OsmEntity#equals} (which compares by ID and type) rather than reference equality.
  */
 class OsmNodeStore {
 
@@ -38,22 +38,23 @@ class OsmNodeStore {
   private static final double FIXED_POINT_FACTOR = 1e7;
 
   /** Coordinates of all retained nodes, packed as two fixed-point ints in one long. */
-  private final TLongLongMap coordinatesById = new TLongLongHashMap();
+  private final LongLongMap coordinatesById = new LongLongHashMap();
 
   /**
    * Index into {@link #providers} of the provider of all retained nodes, minus one entry: nodes
-   * from the first (index 0) provider are left out, relying on {@link TLongByteMap#get} returning
-   * its no-entry-value of {@code 0} for them. In the very common case of there being only a single
+   * from the first (index 0) provider are left out, relying on {@link LongByteMap#get} returning
+   * its default value of {@code 0} for them. In the very common case of there being only a single
    * provider - a single input OSM file - this map therefore stays completely empty.
    */
-  private final TLongByteMap nonDefaultProviderIndexById = new TLongByteHashMap();
+  private final LongByteMap nonDefaultProviderIndexById = new LongByteHashMap();
+
   private final List<OsmProvider> providers = new ArrayList<>();
 
   /**
    * Tags of the retained nodes. The vast majority of nodes have no tags at all, so this map only
    * has an entry for nodes that do, unlike the coordinate and provider stores above.
    */
-  private final TLongObjectMap<Map<String, String>> tagsById = new TLongObjectHashMap<>();
+  private final LongObjectMap<Map<String, String>> tagsById = new LongObjectHashMap<>();
 
   /**
    * Stores the given node, unless a node with the same id is already present.

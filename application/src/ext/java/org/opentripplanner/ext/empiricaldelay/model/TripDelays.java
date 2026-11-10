@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.empiricaldelay.model;
 
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
+import com.carrotsearch.hppc.IntObjectHashMap;
+import com.carrotsearch.hppc.IntObjectMap;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
@@ -16,11 +16,11 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 public class TripDelays implements Serializable {
 
   private final FeedScopedId tripId;
-  private Map<String, TIntObjectMap<EmpiricalDelay>> delaysByServiceId = new HashMap<>();
+  private Map<String, IntObjectMap<EmpiricalDelay>> delaysByServiceId = new HashMap<>();
 
   public TripDelays(
     FeedScopedId tripId,
-    Map<String, TIntObjectMap<EmpiricalDelay>> delaysByServiceId
+    Map<String, IntObjectMap<EmpiricalDelay>> delaysByServiceId
   ) {
     this.tripId = Objects.requireNonNull(tripId);
     this.delaysByServiceId = Objects.requireNonNull(delaysByServiceId);
@@ -36,7 +36,7 @@ public class TripDelays implements Serializable {
 
   /** Retrieve delay for a specific service and stop position. */
   public Optional<EmpiricalDelay> get(String serviceId, int stopPosInPattern) {
-    TIntObjectMap<EmpiricalDelay> delayPerStop = delaysByServiceId.get(serviceId);
+    IntObjectMap<EmpiricalDelay> delayPerStop = delaysByServiceId.get(serviceId);
     // Check if empirical data for the serviceId (serviceDay) exist
     if (delayPerStop == null) {
       return Optional.empty();
@@ -55,21 +55,21 @@ public class TripDelays implements Serializable {
   public static class Builder {
 
     private final FeedScopedId tripId;
-    private Map<String, TIntObjectMap<EmpiricalDelay>> delaysByServiceId = new HashMap<>();
+    private Map<String, IntObjectMap<EmpiricalDelay>> delaysByServiceId = new HashMap<>();
 
     public Builder(FeedScopedId tripId) {
       this.tripId = tripId;
     }
 
     /** Add delays for a specific service, indexed by stop position. */
-    public Builder with(String serviceId, TIntObjectMap<EmpiricalDelay> delaysForEachStop) {
+    public Builder with(String serviceId, IntObjectMap<EmpiricalDelay> delaysForEachStop) {
       delaysByServiceId.put(serviceId, delaysForEachStop);
       return this;
     }
 
     /** Utility method for inserting delays for ALL stops in a pattern */
     public Builder with(String serviceId, List<EmpiricalDelay> delaysForEachStop) {
-      var map = new TIntObjectHashMap<EmpiricalDelay>();
+      var map = new IntObjectHashMap<EmpiricalDelay>();
       for (int i = 0; i < delaysForEachStop.size(); i++) {
         map.put(i, delaysForEachStop.get(i));
       }

@@ -1,18 +1,12 @@
 package org.opentripplanner.routing.graph.kryosupport;
 
-import com.conveyal.kryo.TIntArrayListSerializer;
-import com.conveyal.kryo.TIntIntHashMapSerializer;
+import com.carrotsearch.hppc.IntObjectHashMap;
 import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.serializers.ExternalizableSerializer;
 import com.esotericsoftware.kryo.util.DefaultInstantiatorStrategy;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
 import de.javakaffee.kryoserializers.guava.ArrayListMultimapSerializer;
 import de.javakaffee.kryoserializers.guava.HashMultimapSerializer;
-import gnu.trove.impl.hash.TPrimitiveHash;
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.TIntIntHashMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -46,10 +40,7 @@ public final class KryoBuilder {
     // We might actually want to manually register a serializer for every class, to be safe.
     kryo.setRegistrationRequired(false);
     kryo.setReferences(true);
-    kryo.addDefaultSerializer(TPrimitiveHash.class, ExternalizableSerializer.class);
-    kryo.register(TIntArrayList.class, new TIntArrayListSerializer());
-    kryo.register(TIntIntHashMap.class, new TIntIntHashMapSerializer());
-    kryo.register(TIntObjectHashMap.class, new TIntObjectHashMapSerializer());
+    kryo.register(IntObjectHashMap.class, new IntObjectHashMapSerializer());
 
     // Add support for the package local java.util.ImmutableCollections.
     // Not supported properly in the current com.conveyal:kryo-tools:1.4.0.

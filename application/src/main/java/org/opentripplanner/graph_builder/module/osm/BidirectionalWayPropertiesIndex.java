@@ -1,8 +1,7 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import gnu.trove.TCollections;
-import gnu.trove.map.TLongObjectMap;
-import gnu.trove.map.hash.TLongObjectHashMap;
+import com.carrotsearch.hppc.LongObjectHashMap;
+import com.carrotsearch.hppc.LongObjectMap;
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 import org.opentripplanner.osm.model.OsmWay;
@@ -26,16 +25,16 @@ import org.slf4j.LoggerFactory;
 ///
 /// ### Memory consumption
 ///
-/// The map is backed by Trove's open-addressing `TLongObjectHashMap`, sized upfront to the number of
-/// ways at its default 0.5 load factor, so it never shrinks below that once built. For a graph with
-/// 2 million ways that means a capacity of roughly 4 million slots, backed by three parallel arrays:
+/// The map is backed by HPPC's open-addressing `LongObjectHashMap`, sized upfront to the number of
+/// ways at its default 0.75 load factor, so it never shrinks below that once built. For a graph with
+/// 2 million ways that means a capacity of roughly 4 million slots (rounded up to a power of two),
+/// backed by two parallel arrays:
 ///
 /// | Array | Purpose | Size |
 /// |---|---|---|
-/// | `long[]` | way ids | ~30.5 MB |
-/// | `Object[]` | value references (compressed oops) | ~15.3 MB |
-/// | `byte[]` | slot state (FREE/FULL/REMOVED) | ~3.8 MB |
-/// | **Total** | | **~50 MB** |
+/// | `long[]` | way ids | ~32 MB |
+/// | `Object[]` | value references (compressed oops) | ~16 MB |
+/// | **Total** | | **~48 MB** |
 ///
 /// The deduplicated [BidirectionalWayProperties]/`WayProperties` payload itself is negligible (well
 /// under 1 MB) since a typical way-property configuration only produces a few hundred to a few
@@ -44,9 +43,9 @@ class BidirectionalWayPropertiesIndex {
 
   private static final Logger LOG = LoggerFactory.getLogger(BidirectionalWayPropertiesIndex.class);
 
-  private final TLongObjectMap<BidirectionalWayProperties> index;
+  private final LongObjectMap<BidirectionalWayProperties> index;
 
-  private BidirectionalWayPropertiesIndex(TLongObjectMap<BidirectionalWayProperties> index) {
+  private BidirectionalWayPropertiesIndex(LongObjectMap<BidirectionalWayProperties> index) {
     this.index = index;
   }
 
@@ -59,13 +58,16 @@ class BidirectionalWayPropertiesIndex {
       BidirectionalWayProperties,
       BidirectionalWayProperties
     >();
-    TLongObjectMap<BidirectionalWayProperties> index = new TLongObjectHashMap<>(ways.size());
-    var synchronizedIndex = TCollections.synchronizedMap(index);
+    LongObjectHashMap<BidirectionalWayProperties> index = new LongObjectHashMap<>(ways.size());
     ways.parallelStream().forEach(way -> {
       var props = way.getOsmProvider().getWayPropertySet().getDataForWay(way);
       var canonicalProps = distinctProps.computeIfAbsent(props, p -> p);
-      synchronizedIndex.put(way.getId(), canonicalProps);
-      //Keep lambda! A method-ref would log incorrect class and line number
+      // HPPC has no synchronized-wrapper, so the concurrent writes below are
+      // guarded by a manual monitor on the map itself instead.
+      synchronized (index) {
+        index.put(way.getId(), canonicalProps);
+      }
+      // Keep lambda! A method-ref would log incorrect class and line number
       //noinspection Convert2MethodRef
       progress.step(m -> LOG.info(m));
     });

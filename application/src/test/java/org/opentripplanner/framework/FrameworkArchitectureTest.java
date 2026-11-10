@@ -2,7 +2,7 @@ package org.opentripplanner.framework;
 
 import static org.opentripplanner.OtpArchitectureModules.CORE_MODEL;
 import static org.opentripplanner.OtpArchitectureModules.FRAMEWORK;
-import static org.opentripplanner.OtpArchitectureModules.GNU_TROVE;
+import static org.opentripplanner.OtpArchitectureModules.HPPC;
 import static org.opentripplanner.OtpArchitectureModules.OTP_UTILS;
 
 import org.junit.jupiter.api.Test;
@@ -34,7 +34,7 @@ public class FrameworkArchitectureTest {
 
   @Test
   void enforceCollectionPackageDependencies() {
-    COLLECTION.dependsOn(GNU_TROVE).verify();
+    COLLECTION.dependsOn(HPPC).verify();
   }
 
   @Test

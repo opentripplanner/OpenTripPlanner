@@ -1,13 +1,14 @@
 package org.opentripplanner.raptorlegacy._data.transit;
 
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
+import com.carrotsearch.hppc.IntObjectHashMap;
+import com.carrotsearch.hppc.IntObjectMap;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
@@ -25,8 +26,9 @@ public class TestConstrainedBoardingSearch
 {
 
   /** Index of guaranteed transfers by fromStopPos */
-  private final TIntObjectMap<List<TestConstrainedTransfer>> transfersByFromStopPos =
-    new TIntObjectHashMap<>();
+  private final IntObjectMap<List<TestConstrainedTransfer>> transfersByFromStopPos =
+    new IntObjectHashMap<>();
+
   private final BitSet transfersByToStopPosExist = new BitSet();
   private final BiPredicate<Integer, Integer> timeAfterOrEqual;
   private int currentTargetStopPos;
@@ -75,9 +77,8 @@ public class TestConstrainedBoardingSearch
    * Return boardings as a result for constrained transfers like a guaranteed transfer.
    */
   public List<TestConstrainedTransfer> constrainedBoardings() {
-    return transfersByFromStopPos
-      .valueCollection()
-      .stream()
+    return StreamSupport.stream(transfersByFromStopPos.values().spliterator(), false)
+      .map(c -> c.value)
       .flatMap(Collection::stream)
       .collect(Collectors.toList());
   }
