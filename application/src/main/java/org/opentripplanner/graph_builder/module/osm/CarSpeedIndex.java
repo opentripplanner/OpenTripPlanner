@@ -3,6 +3,7 @@ package org.opentripplanner.graph_builder.module.osm;
 import static org.opentripplanner.osm.model.TraverseDirection.BACKWARD;
 import static org.opentripplanner.osm.model.TraverseDirection.FORWARD;
 
+import gnu.trove.impl.Constants;
 import gnu.trove.map.TLongFloatMap;
 import gnu.trove.map.hash.TLongFloatHashMap;
 import java.util.Collection;
@@ -22,6 +23,8 @@ class CarSpeedIndex {
 
   private static final Logger LOG = LoggerFactory.getLogger(CarSpeedIndex.class);
 
+  private static final float NO_VALUE = -989;
+
   private final TLongFloatMap forward;
   private final TLongFloatMap backward;
 
@@ -35,8 +38,8 @@ class CarSpeedIndex {
     var progress = ProgressTracker.track("Compute car speeds", 5_000, ways.size());
     LOG.info(progress.startMessage());
 
-    TLongFloatMap forward = new TLongFloatHashMap(ways.size());
-    TLongFloatMap backward = new TLongFloatHashMap(ways.size());
+    TLongFloatMap forward = newMap(ways.size());
+    TLongFloatMap backward = newMap(ways.size());
     ways.parallelStream().forEach(way -> {
       var tagMapper = way.getOsmProvider().getOsmTagMapper();
       float forwardSpeed = tagMapper.getCarSpeedForWay(way, FORWARD, issueStore);
@@ -55,13 +58,29 @@ class CarSpeedIndex {
     return new CarSpeedIndex(forward, backward);
   }
 
+  private static TLongFloatMap newMap(int capacity) {
+    return new TLongFloatHashMap(
+      capacity,
+      Constants.DEFAULT_LOAD_FACTOR,
+      Constants.DEFAULT_LONG_NO_ENTRY_VALUE,
+      NO_VALUE
+    );
+  }
+
   /// Return the car speed in the forward direction of the way with the given id.
   float forward(long wayId) {
-    return forward.get(wayId);
+    return requireValue(forward.get(wayId), wayId);
   }
 
   /// Return the car speed in the backward direction of the way with the given id.
   float backward(long wayId) {
-    return backward.get(wayId);
+    return requireValue(backward.get(wayId), wayId);
+  }
+
+  private static float requireValue(float speed, long wayId) {
+    if (speed == NO_VALUE) {
+      throw new IllegalArgumentException("No speed for way %s".formatted(wayId));
+    }
+    return speed;
   }
 }
