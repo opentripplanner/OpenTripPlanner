@@ -239,7 +239,19 @@ query TransmodelExampleQuery {
             }
         }
 
-        const transport = createTransport({ url: urls[apiFlavor] });
+        // Always use POST. Leaving out setMethod hides GraphiQL's HTTP method dropdown, and an
+        // explicit supportedMethods skips the OPTIONS request that discovers allowed methods.
+        const postTransport = createTransport({
+            url: urls[apiFlavor],
+            method: 'POST',
+            supportedMethods: ['POST'],
+        });
+        const transport = {
+            url: postTransport.url,
+            method: 'POST',
+            supportedMethods: ['POST'],
+            send: postTransport.send,
+        };
 
         const select = React.createElement("select", { onChange: updateFlavor, value: apiFlavor }, [
             React.createElement("option", { key: "gtfs", value: "gtfs" }, "GTFS"),
