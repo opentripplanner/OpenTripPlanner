@@ -324,7 +324,7 @@
                     <dependency>
                         <groupId>me.fabriciorby</groupId>
                         <artifactId>maven-surefire-junit5-tree-reporter</artifactId>
-                        <version>1.5.1</version>
+                        <version>2.2.0</version>
                     </dependency>
                 </dependencies>
                 <configuration>
