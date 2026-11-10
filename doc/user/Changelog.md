@@ -52,6 +52,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Cleanup Raptor destination arrivals - drop path creation during the search  [#8092](https://github.com/opentripplanner/OpenTripPlanner/pull/8092)
 - Use `barrier=kerb` for wheelchair routing [#8106](https://github.com/opentripplanner/OpenTripPlanner/pull/8106)
 - Improve performance of GTFS import [#8100](https://github.com/opentripplanner/OpenTripPlanner/pull/8100)
+- Upgrade to GraphiQL 6 [#8189](https://github.com/opentripplanner/OpenTripPlanner/pull/8189)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.10.0 (2026-09-09)
