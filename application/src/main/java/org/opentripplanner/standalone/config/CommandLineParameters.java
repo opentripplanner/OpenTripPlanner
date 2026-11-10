@@ -166,6 +166,14 @@ public class CommandLineParameters {
     return build || loadStreet;
   }
 
+  /**
+   * The loaded graph is used as it is, no graph build step follows. If a build step follows, for
+   * example the transit build after loading the street graph, the graph is changed by this run.
+   */
+  public boolean doUseLoadedGraphAsIs() {
+    return !doBuildStreet() && !doBuildTransit();
+  }
+
   public boolean doLoadGraph() {
     return load;
   }

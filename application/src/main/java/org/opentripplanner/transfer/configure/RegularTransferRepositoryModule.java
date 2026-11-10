@@ -9,13 +9,13 @@ import org.opentripplanner.core.model.transaction.RepositoryRegistry;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferParameters;
 import org.opentripplanner.transit.transfer.regular.api.report.RegularTransferCacheMetrics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,13 +49,13 @@ public class RegularTransferRepositoryModule {
   > regularTransferRepositoryHandle(
     @TransitDomain RepositoryRegistry repositoryRegistry,
     RegularTransferBuildRepository<NearbyStop> buildRepository,
-    BuildConfig buildConfig,
+    TransferParameters<RouteRequest> transferParameters,
     RouterConfig routerConfig,
     Graph graph,
     TransitRepository transitRepository
   ) {
     for (var warning : TransferRequestDifferences.warnings(
-      buildConfig.transferProfiles(),
+      transferParameters,
       routerConfig.routingRequestDefaults()
     )) {
       LOG.warn(warning);
@@ -63,7 +63,7 @@ public class RegularTransferRepositoryModule {
     return StreetTransferFactory.registerRepository(
       repositoryRegistry,
       buildRepository,
-      buildConfig.transferProfiles(),
+      transferParameters,
       graph,
       transitRepository,
       routerConfig.transitTuningConfig().transferCacheMaxSize(),
