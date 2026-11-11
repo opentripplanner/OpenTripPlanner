@@ -270,6 +270,22 @@ public class EstimatedCallType {
         )
         .field(
           GraphQLFieldDefinition.newFieldDefinition()
+            .name("willArriveAtStopPosition")
+            .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
+            .description("Whether it will arrive on a specific stop position")
+            .dataFetcher(env -> ((TripTimeOnDate) env.getSource()).isNotExpectedArrival())
+            .build()
+        )
+        .field(
+          GraphQLFieldDefinition.newFieldDefinition()
+            .name("willDepartFromStopPosition")
+            .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
+            .description("Whether it will depart from specific stop position")
+            .dataFetcher(env -> ((TripTimeOnDate) env.getSource()).isNotExpectedDeparture())
+            .build()
+        )
+        .field(
+          GraphQLFieldDefinition.newFieldDefinition()
             .name("date")
             .type(new GraphQLNonNull(TransmodelScalars.DATE_SCALAR))
             .description("The date the estimated call is valid for.")

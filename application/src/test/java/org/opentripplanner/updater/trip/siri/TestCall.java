@@ -17,6 +17,8 @@ public class TestCall implements CallWrapper {
   private final String stopPointRef;
   private final int sortOrder;
   private final Boolean cancellation;
+  private final Boolean isNotExpectedArrival;
+  private final Boolean isNotExpectedDeparture;
   private final boolean extraCall;
   private final Boolean predictionInaccurate;
   private final OccupancyEnumeration occupancy;
@@ -38,6 +40,8 @@ public class TestCall implements CallWrapper {
     int sortOrder,
     Boolean cancellation,
     boolean extraCall,
+    Boolean isNotExpectedArrival,
+    Boolean isNotExpectedDeparture,
     Boolean predictionInaccurate,
     OccupancyEnumeration occupancy,
     List<NaturalLanguageStringStructure> destinationDisplaies,
@@ -57,6 +61,8 @@ public class TestCall implements CallWrapper {
     this.sortOrder = sortOrder;
     this.cancellation = cancellation;
     this.extraCall = extraCall;
+    this.isNotExpectedArrival = isNotExpectedArrival;
+    this.isNotExpectedDeparture = isNotExpectedDeparture;
     this.predictionInaccurate = predictionInaccurate;
     this.occupancy = occupancy;
     this.destinationDisplaies = destinationDisplaies;
@@ -95,6 +101,16 @@ public class TestCall implements CallWrapper {
   @Override
   public Boolean isPredictionInaccurate() {
     return predictionInaccurate;
+  }
+
+  @Override
+  public Boolean isNotExpectedArrival() {
+    return isNotExpectedArrival;
+  }
+
+  @Override
+  public Boolean isNotExpectedDeparture() {
+    return isNotExpectedDeparture;
   }
 
   @Override
@@ -173,6 +189,8 @@ public class TestCall implements CallWrapper {
     private int sortOrder = 0;
     private Boolean cancellation = null;
     private boolean extraCall = false;
+    private boolean isNotExpectedArrival;
+    private boolean isNotExpectedDeparture;
     private Boolean predictionInaccurate = null;
     private OccupancyEnumeration occupancy = null;
     private List<NaturalLanguageStringStructure> destinationDisplaies = null;
@@ -205,6 +223,16 @@ public class TestCall implements CallWrapper {
 
     public TestCallBuilder withExtraCall(boolean extraCall) {
       this.extraCall = extraCall;
+      return this;
+    }
+
+    public TestCallBuilder withNotExpectedArrival(boolean isNotExpectedArrival) {
+      this.isNotExpectedArrival = isNotExpectedArrival;
+      return this;
+    }
+
+    public TestCallBuilder isNotExpectedDeparture(boolean isNotExpectedDeparture) {
+      this.isNotExpectedDeparture = isNotExpectedDeparture;
       return this;
     }
 
@@ -290,6 +318,8 @@ public class TestCall implements CallWrapper {
         sortOrder,
         cancellation,
         extraCall,
+        isNotExpectedArrival,
+        isNotExpectedDeparture,
         predictionInaccurate,
         occupancy,
         destinationDisplaies,

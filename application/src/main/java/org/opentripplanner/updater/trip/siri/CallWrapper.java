@@ -1,6 +1,7 @@
 package org.opentripplanner.updater.trip.siri;
 
 import static org.opentripplanner.updater.trip.siri.support.NaturalLanguageStringHelper.getFirstStringFromList;
+import static uk.org.siri.siri21.CallStatusEnumeration.NOT_EXPECTED;
 
 import java.math.BigInteger;
 import java.time.ZonedDateTime;
@@ -107,6 +108,8 @@ public interface CallWrapper {
 
   Boolean isCancellation();
   Boolean isPredictionInaccurate();
+  Boolean isNotExpectedArrival();
+  Boolean isNotExpectedDeparture();
   boolean isExtraCall();
 
   /**
@@ -173,6 +176,16 @@ public interface CallWrapper {
     @Override
     public Boolean isPredictionInaccurate() {
       return call.isPredictionInaccurate();
+    }
+
+    @Override
+    public Boolean isNotExpectedArrival() {
+      return call.getArrivalStatus() != null && call.getArrivalStatus().equals(NOT_EXPECTED);
+    }
+
+    @Override
+    public Boolean isNotExpectedDeparture() {
+      return call.getDepartureStatus() != null && call.getDepartureStatus().equals(NOT_EXPECTED);
     }
 
     @Override
@@ -297,6 +310,20 @@ public interface CallWrapper {
     @Override
     public Boolean isPredictionInaccurate() {
       return call.isPredictionInaccurate();
+    }
+
+    @Override
+    public Boolean isNotExpectedArrival() {
+      return call.getArrivalStatus() != null && call.getArrivalStatus().equals(NOT_EXPECTED);
+    }
+
+    @Override
+    public Boolean isNotExpectedDeparture() {
+      return (
+        call != null &&
+        call.getDepartureStatus() != null &&
+        call.getDepartureStatus().equals(NOT_EXPECTED)
+      );
     }
 
     @Override
