@@ -11,7 +11,7 @@ import org.opentripplanner.apis.gtfs.model.CallRealTime;
 import org.opentripplanner.apis.gtfs.model.CallSchedule;
 import org.opentripplanner.apis.gtfs.model.CallScheduledTime.ArrivalDepartureTime;
 import org.opentripplanner.apis.gtfs.model.CallScheduledTime.TimeWindow;
-import org.opentripplanner.framework.graphql.GraphQLUtils;
+import org.opentripplanner.apis.gtfs.model.DestinationDisplay;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.timetable.EstimatedTime;
@@ -21,9 +21,11 @@ import org.opentripplanner.utils.time.ServiceDateUtils;
 public class StopCallImpl implements GraphQLDataFetchers.GraphQLStopCall {
 
   @Override
-  public DataFetcher<String> headsign() {
-    return environment ->
-      GraphQLUtils.getTranslation(getSource(environment).getHeadsign(), environment);
+  public DataFetcher<DestinationDisplay> destinationDisplay() {
+    return environment -> {
+      var headsign = getSource(environment).getHeadsign();
+      return headsign == null ? null : new DestinationDisplay(headsign);
+    };
   }
 
   @Override

@@ -31,6 +31,7 @@ import org.opentripplanner.apis.gtfs.model.CallScheduledTime;
 import org.opentripplanner.apis.gtfs.model.CanceledTripsSummary;
 import org.opentripplanner.apis.gtfs.model.CanceledTripsSummaryPattern;
 import org.opentripplanner.apis.gtfs.model.CanceledTripsSummaryRoute;
+import org.opentripplanner.apis.gtfs.model.DestinationDisplay;
 import org.opentripplanner.apis.gtfs.model.FeedPublisher;
 import org.opentripplanner.apis.gtfs.model.OffsetDateTimeRange;
 import org.opentripplanner.apis.gtfs.model.PlanPageInfo;
@@ -359,6 +360,11 @@ public class GraphQLDataFetchers {
     public DataFetcher<String> name();
     public DataFetcher<Money> price();
     public DataFetcher<RiderCategory> riderCategory();
+  }
+
+  /** The destination a vehicle displays at a specific stop, usually on its head sign. */
+  public interface GraphQLDestinationDisplay {
+    public DataFetcher<String> headsign();
   }
 
   /** A single use of an elevator. */
@@ -980,7 +986,7 @@ public class GraphQLDataFetchers {
    * This may contain real-time information, if available.
    */
   public interface GraphQLStopCall {
-    public DataFetcher<String> headsign();
+    public DataFetcher<DestinationDisplay> destinationDisplay();
     public DataFetcher<Iterable<org.opentripplanner.transit.model.basic.Notice>> notices();
     public DataFetcher<CallRealTime> realTime();
     public DataFetcher<CallSchedule> schedule();

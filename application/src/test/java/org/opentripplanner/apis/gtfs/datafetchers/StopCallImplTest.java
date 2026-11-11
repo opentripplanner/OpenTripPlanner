@@ -1,6 +1,7 @@
 package org.opentripplanner.apis.gtfs.datafetchers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -93,6 +94,26 @@ class StopCallImplTest {
   }
 
   @Test
+  void noDestinationDisplayWithoutHeadsign() throws Exception {
+    var transitEnv = envBuilder.addTrip(TRIP_INPUT).build();
+    var tripData = transitEnv.tripData(TRIP_ID);
+    var call = new TripTimeOnDate(
+      tripData.tripTimes(),
+      0,
+      tripData.tripPattern(),
+      SERVICE_DATE,
+      MIDNIGHT
+    );
+    var env = DataFetchingSupport.dataFetchingEnvironment(
+      call,
+      Map.of(),
+      transitEnv.transitService()
+    );
+
+    assertNull(new StopCallImpl().destinationDisplay().get(env));
+  }
+
+  @Test
   void translatedHeadsign() throws Exception {
     var transitEnv = envBuilder.addTrip(HEADSIGN_TRIP_INPUT).build();
 
@@ -141,11 +162,13 @@ class StopCallImplTest {
       SERVICE_DATE,
       MIDNIGHT
     );
-    var env = DataFetchingSupport.dataFetchingEnvironment(
+    var callEnv = DataFetchingSupport.dataFetchingEnvironment(
       call,
-      arguments,
+      Map.of(),
       transitEnv.transitService()
     );
-    return new StopCallImpl().headsign().get(env);
+    var destinationDisplay = new StopCallImpl().destinationDisplay().get(callEnv);
+    var env = DataFetchingSupport.dataFetchingEnvironment(destinationDisplay, arguments);
+    return new DestinationDisplayImpl().headsign().get(env);
   }
 }
