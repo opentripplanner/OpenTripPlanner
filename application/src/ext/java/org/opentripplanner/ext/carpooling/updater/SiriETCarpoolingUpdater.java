@@ -201,8 +201,8 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
   /**
    * Maps a journey to a carpool trip, resolves its route points, and upserts the result. Removes
    * the trip instead when the journey is cancelled, has fewer than 2 non-cancelled calls, or fails
-   * to resolve. A delivery that repeats the trip's last one is skipped, and a new trip is dropped
-   * when the feed already has as many live trips as it may.
+   * to resolve. A delivery that repeats the trip's last one, and is not recorded later, is
+   * skipped, and a new trip is dropped when the feed already has as many live trips as it may.
    * <p>
    * A journey recorded by the source before the version already applied — stored, failed to
    * resolve, or removed and remembered as a tombstone — is ignored before any of that work: it is
@@ -260,10 +260,22 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
     }
   }
 
-  /** Whether this delivery repeats the trip's last delivery. */
+  /**
+   * Whether this delivery repeats the trip's last delivery. A repeat recorded later than the last
+   * delivery is not unchanged: its {@code RecordedAtTime} has to be stored, or a version recorded
+   * between the two, arriving late, would pass as newer than the stored one and revert the trip.
+   */
   private boolean isUnchanged(FeedScopedId tripId, CarpoolTrip delivered) {
     var last = lastDelivery(tripId);
-    return last != null && last.sameAs(delivered);
+    return last != null && last.sameAs(delivered) && !advancesRecordedAt(delivered, last);
+  }
+
+  /** Whether the delivered version carries a {@code RecordedAtTime} the last one lacks or precedes. */
+  private static boolean advancesRecordedAt(CarpoolTrip delivered, CarpoolTrip last) {
+    var recordedAt = delivered.recordedAt();
+    return (
+      recordedAt != null && (last.recordedAt() == null || recordedAt.isAfter(last.recordedAt()))
+    );
   }
 
   /**

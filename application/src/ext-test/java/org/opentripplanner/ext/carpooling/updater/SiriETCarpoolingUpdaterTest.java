@@ -286,6 +286,36 @@ class SiriETCarpoolingUpdaterTest {
   }
 
   @Test
+  void processEstimatedVehicleJourney_unchangedRedeliveryRecordedLater_storesTheNewStamp() {
+    // v1 at T, then v3 at T+2 identical to v1, then v2 at T+1 arriving late. Unless v3 advances
+    // the stored stamp, v2 passes as newer than v1 and reverts the trip.
+    var departure = ZonedDateTime.now();
+    updater.processEstimatedVehicleJourney(recordedAt(minimalCompleteJourney(departure), T));
+    updater.processEstimatedVehicleJourney(
+      recordedAt(minimalCompleteJourney(departure), T.plusSeconds(2))
+    );
+    assertEquals(T.plusSeconds(2), storedTrip().trip().recordedAt());
+    var stored = storedTrip();
+
+    updater.processEstimatedVehicleJourney(
+      recordedAt(arrivingLater(minimalCompleteJourney(departure)), T.plusSeconds(1))
+    );
+
+    assertSame(stored, storedTrip());
+    verify(resolver, times(1)).resolve(any());
+  }
+
+  @Test
+  void processEstimatedVehicleJourney_unchangedRedeliveryStampedAfterUnstamped_storesTheStamp() {
+    var departure = ZonedDateTime.now();
+    updater.processEstimatedVehicleJourney(minimalCompleteJourney(departure));
+
+    updater.processEstimatedVehicleJourney(recordedAt(minimalCompleteJourney(departure), T));
+
+    assertEquals(T, storedTrip().trip().recordedAt());
+  }
+
+  @Test
   void processEstimatedVehicleJourney_redeliveryAfterCancellation_upsertsTrip() {
     var journey = minimalCompleteJourney();
     updater.processEstimatedVehicleJourney(journey);
