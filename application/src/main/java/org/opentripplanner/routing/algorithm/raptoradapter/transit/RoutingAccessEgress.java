@@ -24,11 +24,6 @@ public interface RoutingAccessEgress extends RaptorAccessEgress {
   boolean isRentingVehicleFromStation();
 
   /**
-   * Return true if any part of the access/egress is traversed by car.
-   */
-  boolean containsModeCar();
-
-  /**
    * Return true if all edges are traversed on foot.
    */
   boolean isWalkOnly();

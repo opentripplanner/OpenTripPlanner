@@ -3,7 +3,6 @@ package org.opentripplanner.ext.carpooling.routing;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.ext.carpooling.CarpoolStreetPathBuilder.createSegment;
 import static org.opentripplanner.ext.carpooling.CarpoolStreetPathBuilder.createStreetPath;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_CENTER;
@@ -151,20 +150,6 @@ class CarpoolAccessEgressTest {
     );
 
     assertFalse(access.isRentingVehicleFromStation());
-  }
-
-  /** A carpool leg always contains the ride in the driver's car. */
-  @Test
-  void containsModeCar() {
-    var access = newAccessEgress(
-      1_000,
-      createStreetPath(Duration.ofSeconds(80)),
-      Duration.ofSeconds(60),
-      createStreetPath(Duration.ofSeconds(40)),
-      1.0
-    );
-
-    assertTrue(access.containsModeCar());
   }
 
   /**

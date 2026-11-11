@@ -122,7 +122,9 @@ public class DefaultAccessEgress implements RoutingAccessEgress {
     return finalState.isRentingVehicleFromStation();
   }
 
-  @Override
+  /**
+   * Return true if any part of the access/egress is traversed by car.
+   */
   public boolean containsModeCar() {
     return finalState.containsModeCar();
   }

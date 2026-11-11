@@ -241,12 +241,6 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
     return false;
   }
 
-  /** Always {@code true}: a carpool leg, by definition, contains a ride in the driver's car. */
-  @Override
-  public boolean containsModeCar() {
-    return true;
-  }
-
   /** Always {@code false}: a carpool leg, by definition, contains a vehicle ride. */
   @Override
   public boolean isWalkOnly() {

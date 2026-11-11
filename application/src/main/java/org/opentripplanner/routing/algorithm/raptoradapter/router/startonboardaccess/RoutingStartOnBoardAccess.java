@@ -73,14 +73,6 @@ public final class RoutingStartOnBoardAccess
     return false;
   }
 
-  /**
-   * On-board access does not originate from a street search, so there is no car.
-   */
-  @Override
-  public boolean containsModeCar() {
-    return false;
-  }
-
   @Override
   public boolean equals(Object obj) {
     if (obj == this) {
