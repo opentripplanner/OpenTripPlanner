@@ -32,7 +32,7 @@ import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
 import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.model.plan.walkstep.WalkStep;
-import org.opentripplanner.service.shape.model.TripGeometryFactory;
+import org.opentripplanner.service.shape.model.TripShapeFactory;
 import org.opentripplanner.street.model.StreetModelForTest;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
@@ -557,7 +557,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
       .withStopPattern(stopPattern)
       .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(tripTimes))
       .build();
-    var tripPatternGeometry = TripGeometryFactory.straightLines(
+    var tripPatternShape = TripShapeFactory.straightLines(
       tripPattern.getStopPattern(),
       DeduplicatorService.NOOP
     );
@@ -568,7 +568,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
       leg = new FrequencyTransitLegBuilder()
         .withTripTimes(tripTimes)
         .withTripPattern(tripPattern)
-        .withTripPatternGeometry(tripPatternGeometry)
+        .withTripPatternShape(tripPatternShape)
         .withBoardStopIndexInPattern(fromStopIndex)
         .withAlightStopIndexInPattern(toStopIndex)
         .withStartTime(newTime(start))
@@ -584,7 +584,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
       leg = new ScheduledTransitLegBuilder()
         .withTripTimes(tripTimes)
         .withTripPattern(tripPattern)
-        .withTripPatternGeometry(tripPatternGeometry)
+        .withTripPatternShape(tripPatternShape)
         .withBoardStopIndexInPattern(fromStopIndex)
         .withAlightStopIndexInPattern(toStopIndex)
         .withStartTime(newTime(start))

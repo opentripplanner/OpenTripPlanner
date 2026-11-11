@@ -33,19 +33,19 @@ public class ShapeDataImport implements Serializable {
   public ShapeDataImport() {}
 
   /**
-   * Store the geometry of the given scheduled trip pattern. An existing geometry for the same
+   * Store the shape of the given scheduled trip pattern. An existing shape for the same
    * pattern is replaced.
    */
-  public void setTripPatternGeometry(
+  public void setTripPatternShape(
     FeedScopedId tripPatternId,
-    CompactLineStringSequence tripPatternGeometry
+    CompactLineStringSequence tripPatternShape
   ) {
     assertModificationsAllowed();
-    geometriesByTripPattern.put(tripPatternId, tripPatternGeometry);
+    geometriesByTripPattern.put(tripPatternId, tripPatternShape);
   }
 
   @Nullable
-  public CompactLineStringSequence getTripPatternGeometry(FeedScopedId tripPatternId) {
+  public CompactLineStringSequence getTripPatternShape(FeedScopedId tripPatternId) {
     return geometriesByTripPattern.get(tripPatternId);
   }
 

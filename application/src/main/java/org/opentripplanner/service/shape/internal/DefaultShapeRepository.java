@@ -54,21 +54,21 @@ public class DefaultShapeRepository implements ShapeRepository {
   }
 
   @Override
-  public void setTripPatternGeometry(
+  public void setTripPatternShape(
     FeedScopedId tripPatternId,
-    CompactLineStringSequence tripPatternGeometry
+    CompactLineStringSequence tripPatternShape
   ) {
     var feedId = tripPatternId.getFeedId();
-    var tripPatternGeometriesForFeed = realTimeGeometries.get(feedId);
+    var tripPatternShapesForFeed = realTimeGeometries.get(feedId);
     if (copiedFeeds.add(feedId)) {
-      if (tripPatternGeometriesForFeed == null) {
-        tripPatternGeometriesForFeed = new HashMap<>();
+      if (tripPatternShapesForFeed == null) {
+        tripPatternShapesForFeed = new HashMap<>();
       } else {
-        tripPatternGeometriesForFeed = new HashMap<>(tripPatternGeometriesForFeed);
+        tripPatternShapesForFeed = new HashMap<>(tripPatternShapesForFeed);
       }
-      realTimeGeometries.put(feedId, tripPatternGeometriesForFeed);
+      realTimeGeometries.put(feedId, tripPatternShapesForFeed);
     }
-    tripPatternGeometriesForFeed.put(tripPatternId, tripPatternGeometry);
+    tripPatternShapesForFeed.put(tripPatternId, tripPatternShape);
   }
 
   @Override
@@ -79,15 +79,15 @@ public class DefaultShapeRepository implements ShapeRepository {
 
   @Override
   @Nullable
-  public CompactLineStringSequence getTripPatternGeometry(FeedScopedId tripPatternId) {
-    var tripPatternGeometriesForFeed = realTimeGeometries.get(tripPatternId.getFeedId());
-    if (tripPatternGeometriesForFeed != null) {
-      var tripPatternGeometry = tripPatternGeometriesForFeed.get(tripPatternId);
-      if (tripPatternGeometry != null) {
-        return tripPatternGeometry;
+  public CompactLineStringSequence getTripPatternShape(FeedScopedId tripPatternId) {
+    var tripPatternShapesForFeed = realTimeGeometries.get(tripPatternId.getFeedId());
+    if (tripPatternShapesForFeed != null) {
+      var tripPatternShape = tripPatternShapesForFeed.get(tripPatternId);
+      if (tripPatternShape != null) {
+        return tripPatternShape;
       }
     }
-    return scheduledShapeData.getTripPatternGeometry(tripPatternId);
+    return scheduledShapeData.getTripPatternShape(tripPatternId);
   }
 
   @Override

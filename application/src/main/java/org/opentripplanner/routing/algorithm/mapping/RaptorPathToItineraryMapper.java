@@ -251,8 +251,8 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       return new FrequencyTransitLegBuilder()
         .withTripTimes(tripSchedule.getOriginalTripTimes())
         .withTripPattern(tripSchedule.getOriginalTripPattern())
-        .withTripPatternGeometry(
-          shapeService.getTripPatternGeometry(tripSchedule.getOriginalTripPattern().getId())
+        .withTripPatternShape(
+          shapeService.getTripPatternShape(tripSchedule.getOriginalTripPattern().getId())
         )
         .withBoardStopIndexInPattern(boardStopIndexInPattern)
         .withAlightStopIndexInPattern(alightStopIndexInPattern)
@@ -286,8 +286,8 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     return new ScheduledTransitLegBuilder<>()
       .withTripTimes(tripSchedule.getOriginalTripTimes())
       .withTripPattern(tripSchedule.getOriginalTripPattern())
-      .withTripPatternGeometry(
-        shapeService.getTripPatternGeometry(tripSchedule.getOriginalTripPattern().getId())
+      .withTripPatternShape(
+        shapeService.getTripPatternShape(tripSchedule.getOriginalTripPattern().getId())
       )
       .withBoardStopIndexInPattern(boardStopIndexInPattern)
       .withAlightStopIndexInPattern(alightStopIndexInPattern)

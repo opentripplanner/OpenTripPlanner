@@ -13,14 +13,14 @@ import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 /**
  * Wrapper class for the result of TripPatternMapper
  *
- * @param tripPatternGeometry      the hop geometries and cumulative distances of the trip pattern
+ * @param tripPatternShape         the hop geometries and cumulative distances of the trip pattern
  * @param scheduledStopPointsIndex A map from trip/serviceJourney id to an ordered list of scheduled
  *                                 stop point ids.
  * @param stopTimeByNetexId        stopTimes by the timetabled-passing-time id
  */
 record TripPatternMapperResult(
   TripPattern tripPattern,
-  CompactLineStringSequence tripPatternGeometry,
+  CompactLineStringSequence tripPatternShape,
   ArrayListMultimap<String, String> scheduledStopPointsIndex,
   Map<Trip, List<StopTime>> tripStopTimes,
   Map<String, StopTime> stopTimeByNetexId,

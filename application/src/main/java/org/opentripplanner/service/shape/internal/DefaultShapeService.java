@@ -21,11 +21,11 @@ public class DefaultShapeService implements ShapeService {
   }
 
   @Override
-  public CompactLineStringSequence getTripPatternGeometry(FeedScopedId tripPatternId) {
-    var tripPatternGeometry = shapes.getTripPatternGeometry(tripPatternId);
-    if (tripPatternGeometry == null) {
-      throw new IllegalStateException("No geometry found for trip pattern " + tripPatternId);
+  public CompactLineStringSequence getTripPatternShape(FeedScopedId tripPatternId) {
+    var tripPatternShape = shapes.getTripPatternShape(tripPatternId);
+    if (tripPatternShape == null) {
+      throw new IllegalStateException("No shape found for trip pattern " + tripPatternId);
     }
-    return tripPatternGeometry;
+    return tripPatternShape;
   }
 }

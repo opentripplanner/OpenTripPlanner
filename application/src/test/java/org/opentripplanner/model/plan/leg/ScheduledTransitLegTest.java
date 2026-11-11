@@ -22,7 +22,7 @@ import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.service.shape.model.CompactLineStringSequence;
-import org.opentripplanner.service.shape.model.TripGeometryFactory;
+import org.opentripplanner.service.shape.model.TripShapeFactory;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model.TripInput;
@@ -57,8 +57,10 @@ class ScheduledTransitLegTest {
   ).build();
   private static final TripOnDateDataFetcher TRIP_DATA = ENV.tripData("trip1");
   private static final TripPattern PATTERN = TRIP_DATA.tripPattern();
-  private static final CompactLineStringSequence PATTERN_GEOMETRY =
-    TripGeometryFactory.straightLines(PATTERN.getStopPattern(), DeduplicatorService.NOOP);
+  private static final CompactLineStringSequence PATTERN_GEOMETRY = TripShapeFactory.straightLines(
+    PATTERN.getStopPattern(),
+    DeduplicatorService.NOOP
+  );
   private static final TripTimes TRIP_TIMES = TRIP_DATA.scheduledTripTimes();
 
   private static final double EXPECTED_DISTANCE = 1111.95;
@@ -91,7 +93,7 @@ class ScheduledTransitLegTest {
   private final ScheduledTransitLeg subject = new ScheduledTransitLegBuilder()
     .withTripTimes(REAL_TIME_TRIP_TIMES)
     .withTripPattern(PATTERN)
-    .withTripPatternGeometry(PATTERN_GEOMETRY)
+    .withTripPatternShape(PATTERN_GEOMETRY)
     .withBoardStopIndexInPattern(BOARD_STOP_INDEX_IN_PATTERN)
     .withAlightStopIndexInPattern(ALIGHT_STOP_INDEX_IN_PATTERN)
     .withStartTime(START_TIME)
@@ -111,7 +113,7 @@ class ScheduledTransitLegTest {
     var subject = new ScheduledTransitLegBuilder()
       .withTripTimes(TRIP_TIMES)
       .withTripPattern(PATTERN)
-      .withTripPatternGeometry(PATTERN_GEOMETRY)
+      .withTripPatternShape(PATTERN_GEOMETRY)
       .withBoardStopIndexInPattern(BOARD_STOP_INDEX_IN_PATTERN)
       .withAlightStopIndexInPattern(ALIGHT_STOP_INDEX_IN_PATTERN)
       .withStartTime(START_TIME)

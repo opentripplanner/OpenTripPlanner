@@ -47,9 +47,9 @@ class GtfsModuleTest {
     assertEquals(1, frequencyTripPattern.size());
 
     var tripPattern = frequencyTripPattern.getFirst();
-    var tripPatternGeometry = model.shapeDataImport.getTripPatternGeometry(tripPattern.getId());
-    assertNotNull(tripPatternGeometry);
-    assertEquals(tripPattern.numberOfStops() - 1, tripPatternGeometry.size());
+    var tripPatternShape = model.shapeDataImport.getTripPatternShape(tripPattern.getId());
+    assertNotNull(tripPatternShape);
+    assertEquals(tripPattern.numberOfStops() - 1, tripPatternShape.size());
   }
 
   @Test

@@ -27,7 +27,7 @@ import org.opentripplanner.updater.trip.TripUpdateApplier;
 import org.opentripplanner.updater.trip.gtfs.model.StopTimeUpdate;
 import org.opentripplanner.updater.trip.gtfs.model.TripUpdate;
 import org.opentripplanner.updater.trip.patterncache.TripPatternCache;
-import org.opentripplanner.updater.trip.shape.RealTimeShapeWriter;
+import org.opentripplanner.updater.trip.shape.RealTimeTripShapeWriter;
 
 /**
  * Handles GTFS-RT TripUpdates for trips with schedule relationship {@code NEW}, {@code ADDED}, or
@@ -40,14 +40,14 @@ class NewTripHandler {
   private final TimetableRepository buffer;
   private final TripTimesUpdater tripTimesUpdater;
   private final TripPatternCache tripPatternCache;
-  private final RealTimeShapeWriter shapeWriter;
+  private final RealTimeTripShapeWriter shapeWriter;
 
   NewTripHandler(
     TransitRepository transitRepository,
     TimetableRepository buffer,
     TripTimesUpdater tripTimesUpdater,
     TripPatternCache tripPatternCache,
-    RealTimeShapeWriter shapeWriter
+    RealTimeTripShapeWriter shapeWriter
   ) {
     this.transitRepository = transitRepository;
     this.buffer = buffer;

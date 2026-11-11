@@ -6,7 +6,7 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.service.shape.model.CompactLineStringSequence;
 
 /**
- * The geometries of the scheduled (non-real-time) trip patterns.
+ * The shapes of the scheduled (non-real-time) trip patterns.
  * <p>
  * Immutable: it holds an immutable copy of the data it is created from and never changes, so it
  * can be shared freely, for example between threads.
@@ -23,7 +23,7 @@ public final class ScheduledShapeData {
 
   /**
    * Create the immutable scheduled data. The given map is copied, so later changes to it are not
-   * reflected. The geometry instances are shared, not copied.
+   * reflected. The shape instances are shared, not copied.
    */
   public static ScheduledShapeData of(
     Map<FeedScopedId, CompactLineStringSequence> geometriesByTripPattern
@@ -36,7 +36,7 @@ public final class ScheduledShapeData {
   }
 
   @Nullable
-  public CompactLineStringSequence getTripPatternGeometry(FeedScopedId tripPatternId) {
+  public CompactLineStringSequence getTripPatternShape(FeedScopedId tripPatternId) {
     return geometriesByTripPattern.get(tripPatternId);
   }
 }

@@ -447,8 +447,8 @@ class RealtimeResolverTest {
       .withBoardStopIndexInPattern(boardPos)
       .withAlightStopIndexInPattern(alightPos)
       .withGeneralizedCost(Cost.ZERO.toSeconds())
-      .withTripPatternGeometry(
-        transitEnv.shapeService().getTripPatternGeometry(trip.tripPattern().getId())
+      .withTripPatternShape(
+        transitEnv.shapeService().getTripPatternShape(trip.tripPattern().getId())
       )
       .build();
   }

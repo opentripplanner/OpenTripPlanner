@@ -18,9 +18,9 @@ import org.opentripplanner.transit.model.network.StopPattern;
  * each entry of the cumulative table. This bounds the rounding error of any
  * {@code distanceBetween(board, alight)} query to at most 1 meter, independent of the length.
  */
-public final class TripGeometryFactory {
+public final class TripShapeFactory {
 
-  private TripGeometryFactory() {}
+  private TripShapeFactory() {}
 
   /**
    * Build a sequence from explicit hop geometries (e.g. from GTFS shapes). Each hop's length is

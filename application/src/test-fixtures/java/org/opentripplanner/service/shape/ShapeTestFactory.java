@@ -4,7 +4,7 @@ import java.util.Collection;
 import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.service.shape.dataimport.ShapeDataImport;
 import org.opentripplanner.service.shape.model.CompactLineStringSequence;
-import org.opentripplanner.service.shape.model.TripGeometryFactory;
+import org.opentripplanner.service.shape.model.TripShapeFactory;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.network.TripPattern;
 
@@ -27,7 +27,7 @@ public class ShapeTestFactory {
       testModel.stop("A", lat, 10.0).build(),
       testModel.stop("B", lat + 0.01, 10.0).build()
     );
-    return TripGeometryFactory.straightLines(stopPattern, DeduplicatorService.NOOP);
+    return TripShapeFactory.straightLines(stopPattern, DeduplicatorService.NOOP);
   }
 
   /**
@@ -36,9 +36,9 @@ public class ShapeTestFactory {
   public static ShapeDataImport shapeDataImport(Collection<TripPattern> patterns) {
     var shapeDataImport = new ShapeDataImport();
     for (var pattern : patterns) {
-      shapeDataImport.setTripPatternGeometry(
+      shapeDataImport.setTripPatternShape(
         pattern.getId(),
-        TripGeometryFactory.straightLines(pattern.getStopPattern(), DeduplicatorService.NOOP)
+        TripShapeFactory.straightLines(pattern.getStopPattern(), DeduplicatorService.NOOP)
       );
     }
     return shapeDataImport;

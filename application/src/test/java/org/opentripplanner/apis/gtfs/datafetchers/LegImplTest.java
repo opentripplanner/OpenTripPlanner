@@ -23,7 +23,7 @@ import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
 import org.opentripplanner.model.plan.leg.StopArrival;
 import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.service.shape.model.CompactLineStringSequence;
-import org.opentripplanner.service.shape.model.TripGeometryFactory;
+import org.opentripplanner.service.shape.model.TripShapeFactory;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TripInput;
@@ -57,8 +57,10 @@ class LegImplTest implements PlanTestConstants {
   )
     .withStopPattern(STOP_PATTERN)
     .build();
-  private static final CompactLineStringSequence PATTERN_GEOMETRY =
-    TripGeometryFactory.straightLines(PATTERN.getStopPattern(), DeduplicatorService.NOOP);
+  private static final CompactLineStringSequence PATTERN_GEOMETRY = TripShapeFactory.straightLines(
+    PATTERN.getStopPattern(),
+    DeduplicatorService.NOOP
+  );
 
   private static final ScheduledTripTimes TRIP_TIMES = ScheduledTripTimes.of()
     .withArrivalTimes("10:00 11:00 12:00 13:00 14:00")
@@ -75,7 +77,7 @@ class LegImplTest implements PlanTestConstants {
     .withBoardStopIndexInPattern(0)
     .withAlightStopIndexInPattern(4)
     .withTripPattern(PATTERN)
-    .withTripPatternGeometry(PATTERN_GEOMETRY)
+    .withTripPatternShape(PATTERN_GEOMETRY)
     .build();
   private static final LegImpl IMPL = new LegImpl();
   private static final Map<String, Object> INCLUDE_STOP_ONLY = Map.of(
@@ -145,7 +147,7 @@ class LegImplTest implements PlanTestConstants {
     var transitService = env.transitService();
 
     var tripData = env.tripData("Trip1");
-    var patternGeometry = TripGeometryFactory.straightLines(
+    var patternGeometry = TripShapeFactory.straightLines(
       tripData.scheduledTripPattern().getStopPattern(),
       DeduplicatorService.NOOP
     );
@@ -156,7 +158,7 @@ class LegImplTest implements PlanTestConstants {
       .withServiceDate(serviceDate)
       .withTripTimes(tripData.scheduledTripTimes())
       .withTripPattern(tripData.scheduledTripPattern())
-      .withTripPatternGeometry(patternGeometry)
+      .withTripPatternShape(patternGeometry)
       .withBoardStopIndexInPattern(0)
       .withAlightStopIndexInPattern(1)
       .build();

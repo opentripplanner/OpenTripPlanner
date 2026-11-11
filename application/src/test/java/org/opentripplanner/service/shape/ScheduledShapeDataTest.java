@@ -17,7 +17,7 @@ class ScheduledShapeDataTest {
   void emptyHasNoGeometry() {
     var empty = ScheduledShapeData.empty();
 
-    assertThat(empty.getTripPatternGeometry(id("A"))).isNull();
+    assertThat(empty.getTripPatternShape(id("A"))).isNull();
   }
 
   @Test
@@ -27,7 +27,7 @@ class ScheduledShapeDataTest {
     var data = ScheduledShapeData.of(geometriesByTripPattern);
     geometriesByTripPattern.put(id("B"), TRIP_PATTERN_GEOMETRY);
 
-    assertThat(data.getTripPatternGeometry(id("A"))).isSameInstanceAs(TRIP_PATTERN_GEOMETRY);
-    assertThat(data.getTripPatternGeometry(id("B"))).isNull();
+    assertThat(data.getTripPatternShape(id("A"))).isSameInstanceAs(TRIP_PATTERN_GEOMETRY);
+    assertThat(data.getTripPatternShape(id("B"))).isNull();
   }
 }

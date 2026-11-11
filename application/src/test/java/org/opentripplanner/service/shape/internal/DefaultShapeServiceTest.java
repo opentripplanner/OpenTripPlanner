@@ -31,27 +31,25 @@ class DefaultShapeServiceTest {
   void scheduledGeometryIsServed() {
     var service = new DefaultShapeService(repository.createSnapshot());
 
-    assertThat(service.getTripPatternGeometry(SCHEDULED_PATTERN)).isSameInstanceAs(
+    assertThat(service.getTripPatternShape(SCHEDULED_PATTERN)).isSameInstanceAs(
       SCHEDULED_TRIP_PATTERN_GEOMETRY
     );
   }
 
   @Test
   void realTimeGeometryIsServed() {
-    repository.setTripPatternGeometry(RT_PATTERN, RT_TRIP_PATTERN_GEOMETRY);
+    repository.setTripPatternShape(RT_PATTERN, RT_TRIP_PATTERN_GEOMETRY);
     var service = new DefaultShapeService(repository.createSnapshot());
 
-    assertThat(service.getTripPatternGeometry(RT_PATTERN)).isSameInstanceAs(
-      RT_TRIP_PATTERN_GEOMETRY
-    );
+    assertThat(service.getTripPatternShape(RT_PATTERN)).isSameInstanceAs(RT_TRIP_PATTERN_GEOMETRY);
   }
 
   @Test
   void realTimeGeometryTakesPrecedenceOverScheduled() {
-    repository.setTripPatternGeometry(SCHEDULED_PATTERN, OVERRIDING_TRIP_PATTERN_GEOMETRY);
+    repository.setTripPatternShape(SCHEDULED_PATTERN, OVERRIDING_TRIP_PATTERN_GEOMETRY);
     var service = new DefaultShapeService(repository.createSnapshot());
 
-    assertThat(service.getTripPatternGeometry(SCHEDULED_PATTERN)).isSameInstanceAs(
+    assertThat(service.getTripPatternShape(SCHEDULED_PATTERN)).isSameInstanceAs(
       OVERRIDING_TRIP_PATTERN_GEOMETRY
     );
   }
@@ -59,28 +57,24 @@ class DefaultShapeServiceTest {
   @Test
   void serviceOverTheMutableRepositorySeesUncommittedWrites() {
     var service = new DefaultShapeService(repository);
-    repository.setTripPatternGeometry(RT_PATTERN, RT_TRIP_PATTERN_GEOMETRY);
+    repository.setTripPatternShape(RT_PATTERN, RT_TRIP_PATTERN_GEOMETRY);
 
-    assertThat(service.getTripPatternGeometry(RT_PATTERN)).isSameInstanceAs(
-      RT_TRIP_PATTERN_GEOMETRY
-    );
+    assertThat(service.getTripPatternShape(RT_PATTERN)).isSameInstanceAs(RT_TRIP_PATTERN_GEOMETRY);
   }
 
   @Test
   void serviceOverASnapshotDoesNotSeeLaterWrites() {
     var service = new DefaultShapeService(repository.createSnapshot());
 
-    repository.setTripPatternGeometry(RT_PATTERN, RT_TRIP_PATTERN_GEOMETRY);
+    repository.setTripPatternShape(RT_PATTERN, RT_TRIP_PATTERN_GEOMETRY);
 
-    assertThrows(IllegalStateException.class, () -> service.getTripPatternGeometry(RT_PATTERN));
+    assertThrows(IllegalStateException.class, () -> service.getTripPatternShape(RT_PATTERN));
   }
 
   @Test
   void serviceFailsForUnknownPattern() {
     var service = new DefaultShapeService(repository.createSnapshot());
 
-    assertThrows(IllegalStateException.class, () ->
-      service.getTripPatternGeometry(UNKNOWN_PATTERN)
-    );
+    assertThrows(IllegalStateException.class, () -> service.getTripPatternShape(UNKNOWN_PATTERN));
   }
 }

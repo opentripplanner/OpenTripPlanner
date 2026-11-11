@@ -8,8 +8,8 @@ import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.trip.patterncache.TripPatternCache;
 import org.opentripplanner.updater.trip.patterncache.TripPatternIdGenerator;
-import org.opentripplanner.updater.trip.shape.RealTimeShapeWriter;
 import org.opentripplanner.updater.trip.shape.RealTimeTripShapeFactory;
+import org.opentripplanner.updater.trip.shape.RealTimeTripShapeWriter;
 
 /**
  * Application-scoped factory for GTFS-RT trip update processing. Holds stable, application-lifetime
@@ -49,7 +49,7 @@ public class GtfsRealTimeTripUpdateAdapter {
     TimetableRepository buffer,
     Supplier<ShapeRepository> shapeRepository
   ) {
-    var shapeWriter = new RealTimeShapeWriter(
+    var shapeWriter = new RealTimeTripShapeWriter(
       shapeRepository,
       new RealTimeTripShapeFactory(deduplicator)
     );

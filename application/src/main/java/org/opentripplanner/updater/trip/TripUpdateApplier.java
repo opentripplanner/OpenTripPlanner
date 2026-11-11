@@ -3,7 +3,7 @@ package org.opentripplanner.updater.trip;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.updater.spi.UpdateSuccess;
-import org.opentripplanner.updater.trip.shape.RealTimeShapeWriter;
+import org.opentripplanner.updater.trip.shape.RealTimeTripShapeWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +26,7 @@ public class TripUpdateApplier {
 
   public static UpdateSuccess apply(
     TimetableRepository buffer,
-    RealTimeShapeWriter shapeWriter,
+    RealTimeTripShapeWriter shapeWriter,
     RealTimeTripUpdate update
   ) {
     var trip = update.updatedTripTimes().getTrip();
@@ -60,7 +60,7 @@ public class TripUpdateApplier {
     buffer.update(update);
 
     // Phase 4: Make sure the pattern has a geometry
-    shapeWriter.ensureGeometry(update.pattern());
+    shapeWriter.ensureTripPatternShape(update.pattern());
     return UpdateSuccess.of(update.producer());
   }
 }

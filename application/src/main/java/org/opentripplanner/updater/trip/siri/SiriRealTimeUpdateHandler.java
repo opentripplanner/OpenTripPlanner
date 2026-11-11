@@ -30,7 +30,7 @@ import org.opentripplanner.updater.trip.TripUpdateApplier;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
 import org.opentripplanner.updater.trip.patterncache.TripPatternCache;
 import org.opentripplanner.updater.trip.patterncache.TripPatternIdGenerator;
-import org.opentripplanner.updater.trip.shape.RealTimeShapeWriter;
+import org.opentripplanner.updater.trip.shape.RealTimeTripShapeWriter;
 import org.opentripplanner.updater.trip.siri.support.TripReferenceHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +53,7 @@ public class SiriRealTimeUpdateHandler {
   private final SiriFuzzyTripMatcher fuzzyTripMatcher;
 
   private final TripPatternCache tripPatternCache;
-  private final RealTimeShapeWriter shapeWriter;
+  private final RealTimeTripShapeWriter shapeWriter;
   private final Supplier<ShapeRepository> shapes;
   private final DeduplicatorService deduplicator;
   private final TripPatternIdGenerator tripPatternIdGenerator;
@@ -63,7 +63,7 @@ public class SiriRealTimeUpdateHandler {
     TimetableRepository buffer,
     @Nullable SiriFuzzyTripMatcher fuzzyTripMatcher,
     TripPatternCache tripPatternCache,
-    RealTimeShapeWriter shapeWriter,
+    RealTimeTripShapeWriter shapeWriter,
     Supplier<ShapeRepository> shapes,
     DeduplicatorService deduplicator,
     TripPatternIdGenerator tripPatternIdGenerator

@@ -20,10 +20,10 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
- * Exercises {@link TripGeometryFactory} and the resulting {@link CompactLineStringSequence} (the
+ * Exercises {@link TripShapeFactory} and the resulting {@link CompactLineStringSequence} (the
  * per-pattern hop geometries + cumulative distance table).
  */
-class TripGeometryFactoryTest {
+class TripShapeFactoryTest {
 
   // Three stops roughly 2 km apart along a north-south line at 60° N.
   private static final TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
@@ -51,7 +51,7 @@ class TripGeometryFactoryTest {
 
   @Test
   void distanceBetweenWithHopGeometriesMatchesHaversineWithinOneMeter() {
-    var subject = TripGeometryFactory.fromLineStrings(HOP_GEOMETRIES, NOOP);
+    var subject = TripShapeFactory.fromLineStrings(HOP_GEOMETRIES, NOOP);
 
     assertThat(subject.distanceBetween(0, 0)).isEqualTo(0);
 
@@ -72,7 +72,7 @@ class TripGeometryFactoryTest {
 
   @Test
   void distanceBetweenFallsBackToStraightLineWhenHopGeometriesAreNull() {
-    var subject = TripGeometryFactory.straightLines(
+    var subject = TripShapeFactory.straightLines(
       TransitRepositoryForTest.stopPattern(STOP_A, STOP_B, STOP_C),
       NOOP
     );
@@ -98,10 +98,7 @@ class TripGeometryFactoryTest {
       stops.add(TEST_MODEL.stop("S" + i, 60.0 + i * 0.001, 10.0).build());
     }
 
-    var subject = TripGeometryFactory.straightLines(
-      TransitRepositoryForTest.stopPattern(stops),
-      NOOP
-    );
+    var subject = TripShapeFactory.straightLines(TransitRepositoryForTest.stopPattern(stops), NOOP);
 
     double exactSum = 0;
     for (int i = 0; i < numberOfStops - 1; i++) {
@@ -114,7 +111,7 @@ class TripGeometryFactoryTest {
 
   @Test
   void distanceBetweenIsAdditive() {
-    var subject = TripGeometryFactory.fromLineStrings(HOP_GEOMETRIES, NOOP);
+    var subject = TripShapeFactory.fromLineStrings(HOP_GEOMETRIES, NOOP);
 
     int partA = subject.distanceBetween(0, 1);
     int partB = subject.distanceBetween(1, 2);
@@ -126,7 +123,7 @@ class TripGeometryFactoryTest {
 
   @Test
   void hopGeometryReturnsCompressedRoundTrip() {
-    var subject = TripGeometryFactory.fromLineStrings(HOP_GEOMETRIES, NOOP);
+    var subject = TripShapeFactory.fromLineStrings(HOP_GEOMETRIES, NOOP);
 
     LineString hop0 = subject.get(0);
     assertThat(hop0.getNumPoints()).isEqualTo(3);
@@ -143,7 +140,7 @@ class TripGeometryFactoryTest {
 
   @Test
   void hopGeometrySynthesizesStraightLineWhenHopGeometriesAreNull() {
-    var subject = TripGeometryFactory.straightLines(
+    var subject = TripShapeFactory.straightLines(
       TransitRepositoryForTest.stopPattern(STOP_A, STOP_B, STOP_C),
       NOOP
     );
@@ -156,7 +153,7 @@ class TripGeometryFactoryTest {
 
   @Test
   void concatenateConcatenatesHopsInRange() {
-    var subject = TripGeometryFactory.fromLineStrings(HOP_GEOMETRIES, NOOP);
+    var subject = TripShapeFactory.fromLineStrings(HOP_GEOMETRIES, NOOP);
 
     LineString full = subject.concatenate(0, 2);
     // Hop 0: A, MID, B (3 points). Hop 1: B, C (2 points). Duplicate B at the join is dropped.
@@ -170,7 +167,7 @@ class TripGeometryFactoryTest {
 
   @Test
   void concatenateAllReturnsFullPatternWhenShapeAvailable() {
-    var subject = TripGeometryFactory.fromLineStrings(HOP_GEOMETRIES, NOOP);
+    var subject = TripShapeFactory.fromLineStrings(HOP_GEOMETRIES, NOOP);
 
     LineString full = subject.concatenate();
     assertThat(full).isNotNull();
@@ -181,7 +178,7 @@ class TripGeometryFactoryTest {
   void concatenateAllSynthesizesStraightLineWhenShapeMissing() {
     // Shapeless patterns expose a non-null straight-line geometry made of one 2-point segment per
     // hop, rather than the historical null sentinel.
-    var subject = TripGeometryFactory.straightLines(
+    var subject = TripShapeFactory.straightLines(
       TransitRepositoryForTest.stopPattern(STOP_A, STOP_B, STOP_C),
       NOOP
     );
@@ -199,7 +196,7 @@ class TripGeometryFactoryTest {
     // Degenerate edge case: a pattern with zero stops has no hops and no meaningful vertex
     // positions. The factory must still produce a valid (empty) sequence whose cumulative table
     // has the contract-mandated single zero entry — even though numberOfStops is 0.
-    var subject = TripGeometryFactory.straightLines(TransitRepositoryForTest.stopPattern(), NOOP);
+    var subject = TripShapeFactory.straightLines(TransitRepositoryForTest.stopPattern(), NOOP);
 
     assertThat(subject.size()).isEqualTo(0);
     assertThat(subject.distanceBetween(0, 0)).isEqualTo(0);
@@ -211,7 +208,7 @@ class TripGeometryFactoryTest {
     // Degenerate edge case: a pattern with a single stop has no hops. cumulative must still exist
     // and distanceBetween(0,0) must return 0 without throwing. concatenate(0, size) has nothing
     // to concatenate, so it returns an empty (but non-null) LineString.
-    var subject = TripGeometryFactory.straightLines(
+    var subject = TripShapeFactory.straightLines(
       TransitRepositoryForTest.stopPattern(STOP_A),
       NOOP
     );
@@ -227,7 +224,7 @@ class TripGeometryFactoryTest {
     // A non-null but empty list must be treated the same as the single-stop degenerate case:
     // factory succeeds, distanceBetween(0,0) is zero, concatenate(0, size) returns an empty
     // (non-null) LineString because there are no hops to concatenate.
-    var subject = TripGeometryFactory.fromLineStrings(List.of(), NOOP);
+    var subject = TripShapeFactory.fromLineStrings(List.of(), NOOP);
 
     assertThat(subject.distanceBetween(0, 0)).isEqualTo(0);
     LineString empty = subject.concatenate(0, subject.size());
@@ -239,7 +236,7 @@ class TripGeometryFactoryTest {
   void concatenateWithSameBoardAndAlightReturnsEmptyGeometry() {
     // Board == alight is outside the ScheduledTransitLeg contract but the method is also reachable
     // directly on the sequence. Lock in the behaviour (empty LineString, no throw).
-    var subject = TripGeometryFactory.fromLineStrings(HOP_GEOMETRIES, NOOP);
+    var subject = TripShapeFactory.fromLineStrings(HOP_GEOMETRIES, NOOP);
 
     LineString empty = subject.concatenate(1, 1);
     assertThat(empty).isNotNull();
@@ -249,8 +246,8 @@ class TripGeometryFactoryTest {
   @Test
   void identicalHopsShareOnePointerWhenDeduplicated() {
     var deduplicator = new Deduplicator();
-    var first = TripGeometryFactory.fromLineStrings(HOP_GEOMETRIES, deduplicator);
-    var second = TripGeometryFactory.fromLineStrings(HOP_GEOMETRIES, deduplicator);
+    var first = TripShapeFactory.fromLineStrings(HOP_GEOMETRIES, deduplicator);
+    var second = TripShapeFactory.fromLineStrings(HOP_GEOMETRIES, deduplicator);
 
     assertThat(first.getCompact(0)).isSameInstanceAs(second.getCompact(0));
     assertThat(first.getCompact(1)).isSameInstanceAs(second.getCompact(1));
@@ -260,8 +257,8 @@ class TripGeometryFactoryTest {
   @Test
   void sharedHopPointersSurviveSerialization() {
     var deduplicator = new Deduplicator();
-    var first = TripGeometryFactory.fromLineStrings(HOP_GEOMETRIES, deduplicator);
-    var second = TripGeometryFactory.fromLineStrings(HOP_GEOMETRIES, deduplicator);
+    var first = TripShapeFactory.fromLineStrings(HOP_GEOMETRIES, deduplicator);
+    var second = TripShapeFactory.fromLineStrings(HOP_GEOMETRIES, deduplicator);
 
     var kryo = KryoBuilder.create();
     var bytes = new ByteArrayOutputStream();

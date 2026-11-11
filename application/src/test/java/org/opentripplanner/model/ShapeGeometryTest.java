@@ -19,10 +19,10 @@ public class ShapeGeometryTest {
     // data includes 2 trips, of which one has incorrect shape_dist_traveled parametrization in stop_times
     for (TripPattern pattern : timetableDataImport.getAllTripPatterns()) {
       // examine if shape extraction worked at first stop intervals, where dist parameter is wrong
-      var tripPatternGeometry = model.shapeDataImport().getTripPatternGeometry(pattern.getId());
-      assertNotNull(tripPatternGeometry);
-      assertTrue(tripPatternGeometry.get(0).getCoordinates().length > 2);
-      assertTrue(tripPatternGeometry.get(1).getCoordinates().length > 2);
+      var tripPatternShape = model.shapeDataImport().getTripPatternShape(pattern.getId());
+      assertNotNull(tripPatternShape);
+      assertTrue(tripPatternShape.get(0).getCoordinates().length > 2);
+      assertTrue(tripPatternShape.get(1).getCoordinates().length > 2);
     }
   }
 }

@@ -14,14 +14,14 @@ public class GeometryMapper {
    */
   public static List<EncodedPolylineBeanWithStops> mapStopToStopGeometries(
     TripPattern tripPattern,
-    CompactLineStringSequence tripPatternGeometry
+    CompactLineStringSequence tripPatternShape
   ) {
     var stopToStopGeometries = new ArrayList<EncodedPolylineBeanWithStops>();
 
     for (int i = 0; i < tripPattern.numberOfStops() - 1; i++) {
       var startLocation = tripPattern.getStop(i);
       var endLocation = tripPattern.getStop(i + 1);
-      var geometry = EncodedPolyline.of(tripPatternGeometry.get(i));
+      var geometry = EncodedPolyline.of(tripPatternShape.get(i));
 
       var stopToStopGeometry = new EncodedPolylineBeanWithStops(
         startLocation,

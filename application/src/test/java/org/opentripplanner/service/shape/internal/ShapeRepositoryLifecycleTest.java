@@ -25,14 +25,14 @@ class ShapeRepositoryLifecycleTest {
 
   @Test
   void snapshotIsNotAffectedByLaterWritesToTheBuffer() {
-    buffer.setTripPatternGeometry(PATTERN_1, TRIP_PATTERN_GEOMETRY_1);
+    buffer.setTripPatternShape(PATTERN_1, TRIP_PATTERN_GEOMETRY_1);
     var snapshot = lifecycle.freeze(buffer);
 
-    lifecycle.copyOnWrite(snapshot).setTripPatternGeometry(PATTERN_2, TRIP_PATTERN_GEOMETRY_2);
+    lifecycle.copyOnWrite(snapshot).setTripPatternShape(PATTERN_2, TRIP_PATTERN_GEOMETRY_2);
 
-    assertThat(snapshot.getTripPatternGeometry(PATTERN_2)).isNull();
+    assertThat(snapshot.getTripPatternShape(PATTERN_2)).isNull();
     var next = lifecycle.freeze(buffer);
-    assertThat(next.getTripPatternGeometry(PATTERN_1)).isEqualTo(TRIP_PATTERN_GEOMETRY_1);
-    assertThat(next.getTripPatternGeometry(PATTERN_2)).isEqualTo(TRIP_PATTERN_GEOMETRY_2);
+    assertThat(next.getTripPatternShape(PATTERN_1)).isEqualTo(TRIP_PATTERN_GEOMETRY_1);
+    assertThat(next.getTripPatternShape(PATTERN_2)).isEqualTo(TRIP_PATTERN_GEOMETRY_2);
   }
 }

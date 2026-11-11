@@ -8,16 +8,16 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.updater.trip.patterncache.TripPatternCache;
 
 /**
- * Makes sure that a trip pattern created by a real-time update has a geometry in the
- * {@link ShapeRepository}. The geometry itself is created by {@link RealTimeTripShapeFactory}.
+ * Makes sure that a trip pattern created by a real-time update has a shape in the
+ * {@link ShapeRepository}. The shape itself is created by {@link RealTimeTripShapeFactory}.
  * <p>
  * The writer is idempotent: the {@link TripPatternCache} outlives the update task that created the
  * pattern, so a pattern may be seen again by a later task even though its shape has been removed in
- * the meantime, see {@link ShapeRepository#clear(String)}. A missing geometry is created again. If
- * the original pattern is itself a real-time pattern whose geometry has been removed, straight
- * lines are used.
+ * the meantime, see {@link ShapeRepository#clear(String)}. A missing shape is created again. If
+ * the original pattern is itself a real-time pattern whose shape has been removed, straight lines
+ * are used.
  */
-public class RealTimeShapeWriter {
+public class RealTimeTripShapeWriter {
 
   /**
    * Resolved lazily, so that tasks that do not touch any real-time pattern do not cause a new shape
@@ -26,31 +26,34 @@ public class RealTimeShapeWriter {
   private final Supplier<ShapeRepository> shapes;
   private final RealTimeTripShapeFactory factory;
 
-  public RealTimeShapeWriter(Supplier<ShapeRepository> shapes, RealTimeTripShapeFactory factory) {
+  public RealTimeTripShapeWriter(
+    Supplier<ShapeRepository> shapes,
+    RealTimeTripShapeFactory factory
+  ) {
     this.shapes = shapes;
     this.factory = factory;
   }
 
   /**
-   * Write the geometry of the given pattern, unless the pattern is not created in real-time or the
-   * geometry is already present.
+   * Write the shape of the given pattern, unless the pattern is not created in real-time or the
+   * shape is already present.
    */
-  public void ensureGeometry(TripPattern pattern) {
+  public void ensureTripPatternShape(TripPattern pattern) {
     if (!pattern.isRealTimeTripPattern()) {
       return;
     }
     var repository = shapes.get();
-    if (repository.getTripPatternGeometry(pattern.getId()) != null) {
+    if (repository.getTripPatternShape(pattern.getId()) != null) {
       return;
     }
-    repository.setTripPatternGeometry(
+    repository.setTripPatternShape(
       pattern.getId(),
-      factory.create(pattern, getOriginalGeometry(pattern, repository))
+      factory.createTripPatternShape(pattern, getOriginalTripPatternShape(pattern, repository))
     );
   }
 
   @Nullable
-  private static CompactLineStringSequence getOriginalGeometry(
+  private static CompactLineStringSequence getOriginalTripPatternShape(
     TripPattern pattern,
     ShapeRepository repository
   ) {
@@ -58,14 +61,14 @@ public class RealTimeShapeWriter {
     if (original == null) {
       return null;
     }
-    var geometry = repository.getTripPatternGeometry(original.getId());
-    // A real-time original can lack a geometry if it was cleared while the pattern lives on in the
+    var shape = repository.getTripPatternShape(original.getId());
+    // A real-time original can lack a shape if it was cleared while the pattern lives on in the
     // cache. Only a scheduled original is expected to always have one.
-    if (geometry == null && !original.isRealTimeTripPattern()) {
+    if (shape == null && !original.isRealTimeTripPattern()) {
       throw new IllegalStateException(
-        "No geometry found for the original trip pattern " + original.getId()
+        "No shape found for the original trip pattern " + original.getId()
       );
     }
-    return geometry;
+    return shape;
   }
 }

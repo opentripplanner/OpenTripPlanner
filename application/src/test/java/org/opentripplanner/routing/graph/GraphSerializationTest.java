@@ -109,7 +109,7 @@ public class GraphSerializationTest {
         .timetableDataImport()
         .getAllTripPatterns()
         .stream()
-        .anyMatch(p -> model.shapeDataImport().getTripPatternGeometry(p.getId()) != null)
+        .anyMatch(p -> model.shapeDataImport().getTripPatternShape(p.getId()) != null)
     );
     var streetRepository = createStreetRepository();
     var osmGraphBuildRepository = new DefaultOsmInfoGraphBuildRepository();
@@ -261,16 +261,16 @@ public class GraphSerializationTest {
     ShapeDataImport copy
   ) {
     for (var pattern : timetableDataImport.getAllTripPatterns()) {
-      var originalGeometry = original.getTripPatternGeometry(pattern.getId());
-      if (originalGeometry == null) {
+      var originalShape = original.getTripPatternShape(pattern.getId());
+      if (originalShape == null) {
         continue;
       }
-      var copiedGeometry = copy.getTripPatternGeometry(pattern.getId());
-      assertEquals(originalGeometry.size(), copiedGeometry.size());
-      for (int i = 0; i < originalGeometry.size(); i++) {
-        assertEquals(originalGeometry.get(i), copiedGeometry.get(i));
+      var copiedGeometry = copy.getTripPatternShape(pattern.getId());
+      assertEquals(originalShape.size(), copiedGeometry.size());
+      for (int i = 0; i < originalShape.size(); i++) {
+        assertEquals(originalShape.get(i), copiedGeometry.get(i));
         assertEquals(
-          originalGeometry.distanceBetween(i, i + 1),
+          originalShape.distanceBetween(i, i + 1),
           copiedGeometry.distanceBetween(i, i + 1)
         );
       }

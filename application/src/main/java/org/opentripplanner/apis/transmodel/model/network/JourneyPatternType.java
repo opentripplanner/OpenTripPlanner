@@ -119,7 +119,7 @@ public class JourneyPatternType {
             TripPattern tripPattern = environment.getSource();
             return EncodedPolyline.of(
               GqlUtil.getShapeService(environment)
-                .getTripPatternGeometry(tripPattern.getId())
+                .getTripPatternShape(tripPattern.getId())
                 .concatenate()
             );
           })
@@ -136,7 +136,7 @@ public class JourneyPatternType {
             TripPattern tripPattern = environment.getSource();
             return GeometryMapper.mapStopToStopGeometries(
               tripPattern,
-              GqlUtil.getShapeService(environment).getTripPatternGeometry(tripPattern.getId())
+              GqlUtil.getShapeService(environment).getTripPatternShape(tripPattern.getId())
             );
           })
           .build()

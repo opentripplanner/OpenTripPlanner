@@ -20,7 +20,7 @@ import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
-import org.opentripplanner.service.shape.model.TripGeometryFactory;
+import org.opentripplanner.service.shape.model.TripShapeFactory;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -220,7 +220,7 @@ public class ItineraryTest implements PlanTestConstants {
     var tripPattern = TransitRepositoryForTest.tripPattern("p", trip.getRoute())
       .withStopPattern(stopPattern)
       .build();
-    var tripPatternGeometry = TripGeometryFactory.straightLines(
+    var tripPatternShape = TripShapeFactory.straightLines(
       tripPattern.getStopPattern(),
       DeduplicatorService.NOOP
     );
@@ -237,7 +237,7 @@ public class ItineraryTest implements PlanTestConstants {
           .withEndTime(endTime)
           .withTripTimes(tripTimes)
           .withTripPattern(tripPattern)
-          .withTripPatternGeometry(tripPatternGeometry)
+          .withTripPatternShape(tripPatternShape)
           .withBoardStopIndexInPattern(0)
           .withAlightStopIndexInPattern(1)
           .withServiceDate(startTime.toLocalDate())

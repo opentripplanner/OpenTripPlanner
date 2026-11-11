@@ -24,8 +24,8 @@ import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.repository.ScheduledTimetableData;
-import org.opentripplanner.updater.trip.shape.RealTimeShapeWriter;
 import org.opentripplanner.updater.trip.shape.RealTimeTripShapeFactory;
+import org.opentripplanner.updater.trip.shape.RealTimeTripShapeWriter;
 
 /**
  * Tests for {@link TripUpdateApplier}, covering the three-phase update logic that was previously in
@@ -83,7 +83,7 @@ class TripUpdateApplierTest {
   private final DefaultShapeRepository shapeRepository = new DefaultShapeRepository(
     ScheduledShapeData.empty()
   );
-  private final RealTimeShapeWriter shapeWriter = new RealTimeShapeWriter(
+  private final RealTimeTripShapeWriter shapeWriter = new RealTimeTripShapeWriter(
     () -> shapeRepository,
     new RealTimeTripShapeFactory(DeduplicatorService.NOOP)
   );
@@ -360,7 +360,7 @@ class TripUpdateApplierTest {
         .build()
     );
 
-    assertThat(shapeRepository.getTripPatternGeometry(MODIFIED_PATTERN.getId())).isNotNull();
+    assertThat(shapeRepository.getTripPatternShape(MODIFIED_PATTERN.getId())).isNotNull();
   }
 
   /**
@@ -377,7 +377,7 @@ class TripUpdateApplierTest {
       RealTimeTripUpdate.of(SCHEDULED_PATTERN, rtTripTimes, TODAY).build()
     );
 
-    assertThat(shapeRepository.getTripPatternGeometry(SCHEDULED_PATTERN.getId())).isNull();
+    assertThat(shapeRepository.getTripPatternShape(SCHEDULED_PATTERN.getId())).isNull();
   }
 
   /**
@@ -396,6 +396,6 @@ class TripUpdateApplierTest {
       )
     );
 
-    assertThat(shapeRepository.getTripPatternGeometry(MODIFIED_PATTERN.getId())).isNull();
+    assertThat(shapeRepository.getTripPatternShape(MODIFIED_PATTERN.getId())).isNull();
   }
 }

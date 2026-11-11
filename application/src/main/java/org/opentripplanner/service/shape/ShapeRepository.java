@@ -5,7 +5,7 @@ import org.opentripplanner.service.shape.model.CompactLineStringSequence;
 
 /**
  * The mutable repository of the shape data. It owns the {@link ScheduledShapeData} - the
- * geometries of the scheduled trip patterns - and holds the geometries of the trip patterns created
+ * shapes of the scheduled trip patterns - and holds the shapes of the trip patterns created
  * by real-time updates on top of it.
  * <p>
  * It is managed by the transaction framework: updaters obtain it through a {@code WriteContext} on
@@ -14,16 +14,13 @@ import org.opentripplanner.service.shape.model.CompactLineStringSequence;
  */
 public interface ShapeRepository extends ShapeRepositorySnapshot {
   /**
-   * Store the geometry of the given real-time trip pattern. An existing real-time geometry for the
+   * Store the shape of the given real-time trip pattern. An existing real-time shape for the
    * same pattern is replaced. The scheduled data is never modified.
    */
-  void setTripPatternGeometry(
-    FeedScopedId tripPatternId,
-    CompactLineStringSequence tripPatternGeometry
-  );
+  void setTripPatternShape(FeedScopedId tripPatternId, CompactLineStringSequence tripPatternShape);
 
   /**
-   * Remove the geometries of all real-time trip patterns of the given feed; they are stored per
+   * Remove the shapes of all real-time trip patterns of the given feed; they are stored per
    * feed. The scheduled data is never modified.
    */
   void clear(String feedId);

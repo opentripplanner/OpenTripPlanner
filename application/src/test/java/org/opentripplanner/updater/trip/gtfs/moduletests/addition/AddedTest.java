@@ -319,19 +319,19 @@ class AddedTest implements RealtimeTestConstants {
       .build();
     assertSuccess(gtfsRt.applyTripUpdate(tripUpdate));
     var pattern = assertAddedTrip(ADDED_TRIP_ID, env);
-    assertNotNull(env.shapeService().getTripPatternGeometry(pattern.getId()));
+    assertNotNull(env.shapeService().getTripPatternShape(pattern.getId()));
 
     gtfsRt.applyTripUpdates(List.of());
 
     assertThrows(IllegalStateException.class, () ->
-      env.shapeService().getTripPatternGeometry(pattern.getId())
+      env.shapeService().getTripPatternShape(pattern.getId())
     );
 
     // The cached pattern is reused and its geometry is created again
     assertSuccess(gtfsRt.applyTripUpdate(tripUpdate));
     var readded = assertAddedTrip(ADDED_TRIP_ID, env);
     assertSame(pattern, readded);
-    assertNotNull(env.shapeService().getTripPatternGeometry(pattern.getId()));
+    assertNotNull(env.shapeService().getTripPatternShape(pattern.getId()));
   }
 
   @Test
@@ -347,7 +347,7 @@ class AddedTest implements RealtimeTestConstants {
 
     gtfsRt.applyTripUpdates(List.of(), DIFFERENTIAL);
 
-    assertNotNull(env.shapeService().getTripPatternGeometry(pattern.getId()));
+    assertNotNull(env.shapeService().getTripPatternShape(pattern.getId()));
   }
 
   private TripPattern assertAddedTrip(String tripId, TransitTestEnvironment env) {

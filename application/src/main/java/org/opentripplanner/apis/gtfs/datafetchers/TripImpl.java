@@ -448,7 +448,7 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
     DataFetchingEnvironment environment,
     TripPattern tripPattern
   ) {
-    return getShapeService(environment).getTripPatternGeometry(tripPattern.getId()).concatenate();
+    return getShapeService(environment).getTripPatternShape(tripPattern.getId()).concatenate();
   }
 
   private ShapeService getShapeService(DataFetchingEnvironment environment) {

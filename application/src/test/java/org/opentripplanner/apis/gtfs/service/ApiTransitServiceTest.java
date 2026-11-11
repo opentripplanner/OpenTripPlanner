@@ -23,7 +23,7 @@ import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
 import org.opentripplanner.model.plan.leg.StreetLeg;
-import org.opentripplanner.service.shape.model.TripGeometryFactory;
+import org.opentripplanner.service.shape.model.TripShapeFactory;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
@@ -142,14 +142,14 @@ class ApiTransitServiceTest {
     var tripData = env.tripData(TRIP_1_ID);
     var tripTimes = tripData.tripTimes();
     var pattern = tripData.tripPattern();
-    var patternGeometry = TripGeometryFactory.straightLines(
+    var patternGeometry = TripShapeFactory.straightLines(
       pattern.getStopPattern(),
       DeduplicatorService.NOOP
     );
 
     var leg = new ScheduledTransitLegBuilder()
       .withTripPattern(pattern)
-      .withTripPatternGeometry(patternGeometry)
+      .withTripPatternShape(patternGeometry)
       .withTripTimes(tripTimes)
       .withStartTime(ANY_TIME)
       .withEndTime(ANY_TIME)

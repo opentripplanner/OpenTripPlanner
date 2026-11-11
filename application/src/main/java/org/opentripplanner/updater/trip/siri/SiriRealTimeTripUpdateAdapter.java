@@ -8,8 +8,8 @@ import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.trip.patterncache.TripPatternCache;
 import org.opentripplanner.updater.trip.patterncache.TripPatternIdGenerator;
-import org.opentripplanner.updater.trip.shape.RealTimeShapeWriter;
 import org.opentripplanner.updater.trip.shape.RealTimeTripShapeFactory;
+import org.opentripplanner.updater.trip.shape.RealTimeTripShapeWriter;
 
 /**
  * Application-scoped factory for SIRI-ET estimated timetable processing. Holds stable,
@@ -59,7 +59,7 @@ public class SiriRealTimeTripUpdateAdapter {
       siriFuzzyTripMatcherCache != null
         ? new SiriFuzzyTripMatcher(siriFuzzyTripMatcherCache, buffer, transitRepository)
         : null;
-    var shapeWriter = new RealTimeShapeWriter(
+    var shapeWriter = new RealTimeTripShapeWriter(
       shapeRepository,
       new RealTimeTripShapeFactory(deduplicator)
     );

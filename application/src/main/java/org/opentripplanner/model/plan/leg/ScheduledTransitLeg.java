@@ -58,7 +58,7 @@ public class ScheduledTransitLeg implements TransitLeg {
   ).thenComparing(FareOffer::uniqueId);
   private final TripTimes<?> tripTimes;
   private final TripPattern tripPattern;
-  private final CompactLineStringSequence tripPatternGeometry;
+  private final CompactLineStringSequence tripPatternShape;
 
   private final ZonedDateTime startTime;
   private final ZonedDateTime endTime;
@@ -115,8 +115,8 @@ public class ScheduledTransitLeg implements TransitLeg {
 
     this.generalizedCost = builder.generalizedCost();
 
-    this.tripPatternGeometry = Objects.requireNonNull(builder.tripPatternGeometry());
-    this.distanceMeters = tripPatternGeometry.distanceBetween(
+    this.tripPatternShape = Objects.requireNonNull(builder.tripPatternShape());
+    this.distanceMeters = tripPatternShape.distanceBetween(
       boardStopPosInPattern,
       alightStopPosInPattern
     );
@@ -150,8 +150,8 @@ public class ScheduledTransitLeg implements TransitLeg {
     return tripPattern;
   }
 
-  public CompactLineStringSequence tripPatternGeometry() {
-    return tripPatternGeometry;
+  public CompactLineStringSequence tripPatternShape() {
+    return tripPatternShape;
   }
 
   public Instant serviceDateMidnight() {
@@ -314,7 +314,7 @@ public class ScheduledTransitLeg implements TransitLeg {
    */
   @Override
   public LineString legGeometry() {
-    return tripPatternGeometry.concatenate(boardStopPosInPattern, alightStopPosInPattern);
+    return tripPatternShape.concatenate(boardStopPosInPattern, alightStopPosInPattern);
   }
 
   @Override

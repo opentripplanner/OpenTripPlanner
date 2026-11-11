@@ -7,21 +7,21 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.service.shape.model.CompactLineStringSequence;
-import org.opentripplanner.service.shape.model.TripGeometryFactory;
+import org.opentripplanner.service.shape.model.TripShapeFactory;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 
 /**
- * Creates the geometry of a trip pattern created by a real-time update. The factory has no access
- * to any repository; the geometry of the original pattern is given as input.
+ * Creates the shape of a trip pattern created by a real-time update. The factory has no access to
+ * any repository; the shape of the original pattern is given as input.
  * <p>
- * The geometry is derived from the pattern it replaces, if there is one: For each hop, the geometry
- * is copied if the hop is between the same stops. If the stops are different but belong to the
- * same stations, the old geometry is used with the first and last point moved to the new stops.
+ * The shape is derived from the pattern it replaces, if there is one: For each hop, the geometry is
+ * copied if the hop is between the same stops. If the stops are different but belong to the same
+ * stations, the old geometry is used with the first and last point moved to the new stops.
  * Otherwise, a straight line is used. A pattern without an original pattern (an added trip), or
- * without a geometry for the original, gets a straight line between each pair of stops, measured
- * with the haversine formula.
+ * without a shape for the original, gets a straight line between each pair of stops, measured with
+ * the haversine formula.
  */
 public class RealTimeTripShapeFactory {
 
@@ -32,42 +32,42 @@ public class RealTimeTripShapeFactory {
   }
 
   /**
-   * Create the geometry of the given pattern.
+   * Create the shape of the given pattern.
    *
-   * @param originalGeometry the geometry of {@link TripPattern#getOriginalTripPattern()}, or
-   *                         {@code null} if the pattern has no original or its geometry is not
-   *                         available.
-   * @throws IllegalStateException if the geometry does not have one hop per pair of stops
+   * @param originalTripPatternShape the shape of {@link TripPattern#getOriginalTripPattern()}, or
+   *                                 {@code null} if the pattern has no original or its shape is
+   *                                 not available.
+   * @throws IllegalStateException if the shape does not have one hop per pair of stops
    */
-  public CompactLineStringSequence create(
+  public CompactLineStringSequence createTripPatternShape(
     TripPattern pattern,
-    @Nullable CompactLineStringSequence originalGeometry
+    @Nullable CompactLineStringSequence originalTripPatternShape
   ) {
     var original = pattern.getOriginalTripPattern();
-    CompactLineStringSequence geometry;
-    if (original == null || originalGeometry == null) {
-      geometry = TripGeometryFactory.straightLines(pattern.getStopPattern(), deduplicator);
+    CompactLineStringSequence shape;
+    if (original == null || originalTripPatternShape == null) {
+      shape = TripShapeFactory.straightLines(pattern.getStopPattern(), deduplicator);
     } else {
-      geometry = TripGeometryFactory.fromLineStrings(
-        generateHopGeometriesFromOriginalTripPatternGeometry(
+      shape = TripShapeFactory.fromLineStrings(
+        generateHopGeometriesFromOriginalTripPatternShape(
           pattern.getStopPattern(),
           original.getStopPattern(),
-          originalGeometry
+          originalTripPatternShape
         ),
         deduplicator
       );
     }
     int expectedHops = Math.max(pattern.numberOfStops() - 1, 0);
-    if (geometry.size() != expectedHops) {
+    if (shape.size() != expectedHops) {
       throw new IllegalStateException(
-        "Geometry of trip pattern %s has %d hops, expected %d".formatted(
+        "Shape of trip pattern %s has %d hops, expected %d".formatted(
           pattern.getId(),
-          geometry.size(),
+          shape.size(),
           expectedHops
         )
       );
     }
-    return geometry;
+    return shape;
   }
 
   /**
@@ -75,16 +75,16 @@ public class RealTimeTripShapeFactory {
    * then preserved up until the first mismatching stop, and a straight line is used for all
    * segments after that.
    */
-  private static List<LineString> generateHopGeometriesFromOriginalTripPatternGeometry(
+  private static List<LineString> generateHopGeometriesFromOriginalTripPatternShape(
     StopPattern stopPattern,
     StopPattern originalStopPattern,
-    CompactLineStringSequence originalTripPatternGeometry
+    CompactLineStringSequence originalTripPatternShape
   ) {
     List<LineString> hopGeometries = new ArrayList<>();
 
     for (int i = 0; i < stopPattern.getSize() - 1; i++) {
       LineString hopGeometry =
-        i < originalStopPattern.getSize() - 1 ? originalTripPatternGeometry.get(i) : null;
+        i < originalStopPattern.getSize() - 1 ? originalTripPatternShape.get(i) : null;
 
       if (hopGeometry != null && stopPattern.sameStops(originalStopPattern, i)) {
         // Copy hop geometry from previous pattern

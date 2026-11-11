@@ -209,7 +209,7 @@ public record ScheduledTransitLegReference(
     ScheduledTransitLeg leg = new ScheduledTransitLegBuilder<>()
       .withTripTimes(tripTimes)
       .withTripPattern(tripPattern)
-      .withTripPatternGeometry(shapeService.getTripPatternGeometry(tripPattern.getId()))
+      .withTripPatternShape(shapeService.getTripPatternShape(tripPattern.getId()))
       .withBoardStopIndexInPattern(updatedFromStopPositionInPattern)
       .withAlightStopIndexInPattern(updatedToStopPositionInPattern)
       .withStartTime(ServiceDateUtils.toZonedDateTime(serviceDate, timeZone, boardingTime))

@@ -769,17 +769,17 @@ class ExtraJourneyTest implements RealtimeTestConstants {
 
     assertSuccess(siri.applyEstimatedTimetable(updates));
     var pattern = env.transitService().findPattern(env.transitService().getTrip(id(ADDED_TRIP_ID)));
-    assertNotNull(env.shapeService().getTripPatternGeometry(pattern.getId()));
+    assertNotNull(env.shapeService().getTripPatternShape(pattern.getId()));
 
     siri.applyEstimatedTimetable(List.of(), false, UpdateIncrementality.FULL_DATASET);
     assertThrows(IllegalStateException.class, () ->
-      env.shapeService().getTripPatternGeometry(pattern.getId())
+      env.shapeService().getTripPatternShape(pattern.getId())
     );
 
     // An extra journey gets a new pattern, which gets its own geometry
     assertSuccess(siri.applyEstimatedTimetable(updates, false, UpdateIncrementality.FULL_DATASET));
     var readded = env.transitService().findPattern(env.transitService().getTrip(id(ADDED_TRIP_ID)));
-    assertNotNull(env.shapeService().getTripPatternGeometry(readded.getId()));
+    assertNotNull(env.shapeService().getTripPatternShape(readded.getId()));
   }
 
   /**
@@ -800,11 +800,11 @@ class ExtraJourneyTest implements RealtimeTestConstants {
       .transitService()
       .findPattern(env.transitService().getTrip(id(ADDED_TRIP_ID)), env.defaultServiceDate());
     assertTrue(modifiedPattern.getOriginalTripPattern().isRealTimeTripPattern());
-    assertNotNull(env.shapeService().getTripPatternGeometry(modifiedPattern.getId()));
+    assertNotNull(env.shapeService().getTripPatternShape(modifiedPattern.getId()));
 
     siri.applyEstimatedTimetable(List.of(), false, UpdateIncrementality.FULL_DATASET);
     assertThrows(IllegalStateException.class, () ->
-      env.shapeService().getTripPatternGeometry(modifiedPattern.getId())
+      env.shapeService().getTripPatternShape(modifiedPattern.getId())
     );
 
     assertSuccess(siri.applyEstimatedTimetable(added, false, UpdateIncrementality.FULL_DATASET));
@@ -813,7 +813,7 @@ class ExtraJourneyTest implements RealtimeTestConstants {
       .transitService()
       .findPattern(env.transitService().getTrip(id(ADDED_TRIP_ID)), env.defaultServiceDate());
     assertEquals(modifiedPattern.getId(), readded.getId());
-    assertNotNull(env.shapeService().getTripPatternGeometry(readded.getId()));
+    assertNotNull(env.shapeService().getTripPatternShape(readded.getId()));
   }
 
   private SiriEtBuilder createEstimatedOnlyExtraJourney(SiriTestHelper siri, boolean noBoarding) {

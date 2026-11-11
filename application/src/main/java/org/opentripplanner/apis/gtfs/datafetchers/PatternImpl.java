@@ -300,7 +300,7 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
 
   private LineString getTripPatternGeometry(DataFetchingEnvironment environment) {
     return getShapeService(environment)
-      .getTripPatternGeometry(getSource(environment).getId())
+      .getTripPatternShape(getSource(environment).getId())
       .concatenate();
   }
 

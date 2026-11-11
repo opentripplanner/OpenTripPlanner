@@ -20,7 +20,7 @@ import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.service.shape.model.CompactLineStringSequence;
-import org.opentripplanner.service.shape.model.TripGeometryFactory;
+import org.opentripplanner.service.shape.model.TripShapeFactory;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
@@ -188,11 +188,11 @@ public class GenerateTripPatternsOperation {
       .withStopPattern(stopPattern)
       .withMode(trip.getMode())
       .withNetexSubmode(trip.getNetexSubMode());
-    CompactLineStringSequence tripPatternGeometry = TripGeometryFactory.fromLineStrings(
+    CompactLineStringSequence tripPatternShape = TripShapeFactory.fromLineStrings(
       geometryProcessor.createHopGeometries(trip),
       deduplicator
     );
-    geometriesByTripPattern.put(patternId, tripPatternGeometry);
+    geometriesByTripPattern.put(patternId, tripPatternShape);
     tripPatternBuilders.put(stopPattern, tripPatternBuilder);
     return tripPatternBuilder;
   }

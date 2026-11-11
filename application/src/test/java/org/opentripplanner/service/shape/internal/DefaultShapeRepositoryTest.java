@@ -30,34 +30,28 @@ class DefaultShapeRepositoryTest {
   void initialSnapshotContainsTheScheduledData() {
     var snapshot = repository.createSnapshot();
 
-    assertThat(snapshot.getTripPatternGeometry(SCHEDULED)).isEqualTo(
-      SCHEDULED_TRIP_PATTERN_GEOMETRY
-    );
-    assertThat(snapshot.getTripPatternGeometry(REAL_TIME)).isNull();
+    assertThat(snapshot.getTripPatternShape(SCHEDULED)).isEqualTo(SCHEDULED_TRIP_PATTERN_GEOMETRY);
+    assertThat(snapshot.getTripPatternShape(REAL_TIME)).isNull();
   }
 
   @Test
   void snapshotContainsRealTimeGeometry() {
-    repository.setTripPatternGeometry(REAL_TIME, REAL_TIME_TRIP_PATTERN_GEOMETRY);
+    repository.setTripPatternShape(REAL_TIME, REAL_TIME_TRIP_PATTERN_GEOMETRY);
 
     var snapshot = repository.createSnapshot();
 
-    assertThat(snapshot.getTripPatternGeometry(REAL_TIME)).isEqualTo(
-      REAL_TIME_TRIP_PATTERN_GEOMETRY
-    );
-    assertThat(snapshot.getTripPatternGeometry(SCHEDULED)).isEqualTo(
-      SCHEDULED_TRIP_PATTERN_GEOMETRY
-    );
+    assertThat(snapshot.getTripPatternShape(REAL_TIME)).isEqualTo(REAL_TIME_TRIP_PATTERN_GEOMETRY);
+    assertThat(snapshot.getTripPatternShape(SCHEDULED)).isEqualTo(SCHEDULED_TRIP_PATTERN_GEOMETRY);
   }
 
   @Test
   void realTimeGeometryOverridesScheduled() {
-    repository.setTripPatternGeometry(SCHEDULED, OVERRIDING_TRIP_PATTERN_GEOMETRY);
+    repository.setTripPatternShape(SCHEDULED, OVERRIDING_TRIP_PATTERN_GEOMETRY);
 
-    assertThat(repository.getTripPatternGeometry(SCHEDULED)).isEqualTo(
+    assertThat(repository.getTripPatternShape(SCHEDULED)).isEqualTo(
       OVERRIDING_TRIP_PATTERN_GEOMETRY
     );
-    assertThat(repository.createSnapshot().getTripPatternGeometry(SCHEDULED)).isEqualTo(
+    assertThat(repository.createSnapshot().getTripPatternShape(SCHEDULED)).isEqualTo(
       OVERRIDING_TRIP_PATTERN_GEOMETRY
     );
   }
@@ -65,98 +59,89 @@ class DefaultShapeRepositoryTest {
   @Test
   void clearRemovesRealTimeGeometriesOfTheFeedOnly() {
     var otherFeedPattern = new FeedScopedId("G", "rt");
-    repository.setTripPatternGeometry(REAL_TIME, REAL_TIME_TRIP_PATTERN_GEOMETRY);
-    repository.setTripPatternGeometry(otherFeedPattern, REAL_TIME_TRIP_PATTERN_GEOMETRY);
+    repository.setTripPatternShape(REAL_TIME, REAL_TIME_TRIP_PATTERN_GEOMETRY);
+    repository.setTripPatternShape(otherFeedPattern, REAL_TIME_TRIP_PATTERN_GEOMETRY);
     var snapshotBeforeClear = repository.createSnapshot();
 
     repository.clear("F");
 
-    assertThat(repository.getTripPatternGeometry(REAL_TIME)).isNull();
-    assertThat(repository.getTripPatternGeometry(otherFeedPattern)).isEqualTo(
+    assertThat(repository.getTripPatternShape(REAL_TIME)).isNull();
+    assertThat(repository.getTripPatternShape(otherFeedPattern)).isEqualTo(
       REAL_TIME_TRIP_PATTERN_GEOMETRY
     );
-    assertThat(repository.getTripPatternGeometry(SCHEDULED)).isEqualTo(
+    assertThat(repository.getTripPatternShape(SCHEDULED)).isEqualTo(
       SCHEDULED_TRIP_PATTERN_GEOMETRY
     );
-    assertThat(snapshotBeforeClear.getTripPatternGeometry(REAL_TIME)).isEqualTo(
+    assertThat(snapshotBeforeClear.getTripPatternShape(REAL_TIME)).isEqualTo(
       REAL_TIME_TRIP_PATTERN_GEOMETRY
     );
   }
 
   @Test
   void snapshotAfterClearDoesNotContainTheFeedAndGeometryCanBeAddedAgain() {
-    repository.setTripPatternGeometry(REAL_TIME, REAL_TIME_TRIP_PATTERN_GEOMETRY);
+    repository.setTripPatternShape(REAL_TIME, REAL_TIME_TRIP_PATTERN_GEOMETRY);
     repository.createSnapshot();
 
     repository.clear("F");
     var snapshotAfterClear = repository.createSnapshot();
-    repository.setTripPatternGeometry(REAL_TIME, OVERRIDING_TRIP_PATTERN_GEOMETRY);
+    repository.setTripPatternShape(REAL_TIME, OVERRIDING_TRIP_PATTERN_GEOMETRY);
 
-    assertThat(snapshotAfterClear.getTripPatternGeometry(REAL_TIME)).isNull();
-    assertThat(snapshotAfterClear.getTripPatternGeometry(SCHEDULED)).isEqualTo(
+    assertThat(snapshotAfterClear.getTripPatternShape(REAL_TIME)).isNull();
+    assertThat(snapshotAfterClear.getTripPatternShape(SCHEDULED)).isEqualTo(
       SCHEDULED_TRIP_PATTERN_GEOMETRY
     );
-    assertThat(repository.createSnapshot().getTripPatternGeometry(REAL_TIME)).isEqualTo(
+    assertThat(repository.createSnapshot().getTripPatternShape(REAL_TIME)).isEqualTo(
       OVERRIDING_TRIP_PATTERN_GEOMETRY
     );
   }
 
   @Test
   void snapshotContainingAFeedIsNotAffectedByLaterWritesToTheFeed() {
-    repository.setTripPatternGeometry(REAL_TIME, REAL_TIME_TRIP_PATTERN_GEOMETRY);
+    repository.setTripPatternShape(REAL_TIME, REAL_TIME_TRIP_PATTERN_GEOMETRY);
     var snapshot = repository.createSnapshot();
 
-    repository.setTripPatternGeometry(OTHER, OVERRIDING_TRIP_PATTERN_GEOMETRY);
+    repository.setTripPatternShape(OTHER, OVERRIDING_TRIP_PATTERN_GEOMETRY);
 
-    assertThat(snapshot.getTripPatternGeometry(OTHER)).isNull();
-    assertThat(snapshot.getTripPatternGeometry(REAL_TIME)).isEqualTo(
-      REAL_TIME_TRIP_PATTERN_GEOMETRY
-    );
+    assertThat(snapshot.getTripPatternShape(OTHER)).isNull();
+    assertThat(snapshot.getTripPatternShape(REAL_TIME)).isEqualTo(REAL_TIME_TRIP_PATTERN_GEOMETRY);
   }
 
   @Test
   void unchangedFeedIsStillServedWhenAnotherFeedIsWrittenOrCleared() {
     var otherFeedPattern = new FeedScopedId("G", "rt");
-    repository.setTripPatternGeometry(REAL_TIME, REAL_TIME_TRIP_PATTERN_GEOMETRY);
-    repository.setTripPatternGeometry(otherFeedPattern, OVERRIDING_TRIP_PATTERN_GEOMETRY);
+    repository.setTripPatternShape(REAL_TIME, REAL_TIME_TRIP_PATTERN_GEOMETRY);
+    repository.setTripPatternShape(otherFeedPattern, OVERRIDING_TRIP_PATTERN_GEOMETRY);
     repository.createSnapshot();
 
     repository.clear("F");
-    repository.setTripPatternGeometry(
-      new FeedScopedId("H", "rt"),
-      OVERRIDING_TRIP_PATTERN_GEOMETRY
-    );
+    repository.setTripPatternShape(new FeedScopedId("H", "rt"), OVERRIDING_TRIP_PATTERN_GEOMETRY);
     var snapshot = repository.createSnapshot();
 
-    assertThat(snapshot.getTripPatternGeometry(otherFeedPattern)).isEqualTo(
+    assertThat(snapshot.getTripPatternShape(otherFeedPattern)).isEqualTo(
       OVERRIDING_TRIP_PATTERN_GEOMETRY
     );
-    assertThat(snapshot.getTripPatternGeometry(REAL_TIME)).isNull();
+    assertThat(snapshot.getTripPatternShape(REAL_TIME)).isNull();
   }
 
   @Test
   void clearOfAFeedWithoutGeometriesDoesNotChangeTheSnapshot() {
-    repository.setTripPatternGeometry(REAL_TIME, REAL_TIME_TRIP_PATTERN_GEOMETRY);
+    repository.setTripPatternShape(REAL_TIME, REAL_TIME_TRIP_PATTERN_GEOMETRY);
     repository.createSnapshot();
 
     repository.clear("unknown feed");
     var snapshot = repository.createSnapshot();
 
-    assertThat(snapshot.getTripPatternGeometry(REAL_TIME)).isEqualTo(
-      REAL_TIME_TRIP_PATTERN_GEOMETRY
-    );
-    assertThat(snapshot.getTripPatternGeometry(SCHEDULED)).isEqualTo(
-      SCHEDULED_TRIP_PATTERN_GEOMETRY
-    );
+    assertThat(snapshot.getTripPatternShape(REAL_TIME)).isEqualTo(REAL_TIME_TRIP_PATTERN_GEOMETRY);
+    assertThat(snapshot.getTripPatternShape(SCHEDULED)).isEqualTo(SCHEDULED_TRIP_PATTERN_GEOMETRY);
   }
 
   @Test
   void snapshotIsNotAffectedByLaterWrites() {
     var snapshot = repository.createSnapshot();
 
-    repository.setTripPatternGeometry(OTHER, REAL_TIME_TRIP_PATTERN_GEOMETRY);
+    repository.setTripPatternShape(OTHER, REAL_TIME_TRIP_PATTERN_GEOMETRY);
 
-    assertThat(snapshot.getTripPatternGeometry(OTHER)).isNull();
-    assertThat(repository.getTripPatternGeometry(OTHER)).isEqualTo(REAL_TIME_TRIP_PATTERN_GEOMETRY);
+    assertThat(snapshot.getTripPatternShape(OTHER)).isNull();
+    assertThat(repository.getTripPatternShape(OTHER)).isEqualTo(REAL_TIME_TRIP_PATTERN_GEOMETRY);
   }
 }

@@ -14,13 +14,13 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.service.shape.ScheduledShapeData;
 import org.opentripplanner.service.shape.internal.DefaultShapeRepository;
 import org.opentripplanner.service.shape.model.CompactLineStringSequence;
-import org.opentripplanner.service.shape.model.TripGeometryFactory;
+import org.opentripplanner.service.shape.model.TripShapeFactory;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 
-class RealTimeShapeWriterTest {
+class RealTimeTripShapeWriterTest {
 
   private static final TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
   private static final Route ROUTE = TransitRepositoryForTest.route("routeId").build();
@@ -41,11 +41,14 @@ class RealTimeShapeWriterTest {
   private final RealTimeTripShapeFactory factory = new RealTimeTripShapeFactory(
     DeduplicatorService.NOOP
   );
-  private final RealTimeShapeWriter subject = new RealTimeShapeWriter(() -> repository, factory);
+  private final RealTimeTripShapeWriter subject = new RealTimeTripShapeWriter(
+    () -> repository,
+    factory
+  );
 
   @Test
-  void storeAGeometryDerivedFromTheOriginal() {
-    repositoryWithOriginalGeometry();
+  void storeAShapeDerivedFromTheOriginal() {
+    repositoryWithOriginalShape();
     var pattern = TripPattern.of(id("replacement"))
       .withRoute(ROUTE)
       .withStopPattern(TransitRepositoryForTest.stopPattern(STOP_A, STOP_B, STOP_C))
@@ -53,10 +56,10 @@ class RealTimeShapeWriterTest {
       .withOriginalTripPattern(ORIGINAL)
       .build();
 
-    subject.ensureGeometry(pattern);
+    subject.ensureTripPatternShape(pattern);
 
-    var original = repository.getTripPatternGeometry(ORIGINAL.getId());
-    var geometry = repository.getTripPatternGeometry(pattern.getId());
+    var original = repository.getTripPatternShape(ORIGINAL.getId());
+    var geometry = repository.getTripPatternShape(pattern.getId());
     assertThat(geometry.get(0)).isEqualTo(original.get(0));
     assertThat(geometry.get(1)).isEqualTo(original.get(1));
   }
@@ -69,46 +72,46 @@ class RealTimeShapeWriterTest {
       .withRealTimeAddedTrip()
       .build();
 
-    subject.ensureGeometry(pattern);
+    subject.ensureTripPatternShape(pattern);
 
-    var geometry = repository.getTripPatternGeometry(pattern.getId());
+    var geometry = repository.getTripPatternShape(pattern.getId());
     assertThat(geometry.get(0)).isEqualTo(
       makeLineString(STOP_A.getCoordinate(), STOP_B.getCoordinate())
     );
   }
 
   @Test
-  void ensureGeometryIsIdempotent() {
+  void ensureTripPatternShapeIsIdempotent() {
     var pattern = TripPattern.of(id("added"))
       .withRoute(ROUTE)
       .withStopPattern(TransitRepositoryForTest.stopPattern(STOP_A, STOP_B, STOP_C))
       .withRealTimeAddedTrip()
       .build();
 
-    subject.ensureGeometry(pattern);
-    var first = repository.getTripPatternGeometry(pattern.getId());
-    subject.ensureGeometry(pattern);
+    subject.ensureTripPatternShape(pattern);
+    var first = repository.getTripPatternShape(pattern.getId());
+    subject.ensureTripPatternShape(pattern);
 
-    assertThat(repository.getTripPatternGeometry(pattern.getId())).isSameInstanceAs(first);
+    assertThat(repository.getTripPatternShape(pattern.getId())).isSameInstanceAs(first);
   }
 
   @Test
   void doNotTouchTheRepositoryForScheduledPatterns() {
     var accessCount = new AtomicInteger();
-    var writer = new RealTimeShapeWriter(() -> {
+    var writer = new RealTimeTripShapeWriter(() -> {
       accessCount.incrementAndGet();
       return repository;
     }, factory);
 
-    writer.ensureGeometry(ORIGINAL);
+    writer.ensureTripPatternShape(ORIGINAL);
 
     assertThat(accessCount.get()).isEqualTo(0);
-    assertThat(repository.getTripPatternGeometry(ORIGINAL.getId())).isNull();
+    assertThat(repository.getTripPatternShape(ORIGINAL.getId())).isNull();
   }
 
   @Test
   void writeOnlyToTheRealTimeRepository() {
-    repositoryWithOriginalGeometry();
+    repositoryWithOriginalShape();
     var pattern = TripPattern.of(id("replacement"))
       .withRoute(ROUTE)
       .withStopPattern(TransitRepositoryForTest.stopPattern(STOP_A, STOP_B, STOP_C))
@@ -117,16 +120,16 @@ class RealTimeShapeWriterTest {
       .build();
     var snapshotBefore = repository.createSnapshot();
 
-    subject.ensureGeometry(pattern);
+    subject.ensureTripPatternShape(pattern);
 
-    assertThat(repository.getTripPatternGeometry(pattern.getId())).isNotNull();
-    assertThat(scheduledShapes.getTripPatternGeometry(pattern.getId())).isNull();
-    assertThat(snapshotBefore.getTripPatternGeometry(pattern.getId())).isNull();
+    assertThat(repository.getTripPatternShape(pattern.getId())).isNotNull();
+    assertThat(scheduledShapes.getTripPatternShape(pattern.getId())).isNull();
+    assertThat(snapshotBefore.getTripPatternShape(pattern.getId())).isNull();
   }
 
   @Test
   void deriveFromAnOriginalWrittenEarlierInTheSameTransaction() {
-    repositoryWithOriginalGeometry();
+    repositoryWithOriginalShape();
     var firstUpdate = TripPattern.of(id("replacement1"))
       .withRoute(ROUTE)
       .withStopPattern(TransitRepositoryForTest.stopPattern(STOP_A, STOP_B, STOP_C))
@@ -140,18 +143,18 @@ class RealTimeShapeWriterTest {
       .withOriginalTripPattern(firstUpdate)
       .build();
 
-    subject.ensureGeometry(firstUpdate);
-    subject.ensureGeometry(secondUpdate);
+    subject.ensureTripPatternShape(firstUpdate);
+    subject.ensureTripPatternShape(secondUpdate);
 
-    var first = repository.getTripPatternGeometry(firstUpdate.getId());
-    var second = repository.getTripPatternGeometry(secondUpdate.getId());
+    var first = repository.getTripPatternShape(firstUpdate.getId());
+    var second = repository.getTripPatternShape(secondUpdate.getId());
     assertThat(second.get(0)).isEqualTo(first.get(0));
     assertThat(second.get(1)).isEqualTo(first.get(1));
   }
 
   @Test
-  void useStraightLinesWhenARealTimeOriginalHasNoGeometry() {
-    repositoryWithOriginalGeometry();
+  void useStraightLinesWhenARealTimeOriginalHasNoShape() {
+    repositoryWithOriginalShape();
     var firstUpdate = TripPattern.of(id("replacement1"))
       .withRoute(ROUTE)
       .withStopPattern(TransitRepositoryForTest.stopPattern(STOP_A, STOP_B, STOP_C))
@@ -164,20 +167,20 @@ class RealTimeShapeWriterTest {
       .withRealTimeStopPatternModified()
       .withOriginalTripPattern(firstUpdate)
       .build();
-    subject.ensureGeometry(firstUpdate);
+    subject.ensureTripPatternShape(firstUpdate);
     repository.clear(firstUpdate.getFeedId());
 
-    subject.ensureGeometry(secondUpdate);
+    subject.ensureTripPatternShape(secondUpdate);
 
-    var second = repository.getTripPatternGeometry(secondUpdate.getId());
+    var second = repository.getTripPatternShape(secondUpdate.getId());
     assertThat(second.get(0)).isEqualTo(
       makeLineString(STOP_A.getCoordinate(), STOP_B.getCoordinate())
     );
-    assertThat(repository.getTripPatternGeometry(firstUpdate.getId())).isNull();
+    assertThat(repository.getTripPatternShape(firstUpdate.getId())).isNull();
   }
 
   @Test
-  void failIfTheOriginalPatternHasNoGeometry() {
+  void failIfTheOriginalPatternHasNoShape() {
     var pattern = TripPattern.of(id("replacement"))
       .withRoute(ROUTE)
       .withStopPattern(TransitRepositoryForTest.stopPattern(STOP_A, STOP_B))
@@ -185,21 +188,21 @@ class RealTimeShapeWriterTest {
       .withOriginalTripPattern(ORIGINAL)
       .build();
 
-    assertThrows(IllegalStateException.class, () -> subject.ensureGeometry(pattern));
+    assertThrows(IllegalStateException.class, () -> subject.ensureTripPatternShape(pattern));
   }
 
-  private void givenScheduledGeometry(
+  private void givenScheduledShape(
     FeedScopedId patternId,
-    CompactLineStringSequence tripPatternGeometry
+    CompactLineStringSequence tripPatternShape
   ) {
-    scheduledShapes = ScheduledShapeData.of(Map.of(patternId, tripPatternGeometry));
+    scheduledShapes = ScheduledShapeData.of(Map.of(patternId, tripPatternShape));
     repository = new DefaultShapeRepository(scheduledShapes);
   }
 
-  private void repositoryWithOriginalGeometry() {
-    givenScheduledGeometry(
+  private void repositoryWithOriginalShape() {
+    givenScheduledShape(
       ORIGINAL.getId(),
-      TripGeometryFactory.fromLineStrings(
+      TripShapeFactory.fromLineStrings(
         List.of(
           makeLineString(STOP_A.getCoordinate(), STOP_X.getCoordinate(), STOP_B.getCoordinate()),
           makeLineString(STOP_B.getCoordinate(), STOP_Y.getCoordinate(), STOP_C.getCoordinate())
