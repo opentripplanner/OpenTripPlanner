@@ -76,7 +76,7 @@ class StopCallImplTest {
     );
 
     var schedule = impl.schedule().get(env);
-    assertEquals(new CallSchedule(new ArrivalDepartureTime(NOON, NOON, false), false), schedule);
+    assertEquals(new CallSchedule(new ArrivalDepartureTime(NOON, NOON, false)), schedule);
   }
 
   @Test
@@ -93,7 +93,7 @@ class StopCallImplTest {
 
     for (int stopPos = 0; stopPos < 3; stopPos++) {
       var call = new TripTimeOnDate(tripTimes, stopPos, pattern, SERVICE_DATE, MIDNIGHT);
-      assertCancellation(false, stopPos == 2, call, realtimeEnv.transitService());
+      assertCanceledInRealTime(stopPos == 2, call, realtimeEnv.transitService());
     }
   }
 
@@ -106,7 +106,7 @@ class StopCallImplTest {
 
     for (int stopPos = 0; stopPos < 3; stopPos++) {
       var call = new TripTimeOnDate(tripTimes, stopPos, pattern, SERVICE_DATE, MIDNIGHT);
-      assertCancellation(false, true, call, realtimeEnv.transitService());
+      assertCanceledInRealTime(true, call, realtimeEnv.transitService());
     }
   }
 
@@ -136,13 +136,15 @@ class StopCallImplTest {
 
     for (int stopPos = 0; stopPos < 3; stopPos++) {
       var call = new TripTimeOnDate(tripData.tripTimes(), stopPos, pattern, SERVICE_DATE, MIDNIGHT);
-      assertCancellation(false, stopPos == 1, call, realtimeEnv.transitService());
+      assertCanceledInRealTime(stopPos == 1, call, realtimeEnv.transitService());
     }
   }
 
+  /** Cancellations in the planned data are not real-time cancellations. */
   @ParameterizedTest
   @EnumSource(value = TripAlteration.class, names = { "CANCELLATION", "REPLACED" })
-  void tripCanceledInPlannedData(TripAlteration alteration) throws Exception {
+  void tripCanceledInPlannedDataIsNotCanceledInRealTime(TripAlteration alteration)
+    throws Exception {
     var realtimeEnv = envBuilder
       .addTrip(TRIP_INPUT, trip -> trip.withNetexAlteration(alteration))
       .build();
@@ -156,22 +158,7 @@ class StopCallImplTest {
         SERVICE_DATE,
         MIDNIGHT
       );
-      assertCancellation(true, false, call, realtimeEnv.transitService());
-    }
-  }
-
-  @Test
-  void tripCanceledInPlannedDataAndRealTime() throws Exception {
-    var realtimeEnv = envBuilder
-      .addTrip(TRIP_INPUT, trip -> trip.withNetexAlteration(TripAlteration.CANCELLATION))
-      .build();
-    var tripData = realtimeEnv.tripData(TRIP_ID);
-    var pattern = tripData.tripPattern();
-    var tripTimes = tripData.tripTimes().createRealTimeFromScheduledTimes().withCanceled().build();
-
-    for (int stopPos = 0; stopPos < 3; stopPos++) {
-      var call = new TripTimeOnDate(tripTimes, stopPos, pattern, SERVICE_DATE, MIDNIGHT);
-      assertCancellation(true, true, call, realtimeEnv.transitService());
+      assertCanceledInRealTime(false, call, realtimeEnv.transitService());
     }
   }
 
@@ -196,10 +183,7 @@ class StopCallImplTest {
       // however, this test is run with the flex feature enabled in a runnable which prevents this.
       try {
         CallSchedule schedule = impl.schedule().get(env);
-        assertEquals(
-          new CallSchedule(new TimeWindow(TEN_AM, TEN_AM.plusMinutes(30)), false),
-          schedule
-        );
+        assertEquals(new CallSchedule(new TimeWindow(TEN_AM, TEN_AM.plusMinutes(30))), schedule);
       } catch (Exception e) {
         throw new RuntimeException(e);
       }
@@ -207,20 +191,16 @@ class StopCallImplTest {
   }
 
   /**
-   * Assert the cancellation of a call in the planned data, in {@code schedule}, and by a real-time
-   * update, in {@code realTime}. A call without real-time data is not canceled by a real-time
-   * update.
+   * Assert whether a call is canceled by a real-time update. A call without real-time data is not
+   * canceled by a real-time update.
    */
-  private static void assertCancellation(
-    boolean canceledInPlannedData,
-    boolean canceledInRealTime,
+  private static void assertCanceledInRealTime(
+    boolean expected,
     TripTimeOnDate call,
     TransitService transitService
   ) throws Exception {
-    var impl = new StopCallImpl();
     var env = DataFetchingSupport.dataFetchingEnvironment(call, Map.of(), transitService);
-    assertEquals(canceledInPlannedData, impl.schedule().get(env).canceled());
-    var realTime = impl.realTime().get(env);
-    assertEquals(canceledInRealTime, realTime != null && realTime.canceled());
+    var realTime = new StopCallImpl().realTime().get(env);
+    assertEquals(expected, realTime != null && realTime.canceled());
   }
 }

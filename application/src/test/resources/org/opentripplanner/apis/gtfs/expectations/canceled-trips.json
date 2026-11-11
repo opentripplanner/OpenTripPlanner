@@ -47,7 +47,6 @@
             "stopCalls": [
               {
                 "schedule": {
-                  "canceled": false,
                   "time": {
                     "arrival": "2024-08-09T11:30:00+02:00",
                     "departure": "2024-08-09T11:30:00+02:00",
@@ -71,7 +70,6 @@
               },
               {
                 "schedule": {
-                  "canceled": false,
                   "time": {
                     "arrival": "2024-08-09T11:35:00+02:00",
                     "departure": "2024-08-09T11:35:00+02:00",
@@ -95,7 +93,6 @@
               },
               {
                 "schedule": {
-                  "canceled": false,
                   "time": {
                     "arrival": "2024-08-09T11:40:00+02:00",
                     "departure": "2024-08-09T11:40:00+02:00",

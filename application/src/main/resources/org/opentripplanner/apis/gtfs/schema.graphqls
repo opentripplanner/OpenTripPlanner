@@ -389,7 +389,11 @@ type BookingTime {
   time: String
 }
 
-"Real-time estimates for arrival and departure times for a stop location."
+"""
+Real-time information for a stop location: estimates for the arrival and departure times, and the
+real-time state of the call. More real-time state, similar to `RealTimeTripState` of trips, may be
+added in the future.
+"""
 type CallRealTime {
   "Real-time estimates for the arrival."
   arrival: EstimatedTime
@@ -397,8 +401,6 @@ type CallRealTime {
   Has this call been canceled by a real-time update, so that the vehicle does not serve it? This is
   the case if the call itself has been canceled, for example because the vehicle skips this stop or
   ends its trip early, or if the whole trip has been canceled or deleted.
-    
-  Cancellations in the planned data are reported in `StopCall.schedule.canceled`.
   """
   canceled: Boolean!
   "Real-time estimates for the departure."
@@ -407,13 +409,6 @@ type CallRealTime {
 
 "What is scheduled for a trip on a service date for a stop location."
 type CallSchedule {
-  """
-  Is this call canceled in the planned data, so that the vehicle does not serve it? This is the case
-  if the whole trip has been canceled or replaced by another trip in the planned data.
-    
-  Cancellations by real-time updates are reported in `StopCall.realTime.canceled`.
-  """
-  canceled: Boolean!
   "Scheduled time for a trip on a service date for a stop location."
   time: CallScheduledTime
 }

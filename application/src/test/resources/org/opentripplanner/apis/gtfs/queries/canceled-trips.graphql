@@ -65,7 +65,6 @@
         }
         stopCalls {
           schedule {
-            canceled
             time {
               ... on ArrivalDepartureTime {
                 arrival

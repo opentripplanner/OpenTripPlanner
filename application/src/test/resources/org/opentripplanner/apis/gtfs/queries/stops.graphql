@@ -40,9 +40,6 @@
             gtfsId
           }
         }
-        schedule {
-          canceled
-        }
         realTime {
           arrival {
             delay
