@@ -6,4 +6,5 @@ package org.opentripplanner.street.model.edge;
  * trip. When a path is split into legs, each such edge is turned into a
  * {@link org.opentripplanner.street.model.path.ExternalEdgeLeg}.
  */
+@Deprecated
 public interface ExternalLegEdge {}
