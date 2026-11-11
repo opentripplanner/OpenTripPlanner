@@ -144,23 +144,16 @@ class StopCallImplTest {
           .addStop(STOP_B, "12:10:00", "12:10:00")
           .addStop(stopC1, "12:20:00", "12:20:00")
           .addStop(stopX, "12:30:00", "12:30:00")
+          // Bent hops can be told apart from the straight lines of hops without a scheduled shape
+          .withHopGeometries(
+            bentLine(STOP_A, STOP_B),
+            bentLine(STOP_B, stopC1),
+            bentLine(stopC1, stopX)
+          )
       )
       .build();
     var tripData = realtimeEnv.tripData(MODIFIED_TRIP_ID);
-
-    // The test environment does not support shapes, so create a scheduled pattern with one.
-    // Otherwise, a copied scheduled hop could not be told apart from a straight line. This does not
-    // use copy(), because the builder returns the original pattern if only the geometry changes.
-    var environmentPattern = tripData.tripPattern();
-    var scheduledPattern = TripPattern.of(id("ScheduledPatternWithShape"))
-      .withRoute(environmentPattern.getRoute())
-      .withMode(environmentPattern.getMode())
-      .withStopPattern(environmentPattern.getStopPattern())
-      .withHopGeometries(
-        List.of(bentLine(STOP_A, STOP_B), bentLine(STOP_B, stopC1), bentLine(stopC1, stopX))
-      )
-      .build();
-    assertEquals(3, scheduledPattern.getHopGeometry(1).getNumPoints());
+    var scheduledPattern = tripData.tripPattern();
     var modifiedPattern = TripPattern.of(id("ModifiedPattern"))
       .withRoute(scheduledPattern.getRoute())
       .withMode(scheduledPattern.getMode())
