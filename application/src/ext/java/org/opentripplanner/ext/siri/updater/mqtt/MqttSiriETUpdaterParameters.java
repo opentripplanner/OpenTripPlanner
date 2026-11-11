@@ -2,6 +2,7 @@ package org.opentripplanner.ext.siri.updater.mqtt;
 
 import java.time.Duration;
 import org.opentripplanner.updater.trip.UrlUpdaterParameters;
+import org.opentripplanner.updater.trip.siri.SiriFuzzyTripMatchingParameters;
 
 public class MqttSiriETUpdaterParameters implements UrlUpdaterParameters {
 
@@ -13,7 +14,7 @@ public class MqttSiriETUpdaterParameters implements UrlUpdaterParameters {
   private final String password;
   private final String topic;
   private final int qos;
-  private final boolean fuzzyTripMatching;
+  private final SiriFuzzyTripMatchingParameters fuzzyTripMatching;
   private final int numberOfPrimingWorkers;
   private final Duration maxPrimingIdleTime;
   private final Duration connectionStartupTimeout;
@@ -27,7 +28,7 @@ public class MqttSiriETUpdaterParameters implements UrlUpdaterParameters {
     String password,
     String topic,
     int qos,
-    boolean fuzzyTripMatching,
+    SiriFuzzyTripMatchingParameters fuzzyTripMatching,
     int numberOfPrimingWorkers,
     Duration maxPrimingIdleTime,
     Duration connectionStartupTimeout
@@ -69,7 +70,7 @@ public class MqttSiriETUpdaterParameters implements UrlUpdaterParameters {
     return qos;
   }
 
-  public boolean fuzzyTripMatching() {
+  public SiriFuzzyTripMatchingParameters fuzzyTripMatching() {
     return fuzzyTripMatching;
   }
 

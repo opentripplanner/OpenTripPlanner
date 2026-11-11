@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.updater.trip.UrlUpdaterParameters;
+import org.opentripplanner.updater.trip.siri.SiriFuzzyTripMatchingParameters;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 public record SiriETGooglePubsubUpdaterParameters(
@@ -15,7 +16,7 @@ public record SiriETGooglePubsubUpdaterParameters(
   @Nullable String dataInitializationUrl,
   Duration reconnectPeriod,
   Duration initialGetDataTimeout,
-  boolean fuzzyTripMatching,
+  SiriFuzzyTripMatchingParameters fuzzyTripMatching,
   boolean producerMetrics
 ) implements UrlUpdaterParameters {
   public static Duration RECONNECT_PERIOD = Duration.ofSeconds(30);
@@ -27,7 +28,7 @@ public record SiriETGooglePubsubUpdaterParameters(
     Objects.requireNonNull(topicName);
     Objects.requireNonNull(reconnectPeriod);
     Objects.requireNonNull(initialGetDataTimeout);
-    Objects.requireNonNull(reconnectPeriod);
+    Objects.requireNonNull(fuzzyTripMatching);
   }
 
   @Override
@@ -40,7 +41,7 @@ public record SiriETGooglePubsubUpdaterParameters(
       .addObj("topicName", topicName)
       .addDuration("reconnectPeriod", reconnectPeriod, RECONNECT_PERIOD)
       .addDuration("initialGetDataTimeout", initialGetDataTimeout, INITIAL_GET_DATA_TIMEOUT)
-      .addBoolIfTrue("fuzzyTripMatching", fuzzyTripMatching)
+      .addObj("fuzzyTripMatching", fuzzyTripMatching, SiriFuzzyTripMatchingParameters.DISABLED)
       .addObj("dataInitializationUrl", dataInitializationUrl, null)
       .toString();
   }

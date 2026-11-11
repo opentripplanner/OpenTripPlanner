@@ -27,20 +27,21 @@ To enable the SIRI-ET MQTT updater you need to add it to the updaters section of
 <!-- siri-et-mqtt BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
 
-| Config Parameter                                             |    Type    | Summary                                                          |  Req./Opt. | Default Value | Since |
-|--------------------------------------------------------------|:----------:|------------------------------------------------------------------|:----------:|---------------|:-----:|
-| type = "siri-et-mqtt"                                        |   `enum`   | The type of the updater.                                         | *Required* |               |  1.5  |
-| [connectionStartupTimeout](#u__17__connectionStartupTimeout) | `duration` | How long to wait for the MQTT broker to be available at startup. | *Optional* | `"PT30S"`     |  2.10 |
-| feedId                                                       |  `string`  | The feed ID this updater should be applied to                    | *Required* |               |  2.9  |
-| fuzzyTripMatching                                            |  `boolean` | Whether or not the fuzzy trip matcher should be used             | *Required* |               |  2.9  |
-| host                                                         |  `string`  | The host of the MQTT broker                                      | *Required* |               |  2.9  |
-| [maxPrimingIdleTime](#u__17__maxPrimingIdleTime)             | `duration` | Max idle time until priming is considered complete.              | *Optional* | `"PT1S"`      |  2.9  |
-| [numberOfPrimingWorkers](#u__17__numberOfPrimingWorkers)     |  `integer` | Number of priming workers to process retained messages           | *Optional* | `1`           |  2.9  |
-| [password](#u__17__password)                                 |  `string`  | The password for authorization at the MQTT broker                | *Optional* |               |  2.9  |
-| port                                                         |  `integer` | The port of the MQTT broker                                      | *Required* |               |  2.9  |
-| qos                                                          |  `integer` | The qos used for the MQTT subscription                           | *Required* |               |  2.9  |
-| topic                                                        |  `string`  | The topic the updater should subscribe to                        | *Required* |               |  2.9  |
-| [user](#u__17__user)                                         |  `string`  | The user for authorization at the MQTT broker                    | *Optional* |               |  2.9  |
+| Config Parameter                                             |    Type    | Summary                                                                                     |  Req./Opt. | Default Value | Since |
+|--------------------------------------------------------------|:----------:|---------------------------------------------------------------------------------------------|:----------:|---------------|:-----:|
+| type = "siri-et-mqtt"                                        |   `enum`   | The type of the updater.                                                                    | *Required* |               |  1.5  |
+| [connectionStartupTimeout](#u__17__connectionStartupTimeout) | `duration` | How long to wait for the MQTT broker to be available at startup.                            | *Optional* | `"PT30S"`     |  2.10 |
+| feedId                                                       |  `string`  | The feed ID this updater should be applied to                                               | *Required* |               |  2.9  |
+| host                                                         |  `string`  | The host of the MQTT broker                                                                 | *Required* |               |  2.9  |
+| [maxPrimingIdleTime](#u__17__maxPrimingIdleTime)             | `duration` | Max idle time until priming is considered complete.                                         | *Optional* | `"PT1S"`      |  2.9  |
+| [numberOfPrimingWorkers](#u__17__numberOfPrimingWorkers)     |  `integer` | Number of priming workers to process retained messages                                      | *Optional* | `1`           |  2.9  |
+| [password](#u__17__password)                                 |  `string`  | The password for authorization at the MQTT broker                                           | *Optional* |               |  2.9  |
+| port                                                         |  `integer` | The port of the MQTT broker                                                                 | *Required* |               |  2.9  |
+| qos                                                          |  `integer` | The qos used for the MQTT subscription                                                      | *Required* |               |  2.9  |
+| topic                                                        |  `string`  | The topic the updater should subscribe to                                                   | *Required* |               |  2.9  |
+| [user](#u__17__user)                                         |  `string`  | The user for authorization at the MQTT broker                                               | *Optional* |               |  2.9  |
+| [fuzzyTripMatching](#u__17__fuzzyTripMatching)               |  `object`  | Whether and how the fuzzy trip matcher should be used. A boolean or an object with options. | *Optional* |               |  2.9  |
+|    [timeTolerance](#u__17__fuzzyTripMatching_timeTolerance)  | `duration` | The maximum difference between the scheduled and the aimed times.                           | *Optional* | `"PT0S"`      |  2.11 |
 
 
 ##### Parameter details
@@ -105,6 +106,42 @@ If no authorization is required, the password does not need to be supplied.
 The user for authorization at the MQTT broker
 
 If no authorization is required, the user does not need to be supplied.
+
+<h4 id="u__17__fuzzyTripMatching">fuzzyTripMatching</h4>
+
+**Since version:** `2.9` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
+**Path:** /updaters/[17] 
+
+Whether and how the fuzzy trip matcher should be used. A boolean or an object with options.
+
+The fuzzy trip matcher identifies the scheduled trip of a SIRI-ET message by its last stop,
+line, service date and the aimed times of the first and last call. Use it for producers whose
+messages do not contain usable trip ids.
+
+The parameter accepts a boolean or an object:
+
+- Missing or `false`: no fuzzy trip matching.
+- `true`: fuzzy trip matching where the scheduled times must be equal to the aimed times, to
+  the second. This is the same as `{ "timeTolerance" : "0s" }`.
+- An object: fuzzy trip matching with the given options, for example
+  `{ "timeTolerance" : "59s" }`.
+
+If more than one trip matches, the message is rejected.
+
+
+<h4 id="u__17__fuzzyTripMatching_timeTolerance">timeTolerance</h4>
+
+**Since version:** `2.11` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT0S"`   
+**Path:** /updaters/[17]/fuzzyTripMatching 
+
+The maximum difference between the scheduled and the aimed times.
+
+A scheduled trip matches if its scheduled departure time at the first stop and its scheduled
+arrival time at the last stop differ from the SIRI aimed times by at most this duration. Use
+this if the producer sends aimed times in whole minutes, while the schedule contains seconds.
+The tolerance must be in whole seconds and less than 30 minutes. A larger tolerance increases
+the chance that more than one trip matches, in which case the message is rejected.
+
 
 
 
