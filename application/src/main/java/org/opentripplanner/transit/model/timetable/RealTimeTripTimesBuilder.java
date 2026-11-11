@@ -28,7 +28,6 @@ public class RealTimeTripTimesBuilder {
   private final BitSet hasDeparted;
 
   private final BitSet isNotExpectedArrival;
-
   private final BitSet isNotExpectedDeparture;
 
   @Nullable

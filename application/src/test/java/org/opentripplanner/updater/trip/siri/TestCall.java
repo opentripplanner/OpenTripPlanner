@@ -17,8 +17,8 @@ public class TestCall implements CallWrapper {
   private final String stopPointRef;
   private final int sortOrder;
   private final Boolean cancellation;
-  private final Boolean isNotExpectedArrival;
-  private final Boolean isNotExpectedDeparture;
+  private final boolean isNotExpectedArrival;
+  private final boolean isNotExpectedDeparture;
   private final boolean extraCall;
   private final Boolean predictionInaccurate;
   private final OccupancyEnumeration occupancy;
@@ -40,8 +40,8 @@ public class TestCall implements CallWrapper {
     int sortOrder,
     Boolean cancellation,
     boolean extraCall,
-    Boolean isNotExpectedArrival,
-    Boolean isNotExpectedDeparture,
+    boolean isNotExpectedArrival,
+    boolean isNotExpectedDeparture,
     Boolean predictionInaccurate,
     OccupancyEnumeration occupancy,
     List<NaturalLanguageStringStructure> destinationDisplaies,
