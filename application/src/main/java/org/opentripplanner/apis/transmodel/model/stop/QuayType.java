@@ -299,7 +299,10 @@ public class QuayType {
           .dataFetcher(environment -> {
             ArrivalDeparture arrivalDeparture = environment.getArgument("arrivalDeparture");
             boolean includeCancelledTrips = environment.getArgument("includeCancelledTrips");
-            int numberOfDepartures = environment.getArgument("numberOfDepartures");
+            int numberOfDepartures = getPositiveNonNullIntegerArgument(
+              environment,
+              "numberOfDepartures"
+            );
             int timeRangeInput = getPositiveNonNullIntegerArgument(environment, "timeRange");
             Duration timeRange = Duration.ofSeconds(timeRangeInput);
             StopLocation stop = environment.getSource();

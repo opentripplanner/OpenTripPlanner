@@ -18,6 +18,7 @@ import org.opentripplanner.transit.model.filter.selector.FilterRequest;
 import org.opentripplanner.transit.model.filter.transit.TripTimeOnDateSelectRequest;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.ArrivalDeparture;
+import org.opentripplanner.utils.lang.IntUtils;
 
 public class TripTimeOnDateRequest {
 
@@ -64,7 +65,7 @@ public class TripTimeOnDateRequest {
     this.time = time;
     this.timeWindow = timeWindow;
     this.arrivalDeparture = arrivalDeparture;
-    this.numberOfDepartures = numberOfDepartures;
+    this.numberOfDepartures = IntUtils.requireNotNegative(numberOfDepartures, "numberOfDepartures");
     this.sortOrder = Objects.requireNonNull(sortOrder);
     this.cancellationPolicy = Objects.requireNonNull(cancellationPolicy);
     this.includeCallTimePeriods = includeCallTimePeriods;
