@@ -31,11 +31,8 @@ import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model.TripInput;
-import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
-import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
@@ -152,22 +149,9 @@ class StopCallImplTest {
           )
       )
       .build();
+    realtimeEnv.applyStopPatternUpdate(MODIFIED_TRIP_ID, STOP_A, STOP_B, stopC2, stopY);
     var tripData = realtimeEnv.tripData(MODIFIED_TRIP_ID);
-    var scheduledPattern = tripData.tripPattern();
-    var modifiedPattern = TripPattern.of(id("ModifiedPattern"))
-      .withRoute(scheduledPattern.getRoute())
-      .withMode(scheduledPattern.getMode())
-      .withStopPattern(TransitRepositoryForTest.stopPattern(STOP_A, STOP_B, stopC2, stopY))
-      .withRealTimeStopPatternModified()
-      .withOriginalTripPattern(scheduledPattern)
-      .build();
-    var modifiedTripTimes = tripData
-      .scheduledTripTimes()
-      .createRealTimeFromScheduledTimes()
-      .build();
-    realtimeEnv.applyUpdate(
-      RealTimeTripUpdate.of(modifiedPattern, modifiedTripTimes, SERVICE_DATE).build()
-    );
+    var scheduledPattern = tripData.scheduledTripPattern();
     var transitService = realtimeEnv.transitService();
 
     var tripOnServiceDate = transitService.getTripOnServiceDate(id(MODIFIED_TOSD_ID));
@@ -178,8 +162,8 @@ class StopCallImplTest {
       );
 
     var leg = new ScheduledTransitLegBuilder()
-      .withTripPattern(modifiedPattern)
-      .withTripTimes(modifiedTripTimes)
+      .withTripPattern(tripData.tripPattern())
+      .withTripTimes(tripData.tripTimes())
       .withStartTime(ANY_TIME)
       .withEndTime(ANY_TIME)
       .withServiceDate(SERVICE_DATE)

@@ -54,7 +54,7 @@ public class TripInput {
   @Nullable
   private String netexInternalPlanningCode;
 
-  // Null means that the hops of the pattern have no geometry
+  // Null means that the hops of the pattern are straight lines between the stops
   @Nullable
   private List<LineString> hopGeometries;
 
