@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.model.basic.GeographicalScope;
+import org.opentripplanner.transit.model.basic.DistanceCategory;
 import org.opentripplanner.transit.model.basic.NarrowedTransitMode;
 import org.opentripplanner.transit.model.basic.ReplacementRequirement;
 import org.opentripplanner.transit.model.basic.SubMode;
@@ -113,31 +113,31 @@ public class FilterFactoryTest {
   }
 
   @Test
-  void multipleGeographicalScopes() {
+  void multipleDistanceCategories() {
     var filter = FilterFactory.create(
       List.of(
         NarrowedTransitMode.of(TransitMode.RAIL)
-          .withGeographicalScope(GeographicalScope.SUBURBAN)
+          .withDistanceCategory(DistanceCategory.LOCAL)
           .build(),
         NarrowedTransitMode.of(TransitMode.RAIL)
-          .withGeographicalScope(GeographicalScope.REGIONAL)
+          .withDistanceCategory(DistanceCategory.REGIONAL)
           .build(),
         NarrowedTransitMode.of(TransitMode.BUS).build()
       )
     );
     assertEquals(
-      "FilterCollection[AllowMainModeFilter{mainMode: BUS}, AllowNarrowedTransitModesFilter{mainMode: RAIL, filters: [AllowNarrowedTransitModeFilter{mode: RAIL, isReplacement: IGNORED, geographicalScope: SUBURBAN}, AllowNarrowedTransitModeFilter{mode: RAIL, isReplacement: IGNORED, geographicalScope: REGIONAL}]}]",
+      "FilterCollection[AllowMainModeFilter{mainMode: BUS}, AllowNarrowedTransitModesFilter{mainMode: RAIL, filters: [AllowNarrowedTransitModeFilter{mode: RAIL, isReplacement: IGNORED, distanceCategory: LOCAL}, AllowNarrowedTransitModeFilter{mode: RAIL, isReplacement: IGNORED, distanceCategory: REGIONAL}]}]",
       filter.toString()
     );
   }
 
   @Test
-  void dropsCoveredGeographicalScope() {
+  void dropsCoveredDistanceCategory() {
     var filter = FilterFactory.create(
       List.of(
         NarrowedTransitMode.of(TransitMode.RAIL).build(),
         NarrowedTransitMode.of(TransitMode.RAIL)
-          .withGeographicalScope(GeographicalScope.LONG_DISTANCE)
+          .withDistanceCategory(DistanceCategory.LONG_DISTANCE)
           .build()
       )
     );
@@ -145,35 +145,20 @@ public class FilterFactoryTest {
   }
 
   @Test
-  void excludedGeographicalScopes() {
-    var filter = FilterFactory.create(
-      List.of(
-        NarrowedTransitMode.of(TransitMode.RAIL)
-          .withExcludedGeographicalScopes(List.of(GeographicalScope.LONG_DISTANCE))
-          .build()
-      )
-    );
-    assertEquals(
-      "AllowNarrowedTransitModeFilter{mode: RAIL, isReplacement: IGNORED, excludedGeographicalScopes: [LONG_DISTANCE]}",
-      filter.toString()
-    );
-  }
-
-  @Test
   void removesDuplicateNarrowedModes() {
     var filter = FilterFactory.create(
       List.of(
         NarrowedTransitMode.of(TransitMode.RAIL)
-          .withGeographicalScope(GeographicalScope.SUBURBAN)
+          .withDistanceCategory(DistanceCategory.LOCAL)
           .build(),
         NarrowedTransitMode.of(TransitMode.RAIL)
-          .withGeographicalScope(GeographicalScope.SUBURBAN)
+          .withDistanceCategory(DistanceCategory.LOCAL)
           .build()
       )
     );
     // A single filter, not an AllowNarrowedTransitModesFilter with two identical filters
     assertEquals(
-      "AllowNarrowedTransitModeFilter{mode: RAIL, isReplacement: IGNORED, geographicalScope: SUBURBAN}",
+      "AllowNarrowedTransitModeFilter{mode: RAIL, isReplacement: IGNORED, distanceCategory: LOCAL}",
       filter.toString()
     );
   }

@@ -118,7 +118,7 @@ public class TransitPreferencesMapper {
 
   /**
    * The reluctance is defined per main mode, so a mode listed more than once, e.g. with different
-   * geographical scopes, must have the same reluctance in all entries that set one.
+   * distance categories, must have the same reluctance in all entries that set one.
    */
   private static Map<TransitMode, Double> mapReluctanceForMode(List<Map<String, Object>> transit) {
     var reluctanceForMode = new EnumMap<TransitMode, Double>(TransitMode.class);
@@ -133,7 +133,7 @@ public class TransitPreferencesMapper {
       var previous = reluctanceForMode.putIfAbsent(transitMode, reluctance);
       if (previous != null && !previous.equals(reluctance)) {
         throw new InvalidInputException(
-          "Transit mode %s is listed with different reluctances (%s and %s). The reluctance can only be set per transit mode, not per geographical scope or replacement.".formatted(
+          "Transit mode %s is listed with different reluctances (%s and %s). The reluctance can only be set per transit mode, not per distance category or replacement.".formatted(
             transitMode,
             previous,
             reluctance

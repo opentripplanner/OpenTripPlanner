@@ -1,7 +1,7 @@
 package org.opentripplanner.model.modes;
 
 import javax.annotation.Nullable;
-import org.opentripplanner.transit.model.basic.GeographicalScope;
+import org.opentripplanner.transit.model.basic.DistanceCategory;
 import org.opentripplanner.transit.model.basic.NarrowedTransitMode;
 import org.opentripplanner.transit.model.basic.ReplacementRequirement;
 import org.opentripplanner.transit.model.basic.SubMode;
@@ -35,10 +35,9 @@ public class AllowNarrowedTransitModeFilter implements AllowTransitModeFilter {
     if (mode.getMode() != transitMode) {
       return false;
     }
-    // The geographical scope is an additional requirement: a trip must always have the requested
-    // scope (or not have an excluded one), no matter how the submode and replacement conditions
-    // below are evaluated.
-    if (!geographicalScopeMatches(transitMode, netexSubmode, gtfsExtendedType)) {
+    // The distance category is an additional requirement: a trip must always have the requested
+    // category, no matter how the submode and replacement conditions below are evaluated.
+    if (!distanceCategoryMatches(transitMode, netexSubmode, gtfsExtendedType)) {
       return false;
     }
     // Three-valued boolean logic here. If more dimensions are added to NarrowedTransitMode
@@ -62,22 +61,16 @@ public class AllowNarrowedTransitModeFilter implements AllowTransitModeFilter {
     return subModeMatches || replacementMatches;
   }
 
-  private boolean geographicalScopeMatches(
+  private boolean distanceCategoryMatches(
     TransitMode transitMode,
     SubMode netexSubmode,
     @Nullable Integer gtfsExtendedType
   ) {
-    var scope = mode.getGeographicalScope();
-    var excludedScopes = mode.getExcludedGeographicalScopes();
-    if (scope == null && excludedScopes.isEmpty()) {
-      return true;
-    }
-    var tripScope = GeographicalScope.of(transitMode, netexSubmode, gtfsExtendedType);
-    if (scope != null) {
-      return tripScope == scope;
-    }
-    // Trips without a scope are not excluded
-    return tripScope == null || !excludedScopes.contains(tripScope);
+    var category = mode.getDistanceCategory();
+    return (
+      category == null ||
+      DistanceCategory.of(transitMode, netexSubmode, gtfsExtendedType) == category
+    );
   }
 
   private static ReplacementRequirement mapReplacement(boolean replacement) {
@@ -121,8 +114,7 @@ public class AllowNarrowedTransitModeFilter implements AllowTransitModeFilter {
       .addEnum("mode", mode.getMode())
       .addObj("subMode", mode.getSubMode())
       .addEnum("isReplacement", mode.getReplacement())
-      .addEnum("geographicalScope", mode.getGeographicalScope())
-      .addCol("excludedGeographicalScopes", mode.getExcludedGeographicalScopes())
+      .addEnum("distanceCategory", mode.getDistanceCategory())
       .toString();
   }
 }

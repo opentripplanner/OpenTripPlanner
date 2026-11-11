@@ -179,19 +179,19 @@ class RouteRequestMapperModesTest {
 
   @Test
   void testSameTransitModeWithConflictingReluctances() {
-    var env = testCtx.executionContext(railBySuburbanAndRegionalScope(1.0, 1.2));
+    var env = testCtx.executionContext(railByLocalAndRegionalCategory(1.0, 1.2));
     var exception = assertThrows(InvalidInputException.class, () ->
       RouteRequestMapper.toRouteRequest(env, testCtx.context())
     );
     assertEquals(
-      "Transit mode RAIL is listed with different reluctances (1.0 and 1.2). The reluctance can only be set per transit mode, not per geographical scope or replacement.",
+      "Transit mode RAIL is listed with different reluctances (1.0 and 1.2). The reluctance can only be set per transit mode, not per distance category or replacement.",
       exception.getMessage()
     );
   }
 
   @Test
   void testSameTransitModeWithEqualReluctances() {
-    var env = testCtx.executionContext(railBySuburbanAndRegionalScope(1.2, 1.2));
+    var env = testCtx.executionContext(railByLocalAndRegionalCategory(1.2, 1.2));
     var routeRequest = RouteRequestMapper.toRouteRequest(env, testCtx.context());
     assertEquals(
       1.2,
@@ -199,135 +199,49 @@ class RouteRequestMapperModesTest {
     );
   }
 
-  private Map<String, Object> railBySuburbanAndRegionalScope(
-    double suburbanReluctance,
+  private Map<String, Object> railByLocalAndRegionalCategory(
+    double localReluctance,
     double regionalReluctance
   ) {
     return transitModes(
       Map.ofEntries(
         entry("mode", "RAIL"),
-        entry("geographicalScope", "SUBURBAN"),
-        entry("cost", Map.ofEntries(entry("reluctance", suburbanReluctance)))
+        entry("distanceCategory", "LOCAL"),
+        entry("cost", Map.ofEntries(entry("reluctance", localReluctance)))
       ),
       Map.ofEntries(
         entry("mode", "RAIL"),
-        entry("geographicalScope", "REGIONAL"),
+        entry("distanceCategory", "REGIONAL"),
         entry("cost", Map.ofEntries(entry("reluctance", regionalReluctance)))
       )
     );
   }
 
   @Test
-  void testTransitModesWithGeographicalScope() {
+  void testTransitModesWithDistanceCategory() {
     var modesArgs = transitModes(
-      Map.ofEntries(entry("mode", "RAIL"), entry("geographicalScope", "SUBURBAN")),
-      Map.ofEntries(entry("mode", "RAIL"), entry("geographicalScope", "REGIONAL")),
-      Map.ofEntries(entry("mode", "COACH"), entry("geographicalScope", "LONG_DISTANCE")),
+      Map.ofEntries(entry("mode", "RAIL"), entry("distanceCategory", "LOCAL")),
+      Map.ofEntries(entry("mode", "RAIL"), entry("distanceCategory", "REGIONAL")),
+      Map.ofEntries(entry("mode", "COACH"), entry("distanceCategory", "LONG_DISTANCE")),
       Map.ofEntries(
         entry("mode", "RAIL"),
-        entry("geographicalScope", "LONG_DISTANCE"),
+        entry("distanceCategory", "LONG_DISTANCE"),
         entry("replacement", Map.ofEntries(entry("requirement", "FORBIDDEN")))
       ),
+      Map.ofEntries(
+        entry("mode", "RAIL"),
+        entry("distanceCategory", "REGIONAL"),
+        entry("replacement", Map.ofEntries(entry("requirement", "REQUIRED")))
+      ),
+      Map.ofEntries(entry("mode", "BUS"), entry("distanceCategory", "REGIONAL")),
       Map.ofEntries(entry("mode", "BUS"))
     );
     var env = testCtx.executionContext(modesArgs);
     var routeRequest = RouteRequestMapper.toRouteRequest(env, testCtx.context());
     assertEquals(
-      "[(select: [(transportModes: [BUS, COACH::::IGNORED::LONG_DISTANCE, RAIL::::FORBIDDEN::LONG_DISTANCE, RAIL::::IGNORED::REGIONAL, RAIL::::IGNORED::SUBURBAN])])]",
+      "[(select: [(transportModes: [BUS, BUS::::IGNORED::REGIONAL, COACH::::IGNORED::LONG_DISTANCE, RAIL::::FORBIDDEN::LONG_DISTANCE, RAIL::::IGNORED::LOCAL, RAIL::::IGNORED::REGIONAL, RAIL::::REQUIRED::REGIONAL])])]",
       routeRequest.journey().transit().filters().toString()
     );
-  }
-
-  @Test
-  void testGeographicalScopeOnUnsupportedMode() {
-    var env = testCtx.executionContext(
-      transitModes(Map.ofEntries(entry("mode", "BUS"), entry("geographicalScope", "REGIONAL")))
-    );
-    var exception = assertThrows(InvalidInputException.class, () ->
-      RouteRequestMapper.toRouteRequest(env, testCtx.context())
-    );
-    assertEquals(
-      "geographicalScope is only supported for the transit modes [RAIL, COACH], not for BUS.",
-      exception.getMessage()
-    );
-  }
-
-  @Test
-  void testGeographicalScopeWithRequiredReplacement() {
-    var env = testCtx.executionContext(
-      transitModes(
-        Map.ofEntries(
-          entry("mode", "RAIL"),
-          entry("geographicalScope", "SUBURBAN"),
-          entry("replacement", Map.ofEntries(entry("requirement", "REQUIRED")))
-        )
-      )
-    );
-    var exception = assertThrows(InvalidInputException.class, () ->
-      RouteRequestMapper.toRouteRequest(env, testCtx.context())
-    );
-    assertEquals(
-      "geographicalScope can't be combined with replacement REQUIRED for RAIL, as replacement services have no geographical scope.",
-      exception.getMessage()
-    );
-  }
-
-  @Test
-  void testTransitModesWithExcludedGeographicalScopes() {
-    var modesArgs = transitModes(
-      Map.ofEntries(
-        entry("mode", "RAIL"),
-        entry("excludedGeographicalScopes", List.of("LONG_DISTANCE", "REGIONAL"))
-      ),
-      // Redundant, as replacement services have no scope, but allowed
-      Map.ofEntries(
-        entry("mode", "COACH"),
-        entry("excludedGeographicalScopes", List.of("REGIONAL")),
-        entry("replacement", Map.ofEntries(entry("requirement", "REQUIRED")))
-      )
-    );
-    var env = testCtx.executionContext(modesArgs);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, testCtx.context());
-    assertEquals(
-      "[(select: [(transportModes: [COACH::::REQUIRED::NOT[REGIONAL], RAIL::::IGNORED::NOT[REGIONAL, LONG_DISTANCE]])])]",
-      routeRequest.journey().transit().filters().toString()
-    );
-  }
-
-  @Test
-  void testGeographicalScopeAndExcludedGeographicalScopesCantBeCombined() {
-    assertInvalidModes(
-      "geographicalScope and excludedGeographicalScopes can't be combined for RAIL.",
-      Map.ofEntries(
-        entry("mode", "RAIL"),
-        entry("geographicalScope", "REGIONAL"),
-        entry("excludedGeographicalScopes", List.of("SUBURBAN"))
-      )
-    );
-  }
-
-  @Test
-  void testEmptyExcludedGeographicalScopes() {
-    assertInvalidModes(
-      "excludedGeographicalScopes must not be empty for RAIL.",
-      Map.ofEntries(entry("mode", "RAIL"), entry("excludedGeographicalScopes", List.of()))
-    );
-  }
-
-  @Test
-  void testExcludedGeographicalScopesOnUnsupportedMode() {
-    assertInvalidModes(
-      "excludedGeographicalScopes is only supported for the transit modes [RAIL, COACH], not for BUS.",
-      Map.ofEntries(entry("mode", "BUS"), entry("excludedGeographicalScopes", List.of("REGIONAL")))
-    );
-  }
-
-  private void assertInvalidModes(String expectedMessage, Map<String, Object> mode) {
-    var env = testCtx.executionContext(transitModes(mode));
-    var exception = assertThrows(InvalidInputException.class, () ->
-      RouteRequestMapper.toRouteRequest(env, testCtx.context())
-    );
-    assertEquals(expectedMessage, exception.getMessage());
   }
 
   @SafeVarargs

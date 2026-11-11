@@ -3,7 +3,6 @@ package org.opentripplanner.transit.model.basic;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class NarrowedTransitModeTest {
@@ -17,8 +16,7 @@ class NarrowedTransitModeTest {
     assertThat(subject.getMode()).isEqualTo(TransitMode.RAIL);
     assertThat(subject.getSubMode()).isNull();
     assertThat(subject.getReplacement()).isEqualTo(ReplacementRequirement.IGNORED);
-    assertThat(subject.getGeographicalScope()).isNull();
-    assertThat(subject.getExcludedGeographicalScopes()).isEmpty();
+    assertThat(subject.getDistanceCategory()).isNull();
     assertThat(subject.isMainModeOnly()).isTrue();
     assertThat(subject.isConvertibleToMainAndSubMode()).isTrue();
   }
@@ -39,9 +37,9 @@ class NarrowedTransitModeTest {
   }
 
   @Test
-  void geographicalScopeIsNotConvertibleToMainAndSubMode() {
+  void distanceCategoryIsNotConvertibleToMainAndSubMode() {
     var subject = NarrowedTransitMode.of(TransitMode.RAIL)
-      .withGeographicalScope(GeographicalScope.REGIONAL)
+      .withDistanceCategory(DistanceCategory.REGIONAL)
       .build();
 
     assertThat(subject.isMainModeOnly()).isFalse();
@@ -53,77 +51,23 @@ class NarrowedTransitModeTest {
   @Test
   void equalsAndHashCode() {
     var regional = NarrowedTransitMode.of(TransitMode.RAIL)
-      .withGeographicalScope(GeographicalScope.REGIONAL)
+      .withDistanceCategory(DistanceCategory.REGIONAL)
       .build();
     var sameRegional = NarrowedTransitMode.of(TransitMode.RAIL)
-      .withGeographicalScope(GeographicalScope.REGIONAL)
+      .withDistanceCategory(DistanceCategory.REGIONAL)
       .build();
 
     assertThat(regional).isEqualTo(sameRegional);
     assertThat(regional.hashCode()).isEqualTo(sameRegional.hashCode());
     assertThat(regional).isNotEqualTo(
-      NarrowedTransitMode.of(TransitMode.RAIL)
-        .withGeographicalScope(GeographicalScope.SUBURBAN)
-        .build()
+      NarrowedTransitMode.of(TransitMode.RAIL).withDistanceCategory(DistanceCategory.LOCAL).build()
     );
     assertThat(regional).isNotEqualTo(
       NarrowedTransitMode.of(TransitMode.RAIL)
         .withReplacement(ReplacementRequirement.FORBIDDEN)
-        .withGeographicalScope(GeographicalScope.REGIONAL)
+        .withDistanceCategory(DistanceCategory.REGIONAL)
         .build()
     );
     assertThat(regional).isNotEqualTo(NarrowedTransitMode.of(TransitMode.RAIL).build());
-  }
-
-  @Test
-  void excludedGeographicalScopes() {
-    var subject = NarrowedTransitMode.of(TransitMode.RAIL)
-      .withExcludedGeographicalScopes(
-        List.of(GeographicalScope.LONG_DISTANCE, GeographicalScope.REGIONAL)
-      )
-      .build();
-
-    assertThat(subject.getExcludedGeographicalScopes()).containsExactly(
-      GeographicalScope.REGIONAL,
-      GeographicalScope.LONG_DISTANCE
-    );
-    assertThat(subject.isMainModeOnly()).isFalse();
-    assertThat(subject.isConvertibleToMainAndSubMode()).isFalse();
-    assertThrows(IllegalArgumentException.class, subject::toMainAndSubMode);
-    assertThat(subject.toString()).isEqualTo("RAIL::::IGNORED::NOT[REGIONAL, LONG_DISTANCE]");
-  }
-
-  @Test
-  void excludedGeographicalScopesEquality() {
-    var subject = NarrowedTransitMode.of(TransitMode.RAIL)
-      .withExcludedGeographicalScopes(
-        List.of(GeographicalScope.LONG_DISTANCE, GeographicalScope.REGIONAL)
-      )
-      .build();
-    var sameInOtherOrder = NarrowedTransitMode.of(TransitMode.RAIL)
-      .withExcludedGeographicalScopes(
-        List.of(GeographicalScope.REGIONAL, GeographicalScope.LONG_DISTANCE)
-      )
-      .build();
-
-    assertThat(subject).isEqualTo(sameInOtherOrder);
-    assertThat(subject.hashCode()).isEqualTo(sameInOtherOrder.hashCode());
-    assertThat(subject).isNotEqualTo(
-      NarrowedTransitMode.of(TransitMode.RAIL)
-        .withExcludedGeographicalScopes(List.of(GeographicalScope.LONG_DISTANCE))
-        .build()
-    );
-    assertThat(
-      NarrowedTransitMode.of(TransitMode.RAIL).withExcludedGeographicalScopes(List.of()).build()
-    ).isEqualTo(NarrowedTransitMode.of(TransitMode.RAIL).build());
-  }
-
-  @Test
-  void geographicalScopeAndExcludedGeographicalScopesCantBeCombined() {
-    var builder = NarrowedTransitMode.of(TransitMode.RAIL)
-      .withGeographicalScope(GeographicalScope.REGIONAL)
-      .withExcludedGeographicalScopes(List.of(GeographicalScope.SUBURBAN));
-
-    assertThrows(IllegalArgumentException.class, builder::build);
   }
 }
