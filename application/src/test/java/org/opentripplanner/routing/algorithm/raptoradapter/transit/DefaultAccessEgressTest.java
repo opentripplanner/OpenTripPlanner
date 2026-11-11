@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -95,6 +96,32 @@ class DefaultAccessEgressTest {
       Duration.ofSeconds(FINAL_STATE.getElapsedTimeSeconds()),
       subject.streetPath().duration()
     );
+  }
+
+  /**
+   * An egress keeps its state in search order, which runs backward in time. The street path must be
+   * reversed, so that it is in chronological order.
+   */
+  @Test
+  void streetPathOfEgressIsChronological() {
+    var finalState = TestStateBuilder.ofWalkingEgress()
+      .streetEdge("first", 100)
+      .streetEdge("second", 100)
+      .streetEdge("third", 100)
+      .build();
+    assertTrue(finalState.getRequest().arriveBy());
+
+    var path = new DefaultAccessEgress(STOP, finalState).streetPath();
+
+    assertEquals(Duration.ofSeconds(finalState.getElapsedTimeSeconds()), path.duration());
+    assertTrue(path.startTime().isBefore(path.endTime()));
+    var edgeNames = path
+      .states()
+      .stream()
+      .skip(1)
+      .map(s -> s.getBackEdge().getName().toString())
+      .toList();
+    assertThat(edgeNames).containsExactly("third", "second", "first").inOrder();
   }
 
   @Test
