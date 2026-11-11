@@ -29,6 +29,7 @@ import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.apis.support.graphql.DataFetchingSupport;
 import org.opentripplanner.apis.transmodel.TransmodelAPITestContextBuilder;
 import org.opentripplanner.apis.transmodel.TransmodelGraphQLRequestContext;
+import org.opentripplanner.core.model.basic.Ratio;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -239,7 +240,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
     var filters = MAPPER.createRequest(executionContext(arguments)).preferences().itineraryFilter();
 
     assertEquals(
-      1.0,
+      Ratio.of(1.0),
       field.equals("groupSimilarityKeepOne")
         ? filters.groupSimilarityKeepOne()
         : filters.groupSimilarityKeepThree()
@@ -261,7 +262,9 @@ public class TripRequestMapperTest implements PlanTestConstants {
       MAPPER.createRequest(executionContext(arguments))
     );
     assertEquals(
-      "The argument 'itineraryFilters." + field + "' must be between 0 and 1, but was 1.01.",
+      "Invalid argument 'itineraryFilters." +
+        field +
+        "': Ratio must be in range [0.0, 1.0], but was: 1.01",
       ex.getMessage()
     );
   }

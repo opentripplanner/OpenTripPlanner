@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.filterchain.api;
 
+import org.opentripplanner.core.model.basic.Ratio;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder;
 import org.opentripplanner.routing.algorithm.filterchain.framework.groupids.GroupByDistance;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
@@ -44,7 +45,7 @@ public class GroupBySimilarity {
    * <p>
    * The value must be a number between {@link #MIN_GROUP_BY_P} and 1.0 (100%).
    */
-  public final double groupByP;
+  public final Ratio groupByP;
 
   /**
    * Set a maximum number of itineraries to keep for each group.
@@ -65,7 +66,7 @@ public class GroupBySimilarity {
   public final double maxCostOtherLegsFactor;
 
   private GroupBySimilarity(
-    double groupByP,
+    Ratio groupByP,
     int maxNumOfItinerariesPerGroup,
     boolean nestedGroupingByAllSameStations,
     double maxCostOtherLegsFactor
@@ -79,7 +80,7 @@ public class GroupBySimilarity {
   /**
    * Get a GroupBySimilarity configured to return one itinerary per group.
    */
-  public static GroupBySimilarity createWithOneItineraryPerGroup(double groupByP) {
+  public static GroupBySimilarity createWithOneItineraryPerGroup(Ratio groupByP) {
     return new GroupBySimilarity(groupByP, 1, false, 0.0);
   }
 
@@ -89,7 +90,7 @@ public class GroupBySimilarity {
    * parameters,
    */
   public static GroupBySimilarity createWithMoreThanOneItineraryPerGroup(
-    double groupByP,
+    Ratio groupByP,
     int maxNumOfItinerariesPerGroup,
     boolean nestedGroupingByAllSameStations,
     double maxCostOtherLegsFactor
@@ -105,7 +106,7 @@ public class GroupBySimilarity {
   @Override
   public String toString() {
     return ToStringBuilder.of(GroupBySimilarity.class)
-      .addNum("groupByP", groupByP)
+      .addObj("groupByP", groupByP)
       .addNum("maxNumOfItinerariesPerGroup", maxNumOfItinerariesPerGroup)
       .addBoolIfTrue("nestedGroupingByAllSameStations", nestedGroupingByAllSameStations)
       .addNum("maxCostOtherLegsFactor", maxCostOtherLegsFactor)

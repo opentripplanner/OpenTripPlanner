@@ -586,14 +586,14 @@ public class ItineraryListFilterChainBuilder {
 
     List<GroupBySimilarity> groupBy = groupBySimilarity
       .stream()
-      .sorted(Comparator.comparingDouble(o -> o.groupByP))
+      .sorted(Comparator.comparingDouble(o -> o.groupByP.asDouble()))
       .toList();
 
     List<ItineraryListFilter> groupByFilters = new ArrayList<>();
 
     for (GroupBySimilarity group : groupBy) {
       String tag = "similar-legs-filter-%.0fp-%dx".formatted(
-        100d * group.groupByP,
+        100d * group.groupByP.asDouble(),
         group.maxNumOfItinerariesPerGroup
       );
       sysTags.add(tag);

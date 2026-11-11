@@ -14,6 +14,7 @@ import java.util.Map;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.apis.gtfs.GtfsGraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
+import org.opentripplanner.core.model.basic.Ratio;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.model.GenericLocation;
@@ -118,10 +119,14 @@ public class RouteRequestMapper {
       );
     }
     if (filters.getGraphQLGroupSimilarityKeepOne() != null) {
-      filterPreferences.withGroupSimilarityKeepOne(filters.getGraphQLGroupSimilarityKeepOne());
+      filterPreferences.withGroupSimilarityKeepOne(
+        Ratio.of(filters.getGraphQLGroupSimilarityKeepOne())
+      );
     }
     if (filters.getGraphQLGroupSimilarityKeepThree() != null) {
-      filterPreferences.withGroupSimilarityKeepThree(filters.getGraphQLGroupSimilarityKeepThree());
+      filterPreferences.withGroupSimilarityKeepThree(
+        Ratio.of(filters.getGraphQLGroupSimilarityKeepThree())
+      );
     }
     if (filters.getGraphQLGroupedOtherThanSameLegsMaxCostMultiplier() != null) {
       filterPreferences.withGroupedOtherThanSameLegsMaxCostMultiplier(

@@ -8,6 +8,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_4;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_7;
 
+import org.opentripplanner.core.model.basic.Ratio;
 import org.opentripplanner.routing.algorithm.filterchain.api.GroupBySimilarity;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
@@ -77,36 +78,40 @@ public class ItineraryFiltersConfig {
           .asEnum(dft.debug())
       )
       .withGroupSimilarityKeepOne(
-        c
-          .of("groupSimilarityKeepOne")
-          .since(V2_1)
-          .summary(
-            "Group itineraries that are at least this similar, and keep ONE itinerary from each group."
-          )
-          .description(
-            """
-            Similarity is the share of the travel distance two itineraries have in common.
+        Ratio.of(
+          c
+            .of("groupSimilarityKeepOne")
+            .since(V2_1)
+            .summary(
+              "Group itineraries that are at least this similar, and keep ONE itinerary from each group."
+            )
+            .description(
+              """
+              Similarity is the share of the travel distance two itineraries have in common.
 
-            The value must be between 0 and 1. A value below %s turns this filter off.
-            """.formatted(GroupBySimilarity.MIN_GROUP_BY_P)
-          )
-          .asDouble(dft.groupSimilarityKeepOne())
+              The value must be between 0 and 1. A value below %s turns this filter off.
+              """.formatted(GroupBySimilarity.MIN_GROUP_BY_P)
+            )
+            .asDouble(dft.groupSimilarityKeepOne().asDouble())
+        )
       )
       .withGroupSimilarityKeepThree(
-        c
-          .of("groupSimilarityKeepThree")
-          .since(V2_1)
-          .summary(
-            "Group itineraries that are at least this similar, and keep at most three itineraries from each group."
-          )
-          .description(
-            """
-            Similarity is the share of the travel distance two itineraries have in common.
+        Ratio.of(
+          c
+            .of("groupSimilarityKeepThree")
+            .since(V2_1)
+            .summary(
+              "Group itineraries that are at least this similar, and keep at most three itineraries from each group."
+            )
+            .description(
+              """
+              Similarity is the share of the travel distance two itineraries have in common.
 
-            The value must be between 0 and 1. A value below %s turns this filter off.
-            """.formatted(GroupBySimilarity.MIN_GROUP_BY_P)
-          )
-          .asDouble(dft.groupSimilarityKeepThree())
+              The value must be between 0 and 1. A value below %s turns this filter off.
+              """.formatted(GroupBySimilarity.MIN_GROUP_BY_P)
+            )
+            .asDouble(dft.groupSimilarityKeepThree().asDouble())
+        )
       )
       .withGroupedOtherThanSameLegsMaxCostMultiplier(
         c

@@ -2,6 +2,7 @@ package org.opentripplanner.routing.algorithm.filterchain.framework.groupids;
 
 import java.util.Comparator;
 import java.util.List;
+import org.opentripplanner.core.model.basic.Ratio;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.TransitLeg;
@@ -44,11 +45,11 @@ public class GroupByDistance implements GroupId<GroupByDistance> {
   private final boolean streetOnly;
 
   /**
-   * @param p 'p' must be between {@link #MIN_P} (50%) and 1.0 (100%).
+   * @param p 'p' must be at least {@link #MIN_P}.
    */
-  public GroupByDistance(Itinerary itinerary, double p) {
+  public GroupByDistance(Itinerary itinerary, Ratio p) {
     assertPIsValid(p);
-    double limit = p * calculateTotalDistance(itinerary.legs());
+    double limit = p.asDouble() * calculateTotalDistance(itinerary.legs());
     this.streetOnly = itinerary.isStreetOnly();
     this.keySet = createKeySetOfLegsByLimit(itinerary.legs(), limit);
   }
@@ -136,9 +137,9 @@ public class GroupByDistance implements GroupId<GroupByDistance> {
     return true;
   }
 
-  private void assertPIsValid(double p) {
-    if (p < MIN_P || p > 1.0) {
-      throw new IllegalArgumentException("'p' is not between %s and 1.0: %s".formatted(MIN_P, p));
+  private void assertPIsValid(Ratio p) {
+    if (p.asDouble() < MIN_P) {
+      throw new IllegalArgumentException("'p' is less than %s: %s".formatted(MIN_P, p));
     }
   }
 

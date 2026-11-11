@@ -13,10 +13,10 @@ import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.apis.transmodel.model.scalars.DoubleFunction;
 import org.opentripplanner.apis.transmodel.support.DataFetcherDecorator;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
+import org.opentripplanner.core.model.basic.Ratio;
 import org.opentripplanner.routing.algorithm.filterchain.api.GroupBySimilarity;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
-import org.opentripplanner.utils.lang.Units;
 
 public class ItineraryFiltersInputType {
 
@@ -100,7 +100,7 @@ public class ItineraryFiltersInputType {
                 GroupBySimilarity.MIN_GROUP_BY_P
               )
           )
-          .defaultValue(dft.groupSimilarityKeepOne())
+          .defaultValue(dft.groupSimilarityKeepOne().asDouble())
           .build()
       )
       .field(
@@ -115,7 +115,7 @@ public class ItineraryFiltersInputType {
                 GroupBySimilarity.MIN_GROUP_BY_P
               )
           )
-          .defaultValue(dft.groupSimilarityKeepThree())
+          .defaultValue(dft.groupSimilarityKeepThree().asDouble())
           .build()
       )
       .field(
@@ -131,7 +131,7 @@ public class ItineraryFiltersInputType {
               )
           )
           .deprecate("Use " + GROUP_SIMILARITY_KEEP_THREE + " instead.")
-          .defaultValue(dft.groupSimilarityKeepThree())
+          .defaultValue(dft.groupSimilarityKeepThree().asDouble())
           .build()
       )
       .field(
@@ -202,21 +202,15 @@ public class ItineraryFiltersInputType {
   }
 
   /**
-   * Return the value, normalized as a ratio, if it is in the range [0.0, 1.0], otherwise throw an
-   * {@link InvalidInputException}.
+   * Return the value as a {@link Ratio}, or throw an {@link InvalidInputException} if it is not a
+   * valid ratio.
    */
-  private static double validateGroupSimilarity(String field, double value) {
-    try {
-      // Units.ratio throws an IllegalArgumentException if the value is outside [0.0, 1.0]
-      return Units.ratio(value);
-    } catch (IllegalArgumentException e) {
+  private static Ratio validateGroupSimilarity(String field, double value) {
+    return Ratio.of(value, message -> {
       throw new InvalidInputException(
-        "The argument 'itineraryFilters.%s' must be between 0 and 1, but was %s.".formatted(
-          field,
-          value
-        )
+        "Invalid argument 'itineraryFilters.%s': %s".formatted(field, message)
       );
-    }
+    }).orElseThrow();
   }
 
   private static <T> void setField(
