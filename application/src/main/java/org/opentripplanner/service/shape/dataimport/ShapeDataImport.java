@@ -6,7 +6,9 @@ import java.util.Map;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.service.shape.ScheduledShapeData;
+import org.opentripplanner.service.shape.TripPatternShapeValidator;
 import org.opentripplanner.service.shape.model.CompactLineStringSequence;
+import org.opentripplanner.transit.model.network.TripPattern;
 
 /**
  * The mutable shape data collected while the graph is built (GTFS and NeTEx import), and
@@ -35,13 +37,18 @@ public class ShapeDataImport implements Serializable {
   /**
    * Store the shape of the given scheduled trip pattern. An existing shape for the same
    * pattern is replaced.
+   *
+   * @throws IllegalArgumentException if the shape is missing or does not have one hop per pair of
+   *                                  stops of the pattern, see {@link TripPatternShapeValidator}
+   * @throws IllegalStateException    if the data import is already frozen
    */
   public void setTripPatternShape(
-    FeedScopedId tripPatternId,
+    TripPattern tripPattern,
     CompactLineStringSequence tripPatternShape
   ) {
     assertModificationsAllowed();
-    geometriesByTripPattern.put(tripPatternId, tripPatternShape);
+    TripPatternShapeValidator.validate(tripPattern, tripPatternShape);
+    geometriesByTripPattern.put(tripPattern.getId(), tripPatternShape);
   }
 
   @Nullable

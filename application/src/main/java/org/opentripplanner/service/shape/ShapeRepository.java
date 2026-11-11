@@ -1,7 +1,7 @@
 package org.opentripplanner.service.shape;
 
-import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.service.shape.model.CompactLineStringSequence;
+import org.opentripplanner.transit.model.network.TripPattern;
 
 /**
  * The mutable repository of the shape data. It owns the {@link ScheduledShapeData} - the
@@ -16,8 +16,11 @@ public interface ShapeRepository extends ShapeRepositorySnapshot {
   /**
    * Store the shape of the given real-time trip pattern. An existing real-time shape for the
    * same pattern is replaced. The scheduled data is never modified.
+   *
+   * @throws IllegalArgumentException if the shape is missing or does not have one hop per pair of
+   *                                  stops of the pattern, see {@link TripPatternShapeValidator}
    */
-  void setTripPatternShape(FeedScopedId tripPatternId, CompactLineStringSequence tripPatternShape);
+  void setTripPatternShape(TripPattern tripPattern, CompactLineStringSequence tripPatternShape);
 
   /**
    * Remove the shapes of all real-time trip patterns of the given feed; they are stored per

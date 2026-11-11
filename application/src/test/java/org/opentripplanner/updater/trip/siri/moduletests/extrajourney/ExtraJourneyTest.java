@@ -772,7 +772,7 @@ class ExtraJourneyTest implements RealtimeTestConstants {
     assertNotNull(env.shapeService().getTripPatternShape(pattern.getId()));
 
     siri.applyEstimatedTimetable(List.of(), false, UpdateIncrementality.FULL_DATASET);
-    assertThrows(IllegalStateException.class, () ->
+    assertThrows(IllegalArgumentException.class, () ->
       env.shapeService().getTripPatternShape(pattern.getId())
     );
 
@@ -803,7 +803,7 @@ class ExtraJourneyTest implements RealtimeTestConstants {
     assertNotNull(env.shapeService().getTripPatternShape(modifiedPattern.getId()));
 
     siri.applyEstimatedTimetable(List.of(), false, UpdateIncrementality.FULL_DATASET);
-    assertThrows(IllegalStateException.class, () ->
+    assertThrows(IllegalArgumentException.class, () ->
       env.shapeService().getTripPatternShape(modifiedPattern.getId())
     );
 

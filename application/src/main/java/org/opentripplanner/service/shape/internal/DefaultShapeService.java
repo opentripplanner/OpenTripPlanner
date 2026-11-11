@@ -24,7 +24,7 @@ public class DefaultShapeService implements ShapeService {
   public CompactLineStringSequence getTripPatternShape(FeedScopedId tripPatternId) {
     var tripPatternShape = shapes.getTripPatternShape(tripPatternId);
     if (tripPatternShape == null) {
-      throw new IllegalStateException("No shape found for trip pattern " + tripPatternId);
+      throw new IllegalArgumentException("No shape found for trip pattern " + tripPatternId);
     }
     return tripPatternShape;
   }

@@ -47,7 +47,7 @@ public class RealTimeTripShapeWriter {
       return;
     }
     repository.setTripPatternShape(
-      pattern.getId(),
+      pattern,
       factory.createTripPatternShape(pattern, getOriginalTripPatternShape(pattern, repository))
     );
   }

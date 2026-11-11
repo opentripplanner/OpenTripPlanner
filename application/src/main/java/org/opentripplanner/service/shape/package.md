@@ -8,7 +8,7 @@ The module follows the same design as the timetable data (`TimetableDataImport` 
 
 - `ShapeService` – read access, used by routing, itinerary mapping and the GraphQL APIs. It is
   request-scoped and backed by a `ShapeRepositorySnapshot`. Asking for the shape of an unknown
-  pattern is a bug and fails with `IllegalStateException`.
+  pattern is a bug and fails with `IllegalArgumentException`.
 - `ShapeDataImport` (`dataimport`) – mutable, filled by the GTFS and NeTEx graph builders and
   serialized with the graph. `toScheduledShapeData()` freezes it into the immutable
   `ScheduledShapeData`.
@@ -16,6 +16,13 @@ The module follows the same design as the timetable data (`TimetableDataImport` 
   shapes of patterns created by real-time updates, and publishes an immutable
   `ShapeRepositorySnapshot` at commit. A snapshot reads real-time shapes first and falls back to the
   scheduled ones.
+
+## Contracts
+
+The write side is keyed by the `TripPattern`, so the shape can be validated against it. Both
+`ShapeDataImport` and `ShapeRepository` check on every write, with `TripPatternShapeValidator`, that
+the pattern has a shape and that it has one hop per pair of stops, and fail with
+`IllegalArgumentException` otherwise. The data only stores the pattern id and reads are by id.
 
 ## Data flow
 

@@ -188,7 +188,10 @@ class RealTimeTripShapeWriterTest {
       .withOriginalTripPattern(ORIGINAL)
       .build();
 
-    assertThrows(IllegalStateException.class, () -> subject.ensureTripPatternShape(pattern));
+    var exception = assertThrows(IllegalStateException.class, () ->
+      subject.ensureTripPatternShape(pattern)
+    );
+    assertThat(exception).hasMessageThat().contains("original trip pattern");
   }
 
   private void givenScheduledShape(

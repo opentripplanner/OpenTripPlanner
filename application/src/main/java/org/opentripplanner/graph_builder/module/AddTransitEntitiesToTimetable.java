@@ -96,23 +96,10 @@ public class AddTransitEntitiesToTimetable {
       // Store the tripPattern in the scheduled timetable data so it will be serialized and usable in routing.
       timetableDataImport.addTripPattern(tripPattern.getId(), tripPattern);
 
-      var tripPatternShape = dataImport.getGeometriesByTripPattern().get(tripPattern.getId());
-      if (tripPatternShape == null) {
-        throw new IllegalStateException(
-          "No geometry created for trip pattern " + tripPattern.getId()
-        );
-      }
-      int expectedHops = Math.max(tripPattern.numberOfStops() - 1, 0);
-      if (tripPatternShape.size() != expectedHops) {
-        throw new IllegalStateException(
-          "Geometry of trip pattern %s has %d hops, expected %d".formatted(
-            tripPattern.getId(),
-            tripPatternShape.size(),
-            expectedHops
-          )
-        );
-      }
-      shapeDataImport.setTripPatternShape(tripPattern.getId(), tripPatternShape);
+      shapeDataImport.setTripPatternShape(
+        tripPattern,
+        dataImport.getGeometriesByTripPattern().get(tripPattern.getId())
+      );
     }
   }
 

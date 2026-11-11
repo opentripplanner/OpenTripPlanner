@@ -323,7 +323,7 @@ class AddedTest implements RealtimeTestConstants {
 
     gtfsRt.applyTripUpdates(List.of());
 
-    assertThrows(IllegalStateException.class, () ->
+    assertThrows(IllegalArgumentException.class, () ->
       env.shapeService().getTripPatternShape(pattern.getId())
     );
 

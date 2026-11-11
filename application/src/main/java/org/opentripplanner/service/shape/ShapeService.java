@@ -14,14 +14,16 @@ import org.opentripplanner.service.shape.model.CompactLineStringSequence;
  * Every scheduled trip pattern and every real-time pattern that has been processed by a real-time
  * updater has a shape. Only a new real-time pattern that is still being created inside an
  * update transaction has none; such a pattern is never visible here, because this service reads
- * committed snapshots only. Asking for the shape of an unknown pattern is therefore a bug and
- * results in an {@link IllegalStateException}.
+ * committed snapshots only. Asking for the shape of an unknown pattern is therefore a bug.
  */
 public interface ShapeService {
   /**
    * The shape of the trip pattern: one hop geometry for each pair of consecutive stops and the
    * cumulative distance table. The code that builds scheduled transit legs resolves the shape of
    * the leg's pattern from this service and gives it to the leg.
+   *
+   * @throws IllegalArgumentException if the committed snapshot has no scheduled or real-time shape
+   *                                  for the trip pattern id
    */
   CompactLineStringSequence getTripPatternShape(FeedScopedId tripPatternId);
 }

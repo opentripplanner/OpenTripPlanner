@@ -37,37 +37,23 @@ public class RealTimeTripShapeFactory {
    * @param originalTripPatternShape the shape of {@link TripPattern#getOriginalTripPattern()}, or
    *                                 {@code null} if the pattern has no original or its shape is
    *                                 not available.
-   * @throws IllegalStateException if the shape does not have one hop per pair of stops
    */
   public CompactLineStringSequence createTripPatternShape(
     TripPattern pattern,
     @Nullable CompactLineStringSequence originalTripPatternShape
   ) {
     var original = pattern.getOriginalTripPattern();
-    CompactLineStringSequence shape;
     if (original == null || originalTripPatternShape == null) {
-      shape = TripShapeFactory.straightLines(pattern.getStopPattern(), deduplicator);
-    } else {
-      shape = TripShapeFactory.fromLineStrings(
-        generateHopGeometriesFromOriginalTripPatternShape(
-          pattern.getStopPattern(),
-          original.getStopPattern(),
-          originalTripPatternShape
-        ),
-        deduplicator
-      );
+      return TripShapeFactory.straightLines(pattern.getStopPattern(), deduplicator);
     }
-    int expectedHops = Math.max(pattern.numberOfStops() - 1, 0);
-    if (shape.size() != expectedHops) {
-      throw new IllegalStateException(
-        "Shape of trip pattern %s has %d hops, expected %d".formatted(
-          pattern.getId(),
-          shape.size(),
-          expectedHops
-        )
-      );
-    }
-    return shape;
+    return TripShapeFactory.fromLineStrings(
+      generateHopGeometriesFromOriginalTripPatternShape(
+        pattern.getStopPattern(),
+        original.getStopPattern(),
+        originalTripPatternShape
+      ),
+      deduplicator
+    );
   }
 
   /**

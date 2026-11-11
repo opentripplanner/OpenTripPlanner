@@ -37,7 +37,7 @@ public class ShapeTestFactory {
     var shapeDataImport = new ShapeDataImport();
     for (var pattern : patterns) {
       shapeDataImport.setTripPatternShape(
-        pattern.getId(),
+        pattern,
         TripShapeFactory.straightLines(pattern.getStopPattern(), DeduplicatorService.NOOP)
       );
     }
