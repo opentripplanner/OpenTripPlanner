@@ -4,13 +4,13 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.plan.legreference.ScheduledTransitLegReference;
 import org.opentripplanner.street.model.StreetMode;
@@ -18,12 +18,12 @@ import org.opentripplanner.street.model.StreetMode;
 class ItineraryReferenceTest {
 
   private static final ScheduledTransitLegReference LEG = new ScheduledTransitLegReference(
-    FeedScopedIdForTestFactory.id("Trip"),
+    id("Trip"),
     LocalDate.of(2022, 1, 31),
     0,
     1,
-    FeedScopedIdForTestFactory.id("A"),
-    FeedScopedIdForTestFactory.id("B"),
+    id("A"),
+    id("B"),
     null
   );
 

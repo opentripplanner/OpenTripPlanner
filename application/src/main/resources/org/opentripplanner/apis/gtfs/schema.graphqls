@@ -828,13 +828,11 @@ type Itinerary {
   "Generalized cost of the itinerary. Used for debugging search results."
   generalizedCost: Int
   """
-  An opaque, versioned identifier for this itinerary. It can be used to refetch this exact
+  An opaque identifier for this itinerary. It can be used to refetch this exact
   itinerary later (with current realtime data applied) using the `itinerary` query, without
-  resending the original search parameters. `null` if this itinerary cannot currently be
-  refetched (for example, if it contains no scheduled transit legs, uses a frequency-based
-  trip, or uses bicycle, car or scooter for access, egress or transfers). The routing
-  preferences stored in the id are the ones in effect when the itinerary was planned. We do not
-  recommend storing ids for a long time.
+  resending the original search parameters. `null` if this itinerary cannot be refetched.
+  The routing preferences stored in the id are the ones in effect when the itinerary was
+  planned. We do not recommend storing ids for a long time.
   """
   id: String
   """
@@ -1655,9 +1653,8 @@ type QueryType {
   ): Trip @timingData
   """
   Refetch a previously planned itinerary using its stable `id` (see `Itinerary.id`), with current
-  realtime data applied. Returns `null` if the id is invalid, malformed, or refers to an
-  itinerary shape that cannot be refetched (for example, a street-only itinerary), or if a
-  transit entity it refers to (such as a trip or stop) no longer exists in the server's data.
+  realtime data applied. Returns `null` if the id is invalid, if the itinerary cannot be
+  refetched, or if a trip or stop it refers to no longer exists in the server's data.
   The id is meant for refetching an itinerary during or shortly before travel, not for long-term
   storage: refetching is likely to fail after the transit data has been updated.
   """
