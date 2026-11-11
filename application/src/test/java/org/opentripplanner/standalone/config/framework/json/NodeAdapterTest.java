@@ -65,6 +65,34 @@ public class NodeAdapterTest {
   }
 
   @Test
+  void isJsonObjectAndIsBoolean() {
+    NodeAdapter subject = newNodeAdapterForTest(
+      "{ empty : {}, object : { a : 1 }, flag : true, text : 'x' }"
+    );
+
+    var empty = subject.of("empty").asObject();
+    assertTrue(empty.isJsonObject());
+    assertFalse(empty.isBoolean());
+
+    var object = subject.of("object").asObject();
+    assertTrue(object.isJsonObject());
+    assertFalse(object.isBoolean());
+    assertEquals(1, object.of("a").asInt());
+
+    var flag = subject.of("flag").asObject();
+    assertFalse(flag.isJsonObject());
+    assertTrue(flag.isBoolean());
+
+    var text = subject.of("text").asObject();
+    assertFalse(text.isJsonObject());
+    assertFalse(text.isBoolean());
+
+    var missing = subject.of("missing").asObject();
+    assertFalse(missing.isJsonObject());
+    assertFalse(missing.isBoolean());
+  }
+
+  @Test
   void path() {
     NodeAdapter subject = newNodeAdapterForTest("{ foo : 'bar' }");
     assertFalse(subject.of("foo").asObject().isEmpty());

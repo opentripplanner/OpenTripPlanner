@@ -96,6 +96,22 @@ public class NodeAdapter {
     return json.isObject() && json.size() > 0;
   }
 
+  /**
+   * Return {@code true} if this node is a JSON object, including an empty object. Use this
+   * together with {@link #isBoolean()} to parse parameters that accept more than one JSON type.
+   */
+  public boolean isJsonObject() {
+    return json.isObject();
+  }
+
+  /**
+   * Return {@code true} if this node is a JSON boolean. This can be used for object parameters
+   * that also accept a boolean shorthand.
+   */
+  public boolean isBoolean() {
+    return json.isBoolean();
+  }
+
   public List<NodeInfo> parametersSorted() {
     return parameters.values().stream().sorted().toList();
   }
