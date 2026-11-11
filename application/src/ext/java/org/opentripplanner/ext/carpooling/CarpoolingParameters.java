@@ -6,7 +6,8 @@ import java.time.Duration;
  * The limits and heuristic values of the carpooling routing, collected in one place.
  * <p>
  * These are deployment-wide values, not part of the routing request. They are hard-coded to
- * {@link #DEFAULT}.
+ * {@link #DEFAULT}, except {@code boardCost}, which can be set in the {@code carpooling} section of
+ * router-config.json.
  *
  * @param maxCandidateTripsPerRequest the most trips a request evaluates; when more pass the
  *                                    pre-filters, the ones whose route passes closest to the
