@@ -53,6 +53,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Use `barrier=kerb` for wheelchair routing [#8106](https://github.com/opentripplanner/OpenTripPlanner/pull/8106)
 - Improve performance of GTFS import [#8100](https://github.com/opentripplanner/OpenTripPlanner/pull/8100)
 - Upgrade to GraphiQL 6 [#8189](https://github.com/opentripplanner/OpenTripPlanner/pull/8189)
+- Fix GTFS GraphQL node query for Stop IDs that refer to stations [#8191](https://github.com/opentripplanner/OpenTripPlanner/pull/8191)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.10.0 (2026-09-09)
