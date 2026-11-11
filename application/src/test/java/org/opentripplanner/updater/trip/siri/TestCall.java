@@ -104,12 +104,12 @@ public class TestCall implements CallWrapper {
   }
 
   @Override
-  public Boolean isNotExpectedArrival() {
+  public boolean isNotExpectedArrival() {
     return isNotExpectedArrival;
   }
 
   @Override
-  public Boolean isNotExpectedDeparture() {
+  public boolean isNotExpectedDeparture() {
     return isNotExpectedDeparture;
   }
 

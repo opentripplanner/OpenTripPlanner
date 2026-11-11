@@ -281,6 +281,10 @@ type EstimatedCall {
   forAlighting: Boolean!
   "Whether vehicle may be boarded at quay."
   forBoarding: Boolean!
+  "Whether it will arrive on a specific stop position"
+  isNotExpectedArrival: Boolean!
+  "Whether it will depart from specific stop position"
+  isNotExpectedDeparture: Boolean!
   notices: [Notice!]!
   occupancyStatus: OccupancyStatus!
   "Whether the updated estimates are expected to be inaccurate."
@@ -303,10 +307,6 @@ type EstimatedCall {
   stopPositionInPattern: Int!
   "Whether this is a timing point or not. Boarding and alighting is not allowed at timing points."
   timingPoint: Boolean!
-  "Whether it will arrive on a specific stop position"
-  willArriveAtStopPosition: Boolean!
-  "Whether it will depart from specific stop position"
-  willDepartFromStopPosition: Boolean!
 }
 
 "Additional (optional) grouping of lines for particular purposes such as e.g. fare harmonisation or public presentation."

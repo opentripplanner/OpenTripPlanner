@@ -108,8 +108,8 @@ public interface CallWrapper {
 
   Boolean isCancellation();
   Boolean isPredictionInaccurate();
-  Boolean isNotExpectedArrival();
-  Boolean isNotExpectedDeparture();
+  boolean isNotExpectedArrival();
+  boolean isNotExpectedDeparture();
   boolean isExtraCall();
 
   /**
@@ -179,12 +179,12 @@ public interface CallWrapper {
     }
 
     @Override
-    public Boolean isNotExpectedArrival() {
+    public boolean isNotExpectedArrival() {
       return call.getArrivalStatus() != null && call.getArrivalStatus().equals(NOT_EXPECTED);
     }
 
     @Override
-    public Boolean isNotExpectedDeparture() {
+    public boolean isNotExpectedDeparture() {
       return call.getDepartureStatus() != null && call.getDepartureStatus().equals(NOT_EXPECTED);
     }
 
@@ -313,17 +313,13 @@ public interface CallWrapper {
     }
 
     @Override
-    public Boolean isNotExpectedArrival() {
+    public boolean isNotExpectedArrival() {
       return call.getArrivalStatus() != null && call.getArrivalStatus().equals(NOT_EXPECTED);
     }
 
     @Override
-    public Boolean isNotExpectedDeparture() {
-      return (
-        call != null &&
-        call.getDepartureStatus() != null &&
-        call.getDepartureStatus().equals(NOT_EXPECTED)
-      );
+    public boolean isNotExpectedDeparture() {
+      return call.getDepartureStatus() != null && call.getDepartureStatus().equals(NOT_EXPECTED);
     }
 
     @Override

@@ -270,7 +270,7 @@ public class EstimatedCallType {
         )
         .field(
           GraphQLFieldDefinition.newFieldDefinition()
-            .name("willArriveAtStopPosition")
+            .name("isNotExpectedArrival")
             .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
             .description("Whether it will arrive on a specific stop position")
             .dataFetcher(env -> ((TripTimeOnDate) env.getSource()).isNotExpectedArrival())
@@ -278,7 +278,7 @@ public class EstimatedCallType {
         )
         .field(
           GraphQLFieldDefinition.newFieldDefinition()
-            .name("willDepartFromStopPosition")
+            .name("isNotExpectedDeparture")
             .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
             .description("Whether it will depart from specific stop position")
             .dataFetcher(env -> ((TripTimeOnDate) env.getSource()).isNotExpectedDeparture())

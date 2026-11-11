@@ -27,10 +27,8 @@ public class RealTimeTripTimesBuilder {
   private final BitSet hasArrived;
   private final BitSet hasDeparted;
 
-  @Nullable
   private final BitSet isNotExpectedArrival;
 
-  @Nullable
   private final BitSet isNotExpectedDeparture;
 
   @Nullable
@@ -281,12 +279,12 @@ public class RealTimeTripTimesBuilder {
     return withStopRealTimeState(stop, StopRealTimeState.INACCURATE_PREDICTIONS);
   }
 
-  public RealTimeTripTimesBuilder withIsNotExpectedArrival(int stop, Boolean isNotExpected) {
+  public RealTimeTripTimesBuilder withIsNotExpectedArrival(int stop, boolean isNotExpected) {
     this.isNotExpectedArrival.set(stop, isNotExpected);
     return this;
   }
 
-  public RealTimeTripTimesBuilder withIsNotExpectedDeparture(int stop, Boolean isNotExpected) {
+  public RealTimeTripTimesBuilder withIsNotExpectedDeparture(int stop, boolean isNotExpected) {
     this.isNotExpectedDeparture.set(stop, isNotExpected);
     return this;
   }
