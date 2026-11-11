@@ -4,9 +4,7 @@ import java.time.Duration;
 import java.util.Objects;
 import java.util.function.Consumer;
 import org.opentripplanner.core.model.basic.CostLinearFunction;
-import org.opentripplanner.routing.algorithm.filterchain.api.GroupBySimilarity;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
-import org.opentripplanner.utils.lang.DoubleUtils;
 import org.opentripplanner.utils.lang.Units;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
@@ -67,14 +65,8 @@ public final class ItineraryFilterPreferences {
     this.groupedOtherThanSameLegsMaxCostMultiplier = Units.reluctance(
       builder.groupedOtherThanSameLegsMaxCostMultiplier
     );
-    this.groupSimilarityKeepOne = groupSimilarity(
-      builder.groupSimilarityKeepOne,
-      "groupSimilarityKeepOne"
-    );
-    this.groupSimilarityKeepThree = groupSimilarity(
-      builder.groupSimilarityKeepThree,
-      "groupSimilarityKeepThree"
-    );
+    this.groupSimilarityKeepOne = Units.ratio(builder.groupSimilarityKeepOne);
+    this.groupSimilarityKeepThree = Units.ratio(builder.groupSimilarityKeepThree);
     this.minBikeParkingDistance = builder.minBikeParkingDistance;
     this.nonTransitGeneralizedCostLimit = Objects.requireNonNull(
       builder.nonTransitGeneralizedCostLimit
@@ -150,15 +142,6 @@ public final class ItineraryFilterPreferences {
 
   public boolean filterDirectFlexBySearchWindow() {
     return filterDirectFlexBySearchWindow;
-  }
-
-  private static double groupSimilarity(double value, String field) {
-    return DoubleUtils.requireInRange(
-      Units.ratio(value),
-      0.0,
-      GroupBySimilarity.MAX_GROUP_BY_P,
-      field
-    );
   }
 
   @Override

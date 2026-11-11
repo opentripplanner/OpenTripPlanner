@@ -8,6 +8,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_4;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_7;
 
+import org.opentripplanner.routing.algorithm.filterchain.api.GroupBySimilarity;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
@@ -80,7 +81,14 @@ public class ItineraryFiltersConfig {
           .of("groupSimilarityKeepOne")
           .since(V2_1)
           .summary(
-            "Pick ONE itinerary from each group after putting itineraries that are 85% similar together."
+            "Group itineraries that are at least this similar, and keep ONE itinerary from each group."
+          )
+          .description(
+            """
+            Similarity is the share of the travel distance two itineraries have in common.
+
+            The value must be between 0 and 1. A value below %s turns this filter off.
+            """.formatted(GroupBySimilarity.MIN_GROUP_BY_P)
           )
           .asDouble(dft.groupSimilarityKeepOne())
       )
@@ -89,7 +97,14 @@ public class ItineraryFiltersConfig {
           .of("groupSimilarityKeepThree")
           .since(V2_1)
           .summary(
-            "Reduce the number of itineraries to three itineraries by reducing each group of itineraries grouped by 68% similarity."
+            "Group itineraries that are at least this similar, and keep at most three itineraries from each group."
+          )
+          .description(
+            """
+            Similarity is the share of the travel distance two itineraries have in common.
+
+            The value must be between 0 and 1. A value below %s turns this filter off.
+            """.formatted(GroupBySimilarity.MIN_GROUP_BY_P)
           )
           .asDouble(dft.groupSimilarityKeepThree())
       )

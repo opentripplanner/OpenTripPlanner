@@ -7,6 +7,7 @@ import graphql.schema.GraphQLInputObjectType;
 import graphql.schema.GraphQLNonNull;
 import java.util.Map;
 import java.util.function.Consumer;
+import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.apis.transmodel.model.scalars.DoubleFunction;
@@ -15,6 +16,7 @@ import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.routing.algorithm.filterchain.api.GroupBySimilarity;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
+import org.opentripplanner.utils.lang.Units;
 
 public class ItineraryFiltersInputType {
 
@@ -91,8 +93,12 @@ public class ItineraryFiltersInputType {
           .name(GROUP_SIMILARITY_KEEP_ONE)
           .type(Scalars.GraphQLFloat)
           .description(
-            "Pick ONE itinerary from each group after putting itineraries that is 85% " +
-              "similar together."
+            "Group itineraries that are at least this similar, and keep ONE itinerary from " +
+              "each group. Similarity is the share of the travel distance two itineraries have " +
+              "in common. " +
+              "The value must be between 0 and 1. A value below %s turns this filter off.".formatted(
+                GroupBySimilarity.MIN_GROUP_BY_P
+              )
           )
           .defaultValue(dft.groupSimilarityKeepOne())
           .build()
@@ -102,10 +108,12 @@ public class ItineraryFiltersInputType {
           .type(Scalars.GraphQLFloat)
           .name(GROUP_SIMILARITY_KEEP_THREE)
           .description(
-            "Reduce the number of itineraries in each group to to maximum 3 itineraries. " +
-              "The itineraries are grouped by similar legs (on board same journey). So, if " +
-              " 68% of the distance is traveled by similar legs, then two itineraries are " +
-              "in the same group. Default value is 68%, must be at least 50%."
+            "Group itineraries that are at least this similar, and keep at most three " +
+              "itineraries from each group. Similarity is the share of the travel distance two " +
+              "itineraries have in common. " +
+              "The value must be between 0 and 1. A value below %s turns this filter off.".formatted(
+                GroupBySimilarity.MIN_GROUP_BY_P
+              )
           )
           .defaultValue(dft.groupSimilarityKeepThree())
           .build()
@@ -114,6 +122,14 @@ public class ItineraryFiltersInputType {
         GraphQLInputObjectField.newInputObjectField()
           .type(Scalars.GraphQLFloat)
           .name(GROUP_SIMILARITY_KEEP_N_ITINERARIES)
+          .description(
+            "Same as " +
+              GROUP_SIMILARITY_KEEP_THREE +
+              ". " +
+              "The value must be between 0 and 1. A value below %s turns this filter off.".formatted(
+                GroupBySimilarity.MIN_GROUP_BY_P
+              )
+          )
           .deprecate("Use " + GROUP_SIMILARITY_KEEP_THREE + " instead.")
           .defaultValue(dft.groupSimilarityKeepThree())
           .build()
@@ -185,13 +201,22 @@ public class ItineraryFiltersInputType {
     setField(callWith, DEBUG, builder::withDebug);
   }
 
+  /**
+   * Return the value, normalized as a ratio, if it is in the range [0.0, 1.0], otherwise throw an
+   * {@link InvalidInputException}.
+   */
   private static double validateGroupSimilarity(String field, double value) {
-    return GqlUtil.requireArgumentInRange(
-      "itineraryFilters." + field,
-      value,
-      0.0,
-      GroupBySimilarity.MAX_GROUP_BY_P
-    );
+    try {
+      // Units.ratio throws an IllegalArgumentException if the value is outside [0.0, 1.0]
+      return Units.ratio(value);
+    } catch (IllegalArgumentException e) {
+      throw new InvalidInputException(
+        "The argument 'itineraryFilters.%s' must be between 0 and 1, but was %s.".formatted(
+          field,
+          value
+        )
+      );
+    }
   }
 
   private static <T> void setField(

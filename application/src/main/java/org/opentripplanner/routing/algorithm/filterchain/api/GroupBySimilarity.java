@@ -39,13 +39,10 @@ public class GroupBySimilarity {
   /** The lowest {@link #groupByP} supported. */
   public static final double MIN_GROUP_BY_P = GroupByDistance.MIN_P;
 
-  /** The highest {@link #groupByP} supported. */
-  public static final double MAX_GROUP_BY_P = GroupByDistance.MAX_P;
-
   /**
    * The minimum similarity percentage used to group itineraries.
    * <p>
-   * The value must be a number between {@link #MIN_GROUP_BY_P} and {@link #MAX_GROUP_BY_P}.
+   * The value must be a number between {@link #MIN_GROUP_BY_P} and 1.0 (100%).
    */
   public final double groupByP;
 

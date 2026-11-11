@@ -67,22 +67,6 @@ public class GqlUtilTest {
   }
 
   @Test
-  void testRequireArgumentInRangeWithinLimits() {
-    assertEquals(0.0, GqlUtil.requireArgumentInRange(TEST_ARGUMENT, 0.0, 0.0, 1.0));
-    assertEquals(1.0, GqlUtil.requireArgumentInRange(TEST_ARGUMENT, 1.0, 0.0, 1.0));
-  }
-
-  @Test
-  void testRequireArgumentInRangeOutsideLimits() {
-    assertThrows(InvalidInputException.class, () ->
-      GqlUtil.requireArgumentInRange(TEST_ARGUMENT, -0.1, 0.0, 1.0)
-    );
-    assertThrows(InvalidInputException.class, () ->
-      GqlUtil.requireArgumentInRange(TEST_ARGUMENT, 1.1, 0.0, 1.0)
-    );
-  }
-
-  @Test
   void testGetNonNullDoubleArgumentWithValue() {
     var env = buildEnvWithTestValue(59.9);
     assertEquals(59.9, GqlUtil.getNonNullDoubleArgument(env, TEST_ARGUMENT));

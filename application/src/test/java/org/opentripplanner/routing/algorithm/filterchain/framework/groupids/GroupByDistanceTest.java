@@ -109,6 +109,17 @@ public class GroupByDistanceTest implements PlanTestConstants {
   }
 
   @Test
+  public void keySetContainsAllLegsWhenPIsOne() {
+    Itinerary itinerary = newItinerary(A)
+      .bus(11, T11_00, T11_05, B)
+      .bus(21, T11_10, T11_12, C)
+      .bus(31, T11_20, T11_23, D)
+      .build();
+
+    assertEquals(3, new GroupByDistance(itinerary, 1.0).size());
+  }
+
+  @Test
   public void mainStreetModeAsKeyInStreatOnlyItinerary() {
     var itinerary = newItinerary(A, T11_00).bicycle(T11_00, T11_10, A).walk(D5_m, B).build();
     var subject = new GroupByDistance(itinerary, 0.5);
@@ -243,7 +254,7 @@ public class GroupByDistanceTest implements PlanTestConstants {
   @Test
   public void illegalRangeForPUpperBound() {
     assertThrows(IllegalArgumentException.class, () ->
-      new GroupByDistance(newItinerary(A).bus(21, T11_01, T11_02, E).build(), 0.991)
+      new GroupByDistance(newItinerary(A).bus(21, T11_01, T11_02, E).build(), 1.001)
     );
   }
 

@@ -12,7 +12,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 /**
  * This class creates a group identifier for an itinerary based on the longest legs which together
  * account for more than 'p' part of the total distance. Transit legs must overlap and ride the same
- * trip, while street-legs only need to have the same mode. We call the set of legs the
+ * trip, while street legs must overlap in time and have the same mode. We call the set of legs the
  * 'key-set-of-legs' or just 'key-set'.
  * <p>
  * Two itineraries can be almost identical, but still have differences in the size of the
@@ -27,29 +27,24 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * <p>
  * This filter does not support grouping street only-itineraries, but it does support having a
  * street leg as part of the key. At least one transit leg must be part of the key. This is done
- * because we only want to group itineraries that overlap in time. We only use the mode when
- * comparing street legs, not the place or time. By adding one transit leg to the key, we make sure
+ * because we only want to group itineraries that overlap in time. We only use the mode and time
+ * when comparing street legs, not the place. By adding one transit leg to the key, we make sure
  * that the journey overlap in place and time.
  * <p>
- * When comparing the street legs part of the key, we only care about the mode. If there are more
- * than one street leg in the key, then other keys must match. The street legs do not need to
- * overlap in time or place. For example, two itineraries, one with a long walking access and the
- * other with a long egress, are considered the same - we ignore the fact that the walking happens
- * in the beginning and the end of the journey.
+ * When comparing the street legs part of the key, we only care about the mode and that they
+ * overlap in time. If there are more than one street leg in the key, then other keys must match.
+ * The street legs do not need to overlap in place.
  */
 public class GroupByDistance implements GroupId<GroupByDistance> {
 
   /** The lowest value of 'p' this group id supports. */
   public static final double MIN_P = 0.50;
 
-  /** The highest value of 'p' this group id supports. */
-  public static final double MAX_P = 0.99;
-
   private final List<Leg> keySet;
   private final boolean streetOnly;
 
   /**
-   * @param p 'p' must be between 0.50 (50%) and 0.99 (99%).
+   * @param p 'p' must be between {@link #MIN_P} (50%) and 1.0 (100%).
    */
   public GroupByDistance(Itinerary itinerary, double p) {
     assertPIsValid(p);
@@ -142,10 +137,8 @@ public class GroupByDistance implements GroupId<GroupByDistance> {
   }
 
   private void assertPIsValid(double p) {
-    if (p > MAX_P || p < MIN_P) {
-      throw new IllegalArgumentException(
-        "'p' is not between %s and %s: %s".formatted(MIN_P, MAX_P, p)
-      );
+    if (p < MIN_P || p > 1.0) {
+      throw new IllegalArgumentException("'p' is not between %s and 1.0: %s".formatted(MIN_P, p));
     }
   }
 

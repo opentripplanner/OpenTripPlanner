@@ -233,16 +233,35 @@ public class TripRequestMapperTest implements PlanTestConstants {
       "groupSimilarityKeepNumOfItineraries",
     }
   )
-  public void testGroupSimilarityValidation(String field) {
+  public void testGroupSimilarityAcceptsOne(String field) {
     Map<String, Object> arguments = arguments("itineraryFilters", Map.of(field, 1.0));
+
+    var filters = MAPPER.createRequest(executionContext(arguments)).preferences().itineraryFilter();
+
+    assertEquals(
+      1.0,
+      field.equals("groupSimilarityKeepOne")
+        ? filters.groupSimilarityKeepOne()
+        : filters.groupSimilarityKeepThree()
+    );
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+    strings = {
+      "groupSimilarityKeepOne",
+      "groupSimilarityKeepThree",
+      "groupSimilarityKeepNumOfItineraries",
+    }
+  )
+  public void testGroupSimilarityOutsideRangeIsRejected(String field) {
+    Map<String, Object> arguments = arguments("itineraryFilters", Map.of(field, 1.01));
 
     var ex = assertThrows(InvalidInputException.class, () ->
       MAPPER.createRequest(executionContext(arguments))
     );
     assertEquals(
-      "The argument 'itineraryFilters." +
-        field +
-        "' must be in the range [0.0, 0.99], but was 1.0.",
+      "The argument 'itineraryFilters." + field + "' must be between 0 and 1, but was 1.01.",
       ex.getMessage()
     );
   }
