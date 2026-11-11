@@ -15,6 +15,7 @@ import org.opentripplanner.ext.carpooling.service.DefaultCarpoolingService;
 import org.opentripplanner.ext.carpooling.util.CarReachableVertexSnapper;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
+import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
 
@@ -86,11 +87,11 @@ public class CarpoolingModule {
   @Provides
   @Singleton
   @Nullable
-  public static CarpoolingParameters provideCarpoolingParameters() {
+  public static CarpoolingParameters provideCarpoolingParameters(RouterConfig routerConfig) {
     if (OTPFeature.CarPooling.isOff()) {
       return null;
     }
-    return CarpoolingParameters.DEFAULT;
+    return routerConfig.carpoolingParameters();
   }
 
   @Provides
