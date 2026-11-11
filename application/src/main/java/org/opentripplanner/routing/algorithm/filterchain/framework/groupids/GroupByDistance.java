@@ -98,7 +98,12 @@ public class GroupByDistance implements GroupId<GroupByDistance> {
     return legs.stream().mapToDouble(Leg::distanceMeters).sum();
   }
 
-  /** package local to be unit-testable */
+  /**
+   * Return the longest legs which together are at least the given distance, or all legs if they
+   * together are shorter.
+   * <p>
+   * package local to be unit-testable
+   */
   static List<Leg> createKeySetOfLegsByLimit(List<Leg> legs, double distanceLimitMeters) {
     // Sort legs descending on distance
     legs = legs
@@ -109,11 +114,7 @@ public class GroupByDistance implements GroupId<GroupByDistance> {
     double sum = 0.0;
     int i = 0;
 
-    while (sum < distanceLimitMeters) {
-      // If the transit legs is not long enough, threat the itinerary as non-transit
-      if (i == legs.size()) {
-        throw new IllegalStateException("Did not expect to get here...");
-      }
+    while (i < legs.size() && sum < distanceLimitMeters) {
       sum += legs.get(i).distanceMeters();
       ++i;
     }

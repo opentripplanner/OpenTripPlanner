@@ -98,6 +98,17 @@ public class GroupByDistanceTest implements PlanTestConstants {
   }
 
   @Test
+  public void getKeySetOfLegsByLimitReturnsAllLegsWhenTheyAreShorterThanTheLimit() {
+    Itinerary i = newItinerary(A).bus(11, T11_00, T11_05, B).bus(21, T11_10, T11_12, C).build();
+
+    Leg l1 = i.legs().get(0);
+    Leg l2 = i.legs().get(1);
+    double total = l1.distanceMeters() + l2.distanceMeters();
+
+    assertEquals(List.of(l1, l2), createKeySetOfLegsByLimit(List.of(l1, l2), total + 0.01));
+  }
+
+  @Test
   public void mainStreetModeAsKeyInStreatOnlyItinerary() {
     var itinerary = newItinerary(A, T11_00).bicycle(T11_00, T11_10, A).walk(D5_m, B).build();
     var subject = new GroupByDistance(itinerary, 0.5);
