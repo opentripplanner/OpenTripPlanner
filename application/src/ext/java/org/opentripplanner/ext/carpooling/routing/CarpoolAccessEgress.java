@@ -2,7 +2,7 @@ package org.opentripplanner.ext.carpooling.routing;
 
 import java.time.ZonedDateTime;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.ext.carpooling.util.StreetPathUtils;
 import org.opentripplanner.framework.model.TimeAndCost;
@@ -275,10 +275,12 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
   @Override
   public State getFinalState() {
     if (startLabel.stop() != null) {
-      var firstSegment = walkToPickup() != null ? walkToPickup() : sharedSegments().getFirst();
+      var firstSegment =
+        walkToPickup() != null ? walkToPickup() : pathsWithNewPassenger().getFirst();
       return firstSegment.states().getFirst();
     }
-    var lastSegment = walkFromDropoff() != null ? walkFromDropoff() : sharedSegments().getLast();
+    var lastSegment =
+      walkFromDropoff() != null ? walkFromDropoff() : pathsWithNewPassenger().getLast();
     return lastSegment.lastState();
   }
 
@@ -305,12 +307,12 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
   }
 
   /**
-   * The carpool route segments traversed by the passenger between pickup and dropoff (inclusive of
-   * intermediate stops the driver makes along the way for other passengers). Never empty for a
-   * valid leg.
+   * The street paths of the carpool route segments traversed by the passenger between pickup and
+   * dropoff (inclusive of intermediate stops the driver makes along the way for other passengers).
+   * Never empty for a valid leg.
    */
-  public List<StreetPath> sharedSegments() {
-    return insertionCandidate.getSharedSegments();
+  public List<StreetPath> pathsWithNewPassenger() {
+    return insertionCandidate.getPathsWithNewPassenger();
   }
 
   /**

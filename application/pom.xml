@@ -237,8 +237,8 @@
          -->
         <dependency>
             <groupId>org.entur</groupId>
-            <artifactId>netex-java-model</artifactId>
-            <version>${netex-java-model.version}</version>
+            <artifactId>netex2-java-model</artifactId>
+            <version>${netex2-java-model.version}</version>
         </dependency>
         <dependency>
             <groupId>org.entur</groupId>
@@ -295,9 +295,13 @@
             <version>${jersey.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.jspecify</groupId>
+            <artifactId>jspecify</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.mobilitydata</groupId>
             <artifactId>gbfs-java-model</artifactId>
-            <version>1.0.14</version>
+            <version>2.0.0</version>
         </dependency>
         <!-- OBA GTFS loader -->
         <dependency>
@@ -424,6 +428,10 @@
                             <version>${google.dagger.version}</version>
                         </path>
                     </annotationProcessorPaths>
+                    <compilerArgs>
+                        <!-- Make Dagger honour JSpecify's type-use @Nullable on its binding sites -->
+                        <arg>-Adagger.nullableTypeAnnotations=ENABLED</arg>
+                    </compilerArgs>
                 </configuration>
             </plugin>
             <plugin>
@@ -492,6 +500,7 @@
                         <sourceDirectory>src/ext/java</sourceDirectory>
                         <sourceDirectory>src/ext-test/java</sourceDirectory>
                     </sourceDirectories>
+                    <suppressionsLocation>${basedir}/checkstyle-suppressions.xml</suppressionsLocation>
                 </configuration>
             </plugin>
             <plugin>

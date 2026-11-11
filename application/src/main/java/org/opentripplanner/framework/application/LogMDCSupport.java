@@ -1,7 +1,7 @@
 package org.opentripplanner.framework.application;
 
 import java.util.Map;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.utils.lang.StringUtils;
 import org.slf4j.MDC;
 

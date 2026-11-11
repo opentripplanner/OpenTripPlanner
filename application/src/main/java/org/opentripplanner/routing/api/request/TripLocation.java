@@ -2,7 +2,7 @@ package org.opentripplanner.routing.api.request;
 
 import java.time.Instant;
 import java.util.Objects;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 
 /**

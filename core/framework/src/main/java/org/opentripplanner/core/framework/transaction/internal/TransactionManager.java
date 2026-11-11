@@ -14,11 +14,11 @@ class TransactionManager {
 
   private final List<TransactionalRepository<?, ?>> repositories = new ArrayList<>();
 
-  public Transaction requestScopedTransaction() {
+  Transaction requestScopedTransaction() {
     return currentTransaction.get();
   }
 
-  public void commit() {
+  void commit() {
     // Skip commit if no modification exist
     if (repositories.stream().noneMatch(TransactionalRepository::modified)) {
       return;

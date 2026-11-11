@@ -1,12 +1,12 @@
 package org.opentripplanner.netex.validation;
 
 import java.util.function.Predicate;
+import org.entur.netex2.model.JourneyPattern_VersionStructure;
+import org.entur.netex2.model.PointInLinkSequence_VersionedChildStructure;
+import org.entur.netex2.model.ServiceJourney;
+import org.entur.netex2.model.StopPointInJourneyPattern;
+import org.entur.netex2.model.StopUseEnumeration;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
-import org.rutebanken.netex.model.JourneyPattern_VersionStructure;
-import org.rutebanken.netex.model.PointInLinkSequence_VersionedChildStructure;
-import org.rutebanken.netex.model.ServiceJourney;
-import org.rutebanken.netex.model.StopPointInJourneyPattern;
-import org.rutebanken.netex.model.StopUseEnumeration;
 
 /**
  * Validates that the number of passing times in the journey and the number of stop points in the

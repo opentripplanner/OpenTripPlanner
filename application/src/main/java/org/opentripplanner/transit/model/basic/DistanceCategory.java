@@ -2,7 +2,7 @@ package org.opentripplanner.transit.model.basic;
 
 import java.util.EnumMap;
 import java.util.Map;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The distance category of a transit service: how far it travels and which kind of journeys it

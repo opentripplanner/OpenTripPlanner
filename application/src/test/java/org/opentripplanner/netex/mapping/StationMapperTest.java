@@ -6,6 +6,8 @@ import static org.opentripplanner.netex.NetexTestDataSupport.createStopPlace;
 
 import java.time.ZoneId;
 import java.util.Set;
+import org.entur.netex2.model.Quay;
+import org.entur.netex2.model.StopPlace;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -13,8 +15,6 @@ import org.opentripplanner.netex.NetexTestDataSupport;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.service.SiteRepository;
-import org.rutebanken.netex.model.Quay;
-import org.rutebanken.netex.model.StopPlace;
 
 class StationMapperTest {
 

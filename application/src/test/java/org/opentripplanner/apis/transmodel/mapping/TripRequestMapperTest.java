@@ -102,12 +102,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
         var calendarServiceData = new CalendarServiceData();
         patterns.forEach(pattern -> {
           timetableDataImport.addTripPattern(pattern.getId(), pattern);
-          final int serviceCode = pattern
-            .getScheduledTimetable()
-            .getTripTimes()
-            .getFirst()
-            .getServiceCode();
-          timetableDataImport.putServiceCode(pattern.getId(), serviceCode);
+          timetableDataImport.addNextServiceCodes(List.of(pattern.getId()));
           calendarServiceData.putServiceDatesForServiceId(pattern.getId(), List.of(serviceDate));
         });
         timetableDataImport.updateCalendarServiceData(calendarServiceData);

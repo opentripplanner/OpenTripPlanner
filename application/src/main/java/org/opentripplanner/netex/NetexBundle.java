@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import org.entur.netex2.model.PublicationDeliveryStructure;
 import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.datastore.api.CompositeDataSource;
@@ -21,7 +22,6 @@ import org.opentripplanner.netex.loader.NetexXmlParser;
 import org.opentripplanner.netex.loader.parser.NetexDocumentParser;
 import org.opentripplanner.netex.mapping.NetexMapper;
 import org.opentripplanner.netex.validation.Validator;
-import org.rutebanken.netex.model.PublicationDeliveryStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +50,7 @@ public class NetexBundle implements Closeable {
   private final double maxStopToShapeSnapDistance;
   private final double transitShapeSimplificationToleranceMeters;
   private final boolean noTransfersOnIsolatedStops;
+  private final boolean allowStopPlaceAsPassengerStopAssignment;
   private final Set<IgnorableFeature> ignoredFeatures;
   /** The NeTEx entities loaded from the input files and passed on to the mapper. */
   private NetexEntityIndex index = new NetexEntityIndex();
@@ -69,6 +70,7 @@ public class NetexBundle implements Closeable {
     double maxStopToShapeSnapDistance,
     double transitShapeSimplificationToleranceMeters,
     boolean noTransfersOnIsolatedStops,
+    boolean allowStopPlaceAsPassengerStopAssignment,
     Set<IgnorableFeature> ignorableFeatures
   ) {
     this.feedId = feedId;
@@ -80,6 +82,7 @@ public class NetexBundle implements Closeable {
     this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
     this.transitShapeSimplificationToleranceMeters = transitShapeSimplificationToleranceMeters;
     this.noTransfersOnIsolatedStops = noTransfersOnIsolatedStops;
+    this.allowStopPlaceAsPassengerStopAssignment = allowStopPlaceAsPassengerStopAssignment;
     this.ignoredFeatures = Set.copyOf(ignorableFeatures);
   }
 
@@ -146,7 +149,6 @@ public class NetexBundle implements Closeable {
       });
     }
     mapper.finishUp();
-    NetexDocumentParser.finishUp();
   }
 
   /**
@@ -188,7 +190,12 @@ public class NetexBundle implements Closeable {
     try {
       LOG.info("reading entity {}: {}", fileDescription, entry.name());
       PublicationDeliveryStructure doc = xmlParser.parseXmlDoc(entry.asInputStream());
-      NetexDocumentParser.parseAndPopulateIndex(index, doc, ignoredFeatures);
+      NetexDocumentParser.parseAndPopulateIndex(
+        index,
+        doc,
+        ignoredFeatures,
+        allowStopPlaceAsPassengerStopAssignment
+      );
     } catch (JAXBException e) {
       throw new RuntimeException(e.getMessage(), e);
     }

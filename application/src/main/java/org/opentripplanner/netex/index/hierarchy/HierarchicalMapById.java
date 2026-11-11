@@ -2,8 +2,8 @@ package org.opentripplanner.netex.index.hierarchy;
 
 import java.util.Collection;
 import java.util.Map;
+import org.entur.netex2.model.EntityStructure;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
-import org.rutebanken.netex.model.EntityStructure;
 
 /**
  * A hierarchical map of {@link EntityStructure} values indexed by their id. Use the one argument

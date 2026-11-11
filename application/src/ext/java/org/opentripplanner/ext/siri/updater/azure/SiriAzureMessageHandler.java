@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.siri.updater.azure;
 
 import java.util.concurrent.Future;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.updater.TransitRealTimeUpdateContext;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import uk.org.siri.siri21.ServiceDelivery;

@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.function.Predicate;
-import org.opentripplanner.core.framework.transaction.internal.TransactionFactory;
+import org.opentripplanner.core.framework.transaction.configure.TransactionFactory;
 import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.transaction.RepositoryHandle;
 import org.opentripplanner.framework.application.OtpAppException;
@@ -169,8 +169,8 @@ public class SpeedTest {
         transitRepository,
         DefaultTimetableRepository.scheduledOnly(scheduledTimetableData)
       ),
-      // The speed test does not enable the CarPooling feature, so it supplies neither a carpooling
-      // repository nor a resolver.
+      // The speed test does not enable the CarPooling feature.
+      null,
       null,
       null,
       transitUpdateManager,

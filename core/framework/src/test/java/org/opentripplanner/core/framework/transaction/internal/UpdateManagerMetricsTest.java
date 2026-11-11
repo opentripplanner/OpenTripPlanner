@@ -7,6 +7,7 @@ import io.micrometer.core.instrument.binder.jvm.ExecutorServiceMetrics;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.framework.transaction.configure.TransactionFactory;
 
 /**
  * Guards the "graphUpdateScheduler" metric wired up in

@@ -1,8 +1,8 @@
 package org.opentripplanner.netex.validation;
 
+import org.entur.netex2.model.ServiceJourney;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.netex.issues.ObjectNotFound;
-import org.rutebanken.netex.model.ServiceJourney;
 
 class JourneyPatternNotFoundInSJ extends AbstractHMapValidationRule<String, ServiceJourney> {
 

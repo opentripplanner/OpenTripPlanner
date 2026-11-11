@@ -22,7 +22,7 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.apis.gtfs.GraphQLUtils;
@@ -471,7 +471,9 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
         case "Route":
           return transitService.getRoute(FeedScopedId.parseStrict(id));
         case "Stop":
-          return transitService.getRegularStop(FeedScopedId.parseStrict(id));
+          var stopOrStationId = FeedScopedId.parseStrict(id);
+          var regularStop = transitService.getRegularStop(stopOrStationId);
+          return regularStop != null ? regularStop : transitService.getStation(stopOrStationId);
         case "Stoptime":
           // TODO
           return null;

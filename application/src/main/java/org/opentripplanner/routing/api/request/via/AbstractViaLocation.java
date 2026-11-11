@@ -3,7 +3,7 @@ package org.opentripplanner.routing.api.request.via;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 
 public abstract class AbstractViaLocation implements ViaLocation {

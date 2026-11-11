@@ -35,8 +35,6 @@ class TransitStopArrivalC2Test {
   )
     .times(TRANSIT_BOARD_TIME, TRANSIT_ALIGHT_TIME)
     .build();
-  private static final int TRANSIT_TRAVEL_DURATION =
-    ACCESS_DURATION + BOARD_SLACK + TRANSIT_LEG_DURATION;
   private static final int TRANSIT_C1 = 128000;
   private static final int TRANSIT_C2 = 8000;
   private static final int ROUND = 1;
@@ -90,11 +88,6 @@ class TransitStopArrivalC2Test {
   @Test
   public void trip() {
     assertSame(TRANSIT_TRIP, subject.trip());
-  }
-
-  @Test
-  public void travelDuration() {
-    assertEquals(TRANSIT_TRAVEL_DURATION, subject.travelDuration());
   }
 
   @Test

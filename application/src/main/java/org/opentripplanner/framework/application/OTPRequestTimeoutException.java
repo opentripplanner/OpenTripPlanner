@@ -23,11 +23,6 @@ public class OTPRequestTimeoutException extends RuntimeException {
    * place the check at the beginning of a significant calculations.
    */
   public static void checkForTimeout() {
-    // We call yield() to allow monitoring thread to interrupt current thread. If this work or not
-    // is hard to document and test, and the result would only apply the environment tested - but
-    // it does not hurt. The logic does not relay on the yield() to work, it only aborts sooner.
-    Thread.yield();
-
     if (Thread.currentThread().isInterrupted()) {
       logDebug();
       throw new OTPRequestTimeoutException();

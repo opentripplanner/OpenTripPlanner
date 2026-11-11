@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.calendar.CalendarServiceData;
@@ -106,10 +106,12 @@ public class TimetableDataImport {
     tripCalendars = tripCalendars.merge(data);
   }
 
-  /** Register {@code code} as the service code for {@code serviceId}. */
-  public void putServiceCode(FeedScopedId serviceId, int code) {
+  /**
+   * Assign each of the given service ids the next free service code, in iteration order.
+   */
+  public void addNextServiceCodes(Collection<FeedScopedId> serviceIds) {
     assertModificationsAllowed();
-    tripCalendars = tripCalendars.withServiceCode(serviceId, code);
+    tripCalendars = tripCalendars.withNextServiceCodes(serviceIds);
   }
 
   /** The service code of each scheduled service id. */

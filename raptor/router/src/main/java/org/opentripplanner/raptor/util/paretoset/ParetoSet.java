@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This {@link java.util.Collection} stores all pareto-optimal elements. The {@link #add(Object)}
@@ -49,10 +49,11 @@ public sealed class ParetoSet<T> extends AbstractCollection<T> permits ParetoSet
   }
 
   /**
-   * Create a new ParetoSet with a comparator and a drop event listener.
+   * Create a new ParetoSet with a comparator and a drop event listener. To add more than one listener use the
+   * {@link ParetoSetEventListenerComposite}.
    *
    * @param comparator    The comparator to use with this set
-   * @param eventListener At most one listener can be registered to listen for drop events.
+   * @param eventListener The event listener registered to listen for accept, drop and reject events.
    */
   public static <T> ParetoSet<T> of(
     ParetoComparator<T> comparator,
@@ -146,7 +147,6 @@ public sealed class ParetoSet<T> extends AbstractCollection<T> permits ParetoSet
 
     // Quick shortcut, one element probably dominate most of the new elements
     if (goodElement != null && leftVectorDominatesRightVector(goodElement, newValue)) {
-      notifyElementRejected(newValue, goodElement);
       return false;
     }
 

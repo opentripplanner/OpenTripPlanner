@@ -1,7 +1,7 @@
 package org.opentripplanner.gtfs.mapping;
 
 import java.util.Objects;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.utils.lang.StringUtils;
@@ -24,7 +24,7 @@ class IdFactory {
    *                   in case of invalid values.
    */
   FeedScopedId createId(AgencyAndId id, String entityName) {
-    Objects.requireNonNull(id, idErrorMessage(entityName));
+    Objects.requireNonNull(id, () -> idErrorMessage(entityName));
     return createId(id.getId(), entityName);
   }
 
