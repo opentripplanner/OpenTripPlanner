@@ -6,9 +6,10 @@ import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.service.shape.ShapeRepository;
 import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.service.TransitRepository;
-import org.opentripplanner.updater.trip.patterncache.RealTimeShapeResolver;
 import org.opentripplanner.updater.trip.patterncache.TripPatternCache;
 import org.opentripplanner.updater.trip.patterncache.TripPatternIdGenerator;
+import org.opentripplanner.updater.trip.shape.RealTimeShapeWriter;
+import org.opentripplanner.updater.trip.shape.RealTimeTripShapeFactory;
 
 /**
  * Application-scoped factory for GTFS-RT trip update processing. Holds stable, application-lifetime
@@ -48,7 +49,10 @@ public class GtfsRealTimeTripUpdateAdapter {
     TimetableRepository buffer,
     Supplier<ShapeRepository> shapeRepository
   ) {
-    var shapeResolver = new RealTimeShapeResolver(shapeRepository, deduplicator);
+    var shapeWriter = new RealTimeShapeWriter(
+      shapeRepository,
+      new RealTimeTripShapeFactory(deduplicator)
+    );
     return new GtfsRealTimeUpdateHandler(
       buffer,
       shapeRepository,
@@ -58,17 +62,17 @@ public class GtfsRealTimeTripUpdateAdapter {
         buffer,
         tripTimesUpdater,
         tripPatternCache,
-        shapeResolver
+        shapeWriter
       ),
       new NewTripHandler(
         transitRepository,
         buffer,
         tripTimesUpdater,
         tripPatternCache,
-        shapeResolver
+        shapeWriter
       ),
-      new CanceledTripHandler(buffer, shapeResolver),
-      new DuplicatedTripHandler(buffer, deduplicator, shapeResolver)
+      new CanceledTripHandler(buffer, shapeWriter),
+      new DuplicatedTripHandler(buffer, deduplicator, shapeWriter)
     );
   }
 }

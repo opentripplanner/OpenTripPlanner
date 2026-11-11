@@ -20,8 +20,8 @@ import org.opentripplanner.updater.trip.TripUpdateApplier;
 import org.opentripplanner.updater.trip.gtfs.interpolation.BackwardsDelayPropagationType;
 import org.opentripplanner.updater.trip.gtfs.interpolation.ForwardsDelayPropagationType;
 import org.opentripplanner.updater.trip.gtfs.model.TripUpdate;
-import org.opentripplanner.updater.trip.patterncache.RealTimeShapeResolver;
 import org.opentripplanner.updater.trip.patterncache.TripPatternCache;
+import org.opentripplanner.updater.trip.shape.RealTimeShapeWriter;
 
 /**
  * Handles GTFS-RT TripUpdates for trips with schedule relationship {@code SCHEDULED}. Applies
@@ -33,20 +33,20 @@ class ScheduledTripHandler {
   private final TimetableRepository buffer;
   private final TripTimesUpdater tripTimesUpdater;
   private final TripPatternCache tripPatternCache;
-  private final RealTimeShapeResolver shapeResolver;
+  private final RealTimeShapeWriter shapeWriter;
 
   ScheduledTripHandler(
     TransitRepository transitRepository,
     TimetableRepository buffer,
     TripTimesUpdater tripTimesUpdater,
     TripPatternCache tripPatternCache,
-    RealTimeShapeResolver shapeResolver
+    RealTimeShapeWriter shapeWriter
   ) {
     this.transitRepository = transitRepository;
     this.buffer = buffer;
     this.tripTimesUpdater = tripTimesUpdater;
     this.tripPatternCache = tripPatternCache;
-    this.shapeResolver = shapeResolver;
+    this.shapeWriter = shapeWriter;
   }
 
   UpdateSuccess handle(
@@ -110,7 +110,7 @@ class ScheduledTripHandler {
 
       return TripUpdateApplier.apply(
         buffer,
-        shapeResolver,
+        shapeWriter,
         RealTimeTripUpdate.of(newPattern, updatedTripTimes, tripUpdate.startDate())
           .withRevertPreviousRealTimeUpdates(true)
           .withHideTripInScheduledPattern(pattern)
@@ -119,7 +119,7 @@ class ScheduledTripHandler {
     } else {
       return TripUpdateApplier.apply(
         buffer,
-        shapeResolver,
+        shapeWriter,
         RealTimeTripUpdate.of(pattern, updatedTripTimes, tripUpdate.startDate())
           .withRevertPreviousRealTimeUpdates(true)
           .build()

@@ -13,7 +13,7 @@ import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.opentripplanner.updater.trip.TripUpdateApplier;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
 import org.opentripplanner.updater.trip.gtfs.model.TripUpdate;
-import org.opentripplanner.updater.trip.patterncache.RealTimeShapeResolver;
+import org.opentripplanner.updater.trip.shape.RealTimeShapeWriter;
 
 /**
  * Handles GTFS-RT TripUpdates for trips with schedule relationship {@code CANCELED} or
@@ -23,11 +23,11 @@ import org.opentripplanner.updater.trip.patterncache.RealTimeShapeResolver;
 class CanceledTripHandler {
 
   private final TimetableRepository buffer;
-  private final RealTimeShapeResolver shapeResolver;
+  private final RealTimeShapeWriter shapeWriter;
 
-  CanceledTripHandler(TimetableRepository buffer, RealTimeShapeResolver shapeResolver) {
+  CanceledTripHandler(TimetableRepository buffer, RealTimeShapeWriter shapeWriter) {
     this.buffer = buffer;
-    this.shapeResolver = shapeResolver;
+    this.shapeWriter = shapeWriter;
   }
 
   UpdateSuccess cancel(TripUpdate tripUpdate, UpdateIncrementality incrementality)
@@ -63,7 +63,7 @@ class CanceledTripHandler {
             }
             return TripUpdateApplier.apply(
               buffer,
-              shapeResolver,
+              shapeWriter,
               RealTimeTripUpdate.of(addedPattern, builder.build(), tripUpdate.startDate()).build()
             );
           }
@@ -89,7 +89,7 @@ class CanceledTripHandler {
     }
     return TripUpdateApplier.apply(
       buffer,
-      shapeResolver,
+      shapeWriter,
       RealTimeTripUpdate.of(pattern, builder.build(), tripUpdate.startDate())
         .withRevertPreviousRealTimeUpdates(true)
         .build()

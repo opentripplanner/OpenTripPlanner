@@ -1,46 +1,34 @@
-package org.opentripplanner.updater.trip.patterncache;
+package org.opentripplanner.updater.trip.shape;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Supplier;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.service.shape.ShapeRepository;
 import org.opentripplanner.service.shape.model.CompactLineStringSequence;
-import org.opentripplanner.service.shape.model.TripGeometryFactory;
-import org.opentripplanner.street.geometry.GeometryUtils;
-import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.updater.trip.patterncache.TripPatternCache;
 
 /**
  * Makes sure that a trip pattern created by a real-time update has a geometry in the
- * {@link ShapeRepository}.
+ * {@link ShapeRepository}. The geometry itself is created by {@link RealTimeTripShapeFactory}.
  * <p>
- * The geometry is derived from the pattern it replaces, if there is one: For each hop, the geometry
- * is copied if the hop is between the same stops. If the stops are different but belong to the
- * same stations, the old geometry is used with the first and last point moved to the new stops.
- * Otherwise, a straight line is used. A pattern without an original pattern (an added trip) gets a
- * straight line between each pair of stops, measured with the haversine formula.
- * <p>
- * The resolver is idempotent: the {@link TripPatternCache} outlives the update task that created
- * the pattern, so a pattern may be seen again by a later task even though its shape has been
- * removed in the meantime, see {@link ShapeRepository#clear(String)}. A missing geometry is
- * created again. If the original pattern is itself a real-time pattern whose geometry has been
- * removed, straight lines are used.
+ * The writer is idempotent: the {@link TripPatternCache} outlives the update task that created the
+ * pattern, so a pattern may be seen again by a later task even though its shape has been removed in
+ * the meantime, see {@link ShapeRepository#clear(String)}. A missing geometry is created again. If
+ * the original pattern is itself a real-time pattern whose geometry has been removed, straight
+ * lines are used.
  */
-public class RealTimeShapeResolver {
+public class RealTimeShapeWriter {
 
   /**
    * Resolved lazily, so that tasks that do not touch any real-time pattern do not cause a new shape
    * snapshot to be published at commit.
    */
   private final Supplier<ShapeRepository> shapes;
-  private final DeduplicatorService deduplicator;
+  private final RealTimeTripShapeFactory factory;
 
-  public RealTimeShapeResolver(Supplier<ShapeRepository> shapes, DeduplicatorService deduplicator) {
+  public RealTimeShapeWriter(Supplier<ShapeRepository> shapes, RealTimeTripShapeFactory factory) {
     this.shapes = shapes;
-    this.deduplicator = deduplicator;
+    this.factory = factory;
   }
 
   /**
@@ -55,93 +43,29 @@ public class RealTimeShapeResolver {
     if (repository.getTripPatternGeometry(pattern.getId()) != null) {
       return;
     }
-    var geometry = createTripPatternGeometry(pattern, repository);
-    int expectedHops = Math.max(pattern.numberOfStops() - 1, 0);
-    if (geometry.size() != expectedHops) {
-      throw new IllegalStateException(
-        "Geometry of trip pattern %s has %d hops, expected %d".formatted(
-          pattern.getId(),
-          geometry.size(),
-          expectedHops
-        )
-      );
-    }
-    repository.setTripPatternGeometry(pattern.getId(), geometry);
+    repository.setTripPatternGeometry(
+      pattern.getId(),
+      factory.create(pattern, getOriginalGeometry(pattern, repository))
+    );
   }
 
-  private CompactLineStringSequence createTripPatternGeometry(
+  @Nullable
+  private static CompactLineStringSequence getOriginalGeometry(
     TripPattern pattern,
     ShapeRepository repository
   ) {
     var original = pattern.getOriginalTripPattern();
     if (original == null) {
-      return TripGeometryFactory.straightLines(pattern.getStopPattern(), deduplicator);
+      return null;
     }
-    var originalTripPatternGeometry = repository.getTripPatternGeometry(original.getId());
-    if (originalTripPatternGeometry == null) {
-      // The geometry of the original has been removed while the pattern lives on in the cache.
-      if (original.isRealTimeTripPattern()) {
-        return TripGeometryFactory.straightLines(pattern.getStopPattern(), deduplicator);
-      }
+    var geometry = repository.getTripPatternGeometry(original.getId());
+    // A real-time original can lack a geometry if it was cleared while the pattern lives on in the
+    // cache. Only a scheduled original is expected to always have one.
+    if (geometry == null && !original.isRealTimeTripPattern()) {
       throw new IllegalStateException(
         "No geometry found for the original trip pattern " + original.getId()
       );
     }
-    return TripGeometryFactory.fromLineStrings(
-      generateHopGeometriesFromOriginalTripPatternGeometry(
-        pattern.getStopPattern(),
-        original.getStopPattern(),
-        originalTripPatternGeometry
-      ),
-      deduplicator
-    );
-  }
-
-  /**
-   * The new pattern and the one it replaces may have a different number of stops. The geometry is
-   * then preserved up until the first mismatching stop, and a straight line is used for all
-   * segments after that.
-   */
-  private static List<LineString> generateHopGeometriesFromOriginalTripPatternGeometry(
-    StopPattern stopPattern,
-    StopPattern originalStopPattern,
-    CompactLineStringSequence originalTripPatternGeometry
-  ) {
-    List<LineString> hopGeometries = new ArrayList<>();
-
-    for (int i = 0; i < stopPattern.getSize() - 1; i++) {
-      LineString hopGeometry =
-        i < originalStopPattern.getSize() - 1 ? originalTripPatternGeometry.get(i) : null;
-
-      if (hopGeometry != null && stopPattern.sameStops(originalStopPattern, i)) {
-        // Copy hop geometry from previous pattern
-        hopGeometries.add(hopGeometry);
-      } else if (hopGeometry != null && stopPattern.sameStations(originalStopPattern, i)) {
-        // Use old geometry but patch first and last point with new stops
-        var newStart = stopPattern.getStop(i).getCoordinate().asJtsCoordinate();
-        var newEnd = stopPattern
-          .getStop(i + 1)
-          .getCoordinate()
-          .asJtsCoordinate();
-
-        Coordinate[] coordinates = hopGeometry.getCoordinates();
-        coordinates[0].setCoordinate(newStart);
-        coordinates[coordinates.length - 1].setCoordinate(newEnd);
-
-        hopGeometries.add(GeometryUtils.getGeometryFactory().createLineString(coordinates));
-      } else {
-        // Create new straight-line geometry for hop
-        hopGeometries.add(
-          GeometryUtils.getGeometryFactory().createLineString(new Coordinate[] {
-            stopPattern.getStop(i).getCoordinate().asJtsCoordinate(),
-            stopPattern
-              .getStop(i + 1)
-              .getCoordinate()
-              .asJtsCoordinate(),
-          })
-        );
-      }
-    }
-    return hopGeometries;
+    return geometry;
   }
 }

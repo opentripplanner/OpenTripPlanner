@@ -26,8 +26,8 @@ import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.opentripplanner.updater.trip.TripUpdateApplier;
 import org.opentripplanner.updater.trip.gtfs.model.StopTimeUpdate;
 import org.opentripplanner.updater.trip.gtfs.model.TripUpdate;
-import org.opentripplanner.updater.trip.patterncache.RealTimeShapeResolver;
 import org.opentripplanner.updater.trip.patterncache.TripPatternCache;
+import org.opentripplanner.updater.trip.shape.RealTimeShapeWriter;
 
 /**
  * Handles GTFS-RT TripUpdates for trips with schedule relationship {@code NEW}, {@code ADDED}, or
@@ -40,20 +40,20 @@ class NewTripHandler {
   private final TimetableRepository buffer;
   private final TripTimesUpdater tripTimesUpdater;
   private final TripPatternCache tripPatternCache;
-  private final RealTimeShapeResolver shapeResolver;
+  private final RealTimeShapeWriter shapeWriter;
 
   NewTripHandler(
     TransitRepository transitRepository,
     TimetableRepository buffer,
     TripTimesUpdater tripTimesUpdater,
     TripPatternCache tripPatternCache,
-    RealTimeShapeResolver shapeResolver
+    RealTimeShapeWriter shapeWriter
   ) {
     this.transitRepository = transitRepository;
     this.buffer = buffer;
     this.tripTimesUpdater = tripTimesUpdater;
     this.tripPatternCache = tripPatternCache;
-    this.shapeResolver = shapeResolver;
+    this.shapeWriter = shapeWriter;
   }
 
   /**
@@ -177,7 +177,7 @@ class NewTripHandler {
         )
         .withTripCreation(true);
     }
-    return TripUpdateApplier.apply(buffer, shapeResolver, builder.build());
+    return TripUpdateApplier.apply(buffer, shapeWriter, builder.build());
   }
 
   /**

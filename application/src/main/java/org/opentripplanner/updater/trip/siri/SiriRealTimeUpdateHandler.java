@@ -28,9 +28,9 @@ import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.opentripplanner.updater.trip.TripUpdateApplier;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
-import org.opentripplanner.updater.trip.patterncache.RealTimeShapeResolver;
 import org.opentripplanner.updater.trip.patterncache.TripPatternCache;
 import org.opentripplanner.updater.trip.patterncache.TripPatternIdGenerator;
+import org.opentripplanner.updater.trip.shape.RealTimeShapeWriter;
 import org.opentripplanner.updater.trip.siri.support.TripReferenceHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +53,7 @@ public class SiriRealTimeUpdateHandler {
   private final SiriFuzzyTripMatcher fuzzyTripMatcher;
 
   private final TripPatternCache tripPatternCache;
-  private final RealTimeShapeResolver shapeResolver;
+  private final RealTimeShapeWriter shapeWriter;
   private final Supplier<ShapeRepository> shapes;
   private final DeduplicatorService deduplicator;
   private final TripPatternIdGenerator tripPatternIdGenerator;
@@ -63,7 +63,7 @@ public class SiriRealTimeUpdateHandler {
     TimetableRepository buffer,
     @Nullable SiriFuzzyTripMatcher fuzzyTripMatcher,
     TripPatternCache tripPatternCache,
-    RealTimeShapeResolver shapeResolver,
+    RealTimeShapeWriter shapeWriter,
     Supplier<ShapeRepository> shapes,
     DeduplicatorService deduplicator,
     TripPatternIdGenerator tripPatternIdGenerator
@@ -72,7 +72,7 @@ public class SiriRealTimeUpdateHandler {
     this.buffer = buffer;
     this.fuzzyTripMatcher = fuzzyTripMatcher;
     this.tripPatternCache = tripPatternCache;
-    this.shapeResolver = shapeResolver;
+    this.shapeWriter = shapeWriter;
     this.shapes = shapes;
     this.deduplicator = deduplicator;
     this.tripPatternIdGenerator = tripPatternIdGenerator;
@@ -360,7 +360,7 @@ public class SiriRealTimeUpdateHandler {
       .withRevertPreviousRealTimeUpdates(revertPreviousRealTimeUpdates)
       .withHideTripInScheduledPattern(tripUpdate.hideTripInScheduledPattern())
       .build();
-    var result = TripUpdateApplier.apply(buffer, shapeResolver, realTimeTripUpdate);
+    var result = TripUpdateApplier.apply(buffer, shapeWriter, realTimeTripUpdate);
     LOG.debug("Applied real-time data for trip {} on {}", trip, serviceDate);
     return result;
   }

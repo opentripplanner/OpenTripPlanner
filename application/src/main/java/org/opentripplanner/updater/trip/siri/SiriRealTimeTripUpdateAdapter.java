@@ -6,9 +6,10 @@ import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.service.shape.ShapeRepository;
 import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.service.TransitRepository;
-import org.opentripplanner.updater.trip.patterncache.RealTimeShapeResolver;
 import org.opentripplanner.updater.trip.patterncache.TripPatternCache;
 import org.opentripplanner.updater.trip.patterncache.TripPatternIdGenerator;
+import org.opentripplanner.updater.trip.shape.RealTimeShapeWriter;
+import org.opentripplanner.updater.trip.shape.RealTimeTripShapeFactory;
 
 /**
  * Application-scoped factory for SIRI-ET estimated timetable processing. Holds stable,
@@ -58,13 +59,16 @@ public class SiriRealTimeTripUpdateAdapter {
       siriFuzzyTripMatcherCache != null
         ? new SiriFuzzyTripMatcher(siriFuzzyTripMatcherCache, buffer, transitRepository)
         : null;
-    var shapeResolver = new RealTimeShapeResolver(shapeRepository, deduplicator);
+    var shapeWriter = new RealTimeShapeWriter(
+      shapeRepository,
+      new RealTimeTripShapeFactory(deduplicator)
+    );
     return new SiriRealTimeUpdateHandler(
       transitRepository,
       buffer,
       fuzzyTripMatcher,
       tripPatternCache,
-      shapeResolver,
+      shapeWriter,
       shapeRepository,
       deduplicator,
       tripPatternIdGenerator

@@ -24,8 +24,9 @@ The module follows the same design as the timetable data (`TimetableDataImport` 
    get straight lines between the stops.
 2. **Startup:** the `ShapeDataImport` is converted to `ScheduledShapeData` and handed to the
    `ShapeRepository` (see `ShapeModule`).
-3. **Real-time:** `RealTimeShapeResolver` (`updater/trip/patterncache`) writes the geometry of every
-   new real-time pattern when the update is applied, derived from the pattern it replaces.
+3. **Real-time:** `RealTimeShapeWriter` (`updater/trip/shape`) stores the geometry of every new
+   real-time pattern when the update is applied. `RealTimeTripShapeFactory` derives it from the
+   pattern it replaces.
 4. **Full dataset update:** the update handlers clear the feed's real-time geometries
    (`ShapeRepository.clear(feedId)`) together with its real-time timetable data. Patterns kept in
    `TripPatternCache` get their geometry created again the next time they are used. If the original
@@ -51,4 +52,5 @@ this across serialization).
 | `CompactLineString`         | One hop in packed form (package-private); equal hops are shared.                          |
 | `PackedLineStringCodec`     | Encodes/decodes the packed byte form; lives in the `street` module.                       |
 | `TripGeometryFactory`       | Builds a `CompactLineStringSequence` from line strings or from straight lines.            |
-| `RealTimeShapeResolver`     | Creates the geometry for real-time patterns (copied from the original or straight lines). |
+| `RealTimeShapeWriter`       | Stores the geometry of real-time patterns in the `ShapeRepository`.                       |
+| `RealTimeTripShapeFactory`  | Creates the geometry for real-time patterns (copied from the original or straight lines). |
