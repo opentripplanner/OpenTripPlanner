@@ -13,6 +13,7 @@ import java.util.List;
 import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
+import org.opentripplanner.service.shape.dataimport.ShapeDataImport;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.service.SiteRepository;
@@ -53,10 +54,12 @@ public class GtfsModuleBenchmark {
     var graph = new Graph();
     var transitRepository = new TransitRepository(new SiteRepository());
     var timetableDataImport = new TimetableDataImport();
+    var shapeDataImport = new ShapeDataImport();
     var module = GtfsModuleTestFactory.forTest(
       List.of(GtfsBundleTestFactory.forTest(gtfsFile)),
       transitRepository,
       timetableDataImport,
+      shapeDataImport,
       graph,
       LocalDateRange.ofUnbounded()
     );
