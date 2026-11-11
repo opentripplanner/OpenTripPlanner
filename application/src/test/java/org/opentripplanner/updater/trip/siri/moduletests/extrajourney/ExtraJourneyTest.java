@@ -5,11 +5,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.PickDrop;
@@ -27,8 +29,10 @@ import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.spi.UpdateErrorType;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
+import org.opentripplanner.updater.trip.UpdateIncrementality;
 import org.opentripplanner.updater.trip.siri.SiriEtBuilder;
 import org.opentripplanner.updater.trip.siri.SiriTestHelper;
+import uk.org.siri.siri21.DepartureBoardingActivityEnumeration;
 import uk.org.siri.siri21.OccupancyEnumeration;
 import uk.org.siri.siri21.VehicleModesEnumeration;
 
@@ -755,6 +759,77 @@ class ExtraJourneyTest implements RealtimeTestConstants {
       newRoute.getNetexSubmode(),
       "When an added rail trip is assigned to an existing rail route, the submode should be 'replacementRailService'"
     );
+  }
+
+  @Test
+  void fullDatasetUpdateRemovesTheGeometryOfAddedPattern() {
+    var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
+    var siri = SiriTestHelper.of(env);
+    var updates = createValidAddedJourney(siri).buildEstimatedTimetableDeliveries();
+
+    assertSuccess(siri.applyEstimatedTimetable(updates));
+    var pattern = env.transitService().findPattern(env.transitService().getTrip(id(ADDED_TRIP_ID)));
+    assertNotNull(env.shapeService().getTripPatternGeometry(pattern.getId()));
+
+    siri.applyEstimatedTimetable(List.of(), false, UpdateIncrementality.FULL_DATASET);
+    assertThrows(IllegalStateException.class, () ->
+      env.shapeService().getTripPatternGeometry(pattern.getId())
+    );
+
+    // An extra journey gets a new pattern, which gets its own geometry
+    assertSuccess(siri.applyEstimatedTimetable(updates, false, UpdateIncrementality.FULL_DATASET));
+    var readded = env.transitService().findPattern(env.transitService().getTrip(id(ADDED_TRIP_ID)));
+    assertNotNull(env.shapeService().getTripPatternGeometry(readded.getId()));
+  }
+
+  /**
+   * A pickup/drop-off change on an extra journey creates a pattern whose original is the
+   * real-time pattern of the extra journey. When the feed is cleared, the cache keeps the modified
+   * pattern but the original is gone, so the geometry falls back to straight lines.
+   */
+  @Test
+  void modifiedExtraJourneyGetsGeometryAfterFullDatasetUpdate() {
+    var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
+    var siri = SiriTestHelper.of(env);
+    var added = createEstimatedOnlyExtraJourney(siri, false).buildEstimatedTimetableDeliveries();
+    var modified = createEstimatedOnlyExtraJourney(siri, true).buildEstimatedTimetableDeliveries();
+
+    assertSuccess(siri.applyEstimatedTimetable(added));
+    assertSuccess(siri.applyEstimatedTimetable(modified));
+    var modifiedPattern = env
+      .transitService()
+      .findPattern(env.transitService().getTrip(id(ADDED_TRIP_ID)), env.defaultServiceDate());
+    assertTrue(modifiedPattern.getOriginalTripPattern().isRealTimeTripPattern());
+    assertNotNull(env.shapeService().getTripPatternGeometry(modifiedPattern.getId()));
+
+    siri.applyEstimatedTimetable(List.of(), false, UpdateIncrementality.FULL_DATASET);
+    assertThrows(IllegalStateException.class, () ->
+      env.shapeService().getTripPatternGeometry(modifiedPattern.getId())
+    );
+
+    assertSuccess(siri.applyEstimatedTimetable(added, false, UpdateIncrementality.FULL_DATASET));
+    assertSuccess(siri.applyEstimatedTimetable(modified));
+    var readded = env
+      .transitService()
+      .findPattern(env.transitService().getTrip(id(ADDED_TRIP_ID)), env.defaultServiceDate());
+    assertEquals(modifiedPattern.getId(), readded.getId());
+    assertNotNull(env.shapeService().getTripPatternGeometry(readded.getId()));
+  }
+
+  private SiriEtBuilder createEstimatedOnlyExtraJourney(SiriTestHelper siri, boolean noBoarding) {
+    return siri
+      .etBuilder()
+      .withEstimatedVehicleJourneyCode(ADDED_TRIP_ID)
+      .withIsExtraJourney(!noBoarding)
+      .withOperatorRef(OPERATOR_ID)
+      .withLineRef(ROUTE_ID)
+      .withEstimatedCalls(builder -> {
+        builder.call(STOP_C).departAimedExpected("00:01", "00:02");
+        if (noBoarding) {
+          builder.withDepartureBoardingActivity(DepartureBoardingActivityEnumeration.NO_BOARDING);
+        }
+        return builder.call(STOP_D).arriveAimedExpected("00:03", "00:04");
+      });
   }
 
   private SiriEtBuilder createValidAddedJourney(SiriTestHelper siri) {

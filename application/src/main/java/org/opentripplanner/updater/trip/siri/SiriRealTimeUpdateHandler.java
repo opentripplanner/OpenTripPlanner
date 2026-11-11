@@ -9,8 +9,10 @@ import static org.opentripplanner.updater.trip.UpdateIncrementality.FULL_DATASET
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
+import org.opentripplanner.service.shape.ShapeRepository;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
@@ -52,6 +54,7 @@ public class SiriRealTimeUpdateHandler {
 
   private final TripPatternCache tripPatternCache;
   private final RealTimeShapeResolver shapeResolver;
+  private final Supplier<ShapeRepository> shapes;
   private final DeduplicatorService deduplicator;
   private final TripPatternIdGenerator tripPatternIdGenerator;
 
@@ -61,6 +64,7 @@ public class SiriRealTimeUpdateHandler {
     @Nullable SiriFuzzyTripMatcher fuzzyTripMatcher,
     TripPatternCache tripPatternCache,
     RealTimeShapeResolver shapeResolver,
+    Supplier<ShapeRepository> shapes,
     DeduplicatorService deduplicator,
     TripPatternIdGenerator tripPatternIdGenerator
   ) {
@@ -69,6 +73,7 @@ public class SiriRealTimeUpdateHandler {
     this.fuzzyTripMatcher = fuzzyTripMatcher;
     this.tripPatternCache = tripPatternCache;
     this.shapeResolver = shapeResolver;
+    this.shapes = shapes;
     this.deduplicator = deduplicator;
     this.tripPatternIdGenerator = tripPatternIdGenerator;
   }
@@ -98,6 +103,7 @@ public class SiriRealTimeUpdateHandler {
     if (incrementality == FULL_DATASET) {
       // Remove all updates from the buffer
       buffer.clear(feedId);
+      shapes.get().clear(feedId);
     }
 
     for (var etDelivery : updates) {

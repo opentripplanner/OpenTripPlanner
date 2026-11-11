@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 import org.jspecify.annotations.Nullable;
+import org.opentripplanner.service.shape.ShapeRepository;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
@@ -30,6 +31,7 @@ import org.opentripplanner.updater.trip.gtfs.model.TripUpdate;
 public class GtfsRealTimeUpdateHandler {
 
   private final TimetableRepository buffer;
+  private final Supplier<ShapeRepository> shapes;
   private final Supplier<LocalDate> localDateNow;
   private final ScheduledTripHandler scheduledTripHandler;
   private final NewTripHandler addedTripHandler;
@@ -38,6 +40,7 @@ public class GtfsRealTimeUpdateHandler {
 
   GtfsRealTimeUpdateHandler(
     TimetableRepository buffer,
+    Supplier<ShapeRepository> shapes,
     Supplier<LocalDate> localDateNow,
     ScheduledTripHandler scheduledTripHandler,
     NewTripHandler addedTripHandler,
@@ -45,6 +48,7 @@ public class GtfsRealTimeUpdateHandler {
     DuplicatedTripHandler duplicatedTripHandler
   ) {
     this.buffer = buffer;
+    this.shapes = shapes;
     this.localDateNow = localDateNow;
     this.scheduledTripHandler = scheduledTripHandler;
     this.addedTripHandler = addedTripHandler;
@@ -80,6 +84,7 @@ public class GtfsRealTimeUpdateHandler {
     if (updateIncrementality == FULL_DATASET) {
       // Remove all updates from the buffer
       buffer.clear(feedId);
+      shapes.get().clear(feedId);
     }
 
     for (var rawTripUpdate : updates) {

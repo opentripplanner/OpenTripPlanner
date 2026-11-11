@@ -23,6 +23,12 @@ public interface ShapeRepository extends ShapeRepositorySnapshot {
   );
 
   /**
+   * Remove the geometries of all real-time trip patterns of the given feed; they are stored per
+   * feed. The scheduled data is never modified.
+   */
+  void clear(String feedId);
+
+  /**
    * Produce an immutable snapshot of the current state of this repository.
    */
   ShapeRepositorySnapshot createSnapshot();

@@ -65,6 +65,7 @@ public class SiriRealTimeTripUpdateAdapter {
       fuzzyTripMatcher,
       tripPatternCache,
       shapeResolver,
+      shapeRepository,
       deduplicator,
       tripPatternIdGenerator
     );

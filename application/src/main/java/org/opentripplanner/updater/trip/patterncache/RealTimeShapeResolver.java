@@ -24,8 +24,10 @@ import org.opentripplanner.transit.model.network.TripPattern;
  * straight line between each pair of stops, measured with the haversine formula.
  * <p>
  * The resolver is idempotent: the {@link TripPatternCache} outlives the update task that created
- * the pattern, so a pattern may be seen again by a later task even though the shape written by the
- * first task was discarded with its transaction.
+ * the pattern, so a pattern may be seen again by a later task even though its shape has been
+ * removed in the meantime, see {@link ShapeRepository#clear(String)}. A missing geometry is
+ * created again. If the original pattern is itself a real-time pattern whose geometry has been
+ * removed, straight lines are used.
  */
 public class RealTimeShapeResolver {
 
@@ -75,10 +77,12 @@ public class RealTimeShapeResolver {
     if (original == null) {
       return TripGeometryFactory.straightLines(pattern.getStopPattern(), deduplicator);
     }
-    // The original is either scheduled or a real-time pattern added earlier, possibly in this
-    // same transaction; the repository sees both.
     var originalTripPatternGeometry = repository.getTripPatternGeometry(original.getId());
     if (originalTripPatternGeometry == null) {
+      // The geometry of the original has been removed while the pattern lives on in the cache.
+      if (original.isRealTimeTripPattern()) {
+        return TripGeometryFactory.straightLines(pattern.getStopPattern(), deduplicator);
+      }
       throw new IllegalStateException(
         "No geometry found for the original trip pattern " + original.getId()
       );

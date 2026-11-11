@@ -26,7 +26,12 @@ The module follows the same design as the timetable data (`TimetableDataImport` 
    `ShapeRepository` (see `ShapeModule`).
 3. **Real-time:** `RealTimeShapeResolver` (`updater/trip/patterncache`) writes the geometry of every
    new real-time pattern when the update is applied, derived from the pattern it replaces.
-4. **Requests:** each request gets a `ShapeService` over the snapshot of its transaction scope.
+4. **Full dataset update:** the update handlers clear the feed's real-time geometries
+   (`ShapeRepository.clear(feedId)`) together with its real-time timetable data. Patterns kept in
+   `TripPatternCache` get their geometry created again the next time they are used. If the
+   original of a pattern is a real-time pattern whose geometry was cleared, straight lines are
+   used.
+5. **Requests:** each request gets a `ShapeService` over the snapshot of its transaction scope.
 
 Identical hops are deduplicated, so equal hops share one instance (Kryo reference tracking keeps
 this across serialization).

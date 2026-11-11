@@ -233,6 +233,33 @@ class RealTimeShapeResolverTest {
   }
 
   @Test
+  void useStraightLinesWhenARealTimeOriginalHasNoGeometry() {
+    repositoryWithOriginalGeometry();
+    var firstUpdate = TripPattern.of(id("replacement1"))
+      .withRoute(ROUTE)
+      .withStopPattern(TransitRepositoryForTest.stopPattern(STOP_A, STOP_B, STOP_C))
+      .withRealTimeStopPatternModified()
+      .withOriginalTripPattern(ORIGINAL)
+      .build();
+    var secondUpdate = TripPattern.of(id("replacement2nd"))
+      .withRoute(ROUTE)
+      .withStopPattern(TransitRepositoryForTest.stopPattern(STOP_A, STOP_B, STOP_C))
+      .withRealTimeStopPatternModified()
+      .withOriginalTripPattern(firstUpdate)
+      .build();
+    subject.ensureGeometry(firstUpdate);
+    repository.clear(firstUpdate.getFeedId());
+
+    subject.ensureGeometry(secondUpdate);
+
+    var second = repository.getTripPatternGeometry(secondUpdate.getId());
+    assertThat(second.get(0)).isEqualTo(
+      makeLineString(STOP_A.getCoordinate(), STOP_B.getCoordinate())
+    );
+    assertThat(repository.getTripPatternGeometry(firstUpdate.getId())).isNull();
+  }
+
+  @Test
   void failIfTheOriginalPatternHasNoGeometry() {
     var pattern = TripPattern.of(id("replacement"))
       .withRoute(ROUTE)

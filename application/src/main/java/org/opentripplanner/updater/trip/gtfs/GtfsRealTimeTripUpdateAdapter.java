@@ -51,6 +51,7 @@ public class GtfsRealTimeTripUpdateAdapter {
     var shapeResolver = new RealTimeShapeResolver(shapeRepository, deduplicator);
     return new GtfsRealTimeUpdateHandler(
       buffer,
+      shapeRepository,
       localDateNow,
       new ScheduledTripHandler(
         transitRepository,
