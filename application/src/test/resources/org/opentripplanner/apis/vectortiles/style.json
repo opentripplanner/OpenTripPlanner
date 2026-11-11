@@ -1,32 +1,5 @@
 {
-  "name" : "OTP Debug Tiles",
-  "sources" : {
-    "positron" : {
-      "name" : "Positron",
-      "tiles" : [
-        "https://cartodb-basemaps-a.global.ssl.fastly.net/light_all/{z}/{x}/{y}{ratio}.png"
-      ],
-      "maxzoom" : 19,
-      "tileSize" : 256,
-      "attribution" : "© <a href=\"http://www.openstreetmap.org/copyright\">OpenStreetMap</a>, &copy; <a href=\"https://carto.com/attributions\">CARTO</a>",
-      "type" : "raster"
-    },
-    "vectorSource" : {
-      "id" : "vectorSource",
-      "url" : "https://example.com",
-      "type" : "vector"
-    },
-    "osm-carto" : {
-      "name" : "OSM Carto",
-      "tiles" : [
-        "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      ],
-      "maxzoom" : 19,
-      "tileSize" : 256,
-      "attribution" : "© OpenStreetMap Contributors",
-      "type" : "raster"
-    }
-  },
+  "glyphs" : "https://cdn.jsdelivr.net/gh/klokantech/klokantech-gl-fonts@master/{fontstack}/{range}.pbf",
   "layers" : [
     {
       "id" : "osm-carto",
@@ -1424,6 +1397,63 @@
       }
     },
     {
+      "id" : "pathway",
+      "type" : "line",
+      "source" : "vectorSource",
+      "source-layer" : "edges",
+      "minzoom" : 6,
+      "maxzoom" : 23,
+      "paint" : {
+        "line-color" : "#277eb5",
+        "line-width" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          13,
+          0.01,
+          23,
+          3.0
+        ],
+        "line-offset" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          13,
+          0.4,
+          23,
+          7.0
+        ]
+      },
+      "filter" : [
+        "in",
+        [
+          "get",
+          "class"
+        ],
+        [
+          "literal",
+          [
+            "PathwayEdge"
+          ]
+        ]
+      ],
+      "layout" : {
+        "line-cap" : "round",
+        "visibility" : "none"
+      },
+      "metadata" : {
+        "group" : "Edges"
+      }
+    },
+    {
       "id" : "area-edge",
       "type" : "line",
       "source" : "vectorSource",
@@ -1482,7 +1512,64 @@
       }
     },
     {
-      "id" : "edge",
+      "id" : "street",
+      "type" : "line",
+      "source" : "vectorSource",
+      "source-layer" : "edges",
+      "minzoom" : 6,
+      "maxzoom" : 23,
+      "paint" : {
+        "line-color" : "#598734",
+        "line-width" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          13,
+          0.01,
+          23,
+          3.0
+        ],
+        "line-offset" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          13,
+          0.4,
+          23,
+          7.0
+        ]
+      },
+      "filter" : [
+        "in",
+        [
+          "get",
+          "class"
+        ],
+        [
+          "literal",
+          [
+            "StreetEdge"
+          ]
+        ]
+      ],
+      "layout" : {
+        "line-cap" : "round",
+        "visibility" : "none"
+      },
+      "metadata" : {
+        "group" : "Edges"
+      }
+    },
+    {
+      "id" : "all-edges",
       "type" : "line",
       "source" : "vectorSource",
       "source-layer" : "edges",
@@ -2502,6 +2589,33 @@
       "voi"
     ]
   },
-  "glyphs" : "https://cdn.jsdelivr.net/gh/klokantech/klokantech-gl-fonts@master/{fontstack}/{range}.pbf",
+  "name" : "OTP Debug Tiles",
+  "sources" : {
+    "positron" : {
+      "name" : "Positron",
+      "tiles" : [
+        "https://cartodb-basemaps-a.global.ssl.fastly.net/light_all/{z}/{x}/{y}{ratio}.png"
+      ],
+      "maxzoom" : 19,
+      "tileSize" : 256,
+      "attribution" : "© <a href=\"http://www.openstreetmap.org/copyright\">OpenStreetMap</a>, &copy; <a href=\"https://carto.com/attributions\">CARTO</a>",
+      "type" : "raster"
+    },
+    "vectorSource" : {
+      "id" : "vectorSource",
+      "url" : "https://example.com",
+      "type" : "vector"
+    },
+    "osm-carto" : {
+      "name" : "OSM Carto",
+      "tiles" : [
+        "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      ],
+      "maxzoom" : 19,
+      "tileSize" : 256,
+      "attribution" : "© OpenStreetMap Contributors",
+      "type" : "raster"
+    }
+  },
   "version" : 8
 }

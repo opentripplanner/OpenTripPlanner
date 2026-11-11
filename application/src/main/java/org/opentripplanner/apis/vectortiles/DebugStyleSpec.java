@@ -10,6 +10,7 @@ import static org.opentripplanner.apis.vectortiles.Color.LIGHT_BLUE;
 import static org.opentripplanner.apis.vectortiles.Color.LIGHT_MAGENTA;
 import static org.opentripplanner.apis.vectortiles.Color.LIGHT_RED;
 import static org.opentripplanner.apis.vectortiles.Color.MAGENTA;
+import static org.opentripplanner.apis.vectortiles.Color.OLIVE_GREEN;
 import static org.opentripplanner.apis.vectortiles.Color.ORANGE;
 import static org.opentripplanner.apis.vectortiles.Color.PURPLE;
 import static org.opentripplanner.apis.vectortiles.Color.RED;
@@ -122,7 +123,7 @@ public class DebugStyleSpec {
   private static final ZoomDependentNumber CIRCLE_STROKE = new ZoomDependentNumber(
     List.of(new ZoomStop(15, 0.2f), new ZoomStop(MAX_ZOOM, 3))
   );
-  private static final Class<Edge>[] EDGES_TO_DISPLAY = new Class[] {
+  private static final Class<Edge>[] ALL_EDGES = new Class[] {
     StreetEdge.class,
     EscalatorEdge.class,
     PathwayEdge.class,
@@ -469,6 +470,17 @@ public class DebugStyleSpec {
 
   private static List<StyleBuilder> edges(VectorSourceLayer edges) {
     return List.of(
+      StyleBuilder.ofId("pathway")
+        .group(EDGES)
+        .typeLine()
+        .vectorSourceLayer(edges)
+        .lineColor(TEAL)
+        .edgeFilter(PathwayEdge.class)
+        .lineWidth(LINE_QUARTER_WIDTH)
+        .lineOffset(LINE_OFFSET)
+        .minZoom(6)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden(),
       StyleBuilder.ofId("area-edge")
         .group(EDGES)
         .typeLine()
@@ -481,12 +493,23 @@ public class DebugStyleSpec {
         .minZoom(15)
         .maxZoom(MAX_ZOOM)
         .intiallyHidden(),
-      StyleBuilder.ofId("edge")
+      StyleBuilder.ofId("street")
+        .group(EDGES)
+        .typeLine()
+        .vectorSourceLayer(edges)
+        .lineColor(OLIVE_GREEN)
+        .edgeFilter(StreetEdge.class)
+        .lineWidth(LINE_QUARTER_WIDTH)
+        .lineOffset(LINE_OFFSET)
+        .minZoom(6)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden(),
+      StyleBuilder.ofId("all-edges")
         .group(EDGES)
         .typeLine()
         .vectorSourceLayer(edges)
         .lineColor(MAGENTA)
-        .edgeFilter(EDGES_TO_DISPLAY)
+        .edgeFilter(ALL_EDGES)
         .lineWidth(LINE_HALF_WIDTH)
         .lineOffset(LINE_OFFSET)
         .minZoom(6)
@@ -497,7 +520,7 @@ public class DebugStyleSpec {
         .typeSymbol()
         .lineText("name")
         .vectorSourceLayer(edges)
-        .edgeFilter(EDGES_TO_DISPLAY)
+        .edgeFilter(ALL_EDGES)
         .minZoom(17)
         .maxZoom(MAX_ZOOM)
         .intiallyHidden(),
@@ -566,7 +589,7 @@ public class DebugStyleSpec {
         .typeSymbol()
         .lineText("bicycleSafetyFactor")
         .textOffset(1)
-        .edgeFilter(EDGES_TO_DISPLAY)
+        .edgeFilter(ALL_EDGES)
         .minZoom(17)
         .maxZoom(MAX_ZOOM)
         .intiallyHidden()
@@ -592,7 +615,7 @@ public class DebugStyleSpec {
         .typeSymbol()
         .lineText("walkSafetyFactor")
         .textOffset(1)
-        .edgeFilter(EDGES_TO_DISPLAY)
+        .edgeFilter(ALL_EDGES)
         .minZoom(17)
         .maxZoom(MAX_ZOOM)
         .intiallyHidden()
@@ -627,7 +650,7 @@ public class DebugStyleSpec {
       .typeSymbol()
       .lineText("permission")
       .textOffset(1)
-      .edgeFilter(EDGES_TO_DISPLAY)
+      .edgeFilter(ALL_EDGES)
       .minZoom(17)
       .maxZoom(MAX_ZOOM)
       .intiallyHidden();
@@ -663,7 +686,7 @@ public class DebugStyleSpec {
       .typeSymbol()
       .lineText("noThruTraffic")
       .textOffset(1)
-      .edgeFilter(EDGES_TO_DISPLAY)
+      .edgeFilter(ALL_EDGES)
       .minZoom(17)
       .maxZoom(MAX_ZOOM)
       .intiallyHidden();
