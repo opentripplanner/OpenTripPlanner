@@ -38,25 +38,34 @@ class CarSpeedIndex {
     var progress = ProgressTracker.track("Compute car speeds", 5_000, ways.size());
     LOG.info(progress.startMessage());
 
-    TLongFloatMap forward = newMap(ways.size());
-    TLongFloatMap backward = newMap(ways.size());
-    ways.parallelStream().forEach(way -> {
+    // Trove maps aren't thread-safe: compute in parallel, put one at a time via forEachOrdered.
+    var speeds = ways.parallelStream().map(way -> {
       var tagMapper = way.getOsmProvider().getOsmTagMapper();
-      float forwardSpeed = tagMapper.getCarSpeedForWay(way, FORWARD, issueStore);
-      float backwardSpeed = tagMapper.getCarSpeedForWay(way, BACKWARD, issueStore);
-      // Trove maps aren't thread-safe; one lock for both puts is cheaper than two synchronized maps.
-      synchronized (forward) {
-        forward.put(way.getId(), forwardSpeed);
-        backward.put(way.getId(), backwardSpeed);
-      }
+      var waySpeeds = new WaySpeeds(
+        way.getId(),
+        tagMapper.getCarSpeedForWay(way, FORWARD, issueStore),
+        tagMapper.getCarSpeedForWay(way, BACKWARD, issueStore)
+      );
       //Keep lambda! A method-ref would log incorrect class and line number
       //noinspection Convert2MethodRef
       progress.step(m -> LOG.info(m));
+      return waySpeeds;
+    });
+
+    TLongFloatMap forward = newMap(ways.size());
+    TLongFloatMap backward = newMap(ways.size());
+
+    speeds.forEachOrdered(waySpeeds -> {
+      forward.put(waySpeeds.wayId(), waySpeeds.forward());
+      backward.put(waySpeeds.wayId(), waySpeeds.backward());
     });
 
     LOG.info(progress.completeMessage());
     return new CarSpeedIndex(forward, backward);
   }
+
+  /// The forward and backward car speed of a single way.
+  private record WaySpeeds(long wayId, float forward, float backward) {}
 
   private static TLongFloatMap newMap(int capacity) {
     return new TLongFloatHashMap(
