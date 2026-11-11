@@ -5,7 +5,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import org.opentripplanner.core.framework.transaction.internal.TransactionFactory;
+import org.opentripplanner.core.framework.transaction.configure.TransactionFactory;
 import org.opentripplanner.core.model.transaction.RepositoryHandle;
 import org.opentripplanner.core.model.transaction.RepositoryRegistry;
 import org.opentripplanner.ext.emission.internal.DefaultEmissionRepository;

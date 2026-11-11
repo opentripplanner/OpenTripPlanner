@@ -8,6 +8,7 @@ import java.time.Instant;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -22,19 +23,31 @@ class CarpoolingRequestTest {
   @Test
   void of_routeRequest_mapsAllFields() {
     var request = buildRouteRequest(true);
-    var carpoolingRequest = CarpoolingRequest.of(request);
+    var carpoolingRequest = CarpoolingRequest.of(
+      request,
+      CarpoolingParameters.DEFAULT.defaultSearchWindow()
+    );
 
     assertTrue(carpoolingRequest.isArriveByRequest());
     assertEquals(DATE_TIME, carpoolingRequest.getRequestedDateTime());
     assertEquals(PICKUP, carpoolingRequest.getPassengerPickup());
     assertEquals(DROPOFF, carpoolingRequest.getPassengerDropoff());
     assertFalse(carpoolingRequest.isAccessEgressRequest());
+    assertEquals(request.preferences().car().pickupTime(), carpoolingRequest.getStopDuration());
+    assertEquals(
+      request.preferences().system().maxJourneyDuration(),
+      carpoolingRequest.getMaxJourneyDuration()
+    );
   }
 
   @ParameterizedTest
   @EnumSource(AccessEgressType.class)
   void of_routeRequestWithAccessOrEgress_flagsRoutingMode(AccessEgressType type) {
-    var carpoolingRequest = CarpoolingRequest.of(buildRouteRequest(false), type);
+    var carpoolingRequest = CarpoolingRequest.of(
+      buildRouteRequest(false),
+      type,
+      CarpoolingParameters.DEFAULT.defaultSearchWindow()
+    );
 
     assertTrue(carpoolingRequest.isAccessEgressRequest());
     assertEquals(type.isAccess(), carpoolingRequest.isAccessRequest());
@@ -43,7 +56,10 @@ class CarpoolingRequestTest {
 
   @Test
   void accessEgressBooleans_areFalseForDirectRouting() {
-    var carpoolingRequest = CarpoolingRequest.of(buildRouteRequest(false));
+    var carpoolingRequest = CarpoolingRequest.of(
+      buildRouteRequest(false),
+      CarpoolingParameters.DEFAULT.defaultSearchWindow()
+    );
 
     assertFalse(carpoolingRequest.isAccessEgressRequest());
     assertFalse(carpoolingRequest.isAccessRequest());

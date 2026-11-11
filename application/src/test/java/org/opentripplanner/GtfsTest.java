@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import org.junit.jupiter.api.BeforeEach;
-import org.opentripplanner.core.framework.transaction.internal.TransactionFactory;
+import org.opentripplanner.core.framework.transaction.configure.TransactionFactory;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;

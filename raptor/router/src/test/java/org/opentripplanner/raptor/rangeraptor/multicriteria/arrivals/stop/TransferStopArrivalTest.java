@@ -91,14 +91,6 @@ class TransferStopArrivalTest {
   }
 
   @Test
-  public void travelDuration() {
-    assertEquals(
-      ACCESS_DURATION + BOARD_SLACK + TRANSIT_LEG_DURATION + TRANSFER_LEG_DURATION,
-      subject.travelDuration()
-    );
-  }
-
-  @Test
   public void round() {
     assertEquals(ROUND, subject.round());
   }

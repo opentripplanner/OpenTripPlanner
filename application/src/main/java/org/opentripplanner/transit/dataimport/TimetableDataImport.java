@@ -106,10 +106,12 @@ public class TimetableDataImport {
     tripCalendars = tripCalendars.merge(data);
   }
 
-  /** Register {@code code} as the service code for {@code serviceId}. */
-  public void putServiceCode(FeedScopedId serviceId, int code) {
+  /**
+   * Assign each of the given service ids the next free service code, in iteration order.
+   */
+  public void addNextServiceCodes(Collection<FeedScopedId> serviceIds) {
     assertModificationsAllowed();
-    tripCalendars = tripCalendars.withServiceCode(serviceId, code);
+    tripCalendars = tripCalendars.withNextServiceCodes(serviceIds);
   }
 
   /** The service code of each scheduled service id. */

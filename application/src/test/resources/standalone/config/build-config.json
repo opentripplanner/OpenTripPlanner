@@ -62,7 +62,8 @@
       "sharedFilePattern": "_stops.xml",
       "sharedGroupFilePattern": "_(\\w{3})_shared_data.xml",
       "groupFilePattern": "(\\w{3})_.*\\.xml",
-      "ignoreFilePattern": "(temp|tmp)"
+      "ignoreFilePattern": "(temp|tmp)",
+      "allowStopPlaceAsPassengerStopAssignment": true
       //"ferryIdsNotAllowedForBicycle" : ["RUT:B107", "RUT:B209"]
     }
   ],

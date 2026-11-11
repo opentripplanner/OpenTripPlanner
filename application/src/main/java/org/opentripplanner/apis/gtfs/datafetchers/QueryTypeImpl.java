@@ -476,7 +476,9 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
         case "Route":
           return transitService.getRoute(FeedScopedId.parseStrict(id));
         case "Stop":
-          return transitService.getRegularStop(FeedScopedId.parseStrict(id));
+          var stopOrStationId = FeedScopedId.parseStrict(id);
+          var regularStop = transitService.getRegularStop(stopOrStationId);
+          return regularStop != null ? regularStop : transitService.getStation(stopOrStationId);
         case "Stoptime":
           // TODO
           return null;

@@ -111,6 +111,66 @@ into the set. This is because 7 < 9 (comparing the 1st criterion of element 1), 
 (comparing with the 2nd criterion of elements 2 and 3). `[6,7]` would not make it into the set
 because the existing element `[5,6]` is better than the new element for both criteria.
 
+### Destination pareto-set
+
+_The code for this is found in `DestinationArrivalParetoSetComparators` in the
+`org.opentripplanner.raptor.rangeraptor.destination` package._
+
+The pareto-set at the destination is different from the pareto-sets at the stops: it is the source
+of the result paths. Raptor does not build a path for each arrival at the destination. The set holds
+light-weight `DestinationArrival`s, and the paths are built from the arrivals that survive, after
+the search. This works for both McRR and RR, since the arrival chain of a destination arrival is not
+changed by later iterations. A stop arrival can be dropped when it is not needed to prune later
+arrivals, a destination arrival that is dropped is a dropped result.
+
+Range Raptor finds journeys for many departure times. Without an extra criterion a journey that
+leaves later (earlier iteration) would be dominated by a journey that arrives earlier. Which of
+these journeys we want to keep depends on the use-case, and we have two ways to define the time
+criteria (in addition to number of transfers and cost):
+
+| Search            | Time criteria                                                              | Result                                                                                             |
+| ----------------- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `timetable=true`  | iteration departure time, arrival time                                     | Keep a journey that departs later, even if it takes longer. This gives a timetable view.           |
+| `timetable=false` | arrival time (or departure time `arriveBy`) and duration (if cost is used) | Keep a journey only if it arrives earlier, departs later (arrive-by) or is faster than the others. |
+
+`timetable=false` was developed to support OTP 1.x, which only had this mode of operation. Most
+users/clients use `timetable=true`. There are use-cases for turning it off, but they are limited,
+and the amount of work to support them is not prioritized - for now.
+
+Some details:
+
+- The **iteration departure time** is the time of the Range Raptor iteration. It is not the actual
+  departure time of a journey, which is normally time-shifted to fit with the departure of the first
+  transit leg. The iteration step is 1 minute. A path found in the first iteration can be shifted
+  far beyond the iteration time, while the shift for the other iterations is less than one iteration
+  step. This is because a later boarding would have been found in the previous iteration. Paths
+  found in the first iteration should only be used to prune the search, not be treated as part of
+  the pareto-optimal result. Note! Raptor returns these paths because they can be used for other
+  purposes like transfer optimization or next/previous page navigation. **LIMITATION:** To find all
+  pareto-optimal journeys, the actual departure times for all accesses and possible first leg trips
+  could be found and used as the iteration departure times, instead of iterating over the minutes.
+  The performance cost is unknown.
+- The **duration** is the arrival time minus the (actual/time-shifted) departure time. Neither the
+  duration nor the departure time is stored in the state. Instead, the iteration departure time is
+  used, this is a _known limitation_.
+- **Known limitation, departure time within a search window** Raptor does not keep the actual
+  departure time in the state, only the iteration departure time. This means that a journey that
+  leaves after another journey, within the same iteration, can be dropped. We only keep the actual
+  departure time in the final destination arrival, not in the intermediate stop-arrival states.
+  Depending on the search type (`timetable=true/false` and departAfter/arriveBy) this can lead to a
+  path being dropped when arriving at a stop, as a result of the qualify operation for destination
+  pruning. The `I03_SameIterationOptimalDepartureDroppedTest` demonstrates this.
+- The **time-penalty** of the access and egress is part of the arrival- and departure times used for
+  comparison. Raptor decorates the access and egress with the penalty (it becomes part of the
+  duration), so it must not be added again. The real time (without penalty) is used to check the
+  `latestArrivalTime` and `earliestDepartureTime` limits.
+- A **reverse** search has the time criteria swapped: the destination arrival time is the journey
+  departure time, and the departure time of the search is the journey arrival time. The comparator
+  is given the search direction to map the criteria to the right fields and directions. A reverse
+  search does not time-shift the access, it uses the iteration departure time.
+- Without a cost criterion (c1) the duration is not used. The standard (non-multi-criteria) Range
+  Raptor compares the arrival time (or departure time) and the number of transfers only.
+
 ## Via-Location Search (chained-segments)
 
 Via-location search enables routing through one or more intermediate via points. The design composes
@@ -175,9 +235,10 @@ The debugger instrument the existing code for the given stops determined by the
 is injected or run; hence the performance overhead under normal execution is minimal. The main
 Raptor logic will post events to the [DebugHandler](rangeraptor/internalapi/DebugHandler.java)
 interface. There are one handler implementation for each event type(stop arrival, pattern ride, and
-path), all created by the [DebugHandlerFactory](rangeraptor/model/debug/DebugHandlerFactory.java).
-The handler implementations are called _Adapters_ because they take the internal Raptor event and
-convert it and passes it to the listeners passed in using the Raptor debug request.
+destination arrival), all created by the
+[DebugHandlerFactory](rangeraptor/model/debug/DebugHandlerFactory.java). The handler implementations
+are called _Adapters_ because they take the internal Raptor event and convert it and passes it to
+the listeners passed in using the Raptor debug request.
 
 # Design
 

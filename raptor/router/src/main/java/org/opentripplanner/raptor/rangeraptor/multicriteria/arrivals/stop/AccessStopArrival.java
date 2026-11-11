@@ -22,10 +22,9 @@ final class AccessStopArrival<T extends RaptorTripSchedule> extends McStopArriva
   AccessStopArrival(int departureTime, RaptorAccessEgress access) {
     super(
       access.stop(),
-      departureTime,
-      access.durationInSeconds(),
-      access.c1(),
-      access.numberOfRides()
+      departureTime + access.durationInSeconds(),
+      access.numberOfRides(),
+      access.c1()
     );
     this.departureTime = departureTime;
     this.access = access;
