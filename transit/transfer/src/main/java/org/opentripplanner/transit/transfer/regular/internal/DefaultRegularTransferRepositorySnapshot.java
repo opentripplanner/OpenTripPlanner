@@ -1,5 +1,7 @@
 package org.opentripplanner.transit.transfer.regular.internal;
 
+import static org.opentripplanner.utils.time.StopWatchMs.startStopWatch;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,17 +68,14 @@ class DefaultRegularTransferRepositorySnapshot<
 
   @Override
   public void warmUp() {
-    for (var entry : warmup) {
-      long start = System.currentTimeMillis();
+    var totalStopWatch = startStopWatch();
+    // The cache is thread-safe, the entries are independent
+    warmup.parallelStream().forEach(entry -> {
+      var stopWatch = startStopWatch();
       cache.get(entry.userPreferences(), cacheFactory);
-      var time = System.currentTimeMillis() - start;
-      LOG.info(
-        "Warmed up the Routing Transfer Cache for the {} '{}' in {} ms.",
-        entry.source() == UserPreferenceSource.PROFILE ? "profile" : "warmup entry",
-        entry.id(),
-        time
-      );
-    }
+      LOG.info("Warm-up transfers: {} '{}' in {}", entry.source(), entry.id(), stopWatch.stop());
+    });
+    LOG.info("Warm-up transfers total: {} entries in {}", warmup.size(), totalStopWatch.stop());
   }
 
   @Override
