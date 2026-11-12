@@ -35,6 +35,9 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 24
+          # also caches the packages of the debug client, which the Maven build installs with npm
+          cache: npm
+          cache-dependency-path: client/package-lock.json
 
       # Java setup step completes very fast, no need to run in a preconfigured docker container
       - name: Set up JDK 25
@@ -73,7 +76,9 @@ jobs:
         if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/dev-2.x')
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: mvn deploy --settings maven-settings.xml -DskipTests -DGITHUB_REPOSITORY=$GITHUB_REPOSITORY -P prettierSkip,checkstyleSkip,deployGitHub
+        # the debug client was built in the package step above, so don't run the npm build again with
+        # the registry credentials around
+        run: mvn deploy --settings maven-settings.xml -DskipTests -Dplugin.frontend.skip=true -DGITHUB_REPOSITORY=$GITHUB_REPOSITORY -P prettierSkip,checkstyleSkip,deployGitHub
 
   build-windows:
     timeout-minutes: 20
@@ -222,6 +227,14 @@ jobs:
           java-version: 25
           distribution: temurin
           cache: maven
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+      - name: Build the application, including the debug client
+        # no registry credentials in this step, because it runs the npm build
+        run: mvn -P prettierSkip,checkstyleSkip -Dmaven.test.skip=true -Dmaven.source.skip=true package
       - name: Build container image with Jib, push to Dockerhub
         env:
           CONTAINER_REPO: docker.io/opentripplanner/opentripplanner
@@ -246,4 +259,5 @@ jobs:
           
           MAVEN_SKIP_ARGS="-P prettierSkip,checkstyleSkip -Dmaven.test.skip=true -Dmaven.source.skip=true"
           
-          mvn $MAVEN_SKIP_ARGS package -Djib.skip=false -Djib.to.tags=latest,$image_version
+          # the debug client was built in the previous step
+          mvn $MAVEN_SKIP_ARGS -Dplugin.frontend.skip=true package -Djib.skip=false -Djib.to.tags=latest,$image_version
