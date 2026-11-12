@@ -166,7 +166,7 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater<TransitRealTimeUpda
     return configRef;
   }
 
-  private void onMessage(Mqtt5Publish message) {
+  void onMessage(Mqtt5Publish message) {
     if (message.getPayloadAsBytes().length == 0) {
       return;
     }
