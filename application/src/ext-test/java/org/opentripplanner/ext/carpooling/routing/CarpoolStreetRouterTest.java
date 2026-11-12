@@ -7,6 +7,7 @@ import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.street.geometry.WgsCoordinate;
@@ -18,7 +19,8 @@ class CarpoolStreetRouterTest extends GraphRoutingTest {
   private static final WgsCoordinate ORIGIN = new WgsCoordinate(59.9139, 10.7522);
 
   private static final CarpoolStreetRouter ROUTER = new CarpoolStreetRouter(
-    StreetLimitationParametersService.DEFAULT
+    StreetLimitationParametersService.DEFAULT,
+    CarpoolingParameters.DEFAULT.maxTripDuration()
   );
 
   private IntersectionVertex vertexA;
@@ -67,7 +69,7 @@ class CarpoolStreetRouterTest extends GraphRoutingTest {
   /** The itinerary mapper draws the leg from this geometry, so it must run in travel order. */
   @Test
   void geometryIsInTravelOrder() {
-    var path = ROUTER.route(vertexA, vertexC);
+    var path = ROUTER.route(vertexA, vertexC).path();
 
     assertThat(List.of(path.geometry().getCoordinates()))
       .containsExactly(vertexA.getCoordinate(), vertexB.getCoordinate(), vertexC.getCoordinate())

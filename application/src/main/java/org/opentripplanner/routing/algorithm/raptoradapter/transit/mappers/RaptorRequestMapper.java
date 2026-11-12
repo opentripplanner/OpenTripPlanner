@@ -288,7 +288,9 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
     switch (type) {
       case STOP_ARRIVALS -> target.withStopArrivalListener(logger::stopArrivalLister);
       case PATTERN_RIDES -> target.withPatternRideDebugListener(logger::patternRideLister);
-      case DESTINATION_ARRIVALS -> target.withPathFilteringListener(logger::pathFilteringListener);
+      case DESTINATION_ARRIVALS -> target.withDestinationArrivalListener(
+        logger::destinationArrivalListener
+      );
     }
   }
 

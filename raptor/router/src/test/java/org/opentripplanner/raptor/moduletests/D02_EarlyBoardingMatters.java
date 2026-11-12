@@ -18,19 +18,20 @@ import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorTestFactory;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 
-/// In this test boarding a pattern at stop 1 is the only valid path to the destination via stop 2.
-/// But the pattern can be reached in earlier rounds at later stops. The point is to show that early
-/// round pattern arrivals does not dominate boarding early in the pattern.
+/// In this test boarding a pattern at stop A is the only valid path to the destination via stop F.
+/// But the pattern can be reached in earlier rounds at later stops. The point is to show that
+/// reaching stop positions later in the pattern does not dominate boarding in a lower stop position.
 ///
 /// **Network**
 /// ```
-///          (Destination)         R1
-///     E——————————F——————————G——————————H——————————I——————————J
-///     ⎮                     ⎮          ⎮          ⎮
-///     ⎮ R8                  ⎮ R6       ⎮ R4       ⎮ R2
-///     ⎮                     ⎮          ⎮          ⎮
-///     D ——————————————————— C ———————— B ———————— A (Origin)
-///                R7              R5         R3
+///
+///           (Origin) R3         R5              R7
+///               A ———————> B ———————> C ——————————————————> D
+///               ⎮          ⎮          ⎮                     ⎮
+///               ⎮ R2       ⎮ R4       ⎮ R6                  ⎮ R8
+///               ⎮          ⎮          ⎮                     ⎮
+///    J <————————I——————————H——————————G——————————F————————— E
+///                               R1         (Destination)
 /// ```
 /// **Origin:** Stop A
 ///

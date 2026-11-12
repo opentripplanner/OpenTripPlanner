@@ -10,36 +10,27 @@ import org.opentripplanner.street.geometry.WgsCoordinate;
 /**
  * Factory methods for creating {@link CarpoolingRequest} instances in tests.
  * <p>
- * Every factory pins the same {@link #DEFAULT_MAX_WALK_TIME} and {@link #DEFAULT_SEARCH_WINDOW}
- * so boundary assertions in filter tests stay independent of OTP defaults.
+ * Every factory pins the same {@link #DEFAULT_MAX_WALK_TIME}, {@link #DEFAULT_SEARCH_WINDOW},
+ * {@link #DEFAULT_STOP_DURATION} and {@link #DEFAULT_MAX_JOURNEY_DURATION} so boundary assertions
+ * in filter tests stay independent of OTP defaults.
  */
 public class CarpoolingRequestTestData {
 
-  /** 15-minute slack the {@code TimeTripFilter} tests are tuned around. */
+  /** The maximum walk the requests carry. */
   public static final Duration DEFAULT_MAX_WALK_TIME = Duration.ofMinutes(15);
 
   /** 30-minute window the {@code TimeTripFilter} / {@code TimeItineraryFilter} tests use. */
   public static final Duration DEFAULT_SEARCH_WINDOW = Duration.ofMinutes(30);
 
+  /** The dwell at each stop of a trip, the passenger's included. */
+  public static final Duration DEFAULT_STOP_DURATION = Duration.ofMinutes(1);
+
+  /** The longest journey the requests accept, OTP's default. */
+  public static final Duration DEFAULT_MAX_JOURNEY_DURATION = Duration.ofHours(24);
+
   /** Direct routing request with specific passenger coordinates; no time constraint. */
   public static CarpoolingRequest directRequest(WgsCoordinate pickup, WgsCoordinate dropoff) {
     return baseBuilder().withPassengerPickup(pickup).withPassengerDropoff(dropoff).build();
-  }
-
-  /** Access routing request; the passenger's relevant coordinate is the pickup. */
-  public static CarpoolingRequest accessRequest(WgsCoordinate passengerPickup) {
-    return baseBuilder()
-      .withPassengerPickup(passengerPickup)
-      .withAccessOrEgress(AccessEgressType.ACCESS)
-      .build();
-  }
-
-  /** Egress routing request; the passenger's relevant coordinate is the dropoff. */
-  public static CarpoolingRequest egressRequest(WgsCoordinate passengerDropoff) {
-    return baseBuilder()
-      .withPassengerDropoff(passengerDropoff)
-      .withAccessOrEgress(AccessEgressType.EGRESS)
-      .build();
   }
 
   public static CarpoolingRequest departAfterWithNoTime() {
@@ -89,7 +80,9 @@ public class CarpoolingRequestTestData {
   private static CarpoolingRequestBuilder baseBuilder() {
     return new CarpoolingRequestBuilder()
       .withMaxWalkTime(DEFAULT_MAX_WALK_TIME)
-      .withSearchWindow(DEFAULT_SEARCH_WINDOW);
+      .withSearchWindow(DEFAULT_SEARCH_WINDOW)
+      .withStopDuration(DEFAULT_STOP_DURATION)
+      .withMaxJourneyDuration(DEFAULT_MAX_JOURNEY_DURATION);
   }
 
   private CarpoolingRequestTestData() {}

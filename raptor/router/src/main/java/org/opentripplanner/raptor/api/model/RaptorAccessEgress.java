@@ -85,11 +85,13 @@ public interface RaptorAccessEgress {
    * the shortest access/egress paths over the longer ones.
    * <p>
    * Another example is FLEX, where we in many use-cases want regular transit to win if there is
-   * an offer. Only in the case where the FLEX is the only solution we want it to be presented. To
-   * achieve this, we must add an extra duration to the time of the FLEX access/egress - it does not
-   * help to just add extra cost - which makes both FLEX optimal on time and transit optimal on
-   * cost. Keeping a large number of optimal access paths has a negative impact on performance as
-   * well.
+   * a comparable offer. FLEX should be presented when there is no transit alternative, or when it
+   * is much better than the alternatives; the time-penalty sets how much better it must be. To
+   * achieve this, we must add an extra duration to the time of the FLEX access/egress. Adding only
+   * extra cost does not work: the FLEX would still be optimal on time and the transit optimal on
+   * cost, so both would be kept. The time-penalty makes the transit win on time as well, unless the
+   * FLEX is faster by more than the penalty. Keeping a large number of optimal access paths has a
+   * negative impact on performance as well.
    * <p>
    *
    * The unit is seconds and the default value is {@link RaptorConstants#TIME_NOT_SET}.

@@ -47,6 +47,7 @@ public class OsmNode extends OsmEntity {
 
   /**
    * Checks if this node blocks traversal in any way
+   * Only applies to able-bodied pedestrians, does not check for accessibility
    *
    * @return true if it does
    */

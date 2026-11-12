@@ -77,6 +77,13 @@ class TripTimeOnDateRequestBuilderTest {
   }
 
   @Test
+  void rejectsNegativeNumberOfDepartures() {
+    var builder = TripTimeOnDateRequest.of(List.of(STOP)).withTime(TIME).withNumberOfDepartures(-1);
+
+    assertThrows(IllegalArgumentException.class, builder::build);
+  }
+
+  @Test
   void withCancellationPolicy() {
     var request = TripTimeOnDateRequest.of(List.of(STOP))
       .withTime(TIME)

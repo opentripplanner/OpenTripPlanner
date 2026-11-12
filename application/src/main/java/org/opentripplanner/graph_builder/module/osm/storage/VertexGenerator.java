@@ -156,7 +156,10 @@ public class VertexGenerator {
         );
       }
 
-      if (iv == null && node.isBarrier()) {
+      // A node is relevant as a barrier either because it restricts the mode permission
+      // (node.isBarrier()) or because it is wheelchair-inaccessible without affecting other
+      // modes, e.g. barrier=kerb
+      if (iv == null && (node.isBarrier() || node.isWheelchairInaccessible())) {
         iv = vertexFactory.barrier(nid, coordinate, node.explicitWheelchairAccessibility());
       }
 
@@ -166,7 +169,7 @@ public class VertexGenerator {
         );
         if (
           bv.wheelchairAccessibility() == Accessibility.NO_INFORMATION &&
-          !node.isWheelchairAccessible()
+          node.isWheelchairInaccessible()
         ) {
           bv.setWheelchairAccessibility(Accessibility.NOT_POSSIBLE);
         }
