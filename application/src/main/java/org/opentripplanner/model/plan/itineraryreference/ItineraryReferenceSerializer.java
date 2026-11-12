@@ -17,18 +17,14 @@ import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.utils.time.DurationUtils;
 
 /**
- * Serializer for {@link ItineraryReference}.
+ * Converts an {@link ItineraryReference} to and from an opaque token.
  * <p>
- * Each leg reference is encoded with the existing {@link LegReferenceSerializer} and the
- * resulting tokens are joined with {@link #LEG_REFERENCE_DELIMITER}, a character not present in
- * the URL-safe Base64 alphabet {@link LegReferenceSerializer} produces. Those tokens are already
- * Base64, so the surrounding token encodes them a second time and is roughly a third larger than
- * strictly necessary. Reusing {@link LegReferenceSerializer} is preferred over duplicating its
- * versioned leg format here, which would have to be kept in sync by hand.
+ * Each leg reference is encoded with {@link LegReferenceSerializer}, and the results are joined
+ * with {@link #LEG_REFERENCE_DELIMITER}. This encodes the leg tokens twice and makes the token a
+ * bit longer, but we don't need to copy the leg format here.
  * <p>
- * {@code StreetMode} fields are deliberately encoded as explicit {@code STRING}s (via
- * {@code name()}/{@code valueOf()}), not {@code addEnum()} - see the token framework's own
- * enum-compatibility warning ({@link Token#getEnum}).
+ * Street modes are stored as plain strings, not with {@code addEnum()}. See {@link Token#getEnum}
+ * for why.
  */
 public class ItineraryReferenceSerializer {
 
@@ -70,10 +66,7 @@ public class ItineraryReferenceSerializer {
   /** private constructor to prevent instantiating this utility class */
   private ItineraryReferenceSerializer() {}
 
-  /**
-   * Encodes {@code ref} as an opaque, versioned token. Returns {@code null} for a {@code null}
-   * input, never for a valid reference.
-   */
+  /** Returns the token for {@code ref}, or {@code null} if {@code ref} is {@code null}. */
   @Nullable
   public static String encode(@Nullable ItineraryReference ref) {
     if (ref == null) {
@@ -104,11 +97,8 @@ public class ItineraryReferenceSerializer {
   }
 
   /**
-   * Decodes {@code itineraryReference} back into an {@link ItineraryReference}. The input is
-   * untrusted client-supplied data: returns {@code null} - rather than throwing - for a
-   * {@code null} or empty input, a malformed or truncated token, a token from a different schema
-   * version, too many leg references, or a value this method rejects as out of bounds for
-   * untrusted input (a non-finite number, or a slack value a client could never have set).
+   * Reads a token back into an {@link ItineraryReference}. The token comes from the client, so it
+   * can be anything. Returns {@code null} instead of throwing if the token is not valid.
    */
   @Nullable
   public static ItineraryReference decode(@Nullable String itineraryReference) {
@@ -170,10 +160,7 @@ public class ItineraryReferenceSerializer {
     }
   }
 
-  /**
-   * Rejects non-finite values ({@code NaN}, {@code Infinity}, {@code -Infinity}) that
-   * {@link Double#parseDouble} would otherwise accept - the token is untrusted client input.
-   */
+  /** Like {@link Double#parseDouble}, but rejects {@code NaN} and infinity. */
   private static double finiteDouble(String value) {
     double result = Double.parseDouble(value);
     if (!Double.isFinite(result)) {
@@ -182,10 +169,7 @@ public class ItineraryReferenceSerializer {
     return result;
   }
 
-  /**
-   * Bounds the decoded value to what a real client could ever have asked for, since the id is
-   * untrusted input - see {@link ItineraryReference}'s class doc.
-   */
+  /** Uses the same limit as the API does for slack sent by a client. */
   private static Duration requireValidSlack(Duration value, String subject) {
     return DurationUtils.requireNonNegativeMax2hours(value, subject + " slack");
   }
@@ -225,10 +209,8 @@ public class ItineraryReferenceSerializer {
   }
 
   /**
-   * Reconstructs a {@code stop}, {@code coordinate}, or {@code stop with fallback coordinate}
-   * {@link GenericLocation}, or {@code null} if neither a stop id nor a coordinate is present.
-   * On-board {@link org.opentripplanner.routing.api.request.TripLocation}s are never encoded, so
-   * are never decoded either.
+   * Returns a stop, a coordinate, or a stop with a fallback coordinate. Returns {@code null} if the
+   * token has neither.
    */
   @Nullable
   private static GenericLocation decodeLocation(

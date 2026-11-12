@@ -23,10 +23,8 @@ public class ItineraryImpl implements GraphQLDataFetchers.GraphQLItinerary {
   /// resolution in [LegImpl#fareProducts].
   static final String ITINERARY_CONTEXT_KEY = "itinerary";
 
-  /// The key used to store the original planning [RouteRequest] in the GraphQL context, so
-  /// [#id] can build a stable [org.opentripplanner.model.plan.itineraryreference.ItineraryReference]
-  /// from it. Set once in [QueryTypeImpl#getPlanResult]; graphql-java propagates it to child
-  /// fields automatically.
+  /// Key for the [RouteRequest] that planned the itinerary, in the GraphQL local context. [#id]
+  /// needs it to create the id.
   static final String ROUTE_REQUEST_CONTEXT_KEY = "routeRequest";
 
   @Override

@@ -400,8 +400,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
         return null;
       }
       try {
-        // The id does not hold a locale: names are returned in the language of this request
-        // (Accept-Language, else the server default), as for the leg(id:) query.
+        // The id holds no locale, so names use the language of this request, like leg(id:).
         var locale = environment.getLocale();
         var routeRequest = ItineraryReferenceMapper.toRouteRequest(
           reference,

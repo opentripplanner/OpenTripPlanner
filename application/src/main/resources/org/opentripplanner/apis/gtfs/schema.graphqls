@@ -834,7 +834,7 @@ type Itinerary {
   The routing preferences stored in the id are the ones in effect when the itinerary was
   planned. We do not recommend storing ids for a long time.
   """
-  id: String
+  id: String @deprecated(reason : "Experimental API that can be changed without notice.")
   """
   A list of Legs. Each Leg is either a walking (cycling, car) portion of the
   itinerary, or a transit leg on a particular vehicle. So a itinerary where the
@@ -1658,7 +1658,7 @@ type QueryType {
   The id is meant for refetching an itinerary during or shortly before travel, not for long-term
   storage: refetching is likely to fail after the transit data has been updated.
   """
-  itinerary(id: String!): Itinerary @timingData
+  itinerary(id: String!): Itinerary @deprecated(reason : "Experimental API that can be changed without notice.") @timingData
   """
   Try refetching the current state of a transit leg using its id.
   This fails when the underlying transit data (mostly IDs) has changed or are no longer available.

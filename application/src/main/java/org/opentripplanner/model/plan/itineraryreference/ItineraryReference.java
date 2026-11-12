@@ -10,44 +10,22 @@ import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * A stable reference containing the information required to refetch an itinerary using
- * {@link org.opentripplanner.routing.refetch.RefetchItineraryService}.
+ * Everything needed to refetch an itinerary later with
+ * {@link org.opentripplanner.routing.refetch.RefetchItineraryService}. It is sent to clients as an
+ * opaque, versioned token that does not depend on any particular API.
  * <p>
- * The reference is serialized as a versioned opaque token and is independent of the API exposing
- * it.
+ * Not every itinerary can be referenced.
  * <p>
- * Custom {@code WheelchairPreferences} are currently not encoded in the reference, nor is
- * {@code transferSlack} (the existing refetch implementation does not use it).
- * {@code from}/{@code to} on-board {@link org.opentripplanner.routing.api.request.TripLocation}s
- * are not currently supported.
- * <p>
- * Only walk preferences are encoded, so only itineraries with walk access, egress and transfers
- * get a reference. Refetching a bike, car or scooter leg would otherwise silently use the server's
- * default preferences for that mode and could return a different itinerary. Encoding the
- * preferences of the remaining modes requires covering their nested parking, rental and
- * optimisation preferences too, and is left to a follow-up.
- * <p>
- * A refetch is meant to update the same itinerary with current realtime data, not to route it
- * again. The encoded values (walk speed and reluctance, default board/alight slack, wheelchair) are
- * therefore the values that were in effect when the itinerary was planned, whether the client set
- * them or they came from the server defaults; later changes to those defaults do not affect an
- * existing reference. Values no supported API lets a client set - per-mode board/alight slack
- * overrides and {@code maxAccessEgressDuration} - are not encoded and are read from the current
- * {@code defaultRouteRequest} at refetch time, so a client-controlled id cannot inject them.
- * {@code boardSlack}/{@code alightSlack} are validated at decode time
- * ({@link ItineraryReferenceSerializer#decode}) against the same bound the GTFS API enforces on
- * client input.
+ * A refetch updates the same itinerary with current realtime data; it does not plan it again. So
+ * the stored values are the ones used when the itinerary was planned.
  * <p>
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */
 public final class ItineraryReference {
 
   /**
-   * The maximum number of transit legs a reference can hold: one more than
-   * {@link org.opentripplanner.routing.api.request.preference.TransferPreferences}'s own hard
-   * ceiling on the number of transfers, so more legs than that are never part of a real plan
-   * response. Caps the work a single refetch can do, since it does a lookup, and possibly a
-   * transfer street search, per leg.
+   * The maximum number of transit legs in a reference. A plan never has more than 30 transfers, so
+   * it never has more than 31 transit legs. The limit also caps the work a single refetch can do.
    */
   public static final int MAX_LEG_REFERENCES = 31;
 
@@ -131,12 +109,12 @@ public final class ItineraryReference {
     return transferMode;
   }
 
-  /** The default board slack; per-mode overrides are read from the current server config. */
+  /** The default board slack. */
   public Duration boardSlack() {
     return boardSlack;
   }
 
-  /** The default alight slack; per-mode overrides are read from the current server config. */
+  /** The default alight slack. */
   public Duration alightSlack() {
     return alightSlack;
   }
@@ -146,7 +124,7 @@ public final class ItineraryReference {
     return walkSpeed;
   }
 
-  /** The walk reluctance: the cost factor applied to time spent walking. */
+  /** How much walking is avoided: the cost factor for time spent walking. */
   public double walkReluctance() {
     return walkReluctance;
   }
@@ -156,15 +134,12 @@ public final class ItineraryReference {
     return wheelchair;
   }
 
-  /**
-   * The opaque, versioned token for this reference. Delegates to
-   * {@link ItineraryReferenceSerializer#encode}.
-   */
+  /** Returns this reference as an opaque token. */
   public String encode() {
     return ItineraryReferenceSerializer.encode(this);
   }
 
-  /** Delegates to {@link ItineraryReferenceSerializer#decode}. */
+  /** Reads a token created by {@link #encode()}. Returns {@code null} if it is not valid. */
   @Nullable
   public static ItineraryReference decode(@Nullable String itineraryReference) {
     return ItineraryReferenceSerializer.decode(itineraryReference);
