@@ -3,13 +3,17 @@ package org.opentripplanner.netex.config;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.netex.config.NetexFeedParameters.DEFAULT;
 
 import java.net.URI;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class NetexFeedParametersTest {
 
@@ -87,26 +91,46 @@ class NetexFeedParametersTest {
     assertNotEquals(subject.hashCode(), other.hashCode());
   }
 
-  @Test
-  void allowStopPlaceAsPassengerStopAssignmentEqualsAndHashCode() {
-    var allowed = subject.copyOf().withAllowStopPlaceAsPassengerStopAssignment(true).build();
-    var sameAllowed = subject.copyOf().withAllowStopPlaceAsPassengerStopAssignment(true).build();
-    // Make a change and set it back again to force a copy of the flag via the builder
-    var copiedAllowed = allowed
-      .copyOf()
-      .withFeedId("FX")
-      .build()
-      .copyOf()
-      .withFeedId(FEED_ID)
-      .build();
+  private static Stream<Arguments> equalsAndHashCodeFieldCases() {
+    return Stream.of(
+      fieldCase("source", b -> b.withSource(URI.create("https://other.test.com"))),
+      fieldCase("feedId", b -> b.withFeedId("OTHER")),
+      fieldCase("sharedFilePattern", b -> b.withSharedFilePattern(Pattern.compile("other"))),
+      fieldCase("sharedGroupFilePattern", b ->
+        b.withSharedGroupFilePattern(Pattern.compile("other"))
+      ),
+      fieldCase("groupFilePattern", b -> b.withGroupFilePattern(Pattern.compile("other"))),
+      fieldCase("ignoreFilePattern", b -> b.withIgnoreFilePattern(Pattern.compile("other"))),
+      fieldCase("ignoredFeatures", b -> b.withIgnoreFareFrame(true)),
+      fieldCase("noTransfersOnIsolatedStops", b -> b.withNoTransfersOnIsolatedStops(true)),
+      fieldCase("allowStopPlaceAsPassengerStopAssignment", b ->
+        b.withAllowStopPlaceAsPassengerStopAssignment(true)
+      ),
+      fieldCase("ferryIdsNotAllowedForBicycle", b ->
+        b.addFerryIdsNotAllowedForBicycle(Set.of("Ferry:Other"))
+      )
+    );
+  }
 
-    assertTrue(allowed.allowStopPlaceAsPassengerStopAssignment());
-    assertEquals(allowed, sameAllowed);
-    assertEquals(allowed.hashCode(), sameAllowed.hashCode());
-    assertEquals(allowed, copiedAllowed);
-    assertEquals(allowed.hashCode(), copiedAllowed.hashCode());
-    assertNotEquals(subject, allowed);
-    assertNotEquals(subject.hashCode(), allowed.hashCode());
+  @ParameterizedTest(name = "{0}")
+  @MethodSource("equalsAndHashCodeFieldCases")
+  void fieldIsPartOfEqualsAndHashCode(String field, Consumer<NetexFeedParameters.Builder> change) {
+    var builder = subject.copyOf();
+    change.accept(builder);
+    var other = builder.build();
+
+    assertNotEquals(subject, other);
+    assertNotEquals(subject.hashCode(), other.hashCode());
+
+    // Make a change and set it back again to verify that the builder copies the field
+    var copy = other.copyOf().withFeedId("TMP").build().copyOf().withFeedId(other.feedId()).build();
+
+    assertEquals(other, copy);
+    assertEquals(other.hashCode(), copy.hashCode());
+  }
+
+  private static Arguments fieldCase(String field, Consumer<NetexFeedParameters.Builder> change) {
+    return Arguments.of(field, change);
   }
 
   @Test
