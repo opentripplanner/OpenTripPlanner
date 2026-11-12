@@ -4,9 +4,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.FeedInfo;
 import org.onebusaway.gtfs.model.Stop;
@@ -229,5 +232,46 @@ public class TranslationHelperTest {
           break;
       }
     }
+  }
+
+  /**
+   * The GTFS language field is a BCP 47 code and may carry a region: the translation is picked
+   * by the full requested locale, not by its language only.
+   */
+  @ParameterizedTest(name = "{0} -> {1}")
+  @CsvSource({
+    "pt-BR, PT-BR stop",
+    "pt-PT, PT-PT stop",
+    "pt, Stop",
+    "es-ES, ES-ES stop",
+    "es, Stop",
+    "it, Stop",
+  })
+  void regionalLanguageCodes(String requestedLanguage, String expected) {
+    FeedInfo feedInfo = new FeedInfo();
+    feedInfo.setLang("it");
+    var helper = new TranslationHelper();
+    helper.importTranslations(
+      List.of(
+        stopNameTranslation("pt-BR", "PT-BR stop"),
+        stopNameTranslation("pt-PT", "PT-PT stop"),
+        stopNameTranslation("es-ES", "ES-ES stop")
+      ),
+      List.of(feedInfo)
+    );
+
+    I18NString name = helper.getTranslation(Stop.class, "name", "1", "Stop");
+
+    assertEquals(expected, name.toString(Locale.forLanguageTag(requestedLanguage)));
+  }
+
+  private static Translation stopNameTranslation(String language, String text) {
+    Translation t = new Translation();
+    t.setTableName("stops");
+    t.setFieldName("stop_name");
+    t.setLanguage(language);
+    t.setTranslation(text);
+    t.setRecordId("1");
+    return t;
   }
 }

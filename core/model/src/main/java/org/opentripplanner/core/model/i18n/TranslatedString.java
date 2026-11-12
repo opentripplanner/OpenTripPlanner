@@ -10,6 +10,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This is for translated strings for which translations are read from OSM or GTFS alerts.
@@ -30,11 +31,7 @@ public class TranslatedString implements I18NString, Serializable {
 
   private TranslatedString(Map<String, String> translations) {
     for (Map.Entry<String, String> i : translations.entrySet()) {
-      if (i.getKey() == null) {
-        this.translations.put(null, i.getValue());
-      } else {
-        this.translations.put(i.getKey().toLowerCase(), i.getValue());
-      }
+      this.translations.put(normalizeLanguage(i.getKey()), i.getValue());
     }
   }
 
@@ -177,15 +174,41 @@ public class TranslatedString implements I18NString, Serializable {
   }
 
   /**
-   * @param locale Wanted locale
-   * @return The translation in the wanted language if it exists, otherwise the default translation
+   * Returns the translation whose language code best matches the wanted locale, by the "lookup"
+   * scheme of RFC 4647 ({@link Locale#lookupTag}): the language tag of the locale is shortened from
+   * the end until it equals a language code of the data, ignoring case. So {@code pt-BR} returns
+   * the {@code pt-BR} translation, or else the {@code pt} one, while {@code pt} never returns
+   * {@code pt-BR}. If no language code matches, or the locale is {@code null}, returns the default
+   * translation.
    */
   @Override
   public String toString(Locale locale) {
-    String language = null;
-    if (locale != null) {
-      language = locale.getLanguage().toLowerCase();
+    if (locale == null) {
+      return toString();
     }
-    return translations.containsKey(language) ? translations.get(language) : toString();
+    List<String> languages = translations.keySet().stream().filter(Objects::nonNull).toList();
+    String language = Locale.lookupTag(
+      Locale.LanguageRange.parse(locale.toLanguageTag()),
+      languages
+    );
+    return language == null ? toString() : translations.get(language);
+  }
+
+  /**
+   * Converts a language code of the data to the canonical BCP 47 form that Java gives to a
+   * requested locale: {@code pt_BR} becomes {@code pt-BR}, {@code iw} becomes {@code he}. A code
+   * Java cannot parse, such as {@code etymology:wikidata} from the OSM key
+   * {@code name:etymology:wikidata}, is kept in lower case, as before. {@code null}, the default
+   * translation, and blank codes are kept unchanged.
+   */
+  @Nullable
+  static String normalizeLanguage(@Nullable String language) {
+    if (language == null || language.isBlank()) {
+      return language;
+    }
+    Locale locale = Locale.forLanguageTag(language.replace('_', '-'));
+    return locale.getLanguage().isEmpty()
+      ? language.toLowerCase(Locale.ROOT)
+      : locale.toLanguageTag();
   }
 }
