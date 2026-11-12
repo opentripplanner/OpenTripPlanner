@@ -11,6 +11,7 @@ import org.opentripplanner.core.framework.transaction.configure.StreetDomain;
 import org.opentripplanner.core.framework.transaction.configure.TransitDomain;
 import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.transaction.RepositoryHandle;
+import org.opentripplanner.core.model.transaction.RepositoryRegistry;
 import org.opentripplanner.core.model.transaction.UpdateManager;
 import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
@@ -78,6 +79,7 @@ class ConstructApplicationFactoryIntegrationTest {
       >() {}
     ),
     of(new GenericType<RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository>>() {}),
+    of(RepositoryRegistry.class, TransitDomain.class),
     of(StreetDetailsRepository.class),
     of(StreetRepository.class),
     of(TransferRepository.class),
