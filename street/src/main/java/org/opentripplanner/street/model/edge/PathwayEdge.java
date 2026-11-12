@@ -192,7 +192,10 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
     }
   }
 
-  private boolean isStairs() {
+  /**
+   * Is this edge a set of stairs?
+   */
+  public boolean isStairs() {
     return stairCount != 0;
   }
 }

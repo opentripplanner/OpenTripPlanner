@@ -1433,20 +1433,103 @@
         ]
       },
       "filter" : [
-        "in",
+        "all",
         [
-          "get",
-          "class"
+          "in",
+          [
+            "get",
+            "class"
+          ],
+          [
+            "literal",
+            [
+              "PathwayEdge"
+            ]
+          ]
         ],
         [
-          "literal",
+          "==",
           [
-            "PathwayEdge"
-          ]
+            "get",
+            "stairs"
+          ],
+          false
         ]
       ],
       "layout" : {
         "line-cap" : "round",
+        "visibility" : "none"
+      },
+      "metadata" : {
+        "group" : "Edges"
+      }
+    },
+    {
+      "id" : "pathway-stairs",
+      "type" : "line",
+      "source" : "vectorSource",
+      "source-layer" : "edges",
+      "minzoom" : 6,
+      "maxzoom" : 23,
+      "paint" : {
+        "line-color" : "#277eb5",
+        "line-dasharray" : [
+          2.0,
+          2.0
+        ],
+        "line-width" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          13,
+          0.01,
+          23,
+          3.0
+        ],
+        "line-offset" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          13,
+          0.4,
+          23,
+          7.0
+        ]
+      },
+      "filter" : [
+        "all",
+        [
+          "in",
+          [
+            "get",
+            "class"
+          ],
+          [
+            "literal",
+            [
+              "PathwayEdge"
+            ]
+          ]
+        ],
+        [
+          "==",
+          [
+            "get",
+            "stairs"
+          ],
+          true
+        ]
+      ],
+      "layout" : {
+        "line-cap" : "butt",
         "visibility" : "none"
       },
       "metadata" : {

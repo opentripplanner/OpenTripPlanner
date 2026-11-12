@@ -75,7 +75,8 @@ public class EdgePropertyMapper extends PropertyMapper<Edge> {
         kv("traversalTime", e.traversalTime()),
         kv("distance", e.getDistanceMeters()),
         kv("stairCount", e.getStairCount()),
-        kv("signpostedAs", e.signpostedAs())
+        kv("signpostedAs", e.signpostedAs()),
+        kv("stairs", e.isStairs())
       );
       default -> List.of();
     };
