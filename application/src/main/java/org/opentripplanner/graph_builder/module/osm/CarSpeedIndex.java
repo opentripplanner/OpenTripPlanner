@@ -55,10 +55,11 @@ class CarSpeedIndex {
     TLongFloatMap forward = newMap(ways.size());
     TLongFloatMap backward = newMap(ways.size());
 
-    speeds.forEachOrdered(waySpeeds -> {
+    Iterable<WaySpeeds> iterable = speeds::iterator;
+    for (var waySpeeds : iterable) {
       forward.put(waySpeeds.wayId(), waySpeeds.forward());
       backward.put(waySpeeds.wayId(), waySpeeds.backward());
-    });
+    }
 
     LOG.info(progress.completeMessage());
     return new CarSpeedIndex(forward, backward);
