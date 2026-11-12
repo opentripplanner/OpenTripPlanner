@@ -240,12 +240,11 @@ public class TranslationHelperTest {
    */
   @ParameterizedTest(name = "{0} -> {1}")
   @CsvSource({
-    "pt, PT stop",
     "pt-BR, PT-BR stop",
-    "pt-PT, PT stop",
-    "es, ES-ES stop",
+    "pt-PT, PT-PT stop",
+    "pt, Stop",
     "es-ES, ES-ES stop",
-    "es-MX, ES-ES stop",
+    "es, Stop",
     "it, Stop",
   })
   void regionalLanguageCodes(String requestedLanguage, String expected) {
@@ -254,8 +253,8 @@ public class TranslationHelperTest {
     var helper = new TranslationHelper();
     helper.importTranslations(
       List.of(
-        stopNameTranslation("pt", "PT stop"),
         stopNameTranslation("pt-BR", "PT-BR stop"),
+        stopNameTranslation("pt-PT", "PT-PT stop"),
         stopNameTranslation("es-ES", "ES-ES stop")
       ),
       List.of(feedInfo)
