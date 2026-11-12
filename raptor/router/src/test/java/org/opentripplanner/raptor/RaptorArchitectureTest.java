@@ -23,10 +23,12 @@ public class RaptorArchitectureTest {
   private static final Package RAPTOR_UTIL = RAPTOR.subPackage("util");
   private static final Package RAPTOR_UTIL_PARETO_SET = RAPTOR_UTIL.subPackage("paretoset");
   private static final Package RAPTOR_UTIL_COMPOSITE = RAPTOR_UTIL.subPackage("composite");
+  private static final Package RAPTOR_UTIL_COLLECTION = RAPTOR_UTIL.subPackage("collection");
   private static final Module RAPTOR_UTILS = Module.of(
     RAPTOR_UTIL,
     RAPTOR_UTIL_PARETO_SET,
-    RAPTOR_UTIL_COMPOSITE
+    RAPTOR_UTIL_COMPOSITE,
+    RAPTOR_UTIL_COLLECTION
   );
   private static final Package RAPTOR_SPI = RAPTOR.subPackage("spi");
   private static final Package RAPTOR_EXTENSIONS = RAPTOR.subPackage("extensions..");
@@ -92,6 +94,7 @@ public class RaptorArchitectureTest {
     RAPTOR_UTIL.dependsOn(OTP_UTILS, RAPTOR_SPI).verify();
     RAPTOR_UTIL_PARETO_SET.dependsOn(RAPTOR_UTIL_COMPOSITE).verify();
     RAPTOR_UTIL_COMPOSITE.verify();
+    RAPTOR_UTIL_COLLECTION.verify();
   }
 
   @Test

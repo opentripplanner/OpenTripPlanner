@@ -4,14 +4,11 @@ import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctio
 import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.removeNonOptimalPathsForMcRaptor;
 import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.removeNonOptimalPathsForStandardRaptor;
 
-import com.carrotsearch.hppc.IntObjectMap;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.IntUnaryOperator;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorStartOnBoardAccess;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
@@ -19,6 +16,7 @@ import org.opentripplanner.raptor.spi.IntIterator;
 import org.opentripplanner.raptor.spi.IntIterators;
 import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.raptor.spi.SearchDirection;
+import org.opentripplanner.raptor.util.collection.IntIndexList;
 
 /**
  * This class is responsible for performing Raptor-specific functionality on access-paths. It groups
@@ -35,8 +33,8 @@ public class AccessPaths {
   private final int maxNumberOfRides;
   private final int maxTimePenalty;
   private final IntUnaryOperator iterationOp;
-  private final IntObjectMap<List<RaptorAccessEgress>> arrivedOnStreetByNumOfRides;
-  private final IntObjectMap<List<RaptorAccessEgress>> arrivedOnBoardByNumOfRides;
+  private final IntIndexList<RaptorAccessEgress> arrivedOnStreetByNumOfRides;
+  private final IntIndexList<RaptorAccessEgress> arrivedOnBoardByNumOfRides;
   private final List<RaptorStartOnBoardAccess> startOnBoardAccessPaths;
   private int iterationTimePenaltyLimit = RaptorConstants.TIME_NOT_SET;
 
@@ -45,8 +43,8 @@ public class AccessPaths {
     int maxNumberOfRides,
     int maxTimePenalty,
     IntUnaryOperator iterationOp,
-    IntObjectMap<List<RaptorAccessEgress>> arrivedOnStreetByNumOfRides,
-    IntObjectMap<List<RaptorAccessEgress>> arrivedOnBoardByNumOfRides,
+    IntIndexList<RaptorAccessEgress> arrivedOnStreetByNumOfRides,
+    IntIndexList<RaptorAccessEgress> arrivedOnBoardByNumOfRides,
     List<RaptorStartOnBoardAccess> startOnBoardAccessPaths
   ) {
     this.iterationStep = iterationStep;
@@ -128,12 +126,8 @@ public class AccessPaths {
     return filterOnTimePenaltyLimitIfExist(arrivedOnBoardByNumOfRides.get(round));
   }
 
-  public List<RaptorAccessEgress> arrivedOnBoard() {
-    var result = new ArrayList<RaptorAccessEgress>();
-    for (var cursor : arrivedOnBoardByNumOfRides.values()) {
-      result.addAll(cursor.value);
-    }
-    return List.copyOf(result);
+  public Iterable<RaptorAccessEgress> arrivedOnBoard() {
+    return arrivedOnBoardByNumOfRides.elements();
   }
 
   /**
@@ -200,18 +194,16 @@ public class AccessPaths {
 
   /* private methods */
 
-  private static int maxTimePenalty(IntObjectMap<List<RaptorAccessEgress>> col) {
-    int max = RaptorConstants.TIME_NOT_SET;
-    for (var cursor : col.values()) {
-      for (var it : cursor.value) {
-        max = Math.max(max, it.timePenalty());
-      }
-    }
-    return max;
+  private static int maxTimePenalty(IntIndexList<RaptorAccessEgress> col) {
+    return col
+      .stream()
+      .mapToInt(RaptorAccessEgress::timePenalty)
+      .max()
+      .orElse(RaptorConstants.TIME_NOT_SET);
   }
 
-  private static int maxNumberOfRounds(IntObjectMap<List<RaptorAccessEgress>> col) {
-    return IntStream.of(col.keys().toArray()).max().orElse(0);
+  private static int maxNumberOfRounds(IntIndexList<RaptorAccessEgress> col) {
+    return Math.max(0, col.maxIndex());
   }
 
   /**
@@ -232,13 +224,8 @@ public class AccessPaths {
     return maxTimePenalty != RaptorConstants.TIME_NOT_SET;
   }
 
-  private static boolean hasTimeDependentAccess(IntObjectMap<List<RaptorAccessEgress>> map) {
-    for (var cursor : map.values()) {
-      if (cursor.value.stream().anyMatch(RaptorAccessEgress::hasOpeningHours)) {
-        return true;
-      }
-    }
-    return false;
+  private static boolean hasTimeDependentAccess(IntIndexList<RaptorAccessEgress> index) {
+    return index.stream().anyMatch(RaptorAccessEgress::hasOpeningHours);
   }
 
   private static List<RaptorStartOnBoardAccess> mapToStartOnBoardAccess(
@@ -265,13 +252,8 @@ public class AccessPaths {
    * set. If the limit is not set, then the given list is returned. This only filters the list after
    * all iterations are done, and we start iterating over the vertual minutes to allow itineraries
    * with a time-penalty to be included, even if the start before the search-window.
-   * <p>
-   * This method returns an empty list if the given input list is {@code null}.
    */
   private List<RaptorAccessEgress> filterOnTimePenaltyLimitIfExist(List<RaptorAccessEgress> list) {
-    if (list == null) {
-      return List.of();
-    }
     if (iterationTimePenaltyLimit != RaptorConstants.TIME_NOT_SET) {
       return list
         .stream()
