@@ -29,7 +29,7 @@ public record KeyValue(String key, Object value) {
     if (value == null) {
       return new KeyValue(key, null);
     } else if (value instanceof Optional<?> opt) {
-      return new KeyValue(key, opt.orElse(null));
+      return new KeyValue(key, opt.map(Object::toString).orElse(null));
     } else if (
       value instanceof FeedScopedId || value instanceof Enum<?> || value instanceof I18NString
     ) {

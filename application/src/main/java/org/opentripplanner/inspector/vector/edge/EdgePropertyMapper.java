@@ -72,6 +72,7 @@ public class EdgePropertyMapper extends PropertyMapper<Edge> {
       );
       case PathwayEdge e -> List.of(
         kv("name", e.getName()),
+        kv("traversalTime", e.traversalTime()),
         kv("distance", e.getDistanceMeters()),
         kv("stairCount", e.getStairCount()),
         kv("signpostedAs", e.signpostedAs())

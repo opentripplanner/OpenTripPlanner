@@ -1,5 +1,6 @@
 package org.opentripplanner.street.model.edge;
 
+import java.time.Duration;
 import java.util.Objects;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
@@ -181,6 +182,14 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
   @Override
   public boolean isWheelchairAccessible() {
     return wheelchairAccessible;
+  }
+
+  public Optional<Duration> traversalTime() {
+    if (traversalTime > 0) {
+      return Optional.of(Duration.ofMillis(traversalTime));
+    } else {
+      return Optional.empty();
+    }
   }
 
   private boolean isStairs() {
