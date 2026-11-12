@@ -68,8 +68,8 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
   private Function<ServiceDelivery, Future<?>> serviceDeliveryConsumer;
   private final List<Future<?>> graphUpdates = Collections.synchronizedList(new ArrayList<>());
 
-  private final BlockingQueue<byte[]> liveMessageQueue = new LinkedBlockingQueue<>();
-  private final BlockingQueue<byte[]> primingMessageQueue = new LinkedBlockingQueue<>();
+  final BlockingQueue<byte[]> liveMessageQueue = new LinkedBlockingQueue<>();
+  final BlockingQueue<byte[]> primingMessageQueue = new LinkedBlockingQueue<>();
   private final ExecutorService primingExecutor;
   private final ExecutorService liveExecutor;
   private final ScheduledExecutorService readinessWatcher;
@@ -310,7 +310,11 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
     return Optional.ofNullable(siri.getServiceDelivery());
   }
 
-  private void onMessage(Mqtt5Publish message) {
+  void onMessage(Mqtt5Publish message) {
+    // An empty payload is not a SIRI message, e.g. the deletion of a retained message
+    if (message.getPayloadAsBytes().length == 0) {
+      return;
+    }
     boolean offer;
     if (message.isRetain() && !primed) {
       offer = primingMessageQueue.offer(message.getPayloadAsBytes());
