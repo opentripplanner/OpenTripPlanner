@@ -13,6 +13,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingSpaces;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 
 /**
  * Maps from NeTEx Parking to an internal {@link VehicleParking}.
@@ -43,16 +44,17 @@ class VehicleParkingMapper {
       );
       return null;
     }
+    WgsCoordinate coordinate = WgsCoordinateMapper.mapToDomain(parking.getCentroid());
     return VehicleParking.of()
       .id(idFactory.createId(parking.getId()))
       .name(
         NonLocalizedString.ofNullable(MultilingualStringMapper.getStringValue(parking.getName()))
       )
-      .coordinate(WgsCoordinateMapper.mapToDomain(parking.getCentroid()))
+      .coordinate(coordinate)
       .capacity(mapCapacity(parking))
       .bicyclePlaces(hasBikes(parking))
       .carPlaces(!hasBikes(parking))
-      .entrance(mapEntrance(parking))
+      .entrance(mapEntrance(parking, coordinate))
       .build();
   }
 
@@ -72,11 +74,14 @@ class VehicleParkingMapper {
     }
   }
 
-  private VehicleParking.VehicleParkingEntranceCreator mapEntrance(Parking parking) {
+  private VehicleParking.VehicleParkingEntranceCreator mapEntrance(
+    Parking parking,
+    WgsCoordinate coordinate
+  ) {
     return builder ->
       builder
         .entranceId(idFactory.createId(parking.getId() + "/entrance"))
-        .coordinate(WgsCoordinateMapper.mapToDomain(parking.getCentroid()))
+        .coordinate(coordinate)
         .walkAccessible(true)
         .carAccessible(true);
   }

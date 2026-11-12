@@ -100,7 +100,7 @@ class QuayMapper {
           MultilingualStringMapper.getStringValue(quay.getDescription())
         )
       )
-      .withCoordinate(WgsCoordinateMapper.mapToDomain(quay.getCentroid()))
+      .withCoordinate(coordinate)
       .withWheelchairAccessibility(wheelchair)
       .withVehicleType(transitMode.mainMode())
       .withNetexVehicleSubmode(subMode)
