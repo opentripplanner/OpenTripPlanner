@@ -320,10 +320,6 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
     return primingMessageQueue.size();
   }
 
-  /**
-   * Queue a received message for processing. Messages with an empty payload are ignored.
-   * Package-private for testing.
-   */
   void onMessage(Mqtt5Publish message) {
     if (message.getPayloadAsBytes().length == 0) {
       return;
