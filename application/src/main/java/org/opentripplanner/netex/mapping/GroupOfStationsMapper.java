@@ -1,9 +1,8 @@
 package org.opentripplanner.netex.mapping;
 
-import jakarta.xml.bind.JAXBElement;
 import java.util.List;
+import java.util.Objects;
 import org.entur.netex2.model.GroupOfStopPlaces;
-import org.entur.netex2.model.StopPlaceRefStructure;
 import org.entur.netex2.model.StopPlaceRefs_RelStructure;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.i18n.I18NString;
@@ -42,28 +41,9 @@ class GroupOfStationsMapper {
   }
 
   GroupOfStations map(GroupOfStopPlaces groupOfStopPlaces) {
-    I18NString name;
-
-    if (groupOfStopPlaces.getName() != null) {
-      name = NonLocalizedString.ofNullable(
-        MultilingualStringMapper.getStringValue(groupOfStopPlaces.getName())
-      );
-    } else {
-      issueStore.add(
-        "GroupOfStopPlacesWithoutName",
-        "GroupOfStopPlaces {} does not contain a name.",
-        groupOfStopPlaces.getId()
-      );
-      StopPlaceRefStructure ref = groupOfStopPlaces
-        .getMembers()
-        .getStopPlaceRef()
-        .get(0)
-        .getValue();
-      name = stations.get(idFactory.createId(ref.getRef())).getName();
-    }
     GroupOfStationsBuilder groupOfStations = GroupOfStations.of(
       idFactory.createId(groupOfStopPlaces.getId())
-    ).withName(name);
+    ).withName(mapName(groupOfStopPlaces));
 
     // TODO Map PurposeOfGrouping from NeTEx
 
@@ -72,7 +52,7 @@ class GroupOfStationsMapper {
     if (coordinate == null) {
       issueStore.add(
         "GroupOfStationWithoutCoordinates",
-        "MultiModal station {} does not contain any coordinates.",
+        "GroupOfStations %s does not contain any coordinates.",
         groupOfStations.getId()
       );
     } else {
@@ -84,28 +64,59 @@ class GroupOfStationsMapper {
     return groupOfStations.build();
   }
 
+  /**
+   * The name is required. If it is missing, the name of the first member found is used instead. A
+   * member may be missing, e.g. a StopPlace without valid coordinates is dropped, so fall back to
+   * "N/A" if no member is found.
+   */
+  private I18NString mapName(GroupOfStopPlaces groupOfStopPlaces) {
+    String name = MultilingualStringMapper.nullableValueOf(groupOfStopPlaces.getName());
+    if (name != null) {
+      return new NonLocalizedString(name);
+    }
+    issueStore.add(
+      "GroupOfStopPlacesWithoutName",
+      "GroupOfStopPlaces %s does not contain a name.",
+      groupOfStopPlaces.getId()
+    );
+    return memberIds(groupOfStopPlaces)
+      .stream()
+      .map(this::lookupStation)
+      .filter(Objects::nonNull)
+      .map(StopLocationsGroup::getName)
+      .findFirst()
+      .orElse(new NonLocalizedString("N/A"));
+  }
+
   private void connectChildStation(
     GroupOfStopPlaces groupOfStopPlaces,
     GroupOfStationsBuilder groupOfStations
   ) {
-    StopPlaceRefs_RelStructure members = groupOfStopPlaces.getMembers();
-    if (members != null) {
-      List<JAXBElement<? extends StopPlaceRefStructure>> memberList = members.getStopPlaceRef();
-      for (JAXBElement<? extends StopPlaceRefStructure> stopPlaceRefStructure : memberList) {
-        FeedScopedId stationId = idFactory.createId(stopPlaceRefStructure.getValue().getRef());
-        StopLocationsGroup station = lookupStation(stationId);
-        if (station != null) {
-          groupOfStations.addChildStation(station);
-        } else {
-          issueStore.add(
-            "GroupOfStationWithoutStations",
-            "GroupOfStation %s child not found: %s",
-            groupOfStations.getId(),
-            stationId
-          );
-        }
+    for (FeedScopedId stationId : memberIds(groupOfStopPlaces)) {
+      StopLocationsGroup station = lookupStation(stationId);
+      if (station != null) {
+        groupOfStations.addChildStation(station);
+      } else {
+        issueStore.add(
+          "GroupOfStationWithoutStations",
+          "GroupOfStation %s child not found: %s",
+          groupOfStations.getId(),
+          stationId
+        );
       }
     }
+  }
+
+  private List<FeedScopedId> memberIds(GroupOfStopPlaces groupOfStopPlaces) {
+    StopPlaceRefs_RelStructure members = groupOfStopPlaces.getMembers();
+    if (members == null) {
+      return List.of();
+    }
+    return members
+      .getStopPlaceRef()
+      .stream()
+      .map(ref -> idFactory.createId(ref.getValue().getRef()))
+      .toList();
   }
 
   @Nullable
