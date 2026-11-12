@@ -167,6 +167,9 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater<TransitRealTimeUpda
   }
 
   private void onMessage(Mqtt5Publish message) {
+    if (message.getPayloadAsBytes().length == 0) {
+      return;
+    }
     List<GtfsRealtime.TripUpdate> updates = null;
     UpdateIncrementality updateIncrementality = FULL_DATASET;
     try {
