@@ -94,6 +94,33 @@ class PassengerStopAssignmentToQuaylessStopPlaceTest {
     assertEquals(OK, validate(stopPlace));
   }
 
+  /**
+   * Quays with out-of-range coordinates are dropped by the stop mapping.
+   */
+  @Test
+  void stopPlaceWithOnlyQuayWithCentroidOutOfRange() {
+    var centroid = new SimplePoint_VersionStructure().withLocation(
+      new LocationStructure()
+        .withLatitude(BigDecimal.valueOf(91))
+        .withLongitude(BigDecimal.valueOf(10.75))
+    );
+    var quay = NetexTestDataSupport.createQuay().withCentroid(centroid);
+    var stopPlace = NetexTestDataSupport.createStopPlace(quay);
+
+    assertEquals(DISCARD, validate(stopPlace));
+  }
+
+  @Test
+  void stopPlaceWithOnlyQuayWithCentroidPosOutOfRange() {
+    var centroid = new SimplePoint_VersionStructure().withLocation(
+      new LocationStructure().withPos(new DirectPositionType().withValue(59.9, 181.0))
+    );
+    var quay = NetexTestDataSupport.createQuay().withCentroid(centroid);
+    var stopPlace = NetexTestDataSupport.createStopPlace(quay);
+
+    assertEquals(DISCARD, validate(stopPlace));
+  }
+
   @Test
   void stopPlaceWithOnlyQuayWithCentroidEmptyPos() {
     var centroid = new SimplePoint_VersionStructure().withLocation(
