@@ -6,9 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.opentripplanner.netex.NetexTestDataSupport.createQuay;
 import static org.opentripplanner.netex.NetexTestDataSupport.createStopPlace;
 
+import java.math.BigDecimal;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Set;
+import org.entur.netex2.model.ObjectFactory;
 import org.entur.netex2.model.Quay;
 import org.entur.netex2.model.StopPlace;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,6 +24,9 @@ import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.service.SiteRepository;
 
 class StationMapperTest {
+
+  /** A latitude which lost its decimal point, as seen in real data. */
+  private static final double INVALID_LAT = 56162332.0;
 
   private DataImportIssueStore issueStore;
   private StationMapper stationMapper;
@@ -57,6 +62,40 @@ class StationMapperTest {
     assertEquals(NetexTestDataSupport.QUAY_LAT, station.getLat());
     assertEquals(NetexTestDataSupport.QUAY_LON, station.getLon());
     assertThat(issueTypes()).containsExactly("StationWithoutCoordinates");
+  }
+
+  @Test
+  void testInvalidStopPlaceCentroidFallsBackToQuayCentroid() {
+    Quay quay = createQuay();
+    StopPlace stopPlace = createStopPlace(quay);
+    stopPlace.getCentroid().getLocation().setLatitude(BigDecimal.valueOf(INVALID_LAT));
+    Station station = stationMapper.map(stopPlace);
+    assertEquals(NetexTestDataSupport.QUAY_LAT, station.getLat());
+    assertEquals(NetexTestDataSupport.QUAY_LON, station.getLon());
+    assertThat(issueTypes()).containsExactly("StationInvalidCoordinates");
+  }
+
+  @Test
+  void testInvalidQuayCentroidIsIgnoredWhenComputingStationCentroid() {
+    Quay invalidQuay = createQuay("Q:invalid", "Invalid", "1", INVALID_LAT, 10.0, "1");
+    StopPlace stopPlace = createStopPlace(invalidQuay);
+    stopPlace.getQuays().withQuayRefOrQuay(new ObjectFactory().createQuay(createQuay()));
+    stopPlace.withCentroid(null);
+    Station station = stationMapper.map(stopPlace);
+    assertEquals(NetexTestDataSupport.QUAY_LAT, station.getLat());
+    assertEquals(NetexTestDataSupport.QUAY_LON, station.getLon());
+  }
+
+  @Test
+  void testStopPlaceWithoutAnyValidCoordinatesIsSkipped() {
+    Quay invalidQuay = createQuay("Q:invalid", "Invalid", "1", INVALID_LAT, 10.0, "1");
+    StopPlace stopPlace = createStopPlace(invalidQuay);
+    stopPlace.getCentroid().getLocation().setLatitude(BigDecimal.valueOf(INVALID_LAT));
+    assertNull(stationMapper.map(stopPlace));
+    assertThat(issueTypes()).containsExactly(
+      "StationInvalidCoordinates",
+      "StationWithoutValidCoordinates"
+    );
   }
 
   @Test

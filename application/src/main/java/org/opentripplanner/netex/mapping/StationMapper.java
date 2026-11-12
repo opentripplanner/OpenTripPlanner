@@ -19,6 +19,7 @@ import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.core.model.i18n.TranslatedString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.netex.mapping.WgsCoordinateMapper.InvalidCoordinateException;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.netex.support.JAXBUtils;
 import org.opentripplanner.street.geometry.WgsCoordinate;
@@ -144,8 +145,8 @@ class StationMapper {
   }
 
   /**
-   * Map the centroid to a coordinate. If the centroid is missing, the mean coordinate of the quays
-   * with coordinates is returned instead.
+   * Map the centroid to a coordinate. If the centroid is missing or invalid, the mean coordinate
+   * of the quays with valid coordinates is returned instead.
    *
    * @return {@code null} if no coordinate can be derived at all.
    */
@@ -170,21 +171,31 @@ class StationMapper {
 
   @Nullable
   private WgsCoordinate mapCentroid(StopPlace stopPlace) {
-    WgsCoordinate coordinate = WgsCoordinateMapper.mapToDomain(stopPlace.getCentroid());
-    if (coordinate == null) {
+    try {
+      WgsCoordinate coordinate = WgsCoordinateMapper.mapToDomain(stopPlace.getCentroid());
+      if (coordinate == null) {
+        issueStore.add(
+          "StationWithoutCoordinates",
+          "Station %s %s does not contain any coordinates.",
+          stopPlace.getId(),
+          MultilingualStringMapper.getStringValue(stopPlace.getName())
+        );
+      }
+      return coordinate;
+    } catch (InvalidCoordinateException e) {
       issueStore.add(
-        "StationWithoutCoordinates",
-        "Station %s %s does not contain any coordinates.",
+        "StationInvalidCoordinates",
+        "Station %s has invalid coordinates. %s",
         stopPlace.getId(),
-        MultilingualStringMapper.getStringValue(stopPlace.getName())
+        e.getMessage()
       );
+      return null;
     }
-    return coordinate;
   }
 
   /**
-   * Return the coordinates of the quays which have a coordinate. Quays with missing coordinates
-   * are reported when the quays themselves are mapped.
+   * Return the coordinates of the quays which have a valid coordinate. Quays with missing or
+   * invalid coordinates are reported when the quays themselves are mapped.
    */
   private static List<WgsCoordinate> mapQuayCoordinates(StopPlace stopPlace) {
     if (stopPlace.getQuays() == null) {
@@ -196,9 +207,13 @@ class StationMapper {
       stopPlace.getQuays().getQuayRefOrQuay()
     ).toList();
     for (Quay quay : quays) {
-      WgsCoordinate coordinate = WgsCoordinateMapper.mapToDomain(quay.getCentroid());
-      if (coordinate != null) {
-        coordinates.add(coordinate);
+      try {
+        WgsCoordinate coordinate = WgsCoordinateMapper.mapToDomain(quay.getCentroid());
+        if (coordinate != null) {
+          coordinates.add(coordinate);
+        }
+      } catch (InvalidCoordinateException ignore) {
+        // Skip the quay, the issue is reported by the QuayMapper
       }
     }
     return coordinates;

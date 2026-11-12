@@ -85,6 +85,19 @@ class VehicleParkingMapperTest {
   }
 
   @Test
+  void dropInvalidCoordinates() {
+    var parking = parking(Set.of(CAR));
+    parking.getCentroid().getLocation().setLatitude(new BigDecimal(100));
+    var issueStore = new DefaultDataImportIssueStore();
+    var vp = mapper(issueStore).map(parking);
+    assertNull(vp);
+    assertEquals(
+      List.of("InvalidParkingCoordinates"),
+      issueStore.listIssues().stream().map(DataImportIssue::getType).toList()
+    );
+  }
+
+  @Test
   void mapMissingName() {
     var parking = parking(Set.of(CAR));
     parking.setName(null);

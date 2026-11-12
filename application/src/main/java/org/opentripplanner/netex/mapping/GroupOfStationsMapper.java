@@ -9,6 +9,7 @@ import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.netex.mapping.WgsCoordinateMapper.InvalidCoordinateException;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.ImmutableEntityById;
@@ -47,15 +48,8 @@ class GroupOfStationsMapper {
 
     // TODO Map PurposeOfGrouping from NeTEx
 
-    WgsCoordinate coordinate = WgsCoordinateMapper.mapToDomain(groupOfStopPlaces.getCentroid());
-
-    if (coordinate == null) {
-      issueStore.add(
-        "GroupOfStationWithoutCoordinates",
-        "GroupOfStations %s does not contain any coordinates.",
-        groupOfStations.getId()
-      );
-    } else {
+    WgsCoordinate coordinate = mapCoordinate(groupOfStopPlaces, groupOfStations.getId());
+    if (coordinate != null) {
       groupOfStations.withCoordinate(coordinate);
     }
 
@@ -86,6 +80,33 @@ class GroupOfStationsMapper {
       .map(StopLocationsGroup::getName)
       .findFirst()
       .orElse(new NonLocalizedString("N/A"));
+  }
+
+  /**
+   * Map the centroid to a coordinate. The coordinate is optional for a GroupOfStations, so a
+   * missing or invalid centroid is reported as an issue and {@code null} is returned.
+   */
+  @Nullable
+  private WgsCoordinate mapCoordinate(GroupOfStopPlaces groupOfStopPlaces, FeedScopedId id) {
+    try {
+      WgsCoordinate coordinate = WgsCoordinateMapper.mapToDomain(groupOfStopPlaces.getCentroid());
+      if (coordinate == null) {
+        issueStore.add(
+          "GroupOfStationWithoutCoordinates",
+          "GroupOfStations %s does not contain any coordinates.",
+          id
+        );
+      }
+      return coordinate;
+    } catch (InvalidCoordinateException e) {
+      issueStore.add(
+        "GroupOfStationInvalidCoordinates",
+        "GroupOfStations %s has invalid coordinates, the coordinates are ignored. %s",
+        id,
+        e.getMessage()
+      );
+      return null;
+    }
   }
 
   private void connectChildStation(

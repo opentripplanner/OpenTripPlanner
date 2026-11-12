@@ -11,6 +11,7 @@ import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.netex.mapping.WgsCoordinateMapper.InvalidCoordinateException;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingSpaces;
@@ -77,20 +78,31 @@ class VehicleParkingMapper {
   }
 
   /**
-   * Map the centroid to a coordinate. A parking lot without a coordinate cannot be linked to the
-   * street network, so a missing centroid is reported and {@code null} is returned.
+   * Map the centroid to a coordinate. A parking lot without a valid coordinate cannot be linked
+   * to the street network, so a missing or invalid centroid is reported and {@code null} is
+   * returned.
    */
   @Nullable
   private WgsCoordinate mapCoordinate(Parking parking) {
-    WgsCoordinate coordinate = WgsCoordinateMapper.mapToDomain(parking.getCentroid());
-    if (coordinate == null) {
+    try {
+      WgsCoordinate coordinate = WgsCoordinateMapper.mapToDomain(parking.getCentroid());
+      if (coordinate == null) {
+        issueStore.add(
+          "MissingParkingCoordinates",
+          "NeTEx Parking '%s' does not contain a centroid",
+          parkingDebugId(parking)
+        );
+      }
+      return coordinate;
+    } catch (InvalidCoordinateException e) {
       issueStore.add(
-        "MissingParkingCoordinates",
-        "NeTEx Parking '%s' does not contain a centroid",
-        parkingDebugId(parking)
+        "InvalidParkingCoordinates",
+        "NeTEx Parking '%s' has invalid coordinates. %s",
+        parkingDebugId(parking),
+        e.getMessage()
       );
+      return null;
     }
-    return coordinate;
   }
 
   /**

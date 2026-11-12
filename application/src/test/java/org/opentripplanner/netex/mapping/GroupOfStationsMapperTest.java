@@ -52,6 +52,16 @@ class GroupOfStationsMapperTest {
     assertThat(issueTypes()).containsExactly("GroupOfStationWithoutCoordinates");
   }
 
+  /** An invalid centroid is ignored, the group is still mapped since the coordinate is optional. */
+  @Test
+  void invalidCoordinates() {
+    var group = groupOfStopPlaces().withCentroid(point(56162332.0, 10.7));
+    var result = mapper.map(group);
+    assertEquals(ID, result.getId().getId());
+    assertNull(result.getCoordinate());
+    assertThat(issueTypes()).containsExactly("GroupOfStationInvalidCoordinates");
+  }
+
   @Test
   void missingNameFallsBackToNameOfFirstMemberFound() {
     stations.add(
