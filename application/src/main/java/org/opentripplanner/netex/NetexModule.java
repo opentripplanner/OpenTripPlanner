@@ -131,6 +131,12 @@ public class NetexModule implements GraphBuilderModule {
     }
   }
 
+  /**
+   * Load the next bundle and close its data source. The NeTEx module is the only reader of the
+   * NeTEx data sources, so the source is released as soon as the bundle is loaded - a streamed zip
+   * file keeps its entire uncompressed content in memory until it is closed. The data sources are
+   * closed again at the end of the graph build by their owner, which has no effect.
+   */
   private TransitDataImportBuilder loadNextBundle() throws IOException {
     try (var netexBundle = netexBundles.poll()) {
       netexBundle.checkInputs();

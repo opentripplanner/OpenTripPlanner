@@ -1,7 +1,9 @@
 package org.opentripplanner.datastore.file;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.datastore.api.FileType.GTFS;
 
@@ -135,6 +137,31 @@ class ZipStreamDataSourceDecoratorTest {
     assertTrue(content.stream().allMatch(DataSource::exists));
     subject.close();
     assertTrue(content.stream().noneMatch(DataSource::exists));
+  }
+
+  @Test
+  void contentIsNotAvailableAfterClose() throws IOException {
+    CompositeDataSource subject = new ZipStreamDataSourceDecorator(
+      new FileDataSource(ConstantsForTests.CALTRAIN_GTFS, GTFS)
+    );
+    subject.content();
+
+    subject.close();
+
+    assertThrows(IllegalStateException.class, subject::content);
+    assertThrows(IllegalStateException.class, () -> subject.entry("agency.txt"));
+  }
+
+  @Test
+  void closeIsIdempotent() throws IOException {
+    CompositeDataSource subject = new ZipStreamDataSourceDecorator(
+      new FileDataSource(ConstantsForTests.CALTRAIN_GTFS, GTFS)
+    );
+    subject.content();
+
+    subject.close();
+
+    assertDoesNotThrow(subject::close);
   }
 
   @Test
