@@ -8,6 +8,7 @@ import java.util.Set;
 import org.entur.netex2.model.Parking;
 import org.entur.netex2.model.ParkingVehicleEnumeration;
 import org.jspecify.annotations.Nullable;
+import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
@@ -44,18 +45,52 @@ class VehicleParkingMapper {
       );
       return null;
     }
-    WgsCoordinate coordinate = WgsCoordinateMapper.mapToDomain(parking.getCentroid());
+    WgsCoordinate coordinate = mapCoordinate(parking);
+    if (coordinate == null) {
+      return null;
+    }
     return VehicleParking.of()
       .id(idFactory.createId(parking.getId()))
-      .name(
-        NonLocalizedString.ofNullable(MultilingualStringMapper.getStringValue(parking.getName()))
-      )
+      .name(mapName(parking))
       .coordinate(coordinate)
       .capacity(mapCapacity(parking))
       .bicyclePlaces(hasBikes(parking))
       .carPlaces(!hasBikes(parking))
       .entrance(mapEntrance(parking, coordinate))
       .build();
+  }
+
+  /**
+   * The name is required by the APIs, so a missing name is reported and replaced by "N/A".
+   */
+  private I18NString mapName(Parking parking) {
+    String name = MultilingualStringMapper.nullableValueOf(parking.getName());
+    if (name != null) {
+      return new NonLocalizedString(name);
+    }
+    issueStore.add(
+      "MissingParkingName",
+      "NeTEx Parking '%s' does not contain a name",
+      parkingDebugId(parking)
+    );
+    return new NonLocalizedString("N/A");
+  }
+
+  /**
+   * Map the centroid to a coordinate. A parking lot without a coordinate cannot be linked to the
+   * street network, so a missing centroid is reported and {@code null} is returned.
+   */
+  @Nullable
+  private WgsCoordinate mapCoordinate(Parking parking) {
+    WgsCoordinate coordinate = WgsCoordinateMapper.mapToDomain(parking.getCentroid());
+    if (coordinate == null) {
+      issueStore.add(
+        "MissingParkingCoordinates",
+        "NeTEx Parking '%s' does not contain a centroid",
+        parkingDebugId(parking)
+      );
+    }
+    return coordinate;
   }
 
   /**
