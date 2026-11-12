@@ -23,6 +23,7 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.ElevatorAlightEdge;
 import org.opentripplanner.street.model.edge.ElevatorBoardEdge;
 import org.opentripplanner.street.model.edge.ElevatorHopEdge;
+import org.opentripplanner.street.model.edge.EscalatorEdge;
 import org.opentripplanner.street.model.edge.PathwayEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.edge.StreetTransitEntranceLink;
@@ -141,6 +142,37 @@ public class TestStateBuilder {
       throw new IllegalStateException("Only single state transitions are supported.");
     }
     currentState = states[0];
+    return this;
+  }
+
+  /**
+   * Traverse a very plain street edge with stairs with no special characteristics.
+   */
+  public TestStateBuilder stairsEdge() {
+    return streetEdge(b -> b.withPermission(StreetTraversalPermission.PEDESTRIAN).withStairs(true));
+  }
+
+  /**
+   * Traverse a very plain escalator edge with no special characteristics.
+   */
+  public TestStateBuilder escalatorEdge() {
+    count++;
+    var from = (StreetVertex) currentState.vertex;
+    var to = StreetModelFactory.intersectionVertex(count, count);
+    var edge = EscalatorEdge.createEscalatorEdge(from, to, 30, null);
+    currentState = edge.traverse(currentState)[0];
+    return this;
+  }
+
+  /**
+   * Traverse an escalator edge ending at a station entrance.
+   */
+  public TestStateBuilder escalatorEdgeAndStationEntrance() {
+    count++;
+    var from = (StreetVertex) currentState.vertex;
+    var to = new StationEntranceVertex(count, count, 12345, "B", Accessibility.POSSIBLE);
+    var edge = EscalatorEdge.createEscalatorEdge(from, to, 30, null);
+    currentState = edge.traverse(currentState)[0];
     return this;
   }
 

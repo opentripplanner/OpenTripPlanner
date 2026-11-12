@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.mapping._support.mapping;
 
-import org.opentripplanner.model.plan.walkstep.AbsoluteDirection;
 import org.opentripplanner.routing.algorithm.mapping._support.model.ApiAbsoluteDirection;
+import org.opentripplanner.street.model.path.step.AbsoluteDirection;
 
 @Deprecated
 class AbsoluteDirectionMapper {
