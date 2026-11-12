@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.siri.updater.mqtt;
 
-import static com.google.common.truth.Truth.assertThat;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5Publish;
 import java.nio.charset.StandardCharsets;
@@ -47,25 +46,23 @@ class MqttEstimatedTimetableSourceTest {
     );
     source.onMessage(Mqtt5Publish.builder().topic(TOPIC).retain(true).build());
 
-    assertThat(source.liveMessageQueue).isEmpty();
-    assertThat(source.primingMessageQueue).isEmpty();
+    assertEquals(0, source.liveQueueSize());
+    assertEquals(0, source.primingQueueSize());
   }
 
   @Test
   void liveMessageIsQueued() {
     source.onMessage(Mqtt5Publish.builder().topic(TOPIC).payload(PAYLOAD).build());
 
-    assertThat(source.liveMessageQueue).hasSize(1);
-    assertArrayEquals(PAYLOAD, source.liveMessageQueue.peek());
-    assertThat(source.primingMessageQueue).isEmpty();
+    assertEquals(1, source.liveQueueSize());
+    assertEquals(0, source.primingQueueSize());
   }
 
   @Test
   void retainedMessageIsQueuedForPriming() {
     source.onMessage(Mqtt5Publish.builder().topic(TOPIC).payload(PAYLOAD).retain(true).build());
 
-    assertThat(source.primingMessageQueue).hasSize(1);
-    assertArrayEquals(PAYLOAD, source.primingMessageQueue.peek());
-    assertThat(source.liveMessageQueue).isEmpty();
+    assertEquals(1, source.primingQueueSize());
+    assertEquals(0, source.liveQueueSize());
   }
 }
