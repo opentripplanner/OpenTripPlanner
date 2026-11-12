@@ -311,7 +311,6 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
   }
 
   void onMessage(Mqtt5Publish message) {
-    // An empty payload is not a SIRI message, e.g. the deletion of a retained message
     if (message.getPayloadAsBytes().length == 0) {
       return;
     }
