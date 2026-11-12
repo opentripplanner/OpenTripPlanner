@@ -1,6 +1,7 @@
 package org.opentripplanner.inspector.vector;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.i18n.I18NString;
@@ -27,6 +28,8 @@ public record KeyValue(String key, Object value) {
   public static KeyValue kv(String key, @Nullable Object value) {
     if (value == null) {
       return new KeyValue(key, null);
+    } else if (value instanceof Optional<?> opt) {
+      return new KeyValue(key, opt.orElse(null));
     } else if (
       value instanceof FeedScopedId || value instanceof Enum<?> || value instanceof I18NString
     ) {
