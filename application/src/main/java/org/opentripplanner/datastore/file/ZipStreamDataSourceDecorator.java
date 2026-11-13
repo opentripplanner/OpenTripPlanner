@@ -50,6 +50,8 @@ public class ZipStreamDataSourceDecorator implements CompositeDataSource {
    */
   private List<DataSource> content = new ArrayList<>();
 
+  private boolean closed = false;
+
   /**
    * Create a Zip Stream data source decorator around another data source. The given delegate is
    * responsible for retrieving meta-data and providing an input stream to fetch the zipped content.
@@ -140,11 +142,13 @@ public class ZipStreamDataSourceDecorator implements CompositeDataSource {
 
   @Override
   public void close() {
-    if (content != null) {
-      for (DataSource dataSource : content) {
-        if (dataSource instanceof TemporaryFileDataSource tempDataSource) {
-          tempDataSource.deleteFile();
-        }
+    if (closed) {
+      return;
+    }
+    closed = true;
+    for (DataSource dataSource : content) {
+      if (dataSource instanceof TemporaryFileDataSource tempDataSource) {
+        tempDataSource.deleteFile();
       }
     }
     // Make the content available for GC.
@@ -157,8 +161,8 @@ public class ZipStreamDataSourceDecorator implements CompositeDataSource {
   }
 
   private void loadContent() {
-    if (content == null) {
-      throw new NullPointerException(
+    if (closed) {
+      throw new IllegalStateException(
         "The content is accessed after the zip file is closed: " + path()
       );
     }
