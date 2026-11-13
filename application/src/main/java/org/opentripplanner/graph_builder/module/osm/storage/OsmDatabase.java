@@ -6,17 +6,18 @@ import com.carrotsearch.hppc.LongObjectHashMap;
 import com.carrotsearch.hppc.LongObjectMap;
 import com.carrotsearch.hppc.LongSet;
 import com.carrotsearch.hppc.cursors.LongCursor;
-import com.carrotsearch.hppc.cursors.ObjectCursor;
 import com.carrotsearch.hppc.procedures.LongProcedure;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.jspecify.annotations.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.framework.collection.HPPCMapSetUtils;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -60,6 +61,10 @@ public class OsmDatabase {
 
   /* Map of all non-area ways keyed by their OSM ID */
   private final LongObjectMap<OsmWay> waysById = new LongObjectHashMap<>();
+
+  /** Cache of {@link #getWays()}; reset to {@code null} whenever {@link #waysById} changes. */
+  @Nullable
+  private List<OsmWay> waysSortedById = null;
 
   /* Map of all area ways keyed by their OSM ID */
   private final LongObjectMap<OsmWay> areaWaysById = new LongObjectHashMap<>();
@@ -141,8 +146,15 @@ public class OsmDatabase {
     return waysById.get(wayId);
   }
 
+  /**
+   * All ways, ordered by OSM id. HPPC hash containers iterate in a per-instance order, so the
+   * explicit ordering keeps the graph build deterministic.
+   */
   public Collection<OsmWay> getWays() {
-    return Collections.unmodifiableCollection(values(waysById));
+    if (waysSortedById == null) {
+      waysSortedById = Collections.unmodifiableList(values(waysById));
+    }
+    return waysSortedById;
   }
 
   public boolean isAreaWay(long wayId) {
@@ -300,6 +312,7 @@ public class OsmDatabase {
     }
 
     waysById.put(wayId, way);
+    waysSortedById = null;
   }
 
   public void addRelation(OsmRelation relation) {
@@ -402,6 +415,7 @@ public class OsmDatabase {
         // do not keep the way used in an area, it creates duplicated edges from the basic
         // street graph and from the area processing
         waysById.remove(way.getId());
+        waysSortedById = null;
       } catch (OsmArea.AreaConstructionException | Ring.RingConstructionException e) {
         // this area cannot be constructed, but we already have all the
         // necessary nodes to construct it. So, something must be wrong with
@@ -510,6 +524,7 @@ public class OsmDatabase {
       if (way != null && isOsmWay && !way.hasTag(key)) {
         var updatedWay = way.copy().withTag(key, "yes").build();
         waysById.put(updatedWay.getId(), updatedWay);
+        waysSortedById = null;
       }
     });
   }
@@ -699,10 +714,16 @@ public class OsmDatabase {
     }
   }
 
+  /**
+   * Return the map values ordered by key. HPPC hash containers iterate in a per-instance order,
+   * so sorting is needed to get a deterministic result.
+   */
   private static <V> List<V> values(LongObjectMap<V> map) {
-    List<V> result = new ArrayList<>(map.size());
-    for (ObjectCursor<V> c : map.values()) {
-      result.add(c.value);
+    long[] keys = map.keys().toArray();
+    Arrays.sort(keys);
+    List<V> result = new ArrayList<>(keys.length);
+    for (long key : keys) {
+      result.add(map.get(key));
     }
     return result;
   }

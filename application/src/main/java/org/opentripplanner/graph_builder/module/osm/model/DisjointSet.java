@@ -1,16 +1,15 @@
 package org.opentripplanner.graph_builder.module.osm.model;
 
 import com.carrotsearch.hppc.IntArrayList;
-import com.carrotsearch.hppc.LongObjectHashMap;
-import com.carrotsearch.hppc.LongObjectMap;
 import com.carrotsearch.hppc.ObjectIntHashMap;
 import com.carrotsearch.hppc.ObjectIntMap;
-import com.carrotsearch.hppc.cursors.ObjectCursor;
 import com.carrotsearch.hppc.procedures.ObjectIntProcedure;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import org.opentripplanner.framework.collection.HPPCMapSetUtils;
+import java.util.TreeMap;
 
 /** Basic union-find data structure with path compression */
 public class DisjointSet<T> {
@@ -60,16 +59,20 @@ public class DisjointSet<T> {
     return setMapping.containsKey(element);
   }
 
+  /**
+   * Return the disjoint sets in a stable order, so that the result is the same on every call and
+   * the graph build is deterministic. The sets are ordered by the index of their representative,
+   * which is assigned when the element is first added.
+   * <p>
+   * This is called once per graph build and is not performance critical; the cost is O(n log g) for
+   * n elements in g sets.
+   */
   public List<Set<T>> sets() {
-    LongObjectMap<Set<T>> out = new LongObjectHashMap<>();
+    Map<Integer, Set<T>> out = new TreeMap<>();
     setMapping.forEach(
-      (ObjectIntProcedure<T>) (k, v) -> HPPCMapSetUtils.addToMapSet(out, compact(v), k)
+      (ObjectIntProcedure<T>) (k, v) -> out.computeIfAbsent(compact(v), i -> new HashSet<>()).add(k)
     );
-    List<Set<T>> result = new ArrayList<>();
-    for (ObjectCursor<Set<T>> c : out.values()) {
-      result.add(c.value);
-    }
-    return result;
+    return new ArrayList<>(out.values());
   }
 
   public int size(int component) {
