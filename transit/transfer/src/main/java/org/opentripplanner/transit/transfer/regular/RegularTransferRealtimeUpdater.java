@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.transfer.regular;
 
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 import org.opentripplanner.core.model.id.FeedScopedId;
 
@@ -33,4 +34,21 @@ public interface RegularTransferRealtimeUpdater<P> {
    * given filter predicate is true.
    */
   void updateTransfersForStops(List<FeedScopedId> stops, Predicate<P> filterPaths);
+
+  /**
+   * Close the given facilities, and open all others. A path that depends on a closed facility,
+   * see {@code TransferPath#closableFacilityIds()}, is not used as a transfer: the cheapest
+   * alternative path without a closed facility is used instead, and there is no transfer between
+   * the two stops if there is none.
+   * <p>
+   * The set is the complete state: every facility that is not in it is open, and an empty set
+   * opens all facilities. Calling the method again with the same set changes nothing. An id that
+   * no path depends on is ignored. A facility can be an elevator or any other part of the street
+   * network that can be closed; the ids are opaque.
+   * <p>
+   * Must be called on the writer thread, inside a transaction.
+   *
+   * @param closedFacilityIds the ids of all closed facilities. The set is copied, not retained.
+   */
+  void closeFacilities(Set<String> closedFacilityIds);
 }
