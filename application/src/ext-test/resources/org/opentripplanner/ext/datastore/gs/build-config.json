@@ -1,7 +1,10 @@
 {
   "gsConfig": {
     "cloudServiceHost": "http://fake-gcp:4443",
-    "credentialFile": "/path/to/file"
+    "credentialFile": "/path/to/file",
+    "parallelReads": 4,
+    "parallelReadBlockSizeMb": 16,
+    "parallelReadMinSizeMb": 32
   },
 
   "graph": "gs://otp-test-bucket/a/b/graph.obj",

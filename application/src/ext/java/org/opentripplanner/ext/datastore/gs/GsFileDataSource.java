@@ -13,6 +13,9 @@ import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.DirectoryDataSource;
 import org.opentripplanner.datastore.file.ZipFileDataSource;
+import org.opentripplanner.ext.datastore.gs.read.GsRangeFetcher;
+import org.opentripplanner.ext.datastore.gs.read.ParallelRangeInputStream;
+import org.opentripplanner.ext.datastore.gs.read.ParallelReadParameters;
 
 /**
  * This class is a wrapper around and EXISTING Google Cloud Store bucket blob. It can be read and
@@ -23,15 +26,17 @@ import org.opentripplanner.datastore.file.ZipFileDataSource;
 class GsFileDataSource extends AbstractGsDataSource implements DataSource {
 
   private final Blob blob;
+  private final ParallelReadParameters parallelRead;
 
   /**
    * Create a data source wrapper around a file. This wrapper handles GZIP(.gz) compressed files as
    * well as normal files. It does not handle directories({@link DirectoryDataSource}) or zip-files
    * {@link ZipFileDataSource} which contain multiple files.
    */
-  GsFileDataSource(Blob blob, FileType type) {
+  GsFileDataSource(Blob blob, FileType type, ParallelReadParameters parallelRead) {
     super(blob.getBlobId(), type);
     this.blob = blob;
+    this.parallelRead = parallelRead;
   }
 
   @Override
@@ -57,7 +62,7 @@ class GsFileDataSource extends AbstractGsDataSource implements DataSource {
   @Override
   public InputStream asInputStream() {
     // We support both gzip and unzipped files when reading.
-    InputStream in = newInputStream(blob.reader());
+    InputStream in = openBlob();
 
     if (blob.getName().endsWith(".gz")) {
       try {
@@ -73,5 +78,22 @@ class GsFileDataSource extends AbstractGsDataSource implements DataSource {
   @Override
   public OutputStream asOutputStream() {
     return newOutputStream(blob.writer(Storage.BlobWriteOption.generationMatch()));
+  }
+
+  /**
+   * Open the raw blob content, either as a set of concurrently fetched byte-ranges or - for small
+   * objects and when the feature is switched off - as the single sequential stream OTP has always
+   * used. The sequential path allocates nothing extra and starts no threads.
+   * <p>
+   * Note that for a {@code .gz} blob the ranges cover the <em>compressed</em> bytes, which is what
+   * {@link #size()} reports, so the decompression above this is unaffected.
+   */
+  private InputStream openBlob() {
+    var plan = parallelRead.planFor(size());
+
+    if (plan == null) {
+      return newInputStream(blob.reader());
+    }
+    return new ParallelRangeInputStream(new GsRangeFetcher(blob, path()), path(), size(), plan);
   }
 }
