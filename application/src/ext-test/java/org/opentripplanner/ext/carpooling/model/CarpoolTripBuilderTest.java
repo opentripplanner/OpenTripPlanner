@@ -56,6 +56,23 @@ public class CarpoolTripBuilderTest {
   }
 
   @Test
+  void buildFromValues_withRecordedAt_storesAndCopiesIt() {
+    var recordedAt = ZonedDateTime.parse("2026-10-23T09:39:45+02:00");
+    var stops = List.of(createStopAt(1, OSLO_EAST), createStopAt(1, OSLO_NORTH));
+
+    var trip = new CarpoolTripBuilder(new FeedScopedId("feed", "recorded-at"))
+      .withStartTime(ZonedDateTime.now())
+      .withEndTime(ZonedDateTime.now().plusMinutes(30))
+      .withStops(stops)
+      .withRecordedAt(recordedAt)
+      .build();
+
+    assertEquals(recordedAt, trip.recordedAt());
+    assertEquals(recordedAt, trip.copy().build().recordedAt());
+    assertNull(createSimpleTrip(OSLO_EAST, OSLO_NORTH).recordedAt());
+  }
+
+  @Test
   void buildFromValues_withPublicContactInformation_storesContactInfo() {
     var contact = ContactInfo.of()
       .withPhoneNumber("+4712345678")
