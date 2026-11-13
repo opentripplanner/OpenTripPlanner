@@ -1,6 +1,5 @@
 package org.opentripplanner.transfer.streetadapter;
 
-import java.util.function.Consumer;
 import org.opentripplanner.core.model.basic.Ratio;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.core.model.basic.Speed;
@@ -16,7 +15,6 @@ import org.opentripplanner.transit.transfer.regular.api.preferences.CarPreferenc
 import org.opentripplanner.transit.transfer.regular.api.preferences.TimeSlopeSafetyTrianglePreference;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WheelchairPreferences;
-import org.opentripplanner.transit.transfer.regular.api.preferences.WithSpeed;
 import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
 
 /**
@@ -47,6 +45,7 @@ public final class RegularTransferPreferencesMapper implements TransferRequestMa
     var speed = Speed.ofMetersPerSecond(appWalk.speed());
     var reluctance = Reluctance.of(appWalk.reluctance());
     var safetyFactor = Ratio.of(appWalk.safetyFactor()).normalize();
+    var appWheelchair = request.preferences().wheelchair();
     var appBike = request.preferences().bike();
     var appCar = request.preferences().car();
 
@@ -57,8 +56,8 @@ public final class RegularTransferPreferencesMapper implements TransferRequestMa
         .withSafetyFactor(safetyFactor)
         .build();
       case WHEELCHAIR -> WheelchairPreferences.of()
-        .withSpeed(speed)
-        .withReluctance(reluctance)
+        .withSpeed(Speed.ofMetersPerSecond(appWheelchair.speed()))
+        .withReluctance(Reluctance.of(appWheelchair.reluctance()))
         .build();
       case BICYCLE -> BicyclePreferences.of()
         .withSpeed(Speed.ofMetersPerSecond(appBike.speed()))
@@ -106,37 +105,38 @@ public final class RegularTransferPreferencesMapper implements TransferRequestMa
 
   /** A walking request for a traveler that is not in a wheelchair. */
   private static RouteRequest walkRequest(WalkPreferences userPreferences, RouteRequest base) {
-    return walkingRequest(userPreferences, base, false, walk ->
-      walk.withSafetyFactor(userPreferences.safetyFactor().asDouble())
-    );
+    return base
+      .copyOf()
+      .withJourney(jb -> jb.withTransfer(StreetMode.WALK).withWheelchair(false))
+      .withPreferences(pb ->
+        pb.withWalk(walk ->
+          walk
+            .withSpeed(userPreferences.speed().toMetersPerSecond())
+            .withReluctance(userPreferences.reluctance().value())
+            .withSafetyFactor(userPreferences.safetyFactor().asDouble())
+        )
+      )
+      .buildDefault();
   }
 
   /**
-   * A walking request for a traveler in a wheelchair. The street search does not use the safety
-   * factor for a wheelchair, so it is the one of the base request.
+   * A walking request for a traveler in a wheelchair. The street search reads the speed and the
+   * reluctance from the wheelchair preferences, and does not use the safety factor, so the walk
+   * preferences are the ones of the base request.
    */
   private static RouteRequest wheelchairRequest(
     WheelchairPreferences userPreferences,
     RouteRequest base
   ) {
-    return walkingRequest(userPreferences, base, true, walk -> {});
-  }
-
-  private static <T extends AbstractUserPreferences<T> & WithSpeed> RouteRequest walkingRequest(
-    T userPreferences,
-    RouteRequest base,
-    boolean wheelchair,
-    Consumer<org.opentripplanner.routing.api.request.preference.WalkPreferences.Builder> other
-  ) {
     return base
       .copyOf()
-      .withJourney(jb -> jb.withTransfer(StreetMode.WALK).withWheelchair(wheelchair))
-      .withPreferences(routingPrefs ->
-        routingPrefs.withWalk(walk -> {
-          walk.withSpeed(userPreferences.speed().toMetersPerSecond());
-          walk.withReluctance(userPreferences.reluctance().value());
-          other.accept(walk);
-        })
+      .withJourney(jb -> jb.withTransfer(StreetMode.WALK).withWheelchair(true))
+      .withPreferences(pb ->
+        pb.withWheelchair(wheelchair ->
+          wheelchair
+            .withSpeed(userPreferences.speed().toMetersPerSecond())
+            .withReluctance(userPreferences.reluctance().value())
+        )
       )
       .buildDefault();
   }
