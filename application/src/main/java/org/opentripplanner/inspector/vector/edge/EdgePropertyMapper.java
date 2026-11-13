@@ -21,6 +21,7 @@ import org.opentripplanner.street.model.edge.ElevatorAlightEdge;
 import org.opentripplanner.street.model.edge.ElevatorBoardEdge;
 import org.opentripplanner.street.model.edge.ElevatorHopEdge;
 import org.opentripplanner.street.model.edge.EscalatorEdge;
+import org.opentripplanner.street.model.edge.PathwayEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.utils.collection.ListUtils;
@@ -68,6 +69,14 @@ public class EdgePropertyMapper extends PropertyMapper<Edge> {
       case ElevatorAlightEdge e -> List.of(
         kv("fromVertexLabel", e.getFromVertex().getLabel().toString()),
         kv("toVertexLabel", e.getToVertex().getLabel().toString())
+      );
+      case PathwayEdge e -> List.of(
+        kv("name", e.getName()),
+        kv("traversalTime", e.traversalTime()),
+        kv("distance", e.getDistanceMeters()),
+        kv("stairCount", e.getStairCount()),
+        kv("signpostedAs", e.signpostedAs()),
+        kv("stairs", e.isStairs())
       );
       default -> List.of();
     };
