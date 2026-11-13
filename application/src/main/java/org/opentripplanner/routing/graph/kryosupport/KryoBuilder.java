@@ -24,6 +24,7 @@ import org.opentripplanner.kryo.RouterConfigSerializer;
 import org.opentripplanner.kryo.UnmodifiableCollectionsSerializer;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
+import org.opentripplanner.utils.collection.trie.ImmutableTrieMap;
 
 public final class KryoBuilder {
 
@@ -61,6 +62,7 @@ public final class KryoBuilder {
     kryo.register(Map.of().getClass(), new JavaImmutableMapSerializer());
     kryo.register(Map.of(1, 1).getClass(), new JavaImmutableMapSerializer());
     kryo.register(EnumMap.class, new EnumMapSerializer());
+    kryo.register(ImmutableTrieMap.class, new ImmutableTrieMapSerializer());
 
     kryo.register(HashMultimap.class, new HashMultimapSerializer());
     kryo.register(ArrayListMultimap.class, new ArrayListMultimapSerializer());
