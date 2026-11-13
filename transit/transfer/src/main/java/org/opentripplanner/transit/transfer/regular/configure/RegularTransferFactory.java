@@ -5,11 +5,13 @@ import org.opentripplanner.core.model.transaction.RepositoryRegistry;
 import org.opentripplanner.raptor.data.stop.RaptorStopIndex;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferGenerator;
+import org.opentripplanner.transit.transfer.regular.RegularTransferRealtimeUpdater;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferParameters;
 import org.opentripplanner.transit.transfer.regular.internal.DefaultRegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.internal.DefaultRegularTransferGenerator;
+import org.opentripplanner.transit.transfer.regular.internal.DefaultRegularTransferRealtimeUpdater;
 import org.opentripplanner.transit.transfer.regular.internal.ProfileUserPreferences;
 import org.opentripplanner.transit.transfer.regular.internal.RegularTransferRepositoryLifecycle;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
@@ -37,6 +39,18 @@ public final class RegularTransferFactory {
     TransferRequestMapper<R> mapper
   ) {
     ProfileUserPreferences.resolveAll(parameters, mapper);
+  }
+
+  /**
+   * Create the realtime updater of one write task, writing to the given mutable repository of the
+   * task. Create a new one for each write task; it must not be used after the task ends.
+   *
+   * @param <P> the street path type
+   */
+  public static <P> RegularTransferRealtimeUpdater<P> createRealtimeUpdater(
+    RegularTransferRepository<P> repository
+  ) {
+    return new DefaultRegularTransferRealtimeUpdater<>(repository);
   }
 
   /** Create an empty build repository, populated at graph build. */
