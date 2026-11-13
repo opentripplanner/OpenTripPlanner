@@ -38,6 +38,7 @@ class DefaultRegularTransferRepositorySnapshot<
   );
 
   private final OverlaidTemplatePaths<P> paths;
+  private final Set<String> closedFacilityIds;
   private final RegularTransferServiceCache<RaptorTransferStore> cache;
   private final CacheFactory cacheFactory;
   private final TransferRequestMapper<R> mapper;
@@ -48,6 +49,7 @@ class DefaultRegularTransferRepositorySnapshot<
 
   DefaultRegularTransferRepositorySnapshot(
     OverlaidTemplatePaths<P> paths,
+    Set<String> closedFacilityIds,
     RegularTransferServiceCache<RaptorTransferStore> cache,
     RaptorTransfersFactory<P, R> raptorTransfersFactory,
     TransferRequestMapper<R> mapper,
@@ -56,6 +58,7 @@ class DefaultRegularTransferRepositorySnapshot<
     RegularTransferCacheStatistics statistics
   ) {
     this.paths = paths;
+    this.closedFacilityIds = Set.copyOf(closedFacilityIds);
     this.cache = cache;
     this.mapper = mapper;
     this.matcher = matcher;
@@ -63,7 +66,9 @@ class DefaultRegularTransferRepositorySnapshot<
     this.entryByPreferences = new HashMap<>();
     warmup.forEach(entry -> entryByPreferences.put(entry.userPreferences(), entry));
     this.statistics = statistics;
-    this.cacheFactory = new CacheFactory(raptorTransfersFactory);
+    this.cacheFactory = new CacheFactory(
+      raptorTransfersFactory.withClosedFacilityIds(this.closedFacilityIds)
+    );
   }
 
   @Override
@@ -136,6 +141,11 @@ class DefaultRegularTransferRepositorySnapshot<
   /** The paths of this snapshot, for the lifecycle. */
   OverlaidTemplatePaths<P> paths() {
     return paths;
+  }
+
+  /** The ids of the facilities that are closed in this snapshot, for the lifecycle. */
+  Set<String> closedFacilityIds() {
+    return closedFacilityIds;
   }
 
   /** The cache of the Raptor transfers of this snapshot, for the lifecycle. */
