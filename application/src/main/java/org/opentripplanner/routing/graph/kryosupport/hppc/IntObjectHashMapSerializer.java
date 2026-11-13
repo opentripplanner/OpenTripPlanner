@@ -1,11 +1,11 @@
-package org.opentripplanner.routing.graph.kryosupport;
+package org.opentripplanner.routing.graph.kryosupport.hppc;
 
 import com.carrotsearch.hppc.IntObjectHashMap;
-import com.carrotsearch.hppc.cursors.IntObjectCursor;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.Serializer;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
+import java.util.Arrays;
 
 /**
  * Direct Kryo serializer for HPPC's {@link IntObjectHashMap}, replacing the default
@@ -15,10 +15,14 @@ class IntObjectHashMapSerializer extends Serializer<IntObjectHashMap<?>> {
 
   @Override
   public void write(Kryo kryo, Output output, IntObjectHashMap<?> map) {
-    output.writeVarInt(map.size(), true);
-    for (IntObjectCursor<?> c : map) {
-      output.writeVarInt(c.key, true);
-      kryo.writeClassAndObject(output, c.value);
+    // Write the keys in sorted order to make the serialized form independent of the map's
+    // internal iteration order.
+    int[] keys = map.keys().toArray();
+    Arrays.sort(keys);
+    output.writeVarInt(keys.length, true);
+    for (int key : keys) {
+      output.writeVarInt(key, true);
+      kryo.writeClassAndObject(output, map.get(key));
     }
   }
 

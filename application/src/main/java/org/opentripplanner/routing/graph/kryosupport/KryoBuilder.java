@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.graph.kryosupport;
 
-import com.carrotsearch.hppc.IntObjectHashMap;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.util.DefaultInstantiatorStrategy;
 import com.google.common.collect.ArrayListMultimap;
@@ -16,6 +15,7 @@ import org.objenesis.strategy.SerializingInstantiatorStrategy;
 import org.opentripplanner.kryo.BuildConfigSerializer;
 import org.opentripplanner.kryo.RouterConfigSerializer;
 import org.opentripplanner.kryo.UnmodifiableCollectionsSerializer;
+import org.opentripplanner.routing.graph.kryosupport.hppc.HppcKryoSupport;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
 
@@ -40,7 +40,7 @@ public final class KryoBuilder {
     // We might actually want to manually register a serializer for every class, to be safe.
     kryo.setRegistrationRequired(false);
     kryo.setReferences(true);
-    kryo.register(IntObjectHashMap.class, new IntObjectHashMapSerializer());
+    HppcKryoSupport.register(kryo);
 
     // Add support for the package local java.util.ImmutableCollections.
     // Not supported properly in the current com.conveyal:kryo-tools:1.4.0.
