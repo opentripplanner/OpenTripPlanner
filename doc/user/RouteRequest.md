@@ -123,8 +123,8 @@ The RouteRequest is the type for the
 |    [debug](#rd_if_debug)                                                                                     |         `enum`         | Enable this to attach a system notice to itineraries instead of removing them. This is very convenient when tuning the itinerary-filter-chain.           | *Optional* | `"off"`          |  2.0  |
 |    [filterDirectFlexBySearchWindow](#rd_if_filterDirectFlexBySearchWindow)                                   |        `boolean`       | Filter direct flex results by the search window. The search-window is not used during flex routing, but we use one end to align it with transit results. | *Optional* | `true`           |  2.7  |
 |    [filterItinerariesWithSameFirstOrLastTrip](#rd_if_filterItinerariesWithSameFirstOrLastTrip)               |        `boolean`       | If more than one itinerary begins or ends with same trip, filter out one of those itineraries so that only one remains.                                  | *Optional* | `false`          |  2.2  |
-|    groupSimilarityKeepOne                                                                                    |        `double`        | Pick ONE itinerary from each group after putting itineraries that are 85% similar together.                                                              | *Optional* | `0.85`           |  2.1  |
-|    groupSimilarityKeepThree                                                                                  |        `double`        | Reduce the number of itineraries to three itineraries by reducing each group of itineraries grouped by 68% similarity.                                   | *Optional* | `0.68`           |  2.1  |
+|    [groupSimilarityKeepOne](#rd_if_groupSimilarityKeepOne)                                                   |        `double`        | Group itineraries that are at least this similar, and keep ONE itinerary from each group.                                                                | *Optional* | `0.85`           |  2.1  |
+|    [groupSimilarityKeepThree](#rd_if_groupSimilarityKeepThree)                                               |        `double`        | Group itineraries that are at least this similar, and keep at most three itineraries from each group.                                                    | *Optional* | `0.68`           |  2.1  |
 |    [groupedOtherThanSameLegsMaxCostMultiplier](#rd_if_groupedOtherThanSameLegsMaxCostMultiplier)             |        `double`        | Filter grouped itineraries, where the non-grouped legs are more expensive than in the lowest cost one.                                                   | *Optional* | `2.0`            |  2.1  |
 |    [minBikeParkingDistance](#rd_if_minBikeParkingDistance)                                                   |        `double`        | Filter out bike park+ride results that have fewer meters of cycling than this value.                                                                     | *Optional* | `0.0`            |  2.3  |
 |    [nonTransitGeneralizedCostLimit](#rd_if_nonTransitGeneralizedCostLimit)                                   | `cost-linear-function` | The function define a max-limit for generalized-cost for non-transit itineraries.                                                                        | *Optional* | `"1h + 2.0 t"`   |  2.1  |
@@ -885,6 +885,30 @@ Trips are considered equal if they have same id and same service day. Non-transi
 during comparison. Before filtering, trips are sorted by their generalized cost. The algorithm loops
 through the list from top to bottom. If an itinerary matches from any other itinerary from above, it is
 removed from list.
+
+
+<h3 id="rd_if_groupSimilarityKeepOne">groupSimilarityKeepOne</h3>
+
+**Since version:** `2.1` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.85`   
+**Path:** /routingDefaults/itineraryFilters 
+
+Group itineraries that are at least this similar, and keep ONE itinerary from each group.
+
+Similarity is the share of the travel distance two itineraries have in common.
+
+The value must be between 0 and 1. A value below 0.5 turns this filter off.
+
+
+<h3 id="rd_if_groupSimilarityKeepThree">groupSimilarityKeepThree</h3>
+
+**Since version:** `2.1` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.68`   
+**Path:** /routingDefaults/itineraryFilters 
+
+Group itineraries that are at least this similar, and keep at most three itineraries from each group.
+
+Similarity is the share of the travel distance two itineraries have in common.
+
+The value must be between 0 and 1. A value below 0.5 turns this filter off.
 
 
 <h3 id="rd_if_groupedOtherThanSameLegsMaxCostMultiplier">groupedOtherThanSameLegsMaxCostMultiplier</h3>
