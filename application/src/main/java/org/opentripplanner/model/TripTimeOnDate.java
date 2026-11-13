@@ -403,6 +403,34 @@ public class TripTimeOnDate {
       : tripPattern.getAlightType(stopPosition);
   }
 
+  /**
+   * The pickup type of the trip pattern at this call, without taking cancellations of the trip or
+   * the stop into account.
+   *
+   * @return null if stops have been added to the trip by a real-time update, since the pattern
+   *         then no longer reflects the schedule
+   */
+  @Nullable
+  public PickDrop getScheduledPickupType() {
+    return hasExtraCalls() ? null : tripPattern.getBoardType(stopPosition);
+  }
+
+  /**
+   * The drop off type of the trip pattern at this call, without taking cancellations of the trip or
+   * the stop into account.
+   *
+   * @return null if stops have been added to the trip by a real-time update, since the pattern
+   *         then no longer reflects the schedule
+   */
+  @Nullable
+  public PickDrop getScheduledDropoffType() {
+    return hasExtraCalls() ? null : tripPattern.getAlightType(stopPosition);
+  }
+
+  private boolean hasExtraCalls() {
+    return IntStream.range(0, tripTimes.getNumStops()).anyMatch(tripTimes::isExtraCall);
+  }
+
   public StopTimeKey getStopTimeKey() {
     return StopTimeKey.of(tripTimes.getTrip().getId(), stopPosition).build();
   }

@@ -13,6 +13,7 @@ import org.opentripplanner.apis.gtfs.model.CallScheduledTime.ArrivalDepartureTim
 import org.opentripplanner.apis.gtfs.model.CallScheduledTime.TimeWindow;
 import org.opentripplanner.apis.support.graphql.DataFetchingSupport;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
@@ -67,7 +68,14 @@ class StopCallImplTest {
     );
 
     var schedule = impl.schedule().get(env);
-    assertEquals(new CallSchedule(new ArrivalDepartureTime(NOON, NOON, false)), schedule);
+    assertEquals(
+      new CallSchedule(
+        new ArrivalDepartureTime(NOON, NOON, false),
+        PickDrop.SCHEDULED,
+        PickDrop.SCHEDULED
+      ),
+      schedule
+    );
   }
 
   @Test
@@ -91,7 +99,14 @@ class StopCallImplTest {
       // however, this test is run with the flex feature enabled in a runnable which prevents this.
       try {
         CallSchedule schedule = impl.schedule().get(env);
-        assertEquals(new CallSchedule(new TimeWindow(TEN_AM, TEN_AM.plusMinutes(30))), schedule);
+        assertEquals(
+          new CallSchedule(
+            new TimeWindow(TEN_AM, TEN_AM.plusMinutes(30)),
+            PickDrop.SCHEDULED,
+            PickDrop.SCHEDULED
+          ),
+          schedule
+        );
       } catch (Exception e) {
         throw new RuntimeException(e);
       }

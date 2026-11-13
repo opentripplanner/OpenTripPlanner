@@ -49,7 +49,9 @@ public class StopCallImpl implements GraphQLDataFetchers.GraphQLStopCall {
         var scheduledArrival = getZonedDateTime(environment, tripTime.getScheduledArrival());
         var scheduledDeparture = getZonedDateTime(environment, tripTime.getScheduledDeparture());
         return new CallSchedule(
-          new ArrivalDepartureTime(scheduledArrival, scheduledDeparture, tripTime.isTimepoint())
+          new ArrivalDepartureTime(scheduledArrival, scheduledDeparture, tripTime.isTimepoint()),
+          tripTime.getScheduledPickupType(),
+          tripTime.getScheduledDropoffType()
         );
       } else {
         var transitService = getTransitService(environment);
@@ -57,15 +59,20 @@ public class StopCallImpl implements GraphQLDataFetchers.GraphQLStopCall {
         if (flexTrip == null) {
           return null;
         }
-        var startSecs = flexTrip.earliestDepartureTime(tripTime.getStopPosition());
-        var endSecs = flexTrip.latestArrivalTime(tripTime.getStopPosition());
+        var stopPosition = tripTime.getStopPosition();
+        var startSecs = flexTrip.earliestDepartureTime(stopPosition);
+        var endSecs = flexTrip.latestArrivalTime(stopPosition);
 
         var serviceDay = tripTime.getServiceDay();
         var timeZone = transitService.getTimeZone();
         var start = ServiceDateUtils.toOffsetDateTime(serviceDay, timeZone, startSecs);
         var end = ServiceDateUtils.toOffsetDateTime(serviceDay, timeZone, endSecs);
 
-        return new CallSchedule(new TimeWindow(start, end));
+        return new CallSchedule(
+          new TimeWindow(start, end),
+          flexTrip.getBoardRule(stopPosition),
+          flexTrip.getAlightRule(stopPosition)
+        );
       }
     };
   }
