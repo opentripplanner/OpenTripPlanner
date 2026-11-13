@@ -38,25 +38,28 @@ class CarSpeedIndex {
     var progress = ProgressTracker.track("Compute car speeds", 5_000, ways.size());
     LOG.info(progress.startMessage());
 
-    // Trove maps aren't thread-safe: compute in parallel, put one at a time via forEachOrdered.
-    var speeds = ways.parallelStream().map(way -> {
-      var tagMapper = way.getOsmProvider().getOsmTagMapper();
-      var waySpeeds = new WaySpeeds(
-        way.getId(),
-        tagMapper.getCarSpeedForWay(way, FORWARD, issueStore),
-        tagMapper.getCarSpeedForWay(way, BACKWARD, issueStore)
-      );
-      //Keep lambda! A method-ref would log incorrect class and line number
-      //noinspection Convert2MethodRef
-      progress.step(m -> LOG.info(m));
-      return waySpeeds;
-    });
+    // Trove maps aren't thread-safe: compute the speeds in parallel into a list, then put them into
+    // the maps on a single thread.
+    var speeds = ways
+      .parallelStream()
+      .map(way -> {
+        var tagMapper = way.getOsmProvider().getOsmTagMapper();
+        var waySpeeds = new WaySpeeds(
+          way.getId(),
+          tagMapper.getCarSpeedForWay(way, FORWARD, issueStore),
+          tagMapper.getCarSpeedForWay(way, BACKWARD, issueStore)
+        );
+        //Keep lambda! A method-ref would log incorrect class and line number
+        //noinspection Convert2MethodRef
+        progress.step(m -> LOG.info(m));
+        return waySpeeds;
+      })
+      .toList();
 
     TLongFloatMap forward = newMap(ways.size());
     TLongFloatMap backward = newMap(ways.size());
 
-    Iterable<WaySpeeds> iterable = speeds::iterator;
-    for (var waySpeeds : iterable) {
+    for (var waySpeeds : speeds) {
       forward.put(waySpeeds.wayId(), waySpeeds.forward());
       backward.put(waySpeeds.wayId(), waySpeeds.backward());
     }
