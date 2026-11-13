@@ -1,6 +1,7 @@
 package org.opentripplanner.street.model.edge;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.street.model.StreetModelFactory.intersectionVertex;
@@ -103,6 +104,36 @@ class ElevatorHopEdgeTest {
     var req = StreetSearchRequest.of().withMode(StreetMode.WALK);
     var res = edge.traverse(new State(from, req.build()))[0];
     assertEquals(62_000, res.getTimeDeltaMilliseconds());
+  }
+
+  static Stream<Arguments> outOfServiceCases() {
+    return Stream.of(
+      Arguments.of(StreetMode.WALK, false),
+      Arguments.of(StreetMode.WALK, true),
+      Arguments.of(StreetMode.BIKE, false)
+    );
+  }
+
+  @ParameterizedTest(
+    name = "An elevator out of service can not be traversed with {0}, wheelchair {1}"
+  )
+  @MethodSource("outOfServiceCases")
+  void outOfService(StreetMode mode, boolean wheelchair) {
+    var edge = ElevatorHopEdge.createElevatorHopEdge(
+      from,
+      to,
+      StreetTraversalPermission.ALL,
+      Accessibility.POSSIBLE
+    );
+    var req = StreetSearchRequest.of().withMode(mode).withWheelchairEnabled(wheelchair).build();
+
+    edge.setOutOfService(true);
+    assertTrue(edge.isOutOfService());
+    assertTrue(State.isEmpty(edge.traverse(new State(from, req))));
+
+    edge.setOutOfService(false);
+    assertFalse(edge.isOutOfService());
+    assertFalse(State.isEmpty(edge.traverse(new State(from, req))));
   }
 
   private State[] traverse(
