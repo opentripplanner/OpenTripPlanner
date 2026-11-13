@@ -1051,14 +1051,22 @@ public class StreetEdge
     double time, weight;
     if (wheelchair) {
       time = getEffectiveWalkDistance() / speed;
-      weight =
-        (getEffectiveBikeDistance() / speed) *
-        StreetEdgeReluctanceCalculator.computeWheelchairReluctance(
-          request,
-          getMaxSlope(),
-          isWheelchairAccessible(),
-          isStairs()
-        );
+      // Use walk safety and the bike slope model.
+      double slopeAdjustedDistance = getEffectiveBikeDistance();
+      double safetyWeightedDistance = getWalkSafetyFactor() * slopeAdjustedDistance;
+
+      // Blend the safety-weighted and the plain distance by how much the request weighs safety
+      double safetyShare = request.walk().safetyFactor();
+      double blendedDistance =
+        safetyWeightedDistance * safetyShare + slopeAdjustedDistance * (1 - safetyShare);
+
+      double wheelchairReluctance = StreetEdgeReluctanceCalculator.computeWheelchairReluctance(
+        request,
+        getMaxSlope(),
+        isWheelchairAccessible(),
+        isStairs()
+      );
+      weight = (blendedDistance / speed) * wheelchairReluctance;
       if (BitSetUtils.get(flags, WHEELCHAIR_INACCESSIBLE_BARRIER_FLAG_INDEX)) {
         weight += WHEELCHAIR_INACCESSIBLE_BARRIER_COST;
       }
