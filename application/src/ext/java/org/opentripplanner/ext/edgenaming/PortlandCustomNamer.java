@@ -155,11 +155,11 @@ class PortlandCustomNamer implements EdgeNamer {
         if (name == null) {
           continue;
         }
-        e.setName(new NonLocalizedString(name));
+        e.overrideName(new NonLocalizedString(name));
         return name;
       } else {
         String name = out.getDefaultName();
-        e.setName(new NonLocalizedString(name));
+        e.overrideName(new NonLocalizedString(name));
         return name;
       }
     }
@@ -176,11 +176,11 @@ class PortlandCustomNamer implements EdgeNamer {
         if (name == null) {
           continue;
         }
-        e.setName(new NonLocalizedString(name));
+        e.overrideName(new NonLocalizedString(name));
         return name;
       } else {
         String name = in.getDefaultName();
-        e.setName(new NonLocalizedString(name));
+        e.overrideName(new NonLocalizedString(name));
         return name;
       }
     }
