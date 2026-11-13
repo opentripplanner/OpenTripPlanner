@@ -46,6 +46,7 @@ import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.standalone.configure.DaggerBindingKey.GenericType;
 import org.opentripplanner.standalone.server.MetricsLogging;
 import org.opentripplanner.street.StreetRepository;
+import org.opentripplanner.street.elevator.ElevatorEdgeIndex;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.transfer.regular.TransferRepository;
@@ -74,6 +75,7 @@ class ConstructApplicationFactoryIntegrationTest {
     of(DeduplicatorService.class),
     of(DelegatingTransitAlertServiceImpl.class),
     of(FareServiceFactory.class),
+    of(ElevatorEdgeIndex.class),
     of(Graph.class),
     of(GraphQLSchema.class, GtfsSchema.class),
     of(GraphQLSchema.class, TransmodelSchema.class),

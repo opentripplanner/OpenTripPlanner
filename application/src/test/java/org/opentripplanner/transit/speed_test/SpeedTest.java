@@ -41,6 +41,7 @@ import org.opentripplanner.standalone.api.TestServerContext;
 import org.opentripplanner.standalone.config.OtpConfigLoader;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.config.routerconfig.RaptorEnvironmentFactory;
+import org.opentripplanner.street.elevator.ElevatorEdgeIndex;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transfer.configure.StreetTransferFactory;
 import org.opentripplanner.transfer.regular.TransferRepository;
@@ -196,6 +197,7 @@ public class SpeedTest {
       streetUpdateManager,
       timetableHandle,
       elevatorStatusHandle,
+      () -> ElevatorEdgeIndex.of(graph),
       new DelegatingTransitAlertServiceImpl(),
       routerConfig.updaterConfig(),
       // The speed test does not use GBFS vehicle rental.

@@ -298,3 +298,89 @@ HTTP headers to add to the request. Any header key, value can be inserted.
 ```
 
 <!-- siri-sx-lite END -->
+
+## SIRI-FM Elevator Status
+
+This updater reads the status of elevators from a SIRI-FM (Facility Monitoring) feed. It downloads
+the entire feed in a single HTTP GET request, and expects the status of all elevators in each
+response: an elevator that is not in the response is in service.
+
+An elevator that is out of service is not used by street routing, for example for wheelchair users.
+The regular transfers avoid it too, if alternative transfer paths were generated at graph build
+(`elevatorAlternatives` in the transfer configuration).
+
+The `FacilityRef` of a `FacilityCondition` must be the id of an elevator in the street graph. The
+ids of the elevators are read from the OSM tags configured with `elevatorRefTags` in the build
+configuration. A `FacilityCondition` whose features are given and do not include `lift` is ignored.
+
+<!-- siri-fm-elevator BEGIN -->
+<!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
+
+| Config Parameter                       |       Type      | Summary                                                                    |  Req./Opt. | Default Value  | Since |
+|----------------------------------------|:---------------:|----------------------------------------------------------------------------|:----------:|----------------|:-----:|
+| type = "siri-fm-elevator"              |      `enum`     | The type of the updater.                                                   | *Required* |                |  1.5  |
+| frequency                              |    `duration`   | How often the feed is polled.                                              | *Optional* | `"PT1M"`       |  2.11 |
+| [unknownStatus](#u__17__unknownStatus) |      `enum`     | How an elevator with an unknown status is treated.                         | *Optional* | `"in-service"` |  2.11 |
+| [url](#u__17__url)                     |      `uri`      | The URL of the SIRI-FM feed with the status of the elevators.              | *Required* |                |  2.11 |
+| [headers](#u__17__headers)             | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted. | *Optional* |                |  2.11 |
+
+
+##### Parameter details
+
+<h4 id="u__17__unknownStatus">unknownStatus</h4>
+
+**Since version:** `2.11` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"in-service"`   
+**Path:** /updaters/[17]   
+**Enum values:** `in-service` | `out-of-service` | `keep-previous`
+
+How an elevator with an unknown status is treated.
+
+The status `unknown` and `partiallyAvailable`, or a missing status, is unknown.
+
+ - `in-service` The elevator is in service. This is the default.
+ - `out-of-service` The elevator is out of service, and is not used.
+ - `keep-previous` The elevator keeps the last known status from the feed. If there is none, it is in service.
+
+
+<h4 id="u__17__url">url</h4>
+
+**Since version:** `2.11` ∙ **Type:** `uri` ∙ **Cardinality:** `Required`   
+**Path:** /updaters/[17] 
+
+The URL of the SIRI-FM feed with the status of the elevators.
+
+The feed is polled with HTTP GET. Each response must contain the status of all the
+elevators: an elevator that is not in it is in service. The `FacilityRef` of a
+`FacilityCondition` is the id of the elevator, and must match an id of an elevator in the
+street graph, see `elevatorRefTags` in the build configuration.
+
+
+<h4 id="u__17__headers">headers</h4>
+
+**Since version:** `2.11` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`   
+**Path:** /updaters/[17] 
+
+HTTP headers to add to the request. Any header key, value can be inserted.
+
+
+
+##### Example configuration
+
+```JSON
+// router-config.json
+{
+  "updaters" : [
+    {
+      "type" : "siri-fm-elevator",
+      "url" : "https://example.com/siri-lite/facility-monitoring/xml",
+      "frequency" : "1m",
+      "unknownStatus" : "keep-previous",
+      "headers" : {
+        "Authorization" : "Some-Token"
+      }
+    }
+  ]
+}
+```
+
+<!-- siri-fm-elevator END -->

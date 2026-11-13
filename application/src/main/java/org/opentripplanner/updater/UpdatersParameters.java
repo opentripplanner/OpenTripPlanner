@@ -9,6 +9,7 @@ import org.opentripplanner.framework.transaction.TimetableSnapshotParameters;
 import org.opentripplanner.updater.alert.gtfs.GtfsRealtimeAlertsUpdaterParameters;
 import org.opentripplanner.updater.alert.siri.SiriSXUpdaterParameters;
 import org.opentripplanner.updater.alert.siri.lite.SiriSXLiteUpdaterParameters;
+import org.opentripplanner.updater.elevator.siri.SiriFmElevatorUpdaterParameters;
 import org.opentripplanner.updater.trip.gtfs.updater.http.PollingTripUpdaterParameters;
 import org.opentripplanner.updater.trip.gtfs.updater.mqtt.MqttGtfsRealtimeUpdaterParameters;
 import org.opentripplanner.updater.trip.siri.updater.DefaultSiriETUpdaterParameters;
@@ -40,6 +41,8 @@ public interface UpdatersParameters {
   List<SiriETLiteUpdaterParameters> getSiriETLiteUpdaterParameters();
 
   List<SiriSXLiteUpdaterParameters> getSiriSXLiteUpdaterParameters();
+
+  List<SiriFmElevatorUpdaterParameters> getSiriFmElevatorUpdaterParameters();
 
   List<MqttGtfsRealtimeUpdaterParameters> getMqttGtfsRealtimeUpdaterParameters();
 

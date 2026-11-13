@@ -258,6 +258,7 @@ public class ConstructApplication {
       factory.streetUpdateManager(),
       factory.timetableRepositoryHandle(),
       factory.elevatorStatusRepositoryHandle(),
+      factory::elevatorEdgeIndex,
       factory.transitAlertService(),
       routerConfig().updaterConfig(),
       otpConfig().gbfsNetworks
