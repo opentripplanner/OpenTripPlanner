@@ -1,0 +1,20 @@
+{
+  "updaters" : [
+    {
+      "type" : "mqtt-gtfs-rt-updater",
+      "url" : "tcp://user1:123@localhost:1883",
+      "topic" : "hapigo/gtfs-rt/bus/trip-updates",
+      "feedId" : "1",
+      "qos" : 1,
+      "user": "user1",
+      "password": "123"
+    },
+    {
+      "type" : "mqtt-gtfs-rt-updater",
+      "url" : "tcp://user1:123@localhost:1883",
+      "topic" : "hapigo/gtfs-rt/metro/trip-updates",
+      "feedId" : "2",
+      "qos" : 1
+    }
+  ]
+}
