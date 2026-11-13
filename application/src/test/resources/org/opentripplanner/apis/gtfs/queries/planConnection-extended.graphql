@@ -114,6 +114,7 @@
     edges {
       cursor
       node {
+        id
         start
         end
         # next two are deprecated
