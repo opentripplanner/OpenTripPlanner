@@ -1,5 +1,7 @@
 package org.opentripplanner.updater;
 
+import org.opentripplanner.core.model.event.DomainEvent;
+import org.opentripplanner.service.elevatorstatus.ElevatorStatusRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.service.TransitRepository;
@@ -48,4 +50,18 @@ public interface TransitRealTimeUpdateContext {
    * in a published snapshot.
    */
   EntityResolver entityResolver(String feedId);
+
+  /**
+   * Return the mutable elevator status repository for this update task. Callers must only use this
+   * from the single writer thread. Accessing it causes the current transaction to publish a new
+   * elevator status snapshot at commit — even if nothing was written — so only call it when there
+   * are statuses to write.
+   */
+  ElevatorStatusRepository elevatorStatusRepository();
+
+  /**
+   * Publish a domain event in this update task. The handlers registered for the event run
+   * synchronously, in the same transaction.
+   */
+  void publish(DomainEvent event);
 }
