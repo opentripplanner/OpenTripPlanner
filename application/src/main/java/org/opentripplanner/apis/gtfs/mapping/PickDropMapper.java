@@ -6,7 +6,10 @@ import org.opentripplanner.model.PickDrop;
 
 public final class PickDropMapper {
 
-  public static GraphQLTypes.@Nullable GraphQLPickupDropoffType map(PickDrop pickDrop) {
+  public static GraphQLTypes.@Nullable GraphQLPickupDropoffType map(@Nullable PickDrop pickDrop) {
+    if (pickDrop == null) {
+      return null;
+    }
     return switch (pickDrop) {
       case SCHEDULED -> GraphQLTypes.GraphQLPickupDropoffType.SCHEDULED;
       case NONE -> GraphQLTypes.GraphQLPickupDropoffType.NONE;

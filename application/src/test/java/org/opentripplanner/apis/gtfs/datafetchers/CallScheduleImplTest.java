@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import graphql.schema.DataFetchingEnvironment;
 import java.time.OffsetDateTime;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLPickupDropoffType;
 import org.opentripplanner.apis.gtfs.model.CallSchedule;
@@ -40,7 +41,18 @@ class CallScheduleImplTest {
     assertNull(subject.dropOffType().get(env));
   }
 
-  private static DataFetchingEnvironment env(PickDrop pickup, PickDrop dropOff) {
+  @Test
+  void missingPickupDropoffType() throws Exception {
+    var env = env(null, null);
+
+    assertNull(subject.pickupType().get(env));
+    assertNull(subject.dropOffType().get(env));
+  }
+
+  private static DataFetchingEnvironment env(
+    @Nullable PickDrop pickup,
+    @Nullable PickDrop dropOff
+  ) {
     return DataFetchingSupport.dataFetchingEnvironment(new CallSchedule(TIME, pickup, dropOff));
   }
 }
