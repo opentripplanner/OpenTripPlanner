@@ -306,6 +306,34 @@ public class ConstrainedBoardingSearchTest {
   }
 
   @Test
+  void mostSpecificMinTimeTransferIsNotOverriddenByALessSpecificOne() {
+    // A 10 minute change time for route R1 at stop C and a 0 minute change time for any route.
+    // The route-level transfer is the more specific one and decides: the tight connection R1-2
+    // -> R2-1 is not possible, even though the stop-level transfer would allow it.
+    var route1TxPoint = new RouteStopTransferPoint(route1.getRoute(), STOP_C);
+    var txRoute = new ConstrainedTransfer(
+      ID,
+      route1TxPoint,
+      STOP_C_TX_POINT,
+      MIN_TRANSFER_TIME_10_MIN_CONSTRAINT
+    );
+    var txStop = new ConstrainedTransfer(
+      ID,
+      STOP_C_TX_POINT,
+      STOP_C_TX_POINT,
+      MIN_TRANSFER_TIME_0_MIN_CONSTRAINT
+    );
+
+    testTransferSearch(
+      STOP_C,
+      List.of(txStop, txRoute),
+      TRIP_2_INDEX,
+      TRIP_1_INDEX,
+      MIN_TRANSFER_TIME_10_MIN_CONSTRAINT
+    );
+  }
+
+  @Test
   void findDefinitiveMinTimeTransfer() {
     OTPFeature.MinimumTransferTimeIsDefinitive.testOn(() -> {
       // we set a very low minimum transfer time of 0 seconds. we expect this to work similar
