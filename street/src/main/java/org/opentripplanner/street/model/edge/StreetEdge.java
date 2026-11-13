@@ -54,6 +54,17 @@ public class StreetEdge
    */
   private static final double WHEELCHAIR_INACCESSIBLE_BARRIER_COST = 600;
 
+  /**
+   * The time factor of stairs for a wheelchair user, instead of the stairs time factor of walking.
+   * It is so large that a path over stairs almost always exceeds the time limits of a wheelchair
+   * search, and an elevator that is out of service is not replaced by the stairs next to it. It
+   * applies to the time only: the cost of the stairs still uses the stairs time factor of walking,
+   * because the generalized cost is an int and would overflow. The time of one edge, an int in
+   * milliseconds, overflows only for stairs longer than about 1.7 km. This is temporary, until the
+   * wheelchair preferences have their own stairs time factor (#8146).
+   */
+  private static final double WHEELCHAIR_STAIRS_TIME_FACTOR = 1_000;
+
   /** If you have more than 16 flags, increase flags to short or int */
   static final int BACK_FLAG_INDEX = 0;
   static final int ROUNDABOUT_FLAG_INDEX = 1;
@@ -1051,6 +1062,10 @@ public class StreetEdge
     double time, weight;
     if (wheelchair) {
       time = getEffectiveWalkDistance() / speed;
+      if (isStairs()) {
+        // Replace the stairs time factor of walking, which is part of the speed, for the time only
+        time *= WHEELCHAIR_STAIRS_TIME_FACTOR / request.walk().stairsTimeFactor();
+      }
       weight =
         (getEffectiveBikeDistance() / speed) *
         StreetEdgeReluctanceCalculator.computeWheelchairReluctance(
