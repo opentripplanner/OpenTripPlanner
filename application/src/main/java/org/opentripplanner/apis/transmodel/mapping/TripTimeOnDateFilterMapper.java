@@ -17,7 +17,8 @@ import org.opentripplanner.transit.model.filter.transit.TripTimeOnDateSelectRequ
  * <p>
  * Each filter has {@code select} and {@code not} arrays of select criteria.
  * <p>
- * Empty lists are not allowed and will result in an {@link InvalidInputException}.
+ * Empty lists are not allowed and will result in an {@link InvalidInputException}. A list field
+ * that is an explicit {@code null} is treated as if it was omitted.
  */
 public class TripTimeOnDateFilterMapper {
 
@@ -34,24 +35,25 @@ public class TripTimeOnDateFilterMapper {
     var filterRequests = new ArrayList<FilterRequest<TripTimeOnDateSelectRequest>>();
 
     for (var filterInput : filters) {
+      var select = (List<Map<String, List<?>>>) filterInput.get("select");
+      var not = (List<Map<String, List<?>>>) filterInput.get("not");
+      if (select == null && not == null) {
+        throw new InvalidInputException("A filter must have at least one of 'select' or 'not'.");
+      }
+
       var filterRequestBuilder = FilterRequest.<TripTimeOnDateSelectRequest>of();
 
-      if (filterInput.containsKey("select")) {
-        var select = (List<Map<String, List<?>>>) filterInput.get("select");
+      if (select != null) {
         validateFieldNotEmpty("select", select);
         for (var it : select) {
           filterRequestBuilder.addSelect(mapSelectRequest(it));
         }
       }
-      if (filterInput.containsKey("not")) {
-        var not = (List<Map<String, List<?>>>) filterInput.get("not");
+      if (not != null) {
         validateFieldNotEmpty("not", not);
         for (var it : not) {
           filterRequestBuilder.addNot(mapSelectRequest(it));
         }
-      }
-      if (!filterInput.containsKey("select") && !filterInput.containsKey("not")) {
-        throw new InvalidInputException("A filter must have at least one of 'select' or 'not'.");
       }
       filterRequests.add(filterRequestBuilder.build());
     }
@@ -64,20 +66,20 @@ public class TripTimeOnDateFilterMapper {
 
     var builder = TripTimeOnDateSelectRequest.of();
 
-    if (input.containsKey("lines")) {
-      var lines = (List<String>) input.get("lines");
+    var lines = (List<String>) input.get("lines");
+    if (lines != null) {
       validateFieldNotEmpty("lines", lines);
       builder.withRoutes(idMapper.parseListNullSafe(lines));
     }
 
-    if (input.containsKey("authorities")) {
-      var authorities = (List<String>) input.get("authorities");
+    var authorities = (List<String>) input.get("authorities");
+    if (authorities != null) {
       validateFieldNotEmpty("authorities", authorities);
       builder.withAgencies(idMapper.parseListNullSafe(authorities));
     }
 
-    if (input.containsKey("transportModes")) {
-      var transportModes = (List<Map<String, ?>>) input.get("transportModes");
+    var transportModes = (List<Map<String, ?>>) input.get("transportModes");
+    if (transportModes != null) {
       validateFieldNotEmpty("transportModes", transportModes);
 
       var tModes = new ArrayList<MainAndSubMode>();
@@ -87,10 +89,10 @@ public class TripTimeOnDateFilterMapper {
         var mainMode = TransportModeInputMapper.mapTransitMode(
           modeWithSubModes.get("transportMode")
         );
-        if (modeWithSubModes.containsKey("transportSubModes")) {
-          var transportSubModes = (List<TransmodelTransportSubmode>) modeWithSubModes.get(
-            "transportSubModes"
-          );
+        var transportSubModes = (List<TransmodelTransportSubmode>) modeWithSubModes.get(
+          "transportSubModes"
+        );
+        if (transportSubModes != null) {
           for (var subMode : transportSubModes) {
             tModes.add(new MainAndSubMode(mainMode, SubMode.of(subMode.getValue())));
           }
@@ -106,9 +108,9 @@ public class TripTimeOnDateFilterMapper {
 
   private static void validateNotEmpty(Map<String, List<?>> input) {
     if (
-      !input.containsKey("lines") &&
-      !input.containsKey("authorities") &&
-      !input.containsKey("transportModes")
+      input.get("lines") == null &&
+      input.get("authorities") == null &&
+      input.get("transportModes") == null
     ) {
       throw new InvalidInputException("A selector cannot be empty");
     }

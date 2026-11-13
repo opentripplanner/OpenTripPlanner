@@ -8,6 +8,7 @@ import static org.opentripplanner.apis.transmodel._support.RequestHelper.list;
 import static org.opentripplanner.apis.transmodel._support.RequestHelper.map;
 import static org.opentripplanner.transit.model.basic.TransitMode.BUS;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -125,6 +126,93 @@ class TripTimeOnDateFilterMapperTest {
     assertThrows(InvalidInputException.class, () -> MAPPER.mapFilters(input));
   }
 
+  @SuppressWarnings("unchecked")
+  static Stream<Arguments> explicitNullIsOmittedCases() {
+    return Stream.of(
+      argumentSet(
+        "nullNotNextToSelect",
+        list(withNulls(map("select", list(map("lines", list("F:Line:1")))), "not")),
+        "[(select: [(routes: [F:Line:1])])]"
+      ),
+      argumentSet(
+        "nullSelectNextToNot",
+        list(withNulls(map("not", list(map("lines", list("F:Line:1")))), "select")),
+        "[(not: [(routes: [F:Line:1])])]"
+      ),
+      argumentSet(
+        "nullAuthoritiesNextToLines",
+        list(map("select", list(withNulls(map("lines", list("F:Line:1")), "authorities")))),
+        "[(select: [(routes: [F:Line:1])])]"
+      ),
+      argumentSet(
+        "nullLinesNextToAuthorities",
+        list(map("select", list(withNulls(map("authorities", list("F:Auth:1")), "lines")))),
+        "[(select: [(agencies: [F:Auth:1])])]"
+      ),
+      argumentSet(
+        "nullTransportModesNextToLines",
+        list(map("not", list(withNulls(map("lines", list("F:Line:1")), "transportModes")))),
+        "[(not: [(routes: [F:Line:1])])]"
+      ),
+      argumentSet(
+        "nullTransportSubModesMatchesAllSubModes",
+        list(
+          map(
+            "select",
+            list(
+              map(
+                entry(
+                  "transportModes",
+                  list(withNulls(map("transportMode", BUS), "transportSubModes"))
+                )
+              )
+            )
+          )
+        ),
+        "[(select: [(transportModes: [BUS])])]"
+      )
+    );
+  }
+
+  @ParameterizedTest
+  @MethodSource("explicitNullIsOmittedCases")
+  void explicitNullIsTreatedAsOmitted(List<Map<String, ?>> input, String expected) {
+    assertEquals(expected, MAPPER.mapFilters(input).toString());
+  }
+
+  @SuppressWarnings("unchecked")
+  static Stream<Arguments> nothingLeftAfterNullsCases() {
+    return Stream.of(
+      argumentSet(
+        "nullSelectAndNot",
+        list(withNulls(map(), "select", "not")),
+        "A filter must have at least one of 'select' or 'not'."
+      ),
+      argumentSet(
+        "nullSelectOnly",
+        list(withNulls(map(), "select")),
+        "A filter must have at least one of 'select' or 'not'."
+      ),
+      argumentSet(
+        "nullLinesOnly",
+        list(map("select", list(withNulls(map(), "lines")))),
+        "A selector cannot be empty"
+      ),
+      argumentSet(
+        "nullLinesAuthoritiesAndModes",
+        list(map("not", list(withNulls(map(), "lines", "authorities", "transportModes")))),
+        "A selector cannot be empty"
+      )
+    );
+  }
+
+  @ParameterizedTest
+  @MethodSource("nothingLeftAfterNullsCases")
+  void nullsLeavingNothingAreRejected(List<Map<String, ?>> input, String message) {
+    var ex = assertThrows(InvalidInputException.class, () -> MAPPER.mapFilters(input));
+    assertEquals(message, ex.getMessage());
+  }
+
   @Test
   void rejectUnknownTransportMode() {
     // The GraphQL TransportMode enum maps "unknown" to a String, not to a TransitMode
@@ -135,5 +223,17 @@ class TripTimeOnDateFilterMapperTest {
         )
       )
     );
+  }
+
+  /**
+   * A copy of the given GraphQL input object where the given fields are set to an explicit
+   * {@code null}, which is how a client that sends {@code field: null} shows up in the mapper.
+   */
+  private static Map<String, Object> withNulls(Map<String, ?> input, String... nullFields) {
+    var result = new HashMap<String, Object>(input);
+    for (var field : nullFields) {
+      result.put(field, null);
+    }
+    return result;
   }
 }
