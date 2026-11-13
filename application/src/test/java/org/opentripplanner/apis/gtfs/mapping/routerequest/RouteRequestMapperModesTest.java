@@ -178,6 +178,83 @@ class RouteRequestMapperModesTest {
   }
 
   @Test
+  void testSameTransitModeWithConflictingReluctances() {
+    var env = testCtx.executionContext(railByLocalAndRegionalCategory(1.0, 1.2));
+    var exception = assertThrows(InvalidInputException.class, () ->
+      RouteRequestMapper.toRouteRequest(env, testCtx.context())
+    );
+    assertEquals(
+      "Transit mode RAIL is listed with different reluctances (1.0 and 1.2). The reluctance can only be set per transit mode, not per distance category or replacement.",
+      exception.getMessage()
+    );
+  }
+
+  @Test
+  void testSameTransitModeWithEqualReluctances() {
+    var env = testCtx.executionContext(railByLocalAndRegionalCategory(1.2, 1.2));
+    var routeRequest = RouteRequestMapper.toRouteRequest(env, testCtx.context());
+    assertEquals(
+      1.2,
+      routeRequest.preferences().transit().reluctanceForMode().get(TransitMode.RAIL)
+    );
+  }
+
+  private Map<String, Object> railByLocalAndRegionalCategory(
+    double localReluctance,
+    double regionalReluctance
+  ) {
+    return transitModes(
+      Map.ofEntries(
+        entry("mode", "RAIL"),
+        entry("distanceCategory", "LOCAL"),
+        entry("cost", Map.ofEntries(entry("reluctance", localReluctance)))
+      ),
+      Map.ofEntries(
+        entry("mode", "RAIL"),
+        entry("distanceCategory", "REGIONAL"),
+        entry("cost", Map.ofEntries(entry("reluctance", regionalReluctance)))
+      )
+    );
+  }
+
+  @Test
+  void testTransitModesWithDistanceCategory() {
+    var modesArgs = transitModes(
+      Map.ofEntries(entry("mode", "RAIL"), entry("distanceCategory", "LOCAL")),
+      Map.ofEntries(entry("mode", "RAIL"), entry("distanceCategory", "REGIONAL")),
+      Map.ofEntries(entry("mode", "COACH"), entry("distanceCategory", "LONG_DISTANCE")),
+      Map.ofEntries(
+        entry("mode", "RAIL"),
+        entry("distanceCategory", "LONG_DISTANCE"),
+        entry("replacement", Map.ofEntries(entry("requirement", "FORBIDDEN")))
+      ),
+      Map.ofEntries(
+        entry("mode", "RAIL"),
+        entry("distanceCategory", "REGIONAL"),
+        entry("replacement", Map.ofEntries(entry("requirement", "REQUIRED")))
+      ),
+      Map.ofEntries(entry("mode", "BUS"), entry("distanceCategory", "REGIONAL")),
+      Map.ofEntries(entry("mode", "BUS"))
+    );
+    var env = testCtx.executionContext(modesArgs);
+    var routeRequest = RouteRequestMapper.toRouteRequest(env, testCtx.context());
+    assertEquals(
+      "[(select: [(transportModes: [BUS, BUS::::IGNORED::REGIONAL, COACH::::IGNORED::LONG_DISTANCE, RAIL::::FORBIDDEN::LONG_DISTANCE, RAIL::::IGNORED::LOCAL, RAIL::::IGNORED::REGIONAL, RAIL::::REQUIRED::REGIONAL])])]",
+      routeRequest.journey().transit().filters().toString()
+    );
+  }
+
+  @SafeVarargs
+  private Map<String, Object> transitModes(Map<String, Object>... modes) {
+    var modesArgs = testCtx.basicRequest();
+    modesArgs.put(
+      "modes",
+      Map.ofEntries(entry("transit", Map.ofEntries(entry("transit", List.of(modes)))))
+    );
+    return modesArgs;
+  }
+
+  @Test
   void testStreetModesWithEmptyModes() {
     var modesArgs = testCtx.basicRequest();
     var empty = List.of();

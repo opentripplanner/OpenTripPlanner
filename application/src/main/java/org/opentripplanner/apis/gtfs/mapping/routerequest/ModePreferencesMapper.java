@@ -18,6 +18,7 @@ import org.opentripplanner.routing.api.request.request.TransitRequestBuilder;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
 import org.opentripplanner.street.model.StreetMode;
+import org.opentripplanner.transit.model.basic.DistanceCategory;
 import org.opentripplanner.transit.model.basic.NarrowedTransitMode;
 import org.opentripplanner.transit.model.basic.ReplacementRequirement;
 import org.opentripplanner.utils.collection.CollectionUtils;
@@ -112,13 +113,24 @@ public class ModePreferencesMapper {
     };
   }
 
+  @Nullable
+  private static DistanceCategory map(GraphQLTypes.@Nullable GraphQLDistanceCategory input) {
+    if (input == null) {
+      return null;
+    }
+    return switch (input) {
+      case LOCAL -> DistanceCategory.LOCAL;
+      case REGIONAL -> DistanceCategory.REGIONAL;
+      case LONG_DISTANCE -> DistanceCategory.LONG_DISTANCE;
+    };
+  }
+
   private static NarrowedTransitMode map(GraphQLTypes.GraphQLPlanTransitModePreferenceInput input) {
     if (input != null) {
-      return new NarrowedTransitMode(
-        TransitModeMapper.map(input.getGraphQLMode()),
-        null,
-        map(input.getGraphQLReplacement())
-      );
+      return NarrowedTransitMode.of(TransitModeMapper.map(input.getGraphQLMode()))
+        .withReplacement(map(input.getGraphQLReplacement()))
+        .withDistanceCategory(map(input.getGraphQLDistanceCategory()))
+        .build();
     } else {
       return null;
     }

@@ -3624,6 +3624,30 @@ enum DependentFareProductFilter {
   MATCH_CATEGORY_AND_MEDIUM
 }
 
+"""
+The distance category of a transit service: how far it travels and which kind of journeys it is
+meant for. The category is derived from the NeTEx submode or the GTFS extended route type of the
+trip, and it exists for every trip of every transit mode.
+
+Trips whose submode or extended route type isn't specific, e.g. a plain GTFS route type 2, get a
+best guess based on their transit mode: `REGIONAL` for `RAIL` and `FERRY`, `LONG_DISTANCE` for
+`COACH` and `AIRPLANE`, and `LOCAL` for all other modes.
+
+The mapping is not configurable and can't be right for every deployment. For example, all high
+speed rail is `LONG_DISTANCE`, including the high speed regional services of the UK.
+"""
+enum DistanceCategory {
+  """
+  Services within a city or its suburbs, e.g. S-Bahn, urban railways, trams, shuttles and local
+  buses.
+  """
+  LOCAL
+  "National and international services, including high speed rail, night trains and domestic flights."
+  LONG_DISTANCE
+  "Services connecting the towns and cities of a region, e.g. regional trains and regional buses."
+  REGIONAL
+}
+
 "Entities, which are relevant for a feed and can contain alerts"
 enum FeedAlertType {
   "Alerts affecting the feed's agencies"
@@ -5225,8 +5249,21 @@ input PlanStreetPreferencesInput {
 
 "Transit mode and a reluctance associated with it."
 input PlanTransitModePreferenceInput {
-  "Costs related to using a transit mode."
+  """
+  Costs related to using a transit mode. Costs are defined per transit mode: if a mode is listed
+  more than once, e.g. with different distance categories, all entries that define a cost must
+  define the same cost.
+  """
   cost: TransitModePreferenceCostInput
+  """
+  If present and not null, only trips with this distance category match. Every trip has a category,
+  see `DistanceCategory`. Like `replacement`, this further limits the transit mode selection, and a
+  trip has to match both.
+  
+  For example, `[(mode: RAIL, distanceCategory: LOCAL), (mode: RAIL, distanceCategory: REGIONAL)]`
+  matches all trains except the long-distance trains.
+  """
+  distanceCategory: DistanceCategory
   "Transit mode that could be (but doesn't have to be) used in an itinerary."
   mode: TransitMode!
   """
