@@ -22,6 +22,7 @@ import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.plan.legreference.ScheduledTransitLegReference;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
+import org.opentripplanner.routing.api.request.via.PassThroughViaLocation;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
@@ -477,6 +478,25 @@ class ItineraryReferenceMapperTest {
           .withEgress(new StreetRequest(egress))
           .withTransfer(new StreetRequest(transfer))
       )
+      .buildRequest();
+
+    assertThrows(UnsupportedItineraryReferenceException.class, () ->
+      ItineraryReferenceMapper.toItineraryReference(itinerary, request)
+    );
+  }
+
+  /** Via locations are not stored in the reference, so such an itinerary gets no reference. */
+  @Test
+  void viaLocationsAreUnsupported() {
+    var itinerary = createRefetchService().refetchItinerary(
+      null,
+      null,
+      List.of(legRef()),
+      routeRequest()
+    );
+    var request = routeRequest()
+      .copyOf()
+      .withViaLocations(List.of(new PassThroughViaLocation("Via B", List.of(STOP_B.getId()))))
       .buildRequest();
 
     assertThrows(UnsupportedItineraryReferenceException.class, () ->

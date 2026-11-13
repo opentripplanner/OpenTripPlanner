@@ -57,6 +57,7 @@ public final class ItineraryReferenceMapper {
     requireWalkMode(routeRequest.journey().access().mode(), "access");
     requireWalkMode(routeRequest.journey().egress().mode(), "egress");
     requireWalkMode(routeRequest.journey().transfer().mode(), "transfer");
+    requireNoViaLocations(routeRequest);
 
     var preferences = routeRequest.preferences();
     return new ItineraryReference(
@@ -173,6 +174,15 @@ public final class ItineraryReferenceMapper {
     if (location != null && location.isOnBoard()) {
       throw new UnsupportedItineraryReferenceException(
         "On-board TripLocation is not supported in ItineraryReference: " + location
+      );
+    }
+  }
+
+  /** Via locations are not stored, so an itinerary planned with them is not supported yet. */
+  private static void requireNoViaLocations(RouteRequest routeRequest) {
+    if (routeRequest.isViaSearch()) {
+      throw new UnsupportedItineraryReferenceException(
+        "Via locations are not supported in ItineraryReference"
       );
     }
   }
