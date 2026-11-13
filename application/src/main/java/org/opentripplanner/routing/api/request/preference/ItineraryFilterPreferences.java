@@ -30,6 +30,7 @@ public final class ItineraryFilterPreferences {
   private final double parkAndRideDurationRatio;
   private final boolean removeItinerariesWithSameRoutesAndStops;
   private final TransitGeneralizedCostFilterParams transitGeneralizedCostLimit;
+  private final TransitGeneralizedCostFilterParams directFlexGeneralizedCostLimit;
   private final CostLinearFunction removeTransitWithHigherCostThanBestOnStreetOnly;
   private final boolean filterDirectFlexBySearchWindow;
 
@@ -46,6 +47,10 @@ public final class ItineraryFilterPreferences {
     this.parkAndRideDurationRatio = 0.0;
     this.removeItinerariesWithSameRoutesAndStops = false;
     this.transitGeneralizedCostLimit = new TransitGeneralizedCostFilterParams(
+      CostLinearFunction.of(Duration.ofMinutes(15), 1.5),
+      0.4
+    );
+    this.directFlexGeneralizedCostLimit = new TransitGeneralizedCostFilterParams(
       CostLinearFunction.of(Duration.ofMinutes(15), 1.5),
       0.4
     );
@@ -74,6 +79,9 @@ public final class ItineraryFilterPreferences {
     this.parkAndRideDurationRatio = Units.ratio(builder.parkAndRideDurationRatio);
     this.removeItinerariesWithSameRoutesAndStops = builder.removeItinerariesWithSameRoutesAndStops;
     this.transitGeneralizedCostLimit = Objects.requireNonNull(builder.transitGeneralizedCostLimit);
+    this.directFlexGeneralizedCostLimit = Objects.requireNonNull(
+      builder.directFlexGeneralizedCostLimit
+    );
     this.removeTransitWithHigherCostThanBestOnStreetOnly = Objects.requireNonNull(
       builder.removeTransitWithHigherCostThanBestOnStreetOnly
     );
@@ -136,6 +144,10 @@ public final class ItineraryFilterPreferences {
     return transitGeneralizedCostLimit;
   }
 
+  public TransitGeneralizedCostFilterParams directFlexGeneralizedCostLimit() {
+    return directFlexGeneralizedCostLimit;
+  }
+
   public CostLinearFunction removeTransitWithHigherCostThanBestOnStreetOnly() {
     return removeTransitWithHigherCostThanBestOnStreetOnly;
   }
@@ -182,6 +194,11 @@ public final class ItineraryFilterPreferences {
         DEFAULT.transitGeneralizedCostLimit
       )
       .addObj(
+        "directFlexGeneralizedCostLimit",
+        directFlexGeneralizedCostLimit,
+        DEFAULT.directFlexGeneralizedCostLimit
+      )
+      .addObj(
         "removeTransitWithHigherCostThanBestOnStreetOnly",
         removeTransitWithHigherCostThanBestOnStreetOnly,
         DEFAULT.removeTransitWithHigherCostThanBestOnStreetOnly
@@ -223,6 +240,7 @@ public final class ItineraryFilterPreferences {
         that.removeTransitWithHigherCostThanBestOnStreetOnly
       ) &&
       Objects.equals(transitGeneralizedCostLimit, that.transitGeneralizedCostLimit) &&
+      Objects.equals(directFlexGeneralizedCostLimit, that.directFlexGeneralizedCostLimit) &&
       filterDirectFlexBySearchWindow == that.filterDirectFlexBySearchWindow
     );
   }
@@ -242,6 +260,7 @@ public final class ItineraryFilterPreferences {
       parkAndRideDurationRatio,
       removeItinerariesWithSameRoutesAndStops,
       transitGeneralizedCostLimit,
+      directFlexGeneralizedCostLimit,
       removeTransitWithHigherCostThanBestOnStreetOnly,
       filterDirectFlexBySearchWindow
     );
@@ -262,6 +281,7 @@ public final class ItineraryFilterPreferences {
     private double parkAndRideDurationRatio;
     private boolean removeItinerariesWithSameRoutesAndStops;
     private TransitGeneralizedCostFilterParams transitGeneralizedCostLimit;
+    private TransitGeneralizedCostFilterParams directFlexGeneralizedCostLimit;
     private CostLinearFunction removeTransitWithHigherCostThanBestOnStreetOnly;
     private boolean filterDirectFlexBySearchWindow;
 
@@ -339,6 +359,13 @@ public final class ItineraryFilterPreferences {
       return this;
     }
 
+    public Builder withDirectFlexGeneralizedCostLimit(
+      TransitGeneralizedCostFilterParams directFlexGeneralizedCostLimit
+    ) {
+      this.directFlexGeneralizedCostLimit = directFlexGeneralizedCostLimit;
+      return this;
+    }
+
     public Builder withRemoveTransitWithHigherCostThanBestOnStreetOnly(
       CostLinearFunction removeTransitWithHigherCostThanBestOnStreetOnly
     ) {
@@ -364,6 +391,7 @@ public final class ItineraryFilterPreferences {
       this.removeItinerariesWithSameRoutesAndStops =
         original.removeItinerariesWithSameRoutesAndStops;
       this.transitGeneralizedCostLimit = original.transitGeneralizedCostLimit;
+      this.directFlexGeneralizedCostLimit = original.directFlexGeneralizedCostLimit;
       this.removeTransitWithHigherCostThanBestOnStreetOnly =
         original.removeTransitWithHigherCostThanBestOnStreetOnly;
       this.filterDirectFlexBySearchWindow = original.filterDirectFlexBySearchWindow;

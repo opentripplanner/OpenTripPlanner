@@ -2434,6 +2434,8 @@ input ItineraryFilters {
   itineraries are returned with a system notice, and not deleted.
   """
   debug: ItineraryFilterDebugProfile = off
+  "Set a relative limit for direct-flex itineraries. The limit is calculated in the same way as for `transitGeneralizedCostLimit`, based on the generalized-cost of the other transit itineraries, including other direct-flex itineraries, and the time between itineraries. Only direct-flex itineraries are removed by this filter. Default: {\"costLimitFunction\": 15m + 1.5 t, \"intervalRelaxFactor\": 0.4}"
+  directFlexGeneralizedCostLimit: TransitGeneralizedCostFilterParams
   groupSimilarityKeepNumOfItineraries: Float = 0.68 @deprecated(reason : "Use groupSimilarityKeepThree instead.")
   "Pick ONE itinerary from each group after putting itineraries that is 85% similar together."
   groupSimilarityKeepOne: Float = 0.85
@@ -2443,7 +2445,7 @@ input ItineraryFilters {
   groupedOtherThanSameLegsMaxCostMultiplier: Float = 2.0
   "Add an additional cost for short transfers on long transit itineraries. See javaDoc on `AddMinSafeTransferCostFilter` details."
   minSafeTransferTimeFactor: Float @deprecated(reason : "This filter is removed, it has undesired side-effects")
-  "Set a relative limit for all transit itineraries. The limit is calculated based on the transit itinerary generalized-cost and the time between itineraries Itineraries without transit legs are excluded from this filter. Example: costLimitFunction(x) = 3600 + 2.0 x and intervalRelaxFactor = 0.5. If the lowest cost returned is 10 000, then the limit is set to: 3 600 + 2 * 10 000 = 26 600 plus half of the time between either departure or arrival times of the itinerary. Default: {\"costLimitFunction\": 15m + 1.5 t, \"intervalRelaxFactor\": 0.4}"
+  "Set a relative limit for all transit itineraries, except direct flex. The limit is calculated based on the transit itinerary generalized-cost and the time between itineraries. Itineraries without transit legs and direct-flex itineraries are excluded from this filter. Example: costLimitFunction(x) = 3600 + 2.0 x and intervalRelaxFactor = 0.5. If the lowest cost returned is 10 000, then the limit is set to: 3 600 + 2 * 10 000 = 26 600 plus half of the time between either departure or arrival times of the itinerary. Default: {\"costLimitFunction\": 15m + 1.5 t, \"intervalRelaxFactor\": 0.4}"
   transitGeneralizedCostLimit: TransitGeneralizedCostFilterParams
 }
 

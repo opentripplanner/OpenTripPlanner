@@ -20,6 +20,7 @@ public class ItineraryFiltersInputType {
   private static final String DEBUG = "debug";
   private static final String MIN_SAFE_TRANSFER_TIME_FACTOR = "minSafeTransferTimeFactor";
   private static final String TRANSIT_GENERALIZED_COST_LIMIT = "transitGeneralizedCostLimit";
+  private static final String DIRECT_FLEX_GENERALIZED_COST_LIMIT = "directFlexGeneralizedCostLimit";
   private static final String GROUP_SIMILARITY_KEEP_ONE = "groupSimilarityKeepOne";
   private static final String GROUP_SIMILARITY_KEEP_THREE = "groupSimilarityKeepThree";
   private static final String GROUPED_OTHER_THAN_SAME_LEGS_MAX_COST_MULTIPLIER =
@@ -28,6 +29,22 @@ public class ItineraryFiltersInputType {
     "groupSimilarityKeepNumOfItineraries";
 
   public static GraphQLInputObjectType create(ItineraryFilterPreferences dft) {
+    var generalizedCostFilterParams = GraphQLInputObjectType.newInputObject()
+      .name("TransitGeneralizedCostFilterParams")
+      .field(
+        GraphQLInputObjectField.newInputObjectField()
+          .name("costLimitFunction")
+          .type(new GraphQLNonNull(TransmodelScalars.DOUBLE_FUNCTION_SCALAR))
+          .build()
+      )
+      .field(
+        GraphQLInputObjectField.newInputObjectField()
+          .name("intervalRelaxFactor")
+          .type(new GraphQLNonNull(Scalars.GraphQLFloat))
+          .build()
+      )
+      .build();
+
     return GraphQLInputObjectType.newInputObject()
       .name("ItineraryFilters")
       .description(
@@ -49,30 +66,16 @@ public class ItineraryFiltersInputType {
       .field(
         GraphQLInputObjectField.newInputObjectField()
           .name(TRANSIT_GENERALIZED_COST_LIMIT)
-          .type(
-            GraphQLInputObjectType.newInputObject()
-              .name("TransitGeneralizedCostFilterParams")
-              .field(
-                GraphQLInputObjectField.newInputObjectField()
-                  .name("costLimitFunction")
-                  .type(new GraphQLNonNull(TransmodelScalars.DOUBLE_FUNCTION_SCALAR))
-                  .build()
-              )
-              .field(
-                GraphQLInputObjectField.newInputObjectField()
-                  .name("intervalRelaxFactor")
-                  .type(new GraphQLNonNull(Scalars.GraphQLFloat))
-                  .build()
-              )
-              .build()
-          )
+          .type(generalizedCostFilterParams)
           // There is a bug in the GraphQL lib. The default value is shown as a `boolean`
           // with value `false`, not the actual value. Hence; The default is added to the
           // description instead.
           .description(
-            "Set a relative limit for all transit itineraries. The limit is calculated based on " +
-              "the transit itinerary generalized-cost and the time between itineraries " +
-              "Itineraries without transit legs are excluded from this filter. Example: " +
+            "Set a relative limit for all transit itineraries, except direct flex. The limit is " +
+              "calculated based on " +
+              "the transit itinerary generalized-cost and the time between itineraries. " +
+              "Itineraries without transit legs and direct-flex itineraries are excluded from " +
+              "this filter. Example: " +
               "costLimitFunction(x) = 3600 + 2.0 x and intervalRelaxFactor = 0.5. " +
               "If the lowest cost returned is 10 000, then the limit " +
               "is set to: 3 600 + 2 * 10 000 = 26 600 plus half of the time between either departure" +
@@ -81,6 +84,25 @@ public class ItineraryFiltersInputType {
               dft.transitGeneralizedCostLimit().costLimitFunction().serialize() +
               ", \"intervalRelaxFactor\": " +
               dft.transitGeneralizedCostLimit().intervalRelaxFactor() +
+              "}"
+          )
+          .build()
+      )
+      .field(
+        GraphQLInputObjectField.newInputObjectField()
+          .name(DIRECT_FLEX_GENERALIZED_COST_LIMIT)
+          .type(generalizedCostFilterParams)
+          // The default is added to the description, see transitGeneralizedCostLimit.
+          .description(
+            "Set a relative limit for direct-flex itineraries. The limit is calculated in the " +
+              "same way as for `transitGeneralizedCostLimit`, based on the generalized-cost of " +
+              "the other transit itineraries, including other direct-flex itineraries, and the " +
+              "time between itineraries. Only " +
+              "direct-flex itineraries are removed by this filter. " +
+              "Default: {\"costLimitFunction\": " +
+              dft.directFlexGeneralizedCostLimit().costLimitFunction().serialize() +
+              ", \"intervalRelaxFactor\": " +
+              dft.directFlexGeneralizedCostLimit().intervalRelaxFactor() +
               "}"
           )
           .build()
@@ -167,6 +189,14 @@ public class ItineraryFiltersInputType {
     );
     setField(callWith, TRANSIT_GENERALIZED_COST_LIMIT, (Map<String, ?> v) ->
       builder.withTransitGeneralizedCostLimit(
+        new TransitGeneralizedCostFilterParams(
+          ((DoubleFunction) v.get("costLimitFunction")).asCostLinearFunction(),
+          (double) v.get("intervalRelaxFactor")
+        )
+      )
+    );
+    setField(callWith, DIRECT_FLEX_GENERALIZED_COST_LIMIT, (Map<String, ?> v) ->
+      builder.withDirectFlexGeneralizedCostLimit(
         new TransitGeneralizedCostFilterParams(
           ((DoubleFunction) v.get("costLimitFunction")).asCostLinearFunction(),
           (double) v.get("intervalRelaxFactor")

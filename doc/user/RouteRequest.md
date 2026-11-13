@@ -131,6 +131,9 @@ The RouteRequest is the type for the
 |    [parkAndRideDurationRatio](#rd_if_parkAndRideDurationRatio)                                               |        `double`        | Filter P+R routes that consist of driving and walking by the minimum fraction of the driving using of _time_.                                            | *Optional* | `0.0`            |  2.1  |
 |    [removeItinerariesWithSameRoutesAndStops](#rd_if_removeItinerariesWithSameRoutesAndStops)                 |        `boolean`       | Set to true if you want to list only the first itinerary  which goes through the same stops and routes.                                                  | *Optional* | `false`          |  2.2  |
 |    [removeTransitWithHigherCostThanBestOnStreetOnly](#rd_if_removeTransitWithHigherCostThanBestOnStreetOnly) | `cost-linear-function` | Limit function for generalized-cost computed from street-only itineries applied to transit itineraries.                                                  | *Optional* | `"1m + 1.3 t"`   |  2.4  |
+|    [directFlexGeneralizedCostLimit](#rd_if_directFlexGeneralizedCostLimit)                                   |        `object`        | A relative limit for the generalized-cost for direct-flex itineraries.                                                                                   | *Optional* |                  |  2.11 |
+|       [costLimitFunction](#rd_if_directFlexGeneralizedCostLimit_costLimitFunction)                           | `cost-linear-function` | The base function used by the filter.                                                                                                                    | *Optional* | `"15m + 1.5 t"`  |  2.11 |
+|       [intervalRelaxFactor](#rd_if_directFlexGeneralizedCostLimit_intervalRelaxFactor)                       |        `double`        | How much the filter should be relaxed for itineraries that do not overlap in time.                                                                       | *Optional* | `0.4`            |  2.11 |
 |    [transitGeneralizedCostLimit](#rd_if_transitGeneralizedCostLimit)                                         |        `object`        | A relative limit for the generalized-cost for transit itineraries.                                                                                       | *Optional* |                  |  2.1  |
 |       [costLimitFunction](#rd_if_transitGeneralizedCostLimit_costLimitFunction)                              | `cost-linear-function` | The base function used by the filter.                                                                                                                    | *Optional* | `"15m + 1.5 t"`  |  2.2  |
 |       [intervalRelaxFactor](#rd_if_transitGeneralizedCostLimit_intervalRelaxFactor)                          |        `double`        | How much the filter should be relaxed for itineraries that do not overlap in time.                                                                       | *Optional* | `0.4`            |  2.2  |
@@ -963,6 +966,41 @@ set. Walking is handled with a different logic: if a transit itinerary has highe
 a plain walk itinerary, it will be removed even if the cost limit function would keep it.
 
 
+<h3 id="rd_if_directFlexGeneralizedCostLimit">directFlexGeneralizedCostLimit</h3>
+
+**Since version:** `2.11` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
+**Path:** /routingDefaults/itineraryFilters 
+
+A relative limit for the generalized-cost for direct-flex itineraries.
+
+The filter compares each direct-flex itinerary against every other transit itinerary,
+including other direct-flex itineraries, and drops it if its generalized-cost is higher
+than the limit. The limit is calculated in the same way as for
+`transitGeneralizedCostLimit`, using the `costLimitFunction` plus a *relative cost*
+for the distance in time between the itineraries.
+
+
+<h3 id="rd_if_directFlexGeneralizedCostLimit_costLimitFunction">costLimitFunction</h3>
+
+**Since version:** `2.11` ∙ **Type:** `cost-linear-function` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"15m + 1.5 t"`   
+**Path:** /routingDefaults/itineraryFilters/directFlexGeneralizedCostLimit 
+
+The base function used by the filter.
+
+This function calculates the threshold for the filter, when the itineraries have exactly the same arrival and departure times.
+
+<h3 id="rd_if_directFlexGeneralizedCostLimit_intervalRelaxFactor">intervalRelaxFactor</h3>
+
+**Since version:** `2.11` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.4`   
+**Path:** /routingDefaults/itineraryFilters/directFlexGeneralizedCostLimit 
+
+How much the filter should be relaxed for itineraries that do not overlap in time.
+
+This value is used to increase the filter threshold for itineraries further away in
+time, compared to those, that have exactly the same arrival and departure times.
+
+The unit is cost unit per second of time difference.
+
 <h3 id="rd_if_transitGeneralizedCostLimit">transitGeneralizedCostLimit</h3>
 
 **Since version:** `2.1` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
@@ -970,7 +1008,8 @@ a plain walk itinerary, it will be removed even if the cost limit function would
 
 A relative limit for the generalized-cost for transit itineraries.
 
-The filter compares all itineraries against every other itinerary. If the generalized-cost plus a
+The filter compares all transit itineraries, except direct flex, against every other such
+itinerary. If the generalized-cost plus a
 `transitGeneralizedCostLimit` is higher than the other generalized-cost, then the itinerary is
 dropped. The `transitGeneralizedCostLimit` is calculated using the `costLimitFunction` plus a
 *relative cost* for the distance in time between the itineraries. The *relative cost* is the
@@ -1412,6 +1451,10 @@ include stairs as a last result.
     },
     "itineraryFilters" : {
       "transitGeneralizedCostLimit" : {
+        "costLimitFunction" : "15m + 1.5 x",
+        "intervalRelaxFactor" : 0.4
+      },
+      "directFlexGeneralizedCostLimit" : {
         "costLimitFunction" : "15m + 1.5 x",
         "intervalRelaxFactor" : 0.4
       },
