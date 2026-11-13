@@ -12,6 +12,7 @@ import org.jspecify.annotations.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 import org.opentripplanner.astar.spi.TraverseVisitor;
+import org.opentripplanner.astar.strategy.ComposingSkipEdgeStrategy;
 import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
 import org.opentripplanner.astar.strategy.MaxCountTerminationStrategy;
 import org.opentripplanner.core.model.id.FeedScopedId;
@@ -33,6 +34,7 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.street.search.strategy.AvoidElevatorsSkipEdgeStrategy;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
 import org.opentripplanner.streetadapter.StreetSearchRequestMapper;
 
@@ -90,12 +92,34 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
     int maxStopCount
   ) {
     return findNearbyStops(
+      vertex,
+      routingRequest,
+      streetMode,
+      reverseDirection,
+      durationLimit,
+      maxStopCount,
+      Set.of()
+    );
+  }
+
+  @Override
+  public Collection<NearbyStop> findNearbyStops(
+    Vertex vertex,
+    RouteRequest routingRequest,
+    StreetMode streetMode,
+    boolean reverseDirection,
+    Duration durationLimit,
+    int maxStopCount,
+    Set<String> avoidElevatorIds
+  ) {
+    return findNearbyStops(
       Set.of(vertex),
       routingRequest,
       streetMode,
       reverseDirection,
       durationLimit,
-      maxStopCount
+      maxStopCount,
+      avoidElevatorIds
     );
   }
 
@@ -153,6 +177,30 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
     Duration durationLimit,
     int maxStopCount
   ) {
+    return findNearbyStops(
+      originVertices,
+      request,
+      streetMode,
+      reverseDirection,
+      durationLimit,
+      maxStopCount,
+      Set.of()
+    );
+  }
+
+  /**
+   * Same as above, but the paths do not use the elevators with an id in {@code avoidElevatorIds}.
+   * The search only checks the elevators if there is something to avoid.
+   */
+  public Collection<NearbyStop> findNearbyStops(
+    Set<Vertex> originVertices,
+    RouteRequest request,
+    StreetMode streetMode,
+    boolean reverseDirection,
+    Duration durationLimit,
+    int maxStopCount,
+    Set<String> avoidElevatorIds
+  ) {
     OTPRequestTimeoutException.checkForTimeout();
 
     var stopsFound = NearbyStopFactory.nearbyStopsForTransitStopVertices(
@@ -174,7 +222,7 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
 
     var streetSearch = StreetSearchBuilder.of()
       .withPreStartHook(OTPRequestTimeoutException::checkForTimeout)
-      .withSkipEdgeStrategy(new DurationSkipEdgeStrategy<>(durationLimit))
+      .withSkipEdgeStrategy(skipEdgeStrategy(durationLimit, avoidElevatorIds))
       .withDominanceFunction(new DominanceFunctions.MinimumWeight())
       .withTraverseVisitor(visitor)
       .withRequest(
@@ -214,6 +262,20 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
     }
 
     return stopsFound;
+  }
+
+  private static SkipEdgeStrategy<State, Edge> skipEdgeStrategy(
+    Duration durationLimit,
+    Set<String> avoidElevatorIds
+  ) {
+    var durationStrategy = new DurationSkipEdgeStrategy<State, Edge>(durationLimit);
+    if (avoidElevatorIds.isEmpty()) {
+      return durationStrategy;
+    }
+    return new ComposingSkipEdgeStrategy<>(
+      durationStrategy,
+      new AvoidElevatorsSkipEdgeStrategy(avoidElevatorIds)
+    );
   }
 
   /**

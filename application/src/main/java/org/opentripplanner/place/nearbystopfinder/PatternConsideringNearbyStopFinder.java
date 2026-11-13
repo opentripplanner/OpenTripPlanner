@@ -3,6 +3,7 @@ package org.opentripplanner.place.nearbystopfinder;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import org.jspecify.annotations.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.ext.flex.FlexIndex;
@@ -75,6 +76,27 @@ public class PatternConsideringNearbyStopFinder implements NearbyStopFinder {
     Duration durationLimit,
     int maxStopCount
   ) {
+    return findNearbyStops(
+      vertex,
+      routingRequest,
+      streetMode,
+      reverseDirection,
+      durationLimit,
+      maxStopCount,
+      Set.of()
+    );
+  }
+
+  @Override
+  public List<NearbyStop> findNearbyStops(
+    Vertex vertex,
+    RouteRequest routingRequest,
+    StreetMode streetMode,
+    boolean reverseDirection,
+    Duration durationLimit,
+    int maxStopCount,
+    Set<String> avoidElevatorIds
+  ) {
     if (!(vertex instanceof TransitStopVertex stopVertex)) {
       throw new IllegalArgumentException(
         "Transfers can only be created between stops. Vertex: " + vertex
@@ -93,7 +115,8 @@ public class PatternConsideringNearbyStopFinder implements NearbyStopFinder {
       streetMode,
       reverseDirection,
       durationLimit,
-      maxStopCount
+      maxStopCount,
+      avoidElevatorIds
     );
 
     // Remove transfersNotAllowed stops BEFORE we filter in Pattern and Flex Trips

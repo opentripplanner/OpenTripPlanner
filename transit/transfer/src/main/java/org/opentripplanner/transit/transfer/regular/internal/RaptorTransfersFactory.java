@@ -1,10 +1,14 @@
 package org.opentripplanner.transit.transfer.regular.internal;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.raptor.data.transfers.regular.RaptorTransferStore;
 import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
+import org.opentripplanner.transit.transfer.regular.spi.PathCriteria;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
 import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
 import org.opentripplanner.transit.transfer.regular.spi.TransferSearch;
@@ -14,6 +18,10 @@ import org.opentripplanner.transit.transfer.regular.spi.TransferSearch;
  * re-costed under the request-time user preferences. Paths that can not be traversed under the
  * preferences are left out. The max duration of the profile type is not applied, it only bounds
  * the search that discovers the paths.
+ * <p>
+ * A transfer whose path depends on a closed facility ids uses the cheapest alternative path that
+ * does not, if there is one, see {@code RegularTransferBuildRepository#setAlternativePaths}. The
+ * transfer is left out if there is none.
  * <p>
  * The transfers are either created from scratch, re-costing every path of the profile, or patched:
  * only the paths from the stops whose transfers changed are re-costed, and the rows of all other
@@ -31,10 +39,19 @@ final class RaptorTransfersFactory<P, R> {
   /** Patch if at most this share of all stops changed, create the transfers from scratch if not. */
   static final double MAX_PATCHED_STOPS_SHARE = 0.05;
 
+  /**
+   * The closed facility ids. Paths that depend on one of them are not used.
+   * <p>
+   * TODO: Empty until the closed ids are provided at runtime, so the best path is always used. See
+   *       design F, closable facility ids with precomputed alternatives.
+   */
+  static final Set<String> CLOSED_FACILITY_IDS = Set.of();
+
   private final int nStops;
   private final TransferPathProvider<P, R> pathProvider;
   private final TransferRequestMapper<R> mapper;
   private final Map<AbstractUserPreferences<?>, R> profileRequests;
+  private final Set<String> closedFacilityIds;
 
   /**
    * @param profileRequests the configured routing request of each profile, by the user preferences
@@ -47,6 +64,21 @@ final class RaptorTransfersFactory<P, R> {
     TransferRequestMapper<R> mapper,
     Map<AbstractUserPreferences<?>, R> profileRequests
   ) {
+    this(nStops, pathProvider, mapper, profileRequests, CLOSED_FACILITY_IDS);
+  }
+
+  /**
+   * @param closedFacilityIds the closed facility ids, see
+   *                            {@link #CLOSED_FACILITY_IDS}
+   */
+  RaptorTransfersFactory(
+    int nStops,
+    TransferPathProvider<P, R> pathProvider,
+    TransferRequestMapper<R> mapper,
+    Map<AbstractUserPreferences<?>, R> profileRequests,
+    Set<String> closedFacilityIds
+  ) {
+    this.closedFacilityIds = Set.copyOf(closedFacilityIds);
     this.nStops = nStops;
     this.pathProvider = pathProvider;
     this.mapper = mapper;
@@ -79,11 +111,9 @@ final class RaptorTransfersFactory<P, R> {
     if (profile != null) {
       var search = searchFor(userPreferences, profile);
       paths.forEachPath(profile, (fromStop, toStop, path) ->
-        search
-          .computePathCriteria(path)
-          .ifPresent(criteria ->
-            builder.addTransfer(fromStop, toStop, criteria.durationInSeconds(), criteria.c1())
-          )
+        cheapestOpenPath(search, paths, profile, fromStop, toStop, path).ifPresent(criteria ->
+          builder.addTransfer(fromStop, toStop, criteria.durationInSeconds(), criteria.c1())
+        )
       );
     }
     return builder.build();
@@ -111,13 +141,37 @@ final class RaptorTransfersFactory<P, R> {
       paths
         .pathsFrom(profile, fromStop)
         .forEach((toStop, path) ->
-          search
-            .computePathCriteria(path)
-            .ifPresent(criteria ->
-              patch.addTransfer(fromStop, toStop, criteria.durationInSeconds(), criteria.c1())
-            )
+          cheapestOpenPath(search, paths, profile, fromStop, toStop, path).ifPresent(criteria ->
+            patch.addTransfer(fromStop, toStop, criteria.durationInSeconds(), criteria.c1())
+          )
         );
     }
     return patch.build();
+  }
+
+  /**
+   * The criteria of the cheapest path of the transfer that does not depend on a closed facility
+   * id. This is the best path, unless it depends on a closed facility.
+   */
+  private Optional<PathCriteria> cheapestOpenPath(
+    TransferSearch<P> search,
+    OverlaidTemplatePaths<P> paths,
+    AbstractUserPreferences<?> profile,
+    int fromStop,
+    int toStop,
+    P bestPath
+  ) {
+    if (closedFacilityIds.isEmpty()) {
+      return search.computePathCriteria(bestPath);
+    }
+    var alternativePaths = paths.alternativePaths(profile, fromStop, toStop);
+    if (alternativePaths.isEmpty()) {
+      return search.computePathCriteria(bestPath);
+    }
+    return alternativePaths
+      .stream()
+      .filter(it -> Collections.disjoint(it.closableFacilityIds(), closedFacilityIds))
+      .flatMap(it -> search.computePathCriteria(it.path()).stream())
+      .min(Comparator.comparingInt(PathCriteria::c1));
   }
 }

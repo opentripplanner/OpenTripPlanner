@@ -1,7 +1,9 @@
 package org.opentripplanner.standalone.config.buildconfig;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.standalone.config.framework.json.JsonSupport.newNodeAdapterForTest;
 
 import java.time.Duration;
@@ -27,6 +29,17 @@ import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferen
 import org.opentripplanner.transit.transfer.regular.api.preferences.WheelchairPreferences;
 
 class TransferProfilesConfigMapperTest {
+
+  @Test
+  void elevatorAlternativesAreOffByDefault() {
+    assertFalse(map("{}").pathAlternatives());
+  }
+
+  @Test
+  void elevatorAlternativesAreOnIfConfigured() {
+    var parameters = map("{ \"transfers\": { \"elevatorAlternatives\": true } }");
+    assertTrue(parameters.pathAlternatives());
+  }
 
   @Test
   void aSingleDefaultWalkProfileIsUsedWithoutConfiguration() {

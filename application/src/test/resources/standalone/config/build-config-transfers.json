@@ -1,5 +1,6 @@
 {
   "transfers": {
+    "elevatorAlternatives": true,
     "walk": {
       "profiles": [
         {

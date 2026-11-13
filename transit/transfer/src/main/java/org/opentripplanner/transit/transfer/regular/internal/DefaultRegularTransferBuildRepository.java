@@ -1,6 +1,8 @@
 package org.opentripplanner.transit.transfer.regular.internal;
 
+import java.util.List;
 import java.util.Map;
+import org.opentripplanner.transit.transfer.regular.AlternativePath;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
 import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
@@ -31,18 +33,32 @@ public class DefaultRegularTransferBuildRepository<P> implements RegularTransfer
     int fromStop,
     Map<Integer, P> pathsByToStop
   ) {
+    assertNotSealed();
+    paths.setPaths(userPreferences, fromStop, pathsByToStop);
+  }
+
+  @Override
+  public void setAlternativePaths(
+    AbstractUserPreferences<?> userPreferences,
+    int fromStop,
+    Map<Integer, List<AlternativePath<P>>> pathsByToStop
+  ) {
+    assertNotSealed();
+    paths.setAlternativePaths(userPreferences, fromStop, pathsByToStop);
+  }
+
+  @Override
+  public int calculateNumberOfTransferPaths(AbstractUserPreferences<?> userPreferences) {
+    return paths.size(userPreferences);
+  }
+
+  private void assertNotSealed() {
     if (sealed) {
       throw new IllegalStateException(
         "The build repository is sealed, regular transfers can only be updated through the " +
           "repository now."
       );
     }
-    paths.setPaths(userPreferences, fromStop, pathsByToStop);
-  }
-
-  @Override
-  public int calculateNumberOfTransferPaths(AbstractUserPreferences<?> userPreferences) {
-    return paths.size(userPreferences);
   }
 
   @Override

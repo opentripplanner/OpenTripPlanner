@@ -2,6 +2,7 @@ package org.opentripplanner.transit.transfer.regular.spi;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.Set;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.transfer.regular.api.maxduration.MaxDurationsPreference;
 
@@ -25,6 +26,21 @@ public interface TransferSearch<P> {
   Collection<TransferPath<P>> findNearbyStops(
     FeedScopedId fromStop,
     MaxDurationsPreference maxDurations
+  );
+
+  /**
+   * Same as {@link #findNearbyStops(FeedScopedId, MaxDurationsPreference)}, but the paths found
+   * do not depend on any of the {@code closedFacilityIds}, see
+   * {@link TransferPath#closableFacilityIds()}. The paths may be worse than the ones found without
+   * the ids. A stop that can only be reached through a closed facility is not found, so the result
+   * may have fewer stops. This is a normal case, not an error.
+   *
+   * @param closedFacilityIds the ids the paths must not depend on, empty to find all paths
+   */
+  Collection<TransferPath<P>> findNearbyStops(
+    FeedScopedId fromStop,
+    MaxDurationsPreference maxDurations,
+    Set<String> closedFacilityIds
   );
 
   /**

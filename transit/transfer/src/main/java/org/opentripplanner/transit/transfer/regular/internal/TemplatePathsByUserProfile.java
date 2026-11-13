@@ -4,10 +4,12 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import org.jspecify.annotations.Nullable;
+import org.opentripplanner.transit.transfer.regular.AlternativePath;
 import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 
 /**
@@ -44,6 +46,33 @@ final class TemplatePathsByUserProfile<P> implements Serializable {
     pathsByUserPreferences
       .computeIfAbsent(userPreferences, p -> new TemplatePathsByStop<>())
       .setPaths(fromStop, pathsByToStop);
+  }
+
+  /** Store the alternative paths from {@code fromStop}, see {@link TemplatePathsByStop}. */
+  void setAlternativePaths(
+    AbstractUserPreferences<?> userPreferences,
+    int fromStop,
+    Map<Integer, List<AlternativePath<P>>> pathsByToStop
+  ) {
+    if (pathsByToStop.isEmpty()) {
+      return;
+    }
+    pathsByUserPreferences
+      .computeIfAbsent(userPreferences, p -> new TemplatePathsByStop<>())
+      .setAlternativePaths(fromStop, pathsByToStop);
+  }
+
+  /**
+   * The alternative paths of the transfer stored under exactly the given profile, the best path
+   * first. Empty if there are none.
+   */
+  List<AlternativePath<P>> alternativePaths(
+    AbstractUserPreferences<?> profile,
+    int fromStop,
+    int toStop
+  ) {
+    var paths = pathsByUserPreferences.get(profile);
+    return paths == null ? List.of() : paths.alternativePaths(fromStop, toStop);
   }
 
   /** The user preferences paths are stored under, the profiles. */
