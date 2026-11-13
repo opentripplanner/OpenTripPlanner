@@ -1,5 +1,7 @@
 package org.opentripplanner.updater;
 
+import org.opentripplanner.core.model.event.DomainEvent;
+import org.opentripplanner.core.model.transaction.RepositoryHandle;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.service.TransitRepository;
@@ -48,4 +50,17 @@ public interface TransitRealTimeUpdateContext {
    * in a published snapshot.
    */
   EntityResolver entityResolver(String feedId);
+
+  /**
+   * Return the mutable repository of the given handle for this update task. The repository must
+   * be registered on the transit domain. Accessing it causes the current transaction to publish a
+   * new snapshot of the repository at commit, so only call it when there is something to write.
+   */
+  <M> M repository(RepositoryHandle<?, M> handle);
+
+  /**
+   * Publish a domain event in this update task. The handlers registered for the event run
+   * synchronously, in the same transaction.
+   */
+  void publish(DomainEvent event);
 }

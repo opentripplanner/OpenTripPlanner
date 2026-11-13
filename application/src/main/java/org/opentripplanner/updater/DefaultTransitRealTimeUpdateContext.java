@@ -1,6 +1,9 @@
 package org.opentripplanner.updater;
 
 import java.util.function.Supplier;
+import org.opentripplanner.core.model.event.DomainEvent;
+import org.opentripplanner.core.model.transaction.RepositoryHandle;
+import org.opentripplanner.core.model.transaction.WriteContext;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.service.TransitRepository;
@@ -18,14 +21,18 @@ public class DefaultTransitRealTimeUpdateContext implements TransitRealTimeUpdat
    */
   private final Supplier<RealtimeVehicleRepository> realtimeVehicleRepository;
 
+  private final WriteContext writeContext;
+
   public DefaultTransitRealTimeUpdateContext(
     TransitRepository transitRepository,
     TimetableRepository timetableRepository,
-    Supplier<RealtimeVehicleRepository> realtimeVehicleRepository
+    Supplier<RealtimeVehicleRepository> realtimeVehicleRepository,
+    WriteContext writeContext
   ) {
     this.transitRepository = transitRepository;
     this.timetableRepository = timetableRepository;
     this.realtimeVehicleRepository = realtimeVehicleRepository;
+    this.writeContext = writeContext;
   }
 
   @Override
@@ -51,5 +58,15 @@ public class DefaultTransitRealTimeUpdateContext implements TransitRealTimeUpdat
   @Override
   public EntityResolver entityResolver(String feedId) {
     return new EntityResolver(timetableRepository, transitRepository, feedId);
+  }
+
+  @Override
+  public <M> M repository(RepositoryHandle<?, M> handle) {
+    return writeContext.repository(handle);
+  }
+
+  @Override
+  public void publish(DomainEvent event) {
+    writeContext.publish(event);
   }
 }
