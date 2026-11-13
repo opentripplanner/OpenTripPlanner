@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.emission.internal.csvdata.route;
 
-import com.csvreader.CsvReader;
 import java.util.List;
+import org.opentripplanner.framework.csv.CsvRecordReader;
 import org.opentripplanner.framework.csv.parser.AbstractCsvParser;
 import org.opentripplanner.framework.csv.parser.HandledCsvParseException;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -25,7 +25,7 @@ class RouteCsvParser extends AbstractCsvParser<RouteRow> {
     AVG_PASSENGER_COUNT
   );
 
-  public RouteCsvParser(DataImportIssueStore issueStore, CsvReader reader) {
+  public RouteCsvParser(DataImportIssueStore issueStore, CsvRecordReader reader) {
     super(issueStore, reader, "RouteEmission");
   }
 

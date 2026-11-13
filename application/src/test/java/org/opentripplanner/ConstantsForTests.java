@@ -1,9 +1,6 @@
 package org.opentripplanner;
 
-import com.csvreader.CsvReader;
 import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +13,7 @@ import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.DirectoryDataSource;
 import org.opentripplanner.ext.fares.service.gtfs.v1.GtfsFareServiceFactory;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.framework.csv.CsvRecordReader;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.ConfiguredCompositeDataSource;
 import org.opentripplanner.graph_builder.module.TestStreetLinkerModule;
@@ -407,9 +405,8 @@ public class ConstantsForTests {
   }
 
   private static void addPortlandVehicleRentals(Graph graph) {
-    try {
-      VertexLinker linker = VertexLinkerTestFactory.of(graph);
-      CsvReader reader = new CsvReader(PORTLAND_BIKE_SHARE_CSV, ',', StandardCharsets.UTF_8);
+    VertexLinker linker = VertexLinkerTestFactory.of(graph);
+    try (var reader = CsvRecordReader.of(new File(PORTLAND_BIKE_SHARE_CSV))) {
       reader.readHeaders();
       while (reader.readRecord()) {
         RentalVehicleType vehicleType = RentalVehicleType.getDefaultType(reader.get("network"));
@@ -447,8 +444,6 @@ public class ConstantsForTests {
             )
         );
       }
-    } catch (IOException e) {
-      throw new RuntimeException(e);
     }
   }
 

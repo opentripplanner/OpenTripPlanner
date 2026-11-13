@@ -1,16 +1,14 @@
 package org.opentripplanner.framework.csv.parser;
 
-import com.csvreader.CsvReader;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import org.jspecify.annotations.Nullable;
+import org.opentripplanner.framework.csv.CsvRecordReader;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.utils.lang.DoubleRange;
 import org.opentripplanner.utils.lang.IntRange;
@@ -31,7 +29,7 @@ public abstract class AbstractCsvParser<T> {
   private static final String TYPE_BOOLEAN = "boolean";
   private static final String TYPE_LOCAL_DATE = "local-date";
   private final DataImportIssueStore issueStore;
-  private final CsvReader reader;
+  private final CsvRecordReader reader;
   private final String issueType;
 
   private T next;
@@ -40,7 +38,11 @@ public abstract class AbstractCsvParser<T> {
   /**
    * @param issueType The type of data read, this is used to group issues.
    */
-  public AbstractCsvParser(DataImportIssueStore issueStore, CsvReader reader, String issueType) {
+  public AbstractCsvParser(
+    DataImportIssueStore issueStore,
+    CsvRecordReader reader,
+    String issueType
+  ) {
     this.issueStore = issueStore;
     this.reader = reader;
     this.issueType = issueType;
@@ -54,17 +56,12 @@ public abstract class AbstractCsvParser<T> {
 
   /** Check if the CSV file headers match the expected headers. */
   public boolean headersMatch() {
-    try {
-      ++lineNumber;
-      if (!reader.readHeaders()) {
-        return false;
-      }
-      var rawHeaders = Arrays.stream(reader.getHeaders()).toList();
-      // All defined headers must exist, but there might be extra headers - these are ignored
-      return rawHeaders.containsAll(headers());
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+    ++lineNumber;
+    if (!reader.readHeaders()) {
+      return false;
     }
+    // All defined headers must exist, but there might be extra headers - these are ignored
+    return reader.headers().containsAll(headers());
   }
 
   /** Check if there are more rows to read. */
@@ -79,8 +76,6 @@ public abstract class AbstractCsvParser<T> {
         } else {
           return false;
         }
-      } catch (IOException e) {
-        throw new RuntimeException(e);
       } catch (HandledCsvParseException ignore) {
         // Issue is already handled. Continue with next row until file is complete
       }
@@ -126,16 +121,12 @@ public abstract class AbstractCsvParser<T> {
   }
 
   protected String getString(String columnName) throws HandledCsvParseException {
-    try {
-      var value = reader.get(columnName);
-      if (StringUtils.hasNoValue(value)) {
-        issueStore.add(new ValueMissingIssue(columnName, line(), issueType));
-        throw new HandledCsvParseException();
-      }
-      return value;
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+    var value = reader.get(columnName);
+    if (StringUtils.hasNoValue(value)) {
+      issueStore.add(new ValueMissingIssue(columnName, line(), issueType));
+      throw new HandledCsvParseException();
     }
+    return value;
   }
 
   protected LocalDate getLocalDate(String columnName) throws HandledCsvParseException {
@@ -185,6 +176,6 @@ public abstract class AbstractCsvParser<T> {
   }
 
   private String line() {
-    return "'" + reader.getRawRecord() + "' (@line:" + lineNumber + ")";
+    return "'" + reader.rawRecord() + "' (@line:" + lineNumber + ")";
   }
 }
