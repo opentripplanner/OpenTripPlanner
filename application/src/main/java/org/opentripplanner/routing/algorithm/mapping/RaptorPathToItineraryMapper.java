@@ -46,8 +46,7 @@ import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
-import org.opentripplanner.street.search.state.State;
-import org.opentripplanner.street.search.state.StateEditor;
+import org.opentripplanner.street.search.state.EdgeTraverser;
 import org.opentripplanner.streetadapter.StreetSearchRequestMapper;
 import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
@@ -400,8 +399,14 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
   }
 
   /**
-   * Map a regular transfer to a street leg, using the street path recovered with
-   * {@link #findRegularTransferPath}. A path without edges gets an empty line string.
+   * Map a regular transfer to street legs, using the street path recovered with
+   * {@link #findRegularTransferPath}. The edges of the path are traversed again with the transfer
+   * request to create the walk steps.
+   * <p>
+   * The path was found with the preferences of a transfer profile, not the ones of this request,
+   * so the request may not be able to traverse all of its edges. Then, and when the path has no
+   * edges, the transfer is a single leg with the times and the cost of the Raptor path, and no
+   * walk steps. Its geometry is the one of the edges, empty if there are none.
    */
   private List<Leg> mapTransferLeg(
     PathLeg<T> pathLeg,
@@ -410,24 +415,24 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     Place from,
     Place to
   ) {
-    List<Edge> edges = transfer.edges();
-    if (edges == null || edges.isEmpty()) {
-      return List.of(
-        StreetLeg.of()
-          .withMode(transferMode)
-          .withStartTime(createZonedDateTime(pathLeg.fromTime()))
-          .withEndTime(createZonedDateTime(pathLeg.toTime()))
-          .withFrom(from)
-          .withTo(to)
-          .withDistanceMeters(transfer.distance())
-          .withGeneralizedCost(toOtpDomainCost(pathLeg.c1()))
-          .withGeometry(GeometryUtils.getGeometryFactory().createLineString())
-          .withWalkSteps(List.of())
-          .build()
-      );
-    } else {
-      return mapTransferLegWithEdges(pathLeg.fromTime(), edges);
+    List<Edge> edges = transfer.edges() == null ? List.of() : transfer.edges();
+    var legs = mapTransferLegWithEdges(pathLeg.fromTime(), edges);
+    if (!legs.isEmpty()) {
+      return legs;
     }
+    return List.of(
+      StreetLeg.of()
+        .withMode(transferMode)
+        .withStartTime(createZonedDateTime(pathLeg.fromTime()))
+        .withEndTime(createZonedDateTime(pathLeg.toTime()))
+        .withFrom(from)
+        .withTo(to)
+        .withDistanceMeters(transfer.distance())
+        .withGeneralizedCost(toOtpDomainCost(pathLeg.c1()))
+        .withGeometry(GeometryUtils.concatenateLineStrings(edges, Edge::getGeometry))
+        .withWalkSteps(List.of())
+        .build()
+    );
   }
 
   private List<Leg> mapViaCoordinateTransferLeg(
@@ -439,7 +444,8 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
     if (fromLegs.isEmpty() || toLegs.isEmpty()) {
       throw new IllegalStateException(
-        "There need to be at least one edge to get from a stop to the via coordinate and back"
+        "There need to be at least one traversable edge to get from a stop to the via coordinate " +
+          "and back"
       );
     }
     // We need to timeshift the toLegs
@@ -456,25 +462,18 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     return ListUtils.combine(fromLegs, toLegs);
   }
 
+  /**
+   * Traverse the edges with the transfer request, starting at {@code fromTime}, and map the
+   * resulting street path to legs. Empty if there are no edges, or if the request can not traverse
+   * all of them.
+   */
   private List<Leg> mapTransferLegWithEdges(int fromTime, List<Edge> edges) {
-    StateEditor se = new StateEditor(edges.getFirst().getFromVertex(), transferStreetRequest);
-    se.setTimeSeconds(createZonedDateTime(fromTime).toEpochSecond());
-
-    State s = se.makeState();
-    ArrayList<State> transferStates = new ArrayList<>();
-    transferStates.add(s);
-    for (Edge e : edges) {
-      var states = e.traverse(s);
-      if (State.isEmpty(states)) {
-        s = null;
-      } else {
-        transferStates.add(states[0]);
-        s = states[0];
-      }
-    }
-    State[] states = transferStates.toArray(State[]::new);
-    var graphPath = new StreetPath(states[states.length - 1]);
-    return streetPathToLegsMapper.map(graphPath, request);
+    var transferRequest = StreetSearchRequest.copyOf(transferStreetRequest)
+      .withStartTime(createZonedDateTime(fromTime).toInstant())
+      .build();
+    return EdgeTraverser.createPath(edges, transferRequest)
+      .map(path -> streetPathToLegsMapper.map(path, request))
+      .orElse(List.of());
   }
 
   private Itinerary mapUnknownRaptorPath(RaptorPath<T> path) {

@@ -6,7 +6,10 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.raptorlegacy._data.RaptorTestConstants.BOARD_SLACK;
+import static org.opentripplanner.street.model.StreetModelForTest.intersectionVertex;
+import static org.opentripplanner.street.model.StreetModelForTest.streetEdge;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -18,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner._support.time.ZoneIds;
+import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.FlexAccessEgress;
 import org.opentripplanner.ext.flex.FlexPathDurations;
@@ -54,6 +58,9 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRepository;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsService;
 import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.ElevatorHopEdge;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
@@ -176,6 +183,113 @@ public class RaptorPathToItineraryMapperTest {
     assertNotNull(itinerary);
     assertEquals(4708, itinerary.generalizedCost());
     assertNotEquals(4708, itinerary.generalizedCostIncludingPenalty().toSeconds());
+  }
+
+  @Test
+  void transferWithTraversableEdges() {
+    var a = intersectionVertex("A", 0.0, 0.0);
+    var b = intersectionVertex("B", 0.0, 0.001);
+    var c = intersectionVertex("C", 0.0, 0.002);
+    var edges = List.<Edge>of(streetEdge(a, b), streetEdge(b, c));
+
+    var legs = mapTransferLegs(edges);
+
+    assertThat(legs).hasSize(1);
+    var leg = legs.getFirst();
+    assertThat(leg.listWalkSteps()).isNotEmpty();
+    assertThat(leg.legGeometry().getCoordinates()).hasLength(3);
+  }
+
+  /**
+   * The path of a regular transfer may contain an edge the transfer request can not traverse, for
+   * example if the path was found under other preferences. The leg is then created from the times
+   * of the Raptor path.
+   */
+  @Test
+  void transferWithAnEdgeTheRequestCanNotTraverse() {
+    var a = intersectionVertex("A", 0.0, 0.0);
+    var b = intersectionVertex("B", 0.0, 0.001);
+    var c = intersectionVertex("C", 0.0, 0.002);
+    var d = intersectionVertex("D", 0.0, 0.003);
+    var edges = List.<Edge>of(
+      streetEdge(a, b),
+      streetEdge(b, c, StreetTraversalPermission.CAR),
+      streetEdge(c, d)
+    );
+
+    var legs = mapTransferLegs(edges);
+
+    assertThat(legs).hasSize(1);
+    var leg = legs.getFirst();
+    assertEquals(S1, leg.from().stop);
+    assertEquals(S2, leg.to().stop);
+    assertEquals(Duration.ofSeconds(TRANSIT_END - TRANSIT_START), leg.duration());
+    assertThat(leg.listWalkSteps()).isEmpty();
+    assertThat(leg.legGeometry().getCoordinates()).hasLength(4);
+  }
+
+  /**
+   * An elevator on the path of a regular transfer may go out of service before the transfers are
+   * updated. The leg is then created from the times of the Raptor path.
+   */
+  @Test
+  void transferThroughAnElevatorOutOfService() {
+    var a = intersectionVertex("A", 0.0, 0.0);
+    var b = intersectionVertex("B", 0.0, 0.001);
+    var c = intersectionVertex("C", 0.0, 0.002);
+    var elevator = ElevatorHopEdge.createElevatorHopEdge(
+      b,
+      c,
+      StreetTraversalPermission.ALL,
+      Accessibility.POSSIBLE
+    );
+    elevator.setOutOfService(true);
+    var edges = List.<Edge>of(streetEdge(a, b), elevator);
+
+    var legs = mapTransferLegs(edges);
+
+    assertThat(legs).hasSize(1);
+    var leg = legs.getFirst();
+    assertEquals(Duration.ofSeconds(TRANSIT_END - TRANSIT_START), leg.duration());
+    assertThat(leg.listWalkSteps()).isEmpty();
+  }
+
+  /**
+   * Map a path with a regular transfer from S1 to S2 along the given edges, from
+   * {@link #TRANSIT_START} to {@link #TRANSIT_END}. The access and the egress are free, so the
+   * legs of the itinerary are the legs of the transfer.
+   */
+  private List<Leg> mapTransferLegs(List<Edge> edges) {
+    var mapper = getRaptorPathToItineraryMapper(
+      FixedRegularTransfers.of()
+        .add(S1, S2, new NearbyStop(S2.getId(), 300, edges, null))
+        .snapshot()
+        .forRequest(RouteRequest.defaultValue())
+    );
+    var egressLeg = new EgressPathLeg<TestTripSchedule>(
+      TestAccessEgress.free(S2.getIndex()),
+      TRANSIT_END,
+      TRANSIT_END,
+      0
+    );
+    var transferLeg = new TransferPathLeg<TestTripSchedule>(
+      S1.getIndex(),
+      TRANSIT_START,
+      S2.getIndex(),
+      TRANSIT_END,
+      RaptorCostConverter.toRaptorCost(300),
+      new TestTransfer(S2.getIndex(), TRANSIT_END - TRANSIT_START, 0),
+      egressLeg
+    );
+    var accessLeg = new AccessPathLeg<TestTripSchedule>(
+      TestAccessEgress.free(S1.getIndex()),
+      TRANSIT_START,
+      TRANSIT_START,
+      0,
+      transferLeg
+    );
+
+    return mapper.createItinerary(new Path<>(TRANSIT_START, accessLeg, 0)).legs();
   }
 
   /**
