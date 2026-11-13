@@ -78,6 +78,9 @@ class TimetableHelper {
       tripTimesBuilder.withInaccuratePredictions(index);
     }
 
+    tripTimesBuilder.withIsNotExpectedDeparture(index, call.isNotExpectedDeparture());
+    tripTimesBuilder.withIsNotExpectedArrival(index, call.isNotExpectedArrival());
+
     if (TRUE.equals(call.isCancellation())) {
       tripTimesBuilder.withCanceled(index);
     }

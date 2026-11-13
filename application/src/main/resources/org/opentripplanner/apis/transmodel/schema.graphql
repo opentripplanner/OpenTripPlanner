@@ -281,6 +281,10 @@ type EstimatedCall {
   forAlighting: Boolean!
   "Whether vehicle may be boarded at quay."
   forBoarding: Boolean!
+  "Whether it will arrive on a specific stop position"
+  isNotExpectedArrival: Boolean!
+  "Whether it will depart from specific stop position"
+  isNotExpectedDeparture: Boolean!
   notices: [Notice!]!
   occupancyStatus: OccupancyStatus!
   "Whether the updated estimates are expected to be inaccurate."

@@ -317,6 +317,14 @@ public class TripTimeOnDate {
     return tripTimes.isExtraCall(stopPosition);
   }
 
+  public boolean isNotExpectedArrival() {
+    return tripTimes.isNotExpectedArrival(stopPosition);
+  }
+
+  public boolean isNotExpectedDeparture() {
+    return tripTimes.isNotExpectedDeparture(stopPosition);
+  }
+
   public boolean isPredictionInaccurate() {
     return tripTimes.isPredictionInaccurate(stopPosition);
   }

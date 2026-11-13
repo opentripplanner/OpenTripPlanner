@@ -162,6 +162,8 @@ class DefaultForwardsDelayInterpolatorTest {
   void noRealTimeIsProvided() {
     var builder = SCHEDULED_TRIP_TIMES.createRealTimeWithoutScheduledTimes()
       .withCanceled(5)
+      .withIsNotExpectedDeparture(5, false)
+      .withIsNotExpectedArrival(7, false)
       .withInaccuratePredictions(7);
     assertTrue(new DefaultForwardsDelayInterpolator().interpolateDelay(builder));
     for (var i = 0; i < STOP_COUNT; ++i) {

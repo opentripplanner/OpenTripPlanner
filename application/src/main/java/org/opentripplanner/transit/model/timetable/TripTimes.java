@@ -171,6 +171,10 @@ public sealed interface TripTimes<T extends TripTimes<T>>
 
   boolean isPredictionInaccurate(int stopPos);
 
+  boolean isNotExpectedArrival(int stopPost);
+
+  boolean isNotExpectedDeparture(int stopPost);
+
   boolean isExtraCall(int stopPos);
 
   /**

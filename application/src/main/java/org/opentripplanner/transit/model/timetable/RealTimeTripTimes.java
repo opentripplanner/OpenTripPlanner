@@ -33,6 +33,8 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
   private final BitSet extraCalls;
   private final BitSet hasArrived;
   private final BitSet hasDeparted;
+  private final BitSet isNotExpectedArrival;
+  private final BitSet isNotExpectedDeparture;
 
   /// Any parts of this trip that are marked as replaced by another trip in a realtime update.
   private final List<PartialReplacedBy> partialReplacedBys;
@@ -64,6 +66,8 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
     state = builder.state();
     vehicleId = builder.vehicleId();
     partialReplacedBys = builder.partialReplacedBys();
+    isNotExpectedArrival = builder.isNotExpectedArrival();
+    isNotExpectedDeparture = builder.isNotExpectedDeparture();
     validateNonIncreasingTimes();
   }
 
@@ -85,6 +89,8 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
     this.state = original.state;
     this.vehicleId = original.vehicleId;
     this.partialReplacedBys = original.partialReplacedBys;
+    this.isNotExpectedDeparture = original.isNotExpectedDeparture;
+    this.isNotExpectedArrival = original.isNotExpectedArrival;
   }
 
   /**
@@ -108,6 +114,8 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
     this.state = original.state;
     this.vehicleId = original.vehicleId;
     this.partialReplacedBys = original.partialReplacedBys;
+    this.isNotExpectedArrival = original.isNotExpectedArrival;
+    this.isNotExpectedDeparture = original.isNotExpectedDeparture;
   }
 
   ScheduledTripTimes scheduledTripTimes() {
@@ -227,6 +235,16 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
   @Override
   public boolean isPredictionInaccurate(int stopPos) {
     return isStopRealTimeStates(stopPos, StopRealTimeState.INACCURATE_PREDICTIONS);
+  }
+
+  @Override
+  public boolean isNotExpectedArrival(int stopPos) {
+    return isNotExpectedArrival.get(stopPos);
+  }
+
+  @Override
+  public boolean isNotExpectedDeparture(int stopPos) {
+    return isNotExpectedDeparture.get(stopPos);
   }
 
   @Override

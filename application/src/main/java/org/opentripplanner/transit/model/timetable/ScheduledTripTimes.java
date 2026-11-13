@@ -265,6 +265,16 @@ public final class ScheduledTripTimes implements TripTimes<ScheduledTripTimes> {
   }
 
   @Override
+  public boolean isNotExpectedArrival(int stopPost) {
+    return false;
+  }
+
+  @Override
+  public boolean isNotExpectedDeparture(int stopPost) {
+    return false;
+  }
+
+  @Override
   public boolean isExtraCall(int stopPos) {
     return false;
   }
