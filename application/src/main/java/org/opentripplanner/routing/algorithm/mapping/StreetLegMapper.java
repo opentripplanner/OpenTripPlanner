@@ -33,14 +33,9 @@ import org.opentripplanner.transit.SiteResolver;
 import org.opentripplanner.transit.model.site.Entrance;
 
 /**
- * Maps the legs of a {@link StreetPath} to the {@link Leg}s returned by the OTP APIs. This only
+ * Maps the legs of a {@link StreetPath} to the {@link Leg}s returned by the OTP HTTP APIs. This only
  * produces itineraries for non-transit searches, as well as the non-transit parts of itineraries
- * containing transit, while the whole transit itinerary is produced by
- * {@link RaptorPathToItineraryMapper}.
- * <p>
- * Splitting the path into legs and generating the turn-by-turn directions is done by the street
- * model, see {@link StreetPath#legs(double)}. This class adds the information that is not part of
- * the street model, like stops, entrances and levels.
+ * containing transit.
  */
 public class StreetLegMapper {
 
