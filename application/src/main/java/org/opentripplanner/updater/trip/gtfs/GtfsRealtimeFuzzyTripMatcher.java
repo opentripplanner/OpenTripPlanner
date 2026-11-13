@@ -16,7 +16,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.opentripplanner.transit.repository.TimetableRepository;
+import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 import org.opentripplanner.utils.time.TimeUtils;
 
@@ -34,15 +34,16 @@ public class GtfsRealtimeFuzzyTripMatcher {
   );
 
   /**
-   * The repository with the trips to match. Trips added to it by real-time updates are found as
-   * well, whether they are committed or not.
+   * The timetable view with the trips to match. Trips added by real-time updates are found as
+   * well: all of them when this is the mutable repository of the current transaction, only the
+   * committed ones when this is a published snapshot.
    */
-  private final TimetableRepository timetableRepository;
+  private final TimetableRepositorySnapshot timetableRepository;
 
   // TODO: replace this with a runtime solution
   private final DirectionMapper directionMapper = new DirectionMapper(DataImportIssueStore.NOOP);
 
-  public GtfsRealtimeFuzzyTripMatcher(TimetableRepository timetableRepository) {
+  public GtfsRealtimeFuzzyTripMatcher(TimetableRepositorySnapshot timetableRepository) {
     this.timetableRepository = timetableRepository;
   }
 

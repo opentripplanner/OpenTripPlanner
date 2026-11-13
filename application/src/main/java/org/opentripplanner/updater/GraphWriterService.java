@@ -3,6 +3,7 @@ package org.opentripplanner.updater;
 import java.util.concurrent.Future;
 import java.util.function.Function;
 import org.opentripplanner.core.model.transaction.RepositoryHandle;
+import org.opentripplanner.core.model.transaction.RepositoryRegistry;
 import org.opentripplanner.core.model.transaction.UpdateManager;
 import org.opentripplanner.core.model.transaction.WriteContext;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
@@ -42,13 +43,19 @@ public class GraphWriterService<C> implements WriteToGraphCallback<C> {
   }
 
   /**
-   * Create the bridge for the transit write domain. Each task checks out the mutable
-   * realtime-timetable repository for the current transaction. The realtime-vehicle repository is
-   * resolved lazily: only tasks that actually apply vehicle updates cause a new vehicle snapshot to
-   * be published at commit.
+   * Create the bridge for the transit write domain. All repositories are resolved lazily: only
+   * tasks that actually access the mutable realtime-timetable repository or the mutable
+   * realtime-vehicle repository cause a new snapshot of that repository to be published at commit.
+   * The committed timetable snapshot is resolved through a new scope of the given registry, which
+   * captures the state of the last commit without causing a new timetable snapshot to be
+   * published.
+   *
+   * @param repositoryRegistry the registry of the transit write domain, in which both handles are
+   *                           registered
    */
   public static GraphWriterService<TransitRealTimeUpdateContext> forTransitDomain(
     UpdateManager updateManager,
+    RepositoryRegistry repositoryRegistry,
     RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableHandle,
     RepositoryHandle<
       RealtimeVehicleRepositorySnapshot,
@@ -59,7 +66,8 @@ public class GraphWriterService<C> implements WriteToGraphCallback<C> {
     return new GraphWriterService<>(updateManager, ctx ->
       new DefaultTransitRealTimeUpdateContext(
         transitRepository,
-        ctx.repository(timetableHandle),
+        () -> ctx.repository(timetableHandle),
+        () -> timetableHandle.repositorySnapshot(repositoryRegistry.scope()),
         () -> ctx.repository(realtimeVehicleHandle)
       )
     );

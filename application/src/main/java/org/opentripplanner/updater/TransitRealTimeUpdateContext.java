@@ -2,6 +2,7 @@ package org.opentripplanner.updater;
 
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.transit.repository.TimetableRepository;
+import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.trip.gtfs.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.trip.siri.EntityResolver;
@@ -16,9 +17,20 @@ public interface TransitRealTimeUpdateContext {
    * must only use this from the single writer thread. Entity lookups (trips, routes, patterns)
    * on this repository already fall back to scheduled data, so this is also the way to resolve
    * entities that see all in-progress real-time additions not yet committed to a published
-   * snapshot.
+   * snapshot. Accessing it causes the current transaction to publish a new timetable snapshot at
+   * commit — even if nothing was written — so tasks that only read transit data should use
+   * {@link #committedTimetableSnapshot()} instead.
    */
   TimetableRepository timetableRepository();
+
+  /**
+   * Return the last <em>committed</em> timetable snapshot. Unlike {@link #timetableRepository()},
+   * it does not see the real-time updates applied in the current, uncommitted transaction, and
+   * accessing it does not cause a new timetable snapshot to be published at commit. Use this in
+   * updaters that only read transit data in order to attach their own real-time entities to it,
+   * such as the vehicle-position updater.
+   */
+  TimetableRepositorySnapshot committedTimetableSnapshot();
 
   /**
    * Return the scheduled (non-realtime) transit repository. Use this only for lookups that have

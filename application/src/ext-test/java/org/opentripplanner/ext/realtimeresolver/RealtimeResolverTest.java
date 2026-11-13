@@ -173,7 +173,6 @@ class RealtimeResolverTest {
   @Test
   void populateLegsWithRealTimeAndChangeQuay() {
     var transitEnv = TRANSIT_ENV.build();
-    var refetchService = createRefetchService(new TransitAlertServiceImpl(), transitEnv);
     TripOnDateDataFetcher trip1 = transitEnv.tripData("trip1");
     TripOnDateDataFetcher trip2 = transitEnv.tripData("trip4");
 
@@ -195,6 +194,8 @@ class RealtimeResolverTest {
       .buildEstimatedTimetableDeliveries();
     UpdateResult updateResult = siri.applyEstimatedTimetable(updates);
     assertEquals(1, updateResult.successful());
+    // The refetch service reads the timetable snapshot committed at the time it is created
+    var refetchService = createRefetchService(new TransitAlertServiceImpl(), transitEnv);
 
     ScheduledTransitLeg busLeg = buildScheduledTransitLeg(trip1, 0, 1, transitEnv);
 
