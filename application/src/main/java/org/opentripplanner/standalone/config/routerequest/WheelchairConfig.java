@@ -112,7 +112,7 @@ public class WheelchairConfig {
       .asObject();
   }
 
-  static void mapAccessibilityPreferences(
+  public static void mapAccessibilityPreferences(
     NodeAdapter adapter,
     AccessibilityPreferences.Builder builder
   ) {

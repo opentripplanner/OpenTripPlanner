@@ -175,8 +175,8 @@ class TransitRepositoryTest {
     var S21 = TransitRepositoryForTest.of().stop("S21").build();
     var S22 = TransitRepositoryForTest.of().stop("S22").build();
     var S23 = TransitRepositoryForTest.of().stop("S23").build();
-    var R1 = route("R1").withMode(TransitMode.BUS).build();
-    var R2 = route("R2").withMode(TransitMode.BUS).build();
+    var R1 = route("R1").withMode(TransitMode.RAIL).build();
+    var R2 = route("R2").withMode(TransitMode.RAIL).build();
     var TP1 = tripPattern("TP1", R1)
       .withStopPattern(stopPattern(S11, S12, S13))
       .withScheduledTimeTableBuilder(builder ->

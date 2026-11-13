@@ -7,30 +7,30 @@ import org.opentripplanner.raptor.api.request.via.RaptorViaLocation;
 import org.opentripplanner.raptor.rangeraptor.transit.AccessPaths;
 import org.opentripplanner.raptor.rangeraptor.transit.EgressPaths;
 import org.opentripplanner.raptor.rangeraptor.transit.ViaConnections;
-import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
+import org.opentripplanner.raptor.spi.RaptorDataProvider;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 public class SearchContextBuilder<T extends RaptorTripSchedule> {
 
   private final RaptorRequest<T> request;
   private final RaptorTuningParameters tuningParameters;
-  private final RaptorTransitDataProvider<T> transit;
+  private final RaptorDataProvider<T> data;
 
   public SearchContextBuilder(
     RaptorRequest<T> request,
     RaptorTuningParameters tuningParameters,
-    RaptorTransitDataProvider<T> transit
+    RaptorDataProvider<T> data
   ) {
     this.request = request;
     this.tuningParameters = tuningParameters;
-    this.transit = transit;
+    this.data = data;
   }
 
   public SearchContext<T> build() {
     return new SearchContext<>(
       request,
       tuningParameters,
-      transit,
+      data,
       accessPaths(),
       viaConnections(),
       egressPaths()
