@@ -9,7 +9,8 @@ import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
 
 /**
- * The start or end of a {@link StreetLeg}.
+ * The start or end of a {@link StreetLeg}. This is a temporary type that exposes some internal
+ * street model entites. It will be refactored in the future.
  *
  * @param vertex                 The vertex where the leg starts or ends
  * @param name                   A display name for the place. For intersections this is derived
@@ -17,6 +18,7 @@ import org.opentripplanner.street.search.state.State;
  * @param realTimeVehicleParking If the vertex is a vehicle parking entrance: whether real-time
  *                               availability data exists for the mode used. Always false otherwise.
  */
+@Deprecated
 public record StreetLegPlace(Vertex vertex, I18NString name, boolean realTimeVehicleParking) {
   /**
    * Create the place for the vertex of the given state.

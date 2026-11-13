@@ -10,7 +10,7 @@ import org.opentripplanner.street.search.TraverseMode;
 
 /**
  * A part of a {@link StreetPath} which is traversed in a single street mode, see
- * {@link StreetPath#legs(double)}. Note, walking a bike does not start a new leg.
+ * {@link StreetPath#computeLegs(double)}. Note, walking a bike does not start a new leg.
  */
 public interface StreetLeg {
   Instant startTime();
