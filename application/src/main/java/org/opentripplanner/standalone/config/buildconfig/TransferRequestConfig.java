@@ -154,6 +154,15 @@ final class TransferRequestConfig {
           .since(V2_10)
           .summary("How much stairs should be avoided.")
           .asDouble(dft.stairsReluctance())
+      )
+      .withStairsTimeFactor(
+        c
+          .of("stairsTimeFactor")
+          .since(V2_10)
+          .summary(
+            "How much more time does it take to traverse a flight of stairs in a wheelchair compared to a similar horizontal length."
+          )
+          .asDouble(dft.stairsTimeFactor())
       );
   }
 

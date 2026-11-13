@@ -65,6 +65,16 @@ class TransferRequestDifferencesTest {
   }
 
   @Test
+  void theStairsTimeFactorOfTheWheelchairIsCompared() {
+    var transfers = request(p -> p.withWheelchair(w -> w.withStairsTimeFactor(5.0)));
+    var routingDefaults = request(p -> p.withWheelchair(w -> w.withStairsTimeFactor(3.0)));
+
+    assertThat(
+      TransferRequestDifferences.of(TransferProfileType.WHEELCHAIR, transfers, routingDefaults)
+    ).containsExactly("wheelchair.stairsTimeFactor: 5.0 (transfers), 3.0 (routingDefaults)");
+  }
+
+  @Test
   void theWheelchairAccessibilityOfStopsIsCompared() {
     var transfers = request(p -> p.withWheelchair(w -> w.withStopCost(100, 1000)));
     var routingDefaults = request(p -> p.withWheelchair(w -> w.withStopCost(600, 3600)));
