@@ -39,11 +39,7 @@ public class SiriETUpdaterConfig {
         .summary("The HTTP timeout to download the updates.")
         .asDuration(Duration.ofSeconds(15)),
       c.of("previewInterval").since(V2_0).summary("TODO").asDuration(null),
-      c
-        .of("fuzzyTripMatching")
-        .since(V2_0)
-        .summary("If the fuzzy trip matcher should be used to match trips.")
-        .asBoolean(false),
+      SiriFuzzyTripMatchingConfig.map(c, V2_0),
       HttpHeadersConfig.headers(c, V2_3),
       c
         .of("producerMetrics")

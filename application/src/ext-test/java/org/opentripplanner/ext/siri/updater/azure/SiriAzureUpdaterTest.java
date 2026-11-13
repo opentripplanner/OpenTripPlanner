@@ -51,7 +51,6 @@ class SiriAzureUpdaterTest {
     when(mockConfig.feedId()).thenReturn("testFeedId");
     when(mockConfig.getAutoDeleteOnIdle()).thenReturn(Duration.ofHours(1));
     when(mockConfig.getPrefetchCount()).thenReturn(10);
-    when(mockConfig.isFuzzyTripMatching()).thenReturn(true);
 
     // Create a spy on AbstractAzureSiriUpdater with the mock configuration
     spy(

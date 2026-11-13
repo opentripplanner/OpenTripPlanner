@@ -193,7 +193,8 @@ public class SiriAlertsUpdateHandler {
         ? new SiriFuzzyTripMatcher(
             siriFuzzyTripMatcherCache,
             context.timetableRepository(),
-            context.transitRepository()
+            context.transitRepository(),
+            Duration.ZERO
           )
         : null;
     alert.addEntites(

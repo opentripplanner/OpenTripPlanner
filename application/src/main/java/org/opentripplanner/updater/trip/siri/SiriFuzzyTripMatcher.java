@@ -5,6 +5,7 @@ import static org.opentripplanner.updater.spi.UpdateErrorType.NO_FUZZY_TRIP_MATC
 import static org.opentripplanner.updater.spi.UpdateErrorType.NO_VALID_STOPS;
 import static org.opentripplanner.updater.spi.UpdateErrorType.UNKNOWN_STOP;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.calendar.TripCalendars;
@@ -37,6 +39,11 @@ import org.slf4j.LoggerFactory;
  * trip. The matching process will always be applied even where good quality IDs exist — a way to
  * disable it would need to be added separately.
  * <p>
+ * The aimed arrival time at the last stop and the aimed departure time at the first stop must
+ * match the scheduled times within the configured time tolerance. A tolerance of zero requires
+ * the times to be equal to the second. If more than one trip matches, the journey is rejected
+ * with {@link UpdateErrorType#MULTIPLE_FUZZY_TRIP_MATCHES}.
+ * <p>
  * Constructed per update task (cheap — only assigns fields). The expensive scheduled-data index
  * lives in {@link SiriFuzzyTripMatcherCache}, which is built once and shared across all SIRI
  * updaters.
@@ -49,14 +56,23 @@ public class SiriFuzzyTripMatcher {
   private final TimetableRepository timetableRepository;
   private final TransitRepository transitRepository;
 
+  /** The maximum difference between a scheduled and an aimed time, in seconds. */
+  private final int timeToleranceSeconds;
+
+  /**
+   * @param timeTolerance The maximum difference between the scheduled time and the SIRI aimed
+   *                      time for a trip to match, see {@link SiriFuzzyTripMatchingParameters}.
+   */
   public SiriFuzzyTripMatcher(
     SiriFuzzyTripMatcherCache cache,
     TimetableRepository timetableRepository,
-    TransitRepository transitRepository
+    TransitRepository transitRepository,
+    Duration timeTolerance
   ) {
     this.cache = cache;
     this.timetableRepository = timetableRepository;
     this.transitRepository = transitRepository;
+    this.timeToleranceSeconds = (int) timeTolerance.toSeconds();
   }
 
   /**
@@ -77,47 +93,82 @@ public class SiriFuzzyTripMatcher {
       throw UpdateException.of(INVALID_DEPARTURE_TIME);
     }
 
-    Set<Trip> trips = Set.of();
+    Optional<Route> route = journeyWrapper.lineRef().map(entityResolver::resolveRoute);
+
     if (journeyWrapper.vehicleRef().isPresent() && journeyWrapper.isRail()) {
-      trips = cache.tripsByInternalPlanningCode(journeyWrapper.vehicleRef().get());
-    }
-
-    if (trips.isEmpty()) {
-      CallWrapper lastCall = calls.getLast();
-      // resolves a scheduled stop point id to a quay (regular stop) if necessary
-      // quay ids also work
-      RegularStop stop = entityResolver.resolveQuay(lastCall.getStopPointRef());
-      if (stop == null) {
-        throw UpdateException.of(UNKNOWN_STOP);
-      }
-      ZonedDateTime arrivalTime =
-        lastCall.getAimedArrivalTime() != null
-          ? lastCall.getAimedArrivalTime()
-          : lastCall.getAimedDepartureTime();
-
-      if (arrivalTime != null) {
-        trips = getMatchingTripsOnStopOrSiblings(stop, arrivalTime);
+      Set<Trip> trips = cache.tripsByInternalPlanningCode(journeyWrapper.vehicleRef().get());
+      if (!trips.isEmpty()) {
+        return singleMatch(
+          findPossibleTrips(
+            filterByRoute(trips, route),
+            calls,
+            entityResolver,
+            getCurrentTimetable,
+            getNewTripPatternForModifiedTrip
+          )
+        );
       }
     }
-    if (trips.isEmpty()) {
+
+    CallWrapper lastCall = calls.getLast();
+    // resolves a scheduled stop point id to a quay (regular stop) if necessary
+    // quay ids also work
+    RegularStop stop = entityResolver.resolveQuay(lastCall.getStopPointRef());
+    if (stop == null) {
+      throw UpdateException.of(UNKNOWN_STOP);
+    }
+    ZonedDateTime arrivalTime =
+      lastCall.getAimedArrivalTime() != null
+        ? lastCall.getAimedArrivalTime()
+        : lastCall.getAimedDepartureTime();
+    if (arrivalTime == null) {
       throw UpdateException.of(NO_FUZZY_TRIP_MATCH);
     }
 
-    Optional<Route> route = journeyWrapper.lineRef().map(entityResolver::resolveRoute);
-    if (route.isPresent()) {
-      trips = trips
-        .stream()
-        .filter(trip -> trip.getRoute().equals(route.get()))
-        .collect(Collectors.toSet());
+    // Try the candidate lookups in order of preference. A lookup is only used if one of its
+    // candidates passes all the checks, otherwise the next lookup is tried. With a time tolerance,
+    // a lookup may return unrelated trips, which must not prevent the following lookups.
+    for (var candidates : candidateLookups(stop, arrivalTime)) {
+      Set<Trip> trips = filterByRoute(candidates.get(), route);
+      if (trips.isEmpty()) {
+        continue;
+      }
+      var possibleTrips = findPossibleTrips(
+        trips,
+        calls,
+        entityResolver,
+        getCurrentTimetable,
+        getNewTripPatternForModifiedTrip
+      );
+      if (!possibleTrips.isEmpty()) {
+        return singleMatch(possibleTrips);
+      }
     }
+    throw UpdateException.of(NO_FUZZY_TRIP_MATCH);
+  }
 
-    return getTripAndPatternForJourney(
-      trips,
-      calls,
-      entityResolver,
-      getCurrentTimetable,
-      getNewTripPatternForModifiedTrip
-    );
+  /**
+   * Return the only possible trip, or reject the journey if there is none or more than one.
+   */
+  private static TripAndPattern singleMatch(Set<TripAndPattern> possibleTrips)
+    throws UpdateException {
+    if (possibleTrips.isEmpty()) {
+      throw UpdateException.of(NO_FUZZY_TRIP_MATCH);
+    }
+    if (possibleTrips.size() > 1) {
+      throw UpdateException.of(UpdateErrorType.MULTIPLE_FUZZY_TRIP_MATCHES);
+    }
+    return possibleTrips.iterator().next();
+  }
+
+  private static Set<Trip> filterByRoute(Set<Trip> trips, Optional<Route> route) {
+    if (route.isEmpty()) {
+      return trips;
+    }
+    return trips
+      .stream()
+      .filter(trip -> trip.getRoute().equals(route.get()))
+      .collect(Collectors.toSet());
   }
 
   /**
@@ -140,51 +191,70 @@ public class SiriFuzzyTripMatcher {
     return matches;
   }
 
-  private Set<Trip> getMatchingTripsOnStopOrSiblings(
+  /**
+   * The candidate lookups for the last stop, in order of preference:
+   * <ol>
+   *   <li>trips arriving at the reported stop,</li>
+   *   <li>trips that started yesterday and arrive at the reported stop, i.e. with 24 hours added
+   *   to the arrival time,</li>
+   *   <li>trips arriving at any quay of the same station, since SIRI data may report another
+   *   platform.</li>
+   * </ol>
+   * The lookups are evaluated lazily, so a lookup is only done if the previous ones gave no match.
+   */
+  private List<Supplier<Set<Trip>>> candidateLookups(
     RegularStop lastStop,
     ZonedDateTime arrivalTime
   ) {
+    var timeZone = transitRepository.getTimeZone();
     int secondsSinceMidnight = ServiceDateUtils.secondsSinceStartOfService(
       arrivalTime,
       arrivalTime,
-      transitRepository.getTimeZone()
+      timeZone
     );
-    int secondsSinceMidnightYesterday = ServiceDateUtils.secondsSinceStartOfService(
-      arrivalTime.minusDays(1),
-      arrivalTime,
-      transitRepository.getTimeZone()
-    );
-
     String lastStopId = lastStop.getId().getId();
-    Set<Trip> trips = cache.tripsByLastStopArrival(lastStopId, secondsSinceMidnight);
-    if (trips.isEmpty()) {
-      //Attempt to fetch trips that started yesterday - i.e. add 24 hours to arrival-time
-      trips = cache.tripsByLastStopArrival(lastStopId, secondsSinceMidnightYesterday);
-    }
 
-    if (!trips.isEmpty()) {
-      return trips;
+    List<Supplier<Set<Trip>>> lookups = new ArrayList<>();
+    lookups.add(() -> tripsByLastStopArrival(lastStopId, secondsSinceMidnight));
+    lookups.add(() ->
+      tripsByLastStopArrival(
+        lastStopId,
+        ServiceDateUtils.secondsSinceStartOfService(arrivalTime.minusDays(1), arrivalTime, timeZone)
+      )
+    );
+    if (lastStop.isPartOfStation()) {
+      lookups.add(() -> {
+        Set<Trip> tripsOnSiblingQuays = new HashSet<>();
+        for (var quay : lastStop.getParentStation().getChildStops()) {
+          tripsOnSiblingQuays.addAll(
+            tripsByLastStopArrival(quay.getId().getId(), secondsSinceMidnight)
+          );
+        }
+        return tripsOnSiblingQuays;
+      });
     }
+    return lookups;
+  }
 
-    //SIRI-data may report other platform, but still on the same Parent-stop
-    if (!lastStop.isPartOfStation()) {
-      return Set.of();
-    }
+  /** The trips arriving at the given last stop within the time tolerance of the arrival time. */
+  private Set<Trip> tripsByLastStopArrival(String stopId, int arrivalTime) {
+    return cache.tripsByLastStopArrival(
+      stopId,
+      arrivalTime - timeToleranceSeconds,
+      arrivalTime + timeToleranceSeconds
+    );
+  }
 
-    Set<Trip> tripsOnSiblingQuays = new HashSet<>();
-    var allQuays = lastStop.getParentStation().getChildStops();
-    for (var quay : allQuays) {
-      tripsOnSiblingQuays.addAll(
-        cache.tripsByLastStopArrival(quay.getId().getId(), secondsSinceMidnight)
-      );
-    }
-    return tripsOnSiblingQuays;
+  private boolean isWithinTimeTolerance(int scheduledTime, int aimedTime) {
+    return Math.abs(scheduledTime - aimedTime) <= timeToleranceSeconds;
   }
 
   /**
-   * Finds the correct trip based on OTP-ServiceDate and SIRI-DepartureTime
+   * The candidate trips that run on the journey's service date, have matching first and last
+   * stops, and depart within the time tolerance of the journey's aimed departure time. Returns an
+   * empty set if no candidate matches.
    */
-  private TripAndPattern getTripAndPatternForJourney(
+  private Set<TripAndPattern> findPossibleTrips(
     Set<Trip> trips,
     List<CallWrapper> calls,
     EntityResolver entityResolver,
@@ -234,18 +304,15 @@ public class SiriFuzzyTripMatcher {
       }
 
       var times = getCurrentTimetable.apply(tripPattern, serviceDate).getTripTimes(trip);
-      if (times != null && times.getScheduledDepartureTime(0) == departureInSecondsSinceMidnight) {
+      if (
+        times != null &&
+        isWithinTimeTolerance(times.getScheduledDepartureTime(0), departureInSecondsSinceMidnight)
+      ) {
         // Found matches
         possibleTrips.add(new TripAndPattern(times.getTrip(), tripPattern));
       }
     }
 
-    if (possibleTrips.isEmpty()) {
-      throw UpdateException.of(UpdateErrorType.NO_FUZZY_TRIP_MATCH);
-    } else if (possibleTrips.size() > 1) {
-      throw UpdateException.of(UpdateErrorType.MULTIPLE_FUZZY_TRIP_MATCHES);
-    } else {
-      return possibleTrips.iterator().next();
-    }
+    return possibleTrips;
   }
 }

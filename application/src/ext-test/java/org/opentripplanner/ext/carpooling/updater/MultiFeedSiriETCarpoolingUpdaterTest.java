@@ -22,6 +22,7 @@ import org.opentripplanner.ext.carpooling.RoutableCarpoolTripTestData;
 import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingRepository;
 import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTripResolver;
 import org.opentripplanner.framework.io.HttpHeaders;
+import org.opentripplanner.updater.trip.siri.SiriFuzzyTripMatchingParameters;
 import org.opentripplanner.updater.trip.siri.updater.DefaultSiriETUpdaterParameters;
 
 /**
@@ -188,7 +189,7 @@ class MultiFeedSiriETCarpoolingUpdaterTest {
       "test-requestor",
       Duration.ofSeconds(30),
       Duration.ofMinutes(15),
-      false,
+      SiriFuzzyTripMatchingParameters.DISABLED,
       HttpHeaders.empty(),
       false
     );
