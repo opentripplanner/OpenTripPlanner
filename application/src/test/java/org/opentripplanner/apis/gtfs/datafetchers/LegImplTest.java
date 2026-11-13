@@ -16,11 +16,14 @@ import java.util.stream.StreamSupport;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.model.RealTimeTripStateModel;
+import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
 import org.opentripplanner.model.plan.leg.StopArrival;
 import org.opentripplanner.model.plan.leg.StreetLeg;
+import org.opentripplanner.service.shape.model.CompactLineStringSequence;
+import org.opentripplanner.service.shape.model.TripShapeFactory;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TripInput;
@@ -54,6 +57,10 @@ class LegImplTest implements PlanTestConstants {
   )
     .withStopPattern(STOP_PATTERN)
     .build();
+  private static final CompactLineStringSequence PATTERN_GEOMETRY = TripShapeFactory.straightLines(
+    PATTERN.getStopPattern(),
+    DeduplicatorService.NOOP
+  );
 
   private static final ScheduledTripTimes TRIP_TIMES = ScheduledTripTimes.of()
     .withArrivalTimes("10:00 11:00 12:00 13:00 14:00")
@@ -70,6 +77,7 @@ class LegImplTest implements PlanTestConstants {
     .withBoardStopIndexInPattern(0)
     .withAlightStopIndexInPattern(4)
     .withTripPattern(PATTERN)
+    .withTripPatternShape(PATTERN_GEOMETRY)
     .build();
   private static final LegImpl IMPL = new LegImpl();
   private static final Map<String, Object> INCLUDE_STOP_ONLY = Map.of(
@@ -139,6 +147,10 @@ class LegImplTest implements PlanTestConstants {
     var transitService = env.transitService();
 
     var tripData = env.tripData("Trip1");
+    var patternGeometry = TripShapeFactory.straightLines(
+      tripData.scheduledTripPattern().getStopPattern(),
+      DeduplicatorService.NOOP
+    );
     var leg = new ScheduledTransitLegBuilder<>()
       .withStartTime(ZonedDateTime.of(serviceDate, LocalTime.of(10, 0), env.timeZone()))
       .withEndTime(ZonedDateTime.of(serviceDate, LocalTime.of(11, 0), env.timeZone()))
@@ -146,6 +158,7 @@ class LegImplTest implements PlanTestConstants {
       .withServiceDate(serviceDate)
       .withTripTimes(tripData.scheduledTripTimes())
       .withTripPattern(tripData.scheduledTripPattern())
+      .withTripPatternShape(patternGeometry)
       .withBoardStopIndexInPattern(0)
       .withAlightStopIndexInPattern(1)
       .build();

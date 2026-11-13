@@ -1,8 +1,10 @@
-package org.opentripplanner.street.geometry;
+package org.opentripplanner.service.shape.model;
 
 import java.io.Serializable;
 import java.util.List;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.street.geometry.GeometryUtils;
+import org.opentripplanner.street.geometry.PackedLineStringCodec;
 
 /**
  * An ordered sequence of {@link CompactLineString} members that are assumed to join end-to-end (the
@@ -16,7 +18,6 @@ import org.locationtech.jts.geom.LineString;
  *       and member {@code i}</li>
  *   <li>position {@code size()} is the end of the last member</li>
  * </ul>
- * <p>
  */
 public final class CompactLineStringSequence implements Serializable {
 
@@ -32,14 +33,14 @@ public final class CompactLineStringSequence implements Serializable {
   }
 
   /**
-   * Compact each line string and store the supplied cumulative arc-length table. The caller is
-   * responsible for choosing how the cumulative distances are measured (e.g. planar sum vs.
-   * haversine) and must pass an array of length {@code geometries.size() + 1} where entry 0 is 0
-   * and each subsequent entry is the meter distance from the start of the sequence up to that
-   * vertex position.
+   * Store the compacted (and possibly deduplicated) hops and the supplied cumulative
+   * arc-length table. The caller is responsible for choosing how the cumulative distances are
+   * measured (e.g. summed along the line's coordinates vs. stop to stop) and must pass an array
+   * of length {@code geometries.size() + 1} where entry 0 is 0 and each subsequent entry is the
+   * meter distance from the start of the sequence up to that vertex position.
    */
-  public static CompactLineStringSequence of(
-    List<LineString> geometries,
+  static CompactLineStringSequence of(
+    List<CompactLineString> geometries,
     int[] cumulativeDistanceMeters
   ) {
     if (cumulativeDistanceMeters.length != geometries.size() + 1) {
@@ -67,11 +68,10 @@ public final class CompactLineStringSequence implements Serializable {
         );
       }
     }
-    var packed = new CompactLineString[geometries.size()];
-    for (int i = 0; i < geometries.size(); i++) {
-      packed[i] = CompactLineString.of(geometries.get(i));
-    }
-    return new CompactLineStringSequence(packed, cumulativeDistanceMeters);
+    return new CompactLineStringSequence(
+      geometries.toArray(new CompactLineString[0]),
+      cumulativeDistanceMeters
+    );
   }
 
   /** Number of line strings in the sequence. */
@@ -84,11 +84,23 @@ public final class CompactLineStringSequence implements Serializable {
     return geometries[index].toLineString(false);
   }
 
+  /** The compact line string at {@code index}, without decoding it. */
+  CompactLineString getCompact(int index) {
+    return geometries[index];
+  }
+
   /**
    * Arc length in meters along the sequence between two vertex positions. Constant time.
    */
   public int distanceBetween(int fromVertex, int toVertex) {
     return cumulativeDistanceMeters[toVertex] - cumulativeDistanceMeters[fromVertex];
+  }
+
+  /**
+   * Decode and concatenate all the line strings of the sequence into a single {@link LineString}.
+   */
+  public LineString concatenate() {
+    return concatenate(0, size());
   }
 
   /**
@@ -116,7 +128,7 @@ public final class CompactLineStringSequence implements Serializable {
     double[] out = new double[totalCoords * 2];
     int offset = 0;
     for (int i = fromIndex; i < toIndexExclusive; i++) {
-      offset = CompactLineString.decodeInto(
+      offset = PackedLineStringCodec.decodeInto(
         geometries[i].packed(),
         out,
         offset,

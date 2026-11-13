@@ -19,6 +19,7 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.fares.service.gtfs.v1.GtfsFareServiceFactory;
 import org.opentripplanner.graph_builder.module.TimeZoneAdjusterModule;
+import org.opentripplanner.service.shape.dataimport.ShapeDataImport;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
@@ -46,10 +47,12 @@ class TransitRepositoryTest {
     var graph = new Graph();
     var transitRepository = new TransitRepository(siteRepository);
     var timetableDataImport = new TimetableDataImport();
+    var shapeDataImport = new ShapeDataImport();
     ConstantsForTests.addGtfsToGraph(
       graph,
       transitRepository,
       timetableDataImport,
+      shapeDataImport,
       ConstantsForTests.SIMPLE_GTFS,
       new GtfsFareServiceFactory(),
       FAKE_FEED_ID
@@ -72,6 +75,7 @@ class TransitRepositoryTest {
           graph,
           transitRepository,
           timetableDataImport,
+          shapeDataImport,
           RESOURCE_LOADER.file("kcm_gtfs.zip"),
           new GtfsFareServiceFactory(),
           null
@@ -89,6 +93,7 @@ class TransitRepositoryTest {
     var transitRepository = new TransitRepository(siteRepository);
 
     var timetableDataImport = new TimetableDataImport();
+    var shapeDataImport = new ShapeDataImport();
     // Whit explicit time zone
     transitRepository.initTimeZone(ZoneIds.CHICAGO);
 
@@ -97,6 +102,7 @@ class TransitRepositoryTest {
       graph,
       transitRepository,
       timetableDataImport,
+      shapeDataImport,
       ConstantsForTests.SIMPLE_GTFS,
       new GtfsFareServiceFactory(),
       FAKE_FEED_ID
@@ -107,6 +113,7 @@ class TransitRepositoryTest {
       graph,
       transitRepository,
       timetableDataImport,
+      shapeDataImport,
       RESOURCE_LOADER.file("kcm_gtfs.zip"),
       new GtfsFareServiceFactory(),
       null

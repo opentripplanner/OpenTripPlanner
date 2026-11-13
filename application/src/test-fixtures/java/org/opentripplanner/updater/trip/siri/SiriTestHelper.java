@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.updater.spi.UpdateResult;
+import org.opentripplanner.updater.trip.UpdateIncrementality;
 import uk.org.siri.siri21.EstimatedTimetableDeliveryStructure;
 
 public class SiriTestHelper {
@@ -43,20 +44,21 @@ public class SiriTestHelper {
   public UpdateResult applyEstimatedTimetableWithFuzzyMatcher(
     List<EstimatedTimetableDeliveryStructure> updates
   ) {
-    return applyEstimatedTimetable(updates, true);
+    return applyEstimatedTimetable(updates, true, DIFFERENTIAL);
   }
 
   public UpdateResult applyEstimatedTimetable(List<EstimatedTimetableDeliveryStructure> updates) {
-    return applyEstimatedTimetable(updates, false);
+    return applyEstimatedTimetable(updates, false, DIFFERENTIAL);
   }
 
   public TransitTestEnvironment realtimeTestEnvironment() {
     return transitTestEnvironment;
   }
 
-  private UpdateResult applyEstimatedTimetable(
+  public UpdateResult applyEstimatedTimetable(
     List<EstimatedTimetableDeliveryStructure> updates,
-    boolean fuzzyMatching
+    boolean fuzzyMatching,
+    UpdateIncrementality incrementality
   ) {
     var resultRef = new AtomicReference<UpdateResult>();
     var adapter = fuzzyMatching ? siriAdapterWithFuzzyMatching : siriAdapter;
@@ -68,11 +70,11 @@ public class SiriTestHelper {
           var feedId = transitTestEnvironment.feedId();
           resultRef.set(
             adapter
-              .forUpdate(buffer)
+              .forUpdate(buffer, () -> ctx.repository(transitTestEnvironment.shapeHandle()))
               .applyEstimatedTimetable(
                 new EntityResolver(buffer, transitTestEnvironment.transitRepository(), feedId),
                 feedId,
-                DIFFERENTIAL,
+                incrementality,
                 updates
               )
           );

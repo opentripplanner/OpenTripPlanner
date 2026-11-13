@@ -8,6 +8,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
+import org.opentripplanner.service.shape.ShapeService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.transfer.regular.RegularTransferService;
@@ -20,6 +21,7 @@ import org.opentripplanner.transit.service.TransitService;
 public record TestGtfsGraphQLRequestContext(
   RoutingService routingService,
   TransitService transitService,
+  ShapeService shapeService,
   TransitAlertService transitAlertService,
   RegularTransferService transferService,
   FareService fareService,

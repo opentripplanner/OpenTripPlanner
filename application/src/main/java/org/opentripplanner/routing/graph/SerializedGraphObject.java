@@ -28,6 +28,7 @@ import org.opentripplanner.model.projectinfo.OtpProjectInfo;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.kryosupport.KryoBuilder;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
+import org.opentripplanner.service.shape.dataimport.ShapeDataImport;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
@@ -72,6 +73,7 @@ public class SerializedGraphObject implements Serializable {
   public final StreetDetailsRepository streetDetailsRepository;
   public final TransitRepository transitRepository;
   public final TimetableDataImport timetableDataImport;
+  public final ShapeDataImport shapeDataImport;
   public final TransferRepository transferRepository;
   public final WorldEnvelopeRepository worldEnvelopeRepository;
   private final Collection<Edge> edges;
@@ -108,6 +110,7 @@ public class SerializedGraphObject implements Serializable {
     StreetRepository streetRepository,
     TransitRepository transitRepository,
     TimetableDataImport timetableDataImport,
+    ShapeDataImport shapeDataImport,
     TransferRepository transferRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository parkingRepository,
@@ -127,6 +130,7 @@ public class SerializedGraphObject implements Serializable {
     this.streetRepository = streetRepository;
     this.transitRepository = transitRepository;
     this.timetableDataImport = timetableDataImport;
+    this.shapeDataImport = shapeDataImport;
     this.transferRepository = transferRepository;
     this.worldEnvelopeRepository = worldEnvelopeRepository;
     this.parkingRepository = parkingRepository;

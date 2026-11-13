@@ -28,6 +28,8 @@ import org.opentripplanner.routing.util.EllipsoidUtils;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySnapshot;
+import org.opentripplanner.service.shape.ScheduledShapeData;
+import org.opentripplanner.service.shape.dataimport.ShapeDataImport;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
@@ -90,6 +92,12 @@ public class ConstructApplication {
   private final TimetableDataImport timetableDataImport;
 
   /**
+   * The mutable shape data of the graph build, kept under the same conditions as TimetableDataImport.
+   */
+  @Nullable
+  private final ShapeDataImport shapeDataImport;
+
+  /**
    * Create a new OTP configuration instance for a given directory.
    */
   ConstructApplication(
@@ -99,6 +107,7 @@ public class ConstructApplication {
     StreetDetailsRepository streetDetailsRepository,
     TransitRepository transitRepository,
     TimetableDataImport timetableDataImport,
+    ShapeDataImport shapeDataImport,
     TransferRepository transferRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     ConfigModel config,
@@ -115,6 +124,7 @@ public class ConstructApplication {
     this.cli = cli;
     boolean buildGraph = cli.doBuildStreet() || cli.doBuildTransit();
     this.timetableDataImport = buildGraph ? timetableDataImport : null;
+    this.shapeDataImport = buildGraph ? shapeDataImport : null;
     this.graphBuilderDataSources = graphBuilderDataSources;
     this.osmInfoGraphBuildRepository = osmInfoGraphBuildRepository;
 
@@ -129,6 +139,10 @@ public class ConstructApplication {
     var scheduledTimetableData = buildGraph
       ? ScheduledTimetableData.empty()
       : timetableDataImport.toScheduledTimetableData();
+    // The shape data follows the timetable data: empty while a graph is built.
+    var scheduledShapeData = buildGraph
+      ? ScheduledShapeData.empty()
+      : shapeDataImport.toScheduledShapeData();
     if (scheduledTimetableData.getTripCalendars().isEmpty() || !transitRepository.isIndexed()) {
       LOG.warn(
         "Cannot create Raptor data, that requires the graph to have transit data and be indexed."
@@ -154,6 +168,7 @@ public class ConstructApplication {
       .streetDetailsRepository(streetDetailsRepository)
       .transitRepository(transitRepository)
       .scheduledTimetableData(scheduledTimetableData)
+      .scheduledShapeData(scheduledShapeData)
       .transferRepository(transferRepository)
       .worldEnvelopeRepository(worldEnvelopeRepository)
       .vehicleParkingRepository(vehicleParkingRepository)
@@ -201,6 +216,7 @@ public class ConstructApplication {
       factory.streetRepository(),
       factory.transitRepository(),
       timetableDataImport(),
+      shapeDataImport(),
       factory.transferRepository(),
       factory.worldEnvelopeRepository(),
       factory.vehicleParkingRepository(),
@@ -254,6 +270,7 @@ public class ConstructApplication {
       factory.transitUpdateManager(),
       factory.streetUpdateManager(),
       factory.timetableRepositoryHandle(),
+      factory.shapeRepositoryHandle(),
       factory.transitAlertService(),
       routerConfig().updaterConfig(),
       otpConfig().gbfsNetworks
@@ -316,6 +333,13 @@ public class ConstructApplication {
     return Objects.requireNonNull(
       timetableDataImport,
       "The timetable data import is only available when building a graph."
+    );
+  }
+
+  public ShapeDataImport shapeDataImport() {
+    return Objects.requireNonNull(
+      shapeDataImport,
+      "The shape data import is only available when building a graph."
     );
   }
 

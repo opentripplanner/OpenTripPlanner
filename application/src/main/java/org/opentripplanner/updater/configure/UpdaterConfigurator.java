@@ -21,6 +21,8 @@ import org.opentripplanner.gbfs.network.GbfsNetworkOverrides;
 import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySnapshot;
+import org.opentripplanner.service.shape.ShapeRepository;
+import org.opentripplanner.service.shape.ShapeRepositorySnapshot;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.street.graph.Graph;
@@ -95,6 +97,7 @@ public class UpdaterConfigurator {
     TimetableRepositorySnapshot,
     TimetableRepository
   > timetableRepositoryHandle;
+  private final RepositoryHandle<ShapeRepositorySnapshot, ShapeRepository> shapeRepositoryHandle;
   private final DelegatingTransitAlertServiceImpl transitAlertService;
 
   @Nullable
@@ -118,6 +121,7 @@ public class UpdaterConfigurator {
     UpdateManager transitUpdateManager,
     UpdateManager streetUpdateManager,
     RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableRepositoryHandle,
+    RepositoryHandle<ShapeRepositorySnapshot, ShapeRepository> shapeRepositoryHandle,
     DelegatingTransitAlertServiceImpl transitAlertService,
     UpdatersParameters updatersParameters,
     GbfsNetworkOverrides gbfsNetworkOverrides
@@ -134,6 +138,7 @@ public class UpdaterConfigurator {
     this.transitUpdateManager = transitUpdateManager;
     this.streetUpdateManager = streetUpdateManager;
     this.timetableRepositoryHandle = timetableRepositoryHandle;
+    this.shapeRepositoryHandle = shapeRepositoryHandle;
     this.carpoolingRepository = carpoolingRepository;
     this.routableCarpoolTripResolver = routableCarpoolTripResolver;
     this.carpoolingParameters = carpoolingParameters;
@@ -159,6 +164,7 @@ public class UpdaterConfigurator {
     UpdateManager transitUpdateManager,
     UpdateManager streetUpdateManager,
     RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableRepositoryHandle,
+    RepositoryHandle<ShapeRepositorySnapshot, ShapeRepository> shapeRepositoryHandle,
     DelegatingTransitAlertServiceImpl transitAlertService,
     UpdatersParameters updatersParameters,
     GbfsNetworkOverrides gbfsNetworkOverrides
@@ -178,6 +184,7 @@ public class UpdaterConfigurator {
       transitUpdateManager,
       streetUpdateManager,
       timetableRepositoryHandle,
+      shapeRepositoryHandle,
       transitAlertService,
       updatersParameters,
       gbfsNetworkOverrides
@@ -208,6 +215,7 @@ public class UpdaterConfigurator {
       transitUpdateManager,
       timetableRepositoryHandle,
       realtimeVehicleRepositoryHandle,
+      shapeRepositoryHandle,
       transitRepository
     );
     var streetWriterService = GraphWriterService.forStreetDomain(streetUpdateManager, graph);

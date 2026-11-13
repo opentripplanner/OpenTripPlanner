@@ -17,6 +17,7 @@ import org.opentripplanner.model.TransitDataImport;
 import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.impl.TransitDataImportBuilder;
+import org.opentripplanner.service.shape.dataimport.ShapeDataImport;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
@@ -40,6 +41,7 @@ public class NetexModule implements GraphBuilderModule {
   private final DeduplicatorService deduplicator;
   private final TransitRepository transitRepository;
   private final TimetableDataImport timetableDataImport;
+  private final ShapeDataImport shapeDataImport;
   private final VehicleParkingRepository parkingRepository;
   private final StreetDetailsRepository streetDetailsRepository;
   private final DataImportIssueStore issueStore;
@@ -61,6 +63,7 @@ public class NetexModule implements GraphBuilderModule {
     DeduplicatorService deduplicator,
     TransitRepository transitRepository,
     TimetableDataImport timetableDataImport,
+    ShapeDataImport shapeDataImport,
     VehicleParkingRepository parkingRepository,
     StreetDetailsRepository streetDetailsRepository,
     DataImportIssueStore issueStore,
@@ -72,6 +75,7 @@ public class NetexModule implements GraphBuilderModule {
     this.deduplicator = deduplicator;
     this.transitRepository = transitRepository;
     this.timetableDataImport = timetableDataImport;
+    this.shapeDataImport = shapeDataImport;
     this.parkingRepository = parkingRepository;
     this.streetDetailsRepository = streetDetailsRepository;
     this.issueStore = issueStore;
@@ -107,7 +111,8 @@ public class NetexModule implements GraphBuilderModule {
         AddTransitEntitiesToTimetable.addToTimetable(
           otpService,
           transitRepository,
-          timetableDataImport
+          timetableDataImport,
+          shapeDataImport
         );
         AddTransitEntitiesToGraph.addToGraph(
           otpService,

@@ -5,6 +5,7 @@ import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.TransitDataImport;
+import org.opentripplanner.service.shape.dataimport.ShapeDataImport;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
@@ -14,23 +15,29 @@ public class AddTransitEntitiesToTimetable {
 
   private final TransitDataImport dataImport;
   private final TimetableDataImport timetableDataImport;
+  private final ShapeDataImport shapeDataImport;
 
   private AddTransitEntitiesToTimetable(
     TransitDataImport dataImport,
-    TimetableDataImport timetableDataImport
+    TimetableDataImport timetableDataImport,
+    ShapeDataImport shapeDataImport
   ) {
     this.dataImport = dataImport;
     this.timetableDataImport = timetableDataImport;
+    this.shapeDataImport = shapeDataImport;
   }
 
   public static void addToTimetable(
     TransitDataImport dataImport,
     TransitRepository transitRepository,
-    TimetableDataImport timetableDataImport
+    TimetableDataImport timetableDataImport,
+    ShapeDataImport shapeDataImport
   ) {
-    new AddTransitEntitiesToTimetable(dataImport, timetableDataImport).applyToTransitRepository(
-      transitRepository
-    );
+    new AddTransitEntitiesToTimetable(
+      dataImport,
+      timetableDataImport,
+      shapeDataImport
+    ).applyToTransitRepository(transitRepository);
   }
 
   private void applyToTransitRepository(TransitRepository transitRepository) {
@@ -88,6 +95,11 @@ public class AddTransitEntitiesToTimetable {
 
       // Store the tripPattern in the scheduled timetable data so it will be serialized and usable in routing.
       timetableDataImport.addTripPattern(tripPattern.getId(), tripPattern);
+
+      shapeDataImport.setTripPatternShape(
+        tripPattern,
+        dataImport.getGeometriesByTripPattern().get(tripPattern.getId())
+      );
     }
   }
 
