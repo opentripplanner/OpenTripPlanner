@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -518,6 +519,15 @@ class DefaultRegularTransferRepositorySnapshotTest {
           MaxDurationsPreference maxDurations
         ) {
           return search.findNearbyStops(fromStop, maxDurations);
+        }
+
+        @Override
+        public Collection<TransferPath<FakePath>> findNearbyStops(
+          FeedScopedId fromStop,
+          MaxDurationsPreference maxDurations,
+          Set<String> closedFacilityIds
+        ) {
+          return search.findNearbyStops(fromStop, maxDurations, closedFacilityIds);
         }
 
         @Override
