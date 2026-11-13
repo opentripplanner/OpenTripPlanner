@@ -18,6 +18,7 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.raptor.data.stop.RaptorStopIndex;
 import org.opentripplanner.raptor.data.transfers.regular.RaptorRegularTransferService;
 import org.opentripplanner.raptor.spi.RaptorTransfer;
+import org.opentripplanner.transit.transfer.regular.AlternativePath;
 import org.opentripplanner.transit.transfer.regular.FakeRequestMapper;
 import org.opentripplanner.transit.transfer.regular.FakeTransferPathProvider;
 import org.opentripplanner.transit.transfer.regular.FakeTransferPathProvider.FakePath;
@@ -86,6 +87,53 @@ class DefaultRegularTransferRepositorySnapshotTest {
     assertThat(from(transfers, A)).containsExactly(tx(B, 200), tx(C, 400));
     assertThat(from(transfers, B)).containsExactly(tx(C, 600));
     assertThat(to(transfers, C)).containsExactly(tx(A, 400), tx(B, 600));
+  }
+
+  @Test
+  void closingAFacilityPatchesTheTransfersThatDependOnItWithTheirAlternatives() {
+    var buildRepository = new DefaultRegularTransferBuildRepository<FakePath>();
+    buildRepository.setPaths(PROFILE, A, Map.of(B, path(A, B, 100), C, path(A, C, 200)));
+    buildRepository.setPaths(PROFILE, B, Map.of(C, path(B, C, 300)));
+    buildRepository.setAlternativePaths(
+      PROFILE,
+      A,
+      Map.of(
+        B,
+        List.of(
+          new AlternativePath<>(path(A, B, 100), Set.of("e1")),
+          new AlternativePath<>(path(A, B, 500), Set.of())
+        )
+      )
+    );
+    repository =
+      (DefaultRegularTransferRepository<FakePath>) buildRepository.createRuntimeRepository();
+    var open = freeze();
+    assertThat(from(open.forRequest(REQUEST).raptorTransfers(), A)).containsExactly(
+      tx(B, 200),
+      tx(C, 400)
+    );
+
+    repository.closeFacilities(Set.of("e1"));
+    var closed = freeze();
+
+    // Re-costed under the request reluctance, 2.0. Only the stop A is patched: 1 search, 2 paths
+    var searches = provider.searches;
+    assertThat(from(closed.forRequest(REQUEST).raptorTransfers(), A)).containsExactly(
+      tx(B, 1000),
+      tx(C, 400)
+    );
+    assertThat(provider.searches).isEqualTo(searches + 1);
+    // The snapshot before still has the facility open
+    assertThat(from(open.forRequest(REQUEST).raptorTransfers(), A)).containsExactly(
+      tx(B, 200),
+      tx(C, 400)
+    );
+
+    repository.closeFacilities(Set.of());
+    assertThat(from(freeze().forRequest(REQUEST).raptorTransfers(), A)).containsExactly(
+      tx(B, 200),
+      tx(C, 400)
+    );
   }
 
   @Test

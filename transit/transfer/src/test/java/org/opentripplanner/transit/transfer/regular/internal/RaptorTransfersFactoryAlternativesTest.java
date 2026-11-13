@@ -1,7 +1,6 @@
 package org.opentripplanner.transit.transfer.regular.internal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,11 +60,6 @@ class RaptorTransfersFactoryAlternativesTest {
     paths.setPaths(PROFILE, FROM, Map.of(TO, detour));
 
     assertEquals(List.of(300), costs(new OverlaidTemplatePaths<>(paths), Set.of("e1")));
-  }
-
-  @Test
-  void theClosedIdsAreEmptyUntilTheyAreProvidedAtRuntime() {
-    assertTrue(RaptorTransfersFactory.CLOSED_FACILITY_IDS.isEmpty());
   }
 
   private List<Integer> costs(Set<String> closedIds) {

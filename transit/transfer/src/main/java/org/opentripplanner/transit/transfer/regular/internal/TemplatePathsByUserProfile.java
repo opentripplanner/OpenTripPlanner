@@ -75,6 +75,15 @@ final class TemplatePathsByUserProfile<P> implements Serializable {
     return paths == null ? List.of() : paths.alternativePaths(fromStop, toStop);
   }
 
+  /**
+   * The stops that have a transfer under exactly the given profile with an alternative path that
+   * depends on one of the facility ids.
+   */
+  Set<Integer> fromStopsDependingOn(AbstractUserPreferences<?> profile, Set<String> facilityIds) {
+    var paths = pathsByUserPreferences.get(profile);
+    return paths == null ? Set.of() : paths.fromStopsDependingOn(facilityIds);
+  }
+
   /** The user preferences paths are stored under, the profiles. */
   Set<AbstractUserPreferences<?>> profiles() {
     return Collections.unmodifiableSet(pathsByUserPreferences.keySet());
