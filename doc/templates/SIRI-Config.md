@@ -48,8 +48,13 @@ the entire feed in a single HTTP GET request, and expects the status of all elev
 response: an elevator that is not in the response is in service.
 
 An elevator that is out of service is not used by street routing, for example for wheelchair users.
-The regular transfers avoid it too, if alternative transfer paths were generated at graph build
-(`elevatorAlternatives` in the transfer configuration).
+The regular transfers avoid it too, with alternative transfer paths generated at graph build.
+
+**The graph must be built with `elevatorAlternatives` in the transfer configuration.** Without the
+alternative paths, the regular transfers do not follow the elevator status: a transfer through an
+elevator can keep using it while it is out of service, or stay missing after it is back in service,
+until OTP is restarted. OTP logs a warning at startup if this updater is configured and the graph
+has no alternative paths.
 
 The `FacilityRef` of a `FacilityCondition` must be the id of an elevator in the street graph. The
 ids of the elevators are read from the OSM tags configured with `elevatorRefTags` in the build

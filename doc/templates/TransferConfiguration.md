@@ -210,10 +210,15 @@ Each distinct subset of a stop costs one extra street search from the stop, shar
 transfers of the stop that need it. A path with `n` elevators needs `2^n - 1` searches. Street paths
 are only reused between profiles if they use the same elevators, the alternatives are not reused.
 `elevatorAlternatives` is `false` by default: no alternative paths are generated and the build is
-unchanged. Turn it on if the elevator status is updated at runtime.
+unchanged.
 
-The alternative paths are stored in the graph, but nothing closes an elevator at runtime yet, so the
-transfers always use the best street paths.
+At runtime, a transfer uses its best path if none of its elevators is out of service, and otherwise
+an alternative path whose elevators are all in service. If there is none, the stops have no
+transfer. **Turn `elevatorAlternatives` on if the elevator status is updated at runtime**, for
+example with the `siri-fm-elevator` updater. Without the alternative paths, the regular transfers do
+not follow the elevator status: a transfer can keep using an elevator that is out of service, or
+stay missing after it is back in service, until OTP is restarted. OTP logs a warning at startup in
+that case.
 
 ## Warmup
 

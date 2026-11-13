@@ -110,8 +110,11 @@ public class TransferProfilesConfigMapper {
         """
         At graph build, find alternative regular transfer paths for the transfers that use elevators
         with an id (see `elevatorRefTags`). For a path with n such elevators, 2^n - 1 extra street
-        searches are made from the stop. Turn this on if the elevator status is updated at runtime.
-        It costs extra build time and graph size.
+        searches are made from the stop. It costs extra build time and graph size.
+
+        It is required if the elevator status is updated at runtime, for example with the
+        `siri-fm-elevator` updater: without the alternative paths, the regular transfers do not
+        follow the elevator status.
         """
       )
       .asBoolean(false);

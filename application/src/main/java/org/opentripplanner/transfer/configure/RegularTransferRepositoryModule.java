@@ -3,14 +3,17 @@ package org.opentripplanner.transfer.configure;
 import dagger.Module;
 import dagger.Provides;
 import jakarta.inject.Singleton;
+import java.util.Optional;
 import org.opentripplanner.core.framework.transaction.configure.TransitDomain;
 import org.opentripplanner.core.model.transaction.RepositoryHandle;
 import org.opentripplanner.core.model.transaction.RepositoryRegistry;
+import org.opentripplanner.core.model.transaction.UpdateManager;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.transfer.regular.ElevatorStatusChangedHandler;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
@@ -35,6 +38,10 @@ public class RegularTransferRepositoryModule {
    * transfers are only updated through the handle. See
    * {@link StreetTransferFactory#registerRepository}.
    * <p>
+   * The {@link ElevatorStatusChangedHandler} is registered on the transit update manager, so the
+   * transfers follow the elevator status in the transaction that changes it. A warning is logged if
+   * an elevator status updater is configured, but the graph has no alternative transfer paths.
+   * <p>
    * Registration is not thread-safe, so the handle must be created at startup, before the updaters
    * start - not lazily by the first request. The transit repository must be indexed.
    * <p>
@@ -52,7 +59,8 @@ public class RegularTransferRepositoryModule {
     TransferParameters<RouteRequest> transferParameters,
     RouterConfig routerConfig,
     Graph graph,
-    TransitRepository transitRepository
+    TransitRepository transitRepository,
+    @TransitDomain UpdateManager transitUpdateManager
   ) {
     for (var warning : TransferRequestDifferences.warnings(
       transferParameters,
@@ -60,7 +68,11 @@ public class RegularTransferRepositoryModule {
     )) {
       LOG.warn(warning);
     }
-    return StreetTransferFactory.registerRepository(
+    missingElevatorAlternativesWarning(
+      transferParameters.pathAlternatives(),
+      routerConfig.updaterConfig().getSiriFmElevatorUpdaterParameters().size()
+    ).ifPresent(LOG::warn);
+    var handle = StreetTransferFactory.registerRepository(
       repositoryRegistry,
       buildRepository,
       transferParameters,
@@ -68,6 +80,31 @@ public class RegularTransferRepositoryModule {
       transitRepository,
       routerConfig.transitTuningConfig().transferCacheMaxSize(),
       OTPFeature.ReportApi.isOn()
+    );
+    transitUpdateManager.register(new ElevatorStatusChangedHandler(), handle);
+    return handle;
+  }
+
+  /**
+   * The warning to log if the elevator status is updated at runtime, but the graph has no
+   * alternative transfer paths. The transfers then do not follow the elevator status.
+   *
+   * @param pathAlternatives        whether the graph was built with alternative transfer paths
+   * @param elevatorStatusUpdaters  the number of elevator status updaters configured
+   */
+  static Optional<String> missingElevatorAlternativesWarning(
+    boolean pathAlternatives,
+    int elevatorStatusUpdaters
+  ) {
+    if (pathAlternatives || elevatorStatusUpdaters == 0) {
+      return Optional.empty();
+    }
+    return Optional.of(
+      "An elevator status updater (siri-fm-elevator) is configured, but the graph was built " +
+        "without 'elevatorAlternatives' in the transfer configuration. The regular transfers do " +
+        "not follow the elevator status: a transfer can keep using an elevator that is out of " +
+        "service, or stay missing after it is back in service, until OTP is restarted. Build the " +
+        "graph with 'elevatorAlternatives' set to true."
     );
   }
 
