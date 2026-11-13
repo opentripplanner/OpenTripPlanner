@@ -36,15 +36,15 @@ public final class StdStopArrivals<T extends RaptorTripSchedule> implements Best
   ) {
     for (int i = 1; i < arrivals.length; i++) {
       final int round = i;
-      egressPaths.byStop().forEachEntry((stop, list) -> {
+      for (var cursor : egressPaths.byStop()) {
+        int stop = cursor.key;
         arrivals[round][stop] = new EgressStopArrivalState<>(
           stop,
           round,
-          list,
+          cursor.value,
           destinationArrivalListener
         );
-        return true;
-      });
+      }
     }
   }
 

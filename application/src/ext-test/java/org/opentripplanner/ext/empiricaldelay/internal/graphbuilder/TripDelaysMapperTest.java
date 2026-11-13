@@ -56,7 +56,7 @@ class TripDelaysMapperTest {
     assertEquals(EMPIRICAL_DELAY_B, res.get(WEEKEND, 1).get());
     assertEquals(EMPIRICAL_DELAY_C, res.get(WEEKEND, 2).get());
     assertEquals(
-      "Deduplicator{EmpiricalDelay: 3(3), TIntObjectHashMap: 1(1)}",
+      "Deduplicator{EmpiricalDelay: 3(3), IntObjectHashMap: 1(1)}",
       deduplicator.toString()
     );
     assertTrue(issueStore.listIssues().isEmpty());
@@ -80,7 +80,7 @@ class TripDelaysMapperTest {
     assertEquals(EMPIRICAL_DELAY_A, res.get(MON_FRI, 0).get());
     assertEquals(EMPIRICAL_DELAY_B, res.get(MON_FRI, 1).get());
     assertEquals(
-      "Deduplicator{EmpiricalDelay: 3(6), TIntObjectHashMap: 1(2)}",
+      "Deduplicator{EmpiricalDelay: 3(6), IntObjectHashMap: 1(2)}",
       deduplicator.toString()
     );
     assertTrue(issueStore.listIssues().isEmpty(), () -> issueStore.listIssues().toString());

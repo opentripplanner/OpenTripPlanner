@@ -1,7 +1,7 @@
 package org.opentripplanner.raptor.rangeraptor.transit;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.core.testfixtures.hppc.HppcAsserts.assertThat;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flex;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flexAndWalk;
 import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.groupByRound;
@@ -9,7 +9,6 @@ import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctio
 import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.removeNonOptimalPathsForMcRaptor;
 import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.removeNonOptimalPathsForStandardRaptor;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -194,25 +193,19 @@ class AccessEgressFunctionsTest implements RaptorTestConstants {
   void groupByRoundTest() {
     // Map one element
     var res = groupByRound(List.of(WALK_8_m), _ -> true);
-    assertArrayEquals(new int[] { 0 }, res.keys());
+    assertThat(res.keys()).contains(0);
     assertElements(List.of(WALK_8_m), res.get(0));
 
     // Map 4 elements into 3 groups
     res = groupByRound(List.of(WALK_8_m, FLEX_1x_8_m, FLEX_2x_8_m, FLEX_1x_10_m), _ -> true);
-    int[] keys = res.keys();
-    Arrays.sort(keys);
-
-    assertArrayEquals(new int[] { 0, 1, 2 }, keys);
+    assertThat(res.keys()).contains(2, 0, 1);
     assertElements(List.of(WALK_8_m), res.get(0));
     assertElements(List.of(FLEX_1x_8_m, FLEX_1x_10_m), res.get(1));
     assertElements(List.of(FLEX_2x_8_m), res.get(2));
 
     // Apply same test, but remove entries with number of rides == 1
     res = groupByRound(List.of(WALK_8_m, FLEX_1x_8_m), RaptorAccessEgress::hasRides);
-    keys = res.keys();
-    Arrays.sort(keys);
-
-    assertArrayEquals(new int[] { 1 }, keys);
+    assertThat(res.keys()).contains(1);
     assertElements(List.of(FLEX_1x_8_m), res.get(1));
   }
 
@@ -220,16 +213,13 @@ class AccessEgressFunctionsTest implements RaptorTestConstants {
   void groupByStopTest() {
     // Map one element
     var res = groupByStop(List.of(WALK_8_m));
-    assertArrayEquals(new int[] { STOP }, res.keys());
+    assertThat(res.keys()).contains(STOP);
     assertElements(List.of(WALK_8_m), res.get(STOP));
 
     // Map 4 elements into 3 groups
     var walk_99 = TestAccessEgress.walk(99, D1_s);
     res = groupByStop(List.of(WALK_8_m, WALK_10_m, walk_99));
-    int[] keys = res.keys();
-    Arrays.sort(keys);
-
-    assertArrayEquals(new int[] { STOP, 99 }, keys);
+    assertThat(res.keys()).contains(99, STOP);
     assertElements(List.of(WALK_8_m, WALK_10_m), res.get(STOP));
     assertElements(List.of(walk_99), res.get(99));
   }

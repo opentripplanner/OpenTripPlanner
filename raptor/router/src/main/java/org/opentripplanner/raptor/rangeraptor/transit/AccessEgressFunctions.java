@@ -1,7 +1,7 @@
 package org.opentripplanner.raptor.rangeraptor.transit;
 
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
+import com.carrotsearch.hppc.IntObjectHashMap;
+import com.carrotsearch.hppc.IntObjectMap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -98,7 +98,7 @@ public final class AccessEgressFunctions {
    * Filter the given input keeping all elements satisfying the given include predicate and then
    * group them by number-of-rides.
    */
-  static TIntObjectMap<List<RaptorAccessEgress>> groupByRound(
+  static IntObjectMap<List<RaptorAccessEgress>> groupByRound(
     Collection<RaptorAccessEgress> input,
     Predicate<RaptorAccessEgress> include
   ) {
@@ -108,16 +108,17 @@ public final class AccessEgressFunctions {
     );
   }
 
-  static TIntObjectMap<List<RaptorAccessEgress>> groupByStop(Collection<RaptorAccessEgress> input) {
+  static IntObjectMap<List<RaptorAccessEgress>> groupByStop(Collection<RaptorAccessEgress> input) {
     return groupBy(input, RaptorAccessEgress::stop);
   }
 
-  static <T extends RaptorAccessEgress> TIntObjectMap<List<T>> filterOnSegment(
-    TIntObjectMap<List<T>> map,
+  static <T extends RaptorAccessEgress> IntObjectMap<List<T>> filterOnSegment(
+    IntObjectMap<List<T>> map,
     int segment
   ) {
-    TIntObjectMap<List<T>> result = new TIntObjectHashMap<>();
-    for (int nRides : map.keys()) {
+    IntObjectMap<List<T>> result = new IntObjectHashMap<>();
+    for (var cursor : map.keys()) {
+      int nRides = cursor.value;
       for (var it : map.get(nRides)) {
         if (it != null && it.numberOfViaLocationsVisited() == segment) {
           var list = result.get(nRides);
@@ -153,8 +154,8 @@ public final class AccessEgressFunctions {
     var set = ParetoSet.of(comparator);
     var result = new ArrayList<RaptorAccessEgress>();
 
-    for (int stop : mapByStop.keys()) {
-      var list = mapByStop.get(stop);
+    for (var cursor : mapByStop.keys()) {
+      var list = mapByStop.get(cursor.value);
       set.clear();
       set.addAll(list);
       result.addAll(set);
@@ -164,7 +165,7 @@ public final class AccessEgressFunctions {
 
   private static List<RaptorAccessEgress> getOrCreate(
     int key,
-    TIntObjectMap<List<RaptorAccessEgress>> map
+    IntObjectMap<List<RaptorAccessEgress>> map
   ) {
     if (!map.containsKey(key)) {
       map.put(key, new ArrayList<>());
@@ -172,11 +173,11 @@ public final class AccessEgressFunctions {
     return map.get(key);
   }
 
-  private static TIntObjectMap<List<RaptorAccessEgress>> groupBy(
+  private static IntObjectMap<List<RaptorAccessEgress>> groupBy(
     Collection<RaptorAccessEgress> input,
     ToIntFunction<RaptorAccessEgress> groupBy
   ) {
-    var mapByRound = new TIntObjectHashMap<List<RaptorAccessEgress>>();
+    var mapByRound = new IntObjectHashMap<List<RaptorAccessEgress>>();
 
     for (RaptorAccessEgress it : input) {
       getOrCreate(groupBy.applyAsInt(it), mapByRound).add(it);

@@ -1,9 +1,8 @@
 package org.opentripplanner.updater.trip.gtfs;
 
+import com.carrotsearch.hppc.IntHashSet;
+import com.carrotsearch.hppc.IntSet;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
-import gnu.trove.TCollections;
-import gnu.trove.set.TIntSet;
-import gnu.trove.set.hash.TIntHashSet;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.Collection;
@@ -29,9 +28,7 @@ import org.opentripplanner.utils.time.TimeUtils;
  */
 public class GtfsRealtimeFuzzyTripMatcher {
 
-  private static final TIntSet EMPTY_SERVICE_CODES = TCollections.unmodifiableSet(
-    new TIntHashSet()
-  );
+  private static final IntSet EMPTY_SERVICE_CODES = new IntHashSet();
 
   /**
    * The repository with the trips to match. Trips added to it by real-time updates are found as
@@ -119,7 +116,7 @@ public class GtfsRealtimeFuzzyTripMatcher {
   @Nullable
   public static Trip findTrip(
     Collection<TripPattern> patterns,
-    TIntSet servicesRunningForDate,
+    IntSet servicesRunningForDate,
     Direction direction,
     int startTime
   ) {

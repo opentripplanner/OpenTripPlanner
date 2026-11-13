@@ -36,8 +36,8 @@
             <artifactId>jspecify</artifactId>
         </dependency>
         <dependency>
-            <groupId>net.sf.trove4j</groupId>
-            <artifactId>trove4j</artifactId>
+            <groupId>com.carrotsearch</groupId>
+            <artifactId>hppc</artifactId>
         </dependency>
         <!-- There should not be logging in this module, get rid of this dependency -->
         <dependency>
@@ -49,6 +49,12 @@
         <dependency>
             <groupId>com.tngtech.archunit</groupId>
             <artifactId>archunit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.opentripplanner.core</groupId>
+            <artifactId>test-fixtures</artifactId>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

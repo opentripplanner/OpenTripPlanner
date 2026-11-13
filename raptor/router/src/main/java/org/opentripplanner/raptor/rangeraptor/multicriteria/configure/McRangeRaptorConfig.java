@@ -1,6 +1,6 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria.configure;
 
-import gnu.trove.map.TIntObjectMap;
+import com.carrotsearch.hppc.IntObjectMap;
 import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.raptor.api.model.DominanceFunction;
@@ -230,7 +230,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
     };
   }
 
-  private TIntObjectMap<ParetoSetEventListener<ArrivalView<T>>> createViaConnectionListeners() {
+  private IntObjectMap<ParetoSetEventListener<ArrivalView<T>>> createViaConnectionListeners() {
     return ViaConnectionStopArrivalEventListener.createEventListeners(
       contextSegment.viaConnections(),
       createStopArrivalFactory(),

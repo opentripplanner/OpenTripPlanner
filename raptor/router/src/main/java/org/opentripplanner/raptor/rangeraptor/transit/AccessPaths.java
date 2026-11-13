@@ -4,7 +4,8 @@ import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctio
 import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.removeNonOptimalPathsForMcRaptor;
 import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.removeNonOptimalPathsForStandardRaptor;
 
-import gnu.trove.map.TIntObjectMap;
+import com.carrotsearch.hppc.IntObjectMap;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -34,8 +35,8 @@ public class AccessPaths {
   private final int maxNumberOfRides;
   private final int maxTimePenalty;
   private final IntUnaryOperator iterationOp;
-  private final TIntObjectMap<List<RaptorAccessEgress>> arrivedOnStreetByNumOfRides;
-  private final TIntObjectMap<List<RaptorAccessEgress>> arrivedOnBoardByNumOfRides;
+  private final IntObjectMap<List<RaptorAccessEgress>> arrivedOnStreetByNumOfRides;
+  private final IntObjectMap<List<RaptorAccessEgress>> arrivedOnBoardByNumOfRides;
   private final List<RaptorStartOnBoardAccess> startOnBoardAccessPaths;
   private int iterationTimePenaltyLimit = RaptorConstants.TIME_NOT_SET;
 
@@ -44,8 +45,8 @@ public class AccessPaths {
     int maxNumberOfRides,
     int maxTimePenalty,
     IntUnaryOperator iterationOp,
-    TIntObjectMap<List<RaptorAccessEgress>> arrivedOnStreetByNumOfRides,
-    TIntObjectMap<List<RaptorAccessEgress>> arrivedOnBoardByNumOfRides,
+    IntObjectMap<List<RaptorAccessEgress>> arrivedOnStreetByNumOfRides,
+    IntObjectMap<List<RaptorAccessEgress>> arrivedOnBoardByNumOfRides,
     List<RaptorStartOnBoardAccess> startOnBoardAccessPaths
   ) {
     this.iterationStep = iterationStep;
@@ -128,11 +129,11 @@ public class AccessPaths {
   }
 
   public List<RaptorAccessEgress> arrivedOnBoard() {
-    return arrivedOnBoardByNumOfRides
-      .valueCollection()
-      .stream()
-      .flatMap(Collection::stream)
-      .toList();
+    var result = new ArrayList<RaptorAccessEgress>();
+    for (var cursor : arrivedOnBoardByNumOfRides.values()) {
+      result.addAll(cursor.value);
+    }
+    return List.copyOf(result);
   }
 
   /**
@@ -199,17 +200,18 @@ public class AccessPaths {
 
   /* private methods */
 
-  private static int maxTimePenalty(TIntObjectMap<List<RaptorAccessEgress>> col) {
-    return col
-      .valueCollection()
-      .stream()
-      .flatMapToInt(it -> it.stream().mapToInt(RaptorAccessEgress::timePenalty))
-      .max()
-      .orElse(RaptorConstants.TIME_NOT_SET);
+  private static int maxTimePenalty(IntObjectMap<List<RaptorAccessEgress>> col) {
+    int max = RaptorConstants.TIME_NOT_SET;
+    for (var cursor : col.values()) {
+      for (var it : cursor.value) {
+        max = Math.max(max, it.timePenalty());
+      }
+    }
+    return max;
   }
 
-  private static int maxNumberOfRounds(TIntObjectMap<List<RaptorAccessEgress>> col) {
-    return IntStream.of(col.keys()).max().orElse(0);
+  private static int maxNumberOfRounds(IntObjectMap<List<RaptorAccessEgress>> col) {
+    return IntStream.of(col.keys().toArray()).max().orElse(0);
   }
 
   /**
@@ -230,9 +232,9 @@ public class AccessPaths {
     return maxTimePenalty != RaptorConstants.TIME_NOT_SET;
   }
 
-  private static boolean hasTimeDependentAccess(TIntObjectMap<List<RaptorAccessEgress>> map) {
-    for (List<RaptorAccessEgress> list : map.valueCollection()) {
-      if (list.stream().anyMatch(RaptorAccessEgress::hasOpeningHours)) {
+  private static boolean hasTimeDependentAccess(IntObjectMap<List<RaptorAccessEgress>> map) {
+    for (var cursor : map.values()) {
+      if (cursor.value.stream().anyMatch(RaptorAccessEgress::hasOpeningHours)) {
         return true;
       }
     }

@@ -1,7 +1,6 @@
 package org.opentripplanner.osm.model;
 
-import gnu.trove.list.TLongList;
-import gnu.trove.list.array.TLongArrayList;
+import com.carrotsearch.hppc.LongArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.osm.OsmProvider;
@@ -11,7 +10,7 @@ public class OsmWayBuilder {
   private long id;
   private Map<String, String> tags = new HashMap<>();
   private OsmProvider osmProvider;
-  private TLongList nodes = new TLongArrayList();
+  private LongArrayList nodes = new LongArrayList();
 
   public OsmWayBuilder() {}
 

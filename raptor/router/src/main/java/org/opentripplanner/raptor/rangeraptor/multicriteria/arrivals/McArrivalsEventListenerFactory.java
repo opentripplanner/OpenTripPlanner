@@ -1,9 +1,9 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals;
 
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
-import gnu.trove.set.TIntSet;
-import gnu.trove.set.hash.TIntHashSet;
+import com.carrotsearch.hppc.IntHashSet;
+import com.carrotsearch.hppc.IntObjectHashMap;
+import com.carrotsearch.hppc.IntObjectMap;
+import com.carrotsearch.hppc.IntSet;
 import java.util.List;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.view.ArrivalView;
@@ -24,17 +24,17 @@ import org.opentripplanner.raptor.util.paretoset.ParetoSetEventListenerComposite
 public class McArrivalsEventListenerFactory<T extends RaptorTripSchedule> {
 
   private final DebugHandlerFactory<T> debugHandlerFactory;
-  private final TIntObjectMap<ParetoSetEventListener<ArrivalView<T>>> nextConnectionListener;
+  private final IntObjectMap<ParetoSetEventListener<ArrivalView<T>>> nextConnectionListener;
   private final EgressPaths egressPaths;
   private final DestinationArrivalPaths<T> destinationPaths;
   private boolean processed = false;
 
-  private final TIntObjectMap<ParetoSetEventListener<ArrivalView<T>>> arrivalListeners =
-    new TIntObjectHashMap<>();
+  private final IntObjectMap<ParetoSetEventListener<ArrivalView<T>>> arrivalListeners =
+    new IntObjectHashMap<>();
 
   public McArrivalsEventListenerFactory(
     DebugHandlerFactory<T> debugHandlerFactory,
-    TIntObjectMap<ParetoSetEventListener<ArrivalView<T>>> nextConnectionListener,
+    IntObjectMap<ParetoSetEventListener<ArrivalView<T>>> nextConnectionListener,
     EgressPaths egressPaths,
     DestinationArrivalPaths<T> destinationPaths
   ) {
@@ -44,7 +44,7 @@ public class McArrivalsEventListenerFactory<T extends RaptorTripSchedule> {
     this.destinationPaths = destinationPaths;
   }
 
-  public TIntObjectMap<ParetoSetEventListener<ArrivalView<T>>> arrivalListeners() {
+  public IntObjectMap<ParetoSetEventListener<ArrivalView<T>>> arrivalListeners() {
     return assertProcessed(arrivalListeners);
   }
 
@@ -55,13 +55,12 @@ public class McArrivalsEventListenerFactory<T extends RaptorTripSchedule> {
   public McArrivalsEventListenerFactory<T> create() {
     var egressByStop = egressPaths.byStop();
 
-    TIntSet stops = new TIntHashSet();
-    stops.addAll(nextConnectionListener.keySet());
-    stops.addAll(egressByStop.keySet());
+    IntSet stops = new IntHashSet();
+    stops.addAll(nextConnectionListener.keys());
+    stops.addAll(egressByStop.keys());
 
-    var it = stops.iterator();
-    while (it.hasNext()) {
-      createListenerForStop(it.next(), egressByStop);
+    for (var cursor : stops) {
+      createListenerForStop(cursor.value, egressByStop);
     }
 
     this.processed = true;
@@ -70,7 +69,7 @@ public class McArrivalsEventListenerFactory<T extends RaptorTripSchedule> {
 
   private void createListenerForStop(
     int stop,
-    TIntObjectMap<List<RaptorAccessEgress>> egressByStop
+    IntObjectMap<List<RaptorAccessEgress>> egressByStop
   ) {
     var l = ParetoSetEventListenerComposite.of(
       debugHandlerFactory.paretoSetStopArrivalListener(stop),

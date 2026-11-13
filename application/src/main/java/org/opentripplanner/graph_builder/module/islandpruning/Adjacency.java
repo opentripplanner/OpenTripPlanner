@@ -1,6 +1,6 @@
 package org.opentripplanner.graph_builder.module.islandpruning;
 
-import gnu.trove.list.array.TIntArrayList;
+import com.carrotsearch.hppc.IntArrayList;
 import java.util.PrimitiveIterator;
 
 /**
@@ -19,11 +19,11 @@ class Adjacency {
    * @param edgeLists   lists of interleaved {@code (from, to)} id pairs; each pair is added in both
    *                    directions
    */
-  Adjacency(int vertexCount, TIntArrayList... edgeLists) {
+  Adjacency(int vertexCount, IntArrayList... edgeLists) {
     offsets = new int[vertexCount + 1];
     for (var edges : edgeLists) {
       for (int i = 0; i < edges.size(); i++) {
-        offsets[edges.getQuick(i) + 1]++;
+        offsets[edges.get(i) + 1]++;
       }
     }
     for (int v = 0; v < vertexCount; v++) {
@@ -34,8 +34,8 @@ class Adjacency {
     System.arraycopy(offsets, 0, next, 0, vertexCount);
     for (var edges : edgeLists) {
       for (int i = 0; i < edges.size(); i += 2) {
-        int from = edges.getQuick(i);
-        int to = edges.getQuick(i + 1);
+        int from = edges.get(i);
+        int to = edges.get(i + 1);
         targets[next[from]++] = to;
         targets[next[to]++] = from;
       }

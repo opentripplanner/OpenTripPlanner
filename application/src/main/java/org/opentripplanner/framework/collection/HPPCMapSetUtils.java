@@ -1,12 +1,12 @@
 package org.opentripplanner.framework.collection;
 
-import gnu.trove.map.TLongObjectMap;
+import com.carrotsearch.hppc.LongObjectMap;
 import java.util.HashSet;
 import java.util.Set;
 
-public class TroveUtils {
+public class HPPCMapSetUtils {
 
-  public static <U> void addToMapSet(TLongObjectMap<Set<U>> mapSet, long key, U value) {
+  public static <U> void addToMapSet(LongObjectMap<Set<U>> mapSet, long key, U value) {
     Set<U> set = mapSet.get(key);
     if (set == null) {
       set = new HashSet<>();
