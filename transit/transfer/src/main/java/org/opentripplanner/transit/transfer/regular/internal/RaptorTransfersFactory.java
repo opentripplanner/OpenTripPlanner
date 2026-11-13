@@ -39,14 +39,6 @@ final class RaptorTransfersFactory<P, R> {
   /** Patch if at most this share of all stops changed, create the transfers from scratch if not. */
   static final double MAX_PATCHED_STOPS_SHARE = 0.05;
 
-  /**
-   * The closed facility ids. Paths that depend on one of them are not used.
-   * <p>
-   * TODO: Empty until the closed ids are provided at runtime, so the best path is always used. See
-   *       design F, closable facility ids with precomputed alternatives.
-   */
-  static final Set<String> CLOSED_FACILITY_IDS = Set.of();
-
   private final int nStops;
   private final TransferPathProvider<P, R> pathProvider;
   private final TransferRequestMapper<R> mapper;
@@ -64,12 +56,12 @@ final class RaptorTransfersFactory<P, R> {
     TransferRequestMapper<R> mapper,
     Map<AbstractUserPreferences<?>, R> profileRequests
   ) {
-    this(nStops, pathProvider, mapper, profileRequests, CLOSED_FACILITY_IDS);
+    this(nStops, pathProvider, mapper, profileRequests, Set.of());
   }
 
   /**
-   * @param closedFacilityIds the closed facility ids, see
-   *                            {@link #CLOSED_FACILITY_IDS}
+   * @param closedFacilityIds the facilities that are closed. Paths that depend on one of them are
+   *                          not used.
    */
   RaptorTransfersFactory(
     int nStops,
@@ -83,6 +75,17 @@ final class RaptorTransfersFactory<P, R> {
     this.pathProvider = pathProvider;
     this.mapper = mapper;
     this.profileRequests = Map.copyOf(profileRequests);
+  }
+
+  /** A factory like this one, for the given closed facilities. */
+  RaptorTransfersFactory<P, R> withClosedFacilityIds(Set<String> closedFacilityIds) {
+    return new RaptorTransfersFactory<>(
+      nStops,
+      pathProvider,
+      mapper,
+      profileRequests,
+      closedFacilityIds
+    );
   }
 
   /** Create the search of {@code userPreferences}, based on the request of {@code profile}. */

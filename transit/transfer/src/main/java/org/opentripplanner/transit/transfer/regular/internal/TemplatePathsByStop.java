@@ -2,8 +2,10 @@ package org.opentripplanner.transit.transfer.regular.internal;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import org.opentripplanner.transit.transfer.regular.AlternativePath;
 
@@ -28,6 +30,13 @@ final class TemplatePathsByStop<P> implements Serializable {
    */
   private final Map<Integer, Map<Integer, List<AlternativePath<P>>>> alternativePaths =
     new HashMap<>();
+
+  /**
+   * Index of {@link #alternativePaths}: the stops with a path that depends on a facility, by
+   * facility id. Built when first used, after graph build, and never modified after that. It is
+   * not serialized.
+   */
+  private transient volatile Map<String, Set<Integer>> fromStopsByFacilityId;
 
   /**
    * Store the paths from {@code fromStop}, keyed by {@code toStop}; paths to other stops are kept.
@@ -62,6 +71,39 @@ final class TemplatePathsByStop<P> implements Serializable {
    */
   List<AlternativePath<P>> alternativePaths(int fromStop, int toStop) {
     return alternativePaths.getOrDefault(fromStop, Map.of()).getOrDefault(toStop, List.of());
+  }
+
+  /**
+   * The stops that have a transfer with an alternative path that depends on one of the ids. The
+   * index is built the first time it is needed.
+   */
+  Set<Integer> fromStopsDependingOn(Set<String> facilityIds) {
+    var index = fromStopsByFacilityId;
+    if (index == null) {
+      index = buildIndex();
+      fromStopsByFacilityId = index;
+    }
+    var result = new HashSet<Integer>();
+    for (var id : facilityIds) {
+      result.addAll(index.getOrDefault(id, Set.of()));
+    }
+    return result;
+  }
+
+  private Map<String, Set<Integer>> buildIndex() {
+    var index = new HashMap<String, Set<Integer>>();
+    alternativePaths.forEach((fromStop, byToStop) ->
+      byToStop
+        .values()
+        .forEach(alternatives ->
+          alternatives.forEach(alternative ->
+            alternative
+              .closableFacilityIds()
+              .forEach(id -> index.computeIfAbsent(id, k -> new HashSet<>()).add(fromStop))
+          )
+        )
+    );
+    return index;
   }
 
   /** The paths from {@code fromStop}, by {@code toStop}. Empty if the stop is unknown. */

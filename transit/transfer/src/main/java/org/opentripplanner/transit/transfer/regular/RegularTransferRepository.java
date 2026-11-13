@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.transfer.regular;
 
 import java.util.Map;
+import java.util.Set;
 import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 
 /**
@@ -42,4 +43,26 @@ public interface RegularTransferRepository<P> {
    * @throws IllegalArgumentException if no paths were generated for {@code profile} at graph build
    */
   void resetTransfersFrom(AbstractUserPreferences<?> profile, int fromStop);
+
+  /**
+   * Close the given facilities, and open all others. A path is not used as a transfer if one of
+   * its {@code TransferPath#closableFacilityIds()} is in the set; the cheapest alternative path
+   * without a closed facility is used instead, and the pair has no transfer if there is none. See
+   * {@code RegularTransferBuildRepository#setAlternativePaths}.
+   * <p>
+   * The set is the complete state: every facility that is not in the set is open. Calling the
+   * method twice with the same set changes nothing (idempotent). The updater never sends a delta.
+   * The repository compares the set with the previous one, and only the stops that have a path
+   * that depends on a facility that was opened or closed are updated. An empty set opens
+   * everything. An id that no path depends on is kept and ignored. A facility can be an elevator
+   * or any other part of the street network that can be closed, the transfer module only sees
+   * opaque ids.
+   * <p>
+   * The closed facilities are independent of the transfers replaced with
+   * {@link #replaceTransfersFrom}: the paths given there have no alternatives, so they are used
+   * whatever is closed.
+   *
+   * @param closedFacilityIds the ids of all closed facilities. The set is copied, not retained.
+   */
+  void closeFacilities(Set<String> closedFacilityIds);
 }

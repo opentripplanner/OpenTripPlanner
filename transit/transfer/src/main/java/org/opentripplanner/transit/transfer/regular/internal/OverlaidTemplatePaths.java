@@ -4,6 +4,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.transit.transfer.regular.AlternativePath;
 import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
@@ -137,6 +138,20 @@ final class OverlaidTemplatePaths<P> {
       return List.of();
     }
     return base.alternativePaths(profile, fromStop, toStop);
+  }
+
+  /** The profiles the paths were generated for at graph build. */
+  Set<AbstractUserPreferences<?>> profiles() {
+    return base.profiles();
+  }
+
+  /**
+   * The stops with a transfer under {@code profile} that has an alternative path that depends on
+   * one of the facility ids. Stops with replaced transfers may be included, their transfers do
+   * not depend on any facility.
+   */
+  Set<Integer> fromStopsDependingOn(AbstractUserPreferences<?> profile, Set<String> facilityIds) {
+    return base.fromStopsDependingOn(profile, facilityIds);
   }
 
   private void assertProfileExists(AbstractUserPreferences<?> profile) {
