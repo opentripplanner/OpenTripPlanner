@@ -223,9 +223,14 @@ public class GraphQLDataFetchers {
     public DataFetcher<String> time();
   }
 
-  /** Real-time estimates for arrival and departure times for a stop location. */
+  /**
+   * Real-time information for a stop location: estimates for the arrival and departure times, and
+   * the real-time state of the call. More real-time state, similar to `RealTimeTripState` of trips,
+   * may be added in the future.
+   */
   public interface GraphQLCallRealTime {
     public DataFetcher<EstimatedTime> arrival();
+    public DataFetcher<Boolean> canceled();
     public DataFetcher<EstimatedTime> departure();
   }
 

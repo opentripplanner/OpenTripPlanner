@@ -321,6 +321,14 @@ public class TripTimeOnDate {
     return tripTimes.isPredictionInaccurate(stopPosition);
   }
 
+  /**
+   * Return {@code true} if a real-time update has canceled the stop, or has canceled or deleted
+   * the trip.
+   */
+  public boolean isCanceledInRealTime() {
+    return isCancelledStop() || tripTimes.isCanceledOrDeleted();
+  }
+
   /** Return {code true} if stop is cancelled, or trip is canceled/replaced */
   public boolean isCanceledEffectively() {
     return (
