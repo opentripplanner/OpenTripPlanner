@@ -1,10 +1,7 @@
 package org.opentripplanner.ext.stopconsolidation;
 
-import com.csvreader.CsvReader;
 import com.google.common.collect.ImmutableListMultimap;
-import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -12,16 +9,14 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.BooleanUtils;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.stopconsolidation.model.ConsolidatedStopGroup;
+import org.opentripplanner.framework.csv.CsvRecordReader;
 
 public class StopConsolidationParser {
 
   private record StopGroupEntry(String groupId, FeedScopedId stopId, boolean isPrimary) {}
 
   public static List<ConsolidatedStopGroup> parseGroups(InputStream is) {
-    try {
-      var reader = new CsvReader(is, StandardCharsets.UTF_8);
-      reader.setDelimiter(',');
-
+    try (var reader = CsvRecordReader.of(is)) {
       reader.readHeaders();
 
       var entries = new ArrayList<StopGroupEntry>();
@@ -66,8 +61,6 @@ public class StopConsolidationParser {
         })
         .distinct()
         .toList();
-    } catch (IOException e) {
-      throw new RuntimeException(e);
     }
   }
 }

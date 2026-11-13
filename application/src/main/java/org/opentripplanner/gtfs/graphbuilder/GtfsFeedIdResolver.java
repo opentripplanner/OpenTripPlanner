@@ -1,15 +1,13 @@
 package org.opentripplanner.gtfs.graphbuilder;
 
-import com.csvreader.CsvReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.jspecify.annotations.Nullable;
 import org.onebusaway.csv_entities.CsvInputSource;
+import org.opentripplanner.framework.csv.CsvRecordReader;
 import org.opentripplanner.utils.lang.StringUtils;
 
 /**
@@ -59,11 +57,10 @@ public class GtfsFeedIdResolver {
   private static String readFeedIdFromDataSource(CsvInputSource source) {
     try {
       if (source.hasResource("feed_info.txt")) {
-        try (InputStream feedInfoInputStream = source.getResource("feed_info.txt")) {
-          CsvReader result = new CsvReader(feedInfoInputStream, StandardCharsets.UTF_8);
-          result.readHeaders();
-          result.readRecord();
-          return normalizeId(result.get("feed_id"));
+        try (var reader = CsvRecordReader.of(source.getResource("feed_info.txt"))) {
+          reader.readHeaders();
+          reader.readRecord();
+          return normalizeId(reader.get("feed_id"));
         }
       }
       return generateId();

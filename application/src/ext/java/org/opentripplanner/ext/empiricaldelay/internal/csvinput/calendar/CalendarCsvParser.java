@@ -1,8 +1,8 @@
 package org.opentripplanner.ext.empiricaldelay.internal.csvinput.calendar;
 
-import com.csvreader.CsvReader;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
+import org.opentripplanner.framework.csv.CsvRecordReader;
 import org.opentripplanner.framework.csv.parser.AbstractCsvParser;
 import org.opentripplanner.framework.csv.parser.HandledCsvParseException;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -46,7 +46,7 @@ public class CalendarCsvParser extends AbstractCsvParser<CalendarRow> {
     END_DATE
   );
 
-  public CalendarCsvParser(DataImportIssueStore issueStore, CsvReader reader) {
+  public CalendarCsvParser(DataImportIssueStore issueStore, CsvRecordReader reader) {
     super(issueStore, reader, "EmpiricalDelayServiceCalendar");
   }
 

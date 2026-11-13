@@ -6,9 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.csvreader.CsvReader;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,6 +25,7 @@ import org.mobilitydata.gbfs.v2_3.system_pricing_plans.GBFSSystemPricingPlans;
 import org.mobilitydata.gbfs.v2_3.system_regions.GBFSSystemRegions;
 import org.mobilitydata.gbfs.v2_3.vehicle_types.GBFSVehicleType;
 import org.mobilitydata.gbfs.v2_3.vehicle_types.GBFSVehicleTypes;
+import org.opentripplanner.framework.csv.CsvRecordReader;
 import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
@@ -91,7 +90,7 @@ class GbfsFeedLoaderTest {
       HttpHeaders.empty(),
       response -> {
         List<Exception> cvsExceptions = new ArrayList<>();
-        CsvReader reader = new CsvReader(response.body(), StandardCharsets.UTF_8);
+        var reader = CsvRecordReader.of(response.body());
         reader.readHeaders();
         while (reader.readRecord()) {
           try {

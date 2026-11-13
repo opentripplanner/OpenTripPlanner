@@ -1,6 +1,5 @@
 package org.opentripplanner.transit.speed_test.model.testcase.io;
 
-import com.csvreader.CsvReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -14,6 +13,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import org.opentripplanner.framework.csv.CsvRecordReader;
 import org.opentripplanner.transit.speed_test.model.testcase.TestCase;
 import org.opentripplanner.utils.lang.StringUtils;
 import org.opentripplanner.utils.time.DurationUtils;
@@ -36,7 +36,7 @@ abstract class AbstractCsvFile<T> {
   private final File file;
   private final String[] headers;
 
-  private CsvReader currentReader;
+  private CsvRecordReader currentReader;
 
   public AbstractCsvFile(File file, String... headers) {
     this.file = file;
@@ -50,17 +50,17 @@ abstract class AbstractCsvFile<T> {
   public List<T> read() {
     try {
       List<T> rows = new ArrayList<>();
-      this.currentReader = new CsvReader(file.getAbsolutePath(), CSV_DELIMITER, CHARSET_UTF_8);
+      this.currentReader = CsvRecordReader.of(file);
       currentReader.readHeaders();
 
       while (currentReader.readRecord()) {
         try {
-          if (isCommentOrEmpty(currentReader.getRawRecord())) {
+          if (isCommentOrEmpty(currentReader.rawRecord())) {
             continue;
           }
           rows.add(parseRow());
         } catch (RuntimeException e) {
-          LOG.error("Parse error! Row: {}", currentReader.getRawRecord());
+          LOG.error("Parse error! Row: {}", currentReader.rawRecord());
           throw e;
         }
       }
