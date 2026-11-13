@@ -32,8 +32,10 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
+import org.opentripplanner.model.TransitDataImport;
 import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.netex.index.NetexEntityIndex;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.SiteRepository;
@@ -145,6 +147,62 @@ class NetexMapperTest {
     // NoticeAssignment would have resolved successfully and none of these issues would be raised.
     var issueTypes = issueStore.listIssues().stream().map(DataImportIssue::getType).toList();
     assertThat(issueTypes).contains("NoticeAssignmentWithUnknownEntity");
+  }
+
+  /**
+   * Each NeTEx feed is mapped by its own {@link NetexMapper}, and the service ids of all feeds are
+   * registered in the same {@link TimetableDataImport}. A trip without operating days gets the
+   * empty service id, so that id must be unique per feed.
+   */
+  @Test
+  void tripsWithoutOperatingDaysInTwoFeeds() {
+    var feedA = mapFeedWithTripWithoutOperatingDays("A");
+    var feedB = mapFeedWithTripWithoutOperatingDays("B");
+
+    // Registering the service ids of both feeds must not fail on a duplicate id
+    var timetableDataImport = new TimetableDataImport();
+    timetableDataImport.addNextServiceCodes(feedA.getAllServiceIds());
+    timetableDataImport.addNextServiceCodes(feedB.getAllServiceIds());
+
+    var serviceIdA = feedA.getAllTrips().iterator().next().getServiceId();
+    var serviceIdB = feedB.getAllTrips().iterator().next().getServiceId();
+    assertEquals(new FeedScopedId("CAL-SERVICE", "A:EMPTY"), serviceIdA);
+    assertEquals(new FeedScopedId("CAL-SERVICE", "B:EMPTY"), serviceIdB);
+    assertThat(timetableDataImport.getServiceCodes()).containsExactly(serviceIdA, 0, serviceIdB, 1);
+  }
+
+  private static TransitDataImport mapFeedWithTripWithoutOperatingDays(String feedId) {
+    var issueStore = new DefaultDataImportIssueStore();
+    var transitBuilder = new TransitDataImportBuilder(SiteRepository.of().build(), issueStore);
+    var siteRepository = transitBuilder.siteRepository();
+    for (var quayId : List.of("quay-1", "quay-2")) {
+      siteRepository.withRegularStop(
+        siteRepository
+          .regularStop(new FeedScopedId(feedId, quayId))
+          .withCoordinate(60.0, 10.0)
+          .build()
+      );
+    }
+
+    var netexMapper = new NetexMapper(
+      transitBuilder,
+      feedId,
+      DEDUPLICATOR,
+      issueStore,
+      Set.of(),
+      Set.of(),
+      10,
+      0.0,
+      false
+    );
+    netexMapper.mapNetexToOtp(new NetexEntityIndex().readOnlyView());
+    netexMapper.push();
+    // The ServiceJourney has no DayTypes, so it does not operate on any day
+    netexMapper.mapNetexToOtp(fileWithServiceJourney().readOnlyView());
+    netexMapper.pop();
+    netexMapper.finishUp();
+
+    return transitBuilder.build();
   }
 
   private static RegularStop stop(String quayId) {

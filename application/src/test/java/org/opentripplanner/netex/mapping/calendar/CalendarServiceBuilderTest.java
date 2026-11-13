@@ -21,15 +21,16 @@ public class CalendarServiceBuilderTest {
   private static final FeedScopedId EXP_SID_1 = FeedScopedIdForTestFactory.id("S000001");
   private static final FeedScopedId EXP_SID_2 = FeedScopedIdForTestFactory.id("S000002");
   private static final FeedScopedId EXP_SID_3 = FeedScopedIdForTestFactory.id("S000003");
+  private static final FeedScopedId EXP_EMPTY_SID = new FeedScopedId(
+    "CAL-SERVICE",
+    FEED_ID + ":EMPTY"
+  );
 
   @Test
   public void addDatesForAGivenService() {
     CalendarServiceBuilder subject = new CalendarServiceBuilder(new FeedScopedIdFactory(FEED_ID));
 
-    assertEquals(
-      CalendarServiceBuilder.EMPTY_SERVICE_ID,
-      subject.registerDatesAndGetServiceId(Set.of())
-    );
+    assertEquals(EXP_EMPTY_SID, subject.registerDatesAndGetServiceId(Set.of()));
     assertEquals(EXP_SID_1, subject.registerDatesAndGetServiceId(Set.of(D1)));
     assertEquals(EXP_SID_2, subject.registerDatesAndGetServiceId(Set.of(D2)));
     assertEquals(EXP_SID_3, subject.registerDatesAndGetServiceId(Set.of(D1, D2)));
@@ -59,6 +60,31 @@ public class CalendarServiceBuilderTest {
     assertServiceDateExistInList(list, EXP_SID_3, D2);
 
     assertEquals(4, list.size());
+  }
+
+  @Test
+  public void createEmptyCalendar() {
+    var subject = new CalendarServiceBuilder(new FeedScopedIdFactory(FEED_ID));
+
+    var calendar = subject.createEmptyCalendar();
+
+    assertEquals(EXP_EMPTY_SID, calendar.getServiceId());
+    assertEquals(subject.registerDatesAndGetServiceId(Set.of()), calendar.getServiceId());
+  }
+
+  @Test
+  public void emptyServiceIdIsScopedByFeed() {
+    var feedA = new CalendarServiceBuilder(new FeedScopedIdFactory("A"));
+    var feedB = new CalendarServiceBuilder(new FeedScopedIdFactory("B"));
+
+    assertEquals(
+      new FeedScopedId("CAL-SERVICE", "A:EMPTY"),
+      feedA.registerDatesAndGetServiceId(Set.of())
+    );
+    assertEquals(
+      new FeedScopedId("CAL-SERVICE", "B:EMPTY"),
+      feedB.registerDatesAndGetServiceId(Set.of())
+    );
   }
 
   @Test
