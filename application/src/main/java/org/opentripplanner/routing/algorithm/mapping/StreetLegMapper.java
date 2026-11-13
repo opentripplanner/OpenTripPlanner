@@ -83,7 +83,7 @@ public class StreetLegMapper {
     List<ViaLocation> viaLocations,
     @Nullable ZonedDateTime startTime
   ) {
-    var pathLegs = path.legs(ellipsoidToGeoidDifference);
+    var pathLegs = path.computeLegs(ellipsoidToGeoidDifference);
     if (pathLegs.isEmpty()) {
       return List.of();
     }
