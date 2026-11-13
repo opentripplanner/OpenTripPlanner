@@ -11,6 +11,7 @@ import java.util.NoSuchElementException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.utils.time.DurationUtils;
 
@@ -103,5 +104,14 @@ class CostLinearFunctionTest {
     assertEquals(exp10s, subject.calculate(COST_10_s).toCentiSeconds());
     assertEquals(exp11s, subject.calculate(COST_11_s).toCentiSeconds());
     assertEquals(exp61s, subject.calculate(COST_61_s).toCentiSeconds());
+  }
+
+  @ParameterizedTest
+  @CsvSource(
+    delimiter = '|',
+    value = { "15s + 0.02 t|15s + 2%", "0s + 1.0 t|0s + 100%", "2m + 0.015 t|2m + 1.5%" }
+  )
+  void toStringWPercentage(String function, String expected) {
+    assertEquals(expected, CostLinearFunction.of(function).toStringWPercentage());
   }
 }

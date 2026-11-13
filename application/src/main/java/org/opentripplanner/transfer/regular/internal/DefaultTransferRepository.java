@@ -15,7 +15,7 @@ public class DefaultTransferRepository implements TransferRepository {
 
   private static final Logger LOG = LoggerFactory.getLogger(DefaultTransferRepository.class);
 
-  private final Multimap<StopLocation, PathTransfer> transfersByStop = HashMultimap.create();
+  private final Multimap<StopLocation, PathTransfer> flexTransfersByStop = HashMultimap.create();
 
   private final TransferIndex index;
 
@@ -25,13 +25,13 @@ public class DefaultTransferRepository implements TransferRepository {
 
   @Override
   public Collection<PathTransfer> findTransfersByStop(StopLocation stop) {
-    return transfersByStop.get(stop);
+    return flexTransfersByStop.get(stop);
   }
 
   /** Pre-generated transfers between all stops filtered based on the modes in the PathTransfer. */
   @Override
   public List<PathTransfer> findTransfersByMode(StreetMode mode) {
-    return transfersByStop
+    return flexTransfersByStop
       .values()
       .stream()
       .filter(pathTransfer -> pathTransfer.getModes().contains(mode))
@@ -40,13 +40,13 @@ public class DefaultTransferRepository implements TransferRepository {
 
   @Override
   public Collection<PathTransfer> listPathTransfers() {
-    return transfersByStop.values();
+    return flexTransfersByStop.values();
   }
 
   @Override
-  public void addAllTransfersByStops(Multimap<StopLocation, PathTransfer> transfersByStop) {
+  public void addAllTransfersByStops(Multimap<StopLocation, PathTransfer> transfers) {
     index.invalidate();
-    this.transfersByStop.putAll(transfersByStop);
+    this.flexTransfersByStop.putAll(transfers);
   }
 
   @Override

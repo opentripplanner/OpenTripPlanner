@@ -28,6 +28,27 @@ public class WheelchairPreferences implements Serializable {
 
   private static final int DEFAULT_SLOPE_EXCEEDED_RELUCTANCE = 1;
 
+  /**
+   * Studies of manual wheelchair users measure everyday average speeds of 0.4-0.8 m/s, including
+   * stops and turns, and self-selected speeds of about 1.5 m/s on short, flat test courses. 1.0 m/s
+   * is a conservative speed for continuous travel on streets, and is slower than the default
+   * walking speed.
+   */
+  private static final double DEFAULT_SPEED = 1.0;
+
+  /**
+   * The same as the default walk reluctance. The lower speed already makes a wheelchair leg cost
+   * more than a walking leg of the same distance.
+   */
+  private static final double DEFAULT_RELUCTANCE = 2.0;
+
+  /**
+   * Stairs are normally inaccessible to wheelchairs, see {@link #DEFAULT_STAIRS_RELUCTANCE}. This
+   * only affects the time of a stair edge that is used anyway, for example with assistance, and
+   * is not based on measurements.
+   */
+  private static final double DEFAULT_STAIRS_TIME_FACTOR = 5.0;
+
   private static final int DEFAULT_STAIRS_RELUCTANCE = 100;
 
   /**
@@ -46,7 +67,10 @@ public class WheelchairPreferences implements Serializable {
     DEFAULT_INACCESSIBLE_STREET_RELUCTANCE,
     DEFAULT_MAX_SLOPE,
     DEFAULT_SLOPE_EXCEEDED_RELUCTANCE,
-    DEFAULT_STAIRS_RELUCTANCE
+    DEFAULT_STAIRS_RELUCTANCE,
+    DEFAULT_SPEED,
+    DEFAULT_RELUCTANCE,
+    DEFAULT_STAIRS_TIME_FACTOR
   );
 
   private AccessibilityPreferences trip;
@@ -56,6 +80,9 @@ public class WheelchairPreferences implements Serializable {
   private double maxSlope;
   private double slopeExceededReluctance;
   private double stairsReluctance;
+  private double speed;
+  private double reluctance;
+  private double stairsTimeFactor;
 
   private WheelchairPreferences(
     AccessibilityPreferences trip,
@@ -64,7 +91,10 @@ public class WheelchairPreferences implements Serializable {
     double inaccessibleStreetReluctance,
     double maxSlope,
     double slopeExceededReluctance,
-    double stairsReluctance
+    double stairsReluctance,
+    double speed,
+    double reluctance,
+    double stairsTimeFactor
   ) {
     this.trip = Objects.requireNonNull(trip);
     this.stop = Objects.requireNonNull(stop);
@@ -73,6 +103,9 @@ public class WheelchairPreferences implements Serializable {
     this.maxSlope = Units.ratio(maxSlope);
     this.slopeExceededReluctance = Units.reluctance(slopeExceededReluctance);
     this.stairsReluctance = Units.reluctance(stairsReluctance);
+    this.speed = Units.speed(speed);
+    this.reluctance = Units.reluctance(reluctance);
+    this.stairsTimeFactor = Units.reluctance(stairsTimeFactor);
   }
 
   private WheelchairPreferences(Builder builder) {
@@ -83,6 +116,9 @@ public class WheelchairPreferences implements Serializable {
     this.maxSlope = Units.ratio(builder.maxSlope);
     this.slopeExceededReluctance = Units.reluctance(builder.slopeExceededReluctance);
     this.stairsReluctance = Units.reluctance(builder.stairsReluctance);
+    this.speed = Units.speed(builder.speed);
+    this.reluctance = Units.reluctance(builder.reluctance);
+    this.stairsTimeFactor = Units.reluctance(builder.stairsTimeFactor);
   }
 
   public static Builder of() {
@@ -121,6 +157,27 @@ public class WheelchairPreferences implements Serializable {
     return stairsReluctance;
   }
 
+  /**
+   * The speed in meters per second of a wheelchair user on streets.
+   */
+  public double speed() {
+    return speed;
+  }
+
+  /**
+   * A multiplier for how bad moving in a wheelchair on streets is, compared to being in transit.
+   */
+  public double reluctance() {
+    return reluctance;
+  }
+
+  /**
+   * How much more time it takes to traverse stairs compared to a similar horizontal length.
+   */
+  public double stairsTimeFactor() {
+    return stairsTimeFactor;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -135,6 +192,9 @@ public class WheelchairPreferences implements Serializable {
       Double.compare(that.maxSlope, maxSlope) == 0 &&
       Double.compare(that.slopeExceededReluctance, slopeExceededReluctance) == 0 &&
       Double.compare(that.stairsReluctance, stairsReluctance) == 0 &&
+      Double.compare(that.speed, speed) == 0 &&
+      Double.compare(that.reluctance, reluctance) == 0 &&
+      Double.compare(that.stairsTimeFactor, stairsTimeFactor) == 0 &&
       trip.equals(that.trip) &&
       stop.equals(that.stop) &&
       elevator.equals(that.elevator)
@@ -150,7 +210,10 @@ public class WheelchairPreferences implements Serializable {
       inaccessibleStreetReluctance,
       maxSlope,
       slopeExceededReluctance,
-      stairsReluctance
+      stairsReluctance,
+      speed,
+      reluctance,
+      stairsTimeFactor
     );
   }
 
@@ -168,6 +231,9 @@ public class WheelchairPreferences implements Serializable {
       .addNum("maxSlope", maxSlope, DEFAULT.maxSlope)
       .addNum("slopeExceededReluctance", slopeExceededReluctance, DEFAULT.slopeExceededReluctance)
       .addNum("stairsReluctance", stairsReluctance, DEFAULT.stairsReluctance)
+      .addNum("speed", speed, DEFAULT.speed)
+      .addNum("reluctance", reluctance, DEFAULT.reluctance)
+      .addNum("stairsTimeFactor", stairsTimeFactor, DEFAULT.stairsTimeFactor)
       .toString();
   }
 
@@ -181,6 +247,9 @@ public class WheelchairPreferences implements Serializable {
     private double maxSlope;
     private double slopeExceededReluctance;
     private double stairsReluctance;
+    private double speed;
+    private double reluctance;
+    private double stairsTimeFactor;
 
     private Builder(WheelchairPreferences original) {
       this.original = original;
@@ -191,6 +260,9 @@ public class WheelchairPreferences implements Serializable {
       this.maxSlope = original.maxSlope;
       this.slopeExceededReluctance = original.slopeExceededReluctance;
       this.stairsReluctance = original.stairsReluctance;
+      this.speed = original.speed;
+      this.reluctance = original.reluctance;
+      this.stairsTimeFactor = original.stairsTimeFactor;
     }
 
     public WheelchairPreferences original() {
@@ -277,6 +349,21 @@ public class WheelchairPreferences implements Serializable {
 
     public Builder withStairsReluctance(double stairsReluctance) {
       this.stairsReluctance = stairsReluctance;
+      return this;
+    }
+
+    public Builder withSpeed(double speed) {
+      this.speed = speed;
+      return this;
+    }
+
+    public Builder withReluctance(double reluctance) {
+      this.reluctance = reluctance;
+      return this;
+    }
+
+    public Builder withStairsTimeFactor(double stairsTimeFactor) {
+      this.stairsTimeFactor = stairsTimeFactor;
       return this;
     }
 
