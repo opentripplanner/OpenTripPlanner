@@ -62,6 +62,7 @@ class ItineraryReferenceSerializerTest {
       Duration.ZERO,
       1.3,
       2.0,
+      1.0,
       false
     );
   }
@@ -97,6 +98,7 @@ class ItineraryReferenceSerializerTest {
       Duration.ZERO,
       1.3,
       2.0,
+      1.0,
       true
     );
 
@@ -118,6 +120,7 @@ class ItineraryReferenceSerializerTest {
       Duration.ofSeconds(30),
       2.5,
       3.25,
+      0.5,
       true
     );
 
@@ -151,6 +154,7 @@ class ItineraryReferenceSerializerTest {
       Duration.ZERO,
       1.3,
       2.0,
+      1.0,
       false
     );
 
@@ -266,6 +270,7 @@ class ItineraryReferenceSerializerTest {
       Duration.ZERO,
       1.3,
       2.0,
+      1.0,
       false
     );
 
@@ -285,6 +290,7 @@ class ItineraryReferenceSerializerTest {
       Duration.ofHours(2).plusSeconds(1),
       1.3,
       2.0,
+      1.0,
       false
     );
 
@@ -304,6 +310,7 @@ class ItineraryReferenceSerializerTest {
       Duration.ZERO,
       1.3,
       2.0,
+      1.0,
       false
     );
 
@@ -368,6 +375,7 @@ class ItineraryReferenceSerializerTest {
       .addDuration("alightSlack")
       .addString("walkSpeed")
       .addString("walkReluctance")
+      .addString("walkSafetyFactor")
       .addBoolean("wheelchair")
       .build();
 
@@ -387,6 +395,7 @@ class ItineraryReferenceSerializerTest {
       .withDuration("alightSlack", Duration.ZERO)
       .withString("walkSpeed", walkSpeed)
       .withString("walkReluctance", "2.0")
+      .withString("walkSafetyFactor", "1.0")
       .withBoolean("wheelchair", false)
       .build();
   }

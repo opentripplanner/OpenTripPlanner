@@ -161,7 +161,7 @@ class ItineraryReferenceMapperTest {
           .withTransit(transit ->
             transit.withDefaultBoardSlackSec(60).withDefaultAlightSlackSec(30)
           )
-          .withWalk(walk -> walk.withSpeed(2.5).withReluctance(3.0))
+          .withWalk(walk -> walk.withSpeed(2.5).withReluctance(3.0).withSafetyFactor(0.5))
       )
       .buildRequest();
 
@@ -177,6 +177,7 @@ class ItineraryReferenceMapperTest {
     assertEquals(Duration.ofSeconds(30), reference.alightSlack());
     assertEquals(2.5, reference.walkSpeed());
     assertEquals(3.0, reference.walkReluctance());
+    assertEquals(0.5, reference.walkSafetyFactor());
   }
 
   /**
@@ -252,6 +253,7 @@ class ItineraryReferenceMapperTest {
       Duration.ofSeconds(30),
       2.5,
       3.0,
+      0.5,
       true
     );
     var currentDefault = RouteRequest.defaultValue()
@@ -281,6 +283,7 @@ class ItineraryReferenceMapperTest {
     assertEquals(Duration.ofSeconds(30), preferences.transit().alightSlack().defaultValue());
     assertEquals(2.5, preferences.walk().speed());
     assertEquals(3.0, preferences.walk().reluctance());
+    assertEquals(0.5, preferences.walk().safetyFactor());
     assertEquals(
       Duration.ofMinutes(12),
       preferences.street().accessEgress().maxDuration().defaultValue()
@@ -306,6 +309,7 @@ class ItineraryReferenceMapperTest {
       Duration.ZERO,
       1.3,
       2.0,
+      1.0,
       false
     );
 
@@ -341,6 +345,7 @@ class ItineraryReferenceMapperTest {
       Duration.ZERO,
       1.3,
       2.0,
+      1.0,
       false
     );
 
@@ -439,6 +444,7 @@ class ItineraryReferenceMapperTest {
       Duration.ZERO,
       1.3,
       2.0,
+      1.0,
       false
     );
 

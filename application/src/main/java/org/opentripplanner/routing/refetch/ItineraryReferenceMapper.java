@@ -71,6 +71,7 @@ public final class ItineraryReferenceMapper {
       preferences.transit().alightSlack().defaultValue(),
       preferences.walk().speed(),
       preferences.walk().reluctance(),
+      preferences.walk().safetyFactor(),
       routeRequest.journey().wheelchair()
     );
   }
@@ -105,7 +106,12 @@ public final class ItineraryReferenceMapper {
                 .withBoardSlack(b -> b.withDefault(ref.boardSlack()))
                 .withAlightSlack(b -> b.withDefault(ref.alightSlack()))
             )
-            .withWalk(walk -> walk.withSpeed(ref.walkSpeed()).withReluctance(ref.walkReluctance()))
+            .withWalk(walk ->
+              walk
+                .withSpeed(ref.walkSpeed())
+                .withReluctance(ref.walkReluctance())
+                .withSafetyFactor(ref.walkSafetyFactor())
+            )
         )
         .buildRequest();
     } catch (RoutingValidationException | IllegalArgumentException e) {

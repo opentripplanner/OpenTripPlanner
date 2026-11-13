@@ -74,6 +74,7 @@ class ItineraryReferenceTest {
       Duration.ZERO,
       walkSpeed,
       2.0,
+      1.0,
       false
     );
   }

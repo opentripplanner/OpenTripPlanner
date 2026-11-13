@@ -44,6 +44,7 @@ public final class ItineraryReference {
   private final Duration alightSlack;
   private final double walkSpeed;
   private final double walkReluctance;
+  private final double walkSafetyFactor;
   private final boolean wheelchair;
 
   public ItineraryReference(
@@ -57,6 +58,7 @@ public final class ItineraryReference {
     Duration alightSlack,
     double walkSpeed,
     double walkReluctance,
+    double walkSafetyFactor,
     boolean wheelchair
   ) {
     // List.copyOf() also rejects null elements and guards against a caller mutating the list
@@ -74,6 +76,7 @@ public final class ItineraryReference {
     this.alightSlack = Objects.requireNonNull(alightSlack);
     this.walkSpeed = walkSpeed;
     this.walkReluctance = walkReluctance;
+    this.walkSafetyFactor = walkSafetyFactor;
     this.wheelchair = wheelchair;
   }
 
@@ -129,6 +132,11 @@ public final class ItineraryReference {
     return walkReluctance;
   }
 
+  /** How much safe streets are preferred for walking, from 0 (not at all) to 1 (fully). */
+  public double walkSafetyFactor() {
+    return walkSafetyFactor;
+  }
+
   /** Whether the itinerary was planned as wheelchair accessible. */
   public boolean wheelchair() {
     return wheelchair;
@@ -157,6 +165,7 @@ public final class ItineraryReference {
     return (
       Double.compare(walkSpeed, that.walkSpeed) == 0 &&
       Double.compare(walkReluctance, that.walkReluctance) == 0 &&
+      Double.compare(walkSafetyFactor, that.walkSafetyFactor) == 0 &&
       wheelchair == that.wheelchair &&
       legReferences.equals(that.legReferences) &&
       Objects.equals(from, that.from) &&
@@ -182,6 +191,7 @@ public final class ItineraryReference {
       alightSlack,
       walkSpeed,
       walkReluctance,
+      walkSafetyFactor,
       wheelchair
     );
   }
@@ -199,6 +209,7 @@ public final class ItineraryReference {
       .addDuration("alightSlack", alightSlack)
       .addNum("walkSpeed", walkSpeed)
       .addNum("walkReluctance", walkReluctance)
+      .addNum("walkSafetyFactor", walkSafetyFactor)
       .addBool("wheelchair", wheelchair)
       .toString();
   }

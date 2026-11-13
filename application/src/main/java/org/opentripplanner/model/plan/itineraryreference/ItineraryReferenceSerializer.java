@@ -43,6 +43,7 @@ public class ItineraryReferenceSerializer {
   private static final String ALIGHT_SLACK_FIELD = "alightSlack";
   private static final String WALK_SPEED_FIELD = "walkSpeed";
   private static final String WALK_RELUCTANCE_FIELD = "walkReluctance";
+  private static final String WALK_SAFETY_FACTOR_FIELD = "walkSafetyFactor";
   private static final String WHEELCHAIR_FIELD = "wheelchair";
 
   private static final TokenSchema SCHEMA = TokenSchema.ofVersion(1)
@@ -60,6 +61,7 @@ public class ItineraryReferenceSerializer {
     .addDuration(ALIGHT_SLACK_FIELD)
     .addString(WALK_SPEED_FIELD)
     .addString(WALK_RELUCTANCE_FIELD)
+    .addString(WALK_SAFETY_FACTOR_FIELD)
     .addBoolean(WHEELCHAIR_FIELD)
     .build();
 
@@ -88,6 +90,7 @@ public class ItineraryReferenceSerializer {
       .withDuration(ALIGHT_SLACK_FIELD, ref.alightSlack())
       .withString(WALK_SPEED_FIELD, Double.toString(ref.walkSpeed()))
       .withString(WALK_RELUCTANCE_FIELD, Double.toString(ref.walkReluctance()))
+      .withString(WALK_SAFETY_FACTOR_FIELD, Double.toString(ref.walkSafetyFactor()))
       .withBoolean(WHEELCHAIR_FIELD, ref.wheelchair());
 
     withLocation(builder, FROM_STOP_ID_FIELD, FROM_LAT_FIELD, FROM_LON_FIELD, ref.from());
@@ -139,6 +142,7 @@ public class ItineraryReferenceSerializer {
 
       var walkSpeed = finiteDouble(token.getString(WALK_SPEED_FIELD).orElseThrow());
       var walkReluctance = finiteDouble(token.getString(WALK_RELUCTANCE_FIELD).orElseThrow());
+      var walkSafetyFactor = finiteDouble(token.getString(WALK_SAFETY_FACTOR_FIELD).orElseThrow());
 
       var wheelchair = token.getBoolean(WHEELCHAIR_FIELD).orElseThrow();
 
@@ -153,6 +157,7 @@ public class ItineraryReferenceSerializer {
         alightSlack,
         walkSpeed,
         walkReluctance,
+        walkSafetyFactor,
         wheelchair
       );
     } catch (RuntimeException e) {

@@ -181,6 +181,7 @@ class QueryTypeImplItineraryTest {
       Duration.ofSeconds(0),
       -1,
       2.0,
+      1.0,
       false
     );
     var id = ItineraryReferenceSerializer.encode(reference);
