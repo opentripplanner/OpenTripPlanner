@@ -57,6 +57,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Add validation of non-negative numberOfDepartures in estimatedCalls [#8194](https://github.com/opentripplanner/OpenTripPlanner/pull/8194)
 - Skip irrelevant PBF blocks when parsing OSM data [#8161](https://github.com/opentripplanner/OpenTripPlanner/pull/8161)
 - Compute way car speeds in parallel [#8162](https://github.com/opentripplanner/OpenTripPlanner/pull/8162)
+- Improve validation of the groupSimilarity itinerary filters [#8195](https://github.com/opentripplanner/OpenTripPlanner/pull/8195)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.10.0 (2026-09-09)
