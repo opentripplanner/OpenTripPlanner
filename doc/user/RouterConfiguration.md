@@ -1067,6 +1067,15 @@ Ordered list of `StreetMode` values used as egress modes. Each entry is paired w
       "url" : "https://example.com/siri-lite/situation-exchange/xml"
     },
     {
+      "type" : "siri-fm-elevator",
+      "url" : "https://example.com/siri-lite/facility-monitoring/xml",
+      "frequency" : "1m",
+      "unknownStatus" : "keep-previous",
+      "headers" : {
+        "Authorization" : "Some-Token"
+      }
+    },
+    {
       "type" : "siri-et-mqtt",
       "user" : "user",
       "password" : "pwd",

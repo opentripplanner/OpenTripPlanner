@@ -255,6 +255,7 @@ public class ConstructApplication {
       factory.transitUpdateManager(),
       factory.streetUpdateManager(),
       factory.timetableRepositoryHandle(),
+      factory.elevatorStatusRepositoryHandle(),
       factory.transitAlertService(),
       routerConfig().updaterConfig(),
       otpConfig().gbfsNetworks

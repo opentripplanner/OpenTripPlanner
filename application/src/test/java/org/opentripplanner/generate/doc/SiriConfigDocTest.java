@@ -32,7 +32,8 @@ public class SiriConfigDocTest {
     "siri-et-updater",
     "siri-sx-updater",
     "siri-et-lite",
-    "siri-sx-lite"
+    "siri-sx-lite",
+    "siri-fm-elevator"
   );
   private static final SkipNodes SKIP_NODES = SkipNodes.of().build();
 

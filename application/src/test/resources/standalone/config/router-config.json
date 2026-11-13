@@ -449,6 +449,16 @@
       "feedId": "sta",
       "url": "https://example.com/siri-lite/situation-exchange/xml"
     },
+    // SIRI-FM elevator status updater
+    {
+      "type": "siri-fm-elevator",
+      "url": "https://example.com/siri-lite/facility-monitoring/xml",
+      "frequency": "1m",
+      "unknownStatus": "keep-previous",
+      "headers": {
+        "Authorization": "Some-Token"
+      }
+    },
     // SIRI-ET MQTT trip updater
     {
       "type": "siri-et-mqtt",

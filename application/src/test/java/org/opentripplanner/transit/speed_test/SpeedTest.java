@@ -31,6 +31,7 @@ import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.routing.service.DefaultRoutingService;
+import org.opentripplanner.service.elevatorstatus.configure.ElevatorStatusRepositoryModule;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.internal.RealtimeVehicleRepositoryLifecycle;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
@@ -159,6 +160,9 @@ public class SpeedTest {
       tuningParameters.transferCacheMaxSize(),
       false
     );
+    var elevatorStatusHandle = ElevatorStatusRepositoryModule.elevatorStatusRepositoryHandle(
+      registry
+    );
     var threadFactory = Executors.defaultThreadFactory();
     var transitUpdateManager = TransactionFactory.createUpdateManagerWithPeriodicCommits(
       "speedtest",
@@ -191,6 +195,7 @@ public class SpeedTest {
       transitUpdateManager,
       streetUpdateManager,
       timetableHandle,
+      elevatorStatusHandle,
       new DelegatingTransitAlertServiceImpl(),
       routerConfig.updaterConfig(),
       // The speed test does not use GBFS vehicle rental.

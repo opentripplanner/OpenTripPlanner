@@ -18,10 +18,13 @@ import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.gbfs.network.GbfsNetworkOverrides;
 import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
+import org.opentripplanner.service.elevatorstatus.ElevatorStatusRepository;
+import org.opentripplanner.service.elevatorstatus.ElevatorStatusRepositorySnapshot;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySnapshot;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
+import org.opentripplanner.street.elevator.ElevatorEdgeIndex;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.model.openinghours.OpeningHoursCalendarService;
@@ -35,6 +38,8 @@ import org.opentripplanner.updater.GraphWriterService;
 import org.opentripplanner.updater.UpdatersParameters;
 import org.opentripplanner.updater.alert.TransitAlertProvider;
 import org.opentripplanner.updater.alert.gtfs.GtfsRealtimeAlertsUpdater;
+import org.opentripplanner.updater.elevator.ElevatorStatusUpdater;
+import org.opentripplanner.updater.elevator.siri.SiriFmElevatorDataSource;
 import org.opentripplanner.updater.spi.GraphUpdater;
 import org.opentripplanner.updater.spi.WriteDomain;
 import org.opentripplanner.updater.spi.WriteToGraphCallbacks;
@@ -88,6 +93,10 @@ public class UpdaterConfigurator {
   private final UpdateManager transitUpdateManager;
   private final UpdateManager streetUpdateManager;
   private final RepositoryHandle<
+    ElevatorStatusRepositorySnapshot,
+    ElevatorStatusRepository
+  > elevatorStatusRepositoryHandle;
+  private final RepositoryHandle<
     TimetableRepositorySnapshot,
     TimetableRepository
   > timetableRepositoryHandle;
@@ -113,6 +122,10 @@ public class UpdaterConfigurator {
     UpdateManager transitUpdateManager,
     UpdateManager streetUpdateManager,
     RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableRepositoryHandle,
+    RepositoryHandle<
+      ElevatorStatusRepositorySnapshot,
+      ElevatorStatusRepository
+    > elevatorStatusRepositoryHandle,
     DelegatingTransitAlertServiceImpl transitAlertService,
     UpdatersParameters updatersParameters,
     GbfsNetworkOverrides gbfsNetworkOverrides
@@ -129,6 +142,7 @@ public class UpdaterConfigurator {
     this.transitUpdateManager = transitUpdateManager;
     this.streetUpdateManager = streetUpdateManager;
     this.timetableRepositoryHandle = timetableRepositoryHandle;
+    this.elevatorStatusRepositoryHandle = elevatorStatusRepositoryHandle;
     this.carpoolingRepository = carpoolingRepository;
     this.carpoolTripVertexResolver = carpoolTripVertexResolver;
     this.transitAlertService = transitAlertService;
@@ -152,6 +166,10 @@ public class UpdaterConfigurator {
     UpdateManager transitUpdateManager,
     UpdateManager streetUpdateManager,
     RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableRepositoryHandle,
+    RepositoryHandle<
+      ElevatorStatusRepositorySnapshot,
+      ElevatorStatusRepository
+    > elevatorStatusRepositoryHandle,
     DelegatingTransitAlertServiceImpl transitAlertService,
     UpdatersParameters updatersParameters,
     GbfsNetworkOverrides gbfsNetworkOverrides
@@ -170,6 +188,7 @@ public class UpdaterConfigurator {
       transitUpdateManager,
       streetUpdateManager,
       timetableRepositoryHandle,
+      elevatorStatusRepositoryHandle,
       transitAlertService,
       updatersParameters,
       gbfsNetworkOverrides
@@ -320,6 +339,17 @@ public class UpdaterConfigurator {
     }
     for (var configItem : updatersParameters.getSiriSXLiteUpdaterParameters()) {
       updaters.add(SiriUpdaterModule.createSiriSXUpdater(configItem, siriFuzzyTripMatcherCache()));
+    }
+    for (var configItem : updatersParameters.getSiriFmElevatorUpdaterParameters()) {
+      updaters.add(
+        new ElevatorStatusUpdater(
+          configItem,
+          new SiriFmElevatorDataSource(configItem),
+          ElevatorEdgeIndex.of(graph),
+          streetUpdateManager,
+          elevatorStatusRepositoryHandle
+        )
+      );
     }
     for (var configItem : updatersParameters.getMqttGtfsRealtimeUpdaterParameters()) {
       updaters.add(new MqttGtfsRealtimeUpdater(configItem, provideGtfsAdapter()));
