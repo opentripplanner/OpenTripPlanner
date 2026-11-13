@@ -13,8 +13,8 @@ public final class RideHailingAccessAdapter extends DefaultAccessEgress {
 
   private final Duration arrival;
 
-  public RideHailingAccessAdapter(RoutingAccessEgress access, Duration arrival) {
-    super(access.stop(), access.getFinalState());
+  public RideHailingAccessAdapter(DefaultAccessEgress access, Duration arrival) {
+    super(access);
     this.arrival = arrival;
   }
 
