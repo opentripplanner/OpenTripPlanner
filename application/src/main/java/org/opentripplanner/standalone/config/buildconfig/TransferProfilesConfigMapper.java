@@ -97,7 +97,23 @@ public class TransferProfilesConfigMapper {
     var profiles = mapProfiles(typeBlocks, requests, configuredTypes);
     var warmup = mapWarmup(typeBlocks, requests);
 
-    return createParameters(profiles, maxDurations, warmup);
+    return createParameters(profiles, maxDurations, warmup, mapElevatorAlternatives(transfers));
+  }
+
+  private static boolean mapElevatorAlternatives(NodeAdapter transfers) {
+    return transfers
+      .of("elevatorAlternatives")
+      .since(V2_10)
+      .summary("Find alternative transfer paths that avoid elevators if closed in real time.")
+      .description(
+        """
+        At graph build, find alternative regular transfer paths for the transfers that use elevators
+        with an id (see `elevatorRefTags`). For a path with n such elevators, 2^n - 1 extra street
+        searches are made from the stop. Turn this on if the elevator status is updated at runtime.
+        It costs extra build time and graph size.
+        """
+      )
+      .asBoolean(false);
   }
 
   /** The block of a profile type, for example {@code walk}. An empty block if it is not set. */
@@ -127,10 +143,11 @@ public class TransferProfilesConfigMapper {
   private static TransferParameters<RouteRequest> createParameters(
     List<TransferProfile<RouteRequest>> profiles,
     Map<TransferProfileType, MaxDurationsPreference> maxDurations,
-    List<WarmupParameters> warmup
+    List<WarmupParameters> warmup,
+    boolean pathAlternatives
   ) {
     try {
-      var parameters = new TransferParameters<>(profiles, maxDurations, warmup);
+      var parameters = new TransferParameters<>(profiles, maxDurations, warmup, pathAlternatives);
       RegularTransferFactory.validate(parameters, new RegularTransferPreferencesMapper());
       return parameters;
     } catch (IllegalArgumentException e) {

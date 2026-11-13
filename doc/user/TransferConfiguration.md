@@ -197,6 +197,24 @@ The graph build logs how many of the paths of each profile are the paths of an e
 Profile 'slow-walk'. Street paths: 85 142, 97% reused from earlier profiles (10s + 1%) - No transfers: 14% stops, 837 (3%) patterns - WalkPreferences{speed: 0.9m/s}.
 ```
 
+## Alternative paths for elevators
+
+A street path can use elevators that may be out of service. Only elevators with an id (see
+`elevatorRefTags` in the build configuration) can be told apart. If `elevatorAlternatives` is
+`true`, the graph build also finds alternative street paths for the transfers whose best path uses
+at least one elevator. For each non-empty subset of the elevators of the best path, the best street
+path that avoids the subset is stored as an alternative, if there is one. Identical paths are stored
+once. A transfer without a street path that avoids the subset has no alternative for it.
+
+Each distinct subset of a stop costs one extra street search from the stop, shared by all the
+transfers of the stop that need it. A path with `n` elevators needs `2^n - 1` searches. Street paths
+are only reused between profiles if they use the same elevators, the alternatives are not reused.
+`elevatorAlternatives` is `false` by default: no alternative paths are generated and the build is
+unchanged. Turn it on if the elevator status is updated at runtime.
+
+The alternative paths are stored in the graph, but nothing closes an elevator at runtime yet, so the
+transfers always use the best street paths.
+
 ## Warmup
 
 When a routing request arrives, OTP creates the transfers for the preferences of the request, by
@@ -417,6 +435,7 @@ otherwise.
 
 | Config Parameter                                                                           |          Type          | Summary                                                                                                          |  Req./Opt. | Default Value    | Since |
 |--------------------------------------------------------------------------------------------|:----------------------:|------------------------------------------------------------------------------------------------------------------|:----------:|------------------|:-----:|
+| [elevatorAlternatives](#transfers_elevatorAlternatives)                                    |        `boolean`       | Find alternative transfer paths that avoid elevators if closed in real time.                                     | *Optional* | `false`          |  2.10 |
 | [bicycle](#transfers_bicycle)                                                              |        `object`        | The configuration of the bicycle transfers.                                                                      | *Optional* |                  |  2.10 |
 |    [maxDuration](#transfers_bicycle_maxDuration)                                           |       `duration`       | The longest bicycle transfer, measured with the user preferences.                                                | *Optional* |                  |  2.10 |
 |    [maxDurationAllowAllModes](#transfers_bicycle_maxDurationAllowAllModes)                 |       `duration`       | The longest bicycle transfer between any two stops.                                                              | *Optional* |                  |  2.10 |
@@ -503,6 +522,19 @@ otherwise.
 
 <!-- PARAMETERS-DETAILS BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
+
+<h3 id="transfers_elevatorAlternatives">elevatorAlternatives</h3>
+
+**Since version:** `2.10` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`   
+**Path:** /transfers 
+
+Find alternative transfer paths that avoid elevators if closed in real time.
+
+At graph build, find alternative regular transfer paths for the transfers that use elevators
+with an id (see `elevatorRefTags`). For a path with n such elevators, 2^n - 1 extra street
+searches are made from the stop. Turn this on if the elevator status is updated at runtime.
+It costs extra build time and graph size.
+
 
 <h3 id="transfers_bicycle">bicycle</h3>
 
@@ -1044,6 +1076,7 @@ This example sets every parameter of the `transfers` section:
 // build-config.json
 {
   "transfers" : {
+    "elevatorAlternatives" : true,
     "walk" : {
       "profiles" : [
         {

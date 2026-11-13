@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.transfer.regular;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 
@@ -36,6 +37,22 @@ public interface RegularTransferBuildRepository<P> extends Serializable {
     AbstractUserPreferences<?> userPreferences,
     int fromStop,
     Map<Integer, P> pathsByToStop
+  );
+
+  /**
+   * Store, for the transfers from {@code fromStop} that depend on ids, all the paths of the
+   * transfer, keyed by {@code toStop}: the best path first, then the paths that avoid some of its
+   * closable facility ids, see {@link AlternativePath}. The best path is also stored with
+   * {@link #setPaths}, the paths here are an addition, used to choose another path when a facility
+   * is unavailable. Existing entries for other stops are kept. The given map is copied, not
+   * retained.
+   *
+   * @throws IllegalStateException if the repository is sealed
+   */
+  void setAlternativePaths(
+    AbstractUserPreferences<?> userPreferences,
+    int fromStop,
+    Map<Integer, List<AlternativePath<P>>> pathsByToStop
   );
 
   /** The number of paths stored under exactly the given user preferences. */
