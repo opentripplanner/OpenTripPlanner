@@ -97,6 +97,17 @@ public class WgsCoordinateTest {
   }
 
   @Test
+  void isValid() {
+    assertTrue(WgsCoordinate.isValid(90d, 180d));
+    assertTrue(WgsCoordinate.isValid(-90d, -180d));
+
+    assertFalse(WgsCoordinate.isValid(91d, 1d));
+    assertFalse(WgsCoordinate.isValid(-91d, 1d));
+    assertFalse(WgsCoordinate.isValid(1d, 181d));
+    assertFalse(WgsCoordinate.isValid(1d, -181d));
+  }
+
+  @Test
   void add() {
     assertEquals(new WgsCoordinate(12d, 5d), new WgsCoordinate(9d, 1d).add(3d, 4d));
   }
