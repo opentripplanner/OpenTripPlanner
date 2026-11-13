@@ -266,6 +266,53 @@ class TripTimeOnDateTest {
     assertEquals(stopC, third.getScheduledStop(shorterScheduledPattern));
   }
 
+  @Test
+  void scheduledPickupDropoffIgnoresCancellation() {
+    var route = TransitRepositoryForTest.route("R1").build();
+    var pattern = TransitRepositoryForTest.tripPattern("P1", route)
+      .withStopPattern(
+        TransitRepositoryForTest.stopPattern(
+          TEST_MODEL.stop("A").build(),
+          TEST_MODEL.stop("B").build(),
+          TEST_MODEL.stop("C").build()
+        )
+      )
+      .build();
+    var tripTimes = tripTimesFor(3).createRealTimeFromScheduledTimes().withCanceled().build();
+
+    var subject = new TripTimeOnDate(tripTimes, 1, pattern);
+
+    assertEquals(PickDrop.CANCELLED, subject.getPickupType());
+    assertEquals(PickDrop.CANCELLED, subject.getDropoffType());
+    assertEquals(PickDrop.SCHEDULED, subject.getScheduledPickupType());
+    assertEquals(PickDrop.SCHEDULED, subject.getScheduledDropoffType());
+  }
+
+  @Test
+  void noScheduledPickupDropoffWhenStopsAreAdded() {
+    var route = TransitRepositoryForTest.route("R1").build();
+    var pattern = TransitRepositoryForTest.tripPattern("P1", route)
+      .withStopPattern(
+        TransitRepositoryForTest.stopPattern(
+          TEST_MODEL.stop("A").build(),
+          TEST_MODEL.stop("extra").build(),
+          TEST_MODEL.stop("C").build()
+        )
+      )
+      .build();
+    var tripTimes = tripTimesFor(3)
+      .createRealTimeFromScheduledTimes()
+      .withExtraCall(1, true)
+      .build();
+
+    // also the calls which are not extra calls themselves
+    for (int stopPos = 0; stopPos < 3; stopPos++) {
+      var subject = new TripTimeOnDate(tripTimes, stopPos, pattern);
+      assertNull(subject.getScheduledPickupType());
+      assertNull(subject.getScheduledDropoffType());
+    }
+  }
+
   private static TripTimes<?> tripTimesFor(int stops) {
     var trip = TransitRepositoryForTest.trip("123").build();
     var stopTimes = TEST_MODEL.stopTimesEvery5Minutes(stops, trip, "11:00");
