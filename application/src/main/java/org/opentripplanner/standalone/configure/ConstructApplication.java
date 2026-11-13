@@ -43,6 +43,7 @@ import org.opentripplanner.standalone.server.OTPWebApplication;
 import org.opentripplanner.street.StreetRepository;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VertexLinker;
+import org.opentripplanner.transfer.regular.ClosedFacilitiesHandler;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.repository.ScheduledTimetableData;
@@ -239,6 +240,9 @@ public class ConstructApplication {
     // request - registration is not thread-safe.
     factory.regularTransferRepositoryHandle();
     factory.elevatorStatusRepositoryHandle();
+    factory
+      .transitUpdateManager()
+      .register(new ClosedFacilitiesHandler(), factory.regularTransferRepositoryHandle());
 
     /* Create updater modules from JSON config. */
     UpdaterConfigurator.configure(
