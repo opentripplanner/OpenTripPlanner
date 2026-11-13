@@ -31,6 +31,8 @@ import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
+import org.opentripplanner.service.elevatorstatus.ElevatorStatusRepository;
+import org.opentripplanner.service.elevatorstatus.ElevatorStatusRepositorySnapshot;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySnapshot;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
@@ -83,6 +85,11 @@ class ConstructApplicationFactoryIntegrationTest {
       >() {}
     ),
     of(new GenericType<RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository>>() {}),
+    of(
+      new GenericType<
+        RepositoryHandle<ElevatorStatusRepositorySnapshot, ElevatorStatusRepository>
+      >() {}
+    ),
     of(new GenericType<RegularTransferBuildRepository<NearbyStop>>() {}),
     of(
       new GenericType<
