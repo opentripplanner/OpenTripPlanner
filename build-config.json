@@ -1,0 +1,14 @@
+{
+  "transitFeeds": [
+    {
+      "feedId": "1",
+      "type": "gtfs",
+      "source": "hanoi_bus.gtfs.zip"
+    },
+    {
+      "feedId": "2",
+      "type": "gtfs",
+      "source": "hanoi_metro.gtfs.zip"
+    }
+  ]
+}

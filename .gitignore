@@ -53,3 +53,8 @@ graph.obj
 
 # EPSG files
 application/v??.?.??
+
+AGENTS.md
+*-config.json
+*.gtfs.zip
+*.pbf
