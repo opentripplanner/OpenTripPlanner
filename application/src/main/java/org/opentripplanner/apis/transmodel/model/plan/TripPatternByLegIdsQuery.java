@@ -50,53 +50,21 @@ public class TripPatternByLegIdsQuery {
     GraphQLInputObjectType durationPerStreetModeType,
     GraphQLInputObjectType locationInputType
   ) {
-    var outputType = createOutputType(
-      "TripPatternResult",
-      "A trip pattern built from a given set of legs",
-      "The trip pattern, with realtime changes applied",
-      tripPatternType
-    );
+    var outputType = createOutputType(tripPatternType);
     return createField(routing, outputType, durationPerStreetModeType, locationInputType)
       .name("tripPatternByLegIds")
       .description("Get a trip pattern for the given legs, with realtime changes applied.")
       .build();
   }
 
-  /**
-   * The predecessor of {@code tripPatternByLegIds}, kept so that existing clients keep working.
-   */
-  public GraphQLFieldDefinition createRefetchTripPattern(
-    DefaultRouteRequestType routing,
-    GraphQLOutputType tripPatternType,
-    GraphQLInputObjectType durationPerStreetModeType,
-    GraphQLInputObjectType locationInputType
-  ) {
-    var outputType = createOutputType(
-      "RefetchTripPatternResult",
-      "Refetched data for a trip pattern",
-      "The refetched trip pattern",
-      tripPatternType
-    );
-    return createField(routing, outputType, durationPerStreetModeType, locationInputType)
-      .name("refetchTripPattern")
-      .description("Get an updated version of a trip pattern with realtime changes applied.")
-      .deprecate("Use tripPatternByLegIds instead.")
-      .build();
-  }
-
-  private static GraphQLObjectType createOutputType(
-    String name,
-    String description,
-    String tripPatternDescription,
-    GraphQLOutputType tripPatternType
-  ) {
+  private static GraphQLObjectType createOutputType(GraphQLOutputType tripPatternType) {
     return GraphQLObjectType.newObject()
-      .name(name)
-      .description(description)
+      .name("TripPatternResult")
+      .description("A trip pattern built from a given set of legs")
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("tripPattern")
-          .description(tripPatternDescription)
+          .description("The trip pattern, with realtime changes applied")
           .type(tripPatternType)
           .dataFetcher(env -> ((TripPatternResult) env.getSource()).itinerary())
           .build()
