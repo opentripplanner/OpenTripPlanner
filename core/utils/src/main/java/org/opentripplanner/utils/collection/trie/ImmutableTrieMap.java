@@ -104,7 +104,14 @@ public final class ImmutableTrieMap<K, V> extends AbstractMap<K, V> implements S
   public ImmutableTrieMap<K, V> without(K key) {
     Objects.requireNonNull(key);
     var newRoot = TrieNode.remove(root, key, TrieNode.hash(key), 0);
-    return newRoot == root ? this : new ImmutableTrieMap<>(newRoot, size - 1);
+    if (newRoot == root) {
+      return this;
+    }
+    return size == 1 ? empty() : new ImmutableTrieMap<>(newRoot, size - 1);
+  }
+
+  TrieNode<K, V> root() {
+    return root;
   }
 
   @Override

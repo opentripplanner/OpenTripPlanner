@@ -66,6 +66,42 @@ class ImmutableTrieMapTest {
   }
 
   @Test
+  void withoutTheLastKeyReturnsTheEmptyMap() {
+    var subject = ImmutableTrieMap.<String, Integer>empty().with("A", 1);
+
+    assertSame(ImmutableTrieMap.empty(), subject.without("A"));
+  }
+
+  @Test
+  void withoutGivesTheSameShapeAsBuildingFromTheRemainingKeys() {
+    var random = new Random(42);
+    var keys = new ArrayList<Integer>();
+    for (int i = 0; i < 5_000; ++i) {
+      keys.add(random.nextInt());
+    }
+    var subject = ImmutableTrieMap.of(toMap(keys));
+    var remaining = new ArrayList<>(keys);
+    for (int key : keys.subList(0, 4_900)) {
+      subject = subject.without(key);
+      remaining.remove((Integer) key);
+    }
+
+    assertSameShape(ImmutableTrieMap.of(toMap(remaining)).root(), subject.root());
+  }
+
+  @Test
+  void withoutMovesAnEntryUpWhenItsCollisionChainShrinksToOne() {
+    var a = new SameHash("A");
+    var b = new SameHash("B");
+    var subject = ImmutableTrieMap.<Object, Integer>empty().with(a, 1).with(b, 2).with("C", 3);
+
+    assertSameShape(
+      ImmutableTrieMap.<Object, Integer>empty().with(a, 1).with("C", 3).root(),
+      subject.without(b).root()
+    );
+  }
+
+  @Test
   void previousVersionsAreUnchanged() {
     var v1 = ImmutableTrieMap.<String, Integer>empty().with("A", 1);
     var v2 = v1.with("B", 2);
@@ -292,6 +328,33 @@ class ImmutableTrieMapTest {
     try (var in = new ObjectInputStream(new ByteArrayInputStream(bytes.toByteArray()))) {
       return (T) in.readObject();
     }
+  }
+
+  private static Map<Integer, Integer> toMap(List<Integer> keys) {
+    var map = new HashMap<Integer, Integer>();
+    keys.forEach(k -> map.put(k, k));
+    return map;
+  }
+
+  /** Assert that two tries have the same nodes, with the same keys in each slot. */
+  private static void assertSameShape(TrieNode<?, ?> expected, TrieNode<?, ?> actual) {
+    assertEquals(expected.bitmap, actual.bitmap);
+    for (int i = 0; i < expected.slots.length; ++i) {
+      assertEquals(expected.slots[i].getClass(), actual.slots[i].getClass());
+      if (expected.slots[i] instanceof TrieNode<?, ?> expectedChild) {
+        assertSameShape(expectedChild, (TrieNode<?, ?>) actual.slots[i]);
+      } else {
+        assertEquals(chainKeys((TrieLeaf<?, ?>) expected.slots[i]), chainKeys(actual.slots[i]));
+      }
+    }
+  }
+
+  private static List<Object> chainKeys(Object slot) {
+    var keys = new ArrayList<>();
+    for (var leaf = (TrieLeaf<?, ?>) slot; leaf != null; leaf = leaf.next) {
+      keys.add(leaf.getKey());
+    }
+    return keys;
   }
 
   /** A key that counts how often its hash code is computed. */

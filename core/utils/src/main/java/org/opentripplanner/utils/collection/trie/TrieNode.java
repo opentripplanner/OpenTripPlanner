@@ -18,6 +18,11 @@ import java.util.function.BiConsumer;
  * only the changed slot differs; every other slot points to the same child as in the original. The
  * new root reaches the new content, the old root still reaches the old content, and both share
  * every subtree off the path.
+ * <p>
+ * The shape of a trie depends only on its keys, not on the order of the changes that built it. Only
+ * the order inside a collision chain can differ. Each single entry sits in the shallowest node
+ * where no other key shares its slot, and a node below the root always has at least two entries
+ * below it.
  */
 final class TrieNode<K, V> {
 
@@ -216,7 +221,14 @@ final class TrieNode<K, V> {
       if (newChild.bitmap == 0) {
         return new TrieNode<>(node.bitmap & ~bit, arrayRemove(node.slots, pos));
       }
-      newSlot = newChild;
+      // A child left with a single entry is not needed; move the entry up into this node. A
+      // collision chain stays in the deepest node, which is where an insert puts it.
+      newSlot =
+        newChild.slots.length == 1 &&
+        newChild.slots[0] instanceof TrieLeaf<?, ?> leaf &&
+        leaf.next == null
+          ? leaf
+          : newChild;
     } else {
       TrieLeaf<K, V> leaf = (TrieLeaf<K, V>) existing;
       if (leaf.find(key) == null) {
