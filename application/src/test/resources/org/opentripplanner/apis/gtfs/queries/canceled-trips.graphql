@@ -64,6 +64,10 @@
           }
         }
         stopCalls {
+          geometryToNextCall {
+            length
+            points
+          }
           schedule {
             time {
               ... on ArrivalDepartureTime {

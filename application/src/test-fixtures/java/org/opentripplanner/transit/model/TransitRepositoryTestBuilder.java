@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.Nullable;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
 import org.opentripplanner.model.StopTime;
@@ -197,7 +199,7 @@ public class TransitRepositoryTestBuilder {
 
     var stopTimes = tripInput.stopTimes(trip);
     var stopPattern = stopPattern(stopTimes);
-    var tripPattern = getOrCreateTripPattern(stopPattern, route);
+    var tripPattern = getOrCreateTripPattern(stopPattern, route, tripInput.hopGeometries());
 
     var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, null);
 
@@ -239,15 +241,28 @@ public class TransitRepositoryTestBuilder {
     tripPatterns.put(TripPatternKey.of(newPattern), newPattern);
   }
 
-  private TripPattern getOrCreateTripPattern(StopPattern stopPattern, Route route) {
+  private TripPattern getOrCreateTripPattern(
+    StopPattern stopPattern,
+    Route route,
+    @Nullable List<LineString> hopGeometries
+  ) {
     var key = new TripPatternKey(stopPattern, route);
     var pattern = tripPatterns.get(key);
     if (pattern != null) {
+      if (hopGeometries != null) {
+        throw new IllegalArgumentException(
+          "Hop geometries can only be set for the first trip of a pattern"
+        );
+      }
       return pattern;
     }
 
     var id = "Pattern" + (tripPatterns.size() + 1);
-    var newPattern = TripPattern.of(id(id)).withRoute(route).withStopPattern(stopPattern).build();
+    var builder = TripPattern.of(id(id)).withRoute(route).withStopPattern(stopPattern);
+    if (hopGeometries != null) {
+      builder.withHopGeometries(hopGeometries);
+    }
+    var newPattern = builder.build();
     tripPatterns.put(key, newPattern);
     return newPattern;
   }

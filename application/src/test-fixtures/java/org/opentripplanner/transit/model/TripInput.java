@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 import org.jspecify.annotations.Nullable;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.model.PickDrop;
@@ -52,6 +53,10 @@ public class TripInput {
 
   @Nullable
   private String netexInternalPlanningCode;
+
+  // Null means that the hops of the pattern are straight lines between the stops
+  @Nullable
+  private List<LineString> hopGeometries;
 
   private final boolean isFlex;
 
@@ -126,6 +131,11 @@ public class TripInput {
     return isFlex;
   }
 
+  @Nullable
+  public List<LineString> hopGeometries() {
+    return hopGeometries;
+  }
+
   public TripInput addStop(RegularStop stop, String arrivalTime, String departureTime) {
     return addStopWithHeadsign(stop, arrivalTime, departureTime, null);
   }
@@ -195,6 +205,15 @@ public class TripInput {
 
   public TripInput withWithTripOnServiceDate(String tripOnServiceDateId) {
     this.tripOnServiceDateId = tripOnServiceDateId;
+    return this;
+  }
+
+  /**
+   * Set the geometries of the hops between the stops of the trip, which are used for the trip
+   * pattern. There must be one geometry for each hop, so one less than the number of stops.
+   */
+  public TripInput withHopGeometries(LineString... hopGeometries) {
+    this.hopGeometries = List.of(hopGeometries);
     return this;
   }
 
