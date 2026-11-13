@@ -2,6 +2,7 @@ package org.opentripplanner.updater.trip.gtfs;
 
 import static org.opentripplanner.updater.spi.UpdateErrorType.INVALID_STOP_REFERENCE;
 import static org.opentripplanner.updater.spi.UpdateErrorType.INVALID_STOP_SEQUENCE;
+import static org.opentripplanner.updater.spi.UpdateErrorType.TOO_MANY_STOPS;
 
 import java.util.Collections;
 import java.util.List;
@@ -78,6 +79,11 @@ class StopPositionMapper {
    * We make a limited effort to interpret the data, but not every case is supported.
    */
   private int handleCircularRoute(int listIndex, String stopId) throws UpdateException {
+    // an update list longer than the pattern cannot be mapped by position, for example when the
+    // producer sends each stop time update twice
+    if (listIndex >= stopIds.size()) {
+      throw UpdateException.of(tripId, TOO_MANY_STOPS, listIndex);
+    }
     // we take the position of the update in the list and see if that, by chance, is the same
     // index in the pattern.
     if (stopIds.get(listIndex).equals(stopId)) {

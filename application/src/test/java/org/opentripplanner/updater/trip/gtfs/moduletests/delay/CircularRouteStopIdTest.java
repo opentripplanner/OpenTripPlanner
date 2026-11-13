@@ -1,6 +1,8 @@
 package org.opentripplanner.updater.trip.gtfs.moduletests.delay;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.updater.spi.UpdateErrorType.TOO_MANY_STOPS;
+import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
 import org.junit.jupiter.api.Test;
@@ -75,6 +77,32 @@ class CircularRouteStopIdTest implements RealtimeTestConstants {
 
     assertEquals(
       "U | A 10:11 10:11 | B 10:21 10:21 | A 10:31 10:31",
+      env.tripData(TRIP_1_ID).showTimetable()
+    );
+  }
+
+  /**
+   * A producer that sends each stop time update twice gives more updates than the pattern has
+   * stops. The update must be rejected, not throw.
+   */
+  @Test
+  void moreUpdatesThanStops() {
+    var env = builder.addTrip(tripInput).build();
+    var rt = GtfsRtTestHelper.of(env);
+    var update = rt
+      .tripUpdateScheduled(TRIP_1_ID)
+      .addStopTime(STOP_A_ID, "10:01")
+      .addStopTime(STOP_A_ID, "10:01")
+      .addStopTime(STOP_B_ID, "10:11")
+      .addStopTime(STOP_B_ID, "10:11")
+      .addStopTime(STOP_A_ID, "10:21")
+      .addStopTime(STOP_A_ID, "10:21")
+      .build();
+
+    assertFailure(TOO_MANY_STOPS, rt.applyTripUpdate(update));
+
+    assertEquals(
+      "S | A 10:00 10:00 | B 10:10 10:10 | A 10:20 10:20",
       env.tripData(TRIP_1_ID).showTimetable()
     );
   }
