@@ -152,6 +152,13 @@ public final class StopTimeUpdate {
     );
   }
 
+  public boolean isNoData() {
+    return (
+      stopTimeUpdate.getScheduleRelationship() ==
+      GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship.NO_DATA
+    );
+  }
+
   public OptionalInt stopSequence() {
     return stopTimeUpdate.hasStopSequence()
       ? OptionalInt.of(stopTimeUpdate.getStopSequence())
@@ -216,9 +223,15 @@ public final class StopTimeUpdate {
 
   /**
    * Get the scheduled time of a StopTimeEvent. If it is not specified, calculate it from time -
-   * delay.
+   * delay. A {@code NO_DATA} stop is an exception: the spec does not allow predictions for it, so
+   * only the scheduled time is considered.
    */
   private OptionalLong getScheduledTimeWithRealTimeFallback(StopTimeEvent stopTimeEvent) {
+    if (isNoData()) {
+      return stopTimeEvent.hasScheduledTime()
+        ? OptionalLong.of(stopTimeEvent.getScheduledTime())
+        : OptionalLong.empty();
+    }
     return stopTimeEvent.hasScheduledTime()
       ? OptionalLong.of(stopTimeEvent.getScheduledTime())
       : getTime(stopTimeEvent)
