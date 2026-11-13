@@ -24,6 +24,7 @@ class CarpoolAccessEgressTest {
   private static final int STOP = 0;
   private static final Duration STOP_DURATION = Duration.ofMinutes(2);
   private static final int DWELL_SECONDS = (int) STOP_DURATION.getSeconds();
+  private static final int BOARD_COST = 0;
   private static final int PICKUP_POSITION = 1;
   private static final int DROPOFF_POSITION = 2;
   private static final Duration PICKUP_SEGMENT_DURATION = Duration.ofMinutes(1);
@@ -202,8 +203,60 @@ class CarpoolAccessEgressTest {
       candidate,
       TimeAndCost.ZERO,
       carpoolReluctance,
+      BOARD_COST,
       startLabel,
       endLabel
+    );
+  }
+
+  @Test
+  void c1IncludesBoardCostOnce() {
+    int boardCost = 2400;
+
+    var withoutBoardCost = newAccessEgressWithBoardCost(0);
+    var withBoardCost = newAccessEgressWithBoardCost(boardCost);
+
+    assertEquals(
+      RaptorCostConverter.toRaptorCost(boardCost),
+      withBoardCost.c1() - withoutBoardCost.c1()
+    );
+    assertEquals(
+      withoutBoardCost.getPassengerRideWeight() + boardCost,
+      withBoardCost.getPassengerRideWeight()
+    );
+  }
+
+  @Test
+  void withPenaltyKeepsBoardCost() {
+    var original = newAccessEgressWithBoardCost(2400);
+
+    var withPenalty = (CarpoolAccessEgress) original.withPenalty(
+      new TimeAndCost(Duration.ofSeconds(30), Cost.costOfSeconds(45))
+    );
+
+    assertEquals(original.getPassengerRideWeight(), withPenalty.getPassengerRideWeight());
+  }
+
+  private static CarpoolAccessEgress newAccessEgressWithBoardCost(int boardCost) {
+    var candidate = new InsertionCandidate(
+      createSimpleTrip(OSLO_CENTER, OSLO_NORTH),
+      PICKUP_POSITION,
+      DROPOFF_POSITION,
+      List.of(createSegment(PICKUP_SEGMENT_DURATION), createSegment(Duration.ofSeconds(60))),
+      STOP_DURATION,
+      null,
+      createStreetPath(Duration.ofSeconds(80)),
+      createStreetPath(Duration.ofSeconds(40))
+    );
+    return new CarpoolAccessEgress(
+      STOP,
+      1_000,
+      candidate,
+      TimeAndCost.ZERO,
+      1.0,
+      boardCost,
+      EndpointLabel.EMPTY,
+      EndpointLabel.EMPTY
     );
   }
 }
