@@ -125,13 +125,14 @@ public class ItineraryFiltersInputType {
           .description(
             "Same as " +
               GROUP_SIMILARITY_KEEP_THREE +
+              ". If set, it overrides " +
+              GROUP_SIMILARITY_KEEP_THREE +
               ". " +
               "The value must be between 0 and 1. A value below %s turns this filter off.".formatted(
                 GroupBySimilarity.MIN_GROUP_BY_P
               )
           )
           .deprecate("Use " + GROUP_SIMILARITY_KEEP_THREE + " instead.")
-          .defaultValue(dft.groupSimilarityKeepThree().asDouble())
           .build()
       )
       .field(
@@ -174,16 +175,17 @@ public class ItineraryFiltersInputType {
     setField(callWith, GROUP_SIMILARITY_KEEP_ONE, (Double v) ->
       builder.withGroupSimilarityKeepOne(validateGroupSimilarity(GROUP_SIMILARITY_KEEP_ONE, v))
     );
+    setField(callWith, GROUP_SIMILARITY_KEEP_THREE, (Double v) ->
+      builder.withGroupSimilarityKeepThree(validateGroupSimilarity(GROUP_SIMILARITY_KEEP_THREE, v))
+    );
 
-    // This is deprecated, sets same value as GROUP_SIMILARITY_KEEP_THREE
+    // Deprecated alias for GROUP_SIMILARITY_KEEP_THREE. It has no default and is applied last,
+    // so it takes effect only if the client sends it, and then wins over the default of
+    // GROUP_SIMILARITY_KEEP_THREE.
     setField(callWith, GROUP_SIMILARITY_KEEP_N_ITINERARIES, (Double v) ->
       builder.withGroupSimilarityKeepThree(
         validateGroupSimilarity(GROUP_SIMILARITY_KEEP_N_ITINERARIES, v)
       )
-    );
-
-    setField(callWith, GROUP_SIMILARITY_KEEP_THREE, (Double v) ->
-      builder.withGroupSimilarityKeepThree(validateGroupSimilarity(GROUP_SIMILARITY_KEEP_THREE, v))
     );
     setField(
       callWith,

@@ -2434,8 +2434,8 @@ input ItineraryFilters {
   itineraries are returned with a system notice, and not deleted.
   """
   debug: ItineraryFilterDebugProfile = off
-  "Same as groupSimilarityKeepThree. The value must be between 0 and 1. A value below 0.5 turns this filter off."
-  groupSimilarityKeepNumOfItineraries: Float = 0.68 @deprecated(reason : "Use groupSimilarityKeepThree instead.")
+  "Same as groupSimilarityKeepThree. If set, it overrides groupSimilarityKeepThree. The value must be between 0 and 1. A value below 0.5 turns this filter off."
+  groupSimilarityKeepNumOfItineraries: Float @deprecated(reason : "Use groupSimilarityKeepThree instead.")
   "Group itineraries that are at least this similar, and keep ONE itinerary from each group. Similarity is the share of the travel distance two itineraries have in common. The value must be between 0 and 1. A value below 0.5 turns this filter off."
   groupSimilarityKeepOne: Float = 0.85
   "Group itineraries that are at least this similar, and keep at most three itineraries from each group. Similarity is the share of the travel distance two itineraries have in common. The value must be between 0 and 1. A value below 0.5 turns this filter off."
