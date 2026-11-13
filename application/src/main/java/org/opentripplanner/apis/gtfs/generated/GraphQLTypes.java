@@ -1180,6 +1180,25 @@ public class GraphQLTypes {
     }
   }
 
+  public static class GraphQLDestinationDisplayHeadsignArgs {
+
+    private String language;
+
+    public GraphQLDestinationDisplayHeadsignArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.language = (String) args.get("language");
+      }
+    }
+
+    public String getGraphQLLanguage() {
+      return this.language;
+    }
+
+    public void setGraphQLLanguage(String language) {
+      this.language = language;
+    }
+  }
+
   public static class GraphQLDestinationScooterPolicyInput {
 
     private Boolean allowKeeping;

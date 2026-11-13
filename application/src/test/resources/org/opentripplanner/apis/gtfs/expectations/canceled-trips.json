@@ -46,6 +46,9 @@
             },
             "stopCalls": [
               {
+                "destinationDisplay": {
+                  "headsign": "Stop headsign at stop 10"
+                },
                 "schedule": {
                   "time": {
                     "arrival": "2024-08-09T11:30:00+02:00",
@@ -68,6 +71,9 @@
                 }
               },
               {
+                "destinationDisplay": {
+                  "headsign": "Stop headsign at stop 20"
+                },
                 "schedule": {
                   "time": {
                     "arrival": "2024-08-09T11:35:00+02:00",
@@ -90,6 +96,9 @@
                 }
               },
               {
+                "destinationDisplay": {
+                  "headsign": "Stop headsign at stop 30"
+                },
                 "schedule": {
                   "time": {
                     "arrival": "2024-08-09T11:40:00+02:00",
