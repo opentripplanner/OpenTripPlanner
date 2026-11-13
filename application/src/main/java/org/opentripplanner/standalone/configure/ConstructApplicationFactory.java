@@ -47,6 +47,9 @@ import org.opentripplanner.routing.linking.configure.LinkingServiceModule;
 import org.opentripplanner.routing.services.configure.TransitAlertServiceModule;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.routing.via.configure.ViaModule;
+import org.opentripplanner.service.elevatorstatus.ElevatorStatusRepository;
+import org.opentripplanner.service.elevatorstatus.ElevatorStatusRepositorySnapshot;
+import org.opentripplanner.service.elevatorstatus.configure.ElevatorStatusRepositoryModule;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySnapshot;
 import org.opentripplanner.service.realtimevehicles.configure.RealtimeVehicleRepositoryModule;
@@ -97,6 +100,7 @@ import org.opentripplanner.warmup.configure.WarmupModule;
     ConfigModule.class,
     ConstructApplicationModule.class,
     DataOverlayParameterBindingsModule.class,
+    ElevatorStatusRepositoryModule.class,
     EmissionServiceModule.class,
     TaxiServiceModule.class,
     EmpiricalDelayServiceModule.class,
@@ -147,6 +151,10 @@ public interface ConstructApplicationFactory {
     RealtimeVehicleRepositorySnapshot,
     RealtimeVehicleRepository
   > realtimeVehicleRepositoryHandle();
+  RepositoryHandle<
+    ElevatorStatusRepositorySnapshot,
+    ElevatorStatusRepository
+  > elevatorStatusRepositoryHandle();
   VehicleRentalRepository vehicleRentalRepository();
   VehicleRentalService vehicleRentalService();
   VehicleParkingRepository vehicleParkingRepository();
