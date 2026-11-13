@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
+import static org.opentripplanner.updater.spi.UpdateErrorType.INVALID_ARRIVAL_TIME;
 import static org.opentripplanner.updater.spi.UpdateErrorType.INVALID_STOP_REFERENCE;
 import static org.opentripplanner.updater.spi.UpdateErrorType.TOO_FEW_STOPS;
 import static org.opentripplanner.updater.spi.UpdateErrorType.UNKNOWN_STOP;
@@ -198,6 +199,50 @@ class AddedTest implements RealtimeTestConstants {
     assertTrue(tripTimes.isCanceledStop(2));
     assertFalse(tripTimes.isCanceledStop(3));
     assertEquals(I18NString.of("A (non-stop)"), tripTimes.getHeadsign(3));
+  }
+
+  @Test
+  void addedTripWithNoDataStop() {
+    var tripUpdate = gtfsRt
+      .tripUpdate(ADDED_TRIP_ID, ADDED)
+      .addStopTime(STOP_A_ID, "00:30")
+      .addNoDataStop(STOP_B_ID, null, "00:40")
+      .addStopTime(STOP_C_ID, "00:55")
+      .build();
+
+    assertSuccess(gtfsRt.applyTripUpdate(tripUpdate));
+    assertAddedTrip(ADDED_TRIP_ID, env);
+
+    var tripTimes = env.tripData(ADDED_TRIP_ID).tripTimes();
+    assertFalse(tripTimes.isNoDataStop(0));
+    assertTrue(tripTimes.isNoDataStop(1));
+    assertEquals(TimeUtils.time("00:40"), tripTimes.getArrivalTime(1));
+  }
+
+  @Test
+  void addedTripWithNoDataStopWithoutTimeIsRejected() {
+    var tripUpdate = gtfsRt
+      .tripUpdate(ADDED_TRIP_ID, ADDED)
+      .addStopTime(STOP_A_ID, "00:30")
+      .addNoDataStop(STOP_B_ID, null, null)
+      .addStopTime(STOP_C_ID, "00:55")
+      .build();
+
+    assertFailure(INVALID_ARRIVAL_TIME, gtfsRt.applyTripUpdate(tripUpdate));
+    assertTripNotAdded();
+  }
+
+  @Test
+  void addedTripWithOneSidedNoDataStopIsRejected() {
+    var tripUpdate = gtfsRt
+      .tripUpdate(ADDED_TRIP_ID, ADDED)
+      .addStopTime(STOP_A_ID, "00:30")
+      .addNoDataStopWithScheduledDeparture(STOP_B_ID, "00:40")
+      .addStopTime(STOP_C_ID, "00:55")
+      .build();
+
+    assertFailure(INVALID_ARRIVAL_TIME, gtfsRt.applyTripUpdate(tripUpdate));
+    assertTripNotAdded();
   }
 
   @Test

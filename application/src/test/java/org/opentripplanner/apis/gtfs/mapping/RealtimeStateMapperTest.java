@@ -183,6 +183,16 @@ class RealtimeStateMapperTest {
   }
 
   @Test
+  void noDataExtraCallIsAdded() {
+    var tripTimes = TripTimesForTest.realTime(b -> {
+      b.withModifiedTripPattern();
+      b.withNoData(0);
+      b.withExtraCall(0, true);
+    });
+    assertEquals(ADDED, RealtimeStateMapper.map(stopTime(tripTimes, 0)));
+  }
+
+  @Test
   void keptStopOfModifiedPatternWithRealTimeIsUpdated() {
     var tripTimes = TripTimesForTest.realTime(RealTimeTripTimesBuilder::withModifiedTripPattern);
     assertEquals(UPDATED, RealtimeStateMapper.map(stopTime(tripTimes, 0)));
