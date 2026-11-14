@@ -4,11 +4,14 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.opentripplanner.street.model.StreetModelForTest.intersectionVertex;
 import static org.opentripplanner.street.model.StreetModelForTest.streetEdge;
 
+import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner._support.geometry.Polygons;
@@ -23,11 +26,13 @@ import org.opentripplanner.model.plan.TestItineraryBuilder;
 import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
+import org.opentripplanner.routing.api.request.via.VisitViaLocation;
 import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.standalone.api.TestServerContext;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetMode;
+import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
@@ -138,6 +143,67 @@ class TaxiRouterDirectRoutingTest implements PlanTestConstants {
   }
 
   /**
+   * A taxi is only used from the origin to the first via location, after that the rest of the
+   * journey is walked.
+   */
+  @ParameterizedTest
+  @ValueSource(booleans = { false, true })
+  void routeWithViaUsesTaxiOnlyToTheFirstVia(boolean arriveBy) {
+    // The segments are long enough (> 500 m) for driving to be clearly faster than walking
+    var fromVertex = intersectionVertex("from", 59.900, 10.700);
+    var viaVertex = intersectionVertex("via", 59.905, 10.700);
+    var toVertex = intersectionVertex("to", 59.905, 10.720);
+    streetEdge(fromVertex, viaVertex);
+    streetEdge(viaVertex, fromVertex);
+    streetEdge(viaVertex, toVertex);
+    streetEdge(toVertex, viaVertex);
+
+    var fromLocation = GenericLocation.fromCoordinate(59.900, 10.700);
+    var toLocation = GenericLocation.fromCoordinate(59.905, 10.720);
+    var via = new VisitViaLocation(
+      "via",
+      Duration.ZERO,
+      List.of(),
+      new WgsCoordinate(59.905, 10.700)
+    );
+
+    var request = RouteRequest.of()
+      .withDateTime(OffsetDateTime.parse("2026-05-13T12:00Z").toInstant())
+      .withArriveBy(arriveBy)
+      .withFrom(fromLocation)
+      .withTo(toLocation)
+      .withViaLocations(List.of(via))
+      .withJourney(jb -> jb.withDirect(new StreetRequest(StreetMode.TAXI)))
+      .buildRequest();
+
+    var linkingContext = new LinkingContext(
+      Map.of(
+        fromLocation,
+        Set.of(fromVertex),
+        via.coordinateLocation(),
+        Set.of(viaVertex),
+        toLocation,
+        Set.of(toVertex)
+      ),
+      Set.of(),
+      Set.of()
+    );
+
+    var itineraries = routeDirect(List.of(COVERING_ROUTE), request, linkingContext);
+
+    assertThat(itineraries).hasSize(1);
+    var legs = itineraries.getFirst().legs();
+    var taxiLegs = legs.stream().filter(TaxiLeg.class::isInstance).toList();
+    assertThat(taxiLegs).hasSize(1);
+    assertThat(taxiLegs.getFirst().to().coordinate.latitude()).isWithin(1e-6).of(59.905);
+    assertThat(taxiLegs.getFirst().to().coordinate.longitude()).isWithin(1e-6).of(10.700);
+    var lastLeg = (StreetLeg) legs.getLast();
+    assertThat(lastLeg.getMode()).isEqualTo(TraverseMode.WALK);
+    assertThat(lastLeg.from().coordinate.longitude()).isWithin(1e-6).of(10.700);
+    assertThat(lastLeg.to().coordinate.longitude()).isWithin(1e-6).of(10.720);
+  }
+
+  /**
    * Routes a direct {@link StreetMode#TAXI} request through {@link TaxiRouter#routeDirect} on a
    * minimal synthetic street graph, decorating the result with the given routes.
    */
@@ -164,6 +230,14 @@ class TaxiRouterDirectRoutingTest implements PlanTestConstants {
       Set.of()
     );
 
+    return routeDirect(routes, request, linkingContext);
+  }
+
+  private static List<Itinerary> routeDirect(
+    List<TaxiRoute> routes,
+    RouteRequest request,
+    LinkingContext linkingContext
+  ) {
     var transitService = TestServerContext.createTransitService(
       new TransitRepository(),
       new TimetableDataImport(),
