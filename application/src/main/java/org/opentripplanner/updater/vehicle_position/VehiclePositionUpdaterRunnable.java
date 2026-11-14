@@ -7,6 +7,7 @@ import java.util.Set;
 import org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.TransitRealTimeUpdateContext;
+import org.opentripplanner.updater.trip.gtfs.GtfsRealtimeFuzzyTripMatcher;
 
 class VehiclePositionUpdaterRunnable implements GraphWriterRunnable<TransitRealTimeUpdateContext> {
 
@@ -29,16 +30,19 @@ class VehiclePositionUpdaterRunnable implements GraphWriterRunnable<TransitRealT
 
   @Override
   public void run(TransitRealTimeUpdateContext context) {
-    var timetableRepository = context.timetableRepository();
+    // Vehicle positions are matched against the last committed timetable snapshot: a vehicle
+    // referencing a trip added in the current, uncommitted transaction is matched on the next
+    // polling cycle, after that transaction has committed.
+    var timetableSnapshot = context.committedTimetableSnapshot();
     RealtimeVehiclePatternMatcher matcher = new RealtimeVehiclePatternMatcher(
       feedId,
-      timetableRepository::getTrip,
-      timetableRepository::findPattern,
-      timetableRepository::findPattern,
-      timetableRepository.getTripCalendars()::listServiceDates,
+      timetableSnapshot::getTrip,
+      timetableSnapshot::findPattern,
+      timetableSnapshot::findPattern,
+      timetableSnapshot.getTripCalendars()::listServiceDates,
       context.realtimeVehicleRepository(),
       context.transitRepository().getTimeZone(),
-      fuzzyTripMatching ? context.gtfsRealtimeFuzzyTripMatcher() : null,
+      fuzzyTripMatching ? new GtfsRealtimeFuzzyTripMatcher(timetableSnapshot) : null,
       vehiclePositionFeatures
     );
     // Apply new vehicle positions

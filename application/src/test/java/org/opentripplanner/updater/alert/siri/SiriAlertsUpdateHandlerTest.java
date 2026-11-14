@@ -88,12 +88,14 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
   public void setUp() throws Exception {
     super.setUp();
 
+    var timetableRepository = new DefaultTimetableRepository(
+      RaptorTransitDataTestFactory.empty(),
+      timetableDataImport.toScheduledTimetableData()
+    );
     realTimeUpdateContext = new DefaultTransitRealTimeUpdateContext(
       transitRepository,
-      new DefaultTimetableRepository(
-        RaptorTransitDataTestFactory.empty(),
-        timetableDataImport.toScheduledTimetableData()
-      ),
+      () -> timetableRepository,
+      () -> timetableRepository,
       () -> {
         throw new UnsupportedOperationException(
           "The realtime-vehicle repository is not available in this test context"

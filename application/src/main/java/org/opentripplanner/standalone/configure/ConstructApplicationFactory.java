@@ -13,6 +13,7 @@ import org.opentripplanner.core.framework.transaction.configure.StreetDomain;
 import org.opentripplanner.core.framework.transaction.configure.TransitDomain;
 import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.transaction.RepositoryHandle;
+import org.opentripplanner.core.model.transaction.RepositoryRegistry;
 import org.opentripplanner.core.model.transaction.UpdateManager;
 import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
@@ -142,6 +143,9 @@ public interface ConstructApplicationFactory {
 
   @TransitDomain
   UpdateManager transitUpdateManager();
+
+  @TransitDomain
+  RepositoryRegistry transitRepositoryRegistry();
 
   @StreetDomain
   UpdateManager streetUpdateManager();

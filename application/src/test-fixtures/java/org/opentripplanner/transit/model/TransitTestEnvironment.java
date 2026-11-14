@@ -76,13 +76,15 @@ public final class TransitTestEnvironment {
     this.transitRepository.initRaptorTransitData(scheduledRaptorData);
 
     this.repositoryRegistry = TransactionFactory.createRepositoryRegistry();
-    var timetableSnapshot = new DefaultTimetableRepository(
+    var timetableRepository = new DefaultTimetableRepository(
       new RaptorTransitData(transitRepository.getRaptorTransitData()),
       scheduledTimetableData
     );
-    this.timetableHandle = repositoryRegistry.registerRepositorySnapshot(
-      timetableSnapshot,
-      new TimetableRepositoryLifecycle(timetableSnapshot, false, () -> defaultServiceDate)
+    // Register the mutable repository, as TransitModule does in production: the initial committed
+    // snapshot is then an immutable copy that does not expose uncommitted changes.
+    this.timetableHandle = repositoryRegistry.registerRepository(
+      timetableRepository,
+      new TimetableRepositoryLifecycle(timetableRepository, false, () -> defaultServiceDate)
     );
     var threadFactory = Thread.ofPlatform().name("test-commit").factory();
     // Use atomic commits (commit immediately after each task) so test assertions see results right away
@@ -163,6 +165,15 @@ public final class TransitTestEnvironment {
 
   public UpdateManager updateManager() {
     return updateManager;
+  }
+
+  /**
+   * The registry backing {@link #timetableHandle()} and {@link #updateManager()}. Use it to
+   * register additional transactional repositories in the same transaction sequence as the
+   * timetable.
+   */
+  public RepositoryRegistry repositoryRegistry() {
+    return repositoryRegistry;
   }
 
   public TimetableRepositorySnapshot timetableSnapshot() {

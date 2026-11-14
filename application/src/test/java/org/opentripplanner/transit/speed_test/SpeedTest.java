@@ -127,15 +127,15 @@ public class SpeedTest {
 
     var parameters = TimetableSnapshotParameters.DEFAULT;
     var registry = TransactionFactory.createRepositoryRegistry();
-    var timetableSnapshot = new DefaultTimetableRepository(
+    var timetableRepository = new DefaultTimetableRepository(
       new RaptorTransitData(transitRepository.getRaptorTransitData()),
       scheduledTimetableData
     );
     RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableHandle =
-      registry.registerRepositorySnapshot(
-        timetableSnapshot,
+      registry.registerRepository(
+        timetableRepository,
         new TimetableRepositoryLifecycle(
-          timetableSnapshot,
+          timetableRepository,
           parameters.purgeExpiredData(),
           LocalDate::now
         )
@@ -174,6 +174,7 @@ public class SpeedTest {
       null,
       null,
       transitUpdateManager,
+      registry,
       streetUpdateManager,
       timetableHandle,
       new DelegatingTransitAlertServiceImpl(),
