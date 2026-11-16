@@ -112,7 +112,6 @@ class StatesToWalkStepsMapperTest {
     assertThat(toStrings(states))
       .containsExactly(
         "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: DEPART, directionText: '1.0_1.0_2.0_2.0', distance: 157,225.7}",
-        "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: CONTINUE, directionText: 'pathway', distance: 0.0}",
         "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: EXIT_STATION, directionText: 'Lichterfelde-Ost', distance: 0.0, entranceId: F:Lichterfelde-Ost}"
       )
       .inOrder();
@@ -157,21 +156,38 @@ class StatesToWalkStepsMapperTest {
       .inOrder();
   }
 
-  private static List<WalkStep> buildWalkSteps(TestStateBuilder builder) {
-    var result = builder.build();
-    var path = new StreetPath(result);
-    var mapper = new StatesToWalkStepsMapper(
-      path.states(),
-      null,
-      new DefaultStreetDetailsService(new DefaultStreetDetailsRepository()),
-      id -> Entrance.of(id).withCoordinate(WgsCoordinate.GREENWICH).build(),
-      0
-    );
-    return mapper.generateWalkSteps();
+  @Test
+  void shortMiddleSection() {
+    var states = TestStateBuilder.ofWalking()
+      .streetEdge("A Street", 100)
+      .unnamedStreetEdge(5)
+      .streetEdge("A Street", 100)
+      .unnamedStreetEdge(5)
+      .streetEdge("B Street", 100);
+
+    assertThat(toStrings(states))
+      .containsExactly(
+        "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: DEPART, directionText: 'A Street', distance: 210.0}",
+        "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: CONTINUE, directionText: 'B Street', distance: 100.0}"
+      )
+      .inOrder();
   }
 
-  private static List<String> toStrings(TestStateBuilder builder) {
-    return buildWalkSteps(builder).stream().map(WalkStep::toString).toList();
+  @Test
+  void unnamedPathIntoStation() {
+    var states = TestStateBuilder.ofWalking()
+      .streetEdge("A Street", 100)
+      .unnamedStreetEdge(5)
+      .enterOsmStation("B")
+      .unnamedStreetEdge(5);
+
+    assertThat(toStrings(states))
+      .containsExactly(
+        "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: DEPART, directionText: 'A Street', distance: 105.0}",
+        "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: CONTINUE, directionText: '3.0_3.0_osm:node:1', distance: 157,106.0}",
+        "WalkStep{relativeDirection: ENTER_OR_EXIT_STATION, directionText: 'station entrance', distance: 5.0, entranceId: osm:1}"
+      )
+      .inOrder();
   }
 
   @ParameterizedTest
@@ -225,5 +241,22 @@ class StatesToWalkStepsMapperTest {
         "A street interrupted by a crossing with a derived name (using a default namer) is the same street."
       )
     );
+  }
+
+  private static List<WalkStep> buildWalkSteps(TestStateBuilder builder) {
+    var result = builder.build();
+    var path = new StreetPath(result);
+    var mapper = new StatesToWalkStepsMapper(
+      path.states(),
+      null,
+      new DefaultStreetDetailsService(new DefaultStreetDetailsRepository()),
+      id -> Entrance.of(id).withCoordinate(WgsCoordinate.GREENWICH).build(),
+      0
+    );
+    return mapper.generateWalkSteps();
+  }
+
+  private static List<String> toStrings(TestStateBuilder builder) {
+    return buildWalkSteps(builder).stream().map(WalkStep::toString).toList();
   }
 }
