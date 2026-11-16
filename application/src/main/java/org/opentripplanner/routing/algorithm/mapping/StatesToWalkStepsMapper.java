@@ -308,9 +308,9 @@ public class StatesToWalkStepsMapper {
       // check last three steps for zag
       int lastIndex = steps.size() - 1;
       if (lastIndex >= 2) {
-        var threeBack = steps.get(lastIndex - 2);
-        var twoBack = steps.get(lastIndex - 1);
-        var lastStep = steps.get(lastIndex);
+        WalkStepBuilder threeBack = steps.get(lastIndex - 2);
+        WalkStepBuilder twoBack = steps.get(lastIndex - 1);
+        WalkStepBuilder lastStep = steps.get(lastIndex);
         boolean isOnSameStreet = isOnSameStreet(lastStep, twoBack, threeBack);
         if (twoBack.distance() < MAX_ZAG_DISTANCE && isOnSameStreet && canZagBeRemoved(twoBack)) {
           if (isUTurn(twoBack, lastStep)) {
