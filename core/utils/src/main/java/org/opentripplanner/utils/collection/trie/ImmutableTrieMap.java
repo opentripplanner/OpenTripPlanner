@@ -6,12 +6,12 @@ import java.io.Serializable;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 /**
  * An immutable map for large data sets that change a little at a time, where many versions of the
@@ -59,28 +59,38 @@ public final class ImmutableTrieMap<K, V> extends AbstractMap<K, V> implements S
     if (map instanceof ImmutableTrieMap<?, ?> trieMap) {
       return (ImmutableTrieMap<K, V>) trieMap;
     }
-    return build(map.entrySet());
+    return of(map.entrySet(), Map.Entry::getKey, Map.Entry::getValue);
   }
 
-  /** Build a map from entries with distinct keys, changing the trie in place while building it. */
-  private static <K, V> ImmutableTrieMap<K, V> build(
-    Collection<? extends Map.Entry<? extends K, ? extends V>> entries
+  /**
+   * Return a map with one mapping for each of the given items, from {@code toKey(item)} to
+   * {@code toValue(item)}. For example, a map of stops by id can be made with
+   * {@code of(stops, Stop::id, Function.identity())}.
+   * <p>
+   * Takes time linear in the number of items, see {@link #of(Map)}.
+   *
+   * @throws IllegalArgumentException if two items have equal keys
+   */
+  public static <T, K, V> ImmutableTrieMap<K, V> of(
+    Iterable<? extends T> items,
+    Function<? super T, ? extends K> toKey,
+    Function<? super T, ? extends V> toValue
   ) {
-    if (entries.isEmpty()) {
-      return empty();
-    }
+    // The trie is changed in place while it is built, which is safe since no map holds it yet.
     TrieNode<K, V> root = TrieNode.empty();
+    int size = 0;
     var addedLeaf = new TrieNode.AddedLeaf();
-    for (var e : entries) {
-      K key = Objects.requireNonNull(e.getKey());
-      V value = Objects.requireNonNull(e.getValue());
+    for (T item : items) {
+      K key = Objects.requireNonNull(toKey.apply(item));
+      V value = Objects.requireNonNull(toValue.apply(item));
       addedLeaf.val = false;
       root = TrieNode.insertInPlace(root, key, TrieNode.hash(key), value, addedLeaf);
       if (!addedLeaf.val) {
         throw new IllegalArgumentException("Duplicate key: " + key);
       }
+      ++size;
     }
-    return new ImmutableTrieMap<>(root, entries.size());
+    return size == 0 ? empty() : new ImmutableTrieMap<>(root, size);
   }
 
   /**
@@ -190,7 +200,7 @@ public final class ImmutableTrieMap<K, V> extends AbstractMap<K, V> implements S
     }
 
     private Object readResolve() {
-      return build(Arrays.asList(entries));
+      return of(Arrays.asList(entries), Map.Entry::getKey, Map.Entry::getValue);
     }
   }
 }

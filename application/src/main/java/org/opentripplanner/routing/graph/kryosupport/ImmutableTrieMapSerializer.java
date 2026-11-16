@@ -4,7 +4,9 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.Serializer;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-import java.util.HashMap;
+import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.ArrayList;
+import java.util.Map;
 import org.opentripplanner.utils.collection.trie.ImmutableTrieMap;
 
 /**
@@ -29,10 +31,12 @@ class ImmutableTrieMapSerializer extends Serializer<ImmutableTrieMap<?, ?>> {
     Class<? extends ImmutableTrieMap<?, ?>> type
   ) {
     int size = input.readVarInt(true);
-    var entries = HashMap.newHashMap(size);
+    var entries = new ArrayList<Map.Entry<Object, Object>>(size);
     for (int i = 0; i < size; i++) {
-      entries.put(kryo.readClassAndObject(input), kryo.readClassAndObject(input));
+      entries.add(
+        new SimpleImmutableEntry<>(kryo.readClassAndObject(input), kryo.readClassAndObject(input))
+      );
     }
-    return ImmutableTrieMap.of(entries);
+    return ImmutableTrieMap.of(entries, Map.Entry::getKey, Map.Entry::getValue);
   }
 }

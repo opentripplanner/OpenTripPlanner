@@ -243,6 +243,36 @@ class ImmutableTrieMapTest {
     assertThrows(IllegalArgumentException.class, () -> ImmutableTrieMap.of(source));
   }
 
+  @Test
+  void ofItems() {
+    var subject = ImmutableTrieMap.of(List.of("A", "BB", "CCC"), String::length, s -> s);
+
+    assertEquals(Map.of(1, "A", 2, "BB", 3, "CCC"), subject);
+    assertEquals(3, subject.size());
+  }
+
+  @Test
+  void ofNoItemsReturnsTheEmptyMap() {
+    assertSame(ImmutableTrieMap.empty(), ImmutableTrieMap.of(List.of(), s -> s, s -> s));
+  }
+
+  @Test
+  void ofItemsDoesNotAllowDuplicateKeys() {
+    assertThrows(IllegalArgumentException.class, () ->
+      ImmutableTrieMap.of(List.of("A", "B"), String::length, s -> s)
+    );
+  }
+
+  @Test
+  void ofItemsDoesNotAllowNullKeysOrValues() {
+    assertThrows(NullPointerException.class, () ->
+      ImmutableTrieMap.of(List.of("A"), s -> null, s -> s)
+    );
+    assertThrows(NullPointerException.class, () ->
+      ImmutableTrieMap.of(List.of("A"), s -> s, s -> null)
+    );
+  }
+
   /**
    * Copy a large map, then apply a random sequence of operations to the copy and to a
    * {@link HashMap}, and check that they stay equal. This verifies that the copy can be changed
