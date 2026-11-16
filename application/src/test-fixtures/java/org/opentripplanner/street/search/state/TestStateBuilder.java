@@ -73,6 +73,14 @@ public class TestStateBuilder {
   }
 
   /**
+   * Create an initial state that starts walking in an egress (arriveBy) search, so the state chain
+   * runs backward in time.
+   */
+  public static TestStateBuilder ofWalkingEgress() {
+    return new TestStateBuilder(StreetMode.WALK, AccessEgressType.EGRESS);
+  }
+
+  /**
    * Create an initial state that starts in a car.
    */
   public static TestStateBuilder ofDriving() {
@@ -112,13 +120,18 @@ public class TestStateBuilder {
     return this;
   }
 
+  /**
+   * Traverse a named street edge. In an arriveBy search the edge leads to the current vertex, since
+   * the search runs backward in time.
+   */
   public TestStateBuilder streetEdge(String name, int distance) {
     count++;
-    var from = (StreetVertex) currentState.vertex;
-    var to = StreetModelForTest.intersectionVertex(count, count);
+    var current = (StreetVertex) currentState.vertex;
+    var next = StreetModelForTest.intersectionVertex(count, count);
+    boolean arriveBy = currentState.getRequest().arriveBy();
     var edge = StreetModelForTest.streetEdgeBuilder(
-      from,
-      to,
+      arriveBy ? next : current,
+      arriveBy ? current : next,
       distance,
       StreetTraversalPermission.PEDESTRIAN
     )

@@ -5088,14 +5088,14 @@ input PlanItineraryFilterInput {
   Pick one itinerary from each group after putting itineraries that are `85%` similar together,
   if the given value is `0.85`, for example. Itineraries are grouped together based on relative
   the distance of transit travel that is identical between the itineraries (access, egress and
-  transfers are ignored). The value must be at least `0.5`.
+  transfers are ignored). A value below `0.5` turns this filter off.
   """
   groupSimilarityKeepOne: Ratio = 0.85
   """
   Pick three itineraries from each group after putting itineraries that are `68%` similar together,
   if the given value is `0.68`, for example. Itineraries are grouped together based on relative
   the distance of transit travel that is identical between the itineraries (access, egress and
-  transfers are ignored). The value must be at least `0.5`.
+  transfers are ignored). A value below `0.5` turns this filter off.
   """
   groupSimilarityKeepThree: Ratio = 0.68
   """
