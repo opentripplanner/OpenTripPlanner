@@ -50,15 +50,9 @@ public class TripPatternByLegIdsQuery {
     GraphQLInputObjectType durationPerStreetModeType,
     GraphQLInputObjectType locationInputType
   ) {
-    var outputType = createOutputType(tripPatternType);
-    return createField(routing, outputType, durationPerStreetModeType, locationInputType)
-      .name("tripPatternByLegIds")
-      .description("Get a trip pattern for the given legs, with realtime changes applied.")
-      .build();
-  }
+    RoutingPreferences preferences = routing.request.preferences();
 
-  private static GraphQLObjectType createOutputType(GraphQLOutputType tripPatternType) {
-    return GraphQLObjectType.newObject()
+    var outputType = GraphQLObjectType.newObject()
       .name("TripPatternResult")
       .description("A trip pattern built from a given set of legs")
       .field(
@@ -70,17 +64,10 @@ public class TripPatternByLegIdsQuery {
           .build()
       )
       .build();
-  }
-
-  private GraphQLFieldDefinition.Builder createField(
-    DefaultRouteRequestType routing,
-    GraphQLObjectType outputType,
-    GraphQLInputObjectType durationPerStreetModeType,
-    GraphQLInputObjectType locationInputType
-  ) {
-    RoutingPreferences preferences = routing.request.preferences();
 
     return GraphQLFieldDefinition.newFieldDefinition()
+      .name("tripPatternByLegIds")
+      .description("Get a trip pattern for the given legs, with realtime changes applied.")
       .withDirective(TransmodelDirectives.TIMING_DATA)
       .type(new GraphQLNonNull(outputType))
       .argument(
@@ -200,7 +187,8 @@ public class TripPatternByLegIdsQuery {
           )
           .build()
       )
-      .dataFetcher(this::tripPatternByLegIds);
+      .dataFetcher(this::tripPatternByLegIds)
+      .build();
   }
 
   private DataFetcherResult<TripPatternResult> tripPatternByLegIds(
