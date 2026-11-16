@@ -7,6 +7,7 @@ import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
+import org.opentripplanner.routing.refetch.RefetchItineraryService;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
@@ -32,5 +33,6 @@ public record TestGtfsGraphQLRequestContext(
   GraphQLSchema schema,
   NearbyPlaceFinder nearbyPlaceFinder,
   NearbyStopFinder nearbyStopFinder,
-  RouteRequest defaultRouteRequest
+  RouteRequest defaultRouteRequest,
+  RefetchItineraryService refetchItineraryService
 ) implements GtfsGraphQLRequestContext {}

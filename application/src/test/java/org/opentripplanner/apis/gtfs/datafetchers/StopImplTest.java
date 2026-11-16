@@ -120,7 +120,8 @@ class StopImplTest {
           null,
           null,
           null,
-          RouteRequest.defaultValue()
+          RouteRequest.defaultValue(),
+          null
         )
       )
       .build();
