@@ -191,6 +191,22 @@ query TransmodelExampleQuery {
             transmodel: '/otp/transmodel/v3'
         }
 
+        // Optional override of the API endpoint of the selected flavor, for OTP served behind a proxy
+        // that exposes the API on another path. Only endpoints on the same origin as this page are
+        // accepted, so a crafted link cannot send the queries, and the headers typed in here, elsewhere.
+        if (parameters.endpoint) {
+            try {
+                const endpoint = new URL(parameters.endpoint, window.location.origin);
+                if (endpoint.origin === window.location.origin) {
+                    urls[apiFlavor] = endpoint.pathname + endpoint.search;
+                } else {
+                    console.warn(`Ignoring endpoint '${parameters.endpoint}', it is not on ${window.location.origin}`);
+                }
+            } catch (e) {
+                console.warn(`Ignoring invalid endpoint '${parameters.endpoint}'`);
+            }
+        }
+
         let defaultQueries = {
             gtfs: gtfsExampleQuery,
             transmodel: transmodelExampleQuery

@@ -72,3 +72,8 @@ or add it to a new `.env.development.local` file (this file will be ignored by g
 In production mode, the default is to access OTP via the same origin as the client (see `.env`).
 This behavior can also be modified by changing the previously mentioned environment variable at
 build-time.
+
+The links from the debug client to GraphiQL (`VITE_GRAPHIQL_URL`) assume the API is at its default
+path. If OTP is served behind a proxy that exposes the API on another path, add an `endpoint`
+parameter to the link, for example `/graphiql?flavor=transmodel&endpoint=/my/proxy/graphql`. The
+endpoint must be on the same origin as the GraphiQL page, other values are ignored.
