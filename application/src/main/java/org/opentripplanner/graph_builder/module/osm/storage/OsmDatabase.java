@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.framework.collection.HPPCMapSetUtils;
+import org.opentripplanner.framework.collection.HppcMapSetUtils;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.InvalidOsmGeometry;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionBad;
@@ -306,7 +306,7 @@ public class OsmDatabase {
         areaWayIds.add(wayId);
         way
           .getNodeRefs()
-          .forEach((LongProcedure) node -> HPPCMapSetUtils.addToMapSet(areasForNode, node, way));
+          .forEach((LongProcedure) node -> HppcMapSetUtils.addToMapSet(areasForNode, node, way));
       }
       return;
     }
@@ -459,7 +459,7 @@ public class OsmDatabase {
         }
         for (LongCursor c : way.getNodeRefs()) {
           if (nodes.contains(c.value)) {
-            HPPCMapSetUtils.addToMapSet(areasForNode, c.value, way);
+            HppcMapSetUtils.addToMapSet(areasForNode, c.value, way);
           } else {
             // this area is missing some nodes, perhaps because it is on
             // the edge of the region, so we will simply not route on it.

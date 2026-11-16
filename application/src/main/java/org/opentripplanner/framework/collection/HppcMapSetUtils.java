@@ -4,7 +4,7 @@ import com.carrotsearch.hppc.LongObjectMap;
 import java.util.HashSet;
 import java.util.Set;
 
-public class HPPCMapSetUtils {
+public class HppcMapSetUtils {
 
   public static <U> void addToMapSet(LongObjectMap<Set<U>> mapSet, long key, U value) {
     Set<U> set = mapSet.get(key);
