@@ -92,6 +92,14 @@ public class DebugUiConfig {
       )
       .asString(DEFAULT_VECTOR_TILES_BASE_PATH);
 
+    // A blank value would give tile URLs like "https://host//layers/..." instead of the default.
+    if (vectorTilesBasePath.isBlank()) {
+      throw root.createException(
+        "The value must not be blank, remove the parameter to use the default.",
+        "vectorTilesBasePath"
+      );
+    }
+
     if (logUnusedParams) {
       root.logAllWarnings(LOG::warn);
     }
