@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
@@ -329,6 +330,17 @@ class ImmutableTrieMapTest {
   @Test
   void serializationOfTheEmptyMapReturnsTheEmptyMap() throws Exception {
     assertSame(ImmutableTrieMap.empty(), roundTrip(ImmutableTrieMap.empty()));
+  }
+
+  @Test
+  void deserializationFailsForDuplicateKeys() {
+    var a = new ArrayList<>(List.of(1));
+    var b = new ArrayList<>(List.of(2));
+    var subject = ImmutableTrieMap.<List<Integer>, Integer>empty().with(a, 1).with(b, 2);
+    // Make the keys equal after the map is built, so the serialized entries have duplicate keys
+    b.set(0, 1);
+
+    assertThrows(InvalidObjectException.class, () -> roundTrip(subject));
   }
 
   @Test

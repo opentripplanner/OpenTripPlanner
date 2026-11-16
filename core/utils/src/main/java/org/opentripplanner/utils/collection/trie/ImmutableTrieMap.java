@@ -2,6 +2,7 @@ package org.opentripplanner.utils.collection.trie;
 
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
@@ -175,10 +176,12 @@ public final class ImmutableTrieMap<K, V> extends AbstractMap<K, V> implements S
     return entrySet;
   }
 
+  @Serial
   private Object writeReplace() {
     return new SerializedForm(this);
   }
 
+  @Serial
   private void readObject(ObjectInputStream in) throws InvalidObjectException {
     throw new InvalidObjectException("Deserialized through SerializedForm");
   }
@@ -190,6 +193,9 @@ public final class ImmutableTrieMap<K, V> extends AbstractMap<K, V> implements S
    */
   private static final class SerializedForm implements Serializable {
 
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     private final Map.Entry<?, ?>[] entries;
 
     private SerializedForm(ImmutableTrieMap<?, ?> map) {
@@ -200,8 +206,16 @@ public final class ImmutableTrieMap<K, V> extends AbstractMap<K, V> implements S
         .toArray(Map.Entry[]::new);
     }
 
-    private Object readResolve() {
-      return of(Arrays.asList(entries), Map.Entry::getKey, Map.Entry::getValue);
+    @Serial
+    private Object readResolve() throws InvalidObjectException {
+      if (entries == null) {
+        throw new InvalidObjectException("No entries");
+      }
+      try {
+        return of(Arrays.asList(entries), Map.Entry::getKey, Map.Entry::getValue);
+      } catch (NullPointerException | IllegalArgumentException e) {
+        throw (InvalidObjectException) new InvalidObjectException("Invalid entries").initCause(e);
+      }
     }
   }
 }
