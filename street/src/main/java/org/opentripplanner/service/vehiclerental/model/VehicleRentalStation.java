@@ -360,7 +360,8 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
       Objects.equals(system, that.system) &&
       Objects.equals(rentalUris, that.rentalUris) &&
       Objects.equals(vehicleTypesAvailable, that.vehicleTypesAvailable) &&
-      Objects.equals(vehicleSpacesAvailable, that.vehicleSpacesAvailable)
+      Objects.equals(vehicleSpacesAvailable, that.vehicleSpacesAvailable) &&
+      Objects.equals(returnPolicy, that.returnPolicy)
     );
   }
 
@@ -386,7 +387,8 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
       isReturning,
       overloadingAllowed,
       isArrivingInRentalVehicleAtDestinationAllowed,
-      realTimeData
+      realTimeData,
+      returnPolicy
     );
   }
 }

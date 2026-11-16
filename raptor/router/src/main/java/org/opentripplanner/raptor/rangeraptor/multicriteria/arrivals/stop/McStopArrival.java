@@ -17,7 +17,6 @@ public abstract sealed class McStopArrival<T extends RaptorTripSchedule>
   private final int round;
   private final int stop;
   private final int arrivalTime;
-  private final int travelDuration;
   private final int c1;
 
   /**
@@ -34,25 +33,17 @@ public abstract sealed class McStopArrival<T extends RaptorTripSchedule>
     this.round = round;
     this.stop = stop;
     this.arrivalTime = arrivalTime;
-    this.travelDuration = previous.travelDuration() + (arrivalTime - previous.arrivalTime());
     this.c1 = c1;
   }
 
   /**
    * Initial state - first stop visited during the RAPTOR algorithm.
    */
-  protected McStopArrival(
-    int stop,
-    int departureTime,
-    int travelDuration,
-    int initialC1,
-    int round
-  ) {
+  protected McStopArrival(int stop, int arrivalTime, int round, int initialC1) {
     this.previous = null;
     this.round = round;
     this.stop = stop;
-    this.arrivalTime = departureTime + travelDuration;
-    this.travelDuration = travelDuration;
+    this.arrivalTime = arrivalTime;
     this.c1 = initialC1;
   }
 
@@ -80,10 +71,6 @@ public abstract sealed class McStopArrival<T extends RaptorTripSchedule>
     return previous;
   }
 
-  public final int travelDuration() {
-    return travelDuration;
-  }
-
   public McStopArrival<T> timeShiftNewArrivalTime(int newArrivalTime) {
     throw new UnsupportedOperationException("No accessEgress for transfer stop arrival");
   }
@@ -105,7 +92,7 @@ public abstract sealed class McStopArrival<T extends RaptorTripSchedule>
   }
 
   @Override
-  public String toString() {
+  public final String toString() {
     return asString();
   }
 }

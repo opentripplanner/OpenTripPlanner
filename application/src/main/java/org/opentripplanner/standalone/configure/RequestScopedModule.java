@@ -25,6 +25,7 @@ import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.ext.taxi.TaxiService;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.filterchain.ext.EmissionDecorator;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
@@ -48,12 +49,15 @@ import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
-import org.opentripplanner.transfer.regular.RegularTransferService;
+import org.opentripplanner.transfer.regular.FlexTransferService;
 import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
+import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
+import org.opentripplanner.transit.transfer.regular.api.report.RegularTransferCacheReport;
 
 /**
  * Provides the bindings that live inside {@link RequestScopedFactory}. A single
@@ -98,6 +102,31 @@ public class RequestScopedModule {
     return new DefaultTransitService(transitRepository, timetableSnapshot);
   }
 
+  /**
+   * The regular-transfer snapshot of this request's {@link TransactionScope}, so the transfers
+   * used for routing and the paths recovered for the itineraries come from the same snapshot.
+   */
+  @Provides
+  @HttpRequestScoped
+  static RegularTransferRepositorySnapshot<NearbyStop, RouteRequest> regularTransfers(
+    RepositoryHandle<
+      RegularTransferRepositorySnapshot<NearbyStop, RouteRequest>,
+      RegularTransferRepository<NearbyStop>
+    > regularTransferRepositoryHandle,
+    TransactionScope transactionScope
+  ) {
+    return regularTransferRepositoryHandle.repositorySnapshot(transactionScope);
+  }
+
+  /** The report of the cache of the Raptor transfers, for the report API. */
+  @Provides
+  @HttpRequestScoped
+  static RegularTransferCacheReport regularTransferCacheReport(
+    RegularTransferRepositorySnapshot<NearbyStop, RouteRequest> regularTransfers
+  ) {
+    return regularTransfers.cacheReport();
+  }
+
   @Provides
   @Nullable
   @HttpRequestScoped
@@ -117,7 +146,7 @@ public class RequestScopedModule {
     Graph graph,
     TransitService transitService,
     TransitAlertService transitAlertService,
-    RegularTransferService transferService,
+    RegularTransferRepositorySnapshot<NearbyStop, RouteRequest> regularTransfers,
     StreetDetailsService streetDetailsService,
     LinkingContextFactory linkingContextFactory,
     StreetLimitationParametersService streetLimitationParametersService
@@ -126,7 +155,7 @@ public class RequestScopedModule {
       graph,
       transitService,
       transitAlertService,
-      transferService,
+      regularTransfers,
       streetDetailsService,
       linkingContextFactory,
       streetLimitationParametersService
@@ -194,7 +223,8 @@ public class RequestScopedModule {
     StreetLimitationParametersService streetLimitationParametersService,
     VehicleRentalService vehicleRentalService,
     StreetDetailsService streetDetailsService,
-    RegularTransferService transferService,
+    FlexTransferService transferService,
+    RegularTransferRepositorySnapshot<NearbyStop, RouteRequest> regularTransfers,
     FlexParameters flexParameters,
     List<RideHailingService> rideHailingServices,
     @Nullable DataOverlayParameterBindings dataOverlayParameterBindings,
@@ -217,6 +247,7 @@ public class RequestScopedModule {
       vehicleRentalService,
       streetDetailsService,
       transferService,
+      regularTransfers,
       transitAlertService,
       flexParameters,
       rideHailingServices,

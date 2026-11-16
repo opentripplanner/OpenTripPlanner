@@ -78,7 +78,7 @@ class BarrierEdgeBuilder {
               )
               .withPermission(permission)
               .withWheelchairAccessible(wheelchairAccessible)
-              .withBogusName(name == null);
+              .withNameIsDerived(name == null);
 
             // If the nodes being connected has no through traffic mode set,
             // the edge crossing the barrier also needs to have no through traffic mode set as well.

@@ -2,6 +2,7 @@ package org.opentripplanner.transit.model.timetable;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -9,10 +10,17 @@ import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.transit.model.timetable.TimetableValidationError.ErrorCode.NEGATIVE_DWELL_TIME;
 import static org.opentripplanner.transit.model.timetable.TimetableValidationError.ErrorCode.NEGATIVE_HOP_TIME;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.core.model.id.FeedScopedId;
@@ -459,5 +467,78 @@ class RealTimeTripTimesTest {
     assertEquals(NEGATIVE_HOP_TIME, error.code());
     assertEquals(expMsg, error.message());
     assertEquals(expMsg, ex.getMessage());
+  }
+
+  @Test
+  void testEqualsAndHashCode() {
+    var scheduled = createInitialTripTimes();
+    var subject = fullBuilder(scheduled).build();
+    var same = fullBuilder(scheduled).build();
+
+    assertEquals(subject, same);
+    assertEquals(subject.hashCode(), same.hashCode());
+  }
+
+  private static Stream<Arguments> equalsAndHashCodeFieldCases() {
+    return Stream.of(
+      fieldCase("scheduledTripTimes", b -> b.withServiceCode(42)),
+      fieldCase("arrivalTimes", b -> b.withArrivalTime(1, 65)),
+      fieldCase("departureTimes", b -> b.withDepartureTime(1, 75)),
+      fieldCase("stopRealTimeStates", b -> b.withCanceled(3)),
+      fieldCase("extraCalls", b -> b.withExtraCall(2, true)),
+      fieldCase("hasArrived", b -> b.withHasArrived(2, true)),
+      fieldCase("hasDeparted", b -> b.withHasDeparted(2, true)),
+      fieldCase("tripHeadsign", b -> b.withTripHeadsign(new NonLocalizedString("Other"))),
+      fieldCase("stopHeadsigns", b -> b.withStopHeadsign(2, new NonLocalizedString("Other"))),
+      fieldCase("occupancyStatus", b -> b.withOccupancyStatus(2, OccupancyStatus.FULL)),
+      fieldCase("wheelchairAccessibility", b ->
+        b.withWheelchairAccessibility(Accessibility.NOT_POSSIBLE)
+      ),
+      fieldCase("state", RealTimeTripTimesBuilder::withModifiedTripPattern),
+      fieldCase("partialReplacedBys", b -> b.withPartialReplacedBy(2, 3, tripOnServiceDate())),
+      fieldCase("vehicleId", b -> b.withVehicleId(id("otherVehicle")))
+    );
+  }
+
+  @ParameterizedTest(name = "{0}")
+  @MethodSource("equalsAndHashCodeFieldCases")
+  void fieldIsPartOfEqualsAndHashCode(String field, Consumer<RealTimeTripTimesBuilder> change) {
+    var scheduled = createInitialTripTimes();
+    var subject = fullBuilder(scheduled).build();
+    var builder = fullBuilder(scheduled);
+    change.accept(builder);
+    var other = builder.build();
+
+    assertNotEquals(subject, other);
+    assertNotEquals(subject.hashCode(), other.hashCode());
+  }
+
+  private static Arguments fieldCase(String field, Consumer<RealTimeTripTimesBuilder> change) {
+    return Arguments.of(field, change);
+  }
+
+  private static RealTimeTripTimesBuilder fullBuilder(TripTimes scheduled) {
+    return scheduled
+      .createRealTimeFromScheduledTimes()
+      .withArrivalTime(1, 70)
+      .withDepartureTime(1, 70)
+      .withRealTimeUpdated()
+      .withNoData(2)
+      .withExtraCall(1, true)
+      .withHasArrived(1, true)
+      .withHasDeparted(1, true)
+      .withTripHeadsign(new NonLocalizedString("Headsign"))
+      .withStopHeadsign(1, new NonLocalizedString("Stop headsign"))
+      .withOccupancyStatus(1, OccupancyStatus.MANY_SEATS_AVAILABLE)
+      .withWheelchairAccessibility(Accessibility.POSSIBLE)
+      .withPartialReplacedBy(0, 1, tripOnServiceDate())
+      .withVehicleId(id("vehicle"));
+  }
+
+  private static TripOnServiceDate tripOnServiceDate() {
+    return TripOnServiceDate.of(id("replacement"))
+      .withTrip(TransitRepositoryForTest.trip("replacementTrip").build())
+      .withServiceDate(LocalDate.of(2026, 1, 1))
+      .build();
   }
 }

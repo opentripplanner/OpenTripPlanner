@@ -11,7 +11,6 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.opentripplanner.raptor.api.debug.DebugEvent;
 import org.opentripplanner.raptor.api.debug.DebugLogger;
-import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.api.view.PatternRideView;
 
@@ -25,7 +24,7 @@ public class DebugRequestBuilder {
   private int debugPathFromStopIndex;
   private Consumer<DebugEvent<ArrivalView<?>>> stopArrivalListener;
   private Consumer<DebugEvent<PatternRideView<?, ?>>> patternRideDebugListener;
-  private Consumer<DebugEvent<RaptorPath<?>>> pathFilteringListener;
+  private Consumer<DebugEvent<ArrivalView<?>>> destinationArrivalListener;
   private DebugLogger logger;
 
   DebugRequestBuilder(DebugRequest debug) {
@@ -34,7 +33,7 @@ public class DebugRequestBuilder {
     this.debugPathFromStopIndex = debug.debugPathFromStopIndex();
     this.stopArrivalListener = debug.stopArrivalListener();
     this.patternRideDebugListener = debug.patternRideDebugListener();
-    this.pathFilteringListener = debug.pathFilteringListener();
+    this.destinationArrivalListener = debug.destinationArrivalListener();
     this.logger = debug.logger();
   }
 
@@ -80,10 +79,10 @@ public class DebugRequestBuilder {
     return this;
   }
 
-  public DebugRequestBuilder withPathFilteringListener(
-    Consumer<DebugEvent<RaptorPath<?>>> listener
+  public DebugRequestBuilder withDestinationArrivalListener(
+    Consumer<DebugEvent<ArrivalView<?>>> listener
   ) {
-    this.pathFilteringListener = listener;
+    this.destinationArrivalListener = listener;
     return this;
   }
 
@@ -104,7 +103,7 @@ public class DebugRequestBuilder {
       debugPathFromStopIndex,
       stopArrivalListener,
       patternRideDebugListener,
-      pathFilteringListener,
+      destinationArrivalListener,
       logger
     );
   }

@@ -44,6 +44,11 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>transit-transfer</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.opentripplanner.core</groupId>
             <artifactId>framework</artifactId>
             <version>${project.version}</version>
@@ -56,6 +61,11 @@
         <dependency>
             <groupId>org.opentripplanner.raptor</groupId>
             <artifactId>router</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.opentripplanner.raptor</groupId>
+            <artifactId>data</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -107,7 +117,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
-            <version>2.22</version>
+            <version>2.23</version>
         </dependency>
         <dependency>
             <groupId>tools.jackson.core</groupId>
@@ -150,7 +160,7 @@
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java</artifactId>
-            <version>26.1</version>
+            <version>26.2</version>
         </dependency>
         <dependency>
             <groupId>com.graphql-java</groupId>
@@ -301,7 +311,7 @@
         <dependency>
             <groupId>org.mobilitydata</groupId>
             <artifactId>gbfs-java-model</artifactId>
-            <version>1.0.14</version>
+            <version>2.0.0</version>
         </dependency>
         <!-- OBA GTFS loader -->
         <dependency>
@@ -433,6 +443,26 @@
                         <arg>-Adagger.nullableTypeAnnotations=ENABLED</arg>
                     </compilerArgs>
                 </configuration>
+            </plugin>
+            <plugin>
+                <!--
+                  Generate the Java types and data fetcher interfaces of the GTFS GraphQL API from
+                  its schema. See src/build/gtfs-graphql-codegen.yml for the type mappings.
+                -->
+                <groupId>org.opentripplanner</groupId>
+                <artifactId>graphql-codegen</artifactId>
+                <version>0.0.2</version>
+                <executions>
+                    <execution>
+                        <id>gtfs-graphql-codegen</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <configFile>${project.basedir}/src/build/gtfs-graphql-codegen.yml</configFile>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>

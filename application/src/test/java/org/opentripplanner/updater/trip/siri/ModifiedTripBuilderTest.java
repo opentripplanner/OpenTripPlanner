@@ -139,7 +139,7 @@ class ModifiedTripBuilderTest {
       SERVICE_ID,
       List.of(SERVICE_DATE.minusDays(1), SERVICE_DATE, SERVICE_DATE.plusDays(1))
     );
-    timetableDataImport.putServiceCode(SERVICE_ID, 0);
+    timetableDataImport.addNextServiceCodes(List.of(SERVICE_ID));
     timetableDataImport.updateCalendarServiceData(calendarServiceData);
 
     // Create transit model index

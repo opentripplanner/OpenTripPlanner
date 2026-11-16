@@ -830,6 +830,15 @@ type Itinerary {
   "Generalized cost of the itinerary. Used for debugging search results."
   generalizedCost: Int
   """
+  An opaque identifier for this itinerary. It can be used to refetch this exact
+  itinerary later (with current realtime data applied) using the `itinerary` query, without
+  resending the original search parameters. `null` if this itinerary cannot be refetched.
+  The routing preferences stored in the id are the ones in effect when the itinerary was
+  planned. If transit entity ids have changed after the itinerary id has been created, refetching
+  will fail.
+  """
+  itineraryId: String @deprecated(reason : "Experimental API that can be changed without notice.")
+  """
   A list of Legs. Each Leg is either a walking (cycling, car) portion of the
   itinerary, or a transit leg on a particular vehicle. So a itinerary where the
   user walks to the Q train, transfers to the 6, then walks to their
@@ -1645,6 +1654,15 @@ type QueryType {
     "Departure time of the trip, format: seconds since midnight of the departure date"
     time: Int!
   ): Trip @timingData
+  """
+  Refetch a previously planned itinerary using its stable `id` (see `Itinerary.itineraryId`), with current
+  realtime data applied. Returns `null` if the id is invalid, if the itinerary cannot be
+  refetched, or if a trip or stop it refers to no longer exists in the server's data.
+  The id is meant for refetching an itinerary during or shortly before travel, not for long-term
+  storage. If transit entity ids have changed after the itinerary id has been created, refetching
+  will fail.
+  """
+  itinerary(id: String!): Itinerary @deprecated(reason : "Experimental API that can be changed without notice.") @timingData
   """
   Try refetching the current state of a transit leg using its id.
   This fails when the underlying transit data (mostly IDs) has changed or are no longer available.
@@ -5090,14 +5108,14 @@ input PlanItineraryFilterInput {
   Pick one itinerary from each group after putting itineraries that are `85%` similar together,
   if the given value is `0.85`, for example. Itineraries are grouped together based on relative
   the distance of transit travel that is identical between the itineraries (access, egress and
-  transfers are ignored). The value must be at least `0.5`.
+  transfers are ignored). A value below `0.5` turns this filter off.
   """
   groupSimilarityKeepOne: Ratio = 0.85
   """
   Pick three itineraries from each group after putting itineraries that are `68%` similar together,
   if the given value is `0.68`, for example. Itineraries are grouped together based on relative
   the distance of transit travel that is identical between the itineraries (access, egress and
-  transfers are ignored). The value must be at least `0.5`.
+  transfers are ignored). A value below `0.5` turns this filter off.
   """
   groupSimilarityKeepThree: Ratio = 0.68
   """

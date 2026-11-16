@@ -10,7 +10,9 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
+import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model.vertex.BarrierVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
@@ -183,6 +185,52 @@ class StreetEdgeWheelchairCostTest {
     StreetEdge accessibleEdge = edge.toBuilder().withWheelchairAccessible(true).buildAndConnect();
     var accessibleResult = traverse(accessibleEdge, req.build());
     assertEquals(15, (long) accessibleResult.weight);
+  }
+
+  static Stream<Arguments> inaccessibleEndpointCases() {
+    return Stream.of(
+      Arguments.of(Accessibility.NOT_POSSIBLE, 615),
+      Arguments.of(Accessibility.POSSIBLE, 15),
+      Arguments.of(Accessibility.NO_INFORMATION, 15)
+    );
+  }
+
+  /**
+   * A {@link BarrierVertex} with {@link Accessibility#NOT_POSSIBLE} wheelchair accessibility
+   * (e.g. created for a {@code barrier=kerb} node with a raised/rolled kerb) adds a fixed cost
+   * to the edge ending at it, independent of the edge length.
+   */
+  @ParameterizedTest(
+    name = "a barrier vertex endpoint with accessibility {0} should lead to traversal costs of {1}"
+  )
+  @MethodSource("inaccessibleEndpointCases")
+  public void inaccessibleBarrierVertexEndpoint(Accessibility accessibility, long expectedCost) {
+    double length = 10;
+    var barrierVertex = new BarrierVertex(0, 0, 123, accessibility);
+    var edge = new StreetEdgeBuilder<>()
+      .withFromVertex(V1)
+      .withToVertex(barrierVertex)
+      .withName("edge to barrier vertex")
+      .withMeterLength(length)
+      .withPermission(StreetTraversalPermission.ALL)
+      .withBack(false)
+      .buildAndConnect();
+
+    var req = StreetSearchRequest.of();
+    req.withWheelchairEnabled(true);
+    req.withWheelchair(b ->
+      b
+        .withStopOnlyAccessible()
+        .withElevatorOnlyAccessible()
+        .withInaccessibleStreetReluctance(10)
+        .withMaxSlope(0)
+        .withSlopeExceededReluctance(1.1)
+        .withStairsReluctance(25)
+        .build()
+    );
+
+    var result = traverse(edge, req.build());
+    assertEquals(expectedCost, (long) result.weight);
   }
 
   static Stream<Arguments> walkReluctanceCases() {
