@@ -206,41 +206,51 @@ class RouteRequestMapperModesTest {
     return transitModes(
       Map.ofEntries(
         entry("mode", "RAIL"),
-        entry("distanceCategory", "LOCAL"),
+        entry("distanceCategories", List.of("LOCAL")),
         entry("cost", Map.ofEntries(entry("reluctance", localReluctance)))
       ),
       Map.ofEntries(
         entry("mode", "RAIL"),
-        entry("distanceCategory", "REGIONAL"),
+        entry("distanceCategories", List.of("REGIONAL")),
         entry("cost", Map.ofEntries(entry("reluctance", regionalReluctance)))
       )
     );
   }
 
   @Test
-  void testTransitModesWithDistanceCategory() {
+  void testTransitModesWithDistanceCategories() {
     var modesArgs = transitModes(
-      Map.ofEntries(entry("mode", "RAIL"), entry("distanceCategory", "LOCAL")),
-      Map.ofEntries(entry("mode", "RAIL"), entry("distanceCategory", "REGIONAL")),
-      Map.ofEntries(entry("mode", "COACH"), entry("distanceCategory", "LONG_DISTANCE")),
       Map.ofEntries(
         entry("mode", "RAIL"),
-        entry("distanceCategory", "LONG_DISTANCE"),
+        entry("distanceCategories", List.of("LOCAL", "REGIONAL"))
+      ),
+      Map.ofEntries(entry("mode", "COACH"), entry("distanceCategories", List.of("LONG_DISTANCE"))),
+      Map.ofEntries(
+        entry("mode", "FERRY"),
+        entry("distanceCategories", List.of("REGIONAL", "LONG_DISTANCE")),
         entry("replacement", Map.ofEntries(entry("requirement", "FORBIDDEN")))
       ),
-      Map.ofEntries(
-        entry("mode", "RAIL"),
-        entry("distanceCategory", "REGIONAL"),
-        entry("replacement", Map.ofEntries(entry("requirement", "REQUIRED")))
-      ),
-      Map.ofEntries(entry("mode", "BUS"), entry("distanceCategory", "REGIONAL")),
       Map.ofEntries(entry("mode", "BUS"))
     );
     var env = testCtx.executionContext(modesArgs);
     var routeRequest = RouteRequestMapper.toRouteRequest(env, testCtx.context());
     assertEquals(
-      "[(select: [(transportModes: [BUS, BUS::::IGNORED::REGIONAL, COACH::::IGNORED::LONG_DISTANCE, RAIL::::FORBIDDEN::LONG_DISTANCE, RAIL::::IGNORED::LOCAL, RAIL::::IGNORED::REGIONAL, RAIL::::REQUIRED::REGIONAL])])]",
+      "[(select: [(transportModes: [BUS, COACH::::IGNORED::LONG_DISTANCE, FERRY::::FORBIDDEN::LONG_DISTANCE, FERRY::::FORBIDDEN::REGIONAL, RAIL::::IGNORED::LOCAL, RAIL::::IGNORED::REGIONAL])])]",
       routeRequest.journey().transit().filters().toString()
+    );
+  }
+
+  @Test
+  void testTransitModeWithEmptyDistanceCategories() {
+    var env = testCtx.executionContext(
+      transitModes(Map.ofEntries(entry("mode", "RAIL"), entry("distanceCategories", List.of())))
+    );
+    var exception = assertThrows(InvalidInputException.class, () ->
+      RouteRequestMapper.toRouteRequest(env, testCtx.context())
+    );
+    assertEquals(
+      "The distance categories of transit mode RAIL must not be empty.",
+      exception.getMessage()
     );
   }
 

@@ -21,7 +21,7 @@ import org.jspecify.annotations.Nullable;
  */
 public enum DistanceCategory {
   /**
-   * Services within a city or its suburbs, e.g. S-Bahn, urban railways, trams, shuttles and
+   * Services within a city or its suburbs, e.g. urban railways, trams, shuttles and
    * local buses.
    */
   LOCAL,

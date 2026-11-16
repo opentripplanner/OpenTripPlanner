@@ -1218,8 +1218,11 @@ public class GraphQLTypes {
    * best guess based on their transit mode: `REGIONAL` for `RAIL` and `FERRY`, `LONG_DISTANCE` for
    * `COACH` and `AIRPLANE`, and `LOCAL` for all other modes.
    *
-   * The mapping is not configurable and can't be right for every deployment. For example, all high
-   * speed rail is `LONG_DISTANCE`, including the high speed regional services of the UK.
+   * Similarly, all submodes that don't directly refer to travel distance are filtered by a
+   * best-effort chosen category which might not make sense for some services.
+   *
+   * NOTE, THIS FILTER IS EXPERIMENTAL AND THE MAPPING BETWEEN MODES/SUBMODES AND CATEGORIES CAN
+   * CHANGE WITHOUT PRIOR NOTICE.
    */
   public enum GraphQLDistanceCategory {
     LOCAL,
@@ -2710,7 +2713,7 @@ public class GraphQLTypes {
   public static class GraphQLPlanTransitModePreferenceInput {
 
     private GraphQLTransitModePreferenceCostInput cost;
-    private GraphQLDistanceCategory distanceCategory;
+    private List<GraphQLDistanceCategory> distanceCategories;
     private GraphQLTransitMode mode;
     private GraphQLReplacementFilterInput replacement;
 
@@ -2719,12 +2722,16 @@ public class GraphQLTypes {
         this.cost = new GraphQLTransitModePreferenceCostInput(
           (Map<String, Object>) args.get("cost")
         );
-        if (args.get("distanceCategory") instanceof GraphQLDistanceCategory) {
-          this.distanceCategory = (GraphQLDistanceCategory) args.get("distanceCategory");
-        } else if (args.get("distanceCategory") != null) {
-          this.distanceCategory = GraphQLDistanceCategory.valueOf(
-            (String) args.get("distanceCategory")
-          );
+        if (args.get("distanceCategories") != null) {
+          this.distanceCategories = ((List<Object>) args.get("distanceCategories"))
+            .stream()
+            .map(item ->
+              item instanceof GraphQLDistanceCategory
+                ? item
+                : GraphQLDistanceCategory.valueOf((String) item)
+            )
+            .map(GraphQLDistanceCategory.class::cast)
+            .collect(Collectors.toList());
         }
         if (args.get("mode") instanceof GraphQLTransitMode) {
           this.mode = (GraphQLTransitMode) args.get("mode");
@@ -2741,8 +2748,8 @@ public class GraphQLTypes {
       return this.cost;
     }
 
-    public GraphQLDistanceCategory getGraphQLDistanceCategory() {
-      return this.distanceCategory;
+    public List<GraphQLDistanceCategory> getGraphQLDistanceCategories() {
+      return this.distanceCategories;
     }
 
     public GraphQLTransitMode getGraphQLMode() {
@@ -2757,8 +2764,8 @@ public class GraphQLTypes {
       this.cost = cost;
     }
 
-    public void setGraphQLDistanceCategory(GraphQLDistanceCategory distanceCategory) {
-      this.distanceCategory = distanceCategory;
+    public void setGraphQLDistanceCategories(List<GraphQLDistanceCategory> distanceCategories) {
+      this.distanceCategories = distanceCategories;
     }
 
     public void setGraphQLMode(GraphQLTransitMode mode) {

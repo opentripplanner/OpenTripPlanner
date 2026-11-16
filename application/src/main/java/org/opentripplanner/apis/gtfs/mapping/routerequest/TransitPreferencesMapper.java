@@ -117,8 +117,8 @@ public class TransitPreferencesMapper {
   }
 
   /**
-   * The reluctance is defined per main mode, so a mode listed more than once, e.g. with different
-   * distance categories, must have the same reluctance in all entries that set one.
+   * The reluctance is defined per main mode. A mode doesn't need to be listed more than once, but if
+   * it is, all entries that set a reluctance must set the same one.
    */
   private static Map<TransitMode, Double> mapReluctanceForMode(List<Map<String, Object>> transit) {
     var reluctanceForMode = new EnumMap<TransitMode, Double>(TransitMode.class);

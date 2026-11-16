@@ -3633,14 +3633,14 @@ Trips whose submode or extended route type isn't specific, e.g. a plain GTFS rou
 best guess based on their transit mode: `REGIONAL` for `RAIL` and `FERRY`, `LONG_DISTANCE` for
 `COACH` and `AIRPLANE`, and `LOCAL` for all other modes.
 
-The mapping is not configurable and can't be right for every deployment. For example, all high
-speed rail is `LONG_DISTANCE`, including the high speed regional services of the UK.
+Similarly, all submodes that don't directly refer to travel distance are filtered by a
+best-effort chosen category which might not make sense for some services.
+
+NOTE, THIS FILTER IS EXPERIMENTAL AND THE MAPPING BETWEEN MODES/SUBMODES AND CATEGORIES CAN
+CHANGE WITHOUT PRIOR NOTICE.
 """
 enum DistanceCategory {
-  """
-  Services within a city or its suburbs, e.g. S-Bahn, urban railways, trams, shuttles and local
-  buses.
-  """
+  "Services within a city or its suburbs, e.g. urban railways, trams, shuttles and local buses."
   LOCAL
   "National and international services, including high speed rail, night trains and domestic flights."
   LONG_DISTANCE
@@ -5249,21 +5249,17 @@ input PlanStreetPreferencesInput {
 
 "Transit mode and a reluctance associated with it."
 input PlanTransitModePreferenceInput {
-  """
-  Costs related to using a transit mode. Costs are defined per transit mode: if a mode is listed
-  more than once, e.g. with different distance categories, all entries that define a cost must
-  define the same cost.
-  """
+  "Costs related to using a transit mode."
   cost: TransitModePreferenceCostInput
   """
-  If present and not null, only trips with this distance category match. Every trip has a category,
-  see `DistanceCategory`. Like `replacement`, this further limits the transit mode selection, and a
-  trip has to match both.
+  If present and not null, only trips with one of these distance categories match. Every trip has
+  a category, see `DistanceCategory`. Like `replacement`, this further limits the transit mode
+  selection, and a trip has to match both. The list must not be empty.
   
-  For example, `[(mode: RAIL, distanceCategory: LOCAL), (mode: RAIL, distanceCategory: REGIONAL)]`
-  matches all trains except the long-distance trains.
+  For example, `(mode: RAIL, distanceCategories: [LOCAL, REGIONAL])` matches all trains except the
+  long-distance trains.
   """
-  distanceCategory: DistanceCategory
+  distanceCategories: [DistanceCategory!]
   "Transit mode that could be (but doesn't have to be) used in an itinerary."
   mode: TransitMode!
   """
