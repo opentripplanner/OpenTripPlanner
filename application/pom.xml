@@ -445,6 +445,26 @@
                 </configuration>
             </plugin>
             <plugin>
+                <!--
+                  Generate the Java types and data fetcher interfaces of the GTFS GraphQL API from
+                  its schema. See src/build/gtfs-graphql-codegen.yml for the type mappings.
+                -->
+                <groupId>org.opentripplanner</groupId>
+                <artifactId>graphql-codegen</artifactId>
+                <version>0.0.2</version>
+                <executions>
+                    <execution>
+                        <id>gtfs-graphql-codegen</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <configFile>${project.basedir}/src/build/gtfs-graphql-codegen.yml</configFile>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
                 <version>3.6.2</version>
