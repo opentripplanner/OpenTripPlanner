@@ -74,6 +74,8 @@ This behavior can also be modified by changing the previously mentioned environm
 build-time.
 
 The links from the debug client to GraphiQL (`VITE_GRAPHIQL_URL`) assume the API is at its default
-path. If OTP is served behind a proxy that exposes the API on another path, add an `endpoint`
-parameter to the link, for example `/graphiql?flavor=transmodel&endpoint=/my/proxy/graphql`. The
-endpoint must be on the same origin as the GraphiQL page, other values are ignored.
+path. If OTP is served behind a proxy that exposes the API on another path, add a
+`transmodelEndpoint` parameter to the link, for example
+`/graphiql?flavor=transmodel&transmodelEndpoint=/my/proxy/graphql`. The GTFS API has its own
+parameter, `gtfsEndpoint`. The endpoints must be on the same origin as the GraphiQL page, other
+values are ignored, and they are kept when the API is switched in the page.
