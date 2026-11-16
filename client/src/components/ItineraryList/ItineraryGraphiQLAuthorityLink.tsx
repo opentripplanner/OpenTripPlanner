@@ -1,5 +1,6 @@
 import { authorityQueryAsString } from '../../static/query/authorityQuery.tsx';
 import { Maybe } from '../../gql/graphql.ts';
+import { graphiQLLink } from '../../util/graphiQLLink.ts';
 const graphiQLUrl = import.meta.env.VITE_GRAPHIQL_URL;
 
 export function ItineraryGraphiQLAuthorityLink({
@@ -14,15 +15,9 @@ export function ItineraryGraphiQLAuthorityLink({
   }
 
   const queryID = { id: legId };
-  const formattedQuery = encodeURIComponent(authorityQueryAsString);
-  const formattedQueryID = encodeURIComponent(JSON.stringify(queryID));
 
   return (
-    <a
-      href={graphiQLUrl + '&query=' + formattedQuery + '&variables=' + formattedQueryID}
-      target={'_blank'}
-      rel={'noreferrer'}
-    >
+    <a href={graphiQLLink(graphiQLUrl, authorityQueryAsString, queryID)} target={'_blank'} rel={'noreferrer'}>
       {legName}
     </a>
   );
