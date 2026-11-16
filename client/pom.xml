@@ -72,4 +72,44 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <!--
+            With -Dplugin.frontend.skip=true, a clean or fresh checkout gives a debug client jar without
+            the client, and nothing else fails. That jar must not reach Maven Central, so the release
+            build fails if the client is not there. The check runs after the npm steps above, which come
+            first in this phase.
+            -->
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                        <version>3.6.2</version>
+                        <executions>
+                            <execution>
+                                <id>require-debug-client</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>enforce</goal>
+                                </goals>
+                                <configuration>
+                                    <rules>
+                                        <requireFilesExist>
+                                            <files>
+                                                <file>${project.build.outputDirectory}/client/index.html</file>
+                                            </files>
+                                            <message>The debug client is missing from target/classes/client, so the jar would be released without it. Build it first: run the release build without -Dplugin.frontend.skip=true, or run mvn package without it in this checkout, without mvn clean afterwards.</message>
+                                        </requireFilesExist>
+                                    </rules>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
