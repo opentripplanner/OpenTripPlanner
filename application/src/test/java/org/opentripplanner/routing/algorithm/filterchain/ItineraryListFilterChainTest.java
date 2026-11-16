@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.opentripplanner.core.model.basic.CostLinearFunction;
+import org.opentripplanner.core.model.basic.Ratio;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
@@ -145,7 +146,7 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
   @Test
   void groupByTheLongestItineraryAndTwoGroups() {
     ItineraryListFilterChain chain = createBuilder(false, false, 20)
-      .addGroupBySimilarity(GroupBySimilarity.createWithOneItineraryPerGroup(.5))
+      .addGroupBySimilarity(GroupBySimilarity.createWithOneItineraryPerGroup(Ratio.of(0.5)))
       .build();
 
     // Group 1
@@ -261,7 +262,7 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
     ItineraryListFilterChain chain = createBuilder(false, false, 10)
       // we need to add the group-by-distance-and-id filter because it undeletes those with the
       // fewest transfers and we want to make sure that the filter under test comes _after_
-      .addGroupBySimilarity(GroupBySimilarity.createWithOneItineraryPerGroup(.5))
+      .addGroupBySimilarity(GroupBySimilarity.createWithOneItineraryPerGroup(Ratio.of(0.5)))
       .withRemoveTimeshiftedItinerariesWithSameRoutesAndStops(true)
       .build();
     assertEquals(toStr(List.of(i4, i1)), toStr(chain.filter(List.of(i1, i2, i3, i4, i5, i6))));
@@ -291,7 +292,7 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
     var chain = new ItineraryListFilterChainBuilder(STREET_AND_ARRIVAL_TIME)
       .withMaxNumberOfItineraries(3)
       .addGroupBySimilarity(
-        GroupBySimilarity.createWithMoreThanOneItineraryPerGroup(0.68, 3, true, 0.0)
+        GroupBySimilarity.createWithMoreThanOneItineraryPerGroup(Ratio.of(0.68), 3, true, 0.0)
       )
       .build();
 

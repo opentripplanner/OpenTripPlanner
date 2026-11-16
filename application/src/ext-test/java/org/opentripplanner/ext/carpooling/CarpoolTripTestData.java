@@ -74,20 +74,7 @@ public class CarpoolTripTestData {
     List<CarpoolStop> allStops = new ArrayList<>();
     allStops.add(createOriginStop(boarding));
 
-    for (int i = 0; i < intermediateStops.size(); i++) {
-      CarpoolStop intermediate = intermediateStops.get(i);
-      allStops.add(
-        CarpoolStop.of(intermediate.getId())
-          .withCoordinate(intermediate.getCoordinate())
-          .withExpectedDepartureTime(intermediate.getExpectedDepartureTime())
-          .withAimedDepartureTime(intermediate.getAimedDepartureTime())
-          .withExpectedArrivalTime(intermediate.getExpectedArrivalTime())
-          .withAimedArrivalTime(intermediate.getAimedArrivalTime())
-          .withOnboardCount(intermediate.getOnboardCount())
-          .withDeviationBudget(intermediate.getDeviationBudget())
-          .build()
-      );
-    }
+    allStops.addAll(intermediateStops);
 
     allStops.add(createDestinationStop(alighting));
     return buildTrip(DEFAULT_TOTAL_CAPACITY, null, allStops);
@@ -107,20 +94,7 @@ public class CarpoolTripTestData {
     List<CarpoolStop> allStops = new ArrayList<>();
     allStops.add(createOriginStopWithDeviationBudget(boarding, deviationBudget));
 
-    for (int i = 0; i < intermediateStops.size(); i++) {
-      CarpoolStop intermediate = intermediateStops.get(i);
-      allStops.add(
-        CarpoolStop.of(intermediate.getId())
-          .withCoordinate(intermediate.getCoordinate())
-          .withExpectedDepartureTime(intermediate.getExpectedDepartureTime())
-          .withAimedDepartureTime(intermediate.getAimedDepartureTime())
-          .withExpectedArrivalTime(intermediate.getExpectedArrivalTime())
-          .withAimedArrivalTime(intermediate.getAimedArrivalTime())
-          .withOnboardCount(intermediate.getOnboardCount())
-          .withDeviationBudget(intermediate.getDeviationBudget())
-          .build()
-      );
-    }
+    allStops.addAll(intermediateStops);
 
     allStops.add(createDestinationStopWithDeviationBudget(alighting, deviationBudget));
     return buildTrip(DEFAULT_TOTAL_CAPACITY, null, allStops);

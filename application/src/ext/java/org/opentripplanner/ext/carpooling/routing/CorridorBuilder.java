@@ -1,0 +1,167 @@
+package org.opentripplanner.ext.carpooling.routing;
+
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import org.jspecify.annotations.Nullable;
+import org.opentripplanner.astar.model.ShortestPathTree;
+import org.opentripplanner.astar.strategy.ComposingSkipEdgeStrategy;
+import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
+import org.opentripplanner.ext.carpooling.util.CarReachableVertexSnapper.SnapResult;
+import org.opentripplanner.ext.carpooling.util.TraversalScope;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.street.service.StreetLimitationParametersService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * Computes a trip's {@link CarpoolCorridor} from the static street graph: the routed baseline of
+ * every leg, and per leg the transit stops inside its feasibility ellipse with the driving times to
+ * serve them. Per leg this builds two ellipse-bounded car trees and reads the times of every stop
+ * inside the ellipse's bounding box off them.
+ */
+public class CorridorBuilder {
+
+  private static final Logger LOG = LoggerFactory.getLogger(CorridorBuilder.class);
+
+  private final CarpoolStopIndex stopIndex;
+  private final CarpoolStreetRouter baselineRouter;
+  private final double maxCarSpeedMetersPerSecond;
+  private final Duration maxTripDuration;
+
+  public CorridorBuilder(
+    CarpoolStopIndex stopIndex,
+    StreetLimitationParametersService streetLimitationParametersService,
+    Duration maxTripDuration
+  ) {
+    this.stopIndex = Objects.requireNonNull(stopIndex, "stopIndex");
+    this.baselineRouter = new CarpoolStreetRouter(
+      streetLimitationParametersService,
+      maxTripDuration
+    );
+    this.maxCarSpeedMetersPerSecond = streetLimitationParametersService.maxCarSpeed();
+    this.maxTripDuration = Objects.requireNonNull(maxTripDuration, "maxTripDuration");
+  }
+
+  /**
+   * The corridor of the trip, or {@code null} when a leg of its baseline cannot be routed within
+   * the carpool bound: such a trip cannot carry a passenger.
+   */
+  @Nullable
+  public CarpoolCorridor build(CarpoolTrip trip, List<Vertex> vertices) {
+    int legs = vertices.size() - 1;
+
+    var legDurations = new Duration[legs];
+    var legLimits = new Duration[legs];
+    for (int leg = 0; leg < legs; leg++) {
+      var segment = baselineRouter.route(vertices.get(leg), vertices.get(leg + 1));
+      if (segment == null) {
+        LOG.debug("Leg {} of carpool trip {} cannot be routed; no corridor", leg, trip.getId());
+        return null;
+      }
+      legDurations[leg] = segment.duration();
+      legLimits[leg] = legDurations[leg].plus(trip.legDeviationBudget(leg));
+    }
+
+    var stops = new ArrayList<CarpoolCorridor.CorridorStop>();
+    for (int leg = 0; leg < legs; leg++) {
+      var from = vertices.get(leg);
+      var to = vertices.get(leg + 1);
+      var searchLimit =
+        legLimits[leg].compareTo(maxTripDuration) <= 0 ? legLimits[leg] : maxTripDuration;
+      var bound = new DetourBound(from, to, searchLimit, maxCarSpeedMetersPerSecond);
+
+      var forward = corridorTree(from, false, searchLimit, bound);
+      var reverse = corridorTree(to, true, searchLimit, bound);
+      for (var stop : stopIndex.stopsWithin(bound.envelope())) {
+        // A stop's snap lies within a walk of it, so a stop the detour cannot pass that close to
+        // has no snap the corridor could serve.
+        if (!bound.mayPassWithin(stopIndex.walkMeters(), stop)) {
+          continue;
+        }
+        var dropoff = times(stopIndex.dropoffSnap(stop.getId()), forward, reverse, bound);
+        var pickup = times(stopIndex.pickupSnap(stop.getId()), forward, reverse, bound);
+        if (dropoff != null || pickup != null) {
+          stops.add(
+            new CarpoolCorridor.CorridorStop(
+              stop.getId(),
+              leg,
+              dropoff == null ? -1 : dropoff.toStop(),
+              dropoff == null ? -1 : dropoff.fromStop(),
+              pickup == null ? -1 : pickup.toStop(),
+              pickup == null ? -1 : pickup.fromStop()
+            )
+          );
+        }
+      }
+    }
+    LOG.debug(
+      "Corridor of carpool trip {}: {} legs, {} stop entries",
+      trip.getId(),
+      legs,
+      stops.size()
+    );
+    return new CarpoolCorridor(
+      List.of(legDurations),
+      List.of(legLimits),
+      stops,
+      vertices,
+      maxCarSpeedMetersPerSecond
+    );
+  }
+
+  /**
+   * A car tree of the leg that expands only where a detour can pass, and never onto another
+   * request's temporary edges: what a corridor tree finds is kept for the trip's lifetime.
+   */
+  private static ShortestPathTree<State, Edge, Vertex> corridorTree(
+    Vertex root,
+    boolean reverse,
+    Duration searchLimit,
+    DetourBound bound
+  ) {
+    return CarpoolTreeStreetRouter.carTree(
+      root,
+      reverse,
+      searchLimit,
+      new ComposingSkipEdgeStrategy<>(
+        TraversalScope.withOwnLinkingOf(root),
+        bound.skipEdgeStrategy(reverse)
+      )
+    );
+  }
+
+  /** Driving times from the leg's start to a stop's snap vertex and from there to the leg's end. */
+  private record StopTimes(int toStop, int fromStop) {}
+
+  /**
+   * The driving times through the snap vertex, or {@code null} when there is no snap, a side is
+   * unreachable, or the detour through it exceeds the leg's bound.
+   */
+  @Nullable
+  private static StopTimes times(
+    @Nullable SnapResult snap,
+    ShortestPathTree<State, Edge, Vertex> forward,
+    ShortestPathTree<State, Edge, Vertex> reverse,
+    DetourBound bound
+  ) {
+    if (snap == null) {
+      return null;
+    }
+    int toStop = elapsedSeconds(forward, snap.vertex());
+    int fromStop = elapsedSeconds(reverse, snap.vertex());
+    if (toStop < 0 || fromStop < 0 || !bound.fits(toStop, fromStop)) {
+      return null;
+    }
+    return new StopTimes(toStop, fromStop);
+  }
+
+  /** The tree's travel time to (or from) {@code vertex} in seconds, {@code -1} if unreached. */
+  private static int elapsedSeconds(ShortestPathTree<State, Edge, Vertex> tree, Vertex vertex) {
+    var state = tree.getState(vertex);
+    return state == null ? -1 : (int) state.getElapsedTimeSeconds();
+  }
+}

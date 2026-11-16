@@ -82,7 +82,7 @@ class StreetEdgeBuilderTest {
       .withBack(BACK)
       .withStairs(STAIRS)
       .withSlopeOverride(SLOPE_OVERRIDE)
-      .withBogusName(NAME_IS_DERIVED)
+      .withNameIsDerived(NAME_IS_DERIVED)
       .withWalkNoThruTraffic(WALK_NO_THRU_TRAFFIC)
       .withBicycleNoThruTraffic(BICYCLE_NO_THRU_TRAFFIC)
       .withMotorVehicleNoThruTraffic(MOTOR_VEHICLE_NO_THRU_TRAFFIC)

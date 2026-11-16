@@ -2434,10 +2434,11 @@ input ItineraryFilters {
   itineraries are returned with a system notice, and not deleted.
   """
   debug: ItineraryFilterDebugProfile = off
+  "Same as groupSimilarityKeepThree. The value must be between 0 and 1. A value below 0.5 turns this filter off."
   groupSimilarityKeepNumOfItineraries: Float = 0.68 @deprecated(reason : "Use groupSimilarityKeepThree instead.")
-  "Pick ONE itinerary from each group after putting itineraries that is 85% similar together."
+  "Group itineraries that are at least this similar, and keep ONE itinerary from each group. Similarity is the share of the travel distance two itineraries have in common. The value must be between 0 and 1. A value below 0.5 turns this filter off."
   groupSimilarityKeepOne: Float = 0.85
-  "Reduce the number of itineraries in each group to to maximum 3 itineraries. The itineraries are grouped by similar legs (on board same journey). So, if  68% of the distance is traveled by similar legs, then two itineraries are in the same group. Default value is 68%, must be at least 50%."
+  "Group itineraries that are at least this similar, and keep at most three itineraries from each group. Similarity is the share of the travel distance two itineraries have in common. The value must be between 0 and 1. A value below 0.5 turns this filter off."
   groupSimilarityKeepThree: Float = 0.68
   "Of the itineraries grouped to maximum of three itineraries, how much worse can the non-grouped legs be compared to the lowest cost. 2.0 means that they can be double the cost, and any itineraries having a higher cost will be filtered. Default value is 2.0, use a value lower than 1.0 to turn off"
   groupedOtherThanSameLegsMaxCostMultiplier: Float = 2.0

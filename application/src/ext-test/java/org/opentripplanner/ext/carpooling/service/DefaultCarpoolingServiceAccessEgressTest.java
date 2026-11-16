@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.ext.carpooling.CarpoolTripTestData;
 import org.opentripplanner.ext.carpooling.internal.CarpoolItineraryMapper;
 import org.opentripplanner.ext.carpooling.model.CarpoolLeg;
@@ -43,7 +44,8 @@ import org.opentripplanner.transit.service.TransitServiceResolver;
  * Integration tests for {@link DefaultCarpoolingService#routeAccessEgress}.
  * <p>
  * These tests use a real street graph with transit stops to verify the full access/egress
- * routing pipeline including nearby stop finding, insertion evaluation, and result mapping.
+ * routing pipeline including the stops of the trips' corridors, insertion evaluation, and result
+ * mapping.
  * <p>
  * Graph layout (going east):
  * <pre>
@@ -51,8 +53,8 @@ import org.opentripplanner.transit.service.TransitServiceResolver;
  *                    / \     / \     / \      :
  *                    |   |   |   |   |   |    : (PEDESTRIAN only)
  *   P1 ---------- A ----- B ----- C ----- D ---------- P3
- *                    \ /             \ /
- *                    T2              T4
+ *                    \ /             \ /      :
+ *                    T2              T4       T6 (walk-only side branch)
  *
  *   Carpool trip: A -> (B -> C) -> D  (2 or 4 stops)
  *   Transit stops: T1..T4 connected to the drivable network with all-permission streets;
@@ -62,7 +64,8 @@ import org.opentripplanner.transit.service.TransitServiceResolver;
  *     T2 = south of A-B midpoint (connected to A and B)
  *     T3 = north of C-D midpoint (connected to C and D)
  *     T4 = south of C-D midpoint (connected to C and D)
- *     T5 = north of D, reachable from D only via a walk-only side branch
+ *     T5 = north of D, reachable from D only via a walk-only side branch; accessibility unknown
+ *     T6 = south of D, a copy of T5 that is wheelchair accessible
  *   Passenger locations:
  *     P1 = 50km west of A (connected to A)
  *     P2 = between B and C, north (connected to B and C)
@@ -88,6 +91,7 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
   private TransitStopVertex stopT3;
   private TransitStopVertex stopT4;
   private TransitStopVertex stopT5;
+  private TransitStopVertex stopT6;
 
   // Carpool trip waypoints
   private WgsCoordinate coordA;
@@ -150,9 +154,7 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
           biLink(iT4, stopT4);
 
           // T5 sits on a pedestrian-only side branch off the drivable network: a car can drive
-          // to D but cannot continue to iT5, so a pure CAR nearby-stop search misses it.
-          // CAR_PICKUP, which models walk -> drive -> walk, can drive to D and walk the
-          // final stretch to reach stopT5.
+          // to D but cannot continue to iT5, so the passenger walks the final stretch from D.
           var iT5 = intersection("iT5", ORIGIN.moveEastMeters(2000).moveNorthMeters(200));
           street(
             D,
@@ -161,8 +163,27 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
             StreetTraversalPermission.PEDESTRIAN,
             StreetTraversalPermission.PEDESTRIAN
           );
-          stopT5 = stop("T5", iT5.toWgsCoordinate());
+          stopT5 = stop("T5", b ->
+            b
+              .withCoordinate(iT5.toWgsCoordinate())
+              .withWheelchairAccessibility(Accessibility.NO_INFORMATION)
+          );
           biLink(iT5, stopT5);
+
+          var iT6 = intersection("iT6", ORIGIN.moveEastMeters(2000).moveSouthMeters(200));
+          street(
+            D,
+            iT6,
+            200,
+            StreetTraversalPermission.PEDESTRIAN,
+            StreetTraversalPermission.PEDESTRIAN
+          );
+          stopT6 = stop("T6", b ->
+            b
+              .withCoordinate(iT6.toWgsCoordinate())
+              .withWheelchairAccessibility(Accessibility.POSSIBLE)
+          );
+          biLink(iT6, stopT6);
 
           // Passenger locations
           var iP1 = intersection("P1", ORIGIN.moveWestMeters(50000));
@@ -202,6 +223,24 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
   private IntersectionVertex vertexP3;
   private IntersectionVertex vertexIT3;
   private IntersectionVertex vertexIT4;
+
+  private List<CarpoolAccessEgress> routeAccessWithMaxCarpoolDuration(Duration maxDuration) {
+    var request = buildCarpoolRequest(coordP2, coordP3, SEARCH_TIME)
+      .copyOf()
+      .withPreferences(p ->
+        p.withStreet(s ->
+          s.withAccessEgress(ae -> ae.withMaxDuration(b -> b.with(StreetMode.CARPOOL, maxDuration)))
+        )
+      )
+      .buildRequest();
+    return service.routeAccessEgress(
+      request,
+      new StreetRequest(StreetMode.CARPOOL),
+      AccessEgressType.ACCESS,
+      transitServiceResolver,
+      SEARCH_TIME
+    );
+  }
 
   private RouteRequest buildCarpoolRequest(
     WgsCoordinate from,
@@ -315,8 +354,11 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
       assertTrue(accessEgress.durationInSeconds() > 0, "Duration should be positive");
       assertTrue(accessEgress.hasOpeningHours(), "Carpool access should have opening hours");
       assertFalse(accessEgress.isWalkOnly(), "Carpool access should not be walk-only");
-      assertNotNull(accessEgress.sharedSegments(), "Shared segments should not be null");
-      assertFalse(accessEgress.sharedSegments().isEmpty(), "Shared segments should not be empty");
+      assertNotNull(accessEgress.pathsWithNewPassenger(), "Shared segments should not be null");
+      assertFalse(
+        accessEgress.pathsWithNewPassenger().isEmpty(),
+        "Shared segments should not be empty"
+      );
     }
 
     int stopT3Index = transitServiceResolver.getStop(stopT3.getId()).getIndex();
@@ -329,6 +371,16 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
       results.stream().anyMatch(r -> r.stop() == stopT4Index),
       "At least one access result should include stopT4"
     );
+  }
+
+  @Test
+  void accessOverTheRequestsMaxCarpoolAccessDurationIsDropped() {
+    var departureTime = SEARCH_TIME.plusMinutes(30);
+    context.upsertTrip(CarpoolTripTestData.createSimpleTripWithTime(coordA, coordD, departureTime));
+
+    assertFalse(routeAccessWithMaxCarpoolDuration(Duration.ofHours(2)).isEmpty());
+    // P2 to the nearest stop drives 77 s; with the 60 s pickup dwell the leg takes 137 s.
+    assertTrue(routeAccessWithMaxCarpoolDuration(Duration.ofMinutes(2)).isEmpty());
   }
 
   @Test
@@ -352,7 +404,7 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
 
     for (CarpoolAccessEgress accessEgress : results) {
       assertTrue(accessEgress.durationInSeconds() > 0, "Duration should be positive");
-      assertNotNull(accessEgress.sharedSegments(), "Shared segments should not be null");
+      assertNotNull(accessEgress.pathsWithNewPassenger(), "Shared segments should not be null");
     }
 
     int stopT1Index = transitServiceResolver.getStop(stopT1.getId()).getIndex();
@@ -548,15 +600,70 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
   }
 
   /**
-   * Regression test: {@code routeAccessEgress} must call {@code findNearbyStops} with
-   * {@link StreetMode#CAR_PICKUP}, not {@link StreetMode#CAR}. CAR_PICKUP allows the search to
-   * leave the drivable network and walk the last stretch to a transit stop whose link endpoint is
-   * reachable only via a pedestrian-only edge (e.g. a pedestrian-plaza stop).
+   * A transit stop whose link endpoint is reachable only via a pedestrian-only edge (e.g. a
+   * pedestrian-plaza stop) is served at the nearest vertex a car can reach and leave, with a walk
+   * for the last stretch.
    * <p>
-   * In this graph stopT5 is exactly such a stop: a walk-only side branch off D. A pure CAR
-   * search would never reach it, so it would not appear in any access result. If the implementation
-   * regresses to using CAR here, this assertion will fail.
+   * In this graph stopT5 is exactly such a stop: a walk-only side branch off D. A car alone
+   * would never reach it, so without the walk it would not appear in any access result.
    */
+  @Test
+  void aStopWhoseWalkIsLongerThanTheRequestAllowsIsLeftOut() {
+    context.upsertTrip(
+      CarpoolTripTestData.createSimpleTripWithTime(coordA, coordD, SEARCH_TIME.plusMinutes(30))
+    );
+    // T5 is a 200 m walk from D, so it takes longer than the one minute this request allows.
+    var request = buildCarpoolRequest(coordP2, coordP3, SEARCH_TIME)
+      .copyOf()
+      .withPreferences(p ->
+        p.withStreet(s ->
+          s.withAccessEgress(ae ->
+            ae.withMaxDuration(b -> b.with(StreetMode.WALK, Duration.ofMinutes(1)))
+          )
+        )
+      )
+      .buildRequest();
+
+    var results = service.routeAccessEgress(
+      request,
+      new StreetRequest(StreetMode.CARPOOL),
+      AccessEgressType.ACCESS,
+      transitServiceResolver,
+      SEARCH_TIME
+    );
+
+    int stopT3Index = transitServiceResolver.getStop(stopT3.getId()).getIndex();
+    int stopT5Index = transitServiceResolver.getStop(stopT5.getId()).getIndex();
+    assertTrue(results.stream().anyMatch(r -> r.stop() == stopT3Index), "T3 needs no walk");
+    assertTrue(results.stream().noneMatch(r -> r.stop() == stopT5Index));
+  }
+
+  @Test
+  void aStopWhoseWalkThePassengerCannotTakeIsLeftOut() {
+    context.upsertTrip(
+      CarpoolTripTestData.createSimpleTripWithTime(coordA, coordD, SEARCH_TIME.plusMinutes(30))
+    );
+    // T5 and T6 are both a walk from D, ending on the link into the stop. A wheelchair user
+    // cannot take that link at T5, whose accessibility is unknown, but can at T6.
+    var request = buildCarpoolRequest(coordP2, coordP3, SEARCH_TIME)
+      .copyOf()
+      .withJourney(j -> j.withWheelchair(true))
+      .buildRequest();
+
+    var results = service.routeAccessEgress(
+      request,
+      new StreetRequest(StreetMode.CARPOOL),
+      AccessEgressType.ACCESS,
+      transitServiceResolver,
+      SEARCH_TIME
+    );
+
+    int stopT5Index = transitServiceResolver.getStop(stopT5.getId()).getIndex();
+    int stopT6Index = transitServiceResolver.getStop(stopT6.getId()).getIndex();
+    assertTrue(results.stream().noneMatch(r -> r.stop() == stopT5Index));
+    assertTrue(results.stream().anyMatch(r -> r.stop() == stopT6Index));
+  }
+
   @Test
   void accessFindsTransitStopReachableOnlyViaWalkOnlySideBranchFromDrivableNetwork() {
     var departureTime = SEARCH_TIME.plusMinutes(30);
@@ -582,9 +689,7 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
     assertNotNull(
       stopT5Result,
       "Access results should include stopT5, which is only reachable from the drivable " +
-        "network by walking. If routeAccessEgress called findNearbyStops with " +
-        "StreetMode.CAR instead of CAR_PICKUP the search could not leave the car network " +
-        "to walk the pedestrian-only side branch to stopT5, and the stop would be missing here."
+        "network by walking the pedestrian-only side branch from D."
     );
 
     // The carpool drops the passenger at D (the only drivable vertex incident to the side branch)

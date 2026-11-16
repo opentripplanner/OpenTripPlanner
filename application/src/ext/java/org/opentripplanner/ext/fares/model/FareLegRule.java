@@ -148,7 +148,10 @@ public final class FareLegRule implements Serializable {
       Objects.equals(this.fromAreaId, that.fromAreaId) &&
       Objects.equals(this.toAreaId, that.toAreaId) &&
       Objects.equals(this.fareDistance, that.fareDistance) &&
-      Objects.equals(this.fareProducts, that.fareProducts)
+      Objects.equals(this.fareProducts, that.fareProducts) &&
+      Objects.equals(this.priority, that.priority) &&
+      Objects.equals(this.fromTimeframes, that.fromTimeframes) &&
+      Objects.equals(this.toTimeframes, that.toTimeframes)
     );
   }
 
@@ -161,7 +164,10 @@ public final class FareLegRule implements Serializable {
       fromAreaId,
       toAreaId,
       fareDistance,
-      fareProducts
+      fareProducts,
+      priority,
+      fromTimeframes,
+      toTimeframes
     );
   }
 

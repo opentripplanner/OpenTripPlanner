@@ -125,7 +125,17 @@ public abstract class OsmEntity {
     "tyres"
   );
 
-  private static final Set<String> WHEELCHAIR_ACCESSIBLE_KERBS = Set.of("flush", "lowered", "no");
+  // https://wiki.openstreetmap.org/wiki/Key:kerb documents flush/lowered/no as accessible, but
+  // real-world data (e.g. taginfo) also shows the widely-used synonyms "sloped", "none" and "low".
+  // Compound values like "flush_and_lowered" are considered tagging errors and not supported.
+  private static final Set<String> WHEELCHAIR_ACCESSIBLE_KERBS = Set.of(
+    "flush",
+    "lowered",
+    "no",
+    "none",
+    "sloped",
+    "low"
+  );
 
   private static final Consumer<String> NO_OP = i -> {};
 
@@ -897,6 +907,9 @@ public abstract class OsmEntity {
    *         information.
    */
   public boolean isWheelchairAccessible() {
+    if (this.isTagless()) {
+      return true;
+    }
     var wheelchairValue = getTag("wheelchair");
     if (isTrue(wheelchairValue)) {
       return true;
@@ -908,9 +921,17 @@ public abstract class OsmEntity {
       return false;
     }
     if (isTag("barrier", "kerb")) {
-      return isOneOfTags("kerb", WHEELCHAIR_ACCESSIBLE_KERBS);
+      // kerb can have semicolon-separated values, e.g. kerb=lowered;raised. The node is
+      // accessible if any of them indicates an accessible kerb.
+      return getMultiTagValues(Set.of("kerb"))
+        .stream()
+        .anyMatch(WHEELCHAIR_ACCESSIBLE_KERBS::contains);
     }
     return true;
+  }
+
+  public boolean isWheelchairInaccessible() {
+    return !isWheelchairAccessible();
   }
 
   /**
