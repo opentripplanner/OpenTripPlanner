@@ -26,6 +26,9 @@ This module mounts an endpoint for generating reports under `otp/report`. Availa
   and street entities in the graph
 - [/otp/report/transit/group/priorities](http://localhost:8080/otp/report/transit/group/priorities):
   List all transit groups used for transit-group-priority (Competition neutral planning).
+- [/otp/report/regular-transfers/cache.json](http://localhost:8080/otp/report/regular-transfers/cache.json)
+  The user preferences the regular transfers are cached for, with the number of requests that used
+  each (source: profile, warmup or on demand).
 
 ### Configuration
 

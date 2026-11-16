@@ -16,6 +16,7 @@ import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.event.DomainEvent;
 import org.opentripplanner.core.model.event.EventHandler;
 import org.opentripplanner.core.model.transaction.RepositoryHandle;
+import org.opentripplanner.core.model.transaction.RepositoryRegistry;
 import org.opentripplanner.core.model.transaction.UpdateManager;
 import org.opentripplanner.core.model.transaction.WriteContext;
 
@@ -27,14 +28,28 @@ import org.opentripplanner.core.model.transaction.WriteContext;
  * task completes, changes are committed via the {@link TransactionManager}. The transaction manager
  * is package-private and never exposed to callers — commit is an internal implementation detail.
  */
-class DefaultUpdateManager implements UpdateManager {
+public class DefaultUpdateManager implements UpdateManager {
 
   private final TransactionManager transactionManager;
   private final ExecutorService executor;
   private final Map<Class<?>, List<HandlerEntry<?, ?>>> eventHandlers = new HashMap<>();
   private final PeriodicCommitScheduler periodicCommitScheduler;
 
-  DefaultUpdateManager(
+  public DefaultUpdateManager(
+    String name,
+    RepositoryRegistry repositoryRegistry,
+    ThreadFactory threadFactory,
+    @Nullable Duration commitInterval
+  ) {
+    this(
+      name,
+      ((DefaultRepositoryRegistry) repositoryRegistry).transactionManager(),
+      threadFactory,
+      commitInterval
+    );
+  }
+
+  private DefaultUpdateManager(
     String name,
     TransactionManager transactionManager,
     ThreadFactory threadFactory,

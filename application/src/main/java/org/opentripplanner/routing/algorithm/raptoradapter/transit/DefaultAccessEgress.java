@@ -4,18 +4,17 @@ import java.util.Objects;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.routing.cost.CostLimit;
+import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.search.state.State;
 
 /**
  * Default implementation of the RaptorAccessEgress interface.
  * <p>
- * Implementation note: As stated in the RoutingAccessEgress interface contract
- * {@link RoutingAccessEgress#getFinalState()}, this class exposes the final A* state in search
- * order, not in chronological order. For egress searches this State is unreversed
- * ({@code request.arriveBy() == true}) — reversal is deferred to
- * {@link org.opentripplanner.street.model.path.StreetPath} construction, which only happens for
- * winning paths during itinerary mapping. This avoids the cost of cloning and reversing the entire
- * State chain for every egress candidate.
+ * Implementation note: This class keeps the final A* state in search order, not in chronological
+ * order. For egress searches this State is unreversed ({@code request.arriveBy() == true}) —
+ * reversal is deferred to {@link #streetPath()}, which is only called for winning paths during
+ * itinerary mapping. This avoids the cost of cloning and reversing the entire State chain for
+ * every egress candidate.
  * <p>
  * The scalar values extracted below ({@code getElapsedTimeSeconds}, {@code getWeight},
  * {@code containsOnlyWalkMode}) are direction-independent and produce identical results on both
@@ -61,7 +60,15 @@ public class DefaultAccessEgress implements RoutingAccessEgress {
     );
   }
 
-  protected DefaultAccessEgress(RoutingAccessEgress other, TimeAndCost penalty) {
+  /**
+   * Create a new access/egress for the same stop and street search as {@code other}. Duration and
+   * cost are derived from the street search again, so any penalty of {@code other} is dropped.
+   */
+  protected DefaultAccessEgress(DefaultAccessEgress other) {
+    this(other.stop, other.finalState);
+  }
+
+  protected DefaultAccessEgress(DefaultAccessEgress other, TimeAndCost penalty) {
     // In the API we have a cost associated with the time-penalty. In Raptor, there is no
     // association between the time-penalty and the cost. So, we add the time-penalty cost to
     // the generalized cost here. In logic later on, we will remove it.
@@ -70,7 +77,7 @@ public class DefaultAccessEgress implements RoutingAccessEgress {
       other.durationInSeconds(),
       other.c1() + penalty.cost().toCentiSeconds(),
       penalty,
-      other.getFinalState()
+      other.finalState
     );
     if (other.penalty() != TimeAndCost.ZERO) {
       throw new IllegalStateException("Can not add penalty twice...");
@@ -103,19 +110,23 @@ public class DefaultAccessEgress implements RoutingAccessEgress {
   }
 
   /**
-   * The final state from the access/egress street search. For egress searches this State is
-   * unreversed ({@code request.arriveBy() == true}) — reversal is deferred to
-   * {@link org.opentripplanner.street.model.path.StreetPath} construction, which only happens for
-   * winning paths during itinerary mapping. This avoids the cost of cloning and reversing the
-   * entire State chain for every egress candidate.
-   * <p>
-   * The scalar values extracted below ({@code getElapsedTimeSeconds}, {@code getWeight},
-   * {@code containsOnlyWalkMode}) are direction-independent and produce identical results on both
-   * reversed and unreversed State chains.
+   * The street path of this access/egress in chronological order. The path is built on every
+   * call, so only call this for paths which are actually used, like when mapping an itinerary.
    */
+  public StreetPath streetPath() {
+    return new StreetPath(finalState);
+  }
+
   @Override
-  public State getFinalState() {
-    return finalState;
+  public boolean isRentingVehicleFromStation() {
+    return finalState.isRentingVehicleFromStation();
+  }
+
+  /**
+   * Return true if any part of the access/egress is traversed by car.
+   */
+  public boolean containsModeCar() {
+    return finalState.containsModeCar();
   }
 
   @Override

@@ -117,6 +117,20 @@
             </plugin>
             -->
             <plugin>
+                <!-- The manifest of this jar is the base for the manifest of the shaded jar. -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <!-- Module name for the shaded jar, which has no module-info.java. -->
+                            <Automatic-Module-Name>org.opentripplanner.otp</Automatic-Module-Name>
+                            <OTP-Serialization-Version-Id>${otp.serialization.version.id}</OTP-Serialization-Version-Id>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>com.diffplug.spotless</groupId>
                 <artifactId>spotless-maven-plugin</artifactId>
                 <configuration>

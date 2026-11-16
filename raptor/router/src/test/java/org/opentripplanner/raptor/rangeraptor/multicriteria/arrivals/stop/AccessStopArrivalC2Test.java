@@ -58,11 +58,6 @@ class AccessStopArrivalC2Test {
     assertEquals(0, subject.round());
   }
 
-  @Test
-  public void travelDuration() {
-    assertEquals(ACCESS_DURATION, subject.travelDuration());
-  }
-
   @SuppressWarnings("ResultOfMethodCallIgnored")
   @Test
   public void equalsThrowsExceptionByDesign() {
@@ -87,7 +82,6 @@ class AccessStopArrivalC2Test {
 
     assertEquals(result.arrivalTime(), ALIGHT_TIME + dTime);
     assertEquals(subject.c1(), result.c1());
-    assertEquals(subject.travelDuration(), result.travelDuration());
     assertEquals(subject.round(), result.round());
     assertEquals(subject.stop(), result.stop());
     assertSame(subject.accessPath().access(), result.accessPath().access());

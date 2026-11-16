@@ -132,6 +132,20 @@ class OsmTagMapperTest {
   }
 
   @Test
+  void sidewalkDesignatedForBicycleIsNotPenalizedAsSidewalk() {
+    var footway = WayTestData.footwaySharedWithBicycle();
+    var sidewalk = footway.copy().withTag("footway", "sidewalk").build();
+    assertEquals(
+      WPS.getDataForEntity(footway).bicycleSafety(),
+      WPS.getDataForEntity(sidewalk).bicycleSafety()
+    );
+    assertTrue(
+      WPS.getDataForWay(WayTestData.footwaySidewalk()).forward().bicycleSafety() >
+        WPS.getDataForWay(WayTestData.footway()).forward().bicycleSafety()
+    );
+  }
+
+  @Test
   void testCycleway() {
     assertEquals(BICYCLE, WPS.getDataForEntity(WayTestData.cycleway()).getPermission());
   }

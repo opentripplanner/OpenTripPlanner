@@ -33,12 +33,12 @@ import org.opentripplanner.street.linking.VisibilityMode;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
-import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model.TripInput;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.transfer.regular.FixedRegularTransfers;
 
 /**
  * UC1 acceptance test for a single scheduled-transit itinerary without access, egress or
@@ -386,7 +386,7 @@ class ItineraryReferenceMapperTest {
       GRAPH,
       TRANSIT_ENV.transitService(),
       new TransitAlertServiceImpl(),
-      TransferServiceTestFactory.defaultTransferService(),
+      FixedRegularTransfers.of().snapshot(),
       null,
       linkingContextFactory,
       StreetLimitationParametersService.DEFAULT

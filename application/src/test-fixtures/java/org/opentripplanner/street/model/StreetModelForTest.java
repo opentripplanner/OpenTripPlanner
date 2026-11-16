@@ -24,6 +24,7 @@ import org.opentripplanner.street.model.edge.TemporaryPartialStreetEdgeBuilder;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.LabelledIntersectionVertex;
 import org.opentripplanner.street.model.vertex.OsmVertex;
+import org.opentripplanner.street.model.vertex.StationEntranceVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.TransitEntranceVertex;
@@ -56,6 +57,10 @@ public class StreetModelForTest {
       I18NString.of(id),
       Accessibility.NO_INFORMATION
     );
+  }
+
+  public static StationEntranceVertex stationEntranceVertex(String id, double lat, double lon) {
+    return new StationEntranceVertex(lat, lon, 1, id, Accessibility.NO_INFORMATION);
   }
 
   public static StreetEdge streetEdge(StreetVertex vA, StreetVertex vB) {

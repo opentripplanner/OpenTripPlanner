@@ -1,6 +1,7 @@
 package org.opentripplanner.standalone.config.buildconfig;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_11;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_6;
@@ -140,6 +141,23 @@ public class NetexConfig {
           )
           .docDefaultValue(dft.noTransfersOnIsolatedStops())
           .asBoolean(base.noTransfersOnIsolatedStops())
+      )
+      .withAllowStopPlaceAsPassengerStopAssignment(
+        config
+          .of("allowStopPlaceAsPassengerStopAssignment")
+          .since(V2_11)
+          .summary(
+            "Whether it is allowed for a `PassengerStopAssigment` to be assigned to a `StopPlace` only (not a `Quay`)."
+          )
+          .description(
+            """
+            The [Nordic Profile](https://entur.atlassian.net/wiki/spaces/PUBLIC/pages/728891481/Nordic%2BNeTEx%2BProfile) only allows `PassengerStopAssignment`s to be assigned to a `Quay` (not a `StopPlace`).
+
+            [EPIP](https://entur.atlassian.net/wiki/spaces/PUBLIC/pages/728891481/Nordic%2BNeTEx%2BProfile) and the [Swiss Profile](https://opentdatach.github.io/netexRealisationGuideSwitzerland/main/06_service.html#passengerstopassignment) allow this.
+            """
+          )
+          .docDefaultValue(dft.allowStopPlaceAsPassengerStopAssignment())
+          .asBoolean(base.allowStopPlaceAsPassengerStopAssignment())
       )
       .addFerryIdsNotAllowedForBicycle(
         config

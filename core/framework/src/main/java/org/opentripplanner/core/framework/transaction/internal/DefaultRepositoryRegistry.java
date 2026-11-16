@@ -16,7 +16,7 @@ import org.opentripplanner.core.model.transaction.UpdateManager;
  * which exposes mutable access to {@link DefaultWriteContext} via an internal cast without
  * surfacing it on the public {@link RepositoryHandle} API.
  */
-class DefaultRepositoryRegistry implements RepositoryRegistry {
+public class DefaultRepositoryRegistry implements RepositoryRegistry {
 
   private final TransactionManager transactionManager = new TransactionManager();
 

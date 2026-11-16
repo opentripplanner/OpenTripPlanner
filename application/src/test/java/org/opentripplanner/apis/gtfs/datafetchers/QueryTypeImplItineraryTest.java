@@ -33,11 +33,11 @@ import org.opentripplanner.street.linking.VisibilityMode;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
-import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model.TripInput;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.transfer.regular.FixedRegularTransfers;
 
 /**
  * Focused test for {@link QueryTypeImpl#itinerary}, the GTFS API's single-id refetch query
@@ -222,7 +222,7 @@ class QueryTypeImplItineraryTest {
       GRAPH,
       TRANSIT_ENV.transitService(),
       new TransitAlertServiceImpl(),
-      TransferServiceTestFactory.defaultTransferService(),
+      FixedRegularTransfers.of().snapshot(),
       null,
       linkingContextFactory,
       StreetLimitationParametersService.DEFAULT
@@ -260,6 +260,7 @@ class QueryTypeImplItineraryTest {
       .locale(requestLocale)
       .context(
         new TestGtfsGraphQLRequestContext(
+          null,
           null,
           null,
           null,
