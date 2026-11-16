@@ -20,7 +20,8 @@ import java.util.function.Function;
  * The map is persistent: {@link #with(Object, Object)} and {@link #without(Object)} return a new
  * version and leave this one unchanged. A new version shares all unchanged content with the
  * previous one, so a change costs {@code O(log n)} time and memory, not {@code O(n)} like a copy.
- * The {@link Map} mutation methods throw {@link UnsupportedOperationException}.
+ * The {@link Map} mutation methods throw {@link UnsupportedOperationException} if they would
+ * change the map.
  * <p>
  * Keys and values can not be {@code null}. Iteration order is unspecified.
  */
