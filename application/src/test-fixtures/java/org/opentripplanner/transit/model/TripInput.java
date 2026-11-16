@@ -54,7 +54,6 @@ public class TripInput {
   @Nullable
   private String netexInternalPlanningCode;
 
-  // Null means that the hops of the pattern are straight lines between the stops
   @Nullable
   private List<LineString> hopGeometries;
 
@@ -131,6 +130,10 @@ public class TripInput {
     return isFlex;
   }
 
+  /**
+   * The geometries of the hops of the trip pattern, or null if the hops are straight lines between
+   * the stops.
+   */
   @Nullable
   public List<LineString> hopGeometries() {
     return hopGeometries;
@@ -210,7 +213,11 @@ public class TripInput {
 
   /**
    * Set the geometries of the hops between the stops of the trip, which are used for the trip
-   * pattern. There must be one geometry for each hop, so one less than the number of stops.
+   * pattern. There must be one geometry for each hop, so one fewer than the number of stops.
+   * <p>
+   * Trips share a pattern only if they have the same stops, route and hop geometries. So if the
+   * geometries are set for only one of several trips with the same stops, that trip gets its own
+   * pattern.
    */
   public TripInput withHopGeometries(LineString... hopGeometries) {
     this.hopGeometries = List.of(hopGeometries);

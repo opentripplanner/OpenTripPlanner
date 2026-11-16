@@ -2739,9 +2739,7 @@ type StopCall {
   may not travel along it.
     
   If a real-time update has changed the stops of the trip, this is the geometry of the updated
-  trip. A hop keeps its scheduled shape if the scheduled hop at the same position is between the
-  same stops, or between other stops of the same stations. Other hops, and all hops of trips added
-  by a real-time update, are straight lines between the stops.
+  trip.
   """
   geometryToNextCall: Geometry
   "Notices of this call which are known ahead of time."
