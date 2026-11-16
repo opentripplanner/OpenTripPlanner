@@ -19,7 +19,7 @@
   ) {
     edges {
       node {
-        id
+        itineraryId
       }
     }
   }

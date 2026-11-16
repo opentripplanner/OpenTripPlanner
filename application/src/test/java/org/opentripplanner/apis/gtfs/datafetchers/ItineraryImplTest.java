@@ -21,7 +21,7 @@ import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model.site.RegularStop;
 
 /**
- * Focused test for {@link ItineraryImpl#id}, the GTFS API's exposure of a stable, refetchable
+ * Focused test for {@link ItineraryImpl#itineraryId}, the GTFS API's exposure of a stable, refetchable
  * itinerary id (#7878). See {@link org.opentripplanner.routing.refetch.ItineraryReferenceMapper}
  * for the shared core this delegates to.
  */
@@ -44,7 +44,7 @@ class ItineraryImplTest {
       Map.of(ItineraryImpl.ROUTE_REQUEST_CONTEXT_KEY, routeRequest())
     );
 
-    var id = IMPL.id().get(env);
+    var id = IMPL.itineraryId().get(env);
 
     assertNotNull(id);
     var decoded = ItineraryReferenceSerializer.decode(id);
@@ -56,14 +56,14 @@ class ItineraryImplTest {
   void idIsNullWithoutLocalContext() throws Exception {
     var env = environment(simpleBusItinerary(), null);
 
-    assertNull(IMPL.id().get(env));
+    assertNull(IMPL.itineraryId().get(env));
   }
 
   @Test
   void idIsNullWithoutRouteRequestInLocalContext() throws Exception {
     var env = environment(simpleBusItinerary(), Map.of("locale", "en"));
 
-    assertNull(IMPL.id().get(env));
+    assertNull(IMPL.itineraryId().get(env));
   }
 
   @Test
@@ -76,7 +76,7 @@ class ItineraryImplTest {
       Map.of(ItineraryImpl.ROUTE_REQUEST_CONTEXT_KEY, routeRequest())
     );
 
-    assertNull(IMPL.id().get(env));
+    assertNull(IMPL.itineraryId().get(env));
   }
 
   private static Itinerary simpleBusItinerary() {

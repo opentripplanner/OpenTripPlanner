@@ -461,7 +461,7 @@ public class GraphQLDataFetchers {
     public DataFetcher<Long> endTime();
     public DataFetcher<Iterable<Object>> fares();
     public DataFetcher<Integer> generalizedCost();
-    public DataFetcher<String> id();
+    public DataFetcher<String> itineraryId();
     public DataFetcher<Iterable<Leg>> legs();
     public DataFetcher<Integer> numberOfTransfers();
     public DataFetcher<java.time.OffsetDateTime> start();

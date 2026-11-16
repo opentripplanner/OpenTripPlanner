@@ -69,7 +69,7 @@ public class ItineraryImpl implements GraphQLDataFetchers.GraphQLItinerary {
   }
 
   @Override
-  public DataFetcher<String> id() {
+  public DataFetcher<String> itineraryId() {
     return environment -> {
       Map<String, ?> ctx = environment.getLocalContext();
       if (ctx == null) {

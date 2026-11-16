@@ -835,7 +835,7 @@ type Itinerary {
   planned. If transit entity ids have changed after the itinerary id has been created, refetching
   will fail.
   """
-  id: String @deprecated(reason : "Experimental API that can be changed without notice.")
+  itineraryId: String @deprecated(reason : "Experimental API that can be changed without notice.")
   """
   A list of Legs. Each Leg is either a walking (cycling, car) portion of the
   itinerary, or a transit leg on a particular vehicle. So a itinerary where the
@@ -1653,7 +1653,7 @@ type QueryType {
     time: Int!
   ): Trip @timingData
   """
-  Refetch a previously planned itinerary using its stable `id` (see `Itinerary.id`), with current
+  Refetch a previously planned itinerary using its stable `id` (see `Itinerary.itineraryId`), with current
   realtime data applied. Returns `null` if the id is invalid, if the itinerary cannot be
   refetched, or if a trip or stop it refers to no longer exists in the server's data.
   The id is meant for refetching an itinerary during or shortly before travel, not for long-term

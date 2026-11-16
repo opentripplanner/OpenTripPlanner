@@ -14,7 +14,7 @@
   ) {
     edges {
       node {
-        id
+        itineraryId
         legs {
           mode
           from {

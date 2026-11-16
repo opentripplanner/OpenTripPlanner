@@ -90,9 +90,9 @@ class QueryTypeImplItineraryTest {
   }
 
   /**
-   * The refetched itinerary must expose an {@code id} of its own, so a client can refresh the same
-   * trip again. {@code ItineraryImpl#id} reads the route request from the local context, which
-   * this query - unlike {@code planConnection} - has to put there itself.
+   * The refetched itinerary must expose an {@code itineraryId} of its own, so a client can refresh
+   * the same trip again. {@code ItineraryImpl#itineraryId} reads the route request from the local
+   * context, which this query - unlike {@code planConnection} - has to put there itself.
    */
   @Test
   @SuppressWarnings("unchecked")
@@ -113,7 +113,7 @@ class QueryTypeImplItineraryTest {
     ).getLocalContext();
     assertThat(localContext).containsKey(ItineraryImpl.ROUTE_REQUEST_CONTEXT_KEY);
 
-    var secondId = IMPL_FOR_ID.id().get(
+    var secondId = IMPL_FOR_ID.itineraryId().get(
       DataFetchingEnvironmentImpl.newDataFetchingEnvironment(executionContext())
         .source(itineraryOf(result))
         .localContext(localContext)
