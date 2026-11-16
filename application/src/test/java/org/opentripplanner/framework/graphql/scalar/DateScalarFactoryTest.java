@@ -8,6 +8,7 @@ import graphql.schema.CoercingParseValueException;
 import graphql.schema.GraphQLScalarType;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -48,6 +49,25 @@ class DateScalarFactoryTest {
   @ParameterizedTest
   @MethodSource("invalidCases")
   void failParsing(GraphQLScalarType scalar, String input) {
+    assertThrows(CoercingParseValueException.class, () -> scalar.getCoercing().parseValue(input));
+  }
+
+  static Stream<Arguments> nonStringCases() {
+    return Stream.of(
+      List.of("2024-05-23"),
+      Map.of("date", "2024-05-23"),
+      20240523,
+      20240523L,
+      2024.0523,
+      true
+    ).flatMap(value ->
+      Stream.of(Arguments.of(GTFS_SCALAR, value), Arguments.of(TRANSMODEL_SCALAR, value))
+    );
+  }
+
+  @ParameterizedTest
+  @MethodSource("nonStringCases")
+  void failParsingNonString(GraphQLScalarType scalar, Object input) {
     assertThrows(CoercingParseValueException.class, () -> scalar.getCoercing().parseValue(input));
   }
 }
