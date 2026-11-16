@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.basic.Ratio;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.plan.paging.cursor.PageCursor;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -230,8 +231,8 @@ class RouteRequestMapperTest {
     var routeRequest = RouteRequestMapper.toRouteRequest(env, testCtx.context());
     var itinFilter = routeRequest.preferences().itineraryFilter();
     assertEquals(profile, itinFilter.debug());
-    assertEquals(keepOne, itinFilter.groupSimilarityKeepOne());
-    assertEquals(keepThree, itinFilter.groupSimilarityKeepThree());
+    assertEquals(Ratio.of(keepOne), itinFilter.groupSimilarityKeepOne());
+    assertEquals(Ratio.of(keepThree), itinFilter.groupSimilarityKeepThree());
     assertEquals(multiplier, itinFilter.groupedOtherThanSameLegsMaxCostMultiplier());
   }
 

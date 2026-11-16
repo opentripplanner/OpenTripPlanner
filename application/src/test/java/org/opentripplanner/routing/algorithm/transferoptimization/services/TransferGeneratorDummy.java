@@ -16,7 +16,8 @@ public class TransferGeneratorDummy {
   public static TransferGenerator<TestTripSchedule> dummyTransferGenerator(
     final List<TripToTripTransfer<TestTripSchedule>>... transfers
   ) {
-    return new TransferGenerator<>(null, new TestTransitData()) {
+    TestTransitData data = new TestTransitData();
+    return new TransferGenerator<TestTripSchedule>(null, data.transitData().slackProvider(), data) {
       @Override
       public List<List<TripToTripTransfer<TestTripSchedule>>> findAllPossibleTransfers(
         List<TransitPathLeg<TestTripSchedule>> transitLegs
