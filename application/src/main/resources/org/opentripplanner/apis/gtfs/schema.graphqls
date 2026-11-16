@@ -832,7 +832,8 @@ type Itinerary {
   itinerary later (with current realtime data applied) using the `itinerary` query, without
   resending the original search parameters. `null` if this itinerary cannot be refetched.
   The routing preferences stored in the id are the ones in effect when the itinerary was
-  planned. We do not recommend storing ids for a long time.
+  planned. If transit entity ids have changed after the itinerary id has been created, refetching
+  will fail.
   """
   id: String @deprecated(reason : "Experimental API that can be changed without notice.")
   """
@@ -1656,7 +1657,8 @@ type QueryType {
   realtime data applied. Returns `null` if the id is invalid, if the itinerary cannot be
   refetched, or if a trip or stop it refers to no longer exists in the server's data.
   The id is meant for refetching an itinerary during or shortly before travel, not for long-term
-  storage: refetching is likely to fail after the transit data has been updated.
+  storage. If transit entity ids have changed after the itinerary id has been created, refetching
+  will fail.
   """
   itinerary(id: String!): Itinerary @deprecated(reason : "Experimental API that can be changed without notice.") @timingData
   """
