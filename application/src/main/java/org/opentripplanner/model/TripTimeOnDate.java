@@ -417,8 +417,7 @@ public class TripTimeOnDate {
   }
 
   /**
-   * The pickup type at this call in the given scheduled pattern, so cancellations and other
-   * real-time changes of the trip or the stop are not taken into account.
+   * The pickup type at this call in the given scheduled pattern.
    *
    * @param scheduledTripPattern the pattern of the trip without real-time updates
    * @return null if this call is an extra call added by a real-time update, since it has no
@@ -433,8 +432,7 @@ public class TripTimeOnDate {
   }
 
   /**
-   * The drop off type at this call in the given scheduled pattern, so cancellations and other
-   * real-time changes of the trip or the stop are not taken into account.
+   * The drop off type at this call in the given scheduled pattern.
    *
    * @param scheduledTripPattern the pattern of the trip without real-time updates
    * @return null if this call is an extra call added by a real-time update, since it has no
