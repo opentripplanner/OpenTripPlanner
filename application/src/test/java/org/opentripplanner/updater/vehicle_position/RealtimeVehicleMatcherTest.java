@@ -46,6 +46,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.FrequencyEntry;
 import org.opentripplanner.transit.model.timetable.OccupancyStatus;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
+import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 
@@ -127,6 +128,50 @@ public class RealtimeVehicleMatcherTest {
 
     assertEquals(1, result.failed());
     assertEquals(Set.of(TRIP_NOT_FOUND_IN_PATTERN), result.failures().keySet());
+  }
+
+  @Test
+  @DisplayName(
+    "A vehicle position for a trip that exists only on the realtime timetable is matched"
+  )
+  void matchTripTimesFromRealtimeTimetable() {
+    var repository = new DefaultRealtimeVehicleRepository();
+    var trip = TransitRepositoryForTest.trip(tripId).build();
+    var stopTimes = List.of(
+      testModel.stopTime(trip, 0),
+      testModel.stopTime(trip, 1),
+      testModel.stopTime(trip, 2)
+    );
+    var stopPattern = new StopPattern(stopTimes);
+    var pattern = TripPattern.of(trip.getId())
+      .withStopPattern(stopPattern)
+      .withRoute(ROUTE)
+      .build();
+    var realtimeTimetable = Timetable.of()
+      .withTripPattern(pattern)
+      .addTripTimes(TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator()))
+      .build();
+
+    var matcher = new RealtimeVehiclePatternMatcher(
+      TransitRepositoryForTest.FEED_ID,
+      ignored -> trip,
+      ignored -> pattern,
+      (id, time) -> pattern,
+      ignored -> Set.of(),
+      repository,
+      zoneId,
+      null,
+      FEATURES,
+      (ignoredPattern, ignoredDate) -> realtimeTimetable
+    );
+
+    var result = matcher.applyRealtimeVehicleUpdates(List.of(vehiclePosition(tripId)));
+
+    assertEquals(1, result.successful());
+    assertEquals(0, result.failed());
+    var realtimeVehicles = vehicles(repository, pattern);
+    assertThat(realtimeVehicles).hasSize(1);
+    assertEquals(tripId, realtimeVehicles.get(0).trip().getId().getId());
   }
 
   @Test
