@@ -61,6 +61,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Release the NeTEx data source as soon as the bundle is loaded [#8148](https://github.com/opentripplanner/OpenTripPlanner/pull/8148)
 - Remove short  sections from walking steps [#8180](https://github.com/opentripplanner/OpenTripPlanner/pull/8180)
 - Transfers v2 [#8133](https://github.com/opentripplanner/OpenTripPlanner/pull/8133)
+- Add itinerary ID for refetch to the GTFS GraphQL API [#8005](https://github.com/opentripplanner/OpenTripPlanner/pull/8005)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.10.0 (2026-09-09)
