@@ -4,9 +4,9 @@ import org.jspecify.annotations.Nullable;
 import org.opentripplanner.transit.model.timetable.EstimatedTime;
 
 /**
- * Real-time information of a call. More real-time state of the call may be added in the future.
+ * Real-time information and state of a call.
  *
- * @param canceled whether a real-time update has canceled the call or its whole trip
+ * @param canceled whether a real-time update has canceled the call
  */
 public record CallRealTime(
   @Nullable EstimatedTime arrival,

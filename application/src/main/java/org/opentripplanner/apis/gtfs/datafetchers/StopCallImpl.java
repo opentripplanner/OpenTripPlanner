@@ -23,7 +23,7 @@ public class StopCallImpl implements GraphQLDataFetchers.GraphQLStopCall {
   public DataFetcher<CallRealTime> realTime() {
     return environment -> {
       var tripTime = getSource(environment);
-      var canceled = tripTime.isCanceledInRealTime();
+      var canceled = tripTime.isCancelledStop();
       // A canceled call is reported even if the trip times are not marked as updated
       if (!tripTime.isRealtime() && !canceled) {
         return null;

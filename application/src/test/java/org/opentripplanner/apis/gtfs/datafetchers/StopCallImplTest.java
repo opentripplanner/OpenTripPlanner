@@ -10,8 +10,6 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
 import org.opentripplanner.apis.gtfs.model.CallSchedule;
 import org.opentripplanner.apis.gtfs.model.CallScheduledTime.ArrivalDepartureTime;
 import org.opentripplanner.apis.gtfs.model.CallScheduledTime.TimeWindow;
@@ -26,7 +24,6 @@ import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.model.timetable.TripAlteration;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
@@ -91,14 +88,17 @@ class StopCallImplTest {
       .withCanceled(2)
       .build();
 
-    for (int stopPos = 0; stopPos < 3; stopPos++) {
+    // Only the last stop is canceled
+    var expectedCanceled = List.of(false, false, true);
+    for (int stopPos = 0; stopPos < expectedCanceled.size(); stopPos++) {
       var call = new TripTimeOnDate(tripTimes, stopPos, pattern, SERVICE_DATE, MIDNIGHT);
-      assertCanceledInRealTime(stopPos == 2, call, realtimeEnv.transitService());
+      assertCanceledInRealTime(expectedCanceled.get(stopPos), call, realtimeEnv.transitService());
     }
   }
 
+  /** Canceling the trip alone does not cancel its calls. */
   @Test
-  void canceledTripCancelsAllCalls() throws Exception {
+  void canceledTripDoesNotCancelCalls() throws Exception {
     var realtimeEnv = envBuilder.addTrip(TRIP_INPUT).build();
     var tripData = realtimeEnv.tripData(TRIP_ID);
     var pattern = tripData.tripPattern();
@@ -106,7 +106,7 @@ class StopCallImplTest {
 
     for (int stopPos = 0; stopPos < 3; stopPos++) {
       var call = new TripTimeOnDate(tripTimes, stopPos, pattern, SERVICE_DATE, MIDNIGHT);
-      assertCanceledInRealTime(true, call, realtimeEnv.transitService());
+      assertCanceledInRealTime(false, call, realtimeEnv.transitService());
     }
   }
 
@@ -120,10 +120,12 @@ class StopCallImplTest {
     var realtimeEnv = envBuilder.addTrip(TRIP_INPUT).build();
     var tripData = realtimeEnv.tripData(TRIP_ID);
     var scheduledPattern = tripData.tripPattern();
-    var stopPattern = StopPattern.create(3);
+    // Only the middle stop is canceled
+    var canceled = List.of(false, true, false);
     var stops = List.of(STOP_A, STOP_B, STOP_C);
-    for (int i = 0; i < 3; i++) {
-      var pickDrop = i == 1 ? PickDrop.CANCELLED : PickDrop.SCHEDULED;
+    var stopPattern = StopPattern.create(stops.size());
+    for (int i = 0; i < stops.size(); i++) {
+      var pickDrop = canceled.get(i) ? PickDrop.CANCELLED : PickDrop.SCHEDULED;
       stopPattern.stops.with(i, stops.get(i));
       stopPattern.pickups.with(i, pickDrop);
       stopPattern.dropoffs.with(i, pickDrop);
@@ -134,31 +136,9 @@ class StopCallImplTest {
       .withStopPattern(stopPattern.build())
       .build();
 
-    for (int stopPos = 0; stopPos < 3; stopPos++) {
+    for (int stopPos = 0; stopPos < stops.size(); stopPos++) {
       var call = new TripTimeOnDate(tripData.tripTimes(), stopPos, pattern, SERVICE_DATE, MIDNIGHT);
-      assertCanceledInRealTime(stopPos == 1, call, realtimeEnv.transitService());
-    }
-  }
-
-  /** Cancellations in the planned data are not real-time cancellations. */
-  @ParameterizedTest
-  @EnumSource(value = TripAlteration.class, names = { "CANCELLATION", "REPLACED" })
-  void tripCanceledInPlannedDataIsNotCanceledInRealTime(TripAlteration alteration)
-    throws Exception {
-    var realtimeEnv = envBuilder
-      .addTrip(TRIP_INPUT, trip -> trip.withNetexAlteration(alteration))
-      .build();
-    var tripData = realtimeEnv.tripData(TRIP_ID);
-
-    for (int stopPos = 0; stopPos < 3; stopPos++) {
-      var call = new TripTimeOnDate(
-        tripData.tripTimes(),
-        stopPos,
-        tripData.tripPattern(),
-        SERVICE_DATE,
-        MIDNIGHT
-      );
-      assertCanceledInRealTime(false, call, realtimeEnv.transitService());
+      assertCanceledInRealTime(canceled.get(stopPos), call, realtimeEnv.transitService());
     }
   }
 
