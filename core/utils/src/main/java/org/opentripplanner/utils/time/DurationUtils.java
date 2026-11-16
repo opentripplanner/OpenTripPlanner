@@ -196,6 +196,21 @@ public class DurationUtils {
   }
 
   /**
+   * Checks that duration is positive, that is neither zero nor negative.
+   *
+   * @param subject used to identify name of the problematic value when throwing an exception.
+   */
+  public static Duration requirePositive(Duration value, String subject) {
+    Objects.requireNonNull(value);
+    if (value.isZero() || value.isNegative()) {
+      throw new IllegalArgumentException(
+        "Duration %s must be positive: %s".formatted(subject, value)
+      );
+    }
+    return value;
+  }
+
+  /**
    * Checks that duration is positive.
    *
    * @param subject used to identify name of the problematic value when throwing an exception.

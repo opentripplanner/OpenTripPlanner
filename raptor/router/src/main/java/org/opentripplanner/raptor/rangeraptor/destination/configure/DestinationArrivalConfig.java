@@ -138,7 +138,7 @@ public class DestinationArrivalConfig<T extends RaptorTripSchedule> {
       ctx.raptorSlackProvider(),
       includeCost ? ctx.costCalculator() : null,
       ctx.stopNameResolver(),
-      ctx.transitData().transferConstraintsSearch()
+      ctx.transferData().transferConstraintsSearch()
     );
   }
 
