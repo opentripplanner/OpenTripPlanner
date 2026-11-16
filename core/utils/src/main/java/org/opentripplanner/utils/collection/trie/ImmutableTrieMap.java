@@ -171,6 +171,17 @@ public final class ImmutableTrieMap<K, V> extends AbstractMap<K, V> implements S
         public int size() {
           return size;
         }
+
+        /** Look the key up in the trie, instead of scanning all entries. */
+        @Override
+        public boolean contains(Object o) {
+          return (
+            o instanceof Map.Entry<?, ?> e &&
+            e.getKey() != null &&
+            e.getValue() != null &&
+            e.getValue().equals(get(e.getKey()))
+          );
+        }
       };
     }
     return entrySet;

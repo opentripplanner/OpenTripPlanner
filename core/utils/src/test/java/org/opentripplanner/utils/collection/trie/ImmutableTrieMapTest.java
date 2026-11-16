@@ -2,9 +2,11 @@ package org.opentripplanner.utils.collection.trie;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -30,6 +32,18 @@ class ImmutableTrieMapTest {
     assertEquals(0, subject.size());
     assertNull(subject.get("A"));
     assertThat(subject.entrySet()).isEmpty();
+  }
+
+  @Test
+  void entrySetContains() {
+    var subject = ImmutableTrieMap.<String, Integer>empty().with("A", 1).with("B", 2);
+    var entries = subject.entrySet();
+
+    assertTrue(entries.contains(Map.entry("A", 1)));
+    assertFalse(entries.contains(Map.entry("A", 2)));
+    assertFalse(entries.contains(Map.entry("C", 1)));
+    assertFalse(entries.contains("A"));
+    assertFalse(entries.contains(null));
   }
 
   @Test
