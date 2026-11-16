@@ -19,7 +19,7 @@ import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetMode;
-import org.opentripplanner.transfer.regular.RegularTransferService;
+import org.opentripplanner.transfer.regular.FlexTransferService;
 import org.opentripplanner.transit.service.TransitService;
 
 public class DirectFlexRouter {
@@ -27,7 +27,7 @@ public class DirectFlexRouter {
   public static List<Itinerary> route(
     Graph graph,
     TransitService transitService,
-    RegularTransferService transferService,
+    FlexTransferService transferService,
     StreetDetailsService streetDetailsService,
     FlexParameters flexParameters,
     @Nullable DataOverlayParameterBindings dataOverlayParameterBindings,

@@ -50,7 +50,7 @@ import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
 import org.opentripplanner.standalone.config.DebugUiConfig;
 import org.opentripplanner.street.graph.Graph;
-import org.opentripplanner.transfer.regular.RegularTransferService;
+import org.opentripplanner.transfer.regular.FlexTransferService;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
@@ -89,7 +89,7 @@ public class DebugVectorTilesResource {
   private final WorldEnvelopeService worldEnvelopeService;
   private final VehicleRentalService vehicleRentalService;
   private final StreetDetailsService streetDetailsService;
-  private final RegularTransferService transferService;
+  private final FlexTransferService transferService;
 
   public DebugVectorTilesResource(
     @Context TransitService transitService,
@@ -98,7 +98,7 @@ public class DebugVectorTilesResource {
     @Context WorldEnvelopeService worldEnvelopeService,
     @Context VehicleRentalService vehicleRentalService,
     @Context StreetDetailsService streetDetailsService,
-    @Context RegularTransferService transferService
+    @Context FlexTransferService transferService
   ) {
     this.transitService = transitService;
     this.graph = graph;
@@ -252,6 +252,6 @@ public class DebugVectorTilesResource {
     VehicleRentalService vehicleRentalService,
     Graph graph,
     StreetDetailsService streetDetailsService,
-    RegularTransferService transferService
+    FlexTransferService transferService
   ) {}
 }

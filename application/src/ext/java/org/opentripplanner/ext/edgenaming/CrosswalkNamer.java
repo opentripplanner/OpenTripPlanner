@@ -96,18 +96,18 @@ class CrosswalkNamer implements EdgeNamer {
     if (crossStreetOpt.isPresent()) {
       OsmWay crossStreet = crossStreetOpt.get();
       if (crossStreet.isNamed()) {
-        crosswalk.setName(
+        crosswalk.overrideDerivedName(
           new LocalizedString("name.crosswalk_over_street", crossStreet.getAssumedName())
         );
       } else if (crossStreet.isServiceRoad()) {
-        crosswalk.setName(new LocalizedString("name.crosswalk_over_service_road"));
+        crosswalk.overrideDerivedName(new LocalizedString("name.crosswalk_over_service_road"));
       } else if (crossStreet.isMotorwayRamp()) {
-        crosswalk.setName(new LocalizedString("name.crosswalk_over_motorway_ramp"));
+        crosswalk.overrideDerivedName(new LocalizedString("name.crosswalk_over_motorway_ramp"));
       } else if (crossStreet.isTurnLane()) {
-        crosswalk.setName(new LocalizedString("name.crosswalk_over_turn_lane"));
+        crosswalk.overrideDerivedName(new LocalizedString("name.crosswalk_over_turn_lane"));
       } else {
         // Default on using the OSM way ID, which should not happen.
-        crosswalk.setName(I18NString.of(String.format("crosswalk %s", way.getId())));
+        crosswalk.overrideDerivedName(I18NString.of(String.format("crosswalk %s", way.getId())));
       }
 
       var adjacentSidewalks = sidewalkIndex
@@ -142,7 +142,7 @@ class CrosswalkNamer implements EdgeNamer {
       .filter(e -> e.way().getNodeRefs().contains(nodeId))
       .toList();
     if (sidewalks.size() == 1) {
-      sidewalks.getFirst().edge().setName(crosswalkName);
+      sidewalks.getFirst().edge().overrideDerivedName(crosswalkName);
     }
   }
 
