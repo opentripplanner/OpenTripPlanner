@@ -10,7 +10,6 @@ import com.carrotsearch.hppc.IntHashSet;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.model.calendar.TripCalendars;
 
 /**
  * The service codes running for a date are HPPC {@link IntHashSet}s, which have no dedicated Kryo

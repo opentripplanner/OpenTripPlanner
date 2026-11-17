@@ -10,10 +10,9 @@ import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.Set;
+import java.util.function.Consumer;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.model.calendar.TripCalendars;
 
 class TripCalendarsTest {
 

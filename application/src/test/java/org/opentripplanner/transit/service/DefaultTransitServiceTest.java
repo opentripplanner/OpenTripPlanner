@@ -182,10 +182,7 @@ class DefaultTransitServiceTest {
       CALENDAR_ID,
       List.of(firstDate, secondDate, thirdDate, SERVICE_DATE)
     );
-    calendarsBuilder.putServiceDatesForServiceId(
-      CALENDAR_ID_TWO,
-      List.of(firstDate, secondDate)
-    );
+    calendarsBuilder.putServiceDatesForServiceId(CALENDAR_ID_TWO, List.of(firstDate, secondDate));
 
     timetableDataImport.addNextServiceCodes(List.of(CALENDAR_ID, CALENDAR_ID_TWO));
 
