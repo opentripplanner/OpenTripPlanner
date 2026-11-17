@@ -28,7 +28,8 @@ class CalculateTransferToDestination<T extends RaptorTripSchedule> implements
   }
 
   /**
-   * When a stop arrival is accepted and we arrived by transit, then add a new destination arrival.
+   * When a stop arrival is accepted, then add a new destination arrival for each egress that can
+   * follow it.
    * <p>
    * We do not have to handle other events like dropped or rejected.
    *
@@ -37,20 +38,13 @@ class CalculateTransferToDestination<T extends RaptorTripSchedule> implements
   @Override
   public void notifyElementAccepted(ArrivalView<T> newElement) {
     switch (newElement.arrivedBy()) {
-      case TRANSIT -> addOnBoardStopArrivalToDestination(newElement);
+      case TRANSIT, ACCESS -> addArrivalToDestinationWithAllEgresses(newElement);
       case TRANSFER -> addOnStreetArrivalToDestination(newElement);
-      case ACCESS -> {
-        if (newElement.arrivedOnBoard()) {
-          addOnBoardStopArrivalToDestination(newElement);
-        } else {
-          addOnStreetArrivalToDestination(newElement);
-        }
-      }
       case EGRESS -> throw new IllegalArgumentException();
     }
   }
 
-  private void addOnBoardStopArrivalToDestination(ArrivalView<T> newElement) {
+  private void addArrivalToDestinationWithAllEgresses(ArrivalView<T> newElement) {
     for (RaptorAccessEgress egress : egressPaths) {
       destinationArrivals.add(newElement, egress);
     }

@@ -34,7 +34,7 @@ public final class StdStopArrivals<T extends RaptorTripSchedule> implements Best
     EgressPaths egressPaths,
     DestinationArrivalListener destinationArrivalListener
   ) {
-    for (int i = 1; i < arrivals.length; i++) {
+    for (int i = 0; i < arrivals.length; i++) {
       final int round = i;
       for (var cursor : egressPaths.byStop()) {
         int stop = cursor.key;
@@ -55,7 +55,7 @@ public final class StdStopArrivals<T extends RaptorTripSchedule> implements Best
   @Override
   public int calculateMinNumberOfTransfers(int stop) {
     for (int i = 0; i < arrivals.length; i++) {
-      if (arrivals[i][stop] != null) {
+      if (isReached(arrivals[i][stop])) {
         return i - 1;
       }
     }
@@ -128,6 +128,14 @@ public final class StdStopArrivals<T extends RaptorTripSchedule> implements Best
     return state.arrivedByTransit()
       ? TransitArrival.create(state.trip(), stopIndex, state.onBoardArrivalTime())
       : null;
+  }
+
+  /**
+   * The egress stop states are created before the search, so a state may exist without the stop
+   * being reached.
+   */
+  private static boolean isReached(StopArrivalState<?> state) {
+    return state != null && state.time() != DefaultStopArrivalState.NOT_SET;
   }
 
   private StopArrivalState<T> getOrCreateStopIndex(final int round, final int stop) {

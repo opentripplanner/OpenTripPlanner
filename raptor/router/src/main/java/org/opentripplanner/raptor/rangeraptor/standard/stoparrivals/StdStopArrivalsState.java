@@ -64,6 +64,6 @@ public final class StdStopArrivalsState<T extends RaptorTripSchedule> implements
 
   @Override
   public Collection<RaptorPath<T>> extractPaths() {
-    return results.listPaths();
+    return results.listPathsWithTransit();
   }
 }
