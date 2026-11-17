@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
+import static org.opentripplanner.updater.spi.UpdateErrorType.NOT_IMPLEMENTED_NO_DATA_IN_REPLACEMENT;
 import static org.opentripplanner.updater.spi.UpdateErrorType.UNKNOWN_STOP;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
@@ -374,6 +375,38 @@ public class ReplacementTest implements RealtimeTestConstants {
       .build();
 
     assertFailure(UNKNOWN_STOP, rt.applyTripUpdate(tripUpdate));
+
+    var tripTimes = env.tripData(TRIP_1_ID).tripTimes();
+    assertNotNull(tripTimes);
+    assertFalse(tripTimes.isTripPatternModified());
+    assertFalse(tripTimes.isCanceledOrDeleted());
+  }
+
+  /**
+   * NO_DATA stops are not supported in a replacement, so the whole update is rejected and the
+   * scheduled trip is left as it is.
+   */
+  @Test
+  void replacementTripWithNoDataStopIsRejected() {
+    var builder = TransitTestEnvironment.of();
+    var STOP_A = builder.stop(STOP_A_ID);
+    var STOP_B = builder.stop(STOP_B_ID);
+    var STOP_C = builder.stop(STOP_C_ID);
+    var TRIP_INPUT = TripInput.of(TRIP_1_ID)
+      .addStop(STOP_A, "8:30:00", "8:30:00")
+      .addStop(STOP_B, "8:40:00", "8:40:00")
+      .addStop(STOP_C, "8:50:00", "8:50:00");
+    var env = builder.addTrip(TRIP_INPUT).build();
+    var rt = GtfsRtTestHelper.of(env);
+
+    var tripUpdate = rt
+      .tripUpdate(TRIP_1_ID, REPLACEMENT)
+      .addStopTime(STOP_A_ID, "8:31")
+      .addNoDataStop(STOP_B_ID)
+      .addStopTime(STOP_C_ID, "8:51")
+      .build();
+
+    assertFailure(NOT_IMPLEMENTED_NO_DATA_IN_REPLACEMENT, rt.applyTripUpdate(tripUpdate));
 
     var tripTimes = env.tripData(TRIP_1_ID).tripTimes();
     assertNotNull(tripTimes);
