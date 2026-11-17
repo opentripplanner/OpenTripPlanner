@@ -68,9 +68,8 @@ class RealtimeVehiclePatternMatcher {
   private final ZoneId timeZoneId;
 
   private final Function<FeedScopedId, Trip> getTripForId;
-  private final Function<Trip, TripPattern> getStaticPattern;
   private final BiFunction<Trip, LocalDate, TripPattern> getRealtimePattern;
-  /** Timetable for a pattern on a service date, including extra journeys that are not scheduled. */
+  /** Timetable for a pattern on a service date, including realtime extra journeys. */
   private final BiFunction<TripPattern, LocalDate, Timetable> getTimetable;
   private final GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
   private final Set<VehiclePositionsUpdaterConfig.VehiclePositionFeature> vehiclePositionFeatures;
@@ -79,32 +78,6 @@ class RealtimeVehiclePatternMatcher {
   public RealtimeVehiclePatternMatcher(
     String feedId,
     Function<FeedScopedId, Trip> getTripForId,
-    Function<Trip, TripPattern> getStaticPattern,
-    BiFunction<Trip, LocalDate, TripPattern> getRealtimePattern,
-    Function<FeedScopedId, Set<LocalDate>> getServiceDatesForServiceId,
-    RealtimeVehicleRepository repository,
-    ZoneId timeZoneId,
-    GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher,
-    Set<VehiclePositionsUpdaterConfig.VehiclePositionFeature> vehiclePositionFeatures
-  ) {
-    this(
-      feedId,
-      getTripForId,
-      getStaticPattern,
-      getRealtimePattern,
-      getServiceDatesForServiceId,
-      repository,
-      timeZoneId,
-      fuzzyTripMatcher,
-      vehiclePositionFeatures,
-      (pattern, date) -> pattern.getScheduledTimetable()
-    );
-  }
-
-  public RealtimeVehiclePatternMatcher(
-    String feedId,
-    Function<FeedScopedId, Trip> getTripForId,
-    Function<Trip, TripPattern> getStaticPattern,
     BiFunction<Trip, LocalDate, TripPattern> getRealtimePattern,
     Function<FeedScopedId, Set<LocalDate>> getServiceDatesForServiceId,
     RealtimeVehicleRepository repository,
@@ -115,7 +88,6 @@ class RealtimeVehiclePatternMatcher {
   ) {
     this.feedId = feedId;
     this.getTripForId = getTripForId;
-    this.getStaticPattern = getStaticPattern;
     this.getRealtimePattern = getRealtimePattern;
     this.getTimetable = getTimetable;
     this.repository = repository;
@@ -413,23 +385,17 @@ class RealtimeVehiclePatternMatcher {
       throw UpdateException.of(scopedTripId, NO_SERVICE_ON_DATE);
     }
 
-    var scheduledTimetable = getStaticPattern.apply(trip).getScheduledTimetable();
-    // Trip times are only used to map GTFS-RT stop_sequence back to a stop. Real-time-modified
-    // scheduled trips get a new TripTimes object, so the static copy is the stable sequence map.
-    var tripTimes = scheduledTimetable.getTripTimes(trip);
+    // resolve() is the realtime overlay (scheduled underneath if there is no update), so extra
+    // journeys and REPLACEMENT stop_sequence maps are found on the same timetable.
+    var timetable = getTimetable.apply(pattern, serviceDate);
+    var tripTimes = timetable.getTripTimes(trip);
 
-    // no fixed trip found, try frequency-based one
     if (
       tripTimes == null &&
-      !scheduledTimetable.getFrequencyEntries().isEmpty() &&
+      !timetable.getFrequencyEntries().isEmpty() &&
       vehiclePosition.getTrip().hasStartDate()
     ) {
-      tripTimes = matchFrequencyTripTimes(vehiclePosition, scheduledTimetable);
-    }
-
-    // Extra journeys (ADDED/NEW) exist only on the realtime timetable for the service date.
-    if (tripTimes == null && serviceDate != null) {
-      tripTimes = getTimetable.apply(pattern, serviceDate).getTripTimes(trip);
+      tripTimes = matchFrequencyTripTimes(vehiclePosition, timetable);
     }
 
     if (tripTimes == null) {
@@ -450,10 +416,10 @@ class RealtimeVehiclePatternMatcher {
   @Nullable
   private static TripTimes<?> matchFrequencyTripTimes(
     VehiclePosition vehiclePosition,
-    Timetable scheduledTimetable
+    Timetable timetable
   ) {
     var updateStartTime = LocalTime.parse(vehiclePosition.getTrip().getStartTime());
-    var tripTimes = scheduledTimetable
+    var tripTimes = timetable
       .getFrequencyEntries()
       .stream()
       .map(FrequencyEntry::tripTimes)

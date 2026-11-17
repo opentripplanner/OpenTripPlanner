@@ -20,6 +20,8 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
@@ -108,18 +110,7 @@ public class RealtimeVehicleMatcherTest {
       : List.of();
     var pattern = tripPattern(trip1, stopTimes);
 
-    // Map positions to trips in feed
-    RealtimeVehiclePatternMatcher matcher = new RealtimeVehiclePatternMatcher(
-      TransitRepositoryForTest.FEED_ID,
-      ignored -> trip2,
-      ignored -> pattern,
-      (id, time) -> pattern,
-      ignored -> Set.of(),
-      repository,
-      zoneId,
-      null,
-      FEATURES
-    );
+    var matcher = matcher(ignored -> trip2, ignored -> pattern, repository);
 
     var positions = hasStopTimes
       ? List.of(vehiclePosition(secondTripId))
@@ -152,16 +143,10 @@ public class RealtimeVehicleMatcherTest {
       .addTripTimes(TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator()))
       .build();
 
-    var matcher = new RealtimeVehiclePatternMatcher(
-      TransitRepositoryForTest.FEED_ID,
+    var matcher = matcher(
       ignored -> trip,
       ignored -> pattern,
-      (id, time) -> pattern,
-      ignored -> Set.of(),
       repository,
-      zoneId,
-      null,
-      FEATURES,
       (ignoredPattern, ignoredDate) -> realtimeTimetable
     );
 
@@ -192,18 +177,7 @@ public class RealtimeVehicleMatcherTest {
     var tripForId = Map.of(scopedTripId, trip1);
     var patternForTrip = Map.of(trip1, pattern1);
 
-    // Map positions to trips in feed
-    RealtimeVehiclePatternMatcher matcher = new RealtimeVehiclePatternMatcher(
-      TransitRepositoryForTest.FEED_ID,
-      tripForId::get,
-      patternForTrip::get,
-      (id, time) -> patternForTrip.get(id),
-      ignored -> null,
-      repository,
-      zoneId,
-      null,
-      FEATURES
-    );
+    var matcher = matcher(tripForId::get, patternForTrip::get, repository);
 
     var pos = VehiclePosition.newBuilder()
       .setTrip(TripDescriptor.newBuilder().setTripId(tripId).build())
@@ -266,17 +240,7 @@ public class RealtimeVehicleMatcherTest {
     // an untouched pattern has no vehicle positions
     assertThat(vehicles(repository, pattern)).isEmpty();
 
-    var matcher = new RealtimeVehiclePatternMatcher(
-      TransitRepositoryForTest.FEED_ID,
-      tripForId::get,
-      patternForTrip::get,
-      (id, time) -> patternForTrip.get(id),
-      ignored -> null,
-      repository,
-      zoneId,
-      null,
-      FEATURES
-    );
+    var matcher = matcher(tripForId::get, patternForTrip::get, repository);
 
     var pos = VehiclePosition.newBuilder()
       .setTrip(
@@ -346,17 +310,7 @@ public class RealtimeVehicleMatcherTest {
     var tripForId = Map.of(scopedTripId, trip);
     var patternForTrip = Map.of(trip, pattern);
 
-    var matcher = new RealtimeVehiclePatternMatcher(
-      TransitRepositoryForTest.FEED_ID,
-      tripForId::get,
-      patternForTrip::get,
-      (id, time) -> patternForTrip.get(id),
-      ignored -> null,
-      repository,
-      zoneId,
-      null,
-      FEATURES
-    );
+    var matcher = matcher(tripForId::get, patternForTrip::get, repository);
 
     var pos = VehiclePosition.newBuilder()
       .setTrip(
@@ -396,18 +350,7 @@ public class RealtimeVehicleMatcherTest {
     // an untouched pattern has no vehicle positions
     assertThat(vehicles(repository, pattern)).isEmpty();
 
-    // Map positions to trips in feed
-    var matcher = new RealtimeVehiclePatternMatcher(
-      TransitRepositoryForTest.FEED_ID,
-      tripForId::get,
-      patternForTrip::get,
-      (id, time) -> patternForTrip.get(id),
-      ignored -> null,
-      repository,
-      zoneId,
-      null,
-      FEATURES
-    );
+    var matcher = matcher(tripForId::get, patternForTrip::get, repository);
 
     var positions = List.of(pos);
 
@@ -445,18 +388,7 @@ public class RealtimeVehicleMatcherTest {
     // an untouched pattern has no vehicle positions
     assertThat(vehicles(repository, pattern)).isEmpty();
 
-    // Map positions to trips in feed
-    RealtimeVehiclePatternMatcher matcher = new RealtimeVehiclePatternMatcher(
-      TransitRepositoryForTest.FEED_ID,
-      tripForId::get,
-      patternForTrip::get,
-      (id, time) -> patternForTrip.get(id),
-      ignored -> null,
-      repository,
-      zoneId,
-      null,
-      FEATURES
-    );
+    var matcher = matcher(tripForId::get, patternForTrip::get, repository);
 
     var positions = List.of(pos);
 
@@ -506,18 +438,7 @@ public class RealtimeVehicleMatcherTest {
     // an untouched pattern has no vehicles
     assertThat(vehicles(repository, pattern1)).isEmpty();
 
-    // Map positions to trips in feed
-    RealtimeVehiclePatternMatcher matcher = new RealtimeVehiclePatternMatcher(
-      TransitRepositoryForTest.FEED_ID,
-      tripForId::get,
-      patternForTrip::get,
-      (id, time) -> patternForTrip.get(id),
-      ignored -> null,
-      repository,
-      zoneId,
-      null,
-      FEATURES
-    );
+    var matcher = matcher(tripForId::get, patternForTrip::get, repository);
 
     var pos1 = vehiclePosition(tripId1);
 
@@ -602,6 +523,35 @@ public class RealtimeVehicleMatcherTest {
     var inferredDate = RealtimeVehiclePatternMatcher.inferServiceDate(tripTimes, zoneId, time);
 
     assertEquals(LocalDate.parse("2022-04-04"), inferredDate);
+  }
+
+  private RealtimeVehiclePatternMatcher matcher(
+    Function<FeedScopedId, Trip> tripForId,
+    Function<Trip, TripPattern> patternForTrip,
+    RealtimeVehicleRepository repository
+  ) {
+    return matcher(tripForId, patternForTrip, repository, (pattern, ignored) ->
+      pattern.getScheduledTimetable()
+    );
+  }
+
+  private RealtimeVehiclePatternMatcher matcher(
+    Function<FeedScopedId, Trip> tripForId,
+    Function<Trip, TripPattern> patternForTrip,
+    RealtimeVehicleRepository repository,
+    BiFunction<TripPattern, LocalDate, Timetable> getTimetable
+  ) {
+    return new RealtimeVehiclePatternMatcher(
+      TransitRepositoryForTest.FEED_ID,
+      tripForId,
+      (trip, ignored) -> patternForTrip.apply(trip),
+      ignored -> Set.of(),
+      repository,
+      zoneId,
+      null,
+      FEATURES,
+      getTimetable
+    );
   }
 
   private static TripPattern tripPattern(Trip trip, List<StopTime> stopTimes) {

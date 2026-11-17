@@ -2,6 +2,7 @@ package org.opentripplanner.updater.vehicle_position;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.ADDED;
+import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.REPLACEMENT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig.VehiclePositionFeature.OCCUPANCY;
@@ -14,24 +15,27 @@ import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
 import java.util.List;
 import java.util.Set;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
 import org.opentripplanner.service.realtimevehicles.internal.RealtimeVehicleRepositoryLifecycle;
+import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
 import org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model.TripInput;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.OccupancyStatus;
+import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.gtfs.GtfsRtTestHelper;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 /**
- * GTFS-RT extra journeys ({@code ADDED}/{@code NEW}) have no scheduled trip times. Vehicle
- * positions must fall back to the realtime timetable or they are rejected as
- * {@code TRIP_NOT_FOUND_IN_PATTERN} (#6176).
+ * Vehicle positions for GTFS-RT extra journeys (ADDED, REPLACEMENT) look up trip times on the
+ * resolved realtime timetable (#6176).
  */
 class AddedTripVehiclePositionTest implements RealtimeTestConstants {
 
@@ -77,25 +81,14 @@ class AddedTripVehiclePositionTest implements RealtimeTestConstants {
     assertThat(addedPattern.getScheduledTimetable().getTripTimes(addedTrip)).isNull();
 
     var repository = new DefaultRealtimeVehicleRepository();
-    var matcher = new RealtimeVehiclePatternMatcher(
-      env.feedId(),
-      snapshot::getTrip,
-      snapshot::findPattern,
-      snapshot::findPattern,
-      snapshot.getTripCalendars()::listServiceDates,
-      repository,
-      env.timeZone(),
-      null,
-      FEATURES,
-      snapshot::resolve
-    );
+    var matcher = matcher(env, snapshot, repository);
 
     var position = VehiclePosition.newBuilder()
       .setTrip(
         TripDescriptor.newBuilder()
           .setTripId(ADDED_TRIP_ID)
           .setStartDate(ServiceDateUtils.asCompactString(env.defaultServiceDate()))
-          .setScheduleRelationship(TripDescriptor.ScheduleRelationship.ADDED)
+          .setScheduleRelationship(ADDED)
           .build()
       )
       .setStopId(STOP_A_ID)
@@ -107,11 +100,7 @@ class AddedTripVehiclePositionTest implements RealtimeTestConstants {
 
     assertSuccess(matcher.applyRealtimeVehicleUpdates(List.of(position)));
 
-    var vehicles = new RealtimeVehicleRepositoryLifecycle()
-      .freeze(repository)
-      .getRealtimeVehicles(addedPattern);
-    assertThat(vehicles).hasSize(1);
-    var vehicle = vehicles.get(0);
+    var vehicle = vehicleOn(repository, addedPattern);
     assertEquals(ADDED_TRIP_ID, vehicle.trip().getId().getId());
     assertEquals(id(STOP_A_ID), vehicle.stop().orElseThrow().stop().getId());
     assertEquals(OccupancyStatus.FEW_SEATS_AVAILABLE, vehicle.occupancyStatus().orElseThrow());
@@ -124,5 +113,84 @@ class AddedTripVehiclePositionTest implements RealtimeTestConstants {
       OccupancyStatus.FEW_SEATS_AVAILABLE,
       occupancyService.getVehicleOccupancyStatus(addedTrip)
     );
+  }
+
+  @Test
+  @DisplayName(
+    "current_stop_sequence on a REPLACEMENT trip maps through the replacement's own sequences"
+  )
+  void vehiclePositionStopSequenceForReplacementTrip() {
+    var builder = TransitTestEnvironment.of();
+    var stopA = builder.stop(STOP_A_ID);
+    var stopB = builder.stop(STOP_B_ID);
+    builder.stop(STOP_C_ID);
+    var replacementEnv = builder
+      .addTrip(
+        TripInput.of(TRIP_1_ID)
+          .addStop(stopA, "8:30:00", "8:30:00")
+          .addStop(stopB, "8:40:00", "8:40:00")
+      )
+      .build();
+    var rt = GtfsRtTestHelper.of(replacementEnv);
+
+    var tripUpdate = rt
+      .tripUpdate(TRIP_1_ID, REPLACEMENT)
+      .addStopTime(STOP_A_ID, "00:30", 10)
+      .addStopTime(STOP_B_ID, "00:40", 20)
+      .addStopTime(STOP_C_ID, "00:55", 30)
+      .build();
+    assertSuccess(rt.applyTripUpdate(tripUpdate));
+
+    var snapshot = replacementEnv.timetableSnapshot();
+    var tripData = replacementEnv.tripData(TRIP_1_ID);
+    var repository = new DefaultRealtimeVehicleRepository();
+    var matcher = matcher(replacementEnv, snapshot, repository);
+
+    var position = VehiclePosition.newBuilder()
+      .setTrip(
+        TripDescriptor.newBuilder()
+          .setTripId(TRIP_1_ID)
+          .setStartDate(ServiceDateUtils.asCompactString(replacementEnv.defaultServiceDate()))
+          .setScheduleRelationship(REPLACEMENT)
+          .build()
+      )
+      .setCurrentStopSequence(20)
+      .build();
+
+    assertSuccess(matcher.applyRealtimeVehicleUpdates(List.of(position)));
+
+    // Modified patterns are stored under the original trip pattern.
+    var vehicle = vehicleOn(repository, tripData.scheduledTripPattern());
+    assertEquals(TRIP_1_ID, vehicle.trip().getId().getId());
+    assertEquals(id(STOP_B_ID), vehicle.stop().orElseThrow().stop().getId());
+  }
+
+  private RealtimeVehiclePatternMatcher matcher(
+    TransitTestEnvironment testEnv,
+    TimetableRepositorySnapshot snapshot,
+    DefaultRealtimeVehicleRepository repository
+  ) {
+    return new RealtimeVehiclePatternMatcher(
+      testEnv.feedId(),
+      snapshot::getTrip,
+      snapshot::findPattern,
+      snapshot.getTripCalendars()::listServiceDates,
+      repository,
+      testEnv.timeZone(),
+      null,
+      FEATURES,
+      snapshot::resolve
+    );
+  }
+
+  private static RealtimeVehicle vehicleOn(
+    DefaultRealtimeVehicleRepository repository,
+    TripPattern pattern
+  ) {
+    var vehicles = new RealtimeVehicleRepositoryLifecycle()
+      .freeze(repository)
+      .getRealtimeVehicles(pattern);
+    assertThat(vehicles).hasSize(1);
+    return vehicles.get(0);
   }
 }
