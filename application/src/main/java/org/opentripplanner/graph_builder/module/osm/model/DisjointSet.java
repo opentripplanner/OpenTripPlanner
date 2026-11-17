@@ -1,22 +1,22 @@
 package org.opentripplanner.graph_builder.module.osm.model;
 
-import gnu.trove.list.TIntList;
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.TLongObjectMap;
-import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.hash.TLongObjectHashMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
+import com.carrotsearch.hppc.IntArrayList;
+import com.carrotsearch.hppc.ObjectIntHashMap;
+import com.carrotsearch.hppc.ObjectIntMap;
+import com.carrotsearch.hppc.procedures.ObjectIntProcedure;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import org.opentripplanner.framework.collection.TroveUtils;
+import java.util.TreeMap;
 
 /** Basic union-find data structure with path compression */
 public class DisjointSet<T> {
 
-  TIntList sets = new TIntArrayList();
+  IntArrayList sets = new IntArrayList();
 
-  TObjectIntMap<T> setMapping = new TObjectIntHashMap<>();
+  ObjectIntMap<T> setMapping = new ObjectIntHashMap<>();
 
   public DisjointSet() {}
 
@@ -59,13 +59,20 @@ public class DisjointSet<T> {
     return setMapping.containsKey(element);
   }
 
+  /**
+   * Return the disjoint sets in a stable order, so that the result is the same on every call and
+   * the graph build is deterministic. The sets are ordered by the index of their representative,
+   * which is assigned when the element is first added.
+   * <p>
+   * This is called once per graph build and is not performance critical; the cost is O(n log g) for
+   * n elements in g sets.
+   */
   public List<Set<T>> sets() {
-    TLongObjectMap<Set<T>> out = new TLongObjectHashMap<>();
-    setMapping.forEachEntry((k, v) -> {
-      TroveUtils.addToMapSet(out, compact(v), k);
-      return true;
-    });
-    return new ArrayList<>(out.valueCollection());
+    Map<Integer, Set<T>> out = new TreeMap<>();
+    setMapping.forEach(
+      (ObjectIntProcedure<T>) (k, v) -> out.computeIfAbsent(compact(v), i -> new HashSet<>()).add(k)
+    );
+    return new ArrayList<>(out.values());
   }
 
   public int size(int component) {

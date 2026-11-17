@@ -2,14 +2,15 @@ package org.opentripplanner.graph_builder.module.osm.storage;
 
 import static org.opentripplanner.graph_builder.module.osm.model.LinearBarrierNodeType.SPLIT;
 
+import com.carrotsearch.hppc.LongArrayList;
+import com.carrotsearch.hppc.LongHashSet;
+import com.carrotsearch.hppc.LongObjectHashMap;
+import com.carrotsearch.hppc.LongObjectMap;
+import com.carrotsearch.hppc.LongSet;
+import com.carrotsearch.hppc.procedures.LongProcedure;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
-import gnu.trove.list.TLongList;
-import gnu.trove.map.TLongObjectMap;
-import gnu.trove.map.hash.TLongObjectHashMap;
-import gnu.trove.set.TLongSet;
-import gnu.trove.set.hash.TLongHashSet;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -49,7 +50,7 @@ public class VertexGenerator {
 
   private static final String NODE_LABEL_FORMAT = "osm:node:%d";
 
-  private final TLongObjectMap<IntersectionVertex> intersectionNodes = new TLongObjectHashMap<>();
+  private final LongObjectMap<IntersectionVertex> intersectionNodes = new LongObjectHashMap<>();
 
   private final HashMap<Long, Map<OsmElevatorKey, OsmElevatorVertex>> elevatorNodes =
     new HashMap<>();
@@ -269,17 +270,18 @@ public class VertexGenerator {
   }
 
   public void initIntersectionNodes() {
-    TLongSet possibleIntersectionNodes = new TLongHashSet();
+    LongSet possibleIntersectionNodes = new LongHashSet();
     for (OsmWay way : osmdb.getWays()) {
-      TLongList nodes = way.getNodeRefs();
-      nodes.forEach(node -> {
-        if (possibleIntersectionNodes.contains(node)) {
-          intersectionNodes.put(node, null);
-        } else {
-          possibleIntersectionNodes.add(node);
+      LongArrayList nodes = way.getNodeRefs();
+      nodes.forEach(
+        (LongProcedure) node -> {
+          if (possibleIntersectionNodes.contains(node)) {
+            intersectionNodes.put(node, null);
+          } else {
+            possibleIntersectionNodes.add(node);
+          }
         }
-        return true;
-      });
+      );
     }
     // Intersect ways at area boundaries if needed.
     for (OsmArea area : Iterables.concat(
@@ -313,7 +315,7 @@ public class VertexGenerator {
   public void initNodesInBarrierWays() {
     for (OsmWay way : osmdb.getWays()) {
       if (way.isBarrier()) {
-        TLongList nodes = way.getNodeRefs();
+        LongArrayList nodes = way.getNodeRefs();
         boolean isClosed = nodes.get(0) == nodes.get(nodes.size() - 1);
         for (int i = 0; i < nodes.size() - (isClosed ? 1 : 0); i++) {
           OsmNode node = osmdb.getNode(nodes.get(i));
@@ -399,7 +401,7 @@ public class VertexGenerator {
     return elevatorVertices;
   }
 
-  private void intersectAreaRingNodes(TLongSet possibleIntersectionNodes, Ring outerRing) {
+  private void intersectAreaRingNodes(LongSet possibleIntersectionNodes, Ring outerRing) {
     for (OsmNode node : outerRing.nodes) {
       long nodeId = node.getId();
       if (possibleIntersectionNodes.contains(nodeId)) {
