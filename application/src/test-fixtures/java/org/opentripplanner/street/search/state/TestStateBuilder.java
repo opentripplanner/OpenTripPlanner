@@ -268,7 +268,7 @@ public class TestStateBuilder {
     )
       .withName(name)
       .buildAndConnect();
-    currentState = edge.traverse(currentState)[0];
+    currentState = requireSingleState(edge.traverse(currentState));
     return this;
   }
 
@@ -303,7 +303,7 @@ public class TestStateBuilder {
     var to = new VehicleRentalPlaceVertex(station);
 
     var link = StreetVehicleRentalLink.createStreetVehicleRentalLink(from, to);
-    currentState = link.traverse(currentState)[0];
+    currentState = requireSingleState(link.traverse(currentState));
     return this;
   }
 
@@ -312,8 +312,7 @@ public class TestStateBuilder {
     var from = (StreetVertex) currentState.vertex;
     final var entranceVertex = StreetModelForTest.transitEntranceVertex(id, count, count);
     var edge = StreetTransitEntranceLink.createStreetTransitEntranceLink(from, entranceVertex);
-    var states = edge.traverse(currentState);
-    currentState = states[0];
+    currentState = requireSingleState(edge.traverse(currentState));
     return this;
   }
 
@@ -337,8 +336,7 @@ public class TestStateBuilder {
     count++;
     var to = StreetModelForTest.intersectionVertex(count, count);
     var link = StreetTransitEntranceLink.createStreetTransitEntranceLink(entranceVertex, to);
-    var states = link.traverse(state);
-    currentState = states[0];
+    currentState = requireSingleState(link.traverse(state));
     return this;
   }
 
@@ -347,7 +345,7 @@ public class TestStateBuilder {
     var from = (StreetVertex) currentState.vertex;
     var tov = StreetModelForTest.intersectionVertex(count, count);
     var edge = PathwayEdge.createPathwayEdge(from, tov, I18NString.of(s), 60, 100, 0, 0, true);
-    currentState = edge.traverse(currentState)[0];
+    currentState = requireSingleState(edge.traverse(currentState));
     return this;
   }
 
@@ -357,7 +355,7 @@ public class TestStateBuilder {
     var tov = StreetModelForTest.intersectionVertex(count, count);
     var name = s == null ? null : I18NString.of(s);
     var edge = PathwayEdge.createPathwayEdge(from, tov, name, 0, distance_m, 0, 0, true);
-    currentState = edge.traverse(currentState)[0];
+    currentState = requireSingleState(edge.traverse(currentState));
     return this;
   }
 
