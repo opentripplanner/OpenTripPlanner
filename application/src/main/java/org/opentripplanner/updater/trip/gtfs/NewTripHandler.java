@@ -1,7 +1,6 @@
 package org.opentripplanner.updater.trip.gtfs;
 
 import static org.opentripplanner.updater.spi.UpdateErrorType.INVALID_STOP_REFERENCE;
-import static org.opentripplanner.updater.spi.UpdateErrorType.NOT_IMPLEMENTED_NO_DATA_IN_REPLACEMENT;
 import static org.opentripplanner.updater.spi.UpdateErrorType.NO_SERVICE_ON_DATE;
 import static org.opentripplanner.updater.spi.UpdateErrorType.OUTSIDE_SERVICE_PERIOD;
 import static org.opentripplanner.updater.spi.UpdateErrorType.TOO_FEW_STOPS;
@@ -9,7 +8,6 @@ import static org.opentripplanner.updater.spi.UpdateErrorType.TRIP_ALREADY_EXIST
 import static org.opentripplanner.updater.spi.UpdateErrorType.TRIP_NOT_FOUND;
 import static org.opentripplanner.updater.spi.UpdateErrorType.UNKNOWN_STOP;
 
-import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -97,14 +95,6 @@ class NewTripHandler {
     if (!serviceIds.contains(trip.getServiceId())) {
       // TODO: should we support this and change service id of trip?
       throw UpdateException.of(tripUpdate.tripId(), NO_SERVICE_ON_DATE);
-    }
-
-    boolean hasNoDataStop = tripUpdate
-      .stopTimeUpdates()
-      .stream()
-      .anyMatch(it -> it.scheduleRelationship() == ScheduleRelationship.NO_DATA);
-    if (hasNoDataStop) {
-      throw UpdateException.of(tripUpdate.tripId(), NOT_IMPLEMENTED_NO_DATA_IN_REPLACEMENT);
     }
 
     return handleNewOrReplacementTrip(trip, tripUpdate, false, true, false);
