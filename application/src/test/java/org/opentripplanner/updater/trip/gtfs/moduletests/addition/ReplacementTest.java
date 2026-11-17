@@ -1,5 +1,6 @@
 package org.opentripplanner.updater.trip.gtfs.moduletests.addition;
 
+import static com.google.common.truth.Truth.assertThat;
 import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.NEW;
 import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.REPLACEMENT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -170,15 +171,15 @@ public class ReplacementTest implements RealtimeTestConstants {
     var tripData = env.tripData(TRIP_1_ID);
     var tripTimes = tripData.tripTimes();
 
-    assertEquals(
-      List.of(STOP_A_ID, STOP_D_ID, STOP_C_ID),
+    assertThat(
       tripData
         .tripPattern()
         .getStops()
         .stream()
         .map(s -> s.getId().getId())
-        .toList()
-    );
+    )
+      .containsExactly(STOP_A_ID, STOP_D_ID, STOP_C_ID)
+      .inOrder();
     assertTrue(tripTimes.isTripPatternModified());
 
     assertFalse(tripTimes.isCanceledStop(0));
@@ -222,15 +223,15 @@ public class ReplacementTest implements RealtimeTestConstants {
 
     var tripData = env.tripData(TRIP_1_ID);
     var tripTimes = tripData.tripTimes();
-    assertEquals(
-      List.of(STOP_A_ID, STOP_B_ID, STOP_D_ID, STOP_C_ID),
+    assertThat(
       tripData
         .tripPattern()
         .getStops()
         .stream()
         .map(s -> s.getId().getId())
-        .toList()
-    );
+    )
+      .containsExactly(STOP_A_ID, STOP_B_ID, STOP_D_ID, STOP_C_ID)
+      .inOrder();
     assertTrue(tripTimes.isTripPatternModified());
 
     assertFalse(tripTimes.isCanceledStop(0));
@@ -278,15 +279,15 @@ public class ReplacementTest implements RealtimeTestConstants {
 
     var tripData = env.tripData(TRIP_1_ID);
     var tripTimes = tripData.tripTimes();
-    assertEquals(
-      List.of(STOP_A_ID, STOP_B_ID, STOP_D_ID, STOP_C_ID),
+    assertThat(
       tripData
         .tripPattern()
         .getStops()
         .stream()
         .map(s -> s.getId().getId())
-        .toList()
-    );
+    )
+      .containsExactly(STOP_A_ID, STOP_B_ID, STOP_D_ID, STOP_C_ID)
+      .inOrder();
     assertTrue(tripTimes.isTripPatternModified());
 
     assertFalse(tripTimes.isCanceledStop(0));
@@ -336,15 +337,15 @@ public class ReplacementTest implements RealtimeTestConstants {
 
     var tripData = env.tripData(ADDED_TRIP_ID);
     var tripTimes = tripData.tripTimes();
-    assertEquals(
-      List.of(STOP_A_ID, STOP_D_ID, STOP_C_ID),
+    assertThat(
       tripData
         .tripPattern()
         .getStops()
         .stream()
         .map(s -> s.getId().getId())
-        .toList()
-    );
+    )
+      .containsExactly(STOP_A_ID, STOP_D_ID, STOP_C_ID)
+      .inOrder();
 
     assertFalse(tripTimes.isCanceledStop(0));
     assertFalse(tripTimes.isExtraCall(0));

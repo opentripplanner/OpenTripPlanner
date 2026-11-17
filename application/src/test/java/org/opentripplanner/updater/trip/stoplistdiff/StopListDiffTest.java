@@ -1,6 +1,6 @@
 package org.opentripplanner.updater.trip.stoplistdiff;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static com.google.common.truth.Truth.assertThat;
 
 import java.util.Arrays;
 import java.util.List;
@@ -32,57 +32,61 @@ class StopListDiffTest {
 
   @Test
   void replacedStopInTheMiddle() {
-    assertEquals(
-      List.of(new Kept(0, 0), new Removed(1), new Added(1), new Kept(2, 2)),
-      StopListDiff.diff(comparands(A, B, C), comparands(A, D, C))
-    );
+    assertThat(StopListDiff.diff(comparands(A, B, C), comparands(A, D, C)))
+      .containsExactly(new Kept(0, 0), new Removed(1), new Added(1), new Kept(2, 2))
+      .inOrder();
   }
 
   @Test
   void identical() {
-    assertEquals(
-      List.of(new Kept(0, 0), new Kept(1, 1), new Kept(2, 2)),
-      StopListDiff.diff(comparands(A, B, C), comparands(A, B, C))
-    );
+    assertThat(StopListDiff.diff(comparands(A, B, C), comparands(A, B, C)))
+      .containsExactly(new Kept(0, 0), new Kept(1, 1), new Kept(2, 2))
+      .inOrder();
   }
 
   @Test
   void addedAndRemovedAtTheEnds() {
-    assertEquals(
-      List.of(new Added(0), new Kept(0, 1), new Kept(1, 2), new Removed(2)),
-      StopListDiff.diff(comparands(A, B, C), comparands(D, A, B))
-    );
+    assertThat(StopListDiff.diff(comparands(A, B, C), comparands(D, A, B)))
+      .containsExactly(new Added(0), new Kept(0, 1), new Kept(1, 2), new Removed(2))
+      .inOrder();
   }
 
   @Test
   void nothingInCommon() {
-    assertEquals(
-      List.of(new Removed(0), new Removed(1), new Added(0), new Added(1)),
-      StopListDiff.diff(comparands(A, B), comparands(C, D))
-    );
+    assertThat(StopListDiff.diff(comparands(A, B), comparands(C, D)))
+      .containsExactly(new Removed(0), new Removed(1), new Added(0), new Added(1))
+      .inOrder();
   }
 
   @Test
   void emptyLists() {
-    assertEquals(List.of(new Added(0)), StopListDiff.diff(List.of(), comparands(A)));
-    assertEquals(List.of(new Removed(0)), StopListDiff.diff(comparands(A), List.of()));
-    assertEquals(List.of(), StopListDiff.diff(List.of(), List.of()));
+    assertThat(StopListDiff.diff(List.of(), comparands(A)))
+      .containsExactly(new Added(0))
+      .inOrder();
+    assertThat(StopListDiff.diff(comparands(A), List.of()))
+      .containsExactly(new Removed(0))
+      .inOrder();
+    assertThat(StopListDiff.diff(List.of(), List.of())).containsExactly().inOrder();
   }
 
   @Test
   void loopTrip() {
-    assertEquals(
-      List.of(new Kept(0, 0), new Removed(1), new Added(1), new Kept(2, 2)),
-      StopListDiff.diff(comparands(A, B, A), comparands(A, C, A))
-    );
+    assertThat(StopListDiff.diff(comparands(A, B, A), comparands(A, C, A)))
+      .containsExactly(new Kept(0, 0), new Removed(1), new Added(1), new Kept(2, 2))
+      .inOrder();
   }
 
   @Test
   void repeatedStopWithoutTimesMatchesEarliestOccurrence() {
-    assertEquals(
-      List.of(new Kept(0, 0), new Kept(1, 1), new Removed(2), new Removed(3), new Kept(4, 2)),
-      StopListDiff.diff(comparands(A, B, C, B, D), comparands(A, B, D))
-    );
+    assertThat(StopListDiff.diff(comparands(A, B, C, B, D), comparands(A, B, D)))
+      .containsExactly(
+        new Kept(0, 0),
+        new Kept(1, 1),
+        new Removed(2),
+        new Removed(3),
+        new Kept(4, 2)
+      )
+      .inOrder();
   }
 
   @Test
@@ -101,10 +105,15 @@ class StopListDiffTest {
       new StopListDiffComparand(D, OptionalLong.of(500), OptionalLong.empty())
     );
 
-    assertEquals(
-      List.of(new Kept(0, 0), new Removed(1), new Removed(2), new Kept(3, 1), new Kept(4, 2)),
-      StopListDiff.diff(original, replacement)
-    );
+    assertThat(StopListDiff.diff(original, replacement))
+      .containsExactly(
+        new Kept(0, 0),
+        new Removed(1),
+        new Removed(2),
+        new Kept(3, 1),
+        new Kept(4, 2)
+      )
+      .inOrder();
   }
 
   @Test
@@ -120,26 +129,23 @@ class StopListDiffTest {
       new StopListDiffComparand(C, OptionalLong.of(300), OptionalLong.empty())
     );
 
-    assertEquals(
-      List.of(new Kept(0, 0), new Kept(1, 1), new Removed(2)),
-      StopListDiff.diff(original, replacement)
-    );
+    assertThat(StopListDiff.diff(original, replacement))
+      .containsExactly(new Kept(0, 0), new Kept(1, 1), new Removed(2))
+      .inOrder();
   }
 
   @Test
   void platformChangeWithinStationIsKept() {
-    assertEquals(
-      List.of(new Kept(0, 0), new Kept(1, 1), new Kept(2, 2)),
-      StopListDiff.diff(comparands(A, X_1, C), comparands(A, X_2, C))
-    );
+    assertThat(StopListDiff.diff(comparands(A, X_1, C), comparands(A, X_2, C)))
+      .containsExactly(new Kept(0, 0), new Kept(1, 1), new Kept(2, 2))
+      .inOrder();
   }
 
   @Test
   void stopsWithoutStationAreNotMatchedByStation() {
-    assertEquals(
-      List.of(new Removed(0), new Added(0)),
-      StopListDiff.diff(comparands(A), comparands(B))
-    );
+    assertThat(StopListDiff.diff(comparands(A), comparands(B)))
+      .containsExactly(new Removed(0), new Added(0))
+      .inOrder();
   }
 
   @Test
@@ -156,10 +162,9 @@ class StopListDiffTest {
       new StopListDiffComparand(E, OptionalLong.of(500), OptionalLong.empty())
     );
 
-    assertEquals(
-      List.of(new Kept(0, 0), new Removed(1), new Added(1), new Removed(2), new Kept(3, 2)),
-      StopListDiff.diff(original, replacement)
-    );
+    assertThat(StopListDiff.diff(original, replacement))
+      .containsExactly(new Kept(0, 0), new Removed(1), new Added(1), new Removed(2), new Kept(3, 2))
+      .inOrder();
   }
 
   @Test
@@ -181,8 +186,12 @@ class StopListDiffTest {
     );
     var expected = List.of(new Kept(0, 0), new Removed(1), new Added(1), new Kept(2, 2));
 
-    assertEquals(expected, StopListDiff.diff(original, replacementSameTime));
-    assertEquals(expected, StopListDiff.diff(original, replacementNoTime));
+    assertThat(StopListDiff.diff(original, replacementSameTime))
+      .containsExactlyElementsIn(expected)
+      .inOrder();
+    assertThat(StopListDiff.diff(original, replacementNoTime))
+      .containsExactlyElementsIn(expected)
+      .inOrder();
   }
 
   @Test
@@ -198,10 +207,9 @@ class StopListDiffTest {
       new StopListDiffComparand(B, OptionalLong.empty(), OptionalLong.of(410))
     );
 
-    assertEquals(
-      List.of(new Kept(0, 0), new Removed(1), new Removed(2)),
-      StopListDiff.diff(original, replacement)
-    );
+    assertThat(StopListDiff.diff(original, replacement))
+      .containsExactly(new Kept(0, 0), new Removed(1), new Removed(2))
+      .inOrder();
   }
 
   @Test
@@ -216,10 +224,9 @@ class StopListDiffTest {
       new StopListDiffComparand(B, OptionalLong.of(690), OptionalLong.of(410))
     );
 
-    assertEquals(
-      List.of(new Removed(0), new Removed(1), new Kept(2, 0)),
-      StopListDiff.diff(original, replacement)
-    );
+    assertThat(StopListDiff.diff(original, replacement))
+      .containsExactly(new Removed(0), new Removed(1), new Kept(2, 0))
+      .inOrder();
   }
 
   @Test
@@ -233,10 +240,9 @@ class StopListDiffTest {
       new StopListDiffComparand(B, OptionalLong.empty(), OptionalLong.of(700))
     );
 
-    assertEquals(
-      List.of(new Kept(0, 0), new Removed(1), new Removed(2)),
-      StopListDiff.diff(original, replacement)
-    );
+    assertThat(StopListDiff.diff(original, replacement))
+      .containsExactly(new Kept(0, 0), new Removed(1), new Removed(2))
+      .inOrder();
   }
 
   @Test
@@ -252,10 +258,9 @@ class StopListDiffTest {
       new StopListDiffComparand(E, OptionalLong.of(500), OptionalLong.empty())
     );
 
-    assertEquals(
-      List.of(new Kept(0, 0), new Added(1), new Removed(1), new Kept(2, 2)),
-      StopListDiff.diff(original, replacement)
-    );
+    assertThat(StopListDiff.diff(original, replacement))
+      .containsExactly(new Kept(0, 0), new Added(1), new Removed(1), new Kept(2, 2))
+      .inOrder();
   }
 
   private static List<StopListDiffComparand> comparands(RegularStop... stops) {
