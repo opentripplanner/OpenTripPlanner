@@ -35,9 +35,8 @@ public class RemoveDirectFlexIfTransitIsBetter implements RemoveItineraryFlagger
       .filter(Itinerary::hasTransit)
       .toList();
 
-    return itineraries
+    return transitItineraries
       .stream()
-      .filter(Itinerary::hasTransit)
       .filter(Itinerary::isDirectFlex)
       .filter(it -> transitItineraries.stream().anyMatch(t -> costLimit.exceedsLimit(it, t)))
       .toList();
