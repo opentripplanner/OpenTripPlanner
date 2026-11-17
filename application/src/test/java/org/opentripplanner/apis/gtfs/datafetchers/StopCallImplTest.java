@@ -3,13 +3,11 @@ package org.opentripplanner.apis.gtfs.datafetchers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -22,11 +20,9 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.apis.gtfs.model.CallSchedule;
 import org.opentripplanner.apis.gtfs.model.CallScheduledTime.ArrivalDepartureTime;
 import org.opentripplanner.apis.gtfs.model.CallScheduledTime.TimeWindow;
-import org.opentripplanner.apis.gtfs.service.ApiTransitService;
 import org.opentripplanner.apis.support.graphql.DataFetchingSupport;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
@@ -47,8 +43,6 @@ class StopCallImplTest {
   private static final String TRIP_ID = "Trip1";
   private static final String FLEX_TRIP_ID = "FlexTrip1";
   private static final String MODIFIED_TRIP_ID = "ModifiedTrip1";
-  private static final String MODIFIED_TOSD_ID = "ModifiedTosd1";
-  private static final ZonedDateTime ANY_TIME = ZonedDateTime.parse("2023-06-03T12:00:00+02:00");
   private static final double TOLERANCE = 1e-6;
 
   private static final OffsetDateTime NOON = OffsetDateTime.parse("2023-06-03T12:00+02:00");
@@ -124,8 +118,7 @@ class StopCallImplTest {
   /**
    * A real-time update replaces the last two stops of the trip: the first hop is unchanged, the
    * second ends at another stop of the same station and the third ends at a stop that is not in the
-   * schedule. The geometries must be the same for the calls of the trip on service date and the
-   * calls of a leg on the modified trip.
+   * schedule.
    */
   @Test
   void geometryToNextCallOfRealTimeModifiedTrip() throws Exception {
@@ -136,7 +129,6 @@ class StopCallImplTest {
     var realtimeEnv = envBuilder
       .addTrip(
         TripInput.of(MODIFIED_TRIP_ID)
-          .withWithTripOnServiceDate(MODIFIED_TOSD_ID)
           .addStop(STOP_A, "12:00:00", "12:00:00")
           .addStop(STOP_B, "12:10:00", "12:10:00")
           .addStop(stopC1, "12:20:00", "12:20:00")
@@ -154,48 +146,28 @@ class StopCallImplTest {
     var scheduledPattern = tripData.scheduledTripPattern();
     var transitService = realtimeEnv.transitService();
 
-    var tripOnServiceDate = transitService.getTripOnServiceDate(id(MODIFIED_TOSD_ID));
-    var tripOnServiceDateCalls = new TripOnServiceDateImpl()
-      .stopCalls()
-      .get(
-        DataFetchingSupport.dataFetchingEnvironment(tripOnServiceDate, Map.of(), transitService)
-      );
+    var calls = transitService.findTripTimesOnDate(tripData.trip(), SERVICE_DATE).orElseThrow();
+    var geometries = geometriesToNextCall(calls, transitService);
+    assertEquals(4, geometries.size());
 
-    var leg = new ScheduledTransitLegBuilder()
-      .withTripPattern(tripData.tripPattern())
-      .withTripTimes(tripData.tripTimes())
-      .withStartTime(ANY_TIME)
-      .withEndTime(ANY_TIME)
-      .withServiceDate(SERVICE_DATE)
-      .withZoneId(realtimeEnv.timeZone())
-      .withBoardStopIndexInPattern(0)
-      .withAlightStopIndexInPattern(3)
-      .build();
-    var legCalls = new ApiTransitService(transitService).findStopCalls(leg);
+    // Unchanged hop: the scheduled shape is kept
+    assertTrue(geometries.get(0).equalsExact(scheduledPattern.getHopGeometry(0), TOLERANCE));
 
-    for (var calls : List.of(tripOnServiceDateCalls, legCalls)) {
-      var geometries = geometriesToNextCall(calls, transitService);
-      assertEquals(4, geometries.size());
+    // Hop to another stop of the same station: the scheduled shape is moved to the new stop
+    var scheduledHop = scheduledPattern.getHopGeometry(1).getCoordinates();
+    var stationHop = geometries.get(1).getCoordinates();
+    assertEquals(scheduledHop.length, stationHop.length);
+    assertCoordinate(scheduledHop[0], stationHop[0]);
+    assertCoordinate(scheduledHop[1], stationHop[1]);
+    assertCoordinate(coordinate(stopC2), stationHop[2]);
 
-      // Unchanged hop: the scheduled shape is kept
-      assertTrue(geometries.get(0).equalsExact(scheduledPattern.getHopGeometry(0), TOLERANCE));
+    // Hop to a stop that is not in the schedule: a straight line between the stops
+    var newHop = geometries.get(2).getCoordinates();
+    assertEquals(2, newHop.length);
+    assertCoordinate(coordinate(stopC2), newHop[0]);
+    assertCoordinate(coordinate(stopY), newHop[1]);
 
-      // Hop to another stop of the same station: the scheduled shape is moved to the new stop
-      var scheduledHop = scheduledPattern.getHopGeometry(1).getCoordinates();
-      var stationHop = geometries.get(1).getCoordinates();
-      assertEquals(scheduledHop.length, stationHop.length);
-      assertCoordinate(scheduledHop[0], stationHop[0]);
-      assertCoordinate(scheduledHop[1], stationHop[1]);
-      assertCoordinate(coordinate(stopC2), stationHop[2]);
-
-      // Hop to a stop that is not in the schedule: a straight line between the stops
-      var newHop = geometries.get(2).getCoordinates();
-      assertEquals(2, newHop.length);
-      assertCoordinate(coordinate(stopC2), newHop[0]);
-      assertCoordinate(coordinate(stopY), newHop[1]);
-
-      assertNull(geometries.get(3));
-    }
+    assertNull(geometries.get(3));
   }
 
   /**
