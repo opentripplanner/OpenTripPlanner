@@ -1,6 +1,5 @@
 package org.opentripplanner.updater.trip.gtfs.moduletests.addition;
 
-import static com.google.common.truth.Truth.assertThat;
 import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.NEW;
 import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.REPLACEMENT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -24,7 +23,6 @@ import org.opentripplanner.transit.model.TripInput;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.gtfs.GtfsRtTestHelper;
 import org.opentripplanner.updater.trip.gtfs.model.TripUpdate;
-import org.opentripplanner.utils.time.TimeUtils;
 
 public class ReplacementTest implements RealtimeTestConstants {
 
@@ -132,14 +130,10 @@ public class ReplacementTest implements RealtimeTestConstants {
       assertEquals(I18NString.of("Changed Headsign"), tripTimes.getHeadsign(1));
       assertEquals(I18NString.of("New Headsign"), tripTimes.getHeadsign(2));
 
-      assertFalse(tripTimes.isCanceledStop(0));
-      assertFalse(tripTimes.isExtraCall(0));
-
-      assertFalse(tripTimes.isCanceledStop(1));
-      assertFalse(tripTimes.isExtraCall(1));
-
-      assertFalse(tripTimes.isCanceledStop(2));
-      assertTrue(tripTimes.isExtraCall(2), "Stop C is not part of the scheduled trip");
+      assertEquals(
+        "P U | A 0:30 0:30 | B 0:45 0:45 | C [EC] 1:00 1:00",
+        tripFetcher.showTimetable()
+      );
     }
   }
 
@@ -170,29 +164,10 @@ public class ReplacementTest implements RealtimeTestConstants {
 
     assertSuccess(rt.applyTripUpdate(tripUpdate));
 
-    var tripData = env.tripData(TRIP_1_ID);
-    var tripTimes = tripData.tripTimes();
-
-    assertThat(
-      tripData
-        .tripPattern()
-        .getStops()
-        .stream()
-        .map(s -> s.getId().getId())
-    )
-      .containsExactly(STOP_A_ID, STOP_D_ID, STOP_C_ID)
-      .inOrder();
-    assertTrue(tripTimes.isTripPatternModified());
-
-    assertFalse(tripTimes.isCanceledStop(0));
-    assertFalse(tripTimes.isExtraCall(0));
-
-    assertFalse(tripTimes.isCanceledStop(1));
-    assertTrue(tripTimes.isExtraCall(1));
-
-    assertFalse(tripTimes.isCanceledStop(2));
-    assertFalse(tripTimes.isExtraCall(2));
-    assertEquals(TimeUtils.time("8:56"), tripTimes.getArrivalTime(2));
+    assertEquals(
+      "P U | A 8:31 8:31 | D [EC] 8:46 8:46 | C 8:56 8:56",
+      env.tripData(TRIP_1_ID).showTimetable()
+    );
   }
 
   /**
@@ -223,30 +198,10 @@ public class ReplacementTest implements RealtimeTestConstants {
 
     assertSuccess(rt.applyTripUpdate(tripUpdate));
 
-    var tripData = env.tripData(TRIP_1_ID);
-    var tripTimes = tripData.tripTimes();
-    assertThat(
-      tripData
-        .tripPattern()
-        .getStops()
-        .stream()
-        .map(s -> s.getId().getId())
-    )
-      .containsExactly(STOP_A_ID, STOP_B_ID, STOP_D_ID, STOP_C_ID)
-      .inOrder();
-    assertTrue(tripTimes.isTripPatternModified());
-
-    assertFalse(tripTimes.isCanceledStop(0));
-    assertFalse(tripTimes.isExtraCall(0));
-
-    assertTrue(tripTimes.isCanceledStop(1));
-    assertFalse(tripTimes.isExtraCall(1));
-
-    assertFalse(tripTimes.isCanceledStop(2));
-    assertTrue(tripTimes.isExtraCall(2));
-
-    assertFalse(tripTimes.isCanceledStop(3));
-    assertFalse(tripTimes.isExtraCall(3));
+    assertEquals(
+      "P U | A 8:30 8:30 | B [C] 8:40 8:40 | D [EC] 8:45 8:45 | C 8:55 8:55",
+      env.tripData(TRIP_1_ID).showTimetable()
+    );
   }
 
   /**
@@ -279,30 +234,10 @@ public class ReplacementTest implements RealtimeTestConstants {
 
     assertSuccess(rt.applyTripUpdate(tripUpdate));
 
-    var tripData = env.tripData(TRIP_1_ID);
-    var tripTimes = tripData.tripTimes();
-    assertThat(
-      tripData
-        .tripPattern()
-        .getStops()
-        .stream()
-        .map(s -> s.getId().getId())
-    )
-      .containsExactly(STOP_A_ID, STOP_B_ID, STOP_D_ID, STOP_C_ID)
-      .inOrder();
-    assertTrue(tripTimes.isTripPatternModified());
-
-    assertFalse(tripTimes.isCanceledStop(0));
-    assertFalse(tripTimes.isExtraCall(0));
-
-    assertTrue(tripTimes.isCanceledStop(1));
-    assertFalse(tripTimes.isExtraCall(1));
-
-    assertFalse(tripTimes.isCanceledStop(2));
-    assertTrue(tripTimes.isExtraCall(2));
-
-    assertFalse(tripTimes.isCanceledStop(3));
-    assertFalse(tripTimes.isExtraCall(3));
+    assertEquals(
+      "P U | A 8:30 8:30 | B [C] 8:40 8:40 | D [EC] 8:45 8:45 | C 8:55 8:55",
+      env.tripData(TRIP_1_ID).showTimetable()
+    );
   }
 
   /**
@@ -337,26 +272,10 @@ public class ReplacementTest implements RealtimeTestConstants {
 
     assertSuccess(rt.applyTripUpdates(List.of(addedTrip, replacement)));
 
-    var tripData = env.tripData(ADDED_TRIP_ID);
-    var tripTimes = tripData.tripTimes();
-    assertThat(
-      tripData
-        .tripPattern()
-        .getStops()
-        .stream()
-        .map(s -> s.getId().getId())
-    )
-      .containsExactly(STOP_A_ID, STOP_D_ID, STOP_C_ID)
-      .inOrder();
-
-    assertFalse(tripTimes.isCanceledStop(0));
-    assertFalse(tripTimes.isExtraCall(0));
-
-    assertFalse(tripTimes.isCanceledStop(1));
-    assertFalse(tripTimes.isExtraCall(1));
-
-    assertFalse(tripTimes.isCanceledStop(2));
-    assertFalse(tripTimes.isExtraCall(2));
+    assertEquals(
+      "P U | A 9:30 9:30 | D 9:45 9:45 | C 9:55 9:55",
+      env.tripData(ADDED_TRIP_ID).showTimetable()
+    );
   }
 
   @Test
