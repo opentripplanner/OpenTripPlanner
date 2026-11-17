@@ -20,6 +20,11 @@ public class FeedScopedIdFactory {
     this.feedId = feedId;
   }
 
+  /** The feed id used to scope the created ids. */
+  public String feedId() {
+    return feedId;
+  }
+
   public FeedScopedId createId(String netexId) {
     return new FeedScopedId(feedId, netexId);
   }
