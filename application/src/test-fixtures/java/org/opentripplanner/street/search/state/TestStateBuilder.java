@@ -17,6 +17,7 @@ import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.street.StreetVehicleRentalLink;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.StreetModelForTest;
@@ -42,6 +43,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
  */
 public class TestStateBuilder {
 
+  private static final WgsCoordinate DEFAULT_START = new WgsCoordinate(1, 1);
   private final TransitRepositoryForTest testModel = TransitRepositoryForTest.of();
 
   private static final Instant DEFAULT_START_TIME = OffsetDateTime.parse(
@@ -52,12 +54,12 @@ public class TestStateBuilder {
   private State currentState;
 
   private TestStateBuilder(StreetMode mode) {
-    this(mode, AccessEgressType.ACCESS);
+    this(mode, AccessEgressType.ACCESS, DEFAULT_START);
   }
 
-  private TestStateBuilder(StreetMode mode, AccessEgressType type) {
+  private TestStateBuilder(StreetMode mode, AccessEgressType type, WgsCoordinate start) {
     currentState = new State(
-      StreetModelForTest.intersectionVertex(count, count),
+      StreetModelForTest.intersectionVertex(start.latitude(), start.longitude()),
       StreetSearchRequest.of()
         .withArriveBy(type.isEgress())
         .withMode(mode)
@@ -78,7 +80,7 @@ public class TestStateBuilder {
    * runs backward in time.
    */
   public static TestStateBuilder ofWalkingEgress() {
-    return new TestStateBuilder(StreetMode.WALK, AccessEgressType.EGRESS);
+    return new TestStateBuilder(StreetMode.WALK, AccessEgressType.EGRESS, DEFAULT_START);
   }
 
   /**
