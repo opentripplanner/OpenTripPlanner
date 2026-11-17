@@ -10,8 +10,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Maps from the internal model to the GTFS API. See
- * {@link org.opentripplanner.apis.transmodel.mapping.RealtimeStateMapper} for transmodel (same
- * implementation)
+ * {@link org.opentripplanner.apis.transmodel.mapping.RealtimeStateMapper} for transmodel.
  */
 public class RealtimeStateMapper {
 
