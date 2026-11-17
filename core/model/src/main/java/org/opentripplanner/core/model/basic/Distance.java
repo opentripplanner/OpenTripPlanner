@@ -1,11 +1,12 @@
 package org.opentripplanner.core.model.basic;
 
+import java.io.Serializable;
 import java.util.Optional;
 import java.util.function.Consumer;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.utils.tostring.ValueObjectToStringBuilder;
 
-public class Distance {
+public class Distance implements Serializable {
 
   private static final int MILLIMETERS_PER_M = 1000;
   private static final int MILLIMETERS_PER_KM = 1000 * MILLIMETERS_PER_M;

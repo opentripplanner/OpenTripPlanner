@@ -1,5 +1,6 @@
 package org.opentripplanner.core.model.time;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.Optional;
@@ -12,7 +13,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * Both bounds are optional: a {@code null} start means that the period has always been valid
  * (unbounded start), and a {@code null} end means that it is valid indefinitely (unbounded end).
  */
-public final class TimePeriod {
+public final class TimePeriod implements Serializable {
 
   private static final TimePeriod UNBOUNDED = new TimePeriod(null, null);
 
