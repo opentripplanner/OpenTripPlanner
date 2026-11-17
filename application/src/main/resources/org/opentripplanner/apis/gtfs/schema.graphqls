@@ -609,7 +609,7 @@ type DependentFareProduct implements FareProduct {
   riderCategory: RiderCategory
 }
 
-"The destination a vehicle displays at a specific stop, usually on its head sign."
+"The destination a vehicle displays at a specific stop, usually on its headsign."
 type DestinationDisplay {
   """
   Vehicle headsign of the trip at this stop. Trip headsigns can change during
@@ -619,9 +619,8 @@ type DestinationDisplay {
   """
   headsign(
     """
-    If a translated headsign is found in GTFS translations.txt and the wanted language is not the
-    same as the feed's language, then returns the wanted translation. Otherwise returns the
-    headsign in the feed's language.
+    Returns headsign with the specified language, if found. Otherwise returns the value with
+    some default language.
     """
     language: String
   ): String
