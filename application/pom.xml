@@ -106,7 +106,7 @@
         <dependency>
             <groupId>com.esotericsoftware</groupId>
             <artifactId>kryo</artifactId>
-            <version>5.5.0</version>
+            <version>5.7.1</version>
         </dependency>
         <!-- Only used for the ObjectDiffer, which tests that a round trip through serialization reproduces the same network. -->
         <dependency>
