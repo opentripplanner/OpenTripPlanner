@@ -44,6 +44,7 @@ public class PathMapperTest implements RaptorTestConstants {
       SLACK_PROVIDER,
       C1_CALCULATOR,
       RaptorTestConstants::stopIndexToName,
+      null,
       null
     );
 
@@ -62,6 +63,7 @@ public class PathMapperTest implements RaptorTestConstants {
       SLACK_PROVIDER,
       C1_CALCULATOR,
       RaptorTestConstants::stopIndexToName,
+      null,
       null
     );
 
@@ -146,6 +148,7 @@ public class PathMapperTest implements RaptorTestConstants {
       FLEX_SLACK_PROVIDER,
       FLEX_COST_CALCULATOR,
       RaptorTestConstants::stopIndexToName,
+      null,
       null
     );
     // When:
@@ -163,6 +166,7 @@ public class PathMapperTest implements RaptorTestConstants {
       FLEX_SLACK_PROVIDER,
       FLEX_COST_CALCULATOR,
       RaptorTestConstants::stopIndexToName,
+      null,
       null
     );
     // When:

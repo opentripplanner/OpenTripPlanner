@@ -1,7 +1,6 @@
 package org.opentripplanner.raptor.rangeraptor.standard.stoparrivals;
 
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
-import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
@@ -110,14 +109,9 @@ public final class AccessStopArrivalState<T extends RaptorTripSchedule> implemen
   }
 
   @Override
-  public RaptorTransfer transferPath() {
-    return delegate.transferPath();
-  }
-
-  @Override
-  public void transferToStop(int fromStop, int arrivalTime, RaptorTransfer transferPath) {
+  public void transferToStop(int fromStop, int arrivalTime) {
     accessArriveOnStreet = null;
-    delegate.transferToStop(fromStop, arrivalTime, transferPath);
+    delegate.transferToStop(fromStop, arrivalTime);
   }
 
   @Override

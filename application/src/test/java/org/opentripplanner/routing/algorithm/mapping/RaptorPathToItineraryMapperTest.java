@@ -37,12 +37,10 @@ import org.opentripplanner.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.raptor.path.Path;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorCostConverter;
-import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptorlegacy._data.api.TestPathBuilder;
 import org.opentripplanner.raptorlegacy._data.transit.TestAccessEgress;
 import org.opentripplanner.raptorlegacy._data.transit.TestRoute;
-import org.opentripplanner.raptorlegacy._data.transit.TestTransfer;
 import org.opentripplanner.raptorlegacy._data.transit.TestTransitData;
 import org.opentripplanner.raptorlegacy._data.transit.TestTripPattern;
 import org.opentripplanner.raptorlegacy._data.transit.TestTripSchedule;
@@ -209,7 +207,6 @@ public class RaptorPathToItineraryMapperTest {
       RoutingBookingInfo.NOT_SET
     );
     RaptorAccessEgress access = new FlexAccessEgressAdapter(flexAccessEgress);
-    RaptorTransfer raptorTransfer = new TestTransfer(S2.getIndex(), 0, 0);
     RaptorAccessEgress egress = new DefaultAccessEgress(S2.getIndex(), state);
     PathLeg<RaptorTripSchedule> egressLeg = new EgressPathLeg<>(egress, 0, 0, 0);
     PathLeg<RaptorTripSchedule> transferLeg = new TransferPathLeg<>(
@@ -218,7 +215,8 @@ public class RaptorPathToItineraryMapperTest {
       S2.getIndex(),
       0,
       0,
-      raptorTransfer,
+      0,
+      null,
       egressLeg
     );
     AccessPathLeg<TestTripSchedule> accessLeg = new AccessPathLeg(access, 0, 0, 0, transferLeg);

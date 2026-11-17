@@ -7,6 +7,7 @@ import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.path.AccessPathLeg;
 import org.opentripplanner.raptor.api.path.PathStringBuilder;
 import org.opentripplanner.raptor.api.path.RaptorPath;
+import org.opentripplanner.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.raptor.spi.BoardAndAlightTime;
 import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.raptor.spi.RaptorConstrainedTransfer;
@@ -162,8 +163,41 @@ public abstract class PathBuilder<T extends RaptorTripSchedule> {
     add(PathBuilderLeg.transitLeg(trip, times, txConstrainedTransferAfter));
   }
 
+  /**
+   * Add a regular transfer. Only the duration and the cost is copied, the given transfer is not
+   * retained. The {@code toStop} is the stop you arrive on when traveling in the direction from
+   * origin to destination.
+   */
   public void transfer(RaptorTransfer transfer, int toStop) {
-    add(PathBuilderLeg.transferLeg(transfer, toStop));
+    transfer(toStop, transfer.durationInSeconds(), transfer.c1());
+  }
+
+  /** Add a regular transfer, see {@link #transfer(RaptorTransfer, int)}. */
+  public void transfer(int toStop, int durationInSeconds, int c1) {
+    add(PathBuilderLeg.transferLeg(toStop, durationInSeconds, c1, null));
+  }
+
+  /**
+   * Add the transfer of a via connection. The transfer is retained, since it can not be looked up
+   * in the transfer data later. The duration is the transfer duration, not including the minimum
+   * wait time of the via connection.
+   */
+  public void viaTransfer(RaptorTransfer viaTransfer, int toStop) {
+    add(
+      PathBuilderLeg.transferLeg(
+        toStop,
+        viaTransfer.durationInSeconds(),
+        viaTransfer.c1(),
+        viaTransfer
+      )
+    );
+  }
+
+  /** Add a copy of the given transfer leg, a via transfer is kept as a via transfer. */
+  public void transfer(TransferPathLeg<T> leg) {
+    add(
+      PathBuilderLeg.transferLeg(leg.toStop(), leg.durationInSeconds(), leg.c1(), leg.viaTransfer())
+    );
   }
 
   public void egress(RaptorAccessEgress egress) {

@@ -10,6 +10,7 @@ import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
+import org.opentripplanner.utils.time.DurationUtils;
 import org.opentripplanner.utils.time.TimeUtils;
 
 /**
@@ -142,11 +143,34 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
   }
 
   /**
-   * The transfer used to reach this stop. Only valid when {@link #arrivedBy()} returns
-   * {@link PathLegType#TRANSFER}.
+   * The time it takes to travel the transfer used to reach this stop, not including any wait time.
+   * Only valid when {@link #arrivedBy()} returns {@link PathLegType#TRANSFER}.
+   * <p>
+   * The transfer itself is not kept in the Raptor state; the duration is the time between the
+   * arrival at the previous stop and this arrival.
    */
-  default RaptorTransfer transfer() {
-    throw new UnsupportedOperationException();
+  default int transferDuration() {
+    return Math.abs(arrivalTime() - previous().arrivalTime());
+  }
+
+  /**
+   * The cost of the transfer used to reach this stop. Only valid when {@link #arrivedBy()} returns
+   * {@link PathLegType#TRANSFER}. {@link RaptorConstants#NOT_SET} is returned if the cost is not
+   * part of the state; the caller must then look it up, see
+   * {@link org.opentripplanner.raptor.spi.RaptorTransferDataProvider#findTransfer(int, int, int)}.
+   */
+  default int transferC1() {
+    return c1() - previous().c1();
+  }
+
+  /**
+   * The transfer if this arrival was reached by the transfer of a via connection, {@code null} for
+   * all other arrivals including regular transfers. A via transfer is specific to the request and
+   * is kept in the state, since it can not be looked up later.
+   */
+  @Nullable
+  default RaptorTransfer viaTransfer() {
+    return null;
   }
 
   /**
@@ -183,7 +207,12 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
         transitPath().trip().pattern().debugInfo(),
         stop()
       );
-      case TRANSFER -> String.format("Transfer [%s] (%s)", vector, transfer());
+      case TRANSFER -> String.format(
+        "Transfer [%s] (On-Street %s ~ %d)",
+        vector,
+        DurationUtils.durationToStr(transferDuration()),
+        stop()
+      );
       case EGRESS -> String.format("Egress [%s] (%s)", vector, egressPath().egress());
     };
   }
