@@ -310,29 +310,20 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
     return Optional.ofNullable(siri.getServiceDelivery());
   }
 
-  /** Package-private for testing. */
-  int liveQueueSize() {
-    return liveMessageQueue.size();
-  }
-
-  /** Package-private for testing. */
-  int primingQueueSize() {
-    return primingMessageQueue.size();
-  }
-
-  void onMessage(Mqtt5Publish message) {
-    if (message.getPayloadAsBytes().length == 0) {
+  private void onMessage(Mqtt5Publish message) {
+    byte[] payload = message.getPayloadAsBytes();
+    if (payload.length == 0) {
       return;
     }
     boolean offer;
     if (message.isRetain() && !primed) {
-      offer = primingMessageQueue.offer(message.getPayloadAsBytes());
+      offer = primingMessageQueue.offer(payload);
       primingMessageCounter.incrementAndGet();
-      primingMessageSize.addAndGet(message.getPayloadAsBytes().length);
+      primingMessageSize.addAndGet(payload.length);
     } else {
-      offer = liveMessageQueue.offer(message.getPayloadAsBytes());
+      offer = liveMessageQueue.offer(payload);
       liveMessageCounter.incrementAndGet();
-      liveMessageSize.addAndGet(message.getPayloadAsBytes().length);
+      liveMessageSize.addAndGet(payload.length);
     }
 
     if (!offer) {
