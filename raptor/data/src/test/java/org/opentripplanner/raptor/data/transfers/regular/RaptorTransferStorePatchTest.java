@@ -190,7 +190,7 @@ class RaptorTransferStorePatchTest {
     return builder.build();
   }
 
-  private static DefaultRaptorTransfer[] fromRow(RaptorTransferStore store, int stop) {
+  private static int[] fromRow(RaptorTransferStore store, int stop) {
     return store.fromStops().row(stop);
   }
 
