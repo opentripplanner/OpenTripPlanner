@@ -81,6 +81,7 @@
               delay
               time
             }
+            canceled
             departure {
               delay
               time

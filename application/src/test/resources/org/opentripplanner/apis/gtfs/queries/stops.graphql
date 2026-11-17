@@ -47,6 +47,7 @@
           arrival {
             delay
           }
+          canceled
         }
       }
     }

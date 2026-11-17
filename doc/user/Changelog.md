@@ -64,6 +64,8 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Add itinerary ID for refetch to the GTFS GraphQL API [#8005](https://github.com/opentripplanner/OpenTripPlanner/pull/8005)
 - Use `walkSafetyFactor` in wheelchair routing [#8173](https://github.com/opentripplanner/OpenTripPlanner/pull/8173)
 - Fix duplicate empty service id when importing several NeTEx feeds [#8210](https://github.com/opentripplanner/OpenTripPlanner/pull/8210)
+- Make GraphQL Date scalar reject non-strings as validation error [#8232](https://github.com/opentripplanner/OpenTripPlanner/pull/8232)
+- Add real-time cancellation of calls to GTFS GraphQL API [#8167](https://github.com/opentripplanner/OpenTripPlanner/pull/8167)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.10.0 (2026-09-09)

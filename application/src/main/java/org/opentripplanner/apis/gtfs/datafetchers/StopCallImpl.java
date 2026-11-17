@@ -32,7 +32,9 @@ public class StopCallImpl implements GraphQLDataFetchers.GraphQLStopCall {
   public DataFetcher<CallRealTime> realTime() {
     return environment -> {
       var tripTime = getSource(environment);
-      if (!tripTime.isRealtime()) {
+      var canceled = tripTime.isCancelledStop();
+      // A canceled call is reported even if the trip times are not marked as updated
+      if (!tripTime.isRealtime() && !canceled) {
         return null;
       }
       var scheduledArrival = getZonedDateTime(environment, tripTime.getScheduledArrival());
@@ -45,7 +47,7 @@ public class StopCallImpl implements GraphQLDataFetchers.GraphQLStopCall {
         scheduledDeparture == null
           ? null
           : EstimatedTime.of(scheduledDeparture, tripTime.getDepartureDelay());
-      return new CallRealTime(estimatedArrival, estimatedDeparture);
+      return new CallRealTime(estimatedArrival, estimatedDeparture, canceled);
     };
   }
 
