@@ -493,6 +493,7 @@ otherwise.
 |          [id](#transfers_wheelchair_profiles_0_id)                                         |        `string`        | The id of the profile.                                                                                                  | *Required* |                  |  2.10 |
 |          [userPreferences](#transfers_wheelchair_profiles_0_userPreferences)               |        `object`        | Street-search preferences used to discover and cost this profile's paths.                                               | *Optional* |                  |  2.10 |
 |             reluctance                                                                     |        `double`        | A multiplier for the cost of traveling in a wheelchair.                                                                 | *Optional* | `2.0`            |  2.10 |
+|             [safetyFactor](#transfers_wheelchair_profiles_0_userPreferences_safetyFactor)  |        `double`        | How much the safety of the streets is considered.                                                                       | *Optional* | `1.0`            |  2.10 |
 |             speed                                                                          |        `double`        | Speed of a traveler in a wheelchair, in meters per second.                                                              | *Optional* | `1.0`            |  2.10 |
 |    [stop](#transfers_wheelchair_stop)                                                      |        `object`        | Configuration for when to use inaccessible stops.                                                                       | *Optional* |                  |  2.10 |
 |       inaccessibleCost                                                                     |        `integer`       | The cost to add when traversing an entity which is know to be inaccessible.                                             | *Optional* | `3600`           |  2.2  |
@@ -1002,6 +1003,18 @@ profiles. Any string is allowed.
 Street-search preferences used to discover and cost this profile's paths.
 
 Optional. If it is not set, the defaults are used.
+
+<h3 id="transfers_wheelchair_profiles_0_userPreferences_safetyFactor">safetyFactor</h3>
+
+**Since version:** `2.10` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `1.0`   
+**Path:** /transfers/wheelchair/profiles/[0]/userPreferences 
+
+How much the safety of the streets is considered.
+
+A value between 0.0 and 1.0. If it is 0.0, the safety is ignored. If it is 1.0, the safety
+factor of the street is applied in whole as a multiplier on the cost, on top of the
+reluctance.
+
 
 <h3 id="transfers_wheelchair_stop">stop</h3>
 

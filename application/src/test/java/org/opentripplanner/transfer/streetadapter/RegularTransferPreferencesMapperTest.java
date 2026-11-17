@@ -85,7 +85,7 @@ class RegularTransferPreferencesMapperTest {
       .withPreferences(p ->
         p
           .withWalk(w -> w.withSpeed(1.7).withReluctance(1.5))
-          .withWheelchair(w -> w.withSpeed(0.9).withReluctance(4.0))
+          .withWheelchair(w -> w.withSpeed(0.9).withReluctance(4.0).withSafetyFactor(0.4))
       )
       .buildDefault();
 
@@ -93,6 +93,7 @@ class RegularTransferPreferencesMapperTest {
       WheelchairPreferences.of()
         .withSpeed(Speed.ofMetersPerSecond(0.9))
         .withReluctance(Reluctance.of(4.0))
+        .withSafetyFactor(Ratio.of(0.4).normalize())
         .build()
     );
   }
@@ -102,6 +103,7 @@ class RegularTransferPreferencesMapperTest {
     var preferences = WheelchairPreferences.of()
       .withSpeed(Speed.ofMetersPerSecond(0.9))
       .withReluctance(Reluctance.of(4.0))
+      .withSafetyFactor(Ratio.of(0.4).normalize())
       .build();
 
     var request = SUBJECT.toRequest(preferences, RouteRequest.defaultValue());
@@ -110,6 +112,7 @@ class RegularTransferPreferencesMapperTest {
     assertThat(request.journey().transfer().mode()).isEqualTo(StreetMode.WALK);
     assertThat(request.preferences().wheelchair().speed()).isEqualTo(0.9);
     assertThat(request.preferences().wheelchair().reluctance()).isEqualTo(4.0);
+    assertThat(request.preferences().wheelchair().safetyFactor()).isEqualTo(0.4);
     assertThat(SUBJECT.toUserPreferences(request)).isEqualTo(preferences);
   }
 

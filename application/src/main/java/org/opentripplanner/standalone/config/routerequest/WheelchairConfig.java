@@ -127,6 +127,19 @@ public class WheelchairConfig {
             "How much more time does it take to traverse a flight of stairs compared to a similar horizontal length."
           )
           .asDouble(dft.stairsTimeFactor())
+      )
+      .withSafetyFactor(
+        a
+          .of("safetyFactor")
+          .since(V2_11)
+          .summary("How much the safety of the streets is considered.")
+          .description(
+            """
+            A value between 0.0 and 1.0. If it is 0.0, the safety is ignored. If it is 1.0, the walk
+            safety factor of the street is applied in whole as a multiplier on the cost.
+            """
+          )
+          .asDouble(dft.safetyFactor())
       );
   }
 

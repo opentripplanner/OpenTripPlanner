@@ -58,6 +58,7 @@ public final class RegularTransferPreferencesMapper implements TransferRequestMa
       case WHEELCHAIR -> WheelchairPreferences.of()
         .withSpeed(Speed.ofMetersPerSecond(appWheelchair.speed()))
         .withReluctance(Reluctance.of(appWheelchair.reluctance()))
+        .withSafetyFactor(Ratio.of(appWheelchair.safetyFactor()).normalize())
         .build();
       case BICYCLE -> BicyclePreferences.of()
         .withSpeed(Speed.ofMetersPerSecond(appBike.speed()))
@@ -120,9 +121,9 @@ public final class RegularTransferPreferencesMapper implements TransferRequestMa
   }
 
   /**
-   * A walking request for a traveler in a wheelchair. The street search reads the speed and the
-   * reluctance from the wheelchair preferences, and does not use the safety factor, so the walk
-   * preferences are the ones of the base request.
+   * A walking request for a traveler in a wheelchair. The street search reads the speed, the
+   * reluctance and the safety factor from the wheelchair preferences, so the walk preferences are
+   * the ones of the base request.
    */
   private static RouteRequest wheelchairRequest(
     WheelchairPreferences userPreferences,
@@ -136,6 +137,7 @@ public final class RegularTransferPreferencesMapper implements TransferRequestMa
           wheelchair
             .withSpeed(userPreferences.speed().toMetersPerSecond())
             .withReluctance(userPreferences.reluctance().value())
+            .withSafetyFactor(userPreferences.safetyFactor().asDouble())
         )
       )
       .buildDefault();

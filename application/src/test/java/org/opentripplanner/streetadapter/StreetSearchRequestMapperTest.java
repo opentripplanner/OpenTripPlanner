@@ -131,8 +131,12 @@ class StreetSearchRequestMapperTest {
     var request = builder()
       .withPreferences(it ->
         it
-          .withWalk(walk -> walk.withSpeed(1.4).withReluctance(2.0).withStairsTimeFactor(3.0))
-          .withWheelchair(w -> w.withSpeed(0.8).withReluctance(4.0).withStairsTimeFactor(5.0))
+          .withWalk(walk ->
+            walk.withSpeed(1.4).withReluctance(2.0).withStairsTimeFactor(3.0).withSafetyFactor(0.9)
+          )
+          .withWheelchair(w ->
+            w.withSpeed(0.8).withReluctance(4.0).withStairsTimeFactor(5.0).withSafetyFactor(0.3)
+          )
       )
       .withJourney(j -> j.withWheelchair(true))
       .buildRequest();
@@ -142,6 +146,7 @@ class StreetSearchRequestMapperTest {
     assertEquals(0.8, subject.walk().speed());
     assertEquals(4.0, subject.walk().reluctance());
     assertEquals(5.0, subject.walk().stairsTimeFactor());
+    assertEquals(0.3, subject.walk().safetyFactor());
   }
 
   @Test

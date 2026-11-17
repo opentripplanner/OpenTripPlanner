@@ -162,7 +162,8 @@
       "stairsReluctance": 100,
       "speed": 1.0,
       "reluctance": 3.0,
-      "stairsTimeFactor": 4.0
+      "stairsTimeFactor": 4.0,
+      "safetyFactor": 0.5
     },
     "directTransitSearch": {
       "enabled": false,

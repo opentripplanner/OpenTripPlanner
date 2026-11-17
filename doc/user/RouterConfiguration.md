@@ -787,7 +787,8 @@ Ordered list of `StreetMode` values used as egress modes. Each entry is paired w
       "stairsReluctance" : 100,
       "speed" : 1.0,
       "reluctance" : 3.0,
-      "stairsTimeFactor" : 4.0
+      "stairsTimeFactor" : 4.0,
+      "safetyFactor" : 0.5
     },
     "directTransitSearch" : {
       "enabled" : false,

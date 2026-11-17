@@ -49,6 +49,12 @@ public class WheelchairPreferences implements Serializable {
    */
   private static final double DEFAULT_STAIRS_TIME_FACTOR = 5.0;
 
+  /**
+   * The same as the default walk safety factor, the wheelchair search uses the walk safety of the
+   * streets.
+   */
+  private static final double DEFAULT_SAFETY_FACTOR = 1.0;
+
   private static final int DEFAULT_STAIRS_RELUCTANCE = 100;
 
   /**
@@ -70,7 +76,8 @@ public class WheelchairPreferences implements Serializable {
     DEFAULT_STAIRS_RELUCTANCE,
     DEFAULT_SPEED,
     DEFAULT_RELUCTANCE,
-    DEFAULT_STAIRS_TIME_FACTOR
+    DEFAULT_STAIRS_TIME_FACTOR,
+    DEFAULT_SAFETY_FACTOR
   );
 
   private AccessibilityPreferences trip;
@@ -83,6 +90,7 @@ public class WheelchairPreferences implements Serializable {
   private double speed;
   private double reluctance;
   private double stairsTimeFactor;
+  private double safetyFactor;
 
   private WheelchairPreferences(
     AccessibilityPreferences trip,
@@ -94,7 +102,8 @@ public class WheelchairPreferences implements Serializable {
     double stairsReluctance,
     double speed,
     double reluctance,
-    double stairsTimeFactor
+    double stairsTimeFactor,
+    double safetyFactor
   ) {
     this.trip = Objects.requireNonNull(trip);
     this.stop = Objects.requireNonNull(stop);
@@ -106,6 +115,7 @@ public class WheelchairPreferences implements Serializable {
     this.speed = Units.speed(speed);
     this.reluctance = Units.reluctance(reluctance);
     this.stairsTimeFactor = Units.reluctance(stairsTimeFactor);
+    this.safetyFactor = Units.reluctance(safetyFactor);
   }
 
   private WheelchairPreferences(Builder builder) {
@@ -119,6 +129,7 @@ public class WheelchairPreferences implements Serializable {
     this.speed = Units.speed(builder.speed);
     this.reluctance = Units.reluctance(builder.reluctance);
     this.stairsTimeFactor = Units.reluctance(builder.stairsTimeFactor);
+    this.safetyFactor = Units.reluctance(builder.safetyFactor);
   }
 
   public static Builder of() {
@@ -178,6 +189,14 @@ public class WheelchairPreferences implements Serializable {
     return stairsTimeFactor;
   }
 
+  /**
+   * How much the safety of the streets is considered, from 0.0 (ignored) to 1.0 (the walk safety
+   * factor of the street is applied in whole).
+   */
+  public double safetyFactor() {
+    return safetyFactor;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -195,6 +214,7 @@ public class WheelchairPreferences implements Serializable {
       Double.compare(that.speed, speed) == 0 &&
       Double.compare(that.reluctance, reluctance) == 0 &&
       Double.compare(that.stairsTimeFactor, stairsTimeFactor) == 0 &&
+      Double.compare(that.safetyFactor, safetyFactor) == 0 &&
       trip.equals(that.trip) &&
       stop.equals(that.stop) &&
       elevator.equals(that.elevator)
@@ -213,7 +233,8 @@ public class WheelchairPreferences implements Serializable {
       stairsReluctance,
       speed,
       reluctance,
-      stairsTimeFactor
+      stairsTimeFactor,
+      safetyFactor
     );
   }
 
@@ -234,6 +255,7 @@ public class WheelchairPreferences implements Serializable {
       .addNum("speed", speed, DEFAULT.speed)
       .addNum("reluctance", reluctance, DEFAULT.reluctance)
       .addNum("stairsTimeFactor", stairsTimeFactor, DEFAULT.stairsTimeFactor)
+      .addNum("safetyFactor", safetyFactor, DEFAULT.safetyFactor)
       .toString();
   }
 
@@ -250,6 +272,7 @@ public class WheelchairPreferences implements Serializable {
     private double speed;
     private double reluctance;
     private double stairsTimeFactor;
+    private double safetyFactor;
 
     private Builder(WheelchairPreferences original) {
       this.original = original;
@@ -263,6 +286,7 @@ public class WheelchairPreferences implements Serializable {
       this.speed = original.speed;
       this.reluctance = original.reluctance;
       this.stairsTimeFactor = original.stairsTimeFactor;
+      this.safetyFactor = original.safetyFactor;
     }
 
     public WheelchairPreferences original() {
@@ -364,6 +388,11 @@ public class WheelchairPreferences implements Serializable {
 
     public Builder withStairsTimeFactor(double stairsTimeFactor) {
       this.stairsTimeFactor = stairsTimeFactor;
+      return this;
+    }
+
+    public Builder withSafetyFactor(double safetyFactor) {
+      this.safetyFactor = safetyFactor;
       return this;
     }
 

@@ -116,12 +116,13 @@ public class StreetSearchRequestMapper {
       .withInaccessibleStreetReluctance(wheelchair.inaccessibleStreetReluctance());
   }
 
-  /// The edges read speed, reluctance and stairs time factor from the walk request, so the
-  /// wheelchair values replace the walk values for wheelchair searches.
+  /// The edges read speed, reluctance, stairs time factor and safety factor from the walk request,
+  /// so the wheelchair values replace the walk values for wheelchair searches.
   private static void mapWheelchairWalk(WalkRequest.Builder b, WheelchairPreferences wheelchair) {
     b.withSpeed(wheelchair.speed())
       .withReluctance(wheelchair.reluctance())
-      .withStairsTimeFactor(wheelchair.stairsTimeFactor());
+      .withStairsTimeFactor(wheelchair.stairsTimeFactor())
+      .withSafetyFactor(wheelchair.safetyFactor());
   }
 
   private static AccessibilityRequest mapAccessibility(AccessibilityPreferences stop) {
