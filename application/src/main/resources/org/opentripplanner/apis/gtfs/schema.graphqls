@@ -2769,7 +2769,7 @@ This may contain real-time information, if available.
 """
 type StopCall {
   """
-  What the vehicle displays as its destination at this stop. Null if neither the stop nor the trip
+  What the vehicle displays as its destination at this stop. Null if neither the call nor the trip
   has a headsign.
   """
   destinationDisplay: DestinationDisplay
