@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.graph.kryosupport;
+package org.opentripplanner.routing.graph.kryosupport.java;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.routing.graph.kryosupport.KryoTestHelper.writeAndRead;

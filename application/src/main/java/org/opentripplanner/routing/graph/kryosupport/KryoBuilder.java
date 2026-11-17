@@ -16,6 +16,11 @@ import org.opentripplanner.kryo.BuildConfigSerializer;
 import org.opentripplanner.kryo.RouterConfigSerializer;
 import org.opentripplanner.kryo.UnmodifiableCollectionsSerializer;
 import org.opentripplanner.routing.graph.kryosupport.hppc.HppcKryoSupport;
+import org.opentripplanner.routing.graph.kryosupport.java.AtomicIntegerSerializer;
+import org.opentripplanner.routing.graph.kryosupport.java.EnumMapSerializer;
+import org.opentripplanner.routing.graph.kryosupport.java.JavaImmutableListSerializer;
+import org.opentripplanner.routing.graph.kryosupport.java.JavaImmutableMapSerializer;
+import org.opentripplanner.routing.graph.kryosupport.java.JavaImmutableSetSerializer;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
 

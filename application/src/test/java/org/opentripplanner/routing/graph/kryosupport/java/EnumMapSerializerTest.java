@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.graph.kryosupport;
+package org.opentripplanner.routing.graph.kryosupport.java;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.opentripplanner.routing.graph.kryosupport.KryoTestHelper.writeAndRead;
