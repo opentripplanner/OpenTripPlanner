@@ -9,7 +9,7 @@ import org.opentripplanner.raptor.spi.RaptorTransfer;
 
 class Transfer extends AbstractStopArrival {
 
-  private final RaptorTransfer transfer;
+  final RaptorTransfer transfer;
 
   Transfer(
     int round,
@@ -27,8 +27,8 @@ class Transfer extends AbstractStopArrival {
   }
 
   @Override
-  public RaptorTransfer transfer() {
-    return transfer;
+  public int transferC1() {
+    return transfer.c1();
   }
 
   @Override

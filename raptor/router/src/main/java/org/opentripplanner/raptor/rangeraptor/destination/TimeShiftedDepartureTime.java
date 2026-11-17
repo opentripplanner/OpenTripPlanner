@@ -4,7 +4,6 @@ import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
-import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
@@ -39,7 +38,7 @@ public final class TimeShiftedDepartureTime<T extends RaptorTripSchedule> {
    */
   public int calculate(ArrivalView<T> lastStopArrival, int iterationDepartureTime) {
     ArrivalView<T> firstTransit = null;
-    RaptorTransfer transferAfterAccess = null;
+    ArrivalView<T> transferAfterAccess = null;
     RaptorAccessEgress access = null;
 
     // Walk back to the access. The last transit and transfer found is the first of the journey
@@ -49,7 +48,7 @@ public final class TimeShiftedDepartureTime<T extends RaptorTripSchedule> {
           firstTransit = it;
           transferAfterAccess = null;
         }
-        case TRANSFER -> transferAfterAccess = it.transfer();
+        case TRANSFER -> transferAfterAccess = it;
         case ACCESS -> access = it.accessPath().access();
         case EGRESS -> throw new IllegalStateException("Unexpected arrival: " + it);
       }
@@ -71,7 +70,7 @@ public final class TimeShiftedDepartureTime<T extends RaptorTripSchedule> {
       }
       int arrivalTimeAtFirstStop = trip.departure(transit.boardStopPosition()) - slack;
       if (transferAfterAccess != null) {
-        arrivalTimeAtFirstStop -= transferAfterAccess.durationInSeconds();
+        arrivalTimeAtFirstStop -= TransferLegMapper.transferDuration(transferAfterAccess);
       }
       int latestAccessArrival = access.latestArrivalTime(arrivalTimeAtFirstStop);
       departureTime =

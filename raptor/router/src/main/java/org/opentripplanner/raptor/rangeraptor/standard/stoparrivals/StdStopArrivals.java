@@ -8,7 +8,6 @@ import org.opentripplanner.raptor.rangeraptor.standard.internalapi.BestNumberOfT
 import org.opentripplanner.raptor.rangeraptor.standard.internalapi.DestinationArrivalListener;
 import org.opentripplanner.raptor.rangeraptor.support.IntArraySingleCriteriaArrivals;
 import org.opentripplanner.raptor.rangeraptor.transit.EgressPaths;
-import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
@@ -91,11 +90,10 @@ public final class StdStopArrivals<T extends RaptorTripSchedule> implements Best
    * Set the time at a transit index iff it is optimal. This sets both the best time and the
    * transfer time
    */
-  void transferToStop(int fromStop, RaptorTransfer transfer, int arrivalTime) {
-    int stop = transfer.stop();
-    var state = getOrCreateStopIndex(round, stop);
+  void transferToStop(int fromStop, int toStop, int arrivalTime) {
+    var state = getOrCreateStopIndex(round, toStop);
 
-    state.transferToStop(fromStop, arrivalTime, transfer);
+    state.transferToStop(fromStop, arrivalTime);
   }
 
   void transitToStop(int stop, int time, int boardStopPosition, T trip, boolean bestTime) {

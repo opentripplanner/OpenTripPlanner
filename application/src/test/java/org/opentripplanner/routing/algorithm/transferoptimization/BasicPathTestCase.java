@@ -245,7 +245,8 @@ public class BasicPathTestCase implements RaptorTestConstants {
       STOP_C,
       TX_END,
       transfer.c1(),
-      transfer,
+      transfer.durationInSeconds(),
+      null,
       leg4.asTransitLeg()
     );
     var leg2 = new TransitPathLeg<>(
@@ -277,7 +278,8 @@ public class BasicPathTestCase implements RaptorTestConstants {
       STOP_E,
       TX_END,
       transfer.c1(),
-      transfer,
+      transfer.durationInSeconds(),
+      null,
       leg6
     );
     var leg2 = new TransitPathLeg<>(
