@@ -238,17 +238,21 @@ class TripTimesUpdater {
 
     // Update all times to mark trip times as realtime
     for (int stopIndex = 0; stopIndex < builder.numberOfStops(); stopIndex++) {
-      final var item = stopAndStopTimeUpdates.get(stopIndex);
-      final var addedStopTime = item.stopTimeUpdate();
+      final var stopAndStopTimeUpdate = stopAndStopTimeUpdates.get(stopIndex);
 
-      if (addedStopTime.isSkipped()) {
+      if (stopAndStopTimeUpdate.stopTimeUpdate().isSkipped()) {
         builder.withCanceled(stopIndex);
       }
-      if (item.extraCall()) {
+      if (stopAndStopTimeUpdate.extraCall()) {
         builder.withExtraCall(stopIndex, true);
       }
 
-      setArrivalAndDeparture(builder, stopIndex, addedStopTime, midnightSecondsSinceEpoch);
+      setArrivalAndDeparture(
+        builder,
+        stopIndex,
+        stopAndStopTimeUpdate.stopTimeUpdate(),
+        midnightSecondsSinceEpoch
+      );
       if (builder.getArrivalTime(stopIndex) == null) {
         builder.withArrivalDelay(stopIndex, 0);
       }
