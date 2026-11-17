@@ -177,7 +177,7 @@ class StatesToWalkStepsMapperTest {
   }
 
   @Test
-  void shortSignposted() {
+  void shortDifferentSigns() {
     var builder = TestStateBuilder.ofWalking()
       .streetEdge(29)
       .pathway(SIGN_A, 10)
@@ -190,6 +190,25 @@ class StatesToWalkStepsMapperTest {
         "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: FOLLOW_SIGNS, directionText: 'platform A', distance: 10.0}",
         // the last two are collapsed
         "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: FOLLOW_SIGNS, directionText: 'platform B', distance: 20.0}"
+      )
+      .inOrder();
+  }
+
+  @Test
+  void turnThenSignposted() {
+    var builder = TestStateBuilder.ofWalking(new WgsCoordinate(1, 1))
+      .streetEdge(29, new WgsCoordinate(0, 1))
+      .unnamedPathway(10, new WgsCoordinate(0, 0))
+      .pathway(SIGN_A, 10, new WgsCoordinate(1, 0))
+      .unnamedPathway(10, new WgsCoordinate(2, 0))
+      .unnamedPathway(10, new WgsCoordinate(3, 0));
+
+    assertThat(toStrings(builder))
+      .containsExactly(
+        "WalkStep{absoluteDirection: SOUTH, relativeDirection: DEPART, directionText: 'street edge', distance: 29.0}",
+        "WalkStep{absoluteDirection: WEST, relativeDirection: RIGHT, directionText: 'pathway', distance: 10.0}",
+        // the last three are collapsed
+        "WalkStep{absoluteDirection: NORTH, relativeDirection: FOLLOW_SIGNS, directionText: 'platform A', distance: 30.0}"
       )
       .inOrder();
   }
