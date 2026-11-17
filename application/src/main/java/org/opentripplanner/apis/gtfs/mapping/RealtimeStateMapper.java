@@ -51,26 +51,19 @@ public class RealtimeStateMapper {
   }
 
   /**
-   * The real-time state of a single stop of a trip. A canceled stop is {@code CANCELED}. Otherwise
-   * it is the trip state, except for trips with a modified stop pattern (e.g. a GTFS-RT
-   * {@code REPLACEMENT} trip), where each stop gets its own state: {@code ADDED} if the stop is not
-   * part of the scheduled trip, otherwise {@code UPDATED}, or {@code SCHEDULED} if there is no
-   * real-time data for the stop.
+   * The real-time state of a single stop of a trip. A canceled stop, or a stop of a canceled trip,
+   * is {@code CANCELED}. A stop added to a trip with a modified stop pattern (e.g. by a GTFS-RT
+   * {@code REPLACEMENT} trip update or a SIRI extra call) is {@code ADDED}. Any other stop has the
+   * real-time state of its trip.
    */
   public static GraphQLTypes.GraphQLRealtimeState map(TripTimeOnDate stopTime) {
     if (stopTime.isCanceledEffectively()) {
       return GraphQLTypes.GraphQLRealtimeState.CANCELED;
     }
     var tripState = map(stopTime.getTripTimes());
-    if (tripState != GraphQLTypes.GraphQLRealtimeState.MODIFIED) {
-      return tripState;
-    }
-    if (stopTime.isExtraCall()) {
+    if (tripState == GraphQLTypes.GraphQLRealtimeState.MODIFIED && stopTime.isExtraCall()) {
       return GraphQLTypes.GraphQLRealtimeState.ADDED;
     }
-    if (stopTime.isNoDataStop()) {
-      return GraphQLTypes.GraphQLRealtimeState.SCHEDULED;
-    }
-    return GraphQLTypes.GraphQLRealtimeState.UPDATED;
+    return tripState;
   }
 }

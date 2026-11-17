@@ -172,20 +172,20 @@ class RealtimeStateMapperTest {
   }
 
   @Test
-  void stopStateOfModifiedPattern() {
+  void stopStateOfModifiedPatternIgnoresNoData() {
     var tripTimes = TripTimesForTest.realTime(b -> {
       b.withModifiedTripPattern();
       b.withNoData(0);
       b.withExtraCall(1, true);
     });
-    assertEquals(SCHEDULED, RealtimeStateMapper.map(stopTime(tripTimes, 0)));
+    assertEquals(MODIFIED, RealtimeStateMapper.map(stopTime(tripTimes, 0)));
     assertEquals(ADDED, RealtimeStateMapper.map(stopTime(tripTimes, 1)));
   }
 
   @Test
-  void keptStopOfModifiedPatternWithRealTimeIsUpdated() {
+  void keptStopOfModifiedPatternIsModified() {
     var tripTimes = TripTimesForTest.realTime(RealTimeTripTimesBuilder::withModifiedTripPattern);
-    assertEquals(UPDATED, RealtimeStateMapper.map(stopTime(tripTimes, 0)));
+    assertEquals(MODIFIED, RealtimeStateMapper.map(stopTime(tripTimes, 0)));
   }
 
   @Test
@@ -214,7 +214,7 @@ class RealtimeStateMapperTest {
       b.withExtraCall(0, true);
     });
     assertEquals(CANCELED, RealtimeStateMapper.map(stopTime(tripTimes, 0)));
-    assertEquals(UPDATED, RealtimeStateMapper.map(stopTime(tripTimes, 1)));
+    assertEquals(MODIFIED, RealtimeStateMapper.map(stopTime(tripTimes, 1)));
   }
 
   @Test
