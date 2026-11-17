@@ -418,6 +418,9 @@ public class TripTimeOnDate {
 
   /**
    * The pickup type at this call in the given scheduled pattern.
+   * <p>
+   * It is regrettable that you have to pass in the scheduled pattern, but the current transit model
+   * requires this awkward workaround. We hope to refactor this in the future.
    *
    * @param scheduledTripPattern the pattern of the trip without real-time updates
    * @return null if this call is an extra call added by a real-time update, since it has no
@@ -433,6 +436,9 @@ public class TripTimeOnDate {
 
   /**
    * The drop off type at this call in the given scheduled pattern.
+   * <p>
+   * It is regrettable that you have to pass in the scheduled pattern, but the current transit model
+   * requires this awkward workaround. We hope to refactor this in the future.
    *
    * @param scheduledTripPattern the pattern of the trip without real-time updates
    * @return null if this call is an extra call added by a real-time update, since it has no
