@@ -202,26 +202,22 @@ class TripTimesUpdater {
       stopTime.setTrip(trip);
       stopTime.setStop(item.stop());
       // Set arrival time
-      final var arrival = item.scheduledArrival();
+      final var arrival = update.scheduledArrivalTimeWithRealTimeFallback();
       if (arrival.isPresent()) {
         final var arrivalTime = arrival.getAsLong() - midnightSecondsSinceEpoch;
         if (arrivalTime < 0 || arrivalTime > MAX_ARRIVAL_DEPARTURE_TIME) {
           throw UpdateException.of(trip.getId(), INVALID_ARRIVAL_TIME);
         }
         stopTime.setArrivalTime((int) arrivalTime);
-      } else if (update.isNoData()) {
-        throw UpdateException.of(trip.getId(), INVALID_ARRIVAL_TIME);
       }
       // Set departure time
-      final var departure = item.scheduledDeparture();
+      final var departure = update.scheduledDepartureTimeWithRealTimeFallback();
       if (departure.isPresent()) {
         final long departureTime = departure.getAsLong() - midnightSecondsSinceEpoch;
         if (departureTime < 0 || departureTime > MAX_ARRIVAL_DEPARTURE_TIME) {
           throw UpdateException.of(trip.getId(), INVALID_DEPARTURE_TIME);
         }
         stopTime.setDepartureTime((int) departureTime);
-      } else if (update.isNoData()) {
-        throw UpdateException.of(trip.getId(), INVALID_DEPARTURE_TIME);
       }
       // Exact time
       stopTime.setTimepoint(1);
@@ -252,13 +248,7 @@ class TripTimesUpdater {
         builder.withExtraCall(stopIndex, true);
       }
 
-      if (addedStopTime.isNoData()) {
-        // No predictions for the stop: its times are the scheduled times. Any time or delay in the
-        // update is ignored, as the spec forbids them.
-        builder.withNoData(stopIndex);
-      } else {
-        setArrivalAndDeparture(builder, stopIndex, addedStopTime, midnightSecondsSinceEpoch);
-      }
+      setArrivalAndDeparture(builder, stopIndex, addedStopTime, midnightSecondsSinceEpoch);
       if (builder.getArrivalTime(stopIndex) == null) {
         builder.withArrivalDelay(stopIndex, 0);
       }
@@ -313,32 +303,15 @@ class TripTimesUpdater {
       serviceDate,
       timeZone
     ).toEpochSecond();
-    var scheduledComparands = scheduledComparands(
-      scheduledPattern,
-      scheduledTripTimes,
-      midnightSecondsSinceEpoch
+    var diff = StopListDiff.diff(
+      scheduledComparands(scheduledPattern, scheduledTripTimes, midnightSecondsSinceEpoch),
+      replacementComparands(replacement)
     );
-    var replacementComparands = replacementComparands(replacement);
-    var diff = StopListDiff.diff(scheduledComparands, replacementComparands);
 
     var result = new ArrayList<StopAndStopTimeUpdate>(replacement.size());
     for (var entry : diff) {
       switch (entry) {
-        case StopListDiffEntry.Kept kept -> {
-          StopAndStopTimeUpdate replacementStop = replacement.get(kept.replacementIndex());
-          StopListDiffComparand originalStop = scheduledComparands.get(kept.originalIndex());
-          result.add(
-            replacementStop.stopTimeUpdate().isNoData()
-              ? new StopAndStopTimeUpdate(
-                  replacementStop.stop(),
-                  replacementStop.stopTimeUpdate(),
-                  replacementStop.extraCall(),
-                  originalStop.arrivalTime(),
-                  originalStop.departureTime()
-                )
-              : replacementStop
-          );
-        }
+        case StopListDiffEntry.Kept kept -> result.add(replacement.get(kept.replacementIndex()));
         case StopListDiffEntry.Added added -> {
           var it = replacement.get(added.replacementIndex());
           result.add(new StopAndStopTimeUpdate(it.stop(), it.stopTimeUpdate(), true));
@@ -382,8 +355,13 @@ class TripTimesUpdater {
   ) {
     var comparands = new ArrayList<StopListDiffComparand>(replacement.size());
     for (var it : replacement) {
+      var update = it.stopTimeUpdate();
       comparands.add(
-        new StopListDiffComparand(it.stop(), it.scheduledArrival(), it.scheduledDeparture())
+        new StopListDiffComparand(
+          it.stop(),
+          update.scheduledArrivalTimeWithRealTimeFallback(),
+          update.scheduledDepartureTimeWithRealTimeFallback()
+        )
       );
     }
     return comparands;
