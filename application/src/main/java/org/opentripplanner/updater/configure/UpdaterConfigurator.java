@@ -359,7 +359,7 @@ public class UpdaterConfigurator {
       updaters.add(
         SiriAzureUpdater.createETUpdater(
           configItem,
-          provideSiriAdapter(configItem.getFuzzyTripMatching())
+          provideSiriAdapter(configItem.getFuzzyMatching())
         )
       );
     }

@@ -4,31 +4,44 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 
 import java.time.Duration;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
-import org.opentripplanner.standalone.config.framework.json.OtpVersion;
 import org.opentripplanner.updater.trip.siri.SiriFuzzyTripMatchingParameters;
 
 /**
- * Parse the {@code fuzzyTripMatching} parameter shared by all SIRI-ET updaters. The parameter
- * accepts a boolean for backwards compatibility, or an object with matching options.
+ * Parse the fuzzy trip matching configuration shared by all SIRI-ET updaters.
+ * <p>
+ * The deprecated boolean {@code fuzzyTripMatching} is parsed by each updater, because its
+ * version and default differ between the updaters. This class parses the {@code fuzzyMatching}
+ * object, which replaces it. A separate parameter, instead of an object form of
+ * {@code fuzzyTripMatching}, lets the same configuration file be used with older OTP versions:
+ * they ignore {@code fuzzyMatching} and use {@code fuzzyTripMatching}.
  */
 public class SiriFuzzyTripMatchingConfig {
 
-  private static final String PARAM_NAME = "fuzzyTripMatching";
+  private static final String PARAM_NAME = "fuzzyMatching";
+  private static final String EMPTY_OBJECT = "{}";
 
-  private static final String DESCRIPTION = """
+  /** The summary of the deprecated {@code fuzzyTripMatching} parameter. */
+  public static final String FUZZY_TRIP_MATCHING_SUMMARY =
+    "**Deprecated**, use `fuzzyMatching`. If the fuzzy trip matcher should be used to match trips.";
+
+  /** The description of the deprecated {@code fuzzyTripMatching} parameter. */
+  public static final String FUZZY_TRIP_MATCHING_DESCRIPTION = """
+  `true` is the same as `"fuzzyMatching" : {}`. This parameter is ignored if `fuzzyMatching` is
+  set, so both can be set in a configuration used by OTP versions with and without
+  `fuzzyMatching`.
+  """;
+
+  private static final String FUZZY_MATCHING_DESCRIPTION = """
   The fuzzy trip matcher identifies the scheduled trip of a SIRI-ET message by its last stop,
   line, service date and the aimed times of the first and last call. Use it for producers whose
   messages do not contain usable trip ids.
 
-  The parameter accepts a boolean or an object:
+  If this parameter is set, fuzzy trip matching is enabled with the given options and the
+  deprecated `fuzzyTripMatching` parameter is ignored. Use an empty object `{}` to enable fuzzy
+  trip matching with the default options.
 
-  - Missing or `false`: no fuzzy trip matching.
-  - `true`: fuzzy trip matching where the scheduled times must be equal to the aimed times, to
-    the second. This is the same as `{ "timeTolerance" : "0s" }`.
-  - An object: fuzzy trip matching with the given options, for example
-    `{ "timeTolerance" : "59s" }`.
-
-  If more than one trip matches, the message is rejected.
+  If a trip matches the aimed times exactly, it is used. Otherwise, if more than one trip matches
+  within the time tolerance, the message is rejected.
   """;
 
   private static final String TIME_TOLERANCE_DESCRIPTION = """
@@ -40,22 +53,19 @@ public class SiriFuzzyTripMatchingConfig {
   """;
 
   /**
-   * @param since The OTP version where the {@code fuzzyTripMatching} parameter was added to the
-   *              updater.
+   * Parse the {@code fuzzyMatching} parameter.
+   *
+   * @param fuzzyTripMatching The value of the deprecated {@code fuzzyTripMatching} parameter. It
+   *                          is used if {@code fuzzyMatching} is not set.
    */
-  public static SiriFuzzyTripMatchingParameters map(NodeAdapter c, OtpVersion since) {
+  public static SiriFuzzyTripMatchingParameters map(NodeAdapter c, boolean fuzzyTripMatching) {
     var node = c
       .of(PARAM_NAME)
-      .since(since)
-      .summary(
-        "Whether and how the fuzzy trip matcher should be used. A boolean or an object with options."
-      )
-      .description(DESCRIPTION)
+      .since(V2_11)
+      .summary("Enable the fuzzy trip matcher, with options.")
+      .description(FUZZY_MATCHING_DESCRIPTION)
       .asObject();
 
-    // Register the child parameters before returning for the boolean form, so they are documented
-    // even if the example config uses `true`. The generated documentation only lists them if
-    // fuzzyTripMatching is present in the example router-config.json used by the doc tests.
     Duration timeTolerance = node
       .of("timeTolerance")
       .since(V2_11)
@@ -64,14 +74,13 @@ public class SiriFuzzyTripMatchingConfig {
       .asDuration(Duration.ZERO);
 
     if (node.isEmpty()) {
-      return SiriFuzzyTripMatchingParameters.DISABLED;
+      return SiriFuzzyTripMatchingParameters.of(fuzzyTripMatching);
     }
-    if (node.isBoolean()) {
-      return SiriFuzzyTripMatchingParameters.of(Boolean.parseBoolean(node.asText()));
-    }
-    if (!node.isJsonObject()) {
+    // asObject() accepts any JSON type, so a value like `false` would enable fuzzy matching with
+    // the default options. NodeAdapter.isObject() is false for the empty object, which is valid.
+    if (!node.isObject() && !EMPTY_OBJECT.equals(node.toJson())) {
       throw c.createException(
-        "The parameter value '%s' must be a boolean or an object.".formatted(node.toJson()),
+        "The parameter value '%s' must be an object, for example {}.".formatted(node.toJson()),
         PARAM_NAME
       );
     }

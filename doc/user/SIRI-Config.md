@@ -17,23 +17,36 @@ responds only with the newest data.
 <!-- siri-et-updater BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
 
-| Config Parameter                                           |       Type      | Summary                                                                                                |  Req./Opt. | Default Value | Since |
-|------------------------------------------------------------|:---------------:|--------------------------------------------------------------------------------------------------------|:----------:|---------------|:-----:|
-| type = "siri-et-updater"                                   |      `enum`     | The type of the updater.                                                                               | *Required* |               |  1.5  |
-| blockReadinessUntilInitialized                             |    `boolean`    | Whether catching up with the updates should block the readiness check from returning a 'ready' result. | *Optional* | `false`       |  2.0  |
-| feedId                                                     |     `string`    | The ID of the feed to apply the updates to.                                                            | *Required* |               |  2.0  |
-| frequency                                                  |    `duration`   | How often the updates should be retrieved.                                                             | *Optional* | `"PT1M"`      |  2.0  |
-| previewInterval                                            |    `duration`   | TODO                                                                                                   | *Optional* |               |  2.0  |
-| producerMetrics                                            |    `boolean`    | If failure, success, and warning metrics should be collected per producer.                             | *Optional* | `false`       |  2.7  |
-| requestorRef                                               |     `string`    | The requester reference.                                                                               | *Optional* |               |  2.0  |
-| timeout                                                    |    `duration`   | The HTTP timeout to download the updates.                                                              | *Optional* | `"PT15S"`     |  2.0  |
-| [url](#u__8__url)                                          |     `string`    | The URL to send the HTTP requests to.                                                                  | *Required* |               |  2.0  |
-| [fuzzyTripMatching](#u__8__fuzzyTripMatching)              |     `object`    | Whether and how the fuzzy trip matcher should be used. A boolean or an object with options.            | *Optional* |               |  2.0  |
-|    [timeTolerance](#u__8__fuzzyTripMatching_timeTolerance) |    `duration`   | The maximum difference between the scheduled and the aimed times.                                      | *Optional* | `"PT0S"`      |  2.11 |
-| [headers](#u__8__headers)                                  | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted.                             | *Optional* |               |  2.3  |
+| Config Parameter                                       |       Type      | Summary                                                                                                |  Req./Opt. | Default Value | Since |
+|--------------------------------------------------------|:---------------:|--------------------------------------------------------------------------------------------------------|:----------:|---------------|:-----:|
+| type = "siri-et-updater"                               |      `enum`     | The type of the updater.                                                                               | *Required* |               |  1.5  |
+| blockReadinessUntilInitialized                         |    `boolean`    | Whether catching up with the updates should block the readiness check from returning a 'ready' result. | *Optional* | `false`       |  2.0  |
+| feedId                                                 |     `string`    | The ID of the feed to apply the updates to.                                                            | *Required* |               |  2.0  |
+| frequency                                              |    `duration`   | How often the updates should be retrieved.                                                             | *Optional* | `"PT1M"`      |  2.0  |
+| [fuzzyTripMatching](#u__8__fuzzyTripMatching)          |    `boolean`    | **Deprecated**, use `fuzzyMatching`. If the fuzzy trip matcher should be used to match trips.          | *Optional* | `false`       |  2.0  |
+| previewInterval                                        |    `duration`   | TODO                                                                                                   | *Optional* |               |  2.0  |
+| producerMetrics                                        |    `boolean`    | If failure, success, and warning metrics should be collected per producer.                             | *Optional* | `false`       |  2.7  |
+| requestorRef                                           |     `string`    | The requester reference.                                                                               | *Optional* |               |  2.0  |
+| timeout                                                |    `duration`   | The HTTP timeout to download the updates.                                                              | *Optional* | `"PT15S"`     |  2.0  |
+| [url](#u__8__url)                                      |     `string`    | The URL to send the HTTP requests to.                                                                  | *Required* |               |  2.0  |
+| [fuzzyMatching](#u__8__fuzzyMatching)                  |     `object`    | Enable the fuzzy trip matcher, with options.                                                           | *Optional* |               |  2.11 |
+|    [timeTolerance](#u__8__fuzzyMatching_timeTolerance) |    `duration`   | The maximum difference between the scheduled and the aimed times.                                      | *Optional* | `"PT0S"`      |  2.11 |
+| [headers](#u__8__headers)                              | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted.                             | *Optional* |               |  2.3  |
 
 
 ##### Parameter details
+
+<h4 id="u__8__fuzzyTripMatching">fuzzyTripMatching</h4>
+
+**Since version:** `2.0` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`   
+**Path:** /updaters/[8] 
+
+**Deprecated**, use `fuzzyMatching`. If the fuzzy trip matcher should be used to match trips.
+
+`true` is the same as `"fuzzyMatching" : {}`. This parameter is ignored if `fuzzyMatching` is
+set, so both can be set in a configuration used by OTP versions with and without
+`fuzzyMatching`.
+
 
 <h4 id="u__8__url">url</h4>
 
@@ -50,32 +63,29 @@ renamed by the loader when processed:
 
 
 
-<h4 id="u__8__fuzzyTripMatching">fuzzyTripMatching</h4>
+<h4 id="u__8__fuzzyMatching">fuzzyMatching</h4>
 
-**Since version:** `2.0` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
+**Since version:** `2.11` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
 **Path:** /updaters/[8] 
 
-Whether and how the fuzzy trip matcher should be used. A boolean or an object with options.
+Enable the fuzzy trip matcher, with options.
 
 The fuzzy trip matcher identifies the scheduled trip of a SIRI-ET message by its last stop,
 line, service date and the aimed times of the first and last call. Use it for producers whose
 messages do not contain usable trip ids.
 
-The parameter accepts a boolean or an object:
+If this parameter is set, fuzzy trip matching is enabled with the given options and the
+deprecated `fuzzyTripMatching` parameter is ignored. Use an empty object `{}` to enable fuzzy
+trip matching with the default options.
 
-- Missing or `false`: no fuzzy trip matching.
-- `true`: fuzzy trip matching where the scheduled times must be equal to the aimed times, to
-  the second. This is the same as `{ "timeTolerance" : "0s" }`.
-- An object: fuzzy trip matching with the given options, for example
-  `{ "timeTolerance" : "59s" }`.
-
-If more than one trip matches, the message is rejected.
+If a trip matches the aimed times exactly, it is used. Otherwise, if more than one trip matches
+within the time tolerance, the message is rejected.
 
 
-<h4 id="u__8__fuzzyTripMatching_timeTolerance">timeTolerance</h4>
+<h4 id="u__8__fuzzyMatching_timeTolerance">timeTolerance</h4>
 
 **Since version:** `2.11` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT0S"`   
-**Path:** /updaters/[8]/fuzzyTripMatching 
+**Path:** /updaters/[8]/fuzzyMatching 
 
 The maximum difference between the scheduled and the aimed times.
 
@@ -106,7 +116,7 @@ HTTP headers to add to the request. Any header key, value can be inserted.
       "url" : "https://example.com/some/path",
       "feedId" : "feed_id",
       "timeout" : "30s",
-      "fuzzyTripMatching" : {
+      "fuzzyMatching" : {
         "timeTolerance" : "59s"
       },
       "headers" : {
@@ -211,19 +221,32 @@ GTFS-RT TripUpdates.
 <!-- siri-et-lite BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
 
-| Config Parameter                                            |       Type      | Summary                                                                                     |  Req./Opt. | Default Value | Since |
-|-------------------------------------------------------------|:---------------:|---------------------------------------------------------------------------------------------|:----------:|---------------|:-----:|
-| type = "siri-et-lite"                                       |      `enum`     | The type of the updater.                                                                    | *Required* |               |  1.5  |
-| feedId                                                      |     `string`    | The ID of the feed to apply the updates to.                                                 | *Required* |               |  2.7  |
-| frequency                                                   |    `duration`   | How often the updates should be retrieved.                                                  | *Optional* | `"PT1M"`      |  2.7  |
-| timeout                                                     |    `duration`   | The HTTP timeout to download the updates.                                                   | *Optional* | `"PT15S"`     |  2.7  |
-| [url](#u__15__url)                                          |      `uri`      | The URL to send the HTTP requests to.                                                       | *Required* |               |  2.7  |
-| [fuzzyTripMatching](#u__15__fuzzyTripMatching)              |     `object`    | Whether and how the fuzzy trip matcher should be used. A boolean or an object with options. | *Optional* |               |  2.7  |
-|    [timeTolerance](#u__15__fuzzyTripMatching_timeTolerance) |    `duration`   | The maximum difference between the scheduled and the aimed times.                           | *Optional* | `"PT0S"`      |  2.11 |
-| [headers](#u__15__headers)                                  | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted.                  | *Optional* |               |  2.7  |
+| Config Parameter                                        |       Type      | Summary                                                                                       |  Req./Opt. | Default Value | Since |
+|---------------------------------------------------------|:---------------:|-----------------------------------------------------------------------------------------------|:----------:|---------------|:-----:|
+| type = "siri-et-lite"                                   |      `enum`     | The type of the updater.                                                                      | *Required* |               |  1.5  |
+| feedId                                                  |     `string`    | The ID of the feed to apply the updates to.                                                   | *Required* |               |  2.7  |
+| frequency                                               |    `duration`   | How often the updates should be retrieved.                                                    | *Optional* | `"PT1M"`      |  2.7  |
+| [fuzzyTripMatching](#u__15__fuzzyTripMatching)          |    `boolean`    | **Deprecated**, use `fuzzyMatching`. If the fuzzy trip matcher should be used to match trips. | *Optional* | `false`       |  2.7  |
+| timeout                                                 |    `duration`   | The HTTP timeout to download the updates.                                                     | *Optional* | `"PT15S"`     |  2.7  |
+| [url](#u__15__url)                                      |      `uri`      | The URL to send the HTTP requests to.                                                         | *Required* |               |  2.7  |
+| [fuzzyMatching](#u__15__fuzzyMatching)                  |     `object`    | Enable the fuzzy trip matcher, with options.                                                  | *Optional* |               |  2.11 |
+|    [timeTolerance](#u__15__fuzzyMatching_timeTolerance) |    `duration`   | The maximum difference between the scheduled and the aimed times.                             | *Optional* | `"PT0S"`      |  2.11 |
+| [headers](#u__15__headers)                              | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted.                    | *Optional* |               |  2.7  |
 
 
 ##### Parameter details
+
+<h4 id="u__15__fuzzyTripMatching">fuzzyTripMatching</h4>
+
+**Since version:** `2.7` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`   
+**Path:** /updaters/[15] 
+
+**Deprecated**, use `fuzzyMatching`. If the fuzzy trip matcher should be used to match trips.
+
+`true` is the same as `"fuzzyMatching" : {}`. This parameter is ignored if `fuzzyMatching` is
+set, so both can be set in a configuration used by OTP versions with and without
+`fuzzyMatching`.
+
 
 <h4 id="u__15__url">url</h4>
 
@@ -240,32 +263,29 @@ renamed by the loader when processed:
 
 
 
-<h4 id="u__15__fuzzyTripMatching">fuzzyTripMatching</h4>
+<h4 id="u__15__fuzzyMatching">fuzzyMatching</h4>
 
-**Since version:** `2.7` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
+**Since version:** `2.11` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
 **Path:** /updaters/[15] 
 
-Whether and how the fuzzy trip matcher should be used. A boolean or an object with options.
+Enable the fuzzy trip matcher, with options.
 
 The fuzzy trip matcher identifies the scheduled trip of a SIRI-ET message by its last stop,
 line, service date and the aimed times of the first and last call. Use it for producers whose
 messages do not contain usable trip ids.
 
-The parameter accepts a boolean or an object:
+If this parameter is set, fuzzy trip matching is enabled with the given options and the
+deprecated `fuzzyTripMatching` parameter is ignored. Use an empty object `{}` to enable fuzzy
+trip matching with the default options.
 
-- Missing or `false`: no fuzzy trip matching.
-- `true`: fuzzy trip matching where the scheduled times must be equal to the aimed times, to
-  the second. This is the same as `{ "timeTolerance" : "0s" }`.
-- An object: fuzzy trip matching with the given options, for example
-  `{ "timeTolerance" : "59s" }`.
-
-If more than one trip matches, the message is rejected.
+If a trip matches the aimed times exactly, it is used. Otherwise, if more than one trip matches
+within the time tolerance, the message is rejected.
 
 
-<h4 id="u__15__fuzzyTripMatching_timeTolerance">timeTolerance</h4>
+<h4 id="u__15__fuzzyMatching_timeTolerance">timeTolerance</h4>
 
 **Since version:** `2.11` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT0S"`   
-**Path:** /updaters/[15]/fuzzyTripMatching 
+**Path:** /updaters/[15]/fuzzyMatching 
 
 The maximum difference between the scheduled and the aimed times.
 
@@ -295,7 +315,8 @@ HTTP headers to add to the request. Any header key, value can be inserted.
       "type" : "siri-et-lite",
       "feedId" : "sta",
       "url" : "https://example.com/siri-lite/estimated-timetable/xml",
-      "fuzzyTripMatching" : {
+      "fuzzyTripMatching" : true,
+      "fuzzyMatching" : {
         "timeTolerance" : "59s"
       }
     }

@@ -16,8 +16,7 @@ public class SiriAzureETUpdaterParameters
 {
 
   private LocalDate fromDateTime;
-  private SiriFuzzyTripMatchingParameters fuzzyTripMatching =
-    SiriFuzzyTripMatchingParameters.DISABLED;
+  private SiriFuzzyTripMatchingParameters fuzzyMatching = SiriFuzzyTripMatchingParameters.DISABLED;
 
   public SiriAzureETUpdaterParameters() {
     super("siri-azure-et-updater");
@@ -31,12 +30,16 @@ public class SiriAzureETUpdaterParameters
     this.fromDateTime = fromDateTime;
   }
 
-  public SiriFuzzyTripMatchingParameters getFuzzyTripMatching() {
-    return fuzzyTripMatching;
+  /**
+   * The fuzzy trip matching configuration, based on both {@code fuzzyMatching} and the deprecated
+   * {@link #isFuzzyTripMatching()}.
+   */
+  public SiriFuzzyTripMatchingParameters getFuzzyMatching() {
+    return fuzzyMatching;
   }
 
-  public void setFuzzyTripMatching(SiriFuzzyTripMatchingParameters fuzzyTripMatching) {
-    this.fuzzyTripMatching = fuzzyTripMatching;
+  public void setFuzzyMatching(SiriFuzzyTripMatchingParameters fuzzyMatching) {
+    this.fuzzyMatching = fuzzyMatching;
   }
 
   @Override

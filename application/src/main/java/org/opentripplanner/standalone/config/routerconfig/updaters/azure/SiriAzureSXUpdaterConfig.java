@@ -10,6 +10,14 @@ public class SiriAzureSXUpdaterConfig extends SiriAzureUpdaterConfig {
   public static SiriAzureSXUpdaterParameters create(String configRef, NodeAdapter c) {
     SiriAzureSXUpdaterParameters parameters = new SiriAzureSXUpdaterParameters();
     populateConfig(parameters, configRef, c);
+    // Registered so that existing configurations do not get an unknown-parameter warning
+    parameters.setFuzzyTripMatching(
+      c
+        .of("fuzzyTripMatching")
+        .since(V2_2)
+        .summary("Ignored. The SX updater does not use fuzzy trip matching.")
+        .asBoolean(false)
+    );
 
     if (c.exist("history")) {
       NodeAdapter history = c

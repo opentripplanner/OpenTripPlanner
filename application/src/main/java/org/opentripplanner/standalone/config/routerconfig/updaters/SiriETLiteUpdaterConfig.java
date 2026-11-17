@@ -28,7 +28,15 @@ public class SiriETLiteUpdaterConfig {
         .since(V2_7)
         .summary("The HTTP timeout to download the updates.")
         .asDuration(Duration.ofSeconds(15)),
-      SiriFuzzyTripMatchingConfig.map(c, V2_7),
+      SiriFuzzyTripMatchingConfig.map(
+        c,
+        c
+          .of("fuzzyTripMatching")
+          .since(V2_7)
+          .summary(SiriFuzzyTripMatchingConfig.FUZZY_TRIP_MATCHING_SUMMARY)
+          .description(SiriFuzzyTripMatchingConfig.FUZZY_TRIP_MATCHING_DESCRIPTION)
+          .asBoolean(false)
+      ),
       HttpHeadersConfig.headers(c, V2_7)
     );
   }
