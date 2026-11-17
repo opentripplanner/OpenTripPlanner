@@ -3,9 +3,8 @@ package org.opentripplanner.graph_builder.module.osm;
 import static org.opentripplanner.osm.model.TraverseDirection.BACKWARD;
 import static org.opentripplanner.osm.model.TraverseDirection.FORWARD;
 
-import gnu.trove.impl.Constants;
-import gnu.trove.map.TLongFloatMap;
-import gnu.trove.map.hash.TLongFloatHashMap;
+import com.carrotsearch.hppc.LongFloatHashMap;
+import com.carrotsearch.hppc.LongFloatMap;
 import java.util.Collection;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.osm.model.OsmWay;
@@ -25,10 +24,10 @@ class CarSpeedIndex {
 
   private static final float NO_VALUE = -989;
 
-  private final TLongFloatMap forward;
-  private final TLongFloatMap backward;
+  private final LongFloatMap forward;
+  private final LongFloatMap backward;
 
-  private CarSpeedIndex(TLongFloatMap forward, TLongFloatMap backward) {
+  private CarSpeedIndex(LongFloatMap forward, LongFloatMap backward) {
     this.forward = forward;
     this.backward = backward;
   }
@@ -38,7 +37,7 @@ class CarSpeedIndex {
     var progress = ProgressTracker.track("Compute car speeds", 5_000, ways.size());
     LOG.info(progress.startMessage());
 
-    // Trove maps aren't thread-safe: compute the speeds in parallel into a list, then put them into
+    // HPPC maps aren't thread-safe: compute the speeds in parallel into a list, then put them into
     // the maps on a single thread.
     var speeds = ways
       .parallelStream()
@@ -56,8 +55,8 @@ class CarSpeedIndex {
       })
       .toList();
 
-    TLongFloatMap forward = newMap(ways.size());
-    TLongFloatMap backward = newMap(ways.size());
+    LongFloatMap forward = newMap(ways.size());
+    LongFloatMap backward = newMap(ways.size());
 
     for (var waySpeeds : speeds) {
       forward.put(waySpeeds.wayId(), waySpeeds.forward());
@@ -71,23 +70,18 @@ class CarSpeedIndex {
   /// The forward and backward car speed of a single way.
   private record WaySpeeds(long wayId, float forward, float backward) {}
 
-  private static TLongFloatMap newMap(int capacity) {
-    return new TLongFloatHashMap(
-      capacity,
-      Constants.DEFAULT_LOAD_FACTOR,
-      Constants.DEFAULT_LONG_NO_ENTRY_VALUE,
-      NO_VALUE
-    );
+  private static LongFloatMap newMap(int capacity) {
+    return new LongFloatHashMap(capacity);
   }
 
   /// Return the car speed in the forward direction of the way with the given id.
   float forward(long wayId) {
-    return requireValue(forward.get(wayId), wayId);
+    return requireValue(forward.getOrDefault(wayId, NO_VALUE), wayId);
   }
 
   /// Return the car speed in the backward direction of the way with the given id.
   float backward(long wayId) {
-    return requireValue(backward.get(wayId), wayId);
+    return requireValue(backward.getOrDefault(wayId, NO_VALUE), wayId);
   }
 
   private static float requireValue(float speed, long wayId) {

@@ -1,7 +1,6 @@
 package org.opentripplanner.graph_builder.module.islandpruning;
 
-import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
+import com.carrotsearch.hppc.ObjectIntHashMap;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
@@ -23,13 +22,13 @@ class VertexIndex {
 
   private static final int NO_ID = -1;
 
-  private final TObjectIntMap<Vertex> ids;
+  private final ObjectIntHashMap<Vertex> ids;
   private final List<Vertex> vertices;
   private final BitSet streetVertex;
   private final BitSet stopVertex;
 
   VertexIndex(Collection<Vertex> graphVertices) {
-    this.ids = new TObjectIntHashMap<>(graphVertices.size(), 0.5f, NO_ID);
+    this.ids = new ObjectIntHashMap<>(graphVertices.size(), 0.5);
     this.vertices = new ArrayList<>(graphVertices.size());
     this.streetVertex = new BitSet(graphVertices.size());
     this.stopVertex = new BitSet(graphVertices.size());
@@ -39,7 +38,7 @@ class VertexIndex {
   }
 
   int idOf(Vertex v) {
-    int id = ids.get(v);
+    int id = ids.getOrDefault(v, NO_ID);
     if (id == NO_ID) {
       throw new IllegalArgumentException("Vertex %s is not in the index".formatted(v));
     }

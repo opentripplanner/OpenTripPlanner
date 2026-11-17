@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.edgenaming;
 
-import gnu.trove.list.TLongList;
+import com.carrotsearch.hppc.LongArrayList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -118,7 +118,7 @@ class CrosswalkNamer implements EdgeNamer {
         .toList();
 
       // Group sidewalks at each end of the crosswalk.
-      TLongList nodes = way.getNodeRefs();
+      LongArrayList nodes = way.getNodeRefs();
       renameAdjacentSidewalk(adjacentSidewalks, crosswalk.getName(), nodes.get(0));
       renameAdjacentSidewalk(adjacentSidewalks, crosswalk.getName(), nodes.get(nodes.size() - 1));
 
@@ -150,12 +150,12 @@ class CrosswalkNamer implements EdgeNamer {
    * Gets the intersecting street, if any, for the given way and candidate streets.
    */
   public static Optional<OsmWay> getIntersectingStreet(OsmWay way, Collection<OsmWay> streets) {
-    TLongList nodeRefs = way.getNodeRefs();
+    LongArrayList nodeRefs = way.getNodeRefs();
     if (nodeRefs.size() >= 3) {
       // There needs to be at least three nodes: 2 extremities that are on the sidewalk,
       // and one somewhere in the middle that joins the crossing with the street.
       // We exclude the first and last node which are on the sidewalk.
-      long[] nodeRefsArray = nodeRefs.toArray(1, nodeRefs.size() - 2);
+      long[] nodeRefsArray = Arrays.copyOfRange(nodeRefs.toArray(), 1, nodeRefs.size() - 1);
       return streets
         .stream()
         .filter(w -> Arrays.stream(nodeRefsArray).anyMatch(nid -> w.getNodeRefs().contains(nid)))

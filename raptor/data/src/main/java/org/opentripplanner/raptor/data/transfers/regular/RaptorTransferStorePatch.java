@@ -1,6 +1,6 @@
 package org.opentripplanner.raptor.data.transfers.regular;
 
-import gnu.trove.list.array.TIntArrayList;
+import com.carrotsearch.hppc.IntArrayList;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,7 +28,7 @@ public final class RaptorTransferStorePatch {
   private final RaptorTransfers toStops;
 
   /** (toStop, duration, c1) triples by replaced fromStop, in insertion order. */
-  private final Map<Integer, TIntArrayList> newTransfersByFromStop = new HashMap<>();
+  private final Map<Integer, IntArrayList> newTransfersByFromStop = new HashMap<>();
   private boolean built = false;
 
   RaptorTransferStorePatch(RaptorTransfers fromStops, RaptorTransfers toStops) {
@@ -43,7 +43,7 @@ public final class RaptorTransferStorePatch {
    */
   public RaptorTransferStorePatch replaceTransfersFrom(int fromStop) {
     assertNotBuilt();
-    newTransfersByFromStop.computeIfAbsent(fromStop, s -> new TIntArrayList(3));
+    newTransfersByFromStop.computeIfAbsent(fromStop, s -> new IntArrayList(3));
     return this;
   }
 
