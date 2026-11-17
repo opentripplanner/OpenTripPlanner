@@ -189,7 +189,8 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
 
         var to = TripStopTime.departure(toTrip, stopPos);
         // Add as a possible result
-        result.add(new TripToTripTransfer<>(from, to, it, tx));
+        // The transfer may be a flyweight, valid only until the next iterator step
+        result.add(new TripToTripTransfer<>(from, to, it.materialize(), tx));
       }
     }
 
