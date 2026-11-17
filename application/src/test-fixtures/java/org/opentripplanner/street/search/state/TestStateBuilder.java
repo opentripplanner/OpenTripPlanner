@@ -6,6 +6,7 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
@@ -120,11 +121,15 @@ public class TestStateBuilder {
     return this;
   }
 
+  public TestStateBuilder streetEdge(int distance_m) {
+    return streetEdge("street edge", distance_m);
+  }
+
   /**
    * Traverse a named street edge. In an arriveBy search the edge leads to the current vertex, since
    * the search runs backward in time.
    */
-  public TestStateBuilder streetEdge(String name, int distance) {
+  public TestStateBuilder streetEdge(String name, int distance_m) {
     count++;
     var current = (StreetVertex) currentState.vertex;
     var next = StreetModelForTest.intersectionVertex(count, count);
@@ -132,7 +137,7 @@ public class TestStateBuilder {
     var edge = StreetModelForTest.streetEdgeBuilder(
       arriveBy ? next : current,
       arriveBy ? current : next,
-      distance,
+      distance_m,
       StreetTraversalPermission.PEDESTRIAN
     )
       .withName(name)
@@ -142,14 +147,14 @@ public class TestStateBuilder {
     return this;
   }
 
-  public TestStateBuilder unnamedStreetEdge(int distance) {
+  public TestStateBuilder unnamedStreetEdge(int distance_m) {
     count++;
     var from = (StreetVertex) currentState.vertex;
     var to = StreetModelForTest.intersectionVertex(count, count);
     var edge = StreetModelForTest.streetEdgeBuilder(
       from,
       to,
-      distance,
+      distance_m,
       StreetTraversalPermission.PEDESTRIAN
     )
       .withName("path")
@@ -344,6 +349,20 @@ public class TestStateBuilder {
     var edge = PathwayEdge.createPathwayEdge(from, tov, I18NString.of(s), 60, 100, 0, 0, true);
     currentState = edge.traverse(currentState)[0];
     return this;
+  }
+
+  public TestStateBuilder pathway(@Nullable String s, double distance_m) {
+    count++;
+    var from = (StreetVertex) currentState.vertex;
+    var tov = StreetModelForTest.intersectionVertex(count, count);
+    var name = s == null ? null : I18NString.of(s);
+    var edge = PathwayEdge.createPathwayEdge(from, tov, name, 0, distance_m, 0, 0, true);
+    currentState = edge.traverse(currentState)[0];
+    return this;
+  }
+
+  public TestStateBuilder unnamedPathway(int distance_m) {
+    return pathway(null, distance_m);
   }
 
   private TestStateBuilder arriveAtStop(RegularStop stop) {
