@@ -15,9 +15,20 @@ public interface McStopArrivalFactory<T extends RaptorTripSchedule> {
     int c1
   );
 
+  /**
+   * Create an arrival for a regular transfer. The transfer is not kept; only the target stop and
+   * the cost are copied, so it is safe to pass in a flyweight.
+   */
   McStopArrival<T> createTransferStopArrival(
     McStopArrival<T> previous,
     RaptorTransfer transfer,
+    int arrivalTime
+  );
+
+  /** Create an arrival for the transfer of a via connection. The transfer is kept. */
+  McStopArrival<T> createViaTransferStopArrival(
+    McStopArrival<T> previous,
+    RaptorTransfer viaTransfer,
     int arrivalTime
   );
 }

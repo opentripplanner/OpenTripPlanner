@@ -4,26 +4,25 @@ import static org.opentripplanner.raptor.api.view.PathLegType.TRANSFER;
 
 import org.opentripplanner.raptor.api.view.PathLegType;
 import org.opentripplanner.raptor.api.view.TransitArrival;
-import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-final class TransferStopArrivalC2<T extends RaptorTripSchedule> extends AbstractStopArrivalC2<T> {
+sealed class TransferStopArrivalC2<T extends RaptorTripSchedule>
+  extends AbstractStopArrivalC2<T>
+  permits ViaTransferStopArrivalC2
+{
 
-  private final RaptorTransfer transfer;
-
-  TransferStopArrivalC2(McStopArrival<T> previous, RaptorTransfer transferPath, int arrivalTime) {
+  TransferStopArrivalC2(McStopArrival<T> previous, int toStop, int arrivalTime, int transferC1) {
     super(
       previous,
       previous.round(),
-      transferPath.stop(),
+      toStop,
       arrivalTime,
-      previous.c1() + transferPath.c1(),
+      previous.c1() + transferC1,
       previous.c2()
     );
-    this.transfer = transferPath;
   }
 
   @Override
@@ -37,17 +36,12 @@ final class TransferStopArrivalC2<T extends RaptorTripSchedule> extends Abstract
   }
 
   @Override
-  public RaptorTransfer transfer() {
-    return transfer;
-  }
-
-  @Override
   public boolean arrivedOnBoard() {
     return false;
   }
 
   @Override
   public McStopArrival<T> addSlackToArrivalTime(int slack) {
-    return new TransferStopArrivalC2<>(previous(), transfer, arrivalTime() + slack);
+    return new TransferStopArrivalC2<>(previous(), stop(), arrivalTime() + slack, transferC1());
   }
 }

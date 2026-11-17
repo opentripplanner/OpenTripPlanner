@@ -1,7 +1,6 @@
 package org.opentripplanner.raptor.rangeraptor.standard.stoparrivals;
 
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
-import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.utils.time.TimeUtils;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
@@ -45,7 +44,6 @@ sealed class DefaultStopArrivalState<T extends RaptorTripSchedule>
 
   // Transfer
   private int transferFromStop = NOT_SET;
-  private RaptorTransfer transferPath = null;
 
   DefaultStopArrivalState() {}
 
@@ -135,15 +133,9 @@ sealed class DefaultStopArrivalState<T extends RaptorTripSchedule>
   }
 
   @Override
-  public final RaptorTransfer transferPath() {
-    return transferPath;
-  }
-
-  @Override
-  public void transferToStop(int fromStop, int arrivalTime, RaptorTransfer transferPath) {
+  public void transferToStop(int fromStop, int arrivalTime) {
     this.bestArrivalTime = arrivalTime;
     this.transferFromStop = fromStop;
-    this.transferPath = transferPath;
   }
 
   /* other methods */
@@ -161,10 +153,6 @@ sealed class DefaultStopArrivalState<T extends RaptorTripSchedule>
       .addNum("boardStopPosition", boardStopPosition, NOT_SET)
       .addObj("trip", tripInfo())
       .addNum("transferFromStop", transferFromStop, NOT_SET);
-
-    if (transferPath != null) {
-      builder.addDurationSec("transfer", transferPath.durationInSeconds());
-    }
     return builder;
   }
 
@@ -173,7 +161,6 @@ sealed class DefaultStopArrivalState<T extends RaptorTripSchedule>
       this.bestArrivalTime = time;
       // Clear transfer to avoid mistakes
       this.transferFromStop = NOT_SET;
-      this.transferPath = null;
     }
     if (onBoard) {
       this.onBoardArrivalTime = time;
