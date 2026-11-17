@@ -43,8 +43,7 @@ public final class KryoBuilder {
     HppcKryoSupport.register(kryo);
 
     // Add support for the package local java.util.ImmutableCollections.
-    // Not supported properly in the current com.conveyal:kryo-tools:1.4.0.
-    // This provide support for List.of, Set.of, Map.of and Collectors.toUnmodifiable(Set|List|Map)
+    // This provides support for List.of, Set.of, Map.of and Collectors.toUnmodifiable(Set|List|Map)
     kryo.register(List.of().getClass(), new JavaImmutableListSerializer());
     kryo.register(List.of(1).getClass(), new JavaImmutableListSerializer());
     kryo.register(Set.of().getClass(), new JavaImmutableSetSerializer());

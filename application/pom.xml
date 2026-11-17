@@ -108,13 +108,6 @@
             <artifactId>kryo</artifactId>
             <version>5.5.0</version>
         </dependency>
-        <!-- Only used for the ObjectDiffer, which tests that a round trip through serialization reproduces the same network. -->
-        <dependency>
-            <groupId>com.conveyal</groupId>
-            <artifactId>kryo-tools</artifactId>
-            <version>1.6.0</version>
-            <scope>test</scope>
-        </dependency>
         <!--
             jersey pulls in older versions of this dependency which are binary-incompatible
             with the latest jackson version, so we need to explicitly define them here
