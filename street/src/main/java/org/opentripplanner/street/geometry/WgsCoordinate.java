@@ -48,15 +48,12 @@ public final class WgsCoordinate implements Serializable {
 
   /**
    * Return {@code true} if the latitude and longitude are within the WGS84 range, i.e. the
-   * {@link #WgsCoordinate(double, double)} constructor accepts them. Use this to check input data
-   * before creating a coordinate.
+   * {@link #WgsCoordinate(double, double)} constructor accepts them. {@code NaN} is not within the
+   * range. Use this to check input data before creating a coordinate.
    */
   public static boolean isValid(double latitude, double longitude) {
-    return !(
-      latitude < LAT_MIN ||
-      latitude > LAT_MAX ||
-      longitude < LON_MIN ||
-      longitude > LON_MAX
+    return (
+      latitude >= LAT_MIN && latitude <= LAT_MAX && longitude >= LON_MIN && longitude <= LON_MAX
     );
   }
 

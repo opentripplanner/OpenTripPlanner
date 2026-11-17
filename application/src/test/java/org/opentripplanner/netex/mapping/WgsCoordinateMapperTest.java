@@ -130,4 +130,12 @@ class WgsCoordinateMapperTest {
     );
     assertThrows(InvalidCoordinateException.class, () -> WgsCoordinateMapper.mapToDomain(p));
   }
+
+  @Test
+  void posNaN() {
+    var p = new SimplePoint_VersionStructure().withLocation(
+      new LocationStructure().withPos(new DirectPositionType().withValue(Double.NaN, Double.NaN))
+    );
+    assertThrows(InvalidCoordinateException.class, () -> WgsCoordinateMapper.mapToDomain(p));
+  }
 }
