@@ -46,6 +46,11 @@ public record TestTransfer(int stop, int durationInSeconds, int cost) implements
   }
 
   @Override
+  public RaptorTransfer materialize() {
+    return this;
+  }
+
+  @Override
   public String toString() {
     return asString();
   }

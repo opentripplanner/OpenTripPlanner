@@ -26,6 +26,14 @@ public interface RaptorTransfer {
    */
   int durationInSeconds();
 
+  /**
+   * Return a transfer which can be kept after the iterator step it was read in. The transfers
+   * returned by {@link RaptorTransferDataProvider#getTransfersFromStop(int)} may be flyweights,
+   * only valid until the iterator is advanced, and must NOT be retained. An immutable transfer
+   * returns {@code this}, a flyweight returns an immutable copy.
+   */
+  RaptorTransfer materialize();
+
   /** Call this from toString */
   default String asString() {
     String duration = DurationUtils.durationToStr(durationInSeconds());

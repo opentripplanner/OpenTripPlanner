@@ -34,6 +34,11 @@ class DefaultRaptorTransfer implements RaptorTransfer, Serializable {
   }
 
   @Override
+  public RaptorTransfer materialize() {
+    return this;
+  }
+
+  @Override
   public boolean equals(Object o) {
     if (o == null || getClass() != o.getClass()) {
       return false;

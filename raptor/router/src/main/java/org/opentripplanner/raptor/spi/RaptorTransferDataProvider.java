@@ -1,6 +1,7 @@
 package org.opentripplanner.raptor.spi;
 
 import java.util.Iterator;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This interface is responsible for providing all regular and constrained transfers from a given stop to all possible
@@ -51,6 +52,42 @@ public interface RaptorTransferDataProvider<T extends RaptorTripSchedule> {
    */
   @Flyweight
   Iterator<? extends RaptorTransfer> getTransfersToStop(int toStop);
+
+  /**
+   * Find the transfer used by a path leg, after the search is complete. This is NOT used during
+   * routing, so it does not need to be fast, but the result must be materialized (not a flyweight
+   * valid only for one iterator step), see {@link RaptorTransfer#materialize()}.
+   * <p>
+   * The Raptor state does not keep the transfer used to arrive at a stop. It is restored from the
+   * stop pair and the time between the two arrivals. Among the transfers from {@code fromStop} to
+   * {@code toStop} with a duration less than or equal to {@code maxDurationInSeconds}, the one with
+   * the lowest c1 is returned. If more than one has the lowest c1, the one with the shortest
+   * duration is returned.
+   * <p>
+   * The stops are given in the direction from origin to destination of the journey, independent
+   * of the search direction. In the result {@link RaptorTransfer#stop()} is {@code toStop}.
+   *
+   * @return the transfer or {@code null} if no transfer matches.
+   */
+  @Nullable
+  default RaptorTransfer findTransfer(int fromStop, int toStop, int maxDurationInSeconds) {
+    RaptorTransfer best = null;
+    var it = getTransfersFromStop(fromStop);
+    while (it.hasNext()) {
+      var tx = it.next();
+      if (tx.stop() != toStop || tx.durationInSeconds() > maxDurationInSeconds) {
+        continue;
+      }
+      if (
+        best == null ||
+        tx.c1() < best.c1() ||
+        (tx.c1() == best.c1() && tx.durationInSeconds() < best.durationInSeconds())
+      ) {
+        best = tx.materialize();
+      }
+    }
+    return best;
+  }
 
   /**
    * Implement this method to provide a service to search for {@link RaptorTransferConstraint}. This

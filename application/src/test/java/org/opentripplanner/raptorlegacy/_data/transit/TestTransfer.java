@@ -10,6 +10,11 @@ public record TestTransfer(int stop, int durationInSeconds, int c1) implements R
   }
 
   @Override
+  public RaptorTransfer materialize() {
+    return this;
+  }
+
+  @Override
   public String toString() {
     String duration = DurationUtils.durationToStr(durationInSeconds());
     return String.format("WALK %s %s ~ %d", duration, OtpNumberFormat.formatCostCenti(c1), stop());
