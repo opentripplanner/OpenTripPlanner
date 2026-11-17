@@ -2,62 +2,69 @@ package org.opentripplanner.raptor.data.transfers.regular;
 
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * Stores transfers as one array of {@link DefaultRaptorTransfer} per stop, avoiding pointer-chasing
- * through a graph of transfer objects on the hot Raptor search path.
+ * Stores the transfers as one packed {@code int[]} per stop: {@code [stop, duration, c1]} for each
+ * transfer. There is no object per transfer, which saves memory (no object header or pointer) and
+ * avoids pointer-chasing on the hot Raptor search path. The iterator is a flyweight cursor over the
+ * row, see {@link org.opentripplanner.raptor.spi.RaptorTransferDataProvider}.
  * <p>
- * A microbenchmark of the iteration shows it ~2.4x faster per transfer than a list of transfer
- * objects per stop (~1.3 ns vs ~3.3 ns). The rows still hold one object per transfer. A packed
- * {@code int[]} layout was ~3.5-4x faster per lookup in a prototype, but it needs a change in Raptor
- * first, so it is not done yet.
- * <p>
- * The transfers of each stop are sorted by duration. The Raptor search stops at the first transfer
- * that is too long, so it relies on this order, see {@code StdRangeRaptorWorkerState}.
+ * The transfers of each stop are sorted by duration, transfers with the same duration keep their
+ * insertion order. The Raptor search stops at the first transfer that is too long, so it relies on
+ * this order, see {@code StdRangeRaptorWorkerState}.
  * <p>
  * This class is immutable: neither the outer array nor a row is modified after construction. That
  * makes it safe to share rows between instances, see {@link #withRows(Map)}.
  */
 final class RaptorTransfers implements Serializable {
 
-  private static final Comparator<DefaultRaptorTransfer> BY_DURATION = Comparator.comparingInt(
-    DefaultRaptorTransfer::durationInSeconds
-  );
+  static final int[] EMPTY_ROW = new int[0];
 
-  private final DefaultRaptorTransfer[][] transfers;
+  /** Number of ints for each transfer in a row: stop, duration and c1. */
+  static final int STRIDE = 3;
+
+  private static final int STOP = 0;
+  private static final int DURATION = 1;
+  private static final int C1 = 2;
+
+  private final int[][] rows;
 
   /** The rows are sorted by duration, the given rows are sorted in place. */
-  RaptorTransfers(DefaultRaptorTransfer[][] transfers) {
-    for (var row : transfers) {
+  RaptorTransfers(int[][] rows) {
+    for (var row : rows) {
       sortByDuration(row);
     }
-    this.transfers = transfers;
+    this.rows = rows;
   }
 
-  private RaptorTransfers(DefaultRaptorTransfer[][] transfers, boolean sorted) {
-    this.transfers = transfers;
+  private RaptorTransfers(int[][] rows, boolean sorted) {
+    this.rows = rows;
   }
 
+  /**
+   * The returned iterator is a flyweight, the element returned by {@code next()} is the iterator
+   * itself and is only valid until the next call to {@code next()}.
+   */
   Iterator<? extends RaptorTransfer> getTransfers(int sourceStop) {
-    return new LightweightTransferIterator(this.transfers[sourceStop]);
+    return new TransferCursor(rows[sourceStop]);
   }
 
-  /** The transfers of {@code sourceStop}. The returned array must not be modified. */
-  DefaultRaptorTransfer[] row(int sourceStop) {
-    return transfers[sourceStop];
+  /** The packed transfers of {@code sourceStop}. The returned array must not be modified. */
+  int[] row(int sourceStop) {
+    return rows[sourceStop];
   }
 
   /**
    * Return a copy with the rows of the given source stops replaced. Only the outer array is
    * copied, all other rows are shared with this instance.
    */
-  RaptorTransfers withRows(Map<Integer, DefaultRaptorTransfer[]> rowsBySourceStop) {
-    var copy = transfers.clone();
+  RaptorTransfers withRows(Map<Integer, int[]> rowsBySourceStop) {
+    var copy = rows.clone();
     rowsBySourceStop.forEach((sourceStop, row) -> {
       sortByDuration(row);
       copy[sourceStop] = row;
@@ -65,34 +72,78 @@ final class RaptorTransfers implements Serializable {
     return new RaptorTransfers(copy, true);
   }
 
-  private static void sortByDuration(DefaultRaptorTransfer[] row) {
-    Arrays.sort(row, BY_DURATION);
+  /** Stable sort, in place, of the packed transfers by duration. */
+  private static void sortByDuration(int[] row) {
+    int size = row.length / STRIDE;
+    if (size < 2) {
+      return;
+    }
+    // Sort (duration, original index) pairs packed in a long, the index gives a stable order
+    long[] keys = new long[size];
+    for (int i = 0; i < size; ++i) {
+      keys[i] = ((long) row[i * STRIDE + DURATION] << 32) | i;
+    }
+    Arrays.sort(keys);
+    int[] sorted = new int[row.length];
+    for (int i = 0; i < size; ++i) {
+      System.arraycopy(row, (int) keys[i] * STRIDE, sorted, i * STRIDE, STRIDE);
+    }
+    System.arraycopy(sorted, 0, row, 0, row.length);
   }
 
   @Override
   public String toString() {
-    return ToStringBuilder.of(RaptorTransfers.class).addNum("size", transfers.length).toString();
+    return ToStringBuilder.of(RaptorTransfers.class).addNum("size", rows.length).toString();
   }
 
-  private static final class LightweightTransferIterator implements Iterator<RaptorTransfer> {
+  /** The flyweight iterator and transfer. */
+  private static final class TransferCursor implements Iterator<RaptorTransfer>, RaptorTransfer {
 
-    private final DefaultRaptorTransfer[] a;
-    private int index;
+    private final int[] row;
+    private int index = -STRIDE;
 
-    LightweightTransferIterator(DefaultRaptorTransfer[] a) {
-      this.a = a;
-      this.index = this.a.length == 0 ? 0 : -1;
+    TransferCursor(int[] row) {
+      this.row = row;
     }
 
     @Override
     public boolean hasNext() {
-      index += 1;
-      return index < a.length;
+      return index + STRIDE < row.length;
     }
 
     @Override
     public RaptorTransfer next() {
-      return a[index];
+      if (!hasNext()) {
+        throw new NoSuchElementException();
+      }
+      index += STRIDE;
+      return this;
+    }
+
+    @Override
+    public int stop() {
+      return row[index + STOP];
+    }
+
+    @Override
+    public int durationInSeconds() {
+      return row[index + DURATION];
+    }
+
+    @Override
+    public int c1() {
+      return row[index + C1];
+    }
+
+    @Override
+    public RaptorTransfer materialize() {
+      return new DefaultRaptorTransfer(stop(), c1(), durationInSeconds());
+    }
+
+    @Override
+    public String toString() {
+      // The cursor points to no transfer before the first next(), and after the last
+      return index < 0 || index >= row.length ? "Transfer cursor" : asString();
     }
   }
 }
