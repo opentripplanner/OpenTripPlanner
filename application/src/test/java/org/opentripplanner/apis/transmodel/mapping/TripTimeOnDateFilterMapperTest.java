@@ -7,6 +7,7 @@ import static org.junit.jupiter.params.provider.Arguments.argumentSet;
 import static org.opentripplanner.apis.transmodel._support.RequestHelper.list;
 import static org.opentripplanner.apis.transmodel._support.RequestHelper.map;
 import static org.opentripplanner.transit.model.basic.TransitMode.BUS;
+import static org.opentripplanner.transit.model.basic.TransitMode.RAIL;
 
 import java.util.HashMap;
 import java.util.List;
@@ -202,6 +203,23 @@ class TripTimeOnDateFilterMapperTest {
         "nullLinesAuthoritiesAndModes",
         list(map("not", list(withNulls(map(), "lines", "authorities", "transportModes")))),
         "A selector cannot be empty"
+      ),
+      argumentSet(
+        "nullTransportModeNextToRail",
+        list(
+          map(
+            "select",
+            list(
+              map(
+                entry(
+                  "transportModes",
+                  list(withNulls(map(), "transportMode"), map("transportMode", RAIL))
+                )
+              )
+            )
+          )
+        ),
+        "'transportMode' is required in a transport mode selector."
       )
     );
   }

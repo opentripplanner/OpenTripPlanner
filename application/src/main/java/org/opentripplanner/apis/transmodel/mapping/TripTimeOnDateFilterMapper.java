@@ -123,7 +123,7 @@ public class TripTimeOnDateFilterMapper {
   }
 
   private static void validateMainModePresent(Map<String, ?> transportModeWithSubModes) {
-    if (!transportModeWithSubModes.containsKey("transportMode")) {
+    if (transportModeWithSubModes.get("transportMode") == null) {
       throw new InvalidInputException("'transportMode' is required in a transport mode selector.");
     }
   }
