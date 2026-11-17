@@ -7,6 +7,7 @@ import org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.StdStopArriv
 import org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.StopArrivalState;
 import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.raptor.spi.RaptorConstants;
+import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.raptor.spi.RaptorTripPattern;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
@@ -60,9 +61,15 @@ public class StopsCursor<T extends RaptorTripSchedule> {
    * linked with the previous arrival which is a "real" arrival present in the state. This enables
    * path generation.
    */
-  public Transfer<T> fictiveTransfer(int round, int fromStop, int toStop, int arrivalTime) {
+  public Transfer<T> fictiveTransfer(
+    int round,
+    int fromStop,
+    RaptorTransfer transfer,
+    int toStop,
+    int arrivalTime
+  ) {
     StopArrivalState<T> arrival = StopArrivalState.create();
-    arrival.transferToStop(fromStop, arrivalTime);
+    arrival.transferToStop(fromStop, arrivalTime, transfer);
     return new Transfer<>(round, toStop, arrival, this);
   }
 

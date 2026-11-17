@@ -67,7 +67,7 @@ class StateDebugger<T extends RaptorTripSchedule> {
 
   void rejectTransfer(int fromStop, RaptorTransfer transfer, int toStop, int arrivalTime) {
     if (isDebug(transfer.stop())) {
-      reject(cursor.fictiveTransfer(round, fromStop, toStop, arrivalTime));
+      reject(cursor.fictiveTransfer(round, fromStop, transfer, toStop, arrivalTime));
     }
   }
 

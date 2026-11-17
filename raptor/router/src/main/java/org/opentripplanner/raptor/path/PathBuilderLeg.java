@@ -220,7 +220,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
       return asAccessLeg().streetPath.c1();
     }
     if (isTransfer()) {
-      return asTransferLeg().c1;
+      return asTransferLeg().transfer.c1();
     }
     if (isTransit()) {
       return transitCost(costCalculator, slackProvider);
@@ -273,16 +273,15 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
   /**
    * Create a transfer leg. The given {@code toStop} is the stop you arrive on when traveling in the
-   * direction from origin to destination. The transfer is not retained, only its duration and cost
-   * are copied. The {@code viaTransfer} is retained, it is {@code null} for regular transfers.
+   * direction from origin to destination. In a forward search the given {@code transfer.stop()} and
+   * the {@code toStop} is the same, but in a reverse search, the {@code transfer.stop()} is the
+   * fromStop; hence the {@code toStop} must be passed in.
    */
   static <T extends RaptorTripSchedule> PathBuilderLeg<T> transferLeg(
-    int toStop,
-    int durationInSeconds,
-    int c1,
-    @Nullable RaptorTransfer viaTransfer
+    RaptorTransfer transfer,
+    int toStop
   ) {
-    return new PathBuilderLeg<>(new MyTransferLeg(toStop, durationInSeconds, c1, viaTransfer));
+    return new PathBuilderLeg<>(new MyTransferLeg(transfer, toStop));
   }
 
   static <T extends RaptorTripSchedule> PathBuilderLeg<T> transitLeg(
@@ -359,8 +358,8 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     return costCalculator != null ? streetPath.c1() : RaptorCostCalculator.ZERO_COST;
   }
 
-  private static int cost(RaptorCostCalculator<?> costCalculator, int c1) {
-    return costCalculator != null ? c1 : RaptorCostCalculator.ZERO_COST;
+  private static int cost(RaptorCostCalculator<?> costCalculator, RaptorTransfer transfer) {
+    return costCalculator != null ? transfer.c1() : RaptorCostCalculator.ZERO_COST;
   }
 
   private void setTime(int fromTime, int toTime) {
@@ -415,18 +414,9 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     RaptorSlackProvider slackProvider
   ) {
     PathLeg<T> nextLeg = next.createPathLeg(costCalculator, slackProvider);
-    var transfer = asTransferLeg();
-    int cost = cost(costCalculator, transfer.c1);
-    return new TransferPathLeg<>(
-      fromStop(),
-      fromTime,
-      toStop(),
-      toTime,
-      cost,
-      transfer.durationInSeconds,
-      transfer.viaTransfer,
-      nextLeg
-    );
+    var transfer = asTransferLeg().transfer;
+    int cost = cost(costCalculator, transfer);
+    return new TransferPathLeg<>(fromStop(), fromTime, toStop(), toTime, cost, transfer, nextLeg);
   }
 
   /* private methods */
@@ -522,7 +512,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     else {
       int toTime = nextTransitLeg.transitStopArrivalTimeBefore(slackProvider, hasRides());
       if (next.isTransfer()) {
-        toTime -= next.asTransferLeg().durationInSeconds;
+        toTime -= next.asTransferLeg().transfer.durationInSeconds();
       }
       toTime = accessPath.latestArrivalTime(toTime);
       assertTimeExist(
@@ -544,7 +534,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     } else {
       throw new IllegalStateException("Unexpected leg type before TransferLeg: " + this);
     }
-    setTime(newFromTime, newFromTime + asTransferLeg().durationInSeconds);
+    setTime(newFromTime, newFromTime + asTransferLeg().transfer.durationInSeconds());
   }
 
   private void timeShiftEgressTime(RaptorSlackProvider slackProvider) {
@@ -759,17 +749,11 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
   private static class MyTransferLeg extends AbstractMyLeg {
 
     final int toStop;
-    final int durationInSeconds;
-    final int c1;
+    final RaptorTransfer transfer;
 
-    @Nullable
-    final RaptorTransfer viaTransfer;
-
-    MyTransferLeg(int toStop, int durationInSeconds, int c1, @Nullable RaptorTransfer viaTransfer) {
+    MyTransferLeg(RaptorTransfer transfer, int toStop) {
+      this.transfer = transfer;
       this.toStop = toStop;
-      this.durationInSeconds = durationInSeconds;
-      this.c1 = c1;
-      this.viaTransfer = viaTransfer;
     }
 
     @Override
@@ -789,7 +773,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
     @Override
     public PathStringBuilder addToString(PathStringBuilder builder) {
-      return builder.walk(durationInSeconds).stop(toStop());
+      return builder.walk(transfer.durationInSeconds()).stop(toStop());
     }
   }
 

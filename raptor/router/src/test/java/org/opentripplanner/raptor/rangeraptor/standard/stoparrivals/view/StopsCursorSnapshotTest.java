@@ -109,7 +109,7 @@ class StopsCursorSnapshotTest implements RaptorTestConstants {
     assertSame(TRIP_3, transit2.transitPath().trip());
     assertEquals(PathLegType.TRANSFER, transfer.arrivedBy());
     assertEquals(transferArrivalTime, transfer.arrivalTime());
-    assertEquals(transferDuration, transfer.transferDuration());
+    assertEquals(transferDuration, transfer.transfer().durationInSeconds());
     assertEquals(PathLegType.TRANSIT, transit1.arrivedBy());
     assertSame(TRIP_1, transit1.transitPath().trip());
     assertEquals(TRIP_1.arrival(1), transit1.arrivalTime());

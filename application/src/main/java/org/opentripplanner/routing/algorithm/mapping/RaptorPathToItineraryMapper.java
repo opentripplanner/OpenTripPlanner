@@ -352,10 +352,12 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     var transferFromStop = raptorTransitData.getStopByIndex(pathLeg.fromStop());
     var transferToStop = raptorTransitData.getStopByIndex(pathLeg.toStop());
 
+    var raptorTransfer = pathLeg.transfer();
+
     Place from = Place.forStop(transferFromStop);
     Place to = Place.forStop(transferToStop);
 
-    if (pathLeg.viaTransfer() instanceof ViaCoordinateTransfer viaTx) {
+    if (raptorTransfer instanceof ViaCoordinateTransfer viaTx) {
       return mapViaCoordinateTransferLeg(pathLeg, viaTx);
     }
     // A regular transfer. Recover its street path for the leg's geometry and walk steps.
@@ -363,9 +365,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     if (regularTransferPath != null) {
       return mapTransferLeg(pathLeg, regularTransferPath, transferMode, from, to);
     }
-    throw new IllegalArgumentException(
-      "No transfer path found from stop " + pathLeg.fromStop() + " to " + pathLeg.toStop()
-    );
+    throw new IllegalArgumentException("Unknown transfer type: " + raptorTransfer.getClass());
   }
 
   /**

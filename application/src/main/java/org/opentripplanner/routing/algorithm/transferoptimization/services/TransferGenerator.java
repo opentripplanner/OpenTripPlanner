@@ -10,7 +10,6 @@ import org.opentripplanner.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.raptor.spi.RaptorTransferDataProvider;
-import org.opentripplanner.raptor.spi.RaptorTransferValue;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.spi.SearchDirection;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.StopTime;
@@ -190,8 +189,7 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
 
         var to = TripStopTime.departure(toTrip, stopPos);
         // Add as a possible result
-        // The transfer may be a flyweight, valid only until the next iterator step
-        result.add(new TripToTripTransfer<>(from, to, RaptorTransferValue.copyOf(it), tx));
+        result.add(new TripToTripTransfer<>(from, to, it, tx));
       }
     }
 

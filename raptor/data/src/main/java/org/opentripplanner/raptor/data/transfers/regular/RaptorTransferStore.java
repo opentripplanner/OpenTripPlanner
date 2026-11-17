@@ -6,13 +6,13 @@ import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * Stores transfers as one packed {@code int[]} per stop, with no object per transfer, see
- * {@link RaptorTransfers}.
+ * Stores transfers as one array of {@link DefaultRaptorTransfer} per stop, avoiding pointer-chasing
+ * through a graph of transfer objects on the hot Raptor search path.
  * <p>
- * The returned iterators are flyweights, as described in
- * {@link org.opentripplanner.raptor.spi.RaptorTransferDataProvider}: the transfer returned by
- * {@code next()} is only valid until the next call to {@code next()}. Use
- * {@link org.opentripplanner.raptor.spi.RaptorTransferValue#copyOf} to keep a transfer.
+ * Note: The returned iterators do not implement the {@code Flyweight} pattern described in
+ * {@link org.opentripplanner.raptor.spi.RaptorTransferDataProvider} - each {@link DefaultRaptorTransfer}
+ * is a normal, independent object. Raptor does not consume flyweight-style transfer iterators
+ * anymore; this can be revisited once that support is added on the routing side.
  * <p>
  * This class is immutable and thread-safe.
  */

@@ -19,7 +19,6 @@ import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorPathConstrainedTransferSearch;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorStopNameResolver;
-import org.opentripplanner.raptor.spi.RaptorTransferDataProvider;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.spi.SearchDirection;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
@@ -139,8 +138,7 @@ public class DestinationArrivalConfig<T extends RaptorTripSchedule> {
       ctx.raptorSlackProvider(),
       includeCost ? ctx.costCalculator() : null,
       ctx.stopNameResolver(),
-      ctx.transferData().transferConstraintsSearch(),
-      ctx.transferData()
+      ctx.transferData().transferConstraintsSearch()
     );
   }
 
@@ -149,23 +147,20 @@ public class DestinationArrivalConfig<T extends RaptorTripSchedule> {
     RaptorSlackProvider slackProvider,
     RaptorCostCalculator<S> costCalculator,
     RaptorStopNameResolver stopNameResolver,
-    RaptorPathConstrainedTransferSearch<S> txConstraintsSearch,
-    RaptorTransferDataProvider<S> transferData
+    RaptorPathConstrainedTransferSearch<S> txConstraintsSearch
   ) {
     return searchDirection.isForward()
       ? new ForwardPathMapper<>(
           slackProvider,
           costCalculator,
           stopNameResolver,
-          txConstraintsSearch,
-          transferData
+          txConstraintsSearch
         )
       : new ReversePathMapper<>(
           slackProvider,
           costCalculator,
           stopNameResolver,
-          txConstraintsSearch,
-          transferData
+          txConstraintsSearch
         );
   }
 }

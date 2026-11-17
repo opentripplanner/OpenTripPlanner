@@ -226,7 +226,7 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
     for (OptimizedPathTail<T> path : tails) {
       path.head().changeBoardingPosition(boardPos);
       if (nextTransferLeg != null) {
-        path.transfer(nextTransferLeg);
+        path.transfer(nextTransferLeg.transfer(), nextTransferLeg.toStop());
       }
       path.access(accessLeg.access());
     }

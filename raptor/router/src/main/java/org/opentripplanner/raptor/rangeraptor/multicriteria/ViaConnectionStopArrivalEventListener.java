@@ -219,7 +219,7 @@ public final class ViaConnectionStopArrivalEventListener<T extends RaptorTripSch
 
   private void continueWithTransfer(McStopArrival<T> from, RaptorTransferViaConnection via) {
     int arrivalTime = from.arrivalTime() + via.durationInSeconds();
-    var to = stopArrivalFactory.createViaTransferStopArrival(from, via.transfer(), arrivalTime);
+    var to = stopArrivalFactory.createTransferStopArrival(from, via.transfer(), arrivalTime);
     transfersCache.add(to);
   }
 

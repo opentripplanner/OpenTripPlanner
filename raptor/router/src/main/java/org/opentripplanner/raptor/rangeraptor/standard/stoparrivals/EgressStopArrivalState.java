@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.rangeraptor.standard.internalapi.DestinationArrivalListener;
+import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
@@ -41,8 +42,8 @@ final class EgressStopArrivalState<T extends RaptorTripSchedule> extends Default
   }
 
   @Override
-  public void transferToStop(int fromStop, int arrivalTime) {
-    super.transferToStop(fromStop, arrivalTime);
+  public void transferToStop(int fromStop, int arrivalTime, RaptorTransfer transferPath) {
+    super.transferToStop(fromStop, arrivalTime, transferPath);
     for (RaptorAccessEgress egressPath : egressPaths) {
       if (egressPath.arrivedOnBoard()) {
         // Raptor does not support currently egress directly after flex access.

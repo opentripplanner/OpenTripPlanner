@@ -7,11 +7,13 @@ import org.opentripplanner.raptor.api.view.PathLegType;
 import org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.StopArrivalState;
 import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
+import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 final class Transfer<T extends RaptorTripSchedule> extends StopArrivalViewAdapter<T> {
 
   private final int arrivalTime;
+  private final RaptorTransfer transfer;
   private final ArrivalView<T> previous;
 
   /**
@@ -21,6 +23,7 @@ final class Transfer<T extends RaptorTripSchedule> extends StopArrivalViewAdapte
   Transfer(int round, int stop, StopArrivalState<T> arrival, StopsCursor<T> cursor) {
     super(round, stop);
     this.arrivalTime = arrival.time();
+    this.transfer = arrival.transferPath();
     this.previous = cursor.stop(round(), arrival.transferFromStop(), true);
   }
 
@@ -49,10 +52,9 @@ final class Transfer<T extends RaptorTripSchedule> extends StopArrivalViewAdapte
     return TRANSFER;
   }
 
-  /** The c1 is not part of the standard Raptor state, it is resolved when the path is created. */
   @Override
-  public int transferC1() {
-    return RaptorConstants.NOT_SET;
+  public RaptorTransfer transfer() {
+    return transfer;
   }
 
   @Override

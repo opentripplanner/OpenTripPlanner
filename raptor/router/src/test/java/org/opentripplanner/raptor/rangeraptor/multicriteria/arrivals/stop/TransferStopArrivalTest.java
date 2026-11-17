@@ -60,9 +60,8 @@ class TransferStopArrivalTest {
 
   private final TransferStopArrival<RaptorTripSchedule> subject = new TransferStopArrival<>(
     TRANSIT_ARRIVAL,
-    TRANSFER_TO_STOP,
-    TRANSFER_ALIGHT_TIME,
-    TRANSFER_C1
+    TRANSFER_WALK,
+    TRANSFER_ALIGHT_TIME
   );
 
   @Test
