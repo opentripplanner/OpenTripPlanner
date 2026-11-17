@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.updater.spi.UpdateErrorType.NOT_IMPLEMENTED_NO_DATA_IN_REPLACEMENT;
+import static org.opentripplanner.updater.spi.UpdateErrorType.TOO_MANY_STOPS;
 import static org.opentripplanner.updater.spi.UpdateErrorType.UNKNOWN_STOP;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
@@ -22,6 +23,7 @@ import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TripInput;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.gtfs.GtfsRtTestHelper;
+import org.opentripplanner.updater.trip.gtfs.model.TripUpdate;
 import org.opentripplanner.utils.time.TimeUtils;
 
 public class ReplacementTest implements RealtimeTestConstants {
@@ -408,6 +410,30 @@ public class ReplacementTest implements RealtimeTestConstants {
       .build();
 
     assertFailure(NOT_IMPLEMENTED_NO_DATA_IN_REPLACEMENT, rt.applyTripUpdate(tripUpdate));
+
+    var tripTimes = env.tripData(TRIP_1_ID).tripTimes();
+    assertNotNull(tripTimes);
+    assertFalse(tripTimes.isTripPatternModified());
+    assertFalse(tripTimes.isCanceledOrDeleted());
+  }
+
+  @Test
+  void replacementTripWithTooManyStopsIsRejected() {
+    var builder = TransitTestEnvironment.of();
+    var STOP_A = builder.stop(STOP_A_ID);
+    var STOP_B = builder.stop(STOP_B_ID);
+    var TRIP_INPUT = TripInput.of(TRIP_1_ID)
+      .addStop(STOP_A, "8:30:00", "8:30:00")
+      .addStop(STOP_B, "8:40:00", "8:40:00");
+    var env = builder.addTrip(TRIP_INPUT).build();
+    var rt = GtfsRtTestHelper.of(env);
+
+    var tripUpdateBuilder = rt.tripUpdate(TRIP_1_ID, REPLACEMENT);
+    for (int i = 0; i <= TripUpdate.MAX_REPLACEMENT_STOPS; i++) {
+      tripUpdateBuilder.addStopTime("STOP_" + i, "8:30");
+    }
+
+    assertFailure(TOO_MANY_STOPS, rt.applyTripUpdate(tripUpdateBuilder.build()));
 
     var tripTimes = env.tripData(TRIP_1_ID).tripTimes();
     assertNotNull(tripTimes);
