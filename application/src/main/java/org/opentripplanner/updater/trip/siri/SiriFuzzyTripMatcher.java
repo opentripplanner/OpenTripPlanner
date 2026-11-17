@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
@@ -41,8 +42,9 @@ import org.slf4j.LoggerFactory;
  * <p>
  * The aimed arrival time at the last stop and the aimed departure time at the first stop must
  * match the scheduled times within the configured time tolerance. A tolerance of zero requires
- * the times to be equal to the second. If more than one trip matches, the journey is rejected
- * with {@link UpdateErrorType#MULTIPLE_FUZZY_TRIP_MATCHES}.
+ * the times to be equal to the second. If exactly one trip matches the aimed times to the second,
+ * it is used, even if other trips match within the tolerance. Otherwise, if more than one trip
+ * matches, the journey is rejected with {@link UpdateErrorType#MULTIPLE_FUZZY_TRIP_MATCHES}.
  * <p>
  * Constructed per update task (cheap — only assigns fields). The expensive scheduled-data index
  * lives in {@link SiriFuzzyTripMatcherCache}, which is built once and shared across all SIRI
@@ -102,6 +104,7 @@ public class SiriFuzzyTripMatcher {
           findPossibleTrips(
             filterByRoute(trips, route),
             calls,
+            OptionalInt.empty(),
             entityResolver,
             getCurrentTimetable,
             getNewTripPatternForModifiedTrip
@@ -128,14 +131,15 @@ public class SiriFuzzyTripMatcher {
     // Try the candidate lookups in order of preference. A lookup is only used if one of its
     // candidates passes all the checks, otherwise the next lookup is tried. With a time tolerance,
     // a lookup may return unrelated trips, which must not prevent the following lookups.
-    for (var candidates : candidateLookups(stop, arrivalTime)) {
-      Set<Trip> trips = filterByRoute(candidates.get(), route);
+    for (var lookup : candidateLookups(stop, arrivalTime)) {
+      Set<Trip> trips = filterByRoute(lookup.trips().get(), route);
       if (trips.isEmpty()) {
         continue;
       }
       var possibleTrips = findPossibleTrips(
         trips,
         calls,
+        OptionalInt.of(lookup.arrivalTime()),
         entityResolver,
         getCurrentTimetable,
         getNewTripPatternForModifiedTrip
@@ -148,17 +152,21 @@ public class SiriFuzzyTripMatcher {
   }
 
   /**
-   * Return the only possible trip, or reject the journey if there is none or more than one.
+   * Return the only exact match if there is one, otherwise the only possible trip. Reject the
+   * journey if there is no possible trip, or more than one without exactly one exact match.
    */
-  private static TripAndPattern singleMatch(Set<TripAndPattern> possibleTrips)
-    throws UpdateException {
+  private static TripAndPattern singleMatch(List<Candidate> possibleTrips) throws UpdateException {
+    var exactMatches = possibleTrips.stream().filter(Candidate::exact).toList();
+    if (exactMatches.size() == 1) {
+      return exactMatches.getFirst().tripAndPattern();
+    }
     if (possibleTrips.isEmpty()) {
       throw UpdateException.of(NO_FUZZY_TRIP_MATCH);
     }
     if (possibleTrips.size() > 1) {
       throw UpdateException.of(UpdateErrorType.MULTIPLE_FUZZY_TRIP_MATCHES);
     }
-    return possibleTrips.iterator().next();
+    return possibleTrips.getFirst().tripAndPattern();
   }
 
   private static Set<Trip> filterByRoute(Set<Trip> trips, Optional<Route> route) {
@@ -202,36 +210,42 @@ public class SiriFuzzyTripMatcher {
    * </ol>
    * The lookups are evaluated lazily, so a lookup is only done if the previous ones gave no match.
    */
-  private List<Supplier<Set<Trip>>> candidateLookups(
-    RegularStop lastStop,
-    ZonedDateTime arrivalTime
-  ) {
+  private List<Lookup> candidateLookups(RegularStop lastStop, ZonedDateTime arrivalTime) {
     var timeZone = transitRepository.getTimeZone();
     int secondsSinceMidnight = ServiceDateUtils.secondsSinceStartOfService(
       arrivalTime,
       arrivalTime,
       timeZone
     );
+    int secondsSinceYesterday = ServiceDateUtils.secondsSinceStartOfService(
+      arrivalTime.minusDays(1),
+      arrivalTime,
+      timeZone
+    );
     String lastStopId = lastStop.getId().getId();
 
-    List<Supplier<Set<Trip>>> lookups = new ArrayList<>();
-    lookups.add(() -> tripsByLastStopArrival(lastStopId, secondsSinceMidnight));
-    lookups.add(() ->
-      tripsByLastStopArrival(
-        lastStopId,
-        ServiceDateUtils.secondsSinceStartOfService(arrivalTime.minusDays(1), arrivalTime, timeZone)
+    List<Lookup> lookups = new ArrayList<>();
+    lookups.add(
+      new Lookup(
+        () -> tripsByLastStopArrival(lastStopId, secondsSinceMidnight),
+        secondsSinceMidnight
+      )
+    );
+    lookups.add(
+      new Lookup(
+        () -> tripsByLastStopArrival(lastStopId, secondsSinceYesterday),
+        secondsSinceYesterday
       )
     );
     if (lastStop.isPartOfStation()) {
-      lookups.add(() -> {
-        Set<Trip> tripsOnSiblingQuays = new HashSet<>();
+      Supplier<Set<Trip>> tripsOnSiblingQuays = () -> {
+        Set<Trip> trips = new HashSet<>();
         for (var quay : lastStop.getParentStation().getChildStops()) {
-          tripsOnSiblingQuays.addAll(
-            tripsByLastStopArrival(quay.getId().getId(), secondsSinceMidnight)
-          );
+          trips.addAll(tripsByLastStopArrival(quay.getId().getId(), secondsSinceMidnight));
         }
-        return tripsOnSiblingQuays;
-      });
+        return trips;
+      };
+      lookups.add(new Lookup(tripsOnSiblingQuays, secondsSinceMidnight));
     }
     return lookups;
   }
@@ -252,11 +266,17 @@ public class SiriFuzzyTripMatcher {
   /**
    * The candidate trips that run on the journey's service date, have matching first and last
    * stops, and depart within the time tolerance of the journey's aimed departure time. Returns an
-   * empty set if no candidate matches.
+   * empty list if no candidate matches.
+   *
+   * @param aimedArrivalTime The aimed arrival time at the last stop, in seconds since the start of
+   *                         the service date of the candidates. The candidates already arrive
+   *                         within the time tolerance of it. It is only used to find out if a
+   *                         candidate matches exactly. If empty, only the departure time is used.
    */
-  private Set<TripAndPattern> findPossibleTrips(
+  private List<Candidate> findPossibleTrips(
     Set<Trip> trips,
     List<CallWrapper> calls,
+    OptionalInt aimedArrivalTime,
     EntityResolver entityResolver,
     BiFunction<TripPattern, LocalDate, Timetable> getCurrentTimetable,
     BiFunction<FeedScopedId, LocalDate, TripPattern> getNewTripPatternForModifiedTrip
@@ -276,7 +296,7 @@ public class SiriFuzzyTripMatcher {
       transitRepository.getTimeZone()
     );
     TripCalendars calendarService = timetableRepository.getTripCalendars();
-    Set<TripAndPattern> possibleTrips = new HashSet<>();
+    List<Candidate> possibleTrips = new ArrayList<>();
     for (Trip trip : trips) {
       if (!calendarService.listServiceDates(trip.getServiceId()).contains(serviceDate)) {
         continue;
@@ -304,15 +324,34 @@ public class SiriFuzzyTripMatcher {
       }
 
       var times = getCurrentTimetable.apply(tripPattern, serviceDate).getTripTimes(trip);
-      if (
-        times != null &&
-        isWithinTimeTolerance(times.getScheduledDepartureTime(0), departureInSecondsSinceMidnight)
-      ) {
-        // Found matches
-        possibleTrips.add(new TripAndPattern(times.getTrip(), tripPattern));
+      if (times == null) {
+        continue;
+      }
+      int scheduledDeparture = times.getScheduledDepartureTime(0);
+      if (isWithinTimeTolerance(scheduledDeparture, departureInSecondsSinceMidnight)) {
+        boolean exact =
+          scheduledDeparture == departureInSecondsSinceMidnight &&
+          (aimedArrivalTime.isEmpty() ||
+            times.getScheduledArrivalTime(times.getNumStops() - 1) == aimedArrivalTime.getAsInt());
+        possibleTrips.add(new Candidate(new TripAndPattern(times.getTrip(), tripPattern), exact));
       }
     }
 
     return possibleTrips;
   }
+
+  /**
+   * A lookup of candidate trips by their arrival time at the last stop.
+   *
+   * @param arrivalTime The aimed arrival time used for the lookup, in seconds since the start of
+   *                    the service date of the candidates.
+   */
+  private record Lookup(Supplier<Set<Trip>> trips, int arrivalTime) {}
+
+  /**
+   * A trip that matches within the time tolerance.
+   *
+   * @param exact {@code true} if the scheduled times are equal to the aimed times, to the second.
+   */
+  private record Candidate(TripAndPattern tripAndPattern, boolean exact) {}
 }

@@ -184,6 +184,48 @@ class SiriFuzzyTripMatcherTest implements RealtimeTestConstants {
     assertFailure(MULTIPLE_FUZZY_TRIP_MATCHES, () -> match(evj, env, Duration.ofSeconds(59)));
   }
 
+  @Test
+  void exactMatchIsPreferredOverOtherTripWithinTolerance() {
+    var exact = tripInput(TRIP_1_ID);
+    var nearby = TripInput.of(TRIP_2_ID)
+      .addStop(STOP_A, "0:10:30", "0:10:30")
+      .addStop(STOP_B, "0:20:30", "0:20:30");
+    var env = ENV_BUILDER.addTrip(exact).addTrip(nearby).build();
+    var evj = estimatedVehicleJourney(env);
+
+    assertEquals(TRIP_1_ID, match(evj, env).trip().getId().getId());
+    assertEquals(TRIP_1_ID, match(evj, env, Duration.ofSeconds(59)).trip().getId().getId());
+  }
+
+  /** A trip is only an exact match if both the departure and the arrival are equal. */
+  @Test
+  void departureOnlyIsNotAnExactMatch() {
+    var exactDeparture = TripInput.of(TRIP_1_ID)
+      .addStop(STOP_A, "0:10:00", "0:10:00")
+      .addStop(STOP_B, "0:20:30", "0:20:30");
+    var nearby = TripInput.of(TRIP_2_ID)
+      .addStop(STOP_A, "0:10:30", "0:10:30")
+      .addStop(STOP_B, "0:20:00", "0:20:00");
+    var env = ENV_BUILDER.addTrip(exactDeparture).addTrip(nearby).build();
+    var evj = estimatedVehicleJourney(env);
+
+    assertFailure(MULTIPLE_FUZZY_TRIP_MATCHES, () -> match(evj, env, Duration.ofSeconds(59)));
+  }
+
+  @Test
+  void multipleExactMatchesWithOtherTripWithinTolerance() {
+    var nearby = TripInput.of("trip3")
+      .addStop(STOP_A, "0:10:30", "0:10:30")
+      .addStop(STOP_B, "0:20:30", "0:20:30");
+    var env = ENV_BUILDER.addTrip(tripInput(TRIP_1_ID))
+      .addTrip(tripInput(TRIP_2_ID))
+      .addTrip(nearby)
+      .build();
+    var evj = estimatedVehicleJourney(env);
+
+    assertFailure(MULTIPLE_FUZZY_TRIP_MATCHES, () -> match(evj, env, Duration.ofSeconds(59)));
+  }
+
   /**
    * SIRI reports another quay of the same station than the schedule. An unrelated trip arrives
    * at the reported quay within the tolerance. It must not prevent the lookup on sibling quays.
