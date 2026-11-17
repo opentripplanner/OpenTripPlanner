@@ -2,7 +2,7 @@ package org.opentripplanner.inspector.vector;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 

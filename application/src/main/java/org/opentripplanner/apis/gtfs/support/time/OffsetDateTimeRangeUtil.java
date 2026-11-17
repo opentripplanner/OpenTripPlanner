@@ -2,7 +2,7 @@ package org.opentripplanner.apis.gtfs.support.time;
 
 import java.time.OffsetDateTime;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.core.model.time.TimePeriod;

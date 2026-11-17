@@ -1,6 +1,6 @@
 package org.opentripplanner.raptor._data.transit;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorCostConverter;
 import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
@@ -22,8 +22,7 @@ public final class TestCostCalculator implements RaptorCostCalculator<TestTripSc
    * Costs for boarding and alighting at a given stop during transfer. See
    * RaptorTransitData.getStopBoardAlightTransferCosts()
    */
-  @Nullable
-  private final int[] stopBoardAlightTransferCosts;
+  private final int @Nullable [] stopBoardAlightTransferCosts;
 
   /**
    * Cost unit: SECONDS - The unit for all input parameters are in the OTP TRANSIT model cost unit
@@ -38,7 +37,7 @@ public final class TestCostCalculator implements RaptorCostCalculator<TestTripSc
     int boardCost,
     int transferCost,
     double waitReluctanceFactor,
-    @Nullable int[] stopBoardAlightTransferCosts
+    int @Nullable [] stopBoardAlightTransferCosts
   ) {
     this.boardCost = RaptorCostConverter.toRaptorCost(boardCost);
     this.transferCost = RaptorCostConverter.toRaptorCost(transferCost);

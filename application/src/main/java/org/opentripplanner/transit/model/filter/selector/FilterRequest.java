@@ -2,7 +2,7 @@ package org.opentripplanner.transit.model.filter.selector;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**

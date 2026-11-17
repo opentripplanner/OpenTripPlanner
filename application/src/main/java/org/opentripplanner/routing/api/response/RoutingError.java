@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.api.response;
 
 import java.util.Objects;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 public class RoutingError {

@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.model.framework;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Implement this interface to include more info into the {@link AbstractTransitEntity#toString()}.

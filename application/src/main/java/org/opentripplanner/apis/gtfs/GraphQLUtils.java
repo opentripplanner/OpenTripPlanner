@@ -2,7 +2,7 @@ package org.opentripplanner.apis.gtfs;
 
 import java.time.Instant;
 import java.util.Locale;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLFilterPlaceType;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLFormFactor;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLInputField;

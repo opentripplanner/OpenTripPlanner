@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.model.StopTime;
@@ -114,8 +114,7 @@ class StopTimeToScheduledTripTimesMapper {
    *         stop.
    * @see org.opentripplanner.transit.model.timetable.TripTimes#getHeadsignVias(int)
    */
-  @Nullable
-  private String[][] makeHeadsignViasArray(final Collection<StopTime> stopTimes) {
+  private String @Nullable [][] makeHeadsignViasArray(final Collection<StopTime> stopTimes) {
     if (
       stopTimes
         .stream()

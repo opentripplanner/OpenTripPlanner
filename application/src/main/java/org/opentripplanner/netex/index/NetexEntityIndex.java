@@ -1,6 +1,32 @@
 package org.opentripplanner.netex.index;
 
 import java.util.Collection;
+import org.entur.netex2.model.Authority;
+import org.entur.netex2.model.Branding;
+import org.entur.netex2.model.DatedServiceJourney;
+import org.entur.netex2.model.DayType;
+import org.entur.netex2.model.DayTypeAssignment;
+import org.entur.netex2.model.DestinationDisplay;
+import org.entur.netex2.model.FlexibleLine;
+import org.entur.netex2.model.FlexibleStopPlace;
+import org.entur.netex2.model.GroupOfLines;
+import org.entur.netex2.model.GroupOfStopPlaces;
+import org.entur.netex2.model.JourneyPattern_VersionStructure;
+import org.entur.netex2.model.Line;
+import org.entur.netex2.model.Network;
+import org.entur.netex2.model.Notice;
+import org.entur.netex2.model.NoticeAssignment;
+import org.entur.netex2.model.OperatingDay;
+import org.entur.netex2.model.OperatingPeriod_VersionStructure;
+import org.entur.netex2.model.Operator;
+import org.entur.netex2.model.Parking;
+import org.entur.netex2.model.Quay;
+import org.entur.netex2.model.Route;
+import org.entur.netex2.model.ServiceJourney;
+import org.entur.netex2.model.ServiceJourneyInterchange;
+import org.entur.netex2.model.ServiceLink;
+import org.entur.netex2.model.StopPlace;
+import org.entur.netex2.model.TariffZone_VersionStructure;
 import org.opentripplanner.netex.index.api.NetexEntityIndexReadOnlyView;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
@@ -10,32 +36,6 @@ import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMultimap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalVersionMapById;
-import org.rutebanken.netex.model.Authority;
-import org.rutebanken.netex.model.Branding;
-import org.rutebanken.netex.model.DatedServiceJourney;
-import org.rutebanken.netex.model.DayType;
-import org.rutebanken.netex.model.DayTypeAssignment;
-import org.rutebanken.netex.model.DestinationDisplay;
-import org.rutebanken.netex.model.FlexibleLine;
-import org.rutebanken.netex.model.FlexibleStopPlace;
-import org.rutebanken.netex.model.GroupOfLines;
-import org.rutebanken.netex.model.GroupOfStopPlaces;
-import org.rutebanken.netex.model.JourneyPattern_VersionStructure;
-import org.rutebanken.netex.model.Line;
-import org.rutebanken.netex.model.Network;
-import org.rutebanken.netex.model.Notice;
-import org.rutebanken.netex.model.NoticeAssignment;
-import org.rutebanken.netex.model.OperatingDay;
-import org.rutebanken.netex.model.OperatingPeriod_VersionStructure;
-import org.rutebanken.netex.model.Operator;
-import org.rutebanken.netex.model.Parking;
-import org.rutebanken.netex.model.Quay;
-import org.rutebanken.netex.model.Route;
-import org.rutebanken.netex.model.ServiceJourney;
-import org.rutebanken.netex.model.ServiceJourneyInterchange;
-import org.rutebanken.netex.model.ServiceLink;
-import org.rutebanken.netex.model.StopPlace;
-import org.rutebanken.netex.model.TariffZone_VersionStructure;
 
 /**
  * This class holds indexes of Netex objects for lookup during the NeTEx import using the
@@ -89,6 +89,7 @@ public class NetexEntityIndex {
   public final HierarchicalMapById<OperatingPeriod_VersionStructure> operatingPeriodById;
   public final HierarchicalMapById<Operator> operatorsById;
   public final HierarchicalVersionMapById<Quay> quayById;
+  public final HierarchicalMap<String, String> stopPlaceIdByStopPointRef;
   public final HierarchicalMap<String, String> flexibleStopPlaceByStopPointRef;
   public final HierarchicalMap<String, String> quayIdByStopPointRef;
   public final HierarchicalMapById<Route> routeById;
@@ -135,6 +136,7 @@ public class NetexEntityIndex {
     this.operatorsById = new HierarchicalMapById<>();
     this.quayById = new HierarchicalVersionMapById<>();
     this.flexibleStopPlaceByStopPointRef = new HierarchicalMap<>();
+    this.stopPlaceIdByStopPointRef = new HierarchicalMap<>();
     this.quayIdByStopPointRef = new HierarchicalMap<>();
     this.routeById = new HierarchicalMapById<>();
     this.serviceJourneyById = new HierarchicalMapById<>();
@@ -176,6 +178,7 @@ public class NetexEntityIndex {
     this.operatingPeriodById = new HierarchicalMapById<>(parent.operatingPeriodById);
     this.operatorsById = new HierarchicalMapById<>(parent.operatorsById);
     this.quayById = new HierarchicalVersionMapById<>(parent.quayById);
+    this.stopPlaceIdByStopPointRef = new HierarchicalMap<>(parent.stopPlaceIdByStopPointRef);
     this.flexibleStopPlaceByStopPointRef = new HierarchicalMap<>(
       parent.flexibleStopPlaceByStopPointRef
     );
@@ -327,6 +330,11 @@ public class NetexEntityIndex {
       @Override
       public ReadOnlyHierarchicalVersionMapById<Quay> getQuayById() {
         return quayById;
+      }
+
+      @Override
+      public ReadOnlyHierarchicalMap<String, String> getStopPlaceIdByStopPointRef() {
+        return stopPlaceIdByStopPointRef;
       }
 
       @Override

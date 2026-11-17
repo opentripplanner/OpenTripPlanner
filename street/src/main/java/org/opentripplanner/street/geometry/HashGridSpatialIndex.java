@@ -1,8 +1,10 @@
 package org.opentripplanner.street.geometry;
 
-import gnu.trove.map.hash.TLongObjectHashMap;
-import gnu.trove.set.TLongSet;
-import gnu.trove.set.hash.TLongHashSet;
+import com.carrotsearch.hppc.LongHashSet;
+import com.carrotsearch.hppc.LongObjectHashMap;
+import com.carrotsearch.hppc.LongSet;
+import com.carrotsearch.hppc.procedures.LongObjectProcedure;
+import com.carrotsearch.hppc.procedures.LongProcedure;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,18 +12,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.function.Consumer;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.LineString;
-import org.locationtech.jts.index.ItemVisitor;
-import org.locationtech.jts.index.SpatialIndex;
 import org.opentripplanner.utils.lang.IntBox;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A spatial index using a 2D fast long hashtable (Trove lib).
+ * A spatial index using a 2D fast long hashtable (HPPC lib).
  * <p>
  * Objects to index are placed in all grid bins touching the bounding envelope. We *do not store*
  * any bouding envelope for each object, so this imply that we will return false positive when
@@ -34,7 +35,7 @@ import org.slf4j.LoggerFactory;
  * @param <T> Type of objects to be spatial indexed.
  * @author laurent
  */
-public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
+public class HashGridSpatialIndex<T> implements Serializable {
 
   @SuppressWarnings("unused")
   private static final Logger LOG = LoggerFactory.getLogger(HashGridSpatialIndex.class);
@@ -55,7 +56,7 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
   private final double yBinSize;
 
   /* The map of all bins. Please see visit() and xKey/yKey for details on the key. */
-  private final TLongObjectHashMap<ArrayList<T>> bins;
+  private final LongObjectHashMap<ArrayList<T>> bins;
 
   private int nBins = 0;
 
@@ -70,7 +71,7 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
     this.xBinSize = xBinSize;
     this.yBinSize = yBinSize;
     // For 200m bins, 500x500 = 100x100km = 250000 bins
-    bins = new TLongObjectHashMap<>();
+    bins = new LongObjectHashMap<>();
   }
 
   /** Create a HashGrid with the default grid dimensions. */
@@ -78,7 +79,6 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
     this(DEFAULT_X_BIN_SIZE, DEFAULT_Y_BIN_SIZE);
   }
 
-  @Override
   public final void insert(Envelope envelope, final Object item) {
     visit(envelope, true, (bin, mapKey) -> {
       /*
@@ -95,7 +95,6 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
     nObjects++;
   }
 
-  @Override
   public final List<T> query(Envelope envelope) {
     final Set<T> ret = new HashSet<>(1024);
     visit(envelope, false, (bin, mapKey) -> {
@@ -105,16 +104,23 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
     return new ArrayList<>(ret);
   }
 
-  @Override
-  public final void query(Envelope envelope, ItemVisitor visitor) {
-    // We are cheating a bit here... But who cares? Never called in OTP.
-    List<T> tlist = query(envelope);
-    for (T t : tlist) {
-      visitor.visitItem(t);
-    }
+  /**
+   * Pass every item stored in the bins touching the envelope to {@code consumer}, without
+   * deduplication. As with {@link #query(Envelope)} the result contains false positives (whole bins
+   * are returned), and in addition an item spanning several of the visited bins is passed once per
+   * bin. Use this instead of {@link #query(Envelope)} when only a few of many candidates are kept:
+   * the caller can discard candidates with a cheap geometric test before paying for a hash-based
+   * dedup of the survivors, rather than hashing and copying every item in the bins first.
+   */
+  public final void forEachCandidate(Envelope envelope, Consumer<? super T> consumer) {
+    visit(envelope, false, (bin, mapKey) -> {
+      for (int i = 0, n = bin.size(); i < n; i++) {
+        consumer.accept(bin.get(i));
+      }
+      return false;
+    });
   }
 
-  @Override
   public final boolean remove(Envelope envelope, final Object item) {
     // This iterates over the entire rectangular envelope of the edge rather than the segments
     // making it up. It will be inefficient for very long edges, but creating a new remove method
@@ -139,7 +145,7 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
 
   public final void insert(LineString geom, final Object item) {
     Coordinate[] coord = geom.getCoordinates();
-    final TLongSet keys = new TLongHashSet(coord.length * 8);
+    final LongSet keys = new LongHashSet(coord.length * 8);
     for (int i = 0; i < coord.length - 1; i++) {
       // TODO Cut the segment if longer than bin size
       // to reduce the number of wrong bins
@@ -149,12 +155,13 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
         return false;
       });
     }
-    keys.forEach(key -> {
-      // Note: bins have been initialized in the previous visit
-      bins.get(key).add((T) item);
-      nEntries++;
-      return true;
-    });
+    keys.forEach(
+      (LongProcedure) key -> {
+        // Note: bins have been initialized in the previous visit
+        bins.get(key).add((T) item);
+        nEntries++;
+      }
+    );
     nObjects++;
   }
 
@@ -166,20 +173,21 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
    */
   public Set<T> queryAlongLineStrings(Collection<LineString> lineStrings) {
     Set<T> result = new HashSet<>(1024);
-    TLongSet keys = new TLongHashSet(256);
+    LongSet keys = new LongHashSet(256);
     for (LineString ls : lineStrings) {
       CoordinateSequence seq = ls.getCoordinateSequence();
       for (int i = 0; i < seq.size() - 1; i++) {
         collectBinKeys(seq.getX(i), seq.getY(i), seq.getX(i + 1), seq.getY(i + 1), keys);
       }
     }
-    keys.forEach(key -> {
-      ArrayList<T> bin = bins.get(key);
-      if (bin != null) {
-        result.addAll(bin);
+    keys.forEach(
+      (LongProcedure) key -> {
+        ArrayList<T> bin = bins.get(key);
+        if (bin != null) {
+          result.addAll(bin);
+        }
       }
-      return true;
-    });
+    );
     return result;
   }
 
@@ -188,7 +196,7 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
    * the bin-key math in {@link #visit(Envelope, boolean, BinVisitor)} but operates on primitive
    * coordinates so the hot query loop has no per-segment object allocations.
    */
-  private void collectBinKeys(double x1, double y1, double x2, double y2, TLongSet out) {
+  private void collectBinKeys(double x1, double y1, double x2, double y2, LongSet out) {
     double minX = clampLon(Math.min(x1, x2));
     double maxX = clampLon(Math.max(x1, x2));
     double minY = clampLat(Math.min(y1, y2));
@@ -226,10 +234,7 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
    * used for reads only.
    */
   public void compact() {
-    bins.forEachValue(ts -> {
-      ts.trimToSize();
-      return true;
-    });
+    bins.forEach((LongObjectProcedure<ArrayList<T>>) (key, list) -> list.trimToSize());
   }
 
   public String toString() {

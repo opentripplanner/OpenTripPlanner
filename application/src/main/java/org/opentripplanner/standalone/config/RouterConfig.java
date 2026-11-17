@@ -6,7 +6,7 @@ import static org.opentripplanner.standalone.config.routerequest.RouteRequestCon
 
 import java.io.Serializable;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.apis.gtfs.GtfsApiParameters;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.ojp.config.OjpApiConfig;

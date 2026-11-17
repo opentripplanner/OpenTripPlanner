@@ -9,7 +9,7 @@ import static org.opentripplanner.updater.trip.UpdateIncrementality.FULL_DATASET
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.network.TripPattern;

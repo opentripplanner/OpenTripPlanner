@@ -3,16 +3,16 @@ package org.opentripplanner.netex.validation;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.LocalTime;
+import org.entur.netex2.model.JourneyPattern;
+import org.entur.netex2.model.JourneyPattern_VersionStructure;
+import org.entur.netex2.model.ServiceJourney;
+import org.entur.netex2.model.StopPointInJourneyPattern;
+import org.entur.netex2.model.TimetabledPassingTime;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.netex.index.NetexEntityIndex;
 import org.opentripplanner.netex.index.api.HMapValidationRule;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.netex.mapping.NetexTestDataSample;
-import org.rutebanken.netex.model.JourneyPattern;
-import org.rutebanken.netex.model.JourneyPattern_VersionStructure;
-import org.rutebanken.netex.model.ServiceJourney;
-import org.rutebanken.netex.model.StopPointInJourneyPattern;
-import org.rutebanken.netex.model.TimetabledPassingTime;
 
 class ServiceJourneyNonIncreasingPassingTimeTest {
 

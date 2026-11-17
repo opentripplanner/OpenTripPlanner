@@ -3,6 +3,8 @@ package org.opentripplanner.standalone.config;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.framework.application.OtpFileNames;
+import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.jackson.databind.node.MissingNode;
@@ -42,6 +44,7 @@ public class ConfigModel {
    * after the graph is loaded.
    */
   private BuildConfig buildConfig;
+  private TransferParameters<RouteRequest> transferParameters = null;
 
   /**
    * The router-config in NOT final because it can be set from the embedded graph.obj router-config
@@ -74,10 +77,22 @@ public class ConfigModel {
     );
   }
 
-  public void updateConfigFromSerializedGraph(BuildConfig buildConfig, RouterConfig routerConfig) {
+  /**
+   * @param graphIsServedAsIs {@code true} if no build step follows.
+   */
+  public void updateConfigFromSerializedGraph(
+    BuildConfig buildConfig,
+    RouterConfig routerConfig,
+    boolean graphIsServedAsIs
+  ) {
     if (this.buildConfig.isDefault()) {
       LOG.info("Using the graph embedded JSON build configuration.");
       this.buildConfig = buildConfig;
+    } else if (graphIsServedAsIs && !buildConfig.isDefault()) {
+      // TODO: Use the whole embedded build config when serving, not only the transfer profiles.
+      //       This is a quick fix, it will be fixed in a follow up PR.
+      LOG.info("Using the transfer profiles of the graph embedded JSON build configuration.");
+      this.transferParameters = buildConfig.transferProfiles();
     }
     if (this.routerConfig.isDefault()) {
       LOG.info("Using the graph embedded JSON router configuration.");
@@ -100,6 +115,16 @@ public class ConfigModel {
   /**
    * Get the graph build config as a java bean - type safe.
    */
+  /**
+   * The transfer profiles to serve the transfers with: the ones of the graph if it is served as it
+   * is, the ones of the {@link #buildConfig()} otherwise.
+   * <p>
+   * TODO: Remove this, and use the whole embedded build config. Follow up PR.
+   */
+  public TransferParameters<RouteRequest> transferParameters() {
+    return transferParameters != null ? transferParameters : buildConfig.transferProfiles();
+  }
+
   public BuildConfig buildConfig() {
     return buildConfig;
   }

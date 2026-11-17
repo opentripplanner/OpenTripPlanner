@@ -2,7 +2,6 @@ package org.opentripplanner.netex.mapping.calendar;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.Collections;
@@ -12,18 +11,18 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.entur.netex2.model.DayType;
+import org.entur.netex2.model.DayTypeAssignment;
+import org.entur.netex2.model.OperatingDay;
+import org.entur.netex2.model.OperatingDayRefStructure;
+import org.entur.netex2.model.OperatingPeriod;
+import org.entur.netex2.model.OperatingPeriod_VersionStructure;
+import org.entur.netex2.model.PropertyOfDay;
+import org.entur.netex2.model.UicOperatingPeriod;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.issues.DayTypeScheduleIsEmpty;
-import org.rutebanken.netex.model.DayType;
-import org.rutebanken.netex.model.DayTypeAssignment;
-import org.rutebanken.netex.model.OperatingDay;
-import org.rutebanken.netex.model.OperatingDayRefStructure;
-import org.rutebanken.netex.model.OperatingPeriod;
-import org.rutebanken.netex.model.OperatingPeriod_VersionStructure;
-import org.rutebanken.netex.model.PropertyOfDay;
-import org.rutebanken.netex.model.UicOperatingPeriod;
 
 /**
  * Map {@link DayTypeAssignment}s to set of {@link LocalDate}s.
@@ -176,21 +175,21 @@ public class DayTypeAssignmentMapper {
     if (period instanceof OperatingPeriod operatingPeriod) {
       Set<DayOfWeek> daysOfWeek = daysOfWeekForDayType(dayType);
       // Plus 1 to make the end date exclusive - simplify the loop test
-      LocalDateTime endDate = getOperatingPeriodEndDate(operatingPeriod).plusDays(1);
-      LocalDateTime date = getOperatingPeriodStartDate(operatingPeriod);
+      LocalDate endDate = getOperatingPeriodEndDate(operatingPeriod).plusDays(1);
+      LocalDate date = getOperatingPeriodStartDate(operatingPeriod);
 
       addDates(isAvailable, daysOfWeek, endDate, date);
     } else if (period instanceof UicOperatingPeriod uicOperatingPeriod) {
-      LocalDateTime endDate = uicOperatingPeriod.getToDate().plusDays(1);
-      LocalDateTime date = uicOperatingPeriod.getFromDate();
+      LocalDate endDate = uicOperatingPeriod.getToDate().toLocalDate().plusDays(1);
+      LocalDate date = uicOperatingPeriod.getFromDate().toLocalDate();
 
       addDates(uicOperatingPeriod.getValidDayBits(), isAvailable, endDate, date);
     }
   }
 
-  private LocalDateTime getOperatingPeriodStartDate(OperatingPeriod operatingPeriod) {
+  private LocalDate getOperatingPeriodStartDate(OperatingPeriod operatingPeriod) {
     if (operatingPeriod.getFromDate() != null) {
-      return operatingPeriod.getFromDate();
+      return operatingPeriod.getFromDate().toLocalDate();
     }
     if (operatingPeriod.getFromOperatingDayRef() != null) {
       return lookupOperatingDay(operatingPeriod.getFromOperatingDayRef());
@@ -200,9 +199,9 @@ public class DayTypeAssignmentMapper {
     );
   }
 
-  private LocalDateTime getOperatingPeriodEndDate(OperatingPeriod operatingPeriod) {
+  private LocalDate getOperatingPeriodEndDate(OperatingPeriod operatingPeriod) {
     if (operatingPeriod.getToDate() != null) {
-      return operatingPeriod.getToDate();
+      return operatingPeriod.getToDate().toLocalDate();
     }
     if (operatingPeriod.getToOperatingDayRef() != null) {
       return lookupOperatingDay(operatingPeriod.getToOperatingDayRef());
@@ -212,15 +211,15 @@ public class DayTypeAssignmentMapper {
     );
   }
 
-  private LocalDateTime lookupOperatingDay(OperatingDayRefStructure operatingDayRef) {
+  private LocalDate lookupOperatingDay(OperatingDayRefStructure operatingDayRef) {
     return operatingDays.lookup(operatingDayRef.getRef()).getCalendarDate();
   }
 
   private void addDates(
     boolean isAvailable,
     Set<DayOfWeek> daysOfWeek,
-    LocalDateTime endDate,
-    LocalDateTime date
+    LocalDate endDate,
+    LocalDate date
   ) {
     for (; date.isBefore(endDate); date = date.plusDays(1)) {
       if (daysOfWeek.contains(date.getDayOfWeek())) {
@@ -232,10 +231,10 @@ public class DayTypeAssignmentMapper {
   private void addDates(
     String validDayBits,
     boolean isAvailable,
-    LocalDateTime endDate,
-    LocalDateTime date
+    LocalDate endDate,
+    LocalDate date
   ) {
-    for (int i = 0; i < ChronoUnit.DAYS.between(date.toLocalDate(), endDate.toLocalDate()); i++) {
+    for (int i = 0; i < ChronoUnit.DAYS.between(date, endDate); i++) {
       if (i >= validDayBits.length() || validDayBits.charAt(i) == '1') {
         addDate(isAvailable, date.plusDays(i));
       } else if (validDayBits.charAt(i) != '0') {
@@ -246,11 +245,11 @@ public class DayTypeAssignmentMapper {
     }
   }
 
-  private void addDate(boolean isAvailable, LocalDateTime date) {
+  private void addDate(boolean isAvailable, LocalDate date) {
     if (isAvailable) {
-      dates.add(date.toLocalDate());
+      dates.add(date);
     } else {
-      datesToRemove.add(date.toLocalDate());
+      datesToRemove.add(date);
     }
   }
 }

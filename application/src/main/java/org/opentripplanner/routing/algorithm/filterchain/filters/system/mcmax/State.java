@@ -3,7 +3,7 @@ package org.opentripplanner.routing.algorithm.filterchain.filters.system.mcmax;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.SingleCriteriaComparator;
 

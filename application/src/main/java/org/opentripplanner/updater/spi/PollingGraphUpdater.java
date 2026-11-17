@@ -4,7 +4,7 @@ import java.time.Duration;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.slf4j.Logger;

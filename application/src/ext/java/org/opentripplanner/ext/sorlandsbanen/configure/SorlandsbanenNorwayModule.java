@@ -2,7 +2,7 @@ package org.opentripplanner.ext.sorlandsbanen.configure;
 
 import dagger.Module;
 import dagger.Provides;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.framework.application.OTPFeature;
 

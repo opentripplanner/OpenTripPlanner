@@ -5,38 +5,36 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Nullable;
+import org.entur.netex2.model.DestinationDisplay;
+import org.entur.netex2.model.DestinationDisplaysInFrame_RelStructure;
+import org.entur.netex2.model.FlexibleLine;
+import org.entur.netex2.model.FlexibleStopAssignment;
+import org.entur.netex2.model.FlexibleStopPlace;
+import org.entur.netex2.model.GroupOfLines;
+import org.entur.netex2.model.GroupsOfLinesInFrame_RelStructure;
+import org.entur.netex2.model.JourneyPattern_VersionStructure;
+import org.entur.netex2.model.JourneyPatternsInFrame_RelStructure;
+import org.entur.netex2.model.Line;
+import org.entur.netex2.model.LinesInFrame_RelStructure;
+import org.entur.netex2.model.Network;
+import org.entur.netex2.model.NetworksInFrame_RelStructure;
+import org.entur.netex2.model.PassengerStopAssignment;
+import org.entur.netex2.model.Route;
+import org.entur.netex2.model.RoutesInFrame_RelStructure;
+import org.entur.netex2.model.ServiceLink;
+import org.entur.netex2.model.ServiceLinksInFrame_RelStructure;
+import org.entur.netex2.model.Service_VersionFrameStructure;
+import org.entur.netex2.model.StopAssignmentsInFrame_RelStructure;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.framework.logging.MaxCountLogger;
 import org.opentripplanner.netex.index.NetexEntityIndex;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
-import org.rutebanken.netex.model.DestinationDisplay;
-import org.rutebanken.netex.model.DestinationDisplaysInFrame_RelStructure;
-import org.rutebanken.netex.model.FlexibleLine;
-import org.rutebanken.netex.model.FlexibleStopAssignment;
-import org.rutebanken.netex.model.FlexibleStopPlace;
-import org.rutebanken.netex.model.GroupOfLines;
-import org.rutebanken.netex.model.GroupsOfLinesInFrame_RelStructure;
-import org.rutebanken.netex.model.JourneyPattern_VersionStructure;
-import org.rutebanken.netex.model.JourneyPatternsInFrame_RelStructure;
-import org.rutebanken.netex.model.Line;
-import org.rutebanken.netex.model.LinesInFrame_RelStructure;
-import org.rutebanken.netex.model.Network;
-import org.rutebanken.netex.model.NetworksInFrame_RelStructure;
-import org.rutebanken.netex.model.PassengerStopAssignment;
-import org.rutebanken.netex.model.Route;
-import org.rutebanken.netex.model.RoutesInFrame_RelStructure;
-import org.rutebanken.netex.model.ServiceLink;
-import org.rutebanken.netex.model.ServiceLinksInFrame_RelStructure;
-import org.rutebanken.netex.model.Service_VersionFrameStructure;
-import org.rutebanken.netex.model.StopAssignmentsInFrame_RelStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
 
   private static final Logger LOG = LoggerFactory.getLogger(ServiceFrameParser.class);
-  private static final MaxCountLogger PASSENGER_STOP_ASSIGNMENT_LOGGER = MaxCountLogger.of(LOG);
 
   private final ReadOnlyHierarchicalMapById<FlexibleStopPlace> flexibleStopPlaceById;
 
@@ -56,6 +54,8 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
 
   private final Collection<DestinationDisplay> destinationDisplays = new ArrayList<>();
 
+  private final Map<String, String> stopPlaceByStopPointRef = new HashMap<>();
+
   private final Map<String, String> quayIdByStopPointRef = new HashMap<>();
 
   private final Map<String, String> flexibleStopPlaceByStopPointRef = new HashMap<>();
@@ -63,13 +63,14 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
   private final Collection<ServiceLink> serviceLinks = new ArrayList<>();
 
   private final NoticeParser noticeParser = new NoticeParser();
+  private final boolean allowStopPlaceAsPassengerStopAssignment;
 
-  ServiceFrameParser(ReadOnlyHierarchicalMapById<FlexibleStopPlace> flexibleStopPlaceById) {
+  ServiceFrameParser(
+    ReadOnlyHierarchicalMapById<FlexibleStopPlace> flexibleStopPlaceById,
+    boolean allowStopPlaceAsPassengerStopAssignment
+  ) {
     this.flexibleStopPlaceById = flexibleStopPlaceById;
-  }
-
-  static void logSummary() {
-    PASSENGER_STOP_ASSIGNMENT_LOGGER.logTotal("PassengerStopAssignment with empty quay ref.");
+    this.allowStopPlaceAsPassengerStopAssignment = allowStopPlaceAsPassengerStopAssignment;
   }
 
   @Override
@@ -129,6 +130,7 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
     index.networkById.addAll(networks);
     noticeParser.setResultOnIndex(index);
     index.quayIdByStopPointRef.addAll(quayIdByStopPointRef);
+    index.stopPlaceIdByStopPointRef.addAll(stopPlaceByStopPointRef);
     index.flexibleStopPlaceByStopPointRef.addAll(flexibleStopPlaceByStopPointRef);
     index.routeById.addAll(routes);
     index.serviceLinkById.addAll(serviceLinks);
@@ -144,15 +146,18 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
 
     for (JAXBElement<?> stopAssignment : stopAssignments.getStopAssignment()) {
       if (stopAssignment.getValue() instanceof PassengerStopAssignment assignment) {
-        if (assignment.getQuayRef() == null) {
-          PASSENGER_STOP_ASSIGNMENT_LOGGER.info(
-            "PassengerStopAssignment with empty quay ref is dropped. Assigment: {}",
-            assignment.getId()
-          );
-        } else {
+        if (assignment.getScheduledStopPointRef() == null) {
+          continue;
+        }
+        var stopPointRef = assignment.getScheduledStopPointRef().getValue().getRef();
+        if (assignment.getQuayRef() != null) {
           String quayRef = assignment.getQuayRef().getValue().getRef();
-          String stopPointRef = assignment.getScheduledStopPointRef().getValue().getRef();
           quayIdByStopPointRef.put(stopPointRef, quayRef);
+        } else if (
+          allowStopPlaceAsPassengerStopAssignment && assignment.getStopPlaceRef() != null
+        ) {
+          var stopPlaceRef = assignment.getStopPlaceRef().getValue().getRef();
+          stopPlaceByStopPointRef.put(stopPointRef, stopPlaceRef);
         }
       } else if (stopAssignment.getValue() instanceof FlexibleStopAssignment assignment) {
         if (OTPFeature.FlexRouting.isOn()) {
@@ -181,7 +186,7 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
       return;
     }
 
-    for (JAXBElement<?> element : routes.getRoute_()) {
+    for (JAXBElement<?> element : routes.getRoute()) {
       if (element.getValue() instanceof Route route) {
         this.routes.add(route);
       }
@@ -232,7 +237,7 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
       return;
     }
 
-    for (JAXBElement<?> element : lines.getLine_()) {
+    for (JAXBElement<?> element : lines.getLine()) {
       if (element.getValue() instanceof Line) {
         this.lines.add((Line) element.getValue());
       } else if (element.getValue() instanceof FlexibleLine) {
@@ -248,7 +253,7 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
       return;
     }
 
-    for (JAXBElement<?> pattern : journeyPatterns.getJourneyPattern_OrJourneyPatternView()) {
+    for (JAXBElement<?> pattern : journeyPatterns.getJourneyPattern()) {
       if (pattern.getValue() instanceof JourneyPattern_VersionStructure journeyPattern) {
         this.journeyPatterns.add(journeyPattern);
       } else {

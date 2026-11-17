@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.io.Serializable;
 import java.time.LocalTime;
+import java.util.Objects;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.utils.tostring.ValueObjectToStringBuilder;
 
@@ -36,6 +37,23 @@ public class Timeframe implements Serializable {
 
   public LocalTime endTime() {
     return end;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    var that = (Timeframe) o;
+    return serviceId.equals(that.serviceId) && start.equals(that.start) && end.equals(that.end);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(serviceId, start, end);
   }
 
   @Override

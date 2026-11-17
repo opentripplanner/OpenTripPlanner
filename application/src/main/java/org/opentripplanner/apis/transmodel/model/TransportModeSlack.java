@@ -21,6 +21,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.opentripplanner.apis.transmodel.mapping.TransportModeInputMapper;
 import org.opentripplanner.routing.api.request.framework.DurationForEnum;
 import org.opentripplanner.transit.model.basic.TransitMode;
 
@@ -122,7 +123,7 @@ public class TransportModeSlack {
       List<Map<String, Object>> list = (List<Map<String, Object>>) value;
       for (Map<String, Object> map : list) {
         int slack = (Integer) map.get("slack");
-        List<TransitMode> modes = (List<TransitMode>) map.get("modes");
+        var modes = TransportModeInputMapper.mapTransitModes((List<?>) map.get("modes"));
         modes.forEach(m -> builder.with(m, Duration.ofSeconds(slack)));
       }
     } else {

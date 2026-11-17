@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.OptionalInt;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Area;
 import org.opentripplanner.core.model.id.FeedScopedId;

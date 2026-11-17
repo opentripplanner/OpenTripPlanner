@@ -1,6 +1,6 @@
 package org.opentripplanner.gbfs;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.framework.io.HttpHeaders;
 
 /**

@@ -3,7 +3,7 @@ package org.opentripplanner.model.plan.walkstep;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.model.plan.walkstep.verticaltransportation.VerticalTransportationUse;
 import org.opentripplanner.street.geometry.WgsCoordinate;
@@ -215,8 +215,15 @@ public final class WalkStep {
     return ToStringBuilder.of(this.getClass())
       .addEnum("absoluteDirection", absoluteDirection)
       .addEnum("relativeDirection", relativeDirection)
-      .addStr("streetName", directionText.toString())
-      .addNum("distance", distance)
+      .addStr("directionText", directionText.toString())
+      .addNum("distance", DoubleUtils.roundTo1Decimal(distance))
+      .addObj("entranceId", entrance == null ? null : entrance.getId())
+      .addStr(
+        "verticalTransportation",
+        verticalTransportationUse == null
+          ? null
+          : verticalTransportationUse.getClass().getSimpleName()
+      )
       .toString();
   }
 }

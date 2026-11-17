@@ -1,13 +1,13 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers;
 
-import gnu.trove.set.TIntSet;
+import com.carrotsearch.hppc.IntSet;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.transit.model.timetable.FrequencyEntry;
 import org.opentripplanner.transit.model.timetable.Timetable;
@@ -30,12 +30,12 @@ public class TripPatternForDateMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(TripPatternForDateMapper.class);
 
-  private final Map<LocalDate, TIntSet> serviceCodesRunningForDate;
+  private final Map<LocalDate, IntSet> serviceCodesRunningForDate;
 
   /**
    * @param serviceCodesRunningForDate - READ ONLY
    */
-  public TripPatternForDateMapper(Map<LocalDate, TIntSet> serviceCodesRunningForDate) {
+  public TripPatternForDateMapper(Map<LocalDate, IntSet> serviceCodesRunningForDate) {
     this.serviceCodesRunningForDate = serviceCodesRunningForDate;
   }
 
@@ -48,7 +48,7 @@ public class TripPatternForDateMapper {
    */
   @Nullable
   public TripPatternForDate map(Timetable timetable, LocalDate serviceDate) {
-    TIntSet serviceCodesRunning = serviceCodesRunningForDate.get(serviceDate);
+    IntSet serviceCodesRunning = serviceCodesRunningForDate.get(serviceDate);
 
     // ServiceCodesRunning is potentially null if the date is not present in the original GTFS.
     // At that point we can simply return null, as there are no trips running on that date.

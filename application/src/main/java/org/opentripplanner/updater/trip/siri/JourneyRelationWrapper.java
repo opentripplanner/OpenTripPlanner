@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import uk.org.siri.siri21.JourneyRelationStructure;
 import uk.org.siri.siri21.JourneyRelationTypeEnumeration;
 import uk.org.siri.siri21.StopPointRefStructure;

@@ -2,7 +2,7 @@ package org.opentripplanner.updater.spi;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Routes each write domain to the callback of its writer thread.

@@ -1,6 +1,6 @@
 package org.opentripplanner.updater.trip;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public interface UrlUpdaterParameters {
   @Nullable

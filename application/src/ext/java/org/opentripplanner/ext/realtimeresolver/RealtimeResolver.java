@@ -3,7 +3,7 @@ package org.opentripplanner.ext.realtimeresolver;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;

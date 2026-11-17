@@ -1,7 +1,10 @@
 
 # Files
 .classpath
-.claude
+.claude/*
+!.claude/settings.json
+.github/copilot/*
+!.github/copilot/settings.json
 .externalToolBuilders
 .gradle
 .settings

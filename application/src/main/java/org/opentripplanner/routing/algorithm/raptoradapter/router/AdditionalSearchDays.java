@@ -4,7 +4,7 @@ import java.time.Duration;
 import java.time.Period;
 import java.time.ZonedDateTime;
 import java.util.Objects;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This class computes the days that should be searched in addition to the search date time.

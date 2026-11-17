@@ -12,41 +12,41 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.entur.netex2.model.AllPublicTransportModesEnumeration;
+import org.entur.netex2.model.DatedServiceJourney;
+import org.entur.netex2.model.DayType;
+import org.entur.netex2.model.DayTypeRefStructure;
+import org.entur.netex2.model.DayTypeRefs_RelStructure;
+import org.entur.netex2.model.DestinationDisplay;
+import org.entur.netex2.model.DestinationDisplayRefStructure;
+import org.entur.netex2.model.JourneyPattern;
+import org.entur.netex2.model.JourneyPatternRefStructure;
+import org.entur.netex2.model.JourneyPattern_VersionStructure;
+import org.entur.netex2.model.Line;
+import org.entur.netex2.model.LineRefStructure;
+import org.entur.netex2.model.MultilingualString;
+import org.entur.netex2.model.OperatingDay;
+import org.entur.netex2.model.OperatingDayRefStructure;
+import org.entur.netex2.model.PointInLinkSequence_VersionedChildStructure;
+import org.entur.netex2.model.PointsInJourneyPattern_RelStructure;
+import org.entur.netex2.model.Route;
+import org.entur.netex2.model.RouteRefStructure;
+import org.entur.netex2.model.ScheduledStopPointRefStructure;
+import org.entur.netex2.model.ServiceAlterationEnumeration;
+import org.entur.netex2.model.ServiceJourney;
+import org.entur.netex2.model.ServiceJourneyRefStructure;
+import org.entur.netex2.model.StopPointInJourneyPattern;
+import org.entur.netex2.model.StopPointInJourneyPatternRefStructure;
+import org.entur.netex2.model.TimetabledPassingTime;
+import org.entur.netex2.model.TimetabledPassingTimes_RelStructure;
+import org.entur.netex2.model.Via_VersionedChildStructure;
+import org.entur.netex2.model.Vias_RelStructure;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.framework.DefaultEntityById;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
-import org.rutebanken.netex.model.DatedServiceJourney;
-import org.rutebanken.netex.model.DayType;
-import org.rutebanken.netex.model.DayTypeRefStructure;
-import org.rutebanken.netex.model.DayTypeRefs_RelStructure;
-import org.rutebanken.netex.model.DestinationDisplay;
-import org.rutebanken.netex.model.DestinationDisplayRefStructure;
-import org.rutebanken.netex.model.JourneyPattern;
-import org.rutebanken.netex.model.JourneyPatternRefStructure;
-import org.rutebanken.netex.model.JourneyPattern_VersionStructure;
-import org.rutebanken.netex.model.Line;
-import org.rutebanken.netex.model.LineRefStructure;
-import org.rutebanken.netex.model.MultilingualString;
-import org.rutebanken.netex.model.OperatingDay;
-import org.rutebanken.netex.model.OperatingDayRefStructure;
-import org.rutebanken.netex.model.PointInLinkSequence_VersionedChildStructure;
-import org.rutebanken.netex.model.PointsInJourneyPattern_RelStructure;
-import org.rutebanken.netex.model.Route;
-import org.rutebanken.netex.model.RouteRefStructure;
-import org.rutebanken.netex.model.ScheduledStopPointRefStructure;
-import org.rutebanken.netex.model.ServiceAlterationEnumeration;
-import org.rutebanken.netex.model.ServiceJourney;
-import org.rutebanken.netex.model.ServiceJourneyRefStructure;
-import org.rutebanken.netex.model.StopPointInJourneyPattern;
-import org.rutebanken.netex.model.StopPointInJourneyPatternRefStructure;
-import org.rutebanken.netex.model.TimetabledPassingTime;
-import org.rutebanken.netex.model.TimetabledPassingTimes_RelStructure;
-import org.rutebanken.netex.model.Via_VersionedChildStructure;
-import org.rutebanken.netex.model.Vias_RelStructure;
 
 public class NetexTestDataSample {
 
@@ -60,7 +60,7 @@ public class NetexTestDataSample {
   public static final List<String> OPERATING_DAYS = List.of("2022-02-28", "2022-02-29");
   private static final DayType EVERYDAY = new DayType()
     .withId("EVERYDAY")
-    .withName(new MultilingualString().withValue("everyday"));
+    .withName(new MultilingualString().withContent("everyday"));
   private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
   private final TransitRepositoryForTest testModel = TransitRepositoryForTest.of();
@@ -89,8 +89,8 @@ public class NetexTestDataSample {
 
     Line line = new Line()
       .withId("RUT:Line:1")
-      .withName(new MultilingualString().withValue("Line 1"))
-      .withTransportMode(AllVehicleModesOfTransportEnumeration.BUS);
+      .withName(new MultilingualString().withContent("Line 1"))
+      .withTransportMode(AllPublicTransportModesEnumeration.BUS);
     JAXBElement<LineRefStructure> lineRef = createWrappedRef(line.getId(), LineRefStructure.class);
 
     // Add OTP Route (correspond to Netex Line)
@@ -116,7 +116,7 @@ public class NetexTestDataSample {
           List.of(this.createViaDestinationDisplayRef(DESTINATION_DISPLAY_ID_2))
         )
       )
-      .withFrontText(new MultilingualString().withValue("Bergen"));
+      .withFrontText(new MultilingualString().withContent("Bergen"));
 
     DestinationDisplay destinationStavanger = new DestinationDisplay()
       .withId(DESTINATION_DISPLAY_ID_2)
@@ -125,7 +125,7 @@ public class NetexTestDataSample {
           List.of(this.createViaDestinationDisplayRef(DESTINATION_DISPLAY_ID_1))
         )
       )
-      .withFrontText(new MultilingualString().withValue("Stavanger"));
+      .withFrontText(new MultilingualString().withContent("Stavanger"));
 
     destinationDisplayById.add(destinationBergen);
     destinationDisplayById.add(destinationStavanger);
@@ -182,7 +182,7 @@ public class NetexTestDataSample {
       for (int i = 0; i < DATED_SERVICE_JOURNEY_ID.size(); i++) {
         OperatingDay operatingDay = new OperatingDay()
           .withId(OPERATING_DAYS.get(i))
-          .withCalendarDate(LocalDate.parse(OPERATING_DAYS.get(i), DATE_FORMATTER).atStartOfDay());
+          .withCalendarDate(LocalDate.parse(OPERATING_DAYS.get(i), DATE_FORMATTER));
         operatingDaysById.add(operatingDay);
 
         DatedServiceJourney datedServiceJourney = new DatedServiceJourney()

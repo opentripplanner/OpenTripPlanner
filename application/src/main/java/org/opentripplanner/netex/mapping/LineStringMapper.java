@@ -1,9 +1,9 @@
 package org.opentripplanner.netex.mapping;
 
-import gnu.trove.list.array.TDoubleArrayList;
-import javax.annotation.Nullable;
+import com.carrotsearch.hppc.DoubleArrayList;
 import net.opengis.gml._3.DirectPositionType;
 import net.opengis.gml._3.LineStringType;
+import org.jspecify.annotations.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -47,7 +47,7 @@ class LineStringMapper {
         .toArray();
       return swapLatLon(values);
     }
-    var list = new TDoubleArrayList();
+    var list = new DoubleArrayList();
     for (Object o : lineString.getPosOrPointProperty()) {
       if (o instanceof DirectPositionType directPosition) {
         var values = directPosition.getValue();

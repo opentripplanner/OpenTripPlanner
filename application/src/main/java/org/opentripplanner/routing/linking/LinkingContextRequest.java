@@ -2,7 +2,7 @@ package org.opentripplanner.routing.linking;
 
 import java.util.List;
 import java.util.Objects;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.utils.tostring.ToStringBuilder;

@@ -22,6 +22,10 @@
     </build>
 
     <dependencies>
+        <dependency>
+            <groupId>org.jspecify</groupId>
+            <artifactId>jspecify</artifactId>
+        </dependency>
         <!-- project dependencies -->
         <dependency>
             <groupId>org.opentripplanner.core</groupId>

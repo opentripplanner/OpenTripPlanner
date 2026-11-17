@@ -3,7 +3,7 @@ package org.opentripplanner.gbfs.v3;
 import static org.opentripplanner.gbfs.v3.GbfsFeedMapper.localizedString;
 import static org.opentripplanner.gbfs.v3.GbfsFeedMapper.optionalLocalizedString;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.mobilitydata.gbfs.v3_0.system_information.GBFSData;
 import org.mobilitydata.gbfs.v3_0.system_information.GBFSName;
 import org.mobilitydata.gbfs.v3_0.system_information.GBFSOperator;

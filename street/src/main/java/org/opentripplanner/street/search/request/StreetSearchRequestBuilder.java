@@ -5,7 +5,7 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.Set;
 import java.util.function.Consumer;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.street.model.StreetMode;

@@ -3,7 +3,7 @@ package org.opentripplanner.place.nearbystopfinder;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.place.NearbyStopFinder;

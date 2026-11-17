@@ -4,7 +4,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.function.Consumer;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.ext.ridehailing.DecorateWithRideHailing;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.stopconsolidation.DecorateConsolidatedStopNames;
@@ -61,13 +61,13 @@ public class RouteRequestToFilterChainMapper {
 
     ItineraryFilterPreferences params = request.preferences().itineraryFilter();
     // Group by similar legs filter
-    if (params.groupSimilarityKeepOne() >= 0.5) {
+    if (params.groupSimilarityKeepOne().asDouble() >= GroupBySimilarity.MIN_GROUP_BY_P) {
       builder.addGroupBySimilarity(
         GroupBySimilarity.createWithOneItineraryPerGroup(params.groupSimilarityKeepOne())
       );
     }
 
-    if (params.groupSimilarityKeepThree() >= 0.5) {
+    if (params.groupSimilarityKeepThree().asDouble() >= GroupBySimilarity.MIN_GROUP_BY_P) {
       builder.addGroupBySimilarity(
         GroupBySimilarity.createWithMoreThanOneItineraryPerGroup(
           params.groupSimilarityKeepThree(),

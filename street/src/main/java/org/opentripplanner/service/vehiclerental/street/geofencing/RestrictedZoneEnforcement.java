@@ -1,6 +1,6 @@
 package org.opentripplanner.service.vehiclerental.street.geofencing;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
@@ -21,8 +21,11 @@ final class RestrictedZoneEnforcement implements GeofencingBoundaryEnforcement {
    * no-traversal zones since they can't legally drop mid-street.
    */
   @Override
-  @Nullable
-  public State[] forwardApproachingEntry(GeofencingZone zone, State state, EdgeTraversal edge) {
+  public State @Nullable [] forwardApproachingEntry(
+    GeofencingZone zone,
+    State state,
+    EdgeTraversal edge
+  ) {
     if (!state.isRentingVehicle()) {
       return null;
     }
@@ -53,8 +56,11 @@ final class RestrictedZoneEnforcement implements GeofencingBoundaryEnforcement {
    * {@link NetworkCommitmentHandler}.
    */
   @Override
-  @Nullable
-  public State[] arriveByCrossingExit(GeofencingZone zone, State state, EdgeTraversal edge) {
+  public State @Nullable [] arriveByCrossingExit(
+    GeofencingZone zone,
+    State state,
+    EdgeTraversal edge
+  ) {
     if (
       state.isRentingVehicle() &&
       state.getVehicleRentalNetwork() != null &&
@@ -72,8 +78,11 @@ final class RestrictedZoneEnforcement implements GeofencingBoundaryEnforcement {
    * {@link DeferredForkHandler}.
    */
   @Override
-  @Nullable
-  public State[] arriveByAtBoundary(GeofencingZone zone, State state, EdgeTraversal edge) {
+  public State @Nullable [] arriveByAtBoundary(
+    GeofencingZone zone,
+    State state,
+    EdgeTraversal edge
+  ) {
     if (state.getVehicleRentalState() != VehicleRentalState.HAVE_RENTED) {
       return null;
     }
@@ -118,8 +127,7 @@ final class RestrictedZoneEnforcement implements GeofencingBoundaryEnforcement {
    * already banned (passes through). Post-traversal veto discards the drop branch if the edge
    * itself crossed into a no-drop-off zone.
    */
-  @Nullable
-  private State[] forwardEnteringNoDropOff(State state, EdgeTraversal edge) {
+  private State @Nullable [] forwardEnteringNoDropOff(State state, EdgeTraversal edge) {
     if (state.isDropOffBannedByCurrentZones()) {
       return null;
     }

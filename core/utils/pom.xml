@@ -23,10 +23,10 @@
 
     <dependencies>
         <!-- 3rd party dependencies -->
-        <!-- This is the ONLY allowed dependency -->
+        <!-- jspecify is the ONLY allowed dependency -->
         <dependency>
-            <groupId>com.google.code.findbugs</groupId>
-            <artifactId>jsr305</artifactId>
+            <groupId>org.jspecify</groupId>
+            <artifactId>jspecify</artifactId>
         </dependency>
 
         <!-- test dependencies -->

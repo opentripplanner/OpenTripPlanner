@@ -2,12 +2,12 @@ package org.opentripplanner.ext.sorlandsbanen;
 
 import java.util.Collection;
 import java.util.function.BiFunction;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.extensions.extrasearch.ExtraMcRouterSearch;
-import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
+import org.opentripplanner.raptor.spi.RaptorDataProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgresses;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccessEgress;
@@ -60,12 +60,14 @@ public class SorlandsbanenNorwayService {
 
     return new ExtraMcRouterSearch<>() {
       @Override
-      public RaptorTransitDataProvider<TripSchedule> createTransitDataAlternativeSearch(
-        RaptorTransitDataProvider<TripSchedule> transitDataMainSearch
+      public RaptorDataProvider<TripSchedule> createTransitDataAlternativeSearch(
+        RaptorDataProvider<TripSchedule> transitDataMainSearch
       ) {
         return new RaptorRoutingRequestTransitData(
           (RaptorRoutingRequestTransitData) transitDataMainSearch,
-          new CoachCostCalculator<>(transitDataMainSearch.multiCriteriaCostCalculator())
+          new CoachCostCalculator<>(
+            transitDataMainSearch.transitData().multiCriteriaCostCalculator()
+          )
         );
       }
 

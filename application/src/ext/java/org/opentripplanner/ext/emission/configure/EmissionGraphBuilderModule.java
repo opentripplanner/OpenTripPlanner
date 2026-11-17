@@ -3,7 +3,7 @@ package org.opentripplanner.ext.emission.configure;
 import dagger.Module;
 import dagger.Provides;
 import jakarta.inject.Singleton;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.emission.internal.graphbuilder.EmissionGraphBuilder;
 import org.opentripplanner.framework.application.OTPFeature;

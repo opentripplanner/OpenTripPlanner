@@ -2,7 +2,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
 import java.util.BitSet;
 import java.util.Objects;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
@@ -78,8 +78,7 @@ public class GeneralizedCostParameters {
    * <p>
    * If {@code null} is returned the default reluctance 1.0 is used.
    */
-  @Nullable
-  public double[] transitReluctanceFactors() {
+  public double @Nullable [] transitReluctanceFactors() {
     return transitReluctanceFactors;
   }
 

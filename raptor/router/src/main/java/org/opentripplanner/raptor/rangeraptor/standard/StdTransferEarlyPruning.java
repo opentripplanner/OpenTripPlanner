@@ -1,7 +1,7 @@
 package org.opentripplanner.raptor.rangeraptor.standard;
 
-import gnu.trove.map.TIntIntMap;
-import gnu.trove.map.hash.TIntIntHashMap;
+import com.carrotsearch.hppc.IntIntHashMap;
+import com.carrotsearch.hppc.IntIntMap;
 import java.util.Arrays;
 import java.util.Collection;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
@@ -44,11 +44,11 @@ public class StdTransferEarlyPruning<T extends RaptorTripSchedule> {
   /**
    * Minimum egress duration per egress stop. The map is sparse — it holds only egress stops, so its
    * memory scales with the number of egress paths rather than the number of stops in the graph,
-   * which matters for large transit networks (100 000+ stops). The {@code get} lookup is O(1),
+   * which matters for large transit networks (100 000+ stops). The {@code getOrDefault} lookup is O(1),
    * keeping {@link #updateArrival(int, int)} cheap; that method is called on every best-time
    * improvement during both the transit and transfer phases.
    */
-  private final TIntIntMap egressMinDurationByStop;
+  private final IntIntMap egressMinDurationByStop;
   private final int[] bestDestArrivalByRound;
   private final RaptorTransitCalculator<T> calculator;
   private int bestDestCurrentIteration;
@@ -60,11 +60,11 @@ public class StdTransferEarlyPruning<T extends RaptorTripSchedule> {
     RaptorTransitCalculator<T> calculator,
     WorkerLifeCycle lifeCycle
   ) {
-    this.egressMinDurationByStop = new TIntIntHashMap(egressPaths.size(), 0.5f, -1, NOT_EGRESS);
+    this.egressMinDurationByStop = new IntIntHashMap(egressPaths.size(), 0.5);
     for (var egress : egressPaths) {
       int stop = egress.stop();
       int duration = egress.durationInSeconds();
-      int current = egressMinDurationByStop.get(stop);
+      int current = egressMinDurationByStop.getOrDefault(stop, NOT_EGRESS);
       if (current == NOT_EGRESS || duration < current) {
         egressMinDurationByStop.put(stop, duration);
       }
@@ -85,7 +85,7 @@ public class StdTransferEarlyPruning<T extends RaptorTripSchedule> {
    * destination arrival bounds are updated.
    */
   void updateArrival(int stop, int alightTime) {
-    int egressMinDuration = egressMinDurationByStop.get(stop);
+    int egressMinDuration = egressMinDurationByStop.getOrDefault(stop, NOT_EGRESS);
     if (egressMinDuration == NOT_EGRESS) {
       return;
     }

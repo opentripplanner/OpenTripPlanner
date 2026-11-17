@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.ext.flex.FlexParameters;
@@ -19,7 +19,7 @@ import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetMode;
-import org.opentripplanner.transfer.regular.RegularTransferService;
+import org.opentripplanner.transfer.regular.FlexTransferService;
 import org.opentripplanner.transit.service.TransitService;
 
 public class DirectFlexRouter {
@@ -27,7 +27,7 @@ public class DirectFlexRouter {
   public static List<Itinerary> route(
     Graph graph,
     TransitService transitService,
-    RegularTransferService transferService,
+    FlexTransferService transferService,
     StreetDetailsService streetDetailsService,
     FlexParameters flexParameters,
     @Nullable DataOverlayParameterBindings dataOverlayParameterBindings,

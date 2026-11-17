@@ -4,7 +4,7 @@ import dagger.Module;
 import dagger.Provides;
 import graphql.schema.GraphQLSchema;
 import jakarta.inject.Singleton;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.api.model.transit.DefaultFeedIdMapper;
 import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.api.model.transit.HideFeedIdMapper;

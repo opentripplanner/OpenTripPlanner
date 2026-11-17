@@ -3,7 +3,7 @@ package org.opentripplanner.gtfs.mapping;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.google.common.collect.ImmutableList;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.ShapePoint;
 

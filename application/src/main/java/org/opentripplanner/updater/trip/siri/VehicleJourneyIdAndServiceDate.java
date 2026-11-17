@@ -1,7 +1,7 @@
 package org.opentripplanner.updater.trip.siri;
 
 import java.time.LocalDate;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 import uk.org.siri.siri21.DataFrameRefStructure;
 import uk.org.siri.siri21.FramedVehicleJourneyRefStructure;

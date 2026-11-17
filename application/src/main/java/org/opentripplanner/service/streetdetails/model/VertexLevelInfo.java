@@ -2,7 +2,7 @@ package org.opentripplanner.service.streetdetails.model;
 
 import java.io.Serializable;
 import java.util.Objects;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**

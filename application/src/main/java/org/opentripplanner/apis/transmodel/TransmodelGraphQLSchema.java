@@ -1,7 +1,7 @@
 package org.opentripplanner.apis.transmodel;
 
 import graphql.schema.GraphQLSchema;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Wraps the Transmodel {@link GraphQLSchema} so it can be exposed as its own HK2 {@code @Context}-

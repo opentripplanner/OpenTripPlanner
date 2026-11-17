@@ -3,7 +3,7 @@ package org.opentripplanner.raptor.api.model;
 import java.time.Duration;
 import java.util.Objects;
 import java.util.Optional;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Using delegation to extend the {@link RaptorAccessEgress} functionality is common, so we provide

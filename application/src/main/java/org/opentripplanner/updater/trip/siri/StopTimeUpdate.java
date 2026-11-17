@@ -1,6 +1,6 @@
 package org.opentripplanner.updater.trip.siri;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Represents a real-time SIRI update for a single stop within a trip, encapsulating both scheduled

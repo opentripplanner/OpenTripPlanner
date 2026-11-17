@@ -18,21 +18,11 @@ class RaptorPathTest {
     VALUE,
     VALUE,
     VALUE,
-    VALUE,
     VALUE
   );
-  private final TestRaptorPath same = new TestRaptorPath(
-    VALUE,
-    VALUE,
-    VALUE,
-    VALUE,
-    VALUE,
-    VALUE,
-    VALUE
-  );
+  private final TestRaptorPath same = new TestRaptorPath(VALUE, VALUE, VALUE, VALUE, VALUE, VALUE);
   private final TestRaptorPath smallIterationDepartureTime = new TestRaptorPath(
     SMALL,
-    VALUE,
     VALUE,
     VALUE,
     VALUE,
@@ -45,20 +35,9 @@ class RaptorPathTest {
     VALUE,
     VALUE,
     VALUE,
-    VALUE,
     VALUE
   );
   private final TestRaptorPath smallArrivalTime = new TestRaptorPath(
-    VALUE,
-    VALUE,
-    SMALL,
-    VALUE,
-    VALUE,
-    VALUE,
-    VALUE
-  );
-  private final TestRaptorPath smallDuration = new TestRaptorPath(
-    VALUE,
     VALUE,
     VALUE,
     SMALL,
@@ -70,13 +49,11 @@ class RaptorPathTest {
     VALUE,
     VALUE,
     VALUE,
-    VALUE,
     SMALL,
     VALUE,
     VALUE
   );
   private final TestRaptorPath smallC1 = new TestRaptorPath(
-    VALUE,
     VALUE,
     VALUE,
     VALUE,
@@ -107,14 +84,6 @@ class RaptorPathTest {
     assertFalse(RaptorPath.compareArrivalTime(subject, same));
     assertFalse(RaptorPath.compareArrivalTime(subject, smallArrivalTime));
     assertTrue(RaptorPath.compareArrivalTime(smallArrivalTime, subject));
-  }
-
-  @Test
-  void compareDuration() {
-    assertFalse(RaptorPath.compareDurationInclusivePenalty(subject, subject));
-    assertFalse(RaptorPath.compareDurationInclusivePenalty(subject, same));
-    assertFalse(RaptorPath.compareDurationInclusivePenalty(subject, smallDuration));
-    assertTrue(RaptorPath.compareDurationInclusivePenalty(smallDuration, subject));
   }
 
   @Test

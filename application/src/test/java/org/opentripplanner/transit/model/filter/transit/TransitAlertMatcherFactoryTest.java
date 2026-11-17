@@ -7,7 +7,7 @@ import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import java.time.Instant;
 import java.util.List;
 import java.util.function.UnaryOperator;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.time.TimePeriod;

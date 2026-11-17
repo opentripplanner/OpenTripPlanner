@@ -6,21 +6,21 @@ import jakarta.xml.bind.JAXBElement;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import org.entur.netex2.model.Common_VersionFrameStructure;
+import org.entur.netex2.model.CompositeFrame;
+import org.entur.netex2.model.FareFrame;
+import org.entur.netex2.model.GeneralFrame;
+import org.entur.netex2.model.InfrastructureFrame;
+import org.entur.netex2.model.PublicationDeliveryStructure;
+import org.entur.netex2.model.ResourceFrame;
+import org.entur.netex2.model.ServiceCalendarFrame;
+import org.entur.netex2.model.ServiceFrame;
+import org.entur.netex2.model.SiteFrame;
+import org.entur.netex2.model.TimetableFrame;
+import org.entur.netex2.model.VersionFrameDefaultsStructure;
+import org.entur.netex2.model.VersionFrame_VersionStructure;
 import org.opentripplanner.netex.config.IgnorableFeature;
 import org.opentripplanner.netex.index.NetexEntityIndex;
-import org.rutebanken.netex.model.Common_VersionFrameStructure;
-import org.rutebanken.netex.model.CompositeFrame;
-import org.rutebanken.netex.model.FareFrame;
-import org.rutebanken.netex.model.GeneralFrame;
-import org.rutebanken.netex.model.InfrastructureFrame;
-import org.rutebanken.netex.model.PublicationDeliveryStructure;
-import org.rutebanken.netex.model.ResourceFrame;
-import org.rutebanken.netex.model.ServiceCalendarFrame;
-import org.rutebanken.netex.model.ServiceFrame;
-import org.rutebanken.netex.model.SiteFrame;
-import org.rutebanken.netex.model.TimetableFrame;
-import org.rutebanken.netex.model.VersionFrameDefaultsStructure;
-import org.rutebanken.netex.model.VersionFrame_VersionStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,10 +35,16 @@ public class NetexDocumentParser {
 
   private final NetexEntityIndex netexIndex;
   private final Set<IgnorableFeature> ignoredFeatures;
+  private final boolean allowStopPlaceAsPassengerStopAssignment;
 
-  private NetexDocumentParser(NetexEntityIndex netexIndex, Set<IgnorableFeature> ignoredFeatures) {
+  private NetexDocumentParser(
+    NetexEntityIndex netexIndex,
+    Set<IgnorableFeature> ignoredFeatures,
+    boolean allowStopPlaceAsPassengerStopAssignment
+  ) {
     this.netexIndex = netexIndex;
     this.ignoredFeatures = ignoredFeatures;
+    this.allowStopPlaceAsPassengerStopAssignment = allowStopPlaceAsPassengerStopAssignment;
   }
 
   /**
@@ -48,13 +54,12 @@ public class NetexDocumentParser {
   public static void parseAndPopulateIndex(
     NetexEntityIndex index,
     PublicationDeliveryStructure doc,
-    Set<IgnorableFeature> ignoredFeatures
+    Set<IgnorableFeature> ignoredFeatures,
+    boolean allowStopPlaceAsPassengerStopAssignment
   ) {
-    new NetexDocumentParser(index, ignoredFeatures).parse(doc);
-  }
-
-  public static void finishUp() {
-    ServiceFrameParser.logSummary();
+    new NetexDocumentParser(index, ignoredFeatures, allowStopPlaceAsPassengerStopAssignment).parse(
+      doc
+    );
   }
 
   /** Top level parse method - parses the document. */
@@ -76,7 +81,13 @@ public class NetexDocumentParser {
     } else if (value instanceof TimetableFrame frame) {
       parse(frame, new TimeTableFrameParser());
     } else if (value instanceof ServiceFrame frame) {
-      parse(frame, new ServiceFrameParser(netexIndex.flexibleStopPlaceById));
+      parse(
+        frame,
+        new ServiceFrameParser(
+          netexIndex.flexibleStopPlaceById,
+          allowStopPlaceAsPassengerStopAssignment
+        )
+      );
     } else if (value instanceof SiteFrame frame) {
       parse(frame, new SiteFrameParser(ignoredFeatures));
     } else if (!ignoredFeatures.contains(FARE_FRAME) && value instanceof FareFrame fareFrame) {

@@ -1,6 +1,6 @@
 package org.opentripplanner.graph_builder.module.islandpruning;
 
-import gnu.trove.list.array.TIntArrayList;
+import com.carrotsearch.hppc.IntArrayList;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.GraphConnectivity;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
@@ -135,8 +135,8 @@ public class IslandPruningModule implements GraphBuilderModule {
     int count;
 
     /* establish vertex neighbourhood, with and without currently relevant noThruTrafficEdges */
-    var thruEdges = new TIntArrayList();
-    var noThruEdges = new TIntArrayList();
+    var thruEdges = new IntArrayList();
+    var noThruEdges = new IntArrayList();
     collectNeighbourVertices(vertexIndex, traverseMode, thruEdges, noThruEdges);
     int vertexCount = vertexIndex.size();
     var thruNeighbours = new Adjacency(vertexCount, thruEdges);
@@ -271,8 +271,8 @@ public class IslandPruningModule implements GraphBuilderModule {
   private void collectNeighbourVertices(
     VertexIndex vertexIndex,
     TraverseMode traverseMode,
-    TIntArrayList thruEdges,
-    TIntArrayList noThruEdges
+    IntArrayList thruEdges,
+    IntArrayList noThruEdges
   ) {
     StreetMode streetMode = switch (traverseMode) {
       case WALK -> StreetMode.WALK;

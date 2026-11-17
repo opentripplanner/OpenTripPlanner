@@ -1,7 +1,8 @@
 package org.opentripplanner.transfer.constrained.raptoradaptor;
 
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
+import com.carrotsearch.hppc.IntObjectHashMap;
+import com.carrotsearch.hppc.IntObjectMap;
+import com.carrotsearch.hppc.procedures.IntObjectProcedure;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -11,16 +12,15 @@ import java.util.List;
  */
 public class TransferForPatternByStopPos {
 
-  private final TIntObjectMap<List<TransferForPattern>> transfers = new TIntObjectHashMap<>();
+  private final IntObjectMap<List<TransferForPattern>> transfers = new IntObjectHashMap<>();
 
   /**
    * Sort in decreasing specificityRanking order
    */
   public void sortOnSpecificityRanking() {
-    transfers.forEachValue(it -> {
-      Collections.sort(it);
-      return true;
-    });
+    transfers.forEach(
+      (IntObjectProcedure<List<TransferForPattern>>) (stopPos, it) -> Collections.sort(it)
+    );
   }
 
   public void add(int targetStopPos, TransferForPattern transfer) {

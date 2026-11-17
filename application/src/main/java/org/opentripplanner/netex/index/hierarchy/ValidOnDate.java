@@ -4,7 +4,7 @@ import static org.opentripplanner.netex.support.NetexVersionHelper.firstValidDat
 import static org.opentripplanner.netex.support.NetexVersionHelper.versionOf;
 
 import java.time.LocalDateTime;
-import org.rutebanken.netex.model.EntityInVersionStructure;
+import org.entur.netex2.model.EntityInVersionStructure;
 
 /**
  * Wrapper class to simplify getting the correct version of a Netex versioned entity.

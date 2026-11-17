@@ -10,8 +10,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.basic.Cost;
+import org.opentripplanner.core.model.basic.CostLinearFunction;
 import org.opentripplanner.ext.accessibilityscore.DecorateWithAccessibilityScore;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.plan.Itinerary;
@@ -51,7 +52,6 @@ import org.opentripplanner.routing.algorithm.filterchain.framework.sort.SortOrde
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryListFilter;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;
-import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.street.search.TraverseMode;
@@ -586,14 +586,14 @@ public class ItineraryListFilterChainBuilder {
 
     List<GroupBySimilarity> groupBy = groupBySimilarity
       .stream()
-      .sorted(Comparator.comparingDouble(o -> o.groupByP))
+      .sorted(Comparator.comparingDouble(o -> o.groupByP.asDouble()))
       .toList();
 
     List<ItineraryListFilter> groupByFilters = new ArrayList<>();
 
     for (GroupBySimilarity group : groupBy) {
       String tag = "similar-legs-filter-%.0fp-%dx".formatted(
-        100d * group.groupByP,
+        100d * group.groupByP.asDouble(),
         group.maxNumOfItinerariesPerGroup
       );
       sysTags.add(tag);

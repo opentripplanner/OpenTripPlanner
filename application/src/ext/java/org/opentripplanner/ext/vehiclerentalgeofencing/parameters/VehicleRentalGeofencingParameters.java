@@ -2,7 +2,7 @@ package org.opentripplanner.ext.vehiclerentalgeofencing.parameters;
 
 import java.net.URI;
 import java.util.Objects;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.framework.io.HttpHeaders;
 
 /**

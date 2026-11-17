@@ -465,7 +465,7 @@ type Cluster implements Node {
   "ID of the cluster"
   gtfsId: String! @deprecated(reason : "Not implemented")
   "Global object ID provided by Relay. This value can be used to refetch this object using **node** query."
-  id: ID! @deprecated(reason : "Not implemented")
+  id: ID!
   "Latitude of the center of this cluster (i.e. average latitude of stops in this cluster)"
   lat: Float! @deprecated(reason : "Not implemented")
   "Longitude of the center of this cluster (i.e. average longitude of stops in this cluster)"
@@ -844,6 +844,15 @@ type Itinerary {
   fares: [fare] @deprecated(reason : "Use the leg's `fareProducts`.")
   "Generalized cost of the itinerary. Used for debugging search results."
   generalizedCost: Int
+  """
+  An opaque identifier for this itinerary. It can be used to refetch this exact
+  itinerary later (with current realtime data applied) using the `itinerary` query, without
+  resending the original search parameters. `null` if this itinerary cannot be refetched.
+  The routing preferences stored in the id are the ones in effect when the itinerary was
+  planned. If transit entity ids have changed after the itinerary id has been created, refetching
+  will fail.
+  """
+  itineraryId: String @deprecated(reason : "Experimental API that can be changed without notice.")
   """
   A list of Legs. Each Leg is either a walking (cycling, car) portion of the
   itinerary, or a transit leg on a particular vehicle. So a itinerary where the
@@ -1660,6 +1669,15 @@ type QueryType {
     "Departure time of the trip, format: seconds since midnight of the departure date"
     time: Int!
   ): Trip @timingData
+  """
+  Refetch a previously planned itinerary using its stable `id` (see `Itinerary.itineraryId`), with current
+  realtime data applied. Returns `null` if the id is invalid, if the itinerary cannot be
+  refetched, or if a trip or stop it refers to no longer exists in the server's data.
+  The id is meant for refetching an itinerary during or shortly before travel, not for long-term
+  storage. If transit entity ids have changed after the itinerary id has been created, refetching
+  will fail.
+  """
+  itinerary(id: String!): Itinerary @deprecated(reason : "Experimental API that can be changed without notice.") @timingData
   """
   Try refetching the current state of a transit leg using its id.
   This fails when the underlying transit data (mostly IDs) has changed or are no longer available.
@@ -4774,7 +4792,11 @@ input CarParkingPreferencesInput {
   unpreferredCost: Cost
 }
 
-"Preferences related to traveling on a car (excluding car travel on transit services such as taxi)."
+"""
+Preferences for street car legs. These can affect such legs in both direct and transit itineraries.
+They do not apply to flex services or to the transit taxi mode, which is different from the street
+taxi mode.
+"""
 input CarPreferencesInput {
   "Cost of boarding a vehicle with a car."
   boardCost: Cost
@@ -5106,14 +5128,14 @@ input PlanItineraryFilterInput {
   Pick one itinerary from each group after putting itineraries that are `85%` similar together,
   if the given value is `0.85`, for example. Itineraries are grouped together based on relative
   the distance of transit travel that is identical between the itineraries (access, egress and
-  transfers are ignored). The value must be at least `0.5`.
+  transfers are ignored). A value below `0.5` turns this filter off.
   """
   groupSimilarityKeepOne: Ratio = 0.85
   """
   Pick three itineraries from each group after putting itineraries that are `68%` similar together,
   if the given value is `0.68`, for example. Itineraries are grouped together based on relative
   the distance of transit travel that is identical between the itineraries (access, egress and
-  transfers are ignored). The value must be at least `0.5`.
+  transfers are ignored). A value below `0.5` turns this filter off.
   """
   groupSimilarityKeepThree: Ratio = 0.68
   """
@@ -5230,10 +5252,7 @@ transit.
 input PlanStreetPreferencesInput {
   "Cycling related preferences."
   bicycle: BicyclePreferencesInput
-  """
-  Car related preferences. These are not used for car travel as part of transit, such as
-  taxi travel.
-  """
+  "Car related preferences."
   car: CarPreferencesInput
   "Scooter (kick or electrical) related preferences."
   scooter: ScooterPreferencesInput

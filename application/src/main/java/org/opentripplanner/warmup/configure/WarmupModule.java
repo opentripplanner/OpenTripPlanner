@@ -3,7 +3,7 @@ package org.opentripplanner.warmup.configure;
 import dagger.Module;
 import dagger.Provides;
 import jakarta.inject.Singleton;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.configure.RequestScopedFactory;
 import org.opentripplanner.transit.service.TransitRepository;

@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.carpooling.routing;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.model.vertex.Vertex;
 

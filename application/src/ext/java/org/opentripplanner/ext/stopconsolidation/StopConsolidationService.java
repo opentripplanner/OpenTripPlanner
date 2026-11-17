@@ -2,7 +2,7 @@ package org.opentripplanner.ext.stopconsolidation;
 
 import java.util.List;
 import java.util.Optional;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.stopconsolidation.model.StopReplacement;
 import org.opentripplanner.transit.model.organization.Agency;

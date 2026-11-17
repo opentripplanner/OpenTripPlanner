@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.geometry.LineStrings;
-import org.opentripplanner.routing.api.request.framework.TimePenalty;
+import org.opentripplanner.core.model.time.TimePenalty;
 import org.opentripplanner.street.model.StreetModelForTest;
 
 class TimePenaltyCalculatorTest {

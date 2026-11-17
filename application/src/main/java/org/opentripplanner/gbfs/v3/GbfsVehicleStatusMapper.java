@@ -4,7 +4,7 @@ import static java.util.Objects.requireNonNullElse;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.mobilitydata.gbfs.v3_0.vehicle_status.GBFSVehicle;
 import org.opentripplanner.core.model.basic.Distance;
 import org.opentripplanner.core.model.basic.Ratio;

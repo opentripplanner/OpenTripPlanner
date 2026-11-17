@@ -1,8 +1,8 @@
 package org.opentripplanner.netex.mapping.support;
 
 import java.util.Comparator;
+import org.entur.netex2.model.StopPlace;
 import org.opentripplanner.netex.support.NetexVersionHelper;
-import org.rutebanken.netex.model.StopPlace;
 
 /**
  * This compares StopPlaces first by validity, then by version.

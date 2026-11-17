@@ -3,7 +3,7 @@ package org.opentripplanner.ext.emission.internal.csvdata.trip;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.framework.csv.HeadersDoNotMatch;
 import org.opentripplanner.framework.csv.OtpCsvReader;

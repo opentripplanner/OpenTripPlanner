@@ -5,7 +5,7 @@ import static org.opentripplanner.raptor.api.model.RaptorValueType.C2;
 import static org.opentripplanner.raptor.api.model.RaptorValueType.ROUNDS;
 
 import java.util.function.IntFunction;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorTransfer;

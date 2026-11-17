@@ -4,7 +4,7 @@ import static org.opentripplanner.standalone.config.framework.json.EnumMapper.do
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_10;
 
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.StreetMode;

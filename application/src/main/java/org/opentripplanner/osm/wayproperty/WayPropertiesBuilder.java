@@ -1,6 +1,6 @@
 package org.opentripplanner.osm.wayproperty;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 
 /**

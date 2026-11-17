@@ -1,7 +1,7 @@
 package org.opentripplanner.core.model.i18n;
 
 import java.util.Locale;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This interface is used when providing translations on server side. Sources: OSM tags with

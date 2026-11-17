@@ -4,10 +4,6 @@
   "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
   "https://checkstyle.org/dtds/configuration_1_3.dtd">
 <module name="Checker">
-    <!-- Generated GraphQL code for the GTFS API -->
-    <module name="BeforeExecutionExclusionFileFilter">
-        <property name="fileNamePattern" value="[\\/]apis[\\/]gtfs[\\/]generated[\\/]"/>
-    </module>
     <module name="TreeWalker">
         <module name="ArrayTypeStyle"/>
         <module name="AvoidModuleImport"/>
@@ -28,6 +24,19 @@
                       value="javax.annotation.Nonnull, org.jspecify.annotations.NonNull"/>
             <message key="import.illegal"
                      value="Everything not annotated with @Nullable is assumed to be non-null."/>
+        </module>
+        <module name="IllegalImport">
+            <property name="id" value="NoMockito"/>
+            <property name="illegalPkgs" value="org.mockito"/>
+            <message key="import.illegal"
+                     value="Use of mockito is highly discouraged."/>
+        </module>
+        <module name="IllegalImport">
+            <property name="illegalPkgs" value="javax.annotation.concurrent"/>
+            <property name="illegalClasses"
+                      value="javax.annotation.Nullable, javax.annotation.ParametersAreNonnullByDefault, jakarta.annotation.Nullable"/>
+            <message key="import.illegal"
+                     value="Use org.jspecify.annotations (@Nullable, @NullMarked) instead of JSR-305 or Jakarta."/>
         </module>
         <module name="NeedBraces"/>
         <module name="RedundantImport"/>

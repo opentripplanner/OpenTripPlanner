@@ -9,7 +9,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
@@ -34,7 +34,7 @@ import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetMode;
-import org.opentripplanner.transfer.regular.RegularTransferService;
+import org.opentripplanner.transfer.regular.FlexTransferService;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.transit.service.TransitServiceResolver;
 import org.opentripplanner.utils.time.ServiceDateUtils;
@@ -49,7 +49,7 @@ class AccessEgressFetcher {
   private final RouteRequest request;
   private final TransitService transitService;
   private final Graph graph;
-  private final RegularTransferService transferService;
+  private final FlexTransferService transferService;
   private final StreetDetailsService streetDetailsService;
   private final FlexParameters flexParameters;
   private final List<RideHailingService> rideHailingServices;
@@ -84,7 +84,7 @@ class AccessEgressFetcher {
     RouteRequest request,
     TransitService transitService,
     Graph graph,
-    RegularTransferService transferService,
+    FlexTransferService transferService,
     StreetDetailsService streetDetailsService,
     FlexParameters flexParameters,
     List<RideHailingService> rideHailingServices,

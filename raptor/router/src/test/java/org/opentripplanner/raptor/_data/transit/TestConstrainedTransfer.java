@@ -2,7 +2,7 @@ package org.opentripplanner.raptor._data.transit;
 
 import static org.opentripplanner.raptor.spi.RaptorConstants.NOT_SET;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
 import org.opentripplanner.raptor.spi.RaptorConstrainedTransfer;
 import org.opentripplanner.raptor.spi.RaptorTransferConstraint;

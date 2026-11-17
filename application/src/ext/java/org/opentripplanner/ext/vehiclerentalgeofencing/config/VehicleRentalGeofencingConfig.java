@@ -2,7 +2,7 @@ package org.opentripplanner.ext.vehiclerentalgeofencing.config;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_10;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.ext.vehiclerentalgeofencing.parameters.VehicleRentalGeofencingParameters;
 import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;

@@ -4,13 +4,13 @@ import static org.opentripplanner.raptor.api.view.PathLegType.TRANSFER;
 import static org.opentripplanner.raptor.api.view.PathLegType.TRANSIT;
 import static org.opentripplanner.utils.collection.ListUtils.requireAtLeastNElements;
 
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
+import com.carrotsearch.hppc.IntObjectHashMap;
+import com.carrotsearch.hppc.IntObjectMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorTripScheduleStopPosition;
 import org.opentripplanner.raptor.api.request.via.RaptorPassThroughViaConnection;
 import org.opentripplanner.raptor.api.request.via.RaptorTransferViaConnection;
@@ -80,7 +80,7 @@ public final class ViaConnectionStopArrivalEventListener<T extends RaptorTripSch
    * Factory method for creating a {@link org.opentripplanner.raptor.util.paretoset.ParetoSet}
    * listener used to copy the state when arriving at a "via point" into the next Raptor "leg".
    */
-  public static <T extends RaptorTripSchedule> TIntObjectMap<
+  public static <T extends RaptorTripSchedule> IntObjectMap<
     ParetoSetEventListener<ArrivalView<T>>
   > createEventListeners(
     @Nullable ViaConnections viaConnections,
@@ -89,12 +89,13 @@ public final class ViaConnectionStopArrivalEventListener<T extends RaptorTripSch
     Consumer<Runnable> onTransitComplete,
     Function<T, RaptorTripScheduleReference> tripInfoProvider
   ) {
-    var map = new TIntObjectHashMap<ParetoSetEventListener<ArrivalView<T>>>();
+    var map = new IntObjectHashMap<ParetoSetEventListener<ArrivalView<T>>>();
     if (viaConnections == null) {
       return map;
     }
-    TIntObjectMap<List<ViaConnection>> connectionsByStop = viaConnections.byFromStop();
-    for (int stop : connectionsByStop.keys()) {
+    IntObjectMap<List<ViaConnection>> connectionsByStop = viaConnections.byFromStop();
+    for (var cursor : connectionsByStop.keys()) {
+      int stop = cursor.value;
       var connections = connectionsByStop.get(stop);
       var listener = new ViaConnectionStopArrivalEventListener<>(
         stopArrivalFactory,

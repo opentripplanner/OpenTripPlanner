@@ -3,7 +3,7 @@ package org.opentripplanner.gbfs.manifest;
 import java.net.URI;
 import java.util.Comparator;
 import java.util.Optional;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.mobilitydata.gbfs.v3_0.manifest.GBFSDataset;
 import org.mobilitydata.gbfs.v3_0.manifest.GBFSManifest;
 import org.mobilitydata.gbfs.v3_0.manifest.GBFSVersion;

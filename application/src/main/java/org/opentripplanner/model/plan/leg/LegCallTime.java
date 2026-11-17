@@ -3,7 +3,7 @@ package org.opentripplanner.model.plan.leg;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.Objects;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A scheduled time of a transit vehicle at a certain location with an optional realtime

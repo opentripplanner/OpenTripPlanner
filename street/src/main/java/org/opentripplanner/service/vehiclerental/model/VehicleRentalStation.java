@@ -10,7 +10,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.street.model.RentalFormFactor;
@@ -360,7 +360,8 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
       Objects.equals(system, that.system) &&
       Objects.equals(rentalUris, that.rentalUris) &&
       Objects.equals(vehicleTypesAvailable, that.vehicleTypesAvailable) &&
-      Objects.equals(vehicleSpacesAvailable, that.vehicleSpacesAvailable)
+      Objects.equals(vehicleSpacesAvailable, that.vehicleSpacesAvailable) &&
+      Objects.equals(returnPolicy, that.returnPolicy)
     );
   }
 
@@ -386,7 +387,8 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
       isReturning,
       overloadingAllowed,
       isArrivingInRentalVehicleAtDestinationAllowed,
-      realTimeData
+      realTimeData,
+      returnPolicy
     );
   }
 }

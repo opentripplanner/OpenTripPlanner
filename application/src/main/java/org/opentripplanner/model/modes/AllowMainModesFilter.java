@@ -3,7 +3,7 @@ package org.opentripplanner.model.modes;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.utils.tostring.ToStringBuilder;

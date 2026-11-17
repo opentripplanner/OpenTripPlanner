@@ -1,8 +1,8 @@
 package org.opentripplanner.apis.gtfs.configure;
 
+import jakarta.inject.Qualifier;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import javax.inject.Qualifier;
 
 /**
  * This is used for dagger injection. Since we have multiple GraphQL APIs and therefore also

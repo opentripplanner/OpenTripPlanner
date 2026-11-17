@@ -6,8 +6,8 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import org.rutebanken.netex.model.EntityInVersionStructure;
-import org.rutebanken.netex.model.ValidBetween;
+import org.entur.netex2.model.EntityInVersionStructure;
+import org.entur.netex2.model.ValidBetween;
 
 /**
  * Utility class to help working with versioned NeTEx element.

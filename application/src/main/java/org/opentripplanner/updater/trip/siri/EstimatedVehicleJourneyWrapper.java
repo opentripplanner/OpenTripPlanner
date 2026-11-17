@@ -5,7 +5,7 @@ import static org.opentripplanner.updater.trip.siri.support.NaturalLanguageStrin
 
 import java.util.List;
 import java.util.Optional;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.timetable.OccupancyStatus;
 import org.opentripplanner.updater.alert.siri.mapping.SiriTransportModeMapper;

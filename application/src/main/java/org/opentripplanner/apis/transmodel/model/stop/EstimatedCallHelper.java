@@ -3,7 +3,7 @@ package org.opentripplanner.apis.transmodel.model.stop;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.timetable.Trip;

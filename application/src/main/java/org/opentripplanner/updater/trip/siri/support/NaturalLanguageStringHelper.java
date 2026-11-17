@@ -1,7 +1,7 @@
 package org.opentripplanner.updater.trip.siri.support;
 
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import uk.org.siri.siri21.NaturalLanguageStringStructure;
 
 /**

@@ -1,7 +1,7 @@
 package org.opentripplanner.updater.configure;
 
 import java.util.function.Consumer;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.updater.alert.siri.SiriSXUpdater;
 import org.opentripplanner.updater.alert.siri.SiriSXUpdaterParameters;
 import org.opentripplanner.updater.alert.siri.lite.SiriLiteHttpLoader;

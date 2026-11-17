@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.Currency;
 import java.util.HashSet;
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.fare.FareMedium;
 import org.opentripplanner.model.fare.FareProduct;
@@ -53,7 +53,7 @@ class FareProductMapper {
 
   @Nullable
   private RiderCategory toInternalModel(
-    @Nullable org.onebusaway.gtfs.model.RiderCategory riderCategory
+    org.onebusaway.gtfs.model.@Nullable RiderCategory riderCategory
   ) {
     if (riderCategory == null) {
       return null;
@@ -72,7 +72,7 @@ class FareProductMapper {
   }
 
   @Nullable
-  private FareMedium toInternalModel(@Nullable org.onebusaway.gtfs.model.FareMedium c) {
+  private FareMedium toInternalModel(org.onebusaway.gtfs.model.@Nullable FareMedium c) {
     if (c == null) {
       return null;
     } else {

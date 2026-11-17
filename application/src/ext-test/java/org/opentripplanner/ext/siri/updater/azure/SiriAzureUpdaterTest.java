@@ -19,7 +19,7 @@ import ch.qos.logback.core.read.ListAppender;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.Future;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;

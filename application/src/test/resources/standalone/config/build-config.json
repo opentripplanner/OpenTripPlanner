@@ -62,36 +62,33 @@
       "sharedFilePattern": "_stops.xml",
       "sharedGroupFilePattern": "_(\\w{3})_shared_data.xml",
       "groupFilePattern": "(\\w{3})_.*\\.xml",
-      "ignoreFilePattern": "(temp|tmp)"
+      "ignoreFilePattern": "(temp|tmp)",
+      "allowStopPlaceAsPassengerStopAssignment": true
       //"ferryIdsNotAllowedForBicycle" : ["RUT:B107", "RUT:B209"]
     }
   ],
-  "transferRequests": [
-    {
-      "modes": "WALK"
+  "transfers": {
+    "walk": {
+      "maxDuration": "30m"
     },
-    {
-      "modes": "WALK",
-      "wheelchairAccessibility": {
-        "enabled": true
-      }
+    "wheelchair": {
+      "maxDuration": "30m"
     },
-    { "modes": "BICYCLE" },
-    { "modes": "CAR" }
-  ],
-  "stopConsolidationFile": "consolidated-stops.csv",
-  "transferParametersForMode": {
-    "CAR": {
-      "disableDefaultTransfers": true,
-      "carsAllowedStopMaxTransferDuration": "3h"
-    },
-    "BIKE": {
-      "disableDefaultTransfers": true,
-      "maxTransferDuration": "30m",
-      "carsAllowedStopMaxTransferDuration": "3h",
-      "bikesAllowedStopMaxTransferDuration": "1h"
+    "flex": {
+      "requests": [
+        {
+          "modes": "WALK"
+        },
+        {
+          "modes": "WALK",
+          "wheelchairAccessibility": {
+            "enabled": true
+          }
+        }
+      ]
     }
   },
+  "stopConsolidationFile": "consolidated-stops.csv",
   "cache": {
     "enabled": true
   },

@@ -11,6 +11,7 @@ import static org.opentripplanner.transit.model.basic.TransitMode.BUS;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -122,5 +123,17 @@ class TripTimeOnDateFilterMapperTest {
   @MethodSource("emptyListRejectedCases")
   void emptyListsAreRejected(List<Map<String, ?>> input) {
     assertThrows(InvalidInputException.class, () -> MAPPER.mapFilters(input));
+  }
+
+  @Test
+  void rejectUnknownTransportMode() {
+    // The GraphQL TransportMode enum maps "unknown" to a String, not to a TransitMode
+    assertThrows(InvalidInputException.class, () ->
+      MAPPER.mapFilters(
+        list(
+          map("select", list(map(entry("transportModes", list(map("transportMode", "unknown"))))))
+        )
+      )
+    );
   }
 }

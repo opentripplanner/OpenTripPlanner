@@ -1,7 +1,7 @@
 package org.opentripplanner.netex.mapping.calendar;
 
 import java.time.LocalDate;
-import org.rutebanken.netex.model.OperatingDay;
+import org.entur.netex2.model.OperatingDay;
 
 class OperatingDayMapper {
 
@@ -9,6 +9,6 @@ class OperatingDayMapper {
   private OperatingDayMapper() {}
 
   static LocalDate map(OperatingDay opDay) {
-    return opDay.getCalendarDate().toLocalDate();
+    return opDay.getCalendarDate();
   }
 }

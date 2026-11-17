@@ -5,7 +5,7 @@ import static java.util.Objects.requireNonNullElse;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.mobilitydata.gbfs.v2_3.free_bike_status.GBFSBike;
 import org.mobilitydata.gbfs.v2_3.free_bike_status.GBFSRentalUris;
 import org.opentripplanner.core.model.basic.Distance;

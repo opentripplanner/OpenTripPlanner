@@ -2,6 +2,7 @@ package org.opentripplanner.apis.transmodel.mapping;
 
 import static java.util.Map.entry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner.apis.transmodel._support.RequestHelper.list;
 import static org.opentripplanner.apis.transmodel._support.RequestHelper.map;
 import static org.opentripplanner.apis.transmodel.model.TransmodelTransportSubmode.LOCAL;
@@ -12,6 +13,7 @@ import static org.opentripplanner.transit.model.basic.TransitMode.RAIL;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.api.model.transit.DefaultFeedIdMapper;
+import org.opentripplanner.apis.support.InvalidInputException;
 import tools.jackson.core.JacksonException;
 
 class SelectRequestMapperTest {
@@ -49,5 +51,15 @@ class SelectRequestMapperTest {
   void mapEmptySelectRequest() throws JacksonException {
     var result = MAPPER.mapSelectRequest(map());
     assertEquals("(transportModes: EMPTY)", result.toString());
+  }
+
+  @Test
+  void rejectUnknownTransportMode() {
+    // The GraphQL TransportMode enum maps "unknown" to a String, not to a TransitMode
+    assertThrows(InvalidInputException.class, () ->
+      MAPPER.mapSelectRequest(
+        map(entry("transportModes", list(map(entry("transportMode", "unknown")))))
+      )
+    );
   }
 }

@@ -1,6 +1,9 @@
 package org.opentripplanner.updater.trip.siri.moduletests.update;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
 import org.junit.jupiter.api.Test;
@@ -28,8 +31,9 @@ class MissingRealtimeTest implements RealtimeTestConstants {
 
   private final TransitTestEnvironmentBuilder ENV_BUILDER = TransitTestEnvironment.of();
   private final RegularStop STOP_A = ENV_BUILDER.stop(STOP_A_ID);
-  private final RegularStop STOP_B = ENV_BUILDER.stop(STOP_B_ID);
+  private final RegularStop STOP_B = ENV_BUILDER.stopAtStation(STOP_B_ID, STATION_OMEGA_ID);
   private final RegularStop STOP_C = ENV_BUILDER.stop(STOP_C_ID);
+  private final RegularStop STOP_D = ENV_BUILDER.stopAtStation(STOP_D_ID, STATION_OMEGA_ID);
 
   private final TripInput TWO_STOP_TRIP = TripInput.of(TRIP_1_ID)
     .withWithTripOnServiceDate(TRIP_1_ID)
@@ -264,5 +268,38 @@ class MissingRealtimeTest implements RealtimeTestConstants {
       "C U | A 0:00:10 0:00:11 | B 0:00:20 0:00:21",
       env.tripData(TRIP_1_ID).showTimetable()
     );
+  }
+
+  /**
+   * Change quay on a trip without setting times should not mark times as updated.
+   */
+  @Test
+  void testChangeQuayWithoutTimes() {
+    var env = ENV_BUILDER.addTrip(TWO_STOP_TRIP).build();
+    assertThat(env.raptorData().summarizePatterns()).containsExactly("F:Pattern1[S]");
+    var siri = SiriTestHelper.of(env);
+
+    var updates = siri
+      .etBuilder()
+      .withDatedVehicleJourneyRef(TRIP_1_ID)
+      .withEstimatedCalls(builder ->
+        builder
+          .call(STOP_A)
+          .departAimedExpected("00:00:11", null)
+          .call(STOP_D)
+          .arriveAimedExpected("00:00:20", null)
+      )
+      .buildEstimatedTimetableDeliveries();
+
+    var result = siri.applyEstimatedTimetable(updates);
+
+    assertSuccess(result);
+    var trip = env.tripData(TRIP_1_ID);
+    assertEquals("P U | A [ND] 0:00:10 0:00:11 | D [ND] 0:00:20 0:00:21", trip.showTimetable());
+
+    assertFalse(trip.tripTimes().isTimesModified());
+    assertTrue(trip.tripTimes().isTripPatternModified());
+
+    assertThat(env.raptorData().summarizePatterns()).containsExactly("F:Route1::001:RT[P U]");
   }
 }

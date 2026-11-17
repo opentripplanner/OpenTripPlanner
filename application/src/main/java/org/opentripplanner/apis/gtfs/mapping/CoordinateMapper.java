@@ -1,14 +1,14 @@
 package org.opentripplanner.apis.gtfs.mapping;
 
 import java.util.Optional;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 
 public class CoordinateMapper {
 
   public static Optional<WgsCoordinate> mapCoordinate(
-    @Nullable GraphQLTypes.GraphQLPlanCoordinateInput coordinate
+    GraphQLTypes.@Nullable GraphQLPlanCoordinateInput coordinate
   ) {
     if (
       coordinate == null ||

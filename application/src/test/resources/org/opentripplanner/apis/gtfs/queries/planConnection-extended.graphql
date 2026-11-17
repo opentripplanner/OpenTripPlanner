@@ -114,6 +114,7 @@
     edges {
       cursor
       node {
+        itineraryId
         start
         end
         # next two are deprecated

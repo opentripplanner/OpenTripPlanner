@@ -1,7 +1,7 @@
 package org.opentripplanner.graph_builder.module.osm.model;
 
 import java.util.ArrayList;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.street.model.edge.StreetEdge;
 
 public record StreetEdgePair(@Nullable StreetEdge main, @Nullable StreetEdge back) {

@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.geom.prep.PreparedPolygon;
@@ -664,7 +664,7 @@ public class WalkableAreaBuilder {
       .withBack(false)
       .withArea(areaGroup)
       .withCarSpeed(carSpeed)
-      .withBogusName(parent.hasNoName())
+      .withNameIsDerived(parent.hasNoName())
       .withWheelchairAccessible(wheelchairAccessible)
       .withLink(parent.isLink());
 
@@ -681,7 +681,7 @@ public class WalkableAreaBuilder {
       .withBack(true)
       .withArea(areaGroup)
       .withCarSpeed(carSpeed)
-      .withBogusName(parent.hasNoName())
+      .withNameIsDerived(parent.hasNoName())
       .withWheelchairAccessible(wheelchairAccessible)
       .withLink(parent.isLink());
 

@@ -20,19 +20,19 @@ public class BrandingMapper {
    * @param branding NeTEx branding entity
    * @return OTP Branding model
    */
-  public Branding mapBranding(org.rutebanken.netex.model.Branding branding) {
+  public Branding mapBranding(org.entur.netex2.model.Branding branding) {
     var builder = Branding.of(idFactory.createId(branding.getId()));
 
     if (branding.getShortName() != null) {
-      builder.withShortName(branding.getShortName().getValue());
+      builder.withShortName(MultilingualStringMapper.getStringValue(branding.getShortName()));
     }
 
     if (branding.getName() != null) {
-      builder.withName(branding.getName().getValue());
+      builder.withName(MultilingualStringMapper.getStringValue(branding.getName()));
     }
 
     if (branding.getDescription() != null) {
-      builder.withDescription(branding.getDescription().getValue());
+      builder.withDescription(MultilingualStringMapper.getStringValue(branding.getDescription()));
     }
 
     builder.withUrl(branding.getUrl());

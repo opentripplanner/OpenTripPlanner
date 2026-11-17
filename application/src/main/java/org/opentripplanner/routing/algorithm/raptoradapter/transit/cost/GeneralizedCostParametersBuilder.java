@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
 import java.util.BitSet;
-import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
+import org.opentripplanner.core.model.basic.CostLinearFunction;
 import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
 
 /**

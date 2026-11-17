@@ -2,7 +2,7 @@ package org.opentripplanner.graph_builder.module.osm.parameters;
 
 import java.net.URI;
 import java.time.ZoneId;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.graph_builder.model.DataSourceConfig;
 import org.opentripplanner.osm.tagmapping.OsmTagMapperSource;
 

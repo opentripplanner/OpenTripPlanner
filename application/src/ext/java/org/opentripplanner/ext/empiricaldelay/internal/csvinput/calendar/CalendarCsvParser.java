@@ -2,7 +2,7 @@ package org.opentripplanner.ext.empiricaldelay.internal.csvinput.calendar;
 
 import com.csvreader.CsvReader;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.framework.csv.parser.AbstractCsvParser;
 import org.opentripplanner.framework.csv.parser.HandledCsvParseException;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
