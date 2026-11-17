@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.transit.model.basic.TransitMode.BUS;
 
-import gnu.trove.set.TIntSet;
-import gnu.trove.set.hash.TIntHashSet;
+import com.carrotsearch.hppc.IntHashSet;
+import com.carrotsearch.hppc.IntSet;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,9 +25,9 @@ public class TripPatternForDateMapperTest {
 
   private static final LocalDate SERVICE_DATE = LocalDate.of(2009, 8, 7);
   private static final int SERVICE_CODE = 555;
-  private static final Map<LocalDate, TIntSet> SERVICE_CODES_RUNNING_FOR_DATE = Map.of(
+  private static final Map<LocalDate, IntSet> SERVICE_CODES_RUNNING_FOR_DATE = Map.of(
     SERVICE_DATE,
-    tintHashSet(SERVICE_CODE)
+    intHashSet(SERVICE_CODE)
   );
   private static Timetable timetable;
 
@@ -83,11 +83,12 @@ public class TripPatternForDateMapperTest {
    */
   @Test
   void testTimeTableWithServiceCodesRunningNotMatchingShouldReturnNull() {
-    //ServiceCodesRunningForDate has the date, but it should not include a service code of any of the trips in the timetable.
-    Map<LocalDate, TIntSet> invalidServiceCodesRunningForDate = new HashMap<>();
+    // ServiceCodesRunningForDate has the date, but it should not include a service code of any of
+    // the trips in the timetable.
+    Map<LocalDate, IntSet> invalidServiceCodesRunningForDate = new HashMap<>();
 
-    //Add an service code that is not used by any of the trips in the timetable.
-    TIntSet serviceCodes = new TIntHashSet();
+    // Add an service code that is not used by any of the trips in the timetable.
+    IntSet serviceCodes = new IntHashSet();
     serviceCodes.add(999);
 
     invalidServiceCodesRunningForDate.put(SERVICE_DATE, serviceCodes);
@@ -98,8 +99,8 @@ public class TripPatternForDateMapperTest {
     assertNull(mapper.map(timetable, SERVICE_DATE));
   }
 
-  private static TIntHashSet tintHashSet(int... numbers) {
-    var set = new TIntHashSet();
+  private static IntHashSet intHashSet(int... numbers) {
+    var set = new IntHashSet();
     set.addAll(numbers);
     return set;
   }

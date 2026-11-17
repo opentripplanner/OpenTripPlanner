@@ -153,6 +153,10 @@ public class TransitRouter {
     @Nullable CarpoolingService carpoolingService,
     @Nullable TaxiService taxiService
   ) {
+    if (!request.journey().transit().enabled() || request.cannotReachTransit()) {
+      return new TransitRouterResult(List.of(), null);
+    }
+
     TransitRouter transitRouter = new TransitRouter(
       request,
       transitService,
@@ -180,10 +184,6 @@ public class TransitRouter {
   }
 
   private TransitRouterResult route() {
-    if (!request.journey().transit().enabled() || request.cannotReachTransit()) {
-      return new TransitRouterResult(List.of(), null);
-    }
-
     if (!transitService.transitFeedCovers(request.dateTime())) {
       throw new RoutingValidationException(
         List.of(new RoutingError(RoutingErrorCode.OUTSIDE_SERVICE_PERIOD, InputField.DATE_TIME))

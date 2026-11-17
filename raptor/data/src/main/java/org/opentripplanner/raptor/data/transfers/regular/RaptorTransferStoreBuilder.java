@@ -1,18 +1,18 @@
 package org.opentripplanner.raptor.data.transfers.regular;
 
-import gnu.trove.list.array.TIntArrayList;
+import com.carrotsearch.hppc.IntArrayList;
 
 public final class RaptorTransferStoreBuilder {
 
   private final DefaultRaptorTransfer[] EMPTY_ARRAY = new DefaultRaptorTransfer[0];
 
-  private final TIntArrayList[] fromStops;
-  private final TIntArrayList[] toStops;
+  private final IntArrayList[] fromStops;
+  private final IntArrayList[] toStops;
   private boolean freeze = false;
 
   RaptorTransferStoreBuilder(int nStops) {
-    this.fromStops = new TIntArrayList[nStops];
-    this.toStops = new TIntArrayList[nStops];
+    this.fromStops = new IntArrayList[nStops];
+    this.toStops = new IntArrayList[nStops];
   }
 
   public RaptorTransferStoreBuilder addTransfer(int fromStop, int toStop, int duration, int c1) {
@@ -23,15 +23,15 @@ public final class RaptorTransferStoreBuilder {
   }
 
   private static void addTransfer(
-    TIntArrayList[] a,
+    IntArrayList[] a,
     int sourceStop,
     int targetStop,
     int duration,
     int c1
   ) {
-    TIntArrayList list = a[sourceStop];
+    IntArrayList list = a[sourceStop];
     if (list == null) {
-      list = new TIntArrayList(3);
+      list = new IntArrayList(3);
       a[sourceStop] = list;
     }
     list.add(targetStop);
@@ -52,7 +52,7 @@ public final class RaptorTransferStoreBuilder {
     return new RaptorTransferStore(mapToArrays(fromStops), mapToArrays(toStops));
   }
 
-  private RaptorTransfers mapToArrays(TIntArrayList[] transfers) {
+  private RaptorTransfers mapToArrays(IntArrayList[] transfers) {
     DefaultRaptorTransfer[][] result = new DefaultRaptorTransfer[transfers.length][];
     for (int i = 0; i < transfers.length; i++) {
       result[i] = mapToArray(transfers[i]);
@@ -60,7 +60,7 @@ public final class RaptorTransferStoreBuilder {
     return new RaptorTransfers(result);
   }
 
-  private DefaultRaptorTransfer[] mapToArray(TIntArrayList transfers) {
+  private DefaultRaptorTransfer[] mapToArray(IntArrayList transfers) {
     if (transfers == null) {
       return EMPTY_ARRAY;
     }

@@ -1,9 +1,7 @@
 package org.opentripplanner.gtfs.mapping;
 
-import gnu.trove.list.TDoubleList;
-import gnu.trove.list.TIntList;
-import gnu.trove.list.array.TDoubleArrayList;
-import gnu.trove.list.array.TIntArrayList;
+import com.carrotsearch.hppc.DoubleArrayList;
+import com.carrotsearch.hppc.IntArrayList;
 import java.util.Iterator;
 import java.util.stream.IntStream;
 import org.opentripplanner.model.ShapePoint;
@@ -12,7 +10,7 @@ import org.opentripplanner.model.ShapePoint;
  * A representation that stores GTFS shape points in a memory-efficient way and allows you to
  * iterate over them for further processing.
  * <p>
- * The fields of ShapePoints are stored densely in automatically expanding Trove primitive lists.
+ * The fields of ShapePoints are stored densely in automatically expanding HPPC primitive lists.
  * When later needed, they are reconstituted into objects and sorted on their sequence number. Only
  * an iterator over the sorted collection escapes rather than the collection itself, providing some
  * assurance that the objects will be quickly garbage collected.
@@ -25,10 +23,10 @@ class CompactShape implements Iterable<ShapePoint> {
   private static final int INITIAL_CAPACITY = 50;
   private static final double NO_DISTANCE = -9999;
 
-  private final TIntList seqs = new TIntArrayList(INITIAL_CAPACITY);
-  private final TDoubleList lats = new TDoubleArrayList(INITIAL_CAPACITY);
-  private final TDoubleList lons = new TDoubleArrayList(INITIAL_CAPACITY);
-  private final TDoubleList dists = new TDoubleArrayList(INITIAL_CAPACITY);
+  private final IntArrayList seqs = new IntArrayList(INITIAL_CAPACITY);
+  private final DoubleArrayList lats = new DoubleArrayList(INITIAL_CAPACITY);
+  private final DoubleArrayList lons = new DoubleArrayList(INITIAL_CAPACITY);
+  private final DoubleArrayList dists = new DoubleArrayList(INITIAL_CAPACITY);
 
   public void addPoint(org.onebusaway.gtfs.model.ShapePoint shapePoint) {
     seqs.add(shapePoint.getSequence());

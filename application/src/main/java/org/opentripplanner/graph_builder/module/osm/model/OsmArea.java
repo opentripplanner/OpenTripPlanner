@@ -1,8 +1,8 @@
 package org.opentripplanner.graph_builder.module.osm.model;
 
+import com.carrotsearch.hppc.LongArrayList;
+import com.carrotsearch.hppc.procedures.LongProcedure;
 import com.google.common.collect.ArrayListMultimap;
-import gnu.trove.list.TLongList;
-import gnu.trove.list.array.TLongArrayList;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -40,20 +40,20 @@ public class OsmArea {
   ) {
     this.parent = parent;
     // ring assignment
-    List<TLongList> innerRingNodes = constructRings(innerRingWays);
-    List<TLongList> outerRingNodes = constructRings(outerRingWays);
+    List<LongArrayList> innerRingNodes = constructRings(innerRingWays);
+    List<LongArrayList> outerRingNodes = constructRings(outerRingWays);
     if (innerRingNodes == null || outerRingNodes == null) {
       throw new AreaConstructionException("innerRing or outerRing nodes are null");
     }
-    ArrayList<TLongList> allRings = new ArrayList<>(innerRingNodes);
+    ArrayList<LongArrayList> allRings = new ArrayList<>(innerRingNodes);
     allRings.addAll(outerRingNodes);
 
     List<Ring> innerRings = new ArrayList<>();
     List<Ring> outerRings = new ArrayList<>();
-    for (TLongList ring : innerRingNodes) {
+    for (LongArrayList ring : innerRingNodes) {
       innerRings.add(new Ring(ring, nodeById));
     }
-    for (TLongList ring : outerRingNodes) {
+    for (LongArrayList ring : outerRingNodes) {
       outerRings.add(new Ring(ring, nodeById));
     }
 
@@ -88,22 +88,22 @@ public class OsmArea {
     jtsMultiPolygon = calculateJTSMultiPolygon();
   }
 
-  public List<TLongList> constructRings(List<OsmWay> ways) {
+  public List<LongArrayList> constructRings(List<OsmWay> ways) {
     if (ways.size() == 0) {
       // no rings is no rings
       return Collections.emptyList();
     }
 
-    List<TLongList> closedRings = new ArrayList<>();
+    List<LongArrayList> closedRings = new ArrayList<>();
 
     ArrayListMultimap<Long, OsmWay> waysByEndpoint = ArrayListMultimap.create();
     for (OsmWay way : ways) {
-      TLongList refs = way.getNodeRefs();
+      LongArrayList refs = way.getNodeRefs();
 
       long start = refs.get(0);
       long end = refs.get(refs.size() - 1);
       if (start == end) {
-        TLongList ring = new TLongArrayList(refs);
+        LongArrayList ring = new LongArrayList(refs);
         closedRings.add(ring);
       } else {
         waysByEndpoint.put(start, way);
@@ -112,19 +112,20 @@ public class OsmArea {
     }
 
     // Precheck for impossible situations, and remove those.
-    TLongList endpointsToRemove = new TLongArrayList();
+    LongArrayList endpointsToRemove = new LongArrayList();
     for (Long endpoint : waysByEndpoint.keySet()) {
       Collection<OsmWay> list = waysByEndpoint.get(endpoint);
       if (list.size() % 2 == 1) {
         endpointsToRemove.add(endpoint);
       }
     }
-    endpointsToRemove.forEach(endpoint -> {
-      waysByEndpoint.removeAll(endpoint);
-      return true;
-    });
+    endpointsToRemove.forEach(
+      (LongProcedure) endpoint -> {
+        waysByEndpoint.removeAll(endpoint);
+      }
+    );
 
-    TLongList partialRing = new TLongArrayList();
+    LongArrayList partialRing = new LongArrayList();
     if (waysByEndpoint.size() == 0) {
       return closedRings;
     }
@@ -135,7 +136,7 @@ public class OsmArea {
     for (Long endpoint : waysByEndpoint.keySet()) {
       List<OsmWay> list = waysByEndpoint.get(endpoint);
       firstWay = list.get(0);
-      TLongList nodeRefs = firstWay.getNodeRefs();
+      LongArrayList nodeRefs = firstWay.getNodeRefs();
       partialRing.addAll(nodeRefs);
       firstEndpoint = nodeRefs.get(0);
       otherEndpoint = nodeRefs.get(nodeRefs.size() - 1);
@@ -188,22 +189,22 @@ public class OsmArea {
 
   private boolean constructRingsRecursive(
     ArrayListMultimap<Long, OsmWay> waysByEndpoint,
-    TLongList ring,
-    List<TLongList> closedRings,
+    LongArrayList ring,
+    List<LongArrayList> closedRings,
     long endpoint
   ) {
     List<OsmWay> ways = new ArrayList<>(waysByEndpoint.get(endpoint));
 
     for (OsmWay way : ways) {
       // remove this way from the map
-      TLongList nodeRefs = way.getNodeRefs();
+      LongArrayList nodeRefs = way.getNodeRefs();
       long firstEndpoint = nodeRefs.get(0);
       long otherEndpoint = nodeRefs.get(nodeRefs.size() - 1);
 
       waysByEndpoint.remove(firstEndpoint, way);
       waysByEndpoint.remove(otherEndpoint, way);
 
-      TLongList newRing = new TLongArrayList(ring.size() + nodeRefs.size());
+      LongArrayList newRing = new LongArrayList(ring.size() + nodeRefs.size());
       long newFirstEndpoint;
       if (firstEndpoint == endpoint) {
         for (int j = nodeRefs.size() - 1; j >= 1; --j) {
@@ -212,7 +213,7 @@ public class OsmArea {
         newRing.addAll(ring);
         newFirstEndpoint = otherEndpoint;
       } else {
-        newRing.addAll(nodeRefs.subList(0, nodeRefs.size() - 1));
+        newRing.add(nodeRefs.toArray(), 0, nodeRefs.size() - 1);
         newRing.addAll(ring);
         newFirstEndpoint = firstEndpoint;
       }
@@ -226,7 +227,7 @@ public class OsmArea {
         }
 
         // otherwise, we need to start a new partial ring
-        newRing = new TLongArrayList();
+        newRing = new LongArrayList();
         OsmWay firstWay = null;
         for (Long entry : waysByEndpoint.keySet()) {
           List<OsmWay> list = waysByEndpoint.get(entry);

@@ -58,7 +58,7 @@
 
 
     <properties>
-        <otp.serialization.version.id>290</otp.serialization.version.id>
+        <otp.serialization.version.id>291</otp.serialization.version.id>
 
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>35.2</geotools.version>
@@ -576,7 +576,7 @@
             <dependency>
                 <groupId>com.azure</groupId>
                 <artifactId>azure-core-http-netty</artifactId>
-                <version>1.16.8</version>
+                <version>1.17.0</version>
             </dependency>
 
             <!--
@@ -598,9 +598,9 @@
             </dependency>
 
             <dependency>
-                <groupId>net.sf.trove4j</groupId>
-                <artifactId>trove4j</artifactId>
-                <version>3.0.3</version>
+                <groupId>com.carrotsearch</groupId>
+                <artifactId>hppc</artifactId>
+                <version>0.13.0</version>
             </dependency>
 
             <!--

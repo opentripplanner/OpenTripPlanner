@@ -389,10 +389,12 @@ type BookingTime {
   time: String
 }
 
-"Real-time estimates for arrival and departure times for a stop location."
+"Real-time information and state for a stop location."
 type CallRealTime {
   "Real-time estimates for the arrival."
   arrival: EstimatedTime
+  "Has this call been canceled by a real-time update."
+  canceled: Boolean!
   "Real-time estimates for the departure."
   departure: EstimatedTime
 }
@@ -2762,7 +2764,7 @@ type StopCall {
   geometryToNextCall: Geometry
   "Notices of this call which are known ahead of time."
   notices: [Notice!]! @deprecated(reason : "Experimental API that can be changed without notice.")
-  "Real-time estimates for arrival and departure times for this stop location."
+  "Real-time information and state for this stop location."
   realTime: CallRealTime
   "Scheduled arrival and departure times for this stop location."
   schedule: CallSchedule
