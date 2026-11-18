@@ -101,6 +101,7 @@
         "org.apache.maven.plugins:maven-compiler-plugin",
         "org.apache.maven.plugins:maven-jar-plugin",
         "org.apache.maven.plugins:maven-resources-plugin",
+        "org.apache.maven.plugins:maven-enforcer-plugin",
         "org.openrewrite.maven:rewrite-maven-plugin",
         "org.openrewrite.recipe:rewrite-static-analysis",
         "org.sonatype.plugins:nexus-staging-maven-plugin",
