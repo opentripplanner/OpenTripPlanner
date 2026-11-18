@@ -7,7 +7,6 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * Based on https://github.com/NABSA/gbfs/blob/master/gbfs.md#system_informationjson
- * <p>
  */
 public final class VehicleRentalSystem {
 

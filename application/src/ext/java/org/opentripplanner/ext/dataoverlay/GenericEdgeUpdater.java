@@ -144,7 +144,6 @@ class GenericEdgeUpdater {
    * Returns average property sample data near given line.
    * <p>
    * Each cell of returned array represent an average of quality of the selected property in time
-   *
    * @param fromLongitude from longitude
    * @param fromLatitude  from latitude
    * @param toLongitude   to longitude
@@ -176,7 +175,6 @@ class GenericEdgeUpdater {
    * Returns the closest property value samples for given line
    * <p>
    * Each list cell represent an average of grid data in time
-   *
    * @param fromLongitude from longitude
    * @param fromLatitude  from latitude
    * @param toLongitude   to longitude
@@ -209,7 +207,6 @@ class GenericEdgeUpdater {
    * Returns closest a value of selected property for given point.
    * <p>
    * Returned array represent value for selected property time
-   *
    * @param samplePoint  point
    * @param propertyName propertyName
    * @return result the closest value for selected property for given point

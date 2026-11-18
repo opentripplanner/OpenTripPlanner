@@ -18,10 +18,10 @@ public class TripPatternTest {
 
   /**
    * The originalTripPattern is to consider a planned trip with 2 stops and one coordinate between.
-   *
+   * <p>
    * The tripPattern is an updated trip with just two stops, belonging to the same stations as for
    * originalTripPattern but first stop is an alternative stop.
-   *
+   * <p>
    * The scope is to create hop geometries from original trip pattern since the stops belong to the
    * same stations. The end result should be that the new tripPattern contains the altered stop but
    * all the rest of the coordinates are as from originalTripPattern

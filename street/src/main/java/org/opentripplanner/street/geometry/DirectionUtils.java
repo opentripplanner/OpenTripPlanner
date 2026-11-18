@@ -34,7 +34,6 @@ public final class DirectionUtils {
    * angles (e.g., 10° and -170° are only 20° apart, not 180°).
    * <p>
    * Works with any degree range (e.g., [0, 360) or [-180, 180]).
-   *
    * @param bearing1 First bearing in degrees
    * @param bearing2 Second bearing in degrees
    * @return Smallest angular difference in degrees [0, 180]

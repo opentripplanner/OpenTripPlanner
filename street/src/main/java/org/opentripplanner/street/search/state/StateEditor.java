@@ -17,7 +17,6 @@ import org.opentripplanner.street.search.request.StreetSearchRequest;
  * allowing it to be modified before being put to use.
  * <p>
  * By virtue of being in the same package as States, it can modify their package private fields.
- *
  * @author andrewbyrd
  */
 public class StateEditor {

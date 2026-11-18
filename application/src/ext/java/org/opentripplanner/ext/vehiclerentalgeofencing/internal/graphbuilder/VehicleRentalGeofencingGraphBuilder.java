@@ -32,7 +32,6 @@ import org.slf4j.LoggerFactory;
  * shared {@code gbfs} configuration puts it in the {@link GeofencingZoneOtpPhase#GRAPH_BUILD} phase
  * and its feed actually publishes a {@code geofencing_zones} feed. Zones are applied per network,
  * so {@code requireDropOffInsideBusinessArea} takes effect for exactly the networks that enable it.
- *
  * <p>
  * The zones are recorded on the {@link Graph}, which carries them into the serialized graph. The
  * serve phase indexes them when it creates the vehicle rental repository; nothing indexes them

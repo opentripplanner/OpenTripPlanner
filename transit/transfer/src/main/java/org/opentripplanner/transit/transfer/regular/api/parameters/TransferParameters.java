@@ -19,7 +19,6 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * max durations of the profile types.
  * <p>
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
- *
  * @param <R> the request type, opaque to the module
  */
 public final class TransferParameters<R> {

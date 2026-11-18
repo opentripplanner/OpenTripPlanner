@@ -10,7 +10,6 @@ import org.locationtech.jts.geom.LineString;
  * Simplifies a {@link LineString} with the Douglas-Peucker algorithm (also known as
  * Ramer-Douglas-Peucker, or RDP), operating on geographic (WGS84 longitude/latitude, in degrees)
  * coordinates.
- *
  * <p>
  * Away from the equator, a degree of longitude covers fewer real-world meters than a degree of
  * latitude, so the distance calculation scales longitude by {@code cos(latitude)} to correct for
@@ -22,7 +21,6 @@ import org.locationtech.jts.geom.LineString;
  * the coordinates themselves. That means every retained point, endpoints included, is the exact
  * original {@link Coordinate} instance: there is no scale/unscale round-trip, and so no rounding
  * error that could move a point off its original location.
- *
  * <p>
  * JTS ships its own Douglas-Peucker simplifier, but it treats coordinates as planar (Cartesian)
  * and does not apply the longitude correction above, so it distorts distances when applied directly
@@ -97,7 +95,6 @@ public class DouglasPeuckerAlgorithm {
    * Keeps the point in each {@code [start, end]} range furthest from the chord between its
    * endpoints if it exceeds {@code toleranceDegrees}, then splits into two halves and keeps going.
    * The result is stored in the {@link #keep} BitSet.
-   *
    * <p>
    * This is iterative, with the pending ranges on an explicit heap-allocated {@code stack},
    * rather than recursive: a naive recursive version can recurse as deep as the input is long (e.g.

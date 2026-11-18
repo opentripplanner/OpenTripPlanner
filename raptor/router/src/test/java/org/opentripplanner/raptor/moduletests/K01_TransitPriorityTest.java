@@ -27,7 +27,7 @@ import org.opentripplanner.raptor.spi.RaptorCostConverter;
 
 /**
  * FEATURE UNDER TEST
- *
+ * <p>
  * Raptor should be able to handle route request with transit-priority.
  */
 public class K01_TransitPriorityTest {

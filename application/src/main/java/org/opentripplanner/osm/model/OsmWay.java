@@ -104,7 +104,7 @@ public class OsmWay extends OsmEntity {
 
   /**
    * Returns true if the way is considered an area.
-   *
+   * <p>
    * An area can be specified as such, or be one by default as an amenity.
    */
   public boolean isRoutableArea() {

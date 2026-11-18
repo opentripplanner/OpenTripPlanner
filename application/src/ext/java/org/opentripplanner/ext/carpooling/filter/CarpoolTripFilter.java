@@ -23,7 +23,6 @@ public interface CarpoolTripFilter {
    * A necessary condition only, to limit computational cost; tight enforcement is done by
    * post-filters after routing. The routing mode (direct, access, or egress) is available via the
    * passenger's request.
-   *
    * @param trip      the carpool trip to evaluate, with its corridor
    * @param passenger the passenger's request and snapped pickup and/or dropoff
    * @return {@code true} if the trip is a candidate, {@code false} otherwise

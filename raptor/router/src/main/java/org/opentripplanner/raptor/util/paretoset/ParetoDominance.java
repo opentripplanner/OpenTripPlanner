@@ -35,7 +35,6 @@ public enum ParetoDominance {
 
   /**
    * Parse a dominance value from either its symbol or enum name.
-   *
    * <p>
    * Accepted symbols are `≺`, `≻`, `∥`, and `≡`. If the input is not a single-character symbol,
    * the value is parsed as an enum name (case-insensitive).

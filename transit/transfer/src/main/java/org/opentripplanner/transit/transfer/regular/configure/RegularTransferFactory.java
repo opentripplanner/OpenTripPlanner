@@ -47,7 +47,9 @@ public final class RegularTransferFactory {
   /**
    * Create the graph-build generator, writing the transfers of all stops into the repository.
    *
-   * @param <P> the street path type
+   * @param
+   *     <p>
+   *     the street path type
    * @param <R> the request type
    */
   public static <P, R> RegularTransferGenerator createTransferGenerator(

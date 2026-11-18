@@ -53,8 +53,6 @@ import uk.org.siri.siri21.Siri;
  * Startup-flow: 1. Create subscription to topic. Subscription will receive all updates after
  * creation. 2. Fetch current data to initialize state. 3. Flag updater as initialized 3. Start
  * receiving updates from Pubsub-subscription
- *
- *
  * <pre>
  *   "type": "google-pubsub-siri-et-updater",
  *   "projectName":"project-1234",                                                      // Google Cloud project name

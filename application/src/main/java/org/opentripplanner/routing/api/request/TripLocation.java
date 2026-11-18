@@ -12,7 +12,6 @@ import org.opentripplanner.core.model.id.FeedScopedId;
  * The stop location is always identified by its {@code stopLocationId}. A stop location can be a
  * quay or a stop place. Optionally, an {@code aimedDepartureTime} can be provided to disambiguate
  * when the same stop is visited multiple times in the pattern (e.g. ring lines).
- *
  * @param tripOnDateReference Identifies the trip and service date, either by trip ID + service date
  *                            or by a trip-on-service-date ID.
  * @param stopLocationId      The stop location at which the traveler is considered to be boarding.

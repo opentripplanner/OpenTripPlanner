@@ -13,7 +13,6 @@ import org.opentripplanner.street.search.state.State;
  * Handles network commitment for generic (null-network) RENTING_FLOATING states in arrive-by
  * searches. When a generic state crosses a zone boundary, this handler forks committed branches for
  * each new network and continues the generic with updated committedNetworks.
- *
  * <p>
  * Also handles no-traversal zone network recording: when a generic state enters a no-traversal
  * zone, the zone's network is added to committedNetworks (since a committed branch for that network

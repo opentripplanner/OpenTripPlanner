@@ -60,7 +60,7 @@ class DeferredForkHandlerTest {
   /**
    * Build a HAVE_RENTED state where backState had the given zone but current state doesn't. This
    * simulates a walker that just exited a restricted zone.
-   *
+   * <p>
    * Chain: v1 →(rent)→ v2 →(drop + set zones)→ v3 →(traverse, zones cleared)→ v4
    */
   private State createHaveRentedWithZoneExit(GeofencingZone zone) {
@@ -85,7 +85,7 @@ class DeferredForkHandlerTest {
   /**
    * Build a HAVE_RENTED state where s0 gained a BA zone that backState didn't have. This simulates
    * a walker that just entered a BA in arrive-by (= exited in forward time).
-   *
+   * <p>
    * Chain: v1 →(rent)→ v2 →(drop, no zones)→ v3 →(traverse, BA zone gained)→ v4
    */
   private State createHaveRentedWithZoneGain(GeofencingZone zone) {

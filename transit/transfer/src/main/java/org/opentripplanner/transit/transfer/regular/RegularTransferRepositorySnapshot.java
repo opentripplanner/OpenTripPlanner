@@ -13,8 +13,9 @@ import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
  * <p>
  * The paths are immutable. The only mutable state is a cache of the Raptor transfers derived from
  * them, see {@link RegularTransfersService#raptorTransfers}.
- *
- * @param <P> the street path type
+ * @param
+ *     <p>
+ *     the street path type
  * @param <R> the request type, see {@link TransferRequestMapper}
  */
 public interface RegularTransferRepositorySnapshot<P, R> {

@@ -22,7 +22,6 @@ import org.slf4j.LoggerFactory;
  * <p>
  * The class also contains the ParetoSet comparator to filter Standard Raptor(not multi-criteria)
  * access and egress.
- * <p>
  */
 public final class AccessEgressFunctions {
 

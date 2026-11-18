@@ -4,13 +4,11 @@ import org.opentripplanner.core.model.transaction.WriteContext;
 
 /**
  * A write-side event handler that receives a mutable repository at dispatch time.
- *
  * <p>
  * A {@code RepositoryEventHandler} is invoked inside an active {@link WriteContext}. The context
  * injects the mutable repository for the handler as the second argument to
  * {@link #handle(DomainEvent, Object)}, so the handler never holds a stored reference to anything
  * mutable.
- *
  * @param <E> the domain event type this handler responds to
  * @param <M> the mutable repository type this handler writes to
  */

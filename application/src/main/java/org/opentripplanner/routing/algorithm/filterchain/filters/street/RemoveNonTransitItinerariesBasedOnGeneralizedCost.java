@@ -20,8 +20,6 @@ import org.opentripplanner.routing.api.request.preference.ItineraryFilterPrefere
  * <p>
  * This will, for example, remove walk legs which last several hours, when transit can take you
  * to the destination much quicker.
- * <p>
- *
  * @see ItineraryFilterPreferences#nonTransitGeneralizedCostLimit()
  */
 public class RemoveNonTransitItinerariesBasedOnGeneralizedCost implements RemoveItineraryFlagger {

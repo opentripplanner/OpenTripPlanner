@@ -13,8 +13,6 @@ import org.opentripplanner.routing.algorithm.filterchain.framework.spi.Itinerary
  * A decorating filter that checks if a transit leg contains any consolidated stops and if it does,
  * then replaces it with the appropriate, agency-specific stop name. This is so that the physical
  * signage and in-vehicle display matches what OTP returns as a board/alight stop name.
- *
- * <p>
  * <pre>
  * TODO: Split removing short legs out of this clas, even if it is a Sandbox feature the filter
  *       contract is broken.

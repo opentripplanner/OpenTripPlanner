@@ -159,7 +159,6 @@ public class ShortestPathTree<
    * <p>
    * So there can be dominated (useless) states in the queue. When they come out we want to
    * ignore them rather than spend time branching out from them.
-   *
    * @param state - the state about to be visited
    * @return - whether this state is still considered worth visiting.
    */

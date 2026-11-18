@@ -10,7 +10,6 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * Contains information about the current battery or fuel status. See the
  * <a href="https://github.com/MobilityData/gbfs/blob/v3.0/gbfs.md#vehicle_statusjson">GBFS
  * vehicle_status specification</a> for more details.
- * <p>
  */
 public final class RentalVehicleFuel {
 

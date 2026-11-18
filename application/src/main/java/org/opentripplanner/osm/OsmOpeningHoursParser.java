@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Utility class for parsing OpenStreetMap format opening hours into {@link OHCalendar}.
- *
+ * <p>
  * Part of the code is copied from https://github.com/leonardehrenfried/opening-hours-evaluator
  */
 public class OsmOpeningHoursParser {
@@ -203,7 +203,6 @@ public class OsmOpeningHoursParser {
    * Creates a {@link OHCalendarBuilder.OpeningHoursBuilder} that is open according to the
    * {@link TimeSpan} in the rule on the days defined in the rule's {@link DateRange} and
    * {@link WeekDayRange}.
-   *
    * <p>
    * TODO there are some unhandled things here
    */
@@ -255,7 +254,6 @@ public class OsmOpeningHoursParser {
   /**
    * Sets provided {@link WeekDayRange} to be open according to the {@link DateRange} on a
    * {@link OHCalendarBuilder.OpeningHoursBuilder}.
-   *
    * <p>
    * TODO there are a lot of unhandled things here
    */
@@ -322,7 +320,6 @@ public class OsmOpeningHoursParser {
 
   /**
    * Sets provided weekday(s) to be open on a {@link OHCalendarBuilder.OpeningHoursBuilder}.
-   *
    * <p>
    * TODO there are a some unhandled things here
    */
@@ -462,7 +459,6 @@ public class OsmOpeningHoursParser {
 
   /**
    * Checks if rule doesn't have any modifiers or if the modifier is open or unknown.
-   *
    * <p>
    * TODO if a modifier only has a comment (such as "by appointment"), we don't consider the rule
    * to be of the open type but maybe we should
@@ -489,7 +485,6 @@ public class OsmOpeningHoursParser {
 
   /**
    * Checks if rule has times defined and there is a {@link TimeSpan} definition with start time.
-   *
    * <p>
    * TODO We filter out {@link TimeSpan} that have events like "sunrise-sunset" but maybe they
    * could be implemented

@@ -13,7 +13,6 @@ import org.opentripplanner.transit.model.framework.LogInfo;
  * operate under contract with an Authority (Agency).
  * <p>
  * Netex ONLY. Operators are available only if the data source is Netex, not GTFS.
- *
  * @see Agency
  */
 public class Operator extends AbstractTransitEntity<Operator, OperatorBuilder> implements LogInfo {

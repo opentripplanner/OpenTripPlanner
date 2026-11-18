@@ -16,7 +16,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * The scooter preferences contain all speed, reluctance, cost and factor preferences for scooter
  * related to street and transit routing. The values are normalized(rounded) so the class can used
  * as a cache key.
- *
+ * <p>
  * Only Scooter rental is supported currently.
  * <p>
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.

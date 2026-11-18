@@ -6,7 +6,7 @@ import org.jspecify.annotations.Nullable;
  * Represents a real-time SIRI update for a single stop within a trip, encapsulating both scheduled
  * and real-time arrival and departure times. This class provides the means to calculate arrival and
  * departure delays based on the difference between scheduled and real-time times.
- *
+ * <p>
  * A value of {@code null} is used to indicate that a real-time time is missing or unavailable. When
  * real-time data is absent, the scheduled time is used as a fallback. For the first stop in a trip,
  * if the real-time arrival time is missing, the real-time departure time is used as a fallback

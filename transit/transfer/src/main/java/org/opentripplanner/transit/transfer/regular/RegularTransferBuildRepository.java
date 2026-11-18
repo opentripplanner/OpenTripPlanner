@@ -14,8 +14,9 @@ import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUser
  * only updated inside the transaction framework - see {@link #createRuntimeRepository}. The
  * conversion seals this repository: writing to it afterward throws an
  * {@link IllegalStateException}.
- *
- * @param <P> the street path type
+ * @param
+ *     <p>
+ *     the street path type
  */
 public interface RegularTransferBuildRepository<P> extends Serializable {
   /**

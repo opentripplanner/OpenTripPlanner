@@ -26,7 +26,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Maps real-time timetable updates into a new {@link RaptorTransitData} instance.
- *
  * <p>
  * This class is <em>stateful</em> and must be instantiated exactly once and reused across all
  * update cycles. The caches ({@code tripPatternsStartingOnDateMapCache},
@@ -35,7 +34,6 @@ import org.slf4j.LoggerFactory;
  * move between {@link TripPatternForDate}s over time. Creating a new instance on each update would
  * discard this history and break the bookkeeping that determines which old patterns need to be
  * removed.
- *
  * <p>
  * <b>Future improvement:</b> The per-date caches maintained here duplicate information that
  * would ideally come from a single authoritative datasource. However,

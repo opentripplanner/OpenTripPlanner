@@ -390,7 +390,6 @@ public class VertexGenerator {
    * If the entity is at level 5, mark that this node is active at level 5. If another entity
    * connected to the node is also at level 5, create a separate vertex for that combination, but
    * mark the level as the same.
-   *
    * @param entity an entity on a level
    * @param node   the node to create the elevator vertex from
    */

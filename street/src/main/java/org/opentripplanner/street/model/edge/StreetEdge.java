@@ -1019,7 +1019,7 @@ public class StreetEdge
 
   /**
    * Calculate effective distance for time/speed based on propulsion type.
-   *
+   * <p>
    * For ELECTRIC (e-scooters): constant speed, ignore slope For ELECTRIC_ASSIST (e-bikes): reduced
    * slope sensitivity (motor helps uphill) For HUMAN and others: full slope effect
    */

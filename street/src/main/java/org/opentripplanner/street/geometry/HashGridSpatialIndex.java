@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Note: For performance reasons, write operation are not synchronized, it must be taken care by
  * the client. Read-only operation are multi-thread-safe though.
- *
  * @param <T> Type of objects to be spatial indexed.
  * @author laurent
  */

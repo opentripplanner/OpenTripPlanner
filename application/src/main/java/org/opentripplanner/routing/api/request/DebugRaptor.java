@@ -20,7 +20,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  *       is
  *       NOT listed. Note! there are events for dropping an accepted path. If an none matching path
  *       dominate a matching path, then both paths are logged as part of the event.
- *       <p>
+ * <p>
  *       You may also specify the first stop in the path to start logging events for. For example
  *       given
  *       the path {@code [1010, 1183, 3211, 492]}, then you may know, that you can get to stop 2

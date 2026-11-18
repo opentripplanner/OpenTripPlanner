@@ -21,7 +21,6 @@ import org.opentripplanner.raptorlegacy._data.transit.TestTripSchedule;
  * access(...)} methods are called the builder reset itself.
  * <p>
  * If the {@code costCalculator} is null, paths will not include cost.
- *
  * @deprecated This was an earlier part of Raptor and should not be used outside the Raptor module.
  *             Use the OTP model entities instead.
  */

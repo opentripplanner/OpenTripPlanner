@@ -23,7 +23,6 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * One of the benefits of the event based return strategy is that the events are returned even in
  * the case of an exception or entering a endless loop. You don´t need to wait for the result to
  * start analyze the results.
- *
  * <h3>Debugging stops</h3>
  * By providing a small set of stops to debug, a list of all events for those stops are returned.
  * This can be useful both to understand the algorithm and to debug events at a particular stop.

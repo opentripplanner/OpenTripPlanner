@@ -7,7 +7,7 @@ import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 /**
  * This class creates and holds two {@code ParetoComparator}s which are used in a single McRaptor
  * search.
- *
+ * <p>
  * The creation of the two {@link ParetoComparator}s should be done in such way that the JIT
  * compiler can inline all lamdas for the best possible performance. Changes to this class should be
  * checked with the SpeedTest to avoid degration in performance.

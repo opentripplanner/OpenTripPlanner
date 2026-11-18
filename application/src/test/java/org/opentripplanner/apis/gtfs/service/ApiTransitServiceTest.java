@@ -95,7 +95,7 @@ class ApiTransitServiceTest {
   /**
    * Tests that you get a single {@link TripTimeOnDate} for a stop in a pattern even if several
    * trips in the pattern have the same stop skipped.
-   *
+   * <p>
    * @link https://github.com/opentripplanner/OpenTripPlanner/issues/6654
    */
   @Test

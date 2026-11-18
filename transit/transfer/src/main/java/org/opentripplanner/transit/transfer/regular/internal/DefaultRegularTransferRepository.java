@@ -21,8 +21,9 @@ import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUser
  * A repository is frozen once, and its paths are published in a snapshot without a copy. Hence,
  * a frozen repository cannot be written to again. A repository that is never frozen, because its
  * transaction failed, is discarded with its changes.
- *
- * @param <P> the street path type
+ * @param
+ *     <p>
+ *     the street path type
  */
 class DefaultRegularTransferRepository<P> implements RegularTransferRepository<P> {
 

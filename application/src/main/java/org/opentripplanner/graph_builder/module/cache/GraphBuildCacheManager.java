@@ -135,7 +135,6 @@ public class GraphBuildCacheManager implements Closeable {
   }
 
   /**
-   * <p>
    * Return {@code null} if the cache is disabled by configuration.
    */
   @Nullable

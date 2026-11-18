@@ -13,7 +13,6 @@ import org.opentripplanner.street.model.vertex.Vertex;
  * Of the driving times an insertion needs, only those with the passenger at one end are
  * request-specific. The baseline legs and the times between a waypoint and a stop depend on the
  * trip and the static street graph alone, so the corridor holds them.
- *
  * @param legDurations routed driving time of each leg
  * @param legLimits    the most each leg may take once a passenger is inserted: its duration plus
  *                     its deviation budget

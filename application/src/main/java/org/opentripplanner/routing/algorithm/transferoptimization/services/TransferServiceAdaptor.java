@@ -17,7 +17,6 @@ import org.opentripplanner.transit.model.timetable.Trip;
  * Raptor and here, but that would require the main transit model to be refactored.
  * <p>
  * The adaptor makes it easy to test the {@link TransferGenerator} by mocking.
- *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public class TransferServiceAdaptor<T extends RaptorTripSchedule> {

@@ -192,7 +192,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
    * routable street edges.
    * <p>
    * This does not apply to zones as street vertices store which zones they are part of.
-   *
+   * <p>
    * @link https://github.com/opentripplanner/OpenTripPlanner/issues/5498
    */
   private void linkToDriveableEdge(TransitStopVertex tStop) {

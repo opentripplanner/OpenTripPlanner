@@ -10,7 +10,6 @@ import org.opentripplanner.utils.time.DurationUtils;
  * If the {@code access/egress} is empty the duration is zero. The flex-trip duration must be at
  * least 1 second. This is just a sanity check, there might be bussiness rules elsewhere restricting
  * this futher.
- *
  * @param access The duration of the walking in the beginning of the Flex path. Should be zero or a
  *               positive number. Zero means that the path start with the flex trip, there is no
  *               access.

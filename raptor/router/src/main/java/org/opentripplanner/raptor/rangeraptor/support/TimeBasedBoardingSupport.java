@@ -104,7 +104,6 @@ public final class TimeBasedBoardingSupport<T extends RaptorTripSchedule> {
    * When a previous transit arrival exists, the alight slack of that leg is subtracted to derive
    * the actual transit arrival time, which is passed to the constrained transfer search together
    * with the earliest board time computed from {@code prevArrivalTime} and {@code boardSlack}.
-   *
    * @param prevTransitStopArrival the transit arrival that is the source of a potential constrained
    *                               transfer; {@code null} if the traveller did not arrive by transit
    * @param prevArrivalTime        the wall-clock arrival time at the board stop; may differ from

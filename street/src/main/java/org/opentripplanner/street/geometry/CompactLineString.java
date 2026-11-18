@@ -127,7 +127,6 @@ public final class CompactLineString implements Serializable {
    * This is the single home of the decode logic; both the self-contained
    * {@link #toLineString(boolean)} and the endpoint-context
    * {@link EndpointContextLineString#uncompact} call it.
-   *
    * @param packed         the compact line string, or {@code null} / empty for a no-op
    * @param out            target array to write decoded coordinates into (flat: [x0, y0, x1, y1,
    *                       …])

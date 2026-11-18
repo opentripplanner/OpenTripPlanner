@@ -33,7 +33,6 @@ import org.opentripplanner.model.plan.paging.cursor.PageType;
  *   <li>OutsideSearchWindowFilter</li>
  *   <li>NumItinerariesFilter</li>
  * </ol>
- * <p>
  */
 @SuppressWarnings("DataFlowIssue")
 class PS2_ManyParetoOptimalItinerariesTest {

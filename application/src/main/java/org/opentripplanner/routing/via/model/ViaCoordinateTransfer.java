@@ -11,7 +11,7 @@ import org.opentripplanner.utils.time.DurationUtils;
 /**
  * This class will act as a {@link RaptorTransfer} during the Raptor routing and carry enough
  * information to create an itinerary after the routing is done.
- *
+ * <p>
  * When routing through a coordinate, we need to generate transfers for each pair of stops connected
  * to it. In this class we keep a reference to the incoming and outgoing paths, instead of
  * connecting the two paths together into one. This approach reduces memory usage during routing.

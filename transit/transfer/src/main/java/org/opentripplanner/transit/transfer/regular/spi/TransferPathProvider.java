@@ -5,7 +5,9 @@ package org.opentripplanner.transit.transfer.regular.spi;
  * path type {@code P} and the request type {@code R} stay fully opaque to this module. An
  * implementation is backed by a street search.
  *
- * @param <P> the street path type
+ * @param
+ *     <p>
+ *     the street path type
  * @param <R> the request type, see {@link TransferRequestMapper}
  */
 public interface TransferPathProvider<P, R> {

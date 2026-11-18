@@ -124,7 +124,6 @@ public class SearchParams {
   /**
    * Keep the latest departures arriving before the given latest-arrival-time(LAT). LAT is required
    * if this parameter is set. This parameter is not allowed if the {@link #timetable} is enabled.
-   * <p>
    * <pre>
    * TODO - Reactor, we should use an Enum value instead of this and 'timetable':
    *      - timePreference : enum TimePreference{ TIMETABLE, DEPART_AFTER, ARRIVE_BY }

@@ -32,7 +32,6 @@ public abstract class AbstractIntersectionTraversalCalculator
 
   /**
    * Computes the turn duration in seconds for non-driving traversal modes.
-   * <p>
    */
   protected double computeNonDrivingTraversalDuration(
     StreetEdge from,

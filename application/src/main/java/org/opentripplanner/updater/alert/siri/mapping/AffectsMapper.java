@@ -41,7 +41,7 @@ import uk.org.siri.siri21.VehicleJourneyRef;
 
 /**
  * Maps a {@link AffectsScopeStructure} to a list of {@link EntitySelector}s
- *
+ * <p>
  * Concretely: this takes the parts of the SIRI SX (Alerts) message describing which transit
  * entities are concerned by the alert, and maps them to EntitySelectors, which can match multiple
  * OTP internal model entities that should be associated with the message.

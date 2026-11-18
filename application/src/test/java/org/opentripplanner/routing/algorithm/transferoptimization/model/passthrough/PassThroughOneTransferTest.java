@@ -18,7 +18,6 @@ import org.opentripplanner.raptorlegacy._data.transit.TestTripSchedule;
 /**
  * This test focus on the PASS-THROUGH functionality with two transit legs and one transfer in the
  * path. But between trip 1 and trip 2, there may be many transfer options to choose from.
- *
  * <p>
  * FEATURE UNDER TEST
  * <p>
@@ -110,8 +109,6 @@ public class PassThroughOneTransferTest implements RaptorTestConstants {
    * will also add transfers between B-F and E-I, these transfers can not be used with the access
    * and egress, because we are not allowed to have two walking legs in a row. We include this
    * transfers to make sure the implementation ignores them.
-   * <p>
-   *
    * <pre>
    *           Origin
    *                \

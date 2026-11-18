@@ -37,7 +37,6 @@ public class GtfsFeedIdResolver {
    * <p>
    * The generated {@code feedId}s are cached in a synchronized map and only inserted if it does
    * not exist already. The single access point(this method) guarantee thread-safety.
-   *
    * @param source       the input source
    * @param dataSourceId Any id which identify the data sorce, for example the URI.
    * @return A GtfsFeedId

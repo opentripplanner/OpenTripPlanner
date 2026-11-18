@@ -11,7 +11,6 @@ package org.opentripplanner.raptor.spi;
  * The instance can represent both the result of a forward search and the result of a reverse
  * search. For a reverse search (searching backward in time) the trip arrival times should be used.
  * This is one of the things that allows for the algorithm to be generic, used in both cases.
- *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public interface RaptorBoardOrAlightEvent<T extends RaptorTripSchedule> {

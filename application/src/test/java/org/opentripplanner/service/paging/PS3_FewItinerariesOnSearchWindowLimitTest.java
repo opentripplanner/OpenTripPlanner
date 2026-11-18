@@ -37,7 +37,6 @@ import org.opentripplanner.utils.time.TimeUtils;
  *   <li>OutsideSearchWindowFilter</li>
  *   <li>NumItinerariesFilter</li>
  * </ol>
- * <p>
  */
 @SuppressWarnings("DataFlowIssue")
 class PS3_FewItinerariesOnSearchWindowLimitTest {

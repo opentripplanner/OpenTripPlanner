@@ -39,7 +39,6 @@ class LocalizedStringMapper {
    * For example. If key platform has key {ref} current value of tag ref in way is saved to be
    * used in localizations. It currently assumes that tag exists in way. (otherwise this namer
    * wouldn't be used)
-   *
    * @param key key of translation for this way set in the WayPropertyMapper and translations read
    *            from properties Files
    * @param way OSM way from which tag values are read

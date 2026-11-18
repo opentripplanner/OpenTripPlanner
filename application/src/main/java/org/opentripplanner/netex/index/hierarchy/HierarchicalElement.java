@@ -9,7 +9,6 @@ import org.jspecify.annotations.Nullable;
  * <p>
  * There is no reference from the parent to the child, enabling garbage collection of children,
  * when not referenced by the outer context any more.
- *
  * @param <E> the element value type.
  */
 public class HierarchicalElement<E> {

@@ -41,7 +41,6 @@ import org.slf4j.LoggerFactory;
  * GTFS-RT decoder Runnable task in the single-threaded executor for handling.
  * <p>
  * Usage example in the file 'router-config.json', inside the 'updaters' array:
- *
  * <pre>
  * {
  *   "id": "hsl-trip-updates",

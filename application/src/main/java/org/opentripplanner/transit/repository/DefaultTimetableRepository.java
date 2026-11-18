@@ -710,7 +710,6 @@ public class DefaultTimetableRepository implements TimetableRepository {
    * <p>
    * Updating the raptor data is now also part of the commit. Previously this was done after the
    * commit. The amount of work triggered by each commit stayed the same.
-   *
    * @return an immutable copy of this repository with all updates applied
    */
   public DefaultTimetableRepository commit() {
@@ -791,7 +790,7 @@ public class DefaultTimetableRepository implements TimetableRepository {
    * If a previous realtime update has changed which trip pattern is associated with the given trip
    * on the given service date, this method will dissociate the trip from that pattern and remove
    * the trip's timetables from that pattern on that particular service date.
-   *
+   * <p>
    * For this service date, the trip will revert to its original trip pattern from the scheduled
    * data, remaining on that pattern unless it's changed again by a future realtime update.
    *

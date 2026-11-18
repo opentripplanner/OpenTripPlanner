@@ -25,7 +25,6 @@ public class TripMatcherFactory {
    * The {@code serviceDateProvider} is a function that provides the service dates for a given
    * Trip. It is injected because the service dates are determined by the transit service which has
    * access to service dates for a Trip.
-   *
    * @param request             the criteria for filtering Trips.
    * @param serviceDateProvider a function that provides the service dates for a given Trip.
    * @return a matcher for filtering Trips.

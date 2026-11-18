@@ -143,7 +143,6 @@ public final class RegularStop
    * it to improve routing by including these stops when stops with no trip patterns would otherwise
    * be excluded for performance reasons. Incorrectly tagging stops with this flag is not critical,
    * it will only degrade performance.
-   *
    * @return {@code true} if this stop may be used by real-time trips despite having no scheduled
    *         patterns, {@code false} otherwise
    */

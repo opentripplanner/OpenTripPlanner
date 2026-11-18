@@ -43,7 +43,6 @@ public interface TransferOptimized {
    * The generalized cost adjusted with a better wait time calculation.
    * <p>
    * Precedence: second
-   *
    * @see TransferWaitTimeCostCalculator
    */
   int generalizedCostWaitTimeOptimized();

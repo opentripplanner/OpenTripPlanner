@@ -70,7 +70,6 @@ public class APIEndpoints {
    * <p>
    * Some of the endpoints can be turned on/off using {@link OTPFeature}s, this method check if
    * an endpoint is enabled before adding it to the list.
-   *
    * @return all mandatory and feature enabled endpoints are returned.
    */
   public static Collection<? extends Class<?>> listAPIEndpoints() {

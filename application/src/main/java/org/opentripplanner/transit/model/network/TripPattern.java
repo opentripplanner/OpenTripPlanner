@@ -418,13 +418,11 @@ public final class TripPattern
 
   /**
    * The original TripPattern this replaces at least for one modified trip.
-   *
+   * <p>
    * Currently this seems to only be set (via TripPatternBuilder) from TripPatternCache and
    * SiriTripPatternCache.
-   *
-   * FIXME RT_AB: Revise comments to make it clear how this is used (it is only used rarely).
-   *
    * <p>
+   * FIXME RT_AB: Revise comments to make it clear how this is used (it is only used rarely).
    * <pre>
    * TODO RT_VP: this method is unreliable due to a design flaw in the current implementation of
    *             {@link org.opentripplanner.updater.trip.patterncache.TripPatternCache}

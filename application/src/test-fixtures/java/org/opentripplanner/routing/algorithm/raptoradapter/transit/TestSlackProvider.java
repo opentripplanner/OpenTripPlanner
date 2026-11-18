@@ -5,7 +5,7 @@ import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 /**
  * This is a simpler version than the {@link DefaultSlackProvider}. Raptor is not under test, so
  * there is no need for the complex version in most unit-tests.
- *
+ * <p>
  * FOR TESTS ONLY
  */
 public class TestSlackProvider implements RaptorSlackProvider {

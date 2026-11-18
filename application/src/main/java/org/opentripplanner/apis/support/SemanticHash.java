@@ -28,7 +28,6 @@ public class SemanticHash {
    * <a href="http://programmers.stackexchange.com/a/145633">here</a> for comparison.
    * <p>
    * TODO deal with frequency-based trips
-   *
    * @param trip a trip object within this pattern, or null to hash the pattern itself independent
    *             any specific trip.
    * @return the semantic hash of a Trip in this pattern as a printable String.

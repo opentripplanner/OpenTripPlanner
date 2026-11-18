@@ -26,7 +26,6 @@ public interface LocalDataSourceRepository extends DataSourceRepository {
    * Get the a data source for the given localFilename and type.
    * <p>
    * The source may or may not {@link DataSource#exists()}.
-   *
    * @param localFilename the short name including extension like: {@code graph.obj}.
    * @param type          the file type to load.
    * @return the datasource wrapper that can be used to access the data source.
@@ -37,7 +36,6 @@ public interface LocalDataSourceRepository extends DataSourceRepository {
    * Get the a composite data source (zip/directory) for the given uri and type.
    * <p>
    * The source may or may not {@link DataSource#exists()}.
-   *
    * @param localFilename the short name including extension like: {@code gtfs.zip}.
    * @param type          the file type to load.
    * @return the datasource wrapper that can be used to access the data source.

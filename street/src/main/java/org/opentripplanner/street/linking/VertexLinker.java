@@ -183,7 +183,6 @@ public class VertexLinker {
    * be a significant fraction of response time. Hannes Junnila has reported >70% speedups in
    * searches by making the search radius smaller. Therefore we use an expanding-envelope search,
    * which is more efficient in dense areas.
-   *
    * @param vertex        Vertex to be linked into the street graph
    * @param traverseModes Only street edges allowing one of these modes will be linked
    * @param direction     The direction of the new edges to be created

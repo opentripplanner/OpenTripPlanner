@@ -11,7 +11,9 @@ import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
 /**
  * The transfer profiles, in the order they are declared in the configuration.
  *
- * @param <P> the street path type
+ * @param
+ *     <p>
+ *     the street path type
  * @param <R> the request type
  */
 final class TransferProfiles<P, R> implements Iterable<TransferProfileState<P, R>> {

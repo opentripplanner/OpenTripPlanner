@@ -8,13 +8,11 @@ import org.opentripplanner.street.search.state.VehicleRentalState;
 /**
  * Handles HAVE_RENTED walkers crossing zone boundaries during arriveBy search. The walker already
  * dropped the vehicle (in forward time) and is walking between the drop point and destination.
- *
  * <p>
  * At a paired boundary the walker actually crossed in forward time, dispatches to
  * {@link GeofencingBoundaryEnforcement#arriveByAtBoundary} to produce a walking continuation.
  * Renting branches for "the rental could have been picked up here" are deferred to the next edge by
  * {@link DeferredForkHandler}.
- *
  * <p>
  * The boundary direction that fires depends on the zone type's legal drop position:
  * <ul>

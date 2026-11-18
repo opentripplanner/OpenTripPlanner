@@ -18,7 +18,6 @@ import org.opentripplanner.utils.collection.SetUtils;
 
 /**
  * Implements the {@link VehicleRentalPlace} class which contains Javadoc.
- * <p>
  */
 public final class VehicleRentalStation implements VehicleRentalPlace {
 

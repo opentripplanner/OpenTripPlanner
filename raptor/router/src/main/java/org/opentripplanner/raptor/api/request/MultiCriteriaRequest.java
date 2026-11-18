@@ -9,8 +9,6 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * Parameters to configure the multi-criteria search.
- * <p>
- *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public class MultiCriteriaRequest<T extends RaptorTripSchedule> {

@@ -42,8 +42,6 @@ import tools.jackson.databind.ObjectMapper;
 /**
  * HTTP client providing convenience methods to send HTTP requests and map HTTP responses to Java
  * objects.
- *
- * <p>
  * <h3>Exception management</h3>
  * Exceptions thrown during network operations or response mapping are wrapped in
  * {@link OtpHttpClientException}

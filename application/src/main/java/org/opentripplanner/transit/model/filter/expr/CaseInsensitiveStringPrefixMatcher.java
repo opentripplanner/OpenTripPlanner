@@ -4,8 +4,6 @@ import java.util.function.Function;
 
 /**
  * A matcher that checks if a string field starts with a given value.
- * <p>
- *
  * @param <T> The type of the entity being matched.
  */
 public class CaseInsensitiveStringPrefixMatcher<T> implements Matcher<T> {

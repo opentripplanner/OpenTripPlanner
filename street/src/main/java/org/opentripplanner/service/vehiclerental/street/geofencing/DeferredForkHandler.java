@@ -14,7 +14,6 @@ import org.opentripplanner.street.search.state.VehicleRentalState;
 /**
  * Creates the deferred RENTING_FLOATING fork one edge after a zone boundary, so the renting state's
  * backEdge is safely outside the zone in the forward itinerary.
- *
  * <p>
  * Forking at the boundary itself would attach the drop event to an edge pointing into the zone
  * (the renting state's backEdge would be the boundary edge), so the rendered itinerary would show

@@ -89,7 +89,6 @@ public class TimetableBuilder {
 
   /**
    * Apply the same update to all trip-times including scheduled and frequency based trip times.
-   * <p>
    */
   public TimetableBuilder withAdjustedTimes(Duration timeshift) {
     tripTimes.replaceAll((t, tt) -> withAdjustedTimes(tt, timeshift));

@@ -27,7 +27,7 @@ import org.opentripplanner.transit.model.timetable.Direction;
  * associated with the Graph or transit model (i.e. the object graph of instances of the transit
  * model) and for updaters to submit write tasks that would patch the current version in a
  * sequential way, e.g. "add these 10 alerts", "remove these 5 alerts", etc.
- *
+ * <p>
  * When an alert is added with more than one transit entity, e.g. a Stop and a Trip, both conditions
  * must be met for the alert to be displayed. This is the case in both the Norwegian interpretation
  * of SIRI, and the GTFS-RT alerts specification.

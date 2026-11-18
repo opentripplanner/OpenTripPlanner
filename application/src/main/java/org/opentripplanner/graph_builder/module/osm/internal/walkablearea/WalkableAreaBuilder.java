@@ -200,7 +200,6 @@ public class WalkableAreaBuilder {
 
   /**
    * Build walkable area edges using visibility graph computation.
-   *
    * <p>
    * Three phases:
    * <ol>
@@ -418,7 +417,6 @@ public class WalkableAreaBuilder {
   /**
    * For each ring, test all candidate vertex pairs for line-of-sight within the ring polygon. This
    * is a pure computation — no graph mutations.
-   *
    * <p>
    * When the area has more vertices than {@code maxAreaNodes}, the vertex set is sampled
    * uniformly so that at least some cross-edges are added even for complex areas.

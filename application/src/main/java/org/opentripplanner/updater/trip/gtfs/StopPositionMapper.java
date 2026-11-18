@@ -77,7 +77,7 @@ class StopPositionMapper {
   /**
    * Special handling for finding the stop position in the pattern when it is circular and the
    * update supplies only stop_id (not stop_sequence).
-   *
+   * <p>
    * We make a limited effort to interpret the data, but not every case is supported.
    */
   private int handleCircularRoute(int listIndex, String stopId) throws UpdateException {

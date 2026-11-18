@@ -279,7 +279,7 @@ class FareLookupService implements Serializable {
 
   /**
    * If a GTFS feed contains rule_priority values, then the highest priority rule is returned.
-   *
+   * <p>
    * @link <a href="https://gtfs.org/documentation/schedule/reference/#fare_leg_rulestxt">spec</a>
    */
   private static Set<FareLegRule> findHighestPriority(Collection<FareLegRule> rules) {

@@ -22,7 +22,6 @@ public class TwoWayLinearSearch {
    * <p>
    * The search pattern is: startIndex, startIndex+1, startIndex-1, startIndex+2, startIndex-2,
    * ...
-   *
    * @param startIndex the index to start searching from; if not within bounds, the method returns
    *                   empty. If the {@code startIndex} is out of bound, the start position is
    *                   adjusted to the closest position inside the search range.

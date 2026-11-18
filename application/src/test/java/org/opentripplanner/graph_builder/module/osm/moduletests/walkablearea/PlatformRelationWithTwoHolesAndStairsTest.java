@@ -15,17 +15,14 @@ import org.opentripplanner.street.graph.summary.GraphSummarizer;
 /**
  * Checks that a platform with two inner holes (each connected to a stairway) produces a
  * fully-connected graph.
- *
  * <p>
  * The platform is a ~200 m square "double-donut": one outer ring with two square holes cut out
  * side by side (west and east). Each hole's south boundary has a midpoint node (inner1S / inner2S)
  * where a stairway from outside the platform terminates.
- *
  * <p>
  * A pedestrian footway from the north terminates at {@code ped} on the outer ring's north side.
  * This makes ped a startingNode, giving it visibility edges into both inner holes. The SPT from
  * {ped, inner1S, inner2S} keeps the edges that connect all three across the donut.
- *
  * <p>
  * The two test cases share the same OSM geometry (built by {@link #buildSummarizer}) but use a
  * different {@code maxAreaNodes} budget. {@link #platformRelationConnectedToTwoStairways} uses a

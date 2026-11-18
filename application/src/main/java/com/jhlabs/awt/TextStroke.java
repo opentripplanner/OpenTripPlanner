@@ -19,7 +19,6 @@ import java.awt.geom.Point2D;
  * Stroke that paint a text.
  * <p>
  * Slightly adapted to OTP from original source.
- *
  * @see <a href=
  *      "http://www.jhlabs.com/java/java2d/strokes/">http://www.jhlabs.com/java/java2d/strokes/</a>
  */

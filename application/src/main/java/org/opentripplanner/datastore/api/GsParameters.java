@@ -8,7 +8,6 @@ public interface GsParameters {
    * <p>
    * Optional. May return {@code null}. If the host is not set, the connection to the Google
    * Cloud Platform is done via the default host {@code https://storage.googleapis.com:4443}.
-   *
    */
   @Nullable
   String host();

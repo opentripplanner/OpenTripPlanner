@@ -6,7 +6,6 @@ package org.opentripplanner.utils.lang;
  * reference and create another heavy object instance such as with the BitSet class.
  * <p>
  * Usage is rather simple:
- *
  * <pre>
  *
  * short flags; // or int, long, byte

@@ -6,7 +6,6 @@ import java.util.function.Consumer;
  * Application-scoped registry for transactional repositories.
  * <p>
  * This is the entry point for wiring the transaction framework. Typical usage:
- *
  * <ol>
  *   <li>Create one {@code RepositoryRegistry} for the application lifetime.
  *   <li>For each domain repository, call
@@ -31,7 +30,6 @@ public interface RepositoryRegistry {
    * The handle is application-scoped and should be kept for the lifetime of the application,
    * typically by injecting it via Dagger. Do not create and register new repositories after wiring
    * is done, this could lead to concurrency issues.
-   *
    * @param initialRepositorySnapshot the initial read-only snapshot for the repository
    * @param lifecycle                 the lifecycle strategy for the given repository/snapshot
    * @param <S>                       the read-only repository snapshot type

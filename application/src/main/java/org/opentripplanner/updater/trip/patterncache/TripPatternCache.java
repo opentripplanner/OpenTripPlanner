@@ -13,7 +13,6 @@ import org.opentripplanner.transit.model.timetable.Trip;
  * NeTEx or GTFS. This is a "cache" in the sense that it will keep returning the same TripPattern
  * when presented with the same StopPattern, so if realtime messages add many trips passing through
  * the same sequence of stops, they will all end up on this same TripPattern.
- * <p>
  * <pre>
  *  TODO RT_TG: There is no clear strategy for what should be in the cache and the transit model and the flow
  *             between them.
@@ -22,7 +21,6 @@ import org.opentripplanner.transit.model.timetable.Trip;
  *             the thread-safety, but just by looking at a few lines of code I see problems - a strategy needs to be
  *             analysed, designed and documented.
  * </pre>
- * <p>
  * <pre>
  *  TODO RT_VP  TripPatternCache caches RT patterns keyed by StopPattern only, setting
  *              originalTripPattern from the first trip that created the entry in the cache.
@@ -60,7 +58,6 @@ public class TripPatternCache {
    * <p>
    * The caller is responsible for resolving {@code originalTripPattern} before calling this
    * method.
-   *
    * @param stopPattern         stop pattern to retrieve/create a trip pattern for
    * @param trip                trip whose route, mode, and submode are copied when a new pattern is
    *                            created; also used to generate the new pattern's id

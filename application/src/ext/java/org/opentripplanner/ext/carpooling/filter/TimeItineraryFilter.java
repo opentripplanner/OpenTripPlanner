@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
  * actual departure and arrival times after routing — and enforces the request window tightly. Today
  * this only runs for direct itineraries (the access/egress flow produces
  * {@code CarpoolAccessEgress} objects, not {@code Itinerary}).
- *
  * <h2>Variables</h2>
  *
  * The passenger's window is derived from {@code request.getRequestedDateTime()} and

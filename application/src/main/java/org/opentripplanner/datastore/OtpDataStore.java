@@ -84,7 +84,6 @@ public class OtpDataStore {
    * the local file system.
    * <p>
    * Never use this method in the OTP application to access the graph, use the data-store.
-   *
    * @param path the location where the graph file must exist.
    * @return The graph file - the graph is not loaded, you can use the
    *         {@link SerializedGraphObject#load(File)} to load the graph.
@@ -140,7 +139,6 @@ public class OtpDataStore {
    * the given type.
    * <p>
    * This method should not be called after this data store is closed. The behavior is undefined.
-   *
    * @return The collection may contain elements of type {@link DataSource} or
    *         {@link CompositeDataSource}.
    */

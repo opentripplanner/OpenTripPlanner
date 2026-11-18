@@ -9,7 +9,6 @@ import java.util.Objects;
  * The network name is not part of this record: it is the key these parameters are looked up by
  * in {@link GbfsNetworkOverrides}, and the same type describes the {@code defaults} block, which
  * has no network of its own.
- *
  * @param geofencingZonePhase              which OTP phase computes and applies this network's
  *                                         geofencing zones. Configured as
  *                                         {@code applyGeofencingZones}.

@@ -45,7 +45,6 @@ public class StopTimesHelper {
    * with sleeper trains and multi-day services.
    * <p>
    * TODO: Add frequency based trips
-   *
    * @param stop                         Stop object to perform the search for
    * @param startTime                    Start time for the search.
    * @param timeRange                    Searches forward for timeRange from startTime
@@ -221,7 +220,6 @@ public class StopTimesHelper {
    * can visit the stop later than the current service date's services.
    * <p>
    * TODO: Add frequency based trips
-   *
    * @param stop                         Stop object to perform the search for
    * @param pattern                      Pattern object to perform the search for
    * @param startTime                    Start time for the search.

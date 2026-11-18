@@ -24,7 +24,6 @@ public class PatternByServiceDatesFilter {
 
   /**
    * This method is not private to enable unit testing.
-   * <p>
    */
   public PatternByServiceDatesFilter(
     LocalDateRange range,

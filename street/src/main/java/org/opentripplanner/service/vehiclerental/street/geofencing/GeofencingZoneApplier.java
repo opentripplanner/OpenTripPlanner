@@ -64,17 +64,14 @@ public class GeofencingZoneApplier {
   /**
    * Pre-resolves the initial geofencing zones for each vehicle rental vertex by querying the
    * repository.
-   *
    * <p>
    * Reads through {@link GeofencingZoneService} so a vertex is seeded whichever phase produced
    * its network's zones, including zones applied during graph build, which the updater does not
    * recompute.
-   *
    * <p>
    * A rental vertex belongs to exactly one network, so only that network's index is queried.
    * Other networks' zones are not inert: {@code DeferredForkHandler} and
    * {@code NetworkCommitmentHandler} read the zone set without filtering by the state's network.
-   *
    * <p>
    * BAs are excluded when {@code requireDropOffInsideBusinessArea} is false. Without boundary
    * markers a BA never leaves {@code currentZones}; left in the set, its permissive flags can win

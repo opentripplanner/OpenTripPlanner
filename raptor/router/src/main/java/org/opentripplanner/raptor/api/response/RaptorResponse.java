@@ -47,7 +47,6 @@ public class RaptorResponse<T extends RaptorTripSchedule> {
   /**
    * The end state of the search, with arrival times and lowest number of transfers. If multiple
    * routing workers are called, the main worker result is returned.
-   * <p>
    */
   public StopArrivals getArrivals() {
     return arrivals;

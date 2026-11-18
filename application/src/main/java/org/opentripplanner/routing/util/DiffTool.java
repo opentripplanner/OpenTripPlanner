@@ -7,7 +7,6 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * This class provide a method for comparing to lists and create a diff between them.
- * <p>
  */
 public final class DiffTool {
 

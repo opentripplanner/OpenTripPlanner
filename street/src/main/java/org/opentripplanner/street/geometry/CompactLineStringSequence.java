@@ -17,7 +17,6 @@ import org.locationtech.jts.geom.LineString;
  *       and member {@code i}</li>
  *   <li>position {@code size()} is the end of the last member</li>
  * </ul>
- * <p>
  */
 public final class CompactLineStringSequence implements Serializable {
 

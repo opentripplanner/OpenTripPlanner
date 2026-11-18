@@ -7,8 +7,6 @@ import java.util.function.Function;
  * <p>
  * The derived entity value is provided by a function that takes the entity being matched as an
  * argument.
- * <p>
- *
  * @param <T> The type of the entity being matched.
  * @param <V> The type of the value that the matcher will test equality for.
  */

@@ -63,7 +63,7 @@ public interface ReadOnlyHierarchicalVersionMapById<V> {
    *             on desired version and validity version. NOT leaving this to the mapper. Fixing
    *             this is part of: TODO TOP2
    *             https://github.com/opentripplanner/OpenTripPlanner/issues/2781
-   *             <p>
+   *     <p>
    *             Lookup element, if not found delegate up to the parent. NB! elements of this
    *             class and its parents are NOT merged, the closest win.
    */

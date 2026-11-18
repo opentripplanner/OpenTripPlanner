@@ -68,7 +68,6 @@ import org.slf4j.LoggerFactory;
  * This service is the main entry point for carpool routing functionality. It coordinates
  * multiple components to efficiently find viable carpool matches while minimizing expensive routing
  * calculations through strategic filtering and early rejection.
- *
  * <h2>Algorithm Phases</h2>
  * <p>
  * The service executes routing requests in three phases:
@@ -131,7 +130,6 @@ public class DefaultCarpoolingService implements CarpoolingService {
    * <p>
    * The service is initialized with standard pre- and post-filters; both filter sets are
    * hardcoded today and could be made configurable in future versions.
-   *
    * @param repository                        provides access to active driver trips, must not be
    *                                          null
    * @param streetLimitationParametersService provides street routing configuration including speed

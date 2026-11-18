@@ -16,7 +16,9 @@ import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUser
  * of the Raptor transfers of the snapshot it is created from. The paths are immutable and the
  * cache is thread-safe, so the view is thread-safe.
  *
- * @param <P> the street path type
+ * @param
+ *     <p>
+ *     the street path type
  */
 final class DefaultRegularTransfersService<P> implements RegularTransfersService<P> {
 

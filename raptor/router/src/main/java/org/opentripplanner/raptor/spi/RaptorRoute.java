@@ -4,8 +4,6 @@ package org.opentripplanner.raptor.spi;
  * The {@link RaptorRoute} serve as the aggregate root for the transit model needed by Raptor to
  * perform the routing. From this class you should be able to navigate to the time-table, the
  * trip-pattern and access all trips within the pattern in service defined by the time-table.
- * <p>
- *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public interface RaptorRoute<T extends RaptorTripSchedule> {

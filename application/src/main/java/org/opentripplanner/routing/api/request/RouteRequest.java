@@ -160,7 +160,7 @@ public class RouteRequest implements Serializable {
    * The search time for the current request. If the client have moved to the next page then this
    * is the adjusted search time - the dateTime passed in is ignored and replaced with by a time
    * from the pageToken.
-   *
+   * <p>
    * This method returns {@code null} for default requests.
    */
   @Nullable
@@ -235,7 +235,6 @@ public class RouteRequest implements Serializable {
    * many-to-one or one-to-many.
    * <p>
    * TODO - Refactor and make separate requests for one-to-one and the other searches.
-   *
    * @throws RoutingValidationException   if either origin or destination is missing.
    * @throws InvalidRoutingInputException if the destination is an on-board location.
    */
@@ -265,7 +264,7 @@ public class RouteRequest implements Serializable {
 
   /**
    * The origin/start location.
-   *
+   * <p>
    * Returns {@code null} for default requests.
    */
   @Nullable
@@ -275,7 +274,7 @@ public class RouteRequest implements Serializable {
 
   /**
    * The destination/end location.
-   *
+   * <p>
    * Returns {@code null} for default requests.
    */
   @Nullable
@@ -413,7 +412,7 @@ public class RouteRequest implements Serializable {
    *       intention of the traveler is unknown, this gives the best result. This use-case includes
    *       all
    *       itineraries in the two next use-cases. This option also work well with paging.
-   *       <p>
+   * <p>
    *       Setting the {@code arriveBy=false}, covers the same use-case, but the input time is
    *       interpreted as latest-arrival-time, and not earliest-departure-time.</li>
    *   <li>The traveler want to find the best alternative with departure after a specific time. For

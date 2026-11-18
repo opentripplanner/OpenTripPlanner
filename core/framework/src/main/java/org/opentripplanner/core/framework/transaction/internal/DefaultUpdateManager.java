@@ -22,7 +22,6 @@ import org.opentripplanner.core.model.transaction.WriteContext;
 
 /**
  * Default implementation of {@link UpdateManager}.
- *
  * <p>
  * Owns a single-threaded {@link ExecutorService} that serialises all submitted tasks. After each
  * task completes, changes are committed via the {@link TransactionManager}. The transaction manager

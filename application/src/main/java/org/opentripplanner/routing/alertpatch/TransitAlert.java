@@ -164,7 +164,6 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
    * validity time periods overlaps the given period. In other words, this returns {@code true} as
    * long as there is at least one instant that is contained in both the given period and the
    * alert's validity.
-   *
    * @param period the period to check for overlap with the alert's validity
    * @return true if the alert is active during any part of the given period
    */

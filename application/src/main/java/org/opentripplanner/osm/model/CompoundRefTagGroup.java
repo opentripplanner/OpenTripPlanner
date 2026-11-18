@@ -41,7 +41,7 @@ public class CompoundRefTagGroup {
   /**
    * Produces a compound value by mapping each tag in this group to its corresponding value using
    * the provided mapper function, then joining the results with a colon delimiter.
-   *
+   * <p>
    * The compound value is only produced when all tags in the group resolve to a non-null value via
    * the mapper. If any tag maps to null, the result is considered incomplete and an empty Optional
    * is returned. Each resolved value is stripped of surrounding whitespace before joining.

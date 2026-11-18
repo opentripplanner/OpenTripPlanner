@@ -69,7 +69,6 @@ public enum OTPFeature {
    * time, but the definitive transfer time. Use this to override what we think the transfer will
    * take according to OSM data, for example if you want to set a very low transfer time like 1
    * minute, when walking the distance take 1m30s.
-   *
    * <p>
    * TODO Harmonize the JavaDoc with the user doc and delete JavaDoc
    */
@@ -201,7 +200,7 @@ public enum OTPFeature {
 
   /**
    * FOR TEST ONLY
-   *
+   * <p>
    * This method will run the given {@code task} with the feature turned ON. When the task complete
    * the feature is set back to its original value.
    * <p>
@@ -216,7 +215,7 @@ public enum OTPFeature {
 
   /**
    * FOR TEST ONLY
-   *
+   * <p>
    * See {@link #testOn(Runnable)}
    */
   public void testOff(Runnable task) {

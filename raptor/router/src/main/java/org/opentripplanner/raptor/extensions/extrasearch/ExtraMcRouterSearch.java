@@ -22,8 +22,6 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  * <p>
  * This will alter the multi-criteria search, if only a standard search is requested any extra
  * multi-criteria search is ignored.
- * <p>
- *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public interface ExtraMcRouterSearch<T extends RaptorTripSchedule> {

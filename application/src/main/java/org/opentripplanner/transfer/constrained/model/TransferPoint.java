@@ -6,12 +6,10 @@ import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
  * This interface is used to represent a point or location where a transfer start from or end.
- *
  * <p>
  * There are 4 different Transfer points:
  * <ol>
  *   <li>{@link StopTransferPoint} This apply to all trip stopping at the given stop.
- *
  * <p>
  * This is the least specific type, and is overridden if a more specific type exist.</li>
  * <li>{@link StationTransferPoint} This applies to all trips stopping at a stop part of the given
@@ -21,13 +19,11 @@ import org.opentripplanner.transit.model.timetable.Trip;
  * {@link RouteStationTransferPoint}.</li>
  * <li>A {@link RouteStationTransferPoint} is a from/to point for a Route at the given stop. This
  * only exists in GTFS, not in the Nordic NeTex profile.
- *
  * <p>
  * The specificity-ranking is above {@link StopTransferPoint}s and less than
  * {@link RouteStopTransferPoint}.</li>
  * <li>A {@link RouteStopTransferPoint} is a from/to point for a Route at the given station. This
  * only exists in GTFS, not in the Nordic NeTex profile.
- *
  * <p>
  * The specificity-ranking is above {@link RouteStationTransferPoint}s and less than
  * {@link TripTransferPoint}.</li>
@@ -43,7 +39,6 @@ import org.opentripplanner.transit.model.timetable.Trip;
  * <p>
  * This is the most specific point type.</li>
  * </ol>
- * <p>
  */
 public interface TransferPoint {
   /**

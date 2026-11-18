@@ -35,9 +35,9 @@ public interface DataSource {
   /**
    * @return the short name identifying the source within its scope (withing a {@link OtpDataStore}
    *         or {@link CompositeDataSource}) Including the file extension.
-   *         <p>
+   *     <p>
    *         Examples:
-   *         <p>
+   *     <p>
    *         {@code build-config.json, gtfs.zip and stops.txt}
    */
   String name();

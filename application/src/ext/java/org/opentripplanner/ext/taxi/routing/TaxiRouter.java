@@ -49,7 +49,6 @@ import org.slf4j.LoggerFactory;
  *       the same logical coordinates rather than the leg's own local coordinates, which may differ
  *       slightly when the route is a walk-drive-walk chain.
  * </ol>
- *
  * <p>
  * TODO: Multi-provider support. Currently only the first matching provider is used. In the
  * future all matching providers should be available so users can choose.

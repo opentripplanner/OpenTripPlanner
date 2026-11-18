@@ -4,7 +4,6 @@ import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.street.model.StreetMode;
 
 /**
- * <p>
  * In OTP, the street search and transit search are done separately. The results are then merged
  * and filtered to remove non-optimal itineraries. But, when the client does NOT provide a
  * ´directMode´, OTP does not do the streetSearch. And, the removal of non-optimal results is not

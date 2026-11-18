@@ -15,7 +15,6 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * TripScheduleBoardSearch} or {@code TripScheduleAlightSearch} is used.
  * <p>
  * This class do not perform the trip search, but delegates this.
- *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public final class TripScheduleExactMatchSearch<T extends RaptorTripSchedule> implements

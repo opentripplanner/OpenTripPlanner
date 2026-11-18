@@ -35,7 +35,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This module creates hop geometries from GTFS shapes.
- *
  * <p>
  * THREAD SAFETY The computation runs in parallel so be careful about thread safety when
  * modifying the logic here.

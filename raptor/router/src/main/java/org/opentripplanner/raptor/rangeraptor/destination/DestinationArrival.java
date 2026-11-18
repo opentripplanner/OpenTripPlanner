@@ -20,7 +20,6 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  * transfers and a time
  * criterion, because the arrivals come from different Range Raptor iterations.
  * See {@code org/opentripplanner/raptor/package.md}, section "Destination pareto-set".
- *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public class DestinationArrival<T extends RaptorTripSchedule> implements ArrivalView<T> {

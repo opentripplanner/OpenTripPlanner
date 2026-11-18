@@ -185,7 +185,6 @@ class ScheduledDeviatedTripIntegrationTest {
    * <p>
    * Normally these trip times are interpolated/repaired during the graph build but for flex this
    * is exactly what we don't want. Here we check that the interpolation process is skipped.
-   *
    * @see ValidateAndInterpolateStopTimesForEachTrip#interpolateStopTimes(List)
    */
   @Test

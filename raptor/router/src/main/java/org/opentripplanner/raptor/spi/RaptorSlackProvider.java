@@ -20,7 +20,6 @@ public interface RaptorSlackProvider {
    * calculate the earliest-bord-time before boarding).
    * <p>
    * Unit: seconds.
-   *
    * @param slackIndex The slackIndex is provided by the RaptorTripPattern
    */
   int boardSlack(int slackIndex);

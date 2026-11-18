@@ -13,7 +13,6 @@ public interface TemporaryVertex {
    * to the temporary subgraph and it is garbage collected.
    * <p>
    * Note! If the {@code vertex} is NOT a TemporaryVertex the method returns. No action taken.
-   *
    * @param vertex Vertex part of the temporary part of the graph.
    */
   static void dispose(Vertex vertex) {

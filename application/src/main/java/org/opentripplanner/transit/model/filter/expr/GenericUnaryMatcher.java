@@ -4,8 +4,6 @@ import java.util.function.Predicate;
 
 /**
  * A generic matcher that takes a predicate function that returns a boolean given the matched type.
- * <p>
- *
  * @param <T> The type of the entity being matched.
  */
 public class GenericUnaryMatcher<T> implements Matcher<T> {

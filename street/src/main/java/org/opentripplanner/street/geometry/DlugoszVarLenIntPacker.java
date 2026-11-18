@@ -8,7 +8,6 @@ import java.io.ByteArrayOutputStream;
  * signed int whose average are around 0.
  * <p>
  * See Dlugosz' variable-length integer encoding (http://www.dlugosz.com/ZIP2/VLI.html).
- *
  * @author laurent
  */
 class DlugoszVarLenIntPacker {

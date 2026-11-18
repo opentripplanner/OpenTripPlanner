@@ -14,7 +14,7 @@ import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfi
  * The street search is made once from each stop, with the longest duration that applies to the
  * stop, see {@link #searchLimit}. Each path found is then accepted or dropped using
  * {@link #accepts}, since the duration that applies depends on the stop the path ends in too.
- *
+ * <p>
  * Implementations are immutable and thread-safe.
  */
 public sealed interface MaxDurationsPreference

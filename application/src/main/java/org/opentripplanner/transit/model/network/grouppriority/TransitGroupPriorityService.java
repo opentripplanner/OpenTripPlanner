@@ -24,7 +24,7 @@ public class TransitGroupPriorityService {
 
   /**
    * IMPLEMENTATION DETAILS
-   *
+   * <p>
    * There are two ways we can treat the base (local-traffic) transit priority group:
    * <ol>
    *   <li>We can assign group id 1 (one) to the base group and it will be treated as any other
@@ -99,8 +99,6 @@ public class TransitGroupPriorityService {
 
   /**
    * Fetch/lookup the transit-group-id for the given pattern.
-   * <p>
-   *
    * @throws IllegalArgumentException if more than 32 group-ids are requested.
    */
   public int lookupTransitGroupPriorityId(TripPattern tripPattern) {
@@ -111,8 +109,6 @@ public class TransitGroupPriorityService {
 
   /**
    * Fetch/lookup the transit-group-id for the given trip.
-   * <p>
-   *
    * @throws IllegalArgumentException if more than 32 group-ids are requested.
    */
   public int lookupTransitGroupPriorityId(Trip trip) {
@@ -121,8 +117,6 @@ public class TransitGroupPriorityService {
 
   /**
    * Fetch/lookup the transit-group-id for the given entity.
-   * <p>
-   *
    * @throws IllegalArgumentException if more than 32 group-ids are requested.
    */
   private int lookupTransitGroupPriorityId(EntityAdapter entity) {

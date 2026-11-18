@@ -14,7 +14,6 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  * For example for a pass-through stop, the board position is where the route was boarded, but the
  * ride is not injected into the algorithm before the pass-through stop. This prevents alighting the
  * trip before the pass-through stop is visited.
- *
  * <p>
  * An on-board trip access represents a passenger who is already on board a vehicle at the start
  * of the search — i.e., their "access leg" is the ride itself rather than a walk to a stop. Each

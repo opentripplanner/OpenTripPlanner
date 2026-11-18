@@ -273,7 +273,7 @@ public class TripPatternForDates
 
   /**
    * Return a list with all departure times for the first stop for each trip per day.
-   *
+   * <p>
    * There are no unit-tests on this method, so the surface to {@link TripPatternForDate} should be
    * kept as thin as possible.
    */

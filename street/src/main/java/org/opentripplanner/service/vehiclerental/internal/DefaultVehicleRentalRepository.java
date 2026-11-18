@@ -20,12 +20,10 @@ import org.opentripplanner.street.graph.Graph;
 /**
  * Default {@link VehicleRentalRepository}. Owns the rental places and the geofencing zone indices,
  * and answers geofencing zone queries via {@link GeofencingZoneService}.
- *
  * <p>
  * Lives only in the serve phase. Zones applied during the graph build are carried on the
  * {@link org.opentripplanner.street.graph.Graph} and indexed here at construction; zones applied by
  * an updater are indexed as they are registered.
- *
  * <p>
  * Indices are keyed by network. A network has exactly one source of zones, so a later
  * registration replaces an earlier one rather than adding a second index alongside it.

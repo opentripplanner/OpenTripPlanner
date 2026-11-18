@@ -69,7 +69,6 @@ public class OtpConfigLoader {
    * given {@code configDir} is {@code null} or config file is NOT found.
    * <p>
    * This method also log all loaded parameters to the console.
-   * <p>
    */
   public OtpConfig loadOtpConfig() {
     return new OtpConfig(
@@ -83,7 +82,6 @@ public class OtpConfigLoader {
    * given {@code configDir} is {@code null} or config file is NOT found.
    * <p>
    * This method also log all loaded parameters to the console.
-   * <p>
    */
   public BuildConfig loadBuildConfig() {
     JsonNode node = loadFromFile(BUILD_CONFIG_FILENAME);
@@ -98,7 +96,6 @@ public class OtpConfigLoader {
   /**
    * Load the router configuration file as a JsonNode three. An empty node is returned if the given
    * {@code configDir} is {@code null} or config file is NOT found.
-   * <p>
    */
   public RouterConfig loadRouterConfig() {
     JsonNode node = loadFromFile(ROUTER_CONFIG_FILENAME);

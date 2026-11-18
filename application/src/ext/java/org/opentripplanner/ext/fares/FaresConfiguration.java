@@ -32,7 +32,6 @@ public class FaresConfiguration {
    * specified.
    * <p>
    * Accept different formats. Examples:
-   *
    * <pre>
    * { fares : "seattle" }
    * --------------------------

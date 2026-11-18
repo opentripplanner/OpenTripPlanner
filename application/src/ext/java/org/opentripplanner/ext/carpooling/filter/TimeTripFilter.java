@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
  * A trip is rejected when it cannot serve the passenger inside the passenger's window. Trips
  * that pass are still subject to expensive routing and a tighter post-filter on the actual
  * itinerary times.
- *
  * <h2>Variables</h2>
  *
  * <h3>Request window</h3>

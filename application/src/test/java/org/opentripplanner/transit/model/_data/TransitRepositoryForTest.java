@@ -51,7 +51,6 @@ import org.opentripplanner.utils.time.TimeUtils;
 
 /**
  * Test utility class to help construct valid transit model objects.
- * <p>
  * <pre>
  * TODO: This need cleanup - it has static factory methods. This is not safe, since
  *       all objects created will be created in the same context. All stops are created

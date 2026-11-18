@@ -107,7 +107,6 @@ public class RaptorTransitDataMapper {
    * Map pre-Raptor TripPatterns and Trips to the corresponding Raptor classes.
    * <p>
    * Part of this method runs IN PARALLEL.
-   * <p>
    */
   private HashMap<LocalDate, List<TripPatternForDate>> mapTripPatterns(
     Collection<TripPattern> allTripPatterns

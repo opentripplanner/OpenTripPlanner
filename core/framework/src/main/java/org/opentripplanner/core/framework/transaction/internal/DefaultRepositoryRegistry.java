@@ -8,7 +8,6 @@ import org.opentripplanner.core.model.transaction.UpdateManager;
 
 /**
  * Default implementation of {@link RepositoryRegistry}.
- *
  * <p>
  * Wraps a {@link TransactionManager} to coordinate transactions across all registered
  * repositories. Each call to {@link #registerRepositorySnapshot(Object, RepositoryLifecycle)}

@@ -32,16 +32,16 @@ import org.opentripplanner.raptor.configure.RaptorTestFactory;
 
 /**
  * FEATURE UNDER TEST
- *
+ * <p>
  * Raptor should be able to handle route request with one or more via locations transfering at a
  * given set of stops. If a stop is specified as via location in the request, then all the results
  * returned from raptor should include the stop. The stop should be a alight, board or intermediate
  * stop of one of the trips in the path.
- *
+ * <p>
  * It should be possible to specify more than one connection. The result should include the via
  * locations in the order as they were specified in the request. Only alternatives that pass through
  * all via locations should be included in the result.
- *
+ * <p>
  * To support stations and other collections of stops, Raptor should also support multiple via
  * connections in one via location.
  */

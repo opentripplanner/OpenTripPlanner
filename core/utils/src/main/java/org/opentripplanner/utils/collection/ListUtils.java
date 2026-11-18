@@ -67,7 +67,6 @@ public class ListUtils {
    * so they must be consumed before the original list is structurally modified (elements added or
    * removed). Unlike the Guava equivalent, the returned outer list does not reflect later changes
    * to the input list.
-   *
    * @param maxSize the maximum number of elements in each sublist, must be at least 1
    * @throws IllegalArgumentException if {@code maxSize} is less than 1
    * @throws NullPointerException     if {@code list} is {@code null}

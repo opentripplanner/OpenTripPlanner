@@ -31,7 +31,7 @@ public class D01_SingeRouteBoardAlightRestrictionsTest implements RaptorTestCons
 
   /**
    * Stops: 0..3
-   *
+   * <p>
    * Route restrictions at stop (B:Board, A:Alight, W:Wheelchair):
    * <pre>
    *   Stop:  B   C   D

@@ -11,7 +11,6 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * Group by Similarity filter parameters. See the configuration for documentation of each field.
- *
  * <p>
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */

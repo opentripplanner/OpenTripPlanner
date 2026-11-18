@@ -217,8 +217,6 @@ public sealed interface TripTimes<T extends TripTimes<T>>
   /**
    * resolves a trip's runtime on a service day, according to its schedule. The period starts at the
    * scheduled departure from the first stop and ends at the scheduled arrival at the last stop.
-   * <p>
-   *
    * @param startOfService the start of the service day the trip is running on, see
    *                       {@link org.opentripplanner.utils.time.ServiceDateUtils#asStartOfService}.
    * @return {@code null} if the schedule of the trip cannot be resolved, either because the trip
@@ -260,7 +258,6 @@ public sealed interface TripTimes<T extends TripTimes<T>>
    * ignores those times. Scheduled times of a real-time added trip are used as-is when the trip is
    * later cancelled, so they must pass the very same validation as the real-time times, or the
    * cancellation would be rejected and the trip would be stuck in the graph as running.
-   *
    * @throws DataValidationException of the first error found.
    */
   default void validateNonIncreasingTimes() {

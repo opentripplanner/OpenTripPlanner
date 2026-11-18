@@ -11,7 +11,6 @@ import org.opentripplanner.transit.api.model.FilterValues;
  * This builder contains convenience methods for creating complex matchers from simpler ones. The
  * resulting matcher "ands" together all the matchers it has built up. This supports the common
  * pattern of narrowing results with multiple filters.
- *
  * @param <T> The type of entity to match in the expression.
  */
 public class ExpressionBuilder<T> {

@@ -66,7 +66,6 @@ public interface RaptorTripPattern {
    * startPosition(exclusive) where alighting is possible.
    * <p>
    * {@code -1} is returned if not found.
-   *
    * @param startPos        the stop position in the pattern to start the search (exclusive). Note!
    *                        Only defined for range {@code [0..N]} (N = number of stops in the
    *                        pattern).
@@ -90,7 +89,6 @@ public interface RaptorTripPattern {
    * only occurrence if the pattern goes in a loop.
    * <p>
    * {@code -1} is returned if not found.
-   *
    * @param startPos        the stop position in the pattern to start the search (exclusive). Note!
    *                        Only defined for range {@code [0..N-1]} (N = number of stops in the
    *                        pattern).
@@ -114,7 +112,6 @@ public interface RaptorTripPattern {
    * pattern goes in a loop.
    * <p>
    * {@code -1} is returned if not found.
-   *
    * @param startPos  the stop position in the pattern to start the search (inclusive)
    * @param stopIndex the stopIndex to find
    */
@@ -134,7 +131,6 @@ public interface RaptorTripPattern {
    * pattern goes in a loop.
    * <p>
    * {@code -1} is returned if not found.
-   *
    * @param startPos       the stop position in the pattern to start the search (exclusive). Note!
    *                       Only defined for range {@code [0..N-1]} (N = number of stops in the
    *                       pattern).
@@ -158,7 +154,6 @@ public interface RaptorTripPattern {
    * pattern goes in a loop.
    * <p>
    * {@code -1} is returned if not found.
-   *
    * @param startPos       the stop position in the pattern to start the search (inclusive). Note!
    *                       Only defined for range {@code [0..N-1]} (N = number of stops in the
    *                       pattern).

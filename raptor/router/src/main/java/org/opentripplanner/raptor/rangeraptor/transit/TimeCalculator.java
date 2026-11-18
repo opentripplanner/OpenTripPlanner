@@ -36,7 +36,6 @@ public interface TimeCalculator {
    * <p>
    * Reverse search: Return {@code true} if the first argument ({@code subject}) is AFTER the
    * second argument ({@code candidate}). If both are equal {@code false} is returned.
-   *
    * @return true if subject is better than the candidate; if not false.
    */
   boolean isBefore(int subject, int candidate);
@@ -47,7 +46,6 @@ public interface TimeCalculator {
    * <p>
    * Reverse search: Return {@code true} if the first argument ({@code subject}) is BEFORE the
    * second argument ({@code candidate}). If both are equal {@code false} is returned.
-   *
    * @return true if subject is better than the candidate; if not false.
    */
   boolean isAfter(int subject, int candidate);

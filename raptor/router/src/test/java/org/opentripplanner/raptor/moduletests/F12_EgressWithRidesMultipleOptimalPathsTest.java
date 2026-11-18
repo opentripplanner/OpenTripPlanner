@@ -36,7 +36,6 @@ import org.opentripplanner.raptor.spi.TestSlackProvider;
  * walking option might not be possible.
  * <p>
  * Test case: <img src="images/F12.svg" width="432" height="212" />
- * <p>
  * <pre>
  * // Allowed paths
  * A ~ L1 ~ C ~ Walk ~ D

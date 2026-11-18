@@ -10,7 +10,6 @@ package org.opentripplanner.street.model.elevation;
  *
  *     W = 6 m/s * Exp(-3.5 * Abs(dh/dx + 0.05))
  * </pre>
- *
  * <p>
  * The {@code 6 m/s} is the Maximum speed achieved. This happens at angle 2.86 degrees or -5%
  * downhill. In OTP we want to apply this as a multiplier to the horizontal walking distance. This

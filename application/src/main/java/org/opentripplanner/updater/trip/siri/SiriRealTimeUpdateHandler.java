@@ -175,7 +175,6 @@ public class SiriRealTimeUpdateHandler {
    * {@code ExtraJourney} element). That second message is routed here as {@code TRIP_UPDATE}
    * (because {@code isExtraJourney()} is {@code null}/false), and {@code ModifiedTripBuilder}
    * handles the cancellation.
-   *
    * <p>
    * This is why the {@link RealTimeTripTimesBuilder} never needs to hold both {@code added=true}
    * and {@code canceled=true} at the same time for a SIRI source.

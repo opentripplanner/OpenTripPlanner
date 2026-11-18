@@ -30,7 +30,6 @@ public interface RaptorAccessEgress {
    * <p>
    * Be careful, calling methods part of the {@link RaptorAccessEgress} interface on the returned
    * value will no longer be decorated - not be the value used by Raptor.
-   *
    * @throws IllegalStateException if the given {@code parentType} does not exist in the chain of
    *                               delegates including the first and last element.
    */
@@ -94,7 +93,6 @@ public interface RaptorAccessEgress {
    * FLEX is faster by more than the penalty. Keeping a large number of optimal access paths has a
    * negative impact on performance as well.
    * <p>
-   *
    * The unit is seconds and the default value is {@link RaptorConstants#TIME_NOT_SET}.
    */
   default int timePenalty() {
@@ -226,7 +224,6 @@ public interface RaptorAccessEgress {
    * instead.
    * <p>
    * Examples/guidelines:
-   * <p>
    * <pre>
    * Access/egress  | num-of-rides | Description
    *     walk       |      0       | Plain walking leg

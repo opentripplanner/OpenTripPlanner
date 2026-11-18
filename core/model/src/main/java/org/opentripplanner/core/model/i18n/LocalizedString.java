@@ -15,7 +15,6 @@ import org.opentripplanner.core.model.resources.ResourceBundleSingleton;
  * internals_lang.properties
  * <p>
  * locale is set in request.
- *
  * @author mabu
  */
 public class LocalizedString implements I18NString, Serializable {

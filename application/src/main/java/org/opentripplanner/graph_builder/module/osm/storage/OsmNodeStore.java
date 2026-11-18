@@ -165,7 +165,6 @@ class OsmNodeStore {
    * into the low bits of the shifted {@code latFixed} recombines the two without the sign bits
    * interfering with each other. {@link #unpackLat} and {@link #unpackLon} reverse this by
    * shifting/narrowing back down to {@code int}, which restores the correct sign for each half.
-   *
    * @throws IllegalArgumentException if lat/lon are outside their valid ranges
    */
   private static long packCoordinate(double lat, double lon) {

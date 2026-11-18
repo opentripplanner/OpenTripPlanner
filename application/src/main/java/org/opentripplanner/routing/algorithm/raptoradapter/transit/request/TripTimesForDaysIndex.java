@@ -36,7 +36,7 @@ final class TripTimesForDaysIndex {
 
   /**
    * Goal: Read the JavaDoc for the class and factory method, and study the unit-test.
-   *
+   * <p>
    * Implementation notes!
    * <p>
    * We need to order trips based on the "actual" departure time, not day and departure-time. We

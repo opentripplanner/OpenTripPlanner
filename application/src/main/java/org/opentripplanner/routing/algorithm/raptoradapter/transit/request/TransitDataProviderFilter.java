@@ -16,7 +16,6 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
  * {@link TripPatternForDate} and {@link TripTimes} are filtered based on the request parameters
  * to only included components which are allowed by the request. Such filters may include bike or
  * wheelchair accessibility, banned routes and transit modes.
- *
  * @see DefaultTransitDataProviderFilter
  */
 public interface TransitDataProviderFilter {

@@ -793,7 +793,6 @@ public abstract class OsmEntity {
    * <p>
    * This intentionally excludes railway=stop and public_transport=stop because these are
    * supposed to be placed on the tracks not on the platform.
-   *
    * @return whether the node is a place used to board a public transport vehicle
    */
   public boolean isBoardingLocation() {
@@ -1007,7 +1006,6 @@ public abstract class OsmEntity {
    * <p>
    * Perhaps this entity has a name that isn't in the source data, but it's also possible that
    * it's explicitly tagged as not having one.
-   *
    * @see OsmEntity#isExplicitlyUnnamed()
    */
   public boolean hasNoName() {

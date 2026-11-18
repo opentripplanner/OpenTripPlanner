@@ -15,7 +15,6 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * Parameters for doing transfers between transit legs.
- *
  * <p>
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */

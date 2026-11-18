@@ -12,8 +12,9 @@ import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUser
  * singleton (mirroring {@code TransferRepository}) before the transit model is indexed, then
  * populated in place by the graph-builder module, and survive graph serialization the same way
  * {@code TransferRepository} does.
- *
- * @param <P> the street path type
+ * @param
+ *     <p>
+ *     the street path type
  */
 public class DefaultRegularTransferBuildRepository<P> implements RegularTransferBuildRepository<P> {
 

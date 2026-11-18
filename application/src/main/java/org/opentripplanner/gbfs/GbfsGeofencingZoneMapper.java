@@ -29,7 +29,6 @@ import org.slf4j.LoggerFactory;
  * by vehicle type scope: rules with the same {@code vehicle_type_ids} are grouped, and only the
  * first (highest-precedence) rule per group is kept. Each distinct vehicle type scope produces one
  * {@link GeofencingZone}.
- *
  * @param <F> The GBFS feature type (zone)
  * @param <R> The GBFS rule type
  */

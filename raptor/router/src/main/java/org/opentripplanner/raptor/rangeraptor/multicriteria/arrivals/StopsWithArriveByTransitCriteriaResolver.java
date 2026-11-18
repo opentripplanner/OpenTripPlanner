@@ -14,7 +14,6 @@ import org.opentripplanner.raptor.rangeraptor.transit.ViaConnections;
  * dominated by on-street arrivals(transfers & access). This is because at these stops arriving
  * on-board will give you an advantage - e.g. you must arrive by transit to continue using a
  * via-connection, transfer or egress.
- *
  * <p>
  * A stop is included in the result when at least one of the following holds:
  * <ol>

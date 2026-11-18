@@ -302,7 +302,7 @@ public class TransitRepository implements Serializable {
    * <p>
    * SIRI feeds are encouraged to refer to scheduled stop points in an EstimatedCall's
    * stopPointRef but the specs are unclear and the reality on the ground very mixed.
-   *
+   * <p>
    * @link <a href="https://public.3.basecamp.com/p/TcEEP5WrNZJPBxrJU9GAjint">NeTEx Basecamp
    *       discussion</a>
    */
@@ -315,7 +315,6 @@ public class TransitRepository implements Serializable {
    * are correctly applied to {@code transitAlertService}.
    * <p>
    * Note: before this method is called an empty {@code transitAlertService} is returned instead.
-   * <p>
    * <pre>
    * TODO: This logic is unfortunate and quite brittle. We would like to improve it in the future.
    *       The UpdateManager should live in a DI context(Dagger), not here.

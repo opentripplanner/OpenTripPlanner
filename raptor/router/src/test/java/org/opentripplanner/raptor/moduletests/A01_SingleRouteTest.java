@@ -31,7 +31,7 @@ public class A01_SingleRouteTest implements RaptorTestConstants {
 
   /**
    * Stops: 0..3
-   *
+   * <p>
    * Stop on route (stop indexes):
    * <pre>
    *   R1:  1 - 2 - 3

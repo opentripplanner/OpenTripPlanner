@@ -168,7 +168,6 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
    * vertex
    * at its own coordinate, connected to the area directly when it lies inside, or else through an
    * access point just inside the area (see {@link #linkIntoPlatformArea}).
-   *
    * @return if the vertex has been connected
    */
   private boolean connectVertexToArea(TransitStopVertex ts, Graph graph) {
@@ -210,7 +209,6 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
    * splitting the way if needed. In {@code TRANSIT} mode it is attached where the way passes
    * closest
    * to the stop's own coordinate, over an edge of the true length (see {@link #linkToPlatformWay}).
-   *
    * @return if the vertex has been connected
    */
   private boolean connectVertexToWay(TransitStopVertex ts, RegularStop stop, Graph graph) {
@@ -322,7 +320,6 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
    * Connect a transit stop vertex to a boarding location node.
    * <p>
    * The node is generated in the OSM processing step but we need to link it here.
-   *
    * @return If the vertex has been connected.
    */
   private boolean connectVertexToNode(TransitStopVertex ts, RegularStop stop, Graph graph) {
@@ -429,7 +426,6 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
    * rather than move the stop - which would swallow a genuine distance - an <em>access point</em>
    * placed just inside takes the visibility edges on its behalf, joined to the boarding location by
    * one edge of the true length.
-   *
    * @param area the matched platform sub-area, whose properties the edge to the access point
    *     carries
    */

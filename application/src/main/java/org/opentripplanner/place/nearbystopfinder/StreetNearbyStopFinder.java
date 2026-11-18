@@ -262,8 +262,6 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
     /**
      * The search can adjusted using extensions. Each extention may provide its own request context.
      * Set the context here.
-     * <p>
-     *
      * @see org.opentripplanner.street.model.edge.StreetEdgeCostExtension
      */
     public Builder withExtensionRequestContexts(

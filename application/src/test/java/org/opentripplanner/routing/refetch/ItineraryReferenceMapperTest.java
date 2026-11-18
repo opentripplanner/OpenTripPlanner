@@ -43,8 +43,8 @@ import org.opentripplanner.transit.transfer.regular.FixedRegularTransfers;
 /**
  * UC1 acceptance test for a single scheduled-transit itinerary without access, egress or
  * transfers.
- *
- * <p>Proves the chain:
+ * <p>
+ * Proves the chain:
  * {@code Itinerary -> ItineraryReference -> encode -> decode -> RefetchItineraryService ->
  * same scheduled transit itinerary}.
  */

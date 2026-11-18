@@ -135,7 +135,6 @@ public class ConfigModel {
    * Get the {@code router-config.json} as JsonNode.
    * <p>
    * Returns a {@link MissingNode} if base directory is {@code null} or the file does not exist.
-   *
    * @throws RuntimeException if the file contains syntax errors or cannot be parsed.
    */
   public RouterConfig routerConfig() {

@@ -149,7 +149,6 @@ public final class EndpointContextLineString {
    * The result is order-invariant, so {@code reverse} only affects which endpoint seeds the
    * delta chain (it must match the value the bytes were encoded with); the minimum distance over
    * the segment set is identical regardless.
-   *
    * @param xa           X (longitude) of end point A
    * @param ya           Y (latitude) of end point A
    * @param xb           X (longitude) of end point B

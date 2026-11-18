@@ -54,7 +54,6 @@ final class RestrictedZoneEnforcement implements GeofencingBoundaryEnforcement {
    * ArriveBy search: a committed renting state was inside the zone (current edge crosses outward in
    * forward time). For a no-traversal zone that's illegal — a rented vehicle couldn't legally have
    * been there. Block.
-   *
    * <p>
    * Only committed (network-bound) states are checked here. HAVE_RENTED walkers are handled by
    * {@link #arriveByAtBoundary}; generic (null-network) renting states by

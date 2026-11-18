@@ -117,7 +117,6 @@ public class DayTypeAssignmentMapper {
    * The NeTEx profile makes both {@code properties} and {@code DaysOfWeek} optional. A day type
    * which does not state any days of the week therefore constrains nothing and is valid for
    * <em>every</em> day in the period.
-   * <p>
    */
   private static Set<DayOfWeek> daysOfWeekForDayType(DayType dayType) {
     if (dayType.getProperties() == null) {
@@ -159,8 +158,6 @@ public class DayTypeAssignmentMapper {
    * <p>
    * Do not call this method before you want to retrieve the result. Calling this method more
    * than once, may have unexpected effects.
-   * <p>
-   *
    * @return the set of service dates for all dayTypes mapped.
    */
   private Set<LocalDate> mergeAndMapDates() {

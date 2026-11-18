@@ -119,7 +119,7 @@ public final class WgsCoordinate implements Serializable {
    * Compare to coordinates and return {@code true} if they are close together - have the same
    * location. The comparison uses an EPSILON of 1E-7 for each axis, for both latitude and
    * longitude.
-   *
+   * <p>
    * When we compare two coordinates we want to see if they are within a given distance, roughly
    * within a square centimeter. This is not <em>transitive</em>, hence violating the equals/hasCode
    * guideline. Consider 3 point along one of the axis:

@@ -20,7 +20,6 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * by transit. If the transfer arrival is better than the transit arrival, it might be tempting to
  * remove the transit arrival, but this transit might be the best way (or only way) to get to
  * another stop by transfer.
- *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 sealed class DefaultStopArrivalState<T extends RaptorTripSchedule>

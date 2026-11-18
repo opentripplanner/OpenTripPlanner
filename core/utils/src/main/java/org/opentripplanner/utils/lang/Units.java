@@ -107,7 +107,6 @@ public class Units {
    * </ol>
    * Ties are broken to the even neighbour (HALF_EVEN, banker's rounding), via BigDecimal so that
    * decimal inputs are pinned exactly and the tie detection is not subject to IEEE-754 drift.
-   *
    * <p>
    * Unit: meters per second (m/s)
    */

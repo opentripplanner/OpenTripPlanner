@@ -128,7 +128,6 @@ public class TripCalendars implements Serializable {
    * Service codes are small integers (0, 1, 2, …) allocated during graph build to enable compact
    * BitSet-based lookups in the Raptor routing engine instead of object comparisons. The
    * relationship with service id is 1-to-1.
-   *
    * @return the integer code, or {@code null} if not found
    */
   public Integer getServiceCode(FeedScopedId serviceId) {
@@ -290,7 +289,6 @@ public class TripCalendars implements Serializable {
    * {@code onUpdate}) a new instance if the service id was not already registered — the common
    * case, where the same date has already been seen by an earlier call, is a pure read with no
    * allocation.
-   *
    * @param serviceDate service date for the added service id
    * @param onUpdate    callback invoked with the new instance, if and only if a new service id was
    *                    registered

@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 
 /**
  * This utility class substitute variable placeholders in a given text on the format ${variable}.
- *
+ * <p>
  * The pattern matching a placeholder must start with '${' and end with '}'. The variable name must
  * consist of only alphanumerical characters (a-z, A-Z, 0-9), dot `.` and underscore '_'.
  */

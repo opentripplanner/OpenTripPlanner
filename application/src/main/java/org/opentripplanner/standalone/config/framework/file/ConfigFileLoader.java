@@ -70,7 +70,6 @@ public class ConfigFileLoader {
    * {@code configDir} is {@code null} or config file is NOT found.
    * <p>
    * This is public to allow loading configuration files from tests like the SpeedTest.
-   *
    * @see #loadJsonFile for more details.
    */
   public JsonNode loadFromFile(String filename) {

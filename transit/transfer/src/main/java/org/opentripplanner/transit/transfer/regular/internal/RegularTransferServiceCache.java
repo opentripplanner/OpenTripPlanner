@@ -39,7 +39,6 @@ import org.opentripplanner.transit.transfer.regular.api.report.RegularTransferCa
  * responsibility, not this cache's.
  * <p>
  * This class is thread-safe.
- *
  * @param <V> the cached value type
  */
 class RegularTransferServiceCache<V> {

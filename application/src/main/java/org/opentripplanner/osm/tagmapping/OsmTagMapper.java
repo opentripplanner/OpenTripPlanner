@@ -46,8 +46,6 @@ import org.opentripplanner.osm.wayproperty.specifier.LogicalOrSpecifier;
  * normally does not permit walking based on its tag matches (the prevailing 'props.setProperties'
  * statement) has a 'foot=yes' tag the permissions are overridden and walking is allowed on that
  * way.
- * <p>
- *
  * @author bdferris, novalis
  */
 

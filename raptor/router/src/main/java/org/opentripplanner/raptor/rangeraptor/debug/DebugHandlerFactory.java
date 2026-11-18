@@ -17,7 +17,6 @@ import org.opentripplanner.raptor.util.paretoset.ParetoSetEventListener;
  * <p>
  * See the <b>package.md</b> for Debugging implementation notes in the raptor root package
  * {@link org.opentripplanner.transit}.
- *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public class DebugHandlerFactory<T extends RaptorTripSchedule> {

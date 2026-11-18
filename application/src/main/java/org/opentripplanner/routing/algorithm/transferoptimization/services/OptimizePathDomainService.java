@@ -28,7 +28,6 @@ import org.opentripplanner.routing.algorithm.transferoptimization.model.TripToTr
  * generated are pruned during construction.
  * <p>
  * <b>Performance</b>
- * <p>
  * <pre>
  * N : number of transfers in path
  * M : number of possible transfer location for a given pair of trips

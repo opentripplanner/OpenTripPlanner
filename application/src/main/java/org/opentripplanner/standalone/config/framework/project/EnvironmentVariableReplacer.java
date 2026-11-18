@@ -15,7 +15,6 @@ import org.opentripplanner.utils.text.TextVariablesSubstitution;
  * current system environment variable values.
  * <p>
  * The following OTP Project info is also available in addition to system environment variables:
- *
  * <ul>
  *   <li>{@code maven.version} - Full Maven version string, including the SNAPSHOT qualifier if
  *       present.</li>

@@ -170,7 +170,6 @@ public class NetexMapper {
    * Note that the order in which the elements are mapped is important. For example, if a file
    * contains Authorities, Line and Notices - they need to be mapped in that order, since Route have
    * a reference on Agency, and Notice may reference on Route.
-   *
    * @param netexIndex The parsed Netex entities to be mapped
    */
   public void mapNetexToOtp(NetexEntityIndexReadOnlyView netexIndex) {

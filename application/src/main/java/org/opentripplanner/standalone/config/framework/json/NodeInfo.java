@@ -11,10 +11,8 @@ import org.opentripplanner.utils.tostring.ValueObjectToStringBuilder;
 
 /**
  * Information about a configuration parameter.
- *
  * <p>
  * TODO DOC - Add Unit tests on this class using the builder
- *
  * @param name         The parameter name in the JSON config file.
  * @param summary      Short one sentence description of the parameter used for documentation.
  * @param description  Long optional multi-line documentation of a parameter - use markdown.
@@ -61,7 +59,6 @@ public record NodeInfo(
    * For some complex types like Map, we describe the child elements as part of the node-info of the
    * parent. Hence, we need to skip the child when generating documentation. So, this factory method
    * is used to generate a placeholder in these cases.
-   * <p>
    * <pre>
    * TODO DOC: A better way to do this is to remove this and add proper NodeInfo elements for
    *           the child, but that requires a bit of refactoring.
@@ -82,7 +79,6 @@ public record NodeInfo(
    * For array of objects the child elements does not have as part of the node-info of the parent.
    * Hence, we need to skip the child when generating documentation. So, this factory method is used
    * to generate a placeholder in these cases.
-   * <p>
    * <pre>
    * TODO DOC: A better way to do this is to remove this and add proper NodeInfo elements for
    *           the child, but that requires a bit of refactoring.
