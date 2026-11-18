@@ -40,44 +40,48 @@ public class EdgePropertyMapper extends PropertyMapper<Edge> {
     List<KeyValue> properties = switch (input) {
       case StreetEdge e -> mapStreetEdge(e);
       case EscalatorEdge e -> mapEscalatorEdge(e);
-      case ElevatorHopEdge e -> List.of(
-        kv("permission", e.getPermission()),
-        kv("levels", e.getLevels()),
-        kv("wheelchairAccessible", e.isWheelchairAccessible()),
-        kv("travelTime", e.getTravelTime().map(Duration::toString).orElse(null)),
-        kv("fromVertexLabel", e.getFromVertex().getLabel().toString()),
-        kv("toVertexLabel", e.getToVertex().getLabel().toString())
-      );
-      case ElevatorBoardEdge e -> List.of(
-        kv(
-          "levelValue",
-          streetDetailsService
-            .findHorizontalEdgeLevelInfo(e)
-            .map(l -> l.level())
-            .orElse(null)
-        ),
-        kv(
-          "levelName",
-          streetDetailsService
-            .findHorizontalEdgeLevelInfo(e)
-            .map(l -> l.name())
-            .orElse(null)
-        ),
-        kv("fromVertexLabel", e.getFromVertex().getLabel().toString()),
-        kv("toVertexLabel", e.getToVertex().getLabel().toString())
-      );
-      case ElevatorAlightEdge e -> List.of(
-        kv("fromVertexLabel", e.getFromVertex().getLabel().toString()),
-        kv("toVertexLabel", e.getToVertex().getLabel().toString())
-      );
-      case PathwayEdge e -> List.of(
-        kv("name", e.getName()),
-        kv("traversalTime", e.traversalTime()),
-        kv("distance", e.getDistanceMeters()),
-        kv("stairCount", e.getStairCount()),
-        kv("signpostedAs", e.signpostedAs()),
-        kv("stairs", e.isStairs())
-      );
+      case ElevatorHopEdge e
+        -> List.of(
+          kv("permission", e.getPermission()),
+          kv("levels", e.getLevels()),
+          kv("wheelchairAccessible", e.isWheelchairAccessible()),
+          kv("travelTime", e.getTravelTime().map(Duration::toString).orElse(null)),
+          kv("fromVertexLabel", e.getFromVertex().getLabel().toString()),
+          kv("toVertexLabel", e.getToVertex().getLabel().toString())
+        );
+      case ElevatorBoardEdge e
+        -> List.of(
+          kv(
+            "levelValue",
+            streetDetailsService
+              .findHorizontalEdgeLevelInfo(e)
+              .map(l -> l.level())
+              .orElse(null)
+          ),
+          kv(
+            "levelName",
+            streetDetailsService
+              .findHorizontalEdgeLevelInfo(e)
+              .map(l -> l.name())
+              .orElse(null)
+          ),
+          kv("fromVertexLabel", e.getFromVertex().getLabel().toString()),
+          kv("toVertexLabel", e.getToVertex().getLabel().toString())
+        );
+      case ElevatorAlightEdge e
+        -> List.of(
+          kv("fromVertexLabel", e.getFromVertex().getLabel().toString()),
+          kv("toVertexLabel", e.getToVertex().getLabel().toString())
+        );
+      case PathwayEdge e
+        -> List.of(
+          kv("name", e.getName()),
+          kv("traversalTime", e.traversalTime()),
+          kv("distance", e.getDistanceMeters()),
+          kv("stairCount", e.getStairCount()),
+          kv("signpostedAs", e.signpostedAs()),
+          kv("stairs", e.isStairs())
+        );
       default -> List.of();
     };
     return ListUtils.combine(baseProps, properties);

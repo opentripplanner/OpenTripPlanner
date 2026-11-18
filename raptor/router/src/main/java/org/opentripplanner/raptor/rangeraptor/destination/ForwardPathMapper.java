@@ -54,9 +54,10 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
         }
         case TRANSFER -> pathBuilder.transfer(arrival.transfer(), arrival.stop());
         case ACCESS -> pathBuilder.access(arrival.accessPath().access());
-        case EGRESS -> throw new RuntimeException(
-          "Unknown arrival type: " + arrival.getClass().getSimpleName()
-        );
+        case EGRESS
+          -> throw new RuntimeException(
+            "Unknown arrival type: " + arrival.getClass().getSimpleName()
+          );
       }
 
       arrival = arrival.previous();

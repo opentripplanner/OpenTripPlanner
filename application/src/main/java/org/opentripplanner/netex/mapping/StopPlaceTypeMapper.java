@@ -49,7 +49,8 @@ class StopPlaceTypeMapper {
         INTERCITY_RAIL,
         URBAN_RAIL,
         SELF_DRIVE,
-        UNKNOWN -> null;
+        UNKNOWN
+          -> null;
     };
   }
 

@@ -9,9 +9,8 @@ class WheelchairAccessibilityMapper {
       case 0 -> Accessibility.NO_INFORMATION;
       case 1 -> Accessibility.POSSIBLE;
       case 2 -> Accessibility.NOT_POSSIBLE;
-      default -> throw new IllegalArgumentException(
-        "Unknown GTFS WheelChairBoardingType: " + gtfsCode
-      );
+      default
+        -> throw new IllegalArgumentException("Unknown GTFS WheelChairBoardingType: " + gtfsCode);
     };
   }
 }

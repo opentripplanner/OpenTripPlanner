@@ -147,7 +147,8 @@ public class OrcaFareService extends DefaultFareService {
           WHATCOM_CROSS_COUNTY,
           KITSAP_TRANSIT_FAST_FERRY,
           MONORAIL,
-          SKAGIT_CROSS_COUNTY -> false;
+          SKAGIT_CROSS_COUNTY
+            -> false;
         default -> true;
       };
     }
@@ -262,13 +263,15 @@ public class OrcaFareService extends DefaultFareService {
           yield RideType.PIERCE_COUNTY_TRANSIT;
         }
       }
-      case SOUND_TRANSIT_AGENCY_ID -> route.getShortName().contains("Shuttle")
-        ? RideType.LINK_SHUTTLE
-        : RideType.SOUND_TRANSIT;
+      case SOUND_TRANSIT_AGENCY_ID
+        -> route.getShortName().contains("Shuttle")
+          ? RideType.LINK_SHUTTLE
+          : RideType.SOUND_TRANSIT;
       case EVERETT_TRANSIT_AGENCY_ID -> RideType.EVERETT_TRANSIT;
-      case SKAGIT_TRANSIT_AGENCY_ID -> Set.of("80X", "90X").contains(route.getShortName())
-        ? RideType.SKAGIT_CROSS_COUNTY
-        : RideType.SKAGIT_LOCAL;
+      case SKAGIT_TRANSIT_AGENCY_ID
+        -> Set.of("80X", "90X").contains(route.getShortName())
+          ? RideType.SKAGIT_CROSS_COUNTY
+          : RideType.SKAGIT_LOCAL;
       case SEATTLE_STREET_CAR_AGENCY_ID -> RideType.SEATTLE_STREET_CAR;
       case WASHINGTON_STATE_FERRIES_AGENCY_ID -> RideType.WASHINGTON_STATE_FERRIES;
       case T_LINK_AGENCY_ID -> RideType.SOUND_TRANSIT_T_LINK;
@@ -279,9 +282,10 @@ public class OrcaFareService extends DefaultFareService {
 
         yield RideType.KITSAP_TRANSIT;
       }
-      case WHATCOM_AGENCY_ID -> "80X".equals(route.getShortName())
-        ? RideType.WHATCOM_CROSS_COUNTY
-        : RideType.WHATCOM_LOCAL;
+      case WHATCOM_AGENCY_ID
+        -> "80X".equals(route.getShortName())
+          ? RideType.WHATCOM_CROSS_COUNTY
+          : RideType.WHATCOM_LOCAL;
       case MONORAIL_AGENCY_ID -> RideType.MONORAIL;
       default -> RideType.UNKNOWN;
     };
@@ -356,27 +360,18 @@ public class OrcaFareService extends DefaultFareService {
     }
 
     return switch (rideType) {
-      case KC_WATER_TAXI_VASHON_ISLAND -> usesOrca(fareType)
-        ? optionalUSD(6.00f)
-        : optionalUSD(7.00f);
-      case KC_WATER_TAXI_WEST_SEATTLE -> usesOrca(fareType)
-        ? optionalUSD(5.25f)
-        : optionalUSD(6.25f);
-      case WASHINGTON_STATE_FERRIES -> defaultFare.map(df ->
-        getWashingtonStateFerriesFare(route.getLongName(), fareType, df)
-      );
-      case KC_METRO, SEATTLE_STREET_CAR, SOUND_TRANSIT_BUS, SOUND_TRANSIT_LINK -> optionalUSD(
-        3.00f
-      );
+      case KC_WATER_TAXI_VASHON_ISLAND
+        -> usesOrca(fareType) ? optionalUSD(6.00f) : optionalUSD(7.00f);
+      case KC_WATER_TAXI_WEST_SEATTLE
+        -> usesOrca(fareType) ? optionalUSD(5.25f) : optionalUSD(6.25f);
+      case WASHINGTON_STATE_FERRIES
+        -> defaultFare.map(df -> getWashingtonStateFerriesFare(route.getLongName(), fareType, df));
+      case KC_METRO, SEATTLE_STREET_CAR, SOUND_TRANSIT_BUS, SOUND_TRANSIT_LINK
+        -> optionalUSD(3.00f);
       case COMM_TRANS_LOCAL_SWIFT -> optionalUSD(2.50f);
       case EVERETT_TRANSIT, PIERCE_COUNTY_TRANSIT -> optionalUSD(2.00f);
-      case
-        WHATCOM_LOCAL,
-        WHATCOM_CROSS_COUNTY,
-        SKAGIT_LOCAL,
-        SKAGIT_CROSS_COUNTY -> fareType.equals(FareType.electronicRegular)
-        ? Optional.empty()
-        : defaultFare;
+      case WHATCOM_LOCAL, WHATCOM_CROSS_COUNTY, SKAGIT_LOCAL, SKAGIT_CROSS_COUNTY
+        -> fareType.equals(FareType.electronicRegular) ? Optional.empty() : defaultFare;
       case MONORAIL -> optionalUSD(4.00f);
       default -> defaultFare;
     };
@@ -406,17 +401,16 @@ public class OrcaFareService extends DefaultFareService {
         KITSAP_TRANSIT,
         EVERETT_TRANSIT,
         PIERCE_COUNTY_TRANSIT,
-        SEATTLE_STREET_CAR -> optionalUSD(1.00f);
+        SEATTLE_STREET_CAR
+          -> optionalUSD(1.00f);
       case MONORAIL -> optionalUSD(2.00f);
-      case WASHINGTON_STATE_FERRIES -> defaultFare.map(df ->
-        getWashingtonStateFerriesFare(route.getLongName(), FareType.electronicSpecial, df)
-      );
+      case WASHINGTON_STATE_FERRIES
+        -> defaultFare.map(df ->
+          getWashingtonStateFerriesFare(route.getLongName(), FareType.electronicSpecial, df)
+        );
       case KITSAP_TRANSIT_FAST_FERRY -> defaultFare.map(Money::half);
-      case
-        SKAGIT_LOCAL,
-        SKAGIT_CROSS_COUNTY,
-        WHATCOM_CROSS_COUNTY,
-        WHATCOM_LOCAL -> Optional.empty();
+      case SKAGIT_LOCAL, SKAGIT_CROSS_COUNTY, WHATCOM_CROSS_COUNTY, WHATCOM_LOCAL
+        -> Optional.empty();
       default -> defaultFare;
     };
   }
@@ -448,15 +442,15 @@ public class OrcaFareService extends DefaultFareService {
         SOUND_TRANSIT_T_LINK,
         PIERCE_COUNTY_TRANSIT,
         SEATTLE_STREET_CAR,
-        KITSAP_TRANSIT -> optionalUSD(1f);
+        KITSAP_TRANSIT
+          -> optionalUSD(1f);
       case MONORAIL -> optionalUSD(2.00f);
       case KC_WATER_TAXI_VASHON_ISLAND -> optionalUSD(3f);
       case KC_WATER_TAXI_WEST_SEATTLE -> optionalUSD(2.5f);
       case KITSAP_TRANSIT_FAST_FERRY -> defaultFare.map(Money::half);
       // Discount specific to Skagit transit and not Orca.
-      case WASHINGTON_STATE_FERRIES -> defaultFare.map(df ->
-        getWashingtonStateFerriesFare(route.getLongName(), fareType, df)
-      );
+      case WASHINGTON_STATE_FERRIES
+        -> defaultFare.map(df -> getWashingtonStateFerriesFare(route.getLongName(), fareType, df));
       case WHATCOM_CROSS_COUNTY, SKAGIT_CROSS_COUNTY -> defaultFare.map(Money::half);
       default -> defaultFare;
     };
@@ -471,15 +465,10 @@ public class OrcaFareService extends DefaultFareService {
     Optional<Money> defaultFare
   ) {
     return switch (rideType) {
-      case
-        UNKNOWN,
-        SKAGIT_TRANSIT,
-        SKAGIT_LOCAL,
-        SKAGIT_CROSS_COUNTY,
-        LINK_SHUTTLE -> Optional.empty();
-      case MONORAIL -> fareType == FareType.electronicYouth
-        ? Optional.of(ZERO_USD)
-        : optionalUSD(2.00f);
+      case UNKNOWN, SKAGIT_TRANSIT, SKAGIT_LOCAL, SKAGIT_CROSS_COUNTY, LINK_SHUTTLE
+        -> Optional.empty();
+      case MONORAIL
+        -> fareType == FareType.electronicYouth ? Optional.of(ZERO_USD) : optionalUSD(2.00f);
       default -> Optional.of(ZERO_USD);
     };
   }

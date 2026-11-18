@@ -29,51 +29,57 @@ class StreetSummarizer {
 
   static String summarizeEdge(Edge e) {
     return switch (e) {
-      case StreetEdge tpe -> String.format(
-        "%s → %s %s ♿%s%s",
-        summarizeVertex(e.getFromVertex()),
-        summarizeVertex(e.getToVertex()),
-        tpe.getPermission(),
-        summarizeBoolean(tpe.isWheelchairAccessible()),
-        summarizeNoThru(tpe)
-      );
-      case TemporaryFreeEdge _ -> String.format(
-        "%s → %s ALL",
-        summarizeVertex(e.getFromVertex()),
-        summarizeVertex(e.getToVertex())
-      );
-      case StreetTransitEntityLink link -> String.format(
-        "%s linked to %s",
-        summarizeVertex(link.getFromVertex()),
-        summarizeVertex(link.getToVertex())
-      );
-      case VehicleParkingEdge p -> String.format(
-        "Parking %s → %s",
-        summarizeVertex(p.getFromVertex()),
-        summarizeVertex(p.getToVertex())
-      );
+      case StreetEdge tpe
+        -> String.format(
+          "%s → %s %s ♿%s%s",
+          summarizeVertex(e.getFromVertex()),
+          summarizeVertex(e.getToVertex()),
+          tpe.getPermission(),
+          summarizeBoolean(tpe.isWheelchairAccessible()),
+          summarizeNoThru(tpe)
+        );
+      case TemporaryFreeEdge _
+        -> String.format(
+          "%s → %s ALL",
+          summarizeVertex(e.getFromVertex()),
+          summarizeVertex(e.getToVertex())
+        );
+      case StreetTransitEntityLink link
+        -> String.format(
+          "%s linked to %s",
+          summarizeVertex(link.getFromVertex()),
+          summarizeVertex(link.getToVertex())
+        );
+      case VehicleParkingEdge p
+        -> String.format(
+          "Parking %s → %s",
+          summarizeVertex(p.getFromVertex()),
+          summarizeVertex(p.getToVertex())
+        );
       // Elevator vertices all share the elevator node's coordinate, so their labels (which encode
       // the connected entity and level) identify them rather than the coordinate.
-      case ElevatorBoardEdge board -> String.format(
-        "%s → %s ELEVATOR board",
-        board.getFromVertex().getLabelString(),
-        board.getToVertex().getLabelString()
-      );
-      case ElevatorAlightEdge alight -> String.format(
-        "%s → %s ELEVATOR alight",
-        alight.getFromVertex().getLabelString(),
-        alight.getToVertex().getLabelString()
-      );
-      case ElevatorHopEdge hop -> String.format(
-        "%s → %s ELEVATOR hop levels=%s ♿%s",
-        hop.getFromVertex().getLabelString(),
-        hop.getToVertex().getLabelString(),
-        DECIMAL_FORMAT.format(hop.getLevels()),
-        summarizeBoolean(hop.isWheelchairAccessible())
-      );
-      default -> throw new NotImplementedException(
-        "No summary for edge " + e.getClass().getSimpleName()
-      );
+      case ElevatorBoardEdge board
+        -> String.format(
+          "%s → %s ELEVATOR board",
+          board.getFromVertex().getLabelString(),
+          board.getToVertex().getLabelString()
+        );
+      case ElevatorAlightEdge alight
+        -> String.format(
+          "%s → %s ELEVATOR alight",
+          alight.getFromVertex().getLabelString(),
+          alight.getToVertex().getLabelString()
+        );
+      case ElevatorHopEdge hop
+        -> String.format(
+          "%s → %s ELEVATOR hop levels=%s ♿%s",
+          hop.getFromVertex().getLabelString(),
+          hop.getToVertex().getLabelString(),
+          DECIMAL_FORMAT.format(hop.getLevels()),
+          summarizeBoolean(hop.isWheelchairAccessible())
+        );
+      default
+        -> throw new NotImplementedException("No summary for edge " + e.getClass().getSimpleName());
     };
   }
 

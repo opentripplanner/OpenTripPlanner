@@ -216,9 +216,10 @@ class DestinationArrivalParetoSetComparatorsTest {
     return switch (cost) {
       case NONE -> false;
       case USE_C1 -> l.c1() < r.c1();
-      case USE_C1_RELAXED_IF_C2_IS_OPTIMAL -> C2_COMP.leftDominateRight(l.c2(), r.c2())
-        ? l.c1() < RELAX_FN.relax(r.c1())
-        : l.c1() < r.c1();
+      case USE_C1_RELAXED_IF_C2_IS_OPTIMAL
+        -> C2_COMP.leftDominateRight(l.c2(), r.c2())
+          ? l.c1() < RELAX_FN.relax(r.c1())
+          : l.c1() < r.c1();
     };
   }
 

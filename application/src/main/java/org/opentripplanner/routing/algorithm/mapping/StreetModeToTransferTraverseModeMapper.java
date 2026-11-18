@@ -13,9 +13,10 @@ public class StreetModeToTransferTraverseModeMapper {
       case WALK -> TraverseMode.WALK;
       case BIKE -> TraverseMode.BICYCLE;
       case CAR -> TraverseMode.CAR;
-      default -> throw new IllegalArgumentException(
-        String.format("StreetMode %s can not be mapped to a TraverseMode for transfers.", mode)
-      );
+      default
+        -> throw new IllegalArgumentException(
+          String.format("StreetMode %s can not be mapped to a TraverseMode for transfers.", mode)
+        );
     };
   }
 }

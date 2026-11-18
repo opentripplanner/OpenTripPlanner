@@ -70,10 +70,11 @@ class EdgeSpatialIndex {
   public final Stream<Edge> query(Envelope envelope, Scope scope) {
     return switch (scope) {
       case PERMANENT, REALTIME -> permanentEdgeIndex.query(envelope).stream();
-      case REQUEST -> Stream.concat(
-        permanentEdgeIndex.query(envelope).stream(),
-        realTimeEdgeIndex.query(envelope).stream()
-      );
+      case REQUEST
+        -> Stream.concat(
+          permanentEdgeIndex.query(envelope).stream(),
+          realTimeEdgeIndex.query(envelope).stream()
+        );
     };
   }
 

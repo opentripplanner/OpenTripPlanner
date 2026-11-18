@@ -22,8 +22,9 @@ public enum ApiDocumentationProfile implements DocumentedEnum<ApiDocumentationPr
   public String enumValueDescription() {
     return switch (this) {
       case DEFAULT -> "Default documentation is used.";
-      case ENTUR -> "Entur specific documentation. This deprecate features not supported at Entur," +
-        " Norway.";
+      case ENTUR
+        -> "Entur specific documentation. This deprecate features not supported at Entur," +
+          " Norway.";
     };
   }
 }

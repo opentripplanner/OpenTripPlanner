@@ -17,9 +17,10 @@ public interface BackwardsDelayInterpolator {
     return switch (backwardsDelayPropagationType) {
       case NONE -> builder -> OptionalInt.empty();
       case ALWAYS -> new BackwardsDelayAlwaysInterpolator();
-      case REQUIRED, REQUIRED_NO_DATA -> new BackwardsDelayRequiredInterpolator(
-        backwardsDelayPropagationType == BackwardsDelayPropagationType.REQUIRED_NO_DATA
-      );
+      case REQUIRED, REQUIRED_NO_DATA
+        -> new BackwardsDelayRequiredInterpolator(
+          backwardsDelayPropagationType == BackwardsDelayPropagationType.REQUIRED_NO_DATA
+        );
     };
   }
 }

@@ -85,14 +85,8 @@ public class StateData implements Cloneable {
         CARPOOL maps to TraverseMode.WALK because we want results involving only walking when it makes sense,
         but we do not want results that includes driving when there are no available carpooling trips.
        */
-      case
-        NOT_SET,
-        WALK,
-        BIKE_RENTAL,
-        SCOOTER_RENTAL,
-        CAR_RENTAL,
-        FLEXIBLE,
-        CARPOOL -> TraverseMode.WALK;
+      case NOT_SET, WALK, BIKE_RENTAL, SCOOTER_RENTAL, CAR_RENTAL, FLEXIBLE, CARPOOL
+        -> TraverseMode.WALK;
       // when cycling all the way or to a stop, you start on your own bike
       case BIKE, BIKE_TO_PARK -> TraverseMode.BICYCLE;
       // when driving (not car rental) you start in your own car or your driver's car
@@ -125,10 +119,8 @@ public class StateData implements Cloneable {
 
     var baseCaseDatas = switch (request.mode()) {
       case WALK, BIKE, BIKE_TO_PARK, CAR, CAR_TO_PARK, FLEXIBLE, CARPOOL, NOT_SET -> stateDatas;
-      case CAR_PICKUP, TAXI, CAR_HAILING -> stateDatas
-        .stream()
-        .filter(d -> d.carPickupState == CarPickupState.IN_CAR)
-        .toList();
+      case CAR_PICKUP, TAXI, CAR_HAILING
+        -> stateDatas.stream().filter(d -> d.carPickupState == CarPickupState.IN_CAR).toList();
       case BIKE_RENTAL, SCOOTER_RENTAL, CAR_RENTAL -> {
         if (request.arriveBy()) {
           yield stateDatas

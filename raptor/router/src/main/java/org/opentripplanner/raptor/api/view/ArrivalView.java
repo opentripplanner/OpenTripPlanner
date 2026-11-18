@@ -177,12 +177,13 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
 
     return switch (arrivedBy()) {
       case ACCESS -> String.format("Access [%s] (%s)", vector, accessPath().access());
-      case TRANSIT -> String.format(
-        "Transit [%s] (%s ~ %s)",
-        vector,
-        transitPath().trip().pattern().debugInfo(),
-        stop()
-      );
+      case TRANSIT
+        -> String.format(
+          "Transit [%s] (%s ~ %s)",
+          vector,
+          transitPath().trip().pattern().debugInfo(),
+          stop()
+        );
       case TRANSFER -> String.format("Transfer [%s] (%s)", vector, transfer());
       case EGRESS -> String.format("Egress [%s] (%s)", vector, egressPath().egress());
     };

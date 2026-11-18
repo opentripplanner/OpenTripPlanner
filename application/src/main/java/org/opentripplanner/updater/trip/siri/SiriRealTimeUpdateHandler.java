@@ -128,14 +128,15 @@ public class SiriRealTimeUpdateHandler {
     try {
       siriUpdateType = updateType(journeyWrapper, entityResolver);
       TripUpdate result = switch (siriUpdateType) {
-        case REPLACEMENT_DEPARTURE -> new AddedTripBuilder(
-          journeyWrapper,
-          transitRepository,
-          buffer,
-          deduplicator,
-          entityResolver,
-          tripPatternIdGenerator::generateUniqueTripPatternId
-        ).build();
+        case REPLACEMENT_DEPARTURE
+          -> new AddedTripBuilder(
+            journeyWrapper,
+            transitRepository,
+            buffer,
+            deduplicator,
+            entityResolver,
+            tripPatternIdGenerator::generateUniqueTripPatternId
+          ).build();
         case EXTRA_CALL -> handleExtraCall(fuzzyTripMatcher, entityResolver, journeyWrapper);
         case TRIP_UPDATE -> handleModifiedTrip(fuzzyTripMatcher, entityResolver, journeyWrapper);
       };

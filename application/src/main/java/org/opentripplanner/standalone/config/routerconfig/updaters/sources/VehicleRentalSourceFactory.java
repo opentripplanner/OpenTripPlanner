@@ -40,17 +40,18 @@ public class VehicleRentalSourceFactory {
   public VehicleRentalDataSourceParameters create() {
     var geofencing = geofencing();
     return switch (type) {
-      case GBFS -> new GbfsVehicleRentalDataSourceParameters(
-        url(),
-        language(),
-        allowKeepingRentedVehicleAtDestination(),
-        headers(),
-        network(),
-        geofencing.enabled(),
-        geofencing.businessAreaBorders(),
-        overloadingAllowed(),
-        rentalPickupTypes()
-      );
+      case GBFS
+        -> new GbfsVehicleRentalDataSourceParameters(
+          url(),
+          language(),
+          allowKeepingRentedVehicleAtDestination(),
+          headers(),
+          network(),
+          geofencing.enabled(),
+          geofencing.businessAreaBorders(),
+          overloadingAllowed(),
+          rentalPickupTypes()
+        );
     };
   }
 

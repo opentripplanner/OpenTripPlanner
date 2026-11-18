@@ -85,62 +85,88 @@ public final class DestinationArrivalParetoSetComparators {
 
     return switch (costConfig) {
       case NONE -> switch (timeConfig) {
-        case USE_TIMETABLE -> reverse
-          ? (l, r) -> arriveLate(l, r) || iterDepartEarly(l, r) || fewTransfers(l, r)
-          : (l, r) -> iterDepartLate(l, r) || arriveEarly(l, r) || fewTransfers(l, r);
-        case USE_ARRIVAL_TIME -> reverse
-          ? (l, r) -> departEarly(l, r) || fewTransfers(l, r)
-          : (l, r) -> arriveEarly(l, r) || fewTransfers(l, r);
-        case USE_DEPARTURE_TIME -> reverse
-          ? (l, r) -> arriveLate(l, r) || fewTransfers(l, r)
-          : (l, r) -> departLate(l, r) || fewTransfers(l, r);
+        case USE_TIMETABLE
+          -> reverse
+            ? (l, r) -> arriveLate(l, r) || iterDepartEarly(l, r) || fewTransfers(l, r)
+            : (l, r) -> iterDepartLate(l, r) || arriveEarly(l, r) || fewTransfers(l, r);
+        case USE_ARRIVAL_TIME
+          -> reverse
+            ? (l, r) -> departEarly(l, r) || fewTransfers(l, r)
+            : (l, r) -> arriveEarly(l, r) || fewTransfers(l, r);
+        case USE_DEPARTURE_TIME
+          -> reverse
+            ? (l, r) -> arriveLate(l, r) || fewTransfers(l, r)
+            : (l, r) -> departLate(l, r) || fewTransfers(l, r);
       };
       case USE_C1 -> switch (timeConfig) {
-        case USE_TIMETABLE -> reverse
-          ? (l, r) -> arriveLate(l, r) || iterDepartEarly(l, r) || fewTransfers(l, r) || lowC1(l, r)
-          : (l, r) ->
-              iterDepartLate(l, r) || arriveEarly(l, r) || fewTransfers(l, r) || lowC1(l, r);
-        case USE_ARRIVAL_TIME -> reverse
-          ? (l, r) -> departEarly(l, r) || fewTransfers(l, r) || shortDuration(l, r) || lowC1(l, r)
-          : (l, r) -> arriveEarly(l, r) || fewTransfers(l, r) || shortDuration(l, r) || lowC1(l, r);
-        case USE_DEPARTURE_TIME -> reverse
-          ? (l, r) -> arriveLate(l, r) || fewTransfers(l, r) || shortDuration(l, r) || lowC1(l, r)
-          : (l, r) -> departLate(l, r) || fewTransfers(l, r) || shortDuration(l, r) || lowC1(l, r);
+        case USE_TIMETABLE
+          -> reverse
+            ? (l, r) -> arriveLate(l, r)
+              || iterDepartEarly(l, r)
+              || fewTransfers(l, r)
+              || lowC1(l, r)
+            : (l, r) -> iterDepartLate(l, r)
+              || arriveEarly(l, r)
+              || fewTransfers(l, r)
+              || lowC1(l, r);
+        case USE_ARRIVAL_TIME
+          -> reverse
+            ? (l, r) -> departEarly(l, r)
+              || fewTransfers(l, r)
+              || shortDuration(l, r)
+              || lowC1(l, r)
+            : (l, r) -> arriveEarly(l, r)
+              || fewTransfers(l, r)
+              || shortDuration(l, r)
+              || lowC1(l, r);
+        case USE_DEPARTURE_TIME
+          -> reverse
+            ? (l, r) -> arriveLate(l, r)
+              || fewTransfers(l, r)
+              || shortDuration(l, r)
+              || lowC1(l, r)
+            : (l, r) -> departLate(l, r)
+              || fewTransfers(l, r)
+              || shortDuration(l, r)
+              || lowC1(l, r);
       };
       case USE_C1_RELAXED_IF_C2_IS_OPTIMAL -> switch (timeConfig) {
-        case USE_TIMETABLE -> reverse
-          ? (l, r) ->
-              arriveLate(l, r) ||
-              iterDepartEarly(l, r) ||
-              fewTransfers(l, r) ||
-              lowC1RelaxedIfC2IsOptimal(l, r, relaxC1, c2Comp)
-          : (l, r) ->
-              iterDepartLate(l, r) ||
-              arriveEarly(l, r) ||
-              fewTransfers(l, r) ||
-              lowC1RelaxedIfC2IsOptimal(l, r, relaxC1, c2Comp);
-        case USE_ARRIVAL_TIME -> reverse
-          ? (l, r) ->
-              departEarly(l, r) ||
-              fewTransfers(l, r) ||
-              shortDuration(l, r) ||
-              lowC1RelaxedIfC2IsOptimal(l, r, relaxC1, c2Comp)
-          : (l, r) ->
-              arriveEarly(l, r) ||
-              fewTransfers(l, r) ||
-              shortDuration(l, r) ||
-              lowC1RelaxedIfC2IsOptimal(l, r, relaxC1, c2Comp);
-        case USE_DEPARTURE_TIME -> reverse
-          ? (l, r) ->
-              arriveLate(l, r) ||
-              fewTransfers(l, r) ||
-              shortDuration(l, r) ||
-              lowC1RelaxedIfC2IsOptimal(l, r, relaxC1, c2Comp)
-          : (l, r) ->
-              departLate(l, r) ||
-              fewTransfers(l, r) ||
-              shortDuration(l, r) ||
-              lowC1RelaxedIfC2IsOptimal(l, r, relaxC1, c2Comp);
+        case USE_TIMETABLE
+          -> reverse
+            ? (l, r) ->
+                arriveLate(l, r) ||
+                iterDepartEarly(l, r) ||
+                fewTransfers(l, r) ||
+                lowC1RelaxedIfC2IsOptimal(l, r, relaxC1, c2Comp)
+            : (l, r) ->
+                iterDepartLate(l, r) ||
+                arriveEarly(l, r) ||
+                fewTransfers(l, r) ||
+                lowC1RelaxedIfC2IsOptimal(l, r, relaxC1, c2Comp);
+        case USE_ARRIVAL_TIME
+          -> reverse
+            ? (l, r) ->
+                departEarly(l, r) ||
+                fewTransfers(l, r) ||
+                shortDuration(l, r) ||
+                lowC1RelaxedIfC2IsOptimal(l, r, relaxC1, c2Comp)
+            : (l, r) ->
+                arriveEarly(l, r) ||
+                fewTransfers(l, r) ||
+                shortDuration(l, r) ||
+                lowC1RelaxedIfC2IsOptimal(l, r, relaxC1, c2Comp);
+        case USE_DEPARTURE_TIME
+          -> reverse
+            ? (l, r) ->
+                arriveLate(l, r) ||
+                fewTransfers(l, r) ||
+                shortDuration(l, r) ||
+                lowC1RelaxedIfC2IsOptimal(l, r, relaxC1, c2Comp)
+            : (l, r) ->
+                departLate(l, r) ||
+                fewTransfers(l, r) ||
+                shortDuration(l, r) ||
+                lowC1RelaxedIfC2IsOptimal(l, r, relaxC1, c2Comp);
       };
     };
   }

@@ -85,10 +85,11 @@ class FareLegRuleMapper {
     }
 
     return switch (distanceType) {
-      case 0 -> new FareDistance.Stops(
-        optionalInt(fareLegRule.getMinDistance()).orElse(0),
-        optionalInt(fareLegRule.getMaxDistance()).orElse(Integer.MAX_VALUE)
-      );
+      case 0
+        -> new FareDistance.Stops(
+          optionalInt(fareLegRule.getMinDistance()).orElse(0),
+          optionalInt(fareLegRule.getMaxDistance()).orElse(Integer.MAX_VALUE)
+        );
       case 1 -> throw new IllegalArgumentException("Distance type 1 is not supported");
       default -> null;
     };

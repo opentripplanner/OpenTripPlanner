@@ -188,14 +188,11 @@ class SidewalkNamer implements EdgeNamer {
     private double length(Geometry intersection) {
       return switch (intersection) {
         case LineString ls -> GeometryUtils.sumDistances(ls);
-        case MultiLineString mls -> GeometryUtils.getLineStrings(mls)
-          .stream()
-          .mapToDouble(this::intersectionLength)
-          .sum();
+        case MultiLineString mls
+          -> GeometryUtils.getLineStrings(mls).stream().mapToDouble(this::intersectionLength).sum();
         case Point _ -> 0;
-        case Geometry g -> throw new IllegalStateException(
-          "Didn't expect geometry %s".formatted(g.getClass())
-        );
+        case Geometry g
+          -> throw new IllegalStateException("Didn't expect geometry %s".formatted(g.getClass()));
       };
     }
   }

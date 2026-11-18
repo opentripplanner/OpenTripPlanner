@@ -143,10 +143,8 @@ public class BookingInfoMapper {
     ) {
       return switch (purchaseWhen) {
         case UNTIL_PREVIOUS_DAY -> new BookingTime(latestBookingTime, 1);
-        case DAY_OF_TRAVEL_ONLY, ADVANCE_ONLY, ADVANCE_AND_DAY_OF_TRAVEL -> new BookingTime(
-          latestBookingTime,
-          0
-        );
+        case DAY_OF_TRAVEL_ONLY, ADVANCE_ONLY, ADVANCE_AND_DAY_OF_TRAVEL
+          -> new BookingTime(latestBookingTime, 0);
         case TIME_OF_TRAVEL_ONLY -> null;
         default -> throw new IllegalArgumentException("Value not supported: " + purchaseWhen);
       };
@@ -154,11 +152,8 @@ public class BookingInfoMapper {
 
     private static BookingTime mapEarliestBookingTime(PurchaseWhenEnumeration purchaseWhen) {
       return switch (purchaseWhen) {
-        case
-          UNTIL_PREVIOUS_DAY,
-          ADVANCE_ONLY,
-          ADVANCE_AND_DAY_OF_TRAVEL,
-          TIME_OF_TRAVEL_ONLY -> null;
+        case UNTIL_PREVIOUS_DAY, ADVANCE_ONLY, ADVANCE_AND_DAY_OF_TRAVEL, TIME_OF_TRAVEL_ONLY
+          -> null;
         case DAY_OF_TRAVEL_ONLY -> new BookingTime(LocalTime.MIDNIGHT, 0);
         default -> throw new IllegalArgumentException("Value not supported: " + purchaseWhen);
       };

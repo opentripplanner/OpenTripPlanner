@@ -82,10 +82,8 @@ public final class PathParetoSetComparators {
       case USE_C1_RELAXED_IF_C2_IS_OPTIMAL -> switch (timeConfig) {
         case USE_TIMETABLE -> comparatorTimetableAndRelaxedC1IfC2IsOptimal(relaxC1, c2Comp);
         case USE_ARRIVAL_TIME -> comparatorArrivalTimeAndRelaxedC1IfC2IsOptimal(relaxC1, c2Comp);
-        case USE_DEPARTURE_TIME -> comparatorDepartureTimeAndRelaxedC1IfC2IsOptimal(
-          relaxC1,
-          c2Comp
-        );
+        case USE_DEPARTURE_TIME
+          -> comparatorDepartureTimeAndRelaxedC1IfC2IsOptimal(relaxC1, c2Comp);
       };
     };
   }

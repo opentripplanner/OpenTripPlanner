@@ -114,10 +114,11 @@ public class VertexCreationService {
     return switch (type) {
       case FROM -> List.of(TemporaryFreeEdge.createTemporaryFreeEdge(location, streetVertex));
       case TO -> List.of(TemporaryFreeEdge.createTemporaryFreeEdge(streetVertex, location));
-      case VISIT_VIA_LOCATION -> List.of(
-        TemporaryFreeEdge.createTemporaryFreeEdge(location, streetVertex),
-        TemporaryFreeEdge.createTemporaryFreeEdge(streetVertex, location)
-      );
+      case VISIT_VIA_LOCATION
+        -> List.of(
+          TemporaryFreeEdge.createTemporaryFreeEdge(location, streetVertex),
+          TemporaryFreeEdge.createTemporaryFreeEdge(streetVertex, location)
+        );
     };
   }
 

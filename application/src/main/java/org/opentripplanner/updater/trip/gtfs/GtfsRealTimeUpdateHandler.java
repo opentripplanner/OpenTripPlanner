@@ -130,20 +130,19 @@ public class GtfsRealTimeUpdateHandler {
     // entity carrying only CANCELED or DELETED. This is why the RealTimeTripTimesBuilder never
     // needs to hold both added=true and canceled=true simultaneously for a GTFS-RT source.
     return switch (tripUpdate.scheduleRelationship()) {
-      case SCHEDULED -> scheduledTripHandler.handle(
-        tripUpdate,
-        forwardsDelayPropagationType,
-        backwardsDelayPropagationType
-      );
+      case SCHEDULED
+        -> scheduledTripHandler.handle(
+          tripUpdate,
+          forwardsDelayPropagationType,
+          backwardsDelayPropagationType
+        );
       case NEW, ADDED -> addedTripHandler.handleNew(tripUpdate);
       case CANCELED -> canceledTripHandler.cancel(tripUpdate, updateIncrementality);
       case DELETED -> canceledTripHandler.delete(tripUpdate, updateIncrementality);
       case DUPLICATED -> duplicatedTripHandler.handleDuplicated(tripUpdate, updateIncrementality);
       case REPLACEMENT -> addedTripHandler.handleReplacement(tripUpdate);
-      case UNSCHEDULED -> throw UpdateException.of(
-        tripUpdate.tripId(),
-        NOT_IMPLEMENTED_UNSCHEDULED
-      );
+      case UNSCHEDULED
+        -> throw UpdateException.of(tripUpdate.tripId(), NOT_IMPLEMENTED_UNSCHEDULED);
     };
   }
 }

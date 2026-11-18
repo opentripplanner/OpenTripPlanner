@@ -28,7 +28,8 @@ public enum OccupancyStatus implements DocumentedEnum<OccupancyStatus> {
   @Override
   public String enumValueDescription() {
     return switch (this) {
-      case NO_DATA_AVAILABLE -> "The vehicle or carriage doesn't have any occupancy data available.";
+      case NO_DATA_AVAILABLE
+        -> "The vehicle or carriage doesn't have any occupancy data available.";
       case EMPTY -> """
       The vehicle is considered empty by most measures, and has few or no passengers onboard, but is
       still accepting passengers. There isn't a big difference between this and `manySeatsAvailable`

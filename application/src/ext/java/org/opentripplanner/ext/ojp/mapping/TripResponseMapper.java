@@ -110,9 +110,10 @@ public class TripResponseMapper {
     return switch (leg) {
       case ScheduledTransitLeg tl -> mapTransitLeg(index, tl);
       case StreetLeg sl -> mapStreetLeg(index, sl);
-      default -> throw new IllegalStateException(
-        "Unexpected leg type : " + leg.getClass().getSimpleName()
-      );
+      default
+        -> throw new IllegalStateException(
+          "Unexpected leg type : " + leg.getClass().getSimpleName()
+        );
     };
   }
 

@@ -211,10 +211,11 @@ public class TransferProfilesConfigMapper {
     shared by all the profiles of the type. The default is 30 minutes.
     """;
     return switch (type) {
-      case WALK, WHEELCHAIR -> description +
-        "\nThere are transfers between all stops within the duration.\n";
-      case BICYCLE -> description +
-        "\nThere are transfers within the duration between the stops that allow bicycles.\n";
+      case WALK, WHEELCHAIR
+        -> description + "\nThere are transfers between all stops within the duration.\n";
+      case BICYCLE
+        -> description +
+          "\nThere are transfers within the duration between the stops that allow bicycles.\n";
       case CAR -> description +
         """
 

@@ -34,12 +34,8 @@ public class DirectModeMapper {
       case TAXI -> GraphQLTypes.GraphQLPlanDirectMode.TAXI;
       case FLEXIBLE -> GraphQLTypes.GraphQLPlanDirectMode.FLEX;
       case SCOOTER_RENTAL -> GraphQLTypes.GraphQLPlanDirectMode.SCOOTER_RENTAL;
-      case
-        WALK,
-        CAR_HAILING,
-        CAR_PICKUP,
-        CARPOOL,
-        NOT_SET -> GraphQLTypes.GraphQLPlanDirectMode.WALK;
+      case WALK, CAR_HAILING, CAR_PICKUP, CARPOOL, NOT_SET
+        -> GraphQLTypes.GraphQLPlanDirectMode.WALK;
     };
   }
 }

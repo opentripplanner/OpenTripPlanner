@@ -319,7 +319,8 @@ public class AtlantaFareService extends DefaultFareService {
             COBB_EXPRESS,
             GCT_EXPRESS_Z1,
             GCT_EXPRESS_Z2,
-            GCT_LOCAL -> new TransferMeta(TransferType.FREE_TRANSFER);
+            GCT_LOCAL
+              -> new TransferMeta(TransferType.FREE_TRANSFER);
           default -> new TransferMeta(TransferType.END_TRANSFER);
         };
       case XPRESS_MORNING:
@@ -331,27 +332,12 @@ public class AtlantaFareService extends DefaultFareService {
         }
 
         return switch (fromRideType) {
-          case
-            MARTA,
-            COBB_EXPRESS,
-            GCT_EXPRESS_Z1,
-            GCT_EXPRESS_Z2,
-            XPRESS_AFTERNOON,
-            XPRESS_MORNING -> new TransferMeta(
-            TransferType.FREE_TRANSFER,
-            Money.ZERO_USD,
-            payOnExit
-            );
-          case COBB_LOCAL -> new TransferMeta(
-            TransferType.TRANSFER_WITH_UPCHARGE,
-            usDollars(1.50f),
-            payOnExit
-          );
-          case GCT_LOCAL -> new TransferMeta(
-            TransferType.TRANSFER_WITH_UPCHARGE,
-            usDollars(1),
-            payOnExit
-          );
+          case MARTA, COBB_EXPRESS, GCT_EXPRESS_Z1, GCT_EXPRESS_Z2, XPRESS_AFTERNOON, XPRESS_MORNING
+            -> new TransferMeta(TransferType.FREE_TRANSFER, Money.ZERO_USD, payOnExit);
+          case COBB_LOCAL
+            -> new TransferMeta(TransferType.TRANSFER_WITH_UPCHARGE, usDollars(1.50f), payOnExit);
+          case GCT_LOCAL
+            -> new TransferMeta(TransferType.TRANSFER_WITH_UPCHARGE, usDollars(1), payOnExit);
           default -> new TransferMeta(TransferType.END_TRANSFER);
         };
       case GCT_LOCAL:
@@ -360,9 +346,8 @@ public class AtlantaFareService extends DefaultFareService {
         }
 
         return switch (fromRideType) {
-          case MARTA, GCT_LOCAL, GCT_EXPRESS_Z1, GCT_EXPRESS_Z2 -> new TransferMeta(
-            TransferType.FREE_TRANSFER
-          );
+          case MARTA, GCT_LOCAL, GCT_EXPRESS_Z1, GCT_EXPRESS_Z2
+            -> new TransferMeta(TransferType.FREE_TRANSFER);
           default -> new TransferMeta(TransferType.END_TRANSFER);
         };
       case GCT_EXPRESS_Z1:
@@ -373,9 +358,8 @@ public class AtlantaFareService extends DefaultFareService {
 
         return switch (fromRideType) {
           case MARTA -> new TransferMeta(TransferType.FREE_TRANSFER);
-          case GCT_LOCAL, GCT_EXPRESS_Z1, GCT_EXPRESS_Z2 -> new TransferMeta(
-            TransferType.TRANSFER_PAY_DIFFERENCE
-          );
+          case GCT_LOCAL, GCT_EXPRESS_Z1, GCT_EXPRESS_Z2
+            -> new TransferMeta(TransferType.TRANSFER_PAY_DIFFERENCE);
           default -> new TransferMeta(TransferType.END_TRANSFER);
         };
       default:

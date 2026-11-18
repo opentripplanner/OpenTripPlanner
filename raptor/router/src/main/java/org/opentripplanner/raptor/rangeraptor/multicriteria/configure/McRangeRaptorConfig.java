@@ -134,16 +134,21 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
 
   private RoutingStrategy<T> createTransitWorkerStrategy(McRangeRaptorWorkerState<T> state) {
     return switch (resolveCostConfig()) {
-      case USE_C1 -> createTransitWorkerStrategy(
-        state,
-        PatternRideC1.factory(),
-        PatternRideC1.paretoComparatorRelativeCost()
-      );
-      case USE_C1_RELAXED_IF_C2_IS_OPTIMAL -> createTransitWorkerStrategy(
-        state,
-        createPatternRideC2Factory(),
-        PatternRideC2.comparatorRelaxedC1IfC2IsOptimal(mcRequest().relaxC1(), dominanceFunctionC2())
-      );
+      case USE_C1
+        -> createTransitWorkerStrategy(
+          state,
+          PatternRideC1.factory(),
+          PatternRideC1.paretoComparatorRelativeCost()
+        );
+      case USE_C1_RELAXED_IF_C2_IS_OPTIMAL
+        -> createTransitWorkerStrategy(
+          state,
+          createPatternRideC2Factory(),
+          PatternRideC2.comparatorRelaxedC1IfC2IsOptimal(
+            mcRequest().relaxC1(),
+            dominanceFunctionC2()
+          )
+        );
       default -> throw new IllegalArgumentException("Not supported here: " + resolveCostConfig());
     };
   }
@@ -227,10 +232,11 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
   private ArrivalParetoSetComparatorFactory<McStopArrival<T>> createFactoryParetoComparator() {
     return switch (resolveCostConfig()) {
       case USE_C1 -> ArrivalParetoSetComparatorFactory.ofCompareC1();
-      case USE_C1_RELAXED_IF_C2_IS_OPTIMAL -> ArrivalParetoSetComparatorFactory.ofCompareC1RelaxedOnC2Dominance(
-        mcRequest().relaxC1(),
-        dominanceFunctionC2()
-      );
+      case USE_C1_RELAXED_IF_C2_IS_OPTIMAL
+        -> ArrivalParetoSetComparatorFactory.ofCompareC1RelaxedOnC2Dominance(
+          mcRequest().relaxC1(),
+          dominanceFunctionC2()
+        );
       default -> throw new IllegalArgumentException();
     };
   }

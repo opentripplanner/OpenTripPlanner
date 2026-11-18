@@ -25,9 +25,10 @@ public class StreetModeToFormFactorMapper {
         TAXI,
         CAR_HAILING,
         CARPOOL,
-        FLEXIBLE -> throw new IllegalStateException(
-        "Cannot convert street mode %s to a form factor".formatted(streetMode)
-        );
+        FLEXIBLE
+          -> throw new IllegalStateException(
+            "Cannot convert street mode %s to a form factor".formatted(streetMode)
+          );
     };
   }
 }

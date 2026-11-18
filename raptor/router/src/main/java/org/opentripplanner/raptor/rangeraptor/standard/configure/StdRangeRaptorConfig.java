@@ -91,17 +91,19 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
 
   private RoutingStrategy<T> createWorkerStrategy() {
     return switch (ctx.profile()) {
-      case STANDARD, BEST_TIME -> new ArrivalTimeRoutingStrategy<>(
-        resolveState(),
-        ctx.createTimeBasedBoardingSupport(),
-        ctx.calculator()
-      );
-      case MIN_TRAVEL_DURATION -> new MinTravelDurationRoutingStrategy<>(
-        resolveState(),
-        ctx.createTimeBasedBoardingSupport(),
-        ctx.calculator(),
-        ctx.lifeCycle()
-      );
+      case STANDARD, BEST_TIME
+        -> new ArrivalTimeRoutingStrategy<>(
+          resolveState(),
+          ctx.createTimeBasedBoardingSupport(),
+          ctx.calculator()
+        );
+      case MIN_TRAVEL_DURATION
+        -> new MinTravelDurationRoutingStrategy<>(
+          resolveState(),
+          ctx.createTimeBasedBoardingSupport(),
+          ctx.calculator(),
+          ctx.lifeCycle()
+        );
       case MULTI_CRITERIA -> throw new IllegalArgumentException(ctx.profile().toString());
     };
   }

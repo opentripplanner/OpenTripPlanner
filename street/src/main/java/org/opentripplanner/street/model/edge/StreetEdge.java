@@ -858,13 +858,14 @@ public class StreetEdge
 
     var traversalCosts = switch (traverseMode) {
       case BICYCLE, SCOOTER -> bicycleOrScooterTraversalCost(request, traverseMode, speed, s0);
-      case WALK -> walkingTraversalCosts(
-        request,
-        traverseMode,
-        speed,
-        walkingBike,
-        s0.getRequest().wheelchairEnabled()
-      );
+      case WALK
+        -> walkingTraversalCosts(
+          request,
+          traverseMode,
+          speed,
+          walkingBike,
+          s0.getRequest().wheelchairEnabled()
+        );
       default -> otherTraversalCosts(request, traverseMode, walkingBike, speed);
     };
 
@@ -925,9 +926,10 @@ public class StreetEdge
       }
 
       var modeReluctance = switch (intersectionMode) {
-        case WALK -> walkingBikeThroughIntersection
-          ? request.bike().walking().reluctance()
-          : request.walk().reluctance();
+        case WALK
+          -> walkingBikeThroughIntersection
+            ? request.bike().walking().reluctance()
+            : request.walk().reluctance();
         case BICYCLE -> request.bike().reluctance();
         case SCOOTER -> request.scooter().reluctance();
         case CAR -> request.car().reluctance();
@@ -1031,10 +1033,8 @@ public class StreetEdge
 
     return switch (propulsion) {
       case ELECTRIC -> getDistanceMeters();
-      case ELECTRIC_ASSIST -> interpolateSlopeEffect(
-        getEffectiveBikeDistance(),
-        electricAssistSlopeSensitivity
-      );
+      case ELECTRIC_ASSIST
+        -> interpolateSlopeEffect(getEffectiveBikeDistance(), electricAssistSlopeSensitivity);
       default -> getEffectiveBikeDistance();
     };
   }
@@ -1052,10 +1052,11 @@ public class StreetEdge
 
     return switch (propulsion) {
       case ELECTRIC -> getDistanceMeters();
-      case ELECTRIC_ASSIST -> interpolateSlopeEffect(
-        getEffectiveBikeDistanceForWorkCost(),
-        electricAssistSlopeSensitivity
-      );
+      case ELECTRIC_ASSIST
+        -> interpolateSlopeEffect(
+          getEffectiveBikeDistanceForWorkCost(),
+          electricAssistSlopeSensitivity
+        );
       default -> getEffectiveBikeDistanceForWorkCost();
     };
   }

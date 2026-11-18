@@ -32,7 +32,8 @@ public class TransferModeMapper {
         BIKE_TO_PARK,
         FLEXIBLE,
         SCOOTER_RENTAL,
-        NOT_SET -> GraphQLTypes.GraphQLPlanTransferMode.WALK;
+        NOT_SET
+          -> GraphQLTypes.GraphQLPlanTransferMode.WALK;
     };
   }
 }

@@ -736,11 +736,12 @@ public class ParameterBuilder {
       case 1 -> new Locale(parts[0]);
       case 2 -> new Locale(parts[0], parts[1]);
       case 3 -> new Locale(parts[0], parts[1], parts[2]);
-      default -> throw error(
-        "The parameter is not a valid Locale: '" +
-          text +
-          "'. Use: <Language>[_<country>[_<variant>]]."
-      );
+      default
+        -> throw error(
+          "The parameter is not a valid Locale: '" +
+            text +
+            "'. Use: <Language>[_<country>[_<variant>]]."
+        );
     };
   }
 

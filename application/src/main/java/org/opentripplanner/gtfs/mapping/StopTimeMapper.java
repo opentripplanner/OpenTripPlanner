@@ -67,9 +67,8 @@ class StopTimeMapper {
       case Stop stop -> lhs.setStop(stopMapper.map(stop));
       case Location location -> lhs.setStop(locationMapper.map(location));
       case LocationGroup locGroup -> lhs.setStop(locationGroupMapper.map(locGroup));
-      default -> throw new IllegalArgumentException(
-        "Unknown location type: %s".formatted(stopLocation)
-      );
+      default
+        -> throw new IllegalArgumentException("Unknown location type: %s".formatted(stopLocation));
     }
 
     I18NString stopHeadsign = null;

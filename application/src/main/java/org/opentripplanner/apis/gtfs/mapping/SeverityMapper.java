@@ -33,11 +33,8 @@ public class SeverityMapper {
   public static List<AlertSeverity> getAlertSeverities(GraphQLAlertSeverityLevelType severity) {
     return switch (severity) {
       case INFO -> List.of(AlertSeverity.INFO);
-      case WARNING -> List.of(
-        AlertSeverity.VERY_SLIGHT,
-        AlertSeverity.SLIGHT,
-        AlertSeverity.WARNING
-      );
+      case WARNING
+        -> List.of(AlertSeverity.VERY_SLIGHT, AlertSeverity.SLIGHT, AlertSeverity.WARNING);
       case SEVERE -> List.of(AlertSeverity.VERY_SEVERE, AlertSeverity.SEVERE);
       case UNKNOWN_SEVERITY -> List.of(AlertSeverity.UNKNOWN_SEVERITY);
     };

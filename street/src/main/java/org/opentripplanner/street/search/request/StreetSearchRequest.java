@@ -273,7 +273,8 @@ public class StreetSearchRequest implements AStarRequest {
         TAXI,
         CAR_HAILING,
         CARPOOL,
-        FLEXIBLE -> null;
+        FLEXIBLE
+          -> null;
     };
   }
 
