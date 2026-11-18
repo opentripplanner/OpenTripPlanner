@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
+import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -35,6 +36,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.updater.trip.gtfs.GtfsRtTestHelper;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 class StopCallImplTest {
@@ -59,6 +61,7 @@ class StopCallImplTest {
   private final RegularStop STOP_C = envBuilder.stop("C");
   private final AreaStop STOP_D = envBuilder.areaStop("D");
   private final AreaStop STOP_E = envBuilder.areaStop("E");
+  private final RegularStop STOP_B_OTHER_PLATFORM = envBuilder.stop("B2");
 
   private final TripInput TRIP_INPUT = TripInput.of(TRIP_ID)
     .addStop(STOP_A, "12:00:00", "12:00:00")
@@ -101,10 +104,47 @@ class StopCallImplTest {
       new CallSchedule(
         new ArrivalDepartureTime(NOON, NOON, false),
         PickDrop.SCHEDULED,
-        PickDrop.SCHEDULED
+        PickDrop.SCHEDULED,
+        STOP_A
       ),
       schedule
     );
+  }
+
+  /**
+   * A real-time update moves the second call to another platform. The call's stop location should
+   * be the new platform, while the scheduled stop location should still be the original one.
+   */
+  @Test
+  void platformChange() throws Exception {
+    var realtimeEnv = envBuilder.addTrip(TRIP_INPUT).build();
+    var rt = GtfsRtTestHelper.of(realtimeEnv);
+    var platformChange = rt
+      .tripUpdateScheduled(TRIP_ID)
+      .addStopTime(0, "12:00:00")
+      .addAssignedStopTime(1, "12:30:00", STOP_B_OTHER_PLATFORM.getId().getId())
+      .addStopTime(2, "13:00:00")
+      .build();
+    assertSuccess(rt.applyTripUpdate(platformChange));
+
+    var tripData = realtimeEnv.tripData(TRIP_ID);
+    var call = new TripTimeOnDate(
+      tripData.tripTimes(),
+      1,
+      tripData.tripPattern(),
+      SERVICE_DATE,
+      MIDNIGHT
+    );
+
+    var impl = new StopCallImpl();
+    var env = DataFetchingSupport.dataFetchingEnvironment(
+      call,
+      Map.of(),
+      realtimeEnv.transitService()
+    );
+
+    assertEquals(STOP_B_OTHER_PLATFORM, impl.stopLocation().get(env));
+    assertEquals(STOP_B, impl.schedule().get(env).stopLocation());
   }
 
   @Test
@@ -358,7 +398,8 @@ class StopCallImplTest {
           new CallSchedule(
             new TimeWindow(TEN_AM, TEN_AM.plusMinutes(30)),
             PickDrop.SCHEDULED,
-            PickDrop.SCHEDULED
+            PickDrop.SCHEDULED,
+            STOP_D
           ),
           schedule
         );
