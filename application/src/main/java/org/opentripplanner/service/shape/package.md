@@ -20,8 +20,8 @@ The module follows the same design as the timetable data (`TimetableDataImport` 
 ## Contracts
 
 The write side is keyed by the `TripPattern`, so the shape can be validated against it. Both
-`ShapeDataImport` and `ShapeRepository` check on every write, with `TripPatternShapeValidator`, that
-the pattern has a shape and that it has one hop per pair of stops, and fail with
+`ShapeDataImport` and `ShapeRepository` check on every write, with `TripShapeValidator`, that the
+pattern has a shape and that it has one hop per pair of stops, and fail with
 `IllegalArgumentException` otherwise. The data only stores the pattern id and reads are by id.
 
 ## Data flow

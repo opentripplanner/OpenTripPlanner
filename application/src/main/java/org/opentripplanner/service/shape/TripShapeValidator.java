@@ -3,9 +3,9 @@ package org.opentripplanner.service.shape;
 import org.opentripplanner.service.shape.model.CompactLineStringSequence;
 import org.opentripplanner.transit.model.network.TripPattern;
 
-public final class TripPatternShapeValidator {
+public final class TripShapeValidator {
 
-  private TripPatternShapeValidator() {}
+  private TripShapeValidator() {}
 
   /**
    * Check that the pattern has a shape, and that it has one hop for each pair of consecutive stops

@@ -10,7 +10,7 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.service.shape.ScheduledShapeData;
 import org.opentripplanner.service.shape.ShapeRepository;
 import org.opentripplanner.service.shape.ShapeRepositorySnapshot;
-import org.opentripplanner.service.shape.TripPatternShapeValidator;
+import org.opentripplanner.service.shape.TripShapeValidator;
 import org.opentripplanner.service.shape.model.CompactLineStringSequence;
 import org.opentripplanner.transit.model.network.TripPattern;
 
@@ -60,7 +60,7 @@ public class DefaultShapeRepository implements ShapeRepository {
     TripPattern tripPattern,
     CompactLineStringSequence tripPatternShape
   ) {
-    TripPatternShapeValidator.validate(tripPattern, tripPatternShape);
+    TripShapeValidator.validate(tripPattern, tripPatternShape);
     var tripPatternId = tripPattern.getId();
     var feedId = tripPatternId.getFeedId();
     var tripPatternShapesForFeed = realTimeGeometries.get(feedId);

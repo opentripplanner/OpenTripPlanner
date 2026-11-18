@@ -6,7 +6,7 @@ import java.util.Map;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.service.shape.ScheduledShapeData;
-import org.opentripplanner.service.shape.TripPatternShapeValidator;
+import org.opentripplanner.service.shape.TripShapeValidator;
 import org.opentripplanner.service.shape.model.CompactLineStringSequence;
 import org.opentripplanner.transit.model.network.TripPattern;
 
@@ -39,7 +39,7 @@ public class ShapeDataImport implements Serializable {
    * pattern is replaced.
    *
    * @throws IllegalArgumentException if the shape is missing or does not have one hop per pair of
-   *                                  stops of the pattern, see {@link TripPatternShapeValidator}
+   *                                  stops of the pattern, see {@link TripShapeValidator}
    * @throws IllegalStateException    if the data import is already frozen
    */
   public void setTripPatternShape(
@@ -47,7 +47,7 @@ public class ShapeDataImport implements Serializable {
     CompactLineStringSequence tripPatternShape
   ) {
     assertModificationsAllowed();
-    TripPatternShapeValidator.validate(tripPattern, tripPatternShape);
+    TripShapeValidator.validate(tripPattern, tripPatternShape);
     geometriesByTripPattern.put(tripPattern.getId(), tripPatternShape);
   }
 

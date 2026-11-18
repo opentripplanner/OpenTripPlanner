@@ -18,7 +18,7 @@ public interface ShapeRepository extends ShapeRepositorySnapshot {
    * same pattern is replaced. The scheduled data is never modified.
    *
    * @throws IllegalArgumentException if the shape is missing or does not have one hop per pair of
-   *                                  stops of the pattern, see {@link TripPatternShapeValidator}
+   *                                  stops of the pattern, see {@link TripShapeValidator}
    */
   void setTripPatternShape(TripPattern tripPattern, CompactLineStringSequence tripPatternShape);
 
