@@ -67,6 +67,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Make GraphQL Date scalar reject non-strings as validation error [#8232](https://github.com/opentripplanner/OpenTripPlanner/pull/8232)
 - Add real-time cancellation of calls to GTFS GraphQL API [#8167](https://github.com/opentripplanner/OpenTripPlanner/pull/8167)
 - Fix GTFS-RT updates for circular trips with too many stop time updates [#8221](https://github.com/opentripplanner/OpenTripPlanner/pull/8221)
+- Make explicit nulls in estimatedCalls filters behave as omitted instead of throwing [#8207](https://github.com/opentripplanner/OpenTripPlanner/pull/8207)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.10.0 (2026-09-09)
