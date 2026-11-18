@@ -272,7 +272,10 @@ public class EstimatedCallType {
           GraphQLFieldDefinition.newFieldDefinition()
             .name("isNotExpectedArrival")
             .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
-            .description("Whether this service is expected to arrive at this stop.")
+            .description(
+              "Whether the real-time data reports that the vehicle is not expected to arrive at this quay, for example at an on-demand stop that has not been booked yet. " +
+                "Unlike cancellation, the call is still part of the planned service and may be served if it is booked. Always false when no real-time data says so."
+            )
             .dataFetcher(env -> ((TripTimeOnDate) env.getSource()).isNotExpectedArrival())
             .build()
         )
@@ -280,7 +283,10 @@ public class EstimatedCallType {
           GraphQLFieldDefinition.newFieldDefinition()
             .name("isNotExpectedDeparture")
             .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
-            .description("Whether this service is expected to depart from this stop.")
+            .description(
+              "Whether the real-time data reports that the vehicle is not expected to depart from this quay, for example at an on-demand stop that has not been booked yet. " +
+                "Unlike cancellation, the call is still part of the planned service and may be served if it is booked. Always false when no real-time data says so."
+            )
             .dataFetcher(env -> ((TripTimeOnDate) env.getSource()).isNotExpectedDeparture())
             .build()
         )
