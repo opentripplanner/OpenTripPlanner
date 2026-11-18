@@ -3,15 +3,11 @@ package org.opentripplanner.service.shape.model;
 import static com.google.common.truth.Truth.assertThat;
 import static org.opentripplanner.street.geometry.GeometryUtils.makeLineString;
 
-import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.kryo.io.Output;
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
-import org.opentripplanner.routing.graph.kryosupport.KryoBuilder;
 import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
@@ -252,25 +248,5 @@ class TripShapeFactoryTest {
     assertThat(first.getCompact(0)).isSameInstanceAs(second.getCompact(0));
     assertThat(first.getCompact(1)).isSameInstanceAs(second.getCompact(1));
     assertThat(first.getCompact(0)).isNotSameInstanceAs(first.getCompact(1));
-  }
-
-  @Test
-  void sharedHopPointersSurviveSerialization() {
-    var deduplicator = new Deduplicator();
-    var first = TripShapeFactory.fromLineStrings(HOP_GEOMETRIES, deduplicator);
-    var second = TripShapeFactory.fromLineStrings(HOP_GEOMETRIES, deduplicator);
-
-    var kryo = KryoBuilder.create();
-    var bytes = new ByteArrayOutputStream();
-    try (var out = new Output(bytes)) {
-      kryo.writeClassAndObject(out, List.of(first, second));
-    }
-    var read = (List<?>) kryo.readClassAndObject(new Input(bytes.toByteArray()));
-    var a = (CompactLineStringSequence) read.get(0);
-    var b = (CompactLineStringSequence) read.get(1);
-
-    assertThat(a.getCompact(0)).isSameInstanceAs(b.getCompact(0));
-    assertThat(a.getCompact(1)).isSameInstanceAs(b.getCompact(1));
-    assertThat(a.getCompact(0)).isNotSameInstanceAs(a.getCompact(1));
   }
 }

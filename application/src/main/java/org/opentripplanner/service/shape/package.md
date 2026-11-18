@@ -40,8 +40,7 @@ pattern has a shape and that it has one hop per pair of stops, and fail with
    a pattern is a real-time pattern whose shape was cleared, straight lines are used.
 5. **Requests:** each request gets a `ShapeService` over the snapshot of its transaction scope.
 
-Identical hops are deduplicated, so equal hops share one instance (Kryo reference tracking keeps
-this across serialization).
+Identical hops are deduplicated, so equal hops share one instance.
 
 ## Glossary
 
