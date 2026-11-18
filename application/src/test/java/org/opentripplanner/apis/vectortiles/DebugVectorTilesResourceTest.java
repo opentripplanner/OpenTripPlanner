@@ -1,7 +1,6 @@
 package org.opentripplanner.apis.vectortiles;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.apis.vectortiles.DebugVectorTilesResource.tilesBaseUrl;
 import static org.opentripplanner.standalone.config.framework.json.JsonSupport.jsonNodeForTest;
 
 import java.util.List;
@@ -88,26 +87,6 @@ class DebugVectorTilesResourceTest {
     assertEquals(
       "https://api.example.com/gateway/debug/otp/debug/vectortiles/l1,l2/{z}/{x}/{y}.pbf",
       tileJson.tiles[0]
-    );
-  }
-
-  @Test
-  void baseUrlFromPathOrUrl() {
-    var host = "http://example.com";
-    var path = DebugUiConfig.DEFAULT.vectorTilesBasePath();
-    assertEquals("http://example.com/otp/debug/vectortiles", tilesBaseUrl(host, path));
-    // leading and trailing slashes of a path are optional
-    for (var basePath : List.of("/gateway/tiles", "gateway/tiles/", "/gateway/tiles/")) {
-      assertEquals("http://example.com/gateway/tiles", tilesBaseUrl(host, basePath));
-    }
-    // a full URL is used as is, apart from a trailing slash
-    assertEquals(
-      "https://api.example.com/tiles",
-      tilesBaseUrl(host, "https://api.example.com/tiles/")
-    );
-    assertEquals(
-      "HTTP://api.example.com/tiles",
-      tilesBaseUrl(host, "HTTP://api.example.com/tiles")
     );
   }
 

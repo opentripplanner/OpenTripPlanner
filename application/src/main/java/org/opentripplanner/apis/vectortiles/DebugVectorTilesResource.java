@@ -26,9 +26,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.function.Predicate;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.StringUtils;
 import org.glassfish.grizzly.http.server.Request;
 import org.opentripplanner.apis.support.TileJson;
 import org.opentripplanner.apis.vectortiles.model.LayerParams;
@@ -82,10 +80,6 @@ public class DebugVectorTilesResource {
     VERTICES,
     RENTAL,
     TRANSFERS
-  );
-  private static final Pattern ABSOLUTE_URL = Pattern.compile(
-    "^https?://.*",
-    Pattern.CASE_INSENSITIVE
   );
 
   private final TransitService transitService;
@@ -155,7 +149,7 @@ public class DebugVectorTilesResource {
     List<String> layers = Arrays.asList(requestedLayers.split(","));
 
     var url = "%s/%s/{z}/{x}/{y}.pbf".formatted(
-      tilesBaseUrl(HttpUtils.getBaseAddress(uri, headers), debugUiConfig.vectorTilesBasePath()),
+      tilesBaseUrl(uri, headers),
       String.join(",", layers)
     );
     return new TileJson(url, envelope, feedInfos, MIN_ZOOM, MAX_ZOOM);
@@ -165,10 +159,7 @@ public class DebugVectorTilesResource {
   @Path("/style.json")
   @Produces(MediaType.APPLICATION_JSON)
   public StyleSpec getTileJson(@Context UriInfo uri, @Context HttpHeaders headers) {
-    var base = tilesBaseUrl(
-      HttpUtils.getBaseAddress(uri, headers),
-      debugUiConfig.vectorTilesBasePath()
-    );
+    var base = tilesBaseUrl(uri, headers);
 
     // these could also be loaded together but are put into separate sources because
     // the stops are fast and the edges are relatively slow
@@ -202,11 +193,11 @@ public class DebugVectorTilesResource {
    * The URL the debug vector tiles are reachable on from the outside. The configured value is
    * either a full URL, which is used as is, or a path, which is put after the host of the request.
    */
-  static String tilesBaseUrl(String requestBaseAddress, String basePathOrUrl) {
-    if (ABSOLUTE_URL.matcher(basePathOrUrl).matches()) {
-      return StringUtils.stripEnd(basePathOrUrl, "/");
-    }
-    return "%s/%s".formatted(requestBaseAddress, StringUtils.strip(basePathOrUrl, "/"));
+  private String tilesBaseUrl(UriInfo uri, HttpHeaders headers) {
+    return HttpUtils.resolveBaseUrl(
+      HttpUtils.getBaseAddress(uri, headers),
+      debugUiConfig.vectorTilesBasePath()
+    );
   }
 
   static String tileJsonUrl(String tilesBaseUrl, List<LayerParameters<LayerType>> layers) {
