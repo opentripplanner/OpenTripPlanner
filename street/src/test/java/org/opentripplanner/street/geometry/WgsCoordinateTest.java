@@ -94,6 +94,21 @@ public class WgsCoordinateTest {
     assertThrows(IllegalArgumentException.class, () -> new WgsCoordinate(-91d, 1d));
     assertThrows(IllegalArgumentException.class, () -> new WgsCoordinate(1d, 181d));
     assertThrows(IllegalArgumentException.class, () -> new WgsCoordinate(1d, -181d));
+    assertThrows(IllegalArgumentException.class, () -> new WgsCoordinate(Double.NaN, 1d));
+    assertThrows(IllegalArgumentException.class, () -> new WgsCoordinate(1d, Double.NaN));
+  }
+
+  @Test
+  void isValid() {
+    assertTrue(WgsCoordinate.isValid(90d, 180d));
+    assertTrue(WgsCoordinate.isValid(-90d, -180d));
+
+    assertFalse(WgsCoordinate.isValid(91d, 1d));
+    assertFalse(WgsCoordinate.isValid(-91d, 1d));
+    assertFalse(WgsCoordinate.isValid(1d, 181d));
+    assertFalse(WgsCoordinate.isValid(1d, -181d));
+    assertFalse(WgsCoordinate.isValid(Double.NaN, 1d));
+    assertFalse(WgsCoordinate.isValid(1d, Double.NaN));
   }
 
   @Test

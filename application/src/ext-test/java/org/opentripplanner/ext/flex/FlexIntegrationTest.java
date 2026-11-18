@@ -20,9 +20,7 @@ import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.TestStreetLinkerModule;
-import org.opentripplanner.graph_builder.module.transfer.DirectTransferGenerator;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundleTestFactory;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModuleTestFactory;
@@ -35,6 +33,7 @@ import org.opentripplanner.routing.api.request.request.JourneyRequest;
 import org.opentripplanner.standalone.api.TestServerContext;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetMode;
+import org.opentripplanner.transfer.dataimport.FlexTransferGenerator;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.service.TransitRepository;
@@ -87,10 +86,14 @@ public class FlexIntegrationTest {
     );
     var transitService = TestServerContext.createTransitService(
       transitRepository,
-      timetableDataImport,
-      transferRepository
+      timetableDataImport
     );
-    service = TestServerContext.createRoutingService(graph, transitService, transferRepository);
+    service = TestServerContext.createRoutingService(
+      graph,
+      transitService,
+      transferRepository,
+      TestServerContext.createRegularTransfers(graph, transitRepository, timetableDataImport)
+    );
   }
 
   @Test
@@ -226,12 +229,11 @@ public class FlexIntegrationTest {
     var req = RouteRequest.defaultValue();
 
     // we don't have a complete coverage of the entire area so use straight lines for transfers
-    new DirectTransferGenerator(
+    new FlexTransferGenerator(
       graph,
       transitRepository,
       timetableDataImport,
       transferRepository,
-      DataImportIssueStore.NOOP,
       Duration.ofMinutes(10),
       List.of(req)
     ).buildGraph();

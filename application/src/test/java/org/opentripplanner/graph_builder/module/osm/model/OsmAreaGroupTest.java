@@ -2,9 +2,9 @@ package org.opentripplanner.graph_builder.module.osm.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.carrotsearch.hppc.LongObjectHashMap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import gnu.trove.map.hash.TLongObjectHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,7 +24,7 @@ class OsmAreaGroupTest {
     new OsmLevel(1.0, "1", OsmLevelSource.LEVEL_TAG)
   );
 
-  private static final TLongObjectHashMap<OsmNode> NODES = new TLongObjectHashMap<>();
+  private static final LongObjectHashMap<OsmNode> NODES = new LongObjectHashMap<>();
 
   static {
     NODES.put(1, OsmNode.of().withId(1).withLatLon(0, 0).build());

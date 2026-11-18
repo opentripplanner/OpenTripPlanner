@@ -2,9 +2,9 @@ package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals;
 
 import static org.opentripplanner.raptor.api.view.PathLegType.TRANSIT;
 
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
-import gnu.trove.set.TIntSet;
+import com.carrotsearch.hppc.IntObjectHashMap;
+import com.carrotsearch.hppc.IntObjectMap;
+import com.carrotsearch.hppc.IntSet;
 import java.util.BitSet;
 import java.util.Collections;
 import java.util.function.Function;
@@ -39,7 +39,7 @@ import org.opentripplanner.raptor.util.paretoset.ParetoSetEventListener;
 public final class McStopArrivals<T extends RaptorTripSchedule> {
 
   private final ParetoSet<McStopArrival<T>>[] arrivals;
-  private final TIntObjectMap<OnTripAccessArrivals<T>> onBoardTripArrivalsByRouteQueue;
+  private final IntObjectMap<OnTripAccessArrivals<T>> onBoardTripArrivalsByRouteQueue;
 
   private final BitSet touchedStops;
 
@@ -58,14 +58,14 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
    */
   public McStopArrivals(
     int nStops,
-    TIntSet onBoardArrivalStops,
-    TIntObjectMap<ParetoSetEventListener<ArrivalView<T>>> arrivalListeners,
+    IntSet onBoardArrivalStops,
+    IntObjectMap<ParetoSetEventListener<ArrivalView<T>>> arrivalListeners,
     ArrivalParetoSetComparatorFactory<McStopArrival<T>> comparatorFactory,
     DebugHandlerFactory<T> debugHandlerFactory
   ) {
     //noinspection unchecked
     this.arrivals = (ParetoSet<McStopArrival<T>>[]) new ParetoSet[nStops];
-    this.onBoardTripArrivalsByRouteQueue = new TIntObjectHashMap<>();
+    this.onBoardTripArrivalsByRouteQueue = new IntObjectHashMap<>();
     this.touchedStops = new BitSet(nStops);
     this.comparator = comparatorFactory.compareArrivalTimeRoundAndCost();
     this.debugHandlerFactory = debugHandlerFactory;
@@ -74,13 +74,14 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
     // Comparator for stops that have arrival listeners with a on-board trip-to-trip via
     // connection.
     var onBoardComparator = comparatorFactory.compareArrivalTimeRoundCostAndOnBoardArrival();
-    for (int stop : arrivalListeners.keys()) {
+    for (var cursor : arrivalListeners.keys()) {
+      int stop = cursor.value;
       var comp = onBoardArrivalStops.contains(stop) ? onBoardComparator : comparator;
       this.arrivals[stop] = ParetoSet.of(comp, arrivalListeners.get(stop));
     }
 
-    for (var it = onBoardArrivalStops.iterator(); it.hasNext(); ) {
-      int stop = it.next();
+    for (var cursor : onBoardArrivalStops) {
+      int stop = cursor.value;
       if (this.arrivals[stop] == null) {
         this.arrivals[stop] = ParetoSet.of(
           onBoardComparator,

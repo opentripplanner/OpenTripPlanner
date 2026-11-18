@@ -664,7 +664,7 @@ public class WalkableAreaBuilder {
       .withBack(false)
       .withArea(areaGroup)
       .withCarSpeed(carSpeed)
-      .withBogusName(parent.hasNoName())
+      .withNameIsDerived(parent.hasNoName())
       .withWheelchairAccessible(wheelchairAccessible)
       .withLink(parent.isLink());
 
@@ -681,7 +681,7 @@ public class WalkableAreaBuilder {
       .withBack(true)
       .withArea(areaGroup)
       .withCarSpeed(carSpeed)
-      .withBogusName(parent.hasNoName())
+      .withNameIsDerived(parent.hasNoName())
       .withWheelchairAccessible(wheelchairAccessible)
       .withLink(parent.isLink());
 

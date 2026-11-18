@@ -3,7 +3,7 @@ package org.opentripplanner.graph_builder.module.osm.storage;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import gnu.trove.list.TLongList;
+import com.carrotsearch.hppc.LongArrayList;
 import java.io.File;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -37,7 +37,7 @@ class OsmParserTest {
 
     OsmWay wayA = osmdb.getWay(13490353L);
     assertEquals(13490353, wayA.getId());
-    TLongList nodeRefsA = wayA.getNodeRefs();
+    LongArrayList nodeRefsA = wayA.getNodeRefs();
     assertEquals(2, nodeRefsA.size());
     assertEquals(123978834, nodeRefsA.get(0));
     assertEquals(123980465, nodeRefsA.get(1));

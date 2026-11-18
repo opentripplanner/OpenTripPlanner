@@ -25,7 +25,8 @@ public enum OTPFeature {
   ConsiderPatternsForDirectTransfers(
     true,
     false,
-    "Enable limiting transfers so that there is only a single transfer to each pattern."
+    "Enable limiting transfers so that there is only a single transfer to each pattern: " +
+      "only the closest stop of each pattern is a transfer target."
   ),
   CostlyAssertions(
     true,
@@ -78,18 +79,6 @@ public enum OTPFeature {
     "If the minimum transfer time is a lower bound (default) or the definitive time for the " +
       "transfer. Set this to `true` if you want to set a transfer time lower than what OTP derives " +
       "from OSM data."
-  ),
-
-  OnDemandRaptorTransfer(
-    false,
-    false,
-    """
-    Calculate transfers only when accessed by Raptor, instead of calculating and caching all transfers for the whole graph,
-    for runtime requests which are not pre-cached in `transferCacheRequests` in router-config.json.
-    This may help performance when doing local journey planning in a large graph.
-
-    Requests which are specified in `transferCacheRequests` in router-config.json are not affected and are always pre-cached for the whole graph.
-    """
   ),
 
   OptimizeTransfers(
