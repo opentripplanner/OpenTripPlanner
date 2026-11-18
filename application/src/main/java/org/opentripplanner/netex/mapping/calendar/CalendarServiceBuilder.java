@@ -46,6 +46,7 @@ public class CalendarServiceBuilder {
    * used to reference the given set of dates.
    * <p>
    * THIS METHOD IS THREAD-SAFE
+   *
    * @return serviceId associated with the given dates
    */
   @Nullable

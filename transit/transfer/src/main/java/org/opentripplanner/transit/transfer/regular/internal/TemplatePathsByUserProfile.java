@@ -21,6 +21,7 @@ import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUser
  * stops), so it is never copied.
  * <p>
  * This class is not thread-safe while it is written to.
+ *
  * @param
  *     <p>
  *     the street path type
@@ -98,6 +99,7 @@ final class TemplatePathsByUserProfile<P> implements Serializable {
    * {@code declarationOrder}, the order the profiles are declared in the configuration. The result
    * does not depend on the order the paths were stored in. Profiles that have the same position are
    * ordered by their values, so the result is always the same.
+   *
    * @throws IllegalArgumentException if paths are stored, but not for the type of the preferences.
    *                                  A request can only use the transfers of a configured type.
    */

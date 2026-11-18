@@ -10,6 +10,7 @@ import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUser
  * how the two relate.
  * <p>
  * Implementations are immutable and thread-safe.
+ *
  * @param <R> the request type
  */
 public interface TransferRequestMapper<R> {

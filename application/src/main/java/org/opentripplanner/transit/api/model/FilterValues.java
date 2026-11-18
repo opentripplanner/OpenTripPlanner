@@ -14,6 +14,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * This abstraction over the Collection type lets us keep filter specific functionality separate
  * from interpretation of various states of a collection. For instance in which case the filter
  * values should match all entities they are meant to filter.
+ *
  * @param <E> - The type of the filter values. Typically, String or {@link FeedScopedId}.
  */
 public abstract class FilterValues<E> {
@@ -30,6 +31,7 @@ public abstract class FilterValues<E> {
 
   /**
    * Returns a {@link FilterValues} that matches everything if there are no filter values.
+   *
    * @param name   - The name of the filter.
    * @param <E>    - The type of the filter values. Typically, String or {@link FeedScopedId}.
    * @param values - The {@link Collection} of filter values.
@@ -44,6 +46,7 @@ public abstract class FilterValues<E> {
 
   /**
    * Returns a {@link FilterValues} that matches everything if the filter values are null.
+   *
    * @param name   - The name of the filter.
    * @param <E>    - The type of the filter values. Typically, String or {@link FeedScopedId}.
    * @param values - The {@link Collection} of filter values.
@@ -59,6 +62,7 @@ public abstract class FilterValues<E> {
   /**
    * Returns a {@link RequiredFilterValues} that throws an exception at creation time if the filter
    * values is null or empty.
+   *
    * @param name   - The name of the filter.
    * @param <E>    - The type of the filter values. Typically, String or {@link FeedScopedId}.
    * @param values - The {@link Collection} of filter values.
@@ -75,6 +79,7 @@ public abstract class FilterValues<E> {
    * Returns True if the collection of filter values matches everything that it could filter. If
    * this is the case, then the filter values should not be used to filter anything and filtering
    * logic can safely ignore it.
+   *
    * @return boolean
    */
   public abstract boolean includeEverything();
@@ -82,6 +87,7 @@ public abstract class FilterValues<E> {
   /**
    * Returns the collection of filter values. If the filter values effectively don't filter
    * anything, an exception is thrown.
+   *
    * @return Collection<E> - The values of the filter.
    */
   public Collection<E> get() {

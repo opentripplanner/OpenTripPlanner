@@ -9,6 +9,7 @@ import org.opentripplanner.street.search.TraverseMode;
  * <p>
  * Turn durations are given in seconds - they represent the expected amount of time it would take
  * to make a turn.
+ *
  * @author avi
  */
 

@@ -20,6 +20,7 @@ import org.opentripplanner.utils.time.DurationUtils;
  * of the stops that allow a mode must be longer than the limit for all stops.
  * <p>
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
+ *
  * @param maxDurationAllowAllModes the longest transfer between any two stops, or {@code null} if
  *                                 there are no transfers between stops that are not allowed for
  *                                 the modes below

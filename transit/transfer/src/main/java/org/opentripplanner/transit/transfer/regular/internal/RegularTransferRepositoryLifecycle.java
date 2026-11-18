@@ -36,6 +36,7 @@ import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
  * <p>
  * This class is only accessed on the writer thread, except the statistics of the cache. They are
  * shared by all snapshots, and are thread-safe.
+ *
  * @param
  *     <p>
  *     the street path type

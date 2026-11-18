@@ -210,6 +210,7 @@ public class StreetSearchRequest implements AStarRequest {
    * instead.
    * <p>
    * If you encounter a case of this, you can adjust this code to take this into account.
+   *
    * @see DominanceFunctions#betterOrEqualAndComparable(State, State)
    */
   public boolean isCloseToStartOrEnd(Vertex vertex) {

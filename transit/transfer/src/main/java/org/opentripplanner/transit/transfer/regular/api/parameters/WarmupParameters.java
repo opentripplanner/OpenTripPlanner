@@ -10,6 +10,7 @@ import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUser
  * a request, so the first request with these preferences does not wait for them.
  * <p>
  * A warmup entry is not a profile. No paths are searched for or stored for it.
+ *
  * @param id              identifies the entry. It must be unique among all the profiles and
  *                        warmup entries.
  * @param userPreferences the preferences to warm up. They must be unique among the profiles and

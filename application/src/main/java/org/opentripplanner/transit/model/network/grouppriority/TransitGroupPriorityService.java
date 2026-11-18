@@ -99,6 +99,7 @@ public class TransitGroupPriorityService {
 
   /**
    * Fetch/lookup the transit-group-id for the given pattern.
+   *
    * @throws IllegalArgumentException if more than 32 group-ids are requested.
    */
   public int lookupTransitGroupPriorityId(TripPattern tripPattern) {
@@ -109,6 +110,7 @@ public class TransitGroupPriorityService {
 
   /**
    * Fetch/lookup the transit-group-id for the given trip.
+   *
    * @throws IllegalArgumentException if more than 32 group-ids are requested.
    */
   public int lookupTransitGroupPriorityId(Trip trip) {
@@ -117,6 +119,7 @@ public class TransitGroupPriorityService {
 
   /**
    * Fetch/lookup the transit-group-id for the given entity.
+   *
    * @throws IllegalArgumentException if more than 32 group-ids are requested.
    */
   private int lookupTransitGroupPriorityId(EntityAdapter entity) {

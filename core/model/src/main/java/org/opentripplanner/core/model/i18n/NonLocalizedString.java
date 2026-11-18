@@ -10,6 +10,7 @@ import org.jspecify.annotations.Nullable;
  * This is to support strings which can't be localized.
  * <p>
  * It just returns string it is given in constructor.
+ *
  * @author mabu
  */
 public class NonLocalizedString implements I18NString, Serializable {

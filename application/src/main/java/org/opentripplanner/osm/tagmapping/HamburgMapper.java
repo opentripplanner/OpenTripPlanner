@@ -7,7 +7,6 @@ import org.opentripplanner.osm.model.OsmEntity;
  *
  * @see GermanyMapper
  * @see OsmTagMapper
- *
  * @author Maintained by HBT (geofox-team@hbt.de)
  */
 public class HamburgMapper extends GermanyMapper {

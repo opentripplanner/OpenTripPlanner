@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Note! This strategy can be used with RangeRaptor - iterating over a time-window to get pareto
  * optimal solution for departure time. Which is outside the scope of this class.
+ *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public final class ArrivalTimeRoutingStrategy<T extends RaptorTripSchedule> implements

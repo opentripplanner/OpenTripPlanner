@@ -17,7 +17,6 @@ import org.opentripplanner.utils.text.Table;
  * Printing stuff clutters up the code, so it is convenient to put printing and formatting output
  * into a separate class - this makes the SpeedTest more readable.
  *
- *
  * <pre>
  *       METHOD CALLS DURATION |
  *                             |  Min   Max  Avg     Count   Total

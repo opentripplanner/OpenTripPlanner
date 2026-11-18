@@ -17,6 +17,7 @@ import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
  * <p>
  * There is no reference from the parent to the child, enableing garbage collection of children,
  * when not referenced by the outer context any more.
+ *
  * @param <K> The key type
  * @param <V> Thr value type
  */

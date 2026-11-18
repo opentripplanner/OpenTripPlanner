@@ -100,6 +100,7 @@ public class DebugEvent<E> {
    * why an element is rejected.
    * <p>
    * The reason is optional, especially if the {@link #rejectedDroppedByElement} is specified.
+   *
    * @return If no reason exist an empty string is returned.
    */
   public String reason() {

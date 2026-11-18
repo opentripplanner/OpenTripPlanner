@@ -42,6 +42,7 @@ public interface RaptorTransitDataProvider<T extends RaptorTripSchedule> {
    * The implementation may implement a lightweight {@link RaptorTripPattern} representation. See
    * {@link RaptorTransferDataProvider#getTransfersFromStop(int)} for detail on how to implement
    * this.
+   *
    * @throws IndexOutOfBoundsException if routeIndex not found
    */
   RaptorRoute<T> getRouteForIndex(int routeIndex);

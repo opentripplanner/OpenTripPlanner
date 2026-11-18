@@ -13,6 +13,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
  * Only reported with the {@code TRANSIT} coordinate source: the stop is still linked, keeping its
  * own coordinate and connected by an edge of this length, so the gap is reported rather than
  * silently added to every itinerary.
+ *
  * @param boardingLocation what the stop was linked to, for looking the feature up in OSM
  */
 public record StopFarFromBoardingLocation(

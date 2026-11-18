@@ -13,6 +13,7 @@ import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTrip;
  * <p>
  * This repository maintains an in-memory index of driver trips, each paired with the permanent
  * street vertices its route points resolve to ({@link RoutableCarpoolTrip}).
+ *
  * @see CarpoolTrip for trip data model
  * @see org.opentripplanner.ext.carpooling.updater.SiriETCarpoolingUpdater for real-time updates
  */
@@ -40,12 +41,14 @@ public interface CarpoolingRepository {
    * This method is the primary mechanism for adding driver trip data to the repository. It is
    * typically called by real-time updaters when receiving trip information from external systems,
    * or when passenger bookings modify trip capacity.
+   *
    * <h3>Validation</h3>
    * <p>
    * The method does not validate trip data beyond basic null checks. It is the caller's
    * responsibility to ensure the trip is valid (has stops, positive capacity, etc.) and that the
    * vertices are the resolution of the trip's current route points. Invalid trips may cause routing
    * failures later.
+   *
    * @param trip the carpool trip to insert or update, must not be null. If a trip with the same ID
    *             exists, it will be completely replaced.
    * @throws IllegalArgumentException if trip is null
@@ -73,6 +76,7 @@ public interface CarpoolingRepository {
    * interval in total instead of once per feed. Calls made before the interval has elapsed are a
    * no-op and return {@code 0}. The method is safe to call concurrently from multiple updater
    * threads.
+   *
    * @param now    the current instant, used both as the throttle reference and to derive the expiry
    *               cut-off
    * @param expiry how long a trip is retained after its latest end time before it becomes eligible

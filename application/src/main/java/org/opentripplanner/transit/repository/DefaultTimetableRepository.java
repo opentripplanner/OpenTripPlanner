@@ -710,6 +710,7 @@ public class DefaultTimetableRepository implements TimetableRepository {
    * <p>
    * Updating the raptor data is now also part of the commit. Previously this was done after the
    * commit. The amount of work triggered by each commit stayed the same.
+   *
    * @return an immutable copy of this repository with all updates applied
    */
   public DefaultTimetableRepository commit() {

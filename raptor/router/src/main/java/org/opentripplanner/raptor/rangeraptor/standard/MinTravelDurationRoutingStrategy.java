@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Note! This strategy should only be used with one Range Raptor iteration (no searchWindow).
  * Multiple iterations are not allowed and would produce the same result in every iteration.
+ *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule> implements

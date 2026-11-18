@@ -67,6 +67,7 @@ class TripMapper {
 
   /**
    * Map a service journey to a trip.
+   *
    * @return valid trip or {@code null} if unable to map to a valid trip.
    */
   @Nullable

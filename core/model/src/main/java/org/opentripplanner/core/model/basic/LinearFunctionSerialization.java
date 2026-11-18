@@ -51,6 +51,7 @@ public class LinearFunctionSerialization {
    * The coefficient must be a number in the range of {@link AbstractLinearFunction}, and is rounded
    * to the step of its bucket in the coefficient scale: finer steps for small values, coarser for
    * large.
+   *
    * @throws NumberFormatException
    * @throws IllegalArgumentException
    */

@@ -25,6 +25,7 @@ import org.opentripplanner.osm.wayproperty.specifier.LogicalOrSpecifier;
  * <p>
  * https://www.gov.uk/government/statistical-data-sets/vehicle-speed-compliance-statistics-data-tables-spe
  * https://wiki.openstreetmap.org/wiki/United_Kingdom_Tagging_Guidelines
+ *
  * @author marcusyoung
  * @see OsmTagMapper
  */

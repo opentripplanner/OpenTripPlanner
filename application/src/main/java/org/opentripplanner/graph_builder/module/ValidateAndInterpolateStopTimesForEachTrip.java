@@ -227,6 +227,7 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
    * improve the constant speed assumption, we can
    * <p>
    * TODO: use route matching (or shape distance etc.) to improve inter-stop distances
+   *
    * @param stopTimes the stoptimes (from a single trip) to be interpolated
    */
   private void interpolateStopTimes(List<StopTime> stopTimes) {

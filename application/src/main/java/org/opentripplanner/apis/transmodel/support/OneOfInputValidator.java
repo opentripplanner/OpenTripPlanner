@@ -23,7 +23,6 @@ public class OneOfInputValidator {
    * @param inputTypeName The name of the type annotated with @oneOf. The name is used in the error
    *                      message only, in case the validation fails.
    * @param definedFields The name of the fields the @oneOf directive apply to.
-   *
    * @return the field with a value set.
    */
   public static String validateOneOf(

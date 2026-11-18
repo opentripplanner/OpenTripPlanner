@@ -25,6 +25,7 @@ import org.opentripplanner.street.graph.Graph;
  * <p>
  * Tile rendering goes through TileRendererManager which select the appropriate renderer for the
  * given layer.
+ *
  * @author laurent
  * @see TileRendererManager
  * @see TileRenderer

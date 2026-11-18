@@ -128,6 +128,7 @@ public final class TripPatternBuilder
    * methods, but it does not make the problem go away. If, e.g. the Route is chosen as the
    * aggregate root, then the logic would be in the Route class - totally hidden for all users of
    * Route/TripPattern/Trip and so on.
+   *
    * @see #withRealTimeAddedTrip() as an alternative
    * @see TripPattern#isRealTimeTripPattern()
    * @see TripPattern#isStopPatternModifiedInRealTime()

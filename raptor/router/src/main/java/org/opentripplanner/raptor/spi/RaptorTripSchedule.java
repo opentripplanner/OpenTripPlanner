@@ -65,6 +65,7 @@ public interface RaptorTripSchedule {
    * time.
    * <p>
    * Consider using position-based methods in {@link RaptorTripPattern} if possible.
+   *
    * @return the stop position in the trip pattern if found; otherwise, -1
    */
   default int findArrivalStopPosition(int latestArrivalTime, int stop) {
@@ -93,6 +94,7 @@ public interface RaptorTripSchedule {
    * first stop position found, or -1 if no stop position is found.
    * <p>
    * Consider using position-based methods in {@link RaptorTripPattern} if possible.
+   *
    * @param startStopPos          the start stop position to search from
    * @param earliestDepartureTime the earliest departure time to search for (inclusive)
    * @param stop                  the stop index to search for

@@ -235,6 +235,7 @@ public class RouteRequest implements Serializable {
    * many-to-one or one-to-many.
    * <p>
    * TODO - Refactor and make separate requests for one-to-one and the other searches.
+   *
    * @throws RoutingValidationException   if either origin or destination is missing.
    * @throws InvalidRoutingInputException if the destination is an on-board location.
    */

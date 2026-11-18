@@ -30,6 +30,7 @@ public interface RepositoryRegistry {
    * The handle is application-scoped and should be kept for the lifetime of the application,
    * typically by injecting it via Dagger. Do not create and register new repositories after wiring
    * is done, this could lead to concurrency issues.
+   *
    * @param initialRepositorySnapshot the initial read-only snapshot for the repository
    * @param lifecycle                 the lifecycle strategy for the given repository/snapshot
    * @param <S>                       the read-only repository snapshot type

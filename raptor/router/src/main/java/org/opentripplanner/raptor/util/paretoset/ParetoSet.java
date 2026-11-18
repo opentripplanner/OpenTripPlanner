@@ -21,6 +21,7 @@ import org.jspecify.annotations.Nullable;
  * {@code  [[1,7], [3,5], [5,3]] + [2,4] => [[1,7], [5,3], [2,4]]   -- less than dominates}
  * <p>
  * No methods for removing elements like {@link #remove(Object)} are supported.
+ *
  * @param <T> the element type
  */
 public sealed class ParetoSet<T> extends AbstractCollection<T> permits ParetoSetWithListener {
@@ -205,6 +206,7 @@ public sealed class ParetoSet<T> extends AbstractCollection<T> permits ParetoSet
    * <p>
    * It is safe to create as many iterators as you like. The iterator created will reflect the
    * current set of elements in this set at the time of creation.
+   *
    * @param startIndexInclusive the first element to include in the iterator, unlike the elements in
    *                            this set the index is cached until an iterator is created.
    */

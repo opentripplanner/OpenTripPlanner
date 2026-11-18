@@ -45,6 +45,7 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  * <p>
  * This class originated as a rewrite of <a href="https://github.com/conveyal/r5">Conveyals
  * RAPTOR code</a>.
+ *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 @SuppressWarnings("Duplicates")

@@ -8,6 +8,7 @@ import java.util.function.Function;
  * A type for containing either a success or a failure type as the result of a computation.
  * <p>
  * It's very similar to the Either or Validation type found in functional programming languages.
+ *
  * @deprecated This not possible to use inside a constructor - can only return one thing. Which,
  *             then makes encapsulation harder and leaves the door open to forget. Also, having to
  *             create error codes, mapping and handling code for hundreds of different possible
@@ -74,6 +75,7 @@ public abstract sealed class Result<T, E> {
    * it is a failure and want to return it in a method without having to cast the success type.
    * <p>
    * If this instance is not a failure an exception is thrown.
+   *
    * @param <N> The success type of the new Result instance.
    */
   public <N> Result<N, E> toFailureResult() {

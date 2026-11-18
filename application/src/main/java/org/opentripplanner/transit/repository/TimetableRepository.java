@@ -50,6 +50,7 @@ public interface TimetableRepository extends TimetableRepositorySnapshot {
    * <p>
    * For this service date, the trip will revert to its original trip pattern from the scheduled
    * data, remaining on that pattern unless it's changed again by a future realtime update.
+   *
    * @return true if the trip was found to be shifted to a different trip pattern by a realtime
    *         message and an attempt was made to re-associate it with its originally scheduled trip
    *         pattern.

@@ -99,6 +99,7 @@ public final class StreetTransferFactory {
    * <p>
    * Registration is not thread-safe, so the handle must be created at startup, before the updaters
    * start. The transit repository must be indexed.
+   *
    * @param cacheMaxSize           the max number of Raptor transfers cached for other user
    *                               preferences than the ones of the profiles and the warmup entries
    * @param collectCacheStatistics whether to count the requests that use each key of the cache of

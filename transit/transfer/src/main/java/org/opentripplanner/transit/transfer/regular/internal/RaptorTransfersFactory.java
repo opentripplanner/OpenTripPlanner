@@ -22,6 +22,7 @@ import org.opentripplanner.transit.transfer.regular.spi.TransferSearch;
  * slower, and restores their memory locality.
  * <p>
  * This class is stateless and thread-safe.
+ *
  * @param
  *     <p>
  *     the street path type

@@ -31,6 +31,7 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  * "Source" and "target" may apply to stop-arrival, trip, board-/aligh-slack, and so on.
  * <p>
  * For a BACKWARD search the "source" means "from" (stop-arrival, trip, and so on).
+ *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public interface TransitCalculator<T extends RaptorTripSchedule> extends TimeCalculator {

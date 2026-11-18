@@ -131,6 +131,7 @@ public class TransferWaitTimeCostCalculator {
    * <pre>
    *   f(0) = N * minSafeTransferTime
    * </pre>
+   *
    * @param backTravelWaitTimeFactor This factor is used to calculate a cost, with should balance
    *                                 the wait time against extra transit time and less walking.
    */

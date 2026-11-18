@@ -30,6 +30,7 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  * <p>
  * This class should have APPLICATION scope. It keeps a reference to the environment and the
  * tuning parameters. The environment has a thread-pool, which should be APPLICATION scope.
+ *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public class RaptorConfig<T extends RaptorTripSchedule> {

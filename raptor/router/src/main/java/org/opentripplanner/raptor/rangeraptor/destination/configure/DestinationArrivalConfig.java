@@ -28,6 +28,7 @@ import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
  * <p>
  * This class has REQUEST scope, so a new instance should be created for each new request/travel
  * search.
+ *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public class DestinationArrivalConfig<T extends RaptorTripSchedule> {

@@ -29,6 +29,7 @@ import org.opentripplanner.transfer.constrained.raptoradaptor.ConstrainedBoardin
  * <p>
  * This service does NOT combine transfers between various trips to form full paths. There are
  * potentially millions of permutations, so we do that later when we can prune the result.
+ *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public class TransferGenerator<T extends RaptorTripSchedule> {

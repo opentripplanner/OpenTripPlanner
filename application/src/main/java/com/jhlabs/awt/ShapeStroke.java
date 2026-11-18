@@ -16,6 +16,7 @@ import java.awt.geom.Rectangle2D;
  * Stroke that draw a shape.
  * <p>
  * Slightly adapted to OTP from original source.
+ *
  * @see <a href=
  *      "http://www.jhlabs.com/java/java2d/strokes/">http://www.jhlabs.com/java/java2d/strokes/</a>
  */

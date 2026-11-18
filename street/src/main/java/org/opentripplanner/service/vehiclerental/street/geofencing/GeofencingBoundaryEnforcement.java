@@ -12,6 +12,7 @@ import org.opentripplanner.street.search.state.State;
  * <p>
  * A zone boundary is a set of street edges. Each boundary edge has one endpoint inside the zone
  * (the inside vertex) and one outside (the outside vertex).
+ *
  * <h3>Approaching vs crossing</h3>
  * <p>
  * For each side of the boundary, a state can be in one of two positions: about to traverse the

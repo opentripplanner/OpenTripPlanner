@@ -22,6 +22,7 @@ import org.opentripplanner.transit.model.site.StopLocation;
  * <p>
  * The mapper enforces the precedence transit stop &gt; user input &gt; vertex; this record only
  * carries the two pre-resolved candidates.
+ *
  * @param stop     the transit-side stop, set on the transit end of an access/egress chain;
  *                 {@code null} when the endpoint is not a transit stop.
  * @param location the passenger-side input location (the request's {@code from} or {@code to}), set

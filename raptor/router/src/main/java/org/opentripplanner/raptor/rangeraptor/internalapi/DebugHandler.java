@@ -6,6 +6,7 @@ package org.opentripplanner.raptor.rangeraptor.internalapi;
  * <p>
  * The implementation of this interface will take these events and report them back to the API
  * listeners, passed in as part of the debug request.
+ *
  * @param <T> The element type reported to the handler
  */
 public interface DebugHandler<T> {
@@ -28,6 +29,7 @@ public interface DebugHandler<T> {
    * <p>
    * The same check as in {@link #accept(Object)} is performed before reporting back to the API
    * listeners.
+   *
    * @param element           the rejected element
    * @param rejectedByElement the dominating element. Optional can be {@code null}
    */

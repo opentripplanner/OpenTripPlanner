@@ -14,6 +14,7 @@ import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
  * under the same preferences and profile, so the two are always consistent.
  * <p>
  * The paths are immutable, and the view is thread-safe.
+ *
  * @param
  *     <p>
  *     the street path type

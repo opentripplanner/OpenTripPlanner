@@ -19,6 +19,7 @@ package org.opentripplanner.updater.spi;
  * constructed. In this way, changes are queued up by many GraphUpdaters running in parallel on
  * different threads, but are applied sequentially in a single-threaded manner to simplify reasoning
  * about concurrent reads and writes to the Graph.
+ *
  * @param <C> the update context of the updater's write domain.
  */
 public interface GraphUpdater<C> {

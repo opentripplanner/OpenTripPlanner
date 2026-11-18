@@ -144,6 +144,7 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
    * {@link TransferParameters#DEFAULT_REUSE_LIMIT}. The path is then stored once, for both
    * profiles.
    * If several are equivalent, the one that costs least is used.
+   *
    * @param pathsOfEarlierProfiles the paths from this stop of the profiles that are generated
    *                               before this profile, by target stop
    * @return the paths of the profile from the stop, by target stop

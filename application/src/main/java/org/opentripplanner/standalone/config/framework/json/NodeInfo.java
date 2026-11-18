@@ -13,6 +13,7 @@ import org.opentripplanner.utils.tostring.ValueObjectToStringBuilder;
  * Information about a configuration parameter.
  * <p>
  * TODO DOC - Add Unit tests on this class using the builder
+ *
  * @param name         The parameter name in the JSON config file.
  * @param summary      Short one sentence description of the parameter used for documentation.
  * @param description  Long optional multi-line documentation of a parameter - use markdown.

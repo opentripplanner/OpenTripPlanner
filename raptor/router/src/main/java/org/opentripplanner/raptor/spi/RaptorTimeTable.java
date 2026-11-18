@@ -5,6 +5,7 @@ package org.opentripplanner.raptor.spi;
  * after. This can be a subset of all trips available to speed up the trip search - that is left to
  * the implementation of this interface. Raptor uses a binary search to find the right
  * trip-schedule, so even for long time-tables the Raptor search perform quite well.
+ *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public interface RaptorTimeTable<T extends RaptorTripSchedule> {
@@ -13,6 +14,7 @@ public interface RaptorTimeTable<T extends RaptorTripSchedule> {
    * the first stop in the pattern.
    * <p>
    * This method needs to be FAST - it is in the most critical line of execution in Raptor.
+   *
    * @param index the trip schedule index in pattern starting at 0.
    * @throws IndexOutOfBoundsException if index not found
    */

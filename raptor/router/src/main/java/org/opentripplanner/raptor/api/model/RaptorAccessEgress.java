@@ -30,6 +30,7 @@ public interface RaptorAccessEgress {
    * <p>
    * Be careful, calling methods part of the {@link RaptorAccessEgress} interface on the returned
    * value will no longer be decorated - not be the value used by Raptor.
+   *
    * @throws IllegalStateException if the given {@code parentType} does not exist in the chain of
    *                               delegates including the first and last element.
    */

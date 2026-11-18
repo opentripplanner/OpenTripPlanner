@@ -34,6 +34,7 @@ public interface RaptorTuningParameters {
    * destination arrival time. This requires transfers to be sorted by duration. The optimization is
    * only applied in Standard RAPTOR — see
    * {@link org.opentripplanner.raptor.rangeraptor.standard.StdTransferEarlyPruning} for details.
+   *
    * @see org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig
    */
   default boolean earlyTransferPruning() {

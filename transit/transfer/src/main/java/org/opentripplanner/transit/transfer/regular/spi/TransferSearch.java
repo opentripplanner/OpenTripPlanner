@@ -11,6 +11,7 @@ import org.opentripplanner.transit.transfer.regular.api.maxduration.MaxDurations
  * one path with it, so a search should be reused for all paths under the same preferences.
  * <p>
  * Implementations are immutable and thread-safe.
+ *
  * @param
  *     <p>
  *     the street path type

@@ -9,6 +9,7 @@ import org.opentripplanner.core.model.transaction.WriteContext;
  * injects the mutable repository for the handler as the second argument to
  * {@link #handle(DomainEvent, Object)}, so the handler never holds a stored reference to anything
  * mutable.
+ *
  * @param <E> the domain event type this handler responds to
  * @param <M> the mutable repository type this handler writes to
  */

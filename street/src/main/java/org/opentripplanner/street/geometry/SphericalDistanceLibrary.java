@@ -86,6 +86,7 @@ public abstract class SphericalDistanceLibrary {
    * The Cartesian approximation for the projection is acceptable for typical urban and suburban
    * distances (under 50 km) where the Earth's curvature effect is minimal. For longer distances or
    * higher accuracy requirements, consider using spherical trigonometry approaches.
+   *
    * @param point        The point to measure from (longitude, latitude degrees)
    * @param segmentStart Start of the line segment (longitude, latitude degrees)
    * @param segmentEnd   End of the line segment (longitude, latitude degrees)

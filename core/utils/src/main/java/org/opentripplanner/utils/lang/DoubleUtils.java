@@ -92,6 +92,7 @@ public class DoubleUtils {
    * ascending order. The step of the first row that has an upper limit greater than the value is
    * used, so a value equal to an upper limit is in the next bucket. The step of the last row is
    * used for the values that are not less than the last upper limit.
+   *
    * @throws IllegalArgumentException if the {@code steps} are empty
    */
   public static double roundToStep(double value, double[][] steps) {

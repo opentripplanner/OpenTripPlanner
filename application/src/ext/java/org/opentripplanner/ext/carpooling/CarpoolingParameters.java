@@ -7,6 +7,7 @@ import java.time.Duration;
  * <p>
  * These are deployment-wide values, not part of the routing request. They are hard-coded to
  * {@link #DEFAULT}.
+ *
  * @param maxCandidateTripsPerRequest the most trips a request evaluates; when more pass the
  *                                    pre-filters, the ones whose route passes closest to the
  *                                    passenger are kept

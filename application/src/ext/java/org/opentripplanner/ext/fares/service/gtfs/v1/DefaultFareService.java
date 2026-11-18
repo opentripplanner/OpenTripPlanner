@@ -333,6 +333,7 @@ public class DefaultFareService implements FareService {
    * treated as a single leg for the purposes of fare calculation.
    * <p>
    * By default it's disabled since this is unspecified in the GTFS fares spec.
+   *
    * @see DefaultFareService#combineInterlinedLegs(List)
    * @see
    *     HighestFareInFreeTransferWindowFareService#shouldCombineInterlinedLegs(ScheduledTransitLeg,

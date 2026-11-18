@@ -8,6 +8,7 @@ package org.opentripplanner.raptor.spi;
  * When searching forward the <em>target</em> is the "to" end of the transfer, and the
  * <em>source</em> is the "from" transfer point. For a reverse search the <em>target</em> is "from"
  * and the <em>source</em> is the "to" transfer point.
+ *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public interface RaptorConstrainedBoardingSearch<T extends RaptorTripSchedule> {
@@ -32,6 +33,7 @@ public interface RaptorConstrainedBoardingSearch<T extends RaptorTripSchedule> {
   /**
    * Get the board-/alight-event for the current pattern at the target stop position coming from the
    * source stop and trip with the given source arrival board-/alight time (exclude slack).
+   *
    * @return An "empty" event if no target trip is found
    */
   RaptorBoardOrAlightEvent<T> find(

@@ -19,6 +19,7 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  * example as part of a destination arrival.
  * <p>
  * The design was originally done to support the FLyweight design pattern.
+ *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public class StopsCursor<T extends RaptorTripSchedule> {

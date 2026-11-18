@@ -26,6 +26,7 @@ interface NearbyStopFilter {
    * <p>
    * Note: The result will include the origin stop if it is a StopVertex. This is intentional -
    * we don't want to return the next stop down the line for patterns passing through the origin.
+   *
    * @param nearbyStops      the stops to filter, typically from a street search
    * @param reverseDirection true for arrival searches (filters by boarding), false for departure
    *                         searches (filters by alighting)

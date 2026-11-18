@@ -31,6 +31,7 @@ public interface WriteContext {
    * <p>
    * Handlers that need to write to a repository receive the mutable repository via their
    * {@code handle} method parameter — injected by this context at dispatch time.
+   *
    * @param event the domain event to publish
    */
   void publish(DomainEvent event);

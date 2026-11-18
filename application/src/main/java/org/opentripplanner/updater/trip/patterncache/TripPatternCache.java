@@ -58,6 +58,7 @@ public class TripPatternCache {
    * <p>
    * The caller is responsible for resolving {@code originalTripPattern} before calling this
    * method.
+   *
    * @param stopPattern         stop pattern to retrieve/create a trip pattern for
    * @param trip                trip whose route, mode, and submode are copied when a new pattern is
    *                            created; also used to generate the new pattern's id

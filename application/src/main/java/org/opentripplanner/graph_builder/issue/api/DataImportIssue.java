@@ -8,6 +8,7 @@ import org.locationtech.jts.geom.Geometry;
  * logging, summarizing and reporting the issue.
  * <p>
  * Do NOT log the issue in the class where the issue is detected/created.
+ *
  * @author andrewbyrd
  */
 public interface DataImportIssue {

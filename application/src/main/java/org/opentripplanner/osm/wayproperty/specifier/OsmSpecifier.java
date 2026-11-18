@@ -32,6 +32,7 @@ public interface OsmSpecifier {
    * Tags in this specifier are matched against those for the forward and backward direction of
    * the OSM way if a direction is specified. See:
    * http://wiki.openstreetmap.org/wiki/Forward_%26_backward,_left_%26_right
+   *
    * @param way an OSM tagged object to compare to this specifier
    */
   int matchScore(OsmEntity way, TraverseDirection direction);

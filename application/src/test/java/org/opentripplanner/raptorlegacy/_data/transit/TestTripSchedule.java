@@ -15,6 +15,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * An implementation of the {@link RaptorTripSchedule} for unit-testing.
+ *
  * @deprecated This was earlier part of Raptor and should not be used outside the Raptor module. Use
  *             the OTP model entities instead.
  */

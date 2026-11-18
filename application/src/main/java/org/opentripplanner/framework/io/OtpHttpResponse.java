@@ -43,6 +43,7 @@ public class OtpHttpResponse {
    * <p>
    * <strong>Important:</strong> The caller must NOT close this stream. Stream lifecycle is
    * managed by OtpHttpClient.
+   *
    * @return the response body input stream
    */
   public InputStream body() {
@@ -54,6 +55,7 @@ public class OtpHttpResponse {
    * <p>
    * Header names are case-insensitive. The map keys are in lowercase. Multiple header values
    * with the same name are stored as a list.
+   *
    * @return an immutable map of headers
    */
   public Map<String, List<String>> headers() {
@@ -64,6 +66,7 @@ public class OtpHttpResponse {
    * Returns the first value of the specified header, or empty if not present.
    * <p>
    * Header name comparison is case-insensitive.
+   *
    * @param name the header name (case-insensitive)
    * @return the first header value, or empty if header is not present
    */
@@ -82,6 +85,7 @@ public class OtpHttpResponse {
    * <p>
    * Header name comparison is case-insensitive. Returns an empty list if the header is not
    * present.
+   *
    * @param name the header name (case-insensitive)
    * @return a list of header values (empty if header not present)
    */

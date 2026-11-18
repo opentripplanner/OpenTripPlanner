@@ -23,6 +23,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * <p>
  * Because adding new destination arrivals to the set is expensive, this class optimize this by
  * only adding new destination arrivals at the end of each round.
+ *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public class EgressArrivalToPathAdapter<T extends RaptorTripSchedule> implements

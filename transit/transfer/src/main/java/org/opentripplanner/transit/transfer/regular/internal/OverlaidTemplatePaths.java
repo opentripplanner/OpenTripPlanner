@@ -20,6 +20,7 @@ import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUser
  * number of paths.
  * <p>
  * This class is not thread-safe. An instance published in a snapshot is never written to.
+ *
  * @param
  *     <p>
  *     the street path type

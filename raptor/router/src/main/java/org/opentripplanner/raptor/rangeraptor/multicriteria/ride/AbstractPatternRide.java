@@ -58,6 +58,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * This interface extends the {@link PatternRideView} with methods which mutate the PatternRide (a
  * new copy is created, since the rides are immutable). The interface is used by Raptor to perform
  * the routing, while the view is used by other parts; hence only need read access.
+ *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public abstract sealed class AbstractPatternRide<T extends RaptorTripSchedule>

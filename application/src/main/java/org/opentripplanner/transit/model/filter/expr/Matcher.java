@@ -2,6 +2,7 @@ package org.opentripplanner.transit.model.filter.expr;
 
 /**
  * Generic matcher interface - this is the root of the matcher type hierarchy.
+ *
  * @param <T> Domain type to match.
  */
 @FunctionalInterface

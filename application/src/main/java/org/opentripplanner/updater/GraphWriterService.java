@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * This class will eventually be removed once all updaters submit directly to
  * {@link UpdateManager}.
+ *
  * @param <C> the update context of this domain, see {@link GraphWriterRunnable}
  */
 public class GraphWriterService<C> implements WriteToGraphCallback<C> {

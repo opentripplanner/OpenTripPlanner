@@ -10,7 +10,6 @@ import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 /// connection to visit something other than a stop, like a street location. This is not an
 /// alternative to transfers. Raptor supports several use-cases through via-connections:
 ///
-///
 /// #4 Route via a pass-through-stop
 ///
 /// Raptor will allow a path to go through a pass-through-stop. The stop can be visited on-board
@@ -18,14 +17,12 @@ import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 /// no
 /// to-stop defined), and the minimum-wait-time must be zero.
 ///
-///
 /// #4 Route via a single stop with a minimum-wait-time
 ///
 /// Raptor will allow a path to go through a single stop, the path must either alight or board at
 /// the
 /// given stop. The from-stop and to-stop is the same (there is no to-stop defined). A
 /// minimum-wait-time can be applied at the given stop.
-///
 ///
 /// #4 Route via a coordinate (transfer via connection)
 ///

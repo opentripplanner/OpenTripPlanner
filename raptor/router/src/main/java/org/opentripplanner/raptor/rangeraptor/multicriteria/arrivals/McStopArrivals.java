@@ -33,6 +33,7 @@ import org.opentripplanner.raptor.util.paretoset.ParetoSetEventListener;
  * Also tracks which stops have been touched since the last call to
  * {@link #clearTouchedStopsAndSetStopMarkers()}, so the routing loop can iterate only over relevant
  * stops.
+ *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public final class McStopArrivals<T extends RaptorTripSchedule> {
@@ -236,6 +237,7 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
    * <p>
    * Also ensures the Pareto set for {@code applyToStopIndex} is initialised and marks the stop
    * as touched so the routing loop will visit it.
+   *
    * @param boardingArrival            the arrival state from which boarding occurs.
    * @param startRoutingAtStopIndex    the stop index where the new ride is applied in the
    *                                   algorithm. The next stop in pattern will be the first

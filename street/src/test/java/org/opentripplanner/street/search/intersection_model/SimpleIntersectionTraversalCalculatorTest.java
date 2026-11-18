@@ -26,6 +26,7 @@ import org.opentripplanner.street.search.TraverseMode;
 
 /**
  * Tests for SimpleIntersectionTraversalModel.
+ *
  * @author avi
  */
 public class SimpleIntersectionTraversalCalculatorTest {

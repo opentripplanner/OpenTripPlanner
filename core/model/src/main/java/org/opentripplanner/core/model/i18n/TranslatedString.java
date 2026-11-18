@@ -15,6 +15,7 @@ import java.util.Objects;
  * This is for translated strings for which translations are read from OSM or GTFS alerts.
  * <p>
  * This can be translated street names, GTFS alerts etc.
+ *
  * @author Hannes Junnila
  */
 public class TranslatedString implements I18NString, Serializable {
@@ -59,6 +60,7 @@ public class TranslatedString implements I18NString, Serializable {
    * <p>
    * This should be used when calling this method during graph building. This should not be
    * called from a real-time updater as this is not thread-safe and may cause a memory leak.
+   *
    * @param translations          A Map of languages and translations, a null language is the
    *                              default translation
    * @param forceTranslatedString Should the language information be kept, even when only a single
@@ -78,6 +80,7 @@ public class TranslatedString implements I18NString, Serializable {
    * <p>
    * This should be used from real-time updaters to avoid memory leaks. For graph building, use
    * {@link #getDeduplicatedI18NString(Map, boolean)} instead.
+   *
    * @param translations          A Map of languages and translations, a null language is the
    *                              default translation
    * @param forceTranslatedString Should the language information be kept, even when only a single

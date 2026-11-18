@@ -76,6 +76,7 @@ public record ScheduledTransitLegReference(
    * journey), the TripOnServiceDate id is stored in the leg reference instead of the Trip id: A
    * TripOnServiceDate id is meant to be more stable than a Trip id across deliveries of planned
    * data, using it gives a better guarantee to reconstruct correctly the original leg.
+   *
    * @return The reconstructed leg usable in the current transit model, {@code null} if it is not
    *         possible to reconstruct the leg.
    */

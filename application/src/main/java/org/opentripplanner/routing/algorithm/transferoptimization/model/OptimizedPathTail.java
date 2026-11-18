@@ -23,6 +23,7 @@ import org.opentripplanner.utils.tostring.ValueObjectToStringBuilder;
  * <p>
  * The class is only used inside the {@code transferoptimization} package to store temporary path
  * "tails", while building new paths with new transfer points.
+ *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public class OptimizedPathTail<T extends RaptorTripSchedule>

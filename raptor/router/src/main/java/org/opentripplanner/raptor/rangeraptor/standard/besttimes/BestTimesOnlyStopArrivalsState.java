@@ -18,6 +18,7 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  * This class is used to calculate heuristic information like the best possible arrival times and
  * the minimum number for transfers. The results are an optimistic "guess", since we use the overall
  * best time instead of best time previous round we might skip hops.
+ *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public class BestTimesOnlyStopArrivalsState<T extends RaptorTripSchedule> implements

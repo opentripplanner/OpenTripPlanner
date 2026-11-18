@@ -694,6 +694,7 @@ public class OsmDatabase {
    * included in the parent area as the value into stopsInAreas. This improves
    * {@link org.opentripplanner.graph_builder.module.OsmBoardingLocationsModule} by enabling us to
    * have unconnected stop nodes within the areas by creating relations.
+   *
    * @author hannesj
    * @see "http://wiki.openstreetmap.org/wiki/Tag:public_transport%3Dstop_area"
    */

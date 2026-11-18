@@ -13,6 +13,7 @@ import java.util.function.BiConsumer;
  * not be modified.
  * <p>
  * This class is not thread-safe while it is written to.
+ *
  * @param
  *     <p>
  *     the street path type

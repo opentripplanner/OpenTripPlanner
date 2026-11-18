@@ -166,6 +166,7 @@ public final class LocalDateRange {
    * start and {@code defaultInclusiveStart}, and the exclusive end is the earlier of this range's
    * end and {@code defaultExclusiveEnd}. This makes the enumerated range as small as possible. When
    * the two do not overlap an empty list is returned.
+   *
    * @param defaultInclusiveStart the start used when this range is unbounded (or wider) at the
    *                              start
    * @param defaultExclusiveEnd   the exclusive end used when this range is unbounded (or wider) at

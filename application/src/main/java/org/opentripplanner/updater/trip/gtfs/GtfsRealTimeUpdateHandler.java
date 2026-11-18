@@ -58,6 +58,7 @@ public class GtfsRealTimeUpdateHandler {
    * <p>
    * However, multi-feed support is not completed, and we currently assume there is only one
    * static feed when matching IDs.
+   *
    * @param backwardsDelayPropagationType Defines when delays are propagated to previous stops and
    *                                      if these stops are given the NO_DATA flag.
    * @param updateIncrementality          Determines the incrementality of the updates. FULL updates

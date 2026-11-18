@@ -41,6 +41,7 @@ import org.opentripplanner.utils.lang.StringUtils;
  * standard itinerary model ({@link Itinerary}). It extracts the passenger's journey portion from
  * the complete driver route and constructs an itinerary with timing, geometry, and cost
  * information.
+ *
  * <h2>Itinerary Shape</h2>
  * <p>
  * Both direct-mode and access/egress itineraries have between one and three legs, emitted in
@@ -63,6 +64,7 @@ import org.opentripplanner.utils.lang.StringUtils;
  * to match the passenger's requested departure time — the driver is on a committed schedule and
  * cannot wait. Whether the passenger should show up early or be matched at all is a filtering
  * concern upstream of this mapper.
+ *
  * <h2>Place naming</h2>
  * <p>
  * The itinerary's outermost endpoints (first leg's {@code from}, last leg's {@code to}) are
@@ -86,6 +88,7 @@ import org.opentripplanner.utils.lang.StringUtils;
  * <p>
  * This class is in the {@code internal} package because it's an implementation detail of the
  * carpooling service. API consumers interact with {@link Itinerary} objects, not this mapper.
+ *
  * @see InsertionCandidate for the source data structure
  * @see CarpoolLeg for the carpool-specific leg type
  * @see Itinerary for the OTP itinerary model
@@ -305,6 +308,7 @@ public class CarpoolItineraryMapper {
    * {@code latestBookingTime} is null — which would misrepresent the carpool product as not
    * bookable in advance. See
    * {@code org.opentripplanner.apis.transmodel.mapping.BookingInfoMapper#mapToBookWhen}.
+   *
    * @param contact       the trip's public-contact details, or {@code null} if the trip publishes
    *                      none.
    * @param tripStartTime the driver's trip start time; only the time-of-day is used, as the

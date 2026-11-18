@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
  * {@link #listPaths()} is called. This is safe because the arrival chain of a destination arrival
  * is not changed by the search: McRaptor's per-stop pareto sets keep all accepted arrivals
  * indefinitely, and StdRaptor copies the values of the mutable stop-arrival state into the chain.
+ *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public class DestinationArrivalPaths<T extends RaptorTripSchedule> {

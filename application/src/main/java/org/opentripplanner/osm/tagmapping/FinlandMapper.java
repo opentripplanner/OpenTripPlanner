@@ -25,6 +25,7 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
  * roads also allows walking and biking, where as some does not.
  * http://wiki.openstreetmap.org/wiki/Tag:highway%3Dtrunk
  * http://wiki.openstreetmap.org/wiki/Highway:International_equivalence
+ *
  * @author juusokor
  * @see OsmTagMapper
  */

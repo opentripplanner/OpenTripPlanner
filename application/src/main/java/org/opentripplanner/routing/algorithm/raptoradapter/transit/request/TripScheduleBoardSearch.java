@@ -17,6 +17,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * The search uses a binary search if the number of trip schedules is above a given threshold. A
  * linear search is slow when the number of schedules is very large, let say more than 300 trip
  * schedules.
+ *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public final class TripScheduleBoardSearch<T extends RaptorTripSchedule> implements
@@ -156,6 +157,7 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule> impleme
    * {@code tripIndexUpperBound} is considered.
    * <p>
    * The search searches backwards until index 0 is reached (inclusive).
+   *
    * @param tripIndexUpperBound The trip index upper bound, where search start (exclusive).
    */
   private RaptorBoardOrAlightEvent<T> findBoardingBySteppingBackwardsInTime(
@@ -204,6 +206,7 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule> impleme
    * <p>
    * This is just a guess and we return when the trip with a best valid departure is in the range
    * of the next {@link #binarySearchThreshold}.
+   *
    * @return a better upper bound index (exclusive)
    */
   private int binarySearchForTripIndex() {

@@ -47,6 +47,7 @@ public final class PickDropChange {
    * <p>
    * SIRI carries less information than the OTP pick/drop type, so the value is only changed when
    * routability changes; an empty result means "leave the scheduled value unchanged".
+   *
    * @param scheduled the current pick drop value on a stopTime
    * @return the mapped {@link PickDrop} type, empty if routability is not changed
    */

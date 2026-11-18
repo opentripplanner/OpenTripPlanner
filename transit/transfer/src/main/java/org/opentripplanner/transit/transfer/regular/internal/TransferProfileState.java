@@ -21,6 +21,7 @@ import org.opentripplanner.transit.transfer.regular.spi.TransferSearch;
  * <p>
  * A profile is identified by its user preferences, the request and the search are derived from
  * them.
+ *
  * @param
  *     <p>
  *     the street path type

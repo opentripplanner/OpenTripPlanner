@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
  * egress legs are the unguarded sibling
  * (<a href="https://github.com/opentripplanner/OpenTripPlanner/issues/7679">#7679</a>). This helper
  * holds the single shared definition used by both.
+ *
  * @see RaptorCostConverter
  */
 public final class CostLimit {

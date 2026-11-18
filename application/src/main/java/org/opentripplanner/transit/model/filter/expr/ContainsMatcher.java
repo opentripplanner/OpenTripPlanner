@@ -8,6 +8,7 @@ import java.util.function.Function;
  * <p>
  * If any of the iterable entities match the valueMatcher, then the match method returns true. In
  * this way it is similar to an OR.
+ *
  * @param <S> The main entity type this matcher is applied to.
  * @param <T> The type of the child entities, for which there is a mapping from S to T.
  */

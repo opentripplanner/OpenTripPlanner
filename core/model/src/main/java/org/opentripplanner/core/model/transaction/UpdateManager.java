@@ -35,6 +35,7 @@ public interface UpdateManager {
    * When a {@link DomainEvent} matching {@code handler.eventType()} is published, the
    * {@link WriteContext} will call the given event handler, injecting the mutable repository for
    * {@code repoHandle} at dispatch time.
+   *
    * @param <E> the domain event type
    * @param <M> the repository type
    */
@@ -56,6 +57,7 @@ public interface UpdateManager {
    * <p>
    * In <em>periodic-commit</em> mode the Future resolves as soon as the task completes; the
    * commit is performed later by the periodic scheduler.
+   *
    * @param task the task to execute
    * @return a {@link Future} that completes after the task (and commit, in atomic mode) has run
    */

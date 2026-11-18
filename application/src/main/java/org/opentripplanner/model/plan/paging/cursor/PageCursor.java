@@ -18,6 +18,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * the clients.
  * <p>
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE
+ *
  * @param generalizedCostMaxLimit The cost limit is used to filter itineraries based on the
  *                                generalized-cost computed in the first page. This is resource
  *                                intensive to compute so we do not want to compute it again in

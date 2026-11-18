@@ -6,6 +6,7 @@ package org.opentripplanner.core.model.transaction;
  * A lifecycle is registered once per repository. The framework calls
  * {@link #copyOnWrite(Object)} when a write task first accesses a repository within a transaction,
  * and {@link #freeze(Object)} at commit time to produce the new repository snapshot.
+ *
  * @param <S> the read-only repository snapshot type
  * @param <M> the mutable repository type
  */

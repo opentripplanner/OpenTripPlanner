@@ -20,6 +20,7 @@ public class PolylineEncoder {
    * <p>
    * Supports LineString, MultiLineString, Polygon, and Point geometries by extracting their
    * coordinates and encoding them using the Google Polyline encoding algorithm.
+   *
    * @param geometry the JTS Geometry to encode (LineString, MultiLineString, Polygon, or Point)
    * @return a PolylineEncoderResult containing the encoded polyline string and the number of
    *         coordinates
@@ -126,6 +127,7 @@ public class PolylineEncoder {
    * This approach encodes the sign information in the least significant bit after the left
    * shift: positive numbers have their bits shifted left (LSB = 0), while negative numbers have
    * their bits shifted left and then inverted (LSB = 1 after inversion).
+   *
    * @param num the signed integer to encode (typically a coordinate delta)
    * @return the encoded string representation
    */
@@ -156,6 +158,7 @@ public class PolylineEncoder {
    * This produces a variable-length ASCII string where each character represents 5 bits of data,
    * with the 6th bit indicating whether more characters follow. The result is a compact
    * representation suitable for URLs and JSON.
+   *
    * @param num the unsigned integer to encode (must be non-negative)
    * @return the encoded string of ASCII characters
    */

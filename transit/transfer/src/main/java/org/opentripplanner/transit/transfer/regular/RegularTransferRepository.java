@@ -17,6 +17,7 @@ import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUser
  * complete set of transfers a stop should have; the repository does not merge, and it does not
  * track why a stop's transfers were replaced. A profile is the exact user preferences the paths
  * were generated under at graph build.
+ *
  * @param
  *     <p>
  *     the street path type

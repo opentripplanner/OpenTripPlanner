@@ -21,6 +21,7 @@ import java.util.List;
  * <p>
  * Some parameter fields are not initialized so when inferring other parameters, we can check for
  * null and see whether they were specified on the command line.
+ *
  * @author abyrd
  */
 public class CommandLineParameters {

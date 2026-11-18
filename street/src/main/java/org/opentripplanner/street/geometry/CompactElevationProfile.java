@@ -17,6 +17,7 @@ import org.opentripplanner.utils.lang.IntUtils;
  * <p>
  * Performance hit should be low as we do not need the elevation profile itself during a path
  * search.
+ *
  * @author laurent
  */
 public final class CompactElevationProfile implements Serializable {

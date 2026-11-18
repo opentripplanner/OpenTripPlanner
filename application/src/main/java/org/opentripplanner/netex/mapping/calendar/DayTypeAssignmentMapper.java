@@ -158,6 +158,7 @@ public class DayTypeAssignmentMapper {
    * <p>
    * Do not call this method before you want to retrieve the result. Calling this method more
    * than once, may have unexpected effects.
+   *
    * @return the set of service dates for all dayTypes mapped.
    */
   private Set<LocalDate> mergeAndMapDates() {

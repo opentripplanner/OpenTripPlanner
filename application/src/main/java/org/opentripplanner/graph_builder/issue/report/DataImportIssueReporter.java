@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * They are created with the help of getHTMLMessage function in {@link DataImportIssue} derived
  * classes.
+ *
  * @author mabu
  */
 public class DataImportIssueReporter implements GraphBuilderModule {

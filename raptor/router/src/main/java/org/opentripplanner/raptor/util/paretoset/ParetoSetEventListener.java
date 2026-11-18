@@ -15,6 +15,7 @@ package org.opentripplanner.raptor.util.paretoset;
  * <p>
  * To subscribe to these events, implement this interface and register it with the
  * {@link ParetoSet}.
+ *
  * @param <T> Pareto Set element type
  */
 public interface ParetoSetEventListener<T> {

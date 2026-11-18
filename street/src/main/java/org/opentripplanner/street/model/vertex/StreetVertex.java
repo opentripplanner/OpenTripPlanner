@@ -35,6 +35,7 @@ public abstract class StreetVertex extends Vertex {
    * This can be: - name of the street if it is only 1 - unnamedStreed (localized in requested
    * language) if it doesn't have a name - corner of 0 and 1 (localized corner of zero and first
    * street in the corner)
+   *
    * @return already localized street names and non-localized corner of x and unnamedStreet
    */
   public I18NString getIntersectionName() {

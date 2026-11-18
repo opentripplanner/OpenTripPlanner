@@ -14,6 +14,7 @@ import org.opentripplanner.osm.model.TraverseDirection;
  * <p>
  * If you'd use a {@link BestMatchSpecifier} then the likelihood of the long spec matching
  * unwanted ways would be high.
+ *
  * @see org.opentripplanner.osm.tagmapping.HoustonMapper
  */
 public class ExactMatchSpecifier implements OsmSpecifier {

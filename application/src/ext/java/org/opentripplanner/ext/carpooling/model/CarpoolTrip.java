@@ -19,6 +19,7 @@ import org.opentripplanner.transit.model.organization.ContactInfo;
  * includes the driver's planned route as a sequence of stops, total vehicle capacity, and timing
  * constraints including a deviation budget that allows the driver to slightly adjust their route to
  * accommodate passengers.
+ *
  * <h2>Core Concepts</h2>
  * <ul>
  *   <li><strong>Origin/Destination Areas:</strong> Start and end zones for the driver's
@@ -34,11 +35,13 @@ import org.opentripplanner.transit.model.organization.ContactInfo;
  * Trips are typically created from SIRI-ET messages provided by external carpooling platforms.
  * The platform manages driver registrations, trip creation, and real-time updates as passengers
  * book or cancel rides.
+ *
  * <h2>Immutability</h2>
  * <p>
  * CarpoolTrip instances are immutable. Updates to trip state (e.g., adding a booked passenger)
  * require creating a new trip instance via {@link CarpoolTripBuilder} and upserting it to the
  * {@link org.opentripplanner.ext.carpooling.CarpoolingRepository}.
+ *
  * <h2>Usage in Routing</h2>
  * <p>
  * The routing algorithm uses trips to find compatible matches for passenger requests:
@@ -154,6 +157,7 @@ public class CarpoolTrip
    * Stops include both the driver's originally planned stops and any dynamically added stops for
    * passenger pickups and dropoffs. The list is ordered by visit order along the route: the first
    * element is the origin and the last is the destination.
+   *
    * @return an immutable list of stops along the carpool route, in visit order; never null, and
    *         always contains at least the origin and destination
    */
@@ -171,6 +175,7 @@ public class CarpoolTrip
    * <p>
    * This list represents the complete path of the carpool trip, useful for distance and
    * direction calculations during filtering and matching.
+   *
    * @return a list of coordinates representing the full route of the trip
    */
   public List<WgsCoordinate> routePoints() {

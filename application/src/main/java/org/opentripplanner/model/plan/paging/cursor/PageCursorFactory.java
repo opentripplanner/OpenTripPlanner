@@ -76,6 +76,7 @@ public class PageCursorFactory {
    * removed in the next and previous pages. This means we will use information from when we cropped
    * the list of itineraries to create the new search encoded in the page cursors. We will also add
    * information necessary for removing potential duplicates when paging.
+   *
    * @param pageCursorInput contains the generated page cursor input
    */
   public PageCursorFactory withPageCursorInput(PageCursorInput pageCursorInput) {

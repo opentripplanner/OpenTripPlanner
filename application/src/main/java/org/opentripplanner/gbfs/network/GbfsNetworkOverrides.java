@@ -11,6 +11,7 @@ import java.util.Optional;
  * Field inheritance is resolved when the configuration is parsed, so the parameters held here
  * are already complete: a listed network's entry has the {@code defaults} filled in for every field
  * it did not name.
+ *
  * @param defaults                the values applied to a network that is not listed
  * @param includeUnlistedNetworks whether a network present in the GBFS manifest but absent from
  *                                {@code networks} is loaded at all. Kept separate from

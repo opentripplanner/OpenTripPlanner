@@ -20,6 +20,7 @@ import org.slf4j.Marker;
  * <p>
  * This class wrap the original logger and forward some log events, based on the implementation
  * of the {@link #mute()} method.
+ *
  * @deprecated This hide the actual logger in the log, the AbstractFilterLogger becomes thelogger -
  *             this make it difficult to find the log statement in the code when investigating.
  */

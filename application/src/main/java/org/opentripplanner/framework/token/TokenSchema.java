@@ -35,6 +35,7 @@ public class TokenSchema {
    * change when merging the versions.
    * <p>
    * Take a look at the unit tests to see an example on merging a schema.
+   *
    * @param baseVersion The initial version for the first definition. The version number is
    *                    automatically incremented when new definitions are added. If there is many
    *                    definitions, the oldest definitions can be merged into one. The new
