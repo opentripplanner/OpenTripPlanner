@@ -3,7 +3,10 @@ package org.opentripplanner.netex.mapping;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+import java.math.BigDecimal;
 import java.util.List;
+import org.entur.netex2.model.LocationStructure;
+import org.entur.netex2.model.SimplePoint_VersionStructure;
 import org.entur.netex2.model.StopPlace;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -30,6 +33,30 @@ class MultiModalStationMapperTest {
     assertEquals(1, dataIssueStore.listIssues().size());
     assertEquals(
       "MultiModalStationWithoutCoordinates",
+      dataIssueStore.listIssues().getFirst().getType()
+    );
+  }
+
+  @Test
+  void testInvalidCoordinates() {
+    DataImportIssueStore dataIssueStore = new DefaultDataImportIssueStore();
+    MultiModalStationMapper multiModalStationMapper = new MultiModalStationMapper(
+      dataIssueStore,
+      new FeedScopedIdFactory(TransitRepositoryForTest.FEED_ID)
+    );
+    StopPlace stopPlace = new StopPlace()
+      .withId(NetexTestDataSupport.STOP_PLACE_ID)
+      .withCentroid(
+        new SimplePoint_VersionStructure().withLocation(
+          new LocationStructure()
+            .withLatitude(BigDecimal.valueOf(56162332.0))
+            .withLongitude(BigDecimal.valueOf(15.579309))
+        )
+      );
+    assertNull(multiModalStationMapper.map(stopPlace, List.of()));
+    assertEquals(1, dataIssueStore.listIssues().size());
+    assertEquals(
+      "MultiModalStationInvalidCoordinates",
       dataIssueStore.listIssues().getFirst().getType()
     );
   }
