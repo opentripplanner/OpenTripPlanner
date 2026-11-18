@@ -3,8 +3,8 @@ package org.opentripplanner.standalone.configure;
 import dagger.BindsInstance;
 import dagger.Component;
 import graphql.schema.GraphQLSchema;
-import jakarta.annotation.Nullable;
 import jakarta.inject.Singleton;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.apis.gtfs.configure.GtfsSchema;
 import org.opentripplanner.apis.gtfs.configure.GtfsSchemaModule;
 import org.opentripplanner.apis.transmodel.configure.TransmodelSchema;
@@ -14,10 +14,11 @@ import org.opentripplanner.core.framework.transaction.configure.TransitDomain;
 import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.transaction.RepositoryHandle;
 import org.opentripplanner.core.model.transaction.UpdateManager;
+import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.carpooling.configure.CarpoolingModule;
-import org.opentripplanner.ext.carpooling.routing.CarpoolTripVertexResolver;
+import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTripResolver;
 import org.opentripplanner.ext.dataoverlay.configure.DataOverlayParameterBindingsModule;
 import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.emission.configure.EmissionServiceModule;
@@ -35,6 +36,7 @@ import org.opentripplanner.ext.taxi.TaxiRepository;
 import org.opentripplanner.ext.taxi.configure.TaxiServiceModule;
 import org.opentripplanner.framework.transaction.configure.TransactionModule;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
+import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -69,6 +71,7 @@ import org.opentripplanner.street.StreetRepository;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.service.StreetLimitationParametersServiceModule;
+import org.opentripplanner.transfer.configure.RegularTransferRepositoryModule;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.configure.TransferServiceModule;
 import org.opentripplanner.transit.configure.StaticTransitService;
@@ -78,6 +81,9 @@ import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
+import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
+import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 import org.opentripplanner.warmup.WarmupLauncher;
 import org.opentripplanner.warmup.configure.WarmupModule;
 
@@ -101,6 +107,7 @@ import org.opentripplanner.warmup.configure.WarmupModule;
     StreetDetailsServiceModule.class,
     LinkingServiceModule.class,
     RealtimeVehicleRepositoryModule.class,
+    RegularTransferRepositoryModule.class,
     RideHailingServicesModule.class,
     GtfsSchemaModule.class,
     TransmodelSchemaModule.class,
@@ -128,6 +135,13 @@ public interface ConstructApplicationFactory {
   TransitRepository transitRepository();
 
   TransferRepository transferRepository();
+  RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository();
+
+  RepositoryHandle<
+    RegularTransferRepositorySnapshot<NearbyStop, RouteRequest>,
+    RegularTransferRepository<NearbyStop>
+  > regularTransferRepositoryHandle();
+
   WorldEnvelopeRepository worldEnvelopeRepository();
   WorldEnvelopeService worldEnvelopeService();
   RepositoryHandle<
@@ -155,7 +169,10 @@ public interface ConstructApplicationFactory {
   CarpoolingRepository carpoolingRepository();
 
   @Nullable
-  CarpoolTripVertexResolver carpoolTripVertexResolver();
+  RoutableCarpoolTripResolver routableCarpoolTripResolver();
+
+  @Nullable
+  CarpoolingParameters carpoolingParameters();
 
   @Nullable
   EmissionRepository emissionRepository();
@@ -227,6 +244,11 @@ public interface ConstructApplicationFactory {
 
     @BindsInstance
     Builder transferRepository(TransferRepository transferRepository);
+
+    @BindsInstance
+    Builder regularTransferBuildRepository(
+      RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository
+    );
 
     @BindsInstance
     Builder worldEnvelopeRepository(WorldEnvelopeRepository worldEnvelopeRepository);

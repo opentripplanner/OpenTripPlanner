@@ -10,6 +10,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.entur.netex2.model.DatedServiceJourney;
+import org.entur.netex2.model.DayType;
+import org.entur.netex2.model.DayTypeAssignment;
+import org.entur.netex2.model.DayTypeRefStructure;
+import org.entur.netex2.model.DayTypeRefs_RelStructure;
+import org.entur.netex2.model.OperatingDay;
+import org.entur.netex2.model.OperatingPeriod_VersionStructure;
+import org.entur.netex2.model.ServiceJourney;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
@@ -19,14 +27,6 @@ import org.opentripplanner.netex.issues.ObjectNotFound;
 import org.opentripplanner.netex.mapping.calendar.CalendarServiceBuilder;
 import org.opentripplanner.netex.mapping.calendar.DatedServiceJourneyMapper;
 import org.opentripplanner.netex.mapping.calendar.DayTypeAssignmentMapper;
-import org.rutebanken.netex.model.DatedServiceJourney;
-import org.rutebanken.netex.model.DayType;
-import org.rutebanken.netex.model.DayTypeAssignment;
-import org.rutebanken.netex.model.DayTypeRefStructure;
-import org.rutebanken.netex.model.DayTypeRefs_RelStructure;
-import org.rutebanken.netex.model.OperatingDay;
-import org.rutebanken.netex.model.OperatingPeriod_VersionStructure;
-import org.rutebanken.netex.model.ServiceJourney;
 
 public class TripCalendarBuilder {
 

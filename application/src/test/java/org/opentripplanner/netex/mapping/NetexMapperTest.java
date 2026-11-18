@@ -8,35 +8,37 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import org.entur.netex2.model.AllPublicTransportModesEnumeration;
+import org.entur.netex2.model.JourneyPattern;
+import org.entur.netex2.model.JourneyPatternRefStructure;
+import org.entur.netex2.model.Line;
+import org.entur.netex2.model.LineRefStructure;
+import org.entur.netex2.model.MultilingualString;
+import org.entur.netex2.model.Notice;
+import org.entur.netex2.model.NoticeAssignment;
+import org.entur.netex2.model.PointInLinkSequence_VersionedChildStructure;
+import org.entur.netex2.model.PointsInJourneyPattern_RelStructure;
+import org.entur.netex2.model.Quay;
+import org.entur.netex2.model.Route;
+import org.entur.netex2.model.RouteRefStructure;
+import org.entur.netex2.model.ScheduledStopPointRefStructure;
+import org.entur.netex2.model.ServiceJourney;
+import org.entur.netex2.model.StopPointInJourneyPattern;
+import org.entur.netex2.model.StopPointInJourneyPatternRefStructure;
+import org.entur.netex2.model.TimetabledPassingTime;
+import org.entur.netex2.model.TimetabledPassingTimes_RelStructure;
+import org.entur.netex2.model.VersionOfObjectRefStructure;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
+import org.opentripplanner.model.TransitDataImport;
 import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.netex.index.NetexEntityIndex;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.SiteRepository;
-import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
-import org.rutebanken.netex.model.JourneyPattern;
-import org.rutebanken.netex.model.JourneyPatternRefStructure;
-import org.rutebanken.netex.model.Line;
-import org.rutebanken.netex.model.LineRefStructure;
-import org.rutebanken.netex.model.MultilingualString;
-import org.rutebanken.netex.model.Notice;
-import org.rutebanken.netex.model.NoticeAssignment;
-import org.rutebanken.netex.model.PointInLinkSequence_VersionedChildStructure;
-import org.rutebanken.netex.model.PointsInJourneyPattern_RelStructure;
-import org.rutebanken.netex.model.Quay;
-import org.rutebanken.netex.model.Route;
-import org.rutebanken.netex.model.RouteRefStructure;
-import org.rutebanken.netex.model.ScheduledStopPointRefStructure;
-import org.rutebanken.netex.model.ServiceJourney;
-import org.rutebanken.netex.model.StopPointInJourneyPattern;
-import org.rutebanken.netex.model.StopPointInJourneyPatternRefStructure;
-import org.rutebanken.netex.model.TimetabledPassingTime;
-import org.rutebanken.netex.model.TimetabledPassingTimes_RelStructure;
-import org.rutebanken.netex.model.VersionOfObjectRefStructure;
 
 class NetexMapperTest {
 
@@ -147,6 +149,62 @@ class NetexMapperTest {
     assertThat(issueTypes).contains("NoticeAssignmentWithUnknownEntity");
   }
 
+  /**
+   * Each NeTEx feed is mapped by its own {@link NetexMapper}, and the service ids of all feeds are
+   * registered in the same {@link TimetableDataImport}. A trip without operating days gets the
+   * empty service id, so that id must be unique per feed.
+   */
+  @Test
+  void tripsWithoutOperatingDaysInTwoFeeds() {
+    var feedA = mapFeedWithTripWithoutOperatingDays("A");
+    var feedB = mapFeedWithTripWithoutOperatingDays("B");
+
+    // Registering the service ids of both feeds must not fail on a duplicate id
+    var timetableDataImport = new TimetableDataImport();
+    timetableDataImport.addNextServiceCodes(feedA.getAllServiceIds());
+    timetableDataImport.addNextServiceCodes(feedB.getAllServiceIds());
+
+    var serviceIdA = feedA.getAllTrips().iterator().next().getServiceId();
+    var serviceIdB = feedB.getAllTrips().iterator().next().getServiceId();
+    assertEquals(new FeedScopedId("CAL-SERVICE", "A:EMPTY"), serviceIdA);
+    assertEquals(new FeedScopedId("CAL-SERVICE", "B:EMPTY"), serviceIdB);
+    assertThat(timetableDataImport.getServiceCodes()).containsExactly(serviceIdA, 0, serviceIdB, 1);
+  }
+
+  private static TransitDataImport mapFeedWithTripWithoutOperatingDays(String feedId) {
+    var issueStore = new DefaultDataImportIssueStore();
+    var transitBuilder = new TransitDataImportBuilder(SiteRepository.of().build(), issueStore);
+    var siteRepository = transitBuilder.siteRepository();
+    for (var quayId : List.of("quay-1", "quay-2")) {
+      siteRepository.withRegularStop(
+        siteRepository
+          .regularStop(new FeedScopedId(feedId, quayId))
+          .withCoordinate(60.0, 10.0)
+          .build()
+      );
+    }
+
+    var netexMapper = new NetexMapper(
+      transitBuilder,
+      feedId,
+      DEDUPLICATOR,
+      issueStore,
+      Set.of(),
+      Set.of(),
+      10,
+      0.0,
+      false
+    );
+    netexMapper.mapNetexToOtp(new NetexEntityIndex().readOnlyView());
+    netexMapper.push();
+    // The ServiceJourney has no DayTypes, so it does not operate on any day
+    netexMapper.mapNetexToOtp(fileWithServiceJourney().readOnlyView());
+    netexMapper.pop();
+    netexMapper.finishUp();
+
+    return transitBuilder.build();
+  }
+
   private static RegularStop stop(String quayId) {
     return RegularStop.of(new FeedScopedId(FEED_ID, quayId), () -> 1)
       .withCoordinate(60.0, 10.0)
@@ -159,8 +217,8 @@ class NetexMapperTest {
 
     Line line = new Line()
       .withId("RUT:Line:1")
-      .withName(new MultilingualString().withValue("Line 1"))
-      .withTransportMode(AllVehicleModesOfTransportEnumeration.BUS);
+      .withName(new MultilingualString().withContent("Line 1"))
+      .withTransportMode(AllPublicTransportModesEnumeration.BUS);
     index.lineById.add(line);
 
     var lineRef = MappingSupport.createWrappedRef(line.getId(), LineRefStructure.class);
@@ -224,7 +282,7 @@ class NetexMapperTest {
     var index = new NetexEntityIndex();
     var notice = new Notice()
       .withId("RUT:Notice:1")
-      .withText(new MultilingualString().withValue("Notice text"));
+      .withText(new MultilingualString().withContent("Notice text"));
 
     var noticeAssignment = new NoticeAssignment()
       .withId("RUT:NoticeAssignment:1")

@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.edgenaming;
 
-import gnu.trove.list.TLongList;
+import com.carrotsearch.hppc.LongArrayList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -96,18 +96,18 @@ class CrosswalkNamer implements EdgeNamer {
     if (crossStreetOpt.isPresent()) {
       OsmWay crossStreet = crossStreetOpt.get();
       if (crossStreet.isNamed()) {
-        crosswalk.setName(
+        crosswalk.overrideDerivedName(
           new LocalizedString("name.crosswalk_over_street", crossStreet.getAssumedName())
         );
       } else if (crossStreet.isServiceRoad()) {
-        crosswalk.setName(new LocalizedString("name.crosswalk_over_service_road"));
+        crosswalk.overrideDerivedName(new LocalizedString("name.crosswalk_over_service_road"));
       } else if (crossStreet.isMotorwayRamp()) {
-        crosswalk.setName(new LocalizedString("name.crosswalk_over_motorway_ramp"));
+        crosswalk.overrideDerivedName(new LocalizedString("name.crosswalk_over_motorway_ramp"));
       } else if (crossStreet.isTurnLane()) {
-        crosswalk.setName(new LocalizedString("name.crosswalk_over_turn_lane"));
+        crosswalk.overrideDerivedName(new LocalizedString("name.crosswalk_over_turn_lane"));
       } else {
         // Default on using the OSM way ID, which should not happen.
-        crosswalk.setName(I18NString.of(String.format("crosswalk %s", way.getId())));
+        crosswalk.overrideDerivedName(I18NString.of(String.format("crosswalk %s", way.getId())));
       }
 
       var adjacentSidewalks = sidewalkIndex
@@ -118,7 +118,7 @@ class CrosswalkNamer implements EdgeNamer {
         .toList();
 
       // Group sidewalks at each end of the crosswalk.
-      TLongList nodes = way.getNodeRefs();
+      LongArrayList nodes = way.getNodeRefs();
       renameAdjacentSidewalk(adjacentSidewalks, crosswalk.getName(), nodes.get(0));
       renameAdjacentSidewalk(adjacentSidewalks, crosswalk.getName(), nodes.get(nodes.size() - 1));
 
@@ -142,7 +142,7 @@ class CrosswalkNamer implements EdgeNamer {
       .filter(e -> e.way().getNodeRefs().contains(nodeId))
       .toList();
     if (sidewalks.size() == 1) {
-      sidewalks.getFirst().edge().setName(crosswalkName);
+      sidewalks.getFirst().edge().overrideDerivedName(crosswalkName);
     }
   }
 
@@ -150,12 +150,12 @@ class CrosswalkNamer implements EdgeNamer {
    * Gets the intersecting street, if any, for the given way and candidate streets.
    */
   public static Optional<OsmWay> getIntersectingStreet(OsmWay way, Collection<OsmWay> streets) {
-    TLongList nodeRefs = way.getNodeRefs();
+    LongArrayList nodeRefs = way.getNodeRefs();
     if (nodeRefs.size() >= 3) {
       // There needs to be at least three nodes: 2 extremities that are on the sidewalk,
       // and one somewhere in the middle that joins the crossing with the street.
       // We exclude the first and last node which are on the sidewalk.
-      long[] nodeRefsArray = nodeRefs.toArray(1, nodeRefs.size() - 2);
+      long[] nodeRefsArray = Arrays.copyOfRange(nodeRefs.toArray(), 1, nodeRefs.size() - 1);
       return streets
         .stream()
         .filter(w -> Arrays.stream(nodeRefsArray).anyMatch(nid -> w.getNodeRefs().contains(nid)))

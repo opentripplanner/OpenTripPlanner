@@ -7,11 +7,14 @@ import graphql.schema.GraphQLInputObjectType;
 import graphql.schema.GraphQLNonNull;
 import java.util.Map;
 import java.util.function.Consumer;
+import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.apis.transmodel.model.scalars.DoubleFunction;
 import org.opentripplanner.apis.transmodel.support.DataFetcherDecorator;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
+import org.opentripplanner.core.model.basic.Ratio;
+import org.opentripplanner.routing.algorithm.filterchain.api.GroupBySimilarity;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
 
@@ -90,10 +93,14 @@ public class ItineraryFiltersInputType {
           .name(GROUP_SIMILARITY_KEEP_ONE)
           .type(Scalars.GraphQLFloat)
           .description(
-            "Pick ONE itinerary from each group after putting itineraries that is 85% " +
-              "similar together."
+            "Group itineraries that are at least this similar, and keep ONE itinerary from " +
+              "each group. Similarity is the share of the travel distance two itineraries have " +
+              "in common. " +
+              "The value must be between 0 and 1. A value below %s turns this filter off.".formatted(
+                GroupBySimilarity.MIN_GROUP_BY_P
+              )
           )
-          .defaultValue(dft.groupSimilarityKeepOne())
+          .defaultValue(dft.groupSimilarityKeepOne().asDouble())
           .build()
       )
       .field(
@@ -101,20 +108,30 @@ public class ItineraryFiltersInputType {
           .type(Scalars.GraphQLFloat)
           .name(GROUP_SIMILARITY_KEEP_THREE)
           .description(
-            "Reduce the number of itineraries in each group to to maximum 3 itineraries. " +
-              "The itineraries are grouped by similar legs (on board same journey). So, if " +
-              " 68% of the distance is traveled by similar legs, then two itineraries are " +
-              "in the same group. Default value is 68%, must be at least 50%."
+            "Group itineraries that are at least this similar, and keep at most three " +
+              "itineraries from each group. Similarity is the share of the travel distance two " +
+              "itineraries have in common. " +
+              "The value must be between 0 and 1. A value below %s turns this filter off.".formatted(
+                GroupBySimilarity.MIN_GROUP_BY_P
+              )
           )
-          .defaultValue(dft.groupSimilarityKeepThree())
+          .defaultValue(dft.groupSimilarityKeepThree().asDouble())
           .build()
       )
       .field(
         GraphQLInputObjectField.newInputObjectField()
           .type(Scalars.GraphQLFloat)
           .name(GROUP_SIMILARITY_KEEP_N_ITINERARIES)
+          .description(
+            "Same as " +
+              GROUP_SIMILARITY_KEEP_THREE +
+              ". " +
+              "The value must be between 0 and 1. A value below %s turns this filter off.".formatted(
+                GroupBySimilarity.MIN_GROUP_BY_P
+              )
+          )
           .deprecate("Use " + GROUP_SIMILARITY_KEEP_THREE + " instead.")
-          .defaultValue(dft.groupSimilarityKeepThree())
+          .defaultValue(dft.groupSimilarityKeepThree().asDouble())
           .build()
       )
       .field(
@@ -154,12 +171,20 @@ public class ItineraryFiltersInputType {
     if (!GqlUtil.hasArgument(environment, "itineraryFilters")) {
       return;
     }
-    setField(callWith, GROUP_SIMILARITY_KEEP_ONE, builder::withGroupSimilarityKeepOne);
+    setField(callWith, GROUP_SIMILARITY_KEEP_ONE, (Double v) ->
+      builder.withGroupSimilarityKeepOne(validateGroupSimilarity(GROUP_SIMILARITY_KEEP_ONE, v))
+    );
 
     // This is deprecated, sets same value as GROUP_SIMILARITY_KEEP_THREE
-    setField(callWith, GROUP_SIMILARITY_KEEP_N_ITINERARIES, builder::withGroupSimilarityKeepThree);
+    setField(callWith, GROUP_SIMILARITY_KEEP_N_ITINERARIES, (Double v) ->
+      builder.withGroupSimilarityKeepThree(
+        validateGroupSimilarity(GROUP_SIMILARITY_KEEP_N_ITINERARIES, v)
+      )
+    );
 
-    setField(callWith, GROUP_SIMILARITY_KEEP_THREE, builder::withGroupSimilarityKeepThree);
+    setField(callWith, GROUP_SIMILARITY_KEEP_THREE, (Double v) ->
+      builder.withGroupSimilarityKeepThree(validateGroupSimilarity(GROUP_SIMILARITY_KEEP_THREE, v))
+    );
     setField(
       callWith,
       GROUPED_OTHER_THAN_SAME_LEGS_MAX_COST_MULTIPLIER,
@@ -174,6 +199,18 @@ public class ItineraryFiltersInputType {
       )
     );
     setField(callWith, DEBUG, builder::withDebug);
+  }
+
+  /**
+   * Return the value as a {@link Ratio}, or throw an {@link InvalidInputException} if it is not a
+   * valid ratio.
+   */
+  private static Ratio validateGroupSimilarity(String field, double value) {
+    return Ratio.of(value, message -> {
+      throw new InvalidInputException(
+        "Invalid argument 'itineraryFilters.%s': %s".formatted(field, message)
+      );
+    }).orElseThrow();
   }
 
   private static <T> void setField(

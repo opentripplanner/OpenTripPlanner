@@ -89,6 +89,7 @@ public class NetexConfigure {
       buildConfig.maxStopToShapeSnapDistance,
       buildConfig.transitShapeSimplificationToleranceMeters(),
       config.noTransfersOnIsolatedStops(),
+      config.allowStopPlaceAsPassengerStopAssignment(),
       config.ignoredFeatures()
     );
   }

@@ -2,6 +2,10 @@ package org.opentripplanner.netex.mapping.calendar;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
+import static org.entur.netex2.model.DayOfWeekEnumeration.EVERYDAY;
+import static org.entur.netex2.model.DayOfWeekEnumeration.NONE;
+import static org.entur.netex2.model.DayOfWeekEnumeration.SUNDAY;
+import static org.entur.netex2.model.DayOfWeekEnumeration.WEEKDAYS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.netex.NetexTestDataSupport.createDayType;
 import static org.opentripplanner.netex.NetexTestDataSupport.createDayTypeAssignment;
@@ -12,25 +16,21 @@ import static org.opentripplanner.netex.NetexTestDataSupport.createOperatingDay;
 import static org.opentripplanner.netex.NetexTestDataSupport.createOperatingPeriod;
 import static org.opentripplanner.netex.NetexTestDataSupport.createOperatingPeriodWithOperatingDays;
 import static org.opentripplanner.netex.NetexTestDataSupport.createUicOperatingPeriod;
-import static org.rutebanken.netex.model.DayOfWeekEnumeration.EVERYDAY;
-import static org.rutebanken.netex.model.DayOfWeekEnumeration.NONE;
-import static org.rutebanken.netex.model.DayOfWeekEnumeration.SUNDAY;
-import static org.rutebanken.netex.model.DayOfWeekEnumeration.WEEKDAYS;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.entur.netex2.model.DayType;
+import org.entur.netex2.model.DayTypeAssignment;
+import org.entur.netex2.model.OperatingDay;
+import org.entur.netex2.model.OperatingPeriod_VersionStructure;
+import org.entur.netex2.model.PropertyOfDay;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMultimap;
-import org.rutebanken.netex.model.DayType;
-import org.rutebanken.netex.model.DayTypeAssignment;
-import org.rutebanken.netex.model.OperatingDay;
-import org.rutebanken.netex.model.OperatingPeriod_VersionStructure;
-import org.rutebanken.netex.model.PropertyOfDay;
 
 class DayTypeAssignmentMapperTest {
 

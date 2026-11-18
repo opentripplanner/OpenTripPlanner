@@ -3,14 +3,14 @@ package org.opentripplanner.netex.loader.parser;
 import jakarta.xml.bind.JAXBElement;
 import java.util.ArrayList;
 import java.util.Collection;
+import org.entur.netex2.model.Authority;
+import org.entur.netex2.model.Branding;
+import org.entur.netex2.model.Operator;
+import org.entur.netex2.model.Organisation_VersionStructure;
+import org.entur.netex2.model.OrganisationsInFrame_RelStructure;
+import org.entur.netex2.model.ResourceFrame_VersionFrameStructure;
+import org.entur.netex2.model.TypesOfValueInFrame_RelStructure;
 import org.opentripplanner.netex.index.NetexEntityIndex;
-import org.rutebanken.netex.model.Authority;
-import org.rutebanken.netex.model.Branding;
-import org.rutebanken.netex.model.Operator;
-import org.rutebanken.netex.model.Organisation_VersionStructure;
-import org.rutebanken.netex.model.OrganisationsInFrame_RelStructure;
-import org.rutebanken.netex.model.ResourceFrame_VersionFrameStructure;
-import org.rutebanken.netex.model.TypesOfValueInFrame_RelStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +58,7 @@ class ResourceFrameParser extends NetexParser<ResourceFrame_VersionFrameStructur
 
   private void parseOrganization(OrganisationsInFrame_RelStructure elements) {
     if (elements != null) {
-      for (JAXBElement<?> e : elements.getOrganisation_()) {
+      for (JAXBElement<?> e : elements.getOrganisation()) {
         parseOrganization((Organisation_VersionStructure) e.getValue());
       }
     }

@@ -73,6 +73,14 @@ public class TestStateBuilder {
   }
 
   /**
+   * Create an initial state that starts walking in an egress (arriveBy) search, so the state chain
+   * runs backward in time.
+   */
+  public static TestStateBuilder ofWalkingEgress() {
+    return new TestStateBuilder(StreetMode.WALK, AccessEgressType.EGRESS);
+  }
+
+  /**
    * Create an initial state that starts in a car.
    */
   public static TestStateBuilder ofDriving() {
@@ -112,7 +120,29 @@ public class TestStateBuilder {
     return this;
   }
 
+  /**
+   * Traverse a named street edge. In an arriveBy search the edge leads to the current vertex, since
+   * the search runs backward in time.
+   */
   public TestStateBuilder streetEdge(String name, int distance) {
+    count++;
+    var current = (StreetVertex) currentState.vertex;
+    var next = StreetModelForTest.intersectionVertex(count, count);
+    boolean arriveBy = currentState.getRequest().arriveBy();
+    var edge = StreetModelForTest.streetEdgeBuilder(
+      arriveBy ? next : current,
+      arriveBy ? current : next,
+      distance,
+      StreetTraversalPermission.PEDESTRIAN
+    )
+      .withName(name)
+      .buildAndConnect();
+
+    currentState = requireSingleState(edge.traverse(currentState));
+    return this;
+  }
+
+  public TestStateBuilder unnamedStreetEdge(int distance) {
     count++;
     var from = (StreetVertex) currentState.vertex;
     var to = StreetModelForTest.intersectionVertex(count, count);
@@ -122,7 +152,8 @@ public class TestStateBuilder {
       distance,
       StreetTraversalPermission.PEDESTRIAN
     )
-      .withName(name)
+      .withName("path")
+      .withNameIsDerived(true)
       .buildAndConnect();
 
     currentState = requireSingleState(edge.traverse(currentState));
@@ -278,6 +309,16 @@ public class TestStateBuilder {
     var edge = StreetTransitEntranceLink.createStreetTransitEntranceLink(from, entranceVertex);
     var states = edge.traverse(currentState);
     currentState = states[0];
+    return this;
+  }
+
+  public TestStateBuilder enterOsmStation(String b) {
+    count++;
+    var from = (StreetVertex) currentState.vertex;
+    var to = StreetModelForTest.stationEntranceVertex(b, count, count);
+    var edge = StreetModelForTest.streetEdge(from, to);
+    var states = edge.traverse(currentState);
+    currentState = requireSingleState(states);
     return this;
   }
 

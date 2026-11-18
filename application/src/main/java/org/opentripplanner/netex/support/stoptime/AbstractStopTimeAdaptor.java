@@ -2,7 +2,7 @@ package org.opentripplanner.netex.support.stoptime;
 
 import java.math.BigInteger;
 import java.time.LocalTime;
-import org.rutebanken.netex.model.TimetabledPassingTime;
+import org.entur.netex2.model.TimetabledPassingTime;
 
 /**
  * Wrapper around {@link TimetabledPassingTime} that provides a simpler interface for passing times

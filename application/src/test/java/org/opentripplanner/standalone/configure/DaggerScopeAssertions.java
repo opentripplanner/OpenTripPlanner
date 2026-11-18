@@ -5,9 +5,9 @@ import static com.google.common.truth.Truth.assertWithMessage;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Shared reflection machinery behind the DI-scope regression tests: reflects over every no-arg
@@ -253,8 +253,8 @@ final class DaggerScopeAssertions {
   /**
    * A {@code null} binding (typically a disabled sandbox feature) has no instance to compare, so
    * its scope cannot be checked and it is skipped. That is only accepted for accessors explicitly
-   * marked {@code @Nullable} (the declaration-style annotation Dagger
-   * understands); any other accessor returning {@code null} is reported as a failure.
+   * marked {@code @Nullable} on their return type; any other accessor returning {@code null} is
+   * reported as a failure.
    *
    * @return true if {@code value} is null, so the caller must skip the scope comparison
    */
@@ -316,8 +316,6 @@ final class DaggerScopeAssertions {
   }
 
   private static boolean isMarkedNullable(Method accessor) {
-    return Arrays.stream(accessor.getAnnotations()).anyMatch(a ->
-      a.annotationType().getSimpleName().equals("Nullable")
-    );
+    return accessor.getAnnotatedReturnType().isAnnotationPresent(Nullable.class);
   }
 }

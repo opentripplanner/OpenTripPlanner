@@ -9,7 +9,7 @@ import tseslint from 'typescript-eslint'
 import eslintConfigPrettier from "eslint-config-prettier"
 
 export default tseslint.config(
-  { ignores: ['output', 'node_modules', 'src/gql/**/*'] },
+  { ignores: ['output', 'target', 'node_modules', 'src/gql/**/*'] },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ['**/*.{ts,tsx}'],

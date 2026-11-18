@@ -1,7 +1,7 @@
 package org.opentripplanner.netex.mapping.support;
 
 import java.util.function.Consumer;
-import org.rutebanken.netex.model.VersionOfObjectRefStructure;
+import org.entur.netex2.model.VersionOfObjectRefStructure;
 import org.slf4j.Logger;
 
 /**

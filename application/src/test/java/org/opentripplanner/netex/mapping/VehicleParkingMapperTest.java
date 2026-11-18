@@ -1,19 +1,24 @@
 package org.opentripplanner.netex.mapping;
 
+import static org.entur.netex2.model.ParkingVehicleEnumeration.AGRICULTURAL_VEHICLE;
+import static org.entur.netex2.model.ParkingVehicleEnumeration.ALL_PASSENGER_VEHICLES;
+import static org.entur.netex2.model.ParkingVehicleEnumeration.CAR;
+import static org.entur.netex2.model.ParkingVehicleEnumeration.CAR_WITH_CARAVAN;
+import static org.entur.netex2.model.ParkingVehicleEnumeration.CYCLE;
+import static org.entur.netex2.model.ParkingVehicleEnumeration.PEDAL_CYCLE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.rutebanken.netex.model.ParkingVehicleEnumeration.AGRICULTURAL_VEHICLE;
-import static org.rutebanken.netex.model.ParkingVehicleEnumeration.ALL_PASSENGER_VEHICLES;
-import static org.rutebanken.netex.model.ParkingVehicleEnumeration.CAR;
-import static org.rutebanken.netex.model.ParkingVehicleEnumeration.CAR_WITH_CARAVAN;
-import static org.rutebanken.netex.model.ParkingVehicleEnumeration.CYCLE;
-import static org.rutebanken.netex.model.ParkingVehicleEnumeration.PEDAL_CYCLE;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Set;
+import org.entur.netex2.model.LocationStructure;
+import org.entur.netex2.model.MultilingualString;
+import org.entur.netex2.model.Parking;
+import org.entur.netex2.model.ParkingVehicleEnumeration;
+import org.entur.netex2.model.SimplePoint_VersionStructure;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -24,11 +29,6 @@ import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingSpaces;
 import org.opentripplanner.street.geometry.WgsCoordinate;
-import org.rutebanken.netex.model.LocationStructure;
-import org.rutebanken.netex.model.MultilingualString;
-import org.rutebanken.netex.model.Parking;
-import org.rutebanken.netex.model.ParkingVehicleEnumeration;
-import org.rutebanken.netex.model.SimplePoint_VersionStructure;
 
 class VehicleParkingMapperTest {
 
@@ -71,6 +71,59 @@ class VehicleParkingMapperTest {
     );
   }
 
+  @Test
+  void dropMissingCoordinates() {
+    var parking = parking(Set.of(CAR));
+    parking.setCentroid(null);
+    var issueStore = new DefaultDataImportIssueStore();
+    var vp = mapper(issueStore).map(parking);
+    assertNull(vp);
+    assertEquals(
+      List.of("MissingParkingCoordinates"),
+      issueStore.listIssues().stream().map(DataImportIssue::getType).toList()
+    );
+  }
+
+  @Test
+  void dropInvalidCoordinates() {
+    var parking = parking(Set.of(CAR));
+    parking.getCentroid().getLocation().setLatitude(new BigDecimal(100));
+    var issueStore = new DefaultDataImportIssueStore();
+    var vp = mapper(issueStore).map(parking);
+    assertNull(vp);
+    assertEquals(
+      List.of("InvalidParkingCoordinates"),
+      issueStore.listIssues().stream().map(DataImportIssue::getType).toList()
+    );
+  }
+
+  @Test
+  void mapMissingName() {
+    var parking = parking(Set.of(CAR));
+    parking.setName(null);
+    var issueStore = new DefaultDataImportIssueStore();
+    var vp = mapper(issueStore).map(parking);
+    assertEquals("N/A", vp.getName().toString());
+    assertEquals(
+      List.of("MissingParkingName"),
+      issueStore.listIssues().stream().map(DataImportIssue::getType).toList()
+    );
+  }
+
+  /** An empty {@code <Name/>} element is treated as a missing name. */
+  @Test
+  void mapNameWithoutValue() {
+    var parking = parking(Set.of(CAR));
+    parking.setName(new MultilingualString());
+    var issueStore = new DefaultDataImportIssueStore();
+    var vp = mapper(issueStore).map(parking);
+    assertEquals("N/A", vp.getName().toString());
+    assertEquals(
+      List.of("MissingParkingName"),
+      issueStore.listIssues().stream().map(DataImportIssue::getType).toList()
+    );
+  }
+
   private VehicleParkingMapper mapper() {
     return mapper(DataImportIssueStore.NOOP);
   }
@@ -89,8 +142,7 @@ class VehicleParkingMapperTest {
   }
 
   private static Parking parking(Set<ParkingVehicleEnumeration> vehicleTypes) {
-    var name = new MultilingualString();
-    name.setValue("A name");
+    var name = new MultilingualString().withContent("A name");
     var point = new SimplePoint_VersionStructure();
     var loc = new LocationStructure();
     loc.setLatitude(new BigDecimal(10));

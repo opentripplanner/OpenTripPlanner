@@ -4,13 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import jakarta.xml.bind.JAXBElement;
 import java.time.LocalDateTime;
+import org.entur.netex2.model.ObjectFactory;
+import org.entur.netex2.model.OperatingPeriod;
+import org.entur.netex2.model.OperatingPeriod_VersionStructure;
+import org.entur.netex2.model.ServiceCalendarFrame_VersionFrameStructure;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.netex.index.NetexEntityIndex;
-import org.rutebanken.netex.model.ObjectFactory;
-import org.rutebanken.netex.model.OperatingPeriod;
-import org.rutebanken.netex.model.OperatingPeriod_VersionStructure;
-import org.rutebanken.netex.model.ServiceCalendarFrame_VersionFrameStructure;
 
 class ServiceCalendarFrameParserTest {
 

@@ -1,7 +1,7 @@
 package org.opentripplanner.netex.issues;
 
+import org.entur.netex2.model.ServiceJourneyInterchange;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
-import org.rutebanken.netex.model.ServiceJourneyInterchange;
 
 public class InterchangeMaxWaitTimeNotGuaranteed implements DataImportIssue {
 

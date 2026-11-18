@@ -4,12 +4,12 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import org.entur.netex2.model.TariffZoneRef;
+import org.entur.netex2.model.TariffZone_VersionStructure;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalVersionMapById;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.transit.model.site.FareZone;
-import org.rutebanken.netex.model.TariffZoneRef;
-import org.rutebanken.netex.model.TariffZone_VersionStructure;
 
 class TariffZoneMapper {
 
@@ -56,7 +56,7 @@ class TariffZoneMapper {
     }
 
     FeedScopedId id = idFactory.createId(tariffZone.getId());
-    String name = tariffZone.getName().getValue();
+    String name = MultilingualStringMapper.getStringValue(tariffZone.getName());
     return deduplicate(FareZone.of(id).withName(name).build());
   }
 

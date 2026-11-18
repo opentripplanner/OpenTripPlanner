@@ -1,8 +1,8 @@
 package org.opentripplanner.netex.mapping;
 
+import org.entur.netex2.model.GroupOfLines;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
-import org.rutebanken.netex.model.GroupOfLines;
 
 /**
  * Responsible for mapping NeTEx GroupOfLines into the OTP model.

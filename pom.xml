@@ -58,7 +58,7 @@
 
 
     <properties>
-        <otp.serialization.version.id>288</otp.serialization.version.id>
+        <otp.serialization.version.id>291</otp.serialization.version.id>
 
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>35.2</geotools.version>
@@ -69,14 +69,14 @@
         <junit.version>6.1.3</junit.version>
         <micrometer.version>1.14.1</micrometer.version>
         <netcdf4.version>5.6.0</netcdf4.version>
-        <logback.version>1.6.3</logback.version>
+        <logback.version>1.6.6</logback.version>
         <lucene.version>10.5.1</lucene.version>
         <micrometer.version>1.17.2</micrometer.version>
-        <netex-java-model.version>2.0.16.3</netex-java-model.version>
+        <netex2-java-model.version>3.0.0</netex2-java-model.version>
         <netcdf4.version>5.6.0</netcdf4.version>
         <protobuf.version>4.36.2</protobuf.version>
         <siri-java-model.version>2.0.10</siri-java-model.version>
-        <slf4j.version>2.0.19</slf4j.version>
+        <slf4j.version>2.0.20</slf4j.version>
         <!-- Other properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <GITHUB_REPOSITORY>opentripplanner/OpenTripPlanner</GITHUB_REPOSITORY>
@@ -85,6 +85,13 @@
         -->
         <argLine/>
         <plugin.checkstyle.skip>false</plugin.checkstyle.skip>
+        <plugin.frontend.skip>false</plugin.frontend.skip>
+        <!-- Debug UI client settings, baked into the client at build time as VITE_* variables. The
+             defaults are the same as in client/.env, override them with -D or in a profile when
+             OTP is exposed under a different path, e.g. behind an API gateway. -->
+        <debugUi.apiUrl>/otp/transmodel/v3</debugUi.apiUrl>
+        <debugUi.styleUrl>/otp/debug/vectortiles/style.json</debugUi.styleUrl>
+        <debugUi.graphiqlUrl>/graphiql?flavor=transmodel</debugUi.graphiqlUrl>
         <plugin.spotless.version>3.10.4</plugin.spotless.version>
         <plugin.spotless.goal>apply</plugin.spotless.goal>
         <plugin.spotless.skip>false</plugin.spotless.skip>
@@ -104,6 +111,7 @@
     <modules>
         <module>application</module>
         <module>astar</module>
+        <module>client</module>
         <module>container</module>
         <module>core</module>
         <module>gtfs-realtime-protobuf</module>
@@ -276,16 +284,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.5.1</version>
-                <configuration>
-                    <archive>
-                        <manifestEntries>
-                            <!-- For Java 11 Modules, specify a module name. Do not create module-info.java until all
-                                 our dependencies specify a module name. -->
-                            <Automatic-Module-Name>org.opentripplanner.otp</Automatic-Module-Name>
-                            <OTP-Serialization-Version-Id>${otp.serialization.version.id}</OTP-Serialization-Version-Id>
-                        </manifestEntries>
-                    </archive>
-                </configuration>
                 <executions>
                     <execution>
                         <!-- OTP includes an empty javadoc.jar file. See doc/javadoc/README.md -->
@@ -329,12 +327,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.5.3</version>
+                <version>3.6.1</version>
                 <dependencies>
                     <dependency>
                         <groupId>me.fabriciorby</groupId>
                         <artifactId>maven-surefire-junit5-tree-reporter</artifactId>
-                        <version>1.4.0</version>
+                        <version>2.2.0</version>
                     </dependency>
                 </dependencies>
                 <configuration>
@@ -420,12 +418,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.15</version>
-                <configuration>
-                    <excludes>
-                        <exclude>org/opentripplanner/apis/gtfs/generated/**</exclude>
-                    </excludes>
-                </configuration>
+                <version>0.8.16</version>
             </plugin>
             <plugin>
                 <!-- Get current Git commit information for use in MavenVersion class.
@@ -467,8 +460,6 @@
                     </activeRecipes>
                     <exclusions>
                         <exclusion>**/package-info-template.java</exclusion>
-                        <!-- Generated GraphQL code for the GTFS API -->
-                        <exclusion>**/apis/gtfs/generated/**</exclusion>
                     </exclusions>
                     <sizeThresholdMb>0</sizeThresholdMb>
                     <runPerSubmodule>true</runPerSubmodule>
@@ -547,7 +538,7 @@
                 <!-- This makes sure all google libraries are using compatible versions. -->
                 <groupId>com.google.cloud</groupId>
                 <artifactId>libraries-bom</artifactId>
-                <version>26.88.0</version>
+                <version>26.93.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -556,7 +547,7 @@
                 <!-- This makes sure all Jackson libraries are using compatible versions. -->
                 <groupId>tools.jackson</groupId>
                 <artifactId>jackson-bom</artifactId>
-                <version>3.2.3</version>
+                <version>3.3.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -568,7 +559,7 @@
                 -->
                 <groupId>com.fasterxml.jackson</groupId>
                 <artifactId>jackson-bom</artifactId>
-                <version>2.22.3</version>
+                <version>2.23.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -582,7 +573,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>33.7.2-jre</version>
+                <version>33.8.0-jre</version>
             </dependency>
 
             <!--
@@ -593,18 +584,7 @@
             <dependency>
                 <groupId>com.azure</groupId>
                 <artifactId>azure-core-http-netty</artifactId>
-                <version>1.16.8</version>
-            </dependency>
-
-            <!--
-             Declaration-style @Nullable. Used only on Dagger sites (@Provides, @BindsInstance, @Inject
-             and component methods), because Dagger does not recognise the type-use @Nullable from
-             JSpecify. Everywhere else use org.jspecify.annotations.Nullable.
-            -->
-            <dependency>
-                <groupId>jakarta.annotation</groupId>
-                <artifactId>jakarta.annotation-api</artifactId>
-                <version>3.0.0</version>
+                <version>1.17.0</version>
             </dependency>
 
             <!--
@@ -626,9 +606,9 @@
             </dependency>
 
             <dependency>
-                <groupId>net.sf.trove4j</groupId>
-                <artifactId>trove4j</artifactId>
-                <version>3.0.3</version>
+                <groupId>com.carrotsearch</groupId>
+                <artifactId>hppc</artifactId>
+                <version>0.13.0</version>
             </dependency>
 
             <!--

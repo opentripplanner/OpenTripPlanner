@@ -9,9 +9,9 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.entur.netex2.model.EntityInVersionStructure;
+import org.entur.netex2.model.VersionOfObjectRefStructure;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalVersionMapById;
-import org.rutebanken.netex.model.EntityInVersionStructure;
-import org.rutebanken.netex.model.VersionOfObjectRefStructure;
 
 /**
  * A hierarchical multimap indexing a collections of {@link EntityInVersionStructure} values by

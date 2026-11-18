@@ -6,11 +6,11 @@ import static org.opentripplanner.osm.model.TraverseDirection.BACKWARD;
 import static org.opentripplanner.osm.model.TraverseDirection.DIRECTIONLESS;
 import static org.opentripplanner.osm.model.TraverseDirection.FORWARD;
 
+import com.carrotsearch.hppc.DoubleArrayList;
+import com.carrotsearch.hppc.LongArrayList;
+import com.carrotsearch.hppc.cursors.LongCursor;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
-import gnu.trove.iterator.TLongIterator;
-import gnu.trove.list.array.TDoubleArrayList;
-import gnu.trove.list.array.TLongArrayList;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -340,6 +340,7 @@ public class OsmModule implements GraphBuilderModule {
       : new NoopInclinedEdgeLevelInfoProcessor();
 
     var wayPropertiesIndex = BidirectionalWayPropertiesIndex.of(osmdb.getWays());
+    var carSpeedIndex = CarSpeedIndex.of(osmdb.getWays(), issueStore);
 
     ProgressTracker progress = ProgressTracker.track("Build street graph", 5_000, wayCount);
     LOG.info(progress.startMessage());
@@ -358,13 +359,13 @@ public class OsmModule implements GraphBuilderModule {
 
       // handle duplicate nodes in OSM ways
       // this is a workaround for crappy OSM data quality
-      TLongArrayList nodes = new TLongArrayList(way.getNodeRefs().size());
+      LongArrayList nodes = new LongArrayList(way.getNodeRefs().size());
       long last = -1;
       double lastLat = -1;
       double lastLon = -1;
       String lastLevel = null;
-      for (TLongIterator iter = way.getNodeRefs().iterator(); iter.hasNext(); ) {
-        long nodeId = iter.next();
+      for (LongCursor c : way.getNodeRefs()) {
+        long nodeId = c.value;
         OsmNode node = osmdb.getNode(nodeId);
         if (node == null) {
           continue WAY;
@@ -389,10 +390,13 @@ public class OsmModule implements GraphBuilderModule {
         lastLevel = level;
       }
 
+      float forwardCarSpeed = carSpeedIndex.forward(way.getId());
+      float backwardCarSpeed = carSpeedIndex.backward(way.getId());
+
       IntersectionVertex fromVertex = null;
       IntersectionVertex toVertex = null;
 
-      TDoubleArrayList segmentCoordinates = new TDoubleArrayList(100);
+      DoubleArrayList segmentCoordinates = new DoubleArrayList(100);
 
       /*
        * Traverse through all the nodes of this edge. For nodes which are not shared with any other edge, do not create endpoints -- just
@@ -439,10 +443,14 @@ public class OsmModule implements GraphBuilderModule {
         if (
           vertexGenerator.isIntersectionNode(endNode) ||
           i == nodes.size() - 2 ||
-          nodes.subList(0, i).contains(nodes.get(i)) ||
+          nodes.indexOf(nodes.get(i)) < i ||
           osmEndNode.hasTag("ele") ||
           osmEndNode.isBoardingLocation() ||
           osmEndNode.isBarrier() ||
+          // split here too so a BarrierVertex is created for nodes that are
+          // wheelchair-inaccessible without restricting any other travel mode,
+          // e.g. barrier=kerb with a raised/rolled kerb value
+          osmEndNode.isWheelchairInaccessible() ||
           osmEndNode.isEntrance() ||
           vertexGenerator.nodesInBarrierWays().containsKey(osmEndNode)
         ) {
@@ -505,6 +513,8 @@ public class OsmModule implements GraphBuilderModule {
             i,
             forwardPermission,
             backwardPermission,
+            forwardCarSpeed,
+            backwardCarSpeed,
             lineString
           );
 
@@ -651,6 +661,8 @@ public class OsmModule implements GraphBuilderModule {
     int index,
     StreetTraversalPermission forwardPermission,
     StreetTraversalPermission backwardPermission,
+    float forwardCarSpeed,
+    float backwardCarSpeed,
     LineString geometry
   ) {
     // No point in returning edges that can't be traversed by anyone.
@@ -671,6 +683,7 @@ public class OsmModule implements GraphBuilderModule {
         index,
         length,
         forwardPermission,
+        forwardCarSpeed,
         geometry,
         FORWARD
       );
@@ -683,6 +696,7 @@ public class OsmModule implements GraphBuilderModule {
         index,
         length,
         backwardPermission,
+        backwardCarSpeed,
         backGeometry,
         BACKWARD
       );
@@ -700,6 +714,7 @@ public class OsmModule implements GraphBuilderModule {
     int index,
     double length,
     StreetTraversalPermission permissions,
+    float carSpeed,
     LineString geometry,
     TraverseDirection direction
   ) {
@@ -718,11 +733,6 @@ public class OsmModule implements GraphBuilderModule {
         return I18NString.of(label);
       });
 
-    float carSpeed = way
-      .getOsmProvider()
-      .getOsmTagMapper()
-      .getCarSpeedForWay(way, direction, issueStore);
-
     StreetEdgeBuilder<?> seb = new StreetEdgeBuilder<>()
       .withFromVertex(fromVertex)
       .withToVertex(toVertex)
@@ -738,7 +748,7 @@ public class OsmModule implements GraphBuilderModule {
       .withSlopeOverride(way.getOsmProvider().getWayPropertySet().getSlopeOverride(way))
       .withStairs(way.isStairs())
       .withWheelchairAccessible(way.isWheelchairAccessible())
-      .withBogusName(way.hasNoName());
+      .withNameIsDerived(way.hasNoName());
 
     return seb.buildAndConnect();
   }

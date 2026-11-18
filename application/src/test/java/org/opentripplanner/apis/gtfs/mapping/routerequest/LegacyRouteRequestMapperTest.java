@@ -58,6 +58,7 @@ import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.transit.transfer.regular.NoRegularTransfers;
 
 class LegacyRouteRequestMapperTest implements PlanTestConstants {
 
@@ -78,7 +79,6 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
       transitRepository,
       DefaultTimetableRepository.scheduledOnly(timetableDataImport.toScheduledTimetableData())
     );
-    var transferService = TransferServiceTestFactory.defaultTransferService();
     var routeRequest = RouteRequest.defaultValue();
     var vertexLinker = VertexLinkerTestFactory.of(graph);
     var vertexCreationService = new VertexCreationService(vertexLinker);
@@ -91,7 +91,8 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
       new TestRoutingService(List.of()),
       transitService,
       new TransitAlertServiceImpl(),
-      transferService,
+      TransferServiceTestFactory.defaultTransferService(),
+      NoRegularTransfers.snapshot(),
       new DefaultFareService(),
       new DefaultVehicleRentalService(new DefaultVehicleRentalRepository()),
       new DefaultVehicleParkingService(new DefaultVehicleParkingRepository()),
@@ -102,7 +103,8 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
       SchemaFactory.createSchemaWithDefaultInjection(routeRequest),
       new StreetNearbyPlaceFinder(linkingContextFactory),
       StreetNearbyStopFinder.of(linkingContextFactory).build(),
-      routeRequest
+      routeRequest,
+      null
     );
   }
 

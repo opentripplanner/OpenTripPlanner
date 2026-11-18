@@ -58,8 +58,8 @@ java -Xmx2G -jar otp-shaded/target/otp-shaded-VERSION.jar [args]
 ## Testing
 
 - Unit tests: JUnit 5, organized by package structure
-- Assertions: prefer the Google Truth library, especially for collections and optionals — it reads
-  far better than the JUnit equivalents
+- Assertions: prefer JUnit where it reads well. Google Truth may be used where it gives better
+  readability, e.g. for collections and optionals
 - Snapshot tests: API and itinerary tests use `.snap` files stored in git (regenerate with
   `-Pclean-test-snapshots`)
 - Speed tests: `test/performance/` (see Performance Testing)

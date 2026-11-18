@@ -2,8 +2,8 @@ package org.opentripplanner.ext.taxi.configure;
 
 import dagger.Module;
 import dagger.Provides;
-import jakarta.annotation.Nullable;
 import jakarta.inject.Singleton;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.ext.taxi.TaxiRepository;
 import org.opentripplanner.ext.taxi.internal.graphbuilder.TaxiGraphBuilder;
 import org.opentripplanner.framework.application.OTPFeature;

@@ -2,8 +2,8 @@ package org.opentripplanner.ext.empiricaldelay.configure;
 
 import dagger.Module;
 import dagger.Provides;
-import jakarta.annotation.Nullable;
 import jakarta.inject.Singleton;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayRepository;
 import org.opentripplanner.ext.empiricaldelay.internal.graphbuilder.EmpiricalDelayGraphBuilder;

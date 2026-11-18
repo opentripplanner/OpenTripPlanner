@@ -5,7 +5,7 @@ import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
 import java.io.InputStream;
-import org.rutebanken.netex.model.PublicationDeliveryStructure;
+import org.entur.netex2.model.PublicationDeliveryStructure;
 
 /** Simple wrapper to perform typesafe xml parsing and simple error handling. */
 public class NetexXmlParser {

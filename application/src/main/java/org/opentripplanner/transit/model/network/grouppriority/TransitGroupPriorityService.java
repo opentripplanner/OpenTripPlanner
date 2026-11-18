@@ -1,8 +1,7 @@
 package org.opentripplanner.transit.model.network.grouppriority;
 
-import gnu.trove.impl.Constants;
-import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
+import com.carrotsearch.hppc.ObjectIntHashMap;
+import com.carrotsearch.hppc.ObjectIntMap;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -131,7 +130,7 @@ public class TransitGroupPriorityService {
     for (var it : agencyMatchersIds) {
       if (it.matcher().match(entity)) {
         var agencyId = entity.agencyId();
-        int groupId = it.ids().get(agencyId);
+        int groupId = it.ids().getOrDefault(agencyId, -1);
 
         if (groupId < 0) {
           groupId = nextGroupId();
@@ -166,12 +165,9 @@ public class TransitGroupPriorityService {
   private record MatcherAndId(Matcher matcher, int groupId) {}
 
   /** Matcher with a map of ids by agency. */
-  private record MatcherAgencyAndIds(Matcher matcher, TObjectIntMap<FeedScopedId> ids) {
+  private record MatcherAgencyAndIds(Matcher matcher, ObjectIntMap<FeedScopedId> ids) {
     MatcherAgencyAndIds(Matcher matcher) {
-      this(
-        matcher,
-        new TObjectIntHashMap<>(Constants.DEFAULT_CAPACITY, Constants.DEFAULT_LOAD_FACTOR, -1)
-      );
+      this(matcher, new ObjectIntHashMap<>());
     }
   }
 }

@@ -215,8 +215,15 @@ public final class WalkStep {
     return ToStringBuilder.of(this.getClass())
       .addEnum("absoluteDirection", absoluteDirection)
       .addEnum("relativeDirection", relativeDirection)
-      .addStr("streetName", directionText.toString())
-      .addNum("distance", distance)
+      .addStr("directionText", directionText.toString())
+      .addNum("distance", DoubleUtils.roundTo1Decimal(distance))
+      .addObj("entranceId", entrance == null ? null : entrance.getId())
+      .addStr(
+        "verticalTransportation",
+        verticalTransportationUse == null
+          ? null
+          : verticalTransportationUse.getClass().getSimpleName()
+      )
       .toString();
   }
 }

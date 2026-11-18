@@ -1,6 +1,6 @@
 package org.opentripplanner.netex.support.stoptime;
 
-import org.rutebanken.netex.model.TimetabledPassingTime;
+import org.entur.netex2.model.TimetabledPassingTime;
 
 public sealed interface StopTimeAdaptor permits AbstractStopTimeAdaptor {
   static StopTimeAdaptor of(

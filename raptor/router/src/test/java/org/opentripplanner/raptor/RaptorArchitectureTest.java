@@ -11,7 +11,7 @@ import org.opentripplanner.raptor._support.arch.Package;
 public class RaptorArchitectureTest {
 
   private static final Package OTP_ROOT = Package.of("org.opentripplanner");
-  private static final Package GNU_TROVE = Package.of("gnu.trove..");
+  private static final Package HPPC = Package.of("com.carrotsearch.hppc..");
   private static final Package OTP_UTILS = OTP_ROOT.subPackage("utils..");
 
   /* The Raptor module, all packages that other paths of OTP may use. */
@@ -38,7 +38,8 @@ public class RaptorArchitectureTest {
   private static final Package RR_TRANSIT = RANGE_RAPTOR.subPackage("transit");
   private static final Package RR_SUPPORT = RANGE_RAPTOR.subPackage("support");
   private static final Package RR_PATH = RANGE_RAPTOR.subPackage("path");
-  private static final Package RR_PATH_CONFIGURE = RR_PATH.subPackage("configure");
+  private static final Package RR_DESTINATION = RANGE_RAPTOR.subPackage("destination");
+  private static final Package RR_DESTINATION_CONFIGURE = RR_DESTINATION.subPackage("configure");
   private static final Package RR_DEBUG = RANGE_RAPTOR.subPackage("debug");
   private static final Package RR_LIFECYCLE = RANGE_RAPTOR.subPackage("lifecycle");
   private static final Package RR_MULTI_CRITERIA = RANGE_RAPTOR.subPackage("multicriteria");
@@ -52,7 +53,7 @@ public class RaptorArchitectureTest {
    */
   private static final Module RR_SHARED_PACKAGES = Module.of(
     OTP_UTILS,
-    GNU_TROVE,
+    HPPC,
     RAPTOR_API,
     RAPTOR_SPI,
     RAPTOR_UTILS,
@@ -61,7 +62,8 @@ public class RaptorArchitectureTest {
     RR_LIFECYCLE,
     RR_TRANSIT,
     RR_SUPPORT,
-    RR_PATH
+    RR_PATH,
+    RR_DESTINATION
   );
 
   @Test
@@ -98,7 +100,7 @@ public class RaptorArchitectureTest {
 
   @Test
   void enforcePackageDependenciesInRangeRaptorSharedPackages() {
-    RR_INTERNAL_API.dependsOn(OTP_UTILS, GNU_TROVE, RAPTOR_API, RAPTOR_SPI).verify();
+    RR_INTERNAL_API.dependsOn(OTP_UTILS, HPPC, RAPTOR_API, RAPTOR_SPI).verify();
     RR_DEBUG.dependsOn(RR_SHARED_PACKAGES).verify();
     RR_LIFECYCLE.dependsOn(RR_SHARED_PACKAGES).verify();
     RR_TRANSIT.dependsOn(RR_SHARED_PACKAGES, RR_DEBUG, RR_LIFECYCLE).verify();
@@ -110,7 +112,8 @@ public class RaptorArchitectureTest {
       RR_TRANSIT
     ).verify();
     RR_PATH.dependsOn(RR_SHARED_PACKAGES, RR_DEBUG, RR_TRANSIT, RAPTOR_PATH).verify();
-    RR_PATH_CONFIGURE.dependsOn(RR_SHARED_PACKAGES, RR_CONTEXT, RR_PATH).verify();
+    RR_DESTINATION.dependsOn(RR_SHARED_PACKAGES, RR_DEBUG, RR_TRANSIT, RAPTOR_PATH).verify();
+    RR_DESTINATION_CONFIGURE.dependsOn(RR_SHARED_PACKAGES, RR_CONTEXT, RR_DESTINATION).verify();
     RANGE_RAPTOR.dependsOn(RR_SHARED_PACKAGES, RR_INTERNAL_API, RR_LIFECYCLE, RR_TRANSIT).verify();
   }
 
@@ -146,7 +149,7 @@ public class RaptorArchitectureTest {
     RR_STD_CONFIGURE.dependsOn(
       RR_SHARED_PACKAGES,
       RR_CONTEXT,
-      RR_PATH_CONFIGURE,
+      RR_DESTINATION_CONFIGURE,
       stdInternalApi,
       stdBestTimes,
       stdStopArrivals,
@@ -183,7 +186,7 @@ public class RaptorArchitectureTest {
     RR_MC_CONFIGURE.dependsOn(
       RR_SHARED_PACKAGES,
       RR_CONTEXT,
-      RR_PATH_CONFIGURE,
+      RR_DESTINATION_CONFIGURE,
       mcHeuristics,
       mcArrivals,
       mcArrivalsC1,

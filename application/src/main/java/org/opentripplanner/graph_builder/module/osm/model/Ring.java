@@ -1,6 +1,6 @@
 package org.opentripplanner.graph_builder.module.osm.model;
 
-import gnu.trove.list.TLongList;
+import com.carrotsearch.hppc.LongArrayList;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -49,7 +49,7 @@ public class Ring {
     jtsPolygon = calculateJtsPolygon();
   }
 
-  public Ring(TLongList osmNodes, LongFunction<OsmNode> nodeById) {
+  public Ring(LongArrayList osmNodes, LongFunction<OsmNode> nodeById) {
     // The collection needs to be mutable, so collect into an ArrayList
     this(
       LongStream.of(osmNodes.toArray())

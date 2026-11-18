@@ -1,7 +1,7 @@
 package org.opentripplanner.netex.mapping;
 
+import org.entur.netex2.model.ServiceAlterationEnumeration;
 import org.opentripplanner.transit.model.timetable.TripAlteration;
-import org.rutebanken.netex.model.ServiceAlterationEnumeration;
 
 public class TripServiceAlterationMapper {
 
@@ -10,7 +10,7 @@ public class TripServiceAlterationMapper {
       return TripAlteration.PLANNED;
     }
     return switch (netexValue) {
-      case PLANNED -> TripAlteration.PLANNED;
+      case PLANNED, PROVISIONAL -> TripAlteration.PLANNED;
       case CANCELLATION -> TripAlteration.CANCELLATION;
       case REPLACED -> TripAlteration.REPLACED;
       case EXTRA_JOURNEY -> TripAlteration.EXTRA_JOURNEY;

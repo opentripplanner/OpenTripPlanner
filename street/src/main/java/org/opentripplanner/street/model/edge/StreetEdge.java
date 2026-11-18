@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.Optional;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
+import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType.PropulsionType;
 import org.opentripplanner.service.vehiclerental.street.geofencing.GeofencingInterceptor;
@@ -21,6 +22,7 @@ import org.opentripplanner.street.model.vertex.BarrierVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
@@ -45,6 +47,13 @@ public class StreetEdge
 
   private static final double SAFEST_STREETS_SAFETY_FACTOR = 0.1;
 
+  /**
+   * Fixed extra weight (about 10 minutes of walking) added once when a wheelchair user crosses a
+   * wheelchair-inaccessible barrier vertex, e.g. a raised kerb. It is a point obstacle, so the
+   * cost does not depend on the length of the adjacent edges.
+   */
+  private static final double WHEELCHAIR_INACCESSIBLE_BARRIER_COST = 600;
+
   /** If you have more than 16 flags, increase flags to short or int */
   static final int BACK_FLAG_INDEX = 0;
   static final int ROUNDABOUT_FLAG_INDEX = 1;
@@ -60,6 +69,11 @@ public class StreetEdge
   static final int WALK_NOTHRUTRAFFIC = 8;
   static final int CLASS_LINK = 9;
   static final int CROSSING_FLAG_INDEX = 10;
+  /**
+   * Set when the end vertex is a wheelchair-inaccessible {@link BarrierVertex}. Derived from the
+   * vertex in the constructor, so it is never copied from a builder.
+   */
+  static final int WHEELCHAIR_INACCESSIBLE_BARRIER_FLAG_INDEX = 11;
 
   private StreetEdgeCostExtension costExtension;
 
@@ -112,7 +126,11 @@ public class StreetEdge
 
   protected StreetEdge(StreetEdgeBuilder<?> builder) {
     super(builder.fromVertex(), builder.toVertex());
-    this.flags = builder.getFlags();
+    this.flags = BitSetUtils.set(
+      builder.getFlags(),
+      WHEELCHAIR_INACCESSIBLE_BARRIER_FLAG_INDEX,
+      isWheelchairInaccessibleBarrier(builder.toVertex())
+    );
     this.setGeometry(builder.geometry());
     this.length_mm = computeLength(builder);
     this.setBicycleSafetyFactor(builder.bicycleSafetyFactor());
@@ -368,15 +386,26 @@ public class StreetEdge
   }
 
   /**
-   * Update the name of the edge after it has been constructed. This method also sets the
+   * Update the name of the edge after it has been constructed and set the
    * nameIsDerived property to false, indicating to the code that maps from edges to steps that this
    * is a real street name.
    *
    * @see Edge#nameIsDerived()
    */
-  public void setName(I18NString name) {
+  public void overrideName(I18NString name) {
     this.name = name;
     this.flags = BitSetUtils.set(flags, NAME_IS_DERIVED_FLAG_INDEX, false);
+  }
+
+  /**
+   * Update the name of the edge after it has been constructed and marking the name as derived,
+   * meaning that its name should be de-prioritized in walk steps.
+   *
+   * @see Edge#nameIsDerived()
+   */
+  public void overrideDerivedName(I18NString name) {
+    this.name = name;
+    this.flags = BitSetUtils.set(flags, NAME_IS_DERIVED_FLAG_INDEX, true);
   }
 
   @Override
@@ -1033,14 +1062,25 @@ public class StreetEdge
     double time, weight;
     if (wheelchair) {
       time = getEffectiveWalkDistance() / speed;
-      weight =
-        (getEffectiveBikeDistance() / speed) *
-        StreetEdgeReluctanceCalculator.computeWheelchairReluctance(
-          request,
-          getMaxSlope(),
-          isWheelchairAccessible(),
-          isStairs()
-        );
+      // Use walk safety and the bike slope model.
+      double slopeAdjustedDistance = getEffectiveBikeDistance();
+      double safetyWeightedDistance = getWalkSafetyFactor() * slopeAdjustedDistance;
+
+      // Blend the safety-weighted and the plain distance by how much the request weighs safety
+      double safetyShare = request.walk().safetyFactor();
+      double blendedDistance =
+        safetyWeightedDistance * safetyShare + slopeAdjustedDistance * (1 - safetyShare);
+
+      double wheelchairReluctance = StreetEdgeReluctanceCalculator.computeWheelchairReluctance(
+        request,
+        getMaxSlope(),
+        isWheelchairAccessible(),
+        isStairs()
+      );
+      weight = (blendedDistance / speed) * wheelchairReluctance;
+      if (BitSetUtils.get(flags, WHEELCHAIR_INACCESSIBLE_BARRIER_FLAG_INDEX)) {
+        weight += WHEELCHAIR_INACCESSIBLE_BARRIER_COST;
+      }
     } else {
       if (walkingBike) {
         // take slopes into account when walking bikes
@@ -1063,6 +1103,19 @@ public class StreetEdge
     }
 
     return new TraversalCosts(time, weight);
+  }
+
+  /**
+   * Checks if the vertex is a {@link BarrierVertex} that is wheelchair-inaccessible, e.g. a
+   * {@code barrier=kerb} node without a {@code kerb=flush/lowered/no} tag. Only the edge ending
+   * at the vertex is charged, so that crossing the barrier is penalised once, not once per
+   * adjacent edge.
+   */
+  private static boolean isWheelchairInaccessibleBarrier(Vertex vertex) {
+    return (
+      vertex instanceof BarrierVertex bv &&
+      bv.wheelchairAccessibility() == Accessibility.NOT_POSSIBLE
+    );
   }
 
   /* The no-thru traffic support works by not allowing a transition from a no-thru area out of it.

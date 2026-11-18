@@ -3,38 +3,40 @@ package org.opentripplanner.netex.mapping;
 import static com.google.common.truth.Truth.assertThat;
 import static graphql.Assert.assertFalse;
 import static graphql.Assert.assertTrue;
+import static org.entur.netex2.model.AllPublicTransportModesEnumeration.TRAM;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.netex.NetexTestDataSupport.createQuay;
 import static org.opentripplanner.netex.NetexTestDataSupport.createStopPlace;
-import static org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration.TRAM;
 
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import org.entur.netex2.model.AccessibilityAssessment;
+import org.entur.netex2.model.AccessibilityLimitation;
+import org.entur.netex2.model.AccessibilityLimitations_RelStructure;
+import org.entur.netex2.model.AllPublicTransportModesEnumeration;
+import org.entur.netex2.model.LimitationStatusEnumeration;
+import org.entur.netex2.model.LimitedUseTypeEnumeration;
+import org.entur.netex2.model.ObjectFactory;
+import org.entur.netex2.model.Quay;
+import org.entur.netex2.model.Quays_RelStructure;
+import org.entur.netex2.model.StopPlace;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.core.model.accessibility.Accessibility;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalVersionMapById;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.SiteRepositoryBuilder;
-import org.rutebanken.netex.model.AccessibilityAssessment;
-import org.rutebanken.netex.model.AccessibilityLimitation;
-import org.rutebanken.netex.model.AccessibilityLimitations_RelStructure;
-import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
-import org.rutebanken.netex.model.LimitationStatusEnumeration;
-import org.rutebanken.netex.model.LimitedUseTypeEnumeration;
-import org.rutebanken.netex.model.ObjectFactory;
-import org.rutebanken.netex.model.Quay;
-import org.rutebanken.netex.model.Quays_RelStructure;
-import org.rutebanken.netex.model.StopPlace;
 
 class StopAndStationMapperTest {
 
@@ -49,7 +51,7 @@ class StopAndStationMapperTest {
       "1",
       55.707005,
       13.186816,
-      AllVehicleModesOfTransportEnumeration.BUS
+      AllPublicTransportModesEnumeration.BUS
     );
 
     // Create on quay with access, one without, and one with NULL
@@ -114,7 +116,7 @@ class StopAndStationMapperTest {
       "2",
       59.909584,
       10.755165,
-      AllVehicleModesOfTransportEnumeration.TRAM
+      AllPublicTransportModesEnumeration.TRAM
     );
 
     StopPlace stopPlaceOld = createStopPlace(
@@ -123,7 +125,7 @@ class StopAndStationMapperTest {
       "1",
       59.909584,
       10.755165,
-      AllVehicleModesOfTransportEnumeration.TRAM
+      AllPublicTransportModesEnumeration.TRAM
     );
 
     stopPlaces.add(stopPlaceNew);
@@ -219,7 +221,7 @@ class StopAndStationMapperTest {
       "1",
       59.909584,
       10.755165,
-      AllVehicleModesOfTransportEnumeration.TRAM
+      AllPublicTransportModesEnumeration.TRAM
     );
 
     stopPlace.withLimitedUse(LimitedUseTypeEnumeration.ISOLATED);
@@ -255,7 +257,7 @@ class StopAndStationMapperTest {
       "1",
       55.707005,
       13.186816,
-      AllVehicleModesOfTransportEnumeration.BUS
+      AllPublicTransportModesEnumeration.BUS
     );
 
     // Create on quay with access, one without, and one with NULL
@@ -310,8 +312,72 @@ class StopAndStationMapperTest {
     assertFalse(stations.get(1).shouldRouteToCentroid());
   }
 
+  /**
+   * A quay with a coordinate outside the WGS84 range is skipped, the other quays of the stop
+   * place are mapped.
+   */
+  @Test
+  void testQuayWithInvalidCoordinatesIsSkipped() {
+    var stopPlace = createStopPlace("ST:StopPlace:1", "A", "1", 55.707005, 13.186816, TRAM);
+    var validQuay = createQuay("ST:Quay:1", "Quay1", "1", 55.706063, 13.186708, "a");
+    var invalidQuay = createQuay("ST:Quay:2", "Quay2", "1", 56162332.0, 13.186708, "b");
+    stopPlace.setQuays(
+      new Quays_RelStructure()
+        .withQuayRefOrQuay(objectFactory.createQuay(validQuay))
+        .withQuayRefOrQuay(objectFactory.createQuay(invalidQuay))
+    );
+    var issueStore = new DefaultDataImportIssueStore();
+    var stopMapper = createStopAndStationMapper(SiteRepository.of(), issueStore);
+
+    stopMapper.mapParentAndChildStops(List.of(stopPlace));
+
+    assertThat(stopMapper.resultStations).hasSize(1);
+    assertThat(
+      stopMapper.resultStops
+        .stream()
+        .map(s -> s.getId().getId())
+        .toList()
+    ).containsExactly("ST:Quay:1");
+    assertThat(issueTypes(issueStore)).containsExactly("QuayInvalidCoordinates");
+  }
+
+  /**
+   * A stop place without any valid coordinates, neither on the stop place nor on its quays, is
+   * skipped together with its quays.
+   */
+  @Test
+  void testStopPlaceWithoutValidCoordinatesIsSkipped() {
+    var stopPlace = createStopPlace("ST:StopPlace:1", "A", "1", 56162332.0, 13.186816, TRAM);
+    var invalidQuay = createQuay("ST:Quay:1", "Quay1", "1", 56162332.0, 13.186708, "a");
+    stopPlace.setQuays(
+      new Quays_RelStructure().withQuayRefOrQuay(objectFactory.createQuay(invalidQuay))
+    );
+    var issueStore = new DefaultDataImportIssueStore();
+    var stopMapper = createStopAndStationMapper(SiteRepository.of(), issueStore);
+
+    stopMapper.mapParentAndChildStops(List.of(stopPlace));
+
+    assertThat(stopMapper.resultStations).isEmpty();
+    assertThat(stopMapper.resultStops).isEmpty();
+    assertThat(issueTypes(issueStore)).containsExactly(
+      "StationInvalidCoordinates",
+      "StationWithoutValidCoordinates"
+    );
+  }
+
+  private static List<String> issueTypes(DataImportIssueStore issueStore) {
+    return issueStore.listIssues().stream().map(DataImportIssue::getType).toList();
+  }
+
   private static StopAndStationMapper createStopAndStationMapper(
     SiteRepositoryBuilder siteRepositoryBuilder
+  ) {
+    return createStopAndStationMapper(siteRepositoryBuilder, DataImportIssueStore.NOOP);
+  }
+
+  private static StopAndStationMapper createStopAndStationMapper(
+    SiteRepositoryBuilder siteRepositoryBuilder,
+    DataImportIssueStore issueStore
   ) {
     return new StopAndStationMapper(
       MappingSupport.ID_FACTORY,
@@ -319,7 +385,7 @@ class StopAndStationMapperTest {
       null,
       siteRepositoryBuilder,
       DEFAULT_TIME_ZONE,
-      DataImportIssueStore.NOOP,
+      issueStore,
       false,
       Set.of()
     );

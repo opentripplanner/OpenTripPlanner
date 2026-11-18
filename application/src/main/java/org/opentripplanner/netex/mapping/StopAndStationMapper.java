@@ -14,6 +14,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.entur.netex2.model.Quay;
+import org.entur.netex2.model.Quays_RelStructure;
+import org.entur.netex2.model.StopPlace;
+import org.entur.netex2.model.TariffZoneRef;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -27,10 +32,6 @@ import org.opentripplanner.transit.model.site.FareZone;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.service.SiteRepositoryBuilder;
-import org.rutebanken.netex.model.Quay;
-import org.rutebanken.netex.model.Quays_RelStructure;
-import org.rutebanken.netex.model.StopPlace;
-import org.rutebanken.netex.model.TariffZoneRef;
 
 /**
  * This maps a NeTEx StopPlace and its child quays to and OTP parent stop and child stops. NeTEx
@@ -99,6 +100,10 @@ class StopAndStationMapper {
     StopPlace selectedStopPlace = first(stopPlaceAllVersions);
 
     Station station = mapStopPlaceAllVersionsToStation(selectedStopPlace);
+    if (station == null) {
+      // The StationMapper has reported the issue, skip the StopPlace and its quays
+      return;
+    }
     Collection<FareZone> fareZones = mapTariffZones(selectedStopPlace);
     var transitMode = stopPlaceTypeMapper.map(selectedStopPlace);
 
@@ -115,9 +120,12 @@ class StopAndStationMapper {
     return stops.get(0);
   }
 
+  @Nullable
   private Station mapStopPlaceAllVersionsToStation(StopPlace stopPlace) {
     Station station = stationMapper.map(stopPlace);
-
+    if (station == null) {
+      return null;
+    }
     if (stopPlace.getParentSiteRef() != null) {
       resultStationByMultiModalStationRfs.put(stopPlace.getParentSiteRef().getRef(), station);
     }
@@ -132,7 +140,7 @@ class StopAndStationMapper {
 
     return stopPlace
       .getTariffZones()
-      .getTariffZoneRef_()
+      .getTariffZoneRef()
       .stream()
       .map(ref -> findTariffZone(stopPlace, (TariffZoneRef) ref.getValue()))
       .filter(Objects::nonNull)

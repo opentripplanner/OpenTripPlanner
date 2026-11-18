@@ -50,7 +50,7 @@ import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
 import org.opentripplanner.standalone.config.DebugUiConfig;
 import org.opentripplanner.street.graph.Graph;
-import org.opentripplanner.transfer.regular.RegularTransferService;
+import org.opentripplanner.transfer.regular.FlexTransferService;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
@@ -81,7 +81,6 @@ public class DebugVectorTilesResource {
     RENTAL,
     TRANSFERS
   );
-  public static final String PATH = "/otp/debug/vectortiles/";
 
   private final TransitService transitService;
   private final Graph graph;
@@ -89,7 +88,7 @@ public class DebugVectorTilesResource {
   private final WorldEnvelopeService worldEnvelopeService;
   private final VehicleRentalService vehicleRentalService;
   private final StreetDetailsService streetDetailsService;
-  private final RegularTransferService transferService;
+  private final FlexTransferService transferService;
 
   public DebugVectorTilesResource(
     @Context TransitService transitService,
@@ -98,7 +97,7 @@ public class DebugVectorTilesResource {
     @Context WorldEnvelopeService worldEnvelopeService,
     @Context VehicleRentalService vehicleRentalService,
     @Context StreetDetailsService streetDetailsService,
-    @Context RegularTransferService transferService
+    @Context FlexTransferService transferService
   ) {
     this.transitService = transitService;
     this.graph = graph;
@@ -149,7 +148,10 @@ public class DebugVectorTilesResource {
     List<FeedInfo> feedInfos = feedInfos();
     List<String> layers = Arrays.asList(requestedLayers.split(","));
 
-    var url = TileJson.urlFromOverriddenBasePath(uri, headers, PATH, layers);
+    var url = "%s/%s/{z}/{x}/{y}.pbf".formatted(
+      tilesBaseUrl(uri, headers),
+      String.join(",", layers)
+    );
     return new TileJson(url, envelope, feedInfos, MIN_ZOOM, MAX_ZOOM);
   }
 
@@ -157,7 +159,7 @@ public class DebugVectorTilesResource {
   @Path("/style.json")
   @Produces(MediaType.APPLICATION_JSON)
   public StyleSpec getTileJson(@Context UriInfo uri, @Context HttpHeaders headers) {
-    var base = HttpUtils.getBaseAddress(uri, headers);
+    var base = tilesBaseUrl(uri, headers);
 
     // these could also be loaded together but are put into separate sources because
     // the stops are fast and the edges are relatively slow
@@ -187,12 +189,23 @@ public class DebugVectorTilesResource {
     );
   }
 
-  static String tileJsonUrl(String base, List<LayerParameters<LayerType>> layers) {
+  /**
+   * The URL the debug vector tiles are reachable on from the outside. The configured value is
+   * either a full URL, which is used as is, or a path, which is put after the host of the request.
+   */
+  private String tilesBaseUrl(UriInfo uri, HttpHeaders headers) {
+    return HttpUtils.resolveBaseUrl(
+      HttpUtils.getBaseAddress(uri, headers),
+      debugUiConfig.vectorTilesBasePath()
+    );
+  }
+
+  static String tileJsonUrl(String tilesBaseUrl, List<LayerParameters<LayerType>> layers) {
     final String allLayers = layers
       .stream()
       .map(LayerParameters::name)
       .collect(Collectors.joining(","));
-    return "%s%s%s/tilejson.json".formatted(base, PATH, allLayers);
+    return "%s/%s/tilejson.json".formatted(tilesBaseUrl, allLayers);
   }
 
   private List<FeedInfo> feedInfos() {
@@ -252,6 +265,6 @@ public class DebugVectorTilesResource {
     VehicleRentalService vehicleRentalService,
     Graph graph,
     StreetDetailsService streetDetailsService,
-    RegularTransferService transferService
+    FlexTransferService transferService
   ) {}
 }

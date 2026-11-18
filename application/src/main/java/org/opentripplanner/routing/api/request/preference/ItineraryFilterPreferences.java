@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.util.Objects;
 import java.util.function.Consumer;
 import org.opentripplanner.core.model.basic.CostLinearFunction;
+import org.opentripplanner.core.model.basic.Ratio;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.utils.lang.Units;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
@@ -23,8 +24,8 @@ public final class ItineraryFilterPreferences {
   private final ItineraryFilterDebugProfile debug;
   private final boolean filterItinerariesWithSameFirstOrLastTrip;
   private final double groupedOtherThanSameLegsMaxCostMultiplier;
-  private final double groupSimilarityKeepOne;
-  private final double groupSimilarityKeepThree;
+  private final Ratio groupSimilarityKeepOne;
+  private final Ratio groupSimilarityKeepThree;
   private final double minBikeParkingDistance;
   private final CostLinearFunction nonTransitGeneralizedCostLimit;
   private final double parkAndRideDurationRatio;
@@ -39,8 +40,8 @@ public final class ItineraryFilterPreferences {
     this.debug = ItineraryFilterDebugProfile.OFF;
     this.filterItinerariesWithSameFirstOrLastTrip = false;
     this.groupedOtherThanSameLegsMaxCostMultiplier = 2.0;
-    this.groupSimilarityKeepOne = 0.85;
-    this.groupSimilarityKeepThree = 0.68;
+    this.groupSimilarityKeepOne = Ratio.of(0.85);
+    this.groupSimilarityKeepThree = Ratio.of(0.68);
     this.minBikeParkingDistance = 0;
     this.nonTransitGeneralizedCostLimit = CostLinearFunction.of(Duration.ofHours(1), 2.0);
     this.parkAndRideDurationRatio = 0.0;
@@ -65,8 +66,8 @@ public final class ItineraryFilterPreferences {
     this.groupedOtherThanSameLegsMaxCostMultiplier = Units.reluctance(
       builder.groupedOtherThanSameLegsMaxCostMultiplier
     );
-    this.groupSimilarityKeepOne = Units.ratio(builder.groupSimilarityKeepOne);
-    this.groupSimilarityKeepThree = Units.ratio(builder.groupSimilarityKeepThree);
+    this.groupSimilarityKeepOne = Objects.requireNonNull(builder.groupSimilarityKeepOne);
+    this.groupSimilarityKeepThree = Objects.requireNonNull(builder.groupSimilarityKeepThree);
     this.minBikeParkingDistance = builder.minBikeParkingDistance;
     this.nonTransitGeneralizedCostLimit = Objects.requireNonNull(
       builder.nonTransitGeneralizedCostLimit
@@ -108,11 +109,11 @@ public final class ItineraryFilterPreferences {
     return groupedOtherThanSameLegsMaxCostMultiplier;
   }
 
-  public double groupSimilarityKeepOne() {
+  public Ratio groupSimilarityKeepOne() {
     return groupSimilarityKeepOne;
   }
 
-  public double groupSimilarityKeepThree() {
+  public Ratio groupSimilarityKeepThree() {
     return groupSimilarityKeepThree;
   }
 
@@ -159,8 +160,8 @@ public final class ItineraryFilterPreferences {
         groupedOtherThanSameLegsMaxCostMultiplier,
         DEFAULT.groupedOtherThanSameLegsMaxCostMultiplier
       )
-      .addNum("groupSimilarityKeepOne", groupSimilarityKeepOne, DEFAULT.groupSimilarityKeepOne)
-      .addNum(
+      .addObj("groupSimilarityKeepOne", groupSimilarityKeepOne, DEFAULT.groupSimilarityKeepOne)
+      .addObj(
         "groupSimilarityKeepThree",
         groupSimilarityKeepThree,
         DEFAULT.groupSimilarityKeepThree
@@ -212,8 +213,8 @@ public final class ItineraryFilterPreferences {
         that.groupedOtherThanSameLegsMaxCostMultiplier,
         groupedOtherThanSameLegsMaxCostMultiplier
       ) == 0 &&
-      Double.compare(that.groupSimilarityKeepOne, groupSimilarityKeepOne) == 0 &&
-      Double.compare(that.groupSimilarityKeepThree, groupSimilarityKeepThree) == 0 &&
+      groupSimilarityKeepOne.equals(that.groupSimilarityKeepOne) &&
+      groupSimilarityKeepThree.equals(that.groupSimilarityKeepThree) &&
       Double.compare(that.minBikeParkingDistance, minBikeParkingDistance) == 0 &&
       Double.compare(that.parkAndRideDurationRatio, parkAndRideDurationRatio) == 0 &&
       removeItinerariesWithSameRoutesAndStops == that.removeItinerariesWithSameRoutesAndStops &&
@@ -255,8 +256,8 @@ public final class ItineraryFilterPreferences {
     private ItineraryFilterDebugProfile debug;
     private boolean filterItinerariesWithSameFirstOrLastTrip;
     private double groupedOtherThanSameLegsMaxCostMultiplier;
-    private double groupSimilarityKeepOne;
-    private double groupSimilarityKeepThree;
+    private Ratio groupSimilarityKeepOne;
+    private Ratio groupSimilarityKeepThree;
     public double minBikeParkingDistance;
     private CostLinearFunction nonTransitGeneralizedCostLimit;
     private double parkAndRideDurationRatio;
@@ -298,12 +299,12 @@ public final class ItineraryFilterPreferences {
       return this;
     }
 
-    public Builder withGroupSimilarityKeepOne(double groupSimilarityKeepOne) {
+    public Builder withGroupSimilarityKeepOne(Ratio groupSimilarityKeepOne) {
       this.groupSimilarityKeepOne = groupSimilarityKeepOne;
       return this;
     }
 
-    public Builder withGroupSimilarityKeepThree(double groupSimilarityKeepThree) {
+    public Builder withGroupSimilarityKeepThree(Ratio groupSimilarityKeepThree) {
       this.groupSimilarityKeepThree = groupSimilarityKeepThree;
       return this;
     }

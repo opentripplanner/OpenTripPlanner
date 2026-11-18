@@ -13,7 +13,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.framework.transaction.internal.TransactionFactory;
+import org.opentripplanner.core.framework.transaction.configure.TransactionFactory;
 import org.opentripplanner.core.framework.transaction.moduletest.candyshop.base.Entity;
 import org.opentripplanner.core.framework.transaction.moduletest.candyshop.base.EntityIdProvider;
 import org.opentripplanner.core.framework.transaction.moduletest.candyshop.customer.CustomerRepository;

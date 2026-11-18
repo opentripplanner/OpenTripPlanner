@@ -1,6 +1,6 @@
 package org.opentripplanner.apis.gtfs.datafetchers;
 
-import gnu.trove.set.TIntSet;
+import com.carrotsearch.hppc.IntSet;
 import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
@@ -216,7 +216,7 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
       ).getGraphQLServiceDate();
 
       try {
-        TIntSet services = getTransitService(environment).getServiceCodesRunningForDate(
+        IntSet services = getTransitService(environment).getServiceCodesRunningForDate(
           ServiceDateUtils.parseString(serviceDate)
         );
         return getSource(environment)

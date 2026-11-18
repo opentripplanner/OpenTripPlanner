@@ -141,7 +141,7 @@ public class OsmTagMapper {
         new Equals("cycleway", "lane"),
         new Not(new Equals("highway", "cycleway"))
       ),
-      ofBicycleSafety(0.87).addPermission(BICYCLE)
+      ofBicycleSafety(0.64).addPermission(BICYCLE)
     );
 
     /* cycleway=share_busway */
@@ -160,7 +160,7 @@ public class OsmTagMapper {
         new Not(new Equals("highway", "cycleway"))
       ),
       new MixinPropertiesBuilder().directional(TraverseDirection.BACKWARD, builder ->
-        builder.withBicycleSafety(0.87).addPermission(BICYCLE)
+        builder.withBicycleSafety(0.64).addPermission(BICYCLE)
       )
     );
 
@@ -170,7 +170,7 @@ public class OsmTagMapper {
         new Equals("cycleway", "track"),
         new Not(new Equals("highway", "cycleway"))
       ),
-      ofBicycleSafety(0.75).addPermission(BICYCLE)
+      ofBicycleSafety(0.51).addPermission(BICYCLE)
     );
 
     /* cycleway=opposite_track */
@@ -180,7 +180,7 @@ public class OsmTagMapper {
         new Not(new Equals("highway", "cycleway"))
       ),
       new MixinPropertiesBuilder().directional(TraverseDirection.BACKWARD, builder ->
-        builder.withBicycleSafety(0.75).addPermission(BICYCLE)
+        builder.withBicycleSafety(0.51).addPermission(BICYCLE)
       )
     );
 
@@ -190,7 +190,7 @@ public class OsmTagMapper {
         new Equals("cycleway", "shared_lane"),
         new Not(new Equals("highway", "cycleway"))
       ),
-      ofBicycleSafety(0.77).addPermission(BICYCLE)
+      ofBicycleSafety(0.84).addPermission(BICYCLE)
     );
 
     /* cycleway=opposite */
@@ -216,8 +216,10 @@ public class OsmTagMapper {
     /* sidewalk and crosswalk */
     props.setMixinProperties(
       new ExactMatchSpecifier(
+        new Equals("footway", "sidewalk"),
+        // a sidewalk that is also bike infrastructure is not penalized
         new Not(new Equals("highway", "cycleway")),
-        new Equals("footway", "sidewalk")
+        new Not(new Equals("bicycle", "designated"))
       ),
       ofBicycleSafety(2.5)
     );

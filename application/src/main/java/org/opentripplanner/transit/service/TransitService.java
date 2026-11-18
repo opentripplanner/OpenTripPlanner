@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.service;
 
-import gnu.trove.set.TIntSet;
+import com.carrotsearch.hppc.IntSet;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -107,7 +107,7 @@ public interface TransitService {
 
   Collection<Station> listStations();
 
-  TIntSet getServiceCodesRunningForDate(LocalDate date);
+  IntSet getServiceCodesRunningForDate(LocalDate date);
 
   Agency getAgency(FeedScopedId id);
 
@@ -406,7 +406,7 @@ public interface TransitService {
 
   Set<LocalDate> listServiceDates();
 
-  Map<LocalDate, TIntSet> getServiceCodesRunningForDate();
+  Map<LocalDate, IntSet> getServiceCodesRunningForDate();
 
   /**
    * Returns a list of {@link TripOnServiceDate}s that match the filtering defined in the request.

@@ -5,7 +5,6 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_10;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_4;
 
 import java.time.Duration;
@@ -16,7 +15,6 @@ import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
-import org.opentripplanner.standalone.config.routerequest.RouteRequestConfig;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
 
 /**
@@ -30,7 +28,6 @@ public final class TransitRoutingConfig implements RaptorTuningParameters, Trans
   private final int searchThreadPoolSize;
   private final int transferCacheMaxSize;
   private final boolean earlyTransferPruning;
-  private final List<RouteRequest> transferCacheRequests;
   private final List<Duration> pagingSearchWindowAdjustments;
 
   private final Map<StopTransferPriority, Integer> stopBoardAlightDuringTransferCost;
@@ -165,38 +162,14 @@ public final class TransitRoutingConfig implements RaptorTuningParameters, Trans
         "The maximum number of distinct transfers parameters to cache pre-calculated transfers for."
       )
       .description(
-        " If too low, requests may be slower. If too high, more memory may be used then required."
+        """
+        The transfers of the profiles and the warmup entries in the `transfers` section of the
+        build config are always cached, they are not counted. If too low, requests may be slower.
+        If too high, more memory may be used then required.
+        """
       )
       .asInt(25);
 
-    this.transferCacheRequests = c
-      .of("transferCacheRequests")
-      .since(V2_3)
-      .summary("Routing requests to use for pre-filling the stop-to-stop transfer cache.")
-      .description(
-        """
-        If not set, the default behavior is to cache stop-to-stop transfers using the default route request
-        (`routingDefaults`). Use this to change the default or specify more than one `RouteRequest`.
-
-        **Example**
-
-        ```JSON
-        // router-config.json
-        {
-          "transit": {
-            "transferCacheRequests": [
-              { "modes": "WALK"                                                     },
-              { "modes": "WALK",    "wheelchairAccessibility": { "enabled": true  } }
-            ]
-          }
-        }
-        ```
-        """
-      )
-      .docDefaultValue("`routingDefaults`")
-      .asObjects(List.of(routingRequestDefaults), n ->
-        RouteRequestConfig.mapRouteRequest(n, routingRequestDefaults)
-      );
     this.pagingSearchWindowAdjustments = c
       .of("pagingSearchWindowAdjustments")
       .since(NA)
@@ -277,11 +250,6 @@ public final class TransitRoutingConfig implements RaptorTuningParameters, Trans
   @Override
   public int transferCacheMaxSize() {
     return transferCacheMaxSize;
-  }
-
-  @Override
-  public List<RouteRequest> transferCacheRequests() {
-    return transferCacheRequests;
   }
 
   @Override

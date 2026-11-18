@@ -5,19 +5,21 @@ import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctio
 import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.removeNonOptimalPathsForMcRaptor;
 import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.removeNonOptimalPathsForStandardRaptor;
 
-import gnu.trove.map.TIntObjectMap;
+import com.carrotsearch.hppc.IntObjectMap;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
 
 public class EgressPaths {
 
-  private final TIntObjectMap<List<RaptorAccessEgress>> pathsByStop;
+  private final IntObjectMap<List<RaptorAccessEgress>> pathsByStop;
 
-  private EgressPaths(TIntObjectMap<List<RaptorAccessEgress>> pathsByStop) {
+  private EgressPaths(IntObjectMap<List<RaptorAccessEgress>> pathsByStop) {
     this.pathsByStop = pathsByStop;
   }
 
@@ -42,20 +44,16 @@ public class EgressPaths {
     return new EgressPaths(groupByStop(paths));
   }
 
-  public TIntObjectMap<List<RaptorAccessEgress>> byStop() {
+  public IntObjectMap<List<RaptorAccessEgress>> byStop() {
     return pathsByStop;
   }
 
   public int[] stops() {
-    return pathsByStop.keys();
+    return pathsByStop.keys().toArray();
   }
 
   public Collection<RaptorAccessEgress> listAll() {
-    return pathsByStop
-      .valueCollection()
-      .stream()
-      .flatMap(Collection::stream)
-      .collect(Collectors.toList());
+    return allPaths().collect(Collectors.toList());
   }
 
   /**
@@ -93,13 +91,14 @@ public class EgressPaths {
   }
 
   private int[] filterPathsAndGetStops(Predicate<RaptorAccessEgress> filter) {
-    return pathsByStop
-      .valueCollection()
-      .stream()
-      .flatMap(Collection::stream)
-      .filter(filter)
-      .mapToInt(RaptorAccessEgress::stop)
-      .distinct()
-      .toArray();
+    return allPaths().filter(filter).mapToInt(RaptorAccessEgress::stop).distinct().toArray();
+  }
+
+  private Stream<RaptorAccessEgress> allPaths() {
+    var result = new ArrayList<RaptorAccessEgress>();
+    for (var cursor : pathsByStop.values()) {
+      result.addAll(cursor.value);
+    }
+    return result.stream();
   }
 }

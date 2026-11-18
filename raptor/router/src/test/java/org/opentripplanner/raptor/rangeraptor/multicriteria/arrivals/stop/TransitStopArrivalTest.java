@@ -33,8 +33,6 @@ class TransitStopArrivalTest {
   private static final RaptorTripSchedule TRANSIT_TRIP = TestTripSchedule.schedule(pattern("T1", 0))
     .arrivals(TRANSIT_ALIGHT_TIME)
     .build();
-  private static final int TRANSIT_TRAVEL_DURATION =
-    ACCESS_DURATION + BOARD_SLACK + TRANSIT_LEG_DURATION;
   private static final int TRANSIT_C1 = 128000;
   private static final int ROUND = 1;
   private final TransitStopArrival<RaptorTripSchedule> subject = new TransitStopArrival<>(
@@ -85,11 +83,6 @@ class TransitStopArrivalTest {
   @Test
   public void trip() {
     assertSame(TRANSIT_TRIP, subject.trip());
-  }
-
-  @Test
-  public void travelDuration() {
-    assertEquals(TRANSIT_TRAVEL_DURATION, subject.travelDuration());
   }
 
   @Test
