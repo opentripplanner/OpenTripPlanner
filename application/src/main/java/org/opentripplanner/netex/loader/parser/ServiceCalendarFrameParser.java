@@ -100,7 +100,9 @@ class ServiceCalendarFrameParser extends NetexParser<ServiceCalendarFrame_Versio
       return;
     }
 
-    for (OperatingPeriod_VersionStructure p : operatingPeriods.getOperatingPeriodOrUicOperatingPeriod()) {
+    for (
+      OperatingPeriod_VersionStructure p : operatingPeriods.getOperatingPeriodOrUicOperatingPeriod()
+    ) {
       parseOperatingPeriod(p);
     }
   }

@@ -80,7 +80,9 @@ public class SiriAlertsUpdateHandler {
   }
 
   public void update(ServiceDelivery delivery, TransitRealTimeUpdateContext context) {
-    for (SituationExchangeDeliveryStructure sxDelivery : delivery.getSituationExchangeDeliveries()) {
+    for (
+      SituationExchangeDeliveryStructure sxDelivery : delivery.getSituationExchangeDeliveries()
+    ) {
       SituationExchangeDeliveryStructure.Situations situations = sxDelivery.getSituations();
 
       if (situations != null) {

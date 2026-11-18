@@ -88,7 +88,9 @@ public class AffectsMapper {
 
     List<EntitySelector> selectors = new ArrayList<>();
 
-    for (AffectedVehicleJourneyStructure affectedVehicleJourney : vjs.getAffectedVehicleJourneies()) {
+    for (
+      AffectedVehicleJourneyStructure affectedVehicleJourney : vjs.getAffectedVehicleJourneies()
+    ) {
       List<AffectedStopPointStructure> affectedStops = new ArrayList<>();
 
       List<AffectedRouteStructure> routes = affectedVehicleJourney.getRoutes();
@@ -242,7 +244,10 @@ public class AffectsMapper {
 
     List<EntitySelector> selectors = new ArrayList<>();
 
-    for (AffectsScopeStructure.Networks.AffectedNetwork affectedNetwork : networks.getAffectedNetworks()) {
+    for (
+      AffectsScopeStructure.Networks.AffectedNetwork affectedNetwork
+      : networks.getAffectedNetworks()
+    ) {
       List<AffectedLineStructure> affectedLines = affectedNetwork.getAffectedLines();
 
       if (isNotEmpty(affectedLines)) {
