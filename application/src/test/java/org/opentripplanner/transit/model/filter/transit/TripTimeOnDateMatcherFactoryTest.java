@@ -454,7 +454,8 @@ class TripTimeOnDateMatcherFactoryTest {
       var request = request().withTransitFilters(List.of(filter1, filter2)).build();
       var matcher = TripTimeOnDateMatcherFactory.of(request);
 
-      // ROUTE_1 is RAIL by a1, selected in filter1 but excluded by not -> no match in filter1, not FERRY -> no match in filter2
+      // ROUTE_1 is RAIL by a1, selected in filter1 but excluded by not -> no match in filter1, not
+      // FERRY -> no match in filter2
       assertFalse(matcher.match(tripTimeOnDate(ROUTE_1)));
       // ROUTE_2 is BUS, not selected in filter1, not FERRY -> no match in filter2
       assertFalse(matcher.match(tripTimeOnDate(ROUTE_2)));

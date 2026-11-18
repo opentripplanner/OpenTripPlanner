@@ -29,7 +29,8 @@ public abstract class PollingGraphUpdater<C> implements GraphUpdater<C> {
   /** How long to wait after polling to poll again. */
   private final Duration pollingPeriod;
 
-  // TODO OTP2 eliminate this field for reasons in "primed" javadoc; also "initialized" is not a clear term.
+  // TODO OTP2 eliminate this field for reasons in "primed" javadoc; also "initialized" is not a
+  // clear term.
   protected boolean blockReadinessUntilInitialized;
 
   /**

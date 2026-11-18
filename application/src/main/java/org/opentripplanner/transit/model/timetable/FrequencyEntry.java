@@ -102,7 +102,8 @@ public class FrequencyEntry implements Serializable {
   }
 
   public int nextDepartureTime(int stop, int time) {
-    // Start time and end time are for the first stop in the trip. Find the time offset for this stop.
+    // Start time and end time are for the first stop in the trip. Find the time offset for this
+    // stop.
     int stopOffset = tripTimes.getDepartureTime(stop) - tripTimes.getDepartureTime(0);
     // First time a vehicle passes by this stop.
     int beg = startTime + stopOffset;

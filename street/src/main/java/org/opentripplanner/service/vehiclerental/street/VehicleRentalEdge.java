@@ -121,7 +121,8 @@ public class VehicleRentalEdge extends Edge {
             return State.empty();
           }
 
-          // For arriveBy searches mayKeepRentedVehicleAtDestination is only set in State#getInitialStates(),
+          // For arriveBy searches mayKeepRentedVehicleAtDestination is only set in
+          // State#getInitialStates(),
           // and so here it is checked if this bicycle could have been kept at the destination
           if (
             s0.mayKeepRentedVehicleAtDestination() &&

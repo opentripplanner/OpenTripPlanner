@@ -204,7 +204,8 @@ public class StopPlaceType {
       //                        .name("adjacentSites")
       //                        .description("This stop place's adjacent sites")
       //                        .type(new GraphQLList(Scalars.GraphQLString))
-      //                        .dataFetcher(environment -> ((MonoOrMultiModalStation) environment.getSource()).getAdjacentSites())
+      //                        .dataFetcher(environment -> ((MonoOrMultiModalStation)
+      //                        environment.getSource()).getAdjacentSites())
       //                        .build())
       // TODO stopPlaceType?
 

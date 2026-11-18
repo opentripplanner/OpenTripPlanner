@@ -83,7 +83,8 @@ class FinlandMapper extends OsmTagMapper {
     props.setProperties("highway=secondary_link", withModes(ALL).bicycleSafety(1.5));
     props.setProperties("highway=primary", withModes(ALL).bicycleSafety(2.06));
     props.setProperties("highway=primary_link", withModes(ALL).bicycleSafety(2.06));
-    // Replace existing matching properties as the logic is that the first statement registered takes precedence over later statements
+    // Replace existing matching properties as the logic is that the first statement registered
+    // takes precedence over later statements
     props.setProperties("highway=trunk_link", withModes(ALL).bicycleSafety(2.06));
     props.setProperties("highway=trunk", withModes(ALL).bicycleSafety(7.47));
 

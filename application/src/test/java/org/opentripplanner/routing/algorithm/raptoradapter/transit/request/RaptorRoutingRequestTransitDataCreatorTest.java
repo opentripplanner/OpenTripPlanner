@@ -83,7 +83,8 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
     var r2 = findTripPatternForDate(tripPattern2.patternIndex(), combinedTripPatterns);
     var r3 = findTripPatternForDate(tripPattern3.patternIndex(), combinedTripPatterns);
 
-    // Check the number of trip schedules available for each pattern after combining dates in the search range
+    // Check the number of trip schedules available for each pattern after combining dates in the
+    // search range
     assertEquals(2, r1.numberOfTripSchedules());
     assertEquals(2, r2.numberOfTripSchedules());
     assertEquals(3, r3.numberOfTripSchedules());

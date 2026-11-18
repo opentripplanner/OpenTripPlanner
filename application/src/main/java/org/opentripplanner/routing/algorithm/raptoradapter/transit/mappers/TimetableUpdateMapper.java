@@ -224,7 +224,8 @@ public class TimetableUpdateMapper {
               patternsForDate.remove(tripPatternForDate);
             }
           } else {
-            // a previous FULL_DATASET update had real-time data for a trip, but the latest one doesn't
+            // a previous FULL_DATASET update had real-time data for a trip, but the latest one
+            // doesn't
             // therefore we remove it from the RAPTOR data
             patternsForDate.remove(tripPatternForDate);
           }
@@ -235,7 +236,8 @@ public class TimetableUpdateMapper {
         .asMap()
         .entrySet()) {
         for (TripPatternForDate newTripPatternForDate : entry.getValue()) {
-          // Add new TripPatternForDate for this date if it mapped correctly and is valid on this date
+          // Add new TripPatternForDate for this date if it mapped correctly and is valid on this
+          // date
           if (newTripPatternForDate != null) {
             if (newTripPatternForDate.getRunningPeriodDates().contains(date)) {
               patternsForDate.add(newTripPatternForDate);

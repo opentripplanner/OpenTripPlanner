@@ -82,7 +82,8 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
       lon
     );
 
-    // After parking or finishing the rental of a vehicle, you can't ever move faster than walking speed.
+    // After parking or finishing the rental of a vehicle, you can't ever move faster than walking
+    // speed.
     boolean useWalkSpeed;
 
     if (arriveBy) {

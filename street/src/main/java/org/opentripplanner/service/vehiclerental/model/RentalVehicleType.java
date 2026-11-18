@@ -17,7 +17,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  */
 public final class RentalVehicleType implements Serializable, Comparable<RentalVehicleType> {
 
-  // This is a ConcurrentHashMap in order to be thread safe, as it is used from different updater threads.
+  // This is a ConcurrentHashMap in order to be thread safe, as it is used from different updater
+  // threads.
   static final Map<String, RentalVehicleType> DEFAULT_VEHICLE_FOR_SYSTEM =
     new ConcurrentHashMap<>();
 

@@ -86,8 +86,10 @@ final class JourneyRelationWrapper {
         }
 
         if (time.equals(call.getAimedArrivalTime()) || time.equals(call.getAimedDepartureTime())) {
-          // The spec is vague in how JourneyPartInfoStructure.startTime and endTime should be interpreted.
-          // If it is provided we require the call to match the aimed arrival time or aimed departure time.
+          // The spec is vague in how JourneyPartInfoStructure.startTime and endTime should be
+          // interpreted.
+          // If it is provided we require the call to match the aimed arrival time or aimed
+          // departure time.
           return Optional.of(i);
         }
       }

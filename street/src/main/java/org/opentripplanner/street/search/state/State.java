@@ -271,7 +271,8 @@ public final class State implements AStarState<State, Edge, Vertex> {
    * @return True if the state at vertex can be the end of path.
    */
   public boolean isFinal() {
-    // When drive-to-transit is enabled, we need to check whether the car has been parked (or whether it has been picked up in reverse).
+    // When drive-to-transit is enabled, we need to check whether the car has been parked (or
+    // whether it has been picked up in reverse).
     boolean parkAndRide = request.mode().includesParking();
     boolean vehicleRentingOk;
     boolean vehicleParkAndRideOk;
@@ -382,8 +383,10 @@ public final class State implements AStarState<State, Edge, Vertex> {
       edge = orig.getBackEdge();
 
       // Not reverse-optimizing, so we don't re-traverse the edges backward.
-      // Instead we just replicate all the states, and replicate the deltas between the state's incremental fields.
-      // TODO determine whether this is really necessary, and whether there's a more maintainable way to do this.
+      // Instead we just replicate all the states, and replicate the deltas between the state's
+      // incremental fields.
+      // TODO determine whether this is really necessary, and whether there's a more maintainable
+      // way to do this.
       StateEditor editor = ret.edit(edge);
       // note the distinction between setFromState and setBackState
       editor.setFromState(orig);

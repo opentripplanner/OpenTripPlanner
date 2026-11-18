@@ -717,7 +717,8 @@ public abstract class OsmEntity {
 
     var parentModeResult = isOneWay(MODE_HIERARACHY.get(mode));
 
-    // check if any presence is explicitly overridden, for example, oneway=yes and bicycle:backward=yes
+    // check if any presence is explicitly overridden, for example, oneway=yes and
+    // bicycle:backward=yes
     if (parentModeResult.isPresent()) {
       var direction = parentModeResult.get();
 

@@ -11,7 +11,8 @@ import org.slf4j.LoggerFactory;
  * Message.properties
  */
 public enum Message {
-  // id field is loosely based on HTTP error codes http://en.wikipedia.org/wiki/List_of_HTTP_status_codes
+  // id field is loosely based on HTTP error codes
+  // http://en.wikipedia.org/wiki/List_of_HTTP_status_codes
   PLAN_OK(200),
   SYSTEM_ERROR(500),
 

@@ -121,7 +121,8 @@ public final class TestCostCalculator implements RaptorCostCalculator<TestTripSc
       return transferCost;
     } else if (stopBoardAlightTransferCosts != null) {
       // Remove cost that was added during alighting.
-      // We do not want to add this cost on last alighting since it should only be applied on transfers
+      // We do not want to add this cost on last alighting since it should only be applied on
+      // transfers
       // It has to be done here because during alighting we do not know yet if it will be
       // a transfer or not.
       return -stopBoardAlightTransferCosts[stopIndex];

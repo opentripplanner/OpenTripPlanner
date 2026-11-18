@@ -165,7 +165,8 @@ public class Place {
       }
     }
 
-    // The actual vertex is used because the StopLocation coordinates may not be equal to the vertex's
+    // The actual vertex is used because the StopLocation coordinates may not be equal to the
+    // vertex's
     // coordinates.
     return new Place(
       name,

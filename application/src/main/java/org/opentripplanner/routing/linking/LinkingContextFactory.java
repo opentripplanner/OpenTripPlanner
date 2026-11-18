@@ -321,7 +321,8 @@ public class LinkingContextFactory {
       }
     }
 
-    // If no vertices found from stop ID lookup and coordinates are available, use coordinates as fallback
+    // If no vertices found from stop ID lookup and coordinates are available, use coordinates as
+    // fallback
     if (results.isEmpty() && location.getCoordinate() != null) {
       // Connect a temporary vertex from coordinate to graph
       results.add(

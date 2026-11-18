@@ -36,7 +36,8 @@ public class BikeRentalStationType {
       //                .field(GraphQLFieldDefinition.newFieldDefinition()
       //                        .name("description")
       //                        .type(Scalars.GraphQLString)
-      //                        .dataFetcher(environment -> ((VehicleRentalPlace) environment.getSource()).description)
+      //                        .dataFetcher(environment -> ((VehicleRentalPlace)
+      //                        environment.getSource()).description)
       //                        .build())
       .field(
         GraphQLFieldDefinition.newFieldDefinition()

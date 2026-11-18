@@ -86,7 +86,8 @@ class PlaceMapper {
 
     if (domain.vehicleRentalPlace != null) {
       api.bikeShareId = domain.vehicleRentalPlace.stationId();
-      // for backwards-compatibility with the IBI frontend this always returns a list of a single item
+      // for backwards-compatibility with the IBI frontend this always returns a list of a single
+      // item
       api.networks = List.of(domain.vehicleRentalPlace.network());
     }
 

@@ -123,7 +123,8 @@ public class MultiCriteriaRoutingStrategy<
       throw new IllegalArgumentException(prevArrival.toString());
     }
 
-    // Use the trip's exact departure time to find the same trip that was riding in the previous segment
+    // Use the trip's exact departure time to find the same trip that was riding in the previous
+    // segment
     var boarding = boardingSupport.searchForRegularBoarding(
       trip.departure(stopPositionInPattern),
       stopPositionInPattern,

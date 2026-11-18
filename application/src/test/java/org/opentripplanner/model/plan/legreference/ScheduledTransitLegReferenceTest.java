@@ -441,7 +441,8 @@ class ScheduledTransitLegReferenceTest {
       STOP_2_ID,
       null
     );
-    // Should handle gracefully by finding the closest matching stops, not throw ArrayIndexOutOfBoundsException
+    // Should handle gracefully by finding the closest matching stops, not throw
+    // ArrayIndexOutOfBoundsException
     var leg = scheduledTransitLegReference.getLeg(transitService, new TransitAlertServiceImpl());
     assertNotNull(leg);
     assertEquals(0, leg.boardStopPosInPattern());

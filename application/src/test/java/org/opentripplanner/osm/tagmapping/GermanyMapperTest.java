@@ -141,7 +141,8 @@ public class GermanyMapperTest {
 
     @Test
     void lcnAndRcnShouldNotBeAddedUp() {
-      // https://www.openstreetmap.org/way/26443041 is part of both an lcn and rcn but that shouldn't mean that
+      // https://www.openstreetmap.org/way/26443041 is part of both an lcn and rcn but that
+      // shouldn't mean that
       // it is to be more heavily favoured than other ways that are part of just one.
 
       var both = OsmWay.of()

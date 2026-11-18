@@ -151,11 +151,13 @@ public class PlanPlaceType {
         //                        .name("bikePark")
         //                        .type(bikeParkType)
         //                        .description("The bike parking related to the place")
-        //                        .dataFetcher(environment -> ((Place) environment.getSource()).vertexType.equals(VertexType.BIKEPARK) ?
+        //                        .dataFetcher(environment -> ((Place)
+        //                        environment.getSource()).vertexType.equals(VertexType.BIKEPARK) ?
         //                                index.graph.getService(VehicleRentalStationService.class)
         //                                        .getBikeParks()
         //                                        .stream()
-        //                                        .filter(bikePark -> bikePark.id.equals(((Place) environment.getSource()).bikeParkId))
+        //                                        .filter(bikePark -> bikePark.id.equals(((Place)
+        //                                        environment.getSource()).bikeParkId))
         //                                        .findFirst()
         //                                        .orElse(null)
         //                                : null)
@@ -164,11 +166,14 @@ public class PlanPlaceType {
         //                        .name("carPark")
         //                        .type(carParkType)
         //                        .description("The car parking related to the place")
-        //                        .dataFetcher(environment -> ((Place) environment.getSource()).vertexType.equals(VertexType.PARKANDRIDE) ?
+        //                        .dataFetcher(environment -> ((Place)
+        //                        environment.getSource()).vertexType.equals(VertexType.PARKANDRIDE)
+        //                        ?
         //                                index.graph.getService(CarParkService.class)
         //                                        .getCarParks()
         //                                        .stream()
-        //                                        .filter(carPark -> carPark.id.equals(((Place) environment.getSource()).carParkId))
+        //                                        .filter(carPark -> carPark.id.equals(((Place)
+        //                                        environment.getSource()).carParkId))
         //                                        .findFirst()
         //                                        .orElse(null)
         //                                : null)

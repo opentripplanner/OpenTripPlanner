@@ -47,7 +47,8 @@ public class UnifiedGridCoverage extends AbstractCoverage {
     regions = new ArrayList<>();
     datumRegionIndex = new STRtree();
 
-    // Iterate through region coverages, creating Interpolators for each region and then adding them and the
+    // Iterate through region coverages, creating Interpolators for each region and then adding them
+    // and the
     // intersected datum to the spatial index.
     for (GridCoverage2D regionCoverage : regionCoverages) {
       // TODO might bicubic interpolation give better results?
@@ -56,7 +57,8 @@ public class UnifiedGridCoverage extends AbstractCoverage {
         Interpolation.getInstance(Interpolation.INTERP_BILINEAR)
       );
 
-      // Iterate over datums to find intersection envelope with each region and add to spatial index.
+      // Iterate over datums to find intersection envelope with each region and add to spatial
+      // index.
       for (VerticalDatum datum : datums) {
         Envelope datumEnvelope = new Envelope(
           datum.lowerLeftLongitude,

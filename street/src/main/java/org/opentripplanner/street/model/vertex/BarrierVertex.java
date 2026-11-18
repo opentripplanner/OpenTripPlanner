@@ -59,10 +59,12 @@ public class BarrierVertex extends OsmVertex {
       var in = this.getIncoming();
 
       if (
-        // if only outgoing edges or incoming edges -> vertex does not act as a pass-through point and barrier makes no sense
+        // if only outgoing edges or incoming edges -> vertex does not act as a pass-through point
+        // and barrier makes no sense
         out.isEmpty() ||
         in.isEmpty() ||
-        // in+out edge pair connects the vertex to a single adjacent vertex -> must be street end point
+        // in+out edge pair connects the vertex to a single adjacent vertex -> must be street end
+        // point
         out.iterator().next().getToVertex() == in.iterator().next().getFromVertex()
       ) {
         needsFix = true;

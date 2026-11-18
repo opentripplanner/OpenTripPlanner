@@ -269,7 +269,8 @@ public class TransitRouter {
 
     debugTimingAggregator.startedItineraryCreation();
 
-    // TODO VIA - Temporarily turn OptimizeTransfers OFF for VIA search until the service support via
+    // TODO VIA - Temporarily turn OptimizeTransfers OFF for VIA search until the service support
+    // via
     //            Remove '&& !request.isViaSearch()'
     if (
       OTPFeature.OptimizeTransfers.isOn() &&

@@ -50,7 +50,8 @@ public class ChronologicalGraphPath {
     // For depart-after, edges are in reverse chronological order; reverse to chronological.
     // For arriveBy, the A* searched backward so edges are already chronological.
     if (!state.getRequest().arriveBy()) {
-      // We considered using `ArrayList.reversed()` (view) here, but there is no significant performance gain
+      // We considered using `ArrayList.reversed()` (view) here, but there is no significant
+      // performance gain
       // and the graph deserialization would break. See PR #7455.
       Collections.reverse(edges);
     }

@@ -16,7 +16,8 @@ public class TransitGeneralizedCostFilterTest implements PlanTestConstants {
 
   @Test
   public void filterWithoutWaitCost() {
-    // Create a filter with f(x) = 600 + 2x, without any penalty for waiting at the beginning or end.
+    // Create a filter with f(x) = 600 + 2x, without any penalty for waiting at the beginning or
+    // end.
     // Remove itineraries with a cost equivalent of 10 minutes and twice the min itinerary cost.
     final TransitGeneralizedCostFilter subject = new TransitGeneralizedCostFilter(
       CostLinearFunction.of(Duration.ofMinutes(10), 2.0),

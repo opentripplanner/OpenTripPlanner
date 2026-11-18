@@ -305,7 +305,8 @@ public class StopTimesHelper {
     int maxTripSpanDays = pattern.getScheduledTimetable().getMaxTripSpanDays();
 
     // The `maxTripSpanDays + 1` is used to "overselect" the running-dates to account for up to
-    // 24h delays. This had a performance overhead of ~25% (Bergen, Norway), so we check if there are delays
+    // 24h delays. This had a performance overhead of ~25% (Bergen, Norway), so we check if there
+    // are delays
     // in the loop below and remove the extra day if not.
     var runningDates = calculateRunningDates(startTime, timeRange, zoneId, maxTripSpanDays + 1);
     var firstDay = runningDates.getFirst();

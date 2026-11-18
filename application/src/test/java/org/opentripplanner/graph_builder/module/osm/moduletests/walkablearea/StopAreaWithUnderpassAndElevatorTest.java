@@ -124,7 +124,8 @@ class StopAreaWithUnderpassAndElevatorTest {
         // underpass (tunnel, level -1) surfacing outside the platform
         "(2.5,7) → (2.5,2.5) PEDESTRIAN ♿✅",
         "(2.5,2.5) → (2.5,7) PEDESTRIAN ♿✅",
-        // elevator level 0: the node is attached both by the platform area (WAY:100) and the footway
+        // elevator level 0: the node is attached both by the platform area (WAY:100) and the
+        // footway
         // (WAY:2), joined by a zero-level hop
         "osm:node:5:WAY:100 → elevator/osm:node:5:WAY:100 ELEVATOR board",
         "elevator/osm:node:5:WAY:100 → osm:node:5:WAY:100 ELEVATOR alight",

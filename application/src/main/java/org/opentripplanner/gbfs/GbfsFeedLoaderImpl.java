@@ -196,8 +196,10 @@ public abstract class GbfsFeedLoaderImpl<
 
     private void updateNextFetchTime(T feedData) {
       try {
-        // Fetch lastUpdated and ttl from the resulting class. Due to type erasure we don't know the actual
-        // class, and have to use introspection to get the method references, as they do not share a supertype.
+        // Fetch lastUpdated and ttl from the resulting class. Due to type erasure we don't know the
+        // actual
+        // class, and have to use introspection to get the method references, as they do not share a
+        // supertype.
         Object lastUpdatedValue = implementingClass.getMethod("getLastUpdated").invoke(feedData);
         Integer lastUpdated =
           lastUpdatedValue == null

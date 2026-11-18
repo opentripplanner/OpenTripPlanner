@@ -36,7 +36,8 @@ public final class KryoBuilder {
     // For generating a histogram of serialized classes with associated serializers:
     // Kryo kryo = new Kryo(new InstanceCountingClassResolver(), new MapReferenceResolver(), new DefaultStreamFactory());
     Kryo kryo = new Kryo();
-    // Allow serialization of unrecognized classes, for which we haven't manually set up a serializer.
+    // Allow serialization of unrecognized classes, for which we haven't manually set up a
+    // serializer.
     // We might actually want to manually register a serializer for every class, to be safe.
     kryo.setRegistrationRequired(false);
     kryo.setReferences(true);
@@ -62,10 +63,14 @@ public final class KryoBuilder {
     kryo.register(AtomicInteger.class, new AtomicIntegerSerializer());
 
     UnmodifiableCollectionsSerializer.registerSerializers(kryo);
-    // Instantiation strategy: how should Kryo make new instances of objects when they are deserialized?
-    // The default strategy requires every class you serialize, even in your dependencies, to have a zero-arg
-    // constructor (which can be private). The setInstantiatorStrategy method completely replaces that default
-    // strategy. The nesting below specifies the Java approach as a fallback strategy to the default strategy.
+    // Instantiation strategy: how should Kryo make new instances of objects when they are
+    // deserialized?
+    // The default strategy requires every class you serialize, even in your dependencies, to have a
+    // zero-arg
+    // constructor (which can be private). The setInstantiatorStrategy method completely replaces
+    // that default
+    // strategy. The nesting below specifies the Java approach as a fallback strategy to the default
+    // strategy.
     kryo.setInstantiatorStrategy(
       new DefaultInstantiatorStrategy(new SerializingInstantiatorStrategy())
     );

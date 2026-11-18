@@ -29,7 +29,8 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
   private final I18NString detailText;
   private final I18NString adviceText;
   // TODO OTP2 we wanted to merge the GTFS single alertUrl and the SIRI multiple URLs.
-  //      However, GTFS URLs are one-per-language in a single object, and SIRI URLs are N objects with no translation.
+  //      However, GTFS URLs are one-per-language in a single object, and SIRI URLs are N objects
+  //      with no translation.
   private final I18NString url;
   private final List<AlertUrl> siriUrls;
   //null means unknown

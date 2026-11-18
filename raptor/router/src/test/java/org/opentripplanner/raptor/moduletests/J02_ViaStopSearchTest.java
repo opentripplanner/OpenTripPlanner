@@ -180,7 +180,8 @@ class J02_ViaStopSearchTest {
 
     requestBuilder.searchParams().addViaLocations(VIA_LOCATION_STOP_B);
 
-    // Verify that the journey start by walking to the via stop, the uses one trip to the destination.
+    // Verify that the journey start by walking to the via stop, the uses one trip to the
+    // destination.
     // A combination of trip one and two with a transfer is not expected.
     assertEquals(
       PathUtils.join(

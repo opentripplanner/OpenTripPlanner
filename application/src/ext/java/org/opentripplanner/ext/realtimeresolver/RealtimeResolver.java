@@ -79,7 +79,8 @@ public class RealtimeResolver {
 
     boolean hasItineraryStopsChanged = hasItineraryStopsChanged(itinerary);
 
-    // We only call refetchItineraryService if any change has been made of stop places, due to performance reasons since refetch can be heavy.
+    // We only call refetchItineraryService if any change has been made of stop places, due to
+    // performance reasons since refetch can be heavy.
     if (hasItineraryStopsChanged) {
       return refetchItineraryService.refetchItinerary(
         fromLocation,

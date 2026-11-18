@@ -214,7 +214,8 @@ class ParkingProcessor {
     OsmEntity entity = null;
 
     // Process all nodes from outer rings
-    // These are IntersectionVertices not OsmVertices because there can be both OsmVertices and TransitStopStreetVertices.
+    // These are IntersectionVertices not OsmVertices because there can be both OsmVertices and
+    // TransitStopStreetVertices.
     for (OsmArea area : group.areas) {
       entity = area.parent;
 
@@ -285,7 +286,8 @@ class ParkingProcessor {
         )
         .name(vehicleParkingName)
         .coordinate(new WgsCoordinate(group.union.getInteriorPoint()))
-        // setting the vertex to null signals the rest of the build process that this needs to be linked to the street network
+        // setting the vertex to null signals the rest of the build process that this needs to be
+        // linked to the street network
         .vertex(null)
         .walkAccessible(true)
         .carAccessible(isCarPark)

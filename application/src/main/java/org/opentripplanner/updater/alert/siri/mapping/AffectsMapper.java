@@ -126,7 +126,8 @@ public class AffectsMapper {
             // Match found - add tripId to selector
             tripIds.add(trip.getId());
           } else if (siriFuzzyTripMatcher != null) {
-            // "Temporary", custom legacy solution - supports alerts tagged on NeTEx-"privateCode" + serviceDate
+            // "Temporary", custom legacy solution - supports alerts tagged on NeTEx-"privateCode" +
+            // serviceDate
             tripIds.addAll(
               siriFuzzyTripMatcher.getTripIdForInternalPlanningCodeServiceDate(
                 vehicleJourneyRef.getValue(),

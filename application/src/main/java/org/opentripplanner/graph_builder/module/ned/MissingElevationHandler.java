@@ -122,7 +122,8 @@ class MissingElevationHandler {
     BinHeap<ElevationRepairState> pq,
     Map<Vertex, Double> elevations
   ) {
-    // Stores vertices without elevation which were visited by a single path from a vertices with elevation
+    // Stores vertices without elevation which were visited by a single path from a vertices with
+    // elevation
     var pending = new HashMap<Vertex, ElevationRepairState>();
 
     while (!pq.empty()) {
@@ -168,7 +169,8 @@ class MissingElevationHandler {
       }
     }
 
-    // Copy elevation to all pending vertices (where only one path with an initial elevation was found)
+    // Copy elevation to all pending vertices (where only one path with an initial elevation was
+    // found)
     pending.forEach((vertex, elevationRepairState) -> {
       if (!elevations.containsKey(vertex)) {
         elevations.put(vertex, lastKnowElevationForState(elevationRepairState, elevations));

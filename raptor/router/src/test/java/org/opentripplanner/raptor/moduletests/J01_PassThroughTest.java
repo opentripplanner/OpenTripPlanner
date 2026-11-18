@@ -212,7 +212,8 @@ class J01_PassThroughTest {
   @DisplayName("Pass-through order")
   void passThroughOrder() {
     // Create two routes.
-    // Both include all the desired pass-through stop points but only one of them have correct order.
+    // Both include all the desired pass-through stop points but only one of them have correct
+    // order.
     data.withTimetables(
       """
       R1

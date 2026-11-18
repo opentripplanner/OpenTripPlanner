@@ -58,8 +58,10 @@ public class TripPatternNamer implements GraphBuilderModule {
    * create a unique name from start/end/intermediate stops, then the best we can do is to create a
    * "like [trip id]" name, which at least tells you where in the GTFS you can find a related trip.
    */
-  // TODO: pass in a transit index that contains a Multimap<Route, TripPattern> and derive all TableTripPatterns
-  // TODO: combine from/to and via in a single name. this could be accomplished by grouping the trips by destination,
+  // TODO: pass in a transit index that contains a Multimap<Route, TripPattern> and derive all
+  // TableTripPatterns
+  // TODO: combine from/to and via in a single name. this could be accomplished by grouping the
+  // trips by destination,
   // then disambiguating in groups of size greater than 1.
   /*
    * Another possible approach: for each route, determine the necessity of each field (which

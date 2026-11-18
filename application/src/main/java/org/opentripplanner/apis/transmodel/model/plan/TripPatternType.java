@@ -51,7 +51,8 @@ public class TripPatternType {
           .dataFetcher(env ->
             itinerary(env)
               .startTime()
-              // startTime is already adjusted for real-time - need to subtract delay to get aimed time
+              // startTime is already adjusted for real-time - need to subtract delay to get aimed
+              // time
               .minusSeconds(itinerary(env).departureDelay())
           )
           .build()
@@ -72,7 +73,8 @@ public class TripPatternType {
           .dataFetcher(env ->
             itinerary(env)
               .endTime()
-              // endTime is already adjusted for real-time - need to subtract delay to get aimed time
+              // endTime is already adjusted for real-time - need to subtract delay to get aimed
+              // time
               .minusSeconds(itinerary(env).arrivalDelay())
           )
           .build()

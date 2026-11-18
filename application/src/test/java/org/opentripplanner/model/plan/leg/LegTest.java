@@ -71,7 +71,8 @@ public class LegTest implements PlanTestConstants {
 
     assertTrue(t0.isPartiallySameTransitLeg(t0), "t0 is same trip as it self");
 
-    // Create a new trip with the same trip Id which ride only between the two first stops of trip 0.
+    // Create a new trip with the same trip Id which ride only between the two first stops of trip
+    // 0.
     t1 = createLegIgnoreTime(tripId0, fromStopIndex, fromStopIndex + 1, day1);
     assertTrue(t1.isPartiallySameTransitLeg(t0), "t1 overlap t0");
     assertTrue(t0.isPartiallySameTransitLeg(t1), "t0 overlap t1");

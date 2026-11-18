@@ -982,7 +982,9 @@ public class TransmodelGraphQLSchemaFactory {
 
             List<PlaceType> filterByPlaceTypes = PlaceMapper.mapToDomain(placeTypes);
 
-            // Need to fetch more than requested no of places if stopPlaces are allowed, as this requires fetching potentially multiple quays for the same stop place and mapping them to unique stop places.
+            // Need to fetch more than requested no of places if stopPlaces are allowed, as this
+            // requires fetching potentially multiple quays for the same stop place and mapping them
+            // to unique stop places.
             int orgMaxResults = environment.getArgument("maximumResults");
             int maxResults = orgMaxResults;
 

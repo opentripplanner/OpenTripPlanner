@@ -87,7 +87,8 @@ public class LegType {
           .dataFetcher(env ->
             leg(env)
               .startTime()
-              // startTime is already adjusted for real-time - need to subtract delay to get aimed time
+              // startTime is already adjusted for real-time - need to subtract delay to get aimed
+              // time
               .minusSeconds(leg(env).departureDelay())
           )
           .build()

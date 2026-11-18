@@ -149,7 +149,8 @@ public class TransitRepositoryTestBuilder {
       customizer.accept(builder);
     }
 
-    // Routes aren't stored explicitly in the timetable repository so we don't have a collection for these
+    // Routes aren't stored explicitly in the timetable repository so we don't have a collection for
+    // these
     return builder.build();
   }
 

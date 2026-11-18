@@ -205,7 +205,8 @@ public class VertexLinker {
 
     try {
       // Expanding-envelope search: try each radius step (smallest first) and stop at the first that
-      // links, so a wider — and more expensive — search only runs when the smaller one finds nothing.
+      // links, so a wider — and more expensive — search only runs when the smaller one finds
+      // nothing.
       // The maximum reach per scope is unchanged, so anything linkable before still links.
       Set<StreetVertex> streetVertices = Set.of();
 
@@ -280,10 +281,12 @@ public class VertexLinker {
   ) {
     Envelope env = new Envelope(vertex.getCoordinate());
 
-    // Perform a simple local equirectangular projection, so distances are expressed in degrees latitude.
+    // Perform a simple local equirectangular projection, so distances are expressed in degrees
+    // latitude.
     final double xscale = getXscale(vertex);
 
-    // Expand more in the longitude direction than the latitude direction to account for converging meridians.
+    // Expand more in the longitude direction than the latitude direction to account for converging
+    // meridians.
     env.expandBy(radiusDeg / xscale, radiusDeg);
 
     // The spatial index returns whole grid cells, so in a dense city centre a small envelope still
@@ -375,14 +378,20 @@ public class VertexLinker {
     List<CandidateEdge> candidateEdges
   ) {
     // The following logic has gone through several different versions using different approaches.
-    // The core idea is to find all edges that are roughly the same distance from the given vertex, which will
+    // The core idea is to find all edges that are roughly the same distance from the given vertex,
+    // which will
     // catch things like superimposed edges going in opposite directions.
     // First, all edges within the initial search radius of the best distance were selected.
-    // More recently, the edges were sorted in order of increasing distance, and all edges in the list were selected
-    // up to the point where a distance increase of DUPLICATE_WAY_EPSILON_DEGREES from one edge to the next.
-    // This was in response to concerns about arbitrary cutoff distances: at any distance, it's always possible
-    // one half of a dual carriageway (or any other pair of edges in opposite directions) will be caught and the
-    // other half lost. It seems like this was based on some incorrect premises about floating point calculations
+    // More recently, the edges were sorted in order of increasing distance, and all edges in the
+    // list were selected
+    // up to the point where a distance increase of DUPLICATE_WAY_EPSILON_DEGREES from one edge to
+    // the next.
+    // This was in response to concerns about arbitrary cutoff distances: at any distance, it's
+    // always possible
+    // one half of a dual carriageway (or any other pair of edges in opposite directions) will be
+    // caught and the
+    // other half lost. It seems like this was based on some incorrect premises about floating point
+    // calculations
     // being non-deterministic.
 
     Set<CandidateEdge> closestEdges = new HashSet<>();
@@ -471,7 +480,8 @@ public class VertexLinker {
       if (start != null && start != split) {
         // vertex is inside the area. try connecting the vertex to the edge's split point, because
         // connections to visibility vertices may fail or do not always provide an optimal route
-        // note that by definition, connection to closest edge cannot be blocked and edge can be forced
+        // note that by definition, connection to closest edge cannot be blocked and edge can be
+        // forced
         addVisibilityEdges(start, split, area, scope, tempEdges, true);
       } else {
         // vertex is outside an area. Use split point for area connections
@@ -577,8 +587,10 @@ public class VertexLinker {
 
       if (scope == Scope.PERMANENT) {
         // remove original edges from the spatial index
-        // This iterates over the entire rectangular envelope of the edge rather than the segments making it up.
-        // It will be inefficient for very long edges, but creating a new remove method mirroring the more efficient
+        // This iterates over the entire rectangular envelope of the edge rather than the segments
+        // making it up.
+        // It will be inefficient for very long edges, but creating a new remove method mirroring
+        // the more efficient
         // insert logic is not trivial and would require additional testing of the spatial index.
         removeEdgeFromIndex(originalEdge, scope);
         // remove original edge from the graph

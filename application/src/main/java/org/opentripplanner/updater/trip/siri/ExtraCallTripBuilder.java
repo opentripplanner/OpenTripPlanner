@@ -122,7 +122,8 @@ class ExtraCallTripBuilder {
         stopSequence == calls.size() - 1
       );
 
-      // Drop this update if the call refers to an unknown stop (not present in the site repository).
+      // Drop this update if the call refers to an unknown stop (not present in the site
+      // repository).
       if (stopTime == null) {
         throw UpdateException.of(trip.getId(), UNKNOWN_STOP);
       }

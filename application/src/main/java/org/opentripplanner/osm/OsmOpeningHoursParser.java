@@ -159,7 +159,8 @@ public class OsmOpeningHoursParser {
       } else if (!rule.isAdditive()) {
         openingHoursBuildersForRule
           .stream()
-          // If a builder is after midnight, there is always another one that can be used to set days
+          // If a builder is after midnight, there is always another one that can be used to set
+          // days
           // off in other builders without having to shift the days in two directions
           .filter(openingHoursBuilder -> !openingHoursBuilder.isAfterMidnight())
           .forEach(openingHoursBuilder ->
@@ -354,7 +355,8 @@ public class OsmOpeningHoursParser {
     TimeSpan timeSpan
   ) {
     if (timeSpan.getStart() < 0) {
-      // TODO We filter out timespans that have events like "sunrise-sunset" but maybe they could be implemented
+      // TODO We filter out timespans that have events like "sunrise-sunset" but maybe they could be
+      // implemented
       return List.of();
     }
 

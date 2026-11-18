@@ -122,7 +122,8 @@ public class WalkableAreaBuilderTest {
     assertFalse(areas.get(0).getAreas().isEmpty());
   }
 
-  // test that entrance node in a stop area relation does not link across different levels and layers
+  // test that entrance node in a stop area relation does not link across different levels and
+  // layers
   // test also that entrance linking of stop area with multiple platforms works properly
   @Test
   @OsmFile("stopareas.pbf")
@@ -130,7 +131,8 @@ public class WalkableAreaBuilderTest {
   @MaxAreaNodes(50)
   void testEntranceStopAreaLinking(TestInfo testInfo) {
     var graph = buildGraph(testInfo);
-    // first platform contains isolated node tagged as highway=bus_stop. Those are linked if level matches.
+    // first platform contains isolated node tagged as highway=bus_stop. Those are linked if level
+    // matches.
     var busStopConnection = graph
       .listAreaEdges()
       .stream()

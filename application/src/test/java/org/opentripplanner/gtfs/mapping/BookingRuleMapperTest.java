@@ -82,7 +82,8 @@ class BookingRuleMapperTest {
   @Test
   void mapNoEarliestOrLatestFallsBackToMinMaxNotice() {
     var rule = rule("3");
-    // when either of prior notice time and day are set to -999(NO_VALUE), they should be treated as "not set".
+    // when either of prior notice time and day are set to -999(NO_VALUE), they should be treated as
+    // "not set".
     rule.setPriorNoticeStartTime(NO_VALUE);
     rule.setPriorNoticeStartDay(NO_VALUE);
     rule.setPriorNoticeLastTime(NO_VALUE);

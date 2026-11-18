@@ -605,7 +605,8 @@ public class StreetEdge
 
     // we have this code implemented in both directions, because splits are fudged half a millimeter
     // when the length of this is odd. We want to make sure the lengths of the split streets end up
-    // exactly the same as their backStreets so that if they are split again the error does not accumulate
+    // exactly the same as their backStreets so that if they are split again the error does not
+    // accumulate
     // and so that the order in which they are split does not matter.
     int l1 = defaultMillimeterLength(geoms.beginning());
     int l2 = defaultMillimeterLength(geoms.ending());
@@ -830,7 +831,8 @@ public class StreetEdge
       // No illegal U-turns.
       // NOTE(flamholz): we check both directions because both edges get a chance to decide
       // if they are the reverse of the other. Also, because it doesn't matter which direction
-      // we are searching in - these traversals are always disallowed (they are U-turns in one direction
+      // we are searching in - these traversals are always disallowed (they are U-turns in one
+      // direction
       // or the other).
       // TODO profiling indicates that this is a hot spot.
       // isReverseOf is symmetric so we no longer test in both directions. isReverseOf must
@@ -1160,7 +1162,8 @@ public class StreetEdge
         s1.setEnteredNoThroughTrafficArea();
       }
     } else if (s0.hasEnteredNoThruTrafficArea()) {
-      // If we transitioned into a no-through-traffic area at some point, check if we are exiting it.
+      // If we transitioned into a no-through-traffic area at some point, check if we are exiting
+      // it.
       return true;
     }
 

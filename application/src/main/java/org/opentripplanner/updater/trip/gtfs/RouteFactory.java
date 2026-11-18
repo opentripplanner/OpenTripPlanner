@@ -40,7 +40,8 @@ class RouteFactory {
 
   private Route createRoute(TripUpdate update) {
     var tripId = update.tripId();
-    // the route in this update doesn't already exist, but the update contains the information so it will be created
+    // the route in this update doesn't already exist, but the update contains the information so it
+    // will be created
     var routeId = update.routeId();
     return routeId
       .map(id -> {

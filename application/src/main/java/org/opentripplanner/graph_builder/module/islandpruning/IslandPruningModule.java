@@ -306,7 +306,8 @@ public class IslandPruningModule implements GraphBuilderModule {
             continue;
           }
 
-          // note: this assumes that edges are bi-directional. Maybe explicit state traversal is needed for CAR mode.
+          // note: this assumes that edges are bi-directional. Maybe explicit state traversal is
+          // needed for CAR mode.
           var edges = se.isNoThruTraffic(traverseMode) ? noThruEdges : thruEdges;
           edges.add(from);
           edges.add(vertexIndex.idOf(se.getToVertex()));

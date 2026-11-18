@@ -131,9 +131,12 @@ public final class ConstrainedBoardingSearch
     int stopIndex
   ) {
     final Trip trip = tripSchedule.getOriginalTripTimes().getTrip();
-    // for performance reasons we use a for loop here as streams are much slower. Verified against the Norway graph:
-    // the result is almost always 0-1 elements even though currentTransfers itself can be large (avg ~46, max ~2500),
-    // so we pre-size the ArrayList instead of using the no-arg constructor, which over-allocates to capacity 10.
+    // for performance reasons we use a for loop here as streams are much slower. Verified against
+    // the Norway graph:
+    // the result is almost always 0-1 elements even though currentTransfers itself can be large
+    // (avg ~46, max ~2500),
+    // so we pre-size the ArrayList instead of using the no-arg constructor, which over-allocates to
+    // capacity 10.
     // Benchmark:
     //   - LinkedList                 310-331 ms
     //   - ArrayList(defaultSize=10)  321-380 ms

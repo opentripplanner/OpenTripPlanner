@@ -128,7 +128,8 @@ public class ShortestPathTree<
 
     State ret = null;
 
-    // TODO are we only checking path parser acceptance when we fetch states via this specific method?
+    // TODO are we only checking path parser acceptance when we fetch states via this specific
+    // method?
     for (State s : (List<State>) existing) {
       if ((ret == null || s.getWeight() < ret.getWeight()) && s.isFinal()) {
         ret = s;

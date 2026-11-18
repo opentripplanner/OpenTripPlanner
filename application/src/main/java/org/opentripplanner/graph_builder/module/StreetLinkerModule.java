@@ -113,7 +113,8 @@ public class StreetLinkerModule implements GraphBuilderModule {
         transitRepository.getSiteRepository().getRegularStop(stopVertex.getId())
       );
 
-      // Stops with pathways do not need to be connected to the street network, since there are explicit entrances defined for that
+      // Stops with pathways do not need to be connected to the street network, since there are
+      // explicit entrances defined for that
       if (stopVertex.hasPathways()) {
         continue;
       }

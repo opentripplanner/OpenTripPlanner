@@ -337,7 +337,8 @@ public class TransferIndexGenerator {
     res.add(scheduledPoint);
 
     for (RoutingTripPattern pattern : realtimePatterns) {
-      // Check if the same stop or its sibling is at the same position, if yes, generate a transfer point
+      // Check if the same stop or its sibling is at the same position, if yes, generate a transfer
+      // point
       if (stopPosInPattern < pattern.numberOfStopsInPattern()) {
         StopLocation stop = pattern.getPattern().getStop(stopPosInPattern);
 

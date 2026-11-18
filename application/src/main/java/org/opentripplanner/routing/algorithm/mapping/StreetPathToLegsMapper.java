@@ -251,7 +251,8 @@ public class StreetPathToLegsMapper {
 
     //This gets nicer names instead of osm:node:id when changing mode of transport
     //Names are generated from all the streets in a corner, same as names in origin and destination
-    //We use name in TemporaryStreetLocation since this name generation already happened when temporary location was generated
+    //We use name in TemporaryStreetLocation since this name generation already happened when
+    //temporary location was generated
     if (vertex instanceof StreetVertex && !(vertex instanceof TemporaryStreetLocation)) {
       name = ((StreetVertex) vertex).getIntersectionName();
     }

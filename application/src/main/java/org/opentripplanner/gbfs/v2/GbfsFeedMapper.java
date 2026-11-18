@@ -91,7 +91,8 @@ public class GbfsFeedMapper implements org.opentripplanner.gbfs.GbfsFeedMapper {
           params.overloadingAllowed()
         );
 
-        // Iterate over all known stations, and if we have any status information add it to those station objects.
+        // Iterate over all known stations, and if we have any status information add it to those
+        // station objects.
         stations.addAll(
           stationInformation
             .getData()

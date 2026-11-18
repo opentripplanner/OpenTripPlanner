@@ -187,7 +187,8 @@ public class SiriRealTimeUpdateHandler {
       return SiriUpdateType.EXTRA_CALL;
     }
 
-    // Replacement departure if the trip is marked as extra journey, and it has not been added before
+    // Replacement departure if the trip is marked as extra journey, and it has not been added
+    // before
     if (journey.isExtraJourney() && entityResolver.resolveTrip(journey) == null) {
       return SiriUpdateType.REPLACEMENT_DEPARTURE;
     }

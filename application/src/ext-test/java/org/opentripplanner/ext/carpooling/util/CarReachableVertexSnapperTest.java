@@ -558,7 +558,8 @@ class CarReachableVertexSnapperTest extends GraphRoutingTest {
             StreetTraversalPermission.PEDESTRIAN
           );
           street(v[3], v[4], 33, StreetTraversalPermission.ALL, StreetTraversalPermission.ALL);
-          // Foreign mode-blind bridge IslC <-> hub <-> Q2, standing in for another request's linking.
+          // Foreign mode-blind bridge IslC <-> hub <-> Q2, standing in for another request's
+          // linking.
           var hub = streetLocation("foreign-bridge", 60.0000, 10.0009);
           link(v[4], hub);
           link(hub, v[4]);

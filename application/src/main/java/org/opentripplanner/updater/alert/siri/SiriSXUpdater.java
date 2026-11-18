@@ -136,7 +136,8 @@ public class SiriSXUpdater
           //   Such runnables should be illustrated in documentation as e.g. a little box labeled
           //   "change trip ABC123 by making stop 53 late by 2 minutes."
           //   Also clarify how this runnable works without even using the supplied
-          //   (graph, transitRepository) parameters. There are multiple TransitAlertServices and they
+          //   (graph, transitRepository) parameters. There are multiple TransitAlertServices and
+          //   they
           //   are not versioned along with the Graph, they are attached to updaters.
           //
           // This is submitting a runnable to an executor, but that runnable only writes back to

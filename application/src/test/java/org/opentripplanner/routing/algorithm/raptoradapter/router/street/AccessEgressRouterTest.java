@@ -119,7 +119,8 @@ class AccessEgressRouterTest extends GraphRoutingTest {
 
   @Test
   void findAccessEgressStation() {
-    // For stations with centroid routing we should use the station centroid as source for the street search
+    // For stations with centroid routing we should use the station centroid as source for the
+    // street search
     var accesses = findAccessEgressFromTo(
       location("CentroidRoutingStation"),
       location(FAR_AWAY_COORDINATE),

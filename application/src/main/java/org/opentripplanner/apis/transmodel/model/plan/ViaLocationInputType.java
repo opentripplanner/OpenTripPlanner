@@ -97,7 +97,8 @@ public class ViaLocationInputType {
         b
           .name(FIELD_STOP_LOCATION_IDS)
           .description(DOC_PASS_THROUGH_STOP_LOCATION_IDS)
-          // This is NOT nonNull, because we might add other parameters later, like 'list of line-ids'
+          // This is NOT nonNull, because we might add other parameters later, like 'list of
+          // line-ids'
           .type(requiredListOfNonNullStrings())
       )
       .build();

@@ -146,7 +146,8 @@ public class InterlineProcessor {
       }
     }
 
-    // Associate pairs of TripPatterns with lists of trips that continue from one pattern to the other.
+    // Associate pairs of TripPatterns with lists of trips that continue from one pattern to the
+    // other.
     Multimap<TripPatternPair, TripPair> interlines = ArrayListMultimap.create();
 
     // Sort trips within each block by first departure time, then iterate over trips in this block,
@@ -238,7 +239,8 @@ public class InterlineProcessor {
           toStop
         )
       );
-      // Only skip this particular interline edge; there may be other valid ones in the block for the
+      // Only skip this particular interline edge; there may be other valid ones in the block for
+      // the
       // from trip.
       return false;
     } else {

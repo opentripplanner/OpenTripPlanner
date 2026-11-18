@@ -177,7 +177,8 @@ public class NetexMapper {
     this.currentNetexIndex = netexIndex;
     this.currentMapperIndexes = new NetexMapperIndexes(netexIndex, currentMapperIndexes);
 
-    // Be careful, the order matter. For example a Route has a reference to Agency; Hence Agency must be mapped
+    // Be careful, the order matter. For example a Route has a reference to Agency; Hence Agency
+    // must be mapped
     // before Route - if both entities are defined in the same file.
 
     mapAuthorities();

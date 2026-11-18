@@ -72,7 +72,8 @@ public class GrizzlyServer {
     // Set up a pool of threads to handle incoming HTTP requests.
     // According to the Grizzly docs, setting the core and max pool size equal with no queue limit
     // will use a more efficient fixed-size thread pool implementation.
-    // TODO we should probably use Grizzly async processing rather than tying up the HTTP handler threads.
+    // TODO we should probably use Grizzly async processing rather than tying up the HTTP handler
+    // threads.
     int nHandlerThreads = getMaxThreads();
     ThreadPoolConfig threadPoolConfig = ThreadPoolConfig.defaultConfig()
       .setPoolName("grizzly")
@@ -148,7 +149,8 @@ public class GrizzlyServer {
     // Graph graph = gs.getGraph();
     // httpServer.getServerConfiguration().addHttpHandler(new OTPHttpHandler(graph), "/test/*");
 
-    // Add shutdown hook to gracefully shut down Grizzly. If no thread is returned then shutdown is already in progress.
+    // Add shutdown hook to gracefully shut down Grizzly. If no thread is returned then shutdown is
+    // already in progress.
     Optional<Thread> shutdownThread = addShutdownHook("grizzly-shutdown", httpServer::shutdown);
 
     if (!shutdownThread.isPresent()) {

@@ -26,7 +26,8 @@ import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 
-// TODO OTP2 instances of this class are still mutable after construction with a builder, this will be refactored in a subsequent step
+// TODO OTP2 instances of this class are still mutable after construction with a builder, this will
+// be refactored in a subsequent step
 /**
  * Represents a group of trips on a route, with the same direction id that all call at the same
  * sequence of stops. For each stop, there is a list of departure times, running times, arrival
@@ -89,7 +90,8 @@ public final class TripPattern
   // It appears that in the TripPatternBuilder it is only ever set from a Trip which is itself set
   // from a Route. This does not just read through to Route because in Netex trips may override
   // the mode of their route. But we need to establish with more clarity whether our internal model
-  // TripPatterns allow trips of mixed modes, or rather if a single mode is part of their unique key.
+  // TripPatterns allow trips of mixed modes, or rather if a single mode is part of their unique
+  // key.
   private final TransitMode mode;
 
   private final SubMode netexSubMode;
@@ -495,7 +497,8 @@ public final class TripPattern
    * @return feed id for this trip pattern
    */
   public String getFeedId() {
-    // The feed id is the same as the agency id on the route, this allows us to obtain it from there.
+    // The feed id is the same as the agency id on the route, this allows us to obtain it from
+    // there.
     return getId().getFeedId();
   }
 

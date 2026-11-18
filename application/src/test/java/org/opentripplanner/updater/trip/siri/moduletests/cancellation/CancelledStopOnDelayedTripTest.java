@@ -40,7 +40,8 @@ class CancelledStopOnDelayedTripTest implements RealtimeTestConstants {
     var siri = SiriTestHelper.of(env);
 
     // Trip is delayed ~5 minutes. Stop C is cancelled but has expected times in the message.
-    // Without applying the RT times, C would retain scheduled arrival 0:06 while B departs at 0:09 -> NEGATIVE_HOP_TIME
+    // Without applying the RT times, C would retain scheduled arrival 0:06 while B departs at 0:09
+    // -> NEGATIVE_HOP_TIME
     var updates = siri
       .etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)

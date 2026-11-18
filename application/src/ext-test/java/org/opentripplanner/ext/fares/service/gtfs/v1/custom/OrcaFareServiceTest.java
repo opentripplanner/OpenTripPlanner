@@ -167,8 +167,10 @@ public class OrcaFareServiceTest {
       return;
     }
 
-    // Calculate the cost specific to this leg by only counting new fare products created for this leg
-    // When a leg uses a transfer, existing fare products are applied but we should only count new costs
+    // Calculate the cost specific to this leg by only counting new fare products created for this
+    // leg
+    // When a leg uses a transfer, existing fare products are applied but we should only count new
+    // costs
     var newFareProducts = legFareProducts
       .stream()
       .filter(fpl -> {
@@ -185,7 +187,8 @@ public class OrcaFareServiceTest {
 
     assertEquals(fare, newFareProducts, "Leg fare amount mismatch");
 
-    // Check for transfer status - transfers are when this leg has fare products but pays no additional cost
+    // Check for transfer status - transfers are when this leg has fare products but pays no
+    // additional cost
     // (i.e., fare = 0 for this leg because it's covered by a previous fare product)
     var hasTransfer = fare == 0 && !legFareProducts.isEmpty();
 
@@ -354,7 +357,8 @@ public class OrcaFareServiceTest {
       ONE_DOLLAR.plus(ONE_DOLLAR).plus(HALF_FERRY_FARE.times(2)).plus(usDollars(0.5f))
     );
     calculateFare(rides, FareType.youth, Money.ZERO_USD);
-    // We don't get any fares for the skagit transit leg below here because they don't accept ORCA (electronic)
+    // We don't get any fares for the skagit transit leg below here because they don't accept ORCA
+    // (electronic)
     calculateFare(
       rides,
       FareType.electronicSpecial,
@@ -892,7 +896,8 @@ public class OrcaFareServiceTest {
     String firstStopName,
     String lastStopName
   ) {
-    // Use the agency ID as feed ID to make sure that we have a new feed ID for each different agency
+    // Use the agency ID as feed ID to make sure that we have a new feed ID for each different
+    // agency
     // This tests to make sure we are calculating transfers across feeds correctly.
     Agency agency = Agency.of(new FeedScopedId(agencyId, agencyId))
       .withName(agencyId)

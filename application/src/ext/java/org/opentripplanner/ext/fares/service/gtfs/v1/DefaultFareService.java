@@ -122,7 +122,8 @@ public class DefaultFareService implements FareService {
       for (String feedId : fareLegsByFeed.keySet()) {
         var fareRules = fareRulesForFeed(fareType, feedId);
 
-        // Get the currency from the first fareAttribute, assuming that all tickets use the same currency.
+        // Get the currency from the first fareAttribute, assuming that all tickets use the same
+        // currency.
         if (fareRules != null && !fareRules.isEmpty()) {
           Currency currency = fareRules.iterator().next().getFareAttribute().getPrice().currency();
           ItineraryFare computedFaresForType = calculateFaresForType(

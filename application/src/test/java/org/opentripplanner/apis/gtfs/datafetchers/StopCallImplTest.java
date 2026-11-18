@@ -162,7 +162,8 @@ class StopCallImplTest {
         realtimeEnv.transitService()
       );
 
-      // using try-catch is not very nice here - ideally we would just add it to the method signature.
+      // using try-catch is not very nice here - ideally we would just add it to the method
+      // signature.
       // however, this test is run with the flex feature enabled in a runnable which prevents this.
       try {
         CallSchedule schedule = impl.schedule().get(env);

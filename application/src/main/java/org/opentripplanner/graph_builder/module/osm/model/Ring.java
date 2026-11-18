@@ -36,7 +36,8 @@ public class Ring {
       vertices.add(point);
     }
 
-    // Make sure rings are always clockwise, in order to be able to calculate if it is concave/convex
+    // Make sure rings are always clockwise, in order to be able to calculate if it is
+    // concave/convex
     if (Orientation.isCCW(new CoordinateArrayListSequence(vertices))) {
       nodes = new ArrayList<>(nodes);
       Collections.reverse(nodes);

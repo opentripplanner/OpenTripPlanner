@@ -362,7 +362,8 @@ class InsertionEvaluatorTest {
     };
 
     // Pickup exactly at OSLO_EAST (existing stop), dropoff at OSLO_NORTH (new)
-    // OSLO_NORTH is directly on the way from OSLO_EAST to OSLO_NORTHEAST (same longitude as OSLO_EAST)
+    // OSLO_NORTH is directly on the way from OSLO_EAST to OSLO_NORTHEAST (same longitude as
+    // OSLO_EAST)
     var result = findOptimalInsertion(trip, OSLO_EAST, OSLO_NORTH, carpoolRouter);
 
     assertNotNull(result, "Should find valid insertion");

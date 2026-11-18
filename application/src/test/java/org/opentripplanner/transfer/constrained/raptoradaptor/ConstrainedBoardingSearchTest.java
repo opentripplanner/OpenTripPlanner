@@ -377,7 +377,8 @@ public class ConstrainedBoardingSearchTest {
     int targetStopPos
   ) {
     var transfers = transferForPatternByStopPos.get(targetStopPos);
-    // Make sure the transfers are sorted on specificityRanking (TransferForPattern implements Comparable)
+    // Make sure the transfers are sorted on specificityRanking (TransferForPattern implements
+    // Comparable)
     assertEquals(transfers.stream().sorted().toList(), transfers);
   }
 

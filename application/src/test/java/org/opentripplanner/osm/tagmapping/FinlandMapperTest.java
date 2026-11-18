@@ -145,7 +145,8 @@ class FinlandMapperTest {
       .build();
     // 1.0 * 1.3 = 1.3
     assertEquals(1.3, wps.getDataForWay(wayWithMixins).forward().bicycleSafety(), EPSILON);
-    // 1.6 is the default walk safety for a way with ALL permissions and speed limit > 35 and <= 60 kph
+    // 1.6 is the default walk safety for a way with ALL permissions and speed limit > 35 and <= 60
+    // kph
     assertEquals(1.6, wps.getDataForWay(wayWithMixins).forward().walkSafety(), EPSILON);
 
     var wayWithMixinsAndCustomSafety = OsmWay.of()

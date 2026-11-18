@@ -213,7 +213,8 @@ public class TripTimeOnDate {
       return getStop();
     }
 
-    // The number of stops is different. There must be extra stops in tripPattern compared to scheduledTripPattern
+    // The number of stops is different. There must be extra stops in tripPattern compared to
+    // scheduledTripPattern
     var extraCallsBefore = (int) IntStream.range(0, stopPosition)
       .filter(tripTimes::isExtraCall)
       .count();

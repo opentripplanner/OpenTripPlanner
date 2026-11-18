@@ -512,7 +512,8 @@ public class TransferGeneratorTest implements RaptorTestConstants {
       Arguments.of(ofMinutes(1), ofMinutes(0), true),
       // slack is 30 minutes, passenger won't make the connection
       Arguments.of(ofMinutes(1), ofMinutes(30), false),
-      // tight since 8 minutes slack + 1 min transfer time but still less than the 10 minutes required
+      // tight since 8 minutes slack + 1 min transfer time but still less than the 10 minutes
+      // required
       Arguments.of(ofMinutes(1), ofMinutes(8), true),
       // transfer slack is ignored since minimumTransferTime is short
       Arguments.of(ofMinutes(1), ofMinutes(9), true),

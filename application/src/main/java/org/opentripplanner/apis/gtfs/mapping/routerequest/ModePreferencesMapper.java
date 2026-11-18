@@ -96,7 +96,8 @@ public class ModePreferencesMapper {
       var planTransitModes = getPlanTransitModes(environment);
 
       if (planTransitModes == null) {
-        // even when there are no transit modes set we need to set the filters because of the route/agency
+        // even when there are no transit modes set we need to set the filters because of the
+        // route/agency
         // includes/excludes
         setTransitFilters(journey, NarrowedTransitMode.all(), args);
       } else {
@@ -155,7 +156,8 @@ public class ModePreferencesMapper {
       var filters = FilterMapper.mapFilters(modes, graphQlFilters);
       journey.withTransit(b -> b.withFilters(filters));
     }
-    // if there isn't a transit filter or a mode set, then we can keep the default which is to include
+    // if there isn't a transit filter or a mode set, then we can keep the default which is to
+    // include
     // everything
     else if (!modes.equals(NarrowedTransitMode.all())) {
       var filter = TransitFilterRequest.of()

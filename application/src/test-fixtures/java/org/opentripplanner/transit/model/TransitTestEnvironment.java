@@ -83,7 +83,8 @@ public final class TransitTestEnvironment {
       new TimetableRepositoryLifecycle(timetableSnapshot, false, () -> defaultServiceDate)
     );
     var threadFactory = Thread.ofPlatform().name("test-commit").factory();
-    // Use atomic commits (commit immediately after each task) so test assertions see results right away
+    // Use atomic commits (commit immediately after each task) so test assertions see results right
+    // away
     this.updateManager = TransactionFactory.createUpdateManagerWithAtomicCommits(
       "test",
       repositoryRegistry,

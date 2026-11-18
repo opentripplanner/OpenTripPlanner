@@ -31,7 +31,8 @@ public class SelectRequest implements Serializable {
       this.transportModeFilter = AllowTransitModeFilter.of(builder.transportModes);
     }
 
-    // TODO: 2022-12-20 filters: having list of modes and modes filter in same instance is not very elegant
+    // TODO: 2022-12-20 filters: having list of modes and modes filter in same instance is not very
+    // elegant
     this.transportModes = builder.transportModes;
 
     this.agencies = List.copyOf(builder.agencies);

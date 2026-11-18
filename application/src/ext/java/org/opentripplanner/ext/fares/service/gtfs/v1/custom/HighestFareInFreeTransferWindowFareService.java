@@ -65,8 +65,10 @@ public class HighestFareInFreeTransferWindowFareService extends DefaultFareServi
       Optional<Money> rideCost = calculateCost(fareType, List.of(leg), fareRules);
 
       if (leg.startTime().toEpochSecond() > freeTransferWindowEndTimeEpochSeconds) {
-        // free transfer window has expired or has not yet been initialized. Reset some items and add to the
-        // overall cost. This is fine to do if the free transfer window hasn't been initialized since the
+        // free transfer window has expired or has not yet been initialized. Reset some items and
+        // add to the
+        // overall cost. This is fine to do if the free transfer window hasn't been initialized
+        // since the
         // overall cost will be 0.
         cost = cost.plus(currentTransferWindowCost);
         // reset current window cost
@@ -77,8 +79,10 @@ public class HighestFareInFreeTransferWindowFareService extends DefaultFareServi
 
       // recalculate free transfer window if needed
       if (freeTransferWindowEndTimeEpochSeconds == -1) {
-        // the new transfer window end time should be calculated by adding the ride's start time (which is in
-        // seconds past the epoch) and the number of equivalent seconds in the free transfer window minutes.
+        // the new transfer window end time should be calculated by adding the ride's start time
+        // (which is in
+        // seconds past the epoch) and the number of equivalent seconds in the free transfer window
+        // minutes.
         freeTransferWindowEndTimeEpochSeconds = leg
           .startTime()
           .plus(freeTransferWindow)

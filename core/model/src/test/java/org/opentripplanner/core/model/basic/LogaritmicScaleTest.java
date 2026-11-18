@@ -17,7 +17,8 @@ class LogaritmicScaleTest {
 
   @Test
   void normalizedDistance() {
-    // The approximate value representing the normalized half distance between 0.0 and 25.0 is using a logaritmic
+    // The approximate value representing the normalized half distance between 0.0 and 25.0 is using
+    // a logaritmic
     // scale.
     double half = 4.099021;
     var subject = new LogaritmicScale(0.0, 25.0);

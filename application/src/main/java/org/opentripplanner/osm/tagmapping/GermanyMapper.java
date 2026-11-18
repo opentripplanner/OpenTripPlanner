@@ -21,10 +21,13 @@ class GermanyMapper extends OsmTagMapper {
   @Override
   public WayPropertySet buildWayPropertySet() {
     var props = WayPropertySet.of();
-    // Replace existing matching properties as the logic is that the first statement registered takes precedence over later statements
+    // Replace existing matching properties as the logic is that the first statement registered
+    // takes precedence over later statements
 
-    // Automobile speeds in Germany. General speed limit is 50kph in settlements, 100kph outside settlements.
-    // For motorways, there (currently still) is no limit. Nevertheless 120kph is assumed to reflect varying
+    // Automobile speeds in Germany. General speed limit is 50kph in settlements, 100kph outside
+    // settlements.
+    // For motorways, there (currently still) is no limit. Nevertheless 120kph is assumed to reflect
+    // varying
     // traffic conditions.
     props.setMaxPossibleCarSpeed(33.34f);
     // = 120 km/h. Varies between 80 - 120 km/h depending on road and season.
@@ -41,10 +44,12 @@ class GermanyMapper extends OsmTagMapper {
     props.setCarSpeed("highway=primary_link", 15);
 
     // you should only use parking aisle if there is no other options
-    // ideally they would be set to noThruTraffic but that would mean the parking lots are inaccessible
+    // ideally they would be set to noThruTraffic but that would mean the parking lots are
+    // inaccessible
     props.setCarSpeed("service=parking_aisle", 5);
 
-    // Many agricultural ways are tagged as 'track' but have no access tags. We assume this to mean that cars
+    // Many agricultural ways are tagged as 'track' but have no access tags. We assume this to mean
+    // that cars
     // are prohibited.
     // https://www.openstreetmap.org/way/124263424
     props.setProperties("highway=track", withModes(PEDESTRIAN_AND_BICYCLE));

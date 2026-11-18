@@ -361,7 +361,8 @@ public class GeometryProcessor {
       Coordinate stopCoord = stop.getCoordinate().asJtsCoordinate();
 
       // Arrange segments into list of continuous segments
-      // we assume that the first time a shape passes through within 150 m of the stop, it will match
+      // we assume that the first time a shape passes through within 150 m of the stop, it will
+      // match
       // the stop. Therefore, we choose the best segment within the first list of continuous
       // segments, rather than trying from the best segment globally.
       // This is to avoid exponential complexity for routes with multiple double-backs with multiple
@@ -427,7 +428,8 @@ public class GeometryProcessor {
       }
 
       // we found one!
-      // best match may be the split segment with the previous stop, in this case we need to load the full segment
+      // best match may be the split segment with the previous stop, in this case we need to load
+      // the full segment
       IndexedLineSegment matchedSegment =
         prevSegment != null && bestMatch.index == prevSegment.index ? prevSegment : bestMatch;
       prevSegmentFraction = matchedSegment.fraction(stopCoord);
@@ -466,7 +468,8 @@ public class GeometryProcessor {
       if (equals(startIndex, endIndex)) {
         //bogus shape_dist_traveled
         issueStore.add(new BogusShapeDistanceTraveled(st1));
-        // return null to indicate failure. Another approach which does not need shape_dist_traveled will be used.
+        // return null to indicate failure. Another approach which does not need shape_dist_traveled
+        // will be used.
         return null;
       }
 
@@ -585,7 +588,8 @@ public class GeometryProcessor {
 
     for (ShapePoint sp : points) {
       if (sp.sequence() < currentSeq) {
-        // this should never happen, because the GTFS import should make sure they are already in order.
+        // this should never happen, because the GTFS import should make sure they are already in
+        // order.
         // therefore this just a safety check to detect a programmer error.
         throw new IllegalStateException(
           "Shape %s is not sorted in order of sequence. This indicates a bug in OTP.".formatted(

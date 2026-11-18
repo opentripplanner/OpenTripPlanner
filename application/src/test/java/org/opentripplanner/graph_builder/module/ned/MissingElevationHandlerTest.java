@@ -109,7 +109,8 @@ class MissingElevationHandlerTest {
     assertElevation(AB, 0, 100, 50, 200);
     assertElevation(BC, 0, 200, 50, 300);
     assertElevation(CA, 0, 300, 50, 100);
-    // The elevation for both A (original) and B (original) is known, so AB2 is assigned an elevation
+    // The elevation for both A (original) and B (original) is known, so AB2 is assigned an
+    // elevation
     assertElevation(AB2, 0, 100, 100, 200);
     assertNullElevation(AD);
     assertNullElevation(ED);
@@ -132,7 +133,8 @@ class MissingElevationHandlerTest {
     assertElevation(AB, 0, 100, 50, 200);
     assertElevation(BC, 0, 200, 50, 300);
     assertElevation(CA, 0, 300, 50, 100);
-    // The elevation for both A (original) and B (original) is known, so AB2 is assigned an elevation
+    // The elevation for both A (original) and B (original) is known, so AB2 is assigned an
+    // elevation
     assertElevation(AB2, 0, 100, 100, 200);
     assertNullElevation(AD);
     assertNullElevation(ED);
@@ -157,7 +159,8 @@ class MissingElevationHandlerTest {
     assertElevation(AB, 0, 100, 50, 200);
     assertElevation(BC, 0, 200, 50, 300);
     assertElevation(CA, 0, 300, 50, 100);
-    // The elevation for both A (original) and B (original) is known, so AB2 is assigned an elevation
+    // The elevation for both A (original) and B (original) is known, so AB2 is assigned an
+    // elevation
     assertElevation(AB2, 0, 100, 100, 200);
     // E has a pending elevation of 100
     assertElevation(AD, 0, 100, 100, 100);
@@ -184,7 +187,8 @@ class MissingElevationHandlerTest {
     assertElevation(AB, 0, 100, 50, 200);
     assertElevation(BC, 0, 200, 50, 300);
     assertElevation(CA, 0, 300, 50, 100);
-    // The elevation for both A (original) and B (original) is known, so AB2 is assigned an elevation
+    // The elevation for both A (original) and B (original) is known, so AB2 is assigned an
+    // elevation
     assertElevation(AB2, 0, 100, 100, 200);
     // E has a pending elevation of 100
     assertElevation(AD, 0, 100, 100, 100);

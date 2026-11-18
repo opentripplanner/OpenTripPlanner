@@ -371,9 +371,12 @@ public class EstimatedCallType {
         //                .field(GraphQLFieldDefinition.newFieldDefinition()
         //                        .name("flexible")
         //                        .type(Scalars.GraphQLBoolean)
-        //                        .description("Whether this call is part of a flexible trip. This means that arrival or departure " +
-        //                                "times are not scheduled but estimated within specified operating hours.")
-        //                        .dataFetcher(env -> ((TripTimeShort) env.getSource()).isFlexible())
+        //                        .description("Whether this call is part of a flexible trip. This
+        //                        means that arrival or departure " +
+        //                                "times are not scheduled but estimated within specified
+        //                                operating hours.")
+        //                        .dataFetcher(env -> ((TripTimeShort)
+        //                        env.getSource()).isFlexible())
         //                        .build())
         .build()
     );

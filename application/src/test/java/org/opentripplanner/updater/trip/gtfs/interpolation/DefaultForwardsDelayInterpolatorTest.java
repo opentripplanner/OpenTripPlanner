@@ -49,7 +49,8 @@ class DefaultForwardsDelayInterpolatorTest {
     builder.build();
   }
 
-  // The examples come from https://gtfs.org/documentation/realtime/feed-entities/trip-updates/#stoptimeupdate
+  // The examples come from
+  // https://gtfs.org/documentation/realtime/feed-entities/trip-updates/#stoptimeupdate
 
   // For a trip with 20 stops, a StopTimeUpdate with arrival delay and departure delay of 0
   // (StopTimeEvents) for stop_sequence of the current stop means that the trip is exactly on time.

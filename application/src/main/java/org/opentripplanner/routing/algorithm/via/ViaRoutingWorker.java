@@ -25,7 +25,8 @@ public class ViaRoutingWorker {
 
   private final RouteViaRequest viaRequest;
   private final Function<RouteRequest, RoutingResponse> routingWorker;
-  // TODO: This constant already exists in RoutingRequestToFilterChainMapper, so when POC is done use only constant
+  // TODO: This constant already exists in RoutingRequestToFilterChainMapper, so when POC is done
+  // use only constant
   private static final int MAX_NUMBER_OF_ITINERARIES = 200;
 
   private RouteRequestBuilder currentSegmentRequest;

@@ -257,7 +257,8 @@ public abstract class SnapshotTestBase {
       .atZone(transitService.getTimeZone())
       .toLocalDateTime();
 
-    // TODO: 2022-12-20 filters: there should not be more than one filter but technically this is not right
+    // TODO: 2022-12-20 filters: there should not be more than one filter but technically this is
+    // not right
     List<MainAndSubMode> transportModes = new ArrayList<>();
     var filter = request.journey().transit().filters().get(0);
 

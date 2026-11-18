@@ -589,8 +589,10 @@ public class OrcaFareService extends DefaultFareService {
 
         if (!validFareProducts.isEmpty()) {
           // This transfer amount fare product represents the total cost of the leg
-          // We copy the ID from a valid fare product that's already been purchased to indicate that the
-          // Fare is not being paid again. The reason to include this is so that the transfer discount amount
+          // We copy the ID from a valid fare product that's already been purchased to indicate that
+          // the
+          // Fare is not being paid again. The reason to include this is so that the transfer
+          // discount amount
           // can be shown.
           var newTransferAmountFareProduct = FareProduct.of(
             validFareProducts.getFirst().fareOffer.fareProduct().id(),
@@ -611,7 +613,8 @@ public class OrcaFareService extends DefaultFareService {
           dependencies.add(newTransferAmountFareProduct);
         }
 
-        // Add the newly generated fare product that represents the portion already paid (transfer discount)
+        // Add the newly generated fare product that represents the portion already paid (transfer
+        // discount)
         var newFareOffer = FareOffer.of(leg.startTime(), newFareProduct, dependencies);
         fare.addFareProduct(leg, newFareOffer);
         purchasedFareProducts.add(new ExtendedFareOffer(newFareOffer, leg.startTime()));

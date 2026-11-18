@@ -84,7 +84,8 @@ public class NoDataGridCoverage implements GridCoverage {
     return gridCoverage.getRangeType();
   }
 
-  // Override the evaluate methods, so that a PointOutsideCoverageException is thrown for NO_DATE values
+  // Override the evaluate methods, so that a PointOutsideCoverageException is thrown for NO_DATE
+  // values
   @Override
   public Set<Record> evaluate(Position directPosition, Collection<String> collection)
     throws CannotEvaluateException {

@@ -71,7 +71,8 @@ public class PathMapperTest implements RaptorTestConstants {
     // Then: verify path - should be the same for reverse and forward mapper
     assertPath(path);
 
-    // The path string alone does not catch a wrong TransferPathLeg#toStop(): it is rendered from the next leg's own
+    // The path string alone does not catch a wrong TransferPathLeg#toStop(): it is rendered from
+    // the next leg's own
     // stop, not from the transfer leg itself - assert the leg directly.
     // See https://github.com/opentripplanner/OpenTripPlanner/issues/8047.
     var transferLeg = path

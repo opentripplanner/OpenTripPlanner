@@ -411,7 +411,8 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
     assertEquals(situationNumber, transitAlert.getId().getId());
 
-    // Effective validity should be calculated based on the actual departures when Operating dat/service date is provided
+    // Effective validity should be calculated based on the actual departures when Operating
+    // dat/service date is provided
     final ZonedDateTime effectiveStartDate = ZonedDateTime.ofInstant(
       transitAlert.getEffectiveStartDate(),
       startTime.getZone()
@@ -469,7 +470,8 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
     assertEquals(situationNumber, transitAlert.getId().getId());
 
-    // Effective validity should be calculated based on the actual departures when Operating dat/service date is provided
+    // Effective validity should be calculated based on the actual departures when Operating
+    // dat/service date is provided
     final ZonedDateTime effectiveStartDate = ZonedDateTime.ofInstant(
       transitAlert.getEffectiveStartDate(),
       startTime.getZone()
@@ -636,7 +638,8 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertTrue(matchesEntity(transitAlert, lineRef));
     assertEquals(situationNumber, transitAlert.getId().getId());
 
-    // Effective validity should be calculated based on the actual departures when Operating dat/service date is provided
+    // Effective validity should be calculated based on the actual departures when Operating
+    // dat/service date is provided
     final ZonedDateTime effectiveStartDate = ZonedDateTime.ofInstant(
       transitAlert.getEffectiveStartDate(),
       startTime.getZone()
@@ -833,7 +836,8 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     alertsUpdateHandler.update(outbound, realTimeUpdateContext);
     alertsUpdateHandler.update(inbound, realTimeUpdateContext);
 
-    // Line and stop-alerts should result in several TransitAlerts. One for each routeId/stop combination
+    // Line and stop-alerts should result in several TransitAlerts. One for each routeId/stop
+    // combination
     var feedRouteId = new FeedScopedId(FEED_ID, routeId);
     var feedStop_0_id = new FeedScopedId(FEED_ID, stopId0);
     var feedStop_1_id = new FeedScopedId(FEED_ID, stopId1);
