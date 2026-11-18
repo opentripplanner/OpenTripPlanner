@@ -10,7 +10,6 @@ import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.view.PatternRideView;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.PatternRideC1;
 import org.opentripplanner.raptor.spi.RaptorConstants;
-import org.opentripplanner.utils.time.DurationUtils;
 import org.opentripplanner.utils.time.TimeUtils;
 
 public class StopArrivalFactoryC1Test {
@@ -75,7 +74,6 @@ public class StopArrivalFactoryC1Test {
 
     assertEquals(STOP_A, stopArrival.stop());
     assertEquals(ACCESS.c1(), stopArrival.c1());
-    assertEquals(ACCESS_DURATION, stopArrival.travelDuration());
     assertEquals(ORIGIN_DEPARTURE_TIME + ACCESS_DURATION, stopArrival.arrivalTime());
 
     // c2 not supported
@@ -89,7 +87,6 @@ public class StopArrivalFactoryC1Test {
     assertEquals(STOP_B, stopArrival.stop());
     assertEquals(STOP_ARRIVAL_TRANSIT_C1, stopArrival.c1());
     assertEquals(STOP_ARRIVAL_TRANSIT_TIME, stopArrival.arrivalTime());
-    assertEquals(STOP_ARRIVAL_TRANSIT_TIME - ORIGIN_DEPARTURE_TIME, stopArrival.travelDuration());
 
     // c2 not supported
     assertEquals(RaptorConstants.NOT_SET, stopArrival.c2());
@@ -106,7 +103,6 @@ public class StopArrivalFactoryC1Test {
       prevArrival.arrivalTime() + TRANSFER.durationInSeconds(),
       stopArrival.arrivalTime()
     );
-    assertEquals(DurationUtils.durationInSeconds("11m30s"), stopArrival.travelDuration());
 
     // c2 not supported
     assertEquals(RaptorConstants.NOT_SET, stopArrival.c2());

@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import java.time.Duration;
 import java.util.Locale;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.basic.Ratio;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 
 public class RoutingPreferencesTest {
@@ -153,7 +154,7 @@ public class RoutingPreferencesTest {
     var pref = RoutingPreferences.DEFAULT;
     var copy = pref
       .copyOf()
-      .withItineraryFilter(i -> i.withGroupSimilarityKeepOne(0.9))
+      .withItineraryFilter(i -> i.withGroupSimilarityKeepOne(Ratio.of(0.9)))
       .build();
 
     assertNotSame(pref, copy);

@@ -5,6 +5,7 @@ import org.entur.netex2.model.StopPlace;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.netex.mapping.WgsCoordinateMapper.InvalidCoordinateException;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.site.MultiModalStation;
@@ -35,7 +36,18 @@ class MultiModalStationMapper {
         )
       );
 
-    WgsCoordinate coordinate = WgsCoordinateMapper.mapToDomain(stopPlace.getCentroid());
+    WgsCoordinate coordinate;
+    try {
+      coordinate = WgsCoordinateMapper.mapToDomain(stopPlace.getCentroid());
+    } catch (InvalidCoordinateException e) {
+      issueStore.add(
+        "MultiModalStationInvalidCoordinates",
+        "MultiModal station %s has invalid coordinates and is skipped. %s",
+        multiModalStation.getId(),
+        e.getMessage()
+      );
+      return null;
+    }
 
     if (coordinate == null) {
       issueStore.add(

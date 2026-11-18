@@ -54,6 +54,11 @@ public class CarpoolEstimatedVehicleJourneyData {
   }
 
   public static EstimatedVehicleJourney minimalCompleteJourney() {
+    return minimalCompleteJourney(ZonedDateTime.now());
+  }
+
+  /** Like {@link #minimalCompleteJourney()}, but departing at this time. */
+  public static EstimatedVehicleJourney minimalCompleteJourney(ZonedDateTime departure) {
     var journey = new EstimatedVehicleJourney();
     var operator = new OperatorRefStructure();
     operator.setValue("ENT");
@@ -61,21 +66,28 @@ public class CarpoolEstimatedVehicleJourneyData {
     journey.setOperatorRef(operator);
 
     var firstStop = forPoint(OSLO_EAST);
-    firstStop.setAimedDepartureTime(ZonedDateTime.now());
+    firstStop.setAimedDepartureTime(departure);
     var firstName = new NaturalLanguageStringStructure();
     firstName.setValue("First stop");
     firstStop.getStopPointNames().add(firstName);
     var lastStop = forPoint(OSLO_NORTH);
-    lastStop.setAimedDepartureTime(ZonedDateTime.now());
+    lastStop.setAimedDepartureTime(departure);
     var lastName = new NaturalLanguageStringStructure();
     lastName.setValue("Last stop");
     lastStop.getStopPointNames().add(lastName);
-    lastStop.setAimedArrivalTime(ZonedDateTime.now().plusMinutes(45));
+    lastStop.setAimedArrivalTime(departure.plusMinutes(45));
 
     journey.setEstimatedCalls(new EstimatedVehicleJourney.EstimatedCalls());
     journey.getEstimatedCalls().getEstimatedCalls().add(firstStop);
     journey.getEstimatedCalls().getEstimatedCalls().add(lastStop);
 
+    return journey;
+  }
+
+  /** Like {@link #minimalCompleteJourney()}, but for the trip with this journey code. */
+  public static EstimatedVehicleJourney journeyWithCode(String code) {
+    var journey = minimalCompleteJourney();
+    journey.setEstimatedVehicleJourneyCode(code);
     return journey;
   }
 

@@ -61,8 +61,6 @@ class RaptorTransitDataTest {
       null,
       null,
       null,
-      null,
-      null,
       null
     );
     var runningOnDate = raptorTransitData.getTripPatternsRunningOnDateCopy(date);
@@ -86,8 +84,6 @@ class RaptorTransitDataTest {
     var tripPatterns = List.of(tripPatternForDate);
     var raptorTransitData = new RaptorTransitData(
       Map.of(date, tripPatterns),
-      null,
-      null,
       null,
       null,
       null,
@@ -118,8 +114,6 @@ class RaptorTransitDataTest {
       null,
       null,
       null,
-      null,
-      null,
       null
     );
     var startingOnDate = raptorTransitData.getTripPatternsOnServiceDateCopy(date);
@@ -142,8 +136,6 @@ class RaptorTransitDataTest {
     );
     var raptorTransitData = new RaptorTransitData(
       Map.of(runningDate, List.of(tripPatternForDate)),
-      null,
-      null,
       null,
       null,
       null,
@@ -175,8 +167,6 @@ class RaptorTransitDataTest {
         entry(firstRunningDate, List.of(tripPatternForDate)),
         entry(secondRunningDate, List.of(tripPatternForDate))
       ),
-      null,
-      null,
       null,
       null,
       null,

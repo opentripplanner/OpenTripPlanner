@@ -57,8 +57,13 @@ public class DateScalarFactory {
 
           @Override
           public LocalDate parseValue(Object input) throws CoercingParseValueException {
+            if (!(input instanceof String text)) {
+              throw new CoercingParseValueException(
+                "Expected type '%s' to be a string, but was '%s'.".formatted(scalarName, input)
+              );
+            }
             try {
-              return LocalDate.from(FORMATTER.parse((String) input));
+              return LocalDate.from(FORMATTER.parse(text));
             } catch (DateTimeParseException e) {
               throw new CoercingParseValueException(
                 "Expected type '%s' but was '%s'.".formatted(scalarName, input)

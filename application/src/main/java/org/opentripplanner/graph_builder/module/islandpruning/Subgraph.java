@@ -1,6 +1,6 @@
 package org.opentripplanner.graph_builder.module.islandpruning;
 
-import gnu.trove.list.array.TIntArrayList;
+import com.carrotsearch.hppc.IntArrayList;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,8 +30,8 @@ import org.opentripplanner.street.model.vertex.Vertex;
 class Subgraph {
 
   private final VertexIndex vertexIndex;
-  private final TIntArrayList streetIds = new TIntArrayList();
-  private final TIntArrayList stopIds = new TIntArrayList();
+  private final IntArrayList streetIds = new IntArrayList();
+  private final IntArrayList stopIds = new IntArrayList();
   private final List<Vertex> streetVertices;
   private final List<TransitStopVertex> stopVertices;
 
@@ -200,9 +200,9 @@ class Subgraph {
   private static class VertexList<T extends Vertex> extends AbstractList<T> {
 
     private final VertexIndex vertexIndex;
-    private final TIntArrayList ids;
+    private final IntArrayList ids;
 
-    VertexList(VertexIndex vertexIndex, TIntArrayList ids) {
+    VertexList(VertexIndex vertexIndex, IntArrayList ids) {
       this.vertexIndex = vertexIndex;
       this.ids = ids;
     }

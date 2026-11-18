@@ -1,8 +1,10 @@
 package org.opentripplanner.street.geometry;
 
-import gnu.trove.map.hash.TLongObjectHashMap;
-import gnu.trove.set.TLongSet;
-import gnu.trove.set.hash.TLongHashSet;
+import com.carrotsearch.hppc.LongHashSet;
+import com.carrotsearch.hppc.LongObjectHashMap;
+import com.carrotsearch.hppc.LongSet;
+import com.carrotsearch.hppc.procedures.LongObjectProcedure;
+import com.carrotsearch.hppc.procedures.LongProcedure;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,7 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A spatial index using a 2D fast long hashtable (Trove lib).
+ * A spatial index using a 2D fast long hashtable (HPPC lib).
  * <p>
  * Objects to index are placed in all grid bins touching the bounding envelope. We *do not store*
  * any bouding envelope for each object, so this imply that we will return false positive when
@@ -54,7 +56,7 @@ public class HashGridSpatialIndex<T> implements Serializable {
   private final double yBinSize;
 
   /* The map of all bins. Please see visit() and xKey/yKey for details on the key. */
-  private final TLongObjectHashMap<ArrayList<T>> bins;
+  private final LongObjectHashMap<ArrayList<T>> bins;
 
   private int nBins = 0;
 
@@ -69,7 +71,7 @@ public class HashGridSpatialIndex<T> implements Serializable {
     this.xBinSize = xBinSize;
     this.yBinSize = yBinSize;
     // For 200m bins, 500x500 = 100x100km = 250000 bins
-    bins = new TLongObjectHashMap<>();
+    bins = new LongObjectHashMap<>();
   }
 
   /** Create a HashGrid with the default grid dimensions. */
@@ -143,7 +145,7 @@ public class HashGridSpatialIndex<T> implements Serializable {
 
   public final void insert(LineString geom, final Object item) {
     Coordinate[] coord = geom.getCoordinates();
-    final TLongSet keys = new TLongHashSet(coord.length * 8);
+    final LongSet keys = new LongHashSet(coord.length * 8);
     for (int i = 0; i < coord.length - 1; i++) {
       // TODO Cut the segment if longer than bin size
       // to reduce the number of wrong bins
@@ -153,12 +155,13 @@ public class HashGridSpatialIndex<T> implements Serializable {
         return false;
       });
     }
-    keys.forEach(key -> {
-      // Note: bins have been initialized in the previous visit
-      bins.get(key).add((T) item);
-      nEntries++;
-      return true;
-    });
+    keys.forEach(
+      (LongProcedure) key -> {
+        // Note: bins have been initialized in the previous visit
+        bins.get(key).add((T) item);
+        nEntries++;
+      }
+    );
     nObjects++;
   }
 
@@ -170,20 +173,21 @@ public class HashGridSpatialIndex<T> implements Serializable {
    */
   public Set<T> queryAlongLineStrings(Collection<LineString> lineStrings) {
     Set<T> result = new HashSet<>(1024);
-    TLongSet keys = new TLongHashSet(256);
+    LongSet keys = new LongHashSet(256);
     for (LineString ls : lineStrings) {
       CoordinateSequence seq = ls.getCoordinateSequence();
       for (int i = 0; i < seq.size() - 1; i++) {
         collectBinKeys(seq.getX(i), seq.getY(i), seq.getX(i + 1), seq.getY(i + 1), keys);
       }
     }
-    keys.forEach(key -> {
-      ArrayList<T> bin = bins.get(key);
-      if (bin != null) {
-        result.addAll(bin);
+    keys.forEach(
+      (LongProcedure) key -> {
+        ArrayList<T> bin = bins.get(key);
+        if (bin != null) {
+          result.addAll(bin);
+        }
       }
-      return true;
-    });
+    );
     return result;
   }
 
@@ -192,7 +196,7 @@ public class HashGridSpatialIndex<T> implements Serializable {
    * the bin-key math in {@link #visit(Envelope, boolean, BinVisitor)} but operates on primitive
    * coordinates so the hot query loop has no per-segment object allocations.
    */
-  private void collectBinKeys(double x1, double y1, double x2, double y2, TLongSet out) {
+  private void collectBinKeys(double x1, double y1, double x2, double y2, LongSet out) {
     double minX = clampLon(Math.min(x1, x2));
     double maxX = clampLon(Math.max(x1, x2));
     double minY = clampLat(Math.min(y1, y2));
@@ -230,10 +234,7 @@ public class HashGridSpatialIndex<T> implements Serializable {
    * used for reads only.
    */
   public void compact() {
-    bins.forEachValue(ts -> {
-      ts.trimToSize();
-      return true;
-    });
+    bins.forEach((LongObjectProcedure<ArrayList<T>>) (key, list) -> list.trimToSize());
   }
 
   public String toString() {

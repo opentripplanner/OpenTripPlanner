@@ -47,7 +47,7 @@ class TimetableDataImportTest {
     assertThrows(IllegalStateException.class, () ->
       subject.updateCalendarServiceData(new CalendarServiceData())
     );
-    assertThrows(IllegalStateException.class, () -> subject.putServiceCode(id("S1"), 0));
+    assertThrows(IllegalStateException.class, () -> subject.addNextServiceCodes(List.of(id("S1"))));
   }
 
   @Test

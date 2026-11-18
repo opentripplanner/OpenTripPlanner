@@ -1,9 +1,8 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals;
 
-import gnu.trove.set.TIntSet;
-import gnu.trove.set.hash.TIntHashSet;
+import com.carrotsearch.hppc.IntHashSet;
+import com.carrotsearch.hppc.IntSet;
 import org.jspecify.annotations.Nullable;
-import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.request.via.RaptorTransferViaConnection;
 import org.opentripplanner.raptor.rangeraptor.transit.AccessPaths;
 import org.opentripplanner.raptor.rangeraptor.transit.EgressPaths;
@@ -34,7 +33,7 @@ import org.opentripplanner.raptor.rangeraptor.transit.ViaConnections;
  */
 public class StopsWithArriveByTransitCriteriaResolver {
 
-  private final TIntSet stops = new TIntHashSet();
+  private final IntSet stops = new IntHashSet();
 
   private StopsWithArriveByTransitCriteriaResolver(
     AccessPaths accessPaths,
@@ -46,7 +45,7 @@ public class StopsWithArriveByTransitCriteriaResolver {
     addAllViaConnectionsFromStopsWithTransfer(viaConnections);
   }
 
-  public static TIntSet resolve(
+  public static IntSet resolve(
     AccessPaths accessPaths,
     EgressPaths egressPaths,
     @Nullable ViaConnections viaConnections
@@ -58,20 +57,20 @@ public class StopsWithArriveByTransitCriteriaResolver {
     ).stops();
   }
 
-  private TIntSet stops() {
+  private IntSet stops() {
     return stops;
   }
 
   private void addAllAccessStopsWithAtLeastOneStopArrivalOnBoard(AccessPaths accessPaths) {
-    stops.addAll(
-      accessPaths.arrivedOnBoard().stream().mapToInt(RaptorAccessEgress::stop).toArray()
-    );
+    for (var access : accessPaths.arrivedOnBoard()) {
+      stops.add(access.stop());
+    }
   }
 
   private void addAllEgressStopsUsingStreetToDestination(EgressPaths egressPaths) {
     var egressByStop = egressPaths.byStop();
-    for (var it = egressByStop.keySet().iterator(); it.hasNext(); ) {
-      int stop = it.next();
+    for (var cursor : egressByStop.keys()) {
+      int stop = cursor.value;
       var egressList = egressByStop.get(stop);
       if (egressList.stream().anyMatch(e -> e.arrivedOnStreet())) {
         stops.add(stop);
@@ -84,10 +83,9 @@ public class StopsWithArriveByTransitCriteriaResolver {
       return;
     }
 
-    for (var it = viaConnections.byFromStop().iterator(); it.hasNext(); ) {
-      it.advance();
-      var stop = it.key();
-      var viaConnectionsFromStop = it.value();
+    for (var cursor : viaConnections.byFromStop()) {
+      int stop = cursor.key;
+      var viaConnectionsFromStop = cursor.value;
       if (
         viaConnectionsFromStop.stream().anyMatch(via -> via instanceof RaptorTransferViaConnection)
       ) {

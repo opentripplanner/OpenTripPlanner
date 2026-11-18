@@ -21,7 +21,7 @@ import org.opentripplanner.raptor.extensions.extrasearch.ExtraMcRouterSearch;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouter;
 import org.opentripplanner.raptor.rangeraptor.transit.RaptorSearchWindowCalculator;
-import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
+import org.opentripplanner.raptor.spi.RaptorDataProvider;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +41,7 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
   private static final Logger LOG = LoggerFactory.getLogger(RangeRaptorDynamicSearch.class);
 
   private final RaptorConfig<T> config;
-  private final RaptorTransitDataProvider<T> transitData;
+  private final RaptorDataProvider<T> data;
   private final RaptorRequest<T> originalRequest;
   private final RaptorSearchWindowCalculator dynamicSearchWindowCalculator;
 
@@ -53,20 +53,20 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
 
   public RangeRaptorDynamicSearch(
     RaptorConfig<T> config,
-    RaptorTransitDataProvider<T> transitData,
+    RaptorDataProvider<T> data,
     @Nullable ExtraMcRouterSearch<T> extraMcSearch,
     RaptorRequest<T> originalRequest
   ) {
     this.config = config;
-    this.transitData = transitData;
+    this.data = data;
     this.originalRequest = originalRequest;
     this.dynamicSearchWindowCalculator = config
       .searchWindowCalculator()
       .withSearchParams(originalRequest.searchParams());
     this.extraMcSearch = extraMcSearch;
 
-    this.fwdHeuristics = new HeuristicSearchTask<>(FORWARD, "Forward", config, transitData);
-    this.revHeuristics = new HeuristicSearchTask<>(REVERSE, "Reverse", config, transitData);
+    this.fwdHeuristics = new HeuristicSearchTask<>(FORWARD, "Forward", config, data);
+    this.revHeuristics = new HeuristicSearchTask<>(REVERSE, "Reverse", config, data);
   }
 
   public RaptorResponse<T> route() {
@@ -140,13 +140,13 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
     // Create worker
     if (request.profile().is(MULTI_CRITERIA)) {
       raptorRouter = config.createRangeRaptorWithMcWorker(
-        transitData,
+        data,
         request,
         getDestinationHeuristics(),
         extraMcSearch
       );
     } else {
-      raptorRouter = config.createRangeRaptorWithStdWorker(transitData, request);
+      raptorRouter = config.createRangeRaptorWithStdWorker(data, request);
     }
 
     // Route
@@ -262,7 +262,7 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
     return originalRequest
       .mutate()
       .searchParams()
-      .earliestDepartureTime(transitData.getValidTransitDataStartTime())
+      .earliestDepartureTime(data.transitData().getValidTransitDataStartTime())
       .build();
   }
 
@@ -274,7 +274,7 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
       .mutate()
       .searchParams()
       .latestArrivalTime(
-        transitData.getValidTransitDataEndTime() +
+        data.transitData().getValidTransitDataEndTime() +
           originalRequest.searchParams().accessEgressMaxDurationSeconds()
       )
       .build();

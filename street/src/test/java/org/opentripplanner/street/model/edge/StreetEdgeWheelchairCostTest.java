@@ -10,7 +10,9 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
+import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model.vertex.BarrierVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
@@ -185,6 +187,52 @@ class StreetEdgeWheelchairCostTest {
     assertEquals(15, (long) accessibleResult.weight);
   }
 
+  static Stream<Arguments> inaccessibleEndpointCases() {
+    return Stream.of(
+      Arguments.of(Accessibility.NOT_POSSIBLE, 615),
+      Arguments.of(Accessibility.POSSIBLE, 15),
+      Arguments.of(Accessibility.NO_INFORMATION, 15)
+    );
+  }
+
+  /**
+   * A {@link BarrierVertex} with {@link Accessibility#NOT_POSSIBLE} wheelchair accessibility
+   * (e.g. created for a {@code barrier=kerb} node with a raised/rolled kerb) adds a fixed cost
+   * to the edge ending at it, independent of the edge length.
+   */
+  @ParameterizedTest(
+    name = "a barrier vertex endpoint with accessibility {0} should lead to traversal costs of {1}"
+  )
+  @MethodSource("inaccessibleEndpointCases")
+  public void inaccessibleBarrierVertexEndpoint(Accessibility accessibility, long expectedCost) {
+    double length = 10;
+    var barrierVertex = new BarrierVertex(0, 0, 123, accessibility);
+    var edge = new StreetEdgeBuilder<>()
+      .withFromVertex(V1)
+      .withToVertex(barrierVertex)
+      .withName("edge to barrier vertex")
+      .withMeterLength(length)
+      .withPermission(StreetTraversalPermission.ALL)
+      .withBack(false)
+      .buildAndConnect();
+
+    var req = StreetSearchRequest.of();
+    req.withWheelchairEnabled(true);
+    req.withWheelchair(b ->
+      b
+        .withStopOnlyAccessible()
+        .withElevatorOnlyAccessible()
+        .withInaccessibleStreetReluctance(10)
+        .withMaxSlope(0)
+        .withSlopeExceededReluctance(1.1)
+        .withStairsReluctance(25)
+        .build()
+    );
+
+    var result = traverse(edge, req.build());
+    assertEquals(expectedCost, (long) result.weight);
+  }
+
   static Stream<Arguments> walkReluctanceCases() {
     return Stream.of(
       Arguments.of(0.5, 3),
@@ -211,6 +259,75 @@ class StreetEdgeWheelchairCostTest {
 
     var req = StreetSearchRequest.of();
     req.withWalk(w -> w.withReluctance(walkReluctance));
+    req.withWheelchairEnabled(true);
+
+    var result = traverse(edge, req.build());
+    assertEquals(expectedCost, (long) result.weight);
+
+    assertEquals(8, result.getElapsedTimeSeconds());
+  }
+
+  static Stream<Arguments> walkSafetyCases() {
+    return Stream.of(
+      Arguments.of(1, 7),
+      Arguments.of(4, 29),
+      Arguments.of(10, 74),
+      Arguments.of(100, 740)
+    );
+  }
+
+  @ParameterizedTest(
+    name = "walkSafety of {0} should affect wheelchair users and lead to traversal costs of {1}"
+  )
+  @MethodSource("walkSafetyCases")
+  public void walkSafety(double walkSafety, long expectedCost) {
+    double length = 10;
+    var edge = new StreetEdgeBuilder<>()
+      .withFromVertex(V1)
+      .withToVertex(V2)
+      .withWalkSafetyFactor((float) walkSafety)
+      .withMeterLength(length)
+      .withPermission(StreetTraversalPermission.ALL)
+      .withBack(false)
+      .buildAndConnect();
+
+    var req = StreetSearchRequest.of();
+    req.withWalk(w -> w.withReluctance(1.0).withSafetyFactor(1.0));
+    req.withWheelchairEnabled(true);
+
+    var result = traverse(edge, req.build());
+    assertEquals(expectedCost, (long) result.weight);
+
+    assertEquals(8, result.getElapsedTimeSeconds());
+  }
+
+  static Stream<Arguments> requestSafetyFactorCases() {
+    return Stream.of(
+      // safety ignored
+      Arguments.of(0, 7),
+      // halfway between flat cost (7.4) and safety cost (22.2)
+      Arguments.of(0.5, 14),
+      // safety fully applied
+      Arguments.of(1, 22)
+    );
+  }
+
+  @ParameterizedTest(
+    name = "request safetyFactor of {0} should weigh the edge walk safety and lead to traversal costs of {1}"
+  )
+  @MethodSource("requestSafetyFactorCases")
+  public void requestSafetyFactor(double requestSafetyFactor, long expectedCost) {
+    var edge = new StreetEdgeBuilder<>()
+      .withFromVertex(V1)
+      .withToVertex(V2)
+      .withWalkSafetyFactor(3f)
+      .withMeterLength(10)
+      .withPermission(StreetTraversalPermission.ALL)
+      .withBack(false)
+      .buildAndConnect();
+
+    var req = StreetSearchRequest.of();
+    req.withWalk(w -> w.withReluctance(1.0).withSafetyFactor(requestSafetyFactor));
     req.withWheelchairEnabled(true);
 
     var result = traverse(edge, req.build());

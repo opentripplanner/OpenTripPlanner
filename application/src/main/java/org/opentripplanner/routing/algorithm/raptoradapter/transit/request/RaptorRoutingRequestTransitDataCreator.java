@@ -2,9 +2,9 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
 import static org.opentripplanner.utils.time.ServiceDateUtils.secondsSinceStartOfTime;
 
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
+import com.carrotsearch.hppc.IntArrayList;
+import com.carrotsearch.hppc.ObjectIntHashMap;
+import com.carrotsearch.hppc.ObjectIntMap;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -48,11 +48,11 @@ class RaptorRoutingRequestTransitDataCreator {
   }
 
   public List<int[]> createTripPatternsPerStop(List<TripPatternForDates> tripPatternsForDate) {
-    // Create temporary array of TIntArrayLists
+    // Create temporary array of IntArrayLists
     int stopCount = raptorTransitData.getStopCount();
-    TIntArrayList[] patternsForStop = new TIntArrayList[stopCount];
+    IntArrayList[] patternsForStop = new IntArrayList[stopCount];
     for (int i = 0; i < stopCount; i++) {
-      patternsForStop[i] = new TIntArrayList();
+      patternsForStop[i] = new IntArrayList();
     }
 
     // Loop through all patterns, and mark all stops containing that pattern
@@ -105,7 +105,7 @@ class RaptorRoutingRequestTransitDataCreator {
 
     List<TripPatternForDates> combinedList = new ArrayList<>();
 
-    TObjectIntMap<LocalDate> offsetCache = new TObjectIntHashMap<>();
+    ObjectIntMap<LocalDate> offsetCache = new ObjectIntHashMap<>();
 
     // For each TripPattern, time expand each TripPatternForDate and merge into a single
     // TripPatternForDates

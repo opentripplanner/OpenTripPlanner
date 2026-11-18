@@ -1,5 +1,6 @@
 package org.opentripplanner.netex;
 
+import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Queue;
@@ -86,11 +87,7 @@ public class NetexModule implements GraphBuilderModule {
       var calendarServiceData = new CalendarServiceData();
 
       while (!netexBundles.isEmpty()) {
-        // removes the bundle from the collection and allows it to be garbage collected
-        var netexBundle = netexBundles.poll();
-        netexBundle.checkInputs();
-
-        TransitDataImportBuilder transitBuilder = netexBundle.loadBundle(deduplicator, issueStore);
+        TransitDataImportBuilder transitBuilder = loadNextBundle();
         transitBuilder.limitServiceDays(transitPeriodLimit);
         calendarServiceData.add(transitBuilder.buildCalendarServiceData());
 
@@ -131,6 +128,19 @@ public class NetexModule implements GraphBuilderModule {
       );
     } catch (Exception e) {
       throw new RuntimeException(e);
+    }
+  }
+
+  /**
+   * Load the next bundle and close its data source. The NeTEx module is the only reader of the
+   * NeTEx data sources, so the source is released as soon as the bundle is loaded - a streamed zip
+   * file keeps its entire uncompressed content in memory until it is closed. The data sources are
+   * closed again at the end of the graph build by their owner, which has no effect.
+   */
+  private TransitDataImportBuilder loadNextBundle() throws IOException {
+    try (var netexBundle = netexBundles.poll()) {
+      netexBundle.checkInputs();
+      return netexBundle.loadBundle(deduplicator, issueStore);
     }
   }
 
