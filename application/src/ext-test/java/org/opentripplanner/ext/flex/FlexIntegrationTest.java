@@ -66,7 +66,7 @@ public class FlexIntegrationTest {
 
   static TransferRepository transferRepository;
 
-  static RoutingService service;
+  static RoutingService routingService;
 
   @BeforeAll
   static void setup() {
@@ -94,7 +94,7 @@ public class FlexIntegrationTest {
       timetableDataImport
     );
     var shapeService = TestServerContext.createShapeService(shapeDataImport);
-    service = TestServerContext.createRoutingService(
+    routingService = TestServerContext.createRoutingService(
       graph,
       transitService,
       shapeService,
@@ -292,7 +292,7 @@ public class FlexIntegrationTest {
       })
       .buildRequest();
 
-    var result = service.route(request);
+    var result = routingService.route(request);
     var itineraries = result.getTripPlan().itineraries;
 
     assertFalse(itineraries.isEmpty());
