@@ -1,6 +1,7 @@
 package org.opentripplanner.service.shape.internal;
 
-import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.service.shape.ScheduledShapeData;
@@ -44,9 +45,9 @@ class ShapeRepositoryLifecycleTest {
 
     lifecycle.copyOnWrite(snapshot).setTripPatternShape(PATTERN_2, TRIP_PATTERN_GEOMETRY_2);
 
-    assertThat(snapshot.getTripPatternShape(PATTERN_2.getId())).isNull();
+    assertNull(snapshot.getTripPatternShape(PATTERN_2.getId()));
     var next = lifecycle.freeze(buffer);
-    assertThat(next.getTripPatternShape(PATTERN_1.getId())).isEqualTo(TRIP_PATTERN_GEOMETRY_1);
-    assertThat(next.getTripPatternShape(PATTERN_2.getId())).isEqualTo(TRIP_PATTERN_GEOMETRY_2);
+    assertEquals(TRIP_PATTERN_GEOMETRY_1, next.getTripPatternShape(PATTERN_1.getId()));
+    assertEquals(TRIP_PATTERN_GEOMETRY_2, next.getTripPatternShape(PATTERN_2.getId()));
   }
 }

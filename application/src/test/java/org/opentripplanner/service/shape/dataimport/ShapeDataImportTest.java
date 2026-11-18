@@ -1,6 +1,8 @@
 package org.opentripplanner.service.shape.dataimport;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.street.geometry.GeometryUtils.makeLineString;
@@ -34,11 +36,11 @@ class ShapeDataImportTest {
   @Test
   void storesGeometry() {
     var subject = new ShapeDataImport();
-    assertThat(subject.getTripPatternShape(id("A"))).isNull();
+    assertNull(subject.getTripPatternShape(id("A")));
 
     subject.setTripPatternShape(PATTERN, TRIP_PATTERN_GEOMETRY);
 
-    assertThat(subject.getTripPatternShape(id("A"))).isEqualTo(TRIP_PATTERN_GEOMETRY);
+    assertEquals(TRIP_PATTERN_GEOMETRY, subject.getTripPatternShape(id("A")));
   }
 
   @Test
@@ -48,7 +50,7 @@ class ShapeDataImportTest {
 
     var scheduled = subject.toScheduledShapeData();
 
-    assertThat(scheduled.getTripPatternShape(id("A"))).isEqualTo(TRIP_PATTERN_GEOMETRY);
+    assertEquals(TRIP_PATTERN_GEOMETRY, scheduled.getTripPatternShape(id("A")));
   }
 
   @Test
@@ -70,7 +72,7 @@ class ShapeDataImportTest {
       subject.setTripPatternShape(PATTERN, null)
     );
     assertThat(exception).hasMessageThat().contains("No shape for trip pattern");
-    assertThat(subject.getTripPatternShape(id("A"))).isNull();
+    assertNull(subject.getTripPatternShape(id("A")));
   }
 
   @Test
@@ -85,6 +87,6 @@ class ShapeDataImportTest {
       subject.setTripPatternShape(PATTERN, twoHops)
     );
     assertThat(exception).hasMessageThat().contains("2 hops, expected 1");
-    assertThat(subject.getTripPatternShape(id("A"))).isNull();
+    assertNull(subject.getTripPatternShape(id("A")));
   }
 }

@@ -1,6 +1,8 @@
 package org.opentripplanner.service.shape.internal;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
@@ -76,10 +78,8 @@ class DefaultShapeRepositoryTest {
   void initialSnapshotContainsTheScheduledData() {
     var snapshot = repository.createSnapshot();
 
-    assertThat(snapshot.getTripPatternShape(SCHEDULED.getId())).isEqualTo(
-      SCHEDULED_TRIP_PATTERN_GEOMETRY
-    );
-    assertThat(snapshot.getTripPatternShape(REAL_TIME.getId())).isNull();
+    assertEquals(SCHEDULED_TRIP_PATTERN_GEOMETRY, snapshot.getTripPatternShape(SCHEDULED.getId()));
+    assertNull(snapshot.getTripPatternShape(REAL_TIME.getId()));
   }
 
   @Test
@@ -88,23 +88,21 @@ class DefaultShapeRepositoryTest {
 
     var snapshot = repository.createSnapshot();
 
-    assertThat(snapshot.getTripPatternShape(REAL_TIME.getId())).isEqualTo(
-      REAL_TIME_TRIP_PATTERN_GEOMETRY
-    );
-    assertThat(snapshot.getTripPatternShape(SCHEDULED.getId())).isEqualTo(
-      SCHEDULED_TRIP_PATTERN_GEOMETRY
-    );
+    assertEquals(REAL_TIME_TRIP_PATTERN_GEOMETRY, snapshot.getTripPatternShape(REAL_TIME.getId()));
+    assertEquals(SCHEDULED_TRIP_PATTERN_GEOMETRY, snapshot.getTripPatternShape(SCHEDULED.getId()));
   }
 
   @Test
   void realTimeGeometryOverridesScheduled() {
     repository.setTripPatternShape(SCHEDULED, OVERRIDING_TRIP_PATTERN_GEOMETRY);
 
-    assertThat(repository.getTripPatternShape(SCHEDULED.getId())).isEqualTo(
-      OVERRIDING_TRIP_PATTERN_GEOMETRY
+    assertEquals(
+      OVERRIDING_TRIP_PATTERN_GEOMETRY,
+      repository.getTripPatternShape(SCHEDULED.getId())
     );
-    assertThat(repository.createSnapshot().getTripPatternShape(SCHEDULED.getId())).isEqualTo(
-      OVERRIDING_TRIP_PATTERN_GEOMETRY
+    assertEquals(
+      OVERRIDING_TRIP_PATTERN_GEOMETRY,
+      repository.createSnapshot().getTripPatternShape(SCHEDULED.getId())
     );
   }
 
@@ -116,15 +114,18 @@ class DefaultShapeRepositoryTest {
 
     repository.clear("F");
 
-    assertThat(repository.getTripPatternShape(REAL_TIME.getId())).isNull();
-    assertThat(repository.getTripPatternShape(OTHER_FEED_REAL_TIME.getId())).isEqualTo(
-      REAL_TIME_TRIP_PATTERN_GEOMETRY
+    assertNull(repository.getTripPatternShape(REAL_TIME.getId()));
+    assertEquals(
+      REAL_TIME_TRIP_PATTERN_GEOMETRY,
+      repository.getTripPatternShape(OTHER_FEED_REAL_TIME.getId())
     );
-    assertThat(repository.getTripPatternShape(SCHEDULED.getId())).isEqualTo(
-      SCHEDULED_TRIP_PATTERN_GEOMETRY
+    assertEquals(
+      SCHEDULED_TRIP_PATTERN_GEOMETRY,
+      repository.getTripPatternShape(SCHEDULED.getId())
     );
-    assertThat(snapshotBeforeClear.getTripPatternShape(REAL_TIME.getId())).isEqualTo(
-      REAL_TIME_TRIP_PATTERN_GEOMETRY
+    assertEquals(
+      REAL_TIME_TRIP_PATTERN_GEOMETRY,
+      snapshotBeforeClear.getTripPatternShape(REAL_TIME.getId())
     );
   }
 
@@ -137,12 +138,14 @@ class DefaultShapeRepositoryTest {
     var snapshotAfterClear = repository.createSnapshot();
     repository.setTripPatternShape(REAL_TIME, OVERRIDING_TRIP_PATTERN_GEOMETRY);
 
-    assertThat(snapshotAfterClear.getTripPatternShape(REAL_TIME.getId())).isNull();
-    assertThat(snapshotAfterClear.getTripPatternShape(SCHEDULED.getId())).isEqualTo(
-      SCHEDULED_TRIP_PATTERN_GEOMETRY
+    assertNull(snapshotAfterClear.getTripPatternShape(REAL_TIME.getId()));
+    assertEquals(
+      SCHEDULED_TRIP_PATTERN_GEOMETRY,
+      snapshotAfterClear.getTripPatternShape(SCHEDULED.getId())
     );
-    assertThat(repository.createSnapshot().getTripPatternShape(REAL_TIME.getId())).isEqualTo(
-      OVERRIDING_TRIP_PATTERN_GEOMETRY
+    assertEquals(
+      OVERRIDING_TRIP_PATTERN_GEOMETRY,
+      repository.createSnapshot().getTripPatternShape(REAL_TIME.getId())
     );
   }
 
@@ -153,10 +156,8 @@ class DefaultShapeRepositoryTest {
 
     repository.setTripPatternShape(OTHER, OVERRIDING_TRIP_PATTERN_GEOMETRY);
 
-    assertThat(snapshot.getTripPatternShape(OTHER.getId())).isNull();
-    assertThat(snapshot.getTripPatternShape(REAL_TIME.getId())).isEqualTo(
-      REAL_TIME_TRIP_PATTERN_GEOMETRY
-    );
+    assertNull(snapshot.getTripPatternShape(OTHER.getId()));
+    assertEquals(REAL_TIME_TRIP_PATTERN_GEOMETRY, snapshot.getTripPatternShape(REAL_TIME.getId()));
   }
 
   @Test
@@ -169,10 +170,11 @@ class DefaultShapeRepositoryTest {
     repository.setTripPatternShape(THIRD_FEED_REAL_TIME, OVERRIDING_TRIP_PATTERN_GEOMETRY);
     var snapshot = repository.createSnapshot();
 
-    assertThat(snapshot.getTripPatternShape(OTHER_FEED_REAL_TIME.getId())).isEqualTo(
-      OVERRIDING_TRIP_PATTERN_GEOMETRY
+    assertEquals(
+      OVERRIDING_TRIP_PATTERN_GEOMETRY,
+      snapshot.getTripPatternShape(OTHER_FEED_REAL_TIME.getId())
     );
-    assertThat(snapshot.getTripPatternShape(REAL_TIME.getId())).isNull();
+    assertNull(snapshot.getTripPatternShape(REAL_TIME.getId()));
   }
 
   @Test
@@ -183,12 +185,8 @@ class DefaultShapeRepositoryTest {
     repository.clear("unknown feed");
     var snapshot = repository.createSnapshot();
 
-    assertThat(snapshot.getTripPatternShape(REAL_TIME.getId())).isEqualTo(
-      REAL_TIME_TRIP_PATTERN_GEOMETRY
-    );
-    assertThat(snapshot.getTripPatternShape(SCHEDULED.getId())).isEqualTo(
-      SCHEDULED_TRIP_PATTERN_GEOMETRY
-    );
+    assertEquals(REAL_TIME_TRIP_PATTERN_GEOMETRY, snapshot.getTripPatternShape(REAL_TIME.getId()));
+    assertEquals(SCHEDULED_TRIP_PATTERN_GEOMETRY, snapshot.getTripPatternShape(SCHEDULED.getId()));
   }
 
   @Test
@@ -197,10 +195,8 @@ class DefaultShapeRepositoryTest {
 
     repository.setTripPatternShape(OTHER, REAL_TIME_TRIP_PATTERN_GEOMETRY);
 
-    assertThat(snapshot.getTripPatternShape(OTHER.getId())).isNull();
-    assertThat(repository.getTripPatternShape(OTHER.getId())).isEqualTo(
-      REAL_TIME_TRIP_PATTERN_GEOMETRY
-    );
+    assertNull(snapshot.getTripPatternShape(OTHER.getId()));
+    assertEquals(REAL_TIME_TRIP_PATTERN_GEOMETRY, repository.getTripPatternShape(OTHER.getId()));
   }
 
   @Test
@@ -209,7 +205,7 @@ class DefaultShapeRepositoryTest {
       repository.setTripPatternShape(OTHER, null)
     );
     assertThat(exception).hasMessageThat().contains("No shape for trip pattern");
-    assertThat(repository.getTripPatternShape(OTHER.getId())).isNull();
+    assertNull(repository.getTripPatternShape(OTHER.getId()));
   }
 
   @Test
@@ -227,6 +223,6 @@ class DefaultShapeRepositoryTest {
       repository.setTripPatternShape(OTHER, threeHops)
     );
     assertThat(exception).hasMessageThat().contains("3 hops, expected 1");
-    assertThat(repository.getTripPatternShape(OTHER.getId())).isNull();
+    assertNull(repository.getTripPatternShape(OTHER.getId()));
   }
 }

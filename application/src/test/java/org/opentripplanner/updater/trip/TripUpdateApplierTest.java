@@ -1,6 +1,5 @@
 package org.opentripplanner.updater.trip;
 
-import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -360,7 +359,7 @@ class TripUpdateApplierTest {
         .build()
     );
 
-    assertThat(shapeRepository.getTripPatternShape(MODIFIED_PATTERN.getId())).isNotNull();
+    assertNotNull(shapeRepository.getTripPatternShape(MODIFIED_PATTERN.getId()));
   }
 
   /**
@@ -377,7 +376,7 @@ class TripUpdateApplierTest {
       RealTimeTripUpdate.of(SCHEDULED_PATTERN, rtTripTimes, TODAY).build()
     );
 
-    assertThat(shapeRepository.getTripPatternShape(SCHEDULED_PATTERN.getId())).isNull();
+    assertNull(shapeRepository.getTripPatternShape(SCHEDULED_PATTERN.getId()));
   }
 
   /**
@@ -396,6 +395,6 @@ class TripUpdateApplierTest {
       )
     );
 
-    assertThat(shapeRepository.getTripPatternShape(MODIFIED_PATTERN.getId())).isNull();
+    assertNull(shapeRepository.getTripPatternShape(MODIFIED_PATTERN.getId()));
   }
 }

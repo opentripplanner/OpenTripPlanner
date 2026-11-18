@@ -1,6 +1,10 @@
 package org.opentripplanner.updater.trip.shape;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.street.geometry.GeometryUtils.makeLineString;
@@ -60,8 +64,8 @@ class RealTimeTripShapeWriterTest {
 
     var original = repository.getTripPatternShape(ORIGINAL.getId());
     var geometry = repository.getTripPatternShape(pattern.getId());
-    assertThat(geometry.get(0)).isEqualTo(original.get(0));
-    assertThat(geometry.get(1)).isEqualTo(original.get(1));
+    assertEquals(original.get(0), geometry.get(0));
+    assertEquals(original.get(1), geometry.get(1));
   }
 
   @Test
@@ -75,9 +79,7 @@ class RealTimeTripShapeWriterTest {
     subject.ensureTripPatternShape(pattern);
 
     var geometry = repository.getTripPatternShape(pattern.getId());
-    assertThat(geometry.get(0)).isEqualTo(
-      makeLineString(STOP_A.getCoordinate(), STOP_B.getCoordinate())
-    );
+    assertEquals(makeLineString(STOP_A.getCoordinate(), STOP_B.getCoordinate()), geometry.get(0));
   }
 
   @Test
@@ -92,7 +94,7 @@ class RealTimeTripShapeWriterTest {
     var first = repository.getTripPatternShape(pattern.getId());
     subject.ensureTripPatternShape(pattern);
 
-    assertThat(repository.getTripPatternShape(pattern.getId())).isSameInstanceAs(first);
+    assertSame(first, repository.getTripPatternShape(pattern.getId()));
   }
 
   @Test
@@ -105,8 +107,8 @@ class RealTimeTripShapeWriterTest {
 
     writer.ensureTripPatternShape(ORIGINAL);
 
-    assertThat(accessCount.get()).isEqualTo(0);
-    assertThat(repository.getTripPatternShape(ORIGINAL.getId())).isNull();
+    assertEquals(0, accessCount.get());
+    assertNull(repository.getTripPatternShape(ORIGINAL.getId()));
   }
 
   @Test
@@ -122,9 +124,9 @@ class RealTimeTripShapeWriterTest {
 
     subject.ensureTripPatternShape(pattern);
 
-    assertThat(repository.getTripPatternShape(pattern.getId())).isNotNull();
-    assertThat(scheduledShapes.getTripPatternShape(pattern.getId())).isNull();
-    assertThat(snapshotBefore.getTripPatternShape(pattern.getId())).isNull();
+    assertNotNull(repository.getTripPatternShape(pattern.getId()));
+    assertNull(scheduledShapes.getTripPatternShape(pattern.getId()));
+    assertNull(snapshotBefore.getTripPatternShape(pattern.getId()));
   }
 
   @Test
@@ -148,8 +150,8 @@ class RealTimeTripShapeWriterTest {
 
     var first = repository.getTripPatternShape(firstUpdate.getId());
     var second = repository.getTripPatternShape(secondUpdate.getId());
-    assertThat(second.get(0)).isEqualTo(first.get(0));
-    assertThat(second.get(1)).isEqualTo(first.get(1));
+    assertEquals(first.get(0), second.get(0));
+    assertEquals(first.get(1), second.get(1));
   }
 
   @Test
@@ -173,10 +175,8 @@ class RealTimeTripShapeWriterTest {
     subject.ensureTripPatternShape(secondUpdate);
 
     var second = repository.getTripPatternShape(secondUpdate.getId());
-    assertThat(second.get(0)).isEqualTo(
-      makeLineString(STOP_A.getCoordinate(), STOP_B.getCoordinate())
-    );
-    assertThat(repository.getTripPatternShape(firstUpdate.getId())).isNull();
+    assertEquals(makeLineString(STOP_A.getCoordinate(), STOP_B.getCoordinate()), second.get(0));
+    assertNull(repository.getTripPatternShape(firstUpdate.getId()));
   }
 
   @Test

@@ -1,6 +1,11 @@
 package org.opentripplanner.service.shape.model;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.street.geometry.GeometryUtils.makeLineString;
 
 import java.util.ArrayList;
@@ -49,7 +54,7 @@ class TripShapeFactoryTest {
   void distanceBetweenWithHopGeometriesMatchesHaversineWithinOneMeter() {
     var subject = TripShapeFactory.fromLineStrings(HOP_GEOMETRIES, NOOP);
 
-    assertThat(subject.distanceBetween(0, 0)).isEqualTo(0);
+    assertEquals(0, subject.distanceBetween(0, 0));
 
     // Contract: any distanceBetween(board, alight) is within 1 m of the exact haversine sum.
     double exactAtoB = exactDistance(STOP_A, STOP_B);
@@ -73,7 +78,7 @@ class TripShapeFactoryTest {
       NOOP
     );
 
-    assertThat(subject.distanceBetween(0, 0)).isEqualTo(0);
+    assertEquals(0, subject.distanceBetween(0, 0));
     assertThat((double) subject.distanceBetween(0, 1))
       .isWithin(1.0)
       .of(exactDistance(STOP_A, STOP_B));
@@ -114,7 +119,7 @@ class TripShapeFactoryTest {
     int whole = subject.distanceBetween(0, 2);
 
     // Strict equality: differences of cumulative entries cancel exactly.
-    assertThat(whole).isEqualTo(partA + partB);
+    assertEquals(partA + partB, whole);
   }
 
   @Test
@@ -122,14 +127,14 @@ class TripShapeFactoryTest {
     var subject = TripShapeFactory.fromLineStrings(HOP_GEOMETRIES, NOOP);
 
     LineString hop0 = subject.get(0);
-    assertThat(hop0.getNumPoints()).isEqualTo(3);
+    assertEquals(3, hop0.getNumPoints());
     assertThat(hop0.getCoordinateN(0).y).isWithin(1e-4).of(STOP_A.getCoordinate().latitude());
     assertThat(hop0.getCoordinateN(0).x).isWithin(1e-4).of(STOP_A.getCoordinate().longitude());
     assertThat(hop0.getCoordinateN(2).y).isWithin(1e-4).of(STOP_B.getCoordinate().latitude());
     assertThat(hop0.getCoordinateN(2).x).isWithin(1e-4).of(STOP_B.getCoordinate().longitude());
 
     LineString hop1 = subject.get(1);
-    assertThat(hop1.getNumPoints()).isEqualTo(2);
+    assertEquals(2, hop1.getNumPoints());
     assertThat(hop1.getCoordinateN(0).y).isWithin(1e-4).of(STOP_B.getCoordinate().latitude());
     assertThat(hop1.getCoordinateN(1).y).isWithin(1e-4).of(STOP_C.getCoordinate().latitude());
   }
@@ -142,9 +147,9 @@ class TripShapeFactoryTest {
     );
 
     LineString hop0 = subject.get(0);
-    assertThat(hop0.getNumPoints()).isEqualTo(2);
-    assertThat(hop0.getCoordinateN(0).y).isEqualTo(STOP_A.getCoordinate().latitude());
-    assertThat(hop0.getCoordinateN(1).y).isEqualTo(STOP_B.getCoordinate().latitude());
+    assertEquals(2, hop0.getNumPoints());
+    assertEquals(STOP_A.getCoordinate().latitude(), hop0.getCoordinateN(0).y);
+    assertEquals(STOP_B.getCoordinate().latitude(), hop0.getCoordinateN(1).y);
   }
 
   @Test
@@ -153,12 +158,12 @@ class TripShapeFactoryTest {
 
     LineString full = subject.concatenate(0, 2);
     // Hop 0: A, MID, B (3 points). Hop 1: B, C (2 points). Duplicate B at the join is dropped.
-    assertThat(full.getNumPoints()).isEqualTo(4);
+    assertEquals(4, full.getNumPoints());
     assertThat(full.getCoordinateN(0).y).isWithin(1e-4).of(STOP_A.getCoordinate().latitude());
     assertThat(full.getCoordinateN(3).y).isWithin(1e-4).of(STOP_C.getCoordinate().latitude());
 
-    assertThat(subject.concatenate(0, 1).getNumPoints()).isEqualTo(3);
-    assertThat(subject.concatenate(1, 2).getNumPoints()).isEqualTo(2);
+    assertEquals(3, subject.concatenate(0, 1).getNumPoints());
+    assertEquals(2, subject.concatenate(1, 2).getNumPoints());
   }
 
   @Test
@@ -166,8 +171,8 @@ class TripShapeFactoryTest {
     var subject = TripShapeFactory.fromLineStrings(HOP_GEOMETRIES, NOOP);
 
     LineString full = subject.concatenate();
-    assertThat(full).isNotNull();
-    assertThat(full.getNumPoints()).isEqualTo(4);
+    assertNotNull(full);
+    assertEquals(4, full.getNumPoints());
   }
 
   @Test
@@ -180,9 +185,9 @@ class TripShapeFactoryTest {
     );
 
     LineString full = subject.concatenate();
-    assertThat(full).isNotNull();
+    assertNotNull(full);
     // Two hops of 2 points each, with the duplicated junction at B dropped → 3 points.
-    assertThat(full.getNumPoints()).isEqualTo(3);
+    assertEquals(3, full.getNumPoints());
     assertThat(full.getCoordinateN(0).y).isWithin(1e-4).of(STOP_A.getCoordinate().latitude());
     assertThat(full.getCoordinateN(2).y).isWithin(1e-4).of(STOP_C.getCoordinate().latitude());
   }
@@ -194,9 +199,9 @@ class TripShapeFactoryTest {
     // has the contract-mandated single zero entry — even though numberOfStops is 0.
     var subject = TripShapeFactory.straightLines(TransitRepositoryForTest.stopPattern(), NOOP);
 
-    assertThat(subject.size()).isEqualTo(0);
-    assertThat(subject.distanceBetween(0, 0)).isEqualTo(0);
-    assertThat(subject.concatenate(0, subject.size()).isEmpty()).isTrue();
+    assertEquals(0, subject.size());
+    assertEquals(0, subject.distanceBetween(0, 0));
+    assertTrue(subject.concatenate(0, subject.size()).isEmpty());
   }
 
   @Test
@@ -209,10 +214,10 @@ class TripShapeFactoryTest {
       NOOP
     );
 
-    assertThat(subject.distanceBetween(0, 0)).isEqualTo(0);
+    assertEquals(0, subject.distanceBetween(0, 0));
     LineString empty = subject.concatenate(0, subject.size());
-    assertThat(empty).isNotNull();
-    assertThat(empty.isEmpty()).isTrue();
+    assertNotNull(empty);
+    assertTrue(empty.isEmpty());
   }
 
   @Test
@@ -222,10 +227,10 @@ class TripShapeFactoryTest {
     // (non-null) LineString because there are no hops to concatenate.
     var subject = TripShapeFactory.fromLineStrings(List.of(), NOOP);
 
-    assertThat(subject.distanceBetween(0, 0)).isEqualTo(0);
+    assertEquals(0, subject.distanceBetween(0, 0));
     LineString empty = subject.concatenate(0, subject.size());
-    assertThat(empty).isNotNull();
-    assertThat(empty.isEmpty()).isTrue();
+    assertNotNull(empty);
+    assertTrue(empty.isEmpty());
   }
 
   @Test
@@ -235,8 +240,8 @@ class TripShapeFactoryTest {
     var subject = TripShapeFactory.fromLineStrings(HOP_GEOMETRIES, NOOP);
 
     LineString empty = subject.concatenate(1, 1);
-    assertThat(empty).isNotNull();
-    assertThat(empty.isEmpty()).isTrue();
+    assertNotNull(empty);
+    assertTrue(empty.isEmpty());
   }
 
   @Test
@@ -245,8 +250,8 @@ class TripShapeFactoryTest {
     var first = TripShapeFactory.fromLineStrings(HOP_GEOMETRIES, deduplicator);
     var second = TripShapeFactory.fromLineStrings(HOP_GEOMETRIES, deduplicator);
 
-    assertThat(first.getCompact(0)).isSameInstanceAs(second.getCompact(0));
-    assertThat(first.getCompact(1)).isSameInstanceAs(second.getCompact(1));
-    assertThat(first.getCompact(0)).isNotSameInstanceAs(first.getCompact(1));
+    assertSame(second.getCompact(0), first.getCompact(0));
+    assertSame(second.getCompact(1), first.getCompact(1));
+    assertNotSame(first.getCompact(1), first.getCompact(0));
   }
 }

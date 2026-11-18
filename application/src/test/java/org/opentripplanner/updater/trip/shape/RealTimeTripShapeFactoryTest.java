@@ -1,6 +1,6 @@
 package org.opentripplanner.updater.trip.shape;
 
-import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.street.geometry.GeometryUtils.makeLineString;
 
@@ -55,16 +55,13 @@ class RealTimeTripShapeFactoryTest {
 
     var geometry = subject.createTripPatternShape(pattern, ORIGINAL_SHAPE);
 
-    assertThat(geometry.size()).isEqualTo(3);
-    assertThat(geometry.get(0)).isEqualTo(
-      makeLineString(STOP_A.getCoordinate(), STOP_X.getCoordinate(), STOP_B.getCoordinate())
+    assertEquals(3, geometry.size());
+    assertEquals(
+      makeLineString(STOP_A.getCoordinate(), STOP_X.getCoordinate(), STOP_B.getCoordinate()),
+      geometry.get(0)
     );
-    assertThat(geometry.get(1)).isEqualTo(
-      makeLineString(STOP_B.getCoordinate(), STOP_X.getCoordinate())
-    );
-    assertThat(geometry.get(2)).isEqualTo(
-      makeLineString(STOP_X.getCoordinate(), STOP_Y.getCoordinate())
-    );
+    assertEquals(makeLineString(STOP_B.getCoordinate(), STOP_X.getCoordinate()), geometry.get(1));
+    assertEquals(makeLineString(STOP_X.getCoordinate(), STOP_Y.getCoordinate()), geometry.get(2));
   }
 
   @Test
@@ -78,9 +75,9 @@ class RealTimeTripShapeFactoryTest {
 
     var geometry = subject.createTripPatternShape(pattern, ORIGINAL_SHAPE);
 
-    assertThat(geometry.distanceBetween(0, 2)).isEqualTo(ORIGINAL_SHAPE.distanceBetween(0, 2));
-    assertThat(geometry.get(0)).isEqualTo(ORIGINAL_SHAPE.get(0));
-    assertThat(geometry.get(1)).isEqualTo(ORIGINAL_SHAPE.get(1));
+    assertEquals(ORIGINAL_SHAPE.distanceBetween(0, 2), geometry.distanceBetween(0, 2));
+    assertEquals(ORIGINAL_SHAPE.get(0), geometry.get(0));
+    assertEquals(ORIGINAL_SHAPE.get(1), geometry.get(1));
   }
 
   /**
@@ -122,11 +119,13 @@ class RealTimeTripShapeFactoryTest {
 
     var geometry = subject.createTripPatternShape(pattern, originalShape);
 
-    assertThat(geometry.get(0)).isEqualTo(
-      makeLineString(stopNewOrigin.getCoordinate(), middle, stopDestination.getCoordinate())
+    assertEquals(
+      makeLineString(stopNewOrigin.getCoordinate(), middle, stopDestination.getCoordinate()),
+      geometry.get(0)
     );
-    assertThat(originalShape.get(0)).isEqualTo(
-      makeLineString(stopOrigin.getCoordinate(), middle, stopDestination.getCoordinate())
+    assertEquals(
+      makeLineString(stopOrigin.getCoordinate(), middle, stopDestination.getCoordinate()),
+      originalShape.get(0)
     );
   }
 
@@ -140,11 +139,9 @@ class RealTimeTripShapeFactoryTest {
 
     var geometry = subject.createTripPatternShape(pattern, null);
 
-    assertThat(geometry.get(0)).isEqualTo(
-      makeLineString(STOP_A.getCoordinate(), STOP_B.getCoordinate())
-    );
+    assertEquals(makeLineString(STOP_A.getCoordinate(), STOP_B.getCoordinate()), geometry.get(0));
     double expected = distance(STOP_A, STOP_B) + distance(STOP_B, STOP_C);
-    assertThat(geometry.distanceBetween(0, 2)).isEqualTo((int) Math.round(expected));
+    assertEquals((int) Math.round(expected), geometry.distanceBetween(0, 2));
   }
 
   @Test
@@ -158,13 +155,9 @@ class RealTimeTripShapeFactoryTest {
 
     var geometry = subject.createTripPatternShape(pattern, null);
 
-    assertThat(geometry.size()).isEqualTo(2);
-    assertThat(geometry.get(0)).isEqualTo(
-      makeLineString(STOP_A.getCoordinate(), STOP_B.getCoordinate())
-    );
-    assertThat(geometry.get(1)).isEqualTo(
-      makeLineString(STOP_B.getCoordinate(), STOP_C.getCoordinate())
-    );
+    assertEquals(2, geometry.size());
+    assertEquals(makeLineString(STOP_A.getCoordinate(), STOP_B.getCoordinate()), geometry.get(0));
+    assertEquals(makeLineString(STOP_B.getCoordinate(), STOP_C.getCoordinate()), geometry.get(1));
   }
 
   private static double distance(RegularStop from, RegularStop to) {

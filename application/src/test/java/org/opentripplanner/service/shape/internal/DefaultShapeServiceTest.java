@@ -1,6 +1,7 @@
 package org.opentripplanner.service.shape.internal;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Map;
@@ -49,8 +50,9 @@ class DefaultShapeServiceTest {
   void scheduledGeometryIsServed() {
     var service = new DefaultShapeService(repository.createSnapshot());
 
-    assertThat(service.getTripPatternShape(SCHEDULED_PATTERN.getId())).isSameInstanceAs(
-      SCHEDULED_TRIP_PATTERN_GEOMETRY
+    assertSame(
+      SCHEDULED_TRIP_PATTERN_GEOMETRY,
+      service.getTripPatternShape(SCHEDULED_PATTERN.getId())
     );
   }
 
@@ -59,9 +61,7 @@ class DefaultShapeServiceTest {
     repository.setTripPatternShape(RT_PATTERN, RT_TRIP_PATTERN_GEOMETRY);
     var service = new DefaultShapeService(repository.createSnapshot());
 
-    assertThat(service.getTripPatternShape(RT_PATTERN.getId())).isSameInstanceAs(
-      RT_TRIP_PATTERN_GEOMETRY
-    );
+    assertSame(RT_TRIP_PATTERN_GEOMETRY, service.getTripPatternShape(RT_PATTERN.getId()));
   }
 
   @Test
@@ -69,8 +69,9 @@ class DefaultShapeServiceTest {
     repository.setTripPatternShape(SCHEDULED_PATTERN, OVERRIDING_TRIP_PATTERN_GEOMETRY);
     var service = new DefaultShapeService(repository.createSnapshot());
 
-    assertThat(service.getTripPatternShape(SCHEDULED_PATTERN.getId())).isSameInstanceAs(
-      OVERRIDING_TRIP_PATTERN_GEOMETRY
+    assertSame(
+      OVERRIDING_TRIP_PATTERN_GEOMETRY,
+      service.getTripPatternShape(SCHEDULED_PATTERN.getId())
     );
   }
 
@@ -79,9 +80,7 @@ class DefaultShapeServiceTest {
     var service = new DefaultShapeService(repository);
     repository.setTripPatternShape(RT_PATTERN, RT_TRIP_PATTERN_GEOMETRY);
 
-    assertThat(service.getTripPatternShape(RT_PATTERN.getId())).isSameInstanceAs(
-      RT_TRIP_PATTERN_GEOMETRY
-    );
+    assertSame(RT_TRIP_PATTERN_GEOMETRY, service.getTripPatternShape(RT_PATTERN.getId()));
   }
 
   @Test

@@ -1,6 +1,7 @@
 package org.opentripplanner.service.shape;
 
-import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
 import java.util.HashMap;
@@ -17,7 +18,7 @@ class ScheduledShapeDataTest {
   void emptyHasNoGeometry() {
     var empty = ScheduledShapeData.empty();
 
-    assertThat(empty.getTripPatternShape(id("A"))).isNull();
+    assertNull(empty.getTripPatternShape(id("A")));
   }
 
   @Test
@@ -27,7 +28,7 @@ class ScheduledShapeDataTest {
     var data = ScheduledShapeData.of(geometriesByTripPattern);
     geometriesByTripPattern.put(id("B"), TRIP_PATTERN_GEOMETRY);
 
-    assertThat(data.getTripPatternShape(id("A"))).isSameInstanceAs(TRIP_PATTERN_GEOMETRY);
-    assertThat(data.getTripPatternShape(id("B"))).isNull();
+    assertSame(TRIP_PATTERN_GEOMETRY, data.getTripPatternShape(id("A")));
+    assertNull(data.getTripPatternShape(id("B")));
   }
 }

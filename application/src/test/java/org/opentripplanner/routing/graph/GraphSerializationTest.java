@@ -1,8 +1,8 @@
 package org.opentripplanner.routing.graph;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.conveyal.object_differ.ObjectDiffer;
 import java.io.File;
@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -106,14 +107,15 @@ public class GraphSerializationTest {
   @Test
   public void testRoundTripSerializationForGTFSGraph() throws Exception {
     TestOtpModel model = ConstantsForTests.buildNewPortlandGraph(true);
-    // Guard against the shape comparison being vacuous
-    assertTrue(
-      model
-        .timetableDataImport()
-        .getAllTripPatterns()
-        .stream()
-        .anyMatch(p -> model.shapeDataImport().getTripPatternShape(p.getId()) != null)
-    );
+    // Make sure there are shapes, otherwise the shape comparison below proves nothing
+    var shapes = model
+      .timetableDataImport()
+      .getAllTripPatterns()
+      .stream()
+      .map(p -> model.shapeDataImport().getTripPatternShape(p.getId()))
+      .filter(Objects::nonNull)
+      .toList();
+    assertThat(shapes).isNotEmpty();
     var streetRepository = createStreetRepository();
     var osmGraphBuildRepository = new DefaultOsmInfoGraphBuildRepository();
     var streetDetailsRepository = new DefaultStreetDetailsRepository();
