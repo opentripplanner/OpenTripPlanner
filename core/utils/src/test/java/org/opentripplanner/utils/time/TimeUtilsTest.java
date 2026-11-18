@@ -11,6 +11,8 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 public class TimeUtilsTest {
 
@@ -77,6 +79,38 @@ public class TimeUtilsTest {
     assertEquals("", TimeUtils.timeToStrLong(NOT_SET, NOT_SET));
     assertEquals("09:36:07", TimeUtils.timeToStrLong(CAL));
     assertEquals("10:26:03-1d", TimeUtils.timeToStrLong(-T13_33_57));
+  }
+
+  @ParameterizedTest
+  @CsvSource({
+    "0, 0",
+    "86399, 0",
+    "86400, 1",
+    "90000, 1",
+    "-1, -1",
+    "-180, -1",
+    "-86400, -1",
+    "-86401, -2",
+    "-172800, -2",
+  })
+  void testDayOffset(int secondsSinceMidnight, int expected) {
+    assertEquals(expected, TimeUtils.dayOffset(secondsSinceMidnight));
+  }
+
+  @ParameterizedTest
+  @CsvSource({
+    "0, 00:00",
+    "86399, 23:59:59",
+    "86400, 00:00",
+    "90000, 01:00",
+    "-1, 23:59:59",
+    "-180, 23:57",
+    "-86400, 00:00",
+    "-86401, 23:59:59",
+    "-172800, 00:00",
+  })
+  void testTimeOfDay(int secondsSinceMidnight, LocalTime expected) {
+    assertEquals(expected, TimeUtils.timeOfDay(secondsSinceMidnight));
   }
 
   @Test

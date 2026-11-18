@@ -8,17 +8,16 @@ import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLScalarType;
-import java.time.Duration;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import org.opentripplanner.utils.time.TimeUtils;
 
 public final class TimeScalarFactory {
 
   private static final String DOCUMENTATION =
     "Time using the format: `HH:MM:SS`. Example: `18:25:43`";
   private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_LOCAL_TIME;
-  private static final long SECONDS_PER_DAY = Duration.ofDays(1).getSeconds();
 
   private TimeScalarFactory() {}
 
@@ -43,9 +42,10 @@ public final class TimeScalarFactory {
               "of the service date."
           )
           .type(Scalars.GraphQLInt)
-          .dataFetcher(environment ->
-            Math.floorDiv((Integer) environment.getSource(), SECONDS_PER_DAY)
-          )
+          .dataFetcher(environment -> {
+            int secondsSinceMidnight = environment.getSource();
+            return TimeUtils.dayOffset(secondsSinceMidnight);
+          })
           .build()
       )
       .build();
@@ -59,10 +59,8 @@ public final class TimeScalarFactory {
         new Coercing<>() {
           @Override
           public String serialize(Object input) {
-            if (input instanceof Integer) {
-              return LocalTime.ofSecondOfDay(
-                Math.floorMod((Integer) input, SECONDS_PER_DAY)
-              ).format(FORMATTER);
+            if (input instanceof Integer secondsSinceMidnight) {
+              return TimeUtils.timeOfDay(secondsSinceMidnight).format(FORMATTER);
             }
             return null;
           }
