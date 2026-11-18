@@ -91,7 +91,7 @@ jobs:
         env:
           MAVEN_OPTS: "-Dmaven.repo.local=/home/lenni/.m2/repository/"
         # the benchmarks don't need the debug client
-        run: mvn -DskipTests -Dplugin.frontend.skip=true --batch-mode install -P prettierSkip,checkstyleSkip
+        run: mvn -DskipTests -Dplugin.frontend.skip=true --batch-mode install -P jcfSkip,checkstyleSkip
 
       - name: Build graph
         if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'

@@ -98,7 +98,7 @@
         <!-- The Java code formatter, see .jcf/config.properties for the format options -->
         <plugin.jcf.version>1.0.0</plugin.jcf.version>
         <plugin.jcf.goal>format</plugin.jcf.goal>
-        <plugin.jcf.skip>true</plugin.jcf.skip>
+        <plugin.jcf.skip>false</plugin.jcf.skip>
         <!-- The npm package used by the Spotless 'prettier' steps (Markdown, JSON and GraphQL) -->
         <prettier.version>3.9.6</prettier.version>
         <plugin.rewrite.skip>true</plugin.rewrite.skip>
@@ -721,26 +721,30 @@
             </properties>
         </profile>
         <profile>
-            <id>prettierCheck</id>
+            <id>jcfCheck</id>
             <properties>
                 <!-- In the CI environment we want to validate that code is formatted -->
                 <plugin.spotless.goal>check</plugin.spotless.goal>
+                <plugin.jcf.goal>check</plugin.jcf.goal>
             </properties>
         </profile>
         <profile>
-            <id>prettierSkip</id>
+            <id>jcfSkip</id>
             <activation>
                 <property>
                     <!--
                       This works as a short alias to enable this from the command line. To skip
-                      prettier, set the 'ps' system property with the '-D ps' parameter.
+                      the code formatting, set the 'jcf' system property with the '-D jcf'
+                      parameter. It skips the Java formatter and Spotless (Markdown, JSON, GraphQL
+                      and unused imports).
                     -->
-                    <name>ps</name>
+                    <name>jcf</name>
                     <value/>
                 </property>
             </activation>
             <properties>
                 <plugin.spotless.skip>true</plugin.spotless.skip>
+                <plugin.jcf.skip>true</plugin.jcf.skip>
             </properties>
         </profile>
         <profile>
