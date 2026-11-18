@@ -38,9 +38,14 @@ public final class TimeScalarFactory {
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("dayOffset")
-          .description("Number of days offset from base line time")
+          .description(
+            "Number of days offset from the service date. Negative if the time is before midnight " +
+              "of the service date."
+          )
           .type(Scalars.GraphQLInt)
-          .dataFetcher(environment -> (Integer) environment.getSource() / SECONDS_PER_DAY)
+          .dataFetcher(environment ->
+            Math.floorDiv((Integer) environment.getSource(), SECONDS_PER_DAY)
+          )
           .build()
       )
       .build();
@@ -55,7 +60,9 @@ public final class TimeScalarFactory {
           @Override
           public String serialize(Object input) {
             if (input instanceof Integer) {
-              return LocalTime.ofSecondOfDay((Integer) input % SECONDS_PER_DAY).format(FORMATTER);
+              return LocalTime.ofSecondOfDay(
+                Math.floorMod((Integer) input, SECONDS_PER_DAY)
+              ).format(FORMATTER);
             }
             return null;
           }
