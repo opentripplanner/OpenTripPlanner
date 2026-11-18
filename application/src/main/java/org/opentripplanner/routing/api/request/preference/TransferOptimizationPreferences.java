@@ -80,9 +80,11 @@ public final class TransferOptimizationPreferences
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     TransferOptimizationPreferences that = (TransferOptimizationPreferences) o;
     return (
       optimizeTransferWaitTime == that.optimizeTransferWaitTime &&

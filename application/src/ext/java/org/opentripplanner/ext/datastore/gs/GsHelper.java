@@ -38,6 +38,7 @@ class GsHelper {
     if (m.matches()) {
       return BlobId.of(m.group(1), dirName(m.group(2)));
     }
+
     throw new IllegalArgumentException(
       "The '" +
         uri +

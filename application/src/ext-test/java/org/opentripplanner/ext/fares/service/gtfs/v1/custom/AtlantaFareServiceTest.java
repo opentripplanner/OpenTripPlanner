@@ -303,9 +303,11 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
     @Override
     protected Money getLegPrice(Leg leg, FareType fareType, Collection<FareRuleSet> fareRules) {
       var routeShortName = leg.route().getShortName();
+
       if (routeShortName == null) {
         return DEFAULT_TEST_RIDE_PRICE;
       }
+
       routeShortName = leg.route().getShortName().toLowerCase();
 
       // Testing, return default test ride price.

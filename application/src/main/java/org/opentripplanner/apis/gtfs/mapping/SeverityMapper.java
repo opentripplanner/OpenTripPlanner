@@ -17,6 +17,7 @@ public class SeverityMapper {
     if (severity == null) {
       return GraphQLAlertSeverityLevelType.UNKNOWN_SEVERITY;
     }
+
     return switch (severity) {
       case INFO -> GraphQLAlertSeverityLevelType.INFO;
       case VERY_SLIGHT, SLIGHT, WARNING -> GraphQLAlertSeverityLevelType.WARNING;

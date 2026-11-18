@@ -56,23 +56,29 @@ public class VertexPropertyMapper extends PropertyMapper<Vertex> {
 
   private Set<TraverseMode> spacesFor(VehicleParking vehicleParking) {
     var ret = new HashSet<TraverseMode>();
+
     if (vehicleParking.hasAnyCarPlaces()) {
       ret.add(TraverseMode.CAR);
     }
+
     if (vehicleParking.hasBicyclePlaces()) {
       ret.add(TraverseMode.BICYCLE);
     }
+
     return ret;
   }
 
   private Set<TraverseMode> traversalPermissions(VehicleParkingEntrance entrance) {
     var ret = new HashSet<TraverseMode>();
+
     if (entrance.isCarAccessible()) {
       ret.add(TraverseMode.CAR);
     }
+
     if (entrance.isWalkAccessible()) {
       ret.add(TraverseMode.WALK);
     }
+
     return ret;
   }
 

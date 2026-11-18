@@ -22,6 +22,7 @@ class PassengerStopAssignmentToQuaylessStopPlace
   @Override
   public Status validate(String stopPlaceRef) {
     var stopPlace = index.getStopPlaceById().lookupLastVersionById(stopPlaceRef);
+
     if (hasAtLeastOneUsableQuay(stopPlace)) {
       return Status.OK;
     } else {
@@ -54,6 +55,7 @@ class PassengerStopAssignmentToQuaylessStopPlace
         .filter(PassengerStopAssignmentToQuaylessStopPlace::hasValidCoordinate)
         .isPresent();
     }
+
     // could be a QuayRef which we don't support (yet)
     return false;
   }
@@ -70,10 +72,13 @@ class PassengerStopAssignmentToQuaylessStopPlace
         location.getLongitude().doubleValue()
       );
     }
+
     var pos = location.getPos();
+
     if (pos == null || (pos.getValue().size() != 2 && pos.getValue().size() != 3)) {
       return false;
     }
+
     return WgsCoordinate.isValid(pos.getValue().getFirst(), pos.getValue().get(1));
   }
 }

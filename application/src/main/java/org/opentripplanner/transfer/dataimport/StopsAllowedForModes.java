@@ -50,18 +50,22 @@ public class StopsAllowedForModes implements AllowedModesLookup {
     boolean car = idx.carStops().contains(stopId);
     boolean bicycle =
       idx.bicycleStops().contains(stopId) || !stopsVisitedByPatterns.contains(stopId);
+
     if (car) {
       return bicycle ? BICYCLE_AND_CAR : CAR;
     }
+
     return bicycle ? BICYCLE : NONE;
   }
 
   /** Thread-safe, the transfers are generated in parallel. */
   private Index index() {
     var result = index;
+
     if (result == null) {
       synchronized (this) {
         result = index;
+
         if (result == null) {
           result = new Index(
             ids(timetableDataImport.getStopLocationsUsedForCarsAllowedTrips()),
@@ -71,14 +75,17 @@ public class StopsAllowedForModes implements AllowedModesLookup {
         }
       }
     }
+
     return result;
   }
 
   private static Set<FeedScopedId> ids(Set<StopLocation> stops) {
     var ids = new HashSet<FeedScopedId>();
+
     for (var stop : stops) {
       ids.add(stop.getId());
     }
+
     return ids;
   }
 

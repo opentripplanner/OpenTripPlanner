@@ -45,9 +45,11 @@ public class StreetRequest implements Serializable {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     StreetRequest that = (StreetRequest) o;
     return mode == that.mode && Objects.equals(rentalDuration, that.rentalDuration);
   }

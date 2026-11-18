@@ -54,20 +54,27 @@ public class InsertionEvaluator {
     TripWithViableAccessEgress tripWithViableAccessEgress
   ) {
     var viableStops = tripWithViableAccessEgress.viableAccessEgress();
+
     if (viableStops.isEmpty()) {
       return List.of();
     }
+
     var plan = plan(tripWithViableAccessEgress.routableTrip());
+
     if (plan == null) {
       return List.of();
     }
+
     var candidates = new ArrayList<InsertionCandidate>();
+
     for (var viable : viableStops) {
       var candidate = plan.best(toPassengerSnap(viable), viable.transitStop());
+
       if (candidate != null) {
         candidates.add(candidate);
       }
     }
+
     return candidates;
   }
 
@@ -91,13 +98,16 @@ public class InsertionEvaluator {
   private TripInsertionPlan plan(RoutableCarpoolTrip routableTrip) {
     var waypoints = routableTrip.vertices();
     var baseline = new RoutedSegment[waypoints.size() - 1];
+
     for (int leg = 0; leg < baseline.length; leg++) {
       baseline[leg] = carpoolRouter.route(waypoints.get(leg), waypoints.get(leg + 1));
+
       if (baseline[leg] == null) {
         LOG.info("Could not route leg {} of carpool trip {}", leg, routableTrip.trip().getId());
         return null;
       }
     }
+
     return new TripInsertionPlan(routableTrip, baseline);
   }
 
@@ -155,17 +165,23 @@ public class InsertionEvaluator {
       this.dwell = stopDuration.toSeconds();
       this.legCount = baseline.length;
       this.legSeconds = new long[legCount];
+
       for (int leg = 0; leg < legCount; leg++) {
         legSeconds[leg] = baseline[leg].durationSeconds();
       }
+
       CarpoolTrip trip = routableTrip.trip();
       this.legBudget = new long[legCount];
+
       for (int leg = 0; leg < legCount; leg++) {
         legBudget[leg] = trip.legDeviationBudget(leg).toSeconds();
       }
+
       this.capacityOk = new boolean[legCount][legCount];
+
       for (int firstLeg = 0; firstLeg < legCount; firstLeg++) {
         boolean ok = true;
+
         for (int lastLeg = firstLeg; lastLeg < legCount && ok; lastLeg++) {
           ok = trip.hasFreeSeat(lastLeg);
           capacityOk[firstLeg][lastLeg] = ok;
@@ -188,67 +204,87 @@ public class InsertionEvaluator {
           // The car is full on the pickup's leg, so no dropoff leg works with a pickup in it.
           continue;
         }
+
         RoutedSegment toPickup = pickupTimes.fromLegStart(pickupLeg);
+
         if (toPickup == null) {
           continue;
         }
+
         for (int dropoffLeg = pickupLeg; dropoffLeg < legCount; dropoffLeg++) {
           if (!capacityOk[pickupLeg][dropoffLeg]) {
             // The car is full somewhere between the two legs, so on every longer span too.
             break;
           }
+
           long detour;
+
           if (pickupLeg == dropoffLeg) {
             // Pickup and dropoff in the same leg: leg start → pickup → dropoff → leg end.
             RoutedSegment fromDropoff = dropoffTimes.toLegEnd(pickupLeg);
+
             if (fromDropoff == null) {
               continue;
             }
+
             RoutedSegment pickupToDropoff = pickupToDropoff(pickup, dropoff);
+
             if (pickupToDropoff == null) {
               continue;
             }
+
             detour =
               toPickup.durationSeconds() +
               pickupToDropoff.durationSeconds() +
               fromDropoff.durationSeconds() -
               legSeconds[pickupLeg] +
               2 * dwell;
+
             if (detour > legBudget[pickupLeg]) {
               continue;
             }
           } else {
             RoutedSegment fromPickup = pickupTimes.toLegEnd(pickupLeg);
+
             if (fromPickup == null) {
               break;
             }
+
             long pickupDetour =
               toPickup.durationSeconds() +
               fromPickup.durationSeconds() -
               legSeconds[pickupLeg] +
               dwell;
+
             if (pickupDetour > legBudget[pickupLeg]) {
               // The pickup's detour delays every later stop, so no later dropoff leg works either.
               break;
             }
+
             RoutedSegment toDropoff = dropoffTimes.fromLegStart(dropoffLeg);
+
             if (toDropoff == null) {
               continue;
             }
+
             RoutedSegment fromDropoff = dropoffTimes.toLegEnd(dropoffLeg);
+
             if (fromDropoff == null) {
               continue;
             }
+
             long dropoffDetour =
               toDropoff.durationSeconds() +
               fromDropoff.durationSeconds() -
               legSeconds[dropoffLeg] +
               dwell;
             detour = pickupDetour + dropoffDetour;
+
             if (detour > legBudget[dropoffLeg]) {
               continue;
             }
           }
+
           if (detour < bestDetour) {
             bestDetour = detour;
             bestPickupLeg = pickupLeg;
@@ -256,9 +292,11 @@ public class InsertionEvaluator {
           }
         }
       }
+
       if (bestPickupLeg < 0) {
         return null;
       }
+
       var pickupToDropoff =
         bestPickupLeg == bestDropoffLeg ? pickupToDropoff(pickup, dropoff) : null;
       return new InsertionCandidate(
@@ -287,6 +325,7 @@ public class InsertionEvaluator {
       @Nullable RoutedSegment pickupToDropoff
     ) {
       var segments = new ArrayList<RoutedSegment>(legCount + 2);
+
       for (int leg = 0; leg < legCount; leg++) {
         if (leg == pickupLeg && leg == dropoffLeg) {
           segments.add(Objects.requireNonNull(pickupTimes.fromLegStart(leg)));
@@ -302,6 +341,7 @@ public class InsertionEvaluator {
           segments.add(baseline[leg]);
         }
       }
+
       return segments;
     }
 
@@ -338,6 +378,7 @@ public class InsertionEvaluator {
           fromLegStartRouted[leg] = true;
           fromLegStart[leg] = carpoolRouter.route(routableTrip.vertices().get(leg), point);
         }
+
         return fromLegStart[leg];
       }
 
@@ -348,6 +389,7 @@ public class InsertionEvaluator {
           toLegEndRouted[leg] = true;
           toLegEnd[leg] = carpoolRouter.route(point, routableTrip.vertices().get(leg + 1));
         }
+
         return toLegEnd[leg];
       }
     }

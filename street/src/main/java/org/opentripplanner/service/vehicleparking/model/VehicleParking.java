@@ -290,9 +290,11 @@ public class VehicleParking implements Serializable {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     final VehicleParking that = (VehicleParking) o;
     return (
       Objects.equals(coordinate, that.coordinate) &&
@@ -447,6 +449,7 @@ public class VehicleParking implements Serializable {
 
     public VehicleParking build() {
       VehicleParkingState state$value = this.state$value;
+
       if (!this.state$set) {
         state$value = VehicleParkingState.OPERATIONAL;
       }

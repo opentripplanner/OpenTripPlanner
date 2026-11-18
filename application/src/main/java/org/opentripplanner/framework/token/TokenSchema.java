@@ -50,11 +50,13 @@ public class TokenSchema {
 
   public Token decode(String token) {
     var deserializer = new Deserializer(token);
+
     for (TokenDefinition definition : definitions) {
       try {
         return new Token(definition, deserializer.deserialize(definition));
       } catch (Exception ignore) {}
     }
+
     throw new IllegalArgumentException(
       "Token is not valid. Unable to parse token: '" + token + "'."
     );

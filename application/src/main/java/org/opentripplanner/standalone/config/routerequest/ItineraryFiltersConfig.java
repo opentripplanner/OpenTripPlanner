@@ -66,6 +66,7 @@ public class ItineraryFiltersConfig {
     if (c.isEmpty()) {
       return;
     }
+
     var dft = builder.original();
 
     builder

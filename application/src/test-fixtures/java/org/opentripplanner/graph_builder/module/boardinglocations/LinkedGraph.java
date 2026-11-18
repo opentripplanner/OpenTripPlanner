@@ -29,15 +29,19 @@ public record LinkedGraph(Graph rawGraph, DefaultDataImportIssueStore issueStore
   /** The single boarding location the stop is linked to. */
   public OsmBoardingLocationVertex boardingLocation(RegularStop stop) {
     var linked = linkedVertices(stop);
+
     if (linked.size() != 1) {
       throw new IllegalStateException(
         stop.getId() + " should link to exactly one boarding location, but linked to " + linked
       );
     }
+
     var vertex = linked.iterator().next();
+
     if (vertex instanceof OsmBoardingLocationVertex boardingLocation) {
       return boardingLocation;
     }
+
     throw new IllegalStateException(
       stop.getId() + " is linked to a " + vertex.getClass().getSimpleName()
     );

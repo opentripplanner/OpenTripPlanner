@@ -26,6 +26,7 @@ public class EmissionServiceModule {
     if (OTPFeature.Emission.isOff() || emissionRepository == null) {
       return null;
     }
+
     return new EmissionItineraryDecorator(new DefaultEmissionService(emissionRepository));
   }
 }

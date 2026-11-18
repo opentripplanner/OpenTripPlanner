@@ -106,10 +106,13 @@ public class TimetableUpdateMapper {
     SetMultimap<TripPattern, TripPatternForDate> oldTripPatternsForDate = HashMultimap.create();
 
     TransferIndexGenerator transferIndexGenerator = null;
+
     if (OTPFeature.TransferConstraints.isOn()) {
       transferIndexGenerator = realtimeRaptorTransitData.getTransferIndexGenerator();
     }
+
     Set<TripPatternForDate> previouslyUsedPatterns = new HashSet<>();
+
     // Map new TriPatternForDate and index for old and new TripPatternsForDate on service date
     for (Timetable timetable : updatedTimetables) {
       LocalDate date = timetable.getServiceDate();
@@ -149,6 +152,7 @@ public class TimetableUpdateMapper {
         tripPatternsStartingOnDateMapCache.get(date).put(tripPattern, newTripPatternForDate);
         newTripPatternsForDate.put(tripPattern, newTripPatternForDate);
         datesToBeUpdated.addAll(newTripPatternForDate.getRunningPeriodDates());
+
         if (transferIndexGenerator != null && tripPattern.isStopPatternModifiedInRealTime()) {
           transferIndexGenerator.addRealtimeTrip(
             tripPattern,
@@ -163,6 +167,7 @@ public class TimetableUpdateMapper {
           );
           TripPatternForDate previousTripPatternForDate =
             tripPatternsForTripIdAndServiceDateCache.put(id, newTripPatternForDate);
+
           if (previousTripPatternForDate != null) {
             previouslyUsedPatterns.add(previousTripPatternForDate);
           } else {
@@ -202,10 +207,13 @@ public class TimetableUpdateMapper {
       for (TripPatternForDate tripPatternForDate : previouslyUsedPatterns) {
         if (tripPatternForDate.getServiceDate().equals(date)) {
           TripPattern pattern = tripPatternForDate.getTripPattern().getPattern();
+
           if (!pattern.isStopPatternModifiedInRealTime()) {
             continue;
           }
+
           var oldTimeTable = timetableProvider.apply(pattern.getId());
+
           if (oldTimeTable != null) {
             var toRemove = oldTimeTable
               .stream()

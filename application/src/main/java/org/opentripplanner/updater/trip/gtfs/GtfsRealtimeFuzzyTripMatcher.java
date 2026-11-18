@@ -62,15 +62,19 @@ public class GtfsRealtimeFuzzyTripMatcher {
     FeedScopedId routeId = new FeedScopedId(feedId, trip.getRouteId());
     int time = TimeUtils.time(trip.getStartTime());
     LocalDate date;
+
     try {
       date = ServiceDateUtils.parseString(trip.getStartDate());
     } catch (ParseException e) {
       return trip;
     }
+
     Route route = timetableRepository.getRoute(routeId);
+
     if (route == null) {
       return trip;
     }
+
     Direction direction = directionMapper.map(trip.getDirectionId());
 
     Trip matchedTrip = getTrip(route, direction, time, date);
@@ -124,6 +128,7 @@ public class GtfsRealtimeFuzzyTripMatcher {
       if (pattern.getDirection() != direction) {
         continue;
       }
+
       for (TripTimes<?> times : pattern.getScheduledTimetable().getTripTimes()) {
         if (
           times.getScheduledDepartureTime(0) == startTime &&
@@ -133,6 +138,7 @@ public class GtfsRealtimeFuzzyTripMatcher {
         }
       }
     }
+
     return null;
   }
 }

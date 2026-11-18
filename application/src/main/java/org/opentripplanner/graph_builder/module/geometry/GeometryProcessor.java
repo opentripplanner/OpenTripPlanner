@@ -82,6 +82,7 @@ public class GeometryProcessor {
    */
   public List<LineString> createHopGeometries(Trip trip) {
     List<StopTime> stopTimes = builder.getStopTimesSortedByTrip().get(trip);
+
     if (
       trip.getShapeId() == null ||
       trip.getShapeId().getId() == null ||
@@ -90,6 +91,7 @@ public class GeometryProcessor {
       // a straight line between two stops has no interior points to simplify away
       return Arrays.asList(createStraightLineHopGeometries(stopTimes));
     }
+
     LineString[] geometry = createGeometry(trip.getShapeId(), stopTimes);
 
     return transitShapeSimplificationToleranceMeters <= 0
@@ -121,6 +123,7 @@ public class GeometryProcessor {
     if (hasShapeDist(shapeId, stopTimes)) {
       // this trip has shape_dist in stop_times
       LineString[] geometries = getHopGeometriesViaShapeDistTravelled(stopTimes, shapeId);
+
       if (geometries != null) {
         return geometries;
       }
@@ -128,6 +131,7 @@ public class GeometryProcessor {
     }
 
     LineString shapeLineString = getLineStringForShapeId(shapeId);
+
     if (shapeLineString == null) {
       // this trip has a shape_id, but no such shape exists, and no shape_dist in stop_times
       // create straight line segments between stops for each hop
@@ -141,6 +145,7 @@ public class GeometryProcessor {
     }
 
     List<LinearLocation> locations = getLinearLocations(stopTimes, shapeLineString);
+
     if (locations == null) {
       // this only happens on shape which have points very far from
       // their stop sequence. So we'll fall back to trivial stop-to-stop
@@ -168,6 +173,7 @@ public class GeometryProcessor {
     LinearLocation endLocation = locationIt.next();
     double distanceSoFar = 0;
     int last = 0;
+
     for (int i = 0; i < stopTimes.size() - 1; ++i) {
       LinearLocation startLocation = endLocation;
       endLocation = locationIt.next();
@@ -182,10 +188,12 @@ public class GeometryProcessor {
         double yd = from.y - to.y;
         distanceSoFar += Math.sqrt(xd * xd + yd * yd);
       }
+
       last = startLocation.getSegmentIndex();
 
       double startIndex =
         distanceSoFar + startLocation.getSegmentFraction() * startLocation.getSegmentLength(shape);
+
       //advance distanceSoFar up to start of segment containing endLocation
       for (int j = last; j < endLocation.getSegmentIndex(); ++j) {
         Coordinate from = shape.getCoordinateN(j);
@@ -194,6 +202,7 @@ public class GeometryProcessor {
         double yd = from.y - to.y;
         distanceSoFar += Math.sqrt(xd * xd + yd * yd);
       }
+
       last = startLocation.getSegmentIndex();
       double endIndex =
         distanceSoFar + endLocation.getSegmentFraction() * endLocation.getSegmentLength(shape);
@@ -212,8 +221,10 @@ public class GeometryProcessor {
         );
         geometry = GEOMETRY_FACTORY.createLineString(sequence);
       }
+
       geoms[i] = geometry;
     }
+
     return geoms;
   }
 
@@ -221,12 +232,15 @@ public class GeometryProcessor {
     var isFlexTrip = FlexTrip.containsFlexStops(stopTimes);
     // This trip does not have shape_dist in stop_times, but does have an associated shape.
     ArrayList<IndexedLineSegment> segments = new ArrayList<>();
+
     for (int i = 0; i < shape.getNumPoints() - 1; ++i) {
       segments.add(new IndexedLineSegment(i, shape.getCoordinateN(i), shape.getCoordinateN(i + 1)));
     }
+
     // Find possible segment matches for each stop.
     List<List<IndexedLineSegment>> possibleSegmentsForStop = new ArrayList<>();
     int minSegmentIndex = 0;
+
     for (int i = 0; i < stopTimes.size(); ++i) {
       StopLocation stop = stopTimes.get(i).getStop();
       Coordinate coord = stop.getCoordinate().asJtsCoordinate();
@@ -236,26 +250,33 @@ public class GeometryProcessor {
       int maxSegmentIndex = -1;
       int index = -1;
       int minSegmentIndexForThisStop = -1;
+
       for (IndexedLineSegment segment : segments) {
         index++;
+
         if (segment.index < minSegmentIndex) {
           continue;
         }
+
         double distance = segment.distance(coord);
+
         if (distance < maxStopToShapeSnapDistance || isFlexTrip) {
           stopSegments.add(segment);
           maxSegmentIndex = index;
+
           if (minSegmentIndexForThisStop == -1) {
             minSegmentIndexForThisStop = index;
           }
         } else if (distance < bestDistance) {
           bestDistance = distance;
           bestSegment = segment;
+
           if (maxSegmentIndex != -1) {
             maxSegmentIndex = index;
           }
         }
       }
+
       if (stopSegments.size() == 0 && bestSegment != null) {
         //no segments within 150m
         //fall back to nearest segment
@@ -272,11 +293,13 @@ public class GeometryProcessor {
 
         ) {
           IndexedLineSegment segment = it.next();
+
           if (segment.index > maxSegmentIndex) {
             it.remove();
           }
         }
       }
+
       possibleSegmentsForStop.add(stopSegments);
     }
 
@@ -286,12 +309,14 @@ public class GeometryProcessor {
   private LineString[] createStraightLineHopGeometries(List<StopTime> stopTimes) {
     LineString[] geoms = new LineString[stopTimes.size() - 1];
     StopTime st0;
+
     for (int i = 0; i < stopTimes.size() - 1; ++i) {
       st0 = stopTimes.get(i);
       StopTime st1 = stopTimes.get(i + 1);
       LineString geometry = createSimpleGeometry(st0.getStop(), st1.getStop());
       geoms[i] = geometry;
     }
+
     return geoms;
   }
 
@@ -301,14 +326,17 @@ public class GeometryProcessor {
   ) {
     LineString[] geoms = new LineString[stopTimes.size() - 1];
     StopTime st0;
+
     for (int i = 0; i < stopTimes.size() - 1; ++i) {
       st0 = stopTimes.get(i);
       StopTime st1 = stopTimes.get(i + 1);
       geoms[i] = getHopGeometryViaShapeDistTraveled(shapeId, st0, st1);
+
       if (geoms[i] == null) {
         return null;
       }
     }
+
     return geoms;
   }
 
@@ -323,6 +351,7 @@ public class GeometryProcessor {
     IndexedLineSegment prevSegment = null;
     var prevSegmentFraction = 0.0;
     List<LinearLocation> locations = new ArrayList<>(stopTimes.size());
+
     for (
       var stopPositionInPattern = 0;
       stopPositionInPattern < stopTimes.size();
@@ -344,6 +373,7 @@ public class GeometryProcessor {
       // of a bus first passing within 150 m of a stop, exit the 150 m radius to a turning circle,
       // then call at the stop at the opposite side of the road.
       List<List<IndexedLineSegment>> continuousSegments = new ArrayList<>();
+
       for (IndexedLineSegment segment : possibleSegmentsForStop.get(stopPositionInPattern)) {
         //can't go backwards along line
         if (prevSegment == null || segment.index >= prevSegment.index) {
@@ -358,7 +388,9 @@ public class GeometryProcessor {
               segment.end
             );
           }
+
           boolean shouldStartNewSegment;
+
           if (continuousSegments.isEmpty()) {
             shouldStartNewSegment = true;
           } else if (stopPositionInPattern + 1 == stopTimes.size()) {
@@ -371,24 +403,30 @@ public class GeometryProcessor {
               .stream()
               .anyMatch(item -> item.index > lastSegment.index && item.index < s.index);
           }
+
           if (shouldStartNewSegment) {
             // start a new continuous segment
             continuousSegments.add(new ArrayList<>());
           }
+
           continuousSegments.getLast().add(segment);
         }
       }
+
       // choose the best match from the first list
       if (continuousSegments.isEmpty()) {
         return null;
       }
+
       List<IndexedLineSegment> firstContinuousSegments = continuousSegments.getFirst();
       var bestMatch = firstContinuousSegments.getFirst();
+
       for (var segment : firstContinuousSegments) {
         if (segment.distance(stopCoord) < bestMatch.distance(stopCoord)) {
           bestMatch = segment;
         }
       }
+
       // we found one!
       // best match may be the split segment with the previous stop, in this case we need to load the full segment
       IndexedLineSegment matchedSegment =
@@ -398,6 +436,7 @@ public class GeometryProcessor {
       locations.add(location);
       prevSegment = matchedSegment;
     }
+
     return locations;
   }
 
@@ -411,6 +450,7 @@ public class GeometryProcessor {
 
     ShapeSegmentKey key = new ShapeSegmentKey(shapeId, startDistance, endDistance);
     LineString geometry = geometriesByShapeSegmentKey.get(key);
+
     if (geometry != null) {
       return geometry;
     }
@@ -430,6 +470,7 @@ public class GeometryProcessor {
         // return null to indicate failure. Another approach which does not need shape_dist_traveled will be used.
         return null;
       }
+
       LineString line = getLineStringForShapeId(shapeId);
       LocationIndexedLine lol = new LocationIndexedLine(line);
 
@@ -461,22 +502,27 @@ public class GeometryProcessor {
 
   private boolean isValid(Geometry geometry, StopLocation s0, StopLocation s1) {
     Coordinate[] coordinates = geometry.getCoordinates();
+
     if (coordinates.length < 2) {
       return false;
     }
+
     if (geometry.getLength() == 0) {
       return false;
     }
+
     for (Coordinate coordinate : coordinates) {
       if (Double.isNaN(coordinate.x) || Double.isNaN(coordinate.y)) {
         return false;
       }
     }
+
     Coordinate geometryStartCoord = coordinates[0];
     Coordinate geometryEndCoord = coordinates[coordinates.length - 1];
 
     Coordinate startCoord = s0.getCoordinate().asJtsCoordinate();
     Coordinate endCoord = s1.getCoordinate().asJtsCoordinate();
+
     if (
       SphericalDistanceLibrary.fastDistance(startCoord, geometryStartCoord) >
       maxStopToShapeSnapDistance
@@ -487,6 +533,7 @@ public class GeometryProcessor {
     ) {
       return false;
     }
+
     return true;
   }
 
@@ -503,6 +550,7 @@ public class GeometryProcessor {
     ShapeSegmentKey key = new ShapeSegmentKey(shapeId, startDistance, endDistance);
 
     LineString geometry = geometriesByShapeSegmentKey.get(key);
+
     if (geometry == null) {
       geometry = (LineString) locationIndexedLine.extractLine(startIndex, endIndex);
 
@@ -517,6 +565,7 @@ public class GeometryProcessor {
         issueStore.add(new BogusShapeGeometryCaught(shapeId, st0, st1));
         return null;
       }
+
       geometriesByShapeSegmentKey.put(key, geometry);
     }
 
@@ -534,6 +583,7 @@ public class GeometryProcessor {
     ArrayList<ShapePoint> filtered = new ArrayList<>();
     ShapePoint last = null;
     int currentSeq = Integer.MIN_VALUE;
+
     for (ShapePoint sp : points) {
       if (sp.sequence() < currentSeq) {
         // this should never happen, because the GTFS import should make sure they are already in order.
@@ -544,6 +594,7 @@ public class GeometryProcessor {
           )
         );
       }
+
       if (last == null || last.sequence() != sp.sequence()) {
         if (last != null && last.sameCoordinates(sp)) {
           LOG.trace("pair of identical shape points (skipping): {} {}", last, sp);
@@ -551,9 +602,11 @@ public class GeometryProcessor {
           filtered.add(sp);
         }
       }
+
       last = sp;
       currentSeq = sp.sequence();
     }
+
     return filtered;
   }
 
@@ -565,21 +618,26 @@ public class GeometryProcessor {
     }
 
     var points = getUniqueShapePointsForShapeId(shapeId);
+
     if (points.size() < 2) {
       return null;
     }
+
     Coordinate[] coordinates = new Coordinate[points.size()];
     double[] distances = new double[points.size()];
 
     boolean hasAllDistances = true;
 
     int i = 0;
+
     for (ShapePoint point : points) {
       coordinates[i] = point.coordinate();
       distances[i] = point.distTraveled();
+
       if (!point.isDistTraveledSet()) {
         hasAllDistances = false;
       }
+
       i++;
     }
 
@@ -603,20 +661,25 @@ public class GeometryProcessor {
 
   private LinearLocation getSegmentFraction(double[] distances, double distance) {
     int index = Arrays.binarySearch(distances, distance);
+
     if (index < 0) {
       index = -(index + 1);
     }
+
     if (index == 0) {
       return new LinearLocation(0, 0.0);
     }
+
     if (index == distances.length) {
       return new LinearLocation(distances.length, 0.0);
     }
 
     double prevDistance = distances[index - 1];
+
     if (prevDistance == distances[index]) {
       return new LinearLocation(index - 1, 1.0);
     }
+
     double indexPart = (distance - distances[index - 1]) / (distances[index] - prevDistance);
     return new LinearLocation(index - 1, indexPart);
   }

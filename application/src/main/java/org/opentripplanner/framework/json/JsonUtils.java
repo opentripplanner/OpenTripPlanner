@@ -12,6 +12,7 @@ public class JsonUtils {
    */
   public static Optional<String> asText(JsonNode node, String field) {
     JsonNode valueNode = node.get(field);
+
     if (valueNode == null) {
       return Optional.empty();
     } else if (valueNode.isString() && !valueNode.asString().isEmpty()) {

@@ -35,18 +35,21 @@ public class ModePreferencesMapper {
   ) {
     var modesInput = args.getGraphQLModes();
     var direct = modesInput.getGraphQLDirect();
+
     if (Boolean.TRUE.equals(modesInput.getGraphQLTransitOnly())) {
       journey.withDirect(new StreetRequest(StreetMode.NOT_SET));
     } else if (direct != null) {
       if (direct.isEmpty()) {
         throw new InvalidInputException("Direct modes must not be empty.");
       }
+
       var streetModes = direct.stream().map(DirectModeMapper::map).toList();
       var rentalDuration = getRentalDurationByQueryArgs(args);
       journey.withDirect(new StreetRequest(getStreetModeForRouting(streetModes), rentalDuration));
     }
 
     var transit = modesInput.getGraphQLTransit();
+
     if (Boolean.TRUE.equals(modesInput.getGraphQLDirectOnly())) {
       journey.withTransit(TransitRequestBuilder::disable);
     } else if (transit == null) {
@@ -55,28 +58,34 @@ public class ModePreferencesMapper {
       setTransitFilters(journey, NarrowedTransitMode.all(), args);
     } else {
       var access = transit.getGraphQLAccess();
+
       if (access != null) {
         if (access.isEmpty()) {
           throw new InvalidInputException("Access modes must not be empty.");
         }
+
         var streetModes = access.stream().map(AccessModeMapper::map).toList();
         journey.withAccess(new StreetRequest(getStreetModeForRouting(streetModes)));
       }
 
       var egress = transit.getGraphQLEgress();
+
       if (egress != null) {
         if (egress.isEmpty()) {
           throw new InvalidInputException("Egress modes must not be empty.");
         }
+
         var streetModes = egress.stream().map(EgressModeMapper::map).toList();
         journey.withEgress(new StreetRequest(getStreetModeForRouting(streetModes)));
       }
 
       var transfer = transit.getGraphQLTransfer();
+
       if (transfer != null) {
         if (transfer.isEmpty()) {
           throw new InvalidInputException("Transfer modes must not be empty.");
         }
+
         var streetModes = transfer.stream().map(TransferModeMapper::map).toList();
         journey.withTransfer(new StreetRequest(getStreetModeForRouting(streetModes)));
       }
@@ -85,6 +94,7 @@ public class ModePreferencesMapper {
       validateStreetModes(journey.build());
 
       var planTransitModes = getPlanTransitModes(environment);
+
       if (planTransitModes == null) {
         // even when there are no transit modes set we need to set the filters because of the route/agency
         // includes/excludes
@@ -93,6 +103,7 @@ public class ModePreferencesMapper {
         if (planTransitModes.isEmpty()) {
           throw new InvalidInputException("Transit modes must not be empty.");
         }
+
         var narrowedModes = planTransitModes.stream().map(ModePreferencesMapper::map).toList();
         setTransitFilters(journey, narrowedModes, args);
       }
@@ -105,6 +116,7 @@ public class ModePreferencesMapper {
     if (input == null || input.getGraphQLRequirement() == null) {
       return ReplacementRequirement.IGNORED;
     }
+
     return switch (input.getGraphQLRequirement()) {
       case REQUIRED -> ReplacementRequirement.REQUIRED;
       case FORBIDDEN -> ReplacementRequirement.FORBIDDEN;
@@ -138,6 +150,7 @@ public class ModePreferencesMapper {
       .map(GraphQLTypes.GraphQLPlanPreferencesInput::getGraphQLTransit)
       .map(GraphQLTypes.GraphQLTransitPreferencesInput::getGraphQLFilters)
       .orElse(List.of());
+
     if (CollectionUtils.hasValue(graphQlFilters)) {
       var filters = FilterMapper.mapFilters(modes, graphQlFilters);
       journey.withTransit(b -> b.withFilters(filters));
@@ -161,18 +174,23 @@ public class ModePreferencesMapper {
     GraphQLTypes.GraphQLQueryTypePlanConnectionArgs args
   ) {
     var graphQLStreet = args.getGraphQLPreferences().getGraphQLStreet();
+
     if (graphQLStreet != null) {
       var graphQLCar = graphQLStreet.getGraphQLCar();
+
       if (graphQLCar != null) {
         var graphQLRental = graphQLCar.getGraphQLRental();
+
         if (graphQLRental != null) {
           var rentalDuration = graphQLRental.getGraphQLRentalDuration();
+
           if (rentalDuration != null) {
             return DurationUtils.requireNonNegative(rentalDuration, "rentalDuration");
           }
         }
       }
     }
+
     return null;
   }
 }

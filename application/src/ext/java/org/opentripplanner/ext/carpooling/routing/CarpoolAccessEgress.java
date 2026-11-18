@@ -150,6 +150,7 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
     if (requestedDepartureTime > passengerDepartureTime) {
       return RaptorConstants.TIME_NOT_SET;
     }
+
     return passengerDepartureTime;
   }
 
@@ -163,6 +164,7 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
     if (requestedArrivalTime < passengerArrivalTime) {
       return RaptorConstants.TIME_NOT_SET;
     }
+
     return passengerArrivalTime;
   }
 
@@ -197,6 +199,7 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
     if (this.penalty != TimeAndCost.ZERO) {
       throw new IllegalStateException("Can not add penalty twice...");
     }
+
     return new CarpoolAccessEgress(
       this.stop,
       this.passengerDepartureTime,

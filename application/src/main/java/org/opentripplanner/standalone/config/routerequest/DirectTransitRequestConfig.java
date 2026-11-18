@@ -26,6 +26,7 @@ public class DirectTransitRequestConfig {
     if (c.isEmpty()) {
       return;
     }
+
     var dft = DirectTransitPreferences.DEFAULT;
 
     builder

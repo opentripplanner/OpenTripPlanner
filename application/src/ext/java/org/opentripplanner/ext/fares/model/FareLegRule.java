@@ -49,6 +49,7 @@ public final class FareLegRule implements Serializable {
     if (builder.fareProducts.isEmpty()) {
       throw new IllegalArgumentException("fareProducts must contain at least one value");
     }
+
     builder.fareProducts.forEach(Objects::requireNonNull);
     this.legGroupId = Objects.requireNonNull(builder.legGroupId);
     this.id = Objects.requireNonNull(builder.id);
@@ -137,9 +138,11 @@ public final class FareLegRule implements Serializable {
     if (obj == this) {
       return true;
     }
+
     if (obj == null || obj.getClass() != this.getClass()) {
       return false;
     }
+
     var that = (FareLegRule) obj;
     return (
       Objects.equals(this.id, that.id) &&

@@ -86,6 +86,7 @@ public final class CoordinateArrayListSequence implements CoordinateSequence, Cl
     for (Coordinate c : coordinates) {
       env.expandToInclude(c);
     }
+
     return env;
   }
 

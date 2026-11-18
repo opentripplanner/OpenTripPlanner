@@ -19,6 +19,7 @@ public class NaturalLanguageStringHelper {
     if (strings == null) {
       return "";
     }
+
     return strings.stream().findFirst().map(NaturalLanguageStringStructure::getValue).orElse("");
   }
 }

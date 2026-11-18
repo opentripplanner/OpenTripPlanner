@@ -86,6 +86,7 @@ public final class PagingSearchWindowAdjuster {
           60 * pagingSearchWindowAdjustments[nActualItinerariesFound]
       );
     }
+
     // No change
     return searchWindowUsed;
   }
@@ -115,15 +116,18 @@ public final class PagingSearchWindowAdjuster {
     if (seconds < minSearchWindow.getSeconds()) {
       return minSearchWindow;
     }
+
     if (seconds > maxSearchWindow.getSeconds()) {
       return maxSearchWindow;
     }
+
     // Round down to the closest minute
     int minutes = seconds / 60;
 
     if (minutes <= 240) {
       return Duration.ofMinutes(ceiling(minutes, 10));
     }
+
     return Duration.ofMinutes(ceiling(minutes, 30));
   }
 }

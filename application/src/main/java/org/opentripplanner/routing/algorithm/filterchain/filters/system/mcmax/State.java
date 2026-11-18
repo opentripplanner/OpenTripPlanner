@@ -37,6 +37,7 @@ class State {
    */
   void findAllSingleItemGroupsAndAddTheItemToTheResult() {
     var item = findItemInFirstSingleItemGroup(groups);
+
     while (item != null) {
       addToResult(item);
       item = findItemInFirstSingleItemGroup(groups);
@@ -59,8 +60,10 @@ class State {
    */
   void fillUpTheResultWithMinimumNumberOfItineraries(int minNumItineraries) {
     int end = Math.min(items.size(), minNumItineraries);
+
     for (int i = 0; result.size() < end; ++i) {
       var it = items.get(i);
+
       if (!result.contains(it)) {
         result.add(it);
       }
@@ -84,6 +87,7 @@ class State {
         group.removeAllItems();
       }
     }
+
     groups.removeIf(Group::isEmpty);
   }
 
@@ -93,6 +97,7 @@ class State {
    */
   private static Item findBestItem(List<Group> groups) {
     var candidate = groups.getFirst().first();
+
     for (Group group : groups) {
       for (Item item : group) {
         if (item.betterThan(candidate)) {
@@ -100,6 +105,7 @@ class State {
         }
       }
     }
+
     return candidate;
   }
 
@@ -118,9 +124,11 @@ class State {
 
   private static ArrayList<Item> createListOfItems(List<Itinerary> itineraries) {
     var items = new ArrayList<Item>();
+
     for (int i = 0; i < itineraries.size(); i++) {
       items.add(new Item(itineraries.get(i), i));
     }
+
     return items;
   }
 
@@ -129,6 +137,7 @@ class State {
     List<SingleCriteriaComparator> comparators
   ) {
     List<Group> groups = new ArrayList<>();
+
     for (SingleCriteriaComparator comparator : comparators) {
       if (comparator.strictOrder()) {
         groups.add(createOrderedGroup(items, comparator));
@@ -136,6 +145,7 @@ class State {
         groups.addAll(createUnorderedGroups(items, comparator));
       }
     }
+
     return groups;
   }
 
@@ -148,18 +158,22 @@ class State {
     SingleCriteriaComparator comparator
   ) {
     Group group = null;
+
     for (Item item : items) {
       if (group == null) {
         group = new Group(item);
         continue;
       }
+
       var current = group.first();
+
       if (comparator.leftDominanceExist(item.item(), current.item())) {
         group.addNewDominantItem(item);
       } else if (!comparator.leftDominanceExist(current.item(), item.item())) {
         group.add(item);
       }
     }
+
     return group;
   }
 
@@ -178,8 +192,10 @@ class State {
 
     for (Item item : items) {
       int groupCount = result.size();
+
       for (Group group : result) {
         var groupItem = group.first().item();
+
         if (comparator.leftDominanceExist(groupItem, item.item())) {
           if (comparator.leftDominanceExist(item.item(), groupItem)) {
             // Mutual dominance => the item belong in another group
@@ -189,13 +205,16 @@ class State {
           if (comparator.leftDominanceExist(item.item(), groupItem)) {
             group.removeAllItems();
           }
+
           group.add(item);
         }
       }
+
       if (groupCount == 0) {
         result.add(new Group(item));
       }
     }
+
     return result;
   }
 }

@@ -297,6 +297,7 @@ public final class ScheduledTripTimes implements TripTimes<ScheduledTripTimes> {
     if (headsignVias == null || headsignVias[stopPos] == null) {
       return List.of();
     }
+
     return List.of(headsignVias[stopPos]);
   }
 
@@ -325,12 +326,15 @@ public final class ScheduledTripTimes implements TripTimes<ScheduledTripTimes> {
     if (gtfsSequenceOfStopIndex == null) {
       return OptionalInt.empty();
     }
+
     for (int i = 0; i < gtfsSequenceOfStopIndex.length; i++) {
       var sequence = gtfsSequenceOfStopIndex[i];
+
       if (sequence == stopSequence) {
         return OptionalInt.of(i);
       }
     }
+
     return OptionalInt.empty();
   }
 
@@ -350,9 +354,11 @@ public final class ScheduledTripTimes implements TripTimes<ScheduledTripTimes> {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     ScheduledTripTimes that = (ScheduledTripTimes) o;
     return (
       timeShift == that.timeShift &&

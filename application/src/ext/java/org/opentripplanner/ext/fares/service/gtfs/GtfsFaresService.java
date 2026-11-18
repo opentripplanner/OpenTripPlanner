@@ -23,12 +23,14 @@ public final class GtfsFaresService implements FareService {
   @Override
   public ItineraryFare calculateFares(Itinerary itinerary) {
     var fare = ItineraryFare.empty();
+
     if (faresV2.isEmpty()) {
       fare = Objects.requireNonNullElse(faresV1.calculateFares(itinerary), ItineraryFare.empty());
     } else {
       var products = faresV2.calculateFares(itinerary);
       addLegProducts(products.legProducts(), fare);
     }
+
     return fare;
   }
 

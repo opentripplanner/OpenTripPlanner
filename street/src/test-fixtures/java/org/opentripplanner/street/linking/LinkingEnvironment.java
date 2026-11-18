@@ -39,9 +39,11 @@ public class LinkingEnvironment {
 
   public LinkingEnvironment(Vertex... vertices) {
     var graph = new Graph();
+
     for (var v : vertices) {
       graph.addVertex(v);
     }
+
     graph.index();
     graphFetcher = new GraphSummarizer(graph);
     linker = new VertexLinker(

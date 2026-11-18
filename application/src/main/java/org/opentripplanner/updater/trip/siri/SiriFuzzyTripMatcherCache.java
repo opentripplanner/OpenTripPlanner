@@ -45,13 +45,16 @@ public class SiriFuzzyTripMatcherCache {
 
       if (tripPattern.getRoute().getMode().equals(TransitMode.RAIL)) {
         String internalPlanningCode = trip.getNetexInternalPlanningCode();
+
         if (internalPlanningCode != null) {
           internalPlanningCodes.put(internalPlanningCode, trip);
         }
       }
+
       String lastStopId = tripPattern.lastStop().getId().getId();
 
       var tripTimes = tripPattern.getScheduledTimetable().getTripTimes(trip);
+
       if (tripTimes != null) {
         int arrivalTime = tripTimes.getArrivalTime(tripTimes.getNumStops() - 1);
         startStopTrips.put(startStopKey(lastStopId, arrivalTime), trip);

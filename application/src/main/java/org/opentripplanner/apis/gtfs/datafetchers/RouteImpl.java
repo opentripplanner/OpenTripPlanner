@@ -42,6 +42,7 @@ public class RouteImpl implements GraphQLDataFetchers.GraphQLRoute {
       TransitAlertService alertService = getAlertService(environment);
       var args = new GraphQLTypes.GraphQLRouteAlertsArgs(environment.getArguments());
       List<GraphQLTypes.GraphQLRouteAlertType> types = args.getGraphQLTypes();
+
       if (types != null) {
         Collection<TransitAlert> alerts = new ArrayList<>();
         types.forEach(type -> {

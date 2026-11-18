@@ -119,15 +119,19 @@ public final class WalkPreferences
   @Override
   public double normalizedDistance(AbstractUserPreferences other) {
     double distance = super.normalizedDistance(other);
+
     if (other instanceof WalkPreferences that) {
       distance += SPEED_WEIGHT * speed.normalizedDistance(that.speed);
       double safetyDistance =
         SAFETY_FACTOR_WEIGHT * safetyFactor.normalizedDistance(that.safetyFactor);
+
       if (safetyFactor.asDouble() > that.safetyFactor.asDouble()) {
         safetyDistance *= MORE_SAFETY_WEIGHT_FACTOR;
       }
+
       distance += safetyDistance;
     }
+
     return distance;
   }
 
@@ -136,6 +140,7 @@ public final class WalkPreferences
     if (!(obj instanceof WalkPreferences that)) {
       return false;
     }
+
     return super.equals(obj) && speed.equals(that.speed) && safetyFactor.equals(that.safetyFactor);
   }
 

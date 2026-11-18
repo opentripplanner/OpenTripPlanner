@@ -123,6 +123,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
       // only connect transit stops that are not part of a pathway network
       if (!ts.hasPathways()) {
         var stop = stopResolver.getStop(ts.getId());
+
         if (!connectVertexToStop(ts, stop, graph)) {
           LOG.debug(
             "Could not connect {} ({}) at {}",
@@ -135,6 +136,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
         }
       }
     }
+
     LOG.info("Found {} OSM references which match a stop's id or code", successes);
   }
 
@@ -183,8 +185,10 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     for (var areaGroup : nearbyAreaGroups) {
       for (Area area : areaGroup.getAreas()) {
         var platOpt = platforms.findPlatform(area);
+
         if (platOpt.isPresent()) {
           var platform = platOpt.get();
+
           if (matchesReference(stop, platform.references())) {
             var boardingLocation = makeBoardingLocationForPlatform(stop, platform, area.getName());
             linkIntoPlatformArea(boardingLocation, areaGroup, area, platform, stop);
@@ -194,6 +198,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
         }
       }
     }
+
     return false;
   }
 
@@ -254,9 +259,11 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
         platformEdges
       )
     );
+
     for (var vertex : attachmentPoints) {
       platforms.addSplitEdges(vertex, platform);
     }
+
     linkToPlatformWay(ts, stop, boardingLocation, attachmentPoints, platformEdges);
     // In OSM mode the boarding location only carried the centroid to link from and is left with no
     // edges. Don't serialize it.
@@ -281,24 +288,30 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
       attachmentPoints.forEach(vertex -> linkBoardingLocationToStop(ts, stop.getCode(), vertex));
       return;
     }
+
     if (attachmentPoints.isEmpty()) {
       return;
     }
+
     var attachment = attachmentPoints.iterator().next().getCoordinate();
     var walkToPlatform = SphericalDistanceLibrary.distance(
       boardingLocation.getCoordinate(),
       attachment
     );
+
     if (walkToPlatform <= SAME_ATTACHMENT_POINT_TOLERANCE_METERS) {
       // The stop already sits on the platform way; a connector would be a zero-length edge.
       attachmentPoints.forEach(vertex -> linkBoardingLocationToStop(ts, stop.getCode(), vertex));
       return;
     }
+
     var properties = ConnectorProperties.of(platformEdges.iterator().next());
+
     for (var vertex : attachmentPoints) {
       connectBoardingLocation(boardingLocation, vertex, properties);
       connectBoardingLocation(vertex, boardingLocation, properties);
     }
+
     reportIfFarAway(stop, "OSM platform way", walkToPlatform);
     linkBoardingLocationToStop(ts, stop.getCode(), boardingLocation);
   }
@@ -329,6 +342,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
               getConnectingEdges(boardingLocation, osmBoardingLocationVertex, splitVertex)
           );
         }
+
         var distanceToNode = SphericalDistanceLibrary.distance(
           stop.getCoordinate().asJtsCoordinate(),
           boardingLocation.getCoordinate()
@@ -337,6 +351,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
         return true;
       }
     }
+
     return false;
   }
 
@@ -359,6 +374,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
       linkBoardingLocationToStop(ts, stop.getCode(), node);
       return;
     }
+
     reportIfFarAway(stop, "OSM node %s".formatted(node.getLabel()), distanceToNode);
     var stopPoint = makeBoardingLocation(
       "node-transit/%s".formatted(stop.getId().toString()),
@@ -389,6 +405,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
         name
       );
     }
+
     // OSM mode: share a single centroid vertex per platform between all stops referencing it.
     return existingBoardingLocationsAtAreas.computeIfAbsent(platform, _ ->
       makeBoardingLocation(
@@ -423,15 +440,18 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
       linker.addPermanentAreaVertex(boardingLocation, areaGroup);
       return;
     }
+
     var insideCoordinate = ensureInsideArea(
       boardingLocation.getCoordinate(),
       areaGroup.getGeometry(),
       platform.geometry().getCoordinate()
     );
+
     if (insideCoordinate.equals2D(boardingLocation.getCoordinate())) {
       linker.addPermanentAreaVertex(boardingLocation, areaGroup);
       return;
     }
+
     var accessPoint = vertexFactory.intersection(
       "platform-access/%s".formatted(stop.getId().toString()),
       insideCoordinate.x,
@@ -463,9 +483,11 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   ) {
     var geometryFactory = GeometryUtils.getGeometryFactory();
     var transitPoint = geometryFactory.createPoint(transitCoordinate);
+
     if (areaGeometry.contains(transitPoint)) {
       return transitCoordinate;
     }
+
     var onBoundary = DistanceOp.nearestPoints(areaGeometry, transitPoint)[0];
     var inside = stepBeyond(transitCoordinate, onBoundary, INSIDE_AREA_MARGIN_METERS);
     return areaGeometry.contains(geometryFactory.createPoint(inside)) ? inside : interiorPoint;
@@ -474,9 +496,11 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   /** {@code marginMeters} past {@code to}, continuing along the line from {@code from}. */
   private static Coordinate stepBeyond(Coordinate from, Coordinate to, double marginMeters) {
     double totalMeters = SphericalDistanceLibrary.distance(from, to);
+
     if (totalMeters == 0) {
       return to;
     }
+
     double fraction = 1 + marginMeters / totalMeters;
     return new Coordinate(from.x + (to.x - from.x) * fraction, from.y + (to.y - from.y) * fraction);
   }
@@ -511,9 +535,11 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
           SphericalDistanceLibrary.distance(boardingLocation.getCoordinate(), v.getCoordinate())
         )
       );
+
     if (closest.isEmpty()) {
       return Set.of();
     }
+
     var attachmentPoint = closest.get().getCoordinate();
     return candidates
       .stream()
@@ -533,6 +559,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     if (osmBoardingLocationVertex == splitVertex) {
       return List.of();
     }
+
     // the OSM boarding location vertex is not connected to the street network, so we
     // need to link it first
     return List.of(

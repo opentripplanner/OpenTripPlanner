@@ -71,30 +71,36 @@ public class OTPMain {
    */
   private static CommandLineParameters parseAndValidateCmdLine(String[] args) {
     CommandLineParameters params = new CommandLineParameters();
+
     try {
       // It is tempting to use JCommander's command syntax: http://jcommander.org/#_more_complex_syntaxes_commands
       // But this seems to lead to confusing switch ordering and more difficult subsequent use of the
       // parsed commands, since there will be three separate objects.
       JCommander jc = JCommander.newBuilder().addObject(params).args(args).build();
+
       if (params.version) {
         System.out.println("OpenTripPlanner " + projectInfo().getVersionString());
         System.exit(0);
       }
+
       if (params.serializationVersionId) {
         System.out.println(projectInfo().getOtpSerializationVersionId());
         System.exit(0);
       }
+
       if (params.help) {
         System.out.println("OpenTripPlanner " + projectInfo().getVersionString());
         jc.setProgramName("java -Xmx4G -jar otp.jar");
         jc.usage();
         System.exit(0);
       }
+
       params.inferAndValidate();
     } catch (ParameterException pex) {
       LOG.error("Parameter error: {}", pex.getMessage());
       System.exit(1);
     }
+
     return params;
   }
 

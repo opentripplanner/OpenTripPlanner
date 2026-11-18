@@ -92,6 +92,7 @@ public class GeotiffGridCoverageFactoryImpl implements ElevationGridCoverageFact
         throw new RuntimeException("Error getting coverage automatically. ", e);
       }
     }
+
     return coverage;
   }
 

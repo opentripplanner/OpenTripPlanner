@@ -19,6 +19,7 @@ class FilterMapper {
     List<GraphQLTypes.GraphQLTransitFilterInput> filters
   ) {
     var filterRequests = new ArrayList<TransitFilter>();
+
     for (var filterInput : filters) {
       var includes = filterInput.getGraphQLInclude();
       var excludes = filterInput.getGraphQLExclude();

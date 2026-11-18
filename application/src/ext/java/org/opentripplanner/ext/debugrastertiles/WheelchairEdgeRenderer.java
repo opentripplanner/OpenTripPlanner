@@ -47,6 +47,7 @@ public class WheelchairEdgeRenderer implements EdgeVertexRenderer {
         return EdgeVisualAttributes.optional(Color.GREEN, "elevator");
       }
     }
+
     return Optional.empty();
   }
 
@@ -61,6 +62,7 @@ public class WheelchairEdgeRenderer implements EdgeVertexRenderer {
       };
       return VertexVisualAttributes.optional(color, v.getDefaultName());
     }
+
     return Optional.empty();
   }
 }

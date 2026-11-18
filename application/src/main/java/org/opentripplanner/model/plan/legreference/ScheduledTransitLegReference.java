@@ -91,10 +91,12 @@ public record ScheduledTransitLegReference(
 
     if (tripOnServiceDateId != null) {
       tripOnServiceDate = transitService.getTripOnServiceDate(tripOnServiceDateId);
+
       if (tripOnServiceDate == null) {
         logInvalidLegRef("trip on service date '{}' not found", tripOnServiceDateId);
         return null;
       }
+
       if (!tripOnServiceDate.getServiceDate().equals(serviceDate)) {
         logInvalidLegRef(
           "trip on service date '{}' does not run on service date {}",
@@ -103,16 +105,19 @@ public record ScheduledTransitLegReference(
         );
         return null;
       }
+
       trip = tripOnServiceDate.getTrip();
     } else {
       trip = transitService.getTrip(tripId);
     }
+
     if (trip == null) {
       logInvalidLegRef("trip '{}' not found", tripId);
       return null;
     }
 
     TripPattern tripPattern = transitService.findPattern(trip, serviceDate);
+
     if (tripPattern == null) {
       logInvalidLegRef(
         "trip pattern not found for trip '{}' and service date {}",
@@ -249,15 +254,18 @@ public record ScheduledTransitLegReference(
     if (exactMatch.isPresent() && sameStationMatch.isPresent()) {
       var exactPosition = exactMatch.getAsInt();
       var sameStationPosition = sameStationMatch.getAsInt();
+
       if (Math.abs(exactPosition - sameStationPosition) <= 1) {
         return exactMatch;
       }
+
       if (
         Math.abs(sameStationPosition - stopPosition) < Math.abs(sameStationPosition - exactPosition)
       ) {
         logMatchForChangedStop(tripPattern, stopPosition, stopId, sameStationPosition);
         return sameStationMatch;
       }
+
       return exactMatch;
     }
 

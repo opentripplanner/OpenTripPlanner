@@ -41,11 +41,13 @@ public class LocationStringParser {
   public static Optional<GenericLocation> fromOldStyleString(String input) {
     String name = null;
     String place = input;
+
     if (input.contains("::")) {
       String[] parts = input.split("::", 2);
       name = parts[0];
       place = parts[1];
     }
+
     return getGenericLocation(name, place);
   }
 
@@ -60,6 +62,7 @@ public class LocationStringParser {
     }
 
     Matcher matcher = LAT_LON_PATTERN.matcher(place);
+
     if (matcher.find()) {
       var lat = Double.parseDouble(matcher.group(1));
       var lon = Double.parseDouble(matcher.group(4));

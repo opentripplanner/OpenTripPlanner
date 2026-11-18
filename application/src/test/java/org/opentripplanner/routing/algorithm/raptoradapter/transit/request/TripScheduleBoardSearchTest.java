@@ -147,6 +147,7 @@ public class TripScheduleBoardSearchTest implements RaptorTestConstants {
       tripSchedules.add(schedule().departures(departureTime).build());
       latestDepartureTime = departureTime;
     }
+
     withTrips(tripSchedules);
 
     // Search for a trip that board after the last trip, expect no trip in return

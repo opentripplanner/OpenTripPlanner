@@ -37,6 +37,7 @@ class MinCostPathTailFilter<T extends RaptorTripSchedule> implements PathTailFil
     for (var costFunction : costFunctions) {
       elements = filter(elements, costFunction);
     }
+
     return elements;
   }
 
@@ -63,6 +64,7 @@ class MinCostPathTailFilter<T extends RaptorTripSchedule> implements PathTailFil
         result.add(it);
       }
     }
+
     return result;
   }
 

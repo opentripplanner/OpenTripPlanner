@@ -30,9 +30,11 @@ class TripSegmentMapper {
 
   void map(Collection<TripSegment> segments, TripStopTimes stopTimesByTrip) {
     var stopTimesByTripId = new HashMap<FeedScopedId, List<StopTime>>();
+
     for (var trip : stopTimesByTrip.keys()) {
       stopTimesByTripId.put(trip.getId(), stopTimesByTrip.get(trip));
     }
+
     for (var segment : segments) {
       mappedTripSegments.put(
         idFactory.createId(segment.getId(), "trip_segment_id"),
@@ -62,14 +64,17 @@ class TripSegmentMapper {
     var tripId = idFactory.createId(segment.getTripId(), "trip_id in trip segment");
     var stopTimes = stopTimesByTripId.getOrDefault(tripId, List.of());
     var result = new ArrayList<StopTimeKey>();
+
     for (int i = 0; i < stopTimes.size(); i++) {
       var stopSequence = stopTimes.get(i).getStopSequence();
+
       if (
         stopSequence >= segment.getFromStopSequence() && stopSequence <= segment.getToStopSequence()
       ) {
         result.add(StopTimeKey.of(tripId, i).build());
       }
     }
+
     return result;
   }
 }

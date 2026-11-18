@@ -113,6 +113,7 @@ public class ReverseRaptorTransitCalculatorTest {
       assertTrue(it.hasNext());
       assertEquals(v, it.next());
     }
+
     assertFalse(it.hasNext());
   }
 }

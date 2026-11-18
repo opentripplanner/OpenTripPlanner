@@ -128,6 +128,7 @@ public class Graph implements Serializable {
   /** Add the given vertex to the graph. */
   public void addVertex(Vertex v) {
     Vertex old = vertices.put(v.getLabel(), v);
+
     if (old != null) {
       if (old == v) {
         LOG.error("repeatedly added the same vertex: {}", v);
@@ -151,6 +152,7 @@ public class Graph implements Serializable {
 
   public void removeEdge(Edge e, Scope scope) {
     e.remove();
+
     if (streetIndex != null) {
       streetIndex.remove(e, scope);
     }
@@ -256,6 +258,7 @@ public class Graph implements Serializable {
 
   public void remove(Vertex vertex) {
     vertices.remove(vertex.getLabel());
+
     if (streetIndex != null) {
       streetIndex.remove(vertex);
     }
@@ -279,9 +282,11 @@ public class Graph implements Serializable {
    */
   public int countEdges() {
     int ne = 0;
+
     for (Vertex v : getVertices()) {
       ne += v.getDegreeOut();
     }
+
     return ne;
   }
 

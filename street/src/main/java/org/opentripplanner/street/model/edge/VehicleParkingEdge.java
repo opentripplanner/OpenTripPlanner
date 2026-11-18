@@ -55,6 +55,7 @@ public class VehicleParkingEdge extends Edge {
     if (o instanceof VehicleParkingEdge other) {
       return other.getFromVertex().equals(fromv) && other.getToVertex().equals(tov);
     }
+
     return false;
   }
 
@@ -101,6 +102,7 @@ public class VehicleParkingEdge extends Edge {
     TraverseMode mode
   ) {
     final StreetSearchRequest request = s0.getRequest();
+
     if (!vehicleParking.hasSpacesAvailable(mode, request.wheelchairEnabled())) {
       return State.empty();
     }

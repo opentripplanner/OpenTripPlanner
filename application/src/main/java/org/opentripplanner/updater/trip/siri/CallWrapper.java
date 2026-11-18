@@ -89,12 +89,15 @@ public interface CallWrapper {
     BigInteger visitNumber
   ) throws UpdateException {
     var ref = stopPointRef != null ? stopPointRef.getValue() : null;
+
     if (StringUtils.hasNoValueOrNullAsString(ref)) {
       throw UpdateException.of(UpdateErrorType.EMPTY_STOP_POINT_REF);
     }
+
     if (order == null && visitNumber == null) {
       throw UpdateException.of(UpdateErrorType.MISSING_CALL_ORDER);
     }
+
     return order != null ? order.intValueExact() : visitNumber.intValueExact();
   }
 
@@ -265,6 +268,7 @@ public interface CallWrapper {
       if (!(obj instanceof EstimatedCallWrapper estimatedCallWrapper)) {
         return false;
       }
+
       return call.equals(estimatedCallWrapper.call);
     }
   }
@@ -381,6 +385,7 @@ public interface CallWrapper {
       if (!(obj instanceof RecordedCallWrapper recordedCallWrapper)) {
         return false;
       }
+
       return call.equals(recordedCallWrapper.call);
     }
   }

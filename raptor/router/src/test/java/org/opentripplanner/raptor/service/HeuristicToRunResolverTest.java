@@ -86,14 +86,17 @@ public class HeuristicToRunResolverTest {
       msg += " EDT";
       b.searchParams().earliestDepartureTime(10_000);
     }
+
     if (lat) {
       msg += " LAT";
       b.searchParams().latestArrivalTime(20_000);
     }
+
     if (win) {
       msg += " WIN";
       b.searchParams().searchWindowInSeconds(6_000);
     }
+
     request = b.build();
     return this;
   }

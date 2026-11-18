@@ -72,6 +72,7 @@ public class WayProperties {
         permission == other.permission
       );
     }
+
     return false;
   }
 

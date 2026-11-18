@@ -56,6 +56,7 @@ public class Money implements Comparable<Money>, Serializable {
     if (!first.currency.equals(second.currency)) {
       throw new RuntimeException("Can't operate on %s and %s as the currencies are not equal.");
     }
+
     if (first.greaterThan(second)) {
       return first;
     } else {
@@ -93,6 +94,7 @@ public class Money implements Comparable<Money>, Serializable {
     if (m.currency != currency) {
       throw new RuntimeException("Can't compare " + m.currency + " to " + currency);
     }
+
     return amount - m.amount;
   }
 

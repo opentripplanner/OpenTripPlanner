@@ -97,9 +97,11 @@ public class SiteRepositoryTestBuilder {
       .withCoordinate(ANY_COORDINATE)
       .withDescription(new NonLocalizedString("Station " + stationId))
       .withPriority(StopTransferPriority.ALLOWED);
+
     if (customizer != null) {
       customizer.accept(builder);
     }
+
     var station = builder.build();
     siteRepositoryBuilder.withStation(station);
     return station;

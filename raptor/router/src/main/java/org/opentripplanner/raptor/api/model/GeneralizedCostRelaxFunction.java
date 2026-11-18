@@ -55,6 +55,7 @@ public final class GeneralizedCostRelaxFunction implements RelaxFunction {
     if (isNormal(normalizedRatio, slack)) {
       return NORMAL;
     }
+
     return new GeneralizedCostRelaxFunction(normalizedRatio, slack);
   }
 
@@ -81,9 +82,11 @@ public final class GeneralizedCostRelaxFunction implements RelaxFunction {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     GeneralizedCostRelaxFunction that = (GeneralizedCostRelaxFunction) o;
     return normalizedRatio == that.normalizedRatio && slack == that.slack;
   }

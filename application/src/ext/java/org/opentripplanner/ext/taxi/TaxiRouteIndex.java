@@ -39,10 +39,12 @@ public class TaxiRouteIndex {
   public static TaxiRouteIndex createAndIndex(List<TaxiRoute> routes) {
     STRtree index = new STRtree();
     Map<TaxiRoute, PreparedGeometry> preparedGeometries = new HashMap<>();
+
     for (TaxiRoute route : routes) {
       index.insert(route.geometry().getEnvelopeInternal(), route);
       preparedGeometries.put(route, PreparedGeometryFactory.prepare(route.geometry()));
     }
+
     return new TaxiRouteIndex(index, preparedGeometries);
   }
 
@@ -57,12 +59,15 @@ public class TaxiRouteIndex {
 
     Point pickupPoint = GeometryUtils.getGeometryFactory().createPoint(pickup.asJtsCoordinate());
     Point dropoffPoint = GeometryUtils.getGeometryFactory().createPoint(dropoff.asJtsCoordinate());
+
     for (TaxiRoute route : candidates) {
       PreparedGeometry preparedGeometry = preparedGeometries.get(route);
+
       if (preparedGeometry.contains(pickupPoint) && preparedGeometry.contains(dropoffPoint)) {
         return Optional.of(route);
       }
     }
+
     return Optional.empty();
   }
 
@@ -77,11 +82,13 @@ public class TaxiRouteIndex {
 
     Point point = GeometryUtils.getGeometryFactory().createPoint(coordinate.asJtsCoordinate());
     List<TaxiRoute> result = new ArrayList<>(candidates.size());
+
     for (TaxiRoute route : candidates) {
       if (preparedGeometries.get(route).contains(point)) {
         result.add(route);
       }
     }
+
     return result;
   }
 

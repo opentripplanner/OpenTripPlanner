@@ -12,6 +12,7 @@ public class BookingInfoMapper {
     if (bookingInfo.getMinimumBookingNotice().isPresent()) {
       return null;
     }
+
     BookingTime latestBookingTime = bookingInfo.getLatestBookingTime();
     BookingTime earliestBookingTime = bookingInfo.getEarliestBookingTime();
 

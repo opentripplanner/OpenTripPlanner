@@ -25,6 +25,7 @@ public class LiipiParkUtilizationToPatchMapper {
       "facilityId",
       feedId
     );
+
     try {
       String capacityType = jsonNode.path("capacityType").asString();
       Integer spacesAvailable = LiipiParkToVehicleParkingMapper.parseIntegerValue(

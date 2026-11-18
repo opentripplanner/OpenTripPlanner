@@ -6,6 +6,7 @@ public record ElevationChange(double elevationGainedMeters, double elevationLost
     if (elevationGainedMeters < 0) {
       throw new IllegalArgumentException("ElevationGainedMeters must be non-negative");
     }
+
     if (elevationLostMeters < 0) {
       throw new IllegalArgumentException("ElevationLostMeters must be non-negative");
     }

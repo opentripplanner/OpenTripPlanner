@@ -58,6 +58,7 @@ class EdgeSpatialIndex {
   public void remove(final Edge edge, Scope scope) {
     if (edge.hasGeometry()) {
       var envelope = edge.getGeometry().getEnvelopeInternal();
+
       switch (scope) {
         case PERMANENT -> permanentEdgeIndex.remove(envelope, edge);
         case REALTIME -> realTimeEdgeIndex.remove(envelope, edge);

@@ -377,12 +377,15 @@ class GeometryProcessorTest {
     if (expected.size() != actual.size()) {
       throw new AssertionFailedError(null, expected, actual);
     }
+
     for (int i = 0; i < expected.size(); i++) {
       var expectedLineString = expected.get(i);
       var actualLineString = actual.get(i);
+
       if (expectedLineString.getNumPoints() != actualLineString.getNumPoints()) {
         throw new AssertionFailedError(null, expected, actual);
       }
+
       for (int j = 0; j < expectedLineString.getNumPoints(); j++) {
         if (
           distance(expectedLineString.getCoordinateN(j), actualLineString.getCoordinateN(j)) >

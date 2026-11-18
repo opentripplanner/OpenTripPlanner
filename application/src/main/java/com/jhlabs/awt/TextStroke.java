@@ -73,6 +73,7 @@ public class TextStroke implements Stroke {
 
     while (currentChar < length && !it.isDone()) {
       type = it.currentSegment(points);
+
       switch (type) {
         case PathIterator.SEG_MOVETO:
           moveX = lastX = points[0];
@@ -92,9 +93,11 @@ public class TextStroke implements Stroke {
           float dx = thisX - lastX;
           float dy = thisY - lastY;
           float distance = (float) Math.sqrt(dx * dx + dy * dy);
+
           if (distance >= next) {
             float r = 1.0f / distance;
             float angle = (float) Math.atan2(dy, dx);
+
             while (currentChar < length && distance >= next) {
               Shape glyph = glyphVector.getGlyphOutline(currentChar);
               Point2D p = glyphVector.getGlyphPosition(currentChar);
@@ -113,16 +116,19 @@ public class TextStroke implements Stroke {
               result.append(t.createTransformedShape(glyph), false);
               next += (advance + nextAdvance) * factor;
               currentChar++;
+
               if (repeat) {
                 currentChar %= length;
               }
             }
           }
+
           next -= distance;
           lastX = thisX;
           lastY = thisY;
           break;
       }
+
       it.next();
     }
 
@@ -143,6 +149,7 @@ public class TextStroke implements Stroke {
 
     while (!it.isDone()) {
       type = it.currentSegment(points);
+
       switch (type) {
         case PathIterator.SEG_MOVETO:
           moveX = lastX = points[0];
@@ -163,6 +170,7 @@ public class TextStroke implements Stroke {
           lastY = thisY;
           break;
       }
+
       it.next();
     }
 

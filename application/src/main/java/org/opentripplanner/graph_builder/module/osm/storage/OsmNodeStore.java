@@ -61,15 +61,20 @@ class OsmNodeStore {
    */
   void add(OsmNode node) {
     long id = node.getId();
+
     if (coordinatesById.containsKey(id)) {
       return;
     }
+
     coordinatesById.put(id, packCoordinate(node.lat, node.lon));
     byte providerIndex = providerIndex(node.getOsmProvider());
+
     if (providerIndex != 0) {
       nonDefaultProviderIndexById.put(id, providerIndex);
     }
+
     var tags = node.getTags();
+
     if (!tags.isEmpty()) {
       tagsById.put(id, tags);
     }
@@ -83,20 +88,25 @@ class OsmNodeStore {
     if (!coordinatesById.containsKey(id)) {
       return null;
     }
+
     long packedCoordinate = coordinatesById.get(id);
     var provider = providers.get(nonDefaultProviderIndexById.get(id));
     var builder = OsmNode.of()
       .withId(id)
       .withLatLon(unpackLat(packedCoordinate), unpackLon(packedCoordinate));
+
     // OsmNodeBuilder.withOsmProvider() rejects null, but some (mostly test) nodes are built
     // without ever setting a provider, so only call it when there actually is one.
     if (provider != null) {
       builder.withOsmProvider(provider);
     }
+
     var tags = tagsById.get(id);
+
     if (tags != null) {
       builder.withTags(tags);
     }
+
     return builder.build();
   }
 
@@ -114,6 +124,7 @@ class OsmNodeStore {
     if (!coordinatesById.containsKey(id)) {
       return null;
     }
+
     long packedCoordinate = coordinatesById.get(id);
     return new Coordinate(unpackLon(packedCoordinate), unpackLat(packedCoordinate));
   }
@@ -133,9 +144,11 @@ class OsmNodeStore {
         return (byte) i;
       }
     }
+
     if (providers.size() >= Byte.MAX_VALUE) {
       throw new IllegalStateException("Too many distinct OSM providers, cannot index as a byte");
     }
+
     providers.add(provider);
     return (byte) (providers.size() - 1);
   }
@@ -159,6 +172,7 @@ class OsmNodeStore {
     if (lat < -90 || lat > 90 || lon < -180 || lon > 180) {
       throw new IllegalArgumentException("Invalid coordinate: lat=%s, lon=%s".formatted(lat, lon));
     }
+
     int latFixed = (int) Math.round(lat * FIXED_POINT_FACTOR);
     int lonFixed = (int) Math.round(lon * FIXED_POINT_FACTOR);
     return ((long) latFixed << 32) | (lonFixed & 0xFFFFFFFFL);

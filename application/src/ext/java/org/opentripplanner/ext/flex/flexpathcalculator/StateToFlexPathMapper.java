@@ -49,6 +49,7 @@ class StateToFlexPathMapper {
 
   private static LineString reverse(Edge e) {
     var geom = e.getGeometry();
+
     if (geom == null) {
       return null;
     } else {

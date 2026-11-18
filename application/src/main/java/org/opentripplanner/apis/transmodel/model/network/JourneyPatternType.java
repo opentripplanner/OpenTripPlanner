@@ -118,6 +118,7 @@ public class JourneyPatternType {
           .type(linkGeometryType)
           .dataFetcher(environment -> {
             LineString geometry = ((TripPattern) environment.getSource()).getGeometry();
+
             if (geometry == null) {
               return null;
             } else {

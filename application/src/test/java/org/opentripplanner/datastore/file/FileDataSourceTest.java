@@ -80,6 +80,7 @@ public class FileDataSourceTest {
   public void verifyReadingNoneExistingFileFails() {
     // given
     FileDataSource subject = new FileDataSource(new File(tempDir, FILENAME), GRAPH);
+
     try {
       // When
       subject.asInputStream();

@@ -75,6 +75,7 @@ public class GbfsFeedLoaderAndMapper {
             gbfsFeedVersion
           );
         }
+
         yield createV23(autoConfiguration, params, client);
       }
       case null -> createV23(autoConfiguration, params, client);

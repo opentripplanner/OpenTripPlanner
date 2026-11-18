@@ -138,6 +138,7 @@ class MultiFeedSiriETCarpoolingUpdaterTest {
     for (var routableTrip : repository.getCarpoolTrips()) {
       var trip = routableTrip.trip();
       var expectedFeed = trip.getId().getFeedId();
+
       for (var stop : trip.stops()) {
         assertEquals(
           expectedFeed,

@@ -69,6 +69,7 @@ public class VehicleRentalGeofencingGraphBuilder implements GraphBuilderModule {
     LOG.info("Loading GBFS geofencing zones from manifest {}", parameters.url());
 
     var manifest = GbfsManifestLoader.loadManifest(parameters.url(), parameters.headers());
+
     if (
       manifest == null || manifest.getData() == null || manifest.getData().getDatasets() == null
     ) {
@@ -88,6 +89,7 @@ public class VehicleRentalGeofencingGraphBuilder implements GraphBuilderModule {
         httpClientFactory,
         issueStore
       );
+
       for (var network : networks) {
         try {
           applyNetwork(network, httpClientFactory);
@@ -119,22 +121,27 @@ public class VehicleRentalGeofencingGraphBuilder implements GraphBuilderModule {
       var network = dataset.getSystemId();
 
       var override = overrides.forNetwork(network);
+
       if (override.isEmpty()) {
         LOG.warn("Network not configured in OTP, skipping: {}", network);
         continue;
       }
+
       var parameters = override.get();
+
       if (parameters.geofencingZonePhase() != GeofencingZoneOtpPhase.GRAPH_BUILD) {
         continue;
       }
 
       var url = GbfsManifestLoader.selectBestVersion(dataset);
+
       if (url.isEmpty()) {
         LOG.warn("No suitable GBFS version found for network {}", network);
         continue;
       }
 
       GbfsAutoConfiguration autoConfiguration;
+
       try {
         autoConfiguration = GbfsAutoConfiguration.fetch(
           url.get(),
@@ -153,11 +160,13 @@ public class VehicleRentalGeofencingGraphBuilder implements GraphBuilderModule {
 
       selected.add(new SelectedNetwork(network, parameters, autoConfiguration));
     }
+
     return selected;
   }
 
   private void applyNetwork(SelectedNetwork network, OtpHttpClientFactory clientFactory) {
     var zones = loadGeofencingZones(network, clientFactory);
+
     if (zones.isEmpty()) {
       LOG.info("No geofencing zones loaded for network {}", network.network());
       return;

@@ -71,10 +71,12 @@ public class SpeedTestRequest {
     if (!config.ignoreStreetResults()) {
       builder.withNumItineraries(opts.numOfItineraries());
     }
+
     builder.withJourney(journeyBuilder -> {
       journeyBuilder.withModes(input.modes().getRequestModes());
 
       var tModes = input.modes().getTransitModes().stream().map(MainAndSubMode::new).toList();
+
       if (tModes.isEmpty()) {
         journeyBuilder.withTransit(b -> b.disable());
       } else {
@@ -101,6 +103,7 @@ public class SpeedTestRequest {
           transit.withRaptor(r -> r.withTimeLimit(time(input.arrivalTime())))
         );
       }
+
       pref.withTransit(transit ->
         transit.withRaptor(raptor ->
           raptor

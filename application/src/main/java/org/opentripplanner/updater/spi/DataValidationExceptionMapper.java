@@ -17,6 +17,7 @@ public class DataValidationExceptionMapper {
     if (error.error() instanceof TimetableValidationError tt) {
       return UpdateException.of(tt.trip().getId(), mapTimeTableError(tt.code()), tt.stopIndex());
     }
+
     // The mapper should handle all possible errors
     LOG.error("Unhandled error: {}", error.getMessage(), error);
     return UpdateException.noTripId(UpdateErrorType.UNKNOWN);

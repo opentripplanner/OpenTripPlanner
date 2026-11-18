@@ -28,6 +28,7 @@ public final class SortingFilter implements ItineraryListFilter {
     if (itineraries.size() < 2) {
       return itineraries;
     }
+
     // Sort ascending by qualifier and map to list of itineraries
     return itineraries.stream().sorted(comparator()).collect(Collectors.toList());
   }

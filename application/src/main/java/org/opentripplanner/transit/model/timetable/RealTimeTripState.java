@@ -73,9 +73,11 @@ public final class RealTimeTripState {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     RealTimeTripState that = (RealTimeTripState) o;
     return (
       timesModified == that.timesModified &&

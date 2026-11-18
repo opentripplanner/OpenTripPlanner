@@ -58,12 +58,15 @@ class PathwayMapper {
     if (rhs.isTraversalTimeSet()) {
       pathway.withTraversalTime(rhs.getTraversalTime());
     }
+
     if (rhs.isLengthSet()) {
       pathway.withLength(rhs.getLength());
     }
+
     if (rhs.isStairCountSet()) {
       pathway.withStairCount(rhs.getStairCount());
     }
+
     if (rhs.isMaxSlopeSet()) {
       pathway.withSlope(rhs.getMaxSlope());
     }
@@ -84,6 +87,7 @@ class PathwayMapper {
           return boardingAreaMapper.map(stop);
       }
     }
+
     // Stop was missing (null) or locationType was not valid (e.g. it was a station or missing)
     return null;
   }

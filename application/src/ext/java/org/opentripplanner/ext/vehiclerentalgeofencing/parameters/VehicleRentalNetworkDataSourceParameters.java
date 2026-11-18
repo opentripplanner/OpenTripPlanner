@@ -22,6 +22,7 @@ public record VehicleRentalNetworkDataSourceParameters(
     if (url == null || url.isBlank()) {
       throw new IllegalArgumentException("GBFS feed URL is required");
     }
+
     if (httpHeaders == null) {
       httpHeaders = HttpHeaders.empty();
     }

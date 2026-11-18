@@ -144,9 +144,11 @@ class LineStringMapperTest {
 
   private static LineStringType lineStringFromPosOrPointProperty(Double... coordinates) {
     var posOrPoints = new ArrayList<>();
+
     for (int i = 0; i < coordinates.length; i += 2) {
       posOrPoints.add(new DirectPositionType().withValue(coordinates[i], coordinates[i + 1]));
     }
+
     return new LineStringType().withPosOrPointProperty(posOrPoints);
   }
 
@@ -155,6 +157,7 @@ class LineStringMapperTest {
     assertNotNull(geometry);
     Coordinate[] actual = geometry.getCoordinates();
     assertEquals(coordinates.length / 2, actual.length);
+
     for (int i = 0; i < actual.length; i++) {
       assertEquals(coordinates[i * 2], actual[i].getY(), FLOATING_POINT_COMPARISON_PRECISION);
       assertEquals(coordinates[i * 2 + 1], actual[i].getX(), FLOATING_POINT_COMPARISON_PRECISION);

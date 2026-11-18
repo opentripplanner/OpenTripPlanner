@@ -81,9 +81,11 @@ public abstract class AbstractFileDataSource implements DataSource {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     AbstractFileDataSource that = (AbstractFileDataSource) o;
     return file.equals(that.file) && type == that.type;
   }

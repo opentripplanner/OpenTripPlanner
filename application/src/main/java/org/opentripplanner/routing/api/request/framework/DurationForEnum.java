@@ -84,6 +84,7 @@ public class DurationForEnum<E extends Enum<E>> implements Serializable {
         builder.addText(", ").addText(e.getKey().name()).addText(":").addDuration(e.getValue());
       }
     }
+
     return builder.addText("}").toString();
   }
 
@@ -92,6 +93,7 @@ public class DurationForEnum<E extends Enum<E>> implements Serializable {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
@@ -143,12 +145,14 @@ public class DurationForEnum<E extends Enum<E>> implements Serializable {
       // Lazy initialize the valueForEnum map
       if (valueForEnum == null) {
         valueForEnum = new EnumMap<>(original.type);
+
         for (E it : original.type.getEnumConstants()) {
           if (original.isSet(it)) {
             valueForEnum.put(it, original.valueOf(it));
           }
         }
       }
+
       valueForEnum.put(key, value);
       return this;
     }
@@ -165,11 +169,13 @@ public class DurationForEnum<E extends Enum<E>> implements Serializable {
       }
 
       var copy = new EnumMap<E, Duration>(original.type);
+
       for (Map.Entry<E, Duration> it : valueForEnum.entrySet()) {
         if (!defaultValue.equals(it.getValue())) {
           copy.put(it.getKey(), it.getValue());
         }
       }
+
       return copy;
     }
 
@@ -177,6 +183,7 @@ public class DurationForEnum<E extends Enum<E>> implements Serializable {
       for (Map.Entry<E, Duration> e : values.entrySet()) {
         with(e.getKey(), e.getValue());
       }
+
       return this;
     }
 

@@ -33,9 +33,11 @@ public class TripOnServiceDateImpl implements GraphQLDataFetchers.GraphQLTripOnS
   public DataFetcher<TripTimeOnDate> end() {
     return environment -> {
       var arguments = getFromTripTimesArguments(environment);
+
       if (arguments.timetable() == null) {
         return null;
       }
+
       return TripTimeOnDate.lastFromTripTimes(
         arguments.timetable(),
         arguments.trip(),
@@ -66,6 +68,7 @@ public class TripOnServiceDateImpl implements GraphQLDataFetchers.GraphQLTripOnS
               "Trip has been deleted. this should not be exposed to the API and is probably a bug"
             );
           }
+
           return new RealTimeTripStateModel(
             tripTimes.isAdded(),
             tripTimes.isCanceled(),
@@ -96,9 +99,11 @@ public class TripOnServiceDateImpl implements GraphQLDataFetchers.GraphQLTripOnS
   public DataFetcher<TripTimeOnDate> start() {
     return environment -> {
       var arguments = getFromTripTimesArguments(environment);
+
       if (arguments.timetable() == null) {
         return null;
       }
+
       return TripTimeOnDate.firstFromTripTimes(
         arguments.timetable(),
         arguments.trip(),
@@ -112,9 +117,11 @@ public class TripOnServiceDateImpl implements GraphQLDataFetchers.GraphQLTripOnS
   public DataFetcher<Iterable<TripTimeOnDate>> stopCalls() {
     return environment -> {
       var arguments = getFromTripTimesArguments(environment);
+
       if (arguments.timetable() == null) {
         return List.of();
       }
+
       return TripTimeOnDate.fromTripTimesWithScheduleFallback(
         arguments.timetable(),
         arguments.trip(),
@@ -133,9 +140,11 @@ public class TripOnServiceDateImpl implements GraphQLDataFetchers.GraphQLTripOnS
   public DataFetcher<String> vehicleId() {
     return environment -> {
       var arguments = getFromTripTimesArguments(environment);
+
       if (arguments.timetable() == null) {
         return null;
       }
+
       var tripTimes = arguments.timetable().getTripTimes(arguments.trip());
       return Optional.ofNullable(tripTimes)
         .flatMap(TripTimes::getVehicleId)
@@ -152,6 +161,7 @@ public class TripOnServiceDateImpl implements GraphQLDataFetchers.GraphQLTripOnS
   ) {
     TransitService transitService = getTransitService(environment);
     TripPattern tripPattern = transitService.findPattern(trip, serviceDate);
+
     // no matching pattern found
     if (tripPattern == null) {
       return null;

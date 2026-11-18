@@ -48,12 +48,14 @@ public class DefaultVehicleParkingRepository implements VehicleParkingRepository
       ArrayListMultimap.create(vehicleParkingGroups);
     parkingToRemove.forEach(vehicleParking -> {
       var vehicleParkingGroup = vehicleParking.getVehicleParkingGroup();
+
       if (vehicleParkingGroup != null) {
         updatedVehicleParkingGroups.remove(vehicleParking.getVehicleParkingGroup(), vehicleParking);
       }
     });
     parkingToAdd.forEach(vehicleParking -> {
       var vehicleParkingGroup = vehicleParking.getVehicleParkingGroup();
+
       if (vehicleParkingGroup != null) {
         updatedVehicleParkingGroups.put(vehicleParking.getVehicleParkingGroup(), vehicleParking);
       }

@@ -97,6 +97,7 @@ public class SpeedTestCmdLineOptsBuilder {
   public SpeedTestCmdLineOpts build() {
     opts = new ArrayList<>();
     Objects.requireNonNull(rootDirectory);
+
     if (profiles.isEmpty()) {
       throw new IllegalStateException();
     }

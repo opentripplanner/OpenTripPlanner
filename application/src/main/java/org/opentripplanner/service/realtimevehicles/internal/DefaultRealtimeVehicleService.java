@@ -43,15 +43,18 @@ public class DefaultRealtimeVehicleService implements RealtimeVehicleService {
     if (pattern.getOriginalTripPattern() != null) {
       pattern = pattern.getOriginalTripPattern();
     }
+
     return snapshot.getRealtimeVehicles(pattern);
   }
 
   @Override
   public OccupancyStatus getVehicleOccupancyStatus(Trip trip) {
     TripPattern pattern = transitService.findPattern(trip);
+
     if (pattern == null) {
       return NO_DATA_AVAILABLE;
     }
+
     return getRealtimeVehicles(pattern)
       .stream()
       .filter(vehicle -> trip.getId().equals(vehicle.trip().getId()))

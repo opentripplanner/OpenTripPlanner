@@ -60,6 +60,7 @@ public class RegularTransferRepositoryModule {
     )) {
       LOG.warn(warning);
     }
+
     return StreetTransferFactory.registerRepository(
       repositoryRegistry,
       buildRepository,

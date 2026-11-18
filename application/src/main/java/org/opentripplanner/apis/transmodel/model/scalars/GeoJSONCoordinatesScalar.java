@@ -37,6 +37,7 @@ public class GeoJSONCoordinatesScalar {
           if (input instanceof Coordinate[]) {
             Coordinate[] coordinates = (Coordinate[]) input;
             List<List<Double>> coordinateList = new ArrayList<>();
+
             for (Coordinate coordinate : coordinates) {
               List<Double> coordinatePair = new ArrayList<>();
               coordinatePair.add(coordinate.x);
@@ -44,8 +45,10 @@ public class GeoJSONCoordinatesScalar {
 
               coordinateList.add(coordinatePair);
             }
+
             return coordinateList;
           }
+
           return null;
         }
 
@@ -81,8 +84,10 @@ public class GeoJSONCoordinatesScalar {
                 latitude.getValue().doubleValue()
               );
             }
+
             return coordinates;
           }
+
           return null;
         }
       }

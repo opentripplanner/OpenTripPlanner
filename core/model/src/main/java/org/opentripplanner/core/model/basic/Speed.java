@@ -50,9 +50,11 @@ public class Speed implements Serializable, Comparable<Speed>, NormalizedDistanc
     if (this == o) {
       return true;
     }
+
     if (o == null) {
       return false;
     }
+
     return o instanceof Speed s ? value == s.value : false;
   }
 

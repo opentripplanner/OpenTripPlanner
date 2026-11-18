@@ -135,6 +135,7 @@ public class DebugTimingAggregator {
     if (startedCalculating == null) {
       return;
     }
+
     precalculationTime = startedCalculating.stop(preCalculationTimer);
     log("┌  Routing initialization", precalculationTime);
   }
@@ -149,6 +150,7 @@ public class DebugTimingAggregator {
     if (startedDirectStreetRouter == null) {
       return;
     }
+
     directStreetRouterTime = startedDirectStreetRouter.stop(directStreetRouterTimer);
   }
 
@@ -162,6 +164,7 @@ public class DebugTimingAggregator {
     if (startedDirectFlexRouter == null) {
       return;
     }
+
     directFlexRouterTime = startedDirectFlexRouter.stop(directFlexRouterTimer);
   }
 
@@ -175,6 +178,7 @@ public class DebugTimingAggregator {
     if (startedDirectCarpoolRouter == null) {
       return;
     }
+
     directCarpoolRouterTime = startedDirectCarpoolRouter.stop(directCarpoolRouterTimer);
   }
 
@@ -188,6 +192,7 @@ public class DebugTimingAggregator {
     if (startedDirectTaxiRouter == null) {
       return;
     }
+
     directTaxiRouterTime = startedDirectTaxiRouter.stop(directTaxiRouterTimer);
   }
 
@@ -201,9 +206,11 @@ public class DebugTimingAggregator {
    */
   public void finishedPatternFiltering() {
     finishedPatternFiltering = Timer.start(clock);
+
     if (startedTransitRouterTime == null) {
       return;
     }
+
     tripPatternFilterTime = startedTransitRouterTime.stop(tripPatternFilterTimer);
   }
 
@@ -215,6 +222,7 @@ public class DebugTimingAggregator {
     if (startedAccessCalculating == null) {
       return;
     }
+
     accessTime = startedAccessCalculating.stop(accessTimer);
   }
 
@@ -226,6 +234,7 @@ public class DebugTimingAggregator {
     if (startedEgressCalculating == null) {
       return;
     }
+
     egressTime = startedEgressCalculating.stop(egressTimer);
   }
 
@@ -234,9 +243,11 @@ public class DebugTimingAggregator {
    */
   public void finishedAccessEgress(int numAccesses, int numEgresses) {
     finishedAccessEgress = Timer.start(clock);
+
     if (finishedPatternFiltering == null) {
       return;
     }
+
     accessEgressTime = finishedPatternFiltering.stop(accessEgressTimer);
     this.numAccesses = numAccesses;
     numAccessesDistribution.record(numAccesses);
@@ -251,6 +262,7 @@ public class DebugTimingAggregator {
     if (finishedAccessEgress == null) {
       return;
     }
+
     raptorSearchTime = finishedAccessEgress.stop(raptorSearchTimer);
   }
 
@@ -265,6 +277,7 @@ public class DebugTimingAggregator {
     if (startedDirectTransitSearch == null) {
       return;
     }
+
     directTransitSearchTime = startedDirectTransitSearch.stop(directTransitSearchTimer);
   }
 
@@ -279,6 +292,7 @@ public class DebugTimingAggregator {
     if (startedItineraryCreation == null) {
       return;
     }
+
     itineraryCreationTime = startedItineraryCreation.stop(itineraryCreationTimer);
   }
 
@@ -287,6 +301,7 @@ public class DebugTimingAggregator {
     if (startedTransitRouterTime == null) {
       return;
     }
+
     transitRouterTime = startedTransitRouterTime.stop(transitRouterTimer);
   }
 
@@ -294,12 +309,15 @@ public class DebugTimingAggregator {
     if (startedCalculating == null) {
       return;
     }
+
     long routingTotalTime = startedCalculating.stop(routingTotalTimer);
 
     finishedRouters = Timer.start(clock);
+
     if (directStreetRouterTime > 0) {
       log("├  Direct street routing", directStreetRouterTime);
     }
+
     if (directFlexRouterTime > 0) {
       log("├  Direct flex routing", directFlexRouterTime);
     }
@@ -310,9 +328,11 @@ public class DebugTimingAggregator {
       log("│├ Egress routing (" + numEgresses + " egresses)", egressTime);
       log("││ Access/Egress routing", accessEgressTime);
       log("│├ Main routing", raptorSearchTime);
+
       if (directTransitSearchTime > 0) {
         log("│├ Direct transit routing", directTransitSearchTime);
       }
+
       log("│├ Creating itineraries", itineraryCreationTime);
       log("├┴ Transit routing total", transitRouterTime);
     }
@@ -323,9 +343,11 @@ public class DebugTimingAggregator {
   /** Record the time when we finished filtering the paths for this request. */
   public void finishedFiltering() {
     finishedFiltering = Timer.start(clock);
+
     if (finishedRouters == null) {
       return;
     }
+
     filteringTime = finishedRouters.stop(filteringTimer);
     log("├  Filtering itineraries", filteringTime);
   }
@@ -336,6 +358,7 @@ public class DebugTimingAggregator {
     if (finishedFiltering == null || startedCalculating == null) {
       return null;
     }
+
     renderingTime = finishedFiltering.stop(renderingTimer);
     requestTotalTime = startedCalculating.stop(requestTotalTimer);
     log("├  Converting model objects", renderingTime);

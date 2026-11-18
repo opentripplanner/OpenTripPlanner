@@ -34,9 +34,11 @@ final class BasicStopTime implements StopTime {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     BasicStopTime that = (BasicStopTime) o;
     return stop == that.stop && time == that.time;
   }

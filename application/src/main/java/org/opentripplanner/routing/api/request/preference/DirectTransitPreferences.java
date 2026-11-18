@@ -85,6 +85,7 @@ public class DirectTransitPreferences {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     DirectTransitPreferences that = (DirectTransitPreferences) o;
     return (
       enabled == that.enabled &&
@@ -109,6 +110,7 @@ public class DirectTransitPreferences {
     if (!enabled) {
       return "DirectTransitPreferences{not enabled}";
     }
+
     return ToStringBuilder.of(DirectTransitPreferences.class)
       .addObj("costRelaxFunction", costRelaxFunction, DEFAULT.costRelaxFunction)
       .addNum(

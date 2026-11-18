@@ -119,6 +119,7 @@ class AccessEgressFetcher {
     if (request.isStartOnBoardAccessRequest()) {
       return List.of(fetchStartOnBoardAccess());
     }
+
     return fetchAccessEgresses(ACCESS);
   }
 
@@ -129,6 +130,7 @@ class AccessEgressFetcher {
   RoutingStartOnBoardAccess fetchStartOnBoardAccess() {
     var from = request.from();
     var onBoardTripLocation = from != null ? from.tripLocation() : null;
+
     if (onBoardTripLocation == null) {
       throw new IllegalArgumentException(
         "Cannot fetch start-on-board-access for a request without an on-board trip location"
@@ -197,9 +199,11 @@ class AccessEgressFetcher {
       stopCountLimit,
       linkingContext
     );
+
     if (taxiService != null && mode == StreetMode.TAXI) {
       nearbyStops = taxiService.filterNearbyStops(transitService, nearbyStops, type, request);
     }
+
     var accessEgresses = accessEgressMapper.mapNearbyStops(nearbyStops);
     accessEgresses = timeshiftRideHailing(streetRequest, type, accessEgresses);
 
@@ -254,6 +258,7 @@ class AccessEgressFetcher {
     if (streetRequest.mode() != StreetMode.CAR_HAILING) {
       return accessEgressList;
     }
+
     return RideHailingAccessShifter.shiftAccesses(
       type.isAccess(),
       accessEgressList,

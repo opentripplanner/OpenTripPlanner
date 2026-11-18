@@ -242,15 +242,19 @@ public class TripInput {
       st.setStop(stop);
       st.setArrivalTime(arrivalTime);
       st.setDepartureTime(departureTime);
+
       if (headsign != null) {
         st.setStopHeadsign(new NonLocalizedString(headsign));
       }
+
       if (pickupType != null) {
         st.setPickupType(pickupType);
       }
+
       if (dropoffType != null) {
         st.setDropOffType(dropoffType);
       }
+
       return st;
     }
 

@@ -53,6 +53,7 @@ public class ShapeStroke implements Stroke {
 
     while (!it.isDone()) {
       type = it.currentSegment(points);
+
       switch (type) {
         case PathIterator.SEG_MOVETO:
           moveX = lastX = points[0];
@@ -71,9 +72,11 @@ public class ShapeStroke implements Stroke {
           float dx = thisX - lastX;
           float dy = thisY - lastY;
           float distance = (float) Math.sqrt(dx * dx + dy * dy);
+
           if (distance >= next) {
             float r = 1.0f / distance;
             float angle = (float) Math.atan2(dy, dx);
+
             while (distance >= next) {
               float x = lastX + next * dx * r;
               float y = lastY + next * dy * r;
@@ -83,11 +86,13 @@ public class ShapeStroke implements Stroke {
               next += advance;
             }
           }
+
           next -= distance;
           lastX = thisX;
           lastY = thisY;
           break;
       }
+
       it.next();
     }
 

@@ -40,9 +40,11 @@ public final class RequestPreProcessor {
    */
   public RoutingWorkerRequest computeRequest(RouteRequest originalRequest) {
     var request = originalRequest.withPageCursor();
+
     if (request.isStartOnBoardAccessRequest()) {
       request = prepareRequestForStartOnBoardAccess(request);
     }
+
     var transitSearchTimeZero = ServiceDateUtils.asStartOfService(request.dateTime(), zoneId);
     var additionalSearchDays = createAdditionalSearchDays(tuningParameters, zoneId, request);
     return new RoutingWorkerRequest(request, transitSearchTimeZero, additionalSearchDays);
@@ -76,6 +78,7 @@ public final class RequestPreProcessor {
   private RouteRequest prepareRequestForStartOnBoardAccess(RouteRequest request) {
     var fromLocation = request.from();
     var tripLocation = fromLocation != null ? fromLocation.tripLocation() : null;
+
     if (tripLocation == null) {
       throw new InvalidRoutingInputException(
         "On-board access request has no trip location in 'from'"

@@ -29,6 +29,7 @@ public class GeneralizedCostParametersMapper {
       .waitReluctanceFactor(preferences.transfer().waitReluctance());
 
     StreetMode mode = request.journey().transfer().mode();
+
     if (mode == StreetMode.BIKE) {
       builder.boardCost(preferences.bike().boardCost());
     } else if (mode == StreetMode.CAR) {
@@ -52,6 +53,7 @@ public class GeneralizedCostParametersMapper {
 
     if (!unpreferredRoutes.isEmpty() || !unpreferredAgencies.isEmpty()) {
       final BitSet unpreferredPatterns = new BitSet();
+
       for (var pattern : patternIndex) {
         if (
           pattern != null &&
@@ -61,6 +63,7 @@ public class GeneralizedCostParametersMapper {
           unpreferredPatterns.set(pattern.patternIndex());
         }
       }
+
       builder.unpreferredPatterns(unpreferredPatterns);
       builder.unpreferredCost(preferences.transit().unpreferredCost());
     }
@@ -81,9 +84,11 @@ public class GeneralizedCostParametersMapper {
     // current transit model design.
     double[] transitReluctance = new double[TransitMode.values().length];
     Arrays.fill(transitReluctance, GeneralizedCostParameters.DEFAULT_TRANSIT_RELUCTANCE);
+
     for (TransitMode mode : map.keySet()) {
       transitReluctance[mode.ordinal()] = map.get(mode);
     }
+
     return transitReluctance;
   }
 }

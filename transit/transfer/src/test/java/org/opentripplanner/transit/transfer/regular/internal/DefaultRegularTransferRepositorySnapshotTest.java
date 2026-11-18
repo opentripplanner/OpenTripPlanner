@@ -423,6 +423,7 @@ class DefaultRegularTransferRepositorySnapshotTest {
       FakeRequestMapper.INSTANCE,
       Map.<AbstractUserPreferences<?>, WalkPreferences>of(PROFILE, PROFILE)
     ).create(paths, REQUEST, PROFILE);
+
     for (int stop = 0; stop < N_STOPS; ++stop) {
       assertThat(from(transfers, stop)).containsExactlyElementsIn(from(expected, stop));
       assertThat(to(transfers, stop)).containsExactlyElementsIn(to(expected, stop));
@@ -459,10 +460,12 @@ class DefaultRegularTransferRepositorySnapshotTest {
 
   private static List<Tx> collect(Iterator<? extends RaptorTransfer> it) {
     List<Tx> result = new ArrayList<>();
+
     while (it.hasNext()) {
       var transfer = it.next();
       result.add(new Tx(transfer.stop(), transfer.c1()));
     }
+
     return result;
   }
 

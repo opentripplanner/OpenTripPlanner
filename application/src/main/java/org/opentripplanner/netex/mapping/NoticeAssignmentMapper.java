@@ -90,6 +90,7 @@ class NoticeAssignmentMapper {
     // Special case for StopPointInJourneyPattern. The OTP model do not have this element, so
     // we attach the notice to all StopTimes for the pattern at the given stop.
     Collection<TimetabledPassingTime> times = passingTimeByStopPointId.get(noticedObjectId);
+
     if (times != null && !times.isEmpty()) {
       for (TimetabledPassingTime time : times) {
         addStopTimeNotice(noticiesByEntity, time.getId(), otpNotice);
@@ -112,6 +113,7 @@ class NoticeAssignmentMapper {
         );
       }
     }
+
     return noticiesByEntity;
   }
 
@@ -131,6 +133,7 @@ class NoticeAssignmentMapper {
     Notice notice
   ) {
     StopTime stopTime = stopTimesByNetexId.lookup(stopTimeId);
+
     if (stopTime == null) {
       issueStore.add(
         "NoticeAssigmentWithoutStopTime",
@@ -139,6 +142,7 @@ class NoticeAssignmentMapper {
       );
       return;
     }
+
     map.put(stopTime.getId(), notice);
   }
 }

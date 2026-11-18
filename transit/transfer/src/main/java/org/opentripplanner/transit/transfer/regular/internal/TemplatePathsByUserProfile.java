@@ -41,6 +41,7 @@ final class TemplatePathsByUserProfile<P> implements Serializable {
     if (pathsByToStop.isEmpty()) {
       return;
     }
+
     pathsByUserPreferences
       .computeIfAbsent(userPreferences, p -> new TemplatePathsByStop<>())
       .setPaths(fromStop, pathsByToStop);
@@ -69,6 +70,7 @@ final class TemplatePathsByUserProfile<P> implements Serializable {
     BiConsumer<Integer, Map<Integer, P>> consumer
   ) {
     var paths = pathsByUserPreferences.get(profile);
+
     if (paths != null) {
       paths.forEachFromStop(consumer);
     }
@@ -107,15 +109,18 @@ final class TemplatePathsByUserProfile<P> implements Serializable {
     if (pathsByUserPreferences.containsKey(userPreferences)) {
       return userPreferences;
     }
+
     if (pathsByUserPreferences.isEmpty()) {
       return null;
     }
+
     var candidates = pathsByUserPreferences
       .keySet()
       .stream()
       .filter(profile -> profile.type() == userPreferences.type())
       .sorted(declarationOrder.thenComparing(AbstractUserPreferences::toString))
       .toList();
+
     if (candidates.isEmpty()) {
       throw new IllegalArgumentException(
         "There is no transfer profile of the type " +
@@ -123,16 +128,20 @@ final class TemplatePathsByUserProfile<P> implements Serializable {
           ", the transfers of that type are not configured."
       );
     }
+
     AbstractUserPreferences<?> best = null;
     double bestDistance = Double.MAX_VALUE;
+
     for (var candidate : candidates) {
       double distance = userPreferences.normalizedDistance(candidate);
+
       // A candidate that is declared first wins a tie
       if (best == null || distance < bestDistance - DISTANCE_EPSILON) {
         best = candidate;
         bestDistance = distance;
       }
     }
+
     return best;
   }
 

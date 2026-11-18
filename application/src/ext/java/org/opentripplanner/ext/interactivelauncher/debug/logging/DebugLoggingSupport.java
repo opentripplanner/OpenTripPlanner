@@ -28,17 +28,21 @@ class DebugLoggingSupport {
   static List<String> listConfiguredDebugLoggers() {
     List<String> result = new ArrayList<>();
     LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
+
     for (Logger log : context.getLoggerList()) {
       var name = log.getName();
+
       if (name.equals("ROOT") || log.getLevel() == null) {
         continue;
       }
+
       if (log.getLevel().toInt() <= Level.DEBUG.toInt()) {
         if (LOG_MATCHER_PATTERN.matcher(name).matches()) {
           result.add(name);
         }
       }
     }
+
     return result;
   }
 

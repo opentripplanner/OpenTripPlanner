@@ -143,14 +143,18 @@ class McMaxLimitFilterTest {
   private static String groupsToString(int groups) {
     var buf = new StringBuilder();
     char ch = 'A';
+
     // Check for 5 groups - the test does not use so many, but it does not matter
     for (int i = 0; i < 5; ++i) {
       int mask = 1 << i;
+
       if ((groups & mask) != 0) {
         buf.append(ch);
       }
+
       ch = (char) (ch + 1);
     }
+
     return buf.toString();
   }
 
@@ -176,10 +180,12 @@ class McMaxLimitFilterTest {
         builder.drive(start, ++start, E);
       } else {
         builder.bus(1, ++start, ++start, PLACES[1]);
+
         for (int i = 0; i < nTransfers; i++) {
           builder.bus(1, ++start, ++start, PLACES[i + 2]);
         }
       }
+
       return builder
         .itineraryBuilder()
         .withGeneralizedCost(Cost.costOfSeconds(c1))

@@ -86,6 +86,7 @@ class RouteMapper {
     builder.withShortName(line.getPublicCode() != null ? line.getPublicCode().getValue() : null);
 
     NetexMainAndSubMode mode;
+
     try {
       mode = transportModeMapper.map(line.getTransportMode(), line.getTransportSubmode());
     } catch (TransportModeMapper.UnsupportedModeException e) {
@@ -109,9 +110,11 @@ class RouteMapper {
 
     if (line.getPresentation() != null) {
       PresentationStructure presentation = line.getPresentation();
+
       if (presentation.getColour() != null) {
         builder.withColor(hexBinaryAdapter.marshal(presentation.getColour()));
       }
+
       if (presentation.getTextColour() != null) {
         builder.withTextColor(hexBinaryAdapter.marshal(presentation.getTextColour()));
       }
@@ -149,6 +152,7 @@ class RouteMapper {
 
     if (representedByGroupRef != null) {
       FeedScopedId groupOfRoutesId = idFactory.createId(representedByGroupRef.getRef());
+
       if (this.groupOfRoutesById.containsKey(groupOfRoutesId)) {
         groupsOfRoutes.add(groupOfRoutesById.get(groupOfRoutesId));
       }
@@ -164,6 +168,7 @@ class RouteMapper {
   private Agency findOrCreateAuthority(Line_VersionStructure line) {
     GroupOfLinesRefStructure representedByGroupRef = line.getRepresentedByGroupRef();
     Agency agency = null;
+
     if (representedByGroupRef != null) {
       String groupRef = representedByGroupRef.getRef();
 
@@ -177,6 +182,7 @@ class RouteMapper {
     } else if (line.getAuthorityRef() != null) {
       agency = agenciesById.get(idFactory.createId(line.getAuthorityRef().getRef()));
     }
+
     // No authority found in Network or GroupOfLines.
     // Use the dummy agency, create if necessary
     return agency != null ? agency : createOrGetDummyAgency(line);
@@ -191,6 +197,7 @@ class RouteMapper {
       agency = authorityMapper.createDummyAgency();
       agenciesById.add(agency);
     }
+
     return agency;
   }
 
@@ -201,6 +208,7 @@ class RouteMapper {
     if (opeRef == null) {
       return null;
     }
+
     return operatorsById.get(idFactory.createId(opeRef.getRef()));
   }
 

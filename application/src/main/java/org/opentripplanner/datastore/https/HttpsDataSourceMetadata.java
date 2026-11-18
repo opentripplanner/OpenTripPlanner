@@ -67,10 +67,12 @@ class HttpsDataSourceMetadata {
   private static long parseDate(String lastModifiedHeader) {
     if (lastModifiedHeader != null) {
       Instant lastModifiedDate = DateUtils.parseStandardDate(lastModifiedHeader);
+
       if (lastModifiedDate != null) {
         return lastModifiedDate.toEpochMilli();
       }
     }
+
     return -1;
   }
 

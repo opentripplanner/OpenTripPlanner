@@ -66,6 +66,7 @@ public class GtfsFeedIdResolver {
           return normalizeId(result.get("feed_id"));
         }
       }
+
       return generateId();
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -87,6 +88,7 @@ public class GtfsFeedIdResolver {
     if (StringUtils.hasNoValue(id)) {
       return null;
     }
+
     // Colon is used as a separator in OTP so that's why we strip it out - it will confuse the
     // parsers in the API (but those could be updated if someone is keen to use colons as the feed
     // id).

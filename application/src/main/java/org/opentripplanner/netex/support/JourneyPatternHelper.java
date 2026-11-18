@@ -22,12 +22,14 @@ public class JourneyPatternHelper {
     JourneyPattern_VersionStructure journeyPattern
   ) {
     String lineRef = null;
+
     if (journeyPattern.getRouteRef() != null) {
       String routeRef = journeyPattern.getRouteRef().getRef();
       lineRef = routeById.lookup(routeRef).getLineRef().getValue().getRef();
     } else if (journeyPattern.getRouteView() != null) {
       lineRef = journeyPattern.getRouteView().getLineRef().getValue().getRef();
     }
+
     return lineRef;
   }
 }

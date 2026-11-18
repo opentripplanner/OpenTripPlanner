@@ -44,6 +44,7 @@ public class RemoveOtherThanSameLegsMaxGeneralizedCost implements RemoveItinerar
     if (maxCostOtherLegsFactor < 1.0) {
       throw new IllegalArgumentException("maxCostOtherLegsFactor must be >= 1.0");
     }
+
     this.maxCostOtherLegsFactor = maxCostOtherLegsFactor;
   }
 

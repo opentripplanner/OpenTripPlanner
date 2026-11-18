@@ -66,6 +66,7 @@ class FlexTemplateFactory {
         }
       }
     }
+
     return result;
   }
 
@@ -82,6 +83,7 @@ class FlexTemplateFactory {
         }
       }
     }
+
     return result;
   }
 

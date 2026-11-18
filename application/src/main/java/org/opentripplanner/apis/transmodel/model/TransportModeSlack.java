@@ -121,6 +121,7 @@ public class TransportModeSlack {
   public static void mapIntoDomain(DurationForEnum.Builder<TransitMode> builder, Object value) {
     if (value instanceof List) {
       List<Map<String, Object>> list = (List<Map<String, Object>>) value;
+
       for (Map<String, Object> map : list) {
         int slack = (Integer) map.get("slack");
         var modes = TransportModeInputMapper.mapTransitModes((List<?>) map.get("modes"));
@@ -138,6 +139,7 @@ public class TransportModeSlack {
     if (modes == null) {
       return "{slack: " + slack + "}";
     }
+
     return (
       "{" +
       modes.stream().map(TransportModeSlack::serializeTransportMode).collect(Collectors.toList()) +

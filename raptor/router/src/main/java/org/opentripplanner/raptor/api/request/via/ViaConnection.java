@@ -84,6 +84,7 @@ public abstract sealed class ViaConnection
     if (other == null || expectedType != other.getClass()) {
       return false;
     }
+
     var that = (ViaConnection) other;
     return fromStop() == that.fromStop();
   }

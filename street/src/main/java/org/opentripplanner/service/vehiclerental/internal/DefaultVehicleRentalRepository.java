@@ -108,9 +108,11 @@ public class DefaultVehicleRentalRepository implements VehicleRentalRepository {
   @Override
   public Set<GeofencingZone> listZones() {
     var zones = new HashSet<GeofencingZone>();
+
     for (var idx : geofencingZoneIndexes.values()) {
       zones.addAll(idx.listZones());
     }
+
     return zones;
   }
 }

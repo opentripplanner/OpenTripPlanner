@@ -38,6 +38,7 @@ public class RaptorStopIndexAdaptor implements RaptorStopIndex {
     if (stopIndex < 0 || stopIndex >= size()) {
       return null;
     }
+
     return siteRepository.stopByIndex(stopIndex) instanceof RegularStop stop ? stop.getId() : null;
   }
 

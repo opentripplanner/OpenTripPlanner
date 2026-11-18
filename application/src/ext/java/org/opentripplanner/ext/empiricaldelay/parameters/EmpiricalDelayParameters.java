@@ -48,6 +48,7 @@ public class EmpiricalDelayParameters implements Serializable {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     var that = (EmpiricalDelayParameters) o;
     return Objects.equals(feeds, that.feeds);
   }

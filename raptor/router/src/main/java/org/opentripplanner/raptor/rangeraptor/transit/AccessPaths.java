@@ -130,9 +130,11 @@ public class AccessPaths {
 
   public List<RaptorAccessEgress> arrivedOnBoard() {
     var result = new ArrayList<RaptorAccessEgress>();
+
     for (var cursor : arrivedOnBoardByNumOfRides.values()) {
       result.addAll(cursor.value);
     }
+
     return List.copyOf(result);
   }
 
@@ -156,6 +158,7 @@ public class AccessPaths {
     if (!hasTimePenalty()) {
       return IntIterators.empty();
     }
+
     // In the first iteration, we want the time-limit to be zero and the raptor-iteration-time
     // to be one step before the earliest-departure-time in the search-window. This will include
     // all access with a penalty in the first iteration. Then:
@@ -202,11 +205,13 @@ public class AccessPaths {
 
   private static int maxTimePenalty(IntObjectMap<List<RaptorAccessEgress>> col) {
     int max = RaptorConstants.TIME_NOT_SET;
+
     for (var cursor : col.values()) {
       for (var it : cursor.value) {
         max = Math.max(max, it.timePenalty());
       }
     }
+
     return max;
   }
 
@@ -238,6 +243,7 @@ public class AccessPaths {
         return true;
       }
     }
+
     return false;
   }
 
@@ -272,12 +278,14 @@ public class AccessPaths {
     if (list == null) {
       return List.of();
     }
+
     if (iterationTimePenaltyLimit != RaptorConstants.TIME_NOT_SET) {
       return list
         .stream()
         .filter(e -> e.timePenalty() > iterationTimePenaltyLimit)
         .toList();
     }
+
     return list;
   }
 

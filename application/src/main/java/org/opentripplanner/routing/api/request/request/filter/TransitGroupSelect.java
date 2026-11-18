@@ -76,9 +76,11 @@ public class TransitGroupSelect {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     TransitGroupSelect that = (TransitGroupSelect) o;
     return (
       Objects.equals(modes, that.modes) &&

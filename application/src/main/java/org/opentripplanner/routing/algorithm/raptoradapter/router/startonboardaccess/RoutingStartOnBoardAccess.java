@@ -78,9 +78,11 @@ public final class RoutingStartOnBoardAccess
     if (obj == this) {
       return true;
     }
+
     if (obj == null || obj.getClass() != this.getClass()) {
       return false;
     }
+
     var that = (RoutingStartOnBoardAccess) obj;
     return (
       this.routeIndex == that.routeIndex &&

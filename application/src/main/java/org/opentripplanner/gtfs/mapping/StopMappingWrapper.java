@@ -48,6 +48,7 @@ class StopMappingWrapper {
     if (stop.getLevel() == null) {
       return null;
     }
+
     return new StopLevel(stop.getLevel().getName(), stop.getLevel().getIndex());
   }
 

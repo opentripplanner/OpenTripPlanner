@@ -90,14 +90,17 @@ public class DefaultEntityById<E extends TransitEntity> implements EntityById<E>
     Collection<E> newSet = oldSet.stream().filter(Predicate.not(test)).collect(Collectors.toList());
 
     int size = map.size();
+
     if (newSet.size() == size) {
       return 0;
     }
+
     if (callback != null) {
       var removed = new HashSet<>(oldSet);
       removed.removeAll(Set.copyOf(newSet));
       removed.forEach(callback);
     }
+
     map.clear();
     addAll(newSet);
     return size - map.size();

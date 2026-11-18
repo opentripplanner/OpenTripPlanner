@@ -59,15 +59,19 @@ public class WorldEnvelopeBuilder {
     var medianCalculator = new MedianCalcForDoubles(collection.size());
 
     double lon = 0.0;
+
     if (includeLongitude180()) {
       collection.forEach(v -> {
         double c = lonProvider.apply(v);
+
         if (c < 0) {
           c += 360.0;
         }
+
         medianCalculator.add(c);
       });
       lon = medianCalculator.median();
+
       if (lon > 180.0) {
         lon -= 180;
       }
@@ -88,12 +92,15 @@ public class WorldEnvelopeBuilder {
     if (minLonWest == MIN_NOT_SET && minLonEast == MIN_NOT_SET) {
       return new WorldEnvelope(-90.0, -180, 90, 180, A_PLACE_IN_EUROPE);
     }
+
     if (minLonWest == MIN_NOT_SET) {
       return new WorldEnvelope(minLat, minLonEast, maxLat, maxLonEast, transitMedianCenter);
     }
+
     if (minLonEast == MIN_NOT_SET) {
       return new WorldEnvelope(minLat, minLonWest, maxLat, maxLonWest, transitMedianCenter);
     }
+
     if (includeLongitude180()) {
       return new WorldEnvelope(minLat, minLonEast, maxLat, minLonWest, transitMedianCenter);
     } else {
@@ -109,6 +116,7 @@ public class WorldEnvelopeBuilder {
     if (minLonWest == MIN_NOT_SET || minLonEast == MIN_NOT_SET) {
       return false;
     }
+
     double dist0 = minLonEast - minLonWest;
     double dist180 = 360d - maxLonEast + minLonWest;
     return dist180 < dist0;
@@ -125,6 +133,7 @@ public class WorldEnvelopeBuilder {
       minLonEast = Math.min(minLonEast, longitude);
       maxLonEast = Math.max(maxLonEast, longitude);
     }
+
     return this;
   }
 }

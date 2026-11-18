@@ -230,6 +230,7 @@ public class DurationUtilsTest {
   @ResourceLock(Resources.LOCALE)
   public void msToSecondsStr() {
     Locale defaultLocale = Locale.getDefault();
+
     try {
       // Setting the default locale should have no effect
       Locale.setDefault(Locale.FRANCE);

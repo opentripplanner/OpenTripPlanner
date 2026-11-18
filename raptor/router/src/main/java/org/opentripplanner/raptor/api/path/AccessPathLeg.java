@@ -79,9 +79,11 @@ public final class AccessPathLeg<T extends RaptorTripSchedule> implements PathLe
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     AccessPathLeg<?> that = (AccessPathLeg<?>) o;
     return (
       fromTime == that.fromTime &&

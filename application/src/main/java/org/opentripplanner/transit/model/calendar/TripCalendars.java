@@ -90,9 +90,11 @@ public class TripCalendars implements Serializable {
   public Set<LocalDate> listServiceDates(FeedScopedId serviceId) {
     Set<LocalDate> dates = new HashSet<>();
     List<LocalDate> serviceDates = serviceDatesByServiceId.get(serviceId);
+
     if (serviceDates != null) {
       dates.addAll(serviceDates);
     }
+
     return dates;
   }
 
@@ -196,6 +198,7 @@ public class TripCalendars implements Serializable {
       serviceDatesByServiceId
     );
     Map<LocalDate, Set<FeedScopedId>> newServiceIdsByDate = deepCopy(serviceIdsByDate);
+
     for (FeedScopedId serviceId : data.getServiceIds()) {
       List<LocalDate> dates = data
         .getServiceDatesForServiceId(serviceId)
@@ -203,10 +206,12 @@ public class TripCalendars implements Serializable {
         .sorted()
         .toList();
       newServiceDatesByServiceId.put(serviceId, dates);
+
       for (LocalDate date : dates) {
         newServiceIdsByDate.computeIfAbsent(date, d -> new HashSet<>()).add(serviceId);
       }
     }
+
     return new TripCalendars(
       Collections.unmodifiableMap(newServiceDatesByServiceId),
       freezeServiceIds(newServiceIdsByDate),
@@ -224,12 +229,15 @@ public class TripCalendars implements Serializable {
    */
   public TripCalendars withNextServiceCodes(Collection<FeedScopedId> serviceIds) {
     Map<FeedScopedId, Integer> updated = new HashMap<>(serviceCodes);
+
     for (FeedScopedId serviceId : serviceIds) {
       var previousValue = updated.put(Objects.requireNonNull(serviceId), updated.size());
+
       if (previousValue != null) {
         throw new IllegalArgumentException("Duplicate service id '%s'".formatted(serviceId));
       }
     }
+
     return new TripCalendars(
       serviceDatesByServiceId,
       serviceIdsByDate,
@@ -247,18 +255,23 @@ public class TripCalendars implements Serializable {
    */
   public TripCalendars initializeServiceCodesRunningForDate() {
     Map<LocalDate, IntSet> newServiceCodesRunningForDate = new HashMap<>();
+
     for (FeedScopedId serviceId : serviceDatesByServiceId.keySet()) {
       Integer code = serviceCodes.get(serviceId);
+
       if (code == null) {
         continue;
       }
+
       List<LocalDate> serviceDates = serviceDatesByServiceId.get(serviceId);
+
       for (LocalDate serviceDate : serviceDates) {
         newServiceCodesRunningForDate
           .computeIfAbsent(serviceDate, ignored -> new IntHashSet())
           .add(code);
       }
     }
+
     return new TripCalendars(
       serviceDatesByServiceId,
       serviceIdsByDate,
@@ -296,12 +309,14 @@ public class TripCalendars implements Serializable {
       CAL_SERVICE_FEED_ID,
       ServiceDateUtils.asCompactString(serviceDate)
     );
+
     if (serviceDatesByServiceId.containsKey(serviceId) && serviceCodes.containsKey(serviceId)) {
       return serviceId;
     }
 
     Map<FeedScopedId, List<LocalDate>> newServiceDatesByServiceId = serviceDatesByServiceId;
     Map<LocalDate, Set<FeedScopedId>> newServiceIdsByDate = serviceIdsByDate;
+
     if (!serviceDatesByServiceId.containsKey(serviceId)) {
       newServiceDatesByServiceId = withEntry(
         serviceDatesByServiceId,
@@ -314,6 +329,7 @@ public class TripCalendars implements Serializable {
 
     Map<FeedScopedId, Integer> newServiceCodes = serviceCodes;
     Map<LocalDate, IntSet> newServiceCodesRunningForDate = serviceCodesRunningForDate;
+
     if (!serviceCodes.containsKey(serviceId)) {
       // Calculating new unique serviceCode based on size (!)
       int serviceCode = serviceCodes.size();
@@ -340,6 +356,7 @@ public class TripCalendars implements Serializable {
     if (startDate == null || endDate == null) {
       return false;
     }
+
     return !serviceDate.isBefore(startDate) && !serviceDate.isAfter(endDate);
   }
 

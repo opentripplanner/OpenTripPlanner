@@ -51,9 +51,11 @@ public class BikeParkImpl implements GraphQLDataFetchers.GraphQLBikePark {
   public DataFetcher<Integer> spacesAvailable() {
     return environment -> {
       var availability = getSource(environment).getAvailability();
+
       if (availability == null) {
         return null;
       }
+
       return availability.getBicycleSpaces();
     };
   }

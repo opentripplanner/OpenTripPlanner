@@ -51,6 +51,7 @@ public class RaptorService<T extends RaptorTripSchedule> {
     } else {
       response = routeUsingStdWorker(data, request);
     }
+
     logResponse(data.transitData(), response);
     return response;
   }

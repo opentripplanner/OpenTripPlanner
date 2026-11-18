@@ -66,6 +66,7 @@ class TimeframeMatcher {
     var end = timeframe.endTime();
 
     var dates = serviceDatesForServiceId.get(timeframe.serviceId());
+
     if (!dates.contains(time.toLocalDate())) {
       return false;
     }

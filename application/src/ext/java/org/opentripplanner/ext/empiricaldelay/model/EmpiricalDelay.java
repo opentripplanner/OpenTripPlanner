@@ -37,6 +37,7 @@ public class EmpiricalDelay implements Serializable {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     EmpiricalDelay that = (EmpiricalDelay) o;
     return p50 == that.p50 && p90 == that.p90;
   }

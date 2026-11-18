@@ -1138,6 +1138,7 @@ public class TripTimesUpdaterTest {
 
   private void assertTimetable(TripTimes tripTimes, String... expectedTimes) {
     var actualTimes = new String[tripTimes.getNumStops() * 2];
+
     for (int i = 0; i < tripTimes.getNumStops(); i++) {
       actualTimes[i * 2] = TimeUtils.timeToStrLong(tripTimes.getArrivalTime(i));
       actualTimes[i * 2 + 1] = TimeUtils.timeToStrLong(tripTimes.getDepartureTime(i));

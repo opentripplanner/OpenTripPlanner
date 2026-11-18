@@ -55,10 +55,12 @@ public class StreetVertexUtils {
       List.of(mode),
       LocationType.VISIT_VIA_LOCATION
     );
+
     // The link failure is already logged; lift it to a null return here.
     if (vertex.getIncoming().isEmpty() && vertex.getOutgoing().isEmpty()) {
       return null;
     }
+
     return vertex;
   }
 }

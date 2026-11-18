@@ -13,6 +13,7 @@ public class SiriTransportModeMapper {
     if (vehicleModes == null || vehicleModes.isEmpty()) {
       return TransitMode.BUS;
     }
+
     return switch (vehicleModes.getFirst()) {
       case RAIL -> TransitMode.RAIL;
       case COACH -> TransitMode.COACH;

@@ -43,6 +43,7 @@ public record RequestTraceParameter(
         "At least one source is required: 'httpRequestHeader' and/or 'generateIdIfMissing'"
       );
     }
+
     if (!(StringUtils.hasValue(httpResponseHeader) || StringUtils.hasValue(logKey))) {
       throw new IllegalArgumentException(
         "At least one target is required: 'httpResponseHeader' and/or 'logKey'"

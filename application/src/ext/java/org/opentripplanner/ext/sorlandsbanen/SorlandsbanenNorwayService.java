@@ -54,6 +54,7 @@ public class SorlandsbanenNorwayService {
     }
 
     double distance = from.distanceTo(to);
+
     if (distance < MIN_DISTANCE_LIMIT) {
       return null;
     }
@@ -98,23 +99,29 @@ public class SorlandsbanenNorwayService {
     RaptorTransitData raptorTransitData
   ) {
     var coord = location.wgsCoordinate();
+
     if (coord != null) {
       return coord;
     }
 
     StopLocation firstStop = null;
+
     for (RoutingAccessEgress it : accessEgress) {
       StopLocation stop = raptorTransitData.getStopByIndex(it.stop());
+
       if (stop.getId().equals(location.stopId())) {
         return stop.getCoordinate();
       }
+
       if (idIsParentStation(stop, location.stopId())) {
         return stop.getParentStation().getCoordinate();
       }
+
       if (firstStop == null) {
         firstStop = stop;
       }
     }
+
     return firstStop.getCoordinate();
   }
 

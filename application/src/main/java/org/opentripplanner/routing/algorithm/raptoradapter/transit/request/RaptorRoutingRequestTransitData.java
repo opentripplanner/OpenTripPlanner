@@ -175,6 +175,7 @@ public class RaptorRoutingRequestTransitData
 
     while (stops.hasNext()) {
       int[] patterns = activeTripPatternsPerStop.get(stops.next());
+
       for (int i : patterns) {
         activeTripPatternsForGivenStops.set(i);
       }
@@ -263,6 +264,7 @@ public class RaptorRoutingRequestTransitData
     if (fromStopTransfers == null && toStopTransfers == null) {
       return ConstrainedBoardingSearch.NOOP_SEARCH;
     }
+
     return new ConstrainedBoardingSearch(true, fromStopTransfers, toStopTransfers);
   }
 
@@ -276,6 +278,7 @@ public class RaptorRoutingRequestTransitData
     if (fromStopTransfers == null && toStopTransfers == null) {
       return ConstrainedBoardingSearch.NOOP_SEARCH;
     }
+
     return new ConstrainedBoardingSearch(false, toStopTransfers, fromStopTransfers);
   }
 

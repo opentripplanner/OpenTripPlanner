@@ -53,6 +53,7 @@ class DataOverlayStreetEdgeCostExtension implements StreetEdgeCostExtension, Ser
     if (traverseMode.isWalking() || traverseMode.isCyclingIsh()) {
       return (calculateDataOverlayPenalties(state) * edgeLength) / 1000;
     }
+
     return 0d;
   }
 
@@ -65,12 +66,15 @@ class DataOverlayStreetEdgeCostExtension implements StreetEdgeCostExtension, Ser
     if (variableValues == null) {
       return 0d;
     }
+
     double totalPenalty = 0d;
     Instant requestInstant = s.getRequest().startTime();
     var optCtx = s.getExtensionRequestContext(DataOverlayContext.class);
+
     if (optCtx.isEmpty()) {
       return 0d;
     }
+
     DataOverlayContext context = optCtx.get();
 
     for (Parameter parameter : context.getParameters()) {
@@ -109,6 +113,7 @@ class DataOverlayStreetEdgeCostExtension implements StreetEdgeCostExtension, Ser
         }
       }
     }
+
     return totalPenalty;
   }
 

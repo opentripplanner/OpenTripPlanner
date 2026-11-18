@@ -70,24 +70,32 @@ final class TripTimesForDaysIndex {
         if (i < a.length) {
           tripIndexIndex = setIndexValue(tripIndexIndex, day, i);
         }
+
         ++i;
+
         if (i < a.length) {
           u = a[i];
         } else {
           ++day;
+
           if (day == list.size()) {
             break;
           }
+
           i = j;
           a = list.get(day);
+
           if (i == a.length) {
             ++day;
+
             if (day == list.size()) {
               break;
             }
+
             i = 0;
             a = list.get(day);
           }
+
           j = 0;
           u = safeValueAt(a, i);
           v = safeValueNextDayAt(list, day, j);
@@ -133,10 +141,12 @@ final class TripTimesForDaysIndex {
     for (int i = 0; i < list.size(); ++i) {
       int o = offsets[i];
       int[] a = list.get(i);
+
       for (int j = 0; j < a.length; ++j) {
         a[j] = a[j] + o;
       }
     }
+
     return list;
   }
 
@@ -145,7 +155,9 @@ final class TripTimesForDaysIndex {
     if (tripIndex.length == 0) {
       return "";
     }
+
     var buf = new StringBuilder();
+
     for (int i = 0; i < tripIndex.length; i += 2) {
       buf
         .append(tripIndex[i])
@@ -153,6 +165,7 @@ final class TripTimesForDaysIndex {
         .append(tripIndex[i + 1])
         .append(' ');
     }
+
     return buf.substring(0, buf.length() - 1);
   }
 }

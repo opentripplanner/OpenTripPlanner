@@ -53,6 +53,7 @@ public class CompoundRefTagGroup {
    */
   public Optional<String> compoundValue(Function<String, String> tagToValueMapper) {
     List<String> values = tags.stream().map(tagToValueMapper).toList();
+
     if (values.stream().anyMatch(Objects::isNull)) {
       return Optional.empty();
     } else {
@@ -70,9 +71,11 @@ public class CompoundRefTagGroup {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     CompoundRefTagGroup that = (CompoundRefTagGroup) o;
     return tags.equals(that.tags);
   }

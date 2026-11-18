@@ -27,7 +27,9 @@ class BackwardsDelayRequiredInterpolator extends AbstractBackwardsDelayInterpola
     ) {
       ++firstUpdatedIndex;
     }
+
     var time = builder.getArrivalTime(firstUpdatedIndex);
+
     if (time == null) {
       builder.withArrivalTime(
         firstUpdatedIndex,
@@ -37,10 +39,12 @@ class BackwardsDelayRequiredInterpolator extends AbstractBackwardsDelayInterpola
         ))
       );
     }
+
     for (int i = firstUpdatedIndex - 1; i >= 0; i--) {
       if (setNoData && builder.stopRealTimeStates()[i] != StopRealTimeState.CANCELLED) {
         builder.withNoData(i);
       }
+
       builder.withDepartureTime(i, (time = Math.min(time, builder.getScheduledDepartureTime(i))));
       builder.withArrivalTime(i, (time = Math.min(time, builder.getScheduledArrivalTime(i))));
     }

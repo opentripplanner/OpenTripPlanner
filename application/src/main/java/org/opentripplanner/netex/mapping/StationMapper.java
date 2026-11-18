@@ -74,6 +74,7 @@ class StationMapper {
   @Nullable
   Station mapStopPlaceToStation(FeedScopedId id, StopPlace stopPlace) {
     WgsCoordinate coordinate = mapCoordinate(stopPlace);
+
     if (coordinate == null) {
       return null;
     }
@@ -119,16 +120,19 @@ class StationMapper {
         zoneId
       );
     }
+
     return null;
   }
 
   private I18NString resolveName(StopPlace stopPlace) {
     final I18NString name;
+
     if (stopPlace.getName() == null) {
       name = new NonLocalizedString("N/A");
     } else if (stopPlace.getAlternativeNames() != null) {
       Map<String, String> translations = new HashMap<>();
       translations.put(null, MultilingualStringMapper.getStringValue(stopPlace.getName()));
+
       for (var translation : stopPlace.getAlternativeNames().getAlternativeName()) {
         if (translation.getNameType() == NameTypeEnumeration.TRANSLATION) {
           String lang =
@@ -141,6 +145,7 @@ class StationMapper {
     } else {
       name = new NonLocalizedString(MultilingualStringMapper.getStringValue(stopPlace.getName()));
     }
+
     return name;
   }
 
@@ -153,10 +158,13 @@ class StationMapper {
   @Nullable
   private WgsCoordinate mapCoordinate(StopPlace stopPlace) {
     WgsCoordinate coordinate = mapCentroid(stopPlace);
+
     if (coordinate != null) {
       return coordinate;
     }
+
     List<WgsCoordinate> quayCoordinates = mapQuayCoordinates(stopPlace);
+
     if (quayCoordinates.isEmpty()) {
       issueStore.add(
         "StationWithoutValidCoordinates",
@@ -166,6 +174,7 @@ class StationMapper {
       );
       return null;
     }
+
     return WgsCoordinate.mean(quayCoordinates);
   }
 
@@ -173,6 +182,7 @@ class StationMapper {
   private WgsCoordinate mapCentroid(StopPlace stopPlace) {
     try {
       WgsCoordinate coordinate = WgsCoordinateMapper.mapToDomain(stopPlace.getCentroid());
+
       if (coordinate == null) {
         issueStore.add(
           "StationWithoutCoordinates",
@@ -181,6 +191,7 @@ class StationMapper {
           MultilingualStringMapper.getStringValue(stopPlace.getName())
         );
       }
+
       return coordinate;
     } catch (InvalidCoordinateException e) {
       issueStore.add(
@@ -201,14 +212,17 @@ class StationMapper {
     if (stopPlace.getQuays() == null) {
       return List.of();
     }
+
     List<WgsCoordinate> coordinates = new ArrayList<>();
     var quays = JAXBUtils.streamJAXBElementValue(
       Quay.class,
       stopPlace.getQuays().getQuayRefOrQuay()
     ).toList();
+
     for (Quay quay : quays) {
       try {
         WgsCoordinate coordinate = WgsCoordinateMapper.mapToDomain(quay.getCentroid());
+
         if (coordinate != null) {
           coordinates.add(coordinate);
         }
@@ -216,6 +230,7 @@ class StationMapper {
         // Skip the quay, the issue is reported by the QuayMapper
       }
     }
+
     return coordinates;
   }
 }

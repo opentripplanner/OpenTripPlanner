@@ -106,6 +106,7 @@ public class GraphBuilderModules {
     GraphBuildCacheManager cacheManager
   ) {
     List<OsmProvider> providers = new ArrayList<>();
+
     for (ConfiguredDataSource<OsmExtractParameters> osmConfiguredDataSource : dataSources.getOsmConfiguredDataSource()) {
       providers.add(
         new DefaultOsmProvider(
@@ -174,9 +175,11 @@ public class GraphBuilderModules {
     FareServiceFactory fareServiceFactory
   ) {
     List<GtfsBundle> gtfsBundles = new ArrayList<>();
+
     for (var gtfsData : dataSources.getGtfsConfiguredDataSource()) {
       gtfsBundles.add(new GtfsBundle(gtfsData.dataSource(), gtfsData.config()));
     }
+
     return new GtfsModule(
       gtfsBundles,
       transitRepository,
@@ -299,6 +302,7 @@ public class GraphBuilderModules {
   ) {
     List<ElevationModule> result = new ArrayList<>();
     List<ElevationGridCoverageFactory> gridCoverageFactories = new ArrayList<>();
+
     if (config.elevationBucket != null) {
       gridCoverageFactories.add(
         createNedElevationFactory(dataSources.getNedCacheDirectory(), config)
@@ -308,12 +312,14 @@ public class GraphBuilderModules {
         createDemGeotiffGridCoverageFactories(dataSources.getDemConfiguredDataSource())
       );
     }
+
     // Refactoring this class, it was made clear that this allows for adding multiple elevation
     // modules to the same graph builder. We do not actually know if this is supported by the
     // ElevationModule class.
     for (ElevationGridCoverageFactory it : gridCoverageFactories) {
       result.add(createElevationModule(config, graph, issueStore, it, osmModule, cacheManager));
     }
+
     return result;
   }
 
@@ -527,12 +533,14 @@ public class GraphBuilderModules {
     Iterable<ConfiguredDataSource<DemExtractParameters>> dataSources
   ) {
     List<ElevationGridCoverageFactory> elevationGridCoverageFactories = new ArrayList<>();
+
     for (ConfiguredDataSource<DemExtractParameters> demSource : dataSources) {
       double elevationUnitMultiplier = demSource.config().elevationUnitMultiplier();
       elevationGridCoverageFactories.add(
         createGeotiffGridCoverageFactoryImpl(demSource.dataSource(), elevationUnitMultiplier)
       );
     }
+
     return elevationGridCoverageFactories;
   }
 

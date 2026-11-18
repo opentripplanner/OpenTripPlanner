@@ -206,9 +206,11 @@ public class StreetModelForTest {
 
     void process(Vertex vertex) {
       graph.addVertex(vertex);
+
       for (Edge edge : vertex.getOutgoing()) {
         add(edge.getToVertex());
       }
+
       for (Edge edge : vertex.getIncoming()) {
         add(edge.getFromVertex());
       }
@@ -259,6 +261,7 @@ public class StreetModelForTest {
         createHalfLocationForTest(location, name, nearestPoint, street, endVertex);
       }
     }
+
     return location;
   }
 

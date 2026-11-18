@@ -102,10 +102,13 @@ public class FareRuleSet implements Serializable {
     //check for matching origin/destination, if this ruleset has any origin/destination restrictions
     if (!originDestinations.isEmpty()) {
       var od = new OriginDestination(startZone, endZone);
+
       if (!originDestinations.contains(od)) {
         var od2 = new OriginDestination(od.origin, null);
+
         if (!originDestinations.contains(od2)) {
           od2 = new OriginDestination(null, od.origin);
+
           if (!originDestinations.contains(od2)) {
             return false;
           }
@@ -130,6 +133,7 @@ public class FareRuleSet implements Serializable {
     if (fareAttribute.isTransfersSet() && fareAttribute.getTransfers() < transfersUsed) {
       return false;
     }
+
     // assume transfers are evaluated at boarding time,
     // as trimet does
     if (
@@ -138,6 +142,7 @@ public class FareRuleSet implements Serializable {
     ) {
       return false;
     }
+
     if (
       fareAttribute.isJourneyDurationSet() &&
       journeyTime.getSeconds() > fareAttribute.getJourneyDuration()

@@ -37,9 +37,11 @@ public record DiffEntry<T>(T left, T right) {
     if (isEqual()) {
       return "(eq: " + element() + ")";
     }
+
     if (leftOnly()) {
       return "(left: " + left + ")";
     }
+
     return "(right: " + right + ")";
   }
 

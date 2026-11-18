@@ -32,10 +32,12 @@ public class PowerOfTwoThrottle {
 
   private boolean throttle() {
     int i = counter.incrementAndGet();
+
     // overflow
     if (counter.get() < 0) {
       return true;
     }
+
     return !isPowerOfTwo(i);
   }
 

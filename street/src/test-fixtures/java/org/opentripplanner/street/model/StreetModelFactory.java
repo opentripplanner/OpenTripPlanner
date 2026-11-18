@@ -161,6 +161,7 @@ public class StreetModelFactory {
     var rentalVehicleBuilder = TestFreeFloatingRentalVehicleBuilder.of()
       .withLatitude(-122.575133)
       .withLongitude(45.456773);
+
     if (formFactor == RentalFormFactor.SCOOTER) {
       rentalVehicleBuilder.withVehicleScooter();
     } else if (formFactor == RentalFormFactor.BICYCLE) {
@@ -168,6 +169,7 @@ public class StreetModelFactory {
     } else if (formFactor == RentalFormFactor.CAR) {
       rentalVehicleBuilder.withVehicleCar();
     }
+
     return rentalVehicleBuilder;
   }
 
@@ -191,6 +193,7 @@ public class StreetModelFactory {
       /* forward edges and vertices */
       createHalfLocationForTest(location, name, nearestPoint, street, endVertex);
     }
+
     return location;
   }
 

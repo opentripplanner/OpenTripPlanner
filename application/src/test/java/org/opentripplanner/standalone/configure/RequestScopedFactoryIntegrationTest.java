@@ -195,6 +195,7 @@ class RequestScopedFactoryIntegrationTest {
       .build();
     var handle = factory.regularTransferRepositoryHandle();
     var updateManager = factory.transitUpdateManager();
+
     try {
       var before = factory.requestScopedFactoryBuilder().build();
       assertThat(findPath(before)).isNull();
@@ -227,11 +228,14 @@ class RequestScopedFactoryIntegrationTest {
     NearbyStop expected
   ) throws InterruptedException {
     long timeout = System.currentTimeMillis() + AWAIT_COMMIT_TIMEOUT_MS;
+
     while (true) {
       var request = factory.requestScopedFactoryBuilder().build();
+
       if (findPath(request) == expected || System.currentTimeMillis() > timeout) {
         return request;
       }
+
       Thread.sleep(AWAIT_COMMIT_POLL_INTERVAL_MS);
     }
   }

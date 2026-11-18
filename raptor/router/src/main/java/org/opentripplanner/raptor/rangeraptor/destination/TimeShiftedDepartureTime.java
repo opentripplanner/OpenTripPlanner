@@ -54,11 +54,13 @@ public final class TimeShiftedDepartureTime<T extends RaptorTripSchedule> {
         case EGRESS -> throw new IllegalStateException("Unexpected arrival: " + it);
       }
     }
+
     if (access == null) {
       return iterationDepartureTime;
     }
 
     int departureTime;
+
     if (firstTransit == null) {
       // Access to egress without transit, the access is moved as early as possible
       departureTime = access.earliestDepartureTime(iterationDepartureTime);
@@ -66,19 +68,24 @@ public final class TimeShiftedDepartureTime<T extends RaptorTripSchedule> {
       var transit = firstTransit.transitPath();
       var trip = transit.trip();
       int slack = slackProvider.boardSlack(trip.pattern().slackIndex());
+
       if (access.hasRides()) {
         slack += slackProvider.transferSlack();
       }
+
       int arrivalTimeAtFirstStop = trip.departure(transit.boardStopPosition()) - slack;
+
       if (transferAfterAccess != null) {
         arrivalTimeAtFirstStop -= transferAfterAccess.durationInSeconds();
       }
+
       int latestAccessArrival = access.latestArrivalTime(arrivalTimeAtFirstStop);
       departureTime =
         latestAccessArrival == RaptorConstants.TIME_NOT_SET
           ? RaptorConstants.TIME_NOT_SET
           : latestAccessArrival - access.durationInSeconds();
     }
+
     return departureTime == RaptorConstants.TIME_NOT_SET ? iterationDepartureTime : departureTime;
   }
 }

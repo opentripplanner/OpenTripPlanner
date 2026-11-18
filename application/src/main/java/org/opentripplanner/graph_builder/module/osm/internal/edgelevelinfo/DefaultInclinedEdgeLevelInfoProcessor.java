@@ -61,16 +61,19 @@ public class DefaultInclinedEdgeLevelInfoProcessor implements InclinedEdgeLevelI
     } else if (inclineInfo != null) {
       return Optional.of(inclineInfo);
     }
+
     return Optional.empty();
   }
 
   private InclinedEdgeLevelInfo findLevelInfo(OsmWay way, long firstNodeRef, long lastNodeRef) {
     List<OsmLevel> levels = osmdb.getLevelsForEntity(way);
+
     // This check also filters out the default level because the list size is 1 when the default
     // level is used.
     if (levels.size() == 2) {
       OsmLevel firstVertexOsmLevel = levels.get(0);
       OsmLevel lastVertexOsmLevel = levels.get(1);
+
       if (firstVertexOsmLevel.level() < lastVertexOsmLevel.level()) {
         return new InclinedEdgeLevelInfo(
           new VertexLevelInfo(
@@ -95,6 +98,7 @@ public class DefaultInclinedEdgeLevelInfoProcessor implements InclinedEdgeLevelI
         );
       }
     }
+
     return null;
   }
 
@@ -110,6 +114,7 @@ public class DefaultInclinedEdgeLevelInfoProcessor implements InclinedEdgeLevelI
         new VertexLevelInfo(null, firstNodeRef)
       );
     }
+
     return null;
   }
 
@@ -121,10 +126,12 @@ public class DefaultInclinedEdgeLevelInfoProcessor implements InclinedEdgeLevelI
     OsmWay way
   ) {
     Edge edge = forwardEdge != null ? forwardEdge : backwardEdge;
+
     if (edge != null && inclinedEdgeLevelInfo.canBeAppliedToEdge(edge)) {
       if (forwardEdge != null) {
         streetDetailsRepository.addInclinedEdgeLevelInfo(forwardEdge, inclinedEdgeLevelInfo);
       }
+
       if (backwardEdge != null) {
         streetDetailsRepository.addInclinedEdgeLevelInfo(backwardEdge, inclinedEdgeLevelInfo);
       }

@@ -84,10 +84,12 @@ public class TransferProfilesConfigMapper {
     var maxDurations = new EnumMap<TransferProfileType, MaxDurationsPreference>(
       TransferProfileType.class
     );
+
     for (var type : TransferProfileType.values()) {
       if (transfers.exist(typeName(type))) {
         configuredTypes.add(type);
       }
+
       var block = mapTypeBlock(transfers, type);
       typeBlocks.put(type, block);
       requests.put(type, TransferRequestConfig.mapRequest(block, type));
@@ -189,9 +191,11 @@ public class TransferProfilesConfigMapper {
         """
       )
       .asDuration(null);
+
     if (maxDuration == null && allowAllModes == null && allowsCar == null) {
       return MaxDurationsPreference.defaultFor(type);
     }
+
     try {
       return new BicycleMaxDurations(allowAllModes, maxDuration, allowsCar);
     } catch (IllegalArgumentException e) {
@@ -244,6 +248,7 @@ public class TransferProfilesConfigMapper {
     if (!profile.node().exist("reuseLimit")) {
       return null;
     }
+
     var builder = profile
       .node()
       .of("reuseLimit")
@@ -263,6 +268,7 @@ public class TransferProfilesConfigMapper {
         Optional. The default is `10s + 0.01x`.
         """
       );
+
     try {
       return builder.asCostLinearFunction(TransferParameters.DEFAULT_REUSE_LIMIT);
     } catch (IllegalArgumentException e) {
@@ -306,21 +312,26 @@ public class TransferProfilesConfigMapper {
           """
         )
         .asObjects(List.of(), node -> readConfiguredProfile(node, type));
+
       if (profiles.isEmpty() && configuredTypes.contains(type)) {
         profiles = List.of(implicitProfile(type, block));
       }
+
       configured.addAll(profiles);
     });
+
     if (configured.isEmpty()) {
       return List.of(StreetTransferFactory.defaultWalkProfile());
     }
 
     var mapper = new RegularTransferPreferencesMapper();
     var mapped = new ArrayList<TransferProfile<RouteRequest>>();
+
     for (var profile : configured) {
       var request = requests.get(profile.type());
       var defaults = mapper.toUserPreferences(profile.type(), request);
       AbstractUserPreferences<?> own = null;
+
       if (profile.node().exist("userPreferences")) {
         own = mapPreferences(
           profile.type(),
@@ -334,10 +345,12 @@ public class TransferProfilesConfigMapper {
           defaults
         );
       }
+
       mapped.add(
         new TransferProfile<>(profile.id(), profile.type(), own, request, mapReuseLimit(profile))
       );
     }
+
     return mapped;
   }
 
@@ -384,11 +397,13 @@ public class TransferProfilesConfigMapper {
       .summary("The id of the warmup entry.")
       .description("Identifies the entry in the logs. It must be unique among all the profiles.")
       .asString();
+
     if (!entry.exist("userPreferences")) {
       throw new OtpAppException(
         "Invalid transfer configuration: The warmup '" + id + "' needs 'userPreferences'"
       );
     }
+
     var userPreferences = mapPreferences(
       defaults.type(),
       entry
@@ -480,6 +495,7 @@ public class TransferProfilesConfigMapper {
         """
       )
       .asDouble(base.safetyFactor().asDouble());
+
     try {
       return Ratio.of(value).normalize();
     } catch (IllegalArgumentException e) {
@@ -507,6 +523,7 @@ public class TransferProfilesConfigMapper {
     if (!p.exist("optimize")) {
       return base;
     }
+
     var optimize = p
       .of("optimize")
       .since(V2_10)
@@ -521,6 +538,7 @@ public class TransferProfilesConfigMapper {
         """
       )
       .asObject();
+
     if (!optimize.exist("time") && !optimize.exist("slope") && !optimize.exist("safety")) {
       throw new OtpAppException(
         "Invalid transfer configuration in " +
@@ -528,6 +546,7 @@ public class TransferProfilesConfigMapper {
           ": at least one of time, slope and safety must be set."
       );
     }
+
     try {
       return TimeSlopeSafetyTrianglePreference.of(
         optimize

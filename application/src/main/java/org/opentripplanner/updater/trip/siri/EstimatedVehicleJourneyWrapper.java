@@ -212,6 +212,7 @@ final class EstimatedVehicleJourneyWrapper {
     if (journey.getJourneyRelations() == null) {
       return List.of();
     }
+
     return journey
       .getJourneyRelations()
       .getJourneyRelations()

@@ -58,11 +58,14 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
         StopLocation::getIdAndParentStationId,
         station -> List.of(station.getId())
       );
+
       if (types != null) {
         Collection<TransitAlert> alerts = new ArrayList<>();
+
         if (types.contains(GraphQLTypes.GraphQLStopAlertType.STOP)) {
           alerts.addAll(alertService.getStopLocationsAlerts(ids));
         }
+
         if (
           types.contains(GraphQLTypes.GraphQLStopAlertType.STOP_ON_ROUTES) ||
           types.contains(GraphQLTypes.GraphQLStopAlertType.STOP_ON_TRIPS)
@@ -88,11 +91,13 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
               .toList()
           );
         }
+
         if (
           types.contains(GraphQLTypes.GraphQLStopAlertType.PATTERNS) ||
           types.contains(GraphQLTypes.GraphQLStopAlertType.TRIPS)
         ) {
           var patterns = getPatterns(environment);
+
           if (patterns != null) {
             patterns.forEach(pattern -> {
               if (types.contains(GraphQLTypes.GraphQLStopAlertType.PATTERNS)) {
@@ -103,6 +108,7 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
                   )
                 );
               }
+
               if (types.contains(GraphQLTypes.GraphQLStopAlertType.TRIPS)) {
                 pattern
                   .scheduledTripsAsStream()
@@ -111,22 +117,26 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
             });
           }
         }
+
         if (
           types.contains(GraphQLTypes.GraphQLStopAlertType.ROUTES) ||
           types.contains(GraphQLTypes.GraphQLStopAlertType.AGENCIES_OF_ROUTES)
         ) {
           var routes = getRoutes(environment);
+
           if (routes != null) {
             routes.forEach(route -> {
               if (types.contains(GraphQLTypes.GraphQLStopAlertType.ROUTES)) {
                 alerts.addAll(alertService.getRouteAlerts(route.getId()));
               }
+
               if (types.contains(GraphQLTypes.GraphQLStopAlertType.AGENCIES_OF_ROUTES)) {
                 alerts.addAll(alertService.getAgencyAlerts(route.getAgency().getId()));
               }
             });
           }
         }
+
         return alerts.stream().distinct().collect(Collectors.toList());
       } else {
         return alertService.getStopLocationsAlerts(ids);
@@ -294,6 +304,7 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
     return env -> {
       var args = new GraphQLTypes.GraphQLStopRoutesArgs(env.getArguments());
       var routes = getRoutes(env);
+
       if (
         LocalDateRangeUtil.hasServiceDateFilter(args.getGraphQLServiceDates()) &&
         !CollectionUtils.isEmpty(routes)
@@ -404,6 +415,7 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
         environment.getArguments()
       );
       LocalDate date;
+
       try {
         date = ServiceDateUtils.parseString(args.getGraphQLDate());
       } catch (ParseException e) {
@@ -503,6 +515,7 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
         .findPathsFrom(stop.getIndex())
         .stream();
     }
+
     return context
       .transferService()
       .findTransfersByStop(stop)
@@ -593,11 +606,13 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
     Function<Station, T> stationTFunction
   ) {
     Object source = environment.getSource();
+
     if (source instanceof StopLocation) {
       return stopTFunction.apply((StopLocation) source);
     } else if (source instanceof Station) {
       return stationTFunction.apply((Station) source);
     }
+
     return null;
   }
 }

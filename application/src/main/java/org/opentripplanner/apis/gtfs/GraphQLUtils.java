@@ -22,6 +22,7 @@ public class GraphQLUtils {
     if (boarding == null) {
       return null;
     }
+
     return switch (boarding) {
       case NO_INFORMATION -> GraphQLWheelchairBoarding.NO_INFORMATION;
       case POSSIBLE -> GraphQLWheelchairBoarding.POSSIBLE;
@@ -33,6 +34,7 @@ public class GraphQLUtils {
     if (code == null) {
       return null;
     }
+
     return switch (code) {
       case LOCATION_NOT_FOUND -> GraphQLRoutingErrorCode.LOCATION_NOT_FOUND;
       case NO_DIRECT_MODE_CONNECTION -> GraphQLRoutingErrorCode.NO_DIRECT_MODE_CONNECTION;
@@ -52,6 +54,7 @@ public class GraphQLUtils {
     if (inputField == null) {
       return null;
     }
+
     return switch (inputField) {
       case DATE_TIME -> GraphQLInputField.DATE_TIME;
       case FROM_PLACE -> GraphQLInputField.FROM;
@@ -64,6 +67,7 @@ public class GraphQLUtils {
     if (formFactor == null) {
       return null;
     }
+
     return switch (formFactor) {
       case BICYCLE -> RentalFormFactor.BICYCLE;
       case SCOOTER -> RentalFormFactor.SCOOTER;
@@ -80,6 +84,7 @@ public class GraphQLUtils {
     if (type == null) {
       return null;
     }
+
     return switch (type) {
       case BICYCLE_RENT, VEHICLE_RENT -> PlaceType.VEHICLE_RENT;
       case BIKE_PARK -> PlaceType.BIKE_PARK;

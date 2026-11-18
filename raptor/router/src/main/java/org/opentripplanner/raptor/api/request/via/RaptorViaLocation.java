@@ -89,13 +89,16 @@ public final class RaptorViaLocation {
     // (N is # connections, S is # from-stops, n is # of connections per stop)
     // N is ~= S * n, so this S times faster. If S==N, then n=1 and the order is O(N)
     var byFromStop = connections.stream().collect(Collectors.groupingBy(ViaConnection::fromStop));
+
     for (var list : byFromStop.values()) {
       for (int i = 0; i < list.size(); ++i) {
         var x = list.get(i);
+
         for (int j = i + 1; j < list.size(); ++j) {
           var y = list.get(j);
           // If NOT both values dominate each other, at least one should be dropped
           var dominance = comparator.compare(x, y);
+
           if (dominance != ParetoDominance.MUTUAL) {
             throw new IllegalArgumentException(
               "All connection need to be pareto-optimal: %s %s %s".formatted(
@@ -128,9 +131,11 @@ public final class RaptorViaLocation {
   public String toString(RaptorStopNameResolver stopNameResolver) {
     var buf = new StringBuilder(getClass().getSimpleName()).append('{');
     buf.append(isPassThroughSearch() ? "pass-through " : "via-visit ");
+
     if (label != null) {
       buf.append(label).append(" ");
     }
+
     buf.append(connections.size() <= 10 ? ": " : "(10/" + connections.size() + "): ").append(
       connections
         .stream()

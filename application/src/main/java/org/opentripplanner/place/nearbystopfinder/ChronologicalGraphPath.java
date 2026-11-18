@@ -37,13 +37,16 @@ public class ChronologicalGraphPath {
   public static ChronologicalGraphPath of(State state) {
     double walkDistance = 0.0;
     var edges = new ArrayList<Edge>();
+
     for (State cur = state; cur != null; cur = cur.getBackState()) {
       Edge backEdge = cur.getBackEdge();
+
       if (backEdge != null && cur.getBackState() != null) {
         walkDistance += backEdge.getEffectiveWalkDistance();
         edges.add(backEdge);
       }
     }
+
     // For depart-after, edges are in reverse chronological order; reverse to chronological.
     // For arriveBy, the A* searched backward so edges are already chronological.
     if (!state.getRequest().arriveBy()) {
@@ -51,6 +54,7 @@ public class ChronologicalGraphPath {
       // and the graph deserialization would break. See PR #7455.
       Collections.reverse(edges);
     }
+
     return new ChronologicalGraphPath(edges, walkDistance);
   }
 

@@ -64,8 +64,10 @@ public final class CompactElevationProfile implements Serializable {
     if (elevation == null) {
       return null;
     }
+
     int oiy = 0;
     int[] coords = new int[elevation.size()];
+
     for (int i = 0; i < elevation.size(); i++) {
       /*
        * Note: We should do the rounding *before* the delta to prevent rounding errors from
@@ -77,6 +79,7 @@ public final class CompactElevationProfile implements Serializable {
       coords[i] = diy;
       oiy = iy;
     }
+
     return DlugoszVarLenIntPacker.pack(coords);
   }
 
@@ -98,10 +101,12 @@ public final class CompactElevationProfile implements Serializable {
     if (packedCoords == null) {
       return null;
     }
+
     int[] coords = DlugoszVarLenIntPacker.unpack(packedCoords);
     int size = coords.length;
     Coordinate[] c = new Coordinate[size];
     int oiy = 0;
+
     for (int i = 0; i < c.length; i++) {
       int iy = oiy + coords[i];
       c[i] = new Coordinate(
@@ -110,6 +115,7 @@ public final class CompactElevationProfile implements Serializable {
       );
       oiy = iy;
     }
+
     return new PackedCoordinateSequence.Double(c, 2);
   }
 

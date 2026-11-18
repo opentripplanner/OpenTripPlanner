@@ -106,9 +106,11 @@ public final class WalkRequest {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     WalkRequest that = (WalkRequest) o;
     return (
       doubleEquals(that.speed, speed) &&
@@ -205,6 +207,7 @@ public final class WalkRequest {
       } else {
         this.safetyFactor = safetyFactor;
       }
+
       return this;
     }
 

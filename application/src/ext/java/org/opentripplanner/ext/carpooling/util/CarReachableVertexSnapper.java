@@ -152,6 +152,7 @@ public final class CarReachableVertexSnapper {
         foundRef[0] = state;
         return true;
       }
+
       return false;
     };
 
@@ -168,24 +169,29 @@ public final class CarReachableVertexSnapper {
       )
       .withDominanceFunction(new DominanceFunctions.MinimumWeight())
       .withTerminationStrategy(terminator);
+
     // Reverse search starts from toVertices, forward from fromVertices.
     if (arriveBy) {
       builder = builder.withTo(vertexToSnap);
     } else {
       builder = builder.withFrom(vertexToSnap);
     }
+
     builder.run();
 
     State best = foundRef[0];
+
     if (best == null) {
       return null;
     }
 
     var path = new StreetPath(best);
+
     // A zero-duration path means the snap landed on a zero-cost temporary hop — no real walk.
     if (path.duration().isZero()) {
       return new SnapResult(best.getVertex(), null);
     }
+
     return new SnapResult(best.getVertex(), path);
   }
 
@@ -201,6 +207,7 @@ public final class CarReachableVertexSnapper {
     if (TraversalScope.isPermanent(vertex)) {
       return isCarReachable(vertex);
     }
+
     return !permanentOnly && computeCarReachable(vertex, scope);
   }
 
@@ -210,9 +217,11 @@ public final class CarReachableVertexSnapper {
    */
   public boolean isCarReachable(Vertex vertex) {
     Boolean cached = carReachableCache.get(vertex);
+
     if (cached != null) {
       return cached;
     }
+
     boolean verdict = computeCarReachable(vertex, TraversalScope.STATIC_GRAPH);
     carReachableCache.putIfAbsent(vertex, verdict);
     return verdict;
@@ -255,6 +264,7 @@ public final class CarReachableVertexSnapper {
         escaped[0] = true;
         return true;
       }
+
       return false;
     };
 
@@ -269,11 +279,13 @@ public final class CarReachableVertexSnapper {
       .withSkipEdgeStrategy(skipEdges)
       .withDominanceFunction(new DominanceFunctions.MinimumWeight())
       .withTerminationStrategy(terminator);
+
     if (arriveBy) {
       builder = builder.withTo(origin);
     } else {
       builder = builder.withFrom(origin);
     }
+
     builder.run();
 
     return escaped[0];
@@ -285,6 +297,7 @@ public final class CarReachableVertexSnapper {
         return true;
       }
     }
+
     return false;
   }
 }

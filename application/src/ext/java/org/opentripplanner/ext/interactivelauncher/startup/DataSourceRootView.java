@@ -66,9 +66,11 @@ class DataSourceRootView {
 
     if (status == JFileChooser.APPROVE_OPTION) {
       File dir = chooser.getSelectedFile();
+
       if (!dir.exists()) {
         dir = dir.getParentFile();
       }
+
       fileTxt.setText(dir.getAbsolutePath());
       rootDirChangedListener.accept(dir.getAbsolutePath());
     }

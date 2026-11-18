@@ -69,9 +69,11 @@ public class StopsWithArriveByTransitCriteriaResolver {
 
   private void addAllEgressStopsUsingStreetToDestination(EgressPaths egressPaths) {
     var egressByStop = egressPaths.byStop();
+
     for (var cursor : egressByStop.keys()) {
       int stop = cursor.value;
       var egressList = egressByStop.get(stop);
+
       if (egressList.stream().anyMatch(e -> e.arrivedOnStreet())) {
         stops.add(stop);
       }
@@ -86,6 +88,7 @@ public class StopsWithArriveByTransitCriteriaResolver {
     for (var cursor : viaConnections.byFromStop()) {
       int stop = cursor.key;
       var viaConnectionsFromStop = cursor.value;
+
       if (
         viaConnectionsFromStop.stream().anyMatch(via -> via instanceof RaptorTransferViaConnection)
       ) {

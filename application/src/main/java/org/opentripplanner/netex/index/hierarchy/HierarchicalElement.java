@@ -43,6 +43,7 @@ public class HierarchicalElement<E> {
     if (element != null) {
       return element;
     }
+
     if (parent == null) {
       return null;
     } else {

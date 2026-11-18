@@ -54,6 +54,7 @@ public final class RegularStop
     this.sometimesUsedRealtime = builder.isSometimesUsedRealtime();
     this.boardingAreas = nullSafeImmutableSet(builder.boardingAreas());
     this.fareZones = builder.fareZones();
+
     if (isPartOfStation()) {
       getParentStation().addChildStop(this);
     }
@@ -100,6 +101,7 @@ public final class RegularStop
     } else if (isPartOfStation()) {
       return getParentStation().getTimezone();
     }
+
     return null;
   }
 

@@ -74,11 +74,13 @@ public interface RaptorTripPattern {
    */
   default int findAlightStopPositionBefore(int startPos, int alightStopIndex) {
     IntUtils.requireInRange(startPos, 0, numberOfStopsInPattern(), "startPos");
+
     for (int i = startPos - 1; i > 0; --i) {
       if (alightStopIndex == stopIndex(i) && alightingPossibleAt(i)) {
         return i;
       }
     }
+
     return -1;
   }
 
@@ -96,11 +98,13 @@ public interface RaptorTripPattern {
    */
   default int findAlightStopPositionAfter(int startPos, int alightStopIndex) {
     IntUtils.requireInRange(startPos, 0, numberOfStopsInPattern() - 1, "startPos");
+
     for (int i = startPos + 1; i < numberOfStopsInPattern(); ++i) {
       if (alightStopIndex == stopIndex(i) && alightingPossibleAt(i)) {
         return i;
       }
     }
+
     return -1;
   }
 
@@ -120,6 +124,7 @@ public interface RaptorTripPattern {
         return i;
       }
     }
+
     return -1;
   }
 
@@ -137,11 +142,13 @@ public interface RaptorTripPattern {
    */
   default int findBoardStopPositionBefore(int startPos, int boardStopIndex) {
     IntUtils.requireInRange(startPos, 0, numberOfStopsInPattern() - 1, "startPos");
+
     for (int i = startPos - 1; i >= 0; --i) {
       if (boardStopIndex == stopIndex(i) && boardingPossibleAt(i)) {
         return i;
       }
     }
+
     return -1;
   }
 
@@ -159,11 +166,13 @@ public interface RaptorTripPattern {
    */
   default int findBoardStopPositionAfter(int startPos, int boardStopIndex) {
     IntUtils.requireInRange(startPos, 0, numberOfStopsInPattern() - 1, "startPos");
+
     for (int i = startPos; i < numberOfStopsInPattern() - 1; ++i) {
       if (boardStopIndex == stopIndex(i) && boardingPossibleAt(i)) {
         return i;
       }
     }
+
     return -1;
   }
 }

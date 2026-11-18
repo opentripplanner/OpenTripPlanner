@@ -27,6 +27,7 @@ public class GenericLocationMapper {
     Map<String, Object> coordinates = (Map<String, Object>) m.get("coordinates");
     Double lat = null;
     Double lon = null;
+
     if (coordinates != null) {
       lat = (Double) coordinates.get("latitude");
       lon = (Double) coordinates.get("longitude");
@@ -85,6 +86,7 @@ public class GenericLocationMapper {
         Instant.ofEpochMilli(aimedDepartureTimeMillis)
       );
     }
+
     return TripLocation.of(tripOnDateReference, stopLocationId);
   }
 

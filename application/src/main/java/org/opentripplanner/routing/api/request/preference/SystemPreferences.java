@@ -80,9 +80,11 @@ public class SystemPreferences implements Serializable {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     SystemPreferences that = (SystemPreferences) o;
     return (
       geoidElevation == that.geoidElevation &&

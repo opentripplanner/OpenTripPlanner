@@ -89,6 +89,7 @@ final class DaggerGtfsGraphQLRequestContext implements GtfsGraphQLRequestContext
     if (nearbyPlaceFinder == null) {
       nearbyPlaceFinder = new StreetNearbyPlaceFinder(factory.linkingContextFactory());
     }
+
     return nearbyPlaceFinder;
   }
 
@@ -99,6 +100,7 @@ final class DaggerGtfsGraphQLRequestContext implements GtfsGraphQLRequestContext
         ? StreetNearbyStopFinder.of(factory.linkingContextFactory()).build()
         : new StraightLineNearbyStopFinder(factory.transitService()::findRegularStopsByBoundingBox);
     }
+
     return nearbyStopFinder;
   }
 

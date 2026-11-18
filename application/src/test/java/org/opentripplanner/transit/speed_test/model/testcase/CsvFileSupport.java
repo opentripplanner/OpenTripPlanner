@@ -64,6 +64,7 @@ public class CsvFileSupport {
         results.add(profile, r)
       );
     }
+
     return resultsById;
   }
 
@@ -108,9 +109,11 @@ public class CsvFileSupport {
 
   private static File csvFile(File dir, String... names) {
     StringBuilder name = new StringBuilder(names[0]);
+
     for (int i = 1; i < names.length; ++i) {
       name.append("-").append(names[i]);
     }
+
     name.append(".csv");
     return new File(dir, name.toString());
   }

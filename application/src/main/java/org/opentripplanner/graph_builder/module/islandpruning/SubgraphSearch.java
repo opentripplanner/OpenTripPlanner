@@ -51,27 +51,35 @@ class SubgraphSearch {
     @Nullable List<Subgraph> islands
   ) {
     int count = 0;
+
     for (int v = 0; v < newgraphs.length; v++) {
       if (!vertexIndex.isStreetVertex(v)) {
         continue;
       }
+
       if (anchors != null && anchors[v] == NO_SUBGRAPH) {
         // do not start new graph generation from non-classified vertex
         continue;
       }
+
       // already processed
       if (newgraphs[v] != NO_SUBGRAPH) {
         continue;
       }
+
       if (!neighbours.hasNeighbours(v)) {
         continue;
       }
+
       Subgraph subgraph = computeConnectedSubgraph(neighbours, v, anchors, newgraphs);
+
       if (islands != null) {
         islands.add(subgraph);
       }
+
       count++;
     }
+
     return count;
   }
 
@@ -95,28 +103,37 @@ class SubgraphSearch {
     int head = 0;
     int tail = 0;
     queue[tail++] = startVertex;
+
     while (head < tail) {
       int vertex = queue[head++];
+
       for (var it = neighbours.neighbours(vertex); it.hasNext(); ) {
         int neighbour = it.nextInt();
+
         if (visitedBy[neighbour] == visited || alreadyMapped[neighbour] != NO_SUBGRAPH) {
           continue;
         }
+
         if (anchor != NO_SUBGRAPH) {
           int compare = anchors[neighbour];
+
           if (compare != NO_SUBGRAPH && compare != anchor) {
             // do not enter a new island
             continue;
           }
         }
+
         visitedBy[neighbour] = visited;
+
         if (!vertexIndex.isStopVertex(neighbour)) {
           alreadyMapped[neighbour] = subgraphId;
         }
+
         subgraph.addVertex(neighbour);
         queue[tail++] = neighbour;
       }
     }
+
     return subgraph;
   }
 }

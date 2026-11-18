@@ -32,6 +32,7 @@ public interface FeedScopedIdMapper {
     if (id == null) {
       return Optional.empty();
     }
+
     return parse(id);
   }
 
@@ -65,6 +66,7 @@ public interface FeedScopedIdMapper {
     if (ids == null) {
       return Collections.emptyList();
     }
+
     return parseList(ids);
   }
 

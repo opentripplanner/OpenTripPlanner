@@ -97,6 +97,7 @@ public class OtpDataStore {
     if (opened) {
       throw new IllegalStateException("Do not open DataSource twice.");
     }
+
     allRepositories.forEach(DataSourceRepository::open);
     addAll(localRepository.listExistingSources(CONFIG));
     addAll(findMultipleSources(config.osmFiles(), OSM));
@@ -177,9 +178,11 @@ public class OtpDataStore {
    */
   public CompositeDataSource getCacheDir(@Nullable URI path) {
     assertDataStoreIsOpened();
+
     if (path != null) {
       return findSourceUsingAllRepos(it -> it.findCompositeSource(path, CACHE));
     }
+
     return localRepository.findCompositeSource(".", CACHE);
   }
 
@@ -207,9 +210,11 @@ public class OtpDataStore {
       .filter(it -> it instanceof LocalDataSourceRepository)
       .map(it -> (LocalDataSourceRepository) it)
       .toList();
+
     if (localRepos.size() != 1) {
       throw new IllegalStateException("Only one LocalDataSourceRepository is supported.");
     }
+
     return localRepos.get(0);
   }
 
@@ -217,6 +222,7 @@ public class OtpDataStore {
     if (uri != null) {
       return findSourceUsingAllRepos(it -> it.findSource(uri, type));
     }
+
     return localRepository.findSource(filename, type);
   }
 
@@ -236,11 +242,14 @@ public class OtpDataStore {
     if (uris == null || uris.isEmpty()) {
       return localRepository.listExistingSources(type);
     }
+
     List<DataSource> result = new ArrayList<>();
+
     for (URI uri : uris) {
       DataSource res = findSourceUsingAllRepos(it -> it.findSource(uri, type));
       result.add(res);
     }
+
     return result;
   }
 
@@ -255,11 +264,14 @@ public class OtpDataStore {
         .map(it -> (CompositeDataSource) it)
         .collect(Collectors.toList());
     }
+
     List<CompositeDataSource> result = new ArrayList<>();
+
     for (URI uri : uris) {
       CompositeDataSource res = findSourceUsingAllRepos(it -> it.findCompositeSource(uri, type));
       result.add(res);
     }
+
     return result;
   }
 
@@ -267,10 +279,12 @@ public class OtpDataStore {
   private <T> T findSourceUsingAllRepos(Function<DataSourceRepository, T> repoFindSource) {
     for (DataSourceRepository it : allRepositories) {
       T res = repoFindSource.apply(it);
+
       if (res != null) {
         return res;
       }
     }
+
     return null;
   }
 

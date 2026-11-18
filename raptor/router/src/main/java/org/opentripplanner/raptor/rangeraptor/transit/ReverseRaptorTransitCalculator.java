@@ -95,6 +95,7 @@ public final class ReverseRaptorTransitCalculator<T extends RaptorTripSchedule>
   @Override
   public boolean isInIteration(int subjectTime, int iterationDepartureTime) {
     boolean iterationDepartureBeforeOrEqSubject = !isAfter(iterationDepartureTime, subjectTime);
+
     if (oneIterationOnly()) {
       return iterationDepartureBeforeOrEqSubject;
     }

@@ -250,6 +250,7 @@ public sealed class ParetoSet<T> extends AbstractCollection<T> permits ParetoSet
 
     while (j < size) {
       notifyElementMoved(j, i);
+
       // Move next element(j) forward if it is not dominated by the new value
       if (!leftVectorDominatesRightVector(newValue, elements[j])) {
         elements[i] = elements[j];
@@ -257,9 +258,11 @@ public sealed class ParetoSet<T> extends AbstractCollection<T> permits ParetoSet
       } else {
         notifyElementDropped(elements[j], newValue);
       }
+
       // Goto the next element
       ++j;
     }
+
     notifyElementMoved(j, i);
     notifyElementAccepted(newValue);
     elements[i] = newValue;

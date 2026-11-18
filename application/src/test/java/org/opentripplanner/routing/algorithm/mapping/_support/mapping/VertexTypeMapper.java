@@ -10,6 +10,7 @@ class VertexTypeMapper {
     if (domain == null) {
       return null;
     }
+
     switch (domain) {
       case NORMAL:
         return ApiVertexType.NORMAL;

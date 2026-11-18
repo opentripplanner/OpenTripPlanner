@@ -80,6 +80,7 @@ public class GraphWriterService<C> implements WriteToGraphCallback<C> {
   public Future<Void> execute(GraphWriterRunnable<C> runnable) {
     return updateManager.submit(ctx -> {
       var context = contextFactory.apply(ctx);
+
       try {
         runnable.run(context);
       } catch (Exception e) {

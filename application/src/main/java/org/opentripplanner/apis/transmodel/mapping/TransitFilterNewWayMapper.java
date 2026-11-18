@@ -24,18 +24,23 @@ class TransitFilterNewWayMapper {
 
       if (filterInput.containsKey("select")) {
         var select = (List<Map<String, List<?>>>) filterInput.get("select");
+
         for (var it : select) {
           filterRequestBuilder.addSelect(selectRequestMapper.mapSelectRequest(it));
         }
       }
+
       if (filterInput.containsKey("not")) {
         var not = (List<Map<String, List<?>>>) filterInput.get("not");
+
         for (var it : not) {
           filterRequestBuilder.addNot(selectRequestMapper.mapSelectRequest(it));
         }
       }
+
       filterRequests.add(filterRequestBuilder.build());
     }
+
     return filterRequests;
   }
 }

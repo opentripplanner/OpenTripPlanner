@@ -42,15 +42,19 @@ public class MaxFieldsInResultInstrumentation implements Instrumentation {
     InstrumentationState state
   ) {
     long fetched = fieldFetchCounter.incrementAndGet();
+
     if (fetched % 10000 == 0) {
       LOG.debug("Fetched {} fields", fetched);
+
       if (fetched > maxFieldFetch) {
         throw new ResponseTooLargeException(
           "The number of fields in the GraphQL result exceeds the maximum allowed: " + maxFieldFetch
         );
       }
+
       OTPRequestTimeoutException.checkForTimeout();
     }
+
     return noOp();
   }
 

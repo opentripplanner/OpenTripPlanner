@@ -54,6 +54,7 @@ public class ExactMatchSpecifier implements OsmSpecifier {
         return false;
       }
     }
+
     return true;
   }
 
@@ -63,6 +64,7 @@ public class ExactMatchSpecifier implements OsmSpecifier {
         return false;
       }
     }
+
     return true;
   }
 
@@ -72,6 +74,7 @@ public class ExactMatchSpecifier implements OsmSpecifier {
         return false;
       }
     }
+
     return true;
   }
 

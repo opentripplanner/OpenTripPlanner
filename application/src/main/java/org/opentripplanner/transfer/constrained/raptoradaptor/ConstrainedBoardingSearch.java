@@ -139,11 +139,13 @@ public final class ConstrainedBoardingSearch
     //   - ArrayList(defaultSize=10)  321-380 ms
     //   - ArrayList(size=4)          315-331 ms
     var result = new ArrayList<TransferForPattern>(4);
+
     for (var t : currentTransfers) {
       if (t.matchesSourcePoint(stopIndex, trip)) {
         result.add(t);
       }
     }
+
     return result;
   }
 
@@ -213,11 +215,13 @@ public final class ConstrainedBoardingSearch
           }
         }
       }
+
       if (useNextNormalTrip) {
         onTripEarliestBoardTime = earliestBoardTime;
         onTripTxConstraint = TransferConstraint.REGULAR_TRANSFER;
         return true;
       }
+
       if (nAllowedBoardings == ABORT_SEARCH_AFTER_N_VALID_NORMAL_TRIPS) {
         return false;
       }

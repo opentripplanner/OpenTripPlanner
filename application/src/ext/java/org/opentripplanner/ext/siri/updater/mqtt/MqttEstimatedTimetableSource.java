@@ -137,6 +137,7 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
       // completion rather than forcing it here.
       return;
     }
+
     if (!primed) {
       LOG.warn(
         "MQTT broker at {} did not connect within {}. " +
@@ -165,10 +166,12 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
     }
 
     List<CompletableFuture<Void>> primingFutures = new ArrayList<>();
+
     for (int i = 0; i < parameters.numberOfPrimingWorkers(); i++) {
       CompletableFuture<Void> f = CompletableFuture.runAsync(new RetainRunner(i), primingExecutor);
       primingFutures.add(f);
     }
+
     LOG.info("Started {} priming workers", parameters.numberOfPrimingWorkers());
 
     CompletableFuture.allOf(primingFutures.toArray(new CompletableFuture[0]))
@@ -197,6 +200,7 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
         throw new RuntimeException(e);
       }
     }
+
     graphUpdates.clear();
   }
 
@@ -235,6 +239,7 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
    */
   private Mqtt5AsyncClient buildAndConnectClient() {
     Mqtt5SimpleAuth auth;
+
     if (hasNoValue(parameters.user()) || hasNoValue(parameters.password())) {
       auth = null;
     } else {
@@ -243,6 +248,7 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
         .password(parameters.password().getBytes(StandardCharsets.UTF_8))
         .build();
     }
+
     Mqtt5AsyncClient mqttClient = Mqtt5Client.builder()
       .identifier("OpenTripPlanner-" + UUID.randomUUID())
       .serverHost(parameters.host())
@@ -294,6 +300,7 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
     readinessWatcher.shutdownNow();
     liveExecutor.shutdownNow();
     primingExecutor.shutdownNow();
+
     if (client != null) {
       client.disconnect();
     }
@@ -301,17 +308,20 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
 
   private Optional<ServiceDelivery> serviceDelivery(byte[] payload) {
     Siri siri;
+
     try {
       siri = SiriXml.parseXml(new String(payload, StandardCharsets.UTF_8));
     } catch (XMLStreamException | JAXBException e) {
       LOG.warn("Failed to parse Siri XML", e);
       return Optional.empty();
     }
+
     return Optional.ofNullable(siri.getServiceDelivery());
   }
 
   private void onMessage(Mqtt5Publish message) {
     boolean offer;
+
     if (message.isRetain() && !primed) {
       offer = primingMessageQueue.offer(message.getPayloadAsBytes());
       primingMessageCounter.incrementAndGet();
@@ -405,6 +415,7 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
             parameters.maxPrimingIdleTime().toSeconds(),
             TimeUnit.SECONDS
           );
+
           if (payload == null) {
             LOG.info(
               "RetainRunner-{} was idle for {} seconds and shut down after processing {} messages.",
@@ -414,12 +425,15 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
             );
             break;
           }
+
           processedPrimingMessageCounter.incrementAndGet();
           runnerMessageCounter.incrementAndGet();
           var optionalServiceDelivery = serviceDelivery(payload);
+
           if (optionalServiceDelivery.isEmpty()) {
             continue;
           }
+
           var serviceDelivery = optionalServiceDelivery.get();
           graphUpdates.add(serviceDeliveryConsumer.apply(serviceDelivery));
         }

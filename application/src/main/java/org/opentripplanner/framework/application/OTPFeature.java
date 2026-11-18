@@ -193,6 +193,7 @@ public enum OTPFeature {
     LOG.info("Features turned on: \n\t{}", valuesAsString(true));
     LOG.info("Features turned off: \n\t{}", valuesAsString(false));
     var featureWarnings = enabledValuesWithSevereWarningAsString();
+
     if (!featureWarnings.isBlank()) {
       LOG.warn("FEATURES THAT SHOULD BE TURNED OFF IN PRODUCTION: \n\t{}", featureWarnings);
     }
@@ -273,6 +274,7 @@ public enum OTPFeature {
   private void testEnabled(boolean enabled, Runnable task) {
     synchronized (TEST_LOCK) {
       boolean originalValue = this.enabled;
+
       try {
         set(enabled);
         task.run();

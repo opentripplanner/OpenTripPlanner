@@ -31,9 +31,11 @@ public class NodeAdapterHelper {
    */
   public static String anchor(NodeAdapter node, String parameterName) {
     String anchor = node.fullPath(parameterName);
+
     for (AnchorAbbreviation it : ANCHOR_ABBREVIATIONS) {
       anchor = anchor.replace(it.name, it.abbreviation);
     }
+
     return anchor;
   }
 

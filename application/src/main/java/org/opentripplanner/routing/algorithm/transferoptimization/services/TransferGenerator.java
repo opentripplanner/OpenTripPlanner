@@ -104,6 +104,7 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
 
     while (stopPos < fromTrip.pattern().numberOfStopsInPattern()) {
       boolean alightingPossible = fromTrip.pattern().alightingPossibleAt(stopPos);
+
       if (alightingPossible) {
         var from = TripStopTime.arrival(fromTrip, stopPos);
 
@@ -114,6 +115,7 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
 
       ++stopPos;
     }
+
     return result;
   }
 
@@ -258,6 +260,7 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
           nextLatestArrivalStopPos = Math.max(tx.from().stopPosition(), nextLatestArrivalStopPos);
         }
       }
+
       latestArrivalStopPos = nextLatestArrivalStopPos;
       result.set(i, filteredTransfers);
     }
@@ -275,10 +278,12 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
     if (!toTrip.pattern().boardingPossibleAt(stopPosition)) {
       return true;
     }
+
     // Transfer is allowed if no constrained transfer exist
     if (tx == null) {
       return false;
     }
+
     return tx.getTransferConstraint().isNotAllowed();
   }
 }

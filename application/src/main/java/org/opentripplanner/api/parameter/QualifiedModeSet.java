@@ -160,10 +160,12 @@ public class QualifiedModeSet implements Serializable {
 
   public String toString() {
     StringBuilder sb = new StringBuilder();
+
     for (QualifiedMode qm : qModes) {
       sb.append(qm.toString());
       sb.append(" ");
     }
+
     return sb.toString();
   }
 
@@ -172,6 +174,7 @@ public class QualifiedModeSet implements Serializable {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     QualifiedModeSet that = (QualifiedModeSet) o;
     return Objects.equals(qModes, that.qModes);
   }

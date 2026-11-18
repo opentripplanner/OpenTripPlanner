@@ -27,7 +27,7 @@ public class StreetModeToFormFactorMapper {
         CARPOOL,
         FLEXIBLE -> throw new IllegalStateException(
         "Cannot convert street mode %s to a form factor".formatted(streetMode)
-      );
+        );
     };
   }
 }

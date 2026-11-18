@@ -85,9 +85,11 @@ class GroupByAllSameStationsTest implements PlanTestConstants {
 
   Place place(String name, double lat, double lon, Station parent) {
     RegularStopBuilder stop = testModel.stop(name).withCoordinate(lat, lon);
+
     if (parent != null) {
       stop.withParentStation(parent);
     }
+
     return Place.forStop(stop.build());
   }
 }

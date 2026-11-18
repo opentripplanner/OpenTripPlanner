@@ -183,27 +183,34 @@ public class StopTimesHelper {
       StopTimesInPattern stopTimes = new StopTimesInPattern(pattern);
       Timetable tt = transitService.findTimetable(pattern, serviceDate);
       List<StopLocation> stops = pattern.getStops();
+
       for (int i = 0; i < stops.size(); i++) {
         StopLocation currStop = stops.get(i);
+
         if (currStop == stop) {
           if (skipByPickUpDropOff(pattern, arrivalDeparture, i)) {
             continue;
           }
+
           if (skipByStopCancellation(pattern, includeCancellations, i)) {
             continue;
           }
+
           for (TripTimes<?> t : tt.getTripTimes()) {
             if (TripTimesHelper.skipByTripCancellationOrDeletion(t, includeCancellations)) {
               continue;
             }
+
             if (servicesRunning.contains(t.getServiceCode())) {
               stopTimes.times.add(new TripTimeOnDate(t, i, pattern, serviceDate, midnight));
             }
           }
         }
       }
+
       ret.add(stopTimes);
     }
+
     return ret;
   }
 
@@ -255,13 +262,17 @@ public class StopTimesHelper {
     Queue<TripTimeOnDate> pq
   ) {
     List<StopTimesInPattern> result = new ArrayList<>();
+
     if (!pq.isEmpty()) {
       StopTimesInPattern stopTimes = new StopTimesInPattern(pattern);
+
       while (!pq.isEmpty()) {
         stopTimes.times.add(0, pq.poll());
       }
+
       result.add(stopTimes);
     }
+
     return result;
   }
 
@@ -319,12 +330,15 @@ public class StopTimesHelper {
       var servicesRunning = transitService.getServiceCodesRunningForDate(serviceDate);
 
       List<StopLocation> stops = pattern.getStops();
+
       for (int stopPos = 0; stopPos < stops.size(); stopPos++) {
         StopLocation currStop = stops.get(stopPos);
+
         if (currStop == stop) {
           if (skipByPickUpDropOff(pattern, arrivalDeparture, stopPos)) {
             continue;
           }
+
           if (skipByStopCancellation(pattern, includeCancellations, stopPos)) {
             continue;
           }
@@ -333,6 +347,7 @@ public class StopTimesHelper {
             if (!servicesRunning.contains(tripTimes.getServiceCode())) {
               continue;
             }
+
             if (TripTimesHelper.skipByTripCancellationOrDeletion(tripTimes, includeCancellations)) {
               continue;
             }
@@ -359,6 +374,7 @@ public class StopTimesHelper {
                 serviceDate,
                 serviceDateMidnight.toInstant()
               );
+
               if (tripTimeOnDateMatcher == null || tripTimeOnDateMatcher.match(tripTimeOnDate)) {
                 pq.add(tripTimeOnDate);
               }
@@ -368,6 +384,7 @@ public class StopTimesHelper {
         }
       }
     }
+
     return pq;
   }
 
@@ -382,12 +399,15 @@ public class StopTimesHelper {
     if (noPickup && noDropoff) {
       return true;
     }
+
     if (noPickup && arrivalDeparture == DEPARTURES) {
       return true;
     }
+
     if (noDropoff && arrivalDeparture == ARRIVALS) {
       return true;
     }
+
     return false;
   }
 

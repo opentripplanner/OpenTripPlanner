@@ -33,6 +33,7 @@ public class FlexPath {
     if (geometry == null) {
       geometry = geometrySupplier.get();
     }
+
     return geometry;
   }
 

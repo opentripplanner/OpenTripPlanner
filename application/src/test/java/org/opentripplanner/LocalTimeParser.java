@@ -29,9 +29,11 @@ public class LocalTimeParser {
    */
   public ZonedDateTime zonedDateTime(String timeString) {
     var time = DateUtils.parseTime(timeString);
+
     if (time == null) {
       throw new IllegalArgumentException("Invalid time format");
     }
+
     return defaultDate.atTime(time).atZone(zone);
   }
 

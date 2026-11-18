@@ -40,10 +40,12 @@ class SelectRequestMapper {
       var tModes = new ArrayList<MainAndSubMode>();
 
       var transportModes = (List<Map<String, ?>>) input.get("transportModes");
+
       for (Map<String, ?> modeWithSubModes : transportModes) {
         var mainMode = TransportModeInputMapper.mapTransitMode(
           modeWithSubModes.get("transportMode")
         );
+
         if (modeWithSubModes.containsKey("transportSubModes")) {
           var transportSubModes = (List<TransmodelTransportSubmode>) modeWithSubModes.get(
             "transportSubModes"
@@ -56,6 +58,7 @@ class SelectRequestMapper {
           tModes.add(new MainAndSubMode(mainMode));
         }
       }
+
       selectRequestBuilder.withTransportModes(tModes);
     }
 

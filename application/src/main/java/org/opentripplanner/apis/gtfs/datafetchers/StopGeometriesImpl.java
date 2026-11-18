@@ -22,6 +22,7 @@ public class StopGeometriesImpl implements GraphQLStopGeometries {
       for (int i = 0; i < geometries.getNumGeometries(); i++) {
         output.add(geometries.getGeometryN(i));
       }
+
       return output;
     };
   }

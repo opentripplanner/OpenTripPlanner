@@ -71,6 +71,7 @@ public class Throttle {
     if (time < timeout) {
       return true;
     }
+
     timeout = time + quietPeriodMilliseconds;
     return false;
   }

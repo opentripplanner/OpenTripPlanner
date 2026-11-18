@@ -94,7 +94,9 @@ public class GraphBuildCacheManager implements Closeable {
     if (!isEnabled(task)) {
       return null;
     }
+
     DataSource entry = cacheFiles.get(task);
+
     if (entry == null || !entry.exists()) {
       LOG.info(
         "No {} cache file found in {}.",
@@ -103,9 +105,12 @@ public class GraphBuildCacheManager implements Closeable {
       );
       return null;
     }
+
     LOG.info("Loading {} cache from '{}'.", task, entry.path());
+
     try (Input input = new Input(entry.asInputStream())) {
       var wrapper = (CacheSerializationObject<T>) kryo.readClassAndObject(input);
+
       if (wrapper.serializationVersionId != task.serializationVersionId) {
         LOG.warn(
           "Ignoring {} cache at '{}': version mismatch (file={}, code={}).",
@@ -116,6 +121,7 @@ public class GraphBuildCacheManager implements Closeable {
         );
         return null;
       }
+
       return wrapper.data;
     } catch (Exception e) {
       LOG.warn(
@@ -178,6 +184,7 @@ public class GraphBuildCacheManager implements Closeable {
   @Override
   public void close() {
     writeExecutor.shutdown();
+
     try {
       if (!writeExecutor.awaitTermination(WRITE_TIMEOUT.toSeconds(), TimeUnit.SECONDS)) {
         LOG.warn(
@@ -195,9 +202,11 @@ public class GraphBuildCacheManager implements Closeable {
 
   private Map<CacheTask, DataSource> mapFilesToTask(Iterable<DataSource> cacheFiles) {
     var result = new HashMap<CacheTask, DataSource>();
+
     for (DataSource dataSource : cacheFiles) {
       result.put(CacheTask.matchName(dataSource.name()), dataSource);
     }
+
     return result;
   }
 }

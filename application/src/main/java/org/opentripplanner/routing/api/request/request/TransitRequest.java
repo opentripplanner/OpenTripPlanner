@@ -120,9 +120,11 @@ public class TransitRequest implements Serializable {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     TransitRequest that = (TransitRequest) o;
     return (
       Objects.equals(filters, that.filters) &&

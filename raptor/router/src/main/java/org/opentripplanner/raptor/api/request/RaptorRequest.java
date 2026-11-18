@@ -96,9 +96,11 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
     if (profile().is(RaptorProfile.MULTI_CRITERIA)) {
       return true;
     }
+
     if (profile.is(RaptorProfile.STANDARD)) {
       return !searchParams().searchOneIterationOnly();
     }
+
     return false;
   }
 
@@ -164,9 +166,11 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     RaptorRequest<?> that = (RaptorRequest<?>) o;
     return (
       profile == that.profile &&
@@ -204,6 +208,7 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
 
   private void verify() {
     searchParams.verify();
+
     if (!profile.is(RaptorProfile.MULTI_CRITERIA)) {
       if (useDestinationPruning()) {
         LOG.warn("Destination pruning is only supported using McRangeRaptor");

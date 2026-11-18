@@ -45,6 +45,7 @@ public class GsDataSourceRepository implements DataSourceRepository {
     if (skipUri(uri)) {
       return null;
     }
+
     BlobId blobId = GsHelper.toBlobId(uri);
     return createSource(blobId, type);
   }
@@ -54,6 +55,7 @@ public class GsDataSourceRepository implements DataSourceRepository {
     if (skipUri(uri)) {
       return null;
     }
+
     return createCompositeSource(GsHelper.toBlobId(uri), type);
   }
 
@@ -86,14 +88,17 @@ public class GsDataSourceRepository implements DataSourceRepository {
           type.text() + " not found: " + GsHelper.toUriString(blobId)
         );
       }
+
       DataSource gsSource = new GsFileDataSource(blob, type);
       return new ZipStreamDataSourceDecorator(gsSource);
     }
+
     return new GsDirectoryDataSource(storage, blobId, type);
   }
 
   private Storage connectToStorage() {
     StorageOptions.Builder builder;
+
     try {
       if (host != null) {
         builder = StorageOptions.newBuilder().setHost(host);
@@ -107,6 +112,7 @@ public class GsDataSourceRepository implements DataSourceRepository {
         ).createScoped(Collections.singletonList("https://www.googleapis.com/auth/cloud-platform"));
         builder.setCredentials(credentials);
       }
+
       return builder.build().getService();
     } catch (IOException e) {
       throw new RuntimeException(e.getLocalizedMessage(), e);

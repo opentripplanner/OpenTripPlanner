@@ -46,6 +46,7 @@ public abstract class AbstractTransitEntity<
     if (obj == null || getClass() != obj.getClass()) {
       return false;
     }
+
     AbstractTransitEntity<E, B> other = (AbstractTransitEntity<E, B>) obj;
     return getId().equals(other.getId());
   }
@@ -62,6 +63,7 @@ public abstract class AbstractTransitEntity<
     if (this instanceof LogInfo n && n.logName() != null) {
       buf.append(' ').append(n.logName());
     }
+
     buf.append('}');
     return buf.toString();
   }

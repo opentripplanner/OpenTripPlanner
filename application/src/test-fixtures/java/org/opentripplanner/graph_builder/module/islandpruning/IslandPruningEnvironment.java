@@ -18,9 +18,11 @@ public class IslandPruningEnvironment {
 
   public static IslandPruningEnvironment of(Vertex... vertices) {
     var graph = new Graph();
+
     for (Vertex vertex : vertices) {
       graph.addVertex(vertex);
     }
+
     return new IslandPruningEnvironment(graph);
   }
 

@@ -36,11 +36,13 @@ public final class ProfileUserPreferences {
   ) {
     var result = new LinkedHashMap<AbstractUserPreferences<?>, TransferProfile<R>>();
     var idsByPreferences = new HashMap<AbstractUserPreferences<?>, String>();
+
     for (var profile : parameters.profiles()) {
       var preferences = resolve(profile, mapper);
       result.put(preferences, profile);
       assertUnique(idsByPreferences.put(preferences, profile.id()), profile.id(), preferences);
     }
+
     for (var entry : parameters.warmup()) {
       assertUnique(
         idsByPreferences.put(entry.userPreferences(), entry.id()),
@@ -48,6 +50,7 @@ public final class ProfileUserPreferences {
         entry.userPreferences()
       );
     }
+
     return result;
   }
 

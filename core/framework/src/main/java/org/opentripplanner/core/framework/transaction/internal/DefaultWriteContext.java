@@ -34,6 +34,7 @@ class DefaultWriteContext implements WriteContext {
       event.getClass(),
       Collections.emptyList()
     );
+
     for (var entry : entries) {
       dispatch(entry, event);
     }

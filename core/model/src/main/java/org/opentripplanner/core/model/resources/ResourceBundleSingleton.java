@@ -23,16 +23,20 @@ public enum ResourceBundleSingleton {
     if (key == null) {
       return null;
     }
+
     if (locale == null) {
       locale = Locale.ROOT;
     }
+
     try {
       ResourceBundle resourceBundle;
+
       if (INTERNAL_KEYS.contains(key)) {
         resourceBundle = getBundleWithoutFallback("internals", locale);
       } else {
         resourceBundle = getBundleWithoutFallback("WayProperties", locale);
       }
+
       return resourceBundle.getString(key);
     } catch (MissingResourceException e) {
       return key;
@@ -49,12 +53,14 @@ public enum ResourceBundleSingleton {
    */
   private static ResourceBundle getBundleWithoutFallback(String baseName, Locale locale) {
     var bundle = ResourceBundle.getBundle(baseName, locale);
+
     // The JDK silently picks the default locale's bundle if the requested one does not exist.
     // Accept the bundle only if it is in the JDK's own candidate list for the requested locale
     // (e.g. nb -> [nb, no, ROOT]).
     if (CONTROL.getCandidateLocales(baseName, locale).contains(bundle.getLocale())) {
       return bundle;
     }
+
     return ResourceBundle.getBundle(baseName, Locale.ROOT);
   }
 }

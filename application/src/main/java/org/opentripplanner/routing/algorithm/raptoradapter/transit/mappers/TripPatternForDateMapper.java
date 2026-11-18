@@ -91,6 +91,7 @@ public class TripPatternForDateMapper {
           serviceDate
         );
       }
+
       return null;
     }
 
@@ -113,9 +114,11 @@ public class TripPatternForDateMapper {
   public TripPatternForDate mapAndValidate(Timetable timetable, LocalDate serviceDate)
     throws IllegalArgumentException {
     var result = map(timetable, serviceDate);
+
     if (result != null) {
       result.assertValidRunningPeriod();
     }
+
     return result;
   }
 }

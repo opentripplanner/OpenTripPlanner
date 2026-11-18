@@ -60,6 +60,7 @@ public class SiriTestHelper {
   ) {
     var resultRef = new AtomicReference<UpdateResult>();
     var adapter = fuzzyMatching ? siriAdapterWithFuzzyMatching : siriAdapter;
+
     try {
       transitTestEnvironment
         .updateManager()
@@ -81,6 +82,7 @@ public class SiriTestHelper {
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
+
     return resultRef.get();
   }
 }

@@ -21,11 +21,13 @@ class OperatorToAgencyMapper {
 
   Operator mapOperator(org.entur.netex2.model.Operator source) {
     String name = MultilingualStringMapper.nullableValueOf(source.getName());
+
     if (name == null) {
       issueStore.add("MissingOperatorName", "Missing name for operator %s", source.getId());
       // fall back to NeTEx id when the operator name is missing
       name = source.getId();
     }
+
     var target = Operator.of(idFactory.createId(source.getId())).withName(name);
 
     mapContactDetails(source.getContactDetails(), target);
@@ -37,6 +39,7 @@ class OperatorToAgencyMapper {
     if (contactDetails == null) {
       return;
     }
+
     target.withUrl(contactDetails.getUrl());
     target.withPhone(contactDetails.getPhone());
   }

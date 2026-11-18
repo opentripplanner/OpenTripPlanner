@@ -20,6 +20,7 @@ class IntObjectHashMapSerializer extends Serializer<IntObjectHashMap<?>> {
     int[] keys = map.keys().toArray();
     Arrays.sort(keys);
     output.writeVarInt(keys.length, true);
+
     for (int key : keys) {
       output.writeVarInt(key, true);
       kryo.writeClassAndObject(output, map.get(key));
@@ -37,10 +38,12 @@ class IntObjectHashMapSerializer extends Serializer<IntObjectHashMap<?>> {
     IntObjectHashMap map = new IntObjectHashMap(size);
     // Register the map before reading the values, so values referencing back to the map resolve.
     kryo.reference(map);
+
     for (int i = 0; i < size; i++) {
       int key = input.readVarInt(true);
       map.put(key, kryo.readClassAndObject(input));
     }
+
     return map;
   }
 }

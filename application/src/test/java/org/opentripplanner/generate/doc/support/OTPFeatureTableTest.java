@@ -11,6 +11,7 @@ public class OTPFeatureTableTest {
   @Test
   void test() {
     var table = otpFeaturesTable();
+
     for (OTPFeature it : OTPFeature.values()) {
       assertTrue(table.contains(it.name()), table);
     }

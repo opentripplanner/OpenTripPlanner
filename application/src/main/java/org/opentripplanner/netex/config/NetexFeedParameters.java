@@ -149,9 +149,11 @@ public class NetexFeedParameters implements DataSourceConfig {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     NetexFeedParameters that = (NetexFeedParameters) o;
     return (
       Objects.equals(source, that.source) &&
@@ -303,6 +305,7 @@ public class NetexFeedParameters implements DataSourceConfig {
       } else {
         ignoredFeatures.remove(feature);
       }
+
       return this;
     }
 

@@ -86,18 +86,21 @@ public class StopEventResponseMapper {
     var stopEvent = new StopEventStructure()
       .withThisCall(callAtNearStop)
       .withService(mapper.datedJourney(call.tripTimeOnDate(), lang(call.tripTimeOnDate())));
+
     if (optionalFeatures.contains(OptionalFeature.PREVIOUS_CALLS)) {
       call
         .tripTimeOnDate()
         .previousTimes()
         .forEach(previous -> stopEvent.withPreviousCall(callAtNearStop(previous)));
     }
+
     if (optionalFeatures.contains(OptionalFeature.ONWARD_CALLS)) {
       call
         .tripTimeOnDate()
         .nextTimes()
         .forEach(next -> stopEvent.withOnwardCall(callAtNearStop(next)));
     }
+
     return new StopEventResultStructure()
       .withStopEvent(stopEvent)
       .withId(eventId(call.tripTimeOnDate()));
@@ -132,6 +135,7 @@ public class StopEventResponseMapper {
   @Nullable
   private String lang(TripTimeOnDate tripTimeOnDate) {
     var agencyLang = tripTimeOnDate.getTrip().getRoute().getAgency().getLang();
+
     if (agencyLang != null) {
       return agencyLang;
     } else {

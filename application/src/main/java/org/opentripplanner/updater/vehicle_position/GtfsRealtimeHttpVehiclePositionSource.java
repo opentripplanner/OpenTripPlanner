@@ -46,6 +46,7 @@ class GtfsRealtimeHttpVehiclePositionSource {
     } catch (OtpHttpClientException e) {
       LOG.warn("Error reading vehicle positions from {}", url, e);
     }
+
     return List.of();
   }
 
@@ -68,6 +69,7 @@ class GtfsRealtimeHttpVehiclePositionSource {
 
       // Create List of TripUpdates
       positions = new ArrayList<>(feedEntityList.size());
+
       for (GtfsRealtime.FeedEntity feedEntity : feedEntityList) {
         if (feedEntity.hasVehicle()) {
           positions.add(feedEntity.getVehicle());

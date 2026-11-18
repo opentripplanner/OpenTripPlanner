@@ -43,6 +43,7 @@ public class DatedServiceJourneyQuery {
         if (id == null) {
           return null;
         }
+
         return GqlUtil.getTransitService(environment).getTripOnServiceDate(id);
       })
       .build();

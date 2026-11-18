@@ -201,10 +201,12 @@ public class Station
       .map(StopLocation::getGeometry)
       .filter(Objects::nonNull)
       .collect(Collectors.toList());
+
     if (coordinate != null) {
       stationPoint = getGeometryFactory().createPoint(coordinate.asJtsCoordinate());
       childGeometries.add(stationPoint);
     }
+
     var geometryCollection = getGeometryFactory().createGeometryCollection(
       childGeometries.toArray(new Geometry[] {})
     );

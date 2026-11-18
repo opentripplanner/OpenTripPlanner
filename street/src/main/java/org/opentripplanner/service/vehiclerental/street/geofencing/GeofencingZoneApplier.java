@@ -134,6 +134,7 @@ public class GeofencingZoneApplier {
         }
       }
     }
+
     return verticesUpdated;
   }
 
@@ -188,6 +189,7 @@ public class GeofencingZoneApplier {
     if (!zoneBBox.contains(coord)) {
       return false;
     }
+
     reusablePoint.getCoordinateSequence().setOrdinate(0, 0, coord.x);
     reusablePoint.getCoordinateSequence().setOrdinate(0, 1, coord.y);
     reusablePoint.geometryChanged();

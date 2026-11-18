@@ -112,19 +112,25 @@ public class VertexGenerator {
     if (node.isElevator()) {
       return getElevatorVertex(node, entity);
     }
+
     boolean isNodeOnLinearBarrier = nodesInBarrierWays.containsKey(node);
+
     if (linearBarrierNodeType == SPLIT && isNodeOnLinearBarrier) {
       return getSplitVertexOnBarrier(node, entity);
     }
+
     // single-level case
     IntersectionVertex iv = null;
     long nid = node.getId();
     iv = intersectionNodes.get(nid);
+
     if (iv == null) {
       Coordinate coordinate = node.getCoordinate();
       String highway = node.getTag("highway");
+
       if ("motorway_junction".equals(highway)) {
         String ref = node.getTag("ref");
+
         if (ref != null) {
           iv = vertexFactory.exit(nid, coordinate, ref);
         }
@@ -134,6 +140,7 @@ public class VertexGenerator {
       if (node.isBoardingLocation()) {
         String label = String.format(NODE_LABEL_FORMAT, node.getId());
         var refs = node.getMultiTagValues(boardingAreaRefTags);
+
         if (!refs.isEmpty()) {
           String name = node.getTag("name");
           iv = vertexFactory.osmBoardingLocation(
@@ -168,6 +175,7 @@ public class VertexGenerator {
         bv.setBarrierPermissions(
           node.overridePermissions(BarrierVertex.DEFAULT_BARRIER_PERMISSIONS)
         );
+
         if (
           bv.wheelchairAccessibility() == Accessibility.NO_INFORMATION &&
           node.isWheelchairInaccessible()
@@ -217,6 +225,7 @@ public class VertexGenerator {
     splitVerticesOnBarriers.putIfAbsent(nodeOnBarrier, new HashMap<>());
     var vertices = splitVerticesOnBarriers.get(nodeOnBarrier);
     var existing = vertices.get(entity);
+
     if (existing != null) {
       return existing;
     }
@@ -241,19 +250,23 @@ public class VertexGenerator {
 
   private List<OsmLevel> getLevelsForNode(OsmNode node, OsmEntity entity) {
     List<OsmLevel> levels = osmdb.getLevelsForEntity(entity);
+
     if (entity instanceof OsmWay way && way.isSteps()) {
       if (levels.size() == 2) {
         var nodeRefs = way.getNodeRefs();
         long firstNodeRef = nodeRefs.get(0);
         long lastNodeRef = nodeRefs.get(nodeRefs.size() - 1);
+
         if (node.getId() == firstNodeRef) {
           return List.of(levels.getFirst());
         } else if (node.getId() == lastNodeRef) {
           return List.of(levels.getLast());
         }
       }
+
       return List.of();
     }
+
     return levels;
   }
 
@@ -271,6 +284,7 @@ public class VertexGenerator {
 
   public void initIntersectionNodes() {
     LongSet possibleIntersectionNodes = new LongHashSet();
+
     for (OsmWay way : osmdb.getWays()) {
       LongArrayList nodes = way.getNodeRefs();
       nodes.forEach(
@@ -283,6 +297,7 @@ public class VertexGenerator {
         }
       );
     }
+
     // Intersect ways at area boundaries if needed.
     for (OsmArea area : Iterables.concat(
       osmdb.getWalkableAreas(),
@@ -317,8 +332,10 @@ public class VertexGenerator {
       if (way.isBarrier()) {
         LongArrayList nodes = way.getNodeRefs();
         boolean isClosed = nodes.get(0) == nodes.get(nodes.size() - 1);
+
         for (int i = 0; i < nodes.size() - (isClosed ? 1 : 0); i++) {
           OsmNode node = osmdb.getNode(nodes.get(i));
+
           if (node != null) {
             nodesInBarrierWays.put(node, way);
           }
@@ -381,6 +398,7 @@ public class VertexGenerator {
     Map<OsmElevatorKey, OsmElevatorVertex> elevatorVertices = getElevatorVertices(node);
     OsmEntityType osmEntityType = getOsmEntityType(entity);
     OsmElevatorKey osmElevatorKey = new OsmElevatorKey(node.getId(), osmEntityType, entity.getId());
+
     if (!elevatorVertices.containsKey(osmElevatorKey)) {
       OsmElevatorVertex vertex = vertexFactory.osmElevator(node, osmEntityType, entity.getId());
       elevatorVertices.put(osmElevatorKey, vertex);
@@ -388,14 +406,17 @@ public class VertexGenerator {
       elevatorNodeLevels.put(osmElevatorKey, osmdb.findSingleLevelForEntity(entity));
       return vertex;
     }
+
     return elevatorVertices.get(osmElevatorKey);
   }
 
   private Map<OsmElevatorKey, OsmElevatorVertex> getElevatorVertices(OsmNode node) {
     long nodeId = node.getId();
+
     if (elevatorNodes.containsKey(nodeId)) {
       return elevatorNodes.get(nodeId);
     }
+
     Map<OsmElevatorKey, OsmElevatorVertex> elevatorVertices = new HashMap<>();
     elevatorNodes.put(nodeId, elevatorVertices);
     return elevatorVertices;
@@ -404,6 +425,7 @@ public class VertexGenerator {
   private void intersectAreaRingNodes(LongSet possibleIntersectionNodes, Ring outerRing) {
     for (OsmNode node : outerRing.nodes) {
       long nodeId = node.getId();
+
       if (possibleIntersectionNodes.contains(nodeId)) {
         intersectionNodes.put(nodeId, null);
       } else {
@@ -416,8 +438,10 @@ public class VertexGenerator {
 
   public void createDifferentLevelsSharingBarrierIssues() {
     Multimap<OsmNode, OsmLevel> levelsConnectingBarriers = getLevelsConnectingBarriers();
+
     for (OsmNode nodeOnBarrier : levelsConnectingBarriers.keySet()) {
       var levels = levelsConnectingBarriers.get(nodeOnBarrier);
+
       if (levels.size() > 1) {
         issueStore.add(new DifferentLevelsSharingBarrier(nodeOnBarrier, levels.size()));
       }

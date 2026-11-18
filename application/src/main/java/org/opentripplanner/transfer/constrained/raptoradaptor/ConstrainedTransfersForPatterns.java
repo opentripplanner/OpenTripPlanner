@@ -34,9 +34,11 @@ public class ConstrainedTransfersForPatterns {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     ConstrainedTransfersForPatterns that = (ConstrainedTransfersForPatterns) o;
     return (
       Objects.equals(transfersToStop, that.transfersToStop) &&

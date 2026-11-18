@@ -92,9 +92,11 @@ public class PatternAtStop {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     final PatternAtStop that = (PatternAtStop) o;
     return (
       Objects.equals(id, that.id) &&

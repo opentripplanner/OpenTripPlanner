@@ -35,6 +35,7 @@ public final class BitSetUtils {
     } else {
       bitset &= ~(1 << index);
     }
+
     return bitset;
   }
 
@@ -48,6 +49,7 @@ public final class BitSetUtils {
     } else {
       bitset &= ~(1 << index);
     }
+
     return bitset;
   }
 
@@ -61,6 +63,7 @@ public final class BitSetUtils {
     } else {
       bitset &= ~(1 << index);
     }
+
     return bitset;
   }
 
@@ -74,6 +77,7 @@ public final class BitSetUtils {
     } else {
       bitset &= ~(1L << index);
     }
+
     return bitset;
   }
 }

@@ -104,6 +104,7 @@ class RealtimeVehiclePatternMatcher {
   public UpdateResult applyRealtimeVehicleUpdates(List<VehiclePosition> vehiclePositions) {
     List<PatternAndRealtimeVehicle> matchResults = new ArrayList<>();
     List<UpdateError> errors = new ArrayList<>();
+
     for (var vehiclePosition : vehiclePositions) {
       try {
         matchResults.add(toRealtimeVehicle(feedId, vehiclePosition));
@@ -235,6 +236,7 @@ class RealtimeVehiclePatternMatcher {
       if (position.hasSpeed()) {
         newVehicle.withSpeed(position.getSpeed());
       }
+
       if (position.hasBearing()) {
         newVehicle.withHeading(position.getBearing());
       }
@@ -263,6 +265,7 @@ class RealtimeVehiclePatternMatcher {
           .stream()
           .filter(stop -> stop.getId().getId().equals(vehiclePosition.getStopId()))
           .toList();
+
         if (matchedStops.size() == 1) {
           newVehicle.withStop(matchedStops.get(0));
         } else {
@@ -364,6 +367,7 @@ class RealtimeVehiclePatternMatcher {
 
     var scopedTripId = new FeedScopedId(feedId, tripId);
     var trip = getTripForId.apply(scopedTripId);
+
     if (trip == null) {
       LOG.debug(
         "Unable to find trip ID in feed '{}' for vehicle position with trip ID {}",
@@ -379,6 +383,7 @@ class RealtimeVehiclePatternMatcher {
       .orElseGet(() -> inferServiceDate(trip));
 
     var pattern = getRealtimePattern.apply(trip, serviceDate);
+
     if (pattern == null) {
       LOG.debug("Unable to match OTP pattern ID for vehicle position with trip ID {}", tripId);
       throw UpdateException.of(scopedTripId, NO_SERVICE_ON_DATE);

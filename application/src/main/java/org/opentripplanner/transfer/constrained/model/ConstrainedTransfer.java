@@ -112,9 +112,11 @@ public final class ConstrainedTransfer implements RaptorConstrainedTransfer, Ser
     if (this == o) {
       return true;
     }
+
     if (!(o instanceof ConstrainedTransfer)) {
       return false;
     }
+
     final ConstrainedTransfer transfer = (ConstrainedTransfer) o;
     return (
       Objects.equals(constraint, transfer.constraint) &&

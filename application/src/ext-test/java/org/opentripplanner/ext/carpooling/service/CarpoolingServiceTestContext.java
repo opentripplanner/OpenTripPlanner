@@ -102,6 +102,7 @@ record CarpoolingServiceTestContext(
    */
   void upsertTrip(CarpoolTrip trip) {
     var routableTrip = resolver.resolve(trip);
+
     if (routableTrip == null) {
       throw new IllegalStateException(
         "Trip %s has a route point that does not resolve to a car-reachable vertex on the test graph, or a leg that cannot be routed".formatted(
@@ -109,6 +110,7 @@ record CarpoolingServiceTestContext(
         )
       );
     }
+
     repository.upsertCarpoolTrip(routableTrip);
   }
 }

@@ -168,6 +168,7 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
     ) {
       return stopsFound;
     }
+
     stopsFound = new ArrayList<>(stopsFound);
 
     var visitor = new NearbyStopFinderVisitor(originVertices, ignoreStops, reverseDirection);
@@ -231,6 +232,7 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
    */
   private boolean hasReachedStop(State state) {
     var vertex = state.getVertex();
+
     if (vertex instanceof TransitStopVertex tsv && state.isFinal()) {
       return !ignoreStops.contains(tsv.getId());
     } else {

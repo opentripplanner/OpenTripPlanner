@@ -145,12 +145,15 @@ public class ZipStreamDataSourceDecorator implements CompositeDataSource {
     if (closed) {
       return;
     }
+
     closed = true;
+
     for (DataSource dataSource : content) {
       if (dataSource instanceof TemporaryFileDataSource tempDataSource) {
         tempDataSource.deleteFile();
       }
     }
+
     // Make the content available for GC.
     content = null;
   }
@@ -170,6 +173,7 @@ public class ZipStreamDataSourceDecorator implements CompositeDataSource {
     if (contentLoaded) {
       return;
     }
+
     contentLoaded = true;
 
     // We support both gzip and unzipped files when reading.
@@ -179,6 +183,7 @@ public class ZipStreamDataSourceDecorator implements CompositeDataSource {
         if (entry.isDirectory()) {
           continue;
         }
+
         uncompressEntry(zis, entry);
       }
     } catch (ZipException ex) {
@@ -195,6 +200,7 @@ public class ZipStreamDataSourceDecorator implements CompositeDataSource {
     ByteArrayOutputStream buf = new ByteArrayOutputStream(4048);
     long nbCopiedBytes = copy(zis, buf, maxZipEntrySizeInMemory + 1L);
     byte[] byteArray = buf.toByteArray();
+
     if (nbCopiedBytes <= maxZipEntrySizeInMemory) {
       content.add(
         new ByteArrayDataSource(
@@ -213,10 +219,12 @@ public class ZipStreamDataSourceDecorator implements CompositeDataSource {
         name()
       );
       File tmpFile = Files.createTempFile(null, null).toFile();
+
       try (OutputStream outputStream = Files.newOutputStream(tmpFile.toPath())) {
         outputStream.write(byteArray);
         zis.transferTo(outputStream);
       }
+
       content.add(new TemporaryFileDataSource(entry.getName(), tmpFile, type()));
     }
   }
@@ -231,12 +239,14 @@ public class ZipStreamDataSourceDecorator implements CompositeDataSource {
     int bytesToRead = buffer.length;
     int read;
     long totalRead = 0;
+
     while (bytesToRead > 0 && (read = inputStream.read(buffer, 0, bytesToRead)) != -1) {
       outputStream.write(buffer, 0, read);
       totalRead += read;
       // Note the cast must work because buffer.length is an integer
       bytesToRead = (int) Math.min(maxLength - totalRead, buffer.length);
     }
+
     return totalRead;
   }
 }

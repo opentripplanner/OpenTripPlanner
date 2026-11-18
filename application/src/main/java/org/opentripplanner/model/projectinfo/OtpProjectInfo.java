@@ -65,9 +65,11 @@ public class OtpProjectInfo implements Serializable {
     if (graphFileHeader.isUnknown()) {
       return true;
     }
+
     if (this.graphFileHeaderInfo.isUnknown()) {
       return true;
     }
+
     return this.graphFileHeaderInfo.equals(graphFileHeader);
   }
 

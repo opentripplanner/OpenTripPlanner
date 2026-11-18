@@ -50,11 +50,13 @@ public final class CompactLineStringSequence implements Serializable {
         )
       );
     }
+
     if (cumulativeDistanceMeters[0] != 0) {
       throw new IllegalArgumentException(
         "cumulativeDistanceMeters[0] must be 0 (was %d)".formatted(cumulativeDistanceMeters[0])
       );
     }
+
     for (int i = 1; i < cumulativeDistanceMeters.length; i++) {
       if (cumulativeDistanceMeters[i] < cumulativeDistanceMeters[i - 1]) {
         throw new IllegalArgumentException(
@@ -67,10 +69,13 @@ public final class CompactLineStringSequence implements Serializable {
         );
       }
     }
+
     var packed = new CompactLineString[geometries.size()];
+
     for (int i = 0; i < geometries.size(); i++) {
       packed[i] = CompactLineString.of(geometries.get(i));
     }
+
     return new CompactLineStringSequence(packed, cumulativeDistanceMeters);
   }
 
@@ -101,20 +106,27 @@ public final class CompactLineStringSequence implements Serializable {
    */
   public LineString concatenate(int fromIndex, int toIndexExclusive) {
     int count = toIndexExclusive - fromIndex;
+
     if (count <= 0) {
       return GeometryUtils.emptyLineString();
     }
+
     int totalCoords = 0;
+
     for (int i = fromIndex; i < toIndexExclusive; i++) {
       totalCoords += geometries[i].coordinateCount();
     }
+
     // Each seam between two consecutive members repeats one coordinate; emit it only once.
     totalCoords -= count - 1;
+
     if (totalCoords <= 0) {
       return GeometryUtils.emptyLineString();
     }
+
     double[] out = new double[totalCoords * 2];
     int offset = 0;
+
     for (int i = fromIndex; i < toIndexExclusive; i++) {
       offset = CompactLineString.decodeInto(
         geometries[i].packed(),
@@ -125,6 +137,7 @@ public final class CompactLineStringSequence implements Serializable {
         i > fromIndex
       );
     }
+
     return GeometryUtils.makeLineString(out);
   }
 }

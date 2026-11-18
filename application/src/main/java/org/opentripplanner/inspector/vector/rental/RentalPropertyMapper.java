@@ -37,6 +37,7 @@ class RentalPropertyMapper extends PropertyMapper<VehicleRentalPlace> {
       );
       return ListUtils.combine(base, props);
     }
+
     return base;
   }
 }

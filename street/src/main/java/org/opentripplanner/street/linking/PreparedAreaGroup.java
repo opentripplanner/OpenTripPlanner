@@ -61,6 +61,7 @@ final class PreparedAreaGroup {
     if (preparedGroup == null) {
       preparedGroup = PreparedGeometryFactory.prepare(areaGroup.getGeometry());
     }
+
     return preparedGroup;
   }
 
@@ -82,29 +83,36 @@ final class PreparedAreaGroup {
    */
   List<Area> areasCrossedBy(LineString line) {
     List<Area> areas = areaGroup.getAreas();
+
     if (areas.size() == 1) {
       return areas;
     }
+
     if (preparedAreas == null) {
       preparedAreas = new PreparedGeometry[areas.size()];
+
       for (int i = 0; i < areas.size(); i++) {
         preparedAreas[i] = PreparedGeometryFactory.prepare(areas.get(i).getGeometry());
       }
     }
+
     LineString probe = LineStringShrinker.shrink(
       line.getCoordinateN(0),
       line.getCoordinateN(line.getNumPoints() - 1)
     );
     List<Area> crossed = new ArrayList<>(areas.size());
+
     for (int i = 0; i < areas.size(); i++) {
       if (preparedAreas[i].intersects(probe)) {
         crossed.add(areas.get(i));
       }
     }
+
     if (crossed.isEmpty()) {
       LOG.warn("No intersecting area found. This may indicate a bug.");
       return List.of(areas.getFirst());
     }
+
     return crossed;
   }
 }

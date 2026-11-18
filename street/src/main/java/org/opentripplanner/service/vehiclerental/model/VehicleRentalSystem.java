@@ -94,9 +94,11 @@ public final class VehicleRentalSystem {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     VehicleRentalSystem that = (VehicleRentalSystem) o;
     return (
       Objects.equals(systemId, that.systemId) &&

@@ -255,6 +255,7 @@ public class TransitRouter {
       request,
       transitResponse.requestUsed().searchParams()
     );
+
     if (directRequest.isPresent()) {
       debugTimingAggregator.startedDirectTransitSearch();
       var directPaths = raptorService.findAllDirectTransit(
@@ -265,6 +266,7 @@ public class TransitRouter {
       paths.addAll(directPaths);
       debugTimingAggregator.finishedDirectTransitSearch();
     }
+
     debugTimingAggregator.startedItineraryCreation();
 
     // TODO VIA - Temporarily turn OptimizeTransfers OFF for VIA search until the service support via
@@ -385,11 +387,13 @@ public class TransitRouter {
     }
 
     List<RoutingError> routingErrors = new ArrayList<>();
+
     if (!accessExist) {
       routingErrors.add(
         new RoutingError(RoutingErrorCode.NO_STOPS_IN_RANGE, InputField.FROM_PLACE)
       );
     }
+
     if (!egressExist) {
       routingErrors.add(new RoutingError(RoutingErrorCode.NO_STOPS_IN_RANGE, InputField.TO_PLACE));
     }
@@ -418,6 +422,7 @@ public class TransitRouter {
         stopLocationId
       );
     }
+
     return stops.stream().mapToInt(StopLocation::getIndex);
   }
 
@@ -433,6 +438,7 @@ public class TransitRouter {
     if (OTPFeature.Sorlandsbanen.isOff()) {
       return null;
     }
+
     return sorlandsbanenService == null
       ? null
       : sorlandsbanenService.createExtraMcRouterSearch(request, accessEgresses, raptorTransitData);

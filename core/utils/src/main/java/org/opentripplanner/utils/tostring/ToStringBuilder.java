@@ -52,9 +52,11 @@ public class ToStringBuilder {
 
   private ToStringBuilder(String name, char open, char close) {
     this.sufix = close;
+
     if (name != null) {
       sb.append(name);
     }
+
     sb.append(open);
   }
 
@@ -116,6 +118,7 @@ public class ToStringBuilder {
     if (TRUE.equals(value)) {
       addLabel(name);
     }
+
     return this;
   }
 
@@ -191,9 +194,11 @@ public class ToStringBuilder {
     if (value == null) {
       return addIt(name, "null");
     }
+
     if (Arrays.stream(value).allMatch(it -> Objects.equals(it, ignoreValue))) {
       return this;
     }
+
     return addIt(name, Arrays.toString(value));
   }
 
@@ -224,10 +229,12 @@ public class ToStringBuilder {
     if (c == null) {
       return this;
     }
+
     if (c.size() > maxLimit + 1) {
       String value = c.stream().limit(maxLimit).map(toString).collect(Collectors.joining(", "));
       return addIt(name + "(" + maxLimit + "/" + c.size() + ")", "[" + value + ", ..]");
     }
+
     return addIfNotNull(name, c);
   }
 
@@ -245,6 +252,7 @@ public class ToStringBuilder {
     if (array == null) {
       return this;
     }
+
     return addIt(
       name,
       Arrays.stream(array)
@@ -260,6 +268,7 @@ public class ToStringBuilder {
     if (bitSet == null) {
       return this;
     }
+
     return addIt(name, bitSet.cardinality() + "/" + bitSet.length());
   }
 
@@ -384,9 +393,11 @@ public class ToStringBuilder {
     if (Objects.equals(ignoreValue, value)) {
       return this;
     }
+
     if (value == null) {
       return addIt(name, NULL_VALUE);
     }
+
     return addIt(name, mapToString.apply(value));
   }
 
@@ -402,6 +413,7 @@ public class ToStringBuilder {
     } else {
       sb.append(FIELD_SEPARATOR);
     }
+
     sb.append(name);
   }
 
@@ -418,6 +430,7 @@ public class ToStringBuilder {
     if (object == null) {
       return NULL_VALUE;
     }
+
     return object.toString();
   }
 }

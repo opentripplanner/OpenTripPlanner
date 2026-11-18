@@ -98,6 +98,7 @@ public class HierarchicalVersionMapById<V extends EntityInVersionStructure>
         }
       }
     }
+
     // Fallback to the latest version of the element.
     return firstValidBestVersion(list, timestamp);
   }

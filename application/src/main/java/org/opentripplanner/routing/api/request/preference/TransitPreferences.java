@@ -183,9 +183,11 @@ public final class TransitPreferences implements Serializable {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     TransitPreferences that = (TransitPreferences) o;
     return (
       boardSlack.equals(that.boardSlack) &&

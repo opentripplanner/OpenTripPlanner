@@ -160,6 +160,7 @@ public class AStar<
     Vertex u_vertex = u.getVertex();
 
     Collection<Edge> edges = arriveBy ? u_vertex.getIncoming() : u_vertex.getOutgoing();
+
     for (Edge edge : edges) {
       if (skipEdgeStrategy != null && skipEdgeStrategy.shouldSkipEdge(u, edge)) {
         continue;
@@ -168,6 +169,7 @@ public class AStar<
       // Iterate over traversal results. When an edge leads nowhere (as indicated by
       // returning an empty array), the iteration is over.
       var states = edge.traverse(u);
+
       for (var v : states) {
         // Could be: for (State v : traverseEdge...)
 
@@ -180,6 +182,7 @@ public class AStar<
         if (remaining_w < 0 || Double.isInfinite(remaining_w)) {
           continue;
         }
+
         double estimate = v.getWeight() + remaining_w;
 
         // spt.add returns true if the state is hopeful; enqueue state if it's hopeful
@@ -188,6 +191,7 @@ public class AStar<
           if (traverseVisitor != null) {
             traverseVisitor.visitEnqueue();
           }
+
           pq.insert(v, estimate);
         }
       }
@@ -232,6 +236,7 @@ public class AStar<
           break;
         }
       }
+
       if (goalVertices != null && goalVertices.contains(u.getVertex()) && u.isFinal()) {
         targetAcceptedStates.add(u);
 

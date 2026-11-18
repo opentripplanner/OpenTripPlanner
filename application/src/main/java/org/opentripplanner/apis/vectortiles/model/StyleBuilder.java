@@ -337,9 +337,11 @@ public class StyleBuilder {
   public StyleBuilder filterValueInProperty(String propertyName, String... values) {
     var newFilter = new ArrayList<>();
     newFilter.add("any");
+
     for (String value : values) {
       newFilter.add(List.of("in", value, List.of("string", List.of("get", propertyName))));
     }
+
     filter = newFilter;
     return this;
   }
@@ -348,18 +350,23 @@ public class StyleBuilder {
     validate();
 
     var copy = new LinkedHashMap<>(props);
+
     if (!paint.isEmpty()) {
       copy.put("paint", paint);
     }
+
     if (!filter.isEmpty()) {
       copy.put("filter", filter);
     }
+
     if (!layout.isEmpty()) {
       copy.put("layout", layout);
     }
+
     if (!line.isEmpty()) {
       copy.put("line", line);
     }
+
     copy.put("metadata", metadata);
     return OBJECT_MAPPER.valueToTree(copy);
   }
@@ -374,6 +381,7 @@ public class StyleBuilder {
     if (!color.startsWith("#")) {
       throw new IllegalArgumentException("Colors must start with '#'");
     }
+
     return color;
   }
 

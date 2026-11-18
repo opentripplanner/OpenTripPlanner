@@ -24,6 +24,7 @@ public record TransitGeneralizedCostFilterParams(
     if (intervalRelaxFactor < 0.0) {
       throw new IllegalArgumentException("Negative value not expected: " + intervalRelaxFactor);
     }
+
     this.costLimitFunction = costLimitFunction;
     this.intervalRelaxFactor = DoubleUtils.roundTo2Decimals(intervalRelaxFactor);
   }

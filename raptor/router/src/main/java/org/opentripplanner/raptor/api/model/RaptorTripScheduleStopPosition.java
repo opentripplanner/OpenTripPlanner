@@ -46,6 +46,7 @@ public final class RaptorTripScheduleStopPosition {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     var that = (RaptorTripScheduleStopPosition) o;
     return (
       routeIndex == that.routeIndex &&

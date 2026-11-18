@@ -61,6 +61,7 @@ public class GenericDataFile {
       Variable longitude = netcdfFile.findVariable(dataOverlayConfig.getLongitudeVariable());
 
       HashMap<IndexVariable, Variable> genVariables = new HashMap<>();
+
       for (IndexVariable indexVariable : dataOverlayConfig.getIndexVariables()) {
         genVariables.put(indexVariable, netcdfFile.findVariable(indexVariable.getVariable()));
         //todo check if any vars from the configuration are missing from the file?
@@ -92,6 +93,7 @@ public class GenericDataFile {
       longitudeArray = longitude.read();
 
       netcdfDataForVariable = HashMap.newHashMap(genVariables.size());
+
       for (Map.Entry<IndexVariable, Variable> genVariable : genVariables.entrySet()) {
         netcdfDataForVariable.put(genVariable.getKey().getName(), genVariable.getValue().read());
       }

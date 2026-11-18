@@ -48,16 +48,20 @@ public class WarmupLauncher {
     if (parameters == null) {
       return;
     }
+
     GraphUpdaterManager updaterManager = transitRepository.getUpdaterManager();
+
     if (updaterManager == null) {
       LOG.info("Application warmup configured but no updaters found. Skipping warmup.");
       return;
     }
+
     var requestScopedFactory = requestScopedFactorySupplier.get();
     var schema = switch (parameters.api()) {
       case TRANSMODEL -> requestScopedFactory.transmodelGraphQLSchema();
       case GTFS -> requestScopedFactory.gtfsRequestContext().schema();
     };
+
     if (schema == null) {
       LOG.warn(
         "Application warmup configured for {} API, but the schema is not available. " +
@@ -66,6 +70,7 @@ public class WarmupLauncher {
       );
       return;
     }
+
     var worker = new WarmupWorker(parameters, requestScopedFactory, () -> updaterManager);
     var thread = new Thread(worker, "app-warmup");
     thread.setDaemon(true);

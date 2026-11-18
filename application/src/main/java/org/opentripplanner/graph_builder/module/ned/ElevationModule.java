@@ -188,6 +188,7 @@ public class ElevationModule implements GraphBuilderModule {
               examplarCoordinate = ee.getGeometry().getCoordinates()[0];
             }
           }
+
           streetsWithElevationEdges.add((StreetEdge) ee);
         }
       }
@@ -211,8 +212,10 @@ public class ElevationModule implements GraphBuilderModule {
     }
 
     int nPoints = nPointsEvaluated.get() + nPointsOutsideDEM.get();
+
     if (nPoints > 0) {
       double failurePercentage = ((double) nPointsOutsideDEM.get() / nPoints) * 100.0;
+
       if (failurePercentage > 50) {
         issueStore.add(
           new Graphwide(
@@ -232,6 +235,7 @@ public class ElevationModule implements GraphBuilderModule {
     }
 
     int pointsOutsideDEM = nPointsOutsideDEM.get();
+
     if (pointsOutsideDEM > 0) {
       issueStore.add(
         "ElevationProfilePointsOutsideDEM",
@@ -244,6 +248,7 @@ public class ElevationModule implements GraphBuilderModule {
 
     // Iterate again to find edges that had elevation calculated.
     List<StreetEdge> edgesWithCalculatedElevations = new ArrayList<>();
+
     for (StreetEdge edgeWithElevation : streetsWithElevationEdges) {
       if (edgeWithElevation.hasElevationExtension() && !edgeWithElevation.isElevationFlattened()) {
         edgesWithCalculatedElevations.add(edgeWithElevation);
@@ -252,12 +257,14 @@ public class ElevationModule implements GraphBuilderModule {
 
     if (cacheManager.isEnabled(CacheTask.ELEVATION)) {
       HashMap<String, PackedCoordinateSequence> newCachedElevations = new HashMap<>();
+
       for (StreetEdge streetEdge : edgesWithCalculatedElevations) {
         newCachedElevations.put(
           PolylineEncoder.encodeGeometry(streetEdge.getGeometry()).points(),
           streetEdge.getElevationProfile()
         );
       }
+
       cacheManager.save(CacheTask.ELEVATION, newCachedElevations);
     }
 
@@ -297,9 +304,11 @@ public class ElevationModule implements GraphBuilderModule {
     long bytes = elevationTileCacheSizeMB * ONE_MEGABYTE;
     TileCache cache = ImageN.getDefaultInstance().getTileCache();
     long previousBytes = cache.getMemoryCapacity();
+
     if (previousBytes == bytes) {
       return;
     }
+
     cache.setMemoryCapacity(bytes);
     LOG.info(
       "Imagen tile cache memory capacity set to {} MB (was {} MB)",
@@ -389,10 +398,12 @@ public class ElevationModule implements GraphBuilderModule {
 
     // first try to find a cached value if possible
     Geometry edgeGeometry = ee.getGeometry();
+
     if (cachedElevations != null) {
       PackedCoordinateSequence coordinateSequence = cachedElevations.get(
         PolylineEncoder.encodeGeometry(edgeGeometry).points()
       );
+
       if (coordinateSequence != null) {
         // found a cached value! Set the elevation profile with the pre-calculated data.
         setEdgeElevationProfile(ee, coordinateSequence);
@@ -424,11 +435,13 @@ public class ElevationModule implements GraphBuilderModule {
       double y1 = coords[0].y;
       double x2;
       double y2;
+
       for (int i = 0; i < coords.length - 1; i++) {
         x2 = coords[i + 1].x;
         y2 = coords[i + 1].y;
         double curSegmentDistance = SphericalDistanceLibrary.distance(y1, x1, y2, x2);
         edgeLenM += curSegmentDistance;
+
         while (edgeLenM > sampleDistance) {
           // if current edge length is longer than the current sample distance, insert new elevation coordinates
           // as needed until sample distance has caught up
@@ -447,6 +460,7 @@ public class ElevationModule implements GraphBuilderModule {
           );
           sampleDistance += distanceBetweenSamplesM;
         }
+
         previousDistance = edgeLenM;
         x1 = x2;
         y1 = y2;
@@ -495,9 +509,11 @@ public class ElevationModule implements GraphBuilderModule {
   private Coverage getThreadSpecificCoverageInterpolator() {
     if (multiThreadElevationCalculations) {
       Coverage coverage = coverageInterpolatorThreadLocal.get();
+
       if (coverage == null) {
         synchronized (gridCoverageFactory) {
           coverage = gridCoverageFactory.getGridCoverage();
+
           // The Coverage instance relies on some synchronized static methods shared across all threads that
           // can cause deadlocks if not fully initialized. Therefore, make a single request for the first
           // point on the edge to initialize these other items.
@@ -514,14 +530,17 @@ public class ElevationModule implements GraphBuilderModule {
               e
             );
           }
+
           coverageInterpolatorThreadLocal.set(coverage);
         }
       }
+
       return coverage;
     } else {
       if (singleThreadedCoverageInterpolator == null) {
         singleThreadedCoverageInterpolator = gridCoverageFactory.getGridCoverage();
       }
+
       return singleThreadedCoverageInterpolator;
     }
   }
@@ -533,6 +552,7 @@ public class ElevationModule implements GraphBuilderModule {
         .withComputed(false)
         .build()
         .ifPresent(ee::setElevationExtension);
+
       if (ee.isElevationFlattened()) {
         issueStore.add(new ElevationFlattened(ee));
       }
@@ -571,6 +591,7 @@ public class ElevationModule implements GraphBuilderModule {
   private double getElevation(Coverage coverage, double x, double y)
     throws PointOutsideCoverageException, TransformException {
     double[] values = new double[1];
+
     try {
       // We specify a CRS here because otherwise the coordinates are assumed to be in the coverage's native CRS.
       // That assumption is fine when the coverage happens to be in longitude-first WGS84 but we want to support
@@ -616,6 +637,7 @@ public class ElevationModule implements GraphBuilderModule {
     // yVal by a prime number of a magnitude larger so that there won't be any hash collisions.
     int hash = yVal * 104729 + xVal;
     Double difference = geoidDifferenceCache.get(hash);
+
     if (difference == null) {
       difference = computeEllipsoidToGeoidDifference(
         yVal / (1.0 * geoidDifferenceCoordinateValueMultiplier),
@@ -623,6 +645,7 @@ public class ElevationModule implements GraphBuilderModule {
       );
       geoidDifferenceCache.put(hash, difference);
     }
+
     return difference;
   }
 }

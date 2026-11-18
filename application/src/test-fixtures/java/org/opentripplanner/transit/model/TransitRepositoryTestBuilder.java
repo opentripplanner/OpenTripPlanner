@@ -94,9 +94,11 @@ public class TransitRepositoryTestBuilder {
     }
 
     var calendarServiceData = new CalendarServiceData();
+
     for (var serviceCode : serviceCodes.values()) {
       calendarServiceData.putServiceDatesForServiceId(serviceCode.id(), serviceCode.serviceDates());
     }
+
     timetableDataImport.addNextServiceCodes(
       serviceCodes.values().stream().map(ServiceCode::id).toList()
     );
@@ -123,9 +125,11 @@ public class TransitRepositoryTestBuilder {
       .withName("Agency Test")
       .withTimezone(timeZone.getId())
       .withUrl("https://www." + id + ".com");
+
     if (customizer != null) {
       customizer.accept(builder);
     }
+
     var agency = builder.build();
     agencies.add(agency);
     return agency;
@@ -140,9 +144,11 @@ public class TransitRepositoryTestBuilder {
       .withAgency(defaultAgency)
       .withShortName("R" + id)
       .withMode(TransitMode.BUS);
+
     if (customizer != null) {
       customizer.accept(builder);
     }
+
     // Routes aren't stored explicitly in the timetable repository so we don't have a collection for these
     return builder.build();
   }
@@ -161,9 +167,11 @@ public class TransitRepositoryTestBuilder {
 
   public Operator operator(String operatorId, Consumer<OperatorBuilder> customizer) {
     var builder = Operator.of(id(operatorId)).withName(operatorId + " name");
+
     if (customizer != null) {
       customizer.accept(builder);
     }
+
     var operator = builder.build();
     operators.add(operator);
     return operator;
@@ -190,9 +198,11 @@ public class TransitRepositoryTestBuilder {
       .withMode(tripInput.mode())
       .withNetexSubmode(tripInput.netexSubmode())
       .withNetexInternalPlanningCode(tripInput.netexInternalPlanningCode());
+
     if (customizer != null) {
       customizer.accept(tripBuilder);
     }
+
     var trip = tripBuilder.build();
 
     var stopTimes = tripInput.stopTimes(trip);
@@ -209,6 +219,7 @@ public class TransitRepositoryTestBuilder {
           "Multiple service dates can't be used with TripOnServiceDate"
         );
       }
+
       addTripOnServiceDate(trip, serviceDates.getFirst(), tripInput.tripOnServiceDateId());
     }
 
@@ -242,6 +253,7 @@ public class TransitRepositoryTestBuilder {
   private TripPattern getOrCreateTripPattern(StopPattern stopPattern, Route route) {
     var key = new TripPatternKey(stopPattern, route);
     var pattern = tripPatterns.get(key);
+
     if (pattern != null) {
       return pattern;
     }
@@ -259,6 +271,7 @@ public class TransitRepositoryTestBuilder {
       .sorted()
       .collect(Collectors.joining("|"));
     var serviceCode = serviceCodes.get(key);
+
     if (serviceCode != null) {
       return serviceCode.id();
     }
@@ -278,12 +291,14 @@ public class TransitRepositoryTestBuilder {
 
   private static StopPattern stopPattern(List<StopTime> stopTimes) {
     var builder = StopPattern.create(stopTimes.size());
+
     for (int i = 0; i < stopTimes.size(); i++) {
       var st = stopTimes.get(i);
       builder.stops.with(i, st.getStop());
       builder.pickups.with(i, st.getPickupType());
       builder.dropoffs.with(i, st.getDropOffType());
     }
+
     return builder.build();
   }
 

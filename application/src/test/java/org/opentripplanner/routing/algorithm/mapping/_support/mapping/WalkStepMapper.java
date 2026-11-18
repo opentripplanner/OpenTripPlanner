@@ -23,6 +23,7 @@ class WalkStepMapper {
     if (domain == null) {
       return null;
     }
+
     return domain.stream().map(this::mapWalkStep).collect(Collectors.toList());
   }
 
@@ -30,6 +31,7 @@ class WalkStepMapper {
     if (domain == null) {
       return null;
     }
+
     ApiWalkStep api = new ApiWalkStep();
 
     api.distance = domain.getDistance();
@@ -43,10 +45,12 @@ class WalkStepMapper {
     api.stayOn = domain.isStayOn();
     api.area = domain.getArea();
     api.bogusName = domain.nameIsDerived();
+
     if (domain.getStartLocation() != null) {
       api.lon = domain.getStartLocation().longitude();
       api.lat = domain.getStartLocation().latitude();
     }
+
     api.elevation = mapElevation(domain.getElevationProfile());
     api.walkingBike = domain.isWalkingBike();
 

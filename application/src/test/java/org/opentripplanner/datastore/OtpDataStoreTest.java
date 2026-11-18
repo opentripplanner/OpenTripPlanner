@@ -131,6 +131,7 @@ public class OtpDataStoreTest {
 
     // Get the uri for the temp data dir to insert into config file
     String uri = tempDataDir.toURI().toString();
+
     // Make sure it ends with a slash '/'
     if (!uri.endsWith("/")) {
       uri += "/";
@@ -268,6 +269,7 @@ public class OtpDataStoreTest {
     String dataDirPath = dataDir.getPath();
 
     List<String> files = new ArrayList<>();
+
     for (FileType type : FileType.values()) {
       store.listExistingSourcesFor(type).forEach(s -> {
         String p = s.path();
@@ -278,9 +280,11 @@ public class OtpDataStoreTest {
         } else if (p.startsWith(dataDirPath)) {
           p = "data:" + p.substring(dataDirPath.length() + 1);
         }
+
         files.add(type.name() + " " + p);
       });
     }
+
     return files;
   }
 

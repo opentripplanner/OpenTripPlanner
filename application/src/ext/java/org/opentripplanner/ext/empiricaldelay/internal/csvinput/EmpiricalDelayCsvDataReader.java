@@ -57,6 +57,7 @@ public class EmpiricalDelayCsvDataReader {
     if (!dataSourcesExist(directory, feedId, calendarDataSource, delayDataSource)) {
       return;
     }
+
     try {
       readCalendarFile(calendarDataSource);
       readTripDelays(delayDataSource, feedId);
@@ -94,6 +95,7 @@ public class EmpiricalDelayCsvDataReader {
 
   private void handleEmpiricalDelayRow(TripTimeDelayRow row) {
     String serviceId = row.empiricalDelayServiceId();
+
     if (!serviceIds.contains(serviceId)) {
       issueStore.add(
         OtpError.of(
@@ -126,6 +128,7 @@ public class EmpiricalDelayCsvDataReader {
         return false;
       }
     }
+
     LOG.info(
       "Reading empirical delay data: %s (feedId: %s)".formatted(parent.detailedInfo(), feedId)
     );

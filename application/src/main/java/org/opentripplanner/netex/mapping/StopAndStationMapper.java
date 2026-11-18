@@ -100,10 +100,12 @@ class StopAndStationMapper {
     StopPlace selectedStopPlace = first(stopPlaceAllVersions);
 
     Station station = mapStopPlaceAllVersionsToStation(selectedStopPlace);
+
     if (station == null) {
       // The StationMapper has reported the issue, skip the StopPlace and its quays
       return;
     }
+
     Collection<FareZone> fareZones = mapTariffZones(selectedStopPlace);
     var transitMode = stopPlaceTypeMapper.map(selectedStopPlace);
 
@@ -123,12 +125,15 @@ class StopAndStationMapper {
   @Nullable
   private Station mapStopPlaceAllVersionsToStation(StopPlace stopPlace) {
     Station station = stationMapper.map(stopPlace);
+
     if (station == null) {
       return null;
     }
+
     if (stopPlace.getParentSiteRef() != null) {
       resultStationByMultiModalStationRfs.put(stopPlace.getParentSiteRef().getRef(), station);
     }
+
     resultStations.add(station);
     return station;
   }
@@ -151,6 +156,7 @@ class StopAndStationMapper {
     if (ref == null) {
       return null;
     }
+
     var result = tariffZoneMapper.findAndMapTariffZone(ref);
 
     if (result == null) {
@@ -163,6 +169,7 @@ class StopAndStationMapper {
         )
       );
     }
+
     return result;
   }
 
@@ -190,6 +197,7 @@ class StopAndStationMapper {
     if (!quayIndex.isNewerOrSameVersionComparedWithExistingValues(quay)) {
       return;
     }
+
     if (quaysAlreadyProcessed.contains(quay.getId())) {
       return;
     }
@@ -197,6 +205,7 @@ class StopAndStationMapper {
     var wheelchair = wheelchairAccessibilityFromQuay(quay, stopPlace);
 
     RegularStop stop = quayMapper.mapQuayToStop(quay, station, fareZones, transitMode, wheelchair);
+
     if (stop == null) {
       return;
     }
@@ -235,6 +244,7 @@ class StopAndStationMapper {
         );
       }
     }
+
     return result;
   }
 

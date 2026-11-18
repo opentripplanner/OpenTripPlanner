@@ -195,6 +195,7 @@ abstract class AbstractFlexTemplate {
     // the flex path was checked before this method was called. this meant that every path
     // was traversed twice, leading to a noticeable slowdown.
     final var afterFlexState = flexEdge.traverse(accessEgress.state());
+
     if (State.isEmpty(afterFlexState)) {
       return null;
     }

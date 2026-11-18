@@ -57,19 +57,24 @@ public class RoutableCarpoolTripResolver {
   @Nullable
   public RoutableCarpoolTrip resolve(CarpoolTrip trip) {
     var vertices = new ArrayList<Vertex>(trip.routePoints().size());
+
     try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
       var streetVertexUtils = new StreetVertexUtils(
         vertexCreationService,
         temporaryVerticesContainer
       );
+
       for (var routePoint : trip.routePoints()) {
         var vertex = resolveRoutePoint(routePoint, streetVertexUtils);
+
         if (vertex == null) {
           return null;
         }
+
         vertices.add(vertex);
       }
     }
+
     // The corridor is computed after the temporary linking is gone: the resolved vertices are
     // permanent, and the searches should see the static graph only.
     return resolve(trip, vertices);
@@ -88,9 +93,11 @@ public class RoutableCarpoolTripResolver {
   @Nullable
   private Vertex resolveRoutePoint(WgsCoordinate point, StreetVertexUtils streetVertexUtils) {
     var linked = streetVertexUtils.createDriverWaypointVertex(point);
+
     if (linked == null) {
       return null;
     }
+
     var snap = carReachableVertexSnapper.snapToPermanentVertex(
       StreetSearchRequest.DEFAULT,
       linked,

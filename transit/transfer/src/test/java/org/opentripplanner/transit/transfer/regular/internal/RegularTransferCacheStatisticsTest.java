@@ -70,6 +70,7 @@ class RegularTransferCacheStatisticsTest {
     for (int i = 0; i < 3; ++i) {
       subject.record(key(2.0));
     }
+
     assertThat(resolved.get()).isEqualTo(0);
 
     subject.entries(
@@ -170,6 +171,7 @@ class RegularTransferCacheStatisticsTest {
   void theRequestsOfManyThreadsAreAllCounted() throws InterruptedException {
     var subject = RegularTransferCacheStatistics.withCapacity(10);
     var threads = new ArrayList<Thread>();
+
     for (int t = 0; t < 8; ++t) {
       var thread = new Thread(() -> {
         for (int i = 0; i < 1000; ++i) {
@@ -179,6 +181,7 @@ class RegularTransferCacheStatisticsTest {
       threads.add(thread);
       thread.start();
     }
+
     for (var thread : threads) {
       thread.join();
     }

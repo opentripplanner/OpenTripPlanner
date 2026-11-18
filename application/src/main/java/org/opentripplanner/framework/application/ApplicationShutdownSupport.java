@@ -24,6 +24,7 @@ public final class ApplicationShutdownSupport {
    */
   public static Optional<Thread> addShutdownHook(String hookName, Runnable shutdownHook) {
     final Thread shutdownThread = new Thread(shutdownHook, hookName);
+
     try {
       LOG.info("Adding shutdown hook '{}'.", hookName);
       Runtime.getRuntime().addShutdownHook(shutdownThread);
@@ -32,6 +33,7 @@ public final class ApplicationShutdownSupport {
       LOG.info("OTP is already shutting down, running shutdown hook '{}' immediately.", hookName);
       shutdownThread.start();
     }
+
     return Optional.empty();
   }
 

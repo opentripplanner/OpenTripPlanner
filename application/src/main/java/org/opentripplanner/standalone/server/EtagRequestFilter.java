@@ -48,6 +48,7 @@ public class EtagRequestFilter implements ContainerResponseFilter {
     ContainerResponseContext response
   ) {
     var statusCode = response.getStatus();
+
     if (statusCode >= 200 && statusCode < 300 && HttpMethod.GET.matches(request.getMethod())) {
       String cacheControl = response.getHeaderString(HEADER_CACHE_CONTROL);
       return cacheControl == null || !cacheControl.contains(DIRECTIVE_NO_STORE);

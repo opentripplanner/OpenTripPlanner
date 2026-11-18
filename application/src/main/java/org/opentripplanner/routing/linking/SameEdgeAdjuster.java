@@ -30,6 +30,7 @@ public class SameEdgeAdjuster {
    */
   public static DisposableEdgeCollection adjust(Vertex from, Vertex to, Graph graph) {
     DisposableEdgeCollection tempEdges = new DisposableEdgeCollection(graph, Scope.REQUEST);
+
     if (from == null || to == null) {
       return tempEdges;
     }
@@ -39,6 +40,7 @@ public class SameEdgeAdjuster {
 
       for (Edge outgoing : from.getOutgoing()) {
         Vertex toVertex = outgoing.getToVertex();
+
         if (
           outgoing instanceof TemporaryFreeEdge &&
           toVertex instanceof StreetVertex &&
@@ -59,6 +61,7 @@ public class SameEdgeAdjuster {
 
       for (Edge incoming : to.getIncoming()) {
         Vertex fromVertex = incoming.getFromVertex();
+
         if (
           incoming instanceof TemporaryFreeEdge &&
           fromVertex instanceof StreetVertex &&
@@ -75,6 +78,7 @@ public class SameEdgeAdjuster {
       for (StreetVertex fromStreetVertex : fromVertices) {
         for (StreetVertex toStreetVertex : toVertices) {
           Set<StreetEdge> overlap = overlappingParentStreetEdges(fromStreetVertex, toStreetVertex);
+
           for (StreetEdge pse : overlap) {
             makePartialEdgeAlong(pse, fromStreetVertex, toStreetVertex, tempEdges);
           }

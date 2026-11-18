@@ -59,6 +59,7 @@ final class RaptorTransfersFactory<P, R> {
     AbstractUserPreferences<?> profile
   ) {
     var base = profileRequests.get(profile);
+
     if (base == null) {
       throw new IllegalStateException(
         "The transfers are stored under preferences without a configured profile: " +
@@ -66,6 +67,7 @@ final class RaptorTransfersFactory<P, R> {
           ". Was the graph built with another transfer configuration?"
       );
     }
+
     return pathProvider.searchFor(mapper.toRequest(userPreferences, base));
   }
 
@@ -76,6 +78,7 @@ final class RaptorTransfersFactory<P, R> {
     @Nullable AbstractUserPreferences<?> profile
   ) {
     var builder = RaptorTransferStore.of(nStops);
+
     if (profile != null) {
       var search = searchFor(userPreferences, profile);
       paths.forEachPath(profile, (fromStop, toStop, path) ->
@@ -86,6 +89,7 @@ final class RaptorTransfersFactory<P, R> {
           )
       );
     }
+
     return builder.build();
   }
 
@@ -104,8 +108,10 @@ final class RaptorTransfersFactory<P, R> {
     if (profile == null || changedFromStops.size() > MAX_PATCHED_STOPS_SHARE * nStops) {
       return create(paths, userPreferences, profile);
     }
+
     var search = searchFor(userPreferences, profile);
     var patch = previous.patch();
+
     for (int fromStop : changedFromStops) {
       patch.replaceTransfersFrom(fromStop);
       paths
@@ -118,6 +124,7 @@ final class RaptorTransfersFactory<P, R> {
             )
         );
     }
+
     return patch.build();
   }
 }

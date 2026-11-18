@@ -46,6 +46,7 @@ public class TripLocationResolver {
     var serviceDate = tripAndServiceDate.serviceDate();
 
     var tripPattern = transitService.findPattern(trip, serviceDate);
+
     if (tripPattern == null) {
       throw new InvalidRoutingInputException(
         "No pattern found for trip %s on date %s".formatted(trip.getId(), serviceDate)
@@ -69,6 +70,7 @@ public class TripLocationResolver {
     @Nullable Integer aimedDepartureTime
   ) {
     var tripTimes = transitService.findTimetable(tripPattern, serviceDate).getTripTimes(trip);
+
     if (tripTimes == null) {
       throw new InvalidRoutingInputException(
         "Trip %s not found in timetable for pattern %s on date %s".formatted(
@@ -90,6 +92,7 @@ public class TripLocationResolver {
           )
         );
       }
+
       throw new InvalidRoutingInputException(
         "Stop or station %s not found in pattern for trip %s".formatted(
           stopOrStationId,
@@ -97,6 +100,7 @@ public class TripLocationResolver {
         )
       );
     }
+
     if (locations.size() > 1) {
       throw new RoutingValidationException(
         List.of(
@@ -110,6 +114,7 @@ public class TripLocationResolver {
 
     var locationInTripPattern = locations.getFirst();
     int lastStopPos = tripPattern.numberOfStops() - 1;
+
     if (locationInTripPattern.stopPositionInPattern() == lastStopPos) {
       throw new InvalidRoutingInputException(
         "Cannot board at the last stop %s of trip %s — no further travel is possible".formatted(
@@ -134,19 +139,24 @@ public class TripLocationResolver {
     @Nullable Integer targetSeconds
   ) {
     var locations = new ArrayList<LocationInTripPatternReference>();
+
     for (int stopPos = 0; stopPos < tripPattern.numberOfStops(); stopPos++) {
       var stop = tripPattern.getStop(stopPos);
+
       if (
         stop.getId().equals(stopOrStationId) || stop.getStationOrStopId().equals(stopOrStationId)
       ) {
         int scheduledDepartureTime = tripTimes.getScheduledDepartureTime(stopPos);
+
         if (targetSeconds != null && scheduledDepartureTime != targetSeconds) {
           continue;
         }
+
         int departureTime = tripTimes.getDepartureTime(stopPos);
         locations.add(new LocationInTripPatternReference(stop.getIndex(), stopPos, departureTime));
       }
     }
+
     return locations;
   }
 }

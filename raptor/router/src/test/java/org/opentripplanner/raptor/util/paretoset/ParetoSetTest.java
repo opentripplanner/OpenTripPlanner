@@ -478,12 +478,14 @@ public class ParetoSetTest {
 
   private void test(ParetoSet<TestVector> set, String expected, TestVector... vectorsToAdd) {
     set.clear();
+
     for (TestVector v : vectorsToAdd) {
       // Copy vector to avoid any identity pitfalls
       TestVector vector = new TestVector(v);
       boolean qualify = set.qualify(vector);
       assertEquals(qualify, set.add(vector), "Qualify and add should return the same value.");
     }
+
     assertEquals(expected, names(set));
   }
 

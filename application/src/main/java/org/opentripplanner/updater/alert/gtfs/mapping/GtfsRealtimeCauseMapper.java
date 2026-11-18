@@ -16,6 +16,7 @@ public class GtfsRealtimeCauseMapper {
     if (cause == null) {
       return AlertCause.UNKNOWN_CAUSE;
     }
+
     switch (cause) {
       case OTHER_CAUSE:
         return AlertCause.OTHER_CAUSE;

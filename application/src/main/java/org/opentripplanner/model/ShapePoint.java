@@ -60,6 +60,7 @@ public final class ShapePoint implements Comparable<ShapePoint> {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     ShapePoint that = (ShapePoint) o;
     return (
       sequence == that.sequence &&
@@ -78,9 +79,11 @@ public final class ShapePoint implements Comparable<ShapePoint> {
   @Override
   public String toString() {
     var s = ValueObjectToStringBuilder.of().addNum(sequence).addCoordinate(lat, lon);
+
     if (distTraveled != MISSING_VALUE) {
       s.addText(" dist=").addNum(distTraveled);
     }
+
     return s.toString();
   }
 

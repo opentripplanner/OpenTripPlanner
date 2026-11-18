@@ -36,6 +36,7 @@ final class RaptorTransfers implements Serializable {
     for (var row : transfers) {
       sortByDuration(row);
     }
+
     this.transfers = transfers;
   }
 

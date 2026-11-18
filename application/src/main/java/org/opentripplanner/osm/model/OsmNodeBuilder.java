@@ -43,8 +43,10 @@ public class OsmNodeBuilder {
       if (this.tags == EMPTY_TAGS) {
         this.tags = new HashMap<>();
       }
+
       this.tags.put(key.toLowerCase(), value);
     }
+
     return this;
   }
 

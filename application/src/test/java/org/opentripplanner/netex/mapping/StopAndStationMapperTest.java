@@ -242,6 +242,7 @@ class StopAndStationMapperTest {
     Collection<Station> stations = stopMapper.resultStations;
 
     assertEquals(1, stations.size());
+
     if (isolated) {
       assertTrue(stations.stream().findFirst().get().isTransfersNotAllowed());
     } else {

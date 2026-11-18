@@ -204,21 +204,27 @@ public enum ConfigType {
     if (Boolean.class.isAssignableFrom(javaType)) {
       return BOOLEAN;
     }
+
     if (Double.class.isAssignableFrom(javaType)) {
       return DOUBLE;
     }
+
     if (Duration.class.isAssignableFrom(javaType)) {
       return DURATION;
     }
+
     if (Integer.class.isAssignableFrom(javaType)) {
       return INTEGER;
     }
+
     if (Long.class.isAssignableFrom(javaType)) {
       return LONG;
     }
+
     if (String.class.isAssignableFrom(javaType)) {
       return STRING;
     }
+
     throw new IllegalArgumentException("Type not supported: " + javaType);
   }
 

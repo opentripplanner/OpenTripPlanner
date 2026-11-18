@@ -62,6 +62,7 @@ class RoutingResult {
     for (RoutingResult it : others) {
       addItineraries(it.itineraries);
       addErrors(it.errors);
+
       if (it.removeWalkAllTheWayResults) {
         this.removeWalkAllTheWayResults = true;
       }
@@ -80,6 +81,7 @@ class RoutingResult {
    */
   void transform(Function<List<Itinerary>, List<Itinerary>> transform) {
     var list = transform.apply(this.itineraries);
+
     if (this.itineraries != list) {
       this.itineraries.clear();
       this.itineraries.addAll(list);

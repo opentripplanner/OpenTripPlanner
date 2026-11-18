@@ -16,6 +16,7 @@ public interface OsmSpecifier {
       .filter(p -> !p.isEmpty())
       .map(pair -> {
         var kv = pair.split("=");
+
         if (kv[1].equals("*")) {
           return new Condition.Present(kv[0].toLowerCase());
         } else {

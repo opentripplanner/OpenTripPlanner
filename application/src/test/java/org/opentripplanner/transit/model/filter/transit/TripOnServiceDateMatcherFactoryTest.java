@@ -112,11 +112,13 @@ class TripOnServiceDateMatcherFactoryTest {
       if (trip.equals(tripOnServiceDateAkt.getTrip())) {
         return patternAkt;
       }
+
       if (
         trip.equals(tripOnServiceDateRut.getTrip()) || trip.equals(tripOnServiceDateRut2.getTrip())
       ) {
         return patternRut;
       }
+
       return null;
     };
     runningTimeResolver = tripOnServiceDate ->

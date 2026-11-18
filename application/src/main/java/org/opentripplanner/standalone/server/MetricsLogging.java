@@ -58,6 +58,7 @@ public class MetricsLogging {
     new LogbackMetrics().bindTo(Metrics.globalRegistry);
     new ProcessorMetrics().bindTo(Metrics.globalRegistry);
     new UptimeMetrics().bindTo(Metrics.globalRegistry);
+
     if (OTPFeature.AlertMetrics.isOn()) {
       new AlertMetrics(() -> transitAlertService).bindTo(Metrics.globalRegistry);
     }

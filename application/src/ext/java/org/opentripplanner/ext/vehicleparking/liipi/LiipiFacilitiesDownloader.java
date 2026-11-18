@@ -67,6 +67,7 @@ public class LiipiFacilitiesDownloader {
         } catch (IOException e) {
           LOG.warn("Error reading facilities from {}", url, e);
         }
+
         return null;
       });
     } catch (OtpHttpClientException e) {
@@ -94,6 +95,7 @@ public class LiipiFacilitiesDownloader {
     if (!jsonParsePath.isEmpty()) {
       String delimiter = "/";
       String[] parseElement = jsonParsePath.split(delimiter);
+
       for (String s : parseElement) {
         rootNode = rootNode.path(s);
       }
@@ -107,11 +109,14 @@ public class LiipiFacilitiesDownloader {
       if (node == null) {
         continue;
       }
+
       VehicleParking parsedElement = facilitiesParser.apply(node, hubForPark);
+
       if (parsedElement != null) {
         out.add(parsedElement);
       }
     }
+
     return out;
   }
 }

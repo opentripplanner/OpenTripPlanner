@@ -88,6 +88,7 @@ public class RealtimeResolver {
         routeRequest
       );
     }
+
     return itinerary.copyOf().transformLegs(this::mapLeg).build();
   }
 
@@ -100,15 +101,18 @@ public class RealtimeResolver {
 
       StopLocation toStopLegA = legA.to().stop;
       StopLocation fromStopLegB = legB.from().stop;
+
       if (toStopLegA == null || fromStopLegB == null) {
         return false;
       }
+
       return !toStopLegA.getId().equals(fromStopLegB.getId());
     });
   }
 
   private Leg mapLeg(Leg leg) {
     var ref = leg.legReference();
+
     if (ref == null) {
       return leg;
     }
@@ -117,10 +121,13 @@ public class RealtimeResolver {
     if (!leg.isScheduledTransitLeg()) {
       return leg;
     }
+
     var realTimeLeg = ref.getLeg(transitService, transitAlertService);
+
     if (realTimeLeg == null) {
       return leg;
     }
+
     return combineReferenceWithOriginal(
       realTimeLeg.asScheduledTransitLeg(),
       leg.asScheduledTransitLeg()

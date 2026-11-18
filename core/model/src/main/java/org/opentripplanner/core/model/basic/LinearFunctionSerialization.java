@@ -59,6 +59,7 @@ public class LinearFunctionSerialization {
     if (StringUtils.hasNoValue(text)) {
       return Optional.empty();
     }
+
     Matcher m = PATTERN.matcher(text);
 
     if (m.matches()) {
@@ -71,6 +72,7 @@ public class LinearFunctionSerialization {
 
       return Optional.of(factory.apply(constant, coefficient));
     }
+
     // No function matched
     throw new IllegalArgumentException("Unable to parse function: '" + text + "'");
   }
@@ -101,20 +103,26 @@ public class LinearFunctionSerialization {
 
   private static String coefficientToString(double coefficient, double[][] scale) {
     int decimals = 0;
+
     for (var row : scale) {
       if (coefficient < row[0]) {
         decimals = Math.max(0, BigDecimal.valueOf(row[1]).stripTrailingZeros().scale());
         break;
       }
     }
+
     var text = String.format(Locale.ROOT, "%." + decimals + "f", coefficient);
+
     if (decimals > 1) {
       int end = text.length();
+
       while (text.charAt(end - 1) == '0' && text.charAt(end - 2) != '.') {
         --end;
       }
+
       text = text.substring(0, end);
     }
+
     return text;
   }
 
@@ -131,6 +139,7 @@ public class LinearFunctionSerialization {
       if (DECIMAL_NUMBER_PATTERN.matcher(text).matches()) {
         return Duration.ofSeconds(IntUtils.round(Double.parseDouble(text)));
       }
+
       return DurationUtils.duration(text);
     } catch (DateTimeParseException e) {
       throw new IllegalArgumentException("Unable to parse duration: '" + text + "'");

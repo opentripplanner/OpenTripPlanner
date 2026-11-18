@@ -186,6 +186,7 @@ public interface RaptorAccessEgress {
     if (!hasOpeningHours()) {
       return null;
     }
+
     // The earliest-departure-time(after 00:00) and latest-arrival-time(before edt+1d). This
     // assumes the access/egress is a continuous period without gaps withing 24 hours from the
     // opening. We ignore the access/egress duration. This is ok for test, debugging and logging.
@@ -195,6 +196,7 @@ public interface RaptorAccessEgress {
     if (edt == TIME_NOT_SET || lat == TIME_NOT_SET) {
       return "closed";
     }
+
     // Opening hours are specified for the departure, not arrival
     int ldt = lat - durationInSeconds();
     return "Open(" + TimeUtils.timeToStrCompact(edt) + " " + TimeUtils.timeToStrCompact(ldt) + ")";
@@ -202,7 +204,7 @@ public interface RaptorAccessEgress {
 
   /*
        ACCESS/TRANSFER/EGRESS PATH CONTAINING MULTIPLE LEGS
-  
+
        The methods below should be only overridden when a RaptorAccessEgress contains information
        about public services, which were generated outside the RAPTOR algorithm. Examples of such
        schemes include flexible transit service and TNC. They should not be used for regular
@@ -306,30 +308,39 @@ public interface RaptorAccessEgress {
       // which would be more precise.
       buf.append("Walk");
     }
+
     if (durationInSeconds() != 0) {
       buf.append(' ').append(DurationUtils.durationToStr(durationInSeconds()));
     }
+
     if (includeCost && c1() > 0) {
       buf.append(' ').append(C1.format(c1()));
     }
+
     if (hasRides()) {
       buf.append(' ').append(RIDES.format(numberOfRides()));
     }
+
     if (numberOfViaLocationsVisited() > 0) {
       buf.append(' ').append(VIAS.format(numberOfViaLocationsVisited()));
     }
+
     if (hasTimePenalty()) {
       buf.append(' ').append(TIME_PENALTY.format(timePenalty()));
     }
+
     if (hasOpeningHours()) {
       buf.append(' ').append(openingHoursToString());
     }
+
     if (summary != null) {
       buf.append(' ').append(summary);
     }
+
     if (includeStop) {
       buf.append(" ~ ").append(stop());
     }
+
     return buf.toString();
   }
 }

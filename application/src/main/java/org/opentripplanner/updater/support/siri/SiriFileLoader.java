@@ -64,6 +64,7 @@ public class SiriFileLoader implements SiriLoader {
   @SuppressWarnings("ResultOfMethodCallIgnored")
   private Optional<Siri> fetchFeed() {
     File[] files = directory.listFiles();
+
     if (files == null) {
       return Optional.empty();
     }
@@ -72,8 +73,10 @@ public class SiriFileLoader implements SiriLoader {
       if (!matchFilename(file)) {
         continue;
       }
+
       LOG.info("Process real-time input file: " + file.getAbsolutePath());
       var inProgressFile = newFile(file, SUFFIX_IN_PROGRESS);
+
       try {
         file.renameTo(inProgressFile);
         Siri siri = null;
@@ -88,6 +91,7 @@ public class SiriFileLoader implements SiriLoader {
         throw new RuntimeException(ex.getMessage(), ex);
       }
     }
+
     return Optional.empty();
   }
 

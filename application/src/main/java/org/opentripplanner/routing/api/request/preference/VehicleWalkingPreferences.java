@@ -91,9 +91,11 @@ public class VehicleWalkingPreferences implements Serializable {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     VehicleWalkingPreferences that = (VehicleWalkingPreferences) o;
     return (
       speed == that.speed &&

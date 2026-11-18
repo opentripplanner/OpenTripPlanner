@@ -131,6 +131,7 @@ public abstract sealed class AbstractPatternRide<T extends RaptorTripSchedule>
     if (addC2 != null) {
       addC2.accept(builder);
     }
+
     return builder
       .addNum("tripSortIndex", tripSortIndex)
       .addObj("trip", trip.pattern().debugInfo())

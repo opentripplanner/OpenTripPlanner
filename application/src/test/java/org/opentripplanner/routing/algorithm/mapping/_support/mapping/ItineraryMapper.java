@@ -21,6 +21,7 @@ public class ItineraryMapper {
     if (domain == null) {
       return null;
     }
+
     return domain.stream().map(this::mapItinerary).collect(Collectors.toList());
   }
 
@@ -28,6 +29,7 @@ public class ItineraryMapper {
     if (domain == null) {
       return null;
     }
+
     ApiItinerary api = new ApiItinerary();
     api.duration = domain.totalDuration().toSeconds();
     api.startTime = GregorianCalendar.from(domain.startTime());

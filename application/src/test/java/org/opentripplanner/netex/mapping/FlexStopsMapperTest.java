@@ -147,9 +147,11 @@ class FlexStopsMapperTest {
     var areaStopPolygon = areaStop.getGeometry().getGeometryN(0);
 
     Coordinate[] coordinates = new Coordinate[VALID_POLYGON.size() / 2];
+
     for (int i = 0; i < VALID_POLYGON.size(); i += 2) {
       coordinates[i / 2] = new Coordinate(VALID_POLYGON.get(i + 1), VALID_POLYGON.get(i));
     }
+
     var geometryFactory = GeometryUtils.getGeometryFactory();
     var ring = geometryFactory.createLinearRing(coordinates);
     var polygon = geometryFactory.createPolygon(ring);
@@ -274,6 +276,7 @@ class FlexStopsMapperTest {
 
   private FlexibleStopPlace getFlexibleStopPlace(List<Collection<Double>> polygons) {
     FlexibleStopPlace_VersionStructure.Areas areas = new FlexibleStopPlace_VersionStructure.Areas();
+
     for (int i = 0; i < polygons.size(); i++) {
       Collection<Double> areaPosList = polygons.get(i);
       areas.withFlexibleAreaOrFlexibleAreaRefOrHailAndRideArea(

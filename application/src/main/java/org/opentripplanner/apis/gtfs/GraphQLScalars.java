@@ -52,6 +52,7 @@ public class GraphQLScalars {
           if (!(input instanceof StringValue)) {
             return null;
           }
+
           return ((StringValue) input).getValue();
         }
       }
@@ -92,6 +93,7 @@ public class GraphQLScalars {
               );
             }
           }
+
           throw new CoercingParseValueException(
             "Cannot parse %s into an OffsetDateTime. Must be a string."
           );
@@ -106,6 +108,7 @@ public class GraphQLScalars {
               throw new CoercingSerializeException();
             }
           }
+
           throw new CoercingParseLiteralException();
         }
       }
@@ -140,11 +143,13 @@ public class GraphQLScalars {
               new CoercingParseValueException(VALIDATION_ERROR_MESSAGE)
             );
           }
+
           if (input instanceof Integer intValue) {
             return validateCoordinate(intValue).orElseThrow(() ->
               new CoercingParseValueException(VALIDATION_ERROR_MESSAGE)
             );
           }
+
           throw new CoercingParseValueException(
             "Expected a number, got %s %s".formatted(input.getClass().getSimpleName(), input)
           );
@@ -157,11 +162,13 @@ public class GraphQLScalars {
               new CoercingParseLiteralException(VALIDATION_ERROR_MESSAGE)
             );
           }
+
           if (input instanceof IntValue coordinate) {
             return validateCoordinate(coordinate.getValue().doubleValue()).orElseThrow(() ->
               new CoercingParseLiteralException(VALIDATION_ERROR_MESSAGE)
             );
           }
+
           throw new CoercingParseLiteralException(
             "Expected a number, got: " + input.getClass().getSimpleName()
           );
@@ -171,6 +178,7 @@ public class GraphQLScalars {
           if (coordinate >= -180.001 && coordinate <= 180.001) {
             return Optional.of(coordinate);
           }
+
           return Optional.empty();
         }
       }
@@ -207,6 +215,7 @@ public class GraphQLScalars {
               new CoercingParseValueException(VALIDATION_ERROR_MESSAGE)
             );
           }
+
           throw new CoercingParseValueException(
             "Expected an integer, got %s %s".formatted(input.getClass().getSimpleName(), input)
           );
@@ -220,6 +229,7 @@ public class GraphQLScalars {
               new CoercingParseLiteralException(VALIDATION_ERROR_MESSAGE)
             );
           }
+
           throw new CoercingParseLiteralException(
             "Expected an integer, got: " + input.getClass().getSimpleName()
           );
@@ -229,6 +239,7 @@ public class GraphQLScalars {
           if (cost >= 0 && cost <= MAX_COST) {
             return Optional.of(Cost.costOfSeconds(cost));
           }
+
           return Optional.empty();
         }
       }
@@ -249,6 +260,7 @@ public class GraphQLScalars {
             var geom = (Geometry) dataFetcherResult;
             return GEOJSON_MAPPER.valueToTree(geom);
           }
+
           return null;
         }
 
@@ -275,6 +287,7 @@ public class GraphQLScalars {
             Relay.ResolvedGlobalId globalId = (Relay.ResolvedGlobalId) dataFetcherResult;
             return new Relay().toGlobalId(globalId.getType(), globalId.getId());
           }
+
           throw new CoercingSerializeException(
             "Unknown type " + dataFetcherResult.getClass().getSimpleName()
           );
@@ -285,6 +298,7 @@ public class GraphQLScalars {
           if (input instanceof String) {
             return new Relay().fromGlobalId((String) input);
           }
+
           throw new CoercingParseValueException(
             "Unexpected type " + input.getClass().getSimpleName()
           );
@@ -296,6 +310,7 @@ public class GraphQLScalars {
           if (input instanceof StringValue) {
             return new Relay().fromGlobalId(((StringValue) input).getValue());
           }
+
           throw new CoercingParseLiteralException(
             "Unexpected type " + input.getClass().getSimpleName()
           );
@@ -314,6 +329,7 @@ public class GraphQLScalars {
             var gram = (Gram) dataFetcherResult;
             return Double.valueOf(gram.asDouble());
           }
+
           return null;
         }
 
@@ -322,9 +338,11 @@ public class GraphQLScalars {
           if (input instanceof Double doubleValue) {
             return Gram.of(doubleValue);
           }
+
           if (input instanceof Integer intValue) {
             return Gram.of(intValue);
           }
+
           throw new CoercingParseValueException(
             "Expected a number, got %s %s".formatted(input.getClass().getSimpleName(), input)
           );
@@ -335,9 +353,11 @@ public class GraphQLScalars {
           if (input instanceof FloatValue floatValue) {
             return Gram.of(floatValue.getValue().doubleValue());
           }
+
           if (input instanceof IntValue intValue) {
             return Gram.of(intValue.getValue().doubleValue());
           }
+
           throw new CoercingParseLiteralException(
             "Expected a number, got: " + input.getClass().getSimpleName()
           );
@@ -356,6 +376,7 @@ public class GraphQLScalars {
         @Override
         public Double serialize(Object dataFetcherResult) throws CoercingSerializeException {
           var validationException = new CoercingSerializeException(VALIDATION_ERROR_MESSAGE);
+
           if (dataFetcherResult instanceof Double doubleValue) {
             return validateRatio(doubleValue).orElseThrow(() -> validationException);
           } else if (dataFetcherResult instanceof Float floatValue) {
@@ -376,11 +397,13 @@ public class GraphQLScalars {
               new CoercingParseValueException(VALIDATION_ERROR_MESSAGE)
             );
           }
+
           if (input instanceof Integer intValue) {
             return validateRatio(intValue).orElseThrow(() ->
               new CoercingParseValueException(VALIDATION_ERROR_MESSAGE)
             );
           }
+
           throw new CoercingParseValueException(
             "Expected a number, got %s %s".formatted(input.getClass().getSimpleName(), input)
           );
@@ -393,11 +416,13 @@ public class GraphQLScalars {
               new CoercingParseLiteralException(VALIDATION_ERROR_MESSAGE)
             );
           }
+
           if (input instanceof IntValue ratio) {
             return validateRatio(ratio.getValue().doubleValue()).orElseThrow(() ->
               new CoercingParseLiteralException(VALIDATION_ERROR_MESSAGE)
             );
           }
+
           throw new CoercingParseLiteralException(
             "Expected a number, got: " + input.getClass().getSimpleName()
           );
@@ -407,6 +432,7 @@ public class GraphQLScalars {
           if (ratio >= -0.001 && ratio <= 1.001) {
             return Optional.of(ratio);
           }
+
           return Optional.empty();
         }
       }
@@ -444,11 +470,13 @@ public class GraphQLScalars {
               new CoercingParseValueException(VALIDATION_ERROR_MESSAGE)
             );
           }
+
           if (input instanceof Integer intValue) {
             return validateReluctance(intValue).orElseThrow(() ->
               new CoercingParseValueException(VALIDATION_ERROR_MESSAGE)
             );
           }
+
           throw new CoercingParseValueException(
             "Expected a number, got %s %s".formatted(input.getClass().getSimpleName(), input)
           );
@@ -461,11 +489,13 @@ public class GraphQLScalars {
               new CoercingParseLiteralException(VALIDATION_ERROR_MESSAGE)
             );
           }
+
           if (input instanceof IntValue reluctance) {
             return validateReluctance(reluctance.getValue().doubleValue()).orElseThrow(() ->
               new CoercingParseLiteralException(VALIDATION_ERROR_MESSAGE)
             );
           }
+
           throw new CoercingParseLiteralException(
             "Expected a number, got: " + input.getClass().getSimpleName()
           );
@@ -475,6 +505,7 @@ public class GraphQLScalars {
           if (reluctance >= MIN_Reluctance - 0.001 && reluctance <= MAX_Reluctance + 0.001) {
             return Optional.of(reluctance);
           }
+
           return Optional.empty();
         }
       }

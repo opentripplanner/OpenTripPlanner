@@ -36,11 +36,13 @@ final class TransferProfiles<P, R> implements Iterable<TransferProfileState<P, R
     // Reject profiles with equal user preferences
     ProfileUserPreferences.resolveAll(parameters, mapper);
     var result = new ArrayList<TransferProfileState<P, R>>();
+
     for (var p : parameters.profiles()) {
       result.add(
         new TransferProfileState<>(p, parameters.maxDurations(p.type()), pathProvider, mapper)
       );
     }
+
     return new TransferProfiles<>(result);
   }
 

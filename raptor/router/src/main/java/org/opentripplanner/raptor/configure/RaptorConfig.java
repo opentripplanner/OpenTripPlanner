@@ -72,6 +72,7 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
     if (extraMcSearch == null) {
       return mainSearch;
     }
+
     var alternativeSearch = createRangeRaptorWithMcWorker(
       extraMcSearch.createTransitDataAlternativeSearch(data),
       request,
@@ -110,6 +111,7 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
       var c = new McRangeRaptorConfig<>(segment).withHeuristics(heuristics);
       nextWorker = createWorker(segment, c.state(), c.strategy());
     }
+
     return createRangeRaptor(context, nextWorker);
   }
 

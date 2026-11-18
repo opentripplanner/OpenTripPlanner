@@ -30,9 +30,11 @@ public class OpeningHours implements Comparable<OpeningHours>, Serializable {
     if (this == o) {
       return true;
     }
+
     if (!(o instanceof OpeningHours)) {
       return false;
     }
+
     final OpeningHours that = (OpeningHours) o;
     // periodDescription is not part of the equals and hashCode, so when deduplicated
     // only the first instance is kept

@@ -517,6 +517,7 @@ public class OsmTagMapper {
 
   public boolean isVehicleThroughTrafficExplicitlyDisallowed(OsmEntity way) {
     String vehicle = way.getTag("vehicle");
+
     if (vehicle != null) {
       return doesTagValueDisallowThroughTraffic(vehicle);
     } else {
@@ -529,6 +530,7 @@ public class OsmTagMapper {
    */
   public boolean isMotorVehicleThroughTrafficExplicitlyDisallowed(OsmEntity way) {
     String motorVehicle = way.getTag("motor_vehicle");
+
     if (motorVehicle != null) {
       return doesTagValueDisallowThroughTraffic(motorVehicle);
     } else {
@@ -541,6 +543,7 @@ public class OsmTagMapper {
    */
   public boolean isBicycleThroughTrafficExplicitlyDisallowed(OsmEntity way) {
     String bicycle = way.getTag("bicycle");
+
     if (bicycle != null) {
       return doesTagValueDisallowThroughTraffic(bicycle);
     } else {
@@ -553,6 +556,7 @@ public class OsmTagMapper {
    */
   public boolean isWalkThroughTrafficExplicitlyDisallowed(OsmEntity way) {
     String foot = way.getTag("foot");
+
     if (foot != null) {
       return doesTagValueDisallowThroughTraffic(foot);
     } else {

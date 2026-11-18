@@ -100,12 +100,15 @@ public class StopEventParamsMapper {
     if (TRUE.equals(params.isIncludePreviousCalls())) {
       res.add(PREVIOUS_CALLS);
     }
+
     if (TRUE.equals(params.isIncludeOnwardCalls())) {
       res.add(ONWARD_CALLS);
     }
+
     if (UseRealtimeDataEnumeration.NONE != params.getUseRealtimeData()) {
       res.add(REALTIME_DATA);
     }
+
     return res;
   }
 

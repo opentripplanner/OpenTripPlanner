@@ -57,6 +57,7 @@ public final class TimeScalarFactory {
             if (input instanceof Integer) {
               return LocalTime.ofSecondOfDay((Integer) input % SECONDS_PER_DAY).format(FORMATTER);
             }
+
             return null;
           }
 
@@ -76,6 +77,7 @@ public final class TimeScalarFactory {
             if (input instanceof StringValue) {
               return parseValue(((StringValue) input).getValue());
             }
+
             return null;
           }
         }

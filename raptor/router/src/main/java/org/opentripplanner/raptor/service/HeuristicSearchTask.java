@@ -81,6 +81,7 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
     if (result == null) {
       return null;
     }
+
     return config.createHeuristic(data, heuristicRequest, result);
   }
 
@@ -98,6 +99,7 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
     if (!isEnabled() || !other.isEnabled()) {
       return;
     }
+
     DebugHeuristics.debug(name(), result(), other.name(), other.result(), originalRequest);
   }
 
@@ -120,6 +122,7 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
     if (!result.isDestinationReached()) {
       throw new DestinationNotReachedException();
     }
+
     if (LOG.isDebugEnabled()) {
       String time = DurationUtils.msToSecondsStr(System.currentTimeMillis() - start);
       LOG.debug("RangeRaptor - {} heuristic search performed in {}.", name, time);

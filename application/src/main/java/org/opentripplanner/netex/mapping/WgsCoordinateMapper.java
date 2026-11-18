@@ -24,9 +24,11 @@ class WgsCoordinateMapper {
     if (point == null || point.getLocation() == null) {
       return null;
     }
+
     LocationStructure loc = point.getLocation();
 
     final DirectPositionType pos = loc.getPos();
+
     try {
       if (loc.getLongitude() != null && loc.getLatitude() != null) {
         return new WgsCoordinate(loc.getLatitude().doubleValue(), loc.getLongitude().doubleValue());
@@ -39,6 +41,7 @@ class WgsCoordinateMapper {
       // Thrown by WgsCoordinate when latitude/longitude is out of range
       throw new InvalidCoordinateException(e.getMessage());
     }
+
     throw new InvalidCoordinateException("Coordinate is not valid: " + loc);
   }
 

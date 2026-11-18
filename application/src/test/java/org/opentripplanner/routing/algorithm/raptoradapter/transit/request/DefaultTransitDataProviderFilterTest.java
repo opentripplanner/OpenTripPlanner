@@ -885,9 +885,11 @@ class DefaultTransitDataProviderFilterTest {
       .build();
 
     var timesFilter = filter.createTripFilter(patternAndTimes.pattern());
+
     if (timesFilter == null) {
       return false;
     }
+
     return timesFilter.test(patternAndTimes.tripTimes());
   }
 
@@ -1100,9 +1102,11 @@ class DefaultTransitDataProviderFilterTest {
     PatternAndTimes patternAndTimes
   ) {
     var tripTimesFilter = filter.createTripFilter(patternAndTimes.pattern());
+
     if (tripTimesFilter == null) {
       return false;
     }
+
     return tripTimesFilter.test(patternAndTimes.tripTimes());
   }
 }

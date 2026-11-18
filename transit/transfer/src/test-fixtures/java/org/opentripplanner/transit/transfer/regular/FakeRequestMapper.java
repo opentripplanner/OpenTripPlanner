@@ -36,6 +36,7 @@ public class FakeRequestMapper implements TransferRequestMapper<WalkPreferences>
     if (type != request.type()) {
       throw new UnsupportedOperationException("The fake request is of the type walk.");
     }
+
     return request;
   }
 }

@@ -45,6 +45,7 @@ public class OsmWay extends OsmEntity {
       long b = nodes.get(size - 1);
       return a == b;
     }
+
     return false;
   }
 

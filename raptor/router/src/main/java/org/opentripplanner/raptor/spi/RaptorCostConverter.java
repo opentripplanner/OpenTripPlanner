@@ -32,6 +32,7 @@ public final class RaptorCostConverter {
     if (raptorCost == NOT_SET) {
       return NOT_SET;
     }
+
     return (raptorCost + HALF) / PRECISION;
   }
 
@@ -42,6 +43,7 @@ public final class RaptorCostConverter {
     if (raptorFactor == NOT_SET) {
       return NOT_SET;
     }
+
     return raptorFactor / (double) PRECISION;
   }
 
@@ -71,9 +73,11 @@ public final class RaptorCostConverter {
    */
   public static int[] toRaptorCosts(double[] domainValues) {
     int[] raptorCost = new int[domainValues.length];
+
     for (int i = 0; i < domainValues.length; i++) {
       raptorCost[i] = toRaptorCost(domainValues[i]);
     }
+
     return raptorCost;
   }
 }

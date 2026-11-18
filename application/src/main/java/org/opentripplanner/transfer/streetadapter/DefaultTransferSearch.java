@@ -91,17 +91,22 @@ final class DefaultTransferSearch implements TransferSearch<NearbyStop> {
     if (!isTransferSource.test(fromStop)) {
       return List.of();
     }
+
     // Check the stop before the street search, there may be no transfers from the stop at all, for
     // example, there are no car transfers from a stop that does not allow cars.
     var modesAtSource = allowedModes.modesAt(fromStop);
     var searchLimit = maxDurations.searchLimit(modesAtSource);
+
     if (searchLimit.isEmpty()) {
       return List.of();
     }
+
     TransitStopVertex vertex = graph.getStopVertex(fromStop);
+
     if (vertex == null) {
       return List.of();
     }
+
     var nearbyStops = nearbyStopFinder.findNearbyStops(
       vertex,
       routeRequest,

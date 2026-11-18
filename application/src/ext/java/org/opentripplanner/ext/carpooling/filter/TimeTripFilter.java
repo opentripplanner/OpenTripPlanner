@@ -103,6 +103,7 @@ public class TimeTripFilter implements CarpoolTripFilter {
   public boolean isCandidateTrip(RoutableCarpoolTrip trip, SnappedPassenger passenger) {
     var request = passenger.request();
     var requestedDateTime = request.getRequestedDateTime();
+
     if (requestedDateTime == null) {
       return true;
     }
@@ -113,12 +114,15 @@ public class TimeTripFilter implements CarpoolTripFilter {
     var window = request.isArriveByRequest()
       ? arriveByWindow(passenger, requestedDateTime)
       : departAfterWindow(passenger, requestedDateTime);
+
     if (tripEnd.isBefore(window.earliest())) {
       return reject(trip.trip(), "tripEnd", tripEnd, "is before", window.earliest());
     }
+
     if (tripStart.isAfter(window.latest())) {
       return reject(trip.trip(), "tripStart", tripStart, "is after", window.latest());
     }
+
     return true;
   }
 
@@ -130,9 +134,11 @@ public class TimeTripFilter implements CarpoolTripFilter {
   static Instant tripEnd(RoutableCarpoolTrip trip, Duration stopDuration) {
     var corridor = trip.corridor();
     var end = trip.trip().startTime().toInstant();
+
     for (var leg : corridor.legDurations()) {
       end = end.plus(leg);
     }
+
     end = end.plus(stopDuration.multipliedBy(corridor.legCount() - 1));
     return end.plus(trip.trip().legDeviationBudget(corridor.legCount() - 1));
   }
@@ -141,10 +147,12 @@ public class TimeTripFilter implements CarpoolTripFilter {
   private static Window departAfterWindow(SnappedPassenger passenger, Instant edt) {
     var request = passenger.request();
     var ldt = edt.plus(request.getSearchWindow());
+
     if (request.isEgressRequest()) {
       var latest = ldt.plus(request.getMaxJourneyDuration()).minus(passenger.walkFromDropoff());
       return new Window(edt, latest);
     }
+
     var walk = passenger.walkToPickup();
     return new Window(edt.plus(walk), ldt.plus(walk));
   }
@@ -153,10 +161,12 @@ public class TimeTripFilter implements CarpoolTripFilter {
   private static Window arriveByWindow(SnappedPassenger passenger, Instant lat) {
     var request = passenger.request();
     var eat = lat.minus(request.getSearchWindow());
+
     if (request.isAccessRequest()) {
       var earliest = eat.minus(request.getMaxJourneyDuration()).plus(passenger.walkToPickup());
       return new Window(earliest, lat);
     }
+
     var walk = passenger.walkFromDropoff();
     return new Window(eat.minus(walk), lat.minus(walk));
   }

@@ -37,6 +37,7 @@ public class UnknownVehicleTypeFilter {
       );
       return false;
     }
+
     return true;
   }
 }

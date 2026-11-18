@@ -60,6 +60,7 @@ class NodeInfoTest {
         );
       }
     }
+
     assertEquals("enum", createBuilder().withEnum(AnEnum.class).build().typeDescription());
     assertEquals("object", createBuilder().withType(ConfigType.OBJECT).build().typeDescription());
     assertEquals(

@@ -131,9 +131,11 @@ public class PolylineEncoder {
    */
   private static String encodeSignedNumber(int num) {
     int sgn_num = num << 1;
+
     if (num < 0) {
       sgn_num = ~sgn_num;
     }
+
     return encodeNumber(sgn_num);
   }
 

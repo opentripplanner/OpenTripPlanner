@@ -200,9 +200,11 @@ public final class ItineraryFilterPreferences {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     ItineraryFilterPreferences that = (ItineraryFilterPreferences) o;
     return (
       accessibilityScore == that.accessibilityScore &&

@@ -243,9 +243,11 @@ public class SearchParams {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     SearchParams that = (SearchParams) o;
     return (
       earliestDepartureTime == that.earliestDepartureTime &&
@@ -323,6 +325,7 @@ public class SearchParams {
     for (var access : accessPaths) {
       access.validateAccessEgressVisitVia("Access", numberOfVias);
     }
+
     for (var egress : egressPaths) {
       egress.validateAccessEgressVisitVia("Egress", numberOfVias);
     }

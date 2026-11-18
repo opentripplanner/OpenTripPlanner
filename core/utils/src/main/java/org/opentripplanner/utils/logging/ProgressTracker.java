@@ -165,21 +165,26 @@ public class ProgressTracker {
    */
   public void startOrStep(Consumer<String> progressNotification) {
     long counter = stepCounter.incrementAndGet();
+
     if (counter == 1) {
       progressNotification.accept(startMessage());
       return;
     }
+
     if (counter % minBlockSize != 0) {
       return;
     }
+
     notifyIfQuietPeriodIsOver(counter, progressNotification);
   }
 
   public void step(Consumer<String> progressNotification) {
     long counter = stepCounter.incrementAndGet();
+
     if (counter % minBlockSize != 0) {
       return;
     }
+
     notifyIfQuietPeriodIsOver(counter, progressNotification);
   }
 
@@ -246,6 +251,7 @@ public class ProgressTracker {
       if (time.isBefore(lastNotification.plusMillis(quietPeriodMilliseconds))) {
         return;
       }
+
       // Prepare for next iteration
       lastNotification = time;
     }

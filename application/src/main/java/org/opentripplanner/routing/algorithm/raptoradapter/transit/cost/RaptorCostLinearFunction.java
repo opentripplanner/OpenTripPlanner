@@ -34,6 +34,7 @@ class RaptorCostLinearFunction {
     if (constantSeconds == 0 && coefficient == 0.0) {
       return ZERO_FUNCTION;
     }
+
     return new RaptorCostLinearFunction(constantSeconds, coefficient);
   }
 
@@ -57,9 +58,11 @@ class RaptorCostLinearFunction {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     RaptorCostLinearFunction that = (RaptorCostLinearFunction) o;
     return constant == that.constant && coefficient == that.coefficient;
   }

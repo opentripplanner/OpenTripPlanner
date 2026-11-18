@@ -82,18 +82,23 @@ record ClosestTrip(
     boolean pickup
   ) {
     var map = new HashMap<FlexTrip<?, ?>, ClosestTrip>();
+
     for (NearbyStop nearbyStop : nearbyStops) {
       var stopId = nearbyStop.stopId();
+
       for (var trip : callbackService.getFlexTripsByStopId(stopId)) {
         int stopPos = pickup ? trip.findBoardIndex(stopId) : trip.findAlightIndex(stopId);
+
         if (stopPos != FlexTrip.STOP_INDEX_NOT_FOUND && matcher.match(trip.getTrip())) {
           var existing = map.get(trip);
+
           if (existing == null || nearbyStop.isBetter(existing.nearbyStop())) {
             map.put(trip, new ClosestTrip(nearbyStop, trip, stopPos));
           }
         }
       }
     }
+
     return map;
   }
 
@@ -104,10 +109,12 @@ record ClosestTrip(
     boolean pickup
   ) {
     var result = new ArrayList<ClosestTrip>();
+
     // Add active dates
     for (Map.Entry<FlexTrip<?, ?>, ClosestTrip> e : map.entrySet()) {
       var trip = e.getKey();
       var closestTrip = e.getValue();
+
       // Include dates where the service is running
       for (FlexServiceDate date : dates) {
         // Filter away boardings early. This needs to be done for egress as well when the
@@ -115,11 +122,13 @@ record ClosestTrip(
         if (pickup && exceedsLatestBookingTime(trip, date, closestTrip.stopPos())) {
           continue;
         }
+
         if (callbackService.isDateActive(date, trip)) {
           result.add(closestTrip.withDate(date));
         }
       }
     }
+
     return result;
   }
 

@@ -90,9 +90,11 @@ public final class ParkingRequest {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     ParkingRequest that = (ParkingRequest) o;
     return (
       Objects.equals(unpreferredVehicleParkingTagCost, that.unpreferredVehicleParkingTagCost) &&

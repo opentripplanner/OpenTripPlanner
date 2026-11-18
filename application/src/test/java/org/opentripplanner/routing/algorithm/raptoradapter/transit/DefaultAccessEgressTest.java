@@ -73,9 +73,11 @@ class DefaultAccessEgressTest {
   @Test
   void generalizedCostDoesNotOverflow() {
     var builder = TestStateBuilder.ofWalking();
+
     for (int i = 0; i < 20; i++) {
       builder.streetEdge();
     }
+
     var state = builder.build();
 
     // Precondition: the raw weight must exceed the cap, otherwise this test proves nothing.

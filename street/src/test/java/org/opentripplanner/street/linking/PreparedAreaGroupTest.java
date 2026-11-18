@@ -126,9 +126,11 @@ class PreparedAreaGroupTest {
 
   private static AreaGroup group(Area... areas) {
     var builder = AreaGroup.of(square(0, 16));
+
     for (Area a : areas) {
       builder.addArea(a);
     }
+
     return builder.build();
   }
 

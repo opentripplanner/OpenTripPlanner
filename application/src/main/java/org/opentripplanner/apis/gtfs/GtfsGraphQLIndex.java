@@ -55,6 +55,7 @@ class GtfsGraphQLIndex {
     }
 
     var registryBuilder = DataLoaderRegistry.newRegistry();
+
     if (requestContext.fareService() != null) {
       registryBuilder.register(
         ItineraryFareDataLoader.KEY,
@@ -70,6 +71,7 @@ class GtfsGraphQLIndex {
       .locale(locale)
       .dataLoaderRegistry(registryBuilder.build())
       .build();
+
     try {
       return graphQL.executeAsync(executionInput).get(timeoutMs, TimeUnit.MILLISECONDS);
     } catch (InterruptedException | ExecutionException | TimeoutException e) {

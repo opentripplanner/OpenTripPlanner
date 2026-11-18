@@ -33,6 +33,7 @@ public final class AlertCalendar {
           "has no validity information."
       );
     }
+
     return new AlertCalendar(timePeriods);
   }
 
@@ -72,6 +73,7 @@ public final class AlertCalendar {
     if (timePeriods.stream().anyMatch(TimePeriod::hasUnboundedStart)) {
       return Optional.empty();
     }
+
     return timePeriods
       .stream()
       .map(TimePeriod::start)
@@ -86,6 +88,7 @@ public final class AlertCalendar {
     if (timePeriods.stream().anyMatch(TimePeriod::hasUnboundedEnd)) {
       return Optional.empty();
     }
+
     return timePeriods
       .stream()
       .map(TimePeriod::end)
@@ -98,6 +101,7 @@ public final class AlertCalendar {
     if (this == o) {
       return true;
     }
+
     return o instanceof AlertCalendar other && timePeriods.equals(other.timePeriods);
   }
 

@@ -17,6 +17,7 @@ public class CoordinateMapper {
     ) {
       return Optional.empty();
     }
+
     return Optional.of(
       new WgsCoordinate(coordinate.getGraphQLLatitude(), coordinate.getGraphQLLongitude())
     );

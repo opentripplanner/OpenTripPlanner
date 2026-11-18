@@ -100,6 +100,7 @@ public class SiriRealTimeUpdateHandler {
       for (var estimatedJourneyVersion : etDelivery.getEstimatedJourneyVersionFrames()) {
         var journeys = estimatedJourneyVersion.getEstimatedVehicleJourneies();
         LOG.debug("Handling {} EstimatedVehicleJourneys.", journeys.size());
+
         for (EstimatedVehicleJourney journey : journeys) {
           try {
             successes.add(apply(journey, entityResolver));
@@ -123,6 +124,7 @@ public class SiriRealTimeUpdateHandler {
     throws UpdateException {
     var journeyWrapper = EstimatedVehicleJourneyWrapper.of(journey);
     SiriUpdateType siriUpdateType = null;
+
     try {
       siriUpdateType = updateType(journeyWrapper, entityResolver);
       TripUpdate result = switch (siriUpdateType) {
@@ -239,10 +241,12 @@ public class SiriRealTimeUpdateHandler {
 
     Timetable currentTimetable = getCurrentTimetable(pattern, serviceDate);
     var existingTripTimes = currentTimetable.getTripTimes(trip);
+
     if (existingTripTimes == null) {
       LOG.debug("tripId {} not found in pattern.", trip.getId());
       throw UpdateException.of(trip.getId(), TRIP_NOT_FOUND_IN_PATTERN);
     }
+
     var tripUpdate = new ModifiedTripBuilder(
       existingTripTimes,
       pattern,
@@ -294,10 +298,12 @@ public class SiriRealTimeUpdateHandler {
 
     Timetable currentTimetable = getCurrentTimetable(pattern, serviceDate);
     var existingTripTimes = currentTimetable.getTripTimes(trip);
+
     if (existingTripTimes == null) {
       LOG.debug("tripId {} not found in pattern.", trip.getId());
       throw UpdateException.of(trip.getId(), TRIP_NOT_FOUND_IN_PATTERN);
     }
+
     var tripUpdate = new ExtraCallTripBuilder(
       journey,
       transitRepository,
@@ -323,6 +329,7 @@ public class SiriRealTimeUpdateHandler {
     LocalDate serviceDate = tripUpdate.serviceDate();
 
     final TripPattern pattern;
+
     if (tripUpdate.tripPatternCreation()) {
       pattern = tripUpdate.addedTripPattern();
     } else {

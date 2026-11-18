@@ -58,12 +58,14 @@ abstract class AbstractCsvFile<T> {
           if (isCommentOrEmpty(currentReader.getRawRecord())) {
             continue;
           }
+
           rows.add(parseRow());
         } catch (RuntimeException e) {
           LOG.error("Parse error! Row: {}", currentReader.getRawRecord());
           throw e;
         }
       }
+
       currentReader = null;
       return rows;
     } catch (IOException e) {
@@ -83,16 +85,20 @@ abstract class AbstractCsvFile<T> {
 
       for (T row : rows) {
         boolean first = true;
+
         for (String header : headers) {
           if (!first) {
             out.print(CSV_DELIMITER);
           }
+
           first = false;
           out.print(cell(row, header).replace(CSV_DELIMITER, '_'));
         }
+
         // use LF explicitly
         out.print(LF);
       }
+
       out.flush();
       LOG.info("INFO - New CSV file with is saved to '{}'.", file.getAbsolutePath());
     } catch (Exception e) {
@@ -137,20 +143,24 @@ abstract class AbstractCsvFile<T> {
 
   protected Duration parseDuration(String colName) throws IOException {
     String timeOrDuration = parseString(colName);
+
     if (timeOrDuration.isBlank()) {
       return null;
     }
+
     // Support for old duration format: 03:02:35, can be removed when all expected result
     // files are migrated to new format: 3h2m35s
     if (timeOrDuration.contains(":")) {
       return Duration.ofSeconds(TimeUtils.time(timeOrDuration));
     }
+
     return DurationUtils.duration(timeOrDuration);
   }
 
   protected <S> List<S> parseCollection(String colName, Function<String, S> mapFunction)
     throws IOException {
     String value = parseString(colName);
+
     if (value == null || value.isBlank()) {
       return List.of();
     }

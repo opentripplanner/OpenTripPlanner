@@ -351,11 +351,13 @@ public class TestStateBuilder {
     var to = TransitStopVertex.of().withId(stop.getId()).withPoint(stop.getGeometry()).build();
 
     Edge edge;
+
     if (currentState.getRequest().arriveBy()) {
       edge = StreetTransitStopLink.createStreetTransitStopLink(to, from);
     } else {
       edge = StreetTransitStopLink.createStreetTransitStopLink(from, to);
     }
+
     currentState = requireSingleState(edge.traverse(currentState));
     return this;
   }
@@ -403,6 +405,7 @@ public class TestStateBuilder {
     if (states.length != 1) {
       throw new IllegalStateException("Only single state transitions are supported.");
     }
+
     return states[0];
   }
 

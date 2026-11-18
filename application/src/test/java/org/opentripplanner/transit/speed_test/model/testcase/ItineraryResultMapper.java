@@ -76,6 +76,7 @@ class ItineraryResultMapper {
 
     for (Leg leg : itin.legs()) {
       var fromStop = leg.from().stop;
+
       if (fromStop != null) {
         buf.stop(formatStop(fromStop));
       }
@@ -97,6 +98,7 @@ class ItineraryResultMapper {
         buf.text(d.description());
       }
     }
+
     return buf.toString();
   }
 
@@ -125,6 +127,7 @@ class ItineraryResultMapper {
         routes.add(it.route().getName());
         modes.add(trLeg.mode());
       }
+
       if (it.to().stop != null) {
         stops.add(it.to().stop.getId().toString());
       }

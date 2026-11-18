@@ -114,15 +114,19 @@ class GroupOfStationsMapperTest {
 
   private static GroupOfStopPlaces unnamedGroupOfStopPlaces(String... memberIds) {
     var group = new GroupOfStopPlaces().withId(ID).withCentroid(point(59.9, 10.7));
+
     if (memberIds.length == 0) {
       return group;
     }
+
     var members = new StopPlaceRefs_RelStructure();
+
     for (String memberId : memberIds) {
       members.withStopPlaceRef(
         OBJECT_FACTORY.createStopPlaceRef(new StopPlaceRefStructure().withRef(memberId))
       );
     }
+
     return group.withMembers(members);
   }
 

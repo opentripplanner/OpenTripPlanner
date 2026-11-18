@@ -164,6 +164,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
   public void debugReject(ArrivalView<T> stopArrival, RaptorAccessEgress egress, String reason) {
     if (isDebugOn()) {
       var destinationArrival = createDestinationArrivalView(stopArrival, egress);
+
       if (destinationArrival != null) {
         debugReject(destinationArrival, reason);
       }
@@ -207,6 +208,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
       egressPath,
       slackProvider.transferSlack()
     );
+
     if (departureTime == RaptorConstants.TIME_NOT_SET) {
       return null;
     }
@@ -279,10 +281,12 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
   private static String raptorCostsAsString(DestinationArrival<?> destArrival) {
     var arrivalCosts = new ArrayList<String>();
     ArrivalView<?> it = destArrival;
+
     while (it != null) {
       arrivalCosts.add(OtpNumberFormat.formatCostCenti(it.c1()));
       it = it.previous();
     }
+
     // Remove decimals if zero
     return String.join(" ", arrivalCosts).replaceAll("\\.00", "");
   }
@@ -290,9 +294,11 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
   private Optional<String> rejectArrivalIfItExceedsTimeLimit(ArrivalView<T> destArrival) {
     var egress = destArrival.egressPath().egress();
     int arrivalTime = transitCalculator.timeMinusPenalty(destArrival.arrivalTime(), egress);
+
     if (transitCalculator.exceedsTimeLimit(arrivalTime)) {
       return Optional.of(transitCalculator.exceedsTimeLimitReason());
     }
+
     return Optional.empty();
   }
 }

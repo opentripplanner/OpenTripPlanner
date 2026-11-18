@@ -98,6 +98,7 @@ public class DefaultUpdateManager implements UpdateManager {
     if (periodicCommitScheduler != null) {
       periodicCommitScheduler.shutdown();
     }
+
     executor.shutdown();
   }
 
@@ -114,6 +115,7 @@ public class DefaultUpdateManager implements UpdateManager {
         rollback();
         throw e;
       }
+
       return null;
     });
   }

@@ -122,6 +122,7 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
     );
     var tripPattern = createTripPattern(TP_ID_1);
     Map<LocalDate, List<TripPatternForDate>> tripPatternsRunningOnDate = new HashMap<>();
+
     for (var i = -5; i <= 5; ++i) {
       var tripPatternForDate = new TripPatternForDate(
         tripPattern,
@@ -129,6 +130,7 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
         List.of(),
         date.minusDays(i)
       );
+
       for (var runningDate : tripPatternForDate.getRunningPeriodDates()) {
         tripPatternsRunningOnDate.putIfAbsent(runningDate, new ArrayList<>());
         tripPatternsRunningOnDate.get(runningDate).add(tripPatternForDate);
@@ -153,10 +155,12 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
     );
     TripPatternForDates resultPattern = result.getFirst();
     var iterator = resultPattern.tripPatternForDatesIndexIterator(true);
+
     for (var item : expectedDates) {
       assertTrue(iterator.hasNext());
       assertEquals(item, resultPattern.tripPatternForDate(iterator.next()).getServiceDate());
     }
+
     assertFalse(iterator.hasNext());
   }
 

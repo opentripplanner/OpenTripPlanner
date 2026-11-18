@@ -143,10 +143,13 @@ class HashGridSpatialIndexQueryAlongLineStringsTest {
     if (xy.length < 4 || xy.length % 2 != 0) {
       throw new IllegalArgumentException("Need an even number of coordinates, at least 4");
     }
+
     var coords = new Coordinate[xy.length / 2];
+
     for (int i = 0; i < coords.length; i++) {
       coords[i] = new Coordinate(xy[i * 2], xy[i * 2 + 1]);
     }
+
     return GF.createLineString(coords);
   }
 }

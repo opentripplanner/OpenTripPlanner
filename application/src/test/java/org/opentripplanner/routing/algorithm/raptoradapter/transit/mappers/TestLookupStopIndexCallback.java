@@ -17,9 +17,11 @@ public class TestLookupStopIndexCallback implements LookupStopIndexCallback {
   @Override
   public IntStream lookupStopLocationIndexes(FeedScopedId stopLocationId) {
     int[] values = index.get(stopLocationId);
+
     if (values == null) {
       throw new EntityNotFoundException(StopLocation.class, stopLocationId);
     }
+
     return IntStream.of(values);
   }
 }

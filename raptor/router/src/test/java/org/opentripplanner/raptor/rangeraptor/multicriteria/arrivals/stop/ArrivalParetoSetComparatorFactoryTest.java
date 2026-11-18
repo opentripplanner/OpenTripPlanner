@@ -110,9 +110,11 @@ class ArrivalParetoSetComparatorFactoryTest implements RaptorTestConstants {
         DOMINANCE_FUNCTION
       )
     );
+
     for (var factory : factories) {
       result.append("  ").append(toStr(factory, left, right));
     }
+
     assertEquals(expexted, result.toString().trim());
   }
 

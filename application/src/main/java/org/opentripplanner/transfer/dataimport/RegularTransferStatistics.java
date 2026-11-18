@@ -32,17 +32,21 @@ final class RegularTransferStatistics {
       Set<FeedScopedId> stopsWithTransfers
     ) {
       int stopsWithout = 0;
+
       for (var stopId : stopIds) {
         if (!stopsWithTransfers.contains(stopId)) {
           ++stopsWithout;
         }
       }
+
       int patternsWithout = 0;
+
       for (var patternStops : stopsOfEachPattern) {
         if (patternStops.stream().noneMatch(stopsWithTransfers::contains)) {
           ++patternsWithout;
         }
       }
+
       return new NoTransfers(
         stopIds.size(),
         stopsWithout,
@@ -101,11 +105,13 @@ final class RegularTransferStatistics {
   List<String> messages(Duration time) {
     var result = new ArrayList<String>();
     long uniquePaths = 0;
+
     for (int i = 0; i < profiles.size(); ++i) {
       var profile = profiles.get(i);
       uniquePaths += profile.stored();
       result.add(profileMessage(profile, profilesNoTransfers.get(i), i > 0));
     }
+
     result.add(
       "Regular transfers generated in %s. %s unique street paths in %d profiles - %s.".formatted(
         DurationUtils.durationToStr(time),
@@ -124,12 +130,14 @@ final class RegularTransferStatistics {
     boolean canReuse
   ) {
     var message = "Profile '%s'. Street paths: %s".formatted(profile.id(), format(profile.paths()));
+
     if (canReuse) {
       message += ", %d%% reused from earlier profiles (%s)".formatted(
         percentage(profile.reused(), profile.paths()),
         profile.reuseLimit().toStringWPercentage()
       );
     }
+
     return message + " - %s - %s.".formatted(noTransfers.message(), profile.preferences());
   }
 

@@ -62,9 +62,11 @@ public class PlanPageInfo {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     PlanPageInfo that = (PlanPageInfo) o;
     return (
       equalsCursors(startCursor, that.startCursor) &&

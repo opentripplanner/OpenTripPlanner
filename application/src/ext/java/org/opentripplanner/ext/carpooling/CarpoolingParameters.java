@@ -72,20 +72,25 @@ public record CarpoolingParameters(
     if (maxCandidateTripsPerRequest <= 0) {
       throw new IllegalArgumentException("maxCandidateTripsPerRequest must be positive");
     }
+
     if (maxTrips <= 0) {
       throw new IllegalArgumentException("maxTrips must be positive");
     }
+
     if (maxPagesPerPoll <= 0) {
       throw new IllegalArgumentException("maxPagesPerPoll must be positive");
     }
+
     requirePositive(maxStopWalk, "maxStopWalk");
     requirePositive(maxTripDuration, "maxTripDuration");
     requirePositive(tripExpiry, "tripExpiry");
     requirePositive(expirySweepInterval, "expirySweepInterval");
     requirePositive(maxRoutePointSnap, "maxRoutePointSnap");
+
     if (minCarEscapeMeters <= 0) {
       throw new IllegalArgumentException("minCarEscapeMeters must be positive");
     }
+
     requirePositive(defaultSearchWindow, "defaultSearchWindow");
   }
 

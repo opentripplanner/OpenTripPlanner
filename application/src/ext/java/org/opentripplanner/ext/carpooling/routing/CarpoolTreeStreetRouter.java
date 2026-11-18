@@ -89,9 +89,11 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
       ? StreetSearchRequest.of().withMode(StreetMode.CAR).withArriveBy(true).build()
       : StreetSearchRequest.of().withMode(StreetMode.CAR).build();
     SkipEdgeStrategy<State, Edge> skipEdgeStrategy = new DurationSkipEdgeStrategy<>(searchLimit);
+
     if (alsoSkip != null) {
       skipEdgeStrategy = new ComposingSkipEdgeStrategy<>(skipEdgeStrategy, alsoSkip);
     }
+
     var builder = StreetSearchBuilder.of()
       .withPreStartHook(OTPRequestTimeoutException::checkForTimeout)
       .withSkipEdgeStrategy(skipEdgeStrategy)
@@ -107,13 +109,17 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
 
   private ShortestPathTree<State, Edge, Vertex> getOrCreateForwardTree(Vertex vertex) {
     var tree = forwardTrees.get(vertex);
+
     if (tree != null) {
       return tree;
     }
+
     var reg = forwardRegistrations.get(vertex);
+
     if (reg == null) {
       return null;
     }
+
     tree = createTree(vertex, false, reg);
     forwardTrees.put(vertex, tree);
     forwardRegistrations.remove(vertex);
@@ -122,13 +128,17 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
 
   private ShortestPathTree<State, Edge, Vertex> getOrCreateReverseTree(Vertex vertex) {
     var tree = reverseTrees.get(vertex);
+
     if (tree != null) {
       return tree;
     }
+
     var reg = reverseRegistrations.get(vertex);
+
     if (reg == null) {
       return null;
     }
+
     tree = createTree(vertex, true, reg);
     reverseTrees.put(vertex, tree);
     reverseRegistrations.remove(vertex);
@@ -170,6 +180,7 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
           "Register all vertices before calling route()."
       );
     }
+
     if (direction == Direction.FROM) {
       registerLargest(forwardRegistrations, vertex, searchLimit, targets);
     } else {
@@ -217,10 +228,12 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
     public boolean shouldSkipEdge(State current, Edge edge) {
       long elapsed = current.getElapsedTimeSeconds();
       var stillNeeded = needed.get(current.getVertex());
+
       if (stillNeeded != null && elapsed < stillNeeded) {
         needed.put(current.getVertex(), elapsed);
         bound = maxNeeded();
       }
+
       return elapsed > bound;
     }
 
@@ -262,16 +275,19 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
     routingStarted = true;
 
     var key = new Pair<>(from, to);
+
     if (segmentCache.containsKey(key)) {
       return segmentCache.get(key);
     }
 
     var isReverse = false;
     var tree = getOrCreateForwardTree(from);
+
     if (tree == null) {
       tree = getOrCreateReverseTree(to);
       isReverse = true;
     }
+
     if (tree == null) {
       LOG.error("tree is null for vertices from {} to {}", from, to);
       return null;
@@ -315,6 +331,7 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
       if (path == null) {
         path = new StreetPath(arrival);
       }
+
       return path;
     }
 

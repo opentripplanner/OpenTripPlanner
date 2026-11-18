@@ -34,9 +34,11 @@ public record CarpoolCorridor(
     legLimits = List.copyOf(legLimits);
     stops = List.copyOf(stops);
     waypoints = List.copyOf(waypoints);
+
     if (legLimits.size() != legDurations.size()) {
       throw new IllegalArgumentException("One limit per leg is required");
     }
+
     if (waypoints.size() != legDurations.size() + 1) {
       throw new IllegalArgumentException(
         "Corridor has %d legs but %d waypoints".formatted(legDurations.size(), waypoints.size())
@@ -97,6 +99,7 @@ public record CarpoolCorridor(
         return true;
       }
     }
+
     return false;
   }
 }

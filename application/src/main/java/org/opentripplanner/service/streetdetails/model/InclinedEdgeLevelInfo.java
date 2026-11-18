@@ -54,9 +54,11 @@ public class InclinedEdgeLevelInfo implements Serializable {
     if (o == this) {
       return true;
     }
+
     if (o == null || o.getClass() != getClass()) {
       return false;
     }
+
     InclinedEdgeLevelInfo that = (InclinedEdgeLevelInfo) o;
     return (
       Objects.equals(lowerVertexInfo, that.lowerVertexInfo) &&

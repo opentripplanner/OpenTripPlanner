@@ -107,9 +107,11 @@ public final class StreetPreferences implements Serializable {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     StreetPreferences that = (StreetPreferences) o;
     return (
       DoubleUtils.doubleEquals(that.turnReluctance, turnReluctance) &&

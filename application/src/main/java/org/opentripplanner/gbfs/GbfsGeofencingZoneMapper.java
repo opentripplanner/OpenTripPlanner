@@ -70,9 +70,11 @@ public abstract class GbfsGeofencingZoneMapper<F, R> {
    */
   protected List<GeofencingZone> toInternalModel(F feature, int zoneIndex) {
     Geometry geometry;
+
     try {
       geometry = GeometryUtils.convertGeoJsonToJtsGeometry(featureGeometry(feature));
       TopologyValidationError validation = new IsValidOp(geometry).getValidationError();
+
       if (validation != null) {
         LOG.warn(
           "Invalid JTS geometry name={}, zoneIndex={} validation={}",
@@ -87,6 +89,7 @@ public abstract class GbfsGeofencingZoneMapper<F, R> {
     }
 
     var rules = featureRules(feature);
+
     if (rules == null || rules.isEmpty()) {
       return Collections.emptyList();
     }
@@ -94,6 +97,7 @@ public abstract class GbfsGeofencingZoneMapper<F, R> {
     // Group by vehicle type scope, keeping only the first rule per scope (GBFS first-wins).
     // LinkedHashMap preserves insertion order so the output is deterministic.
     var firstRuleByScope = new LinkedHashMap<VehicleTypeScope, R>();
+
     for (R rule : rules) {
       var ids = ruleVehicleTypeIds(rule);
       var scope = new VehicleTypeScope(ids == null ? null : new LinkedHashSet<>(ids));

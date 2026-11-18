@@ -95,9 +95,11 @@ public abstract class StationElement<
     if (coordinate != null) {
       return coordinate;
     }
+
     if (parentStation != null) {
       return parentStation.getCoordinate();
     }
+
     throw new IllegalStateException("Coordinate not set for: " + toString());
   }
 
@@ -145,6 +147,7 @@ public abstract class StationElement<
     if (other == null) {
       return false;
     }
+
     return isPartOfStation() && parentStation.equals(other.getParentStation());
   }
 

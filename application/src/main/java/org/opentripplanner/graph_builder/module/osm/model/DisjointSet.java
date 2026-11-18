@@ -81,9 +81,11 @@ public class DisjointSet<T> {
 
   private int compact(int i) {
     int key = sets.get(i);
+
     if (key < 0) {
       return i;
     }
+
     int j = compact(key);
     sets.set(i, j);
     return j;

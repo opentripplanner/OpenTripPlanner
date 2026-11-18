@@ -142,9 +142,11 @@ public final class ServiceCalendar implements Serializable {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     ServiceCalendar that = (ServiceCalendar) o;
     return (
       monday == that.monday &&

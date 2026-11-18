@@ -403,9 +403,11 @@ public class ToStringBuilderTest {
       if (this == o) {
         return true;
       }
+
       if (o == null || getClass() != o.getClass()) {
         return false;
       }
+
       Foo foo = (Foo) o;
       return a == foo.a && Objects.equals(b, foo.b);
     }

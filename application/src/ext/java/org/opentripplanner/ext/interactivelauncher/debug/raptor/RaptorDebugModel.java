@@ -56,6 +56,7 @@ public class RaptorDebugModel implements LauncherRequestDecorator {
 
   public void setStops(@Nullable String stops) {
     stops = StringUtils.hasValue(stops) ? stops : null;
+
     if (!Objects.equals(this.stops, stops)) {
       this.stops = stops;
       save();
@@ -69,6 +70,7 @@ public class RaptorDebugModel implements LauncherRequestDecorator {
 
   public void setPath(@Nullable String path) {
     path = StringUtils.hasValue(path) ? path : null;
+
     if (!Objects.equals(this.path, path)) {
       this.path = path;
       save();

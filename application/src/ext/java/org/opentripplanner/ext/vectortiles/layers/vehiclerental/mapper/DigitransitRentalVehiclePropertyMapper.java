@@ -17,9 +17,11 @@ public class DigitransitRentalVehiclePropertyMapper extends PropertyMapper<Vehic
     items.addAll(getFeedScopedIdAndNetwork(vehicle));
     items.add(kv("formFactor", vehicle.vehicleType().formFactor()));
     items.add(kv("propulsionType", vehicle.vehicleType().propulsionType()));
+
     if (vehicle.fuel() != null && vehicle.fuel().percent() != null) {
       items.add(kv("fuelPercentage", vehicle.fuel().percent().asDouble()));
     }
+
     items.add(kv("pickupAllowed", vehicle.isAllowPickup()));
     return items;
   }

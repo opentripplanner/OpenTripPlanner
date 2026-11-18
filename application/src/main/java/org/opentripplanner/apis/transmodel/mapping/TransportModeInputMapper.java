@@ -26,6 +26,7 @@ public class TransportModeInputMapper {
     if (value == null || value instanceof TransitMode) {
       return (TransitMode) value;
     }
+
     throw new InvalidInputException(
       "transportMode '%s' cannot be used as a filter.".formatted(value)
     );
@@ -41,6 +42,7 @@ public class TransportModeInputMapper {
     if (values == null) {
       return List.of();
     }
+
     return values.stream().map(TransportModeInputMapper::mapTransitMode).toList();
   }
 }

@@ -73,10 +73,12 @@ public class VehicleParkingUpdater extends PollingGraphUpdater<StreetRealTimeUpd
   @Override
   protected void runPolling() throws InterruptedException, ExecutionException {
     LOG.debug("Updating vehicle parkings from {}", source);
+
     if (!source.update()) {
       LOG.debug("No updates");
       return;
     }
+
     List<VehicleParking> vehicleParkings = source.getUpdates();
 
     // Create graph writer runnable to apply these stations to the graph
@@ -120,6 +122,7 @@ public class VehicleParkingUpdater extends PollingGraphUpdater<StreetRealTimeUpd
             .updateAvailability(updatedVehicleParking.getAvailability());
         } else {
           toAdd.add(updatedVehicleParking);
+
           if (operational) {
             toLink.add(updatedVehicleParking);
           }
@@ -168,6 +171,7 @@ public class VehicleParkingUpdater extends PollingGraphUpdater<StreetRealTimeUpd
       List<VehicleParkingEntranceVertex> vehicleParkingVertices
     ) {
       List<DisposableEdgeCollection> disposableEdgeCollectionsForVertex = new ArrayList<>();
+
       for (var vehicleParkingVertex : vehicleParkingVertices) {
         var disposableEdges = linkVehicleParkingForRealtime(vehicleParkingVertex);
         disposableEdgeCollectionsForVertex.addAll(disposableEdges);
@@ -176,6 +180,7 @@ public class VehicleParkingUpdater extends PollingGraphUpdater<StreetRealTimeUpd
           LOG.info("Vehicle parking {} unlinked", vehicleParkingVertex);
         }
       }
+
       return disposableEdgeCollectionsForVertex;
     }
 
@@ -183,6 +188,7 @@ public class VehicleParkingUpdater extends PollingGraphUpdater<StreetRealTimeUpd
       VehicleParkingEntranceVertex vehicleParkingEntranceVertex
     ) {
       List<DisposableEdgeCollection> disposableEdgeCollections = new ArrayList<>();
+
       if (vehicleParkingEntranceVertex.isWalkAccessible()) {
         var disposableWalkEdges = linker.linkVertexForRealTime(
           vehicleParkingEntranceVertex,

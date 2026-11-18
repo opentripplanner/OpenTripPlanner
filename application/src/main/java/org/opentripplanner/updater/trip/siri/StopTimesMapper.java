@@ -31,6 +31,7 @@ class StopTimesMapper {
     boolean isLastStop
   ) {
     RegularStop stop = entityResolver.resolveQuay(call.getStopPointRef());
+
     if (stop == null) {
       return null;
     }
@@ -45,6 +46,7 @@ class StopTimesMapper {
     if (isFirstStop) {
       stopTime.setDropOffType(PickDrop.NONE);
     }
+
     if (isLastStop) {
       stopTime.setPickupType(PickDrop.NONE);
     }
@@ -75,6 +77,7 @@ class StopTimesMapper {
 
     // Update destination display
     var destinationDisplay = call.destinationDisplay();
+
     if (!destinationDisplay.isEmpty()) {
       stopTime.setStopHeadsign(new NonLocalizedString(destinationDisplay));
     } else if (trip.getHeadsign() != null) {

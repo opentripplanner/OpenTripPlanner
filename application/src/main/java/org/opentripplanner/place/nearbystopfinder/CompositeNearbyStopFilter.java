@@ -34,6 +34,7 @@ class CompositeNearbyStopFilter implements NearbyStopFilter {
         return true;
       }
     }
+
     return false;
   }
 
@@ -47,6 +48,7 @@ class CompositeNearbyStopFilter implements NearbyStopFilter {
     for (NearbyStopFilter it : filters) {
       result.addAll(it.filterToStops(nearbyStops, reverseDirection));
     }
+
     return result;
   }
 
@@ -63,6 +65,7 @@ class CompositeNearbyStopFilter implements NearbyStopFilter {
       if (filters.size() == 1) {
         return filters.getFirst();
       }
+
       return new CompositeNearbyStopFilter(filters);
     }
   }

@@ -157,6 +157,7 @@ class AbstractCsvParserTest {
     );
 
     subject.headersMatch();
+
     while (subject.hasNext()) {
       // Spinn trough all items so we can test the result
     }

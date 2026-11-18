@@ -124,9 +124,11 @@ public class NoDataGridCoverage implements GridCoverage {
   public double[] evaluate(Position directPosition, double[] dest)
     throws CannotEvaluateException, ArrayIndexOutOfBoundsException {
     gridCoverage.evaluate(directPosition, dest);
+
     if (this.noData != null && this.noData.getAsSingleValue() == dest[0]) {
       throw new PointOutsideCoverageException("Value is NO_DATA.");
     }
+
     return dest;
   }
 

@@ -22,12 +22,15 @@ public class CompositeComparator<T> implements Comparator<T> {
   @Override
   public int compare(T o1, T o2) {
     int v;
+
     for (Comparator<T> c : compareVector) {
       v = c.compare(o1, o2);
+
       if (v != 0) {
         return v;
       }
     }
+
     return 0;
   }
 }

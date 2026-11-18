@@ -224,11 +224,13 @@ public class StreetEdgeBuilder<B extends StreetEdgeBuilder<B>> {
     if (noThruTrafficTraverseMode == null) {
       return instance();
     }
+
     switch (noThruTrafficTraverseMode) {
       case WALK -> withWalkNoThruTraffic(true);
       case BICYCLE, SCOOTER -> withBicycleNoThruTraffic(true);
       case CAR, FLEX -> withMotorVehicleNoThruTraffic(true);
     }
+
     return instance();
   }
 

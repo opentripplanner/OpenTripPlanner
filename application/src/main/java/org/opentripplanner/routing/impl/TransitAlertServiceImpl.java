@@ -44,11 +44,13 @@ public class TransitAlertServiceImpl implements TransitAlertService {
     //   it. The consistent approach would be to duplicate the entire service, update it
     //   copy-on-write, and swap in the entire service after the update.
     Multimap<EntityKey, TransitAlert> newAlerts = HashMultimap.create();
+
     for (TransitAlert alert : alerts) {
       for (EntitySelector entity : alert.entities()) {
         newAlerts.put(entity.key(), alert);
       }
     }
+
     this.alerts = newAlerts;
   }
 
@@ -157,6 +159,7 @@ public class TransitAlertServiceImpl implements TransitAlertService {
 
   private Collection<TransitAlert> findMatchingAlerts(EntitySelector entitySelector) {
     Set<TransitAlert> result = new HashSet<>();
+
     for (TransitAlert alert : alerts.get(entitySelector.key())) {
       if (
         alert
@@ -167,6 +170,7 @@ public class TransitAlertServiceImpl implements TransitAlertService {
         result.add(alert);
       }
     }
+
     return result;
   }
 }

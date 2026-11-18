@@ -244,8 +244,10 @@ public class EdgeSplittingTest {
     // traverse the FreeEdge from the StreetLocation to the new IntersectionVertex
     StreetSearchRequestBuilder req = StreetSearchRequest.of();
     State traversedOne = new State(start, req.build());
+
     for (Edge e : start.getOutgoing()) {
       var states = e.traverse(traversedOne);
+
       if (!State.isEmpty(states)) {
         traversedOne = states[0];
         break;
@@ -265,8 +267,10 @@ public class EdgeSplittingTest {
     );
 
     traversedOne = new State(start, req.build());
+
     for (Edge e : start.getOutgoing()) {
       var states = e.traverse(traversedOne);
+
       if (!State.isEmpty(states)) {
         traversedOne = states[0];
         break;
@@ -301,6 +305,7 @@ public class EdgeSplittingTest {
         .withTo(toVertices)
         .getShortestPathTree();
       State state = spt.getState(toVertices.iterator().next());
+
       for (State s : state.listBackStates()) {
         assertNotSame(s.getBackEdge(), top);
       }

@@ -13,9 +13,11 @@ public record Split<T>(T head, List<T> tail) {
 
   public List<List<T>> subTails() {
     var ret = new ArrayList<List<T>>();
+
     for (int i = 1; i <= tail.size(); i++) {
       ret.add(tail.subList(0, i));
     }
+
     return ret;
   }
 }

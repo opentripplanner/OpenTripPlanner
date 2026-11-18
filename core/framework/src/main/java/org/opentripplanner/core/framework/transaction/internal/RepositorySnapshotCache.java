@@ -13,6 +13,7 @@ class RepositorySnapshotCache<S> {
 
   void put(Transaction transaction, S repositorySnapshot) {
     Objects.requireNonNull(repositorySnapshot);
+
     synchronized (cache) {
       cache.put(transaction, repositorySnapshot);
     }

@@ -17,6 +17,7 @@ public class ResultLogger {
 
   public static void logUpdateResult(String feedId, String type, UpdateResult updateResult) {
     var totalUpdates = updateResult.successful() + updateResult.failed();
+
     if (totalUpdates > 0) {
       LOG.info(
         "[feedId={}, type={}] {} of {} update messages were applied successfully (success rate: {}%)",
@@ -37,6 +38,7 @@ public class ResultLogger {
     if (updateResult.failed() == 0) {
       return;
     }
+
     var errorIndex = updateResult.failures();
     errorIndex.keySet().forEach(key -> {
       var value = errorIndex.get(key);

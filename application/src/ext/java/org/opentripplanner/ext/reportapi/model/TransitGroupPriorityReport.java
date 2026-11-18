@@ -23,6 +23,7 @@ public class TransitGroupPriorityReport {
     );
 
     var map = new TreeMap<Integer, DebugEntity>();
+
     for (var it : patterns) {
       int groupId = service.lookupTransitGroupPriorityId(it);
       var de = map.computeIfAbsent(groupId, DebugEntity::new);
@@ -32,6 +33,7 @@ public class TransitGroupPriorityReport {
         it.getNetexSubmode().name()
       );
     }
+
     return (
       "TRANSIT GROUPS PRIORITY" +
       map.values().stream().map(DebugEntity::toString).sorted().collect(Collectors.joining(""))
@@ -54,9 +56,11 @@ public class TransitGroupPriorityReport {
     @Override
     public String toString() {
       var buf = new StringBuilder("\n  %#010x".formatted(groupId));
+
       for (var it : agencies.values()) {
         buf.append("\n    ").append(it.toString());
       }
+
       return buf.toString();
     }
   }
@@ -73,13 +77,16 @@ public class TransitGroupPriorityReport {
     @Override
     public String toString() {
       var buf = new StringBuilder();
+
       for (var it : modes.entrySet()) {
         buf.append(", ");
         buf.append(it.getKey());
+
         if (!it.getValue().isEmpty()) {
           buf.append(" (").append(String.join(", ", it.getValue())).append(")");
         }
       }
+
       return agency + " ~ " + buf.substring(2);
     }
   }

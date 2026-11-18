@@ -61,12 +61,15 @@ public class Units {
 
   private static double factorStep(double value) {
     double abs = abs(value);
+
     if (abs < 3.0) {
       return 0.1;
     }
+
     if (abs < 10.0) {
       return 0.5;
     }
+
     return 1.0;
   }
 
@@ -79,6 +82,7 @@ public class Units {
     if (abs(value) < 10.0) {
       return String.format(Locale.ROOT, "%.1f", value);
     }
+
     return String.format(Locale.ROOT, "%.0f", value);
   }
 
@@ -113,14 +117,17 @@ public class Units {
         "Negative speed not expected: " + metersPerSecond + " m/s"
       );
     }
+
     if (metersPerSecond < 0.1) {
       return 0.1;
     }
+
     if (metersPerSecond > ONE_MACH) {
       throw new IllegalArgumentException(
         "Are you flying in supersonic speed: " + metersPerSecond + " m/s"
       );
     }
+
     return DoubleUtils.roundToStep(metersPerSecond, speedStep(metersPerSecond));
   }
 
@@ -128,9 +135,11 @@ public class Units {
     if (metersPerSecond < 2.0) {
       return 0.05;
     }
+
     if (metersPerSecond < 10.0) {
       return 0.1;
     }
+
     return 1.0;
   }
 
@@ -145,9 +154,11 @@ public class Units {
         "Negative acceleration or deceleration not expected: " + metersPerSecondSquared
       );
     }
+
     if (metersPerSecondSquared < 0.1) {
       return 0.1;
     }
+
     return DoubleUtils.roundTo1Decimal(metersPerSecondSquared);
   }
 

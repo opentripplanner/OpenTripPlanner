@@ -235,6 +235,7 @@ public class ParameterBuilder {
     if (node.isMissingNode()) {
       return defaultValue;
     }
+
     return parseOptionalEnum(
       convert(node, JsonNode::asString),
       (Class<T>) defaultValue.getClass()
@@ -287,17 +288,21 @@ public class ParameterBuilder {
     if (mapNode.isEmpty()) {
       return Map.of();
     }
+
     EnumMap<E, T> result = new EnumMap<>(enumType);
 
     Iterator<String> it = mapNode.listExistingChildNodes();
+
     while (it.hasNext()) {
       String name = it.next();
       Optional<E> key = parseOptionalEnum(name, enumType);
+
       if (key.isPresent()) {
         var child = mapNode.rawNode(name);
         result.put(key.get(), parseConfigType(elementType, child));
       }
     }
+
     return result;
   }
 
@@ -321,17 +326,21 @@ public class ParameterBuilder {
     if (mapNode.isEmpty()) {
       return defaultValue;
     }
+
     EnumMap<E, T> result = new EnumMap<>(enumType);
 
     Iterator<String> it = mapNode.listExistingChildNodes();
+
     while (it.hasNext()) {
       String name = it.next();
       Optional<E> key = parseOptionalEnum(name, enumType);
+
       if (key.isPresent()) {
         var child = mapNode.pathUndocumentedChild(name, info.since());
         result.put(key.get(), typeMapper.apply(child));
       }
     }
+
     return result;
   }
 
@@ -346,6 +355,7 @@ public class ParameterBuilder {
     Class<T> elementJavaType
   ) {
     Map<E, T> map = asEnumMap(enumType, elementJavaType);
+
     if (map.isEmpty()) {
       return null;
     }
@@ -356,6 +366,7 @@ public class ParameterBuilder {
     if (!reminding.isEmpty()) {
       throw error("The following enum map keys are missing: %s".formatted(reminding));
     }
+
     return map;
   }
 
@@ -405,6 +416,7 @@ public class ParameterBuilder {
     info.withType(DURATION);
     setInfoOptional(defaultValue.toString());
     var node = build();
+
     if (node.isString()) {
       return asDuration(defaultValue);
     } else {
@@ -539,10 +551,12 @@ public class ParameterBuilder {
     Map<String, T> result = new HashMap<>();
 
     Iterator<String> names = mapNode.parameterNames();
+
     while (names.hasNext()) {
       var parameterName = names.next();
       result.put(parameterName, convert(mapNode.rawNode(parameterName), mapper));
     }
+
     return result;
   }
 
@@ -566,16 +580,21 @@ public class ParameterBuilder {
     Function<JsonNode, T> mapper
   ) {
     JsonNode array = build();
+
     if (array.isMissingNode()) {
       return defaultValues;
     }
+
     if (!array.isArray()) {
       throw error("The parameter is not a JSON array as expected.");
     }
+
     List<T> values = new ArrayList<>();
+
     for (JsonNode node : array) {
       values.add(convert(node, mapper));
     }
+
     return values;
   }
 
@@ -593,9 +612,11 @@ public class ParameterBuilder {
     if (array.isMissingNode()) {
       return defaultValues;
     }
+
     if (!array.isArray()) {
       throw error("The parameter is not a JSON array as expected.");
     }
+
     List<T> values = new ArrayList<>();
     int i = 0;
 
@@ -606,6 +627,7 @@ public class ParameterBuilder {
       values.add(parse.apply(element));
       ++i;
     }
+
     return values;
   }
 
@@ -619,12 +641,15 @@ public class ParameterBuilder {
     if (value == null) {
       return null;
     }
+
     if (value instanceof List list && list.isEmpty()) {
       return "[]";
     }
+
     if (value instanceof Enum enumValue) {
       return EnumMapper.toString(enumValue);
     }
+
     return String.valueOf(value);
   }
 
@@ -670,6 +695,7 @@ public class ParameterBuilder {
 
   private <E extends Enum<E>> Optional<E> parseOptionalEnum(String value, Class<E> ofType) {
     Optional<E> enumValue = EnumMapper.mapToEnum(value, ofType);
+
     if (enumValue.isEmpty()) {
       warning(
         "The enum value '%s' is not legal. Expected one of %s.".formatted(
@@ -679,6 +705,7 @@ public class ParameterBuilder {
       );
       return Optional.empty();
     }
+
     return enumValue;
   }
 
@@ -722,6 +749,7 @@ public class ParameterBuilder {
       if (text == null || text.isBlank()) {
         return null;
       }
+
       return new URI(text);
     } catch (URISyntaxException e) {
       throw error(

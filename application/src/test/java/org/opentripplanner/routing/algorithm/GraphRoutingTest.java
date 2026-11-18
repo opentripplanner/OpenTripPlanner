@@ -241,9 +241,11 @@ public abstract class GraphRoutingTest {
     ) {
       return stopEntity(id, b -> {
         b.withCoordinate(latitude, longitude);
+
         if (parentStation != null) {
           b.withParentStation(parentStation);
         }
+
         if (vehicleType != null) {
           b.withVehicleType(vehicleType);
         }

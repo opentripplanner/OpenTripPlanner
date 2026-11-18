@@ -62,13 +62,16 @@ class StreetEdgeReluctanceCalculator {
 
     // Add reluctance for exceeding the max slope
     double slopeExceededBy = Math.abs(maxSlope) - wheelchair.maxSlope();
+
     if (slopeExceededBy > 0.0) {
       double slopeExceededReluctance = wheelchair.slopeExceededReluctance();
+
       if (slopeExceededReluctance > 0.0) {
         // if we exceed the max slope the cost increases multiplied by how much you go over the maxSlope
         reluctance *= 1.0 + 100.0 * slopeExceededBy * slopeExceededReluctance;
       }
     }
+
     return reluctance;
   }
 }

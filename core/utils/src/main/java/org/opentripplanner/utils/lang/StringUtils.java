@@ -64,6 +64,7 @@ public class StringUtils {
           (value == null ? "null]" : "'" + value + "']")
       );
     }
+
     return value;
   }
 
@@ -80,6 +81,7 @@ public class StringUtils {
       buffer.append(ch);
       --count;
     }
+
     return buffer;
   }
 
@@ -87,9 +89,11 @@ public class StringUtils {
     if (value == null) {
       return String.valueOf(ch).repeat(width);
     }
+
     if (value.length() >= width) {
       return value;
     }
+
     return StringUtils.append(new StringBuilder(), ch, width - value.length())
       .append(value)
       .toString();
@@ -99,9 +103,11 @@ public class StringUtils {
     if (value == null) {
       return String.valueOf(ch).repeat(width);
     }
+
     if (value.length() >= width) {
       return value;
     }
+
     var buf = new StringBuilder();
     StringUtils.append(buf, ch, (width + 1 - value.length()) / 2);
     buf.append(value);
@@ -113,9 +119,11 @@ public class StringUtils {
     if (value == null) {
       return String.valueOf(ch).repeat(width);
     }
+
     if (value.length() >= width) {
       return value;
     }
+
     return StringUtils.append(new StringBuilder(value), ch, width - value.length()).toString();
   }
 

@@ -30,10 +30,13 @@ public class TransitGroupPriorityItineraryDecorator {
     if (!priorityGroupConfigurator.isEnabled() || isC2SetForAllItineraries(itineraries)) {
       return itineraries;
     }
+
     var list = new ArrayList<Itinerary>();
+
     for (Itinerary it : itineraries) {
       list.add(decorate(it));
     }
+
     return list;
   }
 
@@ -41,13 +44,16 @@ public class TransitGroupPriorityItineraryDecorator {
     if (!itinerary.generalizedCost2().isEmpty()) {
       return itinerary;
     }
+
     int c2 = priorityGroupConfigurator.baseGroupId();
+
     for (Leg leg : itinerary.legs()) {
       if (leg.trip() != null) {
         int newGroupId = priorityGroupConfigurator.lookupTransitGroupPriorityId(leg.trip());
         c2 = transitGroupCalculator.mergeInGroupId(c2, newGroupId);
       }
     }
+
     return itinerary.copyOf().withGeneralizedCost2(c2).build();
   }
 

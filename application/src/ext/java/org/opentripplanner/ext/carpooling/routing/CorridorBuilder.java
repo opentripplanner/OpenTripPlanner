@@ -56,17 +56,21 @@ public class CorridorBuilder {
 
     var legDurations = new Duration[legs];
     var legLimits = new Duration[legs];
+
     for (int leg = 0; leg < legs; leg++) {
       var segment = baselineRouter.route(vertices.get(leg), vertices.get(leg + 1));
+
       if (segment == null) {
         LOG.debug("Leg {} of carpool trip {} cannot be routed; no corridor", leg, trip.getId());
         return null;
       }
+
       legDurations[leg] = segment.duration();
       legLimits[leg] = legDurations[leg].plus(trip.legDeviationBudget(leg));
     }
 
     var stops = new ArrayList<CarpoolCorridor.CorridorStop>();
+
     for (int leg = 0; leg < legs; leg++) {
       var from = vertices.get(leg);
       var to = vertices.get(leg + 1);
@@ -76,14 +80,17 @@ public class CorridorBuilder {
 
       var forward = corridorTree(from, false, searchLimit, bound);
       var reverse = corridorTree(to, true, searchLimit, bound);
+
       for (var stop : stopIndex.stopsWithin(bound.envelope())) {
         // A stop's snap lies within a walk of it, so a stop the detour cannot pass that close to
         // has no snap the corridor could serve.
         if (!bound.mayPassWithin(stopIndex.walkMeters(), stop)) {
           continue;
         }
+
         var dropoff = times(stopIndex.dropoffSnap(stop.getId()), forward, reverse, bound);
         var pickup = times(stopIndex.pickupSnap(stop.getId()), forward, reverse, bound);
+
         if (dropoff != null || pickup != null) {
           stops.add(
             new CarpoolCorridor.CorridorStop(
@@ -98,6 +105,7 @@ public class CorridorBuilder {
         }
       }
     }
+
     LOG.debug(
       "Corridor of carpool trip {}: {} legs, {} stop entries",
       trip.getId(),
@@ -151,11 +159,14 @@ public class CorridorBuilder {
     if (snap == null) {
       return null;
     }
+
     int toStop = elapsedSeconds(forward, snap.vertex());
     int fromStop = elapsedSeconds(reverse, snap.vertex());
+
     if (toStop < 0 || fromStop < 0 || !bound.fits(toStop, fromStop)) {
       return null;
     }
+
     return new StopTimes(toStop, fromStop);
   }
 

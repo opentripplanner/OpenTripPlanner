@@ -87,9 +87,11 @@ public final class ScooterPreferences implements Serializable {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     ScooterPreferences that = (ScooterPreferences) o;
     return (
       doubleEquals(that.speed, speed) &&
@@ -180,9 +182,11 @@ public final class ScooterPreferences implements Serializable {
       var builder = TimeSlopeSafetyTriangle.of();
       body.accept(builder);
       this.optimizeTriangle = builder.buildOrDefault(this.optimizeTriangle);
+
       if (!builder.isEmpty()) {
         this.optimizeType = TRIANGLE;
       }
+
       return this;
     }
 

@@ -199,6 +199,7 @@ public class Timetable implements Serializable {
         "Can only copy scheduled timetable for a specific date if a date hasn't been specified yet."
       );
     }
+
     return copyOf().withServiceDate(date).build();
   }
 

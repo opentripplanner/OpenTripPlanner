@@ -81,20 +81,26 @@ public class CarpoolTrip
     this.provider = builder.provider();
     this.totalCapacity = builder.totalCapacity();
     this.stops = Collections.unmodifiableList(builder.stops());
+
     if (stops.size() < 2) {
       throw new IllegalArgumentException(
         "Carpool trip " + getId() + " must contain at least an origin and a destination stop"
       );
     }
+
     this.legDeviationBudgets = new Duration[stops.size() - 1];
     var budget = stops.getLast().getDeviationBudget();
+
     for (int leg = legDeviationBudgets.length - 1; leg >= 0; leg--) {
       var stopBudget = stops.get(leg + 1).getDeviationBudget();
+
       if (stopBudget.compareTo(budget) < 0) {
         budget = stopBudget;
       }
+
       legDeviationBudgets[leg] = budget;
     }
+
     this.publicContactInformation = builder.publicContactInformation();
   }
 
@@ -227,11 +233,13 @@ public class CarpoolTrip
     if (stops.size() != otherStops.size()) {
       return false;
     }
+
     for (int i = 0; i < stops.size(); i++) {
       if (!stops.get(i).sameAs(otherStops.get(i))) {
         return false;
       }
     }
+
     return true;
   }
 

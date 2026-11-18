@@ -69,6 +69,7 @@ public class TestTripSchedule implements RaptorTripSchedule {
         .addServiceTimeSchedule("times", arrivalTimes)
         .toString();
     }
+
     return ToStringBuilder.of(TestTripSchedule.class)
       .addServiceTimeSchedule("arrivals", arrivalTimes)
       .addServiceTimeSchedule("departures", departureTimes)
@@ -159,10 +160,12 @@ public class TestTripSchedule implements RaptorTripSchedule {
         if (arrivalTimes != null) {
           arrivalTimes = IntUtils.shiftArray(offset, arrivalTimes);
         }
+
         if (departureTimes != null) {
           departureTimes = IntUtils.shiftArray(offset, departureTimes);
         }
       }
+
       return this;
     }
 
@@ -178,6 +181,7 @@ public class TestTripSchedule implements RaptorTripSchedule {
       } else if (departureTimes == null) {
         departureTimes = copyWithOffset(arrivalTimes, arrivalDepartureOffset);
       }
+
       if (arrivalTimes.length != departureTimes.length) {
         throw new IllegalStateException(
           "Number of arrival and departure times do not match." +
@@ -187,9 +191,11 @@ public class TestTripSchedule implements RaptorTripSchedule {
             arrivalTimes.length
         );
       }
+
       if (pattern == null) {
         pattern = TestTripPattern.pattern("DummyPattern", new int[arrivalTimes.length]);
       }
+
       if (arrivalTimes.length != pattern.numberOfStopsInPattern()) {
         throw new IllegalStateException(
           "Number of arrival and departure times do not match stops in pattern." +
@@ -205,9 +211,11 @@ public class TestTripSchedule implements RaptorTripSchedule {
 
     private static int[] copyWithOffset(int[] source, int offset) {
       int[] target = new int[source.length];
+
       for (int i = 0; i < source.length; i++) {
         target[i] = source[i] + offset;
       }
+
       return target;
     }
   }

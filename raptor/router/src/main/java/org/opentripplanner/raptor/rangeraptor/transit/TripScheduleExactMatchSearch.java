@@ -46,9 +46,11 @@ public final class TripScheduleExactMatchSearch<T extends RaptorTripSchedule> im
       stopPositionInPattern,
       tripIndexLimit
     );
+
     if (result.empty() || result.transferConstraint().isNotAllowed()) {
       return result;
     }
+
     return isWithinSlack(timeLimit, result.time())
       ? result
       : RaptorBoardOrAlightEvent.empty(result.earliestBoardTime());

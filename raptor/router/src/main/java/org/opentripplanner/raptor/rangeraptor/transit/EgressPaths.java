@@ -41,6 +41,7 @@ public class EgressPaths {
     } else {
       paths = removeNonOptimalPathsForStandardRaptor(paths);
     }
+
     return new EgressPaths(groupByStop(paths));
   }
 
@@ -96,9 +97,11 @@ public class EgressPaths {
 
   private Stream<RaptorAccessEgress> allPaths() {
     var result = new ArrayList<RaptorAccessEgress>();
+
     for (var cursor : pathsByStop.values()) {
       result.addAll(cursor.value);
     }
+
     return result.stream();
   }
 }

@@ -62,6 +62,7 @@ public class OsmModuleTest {
     Edge e1 = null;
     Edge e2 = null;
     Edge e3 = null;
+
     for (Edge e : v2.getOutgoing()) {
       if (e.getToVertex() == v1) {
         e1 = e;
@@ -127,12 +128,15 @@ public class OsmModuleTest {
     assertFalse(iv8.hasDrivingTrafficLight());
 
     Set<VertexPair> edgeEndpoints = new HashSet<>();
+
     for (StreetEdge se : gg.findEdges(StreetEdge.class)) {
       var endpoints = new VertexPair(se.getFromVertex(), se.getToVertex());
+
       // Check that we don't get any duplicate edges on this small graph.
       if (edgeEndpoints.contains(endpoints)) {
         fail();
       }
+
       edgeEndpoints.add(endpoints);
     }
 

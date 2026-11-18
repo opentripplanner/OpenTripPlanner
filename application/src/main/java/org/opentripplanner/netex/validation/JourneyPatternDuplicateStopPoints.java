@@ -31,6 +31,7 @@ class JourneyPatternDuplicateStopPoints extends AbstractHMapValidationRule<Strin
       .getPointsInSequence()
       .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()) {
       String pointId = ((EntityStructure) point).getId();
+
       if (!seenIds.add(pointId)) {
         duplicateStopPointId = pointId;
         return Status.DISCARD;

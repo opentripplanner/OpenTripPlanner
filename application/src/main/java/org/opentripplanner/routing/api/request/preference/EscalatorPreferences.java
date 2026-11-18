@@ -50,9 +50,11 @@ public class EscalatorPreferences implements Serializable {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     EscalatorPreferences that = (EscalatorPreferences) o;
     return doubleEquals(that.reluctance, reluctance) && doubleEquals(that.speed, speed);
   }

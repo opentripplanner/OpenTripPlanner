@@ -66,11 +66,13 @@ public class TripOnServiceDateMatcherFactory {
       request.includeServiceDateRanges(),
       TripOnServiceDateMatcherFactory::serviceDateRange
     );
+
     if (!request.includeRunningTimePeriods().includeEverything()) {
       expr.matches(
         runningTimePeriods(request.includeRunningTimePeriods().get(), runningTimeResolver)
       );
     }
+
     expr.atLeastOneMatch(request.includeAgencies(), TripOnServiceDateMatcherFactory::agencyId);
     expr.atLeastOneMatch(request.includeRoutes(), TripOnServiceDateMatcherFactory::routeId);
     expr.atLeastOneMatch(request.includePatterns(), id -> patternId(id, patternResolver));
@@ -108,6 +110,7 @@ public class TripOnServiceDateMatcherFactory {
       selector.serviceDateRanges(),
       TripOnServiceDateMatcherFactory::serviceDateRange
     );
+
     if (!selector.runningTimePeriods().includeEverything()) {
       expr.matches(runningTimePeriods(selector.runningTimePeriods().get(), runningTimeResolver));
     }
@@ -189,14 +192,17 @@ public class TripOnServiceDateMatcherFactory {
   ) {
     return new GenericUnaryMatcher<>("runningTimePeriod", tripOnServiceDate -> {
       var runningTime = runningTimeResolver.apply(tripOnServiceDate);
+
       if (runningTime == null) {
         return false;
       }
+
       for (var period : periods) {
         if (period.overlaps(runningTime)) {
           return true;
         }
       }
+
       return false;
     });
   }

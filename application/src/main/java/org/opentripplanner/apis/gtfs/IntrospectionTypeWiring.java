@@ -51,8 +51,10 @@ class IntrospectionTypeWiring {
           .collect(
             Collectors.toMap(Method::getName, method -> {
               String fieldName = method.getName();
+
               try {
                 DataFetcher dataFetcher = (DataFetcher) method.invoke(instance);
+
                 if (dataFetcher == null) {
                   throw new RuntimeException(
                     String.format(
@@ -62,6 +64,7 @@ class IntrospectionTypeWiring {
                     )
                   );
                 }
+
                 if (
                   OTPFeature.AsyncGraphQLFetchers.isOn() &&
                   objectType

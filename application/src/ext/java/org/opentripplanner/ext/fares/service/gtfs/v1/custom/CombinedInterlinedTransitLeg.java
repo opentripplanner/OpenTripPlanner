@@ -112,9 +112,11 @@ public class CombinedInterlinedTransitLeg implements TransitLeg {
     if (first.generalizedCost() == UNKNOWN) {
       return second.generalizedCost();
     }
+
     if (second.generalizedCost() == UNKNOWN) {
       return first.generalizedCost();
     }
+
     return first.generalizedCost() + second.generalizedCost();
   }
 

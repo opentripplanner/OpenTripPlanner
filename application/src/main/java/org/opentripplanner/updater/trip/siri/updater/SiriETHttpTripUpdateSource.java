@@ -46,17 +46,21 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
   @Override
   public Optional<Siri> getUpdates() {
     long t1 = System.currentTimeMillis();
+
     try {
       var siri = siriLoader.fetchETFeed(requestorRef);
+
       if (siri.map(Siri::getServiceDelivery).isEmpty()) {
         return Optional.empty();
       }
 
       var serviceDelivery = siri.get().getServiceDelivery();
+
       if (serviceDelivery.getResponseTimestamp().isBefore(lastTimestamp)) {
         LOG.info("Newer data has already been processed");
         return Optional.empty();
       }
+
       lastTimestamp = serviceDelivery.getResponseTimestamp();
 
       //All subsequent requests will return changes since last request
@@ -69,6 +73,7 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
       LOG.info("Failed after {} ms", System.currentTimeMillis() - t1);
       LOG.warn("Failed to parse SIRI-ET feed from {}", url, e);
     }
+
     return Optional.empty();
   }
 

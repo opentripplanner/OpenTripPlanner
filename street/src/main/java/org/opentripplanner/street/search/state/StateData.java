@@ -150,6 +150,7 @@ public class StateData implements Cloneable {
         "Unable to create only a single state for %s".formatted(request)
       );
     }
+
     return baseCaseDatas.get(0);
   }
 
@@ -188,6 +189,7 @@ public class StateData implements Cloneable {
       if (arriveBy) {
         var vehicleMode = StreetModeToRentalTraverseModeMapper.map(requestMode);
         var formFactor = StreetModeToFormFactorMapper.map(requestMode);
+
         if (allowArrivingInRentedVehicleAtDestination) {
           var keptVehicleStateData = proto.clone();
           keptVehicleStateData.vehicleRentalState = RENTING_FROM_STATION;
@@ -195,6 +197,7 @@ public class StateData implements Cloneable {
           keptVehicleStateData.mayKeepRentedVehicleAtDestination = true;
           res.add(keptVehicleStateData);
         }
+
         var floatingRentalStateData = proto.clone();
         floatingRentalStateData.vehicleRentalState = RENTING_FLOATING;
         floatingRentalStateData.rentalVehicleFormFactor = formFactor;
@@ -243,10 +246,12 @@ public class StateData implements Cloneable {
     if (vehicleRentalState == RENTING_FROM_STATION && !restrictedNetworks.isEmpty()) {
       return false;
     }
+
     // Populate zone state on arriveBy rental initial states
     if (!destinationZones.isEmpty()) {
       currentGeofencingZones = Set.copyOf(destinationZones);
     }
+
     // Pre-populate committed networks for generic floating states
     if (
       vehicleRentalState == RENTING_FLOATING &&
@@ -255,6 +260,7 @@ public class StateData implements Cloneable {
     ) {
       committedNetworks = Set.copyOf(restrictedNetworks);
     }
+
     return true;
   }
 

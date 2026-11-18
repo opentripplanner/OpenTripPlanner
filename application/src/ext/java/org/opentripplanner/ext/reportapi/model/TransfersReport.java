@@ -128,6 +128,7 @@ public class TransfersReport {
       r.loc += stop.getName() + " [Pattern no found]";
       return;
     }
+
     int stopPosition = pattern.findStopPosition(stop);
     r.coordinate = stop.getCoordinate();
 
@@ -135,6 +136,7 @@ public class TransfersReport {
       r.loc += "[Stop not found in pattern: " + stop.getName() + "]";
       return;
     }
+
     r.loc += stop.getName() + " [" + stopPosition + "]";
 
     if (trip != null) {

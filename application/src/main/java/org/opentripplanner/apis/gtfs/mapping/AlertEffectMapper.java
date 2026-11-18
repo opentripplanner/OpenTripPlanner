@@ -16,6 +16,7 @@ public class AlertEffectMapper {
     if (effect == null) {
       return GraphQLAlertEffectType.UNKNOWN_EFFECT;
     }
+
     return switch (effect) {
       case NO_SERVICE -> GraphQLAlertEffectType.NO_SERVICE;
       case REDUCED_SERVICE -> GraphQLAlertEffectType.REDUCED_SERVICE;

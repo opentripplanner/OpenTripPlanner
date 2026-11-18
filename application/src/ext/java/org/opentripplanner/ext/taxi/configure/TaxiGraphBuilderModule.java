@@ -24,6 +24,7 @@ public class TaxiGraphBuilderModule {
     if (OTPFeature.TaxiRouting.isOff() || taxiRepository == null) {
       return null;
     }
+
     return new TaxiGraphBuilder(
       dataSources.getTaxiConfiguredDataSource(),
       taxiRepository,

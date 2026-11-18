@@ -316,6 +316,7 @@ public class LegType {
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(quayType))))
           .dataFetcher(env -> {
             List<StopArrival> stops = ((Leg) env.getSource()).listIntermediateStops();
+
             if (stops == null || stops.isEmpty()) {
               return List.of();
             } else {
@@ -450,9 +451,11 @@ public class LegType {
           )
           .dataFetcher(env -> {
             Leg leg = leg(env);
+
             if (!leg.isScheduledTransitLeg()) {
               return null;
             }
+
             return AlternativeLegs.getAlternativeLegs(
               leg,
               env.getArgument("previous"),
@@ -487,9 +490,11 @@ public class LegType {
           )
           .dataFetcher(env -> {
             Leg leg = leg(env);
+
             if (!leg.isScheduledTransitLeg()) {
               return null;
             }
+
             return AlternativeLegs.getAlternativeLegs(
               leg,
               env.getArgument("next"),
@@ -513,18 +518,23 @@ public class LegType {
     Function<TransitLeg, T> transitLegAccessor
   ) {
     Leg leg = leg(environment);
+
     if (leg instanceof StreetLeg sl) {
       return streetLegAccessor.apply(sl);
     }
+
     if (leg instanceof TransitLeg tl) {
       return transitLegAccessor.apply(tl);
     }
+
     if (leg instanceof CarpoolLeg cl) {
       return cl.mode();
     }
+
     if (leg instanceof TaxiLeg taxiLeg) {
       return taxiLeg.mode();
     }
+
     throw new IllegalStateException("Unhandled leg type: " + leg);
   }
 }

@@ -90,10 +90,13 @@ public final class ViaConnectionStopArrivalEventListener<T extends RaptorTripSch
     Function<T, RaptorTripScheduleReference> tripInfoProvider
   ) {
     var map = new IntObjectHashMap<ParetoSetEventListener<ArrivalView<T>>>();
+
     if (viaConnections == null) {
       return map;
     }
+
     IntObjectMap<List<ViaConnection>> connectionsByStop = viaConnections.byFromStop();
+
     for (var cursor : connectionsByStop.keys()) {
       int stop = cursor.value;
       var connections = connectionsByStop.get(stop);
@@ -106,6 +109,7 @@ public final class ViaConnectionStopArrivalEventListener<T extends RaptorTripSch
       );
       map.put(stop, listener);
     }
+
     return map;
   }
 
@@ -113,6 +117,7 @@ public final class ViaConnectionStopArrivalEventListener<T extends RaptorTripSch
     for (var arrival : transfersCache) {
       next.addStopArrival(arrival);
     }
+
     transfersCache.clear();
   }
 
@@ -160,6 +165,7 @@ public final class ViaConnectionStopArrivalEventListener<T extends RaptorTripSch
     if (!alightArrival.arrivedBy(TRANSIT)) {
       return;
     }
+
     var transitPath = alightArrival.transitPath();
     T trip = transitPath.trip();
 

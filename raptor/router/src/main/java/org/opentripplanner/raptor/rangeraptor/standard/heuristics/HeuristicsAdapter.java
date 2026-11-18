@@ -150,11 +150,13 @@ public class HeuristicsAdapter implements Heuristics {
    */
   private int[] toIntArray(int size, int unreached, IntUnaryOperator supplier) {
     int[] a = IntUtils.intArray(size, unreached);
+
     for (int i = 0; i < a.length; i++) {
       if (reached(i)) {
         a[i] = supplier.applyAsInt(i);
       }
     }
+
     return a;
   }
 
@@ -205,6 +207,7 @@ public class HeuristicsAdapter implements Heuristics {
           }
         }
       }
+
       return new AggregatedResults(
         bestJourneyTravelDuration,
         bestJourneyNumOfTransfers,

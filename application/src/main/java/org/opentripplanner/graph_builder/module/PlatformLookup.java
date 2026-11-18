@@ -50,6 +50,7 @@ class PlatformLookup {
     if (!(vertex instanceof SplitterVertex)) {
       return;
     }
+
     Stream.concat(vertex.getIncoming().stream(), vertex.getOutgoing().stream())
       .filter(StreetEdge.class::isInstance)
       .forEach(edge -> platformsOfSplitEdges.put(edge, platform));

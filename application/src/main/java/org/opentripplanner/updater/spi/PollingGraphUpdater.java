@@ -71,6 +71,7 @@ public abstract class PollingGraphUpdater<C> implements GraphUpdater<C> {
 
       // Run concrete polling graph updater's implementation method.
       runPolling();
+
       if (runOnlyOnce()) {
         LOG.info(
           "As requested in configuration, updater {} has run only once and will now stop.",

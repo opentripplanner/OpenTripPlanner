@@ -112,6 +112,7 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule> impleme
         return findBoardingBySteppingBackwardsInTime(nTrips);
       }
     }
+
     // We have already found a candidate in a previous search;
     // Hence searching reverse from the upper bound is the fastest way to proceed.
     return findBoardingBySteppingBackwardsInTime(tripIndexUpperBound);
@@ -172,9 +173,11 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule> impleme
         break;
       }
     }
+
     if (candidateTripIndex != RaptorConstants.NOT_FOUND) {
       candidateTrip = timetable.getTripSchedule(candidateTripIndex);
     }
+
     return this;
   }
 
@@ -194,6 +197,7 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule> impleme
         return this;
       }
     }
+
     return this;
   }
 
@@ -219,6 +223,7 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule> impleme
         lower = m;
       }
     }
+
     return upper == nTrips ? nTrips : upper + 1;
   }
 }

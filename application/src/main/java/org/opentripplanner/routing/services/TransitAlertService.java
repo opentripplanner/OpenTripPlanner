@@ -39,9 +39,11 @@ public interface TransitAlertService {
    */
   default Collection<TransitAlert> findAlerts(TransitAlertRequest request) {
     var alerts = getAllAlerts();
+
     if (request.filters().isEmpty()) {
       return alerts;
     }
+
     var matcher = TransitAlertMatcherFactory.of(request);
     return alerts.stream().filter(matcher::match).toList();
   }

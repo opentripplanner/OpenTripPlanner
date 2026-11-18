@@ -47,6 +47,7 @@ public class EntityResolver {
   @Nullable
   Trip resolveTrip(EstimatedVehicleJourneyWrapper journey) {
     var trip = journey.vehicleJourneyIdAndServiceDate().map(v -> resolveTrip(v.vehicleJourneyId()));
+
     if (trip.isPresent()) {
       return trip.get();
     }
@@ -54,6 +55,7 @@ public class EntityResolver {
     Optional<TripOnServiceDate> tripOnServiceDate = journey
       .datedVehicleJourneyRef()
       .map(jf -> timetableRepository.getTripOnServiceDate(resolveId(jf)));
+
     if (tripOnServiceDate.isPresent()) {
       return tripOnServiceDate.get().getTrip();
     }
@@ -156,24 +158,29 @@ public class EntityResolver {
     var serviceDate = journey
       .vehicleJourneyIdAndServiceDate()
       .map(VehicleJourneyIdAndServiceDate::serviceDate);
+
     if (serviceDate.isPresent()) {
       return serviceDate.get();
     }
 
     FeedScopedId datedServiceJourneyId = resolveDatedServiceJourneyId(journey);
+
     if (datedServiceJourneyId != null) {
       var datedServiceJourney = resolveTripOnServiceDate(datedServiceJourneyId);
+
       if (datedServiceJourney != null) {
         return datedServiceJourney.getServiceDate();
       }
     }
 
     var calls = journey.calls();
+
     if (calls.isEmpty()) {
       return null;
     }
 
     var departureTime = calls.getFirst().getAimedDepartureTime();
+
     if (departureTime == null) {
       return null;
     }
@@ -188,19 +195,26 @@ public class EntityResolver {
    */
   private int calculateDayOffset(EstimatedVehicleJourneyWrapper journey) {
     Trip trip = resolveTrip(journey);
+
     if (trip == null) {
       return 0;
     }
+
     var pattern = timetableRepository.findPattern(trip);
+
     if (pattern == null) {
       return 0;
     }
+
     var tripTimes = pattern.getScheduledTimetable().getTripTimes(trip);
+
     if (tripTimes == null) {
       return 0;
     }
+
     var departureTime = tripTimes.getDepartureTime(0);
     var days = (int) Duration.ofSeconds(departureTime).toDays();
+
     if (departureTime < 0) {
       return days - 1;
     } else {

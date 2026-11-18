@@ -20,6 +20,7 @@ class DataOverlayConfigMapperTest {
     // Test for unused parameters
     var buf = new StringBuilder();
     a.logAllWarnings(m -> buf.append("\n").append(m));
+
     if (!buf.isEmpty()) {
       fail(buf.toString());
     }

@@ -69,6 +69,7 @@ public class SiriFuzzyTripMatcher {
     BiFunction<FeedScopedId, LocalDate, TripPattern> getNewTripPatternForModifiedTrip
   ) throws UpdateException {
     var calls = journeyWrapper.calls();
+
     if (calls.isEmpty()) {
       throw UpdateException.of(NO_VALID_STOPS);
     }
@@ -78,6 +79,7 @@ public class SiriFuzzyTripMatcher {
     }
 
     Set<Trip> trips = Set.of();
+
     if (journeyWrapper.vehicleRef().isPresent() && journeyWrapper.isRail()) {
       trips = cache.tripsByInternalPlanningCode(journeyWrapper.vehicleRef().get());
     }
@@ -87,9 +89,11 @@ public class SiriFuzzyTripMatcher {
       // resolves a scheduled stop point id to a quay (regular stop) if necessary
       // quay ids also work
       RegularStop stop = entityResolver.resolveQuay(lastCall.getStopPointRef());
+
       if (stop == null) {
         throw UpdateException.of(UNKNOWN_STOP);
       }
+
       ZonedDateTime arrivalTime =
         lastCall.getAimedArrivalTime() != null
           ? lastCall.getAimedArrivalTime()
@@ -99,11 +103,13 @@ public class SiriFuzzyTripMatcher {
         trips = getMatchingTripsOnStopOrSiblings(stop, arrivalTime);
       }
     }
+
     if (trips.isEmpty()) {
       throw UpdateException.of(NO_FUZZY_TRIP_MATCH);
     }
 
     Optional<Route> route = journeyWrapper.lineRef().map(entityResolver::resolveRoute);
+
     if (route.isPresent()) {
       trips = trips
         .stream()
@@ -128,10 +134,12 @@ public class SiriFuzzyTripMatcher {
     LocalDate serviceDate
   ) {
     List<FeedScopedId> matches = new ArrayList<>();
+
     for (Trip trip : cache.tripsByInternalPlanningCode(internalPlanningCode)) {
       Set<LocalDate> serviceDates = timetableRepository
         .getTripCalendars()
         .listServiceDates(trip.getServiceId());
+
       if (serviceDates.contains(serviceDate)) {
         matches.add(trip.getId());
       }
@@ -157,6 +165,7 @@ public class SiriFuzzyTripMatcher {
 
     String lastStopId = lastStop.getId().getId();
     Set<Trip> trips = cache.tripsByLastStopArrival(lastStopId, secondsSinceMidnight);
+
     if (trips.isEmpty()) {
       //Attempt to fetch trips that started yesterday - i.e. add 24 hours to arrival-time
       trips = cache.tripsByLastStopArrival(lastStopId, secondsSinceMidnightYesterday);
@@ -173,11 +182,13 @@ public class SiriFuzzyTripMatcher {
 
     Set<Trip> tripsOnSiblingQuays = new HashSet<>();
     var allQuays = lastStop.getParentStation().getChildStops();
+
     for (var quay : allQuays) {
       tripsOnSiblingQuays.addAll(
         cache.tripsByLastStopArrival(quay.getId().getId(), secondsSinceMidnight)
       );
     }
+
     return tripsOnSiblingQuays;
   }
 
@@ -193,6 +204,7 @@ public class SiriFuzzyTripMatcher {
   ) throws UpdateException {
     var journeyFirstStop = entityResolver.resolveQuay(calls.getFirst().getStopPointRef());
     var journeyLastStop = entityResolver.resolveQuay(calls.getLast().getStopPointRef());
+
     if (journeyFirstStop == null || journeyLastStop == null) {
       throw UpdateException.of(NO_VALID_STOPS);
     }
@@ -207,6 +219,7 @@ public class SiriFuzzyTripMatcher {
     );
     TripCalendars calendarService = timetableRepository.getTripCalendars();
     Set<TripAndPattern> possibleTrips = new HashSet<>();
+
     for (Trip trip : trips) {
       if (!calendarService.listServiceDates(trip.getServiceId()).contains(serviceDate)) {
         continue;
@@ -234,6 +247,7 @@ public class SiriFuzzyTripMatcher {
       }
 
       var times = getCurrentTimetable.apply(tripPattern, serviceDate).getTripTimes(trip);
+
       if (times != null && times.getScheduledDepartureTime(0) == departureInSecondsSinceMidnight) {
         // Found matches
         possibleTrips.add(new TripAndPattern(times.getTrip(), tripPattern));

@@ -56,6 +56,7 @@ public class RoutingErrorsAttacher {
           .systemNotices()
           .stream()
           .anyMatch(notice -> notice.tag().equals(RemoveTransitIfWalkingIsBetter.TAG));
+
       if (
         filteredItineraries
           .stream()
@@ -65,6 +66,7 @@ public class RoutingErrorsAttacher {
           .stream()
           .flatMap(Itinerary::streetLegs)
           .allMatch(StreetLeg::isWalkingLeg);
+
         if (nonTransitIsWalking) {
           routingErrors.add(new RoutingError(WALKING_BETTER_THAN_TRANSIT, null));
         }
@@ -76,6 +78,7 @@ public class RoutingErrorsAttacher {
         routingErrors.add(new RoutingError(NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW, DATE_TIME));
       }
     }
+
     return routingErrors;
   }
 }

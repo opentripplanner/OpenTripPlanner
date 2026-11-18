@@ -29,6 +29,7 @@ public class DataFetcherDecorator {
       }
     } else {
       String[] parts = name.split("\\.");
+
       if (hasArgument(m, parts[0])) {
         Map<String, T> nm = (Map<String, T>) m.get(parts[0]);
         call(nm, String.join(".", Arrays.copyOfRange(parts, 1, parts.length)), consumer);
@@ -47,6 +48,7 @@ public class DataFetcherDecorator {
       }
     } else {
       String[] parts = name.split("\\.");
+
       if (GqlUtil.hasArgument(environment, parts[0])) {
         Map<String, T> nm = environment.getArgument(parts[0]);
         call(nm, String.join(".", Arrays.copyOfRange(parts, 1, parts.length)), consumer);

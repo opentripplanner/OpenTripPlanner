@@ -28,6 +28,7 @@ public class ItineraryListFilterChain {
 
   public List<Itinerary> filter(List<Itinerary> itineraries) {
     List<Itinerary> result = itineraries;
+
     for (ItineraryListFilter filter : filters) {
       result = filter.filter(result);
     }

@@ -242,9 +242,11 @@ class AccessEgressRouterTest extends GraphRoutingTest {
 
   private String stateDescription(State state) {
     var last = state;
+
     while (last.getBackState() != null) {
       last = last.getBackState();
     }
+
     return last.getVertex().getName() + " -> " + state.getVertex().getName();
   }
 

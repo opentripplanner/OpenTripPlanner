@@ -161,6 +161,7 @@ public class SiriEtBuilder {
         "You need to call withRecordedCalls() before withEstimatedCalls()"
       );
     }
+
     var builder = new RecordedCallsBuilder(localTimeParser, 0);
 
     builder = producer.apply(builder);
@@ -254,6 +255,7 @@ public class SiriEtBuilder {
     LocalDate serviceDate
   ) {
     var relations = evj.getJourneyRelations();
+
     if (relations == null) {
       relations = new JourneyRelationsStructure();
       evj.setJourneyRelations(relations);
@@ -270,6 +272,7 @@ public class SiriEtBuilder {
     if (startTime != null) {
       part.setStartTime(startTime);
     }
+
     if (endTime != null) {
       part.setEndTime(endTime);
     }
@@ -311,9 +314,11 @@ public class SiriEtBuilder {
 
     public FramedVehicleJourneyRefStructure build() {
       DataFrameRefStructure dataFrameRefStructure = new DataFrameRefStructure();
+
       if (serviceDate != null) {
         dataFrameRefStructure.setValue(DateTimeFormatter.ISO_LOCAL_DATE.format(serviceDate));
       }
+
       FramedVehicleJourneyRefStructure framedVehicleJourneyRefStructure =
         new FramedVehicleJourneyRefStructure();
       framedVehicleJourneyRefStructure.setDataFrameRef(dataFrameRefStructure);
@@ -436,12 +441,15 @@ public class SiriEtBuilder {
       @Nullable String expectedTime
     ) {
       var call = calls.getLast();
+
       if (aimedTime != null) {
         call.setAimedArrivalTime(localTimeParser.zonedDateTime(aimedTime));
       }
+
       if (expectedTime != null) {
         call.setExpectedArrivalTime(localTimeParser.zonedDateTime(expectedTime));
       }
+
       return this;
     }
 
@@ -450,12 +458,15 @@ public class SiriEtBuilder {
       @Nullable String expectedTime
     ) {
       var call = calls.getLast();
+
       if (aimedTime != null) {
         call.setAimedDepartureTime(localTimeParser.zonedDateTime(aimedTime));
       }
+
       if (expectedTime != null) {
         call.setExpectedDepartureTime(localTimeParser.zonedDateTime(expectedTime));
       }
+
       return this;
     }
 

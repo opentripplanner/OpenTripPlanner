@@ -93,8 +93,10 @@ class CrosswalkNamer implements EdgeNamer {
     var streetCandidates = streetIndex.query(buffer).stream().map(EdgeOnLevel::way).toList();
 
     var crossStreetOpt = getIntersectingStreet(way, streetCandidates);
+
     if (crossStreetOpt.isPresent()) {
       OsmWay crossStreet = crossStreetOpt.get();
+
       if (crossStreet.isNamed()) {
         crosswalk.overrideDerivedName(
           new LocalizedString("name.crosswalk_over_street", crossStreet.getAssumedName())
@@ -141,6 +143,7 @@ class CrosswalkNamer implements EdgeNamer {
       .stream()
       .filter(e -> e.way().getNodeRefs().contains(nodeId))
       .toList();
+
     if (sidewalks.size() == 1) {
       sidewalks.getFirst().edge().overrideDerivedName(crosswalkName);
     }
@@ -151,6 +154,7 @@ class CrosswalkNamer implements EdgeNamer {
    */
   public static Optional<OsmWay> getIntersectingStreet(OsmWay way, Collection<OsmWay> streets) {
     LongArrayList nodeRefs = way.getNodeRefs();
+
     if (nodeRefs.size() >= 3) {
       // There needs to be at least three nodes: 2 extremities that are on the sidewalk,
       // and one somewhere in the middle that joins the crossing with the street.
@@ -161,6 +165,7 @@ class CrosswalkNamer implements EdgeNamer {
         .filter(w -> Arrays.stream(nodeRefsArray).anyMatch(nid -> w.getNodeRefs().contains(nid)))
         .findFirst();
     }
+
     return Optional.empty();
   }
 

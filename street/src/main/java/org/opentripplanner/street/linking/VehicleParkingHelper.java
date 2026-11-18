@@ -34,11 +34,14 @@ public class VehicleParkingHelper {
   ) {
     for (int i = 0; i < vehicleParkingVertices.size(); i++) {
       var currentVertex = vehicleParkingVertices.get(i);
+
       if (isUsableForParking(currentVertex, currentVertex)) {
         VehicleParkingEdge.createVehicleParkingEdge(currentVertex);
       }
+
       for (int j = i + 1; j < vehicleParkingVertices.size(); j++) {
         var nextVertex = vehicleParkingVertices.get(j);
+
         if (isUsableForParking(currentVertex, nextVertex)) {
           VehicleParkingEdge.createVehicleParkingEdge(currentVertex, nextVertex);
           VehicleParkingEdge.createVehicleParkingEdge(nextVertex, currentVertex);

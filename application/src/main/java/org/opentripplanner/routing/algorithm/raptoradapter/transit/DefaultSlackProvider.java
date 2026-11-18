@@ -59,9 +59,11 @@ public final class DefaultSlackProvider implements RaptorSlackProvider {
 
   private static int[] slackByMode(DurationForEnum<TransitMode> slack) {
     int[] result = new int[TransitMode.values().length];
+
     for (TransitMode mode : TransitMode.values()) {
       result[RoutingTripPattern.slackIndex(mode)] = (int) slack.valueOf(mode).toSeconds();
     }
+
     return result;
   }
 }

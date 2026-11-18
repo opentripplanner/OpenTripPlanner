@@ -182,10 +182,13 @@ class RealTimeTripTimesTest {
   public void testCompleteTimes() {
     var builder = createInitialTripTimes().createRealTimeWithoutScheduledTimes();
     var delay = 30;
+
     for (var i = 0; i < builder.numberOfStops(); ++i) {
       builder.withArrivalDelay(i, delay).withDepartureDelay(i, delay);
     }
+
     var tripTimes = builder.build();
+
     for (var i = 0; i < tripTimes.getNumStops(); ++i) {
       assertEquals(delay, tripTimes.getArrivalDelay(i));
       assertEquals(delay, tripTimes.getDepartureDelay(i));

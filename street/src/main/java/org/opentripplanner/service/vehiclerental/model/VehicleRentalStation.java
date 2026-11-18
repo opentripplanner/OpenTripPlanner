@@ -335,9 +335,11 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     VehicleRentalStation that = (VehicleRentalStation) o;
     return (
       Double.compare(that.longitude, longitude) == 0 &&

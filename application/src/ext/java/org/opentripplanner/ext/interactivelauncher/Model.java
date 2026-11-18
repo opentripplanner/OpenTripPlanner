@@ -68,12 +68,15 @@ public class Model implements Serializable {
     if (startupModel == null) {
       startupModel = new StartupModel();
     }
+
     if (logModel == null) {
       logModel = LogModel.createFromConfig();
     }
+
     if (raptorDebugModel == null) {
       raptorDebugModel = new RaptorDebugModel();
     }
+
     logModel.init(this::save);
     raptorDebugModel.init(this::save);
     return this;

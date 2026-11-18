@@ -139,6 +139,7 @@ public class GenerateTripPatternsOperation {
       !FlexTrip.containsFlexStops(stopTimes) && stopTimes.size() < 2;
     // flex trips are allowed to have a single stop because that can be an area or a group of stops
     var flexTripWithZeroStops = FlexTrip.containsFlexStops(stopTimes) && stopTimes.size() < 1;
+
     if (staticTripWithFewerThan2Stops || flexTripWithZeroStops) {
       issueStore.add(new TripDegenerate(trip));
       return;
@@ -154,6 +155,7 @@ public class GenerateTripPatternsOperation {
 
     // If this trip is referenced by one or more lines in frequencies.txt, wrap it in a FrequencyEntry.
     List<Frequency> frequencies = frequenciesForTrip.get(trip);
+
     if (!frequencies.isEmpty()) {
       for (Frequency freq : frequencies) {
         tripPatternBuilder.withScheduledTimeTableBuilder(builder ->
@@ -172,6 +174,7 @@ public class GenerateTripPatternsOperation {
   private TripPatternBuilder findOrCreateTripPattern(StopPattern stopPattern, Trip trip) {
     Route route = trip.getRoute();
     Direction direction = trip.getDirection();
+
     for (TripPatternBuilder tripPatternBuilder : tripPatternBuilders.get(stopPattern)) {
       if (
         tripPatternBuilder.getRoute().equals(route) &&
@@ -182,6 +185,7 @@ public class GenerateTripPatternsOperation {
         return tripPatternBuilder;
       }
     }
+
     FeedScopedId patternId = generateUniqueIdForTripPattern(route, direction);
     TripPatternBuilder tripPatternBuilder = TripPattern.of(patternId)
       .withRoute(route)

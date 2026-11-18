@@ -121,9 +121,11 @@ public final class TransitPathLeg<T extends RaptorTripSchedule> implements PathL
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     TransitPathLeg<?> that = (TransitPathLeg<?>) o;
     return (
       boardTime == that.boardTime &&

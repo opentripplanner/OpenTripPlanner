@@ -58,9 +58,11 @@ public class VehicleParkingGroup {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     final VehicleParkingGroup that = (VehicleParkingGroup) o;
     return (
       Objects.equals(coordinate, that.coordinate) &&

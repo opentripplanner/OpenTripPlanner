@@ -42,6 +42,7 @@ public record RaptorModuleTestCase(
     if (requestAdditions != null) {
       requestAdditions.accept(builder);
     }
+
     return config.apply(builder).build();
   }
 

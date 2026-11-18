@@ -77,6 +77,7 @@ public class StreetTransferPathProvider implements TransferPathProvider<NearbySt
         transitRepository.getSiteRepository()::findRegularStops
       );
     }
+
     return StreetNearbyStopFinder.of(null).build();
   }
 
@@ -96,9 +97,11 @@ public class StreetTransferPathProvider implements TransferPathProvider<NearbySt
     @Nullable FlexIndex flexIndex
   ) {
     var finder = createNearbyStopFinder(graph, transitRepository);
+
     if (!OTPFeature.ConsiderPatternsForDirectTransfers.isOn()) {
       return finder;
     }
+
     return new PatternConsideringNearbyStopFinder(
       transitRepository.getSiteRepository(),
       patternsByStop,

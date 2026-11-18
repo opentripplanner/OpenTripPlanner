@@ -81,6 +81,7 @@ public class CarpoolSiriMapper {
   @Nullable
   public CarpoolTrip mapSiriToCarpoolTrip(EstimatedVehicleJourney journey) {
     var calls = journey.getEstimatedCalls().getEstimatedCalls();
+
     if (calls.size() < 2) {
       throw new IllegalArgumentException(
         "Carpool trips must have at least 2 stops (origin and destination)."
@@ -92,6 +93,7 @@ public class CarpoolSiriMapper {
       .stream()
       .filter(c -> !isCancelled(c))
       .toList();
+
     if (activeCalls.size() < 2) {
       LOG.info(
         "Trip {}: fewer than 2 non-cancelled calls remain ({} of {}), treating as cancellation",
@@ -128,11 +130,13 @@ public class CarpoolSiriMapper {
         "Trip " + tripId + ": first call has neither expected nor aimed departure time."
       );
     }
+
     if (endTime == null) {
       throw new IllegalArgumentException(
         "Trip " + tripId + ": last call has neither expected nor aimed arrival time."
       );
     }
+
     if (!endTime.isAfter(startTime)) {
       throw new IllegalArgumentException(
         String.format(
@@ -154,6 +158,7 @@ public class CarpoolSiriMapper {
         ? lastStop.getLatestExpectedArrivalTime()
         : endTime.plus(CarpoolStop.DEFAULT_DEVIATION_BUDGET);
     var tripDuration = Duration.between(startTime, latestArrival);
+
     if (tripDuration.compareTo(maxTripDuration) > 0) {
       throw new IllegalArgumentException(
         String.format(
@@ -172,6 +177,7 @@ public class CarpoolSiriMapper {
     // waypoints cannot be reached in order within the same bound even at the maximum modelled car
     // speed: such a trip is malformed and would expand street trees far beyond a real carpool trip.
     var minimumDriveDuration = minimumDriveDuration(stops);
+
     if (minimumDriveDuration.compareTo(maxTripDuration) > 0) {
       throw new IllegalArgumentException(
         String.format(
@@ -194,8 +200,10 @@ public class CarpoolSiriMapper {
       .withStops(stops);
 
     var publicContact = journey.getPublicContact();
+
     if (publicContact != null) {
       var contactInformation = mapPublicContact(publicContact, tripId);
+
       if (contactInformation != null) {
         builder.withPublicContactInformation(contactInformation);
       }
@@ -217,6 +225,7 @@ public class CarpoolSiriMapper {
     if (phoneNumber == null && bookingUrl == null) {
       return null;
     }
+
     return ContactInfo.of().withPhoneNumber(phoneNumber).withBookingUrl(bookingUrl).build();
   }
 
@@ -229,10 +238,12 @@ public class CarpoolSiriMapper {
     if (bookingUrl == null) {
       return null;
     }
+
     if (!BookingUrlTemplate.isUsable(bookingUrl)) {
       LOG.info("Trip {}: dropping unusable public contact booking URL '{}'.", tripId, bookingUrl);
       return null;
     }
+
     return bookingUrl;
   }
 
@@ -242,11 +253,13 @@ public class CarpoolSiriMapper {
    */
   private static Duration minimumDriveDuration(List<CarpoolStop> stops) {
     double meters = 0;
+
     for (int i = 1; i < stops.size(); i++) {
       var from = stops.get(i - 1).getCoordinate();
       var to = stops.get(i).getCoordinate();
       meters += SphericalDistanceLibrary.fastDistance(from.asJtsCoordinate(), to.asJtsCoordinate());
     }
+
     return Duration.ofSeconds((long) (meters / StreetConstants.DEFAULT_MAX_CAR_SPEED));
   }
 
@@ -290,14 +303,19 @@ public class CarpoolSiriMapper {
 
     for (int i = 0; i < calls.size(); i++) {
       var capacities = calls.get(i).getExpectedDepartureCapacities();
+
       if (capacities == null || capacities.isEmpty()) {
         continue;
       }
+
       BigInteger value = capacities.getFirst().getTotalCapacity();
+
       if (value == null) {
         continue;
       }
+
       int intValue = value.intValue();
+
       if (firstCapacity == null) {
         firstCapacity = intValue;
         firstCapacityIndex = i;
@@ -316,6 +334,7 @@ public class CarpoolSiriMapper {
     if (firstCapacity == null) {
       return DEFAULT_TOTAL_CAPACITY;
     }
+
     if (firstCapacity <= 0) {
       LOG.info(
         "Trip {}: invalid totalCapacity {} at call {}, using default {}",
@@ -326,6 +345,7 @@ public class CarpoolSiriMapper {
       );
       return DEFAULT_TOTAL_CAPACITY;
     }
+
     return firstCapacity;
   }
 
@@ -336,10 +356,13 @@ public class CarpoolSiriMapper {
    */
   private int extractOnboardCount(String tripId, EstimatedCall call) {
     var occupancies = call.getExpectedDepartureOccupancies();
+
     if (occupancies != null && !occupancies.isEmpty()) {
       BigInteger onboardCount = occupancies.getFirst().getOnboardCount();
+
       if (onboardCount != null) {
         int value = onboardCount.intValue();
+
         if (value <= 0) {
           LOG.info(
             "Trip {}: invalid onboardCount {}, using default {}",
@@ -349,9 +372,11 @@ public class CarpoolSiriMapper {
           );
           return DEFAULT_ONBOARD_COUNT;
         }
+
         return value;
       }
     }
+
     return DEFAULT_ONBOARD_COUNT;
   }
 
@@ -387,6 +412,7 @@ public class CarpoolSiriMapper {
     }
 
     Duration budget = Duration.between(arrivalTime, latestExpected);
+
     if (budget.isNegative()) {
       LOG.info(
         "latestExpectedArrivalTime ({}) is before arrivalTime ({}), using zero deviation budget",
@@ -395,6 +421,7 @@ public class CarpoolSiriMapper {
       );
       return Duration.ZERO;
     }
+
     return budget;
   }
 
@@ -486,6 +513,7 @@ public class CarpoolSiriMapper {
 
   private AimedFlexibleArea toFlexibleArea(EstimatedCall et) {
     var stopAssignments = et.getDepartureStopAssignments();
+
     if (stopAssignments == null || stopAssignments.isEmpty()) {
       stopAssignments = et.getArrivalStopAssignments();
     }
@@ -493,6 +521,7 @@ public class CarpoolSiriMapper {
     if (stopAssignments == null || stopAssignments.size() != 1) {
       throw new IllegalArgumentException("Expected exactly one stop assignment for call: " + et);
     }
+
     var flexibleArea = stopAssignments.getFirst().getExpectedFlexibleArea();
 
     if (
@@ -516,6 +545,7 @@ public class CarpoolSiriMapper {
 
     // Convert to JTS coordinates (lon lat pairs)
     Coordinate[] coords = new Coordinate[values.size() / 2];
+
     for (int i = 0; i < values.size(); i += 2) {
       coords[i / 2] = new Coordinate(values.get(i), values.get(i + 1));
     }

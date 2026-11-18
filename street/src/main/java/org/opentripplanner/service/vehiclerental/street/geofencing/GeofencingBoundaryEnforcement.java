@@ -86,6 +86,7 @@ sealed interface GeofencingBoundaryEnforcement
     if (zone.isBusinessArea()) {
       return BusinessAreaEnforcement.INSTANCE;
     }
+
     return RestrictedZoneEnforcement.INSTANCE;
   }
 }

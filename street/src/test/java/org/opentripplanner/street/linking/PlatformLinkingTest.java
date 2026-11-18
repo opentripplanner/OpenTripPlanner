@@ -160,9 +160,11 @@ public class PlatformLinkingTest {
     // dig up the AreaGroup
     AreaGroup ag = null;
     var edge = graph.listEdges().getFirst();
+
     if (edge instanceof AreaEdge ae) {
       ag = ae.getArea();
     }
+
     assertNotNull(ag);
 
     var v = intersectionVertex("boardingLocation", 10.00000001, 60.00000001);
@@ -183,11 +185,13 @@ public class PlatformLinkingTest {
     var out = v.getOutgoing();
     assertEquals(out.size(), 1);
     StreetEdge streetEdge = null;
+
     if (out.iterator().next() instanceof StreetEdge se) {
       streetEdge = se;
       assertEquals(0.5, se.getWalkSafetyFactor());
       assertEquals(0.5, se.getBicycleSafetyFactor());
     }
+
     assertNotNull(streetEdge);
   }
 
@@ -249,12 +253,15 @@ public class PlatformLinkingTest {
     List<TransitStopVertex> transitStops = graph.listStopVertices();
     Vertex v1 = null;
     Vertex v2 = null;
+
     for (Edge e : transitStops.get(0).getOutgoing()) {
       v1 = e.getToVertex();
     }
+
     for (Edge e : transitStops.get(1).getOutgoing()) {
       v2 = e.getToVertex();
     }
+
     assertNotNull(v1);
     assertNotNull(v2);
     assertTrue(v1.isConnected(v2));
@@ -267,7 +274,7 @@ public class PlatformLinkingTest {
   @Test
   void testLinkStopToConcaveArea() {
     /* test platform has a L shape with 12 edges:
-    
+
       0                    1
        ____________________
       |                    |
@@ -339,9 +346,11 @@ public class PlatformLinkingTest {
     // verify that the nearest visibility vertex is connected
     var transitStop = graph.listStopVertices().getFirst();
     Vertex v = null;
+
     for (Edge e : transitStop.getOutgoing()) {
       v = e.getToVertex();
     }
+
     Vertex near = graph.getVertex("0");
     assertNotNull(v);
     assertNotNull(near);
@@ -408,6 +417,7 @@ public class PlatformLinkingTest {
       vertices.add(vertex);
       closedGeom[i] = c;
     }
+
     closedGeom[platform.length] = closedGeom[0];
 
     Polygon polygon = GeometryUtils.getGeometryFactory().createPolygon(closedGeom);
@@ -415,6 +425,7 @@ public class PlatformLinkingTest {
     // visibility vertices are platform entrance points and convex corners
     // which should be directly linked with stops
     Set<IntersectionVertex> visibilityVertices = new HashSet<>();
+
     for (int i : visible) {
       visibilityVertices.add(vertices.get(i));
     }
@@ -448,11 +459,13 @@ public class PlatformLinkingTest {
         areaGroup,
         "edge " + (i + platform.length)
       );
+
       // make one corner surrounded by walk nothru edges
       if (i < 2) {
         edgeBuilder1.withWalkNoThruTraffic(true);
         edgeBuilder2.withWalkNoThruTraffic(true);
       }
+
       edgeBuilder1.buildAndConnect();
       edgeBuilder2.buildAndConnect();
     }
@@ -476,6 +489,7 @@ public class PlatformLinkingTest {
       maxAreaNodes,
       false
     );
+
     for (TransitStopVertex tStop : graph.listStopVertices()) {
       if (permanent) {
         linker.linkVertexPermanently(

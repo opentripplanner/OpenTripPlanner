@@ -46,6 +46,7 @@ public class GeoJsonWriter {
     }
 
     var featureCollection = makeContourFeatures(issues);
+
     try (GeoJSONWriter geoJSONWriter = new GeoJSONWriter(target.asOutputStream())) {
       // Set slightly higher resolution than default. We output small details
       geoJSONWriter.setMaxDecimals(6);
@@ -56,6 +57,7 @@ public class GeoJsonWriter {
       LOG.error("Unable to write GeoJSON", e);
       return false;
     }
+
     return true;
   }
 
@@ -67,11 +69,13 @@ public class GeoJsonWriter {
     SimpleFeatureType schema = makeDataIssueSchema();
     DefaultFeatureCollection featureCollection = new DefaultFeatureCollection(null, schema);
     SimpleFeatureBuilder fbuilder = new SimpleFeatureBuilder(schema);
+
     for (DataImportIssue issue : issues) {
       fbuilder.add(issue.getGeometry());
       fbuilder.add(issue.getMessage());
       featureCollection.add(fbuilder.buildFeature(null));
     }
+
     return featureCollection;
   }
 

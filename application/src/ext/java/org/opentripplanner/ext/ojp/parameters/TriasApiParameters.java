@@ -15,6 +15,7 @@ public class TriasApiParameters {
         "If `hideFeedId` is set to `true`, `hardcodedInputFeedId` must also be set."
       );
     }
+
     this.hideFeedId = hideFeedId;
     this.hardcodedInputFeedId = hardcodedInputFeedId;
     this.timeZone = timeZone;

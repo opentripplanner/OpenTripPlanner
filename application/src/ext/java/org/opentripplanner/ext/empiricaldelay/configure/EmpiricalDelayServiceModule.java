@@ -22,6 +22,7 @@ public class EmpiricalDelayServiceModule {
     if (OTPFeature.EmpiricalDelay.isOff() || repository == null) {
       return null;
     }
+
     return new DefaultEmpiricalDelayService(repository);
   }
 }

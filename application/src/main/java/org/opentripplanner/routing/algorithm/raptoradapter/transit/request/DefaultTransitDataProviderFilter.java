@@ -78,6 +78,7 @@ public class DefaultTransitDataProviderFilter implements TransitDataProviderFilt
         return tripTimes -> tripTimesPredicate(tripTimes, applyTripTimesFilters);
       }
     }
+
     return null;
   }
 
@@ -124,6 +125,7 @@ public class DefaultTransitDataProviderFilter implements TransitDataProviderFilt
           return true;
         }
       }
+
       return false;
     }
 
@@ -160,6 +162,7 @@ public class DefaultTransitDataProviderFilter implements TransitDataProviderFilt
 
       return result;
     }
+
     return result;
   }
 }

@@ -103,6 +103,7 @@ public class DefaultOsmProvider implements OsmProvider {
 
   private void parsePhase(OsmParser parser, OsmParserPhase phase) {
     parser.setPhase(phase);
+
     try (
       var in = new ParallelBlockInputStream(
         createInputStream(phase),
@@ -122,8 +123,10 @@ public class DefaultOsmProvider implements OsmProvider {
       if (cachedBytes == null) {
         cachedBytes = source.asBytes();
       }
+
       return track(phase, cachedBytes.length, new ByteArrayInputStream(cachedBytes));
     }
+
     return track(phase, source.size(), source.asInputStream());
   }
 
@@ -139,6 +142,7 @@ public class DefaultOsmProvider implements OsmProvider {
         );
       }
     }
+
     return zoneId;
   }
 

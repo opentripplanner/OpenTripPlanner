@@ -60,6 +60,7 @@ public class HighestFareInFreeTransferWindowFareService extends DefaultFareServi
     Money currentTransferWindowCost = zero;
     // The initial value of -1 indicates that the free transfer window end time has not yet been set
     long freeTransferWindowEndTimeEpochSeconds = -1;
+
     for (var leg : legs) {
       Optional<Money> rideCost = calculateCost(fareType, List.of(leg), fareRules);
 
@@ -86,6 +87,7 @@ public class HighestFareInFreeTransferWindowFareService extends DefaultFareServi
 
       currentTransferWindowCost = Money.max(currentTransferWindowCost, rideCost.orElse(zero));
     }
+
     cost = cost.plus(currentTransferWindowCost);
     var fp = FareProduct.of(
       new FeedScopedId("fares", fareType.name()),
@@ -93,9 +95,11 @@ public class HighestFareInFreeTransferWindowFareService extends DefaultFareServi
       cost
     ).build();
     var fare = ItineraryFare.empty();
+
     if (cost.greaterThan(zero)) {
       fare.addItineraryProducts(List.of(fp));
     }
+
     return fare;
   }
 

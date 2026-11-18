@@ -77,6 +77,7 @@ public final class AccessEgressFunctions {
     Collection<RaptorAccessEgress> paths
   ) {
     var result = removeNonOptimalPaths(paths, MC_COMPARATOR);
+
     if (LOG.isDebugEnabled() && result.size() < paths.size()) {
       var duplicates = new ArrayList<>(paths);
       duplicates.removeAll(result);
@@ -91,6 +92,7 @@ public final class AccessEgressFunctions {
           duplicates.stream().map(Objects::toString).collect(Collectors.joining("\n\t"))
       );
     }
+
     return result;
   }
 
@@ -117,19 +119,24 @@ public final class AccessEgressFunctions {
     int segment
   ) {
     IntObjectMap<List<T>> result = new IntObjectHashMap<>();
+
     for (var cursor : map.keys()) {
       int nRides = cursor.value;
+
       for (var it : map.get(nRides)) {
         if (it != null && it.numberOfViaLocationsVisited() == segment) {
           var list = result.get(nRides);
+
           if (list == null) {
             list = new ArrayList<>();
             result.put(nRides, list);
           }
+
           list.add(it);
         }
       }
     }
+
     return result;
   }
 
@@ -160,6 +167,7 @@ public final class AccessEgressFunctions {
       set.addAll(list);
       result.addAll(set);
     }
+
     return result;
   }
 
@@ -170,6 +178,7 @@ public final class AccessEgressFunctions {
     if (!map.containsKey(key)) {
       map.put(key, new ArrayList<>());
     }
+
     return map.get(key);
   }
 
@@ -182,6 +191,7 @@ public final class AccessEgressFunctions {
     for (RaptorAccessEgress it : input) {
       getOrCreate(groupBy.applyAsInt(it), mapByRound).add(it);
     }
+
     return mapByRound;
   }
 }

@@ -49,10 +49,12 @@ public class GsDirectoryDataSource extends AbstractGsDataSource implements Compo
   @Override
   public DataSource entry(String name) {
     Blob blob = childBlob(name);
+
     // If file exist
     if (blob != null) {
       return new GsFileDataSource(blob, type());
     }
+
     // New file
     BlobId childBlobId = BlobId.of(bucketName(), childPath(name));
     return new GsOutFileDataSource(storage, childBlobId, type());
@@ -70,9 +72,11 @@ public class GsDirectoryDataSource extends AbstractGsDataSource implements Compo
 
   private Bucket getBucket() {
     Bucket bucket = storage.get(bucketName());
+
     if (bucket == null) {
       throw new IllegalArgumentException("Bucket not found: " + bucketName());
     }
+
     return bucket;
   }
 
@@ -90,8 +94,10 @@ public class GsDirectoryDataSource extends AbstractGsDataSource implements Compo
 
   private void forEachChildBlob(Consumer<Blob> consumer) {
     int pathIndex = childPrefix().length();
+
     for (Blob blob : listBlobs().iterateAll()) {
       String name = blob.getName().substring(pathIndex);
+
       // Skip nested content
       if (!name.contains("/")) {
         consumer.accept(blob);

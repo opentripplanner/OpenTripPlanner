@@ -29,6 +29,7 @@ public class FeedImpl implements GraphQLDataFetchers.GraphQLFeed {
       TransitAlertService alertService = getTransitAlertService(environment);
       var args = new GraphQLTypes.GraphQLFeedAlertsArgs(environment.getArguments());
       List<GraphQLTypes.GraphQLFeedAlertType> types = args.getGraphQLTypes();
+
       if (types != null) {
         Collection<TransitAlert> alerts = new ArrayList<>();
         types.forEach(type -> {
@@ -57,6 +58,7 @@ public class FeedImpl implements GraphQLDataFetchers.GraphQLFeed {
         });
         return alerts.stream().distinct().collect(Collectors.toList());
       }
+
       return null;
     };
   }

@@ -200,6 +200,7 @@ public class FlexTransferGenerator implements GraphBuilderModule {
         );
 
         LOG.debug("Linked stop {} with {} flex transfers.", stop, distinctTransfers.size());
+
         if (!distinctTransfers.isEmpty()) {
           distinctTransfers
             .values()
@@ -233,13 +234,16 @@ public class FlexTransferGenerator implements GraphBuilderModule {
   private Multimap<FeedScopedId, TripPattern> patternsForStop() {
     if (patternsForStop == null) {
       Multimap<FeedScopedId, TripPattern> index = ArrayListMultimap.create();
+
       for (TripPattern pattern : timetableDataImport.getAllTripPatterns()) {
         for (StopLocation stop : pattern.getStops()) {
           index.put(stop.getId(), pattern);
         }
       }
+
       patternsForStop = index;
     }
+
     return patternsForStop;
   }
 
@@ -251,6 +255,7 @@ public class FlexTransferGenerator implements GraphBuilderModule {
   private NearbyStopFinder createNearbyStopFinder() {
     var siteRepository = transitRepository.getSiteRepository();
     NearbyStopFinder finder;
+
     if (!graph.hasStreets) {
       LOG.info(
         "Creating flex transfer edges between stops using straight line distance (not streets)..."
@@ -282,6 +287,7 @@ public class FlexTransferGenerator implements GraphBuilderModule {
   ) {
     TransferKey transferKey = new TransferKey(from, to, sd.edges());
     PathTransfer pathTransfer = distinctTransfers.get(transferKey);
+
     if (pathTransfer == null) {
       // If the PathTransfer can't be found, it is created.
       distinctTransfers.put(
@@ -306,6 +312,7 @@ public class FlexTransferGenerator implements GraphBuilderModule {
     Map<TransferKey, PathTransfer> distinctTransfers
   ) {
     var repository = transitRepository.getSiteRepository();
+
     for (RouteRequest transferProfile : flexTransferRequests) {
       // Flex transfer requests only use the WALK mode.
       StreetMode mode = StreetMode.WALK;
@@ -319,9 +326,11 @@ public class FlexTransferGenerator implements GraphBuilderModule {
         NO_STOP_COUNT_LIMIT
       )) {
         var nearbyStop = repository.getStopLocation(sd.stopId());
+
         if (nearbyStop.equals(stop) || nearbyStop instanceof RegularStop) {
           continue;
         }
+
         createPathTransfer(stop, nearbyStop, sd, distinctTransfers, mode);
       }
 
@@ -334,9 +343,11 @@ public class FlexTransferGenerator implements GraphBuilderModule {
         NO_STOP_COUNT_LIMIT
       )) {
         var nearbyStop = repository.getStopLocation(sd.stopId());
+
         if (nearbyStop.equals(stop) || nearbyStop instanceof RegularStop) {
           continue;
         }
+
         createPathTransfer(nearbyStop, stop, sd, distinctTransfers, mode);
       }
     }

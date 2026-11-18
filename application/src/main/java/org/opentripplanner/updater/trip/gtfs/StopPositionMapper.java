@@ -51,6 +51,7 @@ class StopPositionMapper {
 
   private int handleStopSequence(int listIndex, StopTimeUpdate update) throws UpdateException {
     var pos = tripTimes.stopPositionForGtfsSequence(update.stopSequence().getAsInt());
+
     if (pos.isEmpty()) {
       throw UpdateException.of(tripId, INVALID_STOP_SEQUENCE, listIndex);
     } else {
@@ -60,6 +61,7 @@ class StopPositionMapper {
 
   private int handleStopId(int listIndex, String stopId) throws UpdateException {
     var visitsAtStop = Collections.frequency(stopIds, stopId);
+
     if (visitsAtStop == 0) {
       throw UpdateException.of(tripId, INVALID_STOP_REFERENCE, listIndex);
     } else if (visitsAtStop == 1) {
@@ -84,6 +86,7 @@ class StopPositionMapper {
     if (listIndex >= stopIds.size()) {
       throw UpdateException.of(tripId, TOO_MANY_STOPS, listIndex);
     }
+
     // we take the position of the update in the list and see if that, by chance, is the same
     // index in the pattern.
     if (stopIds.get(listIndex).equals(stopId)) {
@@ -93,6 +96,7 @@ class StopPositionMapper {
       // very niche edge case: the update supplies only stop_id and the beginning of
       // the trip is missing in the real-time update
       var lastPosInPattern = stopIds.lastIndexOf(stopId);
+
       if (lastPosInPattern == -1) {
         throw UpdateException.of(tripId, INVALID_STOP_REFERENCE, listIndex);
       } else {

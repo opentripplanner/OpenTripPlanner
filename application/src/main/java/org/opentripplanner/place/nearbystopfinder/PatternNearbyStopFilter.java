@@ -72,6 +72,7 @@ class PatternNearbyStopFilter implements NearbyStopFilter {
         }
       }
     }
+
     uniqueStopsResult.addAll(closestStopForPattern.values());
 
     return uniqueStopsResult;

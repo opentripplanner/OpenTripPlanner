@@ -51,6 +51,7 @@ class TransitPathLegSelector<T extends RaptorTripSchedule> {
           prevStopPosition
       );
     }
+
     prevStopPosition = fromStopPosition;
 
     Set<OptimizedPathTail<T>> candidates = new HashSet<>();

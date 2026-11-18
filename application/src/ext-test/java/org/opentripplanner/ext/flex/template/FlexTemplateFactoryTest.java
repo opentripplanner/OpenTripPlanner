@@ -355,6 +355,7 @@ class FlexTemplateFactoryTest {
     int startTime
   ) {
     var st = MODEL.stopTime(TRIP, seqNr, stop);
+
     switch (boardAlight) {
       case BOARD_ONLY:
         st.setDropOffType(PickDrop.NONE);
@@ -363,6 +364,7 @@ class FlexTemplateFactoryTest {
         st.setPickupType(PickDrop.NONE);
         break;
     }
+
     st.setFlexWindowStart(startTime);
     // 5-minute window
     st.setFlexWindowEnd(startTime + 300);

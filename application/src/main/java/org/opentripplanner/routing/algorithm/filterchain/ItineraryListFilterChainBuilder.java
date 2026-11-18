@@ -268,6 +268,7 @@ public class ItineraryListFilterChainBuilder {
     if (earliestDepartureTime != null) {
       Objects.requireNonNull(searchWindow);
     }
+
     this.earliestDepartureTime = earliestDepartureTime;
     this.searchWindow = searchWindow;
     return this;
@@ -660,9 +661,11 @@ public class ItineraryListFilterChainBuilder {
       List<SingleCriteriaComparator> comparators = new ArrayList<>();
       comparators.add(SingleCriteriaComparator.compareGeneralizedCost());
       comparators.add(SingleCriteriaComparator.compareNumTransfers());
+
       if (transitGroupPriorityUsed) {
         comparators.add(SingleCriteriaComparator.compareTransitGroupsPriority());
       }
+
       return new McMaxLimitFilter(filterName, maxLimit, comparators);
     }
     // Default is to just use a "hard" max limit

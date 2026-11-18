@@ -31,6 +31,7 @@ class StopFinderTraverseVisitor implements TraverseVisitor<State, Edge> {
   @Override
   public void visitVertex(State state) {
     Vertex vertex = state.getVertex();
+
     if (vertex instanceof TransitStopVertex tsv) {
       stopsFound.add(NearbyStop.nearbyStopForState(state, tsv.getId()));
     }

@@ -223,9 +223,11 @@ public class DebugStyleSpec {
           .typeRaster()
           .source(layer)
           .minZoom(0);
+
         if (!layer.equals(OSM_BACKGROUND)) {
           builder.intiallyHidden();
         }
+
         return builder;
       })
       .toList();

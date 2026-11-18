@@ -84,9 +84,11 @@ public class LocalizedString implements I18NString, Serializable {
     if (this.key == null) {
       return null;
     }
+
     //replaces {name}, {ref} etc with %s to be used as parameters
     //in string formatting with values from way tags values
     String translation = ResourceBundleSingleton.INSTANCE.localize(this.key, locale);
+
     if (this.params != null) {
       translation = PATTERN_MATCHER.matcher(translation).replaceAll("%s");
       return String.format(

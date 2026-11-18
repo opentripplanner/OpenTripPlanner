@@ -37,9 +37,11 @@ class ResultPrinter {
     int prefixLen = 100 - label.length() - 4;
     var buf = new StringBuilder(100);
     buf.append("- ".repeat(prefixLen / 2));
+
     if (label.length() % 2 == 1) {
       buf.append(' ');
     }
+
     return buf.append("[ ").append(label).append(" ]").toString();
   }
 
@@ -118,8 +120,10 @@ class ResultPrinter {
       .mapToInt(it -> it.name().length())
       .max()
       .orElse(20);
+
     for (SpeedTestProfile p : profiles) {
       List<Integer> v = result.get(p);
+
       if (v != null) {
         printProfileResultLine(p.name(), v, labelMaxLen);
       }
@@ -160,6 +164,7 @@ class ResultPrinter {
     resultTable.add(header2(width));
 
     var results = new ArrayList<String>();
+
     for (SpeedTestTimer.Result t : times) {
       results.add(timerToString(t, width));
     }

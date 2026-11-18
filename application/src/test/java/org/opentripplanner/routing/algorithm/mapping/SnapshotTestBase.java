@@ -224,6 +224,7 @@ public abstract class SnapshotTestBase {
         }
       }
     }
+
     return result;
   }
 
@@ -246,6 +247,7 @@ public abstract class SnapshotTestBase {
         transitService.getTimeZone()
       );
     }
+
     return itineraries;
   }
 
@@ -258,6 +260,7 @@ public abstract class SnapshotTestBase {
     // TODO: 2022-12-20 filters: there should not be more than one filter but technically this is not right
     List<MainAndSubMode> transportModes = new ArrayList<>();
     var filter = request.journey().transit().filters().get(0);
+
     if (filter instanceof TransitFilterRequest filterRequest) {
       transportModes = filterRequest
         .select()
@@ -299,6 +302,7 @@ public abstract class SnapshotTestBase {
 
   private String formatPlace(GenericLocation location) {
     String formatted;
+
     if (location.stopId() != null) {
       formatted = String.format("%s::%s", location.label(), location.stopId());
     } else if (location.wgsCoordinate() != null) {
@@ -307,6 +311,7 @@ public abstract class SnapshotTestBase {
     } else {
       formatted = String.format("%s::null", location.label());
     }
+
     return URLEncoder.encode(formatted, StandardCharsets.UTF_8);
   }
 

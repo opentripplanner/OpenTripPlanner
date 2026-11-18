@@ -41,11 +41,13 @@ public class ContainsMatcher<S, T> implements Matcher<S> {
     if (valuesProvider.apply(entity) == null) {
       return false;
     }
+
     for (T it : valuesProvider.apply(entity)) {
       if (valueMatcher.match(it)) {
         return true;
       }
     }
+
     return false;
   }
 

@@ -228,11 +228,14 @@ public sealed interface TripTimes<T extends TripTimes<T>>
   @Nullable
   default TimePeriod scheduledRunningTime(Instant startOfService) {
     int numStops = getNumStops();
+
     if (numStops == 0) {
       return null;
     }
+
     int departure = getScheduledDepartureTime(0);
     int arrival = getScheduledArrivalTime(numStops - 1);
+
     if (
       departure == StopTime.MISSING_VALUE ||
       arrival == StopTime.MISSING_VALUE ||
@@ -240,6 +243,7 @@ public sealed interface TripTimes<T extends TripTimes<T>>
     ) {
       return null;
     }
+
     return TimePeriod.of(
       startOfService.plusSeconds(departure),
       startOfService.plusSeconds(arrival)
@@ -278,6 +282,7 @@ public sealed interface TripTimes<T extends TripTimes<T>>
           new TimetableValidationError(NEGATIVE_DWELL_TIME, stopPos, getTrip())
         );
       }
+
       if (stopPos > 0 && getDepartureTime(stopPos - 1) > arrival) {
         throw new DataValidationException(
           new TimetableValidationError(NEGATIVE_HOP_TIME, stopPos, getTrip())

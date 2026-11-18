@@ -125,6 +125,7 @@ public class PlaceImpl implements GraphQLDataFetchers.GraphQLPlace {
     return environment -> {
       StopArrival stopArrival = getSource(environment);
       var seq = stopArrival.gtfsStopSequence;
+
       if (seq != null) {
         return new PositionAtStop(seq);
       } else {
@@ -180,6 +181,7 @@ public class PlaceImpl implements GraphQLDataFetchers.GraphQLPlace {
   private VehicleParking getBikePark(DataFetchingEnvironment environment) {
     StopArrival stopArrival = getSource(environment);
     var vehicleParkingWithEntrance = stopArrival.place.vehicleParkingWithEntrance;
+
     if (
       vehicleParkingWithEntrance == null ||
       !vehicleParkingWithEntrance.getVehicleParking().hasBicyclePlaces()
@@ -193,6 +195,7 @@ public class PlaceImpl implements GraphQLDataFetchers.GraphQLPlace {
   private VehicleParking getCarPark(DataFetchingEnvironment environment) {
     StopArrival stopArrival = getSource(environment);
     var vehicleParkingWithEntrance = stopArrival.place.vehicleParkingWithEntrance;
+
     if (
       vehicleParkingWithEntrance == null ||
       !vehicleParkingWithEntrance.getVehicleParking().hasAnyCarPlaces()
@@ -206,6 +209,7 @@ public class PlaceImpl implements GraphQLDataFetchers.GraphQLPlace {
   private VehicleParking getVehicleParking(DataFetchingEnvironment environment) {
     StopArrival stopArrival = getSource(environment);
     var vehicleParkingWithEntrance = stopArrival.place.vehicleParkingWithEntrance;
+
     if (vehicleParkingWithEntrance == null) {
       return null;
     }

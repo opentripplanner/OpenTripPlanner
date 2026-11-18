@@ -55,6 +55,7 @@ public final class OnTripAccessArrivals<T extends RaptorTripSchedule> {
       list = new ArrayList<>();
       arrivalsForStopPosition.put(startRoutingAtStopPosition, list);
     }
+
     list.add(new OnTripAccessArrival<>(accessStopArrival, boardingConstraint));
   }
 }

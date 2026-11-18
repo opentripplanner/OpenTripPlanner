@@ -844,6 +844,7 @@ public class BuildConfig implements OtpDataStoreConfig {
       LOG.warn("Build config transitShapeSimplificationToleranceMeters must not be negative.");
       return 0.0;
     }
+
     return transitShapeSimplificationToleranceMeters;
   }
 }

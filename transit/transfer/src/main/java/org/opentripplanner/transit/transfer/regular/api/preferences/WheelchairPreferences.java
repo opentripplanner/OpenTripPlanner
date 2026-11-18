@@ -79,9 +79,11 @@ public final class WheelchairPreferences
   @Override
   public double normalizedDistance(AbstractUserPreferences other) {
     double distance = super.normalizedDistance(other);
+
     if (other instanceof WheelchairPreferences that) {
       distance += SPEED_WEIGHT * speed.normalizedDistance(that.speed);
     }
+
     return distance;
   }
 
@@ -90,6 +92,7 @@ public final class WheelchairPreferences
     if (!(obj instanceof WheelchairPreferences that)) {
       return false;
     }
+
     return super.equals(obj) && speed.equals(that.speed);
   }
 

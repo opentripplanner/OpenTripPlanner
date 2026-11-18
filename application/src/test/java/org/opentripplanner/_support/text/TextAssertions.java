@@ -52,12 +52,15 @@ public final class TextAssertions {
 
   private static int next(String[] lines, int index) {
     ++index;
+
     while (index < lines.length) {
       if (!lines[index].isBlank()) {
         return index;
       }
+
       ++index;
     }
+
     return END_OF_TEXT;
   }
 }

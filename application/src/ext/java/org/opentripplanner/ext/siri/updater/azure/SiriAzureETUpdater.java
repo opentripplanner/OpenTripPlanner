@@ -45,6 +45,7 @@ public class SiriAzureETUpdater implements SiriAzureMessageHandler {
   @Nullable
   public Future<?> handleMessage(ServiceDelivery serviceDelivery, String messageId) {
     var etDeliveries = serviceDelivery.getEstimatedTimetableDeliveries();
+
     if (etDeliveries == null || etDeliveries.isEmpty()) {
       LOG.info("Empty Siri ET message {}", messageId);
       return null;

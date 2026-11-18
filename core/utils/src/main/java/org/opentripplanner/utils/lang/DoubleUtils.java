@@ -76,6 +76,7 @@ public class DoubleUtils {
     if (Double.isNaN(value) || Double.isInfinite(value)) {
       return value;
     }
+
     return BigDecimal.valueOf(value)
       .divide(BigDecimal.valueOf(step), 0, RoundingMode.HALF_EVEN)
       .multiply(BigDecimal.valueOf(step))
@@ -115,6 +116,7 @@ public class DoubleUtils {
     if (Double.isNaN(value) || value < 0) {
       throw new IllegalArgumentException("Value is required to be non-negative, but was: " + value);
     }
+
     return value;
   }
 
@@ -138,6 +140,7 @@ public class DoubleUtils {
         )
       );
     }
+
     return value;
   }
 
@@ -147,6 +150,7 @@ public class DoubleUtils {
     if (Double.isNaN(value) || Double.isInfinite(value)) {
       return value;
     }
+
     return BigDecimal.valueOf(value).setScale(decimals, RoundingMode.HALF_UP).doubleValue();
   }
 
@@ -154,11 +158,13 @@ public class DoubleUtils {
     if (scale.length == 0) {
       throw new IllegalArgumentException("The step table can not be empty.");
     }
+
     for (double[] limit : scale) {
       if (value < limit[0]) {
         return limit[1];
       }
     }
+
     return scale[scale.length - 1][1];
   }
 }

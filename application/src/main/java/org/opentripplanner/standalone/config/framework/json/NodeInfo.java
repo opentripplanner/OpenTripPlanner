@@ -142,6 +142,7 @@ public record NodeInfo(
     if (enumType != null) {
       value = StringUtils.kebabCase(value.toString());
     }
+
     return type.quote(value);
   }
 
@@ -150,9 +151,11 @@ public record NodeInfo(
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     NodeInfo leafNode = (NodeInfo) o;
     return Objects.equals(name, leafNode.name);
   }
@@ -178,6 +181,7 @@ public record NodeInfo(
         builder.addText(" Optional");
       }
     }
+
     builder.addText(" Since ").addText(since.toString());
 
     return builder.toString();
@@ -197,13 +201,16 @@ public record NodeInfo(
     if (isTypeQualifier()) {
       return -1;
     }
+
     if (other.isTypeQualifier()) {
       return 1;
     }
+
     // Put simple types before complex
     if (type.isSimple() != other.type.isSimple()) {
       return type.isSimple() ? -1 : 1;
     }
+
     // Sort by name
     return name.compareTo(other.name);
   }

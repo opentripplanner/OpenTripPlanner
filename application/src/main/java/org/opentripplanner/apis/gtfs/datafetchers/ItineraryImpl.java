@@ -72,13 +72,17 @@ public class ItineraryImpl implements GraphQLDataFetchers.GraphQLItinerary {
   public DataFetcher<String> itineraryId() {
     return environment -> {
       Map<String, ?> ctx = environment.getLocalContext();
+
       if (ctx == null) {
         return null;
       }
+
       RouteRequest routeRequest = (RouteRequest) ctx.get(ROUTE_REQUEST_CONTEXT_KEY);
+
       if (routeRequest == null) {
         return null;
       }
+
       try {
         var reference = ItineraryReferenceMapper.toItineraryReference(
           getSource(environment),
@@ -103,9 +107,11 @@ public class ItineraryImpl implements GraphQLDataFetchers.GraphQLItinerary {
       var itinerary = getSource(environment);
       var ctx = new HashMap<String, Object>();
       Map<String, ?> parentCtx = environment.getLocalContext();
+
       if (parentCtx != null) {
         ctx.putAll(parentCtx);
       }
+
       ctx.put(ITINERARY_CONTEXT_KEY, itinerary);
       return DataFetcherResult.<Iterable<Leg>>newResult()
         .data(itinerary.legs())

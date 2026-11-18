@@ -37,6 +37,7 @@ final class DebugHandlerPatternRideAdapter
       stops.add(it.stop());
       it = it.previous();
     }
+
     Collections.reverse(stops);
     return stops;
   }

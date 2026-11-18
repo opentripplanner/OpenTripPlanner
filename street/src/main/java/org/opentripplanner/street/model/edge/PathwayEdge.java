@@ -90,6 +90,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
   @Override
   public State[] traverse(State s0) {
     StateEditor s1 = createEditorForWalking(s0, this);
+
     if (s1 == null) {
       return State.empty();
     }
@@ -109,6 +110,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
 
     if (time_ms > 0) {
       double weight = time_ms / 1000.0;
+
       if (s0.getRequest().wheelchairEnabled()) {
         weight *= StreetEdgeReluctanceCalculator.computeWheelchairReluctance(
           request,
@@ -124,6 +126,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
           isStairs()
         );
       }
+
       s1.incrementTimeInMilliseconds(time_ms);
       s1.incrementWeight(weight);
     } else {

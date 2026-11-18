@@ -122,9 +122,11 @@ public class NetexDataSourceHierarchy {
 
     private boolean isGroupEntry(String name, Pattern filePattern) {
       Matcher m = filePattern.matcher(name);
+
       if (!m.matches()) {
         return false;
       }
+
       try {
         currentGroup = m.group(1);
       } catch (IndexOutOfBoundsException e) {
@@ -134,6 +136,7 @@ public class NetexDataSourceHierarchy {
             "' is missing a group pattern like: '(\\w+)' in '(\\w+)-.*\\.xml' "
         );
       }
+
       groupEntries.computeIfAbsent(currentGroup, GroupEntries::new);
       return true;
     }

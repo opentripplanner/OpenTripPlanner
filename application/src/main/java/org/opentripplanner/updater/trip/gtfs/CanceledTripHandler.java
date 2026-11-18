@@ -48,16 +48,21 @@ class CanceledTripHandler {
         tripUpdate.tripId(),
         tripUpdate.startDate()
       );
+
       if (addedPattern != null) {
         var timetable = buffer.resolve(addedPattern, tripUpdate.startDate());
+
         if (timetable != null) {
           var tripTimes = timetable.getTripTimes(tripUpdate.tripId());
+
           if (tripTimes != null && tripTimes.isAdded()) {
             var builder = tripTimes.createRealTimeFromScheduledTimes();
+
             switch (cancelationType) {
               case CANCEL -> builder.withCanceled();
               case DELETE -> builder.withDeleted();
             }
+
             return TripUpdateApplier.apply(
               buffer,
               RealTimeTripUpdate.of(addedPattern, builder.build(), tripUpdate.startDate()).build()
@@ -69,20 +74,24 @@ class CanceledTripHandler {
 
     // Cancel the scheduled trip
     var pattern = getPatternForTripId(tripUpdate.tripId());
+
     if (pattern == null) {
       throw UpdateException.of(tripUpdate.tripId(), NO_TRIP_FOR_CANCELLATION_FOUND);
     }
 
     var tripTimes = pattern.getScheduledTimetable().getTripTimes(tripUpdate.tripId());
+
     if (tripTimes == null) {
       throw UpdateException.of(tripUpdate.tripId(), NO_TRIP_FOR_CANCELLATION_FOUND);
     }
 
     var builder = tripTimes.createRealTimeFromScheduledTimes();
+
     switch (cancelationType) {
       case CANCEL -> builder.withCanceled();
       case DELETE -> builder.withDeleted();
     }
+
     return TripUpdateApplier.apply(
       buffer,
       RealTimeTripUpdate.of(pattern, builder.build(), tripUpdate.startDate())

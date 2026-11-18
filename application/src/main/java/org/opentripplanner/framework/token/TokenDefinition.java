@@ -39,9 +39,11 @@ public class TokenDefinition {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     TokenDefinition that = (TokenDefinition) o;
     return version == that.version && listFields().equals(that.listFields());
   }
@@ -74,6 +76,7 @@ public class TokenDefinition {
         return i;
       }
     }
+
     throw unknownFieldNameException(name);
   }
 

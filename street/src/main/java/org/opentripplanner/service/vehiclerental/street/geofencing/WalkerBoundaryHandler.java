@@ -44,28 +44,36 @@ public class WalkerBoundaryHandler {
     if (s0.getVehicleRentalState() != VehicleRentalState.HAVE_RENTED) {
       return null;
     }
+
     for (var boundary : fromBoundaries) {
       if (!hasPair(boundary, toBoundaries)) {
         continue;
       }
+
       var zone = boundary.zone();
+
       if (!zone.hasRestriction() && !zone.isBusinessArea()) {
         continue;
       }
+
       // BA: walker exits in forward time (fromBoundary entering=false).
       // Restricted: walker enters in forward time (fromBoundary entering=true).
       boolean walkerCrossedThisBoundary = zone.isBusinessArea()
         ? !boundary.entering()
         : boundary.entering();
+
       if (!walkerCrossedThisBoundary) {
         continue;
       }
+
       var enforcement = GeofencingBoundaryEnforcement.forZone(zone);
       var result = enforcement.arriveByAtBoundary(zone, s0, edge);
+
       if (result != null) {
         return result;
       }
     }
+
     return null;
   }
 
@@ -78,6 +86,7 @@ public class WalkerBoundaryHandler {
         return true;
       }
     }
+
     return false;
   }
 }

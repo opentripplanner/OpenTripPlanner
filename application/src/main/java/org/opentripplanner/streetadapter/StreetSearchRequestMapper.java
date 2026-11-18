@@ -74,6 +74,7 @@ public class StreetSearchRequestMapper {
       .withTimeout(street.routingTimeout());
 
     var rentalDuration = request.journey().direct().rentalDuration();
+
     if (rentalDuration != null) {
       var rentalPeriod = request.arriveBy()
         ? RentalPeriod.createFromLatestArrivalTime(time, rentalDuration)
@@ -115,9 +116,11 @@ public class StreetSearchRequestMapper {
     var b = AccessibilityRequest.of()
       .withInaccessibleCost(stop.inaccessibleCost())
       .withUnknownCost(stop.unknownCost());
+
     if (stop.onlyConsiderAccessible()) {
       b.withAccessibleOnly();
     }
+
     return b.build();
   }
 
@@ -234,7 +237,9 @@ public class StreetSearchRequestMapper {
     if (location == null) {
       return null;
     }
+
     var coordinate = location.getCoordinate();
+
     if (coordinate == null) {
       return null;
     }

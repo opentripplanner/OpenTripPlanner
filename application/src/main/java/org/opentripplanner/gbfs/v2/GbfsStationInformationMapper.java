@@ -106,6 +106,7 @@ class GbfsStationInformationMapper {
     }
 
     GBFSRentalUris rentalUris = station.getRentalUris();
+
     if (rentalUris != null) {
       String androidUri = rentalUris.getAndroid();
       String iosUri = rentalUris.getIos();

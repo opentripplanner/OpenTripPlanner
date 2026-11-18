@@ -29,9 +29,11 @@ final class DistanceWeight {
    */
   static <T extends NormalizedDistance<T>> double of(T from, T to) {
     double distance = from.normalizedDistance(to);
+
     if (distance <= 0.0) {
       throw new IllegalArgumentException("The reference values must be different: " + from);
     }
+
     return REFERENCE_DISTANCE / distance;
   }
 }

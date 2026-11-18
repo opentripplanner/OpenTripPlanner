@@ -10,12 +10,15 @@ public record StreetEdgePair(@Nullable StreetEdge main, @Nullable StreetEdge bac
    */
   public Iterable<StreetEdge> asIterable() {
     var ret = new ArrayList<StreetEdge>(2);
+
     if (main != null) {
       ret.add(main);
     }
+
     if (back != null) {
       ret.add(back);
     }
+
     return ret;
   }
 
@@ -29,6 +32,7 @@ public record StreetEdgePair(@Nullable StreetEdge main, @Nullable StreetEdge bac
     } else if (back != null) {
       return back;
     }
+
     throw new IllegalStateException(
       "%s must not contain two null elements".formatted(getClass().getSimpleName())
     );

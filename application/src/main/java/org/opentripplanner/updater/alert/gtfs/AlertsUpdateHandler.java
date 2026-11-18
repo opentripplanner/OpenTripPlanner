@@ -57,18 +57,22 @@ public class AlertsUpdateHandler {
 
   public void update(FeedMessage message, GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher) {
     Collection<TransitAlert> alerts = new ArrayList<>();
+
     for (FeedEntity entity : message.getEntityList()) {
       if (!entity.hasAlert()) {
         continue;
       }
+
       GtfsRealtime.Alert alert = entity.getAlert();
       String id = entity.getId();
+
       try {
         alerts.add(mapAlert(id, alert, fuzzyTripMatcher));
       } catch (Exception e) {
         LOG.warn("Failed to map GTFS-RT alert with id {}: {}", id, e.getMessage(), e);
       }
     }
+
     transitAlertService.setAlerts(alerts);
   }
 
@@ -101,6 +105,7 @@ public class AlertsUpdateHandler {
 
     if (alert.getActivePeriodCount() > 0) {
       ArrayList<TimePeriod> periods = new ArrayList<>();
+
       for (TimeRange activePeriod : alert.getActivePeriodList()) {
         final Instant start = activePeriod.hasStart()
           ? Instant.ofEpochSecond(activePeriod.getStart()).minus(earlyStart)
@@ -110,6 +115,7 @@ public class AlertsUpdateHandler {
           : null;
         periods.add(TimePeriod.of(start, end));
       }
+
       alertBuilder.withCalendar(AlertCalendar.of(periods));
     } else {
       // Per the GTFS-rt spec, if an alert has no TimeRanges, than it should always be shown.
@@ -123,30 +129,37 @@ public class AlertsUpdateHandler {
       }
 
       String routeId = null;
+
       if (informed.hasRouteId()) {
         routeId = informed.getRouteId();
       }
 
       int directionId = MISSING_INT_FIELD_VALUE;
+
       if (informed.hasDirectionId()) {
         directionId = informed.getDirectionId();
       }
 
       String tripId = null;
+
       if (informed.hasTrip() && informed.getTrip().hasTripId()) {
         tripId = informed.getTrip().getTripId();
       }
+
       String stopId = null;
+
       if (informed.hasStopId()) {
         stopId = informed.getStopId();
       }
 
       String agencyId = null;
+
       if (informed.hasAgencyId()) {
         agencyId = informed.getAgencyId().intern();
       }
 
       int routeType = MISSING_INT_FIELD_VALUE;
+
       if (informed.hasRouteType()) {
         routeType = informed.getRouteType();
       }
@@ -184,6 +197,7 @@ public class AlertsUpdateHandler {
         alertBuilder.addEntity(new EntitySelector.Stop(new FeedScopedId(feedId, stopId)));
       } else if (agencyId != null) {
         FeedScopedId feedScopedAgencyId = new FeedScopedId(feedId, agencyId);
+
         if (routeType != MISSING_INT_FIELD_VALUE) {
           alertBuilder.addEntity(
             new EntitySelector.RouteTypeAndAgency(feedScopedAgencyId, routeType)
@@ -214,11 +228,13 @@ public class AlertsUpdateHandler {
    */
   private I18NString deBuffer(GtfsRealtime.TranslatedString input) {
     Map<String, String> translations = new HashMap<>();
+
     for (GtfsRealtime.TranslatedString.Translation translation : input.getTranslationList()) {
       String language = translation.getLanguage();
       String string = translation.getText();
       translations.put(language, string);
     }
+
     return translations.isEmpty() ? null : TranslatedString.getI18NString(translations, true);
   }
 }

@@ -38,6 +38,7 @@ public class DefaultStopConsolidationService implements StopConsolidationService
       .stream()
       .flatMap(group -> {
         var primaryStop = transitRepository.getSiteRepository().getRegularStop(group.primary());
+
         if (primaryStop == null) {
           LOG.error(
             "Could not find primary stop with id {}. Ignoring stop group {}.",

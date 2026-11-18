@@ -25,14 +25,17 @@ public class BoardAlightRestrictions {
     if (restrictions.isEmpty()) {
       throw new IllegalArgumentException("At least one stop is required.");
     }
+
     this.restrictions = restrictions;
   }
 
   public static BoardAlightRestrictions noRestriction(int size) {
     var list = new ArrayList<EnumSet<BoardAlightRestriction>>(size);
+
     for (int i = 0; i < size; i++) {
       list.add(ALL_ALLOWED);
     }
+
     return new BoardAlightRestrictions(List.copyOf(list));
   }
 
@@ -52,6 +55,7 @@ public class BoardAlightRestrictions {
   public static BoardAlightRestrictions restrictions(String restrictions) {
     var codes = restrictions.toLowerCase().trim().split("\\s");
     var list = new ArrayList<EnumSet<BoardAlightRestriction>>();
+
     for (String code : codes) {
       if ("a".equals(code)) {
         list.add(ALIGHTING_ONLY);
@@ -63,6 +67,7 @@ public class BoardAlightRestrictions {
         list.add(NONE_ALLOWED);
       }
     }
+
     return new BoardAlightRestrictions(list);
   }
 
@@ -77,6 +82,7 @@ public class BoardAlightRestrictions {
   @Override
   public String toString() {
     var buf = new StringBuilder();
+
     for (int i = 0; i < restrictions.size(); ++i) {
       if (isAlightingPossibleAt(i) && isBoardingPossibleAt(i)) {
         buf.append(" *");
@@ -88,6 +94,7 @@ public class BoardAlightRestrictions {
         buf.append(" Ø");
       }
     }
+
     return buf.substring(1);
   }
 

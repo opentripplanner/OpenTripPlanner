@@ -70,23 +70,30 @@ public class SlopeCostCalculator {
     double[] lengths = getLengthsFromElevation(elev);
     double trueLength = lengths[0];
     double flatLength = lengths[1];
+
     if (flatLength < 1e-3) {
       // Too small edge, returning neutral slope costs.
       return new SlopeCosts(1.0, 1.0, 0.0, 0.0, 1.0, false, 1.0);
     }
+
     double lengthMultiplier = trueLength / flatLength;
+
     for (int i = 0; i < coordinates.length - 1; ++i) {
       double run = coordinates[i + 1].x - coordinates[i].x;
       double rise = coordinates[i + 1].y - coordinates[i].y;
+
       if (run == 0) {
         continue;
       }
+
       double slope = rise / run;
+
       // Slopes above 100% can only be raster/OSM glitches — drop the segment entirely.
       if (slope > MAX_ABS_SLOPE || slope < -MAX_ABS_SLOPE) {
         slope = 0;
         flattened = true;
       }
+
       if (maxSlope < Math.abs(slope)) {
         maxSlope = Math.abs(slope);
       }
@@ -102,11 +109,14 @@ public class SlopeCostCalculator {
       slopeSpeedEffectiveLength += run / slopeSpeedCoef;
       // assume that speed and safety are inverses
       double safetyCost = hypotenuse * (slopeSpeedCoef - 1) * 0.25;
+
       if (safetyCost > 0) {
         slopeSafetyCost += safetyCost;
       }
+
       effectiveWalkLength += calculateEffectiveWalkLength(run, rise);
     }
+
     /*
      * Here we divide by the *flat length* as the slope/work cost factors are multipliers of the
      * length of the street edge which is the flat one.
@@ -138,6 +148,7 @@ public class SlopeCostCalculator {
     double flatLength = 0;
     double lastX = elev.getX(0);
     double lastY = elev.getY(0);
+
     for (int i = 1; i < elev.size(); ++i) {
       Coordinate c = elev.getCoordinate(i);
       double x = c.x - lastX;
@@ -147,6 +158,7 @@ public class SlopeCostCalculator {
       lastX = c.x;
       lastY = c.y;
     }
+
     return new double[] { trueLength, flatLength };
   }
 }

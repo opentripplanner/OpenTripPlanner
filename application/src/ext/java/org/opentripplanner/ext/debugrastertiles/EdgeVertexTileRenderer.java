@@ -127,6 +127,7 @@ public class EdgeVertexTileRenderer implements TileRenderer {
     for (Edge edge : edges) {
       Geometry edgeGeom = edge.getGeometry();
       boolean hasGeom = true;
+
       if (edgeGeom == null) {
         Coordinate[] coordinates = new Coordinate[] {
           edge.getFromVertex().getCoordinate(),
@@ -141,6 +142,7 @@ public class EdgeVertexTileRenderer implements TileRenderer {
       if (evAttrsOpt.isEmpty()) {
         continue;
       }
+
       EdgeVisualAttributes evAttrs = evAttrsOpt.get();
 
       Geometry midLineGeom = context.transform.transform(edgeGeom);
@@ -149,10 +151,12 @@ public class EdgeVertexTileRenderer implements TileRenderer {
         midLineGeom.getCoordinates(),
         lineWidth * 0.4
       );
+
       if (coords.length < 2) {
         // Can happen for very small edges (<1mm)
         continue;
       }
+
       LineString offsetLine = GeometryUtils.makeLineString(coords);
       Shape midLineShape = shapeWriter.toShape(midLineGeom);
       Shape offsetShape = shapeWriter.toShape(offsetLine);
@@ -165,6 +169,7 @@ public class EdgeVertexTileRenderer implements TileRenderer {
         var offsetLength = offsetLine.getLength();
 
         var previousLocation = line.getStartIndex();
+
         for (var it : evRenderer.edgeSegments(edge)) {
           var currentLocation = locater.getLocation(offsetLength * it.position());
           var segmentGeometry = line.extractLine(previousLocation, currentLocation);
@@ -178,16 +183,19 @@ public class EdgeVertexTileRenderer implements TileRenderer {
         context.graphics.setColor(evAttrs.color);
         context.graphics.draw(offsetShape);
       }
+
       if (lineWidth > 6.0f) {
         context.graphics.setColor(Color.WHITE);
         context.graphics.setStroke(arrowStroke);
         context.graphics.draw(offsetShape);
       }
+
       if (lineWidth > 4.0f) {
         context.graphics.setColor(Color.BLACK);
         context.graphics.setStroke(thinStroke);
         context.graphics.draw(midLineShape);
       }
+
       if (evAttrs.label != null && lineWidth > 8.0f) {
         context.graphics.setColor(Color.BLACK);
         context.graphics.setStroke(
@@ -210,6 +218,7 @@ public class EdgeVertexTileRenderer implements TileRenderer {
       if (vvAttrsOp.isEmpty()) {
         continue;
       }
+
       var vvAttrs = vvAttrsOp.get();
 
       Point tilePoint = (Point) context.transform.transform(point);
@@ -218,6 +227,7 @@ public class EdgeVertexTileRenderer implements TileRenderer {
       context.graphics.setColor(vvAttrs.color);
       context.graphics.setStroke(stroke);
       context.graphics.draw(shape);
+
       if (
         vvAttrs.label != null && lineWidth > 6.0f && context.bbox.contains(point.getCoordinate())
       ) {
@@ -228,9 +238,11 @@ public class EdgeVertexTileRenderer implements TileRenderer {
          * need to expand the envelope by an unbounded amount (max label size).
          */
         double x = tilePoint.getX();
+
         if (x + labelWidth > context.tileWidth) {
           x -= labelWidth;
         }
+
         context.graphics.drawString(vvAttrs.label, (float) x, (float) tilePoint.getY());
       }
     }

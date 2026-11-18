@@ -38,10 +38,12 @@ public class StraightLineNearbyStopFinder implements NearbyStopFinder {
       SphericalDistanceLibrary.metersToLonDegrees(radiusMeters, coordinate.y),
       SphericalDistanceLibrary.metersToDegrees(radiusMeters)
     );
+
     for (RegularStop it : queryNearbyStops.apply(envelope)) {
       double distance = Math.round(
         SphericalDistanceLibrary.distance(coordinate, it.getCoordinate().asJtsCoordinate())
       );
+
       if (distance < radiusMeters) {
         NearbyStop sd = new NearbyStop(it.getId(), distance, null, null);
         stopsFound.add(sd);

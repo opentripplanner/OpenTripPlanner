@@ -181,6 +181,7 @@ public class EstimatedCallType {
                   "Trip has been deleted. this should not be exposed to the API and is probably a bug"
                 );
               }
+
               return TransmodelRealTimeTripStateModel.of(realtimeState);
             })
         )
@@ -446,6 +447,7 @@ public class EstimatedCallType {
     allAlerts.addAll(
       alertPatchService.getStopAndRouteAlerts(stopId, routeId, stopConditions, direction)
     );
+
     // StopPlace
     if (stop.getParentStation() != null) {
       FeedScopedId parentStopId = stop.getParentStation().getId();
@@ -457,6 +459,7 @@ public class EstimatedCallType {
         alertPatchService.getStopAndRouteAlerts(parentStopId, routeId, stopConditions, direction)
       );
     }
+
     // Trip
     allAlerts.addAll(alertPatchService.getTripAlerts(tripId, serviceDate));
     // Route

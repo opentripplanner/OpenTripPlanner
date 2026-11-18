@@ -25,6 +25,7 @@ public class AgencyImpl implements GraphQLDataFetchers.GraphQLAgency {
       TransitAlertService alertService = getTransitAlertService(environment);
       var args = new GraphQLTypes.GraphQLAgencyAlertsArgs(environment.getArguments());
       List<GraphQLTypes.GraphQLAgencyAlertType> types = args.getGraphQLTypes();
+
       if (types != null) {
         Collection<TransitAlert> alerts = new ArrayList<>();
         types.forEach(type -> {

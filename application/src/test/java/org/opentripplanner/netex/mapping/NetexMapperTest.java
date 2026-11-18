@@ -175,6 +175,7 @@ class NetexMapperTest {
     var issueStore = new DefaultDataImportIssueStore();
     var transitBuilder = new TransitDataImportBuilder(SiteRepository.of().build(), issueStore);
     var siteRepository = transitBuilder.siteRepository();
+
     for (var quayId : List.of("quay-1", "quay-2")) {
       siteRepository.withRegularStop(
         siteRepository

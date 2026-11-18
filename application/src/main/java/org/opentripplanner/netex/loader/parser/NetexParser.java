@@ -50,9 +50,11 @@ abstract class NetexParser<T> {
     if (rel == null) {
       return;
     }
+
     if (rel instanceof Collection) {
       throw new IllegalArgumentException("Do not pass in collections to this method.");
     }
+
     log.warn("Netex import - Element mapping is missing for {}.", resolveXmlTypeName(rel));
   }
 
@@ -65,9 +67,11 @@ abstract class NetexParser<T> {
     if (rel == null) {
       return;
     }
+
     if (rel instanceof Collection) {
       throw new IllegalArgumentException("Do not pass in collections to this method.");
     }
+
     log.info("Netex import - Element skipped: {}", resolveXmlTypeName(rel));
   }
 

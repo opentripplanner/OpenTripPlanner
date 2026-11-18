@@ -61,9 +61,11 @@ public abstract class AbstractIntersectionTraversalCalculator
     if (turnAngle >= 180) {
       turnAngle -= 360;
     }
+
     if (turnAngle < -180) {
       turnAngle += 360;
     }
+
     return turnAngle;
   }
 }

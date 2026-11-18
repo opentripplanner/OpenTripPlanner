@@ -40,10 +40,12 @@ class GbfsVehicleTypeMapper {
       logIgnoredVehicleType(vehicleType, "form_factor");
       return null;
     }
+
     if (vehicleType.getPropulsionType() == null) {
       logIgnoredVehicleType(vehicleType, "propulsion_type");
       return null;
     }
+
     return new RentalVehicleType(
       new FeedScopedId(systemId, vehicleType.getVehicleTypeId()),
       optionalLocalizedString(vehicleType.getName(), GBFSName::getLanguage, GBFSName::getText),

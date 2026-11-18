@@ -31,6 +31,7 @@ public class GraphQLUtils {
     if (input == null) {
       return null;
     }
+
     return input.toString(getLocale(environment));
   }
 
@@ -46,6 +47,7 @@ public class GraphQLUtils {
    */
   public static Locale getLocale(DataFetchingEnvironment environment) {
     var localeString = environment.getArgument("language");
+
     if (localeString != null) {
       return Locale.forLanguageTag((String) localeString);
     }
@@ -115,9 +117,11 @@ public class GraphQLUtils {
    */
   private static Optional<Locale> getLocalContextLocale(DataFetchingEnvironment environment) {
     Map<String, ?> localContext = environment.getLocalContext();
+
     if (localContext == null) {
       return Optional.empty();
     }
+
     return Optional.ofNullable((Locale) localContext.get("locale"));
   }
 }

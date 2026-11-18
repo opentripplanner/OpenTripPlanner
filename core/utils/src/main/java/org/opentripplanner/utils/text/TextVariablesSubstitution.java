@@ -44,10 +44,12 @@ public class TextVariablesSubstitution {
     for (String key : result.keySet()) {
       var value = result.get(key);
       var sub = insertVariables(value, result::get, errorHandler);
+
       if (!value.equals(sub)) {
         result.put(key, sub);
       }
     }
+
     return result;
   }
 
@@ -75,6 +77,7 @@ public class TextVariablesSubstitution {
     Consumer<String> errorHandler
   ) {
     boolean matchFound = matcher.find();
+
     if (!matchFound) {
       return text;
     }
@@ -84,19 +87,24 @@ public class TextVariablesSubstitution {
     while (matchFound) {
       String subKey = matcher.group(0);
       String nameOnly = matcher.group(1);
+
       if (!substitutions.containsKey(nameOnly)) {
         String value = variableProvider.apply(nameOnly);
+
         if (value != null) {
           substitutions.put(subKey, value);
         } else {
           errorHandler.accept(nameOnly);
         }
       }
+
       matchFound = matcher.find();
     }
+
     for (Map.Entry<String, String> entry : substitutions.entrySet()) {
       text = text.replace(entry.getKey(), entry.getValue());
     }
+
     return insert(text, PATTERN.matcher(text), variableProvider, errorHandler);
   }
 }

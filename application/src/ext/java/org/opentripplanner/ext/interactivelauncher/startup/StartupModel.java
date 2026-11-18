@@ -37,6 +37,7 @@ public class StartupModel {
     if (rootDirectory != null) {
       this.rootDirectory = rootDirectory;
     }
+
     notifyChangeListener();
   }
 
@@ -59,6 +60,7 @@ public class StartupModel {
 
     for (File dir : dirs) {
       var path = dir.getAbsolutePath();
+
       if (path.length() <= length) {
         LOG.warn(
           "The root directory contains a config file, choose " +
@@ -66,8 +68,10 @@ public class StartupModel {
         );
         continue;
       }
+
       dataSourceOptions.add(path.substring(length));
     }
+
     return dataSourceOptions;
   }
 
@@ -127,6 +131,7 @@ public class StartupModel {
     if (dataSource == null) {
       return "DATA_SOURCE_NOT_SET";
     }
+
     return getRootDirectory() + File.separatorChar + dataSource;
   }
 
@@ -146,9 +151,11 @@ public class StartupModel {
     if (saveGraph && (buildTransit || buildStreet)) {
       args.add("--save");
     }
+
     if (serveGraph && !buildStreetOnly()) {
       args.add("--serve");
     }
+
     args.add(getDataSourceDirectory());
 
     return args.toArray(new String[0]);

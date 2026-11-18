@@ -31,6 +31,7 @@ public class AlertsConnectionFilterMapper {
     if (CollectionUtils.isEmpty(filters)) {
       return TransitAlertRequest.of().build();
     }
+
     return TransitAlertRequest.of()
       .withFilters(filters.stream().map(AlertsConnectionFilterMapper::toFilterRequest).toList())
       .build();
@@ -45,18 +46,21 @@ public class AlertsConnectionFilterMapper {
     CollectionUtils.requireNullOrNonEmpty(excludes, "filters.exclude");
 
     var builder = FilterRequest.<TransitAlertSelectRequest>of();
+
     if (includes != null) {
       includes
         .stream()
         .map(select -> toSelectRequest(select, "filters.include"))
         .forEach(builder::addSelect);
     }
+
     if (excludes != null) {
       excludes
         .stream()
         .map(select -> toSelectRequest(select, "filters.exclude"))
         .forEach(builder::addNot);
     }
+
     return builder.build();
   }
 
@@ -67,6 +71,7 @@ public class AlertsConnectionFilterMapper {
     if (select == null) {
       throw new InvalidInputException("'%s' must not contain null values.".formatted(path));
     }
+
     return TransitAlertSelectRequest.of()
       .withFeeds(requireNullOrNonEmpty(select.getGraphQLFeeds(), path + ".feeds"))
       .withSeverityLevels(severities(select.getGraphQLSeverityLevels(), path + ".severityLevels"))
@@ -134,14 +139,17 @@ public class AlertsConnectionFilterMapper {
     if (values == null) {
       return null;
     }
+
     if (values.isEmpty()) {
       throw new InvalidInputException(
         "'%s' must be either null or have at least one entry.".formatted(path)
       );
     }
+
     if (values.contains(null)) {
       throw new InvalidInputException("'%s' must not contain null values.".formatted(path));
     }
+
     return values;
   }
 }

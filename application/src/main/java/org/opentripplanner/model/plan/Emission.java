@@ -60,6 +60,7 @@ public final class Emission implements Serializable {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     return co2.equals(((Emission) o).co2);
   }
 

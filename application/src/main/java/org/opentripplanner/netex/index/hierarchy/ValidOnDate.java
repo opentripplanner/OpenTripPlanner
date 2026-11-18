@@ -39,9 +39,11 @@ class ValidOnDate<T extends EntityInVersionStructure> {
     if (time.isBefore(other.time)) {
       return true;
     }
+
     if (other.time.isBefore(time)) {
       return false;
     }
+
     return versionOf(entity) > versionOf(other.entity);
   }
 }

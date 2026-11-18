@@ -33,6 +33,7 @@ class TripResponseContextMapper {
       .withStopPointRef(stopPointRefMapper.stopPointRef(stopLocation))
       .withStopPointName(internationalText(stopLocation.getName()))
       .withPlannedQuay(internationalText(stopLocation.getPlatformCode()));
+
     if (stopLocation.isPartOfStation()) {
       stopPointStructure.withParentRef(
         stopPointRefMapper.stopPlaceRef(stopLocation.getParentStation())

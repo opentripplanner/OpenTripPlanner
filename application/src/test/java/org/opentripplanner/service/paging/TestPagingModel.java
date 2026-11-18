@@ -254,6 +254,7 @@ class TestPagingModel {
     } else {
       builder.drive(departureTime, arrivalTime, B);
     }
+
     return builder.build(cost);
   }
 }

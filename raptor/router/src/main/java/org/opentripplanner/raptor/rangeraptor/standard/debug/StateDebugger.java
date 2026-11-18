@@ -97,6 +97,7 @@ class StateDebugger<T extends RaptorTripSchedule> {
       if (cursor.reachedOnBoard(round, stop)) {
         dropExistingArrival(round, stop, onBoard);
       }
+
       // and an existing best-over-all arrival exist
       if (newBestOverall) {
         if (cursor.reachedOnStreet(round, stop)) {

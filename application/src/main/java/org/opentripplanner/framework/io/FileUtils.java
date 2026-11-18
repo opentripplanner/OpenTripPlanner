@@ -53,9 +53,11 @@ public class FileUtils {
       while (expectedLines[i].isBlank()) {
         ++i;
       }
+
       while (resultLines[j].isBlank()) {
         ++j;
       }
+
       var expected = expectedLines[i].stripTrailing();
       var result = resultLines[j].stripTrailing();
 
@@ -68,6 +70,7 @@ public class FileUtils {
           """.formatted(newFile.getAbsolutePath(), i, expected, j, result)
         );
       }
+
       ++i;
       ++j;
     }
@@ -77,6 +80,7 @@ public class FileUtils {
         "Lines missing in new file (" + newFile.getAbsolutePath() + "): " + expectedLines[i]
       );
     }
+
     if (j < resultLines.length) {
       throw new IllegalStateException(
         "Lines not expected in new file (" + newFile.getAbsolutePath() + "): " + resultLines[j]

@@ -60,16 +60,20 @@ public class TestConstrainedBoardingSearch
     int earliestBoardTime
   ) {
     var list = transfersByFromStopPos.get(currentTargetStopPos);
+
     for (TestConstrainedTransfer tx : list) {
       var trip = tx.getSourceTrip();
+
       if (trip == sourceTrip) {
         int stopPos = trip.findDepartureStopPosition(prevTransitArrivalTime, sourceStopIndex);
         boolean boardAlightPossible = timeAfterOrEqual.test(tx.getTime(), prevTransitArrivalTime);
+
         if (tx.getSourceStopPos() == stopPos && boardAlightPossible) {
           return tx.boardingEvent(tx.isFacilitated() ? prevTransitArrivalTime : earliestBoardTime);
         }
       }
     }
+
     return RaptorBoardOrAlightEvent.empty(earliestBoardTime);
   }
 
@@ -105,10 +109,12 @@ public class TestConstrainedBoardingSearch
     TransferConstraint constraint
   ) {
     List<TestConstrainedTransfer> list = transfersByFromStopPos.get(targetStopPos);
+
     if (list == null) {
       list = new ArrayList<>();
       transfersByFromStopPos.put(targetStopPos, list);
     }
+
     list.add(
       new TestConstrainedTransfer(
         constraint,

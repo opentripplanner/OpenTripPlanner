@@ -57,6 +57,7 @@ public enum CacheTask implements DocumentedEnum<CacheTask> {
         return it;
       }
     }
+
     return null;
   }
 }

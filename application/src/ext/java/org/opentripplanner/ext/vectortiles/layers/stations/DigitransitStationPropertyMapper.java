@@ -69,9 +69,11 @@ public class DigitransitStationPropertyMapper extends PropertyMapper<Station> {
                 var obj = OBJECT_MAPPER.createObjectNode();
                 obj.put("mode", route.getMode().name());
                 obj.put("gtfsType", route.getGtfsType());
+
                 if (route.getShortName() != null) {
                   obj.put("shortName", route.getShortName());
                 }
+
                 return obj;
               })
               .toList()

@@ -43,6 +43,7 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
     if (feedId.isBlank() || id.isBlank()) {
       return Optional.empty();
     }
+
     return Optional.of(new FeedScopedId(feedId, id));
   }
 
@@ -60,12 +61,14 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
   /// @return Optional.empty if the value is not a valid FeedScopedId
   public static Optional<FeedScopedId> parseOptional(String value) {
     int index = value.indexOf(ID_SEPARATOR);
+
     if (index == -1) {
       return Optional.empty();
     }
 
     var feedId = value.substring(0, index);
     var id = value.substring(index + 1);
+
     if (feedId.isBlank() || id.isBlank()) {
       return Optional.empty();
     }
@@ -107,6 +110,7 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
         "The input string '%s' contains invisible characters which is not allowed.".formatted(s)
       );
     }
+
     return Arrays.stream(s.split(","))
       .map(String::strip)
       .filter(i -> !i.isBlank())
@@ -144,9 +148,11 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
   @Override
   public int compareTo(FeedScopedId o) {
     int c = this.feedId.compareTo(o.feedId);
+
     if (c == 0) {
       c = this.id.compareTo(o.id);
     }
+
     return c;
   }
 
@@ -160,9 +166,11 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
     if (this == obj) {
       return true;
     }
+
     if (obj == null) {
       return false;
     }
+
     if (!(obj instanceof FeedScopedId other)) {
       return false;
     }

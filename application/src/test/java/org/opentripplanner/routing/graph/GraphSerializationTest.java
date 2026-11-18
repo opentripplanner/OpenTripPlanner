@@ -239,12 +239,14 @@ public class GraphSerializationTest {
     var originalCalendars = original.getTripCalendars();
     var copyCalendars = copy.getTripCalendars();
     assertEquals(originalCalendars.listServiceIds(), copyCalendars.listServiceIds());
+
     for (var serviceId : originalCalendars.listServiceIds()) {
       assertEquals(
         originalCalendars.listServiceDates(serviceId),
         copyCalendars.listServiceDates(serviceId)
       );
     }
+
     assertEquals(original.getServiceCodes(), copy.getServiceCodes());
   }
 

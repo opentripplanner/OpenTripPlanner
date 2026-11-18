@@ -90,9 +90,11 @@ final class TransferProfileState<P, R> {
     if (obj == this) {
       return true;
     }
+
     if (obj == null || obj.getClass() != this.getClass()) {
       return false;
     }
+
     var that = (TransferProfileState<?, ?>) obj;
     return userPreferences.equals(that.userPreferences);
   }

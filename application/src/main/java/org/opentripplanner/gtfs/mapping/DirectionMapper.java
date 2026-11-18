@@ -17,6 +17,7 @@ public class DirectionMapper {
       if (gtfsCode == null || gtfsCode.isBlank()) {
         return Direction.UNKNOWN;
       }
+
       return map(Integer.parseInt(gtfsCode));
     } catch (NumberFormatException e) {
       issueStore.add(
@@ -25,6 +26,7 @@ public class DirectionMapper {
         id
       );
     }
+
     return Direction.UNKNOWN;
   }
 

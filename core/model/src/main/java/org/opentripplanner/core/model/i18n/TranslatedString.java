@@ -49,6 +49,7 @@ public class TranslatedString implements I18NString, Serializable {
     for (int i = 0; i < translations.length - 1; i += 2) {
       map.put(translations[i], translations[i + 1]);
     }
+
     return getI18NString(map, false);
   }
 
@@ -115,7 +116,9 @@ public class TranslatedString implements I18NString, Serializable {
     if (translations.isEmpty()) {
       throw new IllegalArgumentException("At least one translation must be provided");
     }
+
     var t = TRANSLATION_CACHE.get(translations);
+
     if (t != null) {
       return t;
     } else {
@@ -125,6 +128,7 @@ public class TranslatedString implements I18NString, Serializable {
       var firstLanguage = translations.keySet().iterator().next();
       boolean onlySingleUntranslatedLanguage =
         translations.size() == 1 && (firstLanguage == null || firstLanguage.isBlank());
+
       if (forceTranslatedString && !onlySingleUntranslatedLanguage) {
         ret = new TranslatedString(translations);
       } else if (allValuesEqual) {
@@ -132,9 +136,11 @@ public class TranslatedString implements I18NString, Serializable {
       } else {
         ret = new TranslatedString(translations);
       }
+
       if (intern) {
         TRANSLATION_CACHE.put(translations, ret);
       }
+
       return ret;
     }
   }
@@ -183,9 +189,11 @@ public class TranslatedString implements I18NString, Serializable {
   @Override
   public String toString(Locale locale) {
     String language = null;
+
     if (locale != null) {
       language = locale.getLanguage().toLowerCase();
     }
+
     return translations.containsKey(language) ? translations.get(language) : toString();
   }
 }

@@ -46,6 +46,7 @@ class HppcKryoSupportTest {
     while (t.getCause() != null) {
       t = t.getCause();
     }
+
     return t;
   }
 }

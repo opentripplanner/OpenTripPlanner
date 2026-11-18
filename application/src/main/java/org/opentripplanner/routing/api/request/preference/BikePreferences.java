@@ -114,9 +114,11 @@ public final class BikePreferences implements Serializable {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     BikePreferences that = (BikePreferences) o;
     return (
       doubleEquals(that.speed, speed) &&
@@ -242,9 +244,11 @@ public final class BikePreferences implements Serializable {
       var builder = TimeSlopeSafetyTriangle.of();
       body.accept(builder);
       this.optimizeTriangle = builder.buildOrDefault(this.optimizeTriangle);
+
       if (!builder.isEmpty()) {
         this.optimizeType = TRIANGLE;
       }
+
       return this;
     }
 

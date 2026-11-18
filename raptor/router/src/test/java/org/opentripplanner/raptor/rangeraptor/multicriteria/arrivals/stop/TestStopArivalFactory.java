@@ -42,6 +42,7 @@ public class TestStopArivalFactory {
     this.arriveOnBoard = arriveOnBoard;
 
     int nLegs;
+
     if (nRounds == 0) {
       nLegs = 1;
       this.trasitLegCoeficient = -1.0f;
@@ -49,6 +50,7 @@ public class TestStopArivalFactory {
       nLegs = 1 + nRounds + (arriveOnBoard ? 0 : 1);
       this.trasitLegCoeficient = 1.0f / nRounds;
     }
+
     this.stops = new ArrayDeque<>(
       IntStream.range(1, nLegs + 1)
         .boxed()
@@ -78,14 +80,17 @@ public class TestStopArivalFactory {
 
   private McStopArrival<TestTripSchedule> arrivalPath(int nRounds) {
     var previous = accessArrival();
+
     if (nRounds > 0) {
       for (int r = 1; r <= nRounds; ++r) {
         previous = transitArrival(previous, r == nRounds, arriveOnBoard);
       }
+
       if (!arriveOnBoard) {
         previous = transferArrival(previous);
       }
     }
+
     return previous;
   }
 

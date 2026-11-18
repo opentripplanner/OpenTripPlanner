@@ -63,21 +63,26 @@ class RaptorValueFormatterTest {
     int numThreads = 8;
     var startBarrier = new CyclicBarrier(numThreads);
     ExecutorService executor = Executors.newFixedThreadPool(numThreads);
+
     try {
       List<Future<Void>> futures = new ArrayList<>();
+
       for (int t = 0; t < numThreads; ++t) {
         Callable<Void> task = () -> {
           startBarrier.await();
+
           for (int i = 0; i < 10_000; ++i) {
             assertEquals("C₁0.01", C1.format(1));
             assertEquals("C₁12.34", C1.format(1234));
             assertEquals("C₁1_000", C1.format(100_000));
             assertEquals("Tₙ1_234", TRANSFERS.format(1234));
           }
+
           return null;
         };
         futures.add(executor.submit(task));
       }
+
       for (Future<Void> f : futures) {
         f.get();
       }

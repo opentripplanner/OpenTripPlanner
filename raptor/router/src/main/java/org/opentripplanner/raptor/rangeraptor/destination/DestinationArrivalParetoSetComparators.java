@@ -75,6 +75,7 @@ public final class DestinationArrivalParetoSetComparators {
     Objects.requireNonNull(timeConfig);
     Objects.requireNonNull(direction);
     Objects.requireNonNull(costConfig);
+
     if (costConfig == ParetoSetCost.USE_C1_RELAXED_IF_C2_IS_OPTIMAL) {
       Objects.requireNonNull(relaxC1);
       Objects.requireNonNull(c2Comp);

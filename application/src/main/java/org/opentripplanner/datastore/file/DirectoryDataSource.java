@@ -25,18 +25,21 @@ public class DirectoryDataSource extends AbstractFileDataSource implements Compo
   @SuppressWarnings("ConstantConditions")
   public Collection<DataSource> content() {
     Collection<DataSource> content = new ArrayList<>();
+
     if (file.exists()) {
       for (File file : file.listFiles()) {
         // Skip any nested directories
         if (file.isDirectory()) {
           continue;
         }
+
         // In general the file type at a child level is not used, but we tag
         // each file with the same type as the parent directory.
         // Examples: GTFS or NETEX.
         content.add(new FileDataSource(file, type));
       }
     }
+
     return content;
   }
 
@@ -46,6 +49,7 @@ public class DirectoryDataSource extends AbstractFileDataSource implements Compo
     if (!file.exists()) {
       file.mkdirs();
     }
+
     return new FileDataSource(new File(file, filename), type);
   }
 

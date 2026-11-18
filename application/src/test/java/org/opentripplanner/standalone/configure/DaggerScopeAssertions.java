@@ -152,12 +152,15 @@ final class DaggerScopeAssertions {
       );
 
       var failures = new ArrayList<String>();
+
       for (var method : accessors) {
         var key = DaggerBindingKey.ofAccessor(method);
         var first = method.invoke(instance);
+
         if (nullIsHandled(method, first, failures)) {
           continue;
         }
+
         var second = method.invoke(instance);
 
         if (singletons.contains(key) && first != second) {
@@ -172,6 +175,7 @@ final class DaggerScopeAssertions {
           failures.add(method.getName() + "() should build a fresh instance every call");
         }
       }
+
       assertThat(failures).isEmpty();
     } catch (ReflectiveOperationException e) {
       throw new RuntimeException(e);
@@ -205,12 +209,15 @@ final class DaggerScopeAssertions {
       );
 
       var failures = new ArrayList<String>();
+
       for (var method : accessors) {
         var key = DaggerBindingKey.ofAccessor(method);
         var withinRequestFirst = method.invoke(requestOne);
+
         if (nullIsHandled(method, withinRequestFirst, failures)) {
           continue;
         }
+
         var withinRequestSecond = method.invoke(requestOne);
         var acrossRequests = method.invoke(requestTwo);
 
@@ -222,6 +229,7 @@ final class DaggerScopeAssertions {
                 key
             );
           }
+
           continue;
         }
 
@@ -244,6 +252,7 @@ final class DaggerScopeAssertions {
           );
         }
       }
+
       assertThat(failures).isEmpty();
     } catch (ReflectiveOperationException e) {
       throw new RuntimeException(e);
@@ -262,9 +271,11 @@ final class DaggerScopeAssertions {
     if (value != null) {
       return false;
     }
+
     if (!isMarkedNullable(accessor)) {
       failures.add(accessor.getName() + "() returned null but is not annotated @Nullable");
     }
+
     return true;
   }
 

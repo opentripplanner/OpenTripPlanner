@@ -25,6 +25,7 @@ public class VerticalTransportationUseFactory {
 
   public ElevatorUse createElevatorUse(State backState, ElevatorAlightEdge elevatorAlightEdge) {
     ElevatorBoardEdge elevatorBoardEdge = findElevatorBoardEdge(backState);
+
     if (elevatorBoardEdge == null) {
       throw new IllegalStateException(
         "An ElevatorAlightEdge was reached without first traversing an ElevatorBoardEdge"
@@ -37,36 +38,43 @@ public class VerticalTransportationUseFactory {
     Optional<Level> alightEdgeLevelOptional = streetDetailsService.findHorizontalEdgeLevelInfo(
       elevatorAlightEdge
     );
+
     if (boardEdgeLevelOptional.isPresent() && alightEdgeLevelOptional.isPresent()) {
       Level boardEdgeLevel = boardEdgeLevelOptional.get();
       Level alightEdgeLevel = alightEdgeLevelOptional.get();
       VerticalDirection verticalDirection = VerticalDirection.UNKNOWN;
+
       if (boardEdgeLevel.level() > alightEdgeLevel.level()) {
         verticalDirection = VerticalDirection.DOWN;
       } else if (boardEdgeLevel.level() < alightEdgeLevel.level()) {
         verticalDirection = VerticalDirection.UP;
       }
+
       return new ElevatorUse(boardEdgeLevel, alightEdgeLevel, verticalDirection);
     } else if (boardEdgeLevelOptional.isPresent()) {
       return new ElevatorUse(boardEdgeLevelOptional.get(), null, VerticalDirection.UNKNOWN);
     } else if (alightEdgeLevelOptional.isPresent()) {
       return new ElevatorUse(null, alightEdgeLevelOptional.get(), VerticalDirection.UNKNOWN);
     }
+
     return new ElevatorUse(null, null, VerticalDirection.UNKNOWN);
   }
 
   public EscalatorUse createEscalatorUse(Edge edge) {
     Optional<InclinedEdgeLevelInfo> inclinedEdgeLevelInfoOptional =
       streetDetailsService.findInclinedEdgeLevelInfo(edge);
+
     if (inclinedEdgeLevelInfoOptional.isEmpty()) {
       return new EscalatorUse(null, null, VerticalDirection.UNKNOWN);
     }
+
     InclinedEdgeLevelInfo inclinedEdgeLevelInfo = inclinedEdgeLevelInfoOptional.get();
 
     VerticalDirection verticalDirection = getInclinedEdgeVerticalDirection(
       edge,
       inclinedEdgeLevelInfo
     );
+
     if (verticalDirection == VerticalDirection.UP) {
       return new EscalatorUse(
         inclinedEdgeLevelInfo.lowerVertexInfo().level(),
@@ -85,15 +93,18 @@ public class VerticalTransportationUseFactory {
   public StairsUse createStairsUse(Edge edge) {
     Optional<InclinedEdgeLevelInfo> inclinedEdgeLevelInfoOptional =
       streetDetailsService.findInclinedEdgeLevelInfo(edge);
+
     if (inclinedEdgeLevelInfoOptional.isEmpty()) {
       return new StairsUse(null, null, VerticalDirection.UNKNOWN);
     }
+
     InclinedEdgeLevelInfo inclinedEdgeLevelInfo = inclinedEdgeLevelInfoOptional.get();
 
     VerticalDirection verticalDirection = getInclinedEdgeVerticalDirection(
       edge,
       inclinedEdgeLevelInfo
     );
+
     if (verticalDirection == VerticalDirection.UP) {
       return new StairsUse(
         inclinedEdgeLevelInfo.lowerVertexInfo().level(),
@@ -127,12 +138,15 @@ public class VerticalTransportationUseFactory {
   private ElevatorBoardEdge findElevatorBoardEdge(State backState) {
     // The initial value is the first possible state that can be the ElevatorBoardEdge.
     State currentState = backState.getBackState();
+
     while (currentState != null) {
       if (currentState.getBackEdge() instanceof ElevatorBoardEdge elevatorBoardEdge) {
         return elevatorBoardEdge;
       }
+
       currentState = currentState.getBackState();
     }
+
     return null;
   }
 }

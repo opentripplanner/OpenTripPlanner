@@ -25,13 +25,17 @@ public class CarPreferencesMapper {
     }
 
     var reluctance = args.getGraphQLReluctance();
+
     if (reluctance != null) {
       preferences.withReluctance(reluctance);
     }
+
     var boardCost = args.getGraphQLBoardCost();
+
     if (boardCost != null) {
       preferences.withBoardCost(boardCost.toSeconds());
     }
+
     preferences.withParking(parking ->
       setCarParkingPreferences(parking, args.getGraphQLParking(), environment)
     );
@@ -48,9 +52,11 @@ public class CarPreferencesMapper {
     }
 
     var unpreferredCost = args.getGraphQLUnpreferredCost();
+
     if (unpreferredCost != null) {
       preferences.withUnpreferredVehicleParkingTagCost(unpreferredCost.toSeconds());
     }
+
     var filters = getParkingFilters(environment, "car");
     preferences.withRequiredVehicleParkingTags(parseSelectFilters(filters));
     preferences.withBannedVehicleParkingTags(parseNotFilters(filters));
@@ -68,13 +74,17 @@ public class CarPreferencesMapper {
     }
 
     var allowedNetworks = args.getGraphQLAllowedNetworks();
+
     if (allowedNetworks != null) {
       if (allowedNetworks.isEmpty()) {
         throw new InvalidInputException("Allowed car rental networks must not be empty.");
       }
+
       preferences.withAllowedNetworks(Set.copyOf(allowedNetworks));
     }
+
     var bannedNetworks = args.getGraphQLBannedNetworks();
+
     if (bannedNetworks != null) {
       preferences.withBannedNetworks(Set.copyOf(bannedNetworks));
     }

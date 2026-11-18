@@ -66,6 +66,7 @@ public class MavenProjectVersion implements Serializable {
       if (pos < version.length()) {
         qualifier = version.substring(pos + 1);
       }
+
       numFields = splitInotNumFields(version.substring(0, pos));
     } else {
       numFields = splitInotNumFields(version);
@@ -74,9 +75,11 @@ public class MavenProjectVersion implements Serializable {
     if (numFields.length > 0) {
       major = parseNumField(numFields[0]);
     }
+
     if (numFields.length > 1) {
       minor = parseNumField(numFields[1]);
     }
+
     if (numFields.length > 2) {
       patch = parseNumField(numFields[2]);
     }

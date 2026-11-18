@@ -58,6 +58,7 @@ class Subgraph {
     } else {
       streetIds.add(vertexId);
     }
+
     allVertices = null;
   }
 
@@ -103,6 +104,7 @@ class Subgraph {
   ) {
     double distance = Double.MAX_VALUE;
     Vertex clostestVertex = null;
+
     for (Vertex vertex : vertices) {
       var d = SphericalDistanceLibrary.fastDistance(
         v.getLat(),
@@ -110,11 +112,13 @@ class Subgraph {
         vertex.getLat(),
         vertex.getLon()
       );
+
       if (d < distance) {
         clostestVertex = vertex;
         distance = d;
       }
     }
+
     if (clostestVertex == null) {
       return searchRadius;
     } else {
@@ -141,20 +145,24 @@ class Subgraph {
     for (var i : streetVertices) {
       envelope.expandToInclude(i.getX(), i.getY());
     }
+
     for (var i : stopVertices) {
       envelope.expandToInclude(i.getX(), i.getY());
     }
+
     envelope.expandBy(searchRadiusDegrees / xscale, searchRadiusDegrees);
 
     Set<Vertex> members = materializeVertices();
     double minDistance = Double.MAX_VALUE;
     boolean found = false;
+
     for (Vertex vx : graph.findVertices(envelope)) {
       if (!members.contains(vx)) {
         minDistance = Math.min(minDistance, vertexDistanceFromSubgraph(vx, searchRadius));
         found = true;
       }
     }
+
     return found ? minDistance : searchRadius;
   }
 
@@ -185,6 +193,7 @@ class Subgraph {
         return false;
       }
     }
+
     return true;
   }
 
@@ -193,6 +202,7 @@ class Subgraph {
       allVertices = new HashSet<>(streetVertices);
       allVertices.addAll(stopVertices);
     }
+
     return allVertices;
   }
 

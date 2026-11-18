@@ -403,6 +403,7 @@ class InsertionEvaluatorTest {
       if (getCoordinate(from).equals(OSLO_EAST) && getCoordinate(to).equals(OSLO_WEST)) {
         rides[0]++;
       }
+
       return RoutedSegment.of(createStreetPath());
     };
     var evaluator = new InsertionEvaluator(router, Duration.ZERO);

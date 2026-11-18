@@ -239,6 +239,7 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
     for (McStopArrival<T> arrival : transitArrivalsCache) {
       addStopArrival(arrival);
     }
+
     transitArrivalsCache.clear();
   }
 
@@ -246,6 +247,7 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
     for (McStopArrival<T> arrival : transferArrivalsCache) {
       addStopArrival(arrival);
     }
+
     transferArrivalsCache.clear();
   }
 
@@ -301,6 +303,7 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
     if (heuristics.rejectDestinationArrivalBasedOnHeuristic(arrival)) {
       return;
     }
+
     arrivals.addStopArrival(arrival);
   }
 

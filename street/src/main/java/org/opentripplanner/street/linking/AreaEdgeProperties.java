@@ -30,9 +30,11 @@ record AreaEdgeProperties(
    */
   static AreaEdgeProperties merge(List<Area> crossed) {
     var merged = of(crossed.getFirst());
+
     for (int i = 1; i < crossed.size(); i++) {
       merged = merged.mergeWith(crossed.get(i));
     }
+
     return merged;
   }
 

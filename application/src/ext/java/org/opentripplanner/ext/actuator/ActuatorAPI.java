@@ -67,6 +67,7 @@ public class ActuatorAPI {
   @Produces(MediaType.APPLICATION_JSON)
   public Response health(@Context TransitService transitService) {
     GraphUpdaterStatus updaterStatus = transitService.getUpdaterStatus();
+
     if (updaterStatus != null) {
       var listUnprimedUpdaters = updaterStatus.listUnprimedUpdaters();
 

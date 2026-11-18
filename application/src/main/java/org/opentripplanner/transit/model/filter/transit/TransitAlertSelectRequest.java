@@ -58,21 +58,27 @@ public class TransitAlertSelectRequest {
   @Override
   public String toString() {
     var builder = ToStringBuilder.ofEmbeddedType();
+
     if (!feeds.includeEverything()) {
       builder.addCol("feeds", feeds.get());
     }
+
     if (!severityLevels.includeEverything()) {
       builder.addCol("severityLevels", severityLevels.get());
     }
+
     if (!causes.includeEverything()) {
       builder.addCol("causes", causes.get());
     }
+
     if (!effects.includeEverything()) {
       builder.addCol("effects", effects.get());
     }
+
     if (!timePeriods.includeEverything()) {
       builder.addCol("timePeriods", timePeriods.get());
     }
+
     return builder.toString();
   }
 

@@ -47,6 +47,7 @@ public class LiipiHubsDownloader {
       LOG.warn("Cannot download updates, because url is null!");
       return null;
     }
+
     try {
       return otpHttpClient.getAndMap(URI.create(url), HttpHeaders.empty(), response -> {
         try {
@@ -58,6 +59,7 @@ public class LiipiHubsDownloader {
         } catch (IOException e) {
           LOG.warn("Error reading hubs from {}", url, e);
         }
+
         return null;
       });
     } catch (OtpHttpClientException e) {
@@ -83,6 +85,7 @@ public class LiipiHubsDownloader {
     if (!jsonParsePath.isEmpty()) {
       String delimiter = "/";
       String[] parseElement = jsonParsePath.split(delimiter);
+
       for (String s : parseElement) {
         rootNode = rootNode.path(s);
       }
@@ -96,11 +99,14 @@ public class LiipiHubsDownloader {
       if (node == null) {
         continue;
       }
+
       Map<FeedScopedId, VehicleParkingGroup> parsedElement = hubsParser.apply(node);
+
       if (parsedElement != null) {
         out.putAll(parsedElement);
       }
     }
+
     return out;
   }
 }

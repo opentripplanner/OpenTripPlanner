@@ -41,6 +41,7 @@ public class LogicalOrSpecifier implements OsmSpecifier {
           case BACKWARD -> subspec.allBackwardTagsMatch(way);
         }
     );
+
     if (oneMatchesExactly) {
       return 1;
     } else {

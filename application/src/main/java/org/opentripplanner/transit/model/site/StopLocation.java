@@ -109,6 +109,7 @@ public interface StopLocation extends LogInfo, TransitEntity {
     for (FareZone t : getFareZones()) {
       return t.getId().getId();
     }
+
     return null;
   }
 
@@ -169,6 +170,7 @@ public interface StopLocation extends LogInfo, TransitEntity {
     if (this instanceof StationElement<?, ?> stationElement && stationElement.isPartOfStation()) {
       return stationElement.getParentStation().getId();
     }
+
     return getId();
   }
 

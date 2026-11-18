@@ -152,6 +152,7 @@ public final class TestCostCalculator implements RaptorCostCalculator<TestTripSc
     if (stopBoardAlightTransferCosts != null && !firstBoarding) {
       cost += stopBoardAlightTransferCosts[boardStop];
     }
+
     return cost;
   }
 

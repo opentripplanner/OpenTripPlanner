@@ -81,6 +81,7 @@ class WarmupWorker implements Runnable {
 
         queryCount++;
         boolean arriveBy = queryCount % 2 == 0;
+
         if (!executeQuery(queryCount, arriveBy)) {
           failureCount++;
         }
@@ -101,6 +102,7 @@ class WarmupWorker implements Runnable {
   /** @return true if the query succeeded without errors, false otherwise. */
   private boolean executeQuery(int queryCount, boolean arriveBy) {
     var queryStart = Instant.now();
+
     try {
       boolean success = queryStrategy.execute(
         parameters.from(),

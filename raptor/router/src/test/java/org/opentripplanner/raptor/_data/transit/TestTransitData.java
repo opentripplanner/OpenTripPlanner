@@ -115,12 +115,15 @@ public class TestTransitData
   @Override
   public IntIterator routeIndexIterator(IntIterator stops) {
     BitSet routes = new BitSet();
+
     while (stops.hasNext()) {
       int stop = stops.next();
+
       for (int i : routeIndexesByStopIndex.get(stop)) {
         routes.set(i);
       }
     }
+
     return IntIterators.of(routes);
   }
 
@@ -171,9 +174,11 @@ public class TestTransitData
       if (list.isEmpty()) {
         return null;
       }
+
       if (list.size() == 1) {
         return list.getFirst();
       }
+
       throw new IllegalStateException("More than on transfers found: " + list);
     };
   }
@@ -226,12 +231,14 @@ public class TestTransitData
   public RaptorTripScheduleReference tripScheduleReference(TestTripSchedule trip) {
     for (int routeIndex = 0; routeIndex < routes.size(); ++routeIndex) {
       var route = routes.get(routeIndex);
+
       for (int tripIndex = 0; tripIndex < route.numberOfTripSchedules(); ++tripIndex) {
         if (trip == route.getTripSchedule(tripIndex)) {
           return new RaptorTripScheduleReference(routeIndex, tripIndex);
         }
       }
     }
+
     throw new IllegalArgumentException("Trip not found: " + trip);
   }
 
@@ -259,9 +266,11 @@ public class TestTransitData
   ///
   public TestTransitData withTimetables(String routeTimetables) {
     int routeIndex = 0;
+
     for (String timetable : routeTimetables.split("\s*--.*\n")) {
       if (!timetable.isBlank()) {
         var firstLine = timetable.lines().findFirst().orElseThrow();
+
         if (ROUTE_NAME_PATTERN.matcher(firstLine.trim()).matches()) {
           withTimetable(firstLine, timetable.substring(firstLine.length() + 1).trim());
         } else {
@@ -269,6 +278,7 @@ public class TestTransitData
         }
       }
     }
+
     return this;
   }
 
@@ -276,6 +286,7 @@ public class TestTransitData
     if (!timetable.isBlank()) {
       withRoute(TestRoute.route(routeName).timetable(timetable.trim()));
     }
+
     return this;
   }
 
@@ -284,12 +295,14 @@ public class TestTransitData
     route.initTripPatternIndex(tripPatternIndex);
     this.routes.add(route);
     var pattern = route.pattern();
+
     for (int i = 0; i < pattern.numberOfStopsInPattern(); ++i) {
       int stopIndex = pattern.stopIndex(i);
       requestBuilder.debug().withStops(stopIndex);
       expandNumOfStops(stopIndex);
       routeIndexesByStopIndex.get(stopIndex).add(tripPatternIndex);
     }
+
     return this;
   }
 
@@ -297,6 +310,7 @@ public class TestTransitData
     for (TestRoute route : routes) {
       withRoute(route);
     }
+
     return this;
   }
 
@@ -338,6 +352,7 @@ public class TestTransitData
     for (TestRoute route : routes) {
       route.addTransferConstraint(fromTrip, fromStopPos, toTrip, toStopPos, constraint);
     }
+
     constrainedTransfers.add(
       new TestConstrainedTransfer(
         constraint,

@@ -30,6 +30,7 @@ public class OsmWayBuilder {
     if (key != null && value != null) {
       this.tags.put(key.toLowerCase(), value);
     }
+
     return this;
   }
 
@@ -42,6 +43,7 @@ public class OsmWayBuilder {
     for (long nodeRef : nodeRefs) {
       nodes.add(nodeRef);
     }
+
     return this;
   }
 

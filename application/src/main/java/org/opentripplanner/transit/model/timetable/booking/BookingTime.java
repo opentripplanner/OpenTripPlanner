@@ -41,9 +41,11 @@ public class BookingTime implements Serializable {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     BookingTime that = (BookingTime) o;
     return daysPrior == that.daysPrior && Objects.equals(time, that.time);
   }

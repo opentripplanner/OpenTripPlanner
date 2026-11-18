@@ -83,9 +83,11 @@ public final class TimeSlopeSafetyTriangle {
     if (obj == this) {
       return true;
     }
+
     if (obj == null || obj.getClass() != this.getClass()) {
       return false;
     }
+
     var that = (TimeSlopeSafetyTriangle) obj;
     return (
       Double.doubleToLongBits(this.time) == Double.doubleToLongBits(that.time) &&
@@ -173,6 +175,7 @@ public final class TimeSlopeSafetyTriangle {
       if (zeroVector(time, slope, safety)) {
         return original;
       }
+
       return new TimeSlopeSafetyTriangle(time, slope, safety);
     }
   }

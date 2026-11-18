@@ -17,6 +17,7 @@ public final class ArrivalDepartureMapper {
     if (arrivalDeparture == null) {
       return ArrivalDeparture.BOTH;
     }
+
     return switch (arrivalDeparture) {
       case ARRIVALS -> ArrivalDeparture.ARRIVALS;
       case EITHER -> ArrivalDeparture.BOTH;

@@ -33,10 +33,13 @@ public record TransferProfile<R>(
   public TransferProfile {
     Objects.requireNonNull(id);
     Objects.requireNonNull(type);
+
     if (id.isBlank()) {
       throw new IllegalArgumentException("A transfer profile needs an id.");
     }
+
     Objects.requireNonNull(routingRequest);
+
     if (userPreferences != null && userPreferences.type() != type) {
       throw new IllegalArgumentException(
         "The user preferences of the profile '" +

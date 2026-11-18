@@ -59,6 +59,7 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
 
     if (target.getDegreeIn() == 1) {
       Edge edge = target.getIncoming().iterator().next();
+
       if (edge instanceof FreeEdge) {
         target = edge.getFromVertex();
       }
@@ -83,6 +84,7 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
 
     // After parking or finishing the rental of a vehicle, you can't ever move faster than walking speed.
     boolean useWalkSpeed;
+
     if (arriveBy) {
       useWalkSpeed = s.getVehicleRentalState() == VehicleRentalState.BEFORE_RENTING;
     } else {

@@ -75,9 +75,11 @@ public class PassThroughPathTailFilter<T extends RaptorTripSchedule> implements 
         )
       );
     var result = new HashSet<OptimizedPathTail<T>>();
+
     for (var set : elementsByC2Value.values()) {
       result.addAll(filterChain.filterIntermediateResult(set, boardStopPosition));
     }
+
     return result;
   }
 

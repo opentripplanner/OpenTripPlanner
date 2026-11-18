@@ -156,9 +156,11 @@ public final class StreetTransferFactory {
     if (!transfersAllowed(siteRepository, stopId)) {
       return false;
     }
+
     if (!OTPFeature.ConsiderPatternsForDirectTransfers.isOn()) {
       return true;
     }
+
     return stopPatterns.contains(stopId) || isUsedRealtime(siteRepository, stopId);
   }
 

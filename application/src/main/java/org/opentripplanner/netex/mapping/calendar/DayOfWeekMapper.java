@@ -24,9 +24,11 @@ class DayOfWeekMapper {
    */
   static Set<DayOfWeek> mapDayOfWeeks(Collection<DayOfWeekEnumeration> values) {
     EnumSet<DayOfWeek> result = EnumSet.noneOf(DayOfWeek.class);
+
     for (DayOfWeekEnumeration it : values) {
       result.addAll(mapDayOfWeek(it));
     }
+
     return result;
   }
 
@@ -65,6 +67,7 @@ class DayOfWeekMapper {
       case NONE:
         return EnumSet.noneOf(DayOfWeek.class);
     }
+
     throw new IllegalArgumentException("Day of week enum mapping missing: " + value);
   }
 }

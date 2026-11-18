@@ -148,6 +148,7 @@ public class FlexRouter {
       var itinerary = LegsToItineraryMapper.map(legs, false, path.calculateElevations());
       itinerary.ifPresent(itineraries::add);
     }
+
     return itineraries;
   }
 

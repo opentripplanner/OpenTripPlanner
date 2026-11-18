@@ -94,6 +94,7 @@ public class DestinationArrival<T extends RaptorTripSchedule> implements Arrival
     if (previous != null || egress != null) {
       throw new IllegalStateException("Only a probe may be modified.");
     }
+
     this.iterationDepartureTime = iterationDepartureTime;
     this.departureTime = iterationDepartureTime;
     this.arrivalTime = arrivalTime;

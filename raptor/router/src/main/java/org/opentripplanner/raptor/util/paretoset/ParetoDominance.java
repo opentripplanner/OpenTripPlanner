@@ -43,12 +43,14 @@ public enum ParetoDominance {
   public static ParetoDominance of(String value) {
     if (value.length() == 1) {
       char ch = value.charAt(0);
+
       for (var it : values()) {
         if (it.symbol == ch) {
           return it;
         }
       }
     }
+
     return valueOf(value.toUpperCase());
   }
 

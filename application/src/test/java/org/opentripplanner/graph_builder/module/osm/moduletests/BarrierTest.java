@@ -134,6 +134,7 @@ public class BarrierTest {
       .orElseThrow();
     assertEquals(PEDESTRIAN, barrierCrossing.getPermission());
     var v1OnArea = barrierCrossing.getToVertex();
+
     for (var edge : v1OnArea.getOutgoingStreetEdges()) {
       // we check that we can cycle freely within the area, not encumbered by the chain
       if (edge instanceof AreaEdge) {

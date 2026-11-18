@@ -59,6 +59,7 @@ class TripMapper {
     lhs.withServiceId(idFactory.createId(rhs.getServiceId(), "trip's service"));
     lhs.withShortName(rhs.getTripShortName());
     I18NString tripHeadsign = null;
+
     if (rhs.getTripHeadsign() != null) {
       tripHeadsign = translationHelper.getTranslation(
         org.onebusaway.gtfs.model.Trip.class,
@@ -67,6 +68,7 @@ class TripMapper {
         rhs.getTripHeadsign()
       );
     }
+
     lhs.withHeadsign(tripHeadsign);
     lhs.withDirection(directionMapper.map(rhs.getDirectionId(), lhs.getId()));
     lhs.withGtfsBlockId(rhs.getBlockId());

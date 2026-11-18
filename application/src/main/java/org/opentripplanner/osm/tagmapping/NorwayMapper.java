@@ -155,6 +155,7 @@ class NorwayMapper extends OsmTagMapper {
           return speedLimit >= 13.8f ? cycleSafetyMediumLowTraffic : cycleSafetyLowTraffic;
         }
       }
+
       // 30 km/h or lower, or lower road class than unclassified
       if (this.isMotorVehicleThroughTrafficExplicitlyDisallowed(way)) {
         return cycleSafetyVeryLowTraffic;

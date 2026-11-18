@@ -120,9 +120,11 @@ public final class WalkPreferences implements Serializable {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     WalkPreferences that = (WalkPreferences) o;
     return (
       doubleEquals(that.speed, speed) &&
@@ -245,6 +247,7 @@ public final class WalkPreferences implements Serializable {
       } else {
         this.safetyFactor = safetyFactor;
       }
+
       return this;
     }
 

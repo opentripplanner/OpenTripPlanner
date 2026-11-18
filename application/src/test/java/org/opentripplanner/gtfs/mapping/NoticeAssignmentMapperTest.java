@@ -130,12 +130,14 @@ class NoticeAssignmentMapperTest {
     segment.setToStopSequence(toStopSequence);
 
     var stopTimes = new ArrayList<StopTime>();
+
     for (int stopSequence : new int[] { 10, 20, 30, 40, 50 }) {
       var stopTime = new StopTime();
       stopTime.setTrip(trip);
       stopTime.setStopSequence(stopSequence);
       stopTimes.add(stopTime);
     }
+
     var stopTimesByTrip = new TripStopTimes();
     stopTimesByTrip.addAll(stopTimes);
 

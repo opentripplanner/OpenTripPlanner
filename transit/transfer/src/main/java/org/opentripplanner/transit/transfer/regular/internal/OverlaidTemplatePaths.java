@@ -70,13 +70,17 @@ final class OverlaidTemplatePaths<P> {
   boolean reset(AbstractUserPreferences<?> profile, int fromStop) {
     assertProfileExists(profile);
     var byFromStop = overlay.get(profile);
+
     if (byFromStop == null || !byFromStop.containsKey(fromStop)) {
       return false;
     }
+
     byFromStop.remove(fromStop);
+
     if (byFromStop.isEmpty()) {
       overlay.remove(profile);
     }
+
     return true;
   }
 
@@ -96,9 +100,11 @@ final class OverlaidTemplatePaths<P> {
    */
   Map<Integer, P> pathsFrom(AbstractUserPreferences<?> profile, int fromStop) {
     var replaced = overlay.getOrDefault(profile, Map.of()).get(fromStop);
+
     if (replaced != null) {
       return replaced;
     }
+
     return base.pathsFrom(profile, fromStop);
   }
 

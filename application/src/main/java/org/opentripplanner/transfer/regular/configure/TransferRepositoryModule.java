@@ -16,11 +16,13 @@ public class TransferRepositoryModule {
   @Singleton
   public TransferRepository provideTransferRepository() {
     TransferIndex index;
+
     if (OTPFeature.FlexRouting.isOn()) {
       index = new FlexTransferIndex();
     } else {
       index = new TransferIndex();
     }
+
     return new DefaultTransferRepository(index);
   }
 }

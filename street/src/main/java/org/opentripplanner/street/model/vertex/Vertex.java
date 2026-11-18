@@ -54,10 +54,12 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
   public String toString() {
     var sb = new StringBuilder();
     sb.append("{").append(this.getLabel());
+
     if (this.getCoordinate() != null) {
       sb.append(" lat,lng=").append(this.getCoordinate().y);
       sb.append(",").append(this.getCoordinate().x);
     }
+
     sb.append("}");
     return sb.toString();
   }
@@ -213,23 +215,29 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
 
   public List<StreetEdge> getIncomingStreetEdges() {
     List<StreetEdge> result = new ArrayList<>();
+
     for (Edge out : this.getIncoming()) {
       if (!(out instanceof StreetEdge)) {
         continue;
       }
+
       result.add((StreetEdge) out);
     }
+
     return result;
   }
 
   public List<StreetEdge> getOutgoingStreetEdges() {
     List<StreetEdge> result = new ArrayList<>();
+
     for (Edge out : this.getOutgoing()) {
       if (!(out instanceof StreetEdge)) {
         continue;
       }
+
       result.add((StreetEdge) out);
     }
+
     return result;
   }
 
@@ -242,11 +250,13 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
         return true;
       }
     }
+
     for (Edge e : incoming) {
       if (e.getFromVertex() == v) {
         return true;
       }
     }
+
     return false;
   }
 
@@ -266,6 +276,7 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
     if (geofencingBoundaries.contains(ext)) {
       return;
     }
+
     var newList = new ArrayList<>(geofencingBoundaries);
     newList.add(ext);
     geofencingBoundaries = List.copyOf(newList);
@@ -294,6 +305,7 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
         return true;
       }
     }
+
     return false;
   }
 
@@ -304,13 +316,16 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
   private static Edge[] addEdge(Edge[] existing, Edge e) {
     Edge[] copy = new Edge[existing.length + 1];
     int i;
+
     for (i = 0; i < existing.length; i++) {
       if (existing[i] == e) {
         LOG.error("repeatedly added edge {}", e);
         return existing;
       }
+
       copy[i] = existing[i];
     }
+
     // append the new edge to the copy of the existing array
     copy[i] = e;
     return copy;
@@ -322,11 +337,13 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
    */
   private Edge[] removeEdge(Edge[] existing, Edge e) {
     int nfound = 0;
+
     for (Edge edge : existing) {
       if (edge == e) {
         nfound++;
       }
     }
+
     if (nfound == 0) {
       LOG.debug(
         "The edge {} has already been removed from this vertex {}, skipping removal",
@@ -335,6 +352,7 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
       );
       return existing;
     }
+
     if (nfound > 1) {
       LOG.warn(
         "There are multiple copies of the edge {} to be removed from this vertex {}",
@@ -342,12 +360,15 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
         this
       );
     }
+
     Edge[] copy = new Edge[existing.length - nfound];
+
     for (int i = 0, j = 0; i < existing.length; i++) {
       if (existing[i] != e) {
         copy[j++] = existing[i];
       }
     }
+
     return copy;
   }
 

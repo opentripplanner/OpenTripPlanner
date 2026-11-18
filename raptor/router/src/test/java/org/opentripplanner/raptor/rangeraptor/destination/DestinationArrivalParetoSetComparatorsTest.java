@@ -243,6 +243,7 @@ class DestinationArrivalParetoSetComparatorsTest {
    */
   private static List<DestinationArrival<RaptorTripSchedule>> grid(boolean reverse) {
     var list = new ArrayList<DestinationArrival<RaptorTripSchedule>>();
+
     for (int iteration : new int[] { 100, 101 }) {
       for (int departure : new int[] { 110, 112 }) {
         for (int arrivalTime : new int[] { 120, 123 }) {
@@ -260,6 +261,7 @@ class DestinationArrivalParetoSetComparatorsTest {
         }
       }
     }
+
     return list;
   }
 

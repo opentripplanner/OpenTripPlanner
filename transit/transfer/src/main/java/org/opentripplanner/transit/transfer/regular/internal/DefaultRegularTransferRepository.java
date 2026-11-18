@@ -68,6 +68,7 @@ class DefaultRegularTransferRepository<P> implements RegularTransferRepository<P
   @Override
   public void resetTransfersFrom(AbstractUserPreferences<?> profile, int fromStop) {
     assertNotFrozen();
+
     if (paths.reset(profile, fromStop)) {
       markChanged(profile, fromStop);
     }

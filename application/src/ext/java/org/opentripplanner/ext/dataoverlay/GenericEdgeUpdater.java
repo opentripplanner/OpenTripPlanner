@@ -91,6 +91,7 @@ class GenericEdgeUpdater {
       return Instant.ofEpochMilli(timeArray.getLong(0));
     } else {
       long addSeconds = 0;
+
       if (dataType.equals(Double.TYPE)) {
         addSeconds = (long) (timeArray.getDouble(0) * 3600);
       } else if (dataType.equals(Float.TYPE)) {
@@ -113,6 +114,7 @@ class GenericEdgeUpdater {
     Coordinate toCoordinate = toVertex.getCoordinate();
 
     HashMap<String, float[]> edgeGenericDataValues = new HashMap<>();
+
     for (Map.Entry<String, Array> variableValues : genericVariablesData.entrySet()) {
       float[] averageDataValue = getAverageValue(
         fromCoordinate.x,
@@ -238,6 +240,7 @@ class GenericEdgeUpdater {
       }
 
       Class dataArrayType = dataArray.getDataType().getPrimitiveClassType();
+
       if (dataArrayType.equals(Integer.TYPE)) {
         result.add(timeIndex, ((ArrayInt) dataArray).get(selectIndex));
       } else if (dataArrayType.equals(Double.TYPE)) {
@@ -269,6 +272,7 @@ class GenericEdgeUpdater {
     for (int i = 0; i < array.getSize(); i++) {
       double current = array.getDouble(i);
       double currentDistance = Math.abs(current - value);
+
       if (currentDistance < distance) {
         distance = currentDistance;
       } else {

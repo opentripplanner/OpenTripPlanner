@@ -205,6 +205,7 @@ class StreetEdgePropulsionCostTest {
     PropulsionType propulsionType
   ) {
     StreetSearchRequest req;
+
     if (streetMode == SCOOTER_RENTAL) {
       req = StreetSearchRequest.of()
         .withMode(streetMode)

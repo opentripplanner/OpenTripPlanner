@@ -26,6 +26,7 @@ final class Transaction {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     Transaction that = (Transaction) o;
     return id == that.id;
   }

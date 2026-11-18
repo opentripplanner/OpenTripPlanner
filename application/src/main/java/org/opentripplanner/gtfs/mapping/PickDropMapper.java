@@ -20,6 +20,7 @@ public class PickDropMapper {
     if (gtfsCode == MISSING_VALUE) {
       return PickDrop.NONE;
     }
+
     return map(gtfsCode);
   }
 }

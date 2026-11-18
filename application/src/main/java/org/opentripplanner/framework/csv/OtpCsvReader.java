@@ -87,10 +87,12 @@ public class OtpCsvReader<T> {
       // The caller should check if the datasource exist before calling this method.
       throw new IllegalStateException("DataSource is missing: " + dataSource.path());
     }
+
     if (progressLogger != null) {
       progress = ProgressTracker.track("Read " + dataSource.name(), 10_000, -1);
       progressLogger.accept(progress.startMessage());
     }
+
     var reader = new CsvReader(dataSource.asInputStream(), StandardCharsets.UTF_8);
     var parser = parserFactory.apply(reader);
 
@@ -104,12 +106,14 @@ public class OtpCsvReader<T> {
       if (progress != null) {
         progress.step(m -> progressLogger.accept(m));
       }
+
       rowHandler.accept(parser.next());
     }
 
     if (progress != null) {
       progressLogger.accept(progress.completeMessage());
     }
+
     return;
   }
 }

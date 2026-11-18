@@ -37,9 +37,11 @@ public class LocalizedStringFormat implements I18NString, Serializable {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     final LocalizedStringFormat that = (LocalizedStringFormat) o;
     return format.equals(that.format) && Arrays.equals(values, that.values);
   }

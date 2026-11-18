@@ -129,9 +129,11 @@ public class MultiCriteriaRoutingStrategy<
       stopPositionInPattern,
       RaptorConstants.ZERO
     );
+
     if (boarding.empty()) {
       throw new IllegalArgumentException("Unable to board trip " + trip + " from " + prevArrival);
     }
+
     board(prevMcArrival, prevArrival.stop(), boarding);
   }
 
@@ -146,6 +148,7 @@ public class MultiCriteriaRoutingStrategy<
       stopPos,
       boardSlack
     );
+
     if (!result.empty()) {
       board(prevArrival, stopIndex, result);
     }
@@ -164,6 +167,7 @@ public class MultiCriteriaRoutingStrategy<
       boardSlack,
       txSearch
     );
+
     if (boarding.empty()) {
       boardWithRegularTransfer(prevArrival, stopIndex, stopPos, boardSlack);
     } else if (!boarding.transferConstraint().isNotAllowed()) {

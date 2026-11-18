@@ -45,6 +45,7 @@ public interface I18NString {
           (value == null ? "null" : "'" + value + "'")
       );
     }
+
     return value;
   }
 

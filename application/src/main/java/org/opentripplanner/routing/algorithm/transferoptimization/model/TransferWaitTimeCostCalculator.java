@@ -201,6 +201,7 @@ public class TransferWaitTimeCostCalculator {
     if (waitTime < 0) {
       return ZERO_COST;
     }
+
     assertMinSafeTransferTimeSet();
 
     return toRaptorCost(avoidShortWaitTimeCost(waitTime) + avoidBackTravelCost(waitTime));

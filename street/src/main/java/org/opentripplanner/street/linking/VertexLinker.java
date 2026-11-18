@@ -208,6 +208,7 @@ public class VertexLinker {
       // links, so a wider — and more expensive — search only runs when the smaller one finds nothing.
       // The maximum reach per scope is unchanged, so anything linkable before still links.
       Set<StreetVertex> streetVertices = Set.of();
+
       for (double radius : SearchPlan.forScope(scope).radiusStepsDegrees()) {
         streetVertices = linkToStreetEdges(
           vertex,
@@ -217,6 +218,7 @@ public class VertexLinker {
           radius,
           tempEdges
         );
+
         if (!streetVertices.isEmpty()) {
           break;
         }
@@ -224,6 +226,7 @@ public class VertexLinker {
 
       for (StreetVertex streetVertex : streetVertices) {
         List<Edge> edges = edgeFunction.apply(vertex, streetVertex);
+
         if (tempEdges != null) {
           for (Edge edge : edges) {
             tempEdges.addEdge(edge);
@@ -234,6 +237,7 @@ public class VertexLinker {
       if (tempEdges != null) {
         tempEdges.disposeEdges();
       }
+
       throw e;
     }
 
@@ -352,6 +356,7 @@ public class VertexLinker {
     if (candidateEdges.isEmpty()) {
       return Set.of();
     }
+
     Set<CandidateEdge> closestEdges = getClosestEdgesPerMode(traverseModes, candidateEdges);
     HashMap<AreaGroup, IntersectionVertex> linkedAreas = new HashMap<>();
     return closestEdges
@@ -382,6 +387,7 @@ public class VertexLinker {
     // being non-deterministic.
 
     Set<CandidateEdge> closestEdges = new HashSet<>();
+
     for (TraverseMode mode : traverseModeSet.getModes()) {
       TraverseModeSet modeSet = new TraverseModeSet(mode);
       // There is at least one appropriate edge within range.
@@ -416,6 +422,7 @@ public class VertexLinker {
           .collect(Collectors.toSet())
       );
     }
+
     return closestEdges;
   }
 
@@ -443,6 +450,7 @@ public class VertexLinker {
       var area = new PreparedAreaGroup(ag);
       // is area already linked ?
       start = linkedAreas.get(ag);
+
       if (start == null) {
         if (area.containsPoint(vertex.getCoordinate())) {
           // vertex is inside an area
@@ -455,10 +463,12 @@ public class VertexLinker {
             } else {
               start = createSplitVertex(aEdge, scope, vertex.getLon(), vertex.getLat());
             }
+
             linkedAreas.put(ag, start);
           }
         }
       }
+
       if (start != null && start != split) {
         // vertex is inside the area. try connecting the vertex to the edge's split point, because
         // connections to visibility vertices may fail or do not always provide an optimal route
@@ -468,6 +478,7 @@ public class VertexLinker {
         // vertex is outside an area. Use split point for area connections
         start = split;
       }
+
       // connect start point to area visibility points to achieve optimal paths
       if (!ag.visibilityVertices().contains(start)) {
         addAreaVertex(start, area, scope, tempEdges, false);
@@ -513,13 +524,16 @@ public class VertexLinker {
       projection,
       edge.getFromVertex().getCoordinate()
     );
+
     if (startDistance < EDGE_SPLIT_END_TOLERANCE_METERS) {
       return (IntersectionVertex) edge.getFromVertex();
     }
+
     var toDistance = SphericalDistanceLibrary.fastDistance(
       projection,
       edge.getToVertex().getCoordinate()
     );
+
     if (toDistance < EDGE_SPLIT_END_TOLERANCE_METERS) {
       return (IntersectionVertex) edge.getToVertex();
     }
@@ -572,6 +586,7 @@ public class VertexLinker {
         graph.removeEdge(originalEdge);
       }
     }
+
     return v;
   }
 
@@ -595,22 +610,27 @@ public class VertexLinker {
     } else {
       v = splitterVertex(originalEdge, x, y, uniqueSplitLabel);
     }
+
     // Compute geofencing boundaries spatially for the split vertex.
     // The entering flag encodes position: outside=true, inside=false.
     // Blind-copying from parent vertices would give the wrong flag when
     // the split point is on the opposite side of the zone boundary.
     var fromBoundaries = originalEdge.getFromVertex().listGeofencingBoundaries();
     var toBoundaries = originalEdge.getToVertex().listGeofencingBoundaries();
+
     if (!fromBoundaries.isEmpty() || !toBoundaries.isEmpty()) {
       var splitCoord = new Coordinate(x, y);
       var containingZones = geofencingZoneService.findZonesContaining(splitCoord);
       var boundaryZones = new HashSet<GeofencingZone>();
+
       for (var b : fromBoundaries) {
         boundaryZones.add(b.zone());
       }
+
       for (var b : toBoundaries) {
         boundaryZones.add(b.zone());
       }
+
       for (var zone : boundaryZones) {
         boolean splitInZone = containingZones.contains(zone);
         v.addGeofencingBoundary(new GeofencingBoundaryExtension(zone, !splitInZone));
@@ -655,6 +675,7 @@ public class VertexLinker {
     int added = 0;
 
     var visibilityVertices = areaGroup.visibilityVertices();
+
     if (scope != Scope.PERMANENT) {
       // heuristics to ensure reasonable computation time
       // The more complex the area polygon is, the less visibility connections should be tried
@@ -665,6 +686,7 @@ public class VertexLinker {
         6,
         Math.floor((2 * maxAreaNodes * maxAreaNodes) / areaComplexity)
       );
+
       if (appliedCount < totalCount) {
         visibilityVertices = visibilityVertices
           .stream()
@@ -675,11 +697,13 @@ public class VertexLinker {
           .collect(Collectors.toSet());
       }
     }
+
     for (IntersectionVertex v : visibilityVertices) {
       if (addVisibilityEdges(newVertex, v, area, scope, tempEdges, false)) {
         added++;
       }
     }
+
     // return false if new vertex could not be connected without intersecting the boundary
     // this happens when the added vertex is outside the area or all visibility edges are blocked
     if (added == 0) {
@@ -693,26 +717,31 @@ public class VertexLinker {
             Double.compare(distSquared(v1, newVertex), distSquared(v2, newVertex))
           )
           .findFirst();
+
         if (!nearest.isPresent()) {
           // This can happen when all (probably the single one) visibility points are very close
           // to the linked vertex. Such situation can arise in boarding location linking which skips
           // the snapping logic of normal linking and calls addPermanentAreaVertex directly
           nearest = areaGroup.visibilityVertices().stream().findFirst();
         }
+
         if (nearest.isPresent()) {
           return addVisibilityEdges(newVertex, nearest.get(), area, scope, tempEdges, true);
         }
       }
+
       return false;
     } else if (scope == Scope.PERMANENT) {
       // marking the new vertex as visibilityVertex enables direct connections to it
       areaGroup.addVisibilityVertex(newVertex);
     }
+
     return true;
   }
 
   public static Set<TraverseMode> getNoThruModes(Collection<Edge> edges) {
     var modes = new HashSet<>(NO_THRU_MODES);
+
     for (Edge e : edges) {
       if (e instanceof StreetEdge se) {
         for (TraverseMode tm : NO_THRU_MODES) {
@@ -722,6 +751,7 @@ public class VertexLinker {
         }
       }
     }
+
     return modes;
   }
 
@@ -738,16 +768,20 @@ public class VertexLinker {
     if (from.isConnected(to)) {
       return true;
     }
+
     // Check that vertices are not overlapping
     if (!force && distSquared(from, to) < DUPLICATE_NODE_EPSILON_DEGREES_SQUARED) {
       return false;
     }
+
     var c1 = from.getCoordinate();
     var c2 = to.getCoordinate();
+
     // ensure that new edge does not leave the bounds of the area or hit any holes
     if (!force && !area.containsSegment(c1, c2)) {
       return false;
     }
+
     LineString line = GEOMETRY_FACTORY.createLineString(new Coordinate[] { c1, c2 });
     // add connecting edges
     createEdges(line, from, to, area, scope, tempEdges);
@@ -785,10 +819,13 @@ public class VertexLinker {
       .withWheelchairAccessible(hit.wheelchairAccessible())
       .withBack(false)
       .withArea(ag);
+
     for (TraverseMode tm : outgoingNoThruModes) {
       areaEdgeBuilder.withNoThruTrafficTraverseMode(tm);
     }
+
     AreaEdge areaEdge = areaEdgeBuilder.buildAndConnect();
+
     if (scope != Scope.PERMANENT) {
       tempEdges.addEdge(areaEdge);
     }
@@ -805,10 +842,13 @@ public class VertexLinker {
       .withWheelchairAccessible(hit.wheelchairAccessible())
       .withBack(true)
       .withArea(ag);
+
     for (TraverseMode tm : incomingNoThruModes) {
       reverseAreaEdgeBuilder.withNoThruTrafficTraverseMode(tm);
     }
+
     AreaEdge reverseAreaEdge = reverseAreaEdgeBuilder.buildAndConnect();
+
     if (scope != Scope.PERMANENT) {
       tempEdges.addEdge(reverseAreaEdge);
     }

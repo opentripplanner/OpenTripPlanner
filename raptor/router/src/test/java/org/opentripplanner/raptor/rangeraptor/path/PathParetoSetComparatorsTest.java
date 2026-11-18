@@ -70,6 +70,7 @@ public class PathParetoSetComparatorsTest {
   ) {
     var comparator = paretoComparator(time, cost, relaxC1, comp2);
     verifyNumberOfTransfers(comparator);
+
     switch (time) {
       case USE_ARRIVAL_TIME:
         verifyEndTimeComparator(comparator);

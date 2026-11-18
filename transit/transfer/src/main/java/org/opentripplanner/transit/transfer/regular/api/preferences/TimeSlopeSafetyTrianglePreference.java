@@ -53,10 +53,13 @@ public final class TimeSlopeSafetyTrianglePreference
         "The time, slope and safety must not be negative: " + time + ", " + slope + ", " + safety
       );
     }
+
     double sum = time + slope + safety;
+
     if (!(sum > 0.0)) {
       throw new IllegalArgumentException("At least one of time, slope and safety must be set.");
     }
+
     var timeRatio = Ratio.of(time / sum).normalize();
     var slopeRatio = Ratio.of(slope / sum).normalize();
     var safetyRatio = Ratio.of(1.0 - (timeRatio.asDouble() + slopeRatio.asDouble())).normalize();

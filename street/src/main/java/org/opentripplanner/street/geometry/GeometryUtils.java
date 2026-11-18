@@ -58,6 +58,7 @@ public class GeometryUtils {
     var GF = getGeometryFactory();
     Geometry[] points = new Geometry[collection.size()];
     int i = 0;
+
     for (T v : collection) {
       points[i++] = GF.createPoint(mapToCoordinate.apply(v));
     }
@@ -81,10 +82,12 @@ public class GeometryUtils {
 
   public static LineString makeLineString(WgsCoordinate... coordinates) {
     var coords = new double[coordinates.length * 2];
+
     for (int i = 0; i < coordinates.length; i++) {
       coords[i * 2] = coordinates[i].longitude();
       coords[i * 2 + 1] = coordinates[i].latitude();
     }
+
     return makeLineString(coords);
   }
 
@@ -113,7 +116,9 @@ public class GeometryUtils {
       if (ls == null || ls.isEmpty()) {
         continue;
       }
+
       var seq = ls.getCoordinateSequence();
+
       for (var i = 0; i < seq.size(); i++) {
         double x = seq.getX(i);
         double y = seq.getY(i);
@@ -130,10 +135,12 @@ public class GeometryUtils {
             continue;
           }
         }
+
         coordinates.add(x);
         coordinates.add(y);
       }
     }
+
     return makeLineString(coordinates.toArray());
   }
 
@@ -175,6 +182,7 @@ public class GeometryUtils {
     LineString empty = new LineString(null, GF);
     LineString total;
     int numPoints;
+
     if (geometry instanceof LineString ls) {
       total = ls;
       numPoints = ls.getNumPoints();
@@ -188,9 +196,11 @@ public class GeometryUtils {
     if (numPoints < 2) {
       return new SplitLineString(empty, empty);
     }
+
     if (fraction <= 0) {
       return new SplitLineString(empty, total);
     }
+
     if (fraction >= 1) {
       return new SplitLineString(total, empty);
     }
@@ -246,21 +256,27 @@ public class GeometryUtils {
       LinearRing shell = GF.createLinearRing(convertPath(geoJsonPolygon.getExteriorRing()));
       LinearRing[] holes = new LinearRing[geoJsonPolygon.getInteriorRings().size()];
       int i = 0;
+
       for (List<LngLatAlt> hole : geoJsonPolygon.getInteriorRings()) {
         holes[i++] = GF.createLinearRing(convertPath(hole));
       }
+
       return GF.createPolygon(shell, holes);
     } else if (geoJsonGeom instanceof MultiPolygon) {
       MultiPolygon geoJsonMultiPolygon = (MultiPolygon) geoJsonGeom;
       Polygon[] jtsPolygons = new Polygon[geoJsonMultiPolygon.getCoordinates().size()];
       int i = 0;
+
       for (List<List<LngLatAlt>> geoJsonRings : geoJsonMultiPolygon.getCoordinates()) {
         org.geojson.Polygon geoJsonPoly = new org.geojson.Polygon();
+
         for (List<LngLatAlt> geoJsonRing : geoJsonRings) {
           geoJsonPoly.add(geoJsonRing);
         }
+
         jtsPolygons[i++] = (Polygon) convertGeoJsonToJtsGeometry(geoJsonPoly);
       }
+
       return GF.createMultiPolygon(jtsPolygons);
     } else if (geoJsonGeom instanceof org.geojson.LineString) {
       org.geojson.LineString geoJsonLineString = (org.geojson.LineString) geoJsonGeom;
@@ -270,12 +286,14 @@ public class GeometryUtils {
         (org.geojson.MultiLineString) geoJsonGeom;
       LineString[] jtsLineStrings = new LineString[geoJsonMultiLineString.getCoordinates().size()];
       int i = 0;
+
       for (List<LngLatAlt> geoJsonPath : geoJsonMultiLineString.getCoordinates()) {
         org.geojson.LineString geoJsonLineString = new org.geojson.LineString(
           geoJsonPath.toArray(new LngLatAlt[0])
         );
         jtsLineStrings[i++] = (LineString) convertGeoJsonToJtsGeometry(geoJsonLineString);
       }
+
       return GF.createMultiLineString(jtsLineStrings);
     }
 
@@ -287,19 +305,23 @@ public class GeometryUtils {
    */
   public static List<LineString> getLineStrings(MultiLineString mls) {
     var ret = new ArrayList<LineString>();
+
     for (var i = 0; i < mls.getNumGeometries(); i++) {
       ret.add((LineString) mls.getGeometryN(i));
     }
+
     return List.copyOf(ret);
   }
 
   private static Coordinate[] convertPath(List<LngLatAlt> path) {
     Coordinate[] coords = new Coordinate[path.size()];
     int i = 0;
+
     for (LngLatAlt p : path) {
       // the serialization library does serialize a 0 but not a NaN
       coords[i++] = new Coordinate(p.getLongitude(), p.getLatitude(), p.getAltitude());
     }
+
     return coords;
   }
 
@@ -337,9 +359,11 @@ public class GeometryUtils {
   /// of coordinates is empty or just one(a point), then `0` is returned.
   public static double sumDistances(Coordinate[] coordinates) {
     double distance = 0;
+
     for (int i = 1; i < coordinates.length; i++) {
       distance += SphericalDistanceLibrary.distance(coordinates[i - 1], coordinates[i]);
     }
+
     return distance;
   }
 
@@ -350,6 +374,7 @@ public class GeometryUtils {
    */
   public static double sumDistances(CoordinateSequence seq) {
     double distance = 0;
+
     for (int i = 1; i < seq.size(); i++) {
       distance += SphericalDistanceLibrary.distance(
         seq.getY(i - 1),
@@ -358,6 +383,7 @@ public class GeometryUtils {
         seq.getX(i)
       );
     }
+
     return distance;
   }
 }

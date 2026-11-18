@@ -154,9 +154,11 @@ public final class GeofencingZone implements Serializable {
     if (this == other) {
       return true;
     }
+
     if (other == null) {
       return false;
     }
+
     return (
       priority == other.priority &&
       businessArea == other.businessArea &&
@@ -176,9 +178,11 @@ public final class GeofencingZone implements Serializable {
     if (this == o) {
       return true;
     }
+
     if (!(o instanceof GeofencingZone other)) {
       return false;
     }
+
     return priority == other.priority && id.equals(other.id);
   }
 
@@ -211,18 +215,23 @@ public final class GeofencingZone implements Serializable {
     if (zones.isEmpty() || network == null) {
       return false;
     }
+
     Boolean bestValue = null;
     int bestPriority = Integer.MAX_VALUE;
+
     for (var zone : zones) {
       if (!zone.id().getFeedId().equals(network)) {
         continue;
       }
+
       Boolean value = fieldAccessor.apply(zone);
+
       if (value != null && zone.priority() < bestPriority) {
         bestPriority = zone.priority();
         bestValue = value;
       }
     }
+
     return Boolean.TRUE.equals(bestValue);
   }
 }

@@ -57,6 +57,7 @@ class EstimatedCallHelper {
     if (raw == null || raw.isEmpty()) {
       return null;
     }
+
     return raw.stream().filter(TransitMode.class::isInstance).map(TransitMode.class::cast).toList();
   }
 

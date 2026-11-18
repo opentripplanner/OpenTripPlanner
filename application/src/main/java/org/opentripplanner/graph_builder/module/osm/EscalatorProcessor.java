@@ -41,8 +41,10 @@ class EscalatorProcessor {
         )
       )
     );
+
     if (duration.isPresent()) {
       double speed = length / duration.get().toSeconds();
+
       if (speed < SLOW_ESCALATOR_ERROR_CUTOFF || speed > FAST_ESCALATOR_ERROR_CUTOFF) {
         duration = Optional.empty();
         issueStore.add(
@@ -55,18 +57,21 @@ class EscalatorProcessor {
         );
       }
     }
+
     if (escalatorWay.isForwardEscalator()) {
       return new EscalatorEdgePair(
         EscalatorEdge.createEscalatorEdge(fromVertex, toVertex, length, duration.orElse(null)),
         null
       );
     }
+
     if (escalatorWay.isBackwardEscalator()) {
       return new EscalatorEdgePair(
         null,
         EscalatorEdge.createEscalatorEdge(toVertex, fromVertex, length, duration.orElse(null))
       );
     }
+
     return new EscalatorEdgePair(
       EscalatorEdge.createEscalatorEdge(fromVertex, toVertex, length, duration.orElse(null)),
       EscalatorEdge.createEscalatorEdge(toVertex, fromVertex, length, duration.orElse(null))

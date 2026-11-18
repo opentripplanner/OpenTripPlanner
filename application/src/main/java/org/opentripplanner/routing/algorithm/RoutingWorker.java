@@ -293,9 +293,11 @@ public class RoutingWorker {
     if (raptorSearchParamsUsed == null) {
       return null;
     }
+
     if (!raptorSearchParamsUsed.isEarliestDepartureTimeSet()) {
       return null;
     }
+
     return transitSearchTimeZero
       .plusSeconds(raptorSearchParamsUsed.earliestDepartureTime())
       .toInstant();
@@ -317,6 +319,7 @@ public class RoutingWorker {
     if (request.isStartOnBoardAccessRequest()) {
       return RoutingResult.empty();
     }
+
     // TODO: Add support for via search to the direct-street search and remove this.
     //       The direct search is used to prune away silly transit results and it
     //       would be nice to also support via as a feature in the direct-street
@@ -324,6 +327,7 @@ public class RoutingWorker {
     if (request.isViaSearch()) {
       return RoutingResult.empty();
     }
+
     // Direct taxi routing is handled separately in routeDirectTaxi().
     if (request.journey().direct().mode() == StreetMode.TAXI) {
       return RoutingResult.empty();
@@ -347,6 +351,7 @@ public class RoutingWorker {
     );
 
     debugTimingAggregator.startedDirectStreetRouter();
+
     try {
       return RoutingResult.ok(
         DirectStreetRouter.route(
@@ -372,10 +377,13 @@ public class RoutingWorker {
     if (request.isStartOnBoardAccessRequest()) {
       return RoutingResult.empty();
     }
+
     if (!OTPFeature.FlexRouting.isOn()) {
       return RoutingResult.ok(List.of());
     }
+
     debugTimingAggregator.startedDirectFlexRouter();
+
     try {
       return RoutingResult.ok(
         DirectFlexRouter.route(
@@ -401,10 +409,13 @@ public class RoutingWorker {
     if (request.isStartOnBoardAccessRequest()) {
       return RoutingResult.empty();
     }
+
     if (OTPFeature.CarPooling.isOff()) {
       return RoutingResult.ok(List.of());
     }
+
     debugTimingAggregator.startedDirectCarpoolRouter();
+
     try {
       return RoutingResult.ok(carpoolingService.routeDirect(request));
     } catch (RoutingValidationException e) {
@@ -419,20 +430,25 @@ public class RoutingWorker {
     if (request.isStartOnBoardAccessRequest()) {
       return RoutingResult.empty();
     }
+
     // See the equivalent TODO in routeDirectStreet() for why via search is not supported here.
     if (request.isViaSearch()) {
       return RoutingResult.empty();
     }
+
     if (request.journey().direct().mode() != StreetMode.TAXI) {
       return RoutingResult.ok(List.of());
     }
+
     // TODO: The default TAXI routing strategy should use, for example flex routing, which has not
     //       yet been implemented. Until then, return no direct itinerary for TAXI unless the
     //       TaxiRouting sandbox feature is enabled and a taxi route provider is configured.
     if (taxiService == null) {
       return RoutingResult.empty();
     }
+
     debugTimingAggregator.startedDirectTaxiRouter();
+
     try {
       var itineraries = taxiService.routeDirect(transitService, request, linkingContext());
       return RoutingResult.ok(itineraries);
@@ -453,6 +469,7 @@ public class RoutingWorker {
     }
 
     debugTimingAggregator.startedTransitRouting();
+
     try {
       var transitResults = TransitRouter.route(
         request,
@@ -532,6 +549,7 @@ public class RoutingWorker {
     ) {
       return List.of(new RoutingError(RoutingErrorCode.NO_DIRECT_MODE_CONNECTION, null));
     }
+
     return List.of();
   }
 

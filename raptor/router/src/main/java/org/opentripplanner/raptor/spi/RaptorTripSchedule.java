@@ -73,6 +73,7 @@ public interface RaptorTripSchedule {
     while (i != -1 && arrival(i) > latestArrivalTime) {
       i = p.findAlightStopPositionBefore(i, stop);
     }
+
     return i;
   }
 
@@ -104,6 +105,7 @@ public interface RaptorTripSchedule {
     while (i != -1 && departure(i) < earliestDepartureTime) {
       i = p.findBoardStopPositionAfter(i + 1, stop);
     }
+
     return i;
   }
 
@@ -120,19 +122,25 @@ public interface RaptorTripSchedule {
     // IntIterators.empty() or IntIterators.singleValueIterator(), thereby avoiding the
     // overhead of creating a BitSet and adding a single stop to it.
     int i0 = findDepartureStopPosition(earliestDepartureTime, stop);
+
     if (i0 == -1) {
       return IntIterators.empty();
     }
+
     int i = findDepartureStopPosition(i0 + 1, earliestDepartureTime, stop);
+
     if (i == -1) {
       return IntIterators.singleValueIterator(i0);
     }
+
     var stops = new BitSet();
     stops.set(i0);
+
     do {
       stops.set(i);
       i = findDepartureStopPosition(i + 1, earliestDepartureTime, stop);
     } while (i != -1);
+
     return IntIterators.of(stops);
   }
 }

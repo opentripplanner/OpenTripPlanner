@@ -130,6 +130,7 @@ public class MonoOrMultiModalStation {
     if (obj == null || getClass() != obj.getClass()) {
       return false;
     }
+
     MonoOrMultiModalStation other = (MonoOrMultiModalStation) obj;
     return getId().equals(other.getId());
   }

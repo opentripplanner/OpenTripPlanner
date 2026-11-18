@@ -49,9 +49,11 @@ public final class RiderCategory implements Serializable {
     if (obj == this) {
       return true;
     }
+
     if (obj == null || obj.getClass() != this.getClass()) {
       return false;
     }
+
     var that = (RiderCategory) obj;
     return Objects.equals(this.id, that.id) && Objects.equals(this.name, that.name);
   }

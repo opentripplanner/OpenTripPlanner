@@ -59,9 +59,11 @@ public final class TaxiRoute implements Serializable {
     if (obj == this) {
       return true;
     }
+
     if (obj == null || obj.getClass() != this.getClass()) {
       return false;
     }
+
     TaxiRoute taxiRoute = (TaxiRoute) obj;
     return route.equals(taxiRoute.route);
   }

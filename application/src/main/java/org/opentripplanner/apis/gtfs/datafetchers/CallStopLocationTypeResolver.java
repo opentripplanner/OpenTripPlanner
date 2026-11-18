@@ -18,12 +18,15 @@ public class CallStopLocationTypeResolver implements TypeResolver {
     if (o instanceof RegularStop) {
       return schema.getObjectType("Stop");
     }
+
     if (o instanceof AreaStop) {
       return schema.getObjectType("Location");
     }
+
     if (o instanceof GroupStop) {
       return schema.getObjectType("LocationGroup");
     }
+
     return null;
   }
 }

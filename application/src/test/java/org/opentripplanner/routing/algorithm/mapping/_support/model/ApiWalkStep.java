@@ -93,9 +93,11 @@ public class ApiWalkStep {
 
   public String toString() {
     String direction = absoluteDirection.toString();
+
     if (relativeDirection != null) {
       direction = relativeDirection.toString();
     }
+
     return "WalkStep(" + direction + " on " + streetName + " for " + distance + ")";
   }
 
@@ -103,10 +105,13 @@ public class ApiWalkStep {
     if (streetName == null) {
       return null;
     }
+
     int idx = streetName.indexOf('(');
+
     if (idx <= 0) {
       return streetName;
     }
+
     return streetName.substring(0, idx - 1);
   }
 }

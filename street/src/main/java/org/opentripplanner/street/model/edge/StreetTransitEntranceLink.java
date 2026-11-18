@@ -53,6 +53,7 @@ public class StreetTransitEntranceLink extends StreetTransitEntityLink<TransitEn
     } else if (getFromVertex() instanceof TransitEntranceVertex tev) {
       return tev.getId();
     }
+
     throw new IllegalStateException("%s doesn't link to an entrance.".formatted(this));
   }
 

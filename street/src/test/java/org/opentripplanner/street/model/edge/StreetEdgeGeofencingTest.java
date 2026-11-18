@@ -851,9 +851,11 @@ class StreetEdgeGeofencingTest {
       null,
       false
     );
+
     for (var network : committedNetworks) {
       editor.addCommittedNetwork(network);
     }
+
     return editor.makeState();
   }
 }

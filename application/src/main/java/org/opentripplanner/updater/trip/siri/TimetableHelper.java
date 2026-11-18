@@ -22,10 +22,12 @@ class TimetableHelper {
   ) {
     for (var supplier : timeSuppliers) {
       final ZonedDateTime time = supplier.get();
+
       if (time != null) {
         return ServiceDateUtils.secondsSinceStartOfService(startOfService, time);
       }
     }
+
     return null;
   }
 
@@ -74,6 +76,7 @@ class TimetableHelper {
 
     // Set flag for inaccurate prediction if either call OR journey has inaccurate-flag set.
     boolean isCallPredictionInaccurate = TRUE.equals(call.isPredictionInaccurate());
+
     if (isJourneyPredictionInaccurate || isCallPredictionInaccurate) {
       tripTimesBuilder.withInaccuratePredictions(index);
     }
@@ -94,6 +97,7 @@ class TimetableHelper {
     }
 
     var destinationDisplay = call.destinationDisplay();
+
     if (!destinationDisplay.isEmpty()) {
       tripTimesBuilder.withStopHeadsign(index, new NonLocalizedString(destinationDisplay));
     }

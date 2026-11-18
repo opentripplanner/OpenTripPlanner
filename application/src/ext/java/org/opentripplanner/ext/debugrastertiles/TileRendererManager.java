@@ -60,6 +60,7 @@ public class TileRendererManager {
     context.graph = graph;
 
     TileRenderer renderer = renderers.get(layer);
+
     if (renderer == null) {
       throw new IllegalArgumentException("Unknown layer: " + layer);
     }

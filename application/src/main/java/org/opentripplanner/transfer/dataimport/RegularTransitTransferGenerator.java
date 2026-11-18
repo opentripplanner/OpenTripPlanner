@@ -83,6 +83,7 @@ public class RegularTransitTransferGenerator implements GraphBuilderModule {
       generator.listAllStopsUsedInTransfers(),
       generator.profileStatistics()
     );
+
     for (var message : statistics.messages(time)) {
       LOG.info(message);
     }
@@ -92,11 +93,15 @@ public class RegularTransitTransferGenerator implements GraphBuilderModule {
     if (OTPFeature.ConsiderPatternsForDirectTransfers.isOn()) {
       return;
     }
+
     Set<FeedScopedId> stopsWithTransfers = generator.listAllStopsUsedInTransfers();
+
     for (RegularStop stop : transitRepository.getSiteRepository().listRegularStops()) {
       var stopId = stop.getId();
+
       if (!stop.transfersNotAllowed() && !stopsWithTransfers.contains(stopId)) {
         var stopVertex = graph.getStopVertex(stopId);
+
         if (stopVertex != null) {
           issueStore.add(new StopNotLinkedForTransfers(stopVertex));
         }

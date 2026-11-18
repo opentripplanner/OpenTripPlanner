@@ -25,9 +25,11 @@ public final class IntBox {
     if (this == o) {
       return true;
     }
+
     if (o == null || o.getClass() != IntBox.class) {
       return false;
     }
+
     return value == ((IntBox) o).value;
   }
 

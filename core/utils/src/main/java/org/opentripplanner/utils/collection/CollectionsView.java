@@ -45,17 +45,23 @@ public class CollectionsView<T>
         if (i == collections.length) {
           return false;
         }
+
         if (it.hasNext()) {
           return true;
         }
+
         ++i;
+
         while (i != collections.length) {
           it = collections[i].iterator();
+
           if (it.hasNext()) {
             return true;
           }
+
           ++i;
         }
+
         it = null;
         return false;
       }
@@ -70,9 +76,11 @@ public class CollectionsView<T>
   @Override
   public int size() {
     int size = 0;
+
     for (Collection<? extends T> it : collections) {
       size += it.size();
     }
+
     return size;
   }
 }

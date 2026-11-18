@@ -59,6 +59,7 @@ public class SiriUpdaterModule {
     if (SiriFileLoader.matchesUrl(params.url())) {
       return new SiriFileLoader(params.url());
     }
+
     // Fallback to default loader
     return switch (params) {
       case SiriSXUpdaterParameters p -> new SiriHttpLoader(

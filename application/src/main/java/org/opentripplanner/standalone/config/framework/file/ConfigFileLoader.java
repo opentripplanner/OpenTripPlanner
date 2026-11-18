@@ -79,9 +79,11 @@ public class ConfigFileLoader {
       if (jsonFallback != null) {
         return stringToJsonNode(jsonFallback, filename);
       }
+
       LOG.warn("Config '{}' not loaded, using defaults. Config directory not set.", filename);
       return MissingNode.getInstance();
     }
+
     return loadJsonFile(new File(configDir, filename));
   }
 
@@ -123,6 +125,7 @@ public class ConfigFileLoader {
       if (jsonAsString == null || jsonAsString.isBlank()) {
         return MissingNode.getInstance();
       }
+
       jsonAsString = includeFileDirective(configDir, jsonAsString, source);
       jsonAsString = insertEnvironmentVariables(jsonAsString, source);
 
@@ -138,9 +141,11 @@ public class ConfigFileLoader {
     if (configDir == null) {
       return null;
     }
+
     if (!configDir.isDirectory()) {
       throw new IllegalArgumentException(configDir + " is not a readable configuration directory.");
     }
+
     return configDir;
   }
 }

@@ -98,6 +98,7 @@ public final class TripPatternBuilder
         "Cannot set scheduled Timetable after scheduled Timetable builder is created"
       );
     }
+
     this.scheduledTimetable = scheduledTimetable;
     return this;
   }
@@ -111,6 +112,7 @@ public final class TripPatternBuilder
       scheduledTimetableBuilder = scheduledTimetable.copyOf();
       scheduledTimetable = null;
     }
+
     producer.apply(scheduledTimetableBuilder);
     return this;
   }
@@ -165,6 +167,7 @@ public final class TripPatternBuilder
     if (scheduledTimetable != null) {
       return scheduledTimetable.getDirection();
     }
+
     return scheduledTimetableBuilder.getDirection();
   }
 
@@ -220,6 +223,7 @@ public final class TripPatternBuilder
 
   CompactLineStringSequence buildGeometry() {
     List<LineString> geometries;
+
     if (this.hopGeometries != null) {
       geometries = this.hopGeometries;
     } else if (this.originalTripPattern != null) {
@@ -227,6 +231,7 @@ public final class TripPatternBuilder
     } else {
       geometries = null;
     }
+
     return buildHopGeometries(stopPattern, geometries);
   }
 
@@ -250,6 +255,7 @@ public final class TripPatternBuilder
   ) {
     int numberOfStops = stopPattern.getSize();
     int expectedHops = Math.max(numberOfStops - 1, 0);
+
     if (hopGeometries != null && hopGeometries.size() != expectedHops) {
       throw new IllegalArgumentException(
         "hopGeometries size (%d) does not match the number of hops in the stop pattern (%d)".formatted(
@@ -258,6 +264,7 @@ public final class TripPatternBuilder
         )
       );
     }
+
     // Cumulative table has one entry per vertex position (0 .. expectedHops). For a degenerate
     // pattern with 0 or 1 stops this is just {0}.
     int cumulativeLength = expectedHops + 1;
@@ -284,9 +291,11 @@ public final class TripPatternBuilder
     }
 
     int[] cumulativeMeters = new int[cumulativeLength];
+
     for (int i = 0; i < cumulativeLength; i++) {
       cumulativeMeters[i] = (int) Math.round(cumulativeDouble[i]);
     }
+
     return CompactLineStringSequence.of(hops, cumulativeMeters);
   }
 
@@ -338,6 +347,7 @@ public final class TripPatternBuilder
         );
       }
     }
+
     return hopGeometries;
   }
 }

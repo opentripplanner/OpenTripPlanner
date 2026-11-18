@@ -41,20 +41,24 @@ public class VerticalDatum {
     DataInputStream stream = new DataInputStream(new BufferedInputStream(inputStream));
     double lowerLeftLatitude = stream.readDouble();
     double lowerLeftLongitude = stream.readDouble();
+
     if (lowerLeftLongitude > 180) {
       // convert to standard coordinates
       lowerLeftLongitude -= 360;
     }
+
     double deltaLatitude = stream.readDouble();
     double deltaLongitude = stream.readDouble();
     int nRows = stream.readInt();
     int nColumns = stream.readInt();
     float[][] data = new float[nRows][nColumns];
+
     for (int y = 0; y < nRows; ++y) {
       for (int x = 0; x < nColumns; ++x) {
         data[y][x] = stream.readFloat();
       }
     }
+
     return new VerticalDatum(
       lowerLeftLongitude,
       lowerLeftLatitude,
@@ -69,12 +73,14 @@ public class VerticalDatum {
     // longitude
 
     double lowerLeftAdjusted = lowerLeftLongitude;
+
     if (lowerLeftLongitude + deltaLongitude > 180) {
       // then lowerLeftLongitude must be left of 180
       if (longitude < lowerLeftLongitude) {
         // lowerLeftLongitude is right of 180 (probablY)
         // this transforms lowerLeft so that interpolation will work
         lowerLeftAdjusted -= 360;
+
         if (longitude < lowerLeftLongitude) {
           throw new RuntimeException("longitude out of range");
         }
@@ -84,6 +90,7 @@ public class VerticalDatum {
     if (longitude > lowerLeftAdjusted + deltaLongitude || longitude < lowerLeftAdjusted) {
       throw new RuntimeException("longitude out of range");
     }
+
     if (latitude < lowerLeftLatitude || latitude > lowerLeftLatitude + deltaLatitude) {
       throw new RuntimeException("latitude out of range");
     }
@@ -109,12 +116,14 @@ public class VerticalDatum {
 
   boolean covers(double longitude, double latitude) {
     double lowerLeftAdjusted = lowerLeftLongitude;
+
     if (lowerLeftLongitude + deltaLongitude > 180) {
       // then lowerLeftLongitude must be left of 180
       if (longitude < lowerLeftLongitude) {
         // lowerLeftLongitude is right of 180 (probablY)
         // this transforms lowerLeft so that interpolation will work
         lowerLeftAdjusted -= 360;
+
         if (longitude < lowerLeftLongitude) {
           return false;
         }
@@ -124,9 +133,11 @@ public class VerticalDatum {
     if (longitude > lowerLeftAdjusted + deltaLongitude || longitude < lowerLeftAdjusted) {
       return false;
     }
+
     if (latitude < lowerLeftLatitude || latitude > lowerLeftLatitude + deltaLatitude) {
       return false;
     }
+
     return true;
   }
 }

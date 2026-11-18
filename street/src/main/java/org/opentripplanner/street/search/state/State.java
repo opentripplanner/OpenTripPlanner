@@ -119,11 +119,13 @@ public final class State implements AStarState<State, Edge, Vertex> {
         if (!stateData.applyGeofencingDestinationZones(destinationZones, restrictedNetworks)) {
           continue;
         }
+
         states.add(
           new State(vertex, streetSearchRequest.startTime(), stateData, streetSearchRequest)
         );
       }
     }
+
     return states;
   }
 
@@ -273,6 +275,7 @@ public final class State implements AStarState<State, Edge, Vertex> {
     boolean parkAndRide = request.mode().includesParking();
     boolean vehicleRentingOk;
     boolean vehicleParkAndRideOk;
+
     if (request.arriveBy()) {
       vehicleRentingOk = !request.mode().includesRenting() || !isRentingVehicle();
       vehicleParkAndRideOk = !parkAndRide || !isVehicleParked();
@@ -281,6 +284,7 @@ public final class State implements AStarState<State, Edge, Vertex> {
         !request.mode().includesRenting() || vehicleRentalNotStarted() || vehicleRentalIsFinished();
       vehicleParkAndRideOk = !parkAndRide || isVehicleParked();
     }
+
     return vehicleRentingOk && vehicleParkAndRideOk;
   }
 
@@ -409,6 +413,7 @@ public final class State implements AStarState<State, Edge, Vertex> {
         }
       } else if (!orig.isRentingVehicle() && orig.getBackState().isRentingVehicle()) {
         var stationVertex = (VehicleRentalPlaceVertex) orig.vertex;
+
         if (orig.getBackState().isRentingVehicleFromStation()) {
           editor.beginVehicleRentingAtStation(
             ((VehicleRentalEdge) edge).formFactor,
@@ -426,6 +431,7 @@ public final class State implements AStarState<State, Edge, Vertex> {
           );
         }
       }
+
       if (orig.isVehicleParked() != orig.getBackState().isVehicleParked()) {
         editor.setVehicleParked(true, orig.getBackState().currentMode());
       }
@@ -458,6 +464,7 @@ public final class State implements AStarState<State, Edge, Vertex> {
         return Optional.of((T) it);
       }
     }
+
     return Optional.empty();
   }
 
@@ -498,6 +505,7 @@ public final class State implements AStarState<State, Edge, Vertex> {
    */
   public boolean containsModeCar() {
     var state = this;
+
     while (state != null) {
       if (state.currentMode().isDrivingIsh()) {
         return true;
@@ -505,6 +513,7 @@ public final class State implements AStarState<State, Edge, Vertex> {
         state = state.getBackState();
       }
     }
+
     return false;
   }
 
@@ -520,6 +529,7 @@ public final class State implements AStarState<State, Edge, Vertex> {
         return false;
       }
     }
+
     return true;
   }
 
@@ -571,10 +581,12 @@ public final class State implements AStarState<State, Edge, Vertex> {
     // have arriveBy true anymore) has times which round correctly, as the rounding rules
     // depend on arriveBy
     var builder = request.copyOfReversed(getTime());
+
     // mutating the builder is a hot spot, only do it if needed
     if (request.mode().includesRenting()) {
       builder.withUseRentalAvailability(false);
     }
+
     var reversedRequest = builder.build();
     StateData newStateData = stateData.clone();
     newStateData.backMode = null;

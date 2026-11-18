@@ -183,11 +183,13 @@ class DefaultTransitDataImport implements TransitDataImport {
    */
   private static <T> List<T> immutableList(Collection<T> c) {
     List<T> list;
+
     if (c instanceof List) {
       list = (List<T>) c;
     } else {
       list = new ArrayList<>(c);
     }
+
     return Collections.unmodifiableList(list);
   }
 }

@@ -49,6 +49,7 @@ public class BestMatchSpecifier implements OsmSpecifier {
 
       int tagScore = toTagScore(match);
       score += tagScore;
+
       if (tagScore > 0) {
         matches++;
       }

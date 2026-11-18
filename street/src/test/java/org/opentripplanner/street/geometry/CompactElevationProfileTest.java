@@ -36,12 +36,15 @@ public class CompactElevationProfileTest {
       packed,
       length
     );
+
     if (elev1 == null) {
       // This is rather simple
       assertNull(elev2);
       return;
     }
+
     assertEquals(elev1.size(), elev2.size());
+
     for (int i = 0; i < elev1.size(); i++) {
       Coordinate c1 = elev1.getCoordinate(i);
       Coordinate c2 = elev2.getCoordinate(i);

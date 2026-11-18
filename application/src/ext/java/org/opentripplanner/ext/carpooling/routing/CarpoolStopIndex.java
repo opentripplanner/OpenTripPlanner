@@ -50,10 +50,12 @@ public class CarpoolStopIndex {
   public CarpoolStopIndex(Graph graph, CarReachableVertexSnapper snapper, Duration maxStopWalk) {
     this.snapper = snapper;
     this.maxStopWalk = maxStopWalk;
+
     for (var vertex : graph.findVertices(TransitStopVertex.class)) {
       stops.put(vertex.getId(), vertex);
       grid.insert(new Envelope(vertex.getCoordinate()), vertex);
     }
+
     LOG.info("Indexed {} transit stops for carpool", stops.size());
   }
 
@@ -109,10 +111,13 @@ public class CarpoolStopIndex {
     boolean dropoff
   ) {
     var stop = stops.get(stopId);
+
     if (stop == null) {
       return null;
     }
+
     var cached = cache.get(stopId);
+
     if (cached == null) {
       // Searched outside the map, which would otherwise block other threads for its duration;
       // two threads may search the same stop at once, and both find the same snap.
@@ -124,6 +129,7 @@ public class CarpoolStopIndex {
       var raced = cache.putIfAbsent(stopId, snap);
       cached = raced == null ? snap : raced;
     }
+
     return cached.orElse(null);
   }
 }

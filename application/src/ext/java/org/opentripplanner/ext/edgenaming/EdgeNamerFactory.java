@@ -25,6 +25,7 @@ public class EdgeNamerFactory {
     if (type == null) {
       return new DefaultNamer();
     }
+
     return switch (type) {
       case PORTLAND -> new PortlandCustomNamer();
       case SIDEWALKS -> new SidewalkNamer();

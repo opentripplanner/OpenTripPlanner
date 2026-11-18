@@ -98,9 +98,11 @@ public final class VehicleParkingPreferences implements Serializable {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     VehicleParkingPreferences that = (VehicleParkingPreferences) o;
     return (
       Objects.equals(unpreferredVehicleParkingTagCost, that.unpreferredVehicleParkingTagCost) &&

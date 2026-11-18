@@ -122,6 +122,7 @@ public class SelectRequest implements Serializable {
 
     if (!groupOfRoutes.isEmpty()) {
       var ids = new ArrayList<FeedScopedId>();
+
       for (var gor : tripPattern.getRoute().getGroupsOfRoutes()) {
         ids.add(gor.getId());
       }
@@ -137,6 +138,7 @@ public class SelectRequest implements Serializable {
       if (tripPattern.getContainsMultipleModes()) {
         return maybeValue;
       }
+
       if (
         !this.transportModeFilter.match(
           tripPattern.getMode(),
@@ -155,15 +157,19 @@ public class SelectRequest implements Serializable {
     if (transportModes == null) {
       return null;
     }
+
     if (transportModes.isEmpty()) {
       return "EMPTY";
     }
+
     if (transportModes.stream().allMatch(NarrowedTransitMode::isMainModeOnly)) {
       int size = transportModes.size();
       int total = MainAndSubMode.all().size();
+
       if (size == total) {
         return "ALL";
       }
+
       if (size + 3 >= total) {
         // If 3 or less of the main modes are *excluded* we guess that the user did exclude, and
         // not included everything. This make it much easier to read: "NOT [FERRY]" instead of
@@ -178,6 +184,7 @@ public class SelectRequest implements Serializable {
         );
       }
     }
+
     return NarrowedTransitMode.toString(transportModes);
   }
 
@@ -207,6 +214,7 @@ public class SelectRequest implements Serializable {
       if (!s.isEmpty()) {
         this.agencies = FeedScopedId.parseList(s);
       }
+
       return this;
     }
 
@@ -219,6 +227,7 @@ public class SelectRequest implements Serializable {
       if (!s.isEmpty()) {
         this.routes = FeedScopedId.parseList(s);
       }
+
       return this;
     }
 

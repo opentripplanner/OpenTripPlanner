@@ -62,6 +62,7 @@ class ScheduledTripHandler {
 
     var serviceId = buffer.getTrip(tripUpdate.tripId()).getServiceId();
     var serviceDates = buffer.getTripCalendars().listServiceDates(serviceId);
+
     if (!serviceDates.contains(tripUpdate.startDate())) {
       throw UpdateException.of(tripUpdate.tripId(), NO_SERVICE_ON_DATE);
     }
@@ -79,10 +80,12 @@ class ScheduledTripHandler {
     var updatedTripTimes = tripTimesPatch.tripTimes();
 
     Map<Integer, StopLocation> newStops = new HashMap<>();
+
     for (var entry : replacedStopIndices.entrySet()) {
       var stop = transitRepository
         .getSiteRepository()
         .getRegularStop(new FeedScopedId(tripUpdate.tripId().getFeedId(), entry.getValue()));
+
       if (stop != null) {
         newStops.put(entry.getKey(), stop);
       }

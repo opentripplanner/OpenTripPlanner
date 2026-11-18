@@ -62,11 +62,13 @@ class BidirectionalWayPropertiesIndex {
     ways.parallelStream().forEach(way -> {
       var props = way.getOsmProvider().getWayPropertySet().getDataForWay(way);
       var canonicalProps = distinctProps.computeIfAbsent(props, p -> p);
+
       // HPPC has no synchronized-wrapper, so the concurrent writes below are
       // guarded by a manual monitor on the map itself instead.
       synchronized (index) {
         index.put(way.getId(), canonicalProps);
       }
+
       // Keep lambda! A method-ref would log incorrect class and line number
       //noinspection Convert2MethodRef
       progress.step(m -> LOG.info(m));

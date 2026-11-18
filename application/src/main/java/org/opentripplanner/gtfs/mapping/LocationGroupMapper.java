@@ -56,6 +56,7 @@ class LocationGroupMapper {
         location,
         "Location group '%s' contains a null element.".formatted(element.getId())
       );
+
       switch (location) {
         case Stop stop -> groupStopBuilder.addLocation(stopMapper.map(stop));
         case Location loc -> groupStopBuilder.addLocation(locationMapper.map(loc));

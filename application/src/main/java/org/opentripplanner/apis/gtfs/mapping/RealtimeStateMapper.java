@@ -33,19 +33,24 @@ public class RealtimeStateMapper {
     if (canceled) {
       return GraphQLTypes.GraphQLRealtimeState.CANCELED;
     }
+
     if (deleted) {
       LOG.warn("deleted Trip {} should not be exposed to API", realTimeTripTimes.getTrip().getId());
       return GraphQLTypes.GraphQLRealtimeState.CANCELED;
     }
+
     if (added) {
       return GraphQLTypes.GraphQLRealtimeState.ADDED;
     }
+
     if (modified) {
       return GraphQLTypes.GraphQLRealtimeState.MODIFIED;
     }
+
     if (updated) {
       return GraphQLTypes.GraphQLRealtimeState.UPDATED;
     }
+
     return GraphQLTypes.GraphQLRealtimeState.SCHEDULED;
   }
 }

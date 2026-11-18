@@ -41,6 +41,7 @@ public class StadtnaviVehicleParkingPropertyMapper extends PropertyMapper<Vehicl
         new KeyValue("note", i18NStringMapper.mapToApi(vehicleParking.getNote()))
       )
     );
+
     if (vehicleParking.getOpeningHours() != null) {
       items.add(
         new KeyValue(
@@ -49,6 +50,7 @@ public class StadtnaviVehicleParkingPropertyMapper extends PropertyMapper<Vehicl
         )
       );
     }
+
     items.addAll(mapPlaces("capacity", vehicleParking.getCapacity()));
     items.addAll(mapPlaces("availability", vehicleParking.getAvailability()));
     return items;

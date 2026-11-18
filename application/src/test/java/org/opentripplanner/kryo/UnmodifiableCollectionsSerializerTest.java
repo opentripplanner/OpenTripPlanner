@@ -103,6 +103,7 @@ class UnmodifiableCollectionsSerializerTest {
   @Test
   void writeRejectsUnsupportedType() {
     var serializer = new UnmodifiableCollectionsSerializer();
+
     try (Output output = new Output(64, -1)) {
       assertThrows(IllegalArgumentException.class, () ->
         serializer.write(kryo, output, "not a wrapped collection")
@@ -122,6 +123,7 @@ class UnmodifiableCollectionsSerializerTest {
     try (Output output = new Output(256, -1)) {
       kryo.writeClassAndObject(output, original);
       output.flush();
+
       try (Input input = new Input(output.toBytes())) {
         return (T) kryo.readClassAndObject(input);
       }

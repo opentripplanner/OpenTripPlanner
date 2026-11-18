@@ -67,21 +67,27 @@ public class TripOnServiceDateSelectRequest {
   @Override
   public String toString() {
     var builder = ToStringBuilder.ofEmbeddedType();
+
     if (!agencies.includeEverything()) {
       builder.addCol("agencies", agencies.get());
     }
+
     if (!routes.includeEverything()) {
       builder.addCol("routes", routes.get());
     }
+
     if (!transportModes.includeEverything()) {
       builder.addCol("transportModes", transportModes.get());
     }
+
     if (!serviceDateRanges.includeEverything()) {
       builder.addCol("serviceDateRanges", serviceDateRanges.get());
     }
+
     if (!runningTimePeriods.includeEverything()) {
       builder.addCol("runningTimePeriods", runningTimePeriods.get());
     }
+
     return builder.toString();
   }
 

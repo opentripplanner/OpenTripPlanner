@@ -56,6 +56,7 @@ public class EmissionGraphBuilder implements GraphBuilderModule {
     if (parameters == null) {
       return;
     }
+
     var tripHopMapper = new TripHopMapper(createStopsByTripIdMap(), issueStore);
     var co2EmissionsDataReader = new EmissionDataReader(
       emissionRepository,
@@ -67,6 +68,7 @@ public class EmissionGraphBuilder implements GraphBuilderModule {
     for (var data : emissionDataSources) {
       co2EmissionsDataReader.read(data.dataSource(), data.config().feedId());
     }
+
     // Read Transit pasenger emission inside gtfs feeds
     for (var data : gtfsDataSources) {
       var resolvedFeedId = new GtfsBundle(data.dataSource(), data.config()).getFeedId();
@@ -78,9 +80,11 @@ public class EmissionGraphBuilder implements GraphBuilderModule {
 
   private Map<FeedScopedId, List<StopLocation>> createStopsByTripIdMap() {
     var map = new HashMap<FeedScopedId, List<StopLocation>>();
+
     for (TripPattern pattern : timetableDataImport.getAllTripPatterns()) {
       pattern.scheduledTripsAsStream().forEach(it -> map.put(it.getId(), pattern.getStops()));
     }
+
     return map;
   }
 

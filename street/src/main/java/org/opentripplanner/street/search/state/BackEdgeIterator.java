@@ -25,6 +25,7 @@ class BackEdgeIterator implements Iterator<Edge> {
     if (!hasNext()) {
       throw new NoSuchElementException("No more back edges available");
     }
+
     var ret = current;
     current = current.getBackState();
     return ret.getBackEdge();

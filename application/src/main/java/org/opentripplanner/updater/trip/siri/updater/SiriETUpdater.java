@@ -66,8 +66,10 @@ public class SiriETUpdater extends PollingGraphUpdater<TransitRealTimeUpdateCont
   @Override
   public void runPolling() {
     boolean moreData = false;
+
     do {
       var updates = updateSource.getUpdates();
+
       if (updates.isPresent()) {
         var incrementality = updateSource.incrementalityOfLastUpdates();
         ServiceDelivery serviceDelivery = updates.get().getServiceDelivery();
@@ -77,11 +79,13 @@ public class SiriETUpdater extends PollingGraphUpdater<TransitRealTimeUpdateCont
         final boolean markPrimed = !moreData;
         List<EstimatedTimetableDeliveryStructure> etds =
           serviceDelivery.getEstimatedTimetableDeliveries();
+
         if (etds != null) {
           updateGraph(context -> {
             var result = estimatedTimetableHandler.applyUpdate(etds, incrementality, context);
             ResultLogger.logUpdateResult(feedId, "siri-et", result);
             metricsConsumer.accept(result);
+
             if (markPrimed) {
               primed = true;
             }

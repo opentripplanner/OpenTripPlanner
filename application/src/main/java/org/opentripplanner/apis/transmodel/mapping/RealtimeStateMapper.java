@@ -32,19 +32,24 @@ public class RealtimeStateMapper {
     if (canceled) {
       return TransmodelRealTimeState.CANCELED;
     }
+
     if (deleted) {
       LOG.warn("deleted Trip {} should not be exposed to API", realTimeTripTimes.getTrip().getId());
       return TransmodelRealTimeState.CANCELED;
     }
+
     if (added) {
       return TransmodelRealTimeState.ADDED;
     }
+
     if (modified) {
       return TransmodelRealTimeState.MODIFIED;
     }
+
     if (updated) {
       return TransmodelRealTimeState.UPDATED;
     }
+
     return TransmodelRealTimeState.SCHEDULED;
   }
 }

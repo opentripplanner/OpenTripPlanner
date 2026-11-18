@@ -59,6 +59,7 @@ public class DataImportIssueReporter implements GraphBuilderModule {
       if (!deleteReportDirectoryAndContent()) {
         return;
       }
+
       List<Bucket> buckets = partitionIssues(
         issueStore.listIssues(),
         maxNumberOfIssuesPerType,
@@ -82,6 +83,7 @@ public class DataImportIssueReporter implements GraphBuilderModule {
       } catch (Exception e) {
         LOG.error("Index file couldn't be created:{}", e.getMessage());
       }
+
       LOG.info(progress.completeMessage());
       LOG.info("Data import issue report is in {}", reportDirectory.path());
     } catch (Exception e) {
@@ -103,6 +105,7 @@ public class DataImportIssueReporter implements GraphBuilderModule {
       LOG.error("Saving folder is empty!");
       return false;
     }
+
     if (reportDirectory.exists()) {
       //Removes all files from report directory
       try {
@@ -117,6 +120,7 @@ public class DataImportIssueReporter implements GraphBuilderModule {
         return false;
       }
     }
+
     // No need to create directories here, because the 'reportDirectory' is responsible for
     // creating paths (it they don´t exist) when saving files.
     return true;
@@ -159,6 +163,7 @@ public class DataImportIssueReporter implements GraphBuilderModule {
           maxNumberOfIssuesPerType
         );
       }
+
       int reported = sortedIssues.size();
 
       // Split the issues to buckets if needed
@@ -167,6 +172,7 @@ public class DataImportIssueReporter implements GraphBuilderModule {
           sortedIssues,
           maxNumberOfIssuesPerFile
         );
+
         for (int i = 0; i < partitions.size(); i++) {
           buckets.add(new Bucket(new BucketKey(key, i + 1), partitions.get(i), reported, total));
         }

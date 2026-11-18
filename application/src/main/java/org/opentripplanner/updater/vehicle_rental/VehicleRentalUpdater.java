@@ -142,10 +142,12 @@ public class VehicleRentalUpdater extends PollingGraphUpdater<StreetRealTimeUpda
   @Override
   protected void runPolling() throws InterruptedException, ExecutionException {
     LOG.debug("Updating vehicle rental stations from {}", nameForLogging);
+
     if (!source.update()) {
       LOG.debug("No updates from {}", nameForLogging);
       return;
     }
+
     List<VehicleRentalPlace> stations = source.getUpdates();
     var geofencingZones = source.getGeofencingZones();
 
@@ -195,6 +197,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater<StreetRealTimeUpda
             LinkingDirection.BIDIRECTIONAL,
             StreetVehicleRentalLink::createBidirectionalLinks
           );
+
           if (vehicleRentalVertex.getOutgoing().isEmpty()) {
             // Copy reference to pass into lambda
             var vrv = vehicleRentalVertex;
@@ -209,6 +212,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater<StreetRealTimeUpda
                 )
             );
           }
+
           VehicleRentalEdge.createRentalEdgesForStation(vehicleRentalVertex, station, tempEdges);
           verticesByStation.put(station.id(), vehicleRentalVertex);
           tempEdgesByStation.put(station.id(), tempEdges);
@@ -220,14 +224,18 @@ public class VehicleRentalUpdater extends PollingGraphUpdater<StreetRealTimeUpda
 
       /* remove existing stations that were not present in the update */
       List<FeedScopedId> toRemove = new ArrayList<>();
+
       for (Entry<FeedScopedId, VehicleRentalPlaceVertex> entry : verticesByStation.entrySet()) {
         FeedScopedId station = entry.getKey();
+
         if (stationSet.contains(station)) {
           continue;
         }
+
         toRemove.add(station);
         service.removeVehicleRentalStation(station);
       }
+
       for (FeedScopedId station : toRemove) {
         // post-iteration removal to avoid concurrent modification
         verticesByStation.remove(station);
@@ -237,6 +245,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater<StreetRealTimeUpda
 
       boolean zonesChanged =
         !geofencingZones.isEmpty() && !geofencingZonesUnchanged(geofencingZones);
+
       if (zonesChanged) {
         LOG.info("Computing geofencing zones for {}", nameForLogging);
         var start = System.currentTimeMillis();
@@ -294,16 +303,19 @@ public class VehicleRentalUpdater extends PollingGraphUpdater<StreetRealTimeUpda
     if (incoming.size() != latestAppliedGeofencingZones.size()) {
       return false;
     }
+
     for (var zone : incoming) {
       var match = latestAppliedGeofencingZones
         .stream()
         .filter(z -> z.equals(zone))
         .findFirst()
         .orElse(null);
+
       if (match == null || !zone.isEquivalentTo(match)) {
         return false;
       }
     }
+
     return true;
   }
 }

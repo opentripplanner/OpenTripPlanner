@@ -74,6 +74,7 @@ public class AlertToLegMapper {
       );
       totalAlerts.addAll(filterAlertsByTime(alerts, legStartTime, legEndTime));
     }
+
     if (toStop instanceof RegularStop stop) {
       Set<StopCondition> stopConditions = StopCondition.ARRIVING;
       Collection<TransitAlert> alerts = getAlertsForStopAndRoute(
@@ -91,6 +92,7 @@ public class AlertToLegMapper {
 
     if (leg.listIntermediateStops() != null) {
       Set<StopCondition> stopConditions = StopCondition.PASSING;
+
       for (StopArrival visit : leg.listIntermediateStops()) {
         if (visit.place.stop instanceof RegularStop stop) {
           Collection<TransitAlert> alerts = getAlertsForStopAndRoute(
@@ -137,6 +139,7 @@ public class AlertToLegMapper {
     if (totalAlerts.isEmpty()) {
       return leg;
     }
+
     return leg.decorateWithAlerts(Set.copyOf(totalAlerts));
   }
 
@@ -192,6 +195,7 @@ public class AlertToLegMapper {
     }
 
     Collection<TransitAlert> alertsForStop = getAlertsForStop.apply(stop.getId());
+
     if (alertsForStop == null) {
       alertsForStop = new HashSet<>();
     }
@@ -200,6 +204,7 @@ public class AlertToLegMapper {
       // Also check parent
       final Station parentStation = stop.getParentStation();
       Collection<TransitAlert> parentStopAlerts = getAlertsForStop.apply(parentStation.getId());
+
       if (parentStopAlerts != null) {
         alertsForStop.addAll(parentStopAlerts);
       }
@@ -208,6 +213,7 @@ public class AlertToLegMapper {
       for (var siblingStop : parentStation.getChildStops()) {
         if (!stop.getId().equals(siblingStop.getId())) {
           Collection<TransitAlert> siblingAlerts = getAlertsForStop.apply(parentStation.getId());
+
           if (siblingAlerts != null) {
             alertsForStop.addAll(siblingAlerts);
           }
@@ -216,15 +222,18 @@ public class AlertToLegMapper {
 
       // Also check multimodal parent
       MultiModalStation multiModalStation = getMultiModalStation.apply(parentStation);
+
       if (multiModalStation != null) {
         Collection<TransitAlert> multimodalStopAlerts = getAlertsForStop.apply(
           multiModalStation.getId()
         );
+
         if (multimodalStopAlerts != null) {
           alertsForStop.addAll(multimodalStopAlerts);
         }
       }
     }
+
     return alertsForStop;
   }
 }

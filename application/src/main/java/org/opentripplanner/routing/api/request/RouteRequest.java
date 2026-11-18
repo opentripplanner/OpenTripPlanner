@@ -179,6 +179,7 @@ public class RouteRequest implements Serializable {
     if (pageCursor != null) {
       return pageCursor.originalSortOrder();
     }
+
     return arriveBy ? SortOrder.STREET_AND_DEPARTURE_TIME : SortOrder.STREET_AND_ARRIVAL_TIME;
   }
 
@@ -198,6 +199,7 @@ public class RouteRequest implements Serializable {
     if (pageCursor == null) {
       return this;
     }
+
     boolean arriveBy = this.arriveBy;
 
     // We switch to "depart-after" search when paging next(lat==null). It does not make
@@ -456,6 +458,7 @@ public class RouteRequest implements Serializable {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     var other = (RouteRequest) o;
 
     // The 'defaultRequest' field does not need to be part of equals and hashCode
@@ -549,6 +552,7 @@ public class RouteRequest implements Serializable {
       if (from != null || to != null) {
         throw new IllegalStateException("from=" + from + ", to=" + to);
       }
+
       return List.of();
     }
 
@@ -563,6 +567,7 @@ public class RouteRequest implements Serializable {
     if (to == null) {
       routingErrors.add(new RoutingError(RoutingErrorCode.LOCATION_NOT_FOUND, InputField.TO_PLACE));
     }
+
     return routingErrors;
   }
 
@@ -571,6 +576,7 @@ public class RouteRequest implements Serializable {
       if (hasMaxSearchWindow() && searchWindow.toSeconds() > maxSearchWindow.toSeconds()) {
         throw new IllegalArgumentException("The search window cannot exceed " + maxSearchWindow);
       }
+
       if (searchWindow.isNegative()) {
         throw new IllegalArgumentException("The search window must be a positive duration");
       }

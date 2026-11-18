@@ -306,13 +306,16 @@ class DefaultCarpoolingServiceDirectTest extends GraphRoutingTest {
 
     boolean passesNearB = false;
     boolean passesNearC = false;
+
     for (var coord : coordinates) {
       // Geometry coordinates are (lon, lat)
       double distToB = coordB.distanceTo(new WgsCoordinate(coord.y, coord.x));
       double distToC = coordC.distanceTo(new WgsCoordinate(coord.y, coord.x));
+
       if (distToB < 5) {
         passesNearB = true;
       }
+
       if (distToC < 5) {
         passesNearC = true;
       }

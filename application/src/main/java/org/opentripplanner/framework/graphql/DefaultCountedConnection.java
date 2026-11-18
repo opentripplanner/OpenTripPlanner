@@ -33,9 +33,11 @@ public class DefaultCountedConnection<T>
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     DefaultCountedConnection<?> that = (DefaultCountedConnection<?>) o;
 
     return (

@@ -52,6 +52,7 @@ public class NarrowedTransitMode {
     if (this.replacement != ReplacementRequirement.IGNORED) {
       throw new IllegalArgumentException("Not convertible to MainAndSubMode");
     }
+
     return new MainAndSubMode(this.mode, this.subMode);
   }
 
@@ -75,9 +76,11 @@ public class NarrowedTransitMode {
     if (replacement != ReplacementRequirement.IGNORED) {
       return mode.name() + "::" + (subMode == null ? "" : subMode.name()) + "::" + replacement;
     }
+
     if (subMode == null) {
       return mode.name();
     }
+
     return mode.name() + "::" + subMode;
   }
 

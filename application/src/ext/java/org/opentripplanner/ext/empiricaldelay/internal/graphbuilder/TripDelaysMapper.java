@@ -32,13 +32,16 @@ class TripDelaysMapper {
 
   Optional<TripDelays> map(TripDelaysAgregator trip) {
     var builder = TripDelays.of(trip.tripId());
+
     for (String serviceId : trip.serviceIds()) {
       var delayAtStops = trip.delaysSortedForServiceId(serviceId);
       var delays = map(trip.tripId(), serviceId, delayAtStops);
+
       if (delays != null) {
         builder.with(serviceId, delays);
       }
     }
+
     return Optional.ofNullable(builder.build());
   }
 
@@ -55,6 +58,7 @@ class TripDelaysMapper {
       addDelayTripNotFoundIssue(tripId, serviceId);
       return null;
     }
+
     int i = 0;
     var skippedStops = new ArrayList<FeedScopedId>();
 
@@ -63,14 +67,17 @@ class TripDelaysMapper {
         skippedStops.add(stopIds.get(i));
         ++i;
       }
+
       if (i == stopIds.size()) {
         addStopMismatchIssue(tripId, serviceId, delay);
         return null;
       }
+
       var value = deduplicator.deduplicateObject(EmpiricalDelay.class, delay.empiricalDelay());
       map.put(i, value);
       ++i;
     }
+
     // Add skipped stops at the end
     for (; i < stopIds.size(); ++i) {
       skippedStops.add(stopIds.get(i));

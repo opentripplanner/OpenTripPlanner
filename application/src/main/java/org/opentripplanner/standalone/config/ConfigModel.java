@@ -94,10 +94,12 @@ public class ConfigModel {
       LOG.info("Using the transfer profiles of the graph embedded JSON build configuration.");
       this.transferParameters = buildConfig.transferProfiles();
     }
+
     if (this.routerConfig.isDefault()) {
       LOG.info("Using the graph embedded JSON router configuration.");
       this.routerConfig = routerConfig;
     }
+
     OtpConfigLoader.logConfigVersion(
       this.otpConfig.configVersion,
       this.buildConfig.configVersion,

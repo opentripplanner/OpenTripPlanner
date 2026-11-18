@@ -33,6 +33,7 @@ public class GrizzlyQueueWaitProbe extends ThreadPoolProbe.Adapter {
   @Override
   public void onTaskDequeueEvent(AbstractThreadPool pool, Runnable task) {
     Long queuedAt = taskQueueTimes.remove(task);
+
     if (queuedAt != null) {
       QUEUE_WAIT_NANOS.set(System.nanoTime() - queuedAt);
     }

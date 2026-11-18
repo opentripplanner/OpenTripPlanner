@@ -32,6 +32,7 @@ public class MaxCountTerminationStrategy<State extends AStarState<State, ?, ?>> 
     if (shouldIncreaseCount.test(current)) {
       count++;
     }
+
     return count >= maxCount;
   }
 }

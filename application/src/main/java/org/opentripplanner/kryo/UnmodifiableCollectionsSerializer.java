@@ -58,6 +58,7 @@ public class UnmodifiableCollectionsSerializer extends Serializer<Object> {
   public static void registerSerializers(Kryo kryo) {
     UnmodifiableCollectionsSerializer serializer = new UnmodifiableCollectionsSerializer();
     UnmodifiableCollection.values();
+
     for (UnmodifiableCollection item : UnmodifiableCollection.values()) {
       kryo.register(item.type, serializer);
     }
@@ -156,6 +157,7 @@ public class UnmodifiableCollectionsSerializer extends Serializer<Object> {
               "the comparator would be lost on deserialization."
           );
         }
+
         return new ArrayList<>((Collection<?>) source);
       }
 
@@ -184,6 +186,7 @@ public class UnmodifiableCollectionsSerializer extends Serializer<Object> {
               "the comparator would be lost on deserialization."
           );
         }
+
         return new HashMap<>((Map<?, ?>) source);
       }
 
@@ -217,6 +220,7 @@ public class UnmodifiableCollectionsSerializer extends Serializer<Object> {
           return item;
         }
       }
+
       throw new IllegalArgumentException("The type " + type + " is not supported.");
     }
   }

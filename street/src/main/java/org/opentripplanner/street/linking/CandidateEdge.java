@@ -36,9 +36,11 @@ final class CandidateEdge {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     CandidateEdge that = (CandidateEdge) o;
     return Objects.equals(edge, that.edge);
   }

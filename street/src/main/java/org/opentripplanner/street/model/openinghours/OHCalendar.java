@@ -34,9 +34,11 @@ public class OHCalendar implements Serializable {
     LocalDate searchDate = searchDateTime.toLocalDate();
     int daysFromStart = (int) ChronoUnit.DAYS.between(startOfCalendar, searchDate);
     int daysUntilEnd = (int) ChronoUnit.DAYS.between(searchDate, endOfCalendar);
+
     if (daysFromStart < 0 || daysUntilEnd < 0) {
       return false;
     }
+
     int secondsFromMidnight = searchDateTime.toLocalTime().toSecondOfDay();
     return openingHours
       .stream()
@@ -55,9 +57,11 @@ public class OHCalendar implements Serializable {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     final OHCalendar that = (OHCalendar) o;
     return (
       openingHours.equals(that.openingHours) &&

@@ -350,9 +350,11 @@ public class DefaultTimetableRepository implements TimetableRepository {
   @Nullable
   public Route getRoute(FeedScopedId id) {
     Route realtimeAddedRoute = getRealtimeAddedRoute(id);
+
     if (realtimeAddedRoute != null) {
       return realtimeAddedRoute;
     }
+
     return scheduledTimetableData.getRouteForId(id);
   }
 
@@ -371,9 +373,11 @@ public class DefaultTimetableRepository implements TimetableRepository {
   @Nullable
   public Trip getTrip(FeedScopedId id) {
     Trip trip = getRealTimeAddedTrip(id);
+
     if (trip != null) {
       return trip;
     }
+
     return scheduledTimetableData.getTripForId(id);
   }
 
@@ -402,6 +406,7 @@ public class DefaultTimetableRepository implements TimetableRepository {
     if (getRealTimeAddedTrip(id) != null) {
       return true;
     }
+
     return scheduledTimetableData.containsTrip(id);
   }
 
@@ -412,9 +417,11 @@ public class DefaultTimetableRepository implements TimetableRepository {
   @Override
   public TripPattern findPattern(Trip trip) {
     TripPattern realtimeAddedTripPattern = getRealTimeAddedPatternForTrip(trip);
+
     if (realtimeAddedTripPattern != null) {
       return realtimeAddedTripPattern;
     }
+
     return scheduledTimetableData.getPatternForTrip(trip);
   }
 
@@ -425,9 +432,11 @@ public class DefaultTimetableRepository implements TimetableRepository {
   @Override
   public TripPattern findPattern(Trip trip, @Nullable LocalDate serviceDate) {
     TripPattern realtimePattern = getNewTripPatternForModifiedTrip(trip.getId(), serviceDate);
+
     if (realtimePattern != null) {
       return realtimePattern;
     }
+
     return findPattern(trip);
   }
 
@@ -451,9 +460,11 @@ public class DefaultTimetableRepository implements TimetableRepository {
   @Nullable
   public TripOnServiceDate getTripOnServiceDate(FeedScopedId id) {
     TripOnServiceDate tripOnServiceDate = getRealTimeAddedTripOnServiceDateById(id);
+
     if (tripOnServiceDate != null) {
       return tripOnServiceDate;
     }
+
     return scheduledTimetableData.getTripOnServiceDateById(id);
   }
 
@@ -466,9 +477,11 @@ public class DefaultTimetableRepository implements TimetableRepository {
     TripOnServiceDate tripOnServiceDate = getRealTimeAddedTripOnServiceDateForTripAndDay(
       tripIdAndServiceDate
     );
+
     if (tripOnServiceDate != null) {
       return tripOnServiceDate;
     }
+
     return scheduledTimetableData.getTripOnServiceDateForTripAndDay(tripIdAndServiceDate);
   }
 
@@ -514,9 +527,11 @@ public class DefaultTimetableRepository implements TimetableRepository {
   @Override
   public Collection<TripPattern> findPatterns(StopLocation stop, boolean includeRealtimeUpdates) {
     Set<TripPattern> tripPatterns = new HashSet<>(findPatterns(stop));
+
     if (includeRealtimeUpdates) {
       tripPatterns.addAll(patternsForStop.get(stop));
     }
+
     return tripPatterns;
   }
 
@@ -524,9 +539,11 @@ public class DefaultTimetableRepository implements TimetableRepository {
   public Set<Route> findRoutes(StopLocation stop) {
     Collection<Route> flexRoutes = List.of();
     var flexIndex = scheduledTimetableData.getFlexIndex();
+
     if (flexIndex != null) {
       flexRoutes = flexIndex.findRoutes(stop);
     }
+
     return SetUtils.combine(flexRoutes, scheduledTimetableData.getRoutesForStop(stop));
   }
 
@@ -641,6 +658,7 @@ public class DefaultTimetableRepository implements TimetableRepository {
     swapTimetable(pattern, tt, updated);
 
     Trip trip = updatedTripTimes.getTrip();
+
     if (pattern.isStopPatternModifiedInRealTime()) {
       // Remember this pattern for the added trip id and service date
       FeedScopedId tripId = trip.getId();
@@ -656,6 +674,7 @@ public class DefaultTimetableRepository implements TimetableRepository {
     if (realTimeTripUpdate.routeCreation()) {
       realtimeAddedRoutes.put(route.getId(), route);
     }
+
     if (realTimeTripUpdate.tripCreation()) {
       FeedScopedId tripId = trip.getId();
       realTimeAddedTrips.put(tripId, trip);
@@ -665,12 +684,14 @@ public class DefaultTimetableRepository implements TimetableRepository {
 
       if (tripOnServiceDate != null) {
         realTimeAddedTripOnServiceDateById.put(tripOnServiceDate.getId(), tripOnServiceDate);
+
         for (var replacementFor : tripOnServiceDate.getReplacementFor()) {
           realTimeAddedReplacedByTripOnServiceDateById.put(
             replacementFor.getId(),
             tripOnServiceDate
           );
         }
+
         realTimeAddedTripOnServiceDateForTripAndDay.put(
           new TripIdAndServiceDate(tripId, serviceDate),
           tripOnServiceDate
@@ -754,6 +775,7 @@ public class DefaultTimetableRepository implements TimetableRepository {
     );
     boolean addedTripPatternsWereCleared = clearEntriesForRealtimeAddedTrips(feedId);
     boolean patternsForStopWereCleared = clearPatternsForStop(feedId);
+
     // If this snapshot was modified, it will be dirty after the clear actions.
     if (
       timetablesWereCleared ||
@@ -783,6 +805,7 @@ public class DefaultTimetableRepository implements TimetableRepository {
     boolean success = false;
 
     final TripPattern pattern = getNewTripPatternForModifiedTrip(tripId, serviceDate);
+
     if (pattern != null) {
       // Dissociate the given trip from any realtime-added pattern.
       // The trip will then fall back to its original scheduled pattern.
@@ -790,11 +813,14 @@ public class DefaultTimetableRepository implements TimetableRepository {
       // Remove times for the trip from any timetables
       // under that now-obsolete realtime-added pattern.
       SortedSet<Timetable> sortedTimetables = this.timetables.get(pattern.getId());
+
       if (sortedTimetables != null) {
         TripTimes<?> tripTimesToRemove = null;
+
         for (Timetable timetable : sortedTimetables) {
           if (timetable.isValidFor(serviceDate)) {
             final var tripTimes = timetable.getTripTimes(tripId);
+
             if (tripTimes == null) {
               LOG.debug("No triptimes to remove for trip {}", tripId);
             } else if (tripTimesToRemove != null) {
@@ -817,6 +843,7 @@ public class DefaultTimetableRepository implements TimetableRepository {
           }
         }
       }
+
       success = true;
     }
 
@@ -832,10 +859,12 @@ public class DefaultTimetableRepository implements TimetableRepository {
     validateNotReadOnly();
 
     boolean modified = false;
+
     for (Iterator<FeedScopedId> it = timetables.keySet().iterator(); it.hasNext(); ) {
       FeedScopedId patternId = it.next();
       SortedSet<Timetable> sortedTimetables = timetables.get(patternId);
       SortedSet<Timetable> toKeepTimetables = new TreeSet<>(new SortedTimetableComparator());
+
       for (Timetable timetable : sortedTimetables) {
         if (serviceDate.isBefore(timetable.getServiceDate())) {
           toKeepTimetables.add(timetable);
@@ -859,6 +888,7 @@ public class DefaultTimetableRepository implements TimetableRepository {
 
     ) {
       TripIdAndServiceDate tripIdAndServiceDate = iterator.next().getKey();
+
       if (!serviceDate.isBefore(tripIdAndServiceDate.serviceDate())) {
         iterator.remove();
         modified = true;
@@ -872,6 +902,7 @@ public class DefaultTimetableRepository implements TimetableRepository {
     if (readOnly) {
       return false;
     }
+
     return dirty;
   }
 
@@ -935,9 +966,11 @@ public class DefaultTimetableRepository implements TimetableRepository {
       .stream()
       .filter(entry -> feedId.equals(entry.getKey().getFeedId()))
       .collect(Collectors.toSet());
+
     for (var entry : entriesToBeRemoved) {
       SortedSet<Timetable> timetablesOfPattern = entry.getValue();
       FeedScopedId patternId = entry.getKey();
+
       for (var timetable : timetablesOfPattern) {
         var serviceDate = timetable.getServiceDate();
         var patternAndServiceDate = new TripPatternAndServiceDate(patternId, serviceDate);
@@ -948,6 +981,7 @@ public class DefaultTimetableRepository implements TimetableRepository {
         dirtyTimetables.put(patternAndServiceDate, scheduledTimetable);
       }
     }
+
     return timetables.entrySet().removeAll(entriesToBeRemoved);
   }
 
@@ -1024,6 +1058,7 @@ public class DefaultTimetableRepository implements TimetableRepository {
    */
   private void swapTimetable(TripPattern pattern, Timetable original, Timetable updated) {
     SortedSet<Timetable> sortedTimetables = timetables.get(pattern.getId());
+
     if (sortedTimetables == null) {
       sortedTimetables = new TreeSet<>(new SortedTimetableComparator());
     } else {
@@ -1031,12 +1066,14 @@ public class DefaultTimetableRepository implements TimetableRepository {
       temp.addAll(sortedTimetables);
       sortedTimetables = temp;
     }
+
     // This is a minor optimization:
     // Since sortedTimetables contains only timetables created in real-time, no need to try to
     // remove the original if it was not created by real-time.
     if (original.isCreatedByRealTimeUpdater()) {
       sortedTimetables.remove(original);
     }
+
     sortedTimetables.add(updated);
     timetables.put(pattern.getId(), ImmutableSortedSet.copyOfSorted(sortedTimetables));
 

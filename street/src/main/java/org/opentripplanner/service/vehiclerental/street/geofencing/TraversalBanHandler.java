@@ -20,6 +20,7 @@ class TraversalBanHandler {
     if (state.isRentingVehicle() && state.isTraversalBannedByCurrentZones()) {
       return State.empty();
     }
+
     return null;
   }
 }

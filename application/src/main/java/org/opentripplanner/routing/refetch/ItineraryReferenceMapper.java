@@ -46,6 +46,7 @@ public final class ItineraryReferenceMapper {
         "Itinerary has no supported transit leg references"
       );
     }
+
     if (legReferences.size() > ItineraryReference.MAX_LEG_REFERENCES) {
       throw new UnsupportedItineraryReferenceException(
         "Itinerary has more than " + ItineraryReference.MAX_LEG_REFERENCES + " transit legs"
@@ -143,6 +144,7 @@ public final class ItineraryReferenceMapper {
     if (legReference instanceof ScheduledTransitLegReference scheduledTransitLegReference) {
       return scheduledTransitLegReference;
     }
+
     throw new UnsupportedItineraryReferenceException(
       "Unsupported leg reference type: " + legReference.getClass().getSimpleName()
     );
@@ -158,12 +160,15 @@ public final class ItineraryReferenceMapper {
         "Frequency-based transit legs cannot be refetched: " + leg.getClass().getSimpleName()
       );
     }
+
     var legReference = leg.legReference();
+
     if (legReference == null) {
       throw new UnsupportedItineraryReferenceException(
         "Leg without a LegReference is not supported: " + leg.getClass().getSimpleName()
       );
     }
+
     return legReference;
   }
 
@@ -171,6 +176,7 @@ public final class ItineraryReferenceMapper {
     if (legReference instanceof ScheduledTransitLegReference) {
       return legReference;
     }
+
     throw new UnsupportedItineraryReferenceException(
       "Unsupported leg reference type: " + legReference.getClass().getSimpleName()
     );

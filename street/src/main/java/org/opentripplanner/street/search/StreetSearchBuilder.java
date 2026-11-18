@@ -147,6 +147,7 @@ public class StreetSearchBuilder {
     } else if (heuristic != null) {
       throw new IllegalArgumentException("Unknown heuristic type: " + heuristic);
     }
+
     return heuristic;
   }
 }

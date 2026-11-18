@@ -67,6 +67,7 @@ class SidewalkNamer implements EdgeNamer {
   @Override
   public void recordEdges(OsmWay way, StreetEdgePair pair, OsmDatabase osmdb) {
     Set<OsmLevel> levelSet = osmdb.getLevelSetForEntity(way);
+
     // This way is a sidewalk and hasn't been named yet (and is not explicitly unnamed)
     if (
       way instanceof OsmWay osmWay &&

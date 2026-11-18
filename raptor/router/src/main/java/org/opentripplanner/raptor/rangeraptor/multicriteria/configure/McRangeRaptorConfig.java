@@ -117,6 +117,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
         context().debugFactory()
       );
     }
+
     return arrivals;
   }
 
@@ -125,6 +126,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
       var c2Comp = isTransitPriority() ? dominanceFunctionC2() : null;
       comparator = destinationArrivalConfig.createPathParetoComparator(resolveCostConfig(), c2Comp);
     }
+
     return comparator;
   }
 
@@ -173,6 +175,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
         context().lifeCycle()
       );
     }
+
     return state;
   }
 
@@ -182,6 +185,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
         ? new StopArrivalFactoryC2<>()
         : new StopArrivalFactoryC1<>();
     }
+
     return stopArrivalFactory;
   }
 
@@ -216,6 +220,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
         dominanceFunctionC2()
       );
     }
+
     return paths;
   }
 
@@ -248,6 +253,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
     if (isTransitPriority()) {
       return new TransitGroupPriorityRideFactory<>(getTransitGroupPriorityCalculator());
     }
+
     throw new IllegalStateException("Only transit-priority uses c2.");
   }
 
@@ -256,6 +262,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
     if (isTransitPriority()) {
       return getTransitGroupPriorityCalculator().dominanceFunction();
     }
+
     return null;
   }
 
@@ -271,6 +278,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
     if (isTransitPriority()) {
       return ParetoSetCost.USE_C1_RELAXED_IF_C2_IS_OPTIMAL;
     }
+
     return ParetoSetCost.USE_C1;
   }
 }

@@ -244,6 +244,7 @@ class MissingElevationHandlerTest {
 
   private void assertElevation(StreetEdge edge, double... points) {
     var expectedCoordinates = new ArrayList<>();
+
     for (int i = 0; i + 1 < points.length; i += 2) {
       expectedCoordinates.add(new Coordinate(points[i], points[i + 1]));
     }

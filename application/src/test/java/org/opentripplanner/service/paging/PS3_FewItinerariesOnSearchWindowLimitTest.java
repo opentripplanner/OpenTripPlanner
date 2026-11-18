@@ -133,6 +133,7 @@ class PS3_FewItinerariesOnSearchWindowLimitTest {
           cursor = subject.previousPageCursor();
           currTime -= tc.timeShift;
         }
+
         String description = tc.testDescription();
         assertEquals(tc.gotoPage(), cursor.type(), description);
         assertEquals(expectedSortOrder, cursor.originalSortOrder(), description);
@@ -165,10 +166,12 @@ class PS3_FewItinerariesOnSearchWindowLimitTest {
     Matcher matcher = PAGING_SEQUENCE_TIME_SHIFT_PATTERN.matcher(token);
     int timeShift = SEARCH_WINDOW_SEC;
     String tokenWithTimeShiftRemoved = token;
+
     if (matcher.matches()) {
       tokenWithTimeShiftRemoved = matcher.group(1);
       timeShift = (int) DurationUtils.duration(matcher.group(2)).toSeconds();
     }
+
     switch (tokenWithTimeShiftRemoved) {
       case "-":
         sequence.append(" > -");

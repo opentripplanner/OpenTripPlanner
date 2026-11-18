@@ -148,17 +148,23 @@ public interface RaptorPath<T extends RaptorTripSchedule> extends Comparable<Rap
   @Override
   default int compareTo(RaptorPath<T> other) {
     int c = endTimeInclusivePenalty() - other.endTimeInclusivePenalty();
+
     if (c != 0) {
       return c;
     }
+
     c = other.startTimeInclusivePenalty() - startTimeInclusivePenalty();
+
     if (c != 0) {
       return c;
     }
+
     c = c1() - other.c1();
+
     if (c != 0) {
       return c;
     }
+
     c = numberOfTransfers() - other.numberOfTransfers();
     return c;
   }

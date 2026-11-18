@@ -47,20 +47,24 @@ public class NoThruTrafficEdgeRenderer implements EdgeVertexRenderer {
         label = " walk ";
         colorIndex += 1;
       }
+
       if (pse.isBicycleNoThruTraffic()) {
         label += " bike";
         colorIndex += 2;
       }
+
       if (pse.isMotorVehicleNoThruTraffic()) {
         label += " car";
         colorIndex += 4;
       }
+
       if (!label.isEmpty()) {
         label = "No" + label + " thru traffic";
       }
 
       return EdgeVisualAttributes.optional(COLORS[colorIndex], label);
     }
+
     return Optional.empty();
   }
 

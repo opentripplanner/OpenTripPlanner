@@ -140,6 +140,7 @@ public class SimpleIntersectionTraversalCalculator
     StreetEdge to
   ) {
     int turnAngle = calculateTurnAngle(from, to);
+
     if (v.hasDrivingTrafficLight()) {
       // Use constants that apply when there are stop lights.
       if (isSafeTurn(turnAngle)) {
@@ -211,6 +212,7 @@ public class SimpleIntersectionTraversalCalculator
     if (!(o instanceof SimpleIntersectionTraversalCalculator that)) {
       return false;
     }
+
     return (
       Double.compare(acrossTrafficBicycleTurnMultiplier, that.acrossTrafficBicycleTurnMultiplier) ==
         0 &&

@@ -50,12 +50,14 @@ public class BarrierVertex extends OsmVertex {
   public void makeBarrierAtEndReachable() {
     var edgeCount = this.getDegreeOut() + this.getDegreeIn();
     var needsFix = false;
+
     if (edgeCount == 1) {
       // only one edge connects the vertex, must be end point
       needsFix = true;
     } else if (edgeCount == 2) {
       var out = this.getOutgoing();
       var in = this.getIncoming();
+
       if (
         // if only outgoing edges or incoming edges -> vertex does not act as a pass-through point and barrier makes no sense
         out.isEmpty() ||
@@ -66,6 +68,7 @@ public class BarrierVertex extends OsmVertex {
         needsFix = true;
       }
     }
+
     if (needsFix) {
       this.barrierPermissions = StreetTraversalPermission.ALL;
     }

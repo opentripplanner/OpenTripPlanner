@@ -56,19 +56,24 @@ final class ScheduledTimetableIndex {
         patternForTrip.put(trip, pattern);
         tripForId.put(trip.getId(), trip);
       });
+
       for (StopLocation stop : pattern.getStops()) {
         patternsForStop.put(stop, pattern);
       }
     }
+
     for (Route route : patternsForRoute.asMap().keySet()) {
       routeForId.put(route.getId(), route);
+
       for (GroupOfRoutes groupOfRoutes : route.getGroupsOfRoutes()) {
         routesForGroupOfRoutes.put(groupOfRoutes, route);
       }
     }
+
     for (GroupOfRoutes groupOfRoutes : routesForGroupOfRoutes.keySet()) {
       groupOfRoutesForId.put(groupOfRoutes.getId(), groupOfRoutes);
     }
+
     for (TripOnServiceDate tripOnServiceDate : entities.getAllTripsOnServiceDate()) {
       tripOnServiceDateForTripAndDay.put(
         new TripIdAndServiceDate(
@@ -85,9 +90,11 @@ final class ScheduledTimetableIndex {
     // built with it.
     if (OTPFeature.FlexRouting.isOn()) {
       flexIndex = new FlexIndex(entities.getAllFlexTrips(), tripCalendars);
+
       for (Route route : flexIndex.getAllFlexRoutes()) {
         routeForId.put(route.getId(), route);
       }
+
       for (FlexTrip<?, ?> flexTrip : flexIndex.getAllFlexTrips()) {
         tripForId.put(flexTrip.getId(), flexTrip.getTrip());
       }
@@ -135,9 +142,11 @@ final class ScheduledTimetableIndex {
 
   Set<Route> getRoutesForStop(StopLocation stop) {
     Set<Route> routes = new HashSet<>();
+
     for (TripPattern p : patternsForStop.get(stop)) {
       routes.add(p.getRoute());
     }
+
     return routes;
   }
 
@@ -171,6 +180,7 @@ final class ScheduledTimetableIndex {
 
   private Map<StopLocation, LocalDate> endOfServiceDateForStop(TripCalendars tripCalendars) {
     Map<FeedScopedId, LocalDate> endOfServiceDateForService = new HashMap<>();
+
     for (FeedScopedId serviceId : tripCalendars.listServiceIds()) {
       for (LocalDate serviceDate : tripCalendars.listServiceDates(serviceId)) {
         endOfServiceDateForService.merge(serviceId, serviceDate, (a, b) -> a.isAfter(b) ? a : b);
@@ -178,16 +188,19 @@ final class ScheduledTimetableIndex {
     }
 
     Map<StopLocation, LocalDate> endOfServiceDates = new HashMap<>();
+
     for (StopLocation stop : patternsForStop.keySet()) {
       for (TripPattern pattern : patternsForStop.get(stop)) {
         pattern.scheduledTripsAsStream().forEach(trip -> {
           LocalDate tripEndDate = endOfServiceDateForService.get(trip.getServiceId());
+
           if (tripEndDate != null) {
             endOfServiceDates.merge(stop, tripEndDate, (a, b) -> a.isAfter(b) ? a : b);
           }
         });
       }
     }
+
     return Map.copyOf(endOfServiceDates);
   }
 }

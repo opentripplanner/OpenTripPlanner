@@ -10,6 +10,7 @@ class RelativeDirectionMapper {
     if (domain == null) {
       return null;
     }
+
     return switch (domain) {
       case DEPART -> ApiRelativeDirection.DEPART;
       case HARD_LEFT -> ApiRelativeDirection.HARD_LEFT;

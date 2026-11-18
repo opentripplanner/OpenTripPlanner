@@ -70,9 +70,11 @@ public class ItineraryFare {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     ItineraryFare fare1 = (ItineraryFare) o;
     return (
       Objects.equals(itineraryProducts, fare1.itineraryProducts) &&

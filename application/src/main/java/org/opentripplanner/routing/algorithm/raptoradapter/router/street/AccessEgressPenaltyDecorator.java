@@ -47,6 +47,7 @@ public class AccessEgressPenaltyDecorator {
     if (input.isEmpty()) {
       return input;
     }
+
     var penaltyWalking = penalty.valueOf(StreetMode.WALK);
 
     // The routing request only has ONE access/egress street-mode set, So, if it is WALK, then we

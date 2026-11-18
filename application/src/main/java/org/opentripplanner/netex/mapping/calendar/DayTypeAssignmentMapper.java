@@ -87,6 +87,7 @@ public class DayTypeAssignmentMapper {
       for (DayTypeAssignment it : assignments.lookup(dayType.getId())) {
         mapper.map(it);
       }
+
       Set<LocalDate> dates = mapper.mergeAndMapDates();
 
       if (dates.isEmpty()) {
@@ -95,6 +96,7 @@ public class DayTypeAssignmentMapper {
 
       result.put(dayType.getId(), dates);
     }
+
     return result;
   }
 
@@ -104,6 +106,7 @@ public class DayTypeAssignmentMapper {
     if (dta.isIsAvailable() == null) {
       return true;
     }
+
     return dta.isIsAvailable();
   }
 
@@ -120,6 +123,7 @@ public class DayTypeAssignmentMapper {
     if (dayType.getProperties() == null) {
       return EVERY_DAY_OF_WEEK;
     }
+
     List<PropertyOfDay> propertyOfDays = dayType.getProperties().getPropertyOfDay();
 
     if (propertyOfDays.stream().allMatch(p -> p.getDaysOfWeek().isEmpty())) {
@@ -127,9 +131,11 @@ public class DayTypeAssignmentMapper {
     }
 
     Set<DayOfWeek> result = EnumSet.noneOf(DayOfWeek.class);
+
     for (PropertyOfDay p : propertyOfDays) {
       result.addAll(DayOfWeekMapper.mapDayOfWeeks(p.getDaysOfWeek()));
     }
+
     return result;
   }
 
@@ -191,9 +197,11 @@ public class DayTypeAssignmentMapper {
     if (operatingPeriod.getFromDate() != null) {
       return operatingPeriod.getFromDate().toLocalDate();
     }
+
     if (operatingPeriod.getFromOperatingDayRef() != null) {
       return lookupOperatingDay(operatingPeriod.getFromOperatingDayRef());
     }
+
     throw new IllegalArgumentException(
       "Missing start date for operating period " + operatingPeriod.getId()
     );
@@ -203,9 +211,11 @@ public class DayTypeAssignmentMapper {
     if (operatingPeriod.getToDate() != null) {
       return operatingPeriod.getToDate().toLocalDate();
     }
+
     if (operatingPeriod.getToOperatingDayRef() != null) {
       return lookupOperatingDay(operatingPeriod.getToOperatingDayRef());
     }
+
     throw new IllegalArgumentException(
       "Missing end date for operating period " + operatingPeriod.getId()
     );

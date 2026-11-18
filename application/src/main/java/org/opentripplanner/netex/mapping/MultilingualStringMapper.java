@@ -17,6 +17,7 @@ public class MultilingualStringMapper {
     }
 
     String value = getStringValue(multilingualString);
+
     if (StringUtils.hasNoValue(value)) {
       return null;
     }
@@ -45,6 +46,7 @@ public class MultilingualStringMapper {
     if (multilingualString == null) {
       return null;
     }
+
     List<Serializable> content = multilingualString.getContent();
 
     // Fast path for the common case: a single plain text node
@@ -54,6 +56,7 @@ public class MultilingualStringMapper {
 
     StringBuilder text = new StringBuilder();
     String firstTextElement = null;
+
     for (Serializable item : content) {
       if (item instanceof String s) {
         text.append(s);
@@ -61,9 +64,11 @@ public class MultilingualStringMapper {
         firstTextElement = nonBlankTextElementValue(element);
       }
     }
+
     if (firstTextElement != null && StringUtils.hasNoValue(text.toString())) {
       return normalize(firstTextElement);
     }
+
     return normalize(text.toString());
   }
 
@@ -74,20 +79,25 @@ public class MultilingualStringMapper {
     ) {
       return textType.getValue();
     }
+
     return null;
   }
 
   private static String normalize(String text) {
     int i = indexOfWhitespaceToNormalize(text);
+
     if (i < 0) {
       return text;
     }
+
     char[] chars = text.toCharArray();
+
     for (; i < chars.length; i++) {
       if (isWhitespaceToNormalize(chars[i])) {
         chars[i] = ' ';
       }
     }
+
     return new String(chars);
   }
 
@@ -97,6 +107,7 @@ public class MultilingualStringMapper {
         return i;
       }
     }
+
     return -1;
   }
 

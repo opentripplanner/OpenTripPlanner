@@ -64,6 +64,7 @@ class WalkRoutingTest {
       .withTo(to)
       .withArriveBy(arriveBy)
       .buildRequest();
+
     try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
       var vertexLinker = VertexLinkerTestFactory.of(graph);
       var vertexCreationService = new VertexCreationService(vertexLinker);

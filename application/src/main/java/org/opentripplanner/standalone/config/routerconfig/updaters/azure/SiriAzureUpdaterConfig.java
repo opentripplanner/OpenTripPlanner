@@ -100,6 +100,7 @@ public abstract class SiriAzureUpdaterConfig {
       if (text == null || text.isBlank()) {
         return null;
       }
+
       if (text.startsWith("-") || text.startsWith("P")) {
         return getDateBasedOnCustomMidnight(
           ZonedDateTime.now(ZoneId.of("CET")).plus(Period.parse(text)),

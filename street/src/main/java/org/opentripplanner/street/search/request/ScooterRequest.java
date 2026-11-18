@@ -86,9 +86,11 @@ public final class ScooterRequest {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     ScooterRequest that = (ScooterRequest) o;
     return (
       doubleEquals(that.speed, speed) &&
@@ -167,9 +169,11 @@ public final class ScooterRequest {
       var builder = TimeSlopeSafetyTriangle.of();
       body.accept(builder);
       this.optimizeTriangle = builder.build();
+
       if (!builder.isEmpty()) {
         this.optimizeType = TRIANGLE;
       }
+
       return this;
     }
 

@@ -40,6 +40,7 @@ public final class AddedRoute {
 
   public static AddedRoute ofTripDescriptor(TripUpdate tripDescriptor) {
     var rawTripDescriptor = tripDescriptor.descriptor().original();
+
     if (rawTripDescriptor.hasExtension(MfdzRealtimeExtensions.tripDescriptor)) {
       var ext = rawTripDescriptor.getExtension(MfdzRealtimeExtensions.tripDescriptor);
       var url = ext.getRouteUrl();

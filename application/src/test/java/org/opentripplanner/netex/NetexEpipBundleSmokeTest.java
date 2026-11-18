@@ -47,6 +47,7 @@ class NetexEpipBundleSmokeTest {
   void smokeTestOfNetexEpipLoadData() {
     // Given
     TransitDataImportBuilder transitBuilder;
+
     try (NetexBundle netexBundle = ConstantsForTests.createMinimalNetexEpipBundle()) {
       // Run the check to make sure it does not throw an exception
       netexBundle.checkInputs();

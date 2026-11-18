@@ -37,9 +37,11 @@ class AllowMainModeFilter implements AllowTransitModeFilter {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     AllowMainModeFilter that = (AllowMainModeFilter) o;
     return mainMode == that.mainMode;
   }

@@ -514,6 +514,7 @@ public class RealtimeVehicleMatcherTest {
 
     ScheduledTripTimes tripTimes = null;
     Set<LocalDate> serviceDates = null;
+
     if (hasTripTimes) {
       var sixOclock = (int) Duration.ofHours(18).toSeconds();
       var fivePast6 = sixOclock + 300;
@@ -525,6 +526,7 @@ public class RealtimeVehicleMatcherTest {
     } else {
       serviceDates = serviceDateStrings.stream().map(LocalDate::parse).collect(Collectors.toSet());
     }
+
     var instant = OffsetDateTime.parse(time).toInstant();
 
     var inferredDate = RealtimeVehiclePatternMatcher.inferServiceDate(
@@ -574,9 +576,11 @@ public class RealtimeVehicleMatcherTest {
 
   private static VehiclePosition vehiclePosition(String tripId1, String startDate) {
     TripDescriptor.Builder tripBuilder = TripDescriptor.newBuilder().setTripId(tripId1);
+
     if (startDate != null) {
       tripBuilder.setStartDate(startDate);
     }
+
     return VehiclePosition.newBuilder()
       .setTrip(tripBuilder.build())
       .setStopId("stop-1")

@@ -51,6 +51,7 @@ class RaptorRoutingRequestTransitDataCreator {
     // Create temporary array of IntArrayLists
     int stopCount = raptorTransitData.getStopCount();
     IntArrayList[] patternsForStop = new IntArrayList[stopCount];
+
     for (int i = 0; i < stopCount; i++) {
       patternsForStop[i] = new IntArrayList();
     }
@@ -60,6 +61,7 @@ class RaptorRoutingRequestTransitDataCreator {
       final RoutingTripPattern tripPattern = tripPatternForDateList.getTripPattern();
       final int patternIndex = tripPattern.patternIndex();
       final int numberOfStopsInPattern = tripPattern.numberOfStopsInPattern();
+
       for (int i = 0; i < numberOfStopsInPattern; i++) {
         patternsForStop[tripPattern.stopIndex(i)].add(patternIndex);
       }
@@ -67,6 +69,7 @@ class RaptorRoutingRequestTransitDataCreator {
 
     // Create the final list with raw int arrays, in order to get the best iteration performance
     List<int[]> result = new ArrayList<>(stopCount);
+
     for (var patterns : patternsForStop) {
       result.add(patterns.toArray());
     }
@@ -76,9 +79,11 @@ class RaptorRoutingRequestTransitDataCreator {
 
   public List<TripPatternForDates> createPatternIndex(List<TripPatternForDates> tripPatterns) {
     TripPatternForDates[] result = new TripPatternForDates[RoutingTripPattern.indexCounter()];
+
     for (var pattern : tripPatterns) {
       result[pattern.getTripPattern().patternIndex()] = pattern;
     }
+
     return Arrays.asList(result);
   }
 
@@ -97,6 +102,7 @@ class RaptorRoutingRequestTransitDataCreator {
     // Group TripPatternForDate objects by TripPattern.
     // This is done in a loop to increase performance.
     Map<RoutingTripPattern, List<TripPatternForDate>> patternForDateByPattern = new HashMap<>();
+
     for (TripPatternForDate patternForDate : patternForDateList) {
       patternForDateByPattern
         .computeIfAbsent(patternForDate.getTripPattern(), k -> new ArrayList<>())
@@ -121,8 +127,10 @@ class RaptorRoutingRequestTransitDataCreator {
 
       // Calculate offsets per date
       int[] offsets = new int[patternsSorted.length];
+
       for (int i = 0; i < patternsSorted.length; i++) {
         LocalDate serviceDate = patternsSorted[i].getServiceDate();
+
         if (offsetCache.containsKey(serviceDate)) {
           offsets[i] = offsetCache.get(serviceDate);
         } else {
@@ -186,18 +194,23 @@ class RaptorRoutingRequestTransitDataCreator {
       raptorTransitData.getTripPatternsForRunningDate(date);
 
     List<TripPatternForDate> result = new ArrayList<>(tripPatternsForDate.size());
+
     for (TripPatternForDate p : tripPatternsForDate) {
       if (firstDay || p.getStartOfRunningPeriod().equals(date)) {
         var tripTimesFilter = filter.createTripFilter(p.getTripPattern().getPattern());
+
         if (tripTimesFilter == null) {
           continue;
         }
+
         TripPatternForDate tripPatternForDate = p.newWithFilteredTripTimes(tripTimesFilter);
+
         if (tripPatternForDate != null) {
           result.add(tripPatternForDate);
         }
       }
     }
+
     return result;
   }
 

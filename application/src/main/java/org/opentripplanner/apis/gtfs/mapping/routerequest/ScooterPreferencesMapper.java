@@ -17,13 +17,17 @@ public class ScooterPreferencesMapper {
     }
 
     var speed = args.getGraphQLSpeed();
+
     if (speed != null) {
       preferences.withSpeed(speed);
     }
+
     var reluctance = args.getGraphQLReluctance();
+
     if (reluctance != null) {
       preferences.withReluctance(reluctance);
     }
+
     preferences.withRental(rental -> setScooterRentalPreferences(rental, args.getGraphQLRental()));
     setScooterOptimization(preferences, args.getGraphQLOptimization());
   }
@@ -37,23 +41,32 @@ public class ScooterPreferencesMapper {
     }
 
     var allowedNetworks = args.getGraphQLAllowedNetworks();
+
     if (allowedNetworks != null) {
       if (allowedNetworks.isEmpty()) {
         throw new InvalidInputException("Allowed scooter rental networks must not be empty.");
       }
+
       preferences.withAllowedNetworks(Set.copyOf(allowedNetworks));
     }
+
     var bannedNetworks = args.getGraphQLBannedNetworks();
+
     if (bannedNetworks != null) {
       preferences.withBannedNetworks(Set.copyOf(bannedNetworks));
     }
+
     var destinationPolicy = args.getGraphQLDestinationScooterPolicy();
+
     if (destinationPolicy != null) {
       var allowed = destinationPolicy.getGraphQLAllowKeeping();
+
       if (allowed != null) {
         preferences.withAllowArrivingInRentedVehicleAtDestination(allowed);
       }
+
       var cost = destinationPolicy.getGraphQLKeepingCost();
+
       if (cost != null) {
         preferences.withArrivingInRentalVehicleAtDestinationCost(cost.toSeconds());
       }
@@ -70,10 +83,13 @@ public class ScooterPreferencesMapper {
 
     var type = args.getGraphQLType();
     var mappedType = type != null ? VehicleOptimizationTypeMapper.map(type) : null;
+
     if (mappedType != null) {
       preferences.withOptimizeType(mappedType);
     }
+
     var triangleArgs = args.getGraphQLTriangle();
+
     if (isScooterTriangleSet(triangleArgs)) {
       preferences.withForcedOptimizeTriangle(triangle -> {
         triangle

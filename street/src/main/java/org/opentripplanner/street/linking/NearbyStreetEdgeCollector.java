@@ -53,10 +53,13 @@ final class NearbyStreetEdgeCollector implements Consumer<Edge> {
     if (!(edge instanceof StreetEdge streetEdge) || !streetEdge.canTraverse(traverseModes)) {
       return;
     }
+
     double squaredDistance = streetEdge.squaredEquirectangularDistanceToPoint(lon, lat, xscale);
+
     if (squaredDistance >= radiusDegSq || !seen.add(streetEdge)) {
       return;
     }
+
     if (streetEdge.isReachableFromGraph()) {
       nearbyEdges.add(new CandidateEdge(streetEdge, squaredDistance));
     }

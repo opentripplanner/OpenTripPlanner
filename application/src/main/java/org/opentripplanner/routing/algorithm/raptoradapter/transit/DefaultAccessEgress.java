@@ -79,6 +79,7 @@ public class DefaultAccessEgress implements RoutingAccessEgress {
       penalty,
       other.finalState
     );
+
     if (other.penalty() != TimeAndCost.ZERO) {
       throw new IllegalStateException("Can not add penalty twice...");
     }
@@ -169,11 +170,13 @@ public class DefaultAccessEgress implements RoutingAccessEgress {
     if (this == o) {
       return true;
     }
+
     // We check the contract of DefaultAccessEgress used for routing for equality, we do not care
     // if the entries are different implementation or have different AStar paths(lastState).
     if (!(o instanceof RoutingAccessEgress that)) {
       return false;
     }
+
     return (
       stop() == that.stop() &&
       durationInSeconds() == that.durationInSeconds() &&

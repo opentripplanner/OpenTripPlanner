@@ -119,9 +119,11 @@ public class CarpoolItineraryMapper {
     GenericLocation toLocation
   ) {
     var pathsWithNewPassenger = candidate.getPathsWithNewPassenger();
+
     if (pathsWithNewPassenger.isEmpty()) {
       return null;
     }
+
     var carpoolStart = candidate.trip().startTime().plus(candidate.getDurationUntilPickupArrival());
     var carpoolEnd = carpoolStart.plus(candidate.getPassengerRideDuration());
     return buildItinerary(
@@ -199,9 +201,11 @@ public class CarpoolItineraryMapper {
   @Nullable
   public Itinerary toItinerary(CarpoolAccessEgress accessEgress) {
     var pathsWithNewPassenger = accessEgress.pathsWithNewPassenger();
+
     if (pathsWithNewPassenger.isEmpty()) {
       return null;
     }
+
     return buildItinerary(
       pathsWithNewPassenger,
       accessEgress.walkToPickup(),
@@ -257,10 +261,12 @@ public class CarpoolItineraryMapper {
     Place carpoolToPlace = walkFromDropoff != null ? dropoffPlace : itineraryEnd;
 
     List<Leg> legs = new ArrayList<>(3);
+
     if (walkToPickup != null) {
       var walkStart = carpoolStart.minus(walkToPickup.duration());
       legs.add(buildWalkLeg(walkToPickup, walkStart, carpoolStart, itineraryStart, pickupPlace));
     }
+
     legs.add(
       buildCarpoolLeg(
         pathsWithNewPassenger,
@@ -272,6 +278,7 @@ public class CarpoolItineraryMapper {
         bookingInfo
       )
     );
+
     if (walkFromDropoff != null) {
       var walkEnd = carpoolEnd.plus(walkFromDropoff.duration());
       legs.add(buildWalkLeg(walkFromDropoff, carpoolEnd, walkEnd, dropoffPlace, itineraryEnd));
@@ -322,16 +329,21 @@ public class CarpoolItineraryMapper {
     if (contact == null || (contact.getPhoneNumber() == null && contact.getBookingUrl() == null)) {
       return null;
     }
+
     var bookingMethods = EnumSet.noneOf(BookingMethod.class);
+
     if (contact.getPhoneNumber() != null) {
       bookingMethods.add(BookingMethod.CALL_OFFICE);
     }
+
     String bookingUrl = contact.getBookingUrl();
     String expandedUrl =
       bookingUrl == null ? null : BookingUrlTemplate.expand(bookingUrl, pickup, dropoff);
+
     if (expandedUrl != null) {
       bookingMethods.add(BookingMethod.ONLINE);
     }
+
     ContactInfo effectiveContact = Objects.equals(expandedUrl, bookingUrl)
       ? contact
       : contact.copy().withBookingUrl(expandedUrl).build();
@@ -367,6 +379,7 @@ public class CarpoolItineraryMapper {
     if (label.stop() != null) {
       return Place.forStop(label.stop());
     }
+
     if (label.location() != null) {
       // Place.forGenericLocation only swaps in defaultName when label() is null, but
       // GenericLocationMapper coerces an absent GraphQL "name" to "" — so without StringUtils'
@@ -380,6 +393,7 @@ public class CarpoolItineraryMapper {
         ? Place.normal(loc.wgsCoordinate(), name)
         : Place.noCoords(name);
     }
+
     return makePlace(fallbackVertex);
   }
 
@@ -394,6 +408,7 @@ public class CarpoolItineraryMapper {
     if (vertex instanceof StreetVertex sv && !(vertex instanceof TemporaryStreetLocation)) {
       return Place.normal(vertex, sv.getIntersectionName());
     }
+
     return Place.normal(vertex, vertex.getName());
   }
 }

@@ -38,6 +38,7 @@ class IdFactory {
     if (StringUtils.hasNoValue(id)) {
       throw new IllegalArgumentException(idErrorMessage(entityName));
     }
+
     return new FeedScopedId(feedId, id);
   }
 

@@ -63,6 +63,7 @@ public class LiipiParkToVehicleParkingMapper {
     if (!jsonNode.has(fieldName)) {
       return null;
     }
+
     return jsonNode.get(fieldName).asInt();
   }
 
@@ -71,6 +72,7 @@ public class LiipiParkToVehicleParkingMapper {
     Map<FeedScopedId, VehicleParkingGroup> hubForPark
   ) {
     var vehicleParkId = createIdForNode(jsonNode, "id", feedId);
+
     try {
       var capacity = parseVehicleSpaces(
         jsonNode.path("builtCapacity"),
@@ -85,6 +87,7 @@ public class LiipiParkToVehicleParkingMapper {
         .iterator()
         .forEachRemaining(lang -> {
           String name = nameNode.path(lang).asString();
+
           if (!name.isEmpty()) {
             translations.put(lang, nameNode.path(lang).asString());
           }
@@ -170,6 +173,7 @@ public class LiipiParkToVehicleParkingMapper {
     if (stateText == null) {
       return VehicleParkingState.OPERATIONAL;
     }
+
     switch (stateText) {
       case "INACTIVE":
         return VehicleParkingState.CLOSED;
@@ -189,20 +193,25 @@ public class LiipiParkToVehicleParkingMapper {
   private List<String> parseTags(JsonNode node) {
     var tagList = new ArrayList<String>();
     ArrayNode servicesArray = (ArrayNode) node.get("services");
+
     if (servicesArray != null && servicesArray.isArray()) {
       for (JsonNode jsonNode : servicesArray) {
         tagList.add(feedId + ":SERVICE_" + jsonNode.asString());
       }
     }
+
     ArrayNode authenticationMethods = (ArrayNode) node.get("authenticationMethods");
+
     if (authenticationMethods != null && authenticationMethods.isArray()) {
       for (JsonNode jsonNode : authenticationMethods) {
         tagList.add(feedId + ":AUTHENTICATION_METHOD_" + jsonNode.asString());
       }
     }
+
     if (node.has("pricingMethod")) {
       tagList.add(feedId + ":PRICING_METHOD_" + node.path("pricingMethod").asString());
     }
+
     return tagList;
   }
 
@@ -228,9 +237,12 @@ public class LiipiParkToVehicleParkingMapper {
     if (zoneId == null) {
       return null;
     }
+
     var calendarBuilder = openingHoursCalendarService.newBuilder(zoneId);
+
     for (DayTypeAndDays dayTypeAndDays : DAYS_FOR_DAY_TYPES) {
       String key = dayTypeAndDays.typeKey();
+
       if (openingHoursByDayType.has(key) && openingHoursByDayType.path(key).has("from")) {
         LocalTime fromTime = convertTimeStringLocalTime(
           openingHoursByDayType.path(key).path("from").asString()
@@ -243,12 +255,15 @@ public class LiipiParkToVehicleParkingMapper {
           fromTime,
           toTime
         );
+
         for (DayOfWeek day : dayTypeAndDays.days()) {
           openingHoursBuilder.on(day);
         }
+
         openingHoursBuilder.add();
       }
     }
+
     return calendarBuilder.build();
   }
 

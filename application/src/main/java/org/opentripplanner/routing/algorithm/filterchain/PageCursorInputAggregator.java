@@ -34,6 +34,7 @@ public class PageCursorInputAggregator {
 
   public void providePageCursorInput() {
     DefaultPageCursorInput.Builder pageCursorInputBuilder = DefaultPageCursorInput.of();
+
     if (
       numItinerariesFilter != null && numItinerariesFilter.getNumItinerariesFilterResult() != null
     ) {
@@ -46,6 +47,7 @@ public class PageCursorInputAggregator {
         )
         .withPageCut(numItinerariesFilter.getNumItinerariesFilterResult().pageCut());
     }
+
     if (
       removeTransitIfStreetOnlyIsBetter != null &&
       removeTransitIfStreetOnlyIsBetter.getRemoveTransitIfStreetOnlyIsBetterResult() != null

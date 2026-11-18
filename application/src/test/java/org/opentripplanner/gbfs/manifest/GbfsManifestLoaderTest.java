@@ -68,12 +68,14 @@ class GbfsManifestLoaderTest {
 
   private static GBFSDataset dataset(String... versionAndUrl) {
     var versions = new ArrayList<GBFSVersion>();
+
     for (int i = 0; i < versionAndUrl.length; i += 2) {
       var version = new GBFSVersion();
       version.setVersion(GBFSVersion.Version.fromValue(versionAndUrl[i]));
       version.setUrl(versionAndUrl[i + 1]);
       versions.add(version);
     }
+
     var dataset = new GBFSDataset();
     dataset.setSystemId("test");
     dataset.setVersions(versions);

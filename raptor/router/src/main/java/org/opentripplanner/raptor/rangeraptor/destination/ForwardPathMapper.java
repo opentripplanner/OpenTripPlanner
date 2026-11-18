@@ -58,6 +58,7 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
           "Unknown arrival type: " + arrival.getClass().getSimpleName()
         );
       }
+
       arrival = arrival.previous();
     }
 

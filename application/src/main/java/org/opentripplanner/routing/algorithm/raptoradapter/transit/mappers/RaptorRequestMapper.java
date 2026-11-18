@@ -116,6 +116,7 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
         searchParams.earliestDepartureTime(time);
         searchParams.latestArrivalTime(timeLimit);
       }
+
       searchParams.searchWindow(request.searchWindow());
     } else {
       var c = request.pageCursor();
@@ -123,9 +124,11 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
       if (c.earliestDepartureTime() != null) {
         searchParams.earliestDepartureTime(relativeTime(c.earliestDepartureTime()));
       }
+
       if (c.latestArrivalTime() != null) {
         searchParams.latestArrivalTime(relativeTime(c.latestArrivalTime()));
       }
+
       searchParams.searchWindow(c.searchWindow());
     }
 
@@ -198,6 +201,7 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
         )
       );
     }
+
     return builder.build();
   }
 
@@ -208,33 +212,40 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
   private RaptorViaLocation mapViaLocation(ViaLocation input) {
     if (input.isPassThroughLocation()) {
       var builder = RaptorViaLocation.passThrough(input.label());
+
       for (int stopIndex : lookUpStopIndex.lookupStopLocationIndexes(input.stopLocationIds())) {
         builder.addStop(stopIndex);
       }
+
       return builder.build();
     }
     // Visit Via location
     else {
       var viaStops = new HashSet<Integer>();
       var builder = RaptorViaLocation.viaVisit(input.label(), input.minimumWaitTime());
+
       for (int stopIndex : lookUpStopIndex.lookupStopLocationIndexes(input.stopLocationIds())) {
         builder.addStop(stopIndex);
         viaStops.add(stopIndex);
       }
+
       if (input.coordinate().isPresent()) {
         var vertices = linkingContext.findVertices(((VisitViaLocation) input).coordinateLocation());
+
         if (vertices.isEmpty()) {
           LOG.warn(
             "Found no vertices for the visit via location {} which indicates a problem.",
             input
           );
         }
+
         for (var vertex : vertices) {
           var viaTransfers = viaTransferResolver.createViaTransfers(
             request,
             vertex,
             input.coordinate().get()
           );
+
           for (var it : viaTransfers) {
             // If via-stop and via-transfers are used together then walking from a stop
             // to the coordinate and back is not pareto optimal, using just the stop
@@ -242,15 +253,19 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
             if (it.stop() == it.fromStopIndex() && viaStops.contains(it.stop())) {
               continue;
             }
+
             builder.addTransfer(it.fromStopIndex(), it);
           }
         }
       }
+
       var viaLocation = builder.build();
+
       if (OTPFeature.CostlyAssertions.isOn()) {
         // This check can have a bad performance if there are a lot of connections
         viaLocation.validateDuplicateConnections();
       }
+
       return viaLocation;
     }
   }
@@ -259,6 +274,7 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
     if (relax == null) {
       return null;
     }
+
     return GeneralizedCostRelaxFunction.of(
       relax.coefficient(),
       RaptorCostConverter.toRaptorCost(relax.constant().toSeconds())
@@ -269,6 +285,7 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
     if (time == null) {
       return RaptorConstants.TIME_NOT_SET;
     }
+
     return (int) (time.getEpochSecond() - transitSearchTimeZeroEpocSecond);
   }
 
@@ -296,17 +313,21 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
 
   private List<Integer> mapDebugStopList(List<String> stops) {
     List<Integer> result = new ArrayList<>();
+
     for (String stop : stops) {
       try {
         result.add(Integer.parseInt(stop));
       } catch (NumberFormatException ignore) {
         var a = lookUpStopIndex.lookupStopLocationIndexes(FeedScopedId.parseStrict(stop)).toArray();
+
         if (a.length != 1) {
           throw new IllegalArgumentException("Unable to parse the input stop id: '" + stop + "'");
         }
+
         result.add(a[0]);
       }
     }
+
     return result;
   }
 }

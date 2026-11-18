@@ -223,6 +223,7 @@ public class ServiceJourneyType {
             } else if (last != null && last < stops.size()) {
               return stops.subList(stops.size() - last, stops.size());
             }
+
             return stops;
           })
           .build()
@@ -278,11 +279,13 @@ public class ServiceJourneyType {
             TripPattern tripPattern = GqlUtil.getTransitService(environment).findPattern(
               trip(environment)
             );
+
             if (tripPattern == null) {
               return null;
             }
 
             LineString geometry = tripPattern.getGeometry();
+
             if (geometry == null) {
               return null;
             }

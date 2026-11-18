@@ -60,9 +60,11 @@ public class VehicleParkingSpaces implements Serializable {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     final VehicleParkingSpaces that = (VehicleParkingSpaces) o;
     return (
       Objects.equals(bicycleSpaces, that.bicycleSpaces) &&

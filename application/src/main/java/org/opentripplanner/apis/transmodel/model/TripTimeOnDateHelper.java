@@ -24,6 +24,7 @@ public class TripTimeOnDateHelper {
     if (!leg.isScheduledTransitLeg()) {
       return null;
     }
+
     ScheduledTransitLeg transitLeg = leg.asScheduledTransitLeg();
     return new TripTimeOnDate(
       transitLeg.tripTimes(),
@@ -52,6 +53,7 @@ public class TripTimeOnDateHelper {
     if (!leg.isScheduledTransitLeg()) {
       return null;
     }
+
     ScheduledTransitLeg transitLeg = leg.asScheduledTransitLeg();
     return new TripTimeOnDate(
       transitLeg.tripTimes(),
@@ -79,6 +81,7 @@ public class TripTimeOnDateHelper {
     if (!leg.isScheduledTransitLeg()) {
       return List.of();
     }
+
     ScheduledTransitLeg transitLeg = leg.asScheduledTransitLeg();
     var tripTimes = transitLeg.tripTimes();
     TripPattern tripPattern = transitLeg.tripPattern();
@@ -104,6 +107,7 @@ public class TripTimeOnDateHelper {
     if (!leg.isScheduledTransitLeg()) {
       return List.of();
     }
+
     ScheduledTransitLeg transitLeg = leg.asScheduledTransitLeg();
     var tripTimes = transitLeg.tripTimes();
     TripPattern tripPattern = transitLeg.tripPattern();

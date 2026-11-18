@@ -14,9 +14,11 @@ class StopPlaceTypeMapper {
 
   public NetexMainAndSubMode map(StopPlace stopPlace) {
     NetexMainAndSubMode submode = getSubmodeAsString(stopPlace);
+
     if (submode != null) {
       return submode;
     }
+
     TransitMode mode = mapVehicleMode(stopPlace);
     return new NetexMainAndSubMode(mode, null);
   }
@@ -25,6 +27,7 @@ class StopPlaceTypeMapper {
     if (stopPlace.getTransportMode() == null) {
       return null;
     }
+
     return switch (stopPlace.getTransportMode()) {
       case AIR -> TransitMode.AIRPLANE;
       case BUS -> TransitMode.BUS;
@@ -54,33 +57,42 @@ class StopPlaceTypeMapper {
     if (stopPlace.getAirSubmode() != null) {
       return new NetexMainAndSubMode(TransitMode.AIRPLANE, stopPlace.getAirSubmode().value());
     }
+
     if (stopPlace.getBusSubmode() != null) {
       return new NetexMainAndSubMode(TransitMode.BUS, stopPlace.getBusSubmode().value());
     }
+
     if (stopPlace.getTelecabinSubmode() != null) {
       return new NetexMainAndSubMode(TransitMode.GONDOLA, stopPlace.getTelecabinSubmode().value());
     }
+
     if (stopPlace.getCoachSubmode() != null) {
       return new NetexMainAndSubMode(TransitMode.COACH, stopPlace.getCoachSubmode().value());
     }
+
     if (stopPlace.getFunicularSubmode() != null) {
       return new NetexMainAndSubMode(
         TransitMode.FUNICULAR,
         stopPlace.getFunicularSubmode().value()
       );
     }
+
     if (stopPlace.getMetroSubmode() != null) {
       return new NetexMainAndSubMode(TransitMode.SUBWAY, stopPlace.getMetroSubmode().value());
     }
+
     if (stopPlace.getRailSubmode() != null) {
       return new NetexMainAndSubMode(TransitMode.RAIL, stopPlace.getRailSubmode().value());
     }
+
     if (stopPlace.getTramSubmode() != null) {
       return new NetexMainAndSubMode(TransitMode.TRAM, stopPlace.getTramSubmode().value());
     }
+
     if (stopPlace.getWaterSubmode() != null) {
       return new NetexMainAndSubMode(TransitMode.FERRY, stopPlace.getWaterSubmode().value());
     }
+
     return null;
   }
 }

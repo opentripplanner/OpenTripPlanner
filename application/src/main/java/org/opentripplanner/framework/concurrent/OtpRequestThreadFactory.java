@@ -40,6 +40,7 @@ public class OtpRequestThreadFactory implements ThreadFactory {
     if (LogMDCSupport.isRequestTracingInLoggingEnabled()) {
       return delegate.newThread(new LogMDCRunnableDecorator(r));
     }
+
     return delegate.newThread(r);
   }
 }

@@ -164,6 +164,7 @@ final class TestDriver {
     var maxNumFilter = new NumItinerariesFilter(nResults, cropItineraries);
     kept = maxNumFilter.removeMatchesForTest(kept);
     DefaultPageCursorInput.Builder pageCursorInputBuilder = DefaultPageCursorInput.of();
+
     if (maxNumFilter.getNumItinerariesFilterResult() != null) {
       pageCursorInputBuilder = pageCursorInputBuilder
         .withEarliestRemovedDeparture(
@@ -174,6 +175,7 @@ final class TestDriver {
         )
         .withPageCut(maxNumFilter.getNumItinerariesFilterResult().pageCut());
     }
+
     filterResultBox.set(pageCursorInputBuilder.build());
 
     return new TestDriver(
@@ -192,13 +194,16 @@ final class TestDriver {
     if (TestDebug.off()) {
       return;
     }
+
     TestDebug.println();
     TestDebug.println("ITINERARIES:");
     all.forEach(it -> {
       var value = TestPagingUtils.toString(it);
+
       if (kept.contains(it)) {
         value += " *";
       }
+
       TestDebug.println(value);
     });
   }

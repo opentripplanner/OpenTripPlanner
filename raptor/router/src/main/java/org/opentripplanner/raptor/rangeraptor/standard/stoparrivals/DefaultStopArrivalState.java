@@ -165,6 +165,7 @@ sealed class DefaultStopArrivalState<T extends RaptorTripSchedule>
     if (transferPath != null) {
       builder.addDurationSec("transfer", transferPath.durationInSeconds());
     }
+
     return builder;
   }
 
@@ -175,6 +176,7 @@ sealed class DefaultStopArrivalState<T extends RaptorTripSchedule>
       this.transferFromStop = NOT_SET;
       this.transferPath = null;
     }
+
     if (onBoard) {
       this.onBoardArrivalTime = time;
       // Clear transit to avoid mistakes

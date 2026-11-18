@@ -207,6 +207,7 @@ public class CarpoolSiriMapperTest {
   @Test
   void mapSiriToCarpoolTrip_noOccupancyData_returnsDefaultOnboardCount() {
     var mapped = mapper.mapSiriToCarpoolTrip(minimalCompleteJourney());
+
     for (var stop : mapped.stops()) {
       assertEquals(DEFAULT_ONBOARD_COUNT, stop.getOnboardCount());
     }
@@ -222,6 +223,7 @@ public class CarpoolSiriMapperTest {
   @Test
   void mapSiriToCarpoolTrip_zeroOnboardCount_returnsDefaultOnboardCount() {
     var mapped = mapper.mapSiriToCarpoolTrip(journeyWithOnboardCounts(0, 0));
+
     for (var stop : mapped.stops()) {
       assertEquals(DEFAULT_ONBOARD_COUNT, stop.getOnboardCount());
     }
@@ -230,6 +232,7 @@ public class CarpoolSiriMapperTest {
   @Test
   void mapSiriToCarpoolTrip_negativeOnboardCount_returnsDefaultOnboardCount() {
     var mapped = mapper.mapSiriToCarpoolTrip(journeyWithOnboardCounts(-1, -1));
+
     for (var stop : mapped.stops()) {
       assertEquals(DEFAULT_ONBOARD_COUNT, stop.getOnboardCount());
     }

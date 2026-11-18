@@ -82,9 +82,11 @@ class StreetSummarizer {
 
     var coord = String.format("(%s,%s)".formatted(format(v.getLat()), format(v.getLon())));
     buf.append(coord);
+
     if (v instanceof TransitStopVertex tsv) {
       buf.append("[%s]".formatted(tsv.getId()));
     }
+
     if (v instanceof VehicleParkingEntranceVertex pev) {
       buf.append("[%s]".formatted(pev.getLabel()));
     }
@@ -111,15 +113,19 @@ class StreetSummarizer {
   /// noThru=WALK,CAR"`. Returns an empty string if the edge is not restricted for any mode.
   private static String summarizeNoThru(StreetEdge e) {
     var modes = new ArrayList<String>();
+
     if (e.isWalkNoThruTraffic()) {
       modes.add("WALK");
     }
+
     if (e.isBicycleNoThruTraffic()) {
       modes.add("BICYCLE");
     }
+
     if (e.isMotorVehicleNoThruTraffic()) {
       modes.add("CAR");
     }
+
     return modes.isEmpty() ? "" : " noThru=" + String.join(",", modes);
   }
 

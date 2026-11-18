@@ -60,6 +60,7 @@ public class RouteRequestToFilterChainMapper {
     }
 
     ItineraryFilterPreferences params = request.preferences().itineraryFilter();
+
     // Group by similar legs filter
     if (params.groupSimilarityKeepOne().asDouble() >= GroupBySimilarity.MIN_GROUP_BY_P) {
       builder.addGroupBySimilarity(
@@ -132,6 +133,7 @@ public class RouteRequestToFilterChainMapper {
     if (request.journey().modes().hasAccessOrEgressMode(StreetMode.BIKE_TO_PARK)) {
       return request.preferences().itineraryFilter().minBikeParkingDistance();
     }
+
     return 0;
   }
 }

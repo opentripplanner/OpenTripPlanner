@@ -37,6 +37,7 @@ public class DefaultRegularTransferBuildRepository<P> implements RegularTransfer
           "repository now."
       );
     }
+
     paths.setPaths(userPreferences, fromStop, pathsByToStop);
   }
 

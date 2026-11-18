@@ -23,13 +23,16 @@ public class ArgumentUtils {
   static List<Map<String, Object>> getTransitModes(DataFetchingEnvironment environment) {
     if (environment.containsArgument("modes")) {
       Map<String, Object> modesArgs = environment.getArgument("modes");
+
       if (modesArgs.containsKey("transit")) {
         Map<String, Object> transitArgs = (Map<String, Object>) modesArgs.get("transit");
+
         if (transitArgs.containsKey("transit")) {
           return (List<Map<String, Object>>) transitArgs.get("transit");
         }
       }
     }
+
     return null;
   }
 
@@ -38,6 +41,7 @@ public class ArgumentUtils {
     DataFetchingEnvironment environment
   ) {
     var transitModes = getTransitModes(environment);
+
     if (transitModes != null) {
       return transitModes
         .stream()

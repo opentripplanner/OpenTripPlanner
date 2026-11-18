@@ -14,18 +14,25 @@ public class WalkPreferencesMapper {
     }
 
     var speed = args.getGraphQLSpeed();
+
     if (speed != null) {
       preferences.withSpeed(speed);
     }
+
     var reluctance = args.getGraphQLReluctance();
+
     if (reluctance != null) {
       preferences.withReluctance(reluctance);
     }
+
     var walkSafetyFactor = args.getGraphQLSafetyFactor();
+
     if (walkSafetyFactor != null) {
       preferences.withSafetyFactor(walkSafetyFactor);
     }
+
     var boardCost = args.getGraphQLBoardCost();
+
     if (boardCost != null) {
       preferences.withBoardCost(boardCost.toSeconds());
     }

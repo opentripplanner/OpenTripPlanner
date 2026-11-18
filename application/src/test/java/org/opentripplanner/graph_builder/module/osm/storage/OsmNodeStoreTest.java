@@ -137,6 +137,7 @@ class OsmNodeStoreTest {
   @Test
   void tooManyDistinctProvidersThrows() {
     var store = new OsmNodeStore();
+
     // the first provider is "free" (index 0, never written to the index map), so this fills
     // up the 127 indices the byte-sized index map can hold.
     for (int i = 0; i < 127; i++) {

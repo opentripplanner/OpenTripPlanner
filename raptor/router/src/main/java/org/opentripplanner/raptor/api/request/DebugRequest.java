@@ -65,9 +65,11 @@ public record DebugRequest(
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     DebugRequest that = (DebugRequest) o;
     return (
       debugPathFromStopIndex == that.debugPathFromStopIndex &&

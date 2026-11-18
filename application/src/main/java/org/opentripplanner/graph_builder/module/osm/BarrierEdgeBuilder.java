@@ -40,6 +40,7 @@ class BarrierEdgeBuilder {
           barrier.overridePermissions(StreetTraversalPermission.ALL)
         );
         wheelchairAccessible = wheelchairAccessible && barrier.isWheelchairAccessible();
+
         if (!barrier.hasNoName()) {
           name = edgeNamer
             .getName(barrier)
@@ -49,6 +50,7 @@ class BarrierEdgeBuilder {
     }
 
     permission = node.overridePermissions(permission);
+
     if (permission.allowsNothing()) {
       return;
     }
@@ -60,6 +62,7 @@ class BarrierEdgeBuilder {
     var outDegrees = Arrays.stream(vs)
       .map(Vertex::getDegreeOut)
       .toArray(Integer[]::new);
+
     for (var i = 0; i < vs.length; ++i) {
       for (var j = 0; j < vs.length; ++j) {
         if (i != j) {
@@ -87,6 +90,7 @@ class BarrierEdgeBuilder {
             for (var mode : getNoThruModes(from.getIncoming())) {
               seb.withNoThruTrafficTraverseMode(mode);
             }
+
             for (var mode : getNoThruModes(to.getOutgoing())) {
               seb.withNoThruTrafficTraverseMode(mode);
             }

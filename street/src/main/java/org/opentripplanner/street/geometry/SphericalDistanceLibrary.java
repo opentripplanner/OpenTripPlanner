@@ -198,6 +198,7 @@ public abstract class SphericalDistanceLibrary {
     if (abs(lat1 - lat2) > MAX_LAT_DELTA_DEG || abs(lon1 - lon2) > MAX_LON_DELTA_DEG) {
       return distance(lat1, lon1, lat2, lon2, radius);
     }
+
     double dLat = toRadians(lat2 - lat1);
     double dLon = toRadians(lon2 - lon1) * cos(toRadians((lat1 + lat2) / 2));
     return radius * sqrt(dLat * dLat + dLon * dLon) * MAX_ERR_INV;
@@ -235,11 +236,13 @@ public abstract class SphericalDistanceLibrary {
      * the range [lat-dLat, lat+dLat].
      */
     double minCosLat;
+
     if (latDeg > 0) {
       minCosLat = cos(toRadians(latDeg + dLatDeg));
     } else {
       minCosLat = cos(toRadians(latDeg - dLatDeg));
     }
+
     return dLatDeg / minCosLat;
   }
 
@@ -287,10 +290,12 @@ public abstract class SphericalDistanceLibrary {
     CoordinateSequence seq = lineString.getCoordinateSequence();
     int n = seq.size();
     double[] projected = new double[n * 2];
+
     for (int i = 0; i < n; i++) {
       projected[i * 2] = toRadians(seq.getX(i)) * cosLat;
       projected[i * 2 + 1] = toRadians(seq.getY(i));
     }
+
     CoordinateSequence projSeq = new PackedCoordinateSequence.Double(projected, 2, 0);
     return GeometryUtils.getGeometryFactory().createLineString(projSeq);
   }

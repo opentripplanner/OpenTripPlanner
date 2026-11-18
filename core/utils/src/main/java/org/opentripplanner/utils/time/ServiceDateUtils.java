@@ -145,6 +145,7 @@ public class ServiceDateUtils {
     if (t1.getHour() == 23 && t1.plusHours(12).getHour() == 12) {
       ld1 = ld1.plusDays(1);
     }
+
     // +1 to end, to include the end. The `datesUntil` is [inclusive, exclusive)
     return ld0.datesUntil(ld1.plusDays(1)).toList();
   }
@@ -210,9 +211,11 @@ public class ServiceDateUtils {
     if (LocalDate.MAX.equals(date)) {
       return MAX_TEXT;
     }
+
     if (LocalDate.MIN.equals(date)) {
       return MIN_TEXT;
     }
+
     return date.toString();
   }
 }

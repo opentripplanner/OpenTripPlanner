@@ -22,6 +22,7 @@ public record UpdateError(
 ) {
   public String debugId() {
     var id = tripId != null ? tripId.toString() : tripReference;
+
     if (id == null) {
       return "no trip id";
     } else if (stopPosition == null) {

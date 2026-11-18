@@ -11,6 +11,7 @@ import org.opentripplanner.street.model.vertex.Vertex;
 public record RoutableCarpoolTrip(CarpoolTrip trip, CarpoolCorridor corridor) {
   public RoutableCarpoolTrip {
     Objects.requireNonNull(corridor, "corridor");
+
     if (corridor.waypoints().size() != trip.stops().size()) {
       throw new IllegalArgumentException(
         "Number of vertices (%d) does not match number of stops (%d)".formatted(

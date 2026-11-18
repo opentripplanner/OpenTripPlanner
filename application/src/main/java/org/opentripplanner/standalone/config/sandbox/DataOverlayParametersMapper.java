@@ -18,6 +18,7 @@ public class DataOverlayParametersMapper {
         .asDoubleOptional()
         .ifPresent(it -> builder.add(param, it));
     }
+
     return builder.build();
   }
 }

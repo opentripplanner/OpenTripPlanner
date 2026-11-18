@@ -36,6 +36,7 @@ public class JourneyWhiteListed {
 
   public JourneyWhiteListed(DataFetchingEnvironment environment, FeedScopedIdMapper idMapper) {
     Map<String, List<String>> whiteList = environment.getArgument("whiteListed");
+
     if (whiteList == null) {
       this.authorityIds = Set.of();
       this.lineIds = Set.of();

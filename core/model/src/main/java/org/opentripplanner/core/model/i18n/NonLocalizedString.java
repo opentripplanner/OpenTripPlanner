@@ -30,6 +30,7 @@ public class NonLocalizedString implements I18NString, Serializable {
     if (name == null) {
       return null;
     }
+
     return new NonLocalizedString(name);
   }
 

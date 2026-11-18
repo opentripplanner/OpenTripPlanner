@@ -64,6 +64,7 @@ public class MaxStopCountLimit {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
@@ -110,12 +111,14 @@ public class MaxStopCountLimit {
       // Lazy initialize the valueForEnum map
       if (limitsForModes == null) {
         limitsForModes = new EnumMap<>(StreetMode.class);
+
         for (StreetMode it : StreetMode.values()) {
           if (original.hasCustomLimit(it)) {
             limitsForModes.put(it, original.limitForMode(it));
           }
         }
       }
+
       limitsForModes.put(mode, limit);
       return this;
     }
@@ -124,6 +127,7 @@ public class MaxStopCountLimit {
       for (Map.Entry<StreetMode, Integer> e : limitsForModes.entrySet()) {
         with(e.getKey(), e.getValue());
       }
+
       return this;
     }
 
@@ -139,11 +143,13 @@ public class MaxStopCountLimit {
       }
 
       var copy = new EnumMap<StreetMode, Integer>(StreetMode.class);
+
       for (Map.Entry<StreetMode, Integer> it : limitsForModes.entrySet()) {
         if (defaultLimit != it.getValue()) {
           copy.put(it.getKey(), it.getValue());
         }
       }
+
       return copy;
     }
 

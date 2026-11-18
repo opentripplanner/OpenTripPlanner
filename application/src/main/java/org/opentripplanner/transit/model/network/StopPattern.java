@@ -64,9 +64,11 @@ public final class StopPattern implements Serializable {
   public StopPattern(Collection<StopTime> stopTimes) {
     this(stopTimes.size());
     int size = stopTimes.size();
+
     if (size == 0) {
       return;
     }
+
     Iterator<StopTime> stopTimeIterator = stopTimes.iterator();
 
     for (int i = 0; i < size; ++i) {
@@ -135,9 +137,11 @@ public final class StopPattern implements Serializable {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("StopPattern: ");
+
     for (int i = 0, j = stops.length; i < j; ++i) {
       sb.append(String.format("%s_%s%s ", stops[i].getCode(), pickups[i], dropoffs[i]));
     }
+
     return sb.toString();
   }
 
@@ -162,6 +166,7 @@ public final class StopPattern implements Serializable {
         return i;
       }
     }
+
     return -1;
   }
 
@@ -223,6 +228,7 @@ public final class StopPattern implements Serializable {
         return true;
       }
     }
+
     return false;
   }
 
@@ -251,6 +257,7 @@ public final class StopPattern implements Serializable {
         return true;
       }
     }
+
     return false;
   }
 
@@ -280,6 +287,7 @@ public final class StopPattern implements Serializable {
         return i;
       }
     }
+
     return -1;
   }
 
@@ -351,6 +359,7 @@ public final class StopPattern implements Serializable {
       for (var entry : updatedPickups.entrySet()) {
         pickups.with(entry.getKey(), entry.getValue());
       }
+
       return this;
     }
 
@@ -363,6 +372,7 @@ public final class StopPattern implements Serializable {
       for (var entry : updatedDropoffs.entrySet()) {
         dropoffs.with(entry.getKey(), entry.getValue());
       }
+
       return this;
     }
 
@@ -372,11 +382,13 @@ public final class StopPattern implements Serializable {
     public StopPatternBuilder replaceStop(FeedScopedId old, StopLocation newStop) {
       Objects.requireNonNull(old);
       Objects.requireNonNull(newStop);
+
       for (int i = 0; i < stops.size(); i++) {
         if (stops.getOrOriginal(i).getId().equals(old)) {
           stops.with(i, newStop);
         }
       }
+
       return this;
     }
 
@@ -385,9 +397,11 @@ public final class StopPattern implements Serializable {
      */
     public StopPatternBuilder replaceStops(Map<Integer, StopLocation> newStops) {
       Objects.requireNonNull(newStops);
+
       for (var entry : newStops.entrySet()) {
         stops.with(entry.getKey(), entry.getValue());
       }
+
       return this;
     }
 

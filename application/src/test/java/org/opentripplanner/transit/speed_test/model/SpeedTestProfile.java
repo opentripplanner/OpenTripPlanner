@@ -115,6 +115,7 @@ public enum SpeedTestProfile {
           return it;
         }
       }
+
       throw new IllegalArgumentException(
         "Profile is not valid: '" +
           value +
@@ -139,10 +140,12 @@ public enum SpeedTestProfile {
     if (raptorProfile != null) {
       text.append(String.format("\n·%22s%s", "", raptorProfile));
       text.append(", ").append(direction.name());
+
       for (Optimization it : optimizations) {
         text.append(", ").append(it.name());
       }
     }
+
     return text.toString();
   }
 }

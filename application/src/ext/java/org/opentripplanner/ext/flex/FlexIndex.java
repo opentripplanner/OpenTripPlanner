@@ -35,6 +35,7 @@ public class FlexIndex {
       var route = flexTrip.getTrip().getRoute();
       routeById.put(route.getId(), route);
       tripById.put(flexTrip.getTrip().getId(), flexTrip);
+
       for (StopLocation stop : flexTrip.getStops()) {
         if (stop instanceof GroupStop groupStop) {
           for (StopLocation stopElement : groupStop.getChildLocations()) {

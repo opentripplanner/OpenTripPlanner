@@ -81,6 +81,7 @@ class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> {
     if (filterByPlaceTypes == null || filterByPlaceTypes.isEmpty()) {
       throw new IllegalArgumentException("No place type filter was included in request");
     }
+
     this.transitService = transitService;
 
     this.filterByModes = toSet(filterByModes);
@@ -108,6 +109,7 @@ class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> {
   public void visitVertex(State state) {
     Vertex vertex = state.getVertex();
     double distance = state.getTraversalDistanceMeters();
+
     if (vertex instanceof TransitStopVertex transitVertex) {
       var stop = Objects.requireNonNull(transitService.getRegularStop(transitVertex.getId()));
       handleStop(stop, distance);
@@ -138,6 +140,7 @@ class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> {
         PlaceFinderTraverseVisitor.this.maxResults
       ) {
         furthestDistance = 0;
+
         for (PlaceAtDistance pad : PlaceFinderTraverseVisitor.this.placesFound) {
           if (pad.distance() > furthestDistance) {
             furthestDistance = pad.distance();
@@ -153,6 +156,7 @@ class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> {
     if (list == null) {
       return Set.of();
     }
+
     return Set.copyOf(list);
   }
 
@@ -162,6 +166,7 @@ class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> {
         placesFound.add(new PlaceAtDistance(parking, distance));
         seenParkingLots.add(parking.getId());
       }
+
       // make sure that we don't add the same place twice if it has bike and car parking spaces
       if (
         includeCarParking && parking.hasAnyCarPlaces() && !seenParkingLots.contains(parking.getId())
@@ -247,6 +252,7 @@ class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> {
 
       for (TripPattern pattern : patterns) {
         String seenKey = pattern.getRoute().getId().toString() + ":" + pattern.getId().toString();
+
         if (!seenPatternAtStops.contains(seenKey)) {
           PatternAtStop row = new PatternAtStop(stop, pattern);
           PlaceAtDistance place = new PlaceAtDistance(row, distance);
@@ -261,15 +267,19 @@ class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> {
     if (!includeVehicleRentals) {
       return;
     }
+
     if (!filterByVehicleRental.isEmpty() && !filterByVehicleRental.contains(station.stationId())) {
       return;
     }
+
     if (seenVehicleRentalPlaces.contains(station.id())) {
       return;
     }
+
     if (!filterByNetwork.isEmpty() && !filterByNetwork.contains(station.network())) {
       return;
     }
+
     seenVehicleRentalPlaces.add(station.id());
     placesFound.add(new PlaceAtDistance(station, distance));
   }

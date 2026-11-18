@@ -70,6 +70,7 @@ class JourneyPatternDuplicateStopPointsTest {
 
     var points = new PointsInJourneyPattern_RelStructure();
     int order = 1;
+
     for (String pointId : pointIds) {
       var point = new StopPointInJourneyPattern();
       point.setId(pointId);

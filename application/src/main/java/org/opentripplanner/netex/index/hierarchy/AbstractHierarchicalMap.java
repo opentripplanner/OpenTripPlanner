@@ -61,6 +61,7 @@ public abstract class AbstractHierarchicalMap<K, V> implements ReadOnlyHierarchi
    */
   public void validate(HMapValidationRule<K, V> rule, Consumer<DataImportIssue> warnMsgConsumer) {
     List<K> discardKeys = new ArrayList<>();
+
     for (K key : localKeys()) {
       V value = localGet(key);
 
@@ -69,10 +70,12 @@ public abstract class AbstractHierarchicalMap<K, V> implements ReadOnlyHierarchi
       if (status == HMapValidationRule.Status.DISCARD) {
         discardKeys.add(key);
       }
+
       if (status != HMapValidationRule.Status.OK) {
         warnMsgConsumer.accept(rule.logMessage(key, value));
       }
     }
+
     discardKeys.forEach(this::localRemove);
   }
 
@@ -84,6 +87,7 @@ public abstract class AbstractHierarchicalMap<K, V> implements ReadOnlyHierarchi
     Consumer<DataImportIssue> warnMsgConsumer
   ) {
     List<K> discardKeys = new ArrayList<>();
+
     for (K key : localKeys()) {
       V value = localGet(key);
       HMapValidationRule<K, V> rule = ruleSupplier.get();
@@ -92,10 +96,12 @@ public abstract class AbstractHierarchicalMap<K, V> implements ReadOnlyHierarchi
       if (status == HMapValidationRule.Status.DISCARD) {
         discardKeys.add(key);
       }
+
       if (status != HMapValidationRule.Status.OK) {
         warnMsgConsumer.accept(rule.logMessage(key, value));
       }
     }
+
     discardKeys.forEach(this::localRemove);
   }
 

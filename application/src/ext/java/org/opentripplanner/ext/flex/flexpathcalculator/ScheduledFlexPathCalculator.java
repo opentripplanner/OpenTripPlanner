@@ -31,9 +31,11 @@ public class ScheduledFlexPathCalculator implements FlexPathCalculator {
       boardStopPosition,
       alightStopPosition
     );
+
     if (flexPath == null) {
       return null;
     }
+
     int departureTime = trip.earliestDepartureTime(
       Integer.MIN_VALUE,
       boardStopPosition,
@@ -59,6 +61,7 @@ public class ScheduledFlexPathCalculator implements FlexPathCalculator {
     if (departureTime >= arrivalTime) {
       return null;
     }
+
     return new FlexPath(
       flexPath.distanceMeters,
       arrivalTime - departureTime,

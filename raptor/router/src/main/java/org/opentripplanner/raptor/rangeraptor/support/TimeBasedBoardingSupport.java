@@ -172,6 +172,7 @@ public final class TimeBasedBoardingSupport<T extends RaptorTripSchedule> {
     if (!inFirstIteration && isFirstRound(round) && !hasTimeDependentAccess) {
       return calculator.createExactTripSearch(timeTable);
     }
+
     return calculator.createTripSearch(timeTable);
   }
 }

@@ -72,9 +72,11 @@ public class TripRequest {
     if (this == o) {
       return true;
     }
+
     if (!(o instanceof TripRequest that)) {
       return false;
     }
+
     return (
       Objects.equals(includeAgencies, that.includeAgencies) &&
       Objects.equals(includeRoutes, that.includeRoutes) &&

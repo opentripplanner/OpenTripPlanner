@@ -31,9 +31,11 @@ class OpenGisMapper {
         .toArray(LinearRing[]::new),
       GeometryUtils.getGeometryFactory()
     );
+
     if (!polygon.isValid()) {
       throw new IllegalArgumentException("The polygon has an invalid geometry");
     }
+
     return polygon;
   }
 
@@ -46,6 +48,7 @@ class OpenGisMapper {
 
     // Convert a single list of alternating lat/lon values into coordinates
     ArrayList<Coordinate> coordinates = new ArrayList<>();
+
     for (int i = 0; i < posList.size(); i += 2) {
       coordinates.add(new Coordinate(posList.get(i + 1), posList.get(i)));
     }

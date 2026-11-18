@@ -75,9 +75,11 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
     stops.parallelStream().forEach(stop -> {
       // The paths of this stop of the profiles generated so far, in the order of the profiles
       var pathsOfEarlierProfiles = new ArrayList<Map<Integer, P>>();
+
       for (var profile : profiles) {
         pathsOfEarlierProfiles.add(generateForStop(profile, stop, pathsOfEarlierProfiles));
       }
+
       progress.step(m -> LOG.info(m));
     });
     LOG.info(progress.completeMessage());
@@ -91,18 +93,22 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
   /** All stops in the stop index. The path provider decides which of them have transfers. */
   private List<FeedScopedId> listAllStops() {
     var stops = new ArrayList<FeedScopedId>();
+
     for (int i = 0; i < stopIndex.size(); ++i) {
       var stopId = stopIndex.toStopId(i);
+
       if (stopId != null) {
         stops.add(stopId);
       }
     }
+
     return stops;
   }
 
   @Override
   public List<RegularTransferProfileStatistics> profileStatistics() {
     var result = new ArrayList<RegularTransferProfileStatistics>();
+
     for (var profile : profiles) {
       var stops = stopsUsedByProfile
         .getOrDefault(profile.id(), Set.of())
@@ -120,6 +126,7 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
         )
       );
     }
+
     return result;
   }
 
@@ -149,13 +156,17 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
     Map<Integer, TransferPath<P>> bestCandidatePerTargetStop = new HashMap<>();
 
     var nearbyStops = profile.search().findNearbyStops(fromStopId, profile.maxDurations());
+
     for (var candidate : nearbyStops) {
       int toStop = stopIndex.toStopIndex(candidate.toStop());
+
       if (toStop == RaptorConstants.NOT_FOUND) {
         // The nearby stops may include flex stops, they can not be a target of a regular transfer
         continue;
       }
+
       var existing = bestCandidatePerTargetStop.get(toStop);
+
       if (existing == null || candidate.criteria().c1() < existing.criteria().c1()) {
         bestCandidatePerTargetStop.put(toStop, candidate);
       }
@@ -170,6 +181,7 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
         candidate,
         pathsOfEarlierProfiles
       );
+
       if (reusedPath != null) {
         pathsByToStop.put(toStop, reusedPath);
         sharedPaths.computeIfAbsent(profile.id(), id -> new LongAdder()).increment();
@@ -177,6 +189,7 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
         pathsByToStop.put(toStop, candidate.path());
       }
     });
+
     if (!pathsByToStop.isEmpty()) {
       stopsUsedInTransfers.add(fromStop);
       stopsUsedInTransfers.addAll(pathsByToStop.keySet());
@@ -186,10 +199,12 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
       stopsOfProfile.add(fromStop);
       stopsOfProfile.addAll(pathsByToStop.keySet());
     }
+
     // Stops are generated in parallel, the build repository is not thread-safe
     synchronized (this) {
       buildRepository.setPaths(profile.userPreferences(), fromStop, pathsByToStop);
     }
+
     return pathsByToStop;
   }
 
@@ -211,14 +226,19 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
     var checked = Collections.newSetFromMap(new IdentityHashMap<P, Boolean>());
     P best = null;
     int bestC1 = Integer.MAX_VALUE;
+
     for (var paths : pathsOfEarlierProfiles) {
       var path = paths.get(toStop);
+
       if (path == null || !checked.add(path)) {
         continue;
       }
+
       var criteria = profile.search().computePathCriteria(path);
+
       if (criteria.isPresent()) {
         int c1 = criteria.get().c1();
+
         if (
           c1 < bestC1 &&
           isWithinLimit(profile, c1, own.criteria().c1()) &&
@@ -229,6 +249,7 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
         }
       }
     }
+
     return best;
   }
 
@@ -247,9 +268,11 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
 
   private int requireStopIndex(FeedScopedId stopId) {
     int index = stopIndex.toStopIndex(stopId);
+
     if (index == RaptorConstants.NOT_FOUND) {
       throw new IllegalStateException("The stop is not in the stop index: " + stopId);
     }
+
     return index;
   }
 }

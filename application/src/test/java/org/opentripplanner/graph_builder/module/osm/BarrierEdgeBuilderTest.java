@@ -71,6 +71,7 @@ class BarrierEdgeBuilderTest {
     assertEquals(3, v2.getDegreeOut());
     assertEquals(3, v3.getDegreeIn());
     assertEquals(3, v3.getDegreeOut());
+
     for (var edge : getEdgesThroughBarrierFromVertex(v1)) {
       assertEquals(ALL, edge.getPermission());
       assertTrue(edge.isWheelchairAccessible());
@@ -219,6 +220,7 @@ class BarrierEdgeBuilderTest {
     assertEquals(3, v2.getDegreeOut());
     assertEquals(3, v3.getDegreeIn());
     assertEquals(3, v3.getDegreeOut());
+
     for (var edge : getEdgesThroughBarrierFromVertex(v1)) {
       assertEquals(expectedPermission, edge.getPermission());
       assertTrue(edge.isWheelchairAccessible());
@@ -239,6 +241,7 @@ class BarrierEdgeBuilderTest {
     SUBJECT.build(node, List.of(v1, v2), List.of(WALL));
     assertEquals(1, v1.getDegreeOut());
     assertEquals(1, v2.getDegreeOut());
+
     for (var edge : getEdgesThroughBarrierFromVertex(v1)) {
       assertEquals(PEDESTRIAN_AND_BICYCLE, edge.getPermission());
       assertTrue(edge.isWheelchairAccessible());
@@ -261,6 +264,7 @@ class BarrierEdgeBuilderTest {
     SUBJECT.build(node, List.of(v1, v2), List.of(WALL));
     assertEquals(1, v1.getDegreeOut());
     assertEquals(1, v2.getDegreeOut());
+
     for (var edge : getEdgesThroughBarrierFromVertex(v1)) {
       assertEquals(ALL, edge.getPermission());
       assertTrue(edge.isWalkNoThruTraffic());
@@ -279,9 +283,11 @@ class BarrierEdgeBuilderTest {
       .withToVertex(v2)
       .withPermission(ALL)
       .withGeometry(GeometryUtils.makeLineString(0, 0, 0, 1));
+
     for (var mode : noThruTraverseModes) {
       seb.withNoThruTrafficTraverseMode(mode);
     }
+
     seb.buildAndConnect();
   }
 
@@ -290,6 +296,7 @@ class BarrierEdgeBuilderTest {
    */
   private static void connectToOutsideWorld(StreetVertex... vertices) {
     var v0 = new OsmVertex(0, 0, 1);
+
     for (var v : vertices) {
       connect(v0, v);
       connect(v, v0);

@@ -32,9 +32,11 @@ public class CalendarServiceImpl implements CalendarService {
   public Set<LocalDate> getServiceDatesForServiceId(FeedScopedId serviceId) {
     Set<LocalDate> dates = new HashSet<>();
     List<LocalDate> serviceDates = data.getServiceDatesForServiceId(serviceId);
+
     if (serviceDates != null) {
       dates.addAll(serviceDates);
     }
+
     return dates;
   }
 

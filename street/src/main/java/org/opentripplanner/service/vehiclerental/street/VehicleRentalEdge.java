@@ -49,6 +49,7 @@ public class VehicleRentalEdge extends Edge {
       station.availablePickupFormFactors(false).stream(),
       station.availableDropoffFormFactors(false).stream()
     ).collect(Collectors.toSet());
+
     for (var formFactor : formFactors) {
       edges.addEdge(createVehicleRentalEdge(vertex, formFactor));
     }
@@ -77,6 +78,7 @@ public class VehicleRentalEdge extends Edge {
     }
 
     boolean pickedUp;
+
     if (s0.getRequest().arriveBy()) {
       switch (s0.getVehicleRentalState()) {
         case BEFORE_RENTING -> {
@@ -86,6 +88,7 @@ public class VehicleRentalEdge extends Edge {
           if (!station.canDropOffFormFactor(formFactor, realtimeAvailability)) {
             return State.empty();
           }
+
           s1.dropOffRentedVehicleAtStation(formFactor, getPropulsionType(station), network, true);
           pickedUp = false;
         }
@@ -98,10 +101,12 @@ public class VehicleRentalEdge extends Edge {
           ) {
             return State.empty();
           }
+
           if (station.isFloatingVehicle()) {
             if (!isVehicleAvailableDuringRentalPeriod(s0, station)) {
               return State.empty();
             }
+
             s1.beginFloatingVehicleRenting(formFactor, getPropulsionType(station), network, true);
             pickedUp = true;
           } else {
@@ -115,6 +120,7 @@ public class VehicleRentalEdge extends Edge {
           ) {
             return State.empty();
           }
+
           // For arriveBy searches mayKeepRentedVehicleAtDestination is only set in State#getInitialStates(),
           // and so here it is checked if this bicycle could have been kept at the destination
           if (
@@ -123,9 +129,11 @@ public class VehicleRentalEdge extends Edge {
           ) {
             return State.empty();
           }
+
           if (!hasCompatibleNetworks(network, s0.getVehicleRentalNetwork())) {
             return State.empty();
           }
+
           s1.beginVehicleRentingAtStation(
             formFactor,
             getPropulsionType(station),
@@ -146,10 +154,12 @@ public class VehicleRentalEdge extends Edge {
           ) {
             return State.empty();
           }
+
           if (station.isFloatingVehicle()) {
             if (!isVehicleAvailableDuringRentalPeriod(s0, station)) {
               return State.empty();
             }
+
             s1.beginFloatingVehicleRenting(formFactor, getPropulsionType(station), network, false);
           } else {
             boolean mayKeep =
@@ -163,6 +173,7 @@ public class VehicleRentalEdge extends Edge {
               false
             );
           }
+
           pickedUp = true;
         }
         case HAVE_RENTED -> {
@@ -172,9 +183,11 @@ public class VehicleRentalEdge extends Edge {
           if (!hasCompatibleNetworks(network, s0.getVehicleRentalNetwork())) {
             return State.empty();
           }
+
           if (!station.canDropOffFormFactor(formFactor, realtimeAvailability)) {
             return State.empty();
           }
+
           s1.dropOffRentedVehicleAtStation(formFactor, getPropulsionType(station), network, false);
           pickedUp = false;
         }
@@ -199,6 +212,7 @@ public class VehicleRentalEdge extends Edge {
     // on the RENTING_FLOATING state which immediately hits dead ends at zone-adjacent edges.
     if (pickedUp && station.isFloatingVehicle() && !s0.getRequest().arriveBy()) {
       State rentingState = s1.makeState();
+
       if (
         rentingState != null &&
         GeofencingBoundaryExtension.hasNoTraversalEntry(
@@ -241,6 +255,7 @@ public class VehicleRentalEdge extends Edge {
         })
         .orElse(true);
     }
+
     return true;
   }
 
@@ -279,6 +294,7 @@ public class VehicleRentalEdge extends Edge {
       var vehicleType = vehicle.vehicleType();
       return vehicleType != null ? vehicleType.propulsionType() : PropulsionType.HUMAN;
     }
+
     if (place instanceof VehicleRentalStation station) {
       // For stations, find a matching vehicle type for this form factor
       return station
@@ -290,6 +306,7 @@ public class VehicleRentalEdge extends Edge {
         .findFirst()
         .orElse(PropulsionType.HUMAN);
     }
+
     return PropulsionType.HUMAN;
   }
 }

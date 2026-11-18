@@ -52,6 +52,7 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
     Vertex destinationVertex = reverseDirection ? fromv : tov;
 
     ShortestPathTree<State, Edge, Vertex> shortestPathTree;
+
     if (cache.containsKey(originVertex)) {
       shortestPathTree = cache.get(originVertex);
     } else {
@@ -60,6 +61,7 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
     }
 
     var state = shortestPathTree.getState(destinationVertex);
+
     if (state == null) {
       return null;
     }

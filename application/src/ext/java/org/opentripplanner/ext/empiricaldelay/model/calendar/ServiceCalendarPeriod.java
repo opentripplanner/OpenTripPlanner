@@ -42,6 +42,7 @@ public class ServiceCalendarPeriod implements Serializable {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     ServiceCalendarPeriod that = (ServiceCalendarPeriod) o;
     return (
       Objects.equals(serviceId, that.serviceId) &&

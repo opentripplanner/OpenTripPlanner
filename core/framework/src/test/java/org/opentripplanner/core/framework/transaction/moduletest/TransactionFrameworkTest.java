@@ -246,6 +246,7 @@ public class TransactionFrameworkTest {
   @SuppressWarnings("BusyWait")
   private void awaitState(String expScope, TestEvent... expected) throws InterruptedException {
     long deadline = System.currentTimeMillis() + AWAIT_STATE_TIMEOUT;
+
     while (System.currentTimeMillis() < deadline) {
       try {
         assertState(expScope, expected);
@@ -254,6 +255,7 @@ public class TransactionFrameworkTest {
         Thread.sleep(AWAIT_STATE_CHECK_INTERVAL_MS);
       }
     }
+
     assertState(expScope, expected);
   }
 

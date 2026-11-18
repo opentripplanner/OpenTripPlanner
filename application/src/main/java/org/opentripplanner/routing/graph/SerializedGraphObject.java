@@ -157,6 +157,7 @@ public class SerializedGraphObject implements Serializable {
           graphOutput.path()
         );
       }
+
       if (!graphOutput.isWritable()) {
         throw new RuntimeException("Cannot create or write to graph at: " + graphOutput.path());
       }
@@ -185,6 +186,7 @@ public class SerializedGraphObject implements Serializable {
     for (Vertex v : graph.getVertices()) {
       v.initEdgeLists();
     }
+
     for (Edge e : edges) {
       Vertex fromVertex = e.getFromVertex();
       Vertex toVertex = e.getToVertex();
@@ -238,6 +240,7 @@ public class SerializedGraphObject implements Serializable {
         LOG.error("IO exception while loading graph: {}", ke.getLocalizedMessage(), ke);
         return null;
       }
+
       LOG.warn(
         "Deserialization exception while loading graph: {}\n{}",
         sourceDescription,

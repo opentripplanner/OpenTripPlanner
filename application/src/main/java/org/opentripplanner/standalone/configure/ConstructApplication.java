@@ -130,11 +130,13 @@ public class ConstructApplication {
     var scheduledTimetableData = buildGraph
       ? ScheduledTimetableData.empty()
       : timetableDataImport.toScheduledTimetableData();
+
     if (scheduledTimetableData.getTripCalendars().isEmpty() || !transitRepository.isIndexed()) {
       LOG.warn(
         "Cannot create Raptor data, that requires the graph to have transit data and be indexed."
       );
     }
+
     LOG.info("Creating transit layer for Raptor routing.");
     transitRepository.initRaptorTransitData(
       RaptorTransitDataMapper.map(tuningParameters, transitRepository, scheduledTimetableData)

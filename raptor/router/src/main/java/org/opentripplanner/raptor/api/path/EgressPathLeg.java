@@ -77,9 +77,11 @@ public final class EgressPathLeg<T extends RaptorTripSchedule> implements PathLe
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     EgressPathLeg<?> that = (EgressPathLeg<?>) o;
     return fromStop() == that.fromStop() && fromTime == that.fromTime && toTime == that.toTime;
   }

@@ -42,17 +42,21 @@ public class OsmArea {
     // ring assignment
     List<LongArrayList> innerRingNodes = constructRings(innerRingWays);
     List<LongArrayList> outerRingNodes = constructRings(outerRingWays);
+
     if (innerRingNodes == null || outerRingNodes == null) {
       throw new AreaConstructionException("innerRing or outerRing nodes are null");
     }
+
     ArrayList<LongArrayList> allRings = new ArrayList<>(innerRingNodes);
     allRings.addAll(outerRingNodes);
 
     List<Ring> innerRings = new ArrayList<>();
     List<Ring> outerRings = new ArrayList<>();
+
     for (LongArrayList ring : innerRingNodes) {
       innerRings.add(new Ring(ring, nodeById));
     }
+
     for (LongArrayList ring : outerRingNodes) {
       outerRings.add(new Ring(ring, nodeById));
     }
@@ -68,6 +72,7 @@ public class OsmArea {
             continue OUTER;
           }
         }
+
         outermostRings.add(outer);
 
         // find holes in this ring
@@ -97,11 +102,13 @@ public class OsmArea {
     List<LongArrayList> closedRings = new ArrayList<>();
 
     ArrayListMultimap<Long, OsmWay> waysByEndpoint = ArrayListMultimap.create();
+
     for (OsmWay way : ways) {
       LongArrayList refs = way.getNodeRefs();
 
       long start = refs.get(0);
       long end = refs.get(refs.size() - 1);
+
       if (start == end) {
         LongArrayList ring = new LongArrayList(refs);
         closedRings.add(ring);
@@ -113,12 +120,15 @@ public class OsmArea {
 
     // Precheck for impossible situations, and remove those.
     LongArrayList endpointsToRemove = new LongArrayList();
+
     for (Long endpoint : waysByEndpoint.keySet()) {
       Collection<OsmWay> list = waysByEndpoint.get(endpoint);
+
       if (list.size() % 2 == 1) {
         endpointsToRemove.add(endpoint);
       }
     }
+
     endpointsToRemove.forEach(
       (LongProcedure) endpoint -> {
         waysByEndpoint.removeAll(endpoint);
@@ -126,6 +136,7 @@ public class OsmArea {
     );
 
     LongArrayList partialRing = new LongArrayList();
+
     if (waysByEndpoint.size() == 0) {
       return closedRings;
     }
@@ -133,6 +144,7 @@ public class OsmArea {
     long firstEndpoint = 0;
     long otherEndpoint = 0;
     OsmWay firstWay = null;
+
     for (Long endpoint : waysByEndpoint.keySet()) {
       List<OsmWay> list = waysByEndpoint.get(endpoint);
       firstWay = list.get(0);
@@ -142,8 +154,10 @@ public class OsmArea {
       otherEndpoint = nodeRefs.get(nodeRefs.size() - 1);
       break;
     }
+
     waysByEndpoint.get(firstEndpoint).remove(firstWay);
     waysByEndpoint.get(otherEndpoint).remove(firstWay);
+
     if (constructRingsRecursive(waysByEndpoint, partialRing, closedRings, firstEndpoint)) {
       return closedRings;
     } else {
@@ -158,9 +172,11 @@ public class OsmArea {
    */
   public Point findInteriorPoint() {
     var centroid = jtsMultiPolygon.getGeometry().getCentroid();
+
     if (jtsMultiPolygon.intersects(centroid)) {
       return centroid;
     }
+
     return jtsMultiPolygon.getGeometry().getInteriorPoint();
   }
 
@@ -170,13 +186,16 @@ public class OsmArea {
 
   private PreparedPolygon calculateJTSMultiPolygon() {
     List<Polygon> polygons = new ArrayList<>();
+
     for (Ring ring : outermostRings) {
       polygons.add(ring.jtsPolygon);
     }
+
     MultiPolygon jtsMultiPolygon = GeometryUtils.getGeometryFactory().createMultiPolygon(
       polygons.toArray(new Polygon[0])
     );
     var validOp = new IsValidOp(jtsMultiPolygon);
+
     if (!validOp.isValid()) {
       var validationError = validOp.getValidationError();
       throw new AreaConstructionException(
@@ -206,10 +225,12 @@ public class OsmArea {
 
       LongArrayList newRing = new LongArrayList(ring.size() + nodeRefs.size());
       long newFirstEndpoint;
+
       if (firstEndpoint == endpoint) {
         for (int j = nodeRefs.size() - 1; j >= 1; --j) {
           newRing.add(nodeRefs.get(j));
         }
+
         newRing.addAll(ring);
         newFirstEndpoint = otherEndpoint;
       } else {
@@ -217,9 +238,11 @@ public class OsmArea {
         newRing.addAll(ring);
         newFirstEndpoint = firstEndpoint;
       }
+
       if (newRing.get(newRing.size() - 1) == newRing.get(0)) {
         // ring closure
         closedRings.add(newRing);
+
         // if we're out of endpoints, then we have succeeded
         if (waysByEndpoint.size() == 0) {
           // success
@@ -229,6 +252,7 @@ public class OsmArea {
         // otherwise, we need to start a new partial ring
         newRing = new LongArrayList();
         OsmWay firstWay = null;
+
         for (Long entry : waysByEndpoint.keySet()) {
           List<OsmWay> list = waysByEndpoint.get(entry);
           firstWay = list.get(0);
@@ -256,12 +280,14 @@ public class OsmArea {
           }
         }
       }
+
       if (firstEndpoint == endpoint) {
         waysByEndpoint.put(otherEndpoint, way);
       } else {
         waysByEndpoint.put(firstEndpoint, way);
       }
     }
+
     return false;
   }
 

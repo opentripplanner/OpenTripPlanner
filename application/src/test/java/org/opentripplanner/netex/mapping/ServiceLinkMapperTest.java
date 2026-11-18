@@ -457,6 +457,7 @@ class ServiceLinkMapperTest {
 
   private static JourneyPattern journeyPatternOf(String... serviceLinkRefs) {
     var links = new LinksInJourneyPattern_RelStructure();
+
     for (String ref : serviceLinkRefs) {
       links.withServiceLinkInJourneyPatternOrTimingLinkInJourneyPattern(
         new ServiceLinkInJourneyPattern_VersionedChildStructure().withServiceLinkRef(
@@ -464,6 +465,7 @@ class ServiceLinkMapperTest {
         )
       );
     }
+
     return new JourneyPattern().withId("RUT:JourneyPattern:1300").withLinksInSequence(links);
   }
 
@@ -516,9 +518,11 @@ class ServiceLinkMapperTest {
     Double[] coordinates
   ) {
     var posOrPoints = new ArrayList<>();
+
     for (int i = 0; i < coordinates.length; i += 2) {
       posOrPoints.add(new DirectPositionType().withValue(coordinates[i], coordinates[i + 1]));
     }
+
     var lineString = new LineStringType().withPosOrPointProperty(posOrPoints);
     var linkSequenceProjection = new LinkSequenceProjection().withLineString(lineString);
     var linkSequenceProjection_versionStructure = MappingSupport.createJaxbElement(

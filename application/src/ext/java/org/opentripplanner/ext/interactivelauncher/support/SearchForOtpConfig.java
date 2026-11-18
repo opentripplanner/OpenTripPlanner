@@ -27,6 +27,7 @@ public class SearchForOtpConfig {
     if (!dir.isDirectory() || depthLimit == 0) {
       return Stream.empty();
     }
+
     if (EXCLUDE_DIR.matcher(dir.getName()).matches()) {
       return Stream.empty();
     }
@@ -48,6 +49,7 @@ public class SearchForOtpConfig {
   @SuppressWarnings("ConstantConditions")
   private static boolean isOtpConfigDataDir(File dir) {
     File[] files = dir.listFiles();
+
     if (files == null) {
       return false;
     }
@@ -57,6 +59,7 @@ public class SearchForOtpConfig {
         return true;
       }
     }
+
     return false;
   }
 }

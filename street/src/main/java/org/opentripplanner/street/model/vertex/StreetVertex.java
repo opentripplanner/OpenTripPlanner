@@ -41,11 +41,13 @@ public abstract class StreetVertex extends Vertex {
   public I18NString getIntersectionName() {
     // generate names for corners when no name was given
     Set<I18NString> uniqueNameSet = new HashSet<>();
+
     for (Edge e : getOutgoing()) {
       if (e instanceof StreetEdge) {
         uniqueNameSet.add(e.getName());
       }
     }
+
     List<I18NString> uniqueNames = new ArrayList<>(uniqueNameSet);
 
     if (uniqueNames.size() > 1) {
@@ -96,6 +98,7 @@ public abstract class StreetVertex extends Vertex {
    */
   public void addAreaStops(Collection<FeedScopedId> toBeAdded) {
     Objects.requireNonNull(toBeAdded);
+
     synchronized (this) {
       if (areaStops == EMPTY_SET) {
         areaStops = Set.copyOf(toBeAdded);

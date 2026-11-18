@@ -102,12 +102,14 @@ public class IslandPruningModule implements GraphBuilderModule {
       .collect(Collectors.toSet());
 
     int removed = 0;
+
     for (Vertex v : graph.findVertices(StreetVertex.class)) {
       if (v.getDegreeOut() + v.getDegreeIn() == 0 && !visibilityVertices.contains(v)) {
         graph.remove(v);
         removed += 1;
       }
     }
+
     LOG.info("Removed {} edgeless street vertices", removed);
 
     LOG.info(
@@ -190,6 +192,7 @@ public class IslandPruningModule implements GraphBuilderModule {
     // Find largest sub graph
     for (Subgraph island : islands) {
       int streetCount = island.streetSize();
+
       if (streetCount >= maxSize) {
         maxSize = streetCount;
         largest = island;
@@ -203,11 +206,13 @@ public class IslandPruningModule implements GraphBuilderModule {
       if (island == largest) {
         continue;
       }
+
       if (island.stopSize() > 0) {
         //for islands with stops
         stats.incrementIslandsWithStops();
         boolean onlyFerry = island.hasOnlyFerryStops();
         int pruningThresholdWithStops = parameters.pruningThresholdIslandWithStops();
+
         // do not remove real islands which have only ferry stops
         if (!onlyFerry && island.streetSize() < pruningThresholdWithStops * adaptivePruningFactor) {
           double sizeCoeff =
@@ -226,12 +231,14 @@ public class IslandPruningModule implements GraphBuilderModule {
       } else {
         //for islands without stops
         int pruningThresholdWithoutStops = parameters.pruningThresholdIslandWithoutStops();
+
         if (island.streetSize() < pruningThresholdWithoutStops * adaptivePruningFactor) {
           double sizeCoeff =
             adaptivePruningFactor > 1.0
               ? island.distanceFromOtherGraph(graph, adaptivePruningDistance) /
                 adaptivePruningDistance
               : 1.0;
+
           if (island.streetSize() * sizeCoeff < pruningThresholdWithoutStops) {
             if (restrictOrRemove(island, isolated, stats, markIsolated, traverseMode)) {
               stats.incrementModifiedIslands();
@@ -240,6 +247,7 @@ public class IslandPruningModule implements GraphBuilderModule {
         }
       }
     }
+
     if (markIsolated) {
       LOG.info("Detected {} isolated edges", stats.isolated());
     } else {
@@ -260,6 +268,7 @@ public class IslandPruningModule implements GraphBuilderModule {
         )
       );
     }
+
     return stats.modifiedIslands();
   }
 
@@ -287,13 +296,16 @@ public class IslandPruningModule implements GraphBuilderModule {
       if (!vertexIndex.isStreetVertex(from)) {
         continue;
       }
+
       Vertex gv = vertexIndex.vertex(from);
       State s0 = null;
+
       for (Edge e : gv.getOutgoing()) {
         if (e instanceof StreetEdge se) {
           if (!canTraverse(se, traverseMode)) {
             continue;
           }
+
           // note: this assumes that edges are bi-directional. Maybe explicit state traversal is needed for CAR mode.
           var edges = se.isNoThruTraffic(traverseMode) ? noThruEdges : thruEdges;
           edges.add(from);
@@ -304,10 +316,13 @@ public class IslandPruningModule implements GraphBuilderModule {
           if (s0 == null) {
             s0 = new State(gv, request);
           }
+
           State[] states = e.traverse(s0);
+
           if (State.isEmpty(states)) {
             continue;
           }
+
           for (State state : states) {
             thruEdges.add(from);
             thruEdges.add(vertexIndex.idOf(state.getVertex()));
@@ -328,6 +343,7 @@ public class IslandPruningModule implements GraphBuilderModule {
     if (traverseMode == TraverseMode.BICYCLE) {
       return edge.canTraverse(TraverseMode.BICYCLE) || edge.canTraverse(TraverseMode.WALK);
     }
+
     return edge.canTraverse(traverseMode);
   }
 
@@ -341,9 +357,11 @@ public class IslandPruningModule implements GraphBuilderModule {
     int nothru = 0;
     int removed = 0;
     int restricted = 0;
+
     //iterate over the street vertex of the subgraph
     for (Vertex v : island.streetVertices()) {
       Collection<Edge> outgoing = new ArrayList<>(v.getOutgoing());
+
       for (Edge e : outgoing) {
         if (e instanceof StreetEdge) {
           if (markIsolated) {
@@ -351,6 +369,7 @@ public class IslandPruningModule implements GraphBuilderModule {
             stats.incrementIsolated();
           } else {
             StreetEdge pse = (StreetEdge) e;
+
             if (!isolated.containsKey(e)) {
               boolean changed = false;
 
@@ -372,6 +391,7 @@ public class IslandPruningModule implements GraphBuilderModule {
                   changed = true;
                 }
               }
+
               if (changed) {
                 stats.incrementNoThru();
                 nothru++;
@@ -379,6 +399,7 @@ public class IslandPruningModule implements GraphBuilderModule {
             } else {
               StreetTraversalPermission permission = pse.getPermission();
               boolean changed = false;
+
               if (traverseMode == TraverseMode.CAR) {
                 if (permission.allows(StreetTraversalPermission.CAR)) {
                   permission = permission.remove(StreetTraversalPermission.CAR);
@@ -395,6 +416,7 @@ public class IslandPruningModule implements GraphBuilderModule {
                   changed = true;
                 }
               }
+
               if (changed) {
                 if (permission == StreetTraversalPermission.NONE) {
                   graph.removeEdge(pse);
@@ -411,6 +433,7 @@ public class IslandPruningModule implements GraphBuilderModule {
         }
       }
     }
+
     if (markIsolated) {
       return false;
     }
@@ -419,14 +442,17 @@ public class IslandPruningModule implements GraphBuilderModule {
       // note: do not unlink stop if only CAR mode is pruned
       // maybe this needs more logic for flex routing cases
       List<VertexLabel> stopLabels = new ArrayList<>();
+
       for (var v : island.stopVertices()) {
         stopLabels.add(v.getLabel());
         Collection<Edge> edges = new ArrayList<>(v.getOutgoing());
         edges.addAll(v.getIncoming());
+
         for (Edge e : edges) {
           graph.removeEdge(e);
         }
       }
+
       if (island.stopSize() > 0) {
         // issue about stops that got unlinked in pruning
         issueStore.add(
@@ -440,6 +466,7 @@ public class IslandPruningModule implements GraphBuilderModule {
         );
       }
     }
+
     issueStore.add(new GraphIsland(island, nothru, restricted, removed, traverseMode.name()));
     return true;
   }

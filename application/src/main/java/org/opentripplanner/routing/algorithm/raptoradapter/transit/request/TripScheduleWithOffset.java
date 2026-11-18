@@ -81,6 +81,7 @@ public final class TripScheduleWithOffset implements TripSchedule {
     if (tripTimes == null) {
       this.findTripTimes();
     }
+
     return this.tripTimes;
   }
 
@@ -99,6 +100,7 @@ public final class TripScheduleWithOffset implements TripSchedule {
     if (tripTimes == null) {
       this.findTripTimes();
     }
+
     return serviceDate;
   }
 
@@ -106,6 +108,7 @@ public final class TripScheduleWithOffset implements TripSchedule {
     if (tripTimes == null) {
       this.findTripTimes();
     }
+
     return secondsOffset;
   }
 
@@ -122,6 +125,7 @@ public final class TripScheduleWithOffset implements TripSchedule {
   private void findTripTimes() {
     int index = tripIndexForDates;
     IntIterator indexIterator = pattern.tripPatternForDatesIndexIterator(true);
+
     while (indexIterator.hasNext()) {
       int i = indexIterator.next();
       TripPatternForDate tripPatternForDate = pattern.tripPatternForDate(i);
@@ -133,8 +137,10 @@ public final class TripScheduleWithOffset implements TripSchedule {
         this.secondsOffset = pattern.tripPatternForDateOffsets(i);
         return;
       }
+
       index -= numSchedules;
     }
+
     throw new IndexOutOfBoundsException("Index out of bound: " + index);
   }
 }

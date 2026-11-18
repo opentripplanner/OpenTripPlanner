@@ -556,9 +556,11 @@ class ItineraryReferenceMapperTest {
     var stopA = Place.forStop(STOP_A);
     var stopB = Place.forStop(STOP_B);
     var builder = newItinerary(stopA, 0);
+
     for (int i = 0; i <= ItineraryReference.MAX_LEG_REFERENCES; i++) {
       builder.bus(i, i * 100, i * 100 + 50, i % 2 == 0 ? stopB : stopA);
     }
+
     var itinerary = builder.build();
 
     assertThrows(UnsupportedItineraryReferenceException.class, () ->

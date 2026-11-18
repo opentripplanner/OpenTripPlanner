@@ -23,6 +23,7 @@ public final class AndMatcher<T> implements Matcher<T> {
     if (matchers.size() == 1) {
       return matchers.get(0);
     }
+
     return new AndMatcher<>(matchers);
   }
 
@@ -33,6 +34,7 @@ public final class AndMatcher<T> implements Matcher<T> {
         return false;
       }
     }
+
     return true;
   }
 

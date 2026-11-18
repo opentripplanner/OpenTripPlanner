@@ -79,6 +79,7 @@ public class TransferMapper {
       issueStore.add(new InterchangeWithoutConstraint(tx));
       return null;
     }
+
     return tx;
   }
 
@@ -92,6 +93,7 @@ public class TransferMapper {
     if (isInvalid(sjRef)) {
       return null;
     }
+
     var sjId = sjRef.getRef();
     var trip = findTrip(label, "Journey", interchangeId, sjId);
     int stopPos = findStopPosition(interchangeId, label, "Point", sjId, pointRef);
@@ -111,12 +113,15 @@ public class TransferMapper {
     if (it.isStaySeated() != null) {
       cBuilder.staySeated(it.isStaySeated());
     }
+
     if (it.isGuaranteed() != null) {
       cBuilder.guaranteed(it.isGuaranteed());
     }
+
     if (it.getPriority() != null) {
       cBuilder.priority(mapPriority(it.getPriority()));
     }
+
     if (it.getMaximumWaitTime() != null) {
       if (it.isGuaranteed()) {
         cBuilder.maxWaitTime((int) it.getMaximumWaitTime().toSeconds());
@@ -125,6 +130,7 @@ public class TransferMapper {
         issueStore.add(new InterchangeMaxWaitTimeNotGuaranteed(it));
       }
     }
+
     return cBuilder.build();
   }
 
@@ -159,6 +165,7 @@ public class TransferMapper {
         case Label.TO -> scheduledStopPoints.indexOf(sspId);
         case Label.FROM -> scheduledStopPoints.lastIndexOf(sspId);
       };
+
       if (index >= 0) {
         return index;
       }
@@ -194,6 +201,7 @@ public class TransferMapper {
       issueStore.add(new ObjectNotFound("Interchange", interchangeId, fieldName, id));
       return false;
     }
+
     return true;
   }
 

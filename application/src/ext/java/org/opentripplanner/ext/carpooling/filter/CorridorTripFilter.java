@@ -21,6 +21,7 @@ public class CorridorTripFilter implements CarpoolTripFilter {
     if (snap == null) {
       return true;
     }
+
     return trip.corridor().mayServe(snap.vertex());
   }
 }

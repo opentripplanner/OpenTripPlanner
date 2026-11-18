@@ -155,6 +155,7 @@ class ElevatorProcessor {
       }
 
       List<OsmElevatorKey> osmElevatorKeys = new ArrayList<>(vertices.keySet());
+
       if (
         osmElevatorKeys
           .stream()
@@ -164,6 +165,7 @@ class ElevatorProcessor {
       ) {
         issueStore.add(new AllWaysOfElevatorNodeOnSameLevel(node));
       }
+
       // Sort to make logic correct and create a deterministic order.
       osmElevatorKeys.sort(
         Comparator.comparing((OsmElevatorKey key) -> verticeLevels.get(key))
@@ -171,6 +173,7 @@ class ElevatorProcessor {
           .thenComparing(OsmElevatorKey::osmEntityType)
       );
       List<ElevatorHopVertex> elevatorHopVertices = new ArrayList<>();
+
       for (OsmElevatorKey key : osmElevatorKeys) {
         OsmElevatorVertex sourceVertex = vertices.get(key);
         OsmLevel level = verticeLevels.get(key);
@@ -216,6 +219,7 @@ class ElevatorProcessor {
       if (!isElevatorWay(way)) {
         continue;
       }
+
       List<OsmLevel> nodeLevels = osmdb.getLevelsForEntity(way);
       List<Long> nodes = Arrays.stream(way.getNodeRefs().toArray())
         .filter(vertexGenerator::hasIntersectionVertex)
@@ -261,6 +265,7 @@ class ElevatorProcessor {
       }
 
       List<ElevatorHopVertex> elevatorHopVertices = new ArrayList<>();
+
       for (int i = 0; i < nodes.size(); i++) {
         Long node = nodes.get(i);
         var sourceVertex = vertexGenerator.getIntersectionVertex(node);

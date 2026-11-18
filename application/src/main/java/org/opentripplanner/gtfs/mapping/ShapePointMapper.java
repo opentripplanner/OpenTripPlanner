@@ -17,11 +17,13 @@ class ShapePointMapper {
 
   Map<FeedScopedId, CompactShape> map(Collection<ShapePoint> allShapePoints) {
     var ret = new HashMap<FeedScopedId, CompactShape>();
+
     for (var shapePoint : allShapePoints) {
       var shapeId = idFactory.createId(shapePoint.getShapeId(), "shape point");
       var shape = ret.computeIfAbsent(shapeId, id -> new CompactShape());
       shape.addPoint(shapePoint);
     }
+
     return ret;
   }
 }

@@ -115,12 +115,15 @@ class TransitAlertMatcherFactoryTest {
     @Nullable UnaryOperator<TransitAlertSelectRequest.Builder> not
   ) {
     var filter = FilterRequest.<TransitAlertSelectRequest>of();
+
     if (select != null) {
       filter.addSelect(select.apply(TransitAlertSelectRequest.of()).build());
     }
+
     if (not != null) {
       filter.addNot(not.apply(TransitAlertSelectRequest.of()).build());
     }
+
     return TransitAlertRequest.of().withFilters(List.of(filter.build())).build();
   }
 }

@@ -47,6 +47,7 @@ class LegMapper {
 
       apiLegs.add(mapLeg(domain.get(i), arrivalTimeFromPlace, departureTimeToPlace));
     }
+
     return apiLegs;
   }
 
@@ -58,6 +59,7 @@ class LegMapper {
     if (domain == null) {
       return null;
     }
+
     ApiLeg api = new ApiLeg();
     api.startTime = GregorianCalendar.from(domain.startTime());
     api.endTime = GregorianCalendar.from(domain.endTime());
@@ -120,9 +122,11 @@ class LegMapper {
     api.headsign = i18NStringMapper.mapToApi(domain.headsign());
     api.serviceDate = LocalDateMapper.mapToApi(domain.serviceDate());
     api.routeBrandingUrl = domain.routeBrandingUrl();
+
     if (addIntermediateStops) {
       api.intermediateStops = placeMapper.mapStopArrivals(domain.listIntermediateStops());
     }
+
     api.legGeometry = EncodedPolyline.of(domain.legGeometry());
     api.legElevation = mapElevation(domain.elevationProfile());
     api.steps = walkStepMapper.mapWalkSteps(domain.listWalkSteps());

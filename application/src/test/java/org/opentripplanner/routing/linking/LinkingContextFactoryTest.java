@@ -189,6 +189,7 @@ class LinkingContextFactoryTest {
         if (id.equals(stationAlpha.getId())) {
           return Optional.of(stationAlpha.getCoordinate());
         }
+
         return id.equals(multiModalStation.getId())
           ? Optional.of(multiModalStation.getCoordinate())
           : Optional.empty();

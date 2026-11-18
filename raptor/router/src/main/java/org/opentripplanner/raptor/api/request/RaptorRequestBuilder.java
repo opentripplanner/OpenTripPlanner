@@ -151,14 +151,17 @@ public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
     if (searchDirection.isInReverse()) {
       name += "-Rev";
     }
+
     if (Optimization.PARALLEL.isOneOf(optimizations)) {
       // Run search in parallel
       name += "-LL";
     }
+
     if (Optimization.PARETO_CHECK_AGAINST_DESTINATION.isOneOf(optimizations)) {
       // Heuristic to prune on pareto optimal Destination arrivals
       name += "-DP";
     }
+
     return name;
   }
 

@@ -28,6 +28,7 @@ final class TemplatePathsByStop<P> implements Serializable {
     if (pathsByToStop.isEmpty()) {
       return;
     }
+
     // Never modify a stored toStop map, it may already have been handed out - replace it.
     var byToStop = new HashMap<>(paths.getOrDefault(fromStop, Map.of()));
     byToStop.putAll(pathsByToStop);

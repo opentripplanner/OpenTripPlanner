@@ -51,6 +51,7 @@ public class EmissionItineraryDecorator implements ItineraryDecorator {
         l = l.withEmissionPerPerson(value);
         sum = sum.plus(value);
       }
+
       newLegs.add(l);
     }
 
@@ -60,6 +61,7 @@ public class EmissionItineraryDecorator implements ItineraryDecorator {
     if (!partialResults) {
       builder.withEmissionPerPerson(sum);
     }
+
     return builder.build();
   }
 

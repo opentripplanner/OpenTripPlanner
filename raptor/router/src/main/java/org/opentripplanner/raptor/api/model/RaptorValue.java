@@ -22,6 +22,7 @@ public class RaptorValue {
         return new RaptorValue(type.parseValue(text), type);
       }
     }
+
     throw new IllegalArgumentException("Not a valid RaptorValue: " + text);
   }
 
@@ -38,6 +39,7 @@ public class RaptorValue {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     RaptorValue that = (RaptorValue) o;
     return value == that.value && type == that.type;
   }

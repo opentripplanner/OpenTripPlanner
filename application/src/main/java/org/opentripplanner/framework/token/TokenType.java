@@ -31,6 +31,7 @@ public enum TokenType {
     if (value == null) {
       return EMPTY;
     }
+
     return switch (this) {
       case BOOLEAN -> Boolean.toString((boolean) value);
       case BYTE -> Byte.toString((byte) value);
@@ -46,6 +47,7 @@ public enum TokenType {
     if (EMPTY.equals(value)) {
       return null;
     }
+
     return switch (this) {
       case BOOLEAN -> Boolean.valueOf(value);
       case BYTE -> Byte.valueOf(value);

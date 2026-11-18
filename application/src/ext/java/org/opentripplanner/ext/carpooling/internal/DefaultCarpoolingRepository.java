@@ -54,6 +54,7 @@ public class DefaultCarpoolingRepository implements CarpoolingRepository {
   public void upsertCarpoolTrip(RoutableCarpoolTrip routableTrip) {
     CarpoolTrip trip = routableTrip.trip();
     RoutableCarpoolTrip existing = trips.put(trip.getId(), routableTrip);
+
     if (existing != null) {
       LOG.debug("Updated carpool trip {} with {} stops", trip.getId(), trip.stops().size());
     } else {
@@ -65,6 +66,7 @@ public class DefaultCarpoolingRepository implements CarpoolingRepository {
   @Override
   public void removeCarpoolTrip(FeedScopedId id) {
     RoutableCarpoolTrip removed = trips.remove(id);
+
     if (removed != null) {
       changeTripCount(id, -1);
       LOG.debug("Removed carpool trip {}", id);
@@ -76,14 +78,17 @@ public class DefaultCarpoolingRepository implements CarpoolingRepository {
   @Override
   public int removeExpiredTrips(Instant now, Duration expiry) {
     Instant allowedAt = nextSweep.get();
+
     if (now.isBefore(allowedAt) || !nextSweep.compareAndSet(allowedAt, now.plus(sweepInterval))) {
       return 0;
     }
 
     Instant expiryThreshold = now.minus(expiry);
     int removed = 0;
+
     for (RoutableCarpoolTrip routableTrip : trips.values()) {
       CarpoolTrip trip = routableTrip.trip();
+
       if (
         trip.latestEndTime().toInstant().isBefore(expiryThreshold) &&
         trips.remove(trip.getId(), routableTrip)
@@ -92,9 +97,11 @@ public class DefaultCarpoolingRepository implements CarpoolingRepository {
         removed++;
       }
     }
+
     if (removed > 0) {
       LOG.debug("Removed {} carpool trips that ended before {}", removed, expiryThreshold);
     }
+
     return removed;
   }
 

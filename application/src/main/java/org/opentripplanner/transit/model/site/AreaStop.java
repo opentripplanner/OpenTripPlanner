@@ -40,6 +40,7 @@ public class AreaStop
   AreaStop(AreaStopBuilder builder) {
     super(builder.getId());
     this.index = builder.createIndex();
+
     // according to the spec stop location names are optional for flex zones so, we set the id
     // as the bogus name. *shrug*
     if (builder.name() == null) {
@@ -49,6 +50,7 @@ public class AreaStop
       this.name = builder.name();
       hasFallbackName = builder.hasFallbackName();
     }
+
     this.description = builder.description();
     this.url = builder.url();
     this.zoneId = builder.zoneId();

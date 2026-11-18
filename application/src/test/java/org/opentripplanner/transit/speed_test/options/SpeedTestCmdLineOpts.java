@@ -42,6 +42,7 @@ public class SpeedTestCmdLineOpts {
         printHelp(options);
         System.exit(0);
       }
+
       if (!cmd.getArgList().isEmpty()) {
         System.err.println("Unexpected argument(s): " + cmd.getArgList());
         printHelp(options);
@@ -56,11 +57,13 @@ public class SpeedTestCmdLineOpts {
 
   public File rootDir() {
     File rootDir = new File(cmd.getOptionValue(ROOT_DIR, "."));
+
     if (!rootDir.exists()) {
       throw new IllegalArgumentException(
         "Unable to find root directory: " + rootDir.getAbsolutePath()
       );
     }
+
     return rootDir;
   }
 

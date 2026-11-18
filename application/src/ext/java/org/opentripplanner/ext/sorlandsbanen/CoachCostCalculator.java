@@ -65,6 +65,7 @@ class CoachCostCalculator<T extends TripSchedule> implements RaptorCostCalculato
     if (trip.transitReluctanceFactorIndex() == TransitMode.COACH.ordinal()) {
       cost += transitDuration * EXTRA_RELUCTANCE_ON_COACH;
     }
+
     return cost;
   }
 

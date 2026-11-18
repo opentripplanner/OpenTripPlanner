@@ -74,6 +74,7 @@ public class TimetableDataImport {
   public void addTripOnServiceDate(TripOnServiceDate tripOnServiceDate) {
     assertModificationsAllowed();
     tripOnServiceDateById.put(tripOnServiceDate.getId(), tripOnServiceDate);
+
     for (var replacementFor : tripOnServiceDate.getReplacementFor()) {
       replacedByTripOnServiceDates.put(replacementFor.getId(), tripOnServiceDate);
     }

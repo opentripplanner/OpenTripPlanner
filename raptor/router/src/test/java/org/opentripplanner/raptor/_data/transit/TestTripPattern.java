@@ -71,6 +71,7 @@ public class TestTripPattern implements RaptorTripPattern {
     if (patternIndex == RaptorConstants.NOT_SET) {
       throw new IllegalStateException();
     }
+
     return patternIndex;
   }
 
@@ -97,6 +98,7 @@ public class TestTripPattern implements RaptorTripPattern {
     if (this.patternIndex != RaptorConstants.NOT_SET) {
       throw new IllegalStateException("Init once!");
     }
+
     this.patternIndex = patternIndex;
   }
 

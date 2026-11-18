@@ -33,6 +33,7 @@ class FlexTripNearbyStopFilter implements NearbyStopFilter {
     boolean reverseDirection
   ) {
     MinMap<FlexTrip<?, ?>, NearbyStop> closestStopForFlexTrip = MinMap.ofNaturalOrder();
+
     for (var it : nearbyStops) {
       var stopId = it.stopId();
       var flexTrips = flexIndex.getFlexTripsByStopId(stopId);
@@ -43,6 +44,7 @@ class FlexTripNearbyStopFilter implements NearbyStopFilter {
         }
       }
     }
+
     return closestStopForFlexTrip.values();
   }
 }

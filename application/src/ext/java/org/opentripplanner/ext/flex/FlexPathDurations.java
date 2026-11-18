@@ -29,9 +29,11 @@ public record FlexPathDurations(int access, int trip, int egress, int offset) {
     if (access < 0) {
       throw new IllegalArgumentException("The access duration must be 0 or a positive number.");
     }
+
     if (trip < 0) {
       throw new IllegalArgumentException("The trip duration must be 0 or a positive number.");
     }
+
     if (egress < 0) {
       throw new IllegalArgumentException("The egress duration must be 0 or a positive number.");
     }
@@ -66,9 +68,11 @@ public record FlexPathDurations(int access, int trip, int egress, int offset) {
     buf.append(DurationUtils.durationToStr(access)).append(" + ");
     buf.append(DurationUtils.durationToStr(trip)).append(" + ");
     buf.append(DurationUtils.durationToStr(egress));
+
     if (offset != 0) {
       buf.append(", offset: ").append(DurationUtils.durationToStr(offset));
     }
+
     return buf.append(")").toString();
   }
 

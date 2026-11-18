@@ -86,6 +86,7 @@ public class MinSafeTransferTimeCalculator<T extends RaptorTripSchedule> {
     if (list.isEmpty()) {
       return MIN_SAFE_TRANSFER_TIME_LIMIT_UPPER_BOUND;
     }
+
     int minTransitTime = list.stream().mapToInt(transitDurationSeconds).min().getAsInt();
     int minSafeTransitTime = IntUtils.round((minTransitTime * P) / 100.0);
     return bound(

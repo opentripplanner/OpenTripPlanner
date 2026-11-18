@@ -63,11 +63,14 @@ class StreetVertexUtilsTest {
 
     // Splitters reached by following the passenger vertex's outgoing connectors.
     var outgoingSplitters = new HashSet<Vertex>();
+
     for (var edge : result.getOutgoing()) {
       outgoingSplitters.add(edge.getToVertex());
     }
+
     // Splitters that have a connector pointing back to the passenger vertex.
     var incomingSplitters = new HashSet<Vertex>();
+
     for (var edge : result.getIncoming()) {
       incomingSplitters.add(edge.getFromVertex());
     }
@@ -113,19 +116,23 @@ class StreetVertexUtilsTest {
     assertFalse(result.getIncoming().isEmpty());
 
     var twoHopOutgoing = new HashSet<Vertex>();
+
     for (var edge : result.getOutgoing()) {
       for (var nextEdge : edge.getToVertex().getOutgoing()) {
         twoHopOutgoing.add(nextEdge.getToVertex());
       }
     }
+
     assertTrue(twoHopOutgoing.contains(from) || twoHopOutgoing.contains(to));
 
     var twoHopIncoming = new HashSet<Vertex>();
+
     for (var edge : result.getIncoming()) {
       for (var nextEdge : edge.getFromVertex().getIncoming()) {
         twoHopIncoming.add(nextEdge.getFromVertex());
       }
     }
+
     assertTrue(twoHopIncoming.contains(from) || twoHopIncoming.contains(to));
   }
 
@@ -144,6 +151,7 @@ class StreetVertexUtilsTest {
         return true;
       }
     }
+
     return false;
   }
 }

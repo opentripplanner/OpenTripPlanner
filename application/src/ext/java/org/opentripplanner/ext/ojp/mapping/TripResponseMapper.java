@@ -97,10 +97,12 @@ public class TripResponseMapper {
 
   private List<LegStructure> mapLegs(Itinerary itinerary) {
     var legs = new ArrayList<LegStructure>();
+
     for (int i = 0; i < itinerary.legs().size(); i++) {
       var leg = itinerary.legs().get(i);
       legs.add(mapLeg(i, leg));
     }
+
     return legs;
   }
 
@@ -161,9 +163,11 @@ public class TripResponseMapper {
           )
       )
       .withService(journeyMapper.datedJourney(tl.trip(), tl.tripPattern(), tl.serviceDate()));
+
     if (optionalFeatures.contains(OptionalFeature.INTERMEDIATE_STOPS)) {
       timedLeg.withLegIntermediate(mapIntermediateStops(tl.listIntermediateStops()));
     }
+
     return baseLeg(index, tl).withTimedLeg(timedLeg);
   }
 
@@ -190,6 +194,7 @@ public class TripResponseMapper {
 
   private PlaceRefStructure placeRef(Place place) {
     var ref = new PlaceRefStructure().withName(internationalText(place.name));
+
     if (place.stop != null) {
       return ref.withStopPointRef(stopPointRefMapper.stopPointRef(place.stop));
     } else {

@@ -80,6 +80,7 @@ public class LegacyRouteRequestMapper {
             )
           );
         }
+
         if (bike.optimizeType() == VehicleRoutingOptimizeType.TRIANGLE) {
           bike.withOptimizeTriangle(triangle -> {
             callWith.argument("triangle.timeFactor", triangle::withTime);
@@ -110,6 +111,7 @@ public class LegacyRouteRequestMapper {
             )
           );
         }
+
         if (scooter.optimizeType() == VehicleRoutingOptimizeType.TRIANGLE) {
           scooter.withOptimizeTriangle(triangle -> {
             callWith.argument("triangle.timeFactor", triangle::withTime);
@@ -184,11 +186,13 @@ public class LegacyRouteRequestMapper {
         );
 
         var transitDisabled = false;
+
         if (hasArgument(environment, "banned") || hasArgument(environment, "transportModes")) {
           var filterRequestBuilder = TransitFilterRequest.of();
 
           callWith.argument("banned.routes", (String v) -> {
             var bannedRoutes = FeedScopedId.parseList(v);
+
             if (!bannedRoutes.isEmpty()) {
               filterRequestBuilder.addNot(SelectRequest.of().withRoutes(bannedRoutes).build());
             }
@@ -196,6 +200,7 @@ public class LegacyRouteRequestMapper {
 
           callWith.argument("banned.agencies", (String v) -> {
             var bannedAgencies = FeedScopedId.parseList(v);
+
             if (!bannedAgencies.isEmpty()) {
               filterRequestBuilder.addNot(SelectRequest.of().withAgencies(bannedAgencies).build());
             }
@@ -224,6 +229,7 @@ public class LegacyRouteRequestMapper {
             journeyBuilder.withModes(modes.getRequestModes());
 
             var tModes = modes.getTransitModes().stream().map(MainAndSubMode::new).toList();
+
             if (tModes.isEmpty()) {
               transitDisabled = true;
             } else {
@@ -344,6 +350,7 @@ public class LegacyRouteRequestMapper {
         }
       } else {
         String[] parts = name.split("\\.");
+
         if (hasArgument(environment, parts[0])) {
           Map<String, T> nm = environment.getArgument(parts[0]);
           call(nm, String.join(".", Arrays.copyOfRange(parts, 1, parts.length)), consumer);
@@ -359,6 +366,7 @@ public class LegacyRouteRequestMapper {
         }
       } else {
         String[] parts = name.split("\\.");
+
         if (hasArgument(m, parts[0])) {
           Map<String, T> nm = (Map<String, T>) m.get(parts[0]);
           call(nm, String.join(".", Arrays.copyOfRange(parts, 1, parts.length)), consumer);

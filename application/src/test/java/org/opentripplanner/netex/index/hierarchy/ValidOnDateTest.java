@@ -53,14 +53,17 @@ class ValidOnDateTest {
 
   private TariffZone entity(int version, LocalDateTime from, LocalDateTime to) {
     var e = new TariffZone().withVersion(Integer.toString(version));
+
     if (from == null && to == null) {
       return e;
     }
 
     var v = new ValidBetween();
+
     if (from != null) {
       v.withFromDate(from);
     }
+
     if (to != null) {
       v.withToDate(to);
     }

@@ -50,6 +50,7 @@ public final class TracingUtils {
       .map(header -> {
         String headerValue = headers.getHeaderString(header);
         String queryParameterValue = queryParameters.getFirst(header);
+
         if (headerValue != null) {
           return Tag.of(header, headerValue);
         } else if (queryParameterValue != null) {

@@ -111,6 +111,7 @@ class HTMLWriter {
             bucket.key().issueType()
           );
         }
+
         writeIssues(out);
       }
 
@@ -140,9 +141,11 @@ class HTMLWriter {
    */
   private void printCategoryLinks(PrintWriter out) {
     out.println("<p>");
+
     for (BucketKey linkKey : keys) {
       String linkIssueType = linkKey.issueType();
       String label = linkKey.label();
+
       if (linkKey.equals(bucketKey)) {
         out.printf(
           "<button class='pure-button pure-button-disabled button-%s' style='background-color: %s;'>%s</button>%n",
@@ -160,6 +163,7 @@ class HTMLWriter {
         );
       }
     }
+
     out.println("</p>");
   }
 
@@ -193,9 +197,11 @@ class HTMLWriter {
    */
   private void writeIssues(PrintWriter out) {
     out.println("<ul id=\"log\">");
+
     for (DataImportIssue it : bucket.issues()) {
       out.printf("<li>%s</li>%n", it.getHTMLMessage());
     }
+
     out.println("</ul>");
   }
 

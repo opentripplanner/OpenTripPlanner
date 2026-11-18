@@ -20,6 +20,7 @@ public record WarmupParameters(String id, AbstractUserPreferences<?> userPrefere
   public WarmupParameters {
     Objects.requireNonNull(id);
     Objects.requireNonNull(userPreferences);
+
     if (id.isBlank()) {
       throw new IllegalArgumentException("A warmup entry needs an id.");
     }

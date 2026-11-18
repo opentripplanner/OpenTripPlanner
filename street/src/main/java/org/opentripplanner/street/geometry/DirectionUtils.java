@@ -19,9 +19,11 @@ public final class DirectionUtils {
     double dY = b.y - a.y;
     // same
     double dX = (b.x - a.x) * cosLat;
+
     if (Math.abs(dX) < 1e-10 && Math.abs(dY) < 1e-10) {
       return 180;
     }
+
     return Math.toDegrees(Math.atan2(dX, dY));
   }
 
@@ -56,17 +58,20 @@ public final class DirectionUtils {
    */
   public static double getLastAngle(Geometry geometry) {
     LineString line;
+
     if (geometry instanceof MultiLineString) {
       line = (LineString) geometry.getGeometryN(geometry.getNumGeometries() - 1);
     } else {
       assert geometry instanceof LineString;
       line = (LineString) geometry;
     }
+
     int numPoints = line.getNumPoints();
     Coordinate coord0 = line.getCoordinateN(numPoints - 2);
     Coordinate coord1 = line.getCoordinateN(numPoints - 1);
     int i = numPoints - 3;
     int minDistance_m = 10;
+
     while (SphericalDistanceLibrary.fastDistance(coord0, coord1) < minDistance_m && i >= 0) {
       coord0 = line.getCoordinateN(i--);
     }
@@ -83,6 +88,7 @@ public final class DirectionUtils {
    */
   public static double getFirstAngle(Geometry geometry) {
     LineString line;
+
     if (geometry instanceof MultiLineString) {
       line = (LineString) geometry.getGeometryN(0);
     } else {
@@ -94,6 +100,7 @@ public final class DirectionUtils {
     Coordinate coord1 = line.getCoordinateN(1);
     int i = 2;
     int minDistance_m = 10;
+
     while (
       SphericalDistanceLibrary.fastDistance(coord0, coord1) < minDistance_m &&
       i < line.getNumPoints()

@@ -48,6 +48,7 @@ class LocalizedStringMapper {
     List<I18NString> lparams = new ArrayList<>(4);
     //Which tags do we want from way
     List<String> tagNames = getTagNames(key);
+
     for (String it : tagNames) {
       String param = way.getTag(it);
       lparams.add(new NonLocalizedString(Objects.requireNonNullElse(param, "")));
@@ -71,15 +72,18 @@ class LocalizedStringMapper {
     if (keyTagNames.containsKey(key)) {
       return keyTagNames.get(key);
     }
+
     List<String> tagNames = new ArrayList<>(4);
     String englishTrans = ResourceBundleSingleton.INSTANCE.localize(key, Locale.ENGLISH);
 
     Matcher matcher = PATTERN_MATCHER.matcher(englishTrans);
+
     while (matcher.find()) {
       String tagName = matcher.group(1);
       keyTagNames.put(key, tagName);
       tagNames.add(tagName);
     }
+
     return tagNames;
   }
 }

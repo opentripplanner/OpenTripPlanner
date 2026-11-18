@@ -105,9 +105,11 @@ public final class TransferParameters<R> {
    */
   public MaxDurationsPreference maxDurations(TransferProfileType type) {
     var result = maxDurations.get(type);
+
     if (result == null) {
       throw new IllegalArgumentException("There are no max durations for the type " + type);
     }
+
     return result;
   }
 
@@ -117,9 +119,11 @@ public final class TransferParameters<R> {
     var result = new EnumMap<TransferProfileType, MaxDurationsPreference>(
       TransferProfileType.class
     );
+
     for (var profile : profiles) {
       result.computeIfAbsent(profile.type(), MaxDurationsPreference::defaultFor);
     }
+
     return result;
   }
 
@@ -149,6 +153,7 @@ public final class TransferParameters<R> {
       case CAR -> maxDurations instanceof CarMaxDuration;
       case WALK, WHEELCHAIR -> maxDurations instanceof PlainMaxDuration;
     };
+
     if (!valid) {
       throw new IllegalArgumentException(
         "The max durations of the type " +
@@ -166,7 +171,9 @@ public final class TransferParameters<R> {
     if (profiles.isEmpty()) {
       throw new IllegalArgumentException("At least one transfer profile is required.");
     }
+
     var ids = new HashSet<String>();
+
     for (var profile : profiles) {
       if (!ids.add(profile.id())) {
         throw new IllegalArgumentException(
@@ -174,6 +181,7 @@ public final class TransferParameters<R> {
         );
       }
     }
+
     for (var entry : warmup) {
       if (!ids.add(entry.id())) {
         throw new IllegalArgumentException(
@@ -183,6 +191,7 @@ public final class TransferParameters<R> {
     }
 
     var types = profiles.stream().map(TransferProfile::type).collect(Collectors.toSet());
+
     for (var entry : warmup) {
       if (!types.contains(entry.userPreferences().type())) {
         throw new IllegalArgumentException(
@@ -201,9 +210,11 @@ public final class TransferParameters<R> {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     var that = (TransferParameters<?>) o;
     return (
       profiles.equals(that.profiles) &&

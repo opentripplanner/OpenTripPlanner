@@ -59,24 +59,30 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
         color = getColor(pse.getPermission());
         label = getLabel(pse.getPermission());
       }
+
       if (pse.isMotorVehicleNoThruTraffic()) {
         label += " car NTT";
       }
+
       if (pse.isBicycleNoThruTraffic()) {
         label += " bike NTT";
       }
+
       if (pse.isWalkNoThruTraffic()) {
         label += " walk NTT";
       }
     } else if (e instanceof ElevatorHopEdge ehe) {
       color = ELEVATOR_COLOR_EDGE;
       label = "elevator";
+
       if (ehe.isWheelchairAccessible()) {
         label += " wheelchair";
       }
+
       if (ehe.getPermission().allows(StreetTraversalPermission.BICYCLE)) {
         label += " bike";
       }
+
       if (ehe.getPermission().allows(StreetTraversalPermission.CAR)) {
         label += " car";
       }
@@ -87,6 +93,7 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
       color = LINK_COLOR_EDGE;
       label = "link";
     }
+
     return EdgeVisualAttributes.optional(color, label);
   }
 
@@ -101,6 +108,7 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
       if (v instanceof BarrierVertex) {
         return VertexVisualAttributes.optional(BARRIER_COLOR_VERTEX, null);
       }
+
       return VertexVisualAttributes.optional(STREET_COLOR_VERTEX, null);
     } else if (
       v instanceof TransitStopVertex ||
@@ -114,6 +122,7 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
     } else if (v instanceof VehicleParkingEntranceVertex) {
       return VertexVisualAttributes.optional(PARK_AND_RIDE_COLOR_VERTEX, v.getDefaultName());
     }
+
     return Optional.empty();
   }
 
@@ -125,36 +134,45 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
     float r = 0.2f;
     float g = 0.2f;
     float b = 0.2f;
+
     if (permissions.allows(StreetTraversalPermission.PEDESTRIAN)) {
       g += 0.5f;
     }
+
     if (permissions.allows(StreetTraversalPermission.BICYCLE)) {
       b += 0.5f;
     }
+
     if (permissions.allows(StreetTraversalPermission.CAR)) {
       r += 0.5f;
     }
+
     // TODO CUSTOM_VEHICLE (?)
     return new Color(r, g, b);
   }
 
   private String getLabel(StreetTraversalPermission permissions) {
     StringBuilder sb = new StringBuilder();
+
     if (permissions.allows(StreetTraversalPermission.PEDESTRIAN)) {
       sb.append("walk,");
     }
+
     if (permissions.allows(StreetTraversalPermission.BICYCLE)) {
       sb.append("bike,");
     }
+
     if (permissions.allows(StreetTraversalPermission.CAR)) {
       sb.append("car,");
     }
+
     if (sb.length() > 0) {
       // Remove last comma
       sb.setLength(sb.length() - 1);
     } else {
       sb.append("none");
     }
+
     return sb.toString();
   }
 }

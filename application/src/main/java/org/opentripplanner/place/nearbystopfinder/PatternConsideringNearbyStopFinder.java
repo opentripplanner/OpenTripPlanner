@@ -55,6 +55,7 @@ public class PatternConsideringNearbyStopFinder implements NearbyStopFinder {
     if (flexIndex != null) {
       builder.add(new FlexTripNearbyStopFilter(flexIndex));
     }
+
     this.filter = builder.build();
     this.delegateNearbyStopFinder = delegateNearbyStopFinder;
   }

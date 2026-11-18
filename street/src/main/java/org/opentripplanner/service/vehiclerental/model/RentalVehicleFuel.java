@@ -61,9 +61,11 @@ public final class RentalVehicleFuel {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     RentalVehicleFuel that = (RentalVehicleFuel) o;
     return Objects.equals(percent, that.percent) && Objects.equals(range, that.range);
   }

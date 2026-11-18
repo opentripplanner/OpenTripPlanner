@@ -150,9 +150,11 @@ public final class RoutingPreferences implements Serializable {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     RoutingPreferences that = (RoutingPreferences) o;
     return (
       Objects.equals(transit, that.transit) &&

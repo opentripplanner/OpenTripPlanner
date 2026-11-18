@@ -115,6 +115,7 @@ public class ItineraryReferenceSerializer {
       String joinedLegReferences = token.getString(LEG_REFERENCES_FIELD).orElseThrow();
 
       String[] rawLegReferences = joinedLegReferences.split(LEG_REFERENCE_DELIMITER, -1);
+
       if (rawLegReferences.length > ItineraryReference.MAX_LEG_REFERENCES) {
         throw new IllegalArgumentException("Too many leg references: " + rawLegReferences.length);
       }
@@ -168,9 +169,11 @@ public class ItineraryReferenceSerializer {
   /** Like {@link Double#parseDouble}, but rejects {@code NaN} and infinity. */
   private static double finiteDouble(String value) {
     double result = Double.parseDouble(value);
+
     if (!Double.isFinite(result)) {
       throw new IllegalArgumentException("Expected a finite number");
     }
+
     return result;
   }
 
@@ -199,11 +202,13 @@ public class ItineraryReferenceSerializer {
 
     if (location != null) {
       var locationStopId = location.stopId();
+
       if (locationStopId != null) {
         stopId = locationStopId.toString();
       }
 
       var coordinate = location.wgsCoordinate();
+
       if (coordinate != null) {
         lat = Double.toString(coordinate.latitude());
         lon = Double.toString(coordinate.longitude());

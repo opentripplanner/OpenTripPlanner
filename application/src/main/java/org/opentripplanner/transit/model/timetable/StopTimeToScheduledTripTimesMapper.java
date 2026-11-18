@@ -44,6 +44,7 @@ class StopTimeToScheduledTripTimesMapper {
     final List<BookingInfo> dropOffBookingInfos = new ArrayList<>();
     final List<BookingInfo> pickupBookingInfos = new ArrayList<>();
     int s = 0;
+
     for (final StopTime st : stopTimes) {
       departures[s] = st.getDepartureTime();
       arrivals[s] = st.getArrivalTime();
@@ -54,6 +55,7 @@ class StopTimeToScheduledTripTimesMapper {
       pickupBookingInfos.add(st.getPickupBookingInfo());
       s++;
     }
+
     builder
       .withDepartureTimes(departures)
       .withArrivalTimes(arrivals)
@@ -74,6 +76,7 @@ class StopTimeToScheduledTripTimesMapper {
   private I18NString[] makeHeadsignsArray(final Collection<StopTime> stopTimes) {
     final I18NString tripHeadsign = trip.getHeadsign();
     boolean useStopHeadsigns = false;
+
     if (tripHeadsign == null) {
       useStopHeadsigns = true;
     } else {
@@ -84,20 +87,25 @@ class StopTimeToScheduledTripTimesMapper {
         }
       }
     }
+
     if (!useStopHeadsigns) {
       // defer to trip_headsign
       return null;
     }
+
     boolean allNull = true;
     int i = 0;
     final I18NString[] hs = new I18NString[stopTimes.size()];
+
     for (final StopTime st : stopTimes) {
       final I18NString headsign = st.getStopHeadsign();
       hs[i++] = headsign;
+
       if (headsign != null) {
         allNull = false;
       }
     }
+
     if (allNull) {
       return null;
     } else {
@@ -126,6 +134,7 @@ class StopTimeToScheduledTripTimesMapper {
     String[][] vias = new String[stopTimes.size()][];
 
     int i = 0;
+
     for (final StopTime st : stopTimes) {
       if (st.getHeadsignVias() == null) {
         vias[i] = EMPTY_STRING_ARRAY;

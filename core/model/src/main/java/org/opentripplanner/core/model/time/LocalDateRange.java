@@ -39,6 +39,7 @@ public final class LocalDateRange {
   private LocalDateRange(LocalDate inclusiveStart, LocalDate exclusiveEnd) {
     this.inclusiveStart = inclusiveStart;
     this.exclusiveEnd = exclusiveEnd;
+
     if (exclusiveEnd.isBefore(inclusiveStart)) {
       throw new IllegalArgumentException(
         "Invalid range, the end is before the start: start=" +
@@ -58,11 +59,13 @@ public final class LocalDateRange {
   public static LocalDateRange ofInclusiveEnd(@Nullable LocalDate start, @Nullable LocalDate end) {
     var startInclusive = start == null ? MIN : start;
     var endInclusive = end == null ? MAX : end;
+
     if (endInclusive.isBefore(startInclusive)) {
       throw new IllegalArgumentException(
         "Invalid range, the end " + end + " is before the start " + start
       );
     }
+
     var endExclusive = endInclusive.equals(MAX) ? MAX : endInclusive.plusDays(1);
     return new LocalDateRange(startInclusive, endExclusive);
   }
@@ -147,9 +150,11 @@ public final class LocalDateRange {
   public LocalDateRange intersection(LocalDateRange other) {
     LocalDate newStart = ServiceDateUtils.max(inclusiveStart, other.inclusiveStart);
     LocalDate newEnd = ServiceDateUtils.min(exclusiveEnd, other.exclusiveEnd);
+
     if (!newStart.isBefore(newEnd)) {
       throw new IllegalArgumentException("ranges do not overlap: " + this + " and " + other);
     }
+
     return new LocalDateRange(newStart, newEnd);
   }
 
@@ -181,6 +186,7 @@ public final class LocalDateRange {
     }
 
     long days = ChronoUnit.DAYS.between(effectiveInclusiveStart, effectiveExclusiveEnd);
+
     if (days > MAX_DAYS_AS_LOCAL_DATES) {
       throw new IllegalArgumentException(
         "The date range [" +
@@ -196,6 +202,7 @@ public final class LocalDateRange {
     }
 
     List<LocalDate> dates = new ArrayList<>((int) days);
+
     for (
       LocalDate date = effectiveInclusiveStart;
       date.isBefore(effectiveExclusiveEnd);
@@ -203,6 +210,7 @@ public final class LocalDateRange {
     ) {
       dates.add(date);
     }
+
     return dates;
   }
 
@@ -223,9 +231,11 @@ public final class LocalDateRange {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     LocalDateRange that = (LocalDateRange) o;
     return inclusiveStart.equals(that.inclusiveStart) && exclusiveEnd.equals(that.exclusiveEnd);
   }

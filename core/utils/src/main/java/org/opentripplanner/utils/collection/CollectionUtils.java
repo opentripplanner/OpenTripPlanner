@@ -27,10 +27,13 @@ public class CollectionUtils {
     if (c == null) {
       return nullText;
     }
+
     var stream = c.stream().map(it -> it == null ? nullText : it.toString());
+
     if (c instanceof Set && !(c instanceof SortedSet<T>)) {
       stream = stream.sorted();
     }
+
     return stream.collect(Collectors.joining(", ", "[", "]"));
   }
 
@@ -83,6 +86,7 @@ public class CollectionUtils {
     if (key == null) {
       return null;
     }
+
     return map.get(key);
   }
 

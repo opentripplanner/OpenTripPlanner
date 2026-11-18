@@ -114,6 +114,7 @@ public class GroupByDistance implements GroupId<GroupByDistance> {
       sum += legs.get(i).distanceMeters();
       ++i;
     }
+
     return legs.stream().limit(i).toList();
   }
 
@@ -134,6 +135,7 @@ public class GroupByDistance implements GroupId<GroupByDistance> {
         return false;
       }
     }
+
     return true;
   }
 
@@ -155,6 +157,7 @@ public class GroupByDistance implements GroupId<GroupByDistance> {
     } else {
       throw new IllegalStateException("Unhandled type: " + leg.getClass());
     }
+
     return builder.toString();
   }
 }

@@ -29,6 +29,7 @@ public class LocalTimeScalarFactory {
             if (input instanceof LocalTime) {
               return FORMATTER.format((LocalTime) input);
             }
+
             return null;
           }
 
@@ -48,6 +49,7 @@ public class LocalTimeScalarFactory {
             if (input instanceof StringValue) {
               return parseValue(((StringValue) input).getValue());
             }
+
             return null;
           }
         }

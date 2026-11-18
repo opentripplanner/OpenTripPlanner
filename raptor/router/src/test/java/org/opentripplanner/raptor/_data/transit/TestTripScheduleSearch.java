@@ -50,12 +50,14 @@ class TestTripScheduleSearch
 
     for (int i = 0; i <= end; ++i) {
       int departureTime = trips.get(i).departure(stopPositionInPattern);
+
       if (timeLimit <= departureTime) {
         this.time = departureTime;
         this.tripIndex = i;
         return this;
       }
     }
+
     return RaptorBoardOrAlightEvent.empty(timeLimit);
   }
 
@@ -64,12 +66,14 @@ class TestTripScheduleSearch
 
     for (int i = trips.size() - 1; i >= end; --i) {
       int arrivalTime = trips.get(i).arrival(stopPositionInPattern);
+
       if (timeLimit >= arrivalTime) {
         this.time = arrivalTime;
         this.tripIndex = i;
         return this;
       }
     }
+
     return RaptorBoardOrAlightEvent.empty(timeLimit);
   }
 

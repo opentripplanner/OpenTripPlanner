@@ -52,10 +52,12 @@ public class CountdownTimer {
    */
   public boolean nextLap() {
     long time = now();
+
     if (timeIsUp(time)) {
       restart(time);
       return true;
     }
+
     return false;
   }
 

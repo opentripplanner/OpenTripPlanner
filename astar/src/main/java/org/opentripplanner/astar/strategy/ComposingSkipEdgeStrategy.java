@@ -22,6 +22,7 @@ public record ComposingSkipEdgeStrategy<
         return true;
       }
     }
+
     return false;
   }
 }

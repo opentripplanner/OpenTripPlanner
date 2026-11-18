@@ -271,11 +271,13 @@ public class TransitRepositoryForTest {
 
   public StopPattern stopPattern(int numberOfStops) {
     var builder = StopPattern.create(numberOfStops);
+
     for (int i = 0; i < numberOfStops; i++) {
       builder.stops.with(i, stop("Stop_" + i).build());
       builder.pickups.with(i, PickDrop.SCHEDULED);
       builder.dropoffs.with(i, PickDrop.SCHEDULED);
     }
+
     return builder.build();
   }
 
@@ -285,11 +287,13 @@ public class TransitRepositoryForTest {
 
   public static StopPattern stopPattern(List<StopLocation> stops) {
     var builder = StopPattern.create(stops.size());
+
     for (int i = 0; i < stops.size(); i++) {
       builder.stops.with(i, stops.get(i));
       builder.pickups.with(i, PickDrop.SCHEDULED);
       builder.dropoffs.with(i, PickDrop.SCHEDULED);
     }
+
     return builder.build();
   }
 

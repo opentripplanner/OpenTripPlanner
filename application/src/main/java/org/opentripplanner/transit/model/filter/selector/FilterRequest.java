@@ -43,6 +43,7 @@ public class FilterRequest<T> {
     if (select == null && not == null) {
       return "ALL";
     }
+
     return ToStringBuilder.ofEmbeddedType().addCol("select", select).addCol("not", not).toString();
   }
 

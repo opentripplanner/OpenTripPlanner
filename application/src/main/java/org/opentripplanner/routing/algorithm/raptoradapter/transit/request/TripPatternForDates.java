@@ -81,12 +81,15 @@ public class TripPatternForDates
 
     int numberOfTripSchedules = 0;
     boolean hasFrequencies = false;
+
     for (TripPatternForDate tripPatternForDate : this.tripPatternForDates) {
       numberOfTripSchedules += tripPatternForDate.numberOfTripSchedules();
+
       if (tripPatternForDate.hasFrequencies()) {
         hasFrequencies = true;
       }
     }
+
     this.numberOfTripSchedules = numberOfTripSchedules;
     this.isFrequencyBased = hasFrequencies;
 
@@ -104,6 +107,7 @@ public class TripPatternForDates
       var tt = tripPatternForDates[day].tripTimes().get(tripIndex.tripIndexForDay(i));
 
       wheelchairBoardings[i] = tt.getWheelchairAccessibility();
+
       for (int s = 0; s < nStops; s++) {
         this.arrivalTimes[s * numberOfTripSchedules + i] = tt.getArrivalTime(s) + offset;
         this.departureTimes[s * numberOfTripSchedules + i] = tt.getDepartureTime(s) + offset;
@@ -196,6 +200,7 @@ public class TripPatternForDates
     if (useCustomizedTripSearch()) {
       return createCustomizedTripSearch(direction);
     }
+
     return TripScheduleSearchFactory.create(direction, this);
   }
 
@@ -277,13 +282,17 @@ public class TripPatternForDates
     int[] offsets
   ) {
     var departureTimes = new ArrayList<int[]>(tripPatternForDates.length);
+
     for (var tripPatternForDate : tripPatternForDates) {
       var times = new int[tripPatternForDate.numberOfTripSchedules()];
+
       for (int i = 0; i < times.length; i++) {
         times[i] = tripPatternForDate.getTripTimes(i).getDepartureTime(FIRST_STOP_POS_IN_PATTERN);
       }
+
       departureTimes.add(times);
     }
+
     return TripTimesForDaysIndex.ofTripTimesForDay(departureTimes, offsets);
   }
 }

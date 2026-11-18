@@ -40,11 +40,13 @@ public class TimetableRepositoryLifecycle
       final LocalDate today = localDateNow.get();
       // Keep data for today and the previous day; purge anything older
       final LocalDate previously = today.minusDays(2);
+
       if (lastPurgeDate == null || lastPurgeDate.compareTo(previously) < 0) {
         lastPurgeDate = previously;
         buffer.purgeExpiredData(previously);
       }
     }
+
     return buffer.createSnapshot();
   }
 }

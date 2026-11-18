@@ -55,11 +55,13 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
     if (heuristics == null || paths.isEmpty()) {
       return false;
     }
+
     boolean rejected = !qualify(arrival.stop(), arrival.arrivalTime(), arrival.c1(), arrival.c2());
 
     if (rejected) {
       debugRejectByOptimization(arrival);
     }
+
     return rejected;
   }
 
@@ -94,6 +96,7 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
     if (h == HeuristicAtStop.UNREACHED) {
       return false;
     }
+
     int minArrivalTime = arrivalTime + h.minTravelDuration();
     int minNumberOfTransfers = round - 1 + h.minNumTransfers();
     int minCost = cost + h.minCost();
@@ -110,6 +113,7 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
     if (stops[stop] == null) {
       stops[stop] = heuristics.createHeuristicAtStop(stop);
     }
+
     return stops[stop];
   }
 }

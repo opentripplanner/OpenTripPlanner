@@ -49,9 +49,11 @@ public class EscalatorRequest {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     EscalatorRequest that = (EscalatorRequest) o;
     return doubleEquals(that.reluctance, reluctance) && doubleEquals(that.speed, speed);
   }

@@ -62,6 +62,7 @@ class StopTimeMapper {
     Objects.requireNonNull(stopLocation, () ->
       "Trip %s contains stop_time with no stop, location or group.".formatted(rhs.getTrip())
     );
+
     switch (stopLocation) {
       case Stop stop -> lhs.setStop(stopMapper.map(stop));
       case Location location -> lhs.setStop(locationMapper.map(location));
@@ -72,6 +73,7 @@ class StopTimeMapper {
     }
 
     I18NString stopHeadsign = null;
+
     if (rhs.getStopHeadsign() != null) {
       stopHeadsign = translationHelper.getTranslation(
         org.onebusaway.gtfs.model.StopTime.class,

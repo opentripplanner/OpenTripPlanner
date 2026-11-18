@@ -35,6 +35,7 @@ public class EmpiricalDelaySummary {
     if (feeds.size() > 1) {
       numbers = total.toString() + ", " + numbers;
     }
+
     return "Empirical Delay Summary - " + numbers;
   }
 

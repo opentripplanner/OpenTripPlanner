@@ -222,6 +222,7 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
     // Ignore transfer, board and alight slack for min-transfer-time
     if (isMinTransferTimeSet()) {
       int minTransferTime = getMinTransferTime() + transferSlack;
+
       if (direction.isForward()) {
         int minTransferBoardTime = sourceTransitArrivalTime + minTransferTime;
         return OTPFeature.MinimumTransferTimeIsDefinitive.isOn()
@@ -234,6 +235,7 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
           : Math.min(minTransferBoardTime, calcRegularTransferTargetTime.getAsInt());
       }
     }
+
     // Transfers with priority only apply to the cost not the transfer time
     return calcRegularTransferTargetTime.getAsInt();
   }
@@ -248,9 +250,11 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
     if (this == o) {
       return true;
     }
+
     if (!(o instanceof final TransferConstraint that)) {
       return false;
     }
+
     return (
       staySeated == that.staySeated &&
       guaranteed == that.guaranteed &&
@@ -281,9 +285,11 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
     if (staySeated) {
       return STAY_SEATED_TRANSFER_COST;
     }
+
     if (guaranteed) {
       return GUARANTEED_TRANSFER_COST;
     }
+
     return NONE_FACILITATED_COST;
   }
 

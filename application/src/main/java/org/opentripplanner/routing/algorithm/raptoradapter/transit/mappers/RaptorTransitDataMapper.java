@@ -82,6 +82,7 @@ public class RaptorTransitDataMapper {
     tripPatternsByStopByDate = mapTripPatterns(allTripPatterns);
 
     TransferIndexGenerator transferIndexGenerator = null;
+
     if (OTPFeature.TransferConstraints.isOn()) {
       transferIndexGenerator = new TransferIndexGenerator(
         transitService.getConstrainedTransferService().listAll(),
@@ -132,10 +133,12 @@ public class RaptorTransitDataMapper {
           oldTripPattern.getScheduledTimetable(),
           serviceDate
         );
+
         if (tripPatternForDate != null) {
           values.add(tripPatternForDate);
         }
       }
+
       if (!values.isEmpty()) {
         tripPatternForDates.addAll(values);
       }
@@ -153,6 +156,7 @@ public class RaptorTransitDataMapper {
   ) {
     // Create multimap by running period dates
     ArrayListMultimap<LocalDate, TripPatternForDate> multiMap = ArrayListMultimap.create();
+
     for (TripPatternForDate tripPatternForDate : tripPatternForDates) {
       for (LocalDate date : tripPatternForDate.getRunningPeriodDates()) {
         multiMap.put(date, tripPatternForDate);
@@ -161,6 +165,7 @@ public class RaptorTransitDataMapper {
 
     // Convert to Map<LocalDate, List<TripPatternForDate>>
     HashMap<LocalDate, List<TripPatternForDate>> result = new HashMap<>();
+
     for (Map.Entry<LocalDate, Collection<TripPatternForDate>> entry : multiMap.asMap().entrySet()) {
       result.put(entry.getKey(), new ArrayList<>(entry.getValue()));
     }
@@ -178,6 +183,7 @@ public class RaptorTransitDataMapper {
     if (!tuningParams.enableStopTransferPriority()) {
       return null;
     }
+
     int defaultCost = RaptorCostConverter.toRaptorCost(
       tuningParams.stopBoardAlightDuringTransferCost(StopTransferPriority.defaultValue())
     );
@@ -186,6 +192,7 @@ public class RaptorTransitDataMapper {
     for (int i = 0; i < stops.stopIndexSize(); ++i) {
       // There can be holes in the stop index, so we need to account for 'null' here.
       var stop = stops.stopByIndex(i);
+
       if (stop == null) {
         stopBoardAlightTransferCosts[i] = defaultCost;
       } else {
@@ -194,6 +201,7 @@ public class RaptorTransitDataMapper {
         stopBoardAlightTransferCosts[i] = RaptorCostConverter.toRaptorCost(domainCost);
       }
     }
+
     return stopBoardAlightTransferCosts;
   }
 }

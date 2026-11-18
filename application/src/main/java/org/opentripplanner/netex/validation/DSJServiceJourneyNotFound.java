@@ -30,6 +30,7 @@ class DSJServiceJourneyNotFound extends AbstractHMapValidationRule<String, Dated
     if (journeyRef == null) {
       return null;
     }
+
     JourneyRefStructure ref = journeyRef.getValue();
     return ref == null ? null : ref.getRef();
   }

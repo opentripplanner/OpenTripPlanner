@@ -27,6 +27,7 @@ public class TransmodelAPITestContextBuilder {
     if (graph == null) {
       graph = new Graph();
     }
+
     return graph;
   }
 
@@ -50,6 +51,7 @@ public class TransmodelAPITestContextBuilder {
     if (defaultRequest == null) {
       defaultRequest = RouteRequest.of().buildDefault();
     }
+
     return defaultRequest;
   }
 

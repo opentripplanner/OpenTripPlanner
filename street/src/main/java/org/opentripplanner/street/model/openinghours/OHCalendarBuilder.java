@@ -114,9 +114,11 @@ public class OHCalendarBuilder {
      */
     public OpeningHoursBuilder on(LocalDate date) {
       var shiftedDate = date.plusDays(afterMidnight ? 1 : 0);
+
       if (shiftedDate.isBefore(startOfPeriod) || shiftedDate.isAfter(endOfPeriod)) {
         return this;
       }
+
       openingDays.set((int) ChronoUnit.DAYS.between(startOfPeriod, shiftedDate));
       return this;
     }
@@ -137,6 +139,7 @@ public class OHCalendarBuilder {
       for (int i = firstOccurrenceDaysFromStart; i < daysInPeriod; i += 7) {
         openingDays.set(i);
       }
+
       return this;
     }
 
@@ -149,6 +152,7 @@ public class OHCalendarBuilder {
       if (fromDayOfWeek == null) {
         return this;
       }
+
       if (untilDayOfWeek == null) {
         on(fromDayOfWeek);
         return this;
@@ -158,10 +162,12 @@ public class OHCalendarBuilder {
         fromDayOfWeek.getValue() > untilDayOfWeek.getValue()
           ? untilDayOfWeek.getValue() + 7
           : untilDayOfWeek.getValue();
+
       for (int i = fromDayOfWeek.getValue(); i <= untilAdjusted; i++) {
         int dayValue = i > 7 ? i - 7 : i;
         on(DayOfWeek.of(dayValue));
       }
+
       return this;
     }
 
@@ -182,6 +188,7 @@ public class OHCalendarBuilder {
       }
 
       Set<Month> months = new HashSet<>();
+
       if (untilMonth == null) {
         months.add(fromMonth);
       } else {
@@ -189,6 +196,7 @@ public class OHCalendarBuilder {
           fromMonth.getValue() > untilMonth.getValue()
             ? untilMonth.getValue() + 12
             : untilMonth.getValue();
+
         for (int i = fromMonth.getValue(); i <= untilMonthAdjusted; i++) {
           int monthValue = i > 12 ? i - 12 : i;
           months.add(Month.of(monthValue));
@@ -196,6 +204,7 @@ public class OHCalendarBuilder {
       }
 
       Set<DayOfWeek> daysOfWeek = new HashSet<>();
+
       if (untilDayOfWeek == null) {
         daysOfWeek.add(fromDayOfWeek);
       } else {
@@ -203,6 +212,7 @@ public class OHCalendarBuilder {
           fromDayOfWeek.getValue() > untilDayOfWeek.getValue()
             ? untilDayOfWeek.getValue() + 7
             : untilDayOfWeek.getValue();
+
         for (int i = fromDayOfWeek.getValue(); i <= untilDayAdjusted; i++) {
           int dayValue = i > 7 ? i - 7 : i;
           daysOfWeek.add(DayOfWeek.of(dayValue));
@@ -211,11 +221,13 @@ public class OHCalendarBuilder {
 
       var dateToProcess = afterMidnight ? startOfPeriod.minusDays(1) : startOfPeriod;
       int i = 0;
+
       while (i < daysInPeriod) {
         if (months.contains(dateToProcess.getMonth())) {
           if (daysOfWeek.contains(dateToProcess.getDayOfWeek())) {
             openingDays.set(i);
           }
+
           dateToProcess = dateToProcess.plusDays(1);
           i += 1;
         } else {
@@ -227,6 +239,7 @@ public class OHCalendarBuilder {
           i += daysToSkip;
         }
       }
+
       return this;
     }
 
@@ -247,14 +260,17 @@ public class OHCalendarBuilder {
     public OpeningHoursBuilder offWithTimeShift(OpeningHoursBuilder otherBuilder) {
       BitSet daysOff = otherBuilder.getOpeningDays();
       String offDescription = otherBuilder.getPeriodDescription();
+
       if (afterMidnight) {
         boolean intersects = false;
+
         // Java doesn't seem to have operations for shifting bits
         for (int i = 1; i < daysInPeriod; i++) {
           if (openingDays.get(i) && daysOff.get(i - 1)) {
             intersects = true;
             openingDays.clear(i);
           }
+
           if (intersects) {
             appendDescription(" except " + offDescription);
           }
@@ -262,6 +278,7 @@ public class OHCalendarBuilder {
       } else {
         off(daysOff, offDescription);
       }
+
       return this;
     }
 
@@ -289,6 +306,7 @@ public class OHCalendarBuilder {
     ) {
       LocalTime otherStartTime = otherBuilder.getStartTime();
       LocalTime otherEndTime = otherBuilder.getEndTime();
+
       if (
         otherEndTime.equals(startTime) ||
         otherEndTime.isBefore(startTime) ||
@@ -297,7 +315,9 @@ public class OHCalendarBuilder {
       ) {
         return new OpeningHoursBuilderAndNewBuilders(this, List.of());
       }
+
       String offDescription = otherBuilder.getPeriodDescription();
+
       if (
         (otherStartTime.isBefore(startTime) || otherStartTime.equals(startTime)) &&
         (endTime.isBefore(otherEndTime) || endTime.equals(otherEndTime))
@@ -305,27 +325,33 @@ public class OHCalendarBuilder {
         off(otherBuilder.getOpeningDays(), offDescription);
         return new OpeningHoursBuilderAndNewBuilders(this, List.of());
       }
+
       BitSet commonDays = this.getCommonDays(otherBuilder);
+
       if (commonDays.isEmpty()) {
         return new OpeningHoursBuilderAndNewBuilders(this, List.of());
       }
+
       String newDescription = String.format(
         "Days overlapping between %s and %s",
         getPeriodDescription(),
         otherBuilder.getPeriodDescription()
       );
+
       if (otherStartTime.equals(startTime) || otherStartTime.isBefore(startTime)) {
         var newOpeningHoursBuilder = openingHours(newDescription, otherEndTime, endTime);
         newOpeningHoursBuilder.on(commonDays);
         off(commonDays, offDescription);
         return new OpeningHoursBuilderAndNewBuilders(this, List.of(newOpeningHoursBuilder));
       }
+
       if (endTime.equals(otherEndTime) || endTime.isBefore(otherEndTime)) {
         var newOpeningHoursBuilder = openingHours(newDescription, startTime, otherStartTime);
         newOpeningHoursBuilder.on(commonDays);
         off(commonDays, offDescription);
         return new OpeningHoursBuilderAndNewBuilders(this, List.of(newOpeningHoursBuilder));
       }
+
       var firstNewOpeningHoursBuilder = openingHours(newDescription, startTime, otherStartTime);
       firstNewOpeningHoursBuilder.on(commonDays);
       var secondNewOpeningHoursBuilder = openingHours(newDescription, otherEndTime, endTime);
@@ -388,6 +414,7 @@ public class OHCalendarBuilder {
       if (days.size() != openingDays.size()) {
         return this;
       }
+
       openingDays.or(days);
       return this;
     }
@@ -401,6 +428,7 @@ public class OHCalendarBuilder {
         openingDays.andNot(daysOff);
         appendDescription(" except " + offDescription);
       }
+
       return this;
     }
   }

@@ -176,6 +176,7 @@ public class OTPWebApplication extends Application {
     if (traceParameters.isEmpty()) {
       return List.of();
     }
+
     RequestTraceFilter.init(traceParameters);
 
     return List.of(RequestTraceFilter.class);

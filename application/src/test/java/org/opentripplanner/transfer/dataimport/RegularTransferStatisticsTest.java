@@ -150,9 +150,11 @@ class RegularTransferStatisticsTest {
 
   private static List<FeedScopedId> stops(int fromInclusive, int toExclusive) {
     var result = new ArrayList<FeedScopedId>();
+
     for (int i = fromInclusive; i < toExclusive; ++i) {
       result.add(id("S" + i));
     }
+
     return result;
   }
 

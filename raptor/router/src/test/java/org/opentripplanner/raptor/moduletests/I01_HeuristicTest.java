@@ -111,6 +111,7 @@ public class I01_HeuristicTest implements RaptorTestConstants {
   private void assertArrayLessOrEqual(int[] expected, int[] actual, String arrayName) {
     assertNotNull(actual);
     assertEquals(expected.length, actual.length);
+
     for (int i = 0; i < expected.length; i++) {
       assertTrue(
         expected[i] >= actual[i],

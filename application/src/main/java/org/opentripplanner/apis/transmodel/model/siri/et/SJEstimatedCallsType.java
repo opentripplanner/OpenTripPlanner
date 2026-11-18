@@ -57,9 +57,11 @@ public class SJEstimatedCallsType {
           )
           .dataFetcher(environment -> {
             Integer count = environment.getArgument("count");
+
             if (count == null) {
               return environment.<TripTimeOnDate>getSource().nextTimes();
             }
+
             checkStrictlyPositive(count);
             return environment.<TripTimeOnDate>getSource().nextTimes(count);
           })
@@ -80,9 +82,11 @@ public class SJEstimatedCallsType {
           )
           .dataFetcher(environment -> {
             Integer count = environment.getArgument("count");
+
             if (count == null) {
               return environment.<TripTimeOnDate>getSource().previousTimes();
             }
+
             checkStrictlyPositive(count);
             return environment.<TripTimeOnDate>getSource().previousTimes(count);
           })

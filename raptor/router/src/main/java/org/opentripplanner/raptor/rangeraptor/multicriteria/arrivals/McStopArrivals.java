@@ -74,6 +74,7 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
     // Comparator for stops that have arrival listeners with a on-board trip-to-trip via
     // connection.
     var onBoardComparator = comparatorFactory.compareArrivalTimeRoundCostAndOnBoardArrival();
+
     for (var cursor : arrivalListeners.keys()) {
       int stop = cursor.value;
       var comp = onBoardArrivalStops.contains(stop) ? onBoardComparator : comparator;
@@ -82,6 +83,7 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
 
     for (var cursor : onBoardArrivalStops) {
       int stop = cursor.value;
+
       if (this.arrivals[stop] == null) {
         this.arrivals[stop] = ParetoSet.of(
           onBoardComparator,
@@ -206,9 +208,11 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
    */
   public void clearTouchedStopsAndSetStopMarkers() {
     IntIterator it = stopsTouchedIterator();
+
     while (it.hasNext()) {
       arrivals[it.next()].markAtEndOfSet();
     }
+
     touchedStops.clear();
   }
 
@@ -250,6 +254,7 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
       arrivalsForRoute = new OnTripAccessArrivals<>();
       onBoardTripArrivalsByRouteQueue.put(routeIndex, arrivalsForRoute);
     }
+
     arrivalsForRoute.add(boardingArrival, startRoutingAtStopPosition, boardingConstraint);
 
     // Then update the state, both touchedStops and init the pareto-set for the given stop to
@@ -267,6 +272,7 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
         debugHandlerFactory.paretoSetStopArrivalListener(stop)
       );
     }
+
     return arrivals[stop];
   }
 

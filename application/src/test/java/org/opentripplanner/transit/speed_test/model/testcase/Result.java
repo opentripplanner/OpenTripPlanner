@@ -73,12 +73,15 @@ public record Result(
 
   static <T> int compare(List<T> a, List<T> b, Comparator<T> comparator) {
     int size = Math.min(a.size(), b.size());
+
     for (int i = 0; i < size; i++) {
       int c = comparator.compare(a.get(i), b.get(i));
+
       if (c != 0) {
         return c;
       }
     }
+
     return a.size() - b.size();
   }
 
@@ -87,12 +90,15 @@ public record Result(
       if (skipCost) {
         return 0;
       }
+
       if (r1.c1 == null || r1.c1.equals(0)) {
         return 0;
       }
+
       if (r2.c1 == null || r2.c1.equals(0)) {
         return 0;
       }
+
       return -(r2.c1 - r1.c1);
     };
   }

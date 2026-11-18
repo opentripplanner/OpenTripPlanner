@@ -101,6 +101,7 @@ final class DaggerTransmodelGraphQLRequestContext implements TransmodelGraphQLRe
     if (nearbyPlaceFinder == null) {
       nearbyPlaceFinder = new StreetNearbyPlaceFinder(factory.linkingContextFactory());
     }
+
     return nearbyPlaceFinder;
   }
 
@@ -111,6 +112,7 @@ final class DaggerTransmodelGraphQLRequestContext implements TransmodelGraphQLRe
         ? StreetNearbyStopFinder.of(factory.linkingContextFactory()).build()
         : new StraightLineNearbyStopFinder(factory.transitService()::findRegularStopsByBoundingBox);
     }
+
     return nearbyStopFinder;
   }
 }

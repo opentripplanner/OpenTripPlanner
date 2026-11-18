@@ -158,9 +158,11 @@ public class PatternCostCalculatorTest {
     @Override
     public String toString() {
       final StringBuilder sb = new StringBuilder();
+
       if (unPreferredAgency) {
         sb.append(", unPrefAgency=X");
       }
+
       if (unPreferredRoute) {
         sb.append(", unPrefRoute=X");
       }
@@ -208,6 +210,7 @@ public class PatternCostCalculatorTest {
             if (unPreferredAgency) {
               b.withUnpreferredAgencies(List.of(UNPREFERRED_AGENCY_ID));
             }
+
             if (unPreferredRoute) {
               b.withUnpreferredRoutes(List.of(UNPREFERRED_ROUTE_ID));
             }

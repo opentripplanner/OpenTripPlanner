@@ -54,6 +54,7 @@ public final class EncodedPolyline {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     EncodedPolyline that = (EncodedPolyline) o;
     return length() == that.length() && Objects.equals(points(), that.points());
   }

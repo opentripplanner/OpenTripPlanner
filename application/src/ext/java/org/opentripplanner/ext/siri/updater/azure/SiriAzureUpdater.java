@@ -178,6 +178,7 @@ public class SiriAzureUpdater implements GraphUpdater<TransitRealTimeUpdateConte
     try {
       // In Kubernetes this should be the POD identifier
       subscriptionName = System.getenv("HOSTNAME");
+
       if (subscriptionName == null || subscriptionName.isBlank()) {
         subscriptionName = "otp-" + UUID.randomUUID();
       }
@@ -190,6 +191,7 @@ public class SiriAzureUpdater implements GraphUpdater<TransitRealTimeUpdateConte
 
       executeStartupStep(() -> {
         var initialData = fetchInitialSiriData();
+
         if (initialData.isEmpty()) {
           LOG.info("Got empty response from history endpoint");
         } else {
@@ -221,6 +223,7 @@ public class SiriAzureUpdater implements GraphUpdater<TransitRealTimeUpdateConte
   private boolean executeStartupStep(Runnable task, String stepDescription)
     throws InterruptedException {
     OtpRetry otpRetry = createOtpRetry(stepDescription);
+
     try {
       otpRetry.execute(task);
       LOG.info("{} completed successfully", stepDescription);
@@ -309,6 +312,7 @@ public class SiriAzureUpdater implements GraphUpdater<TransitRealTimeUpdateConte
       serviceBusAdmin.deleteSubscription(topicName, subscriptionName);
       LOG.info("Service Bus deleted subscription {}.", subscriptionName);
     }
+
     serviceBusAdmin.createSubscription(topicName, subscriptionName, options);
 
     LOG.info("{} updater created subscription {}", updaterType, subscriptionName);
@@ -371,6 +375,7 @@ public class SiriAzureUpdater implements GraphUpdater<TransitRealTimeUpdateConte
       var siriXmlMessage = message.getBody();
       var siri = SiriXml.parseXml(siriXmlMessage.toStream());
       var serviceDelivery = siri.getServiceDelivery();
+
       if (serviceDelivery == null) {
         if (siri.getHeartbeatNotification() != null) {
           LOG.debug("Updater {} received SIRI heartbeat message", updaterType);
@@ -406,6 +411,7 @@ public class SiriAzureUpdater implements GraphUpdater<TransitRealTimeUpdateConte
     if (dataInitializationUrl == null) {
       return Optional.empty();
     }
+
     var headers = HttpHeaders.of().acceptApplicationXML().build();
 
     LOG.info(
@@ -438,9 +444,11 @@ public class SiriAzureUpdater implements GraphUpdater<TransitRealTimeUpdateConte
     try {
       long t1 = System.currentTimeMillis();
       var f = messageHandler.handleMessage(serviceDelivery, "history-message");
+
       if (f != null) {
         f.get();
       }
+
       LOG.info("{} updater initialized in {} ms.", updaterType, System.currentTimeMillis() - t1);
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
@@ -488,6 +496,7 @@ public class SiriAzureUpdater implements GraphUpdater<TransitRealTimeUpdateConte
       reason == ServiceBusFailureReason.UNAUTHORIZED
     ) {
       LOG.error("Service Bus is busy or unauthorized, wait and try again");
+
       try {
         // Wait before retrying when Service Bus is busy or unauthorized
         TimeUnit.SECONDS.sleep(ERROR_RETRY_WAIT_SECONDS);

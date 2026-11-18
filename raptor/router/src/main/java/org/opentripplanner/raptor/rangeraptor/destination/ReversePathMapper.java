@@ -72,6 +72,7 @@ public final class ReversePathMapper<T extends RaptorTripSchedule> implements Pa
         case EGRESS:
           throw new IllegalStateException("Unexpected arrival: " + arrival);
       }
+
       arrival = arrival.previous();
     }
   }

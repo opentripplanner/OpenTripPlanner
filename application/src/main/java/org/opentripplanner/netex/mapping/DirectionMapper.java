@@ -9,6 +9,7 @@ class DirectionMapper {
     if (direction == null) {
       return Direction.UNKNOWN;
     }
+
     return switch (direction) {
       case INBOUND -> Direction.INBOUND;
       case OUTBOUND -> Direction.OUTBOUND;

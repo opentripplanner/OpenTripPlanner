@@ -161,6 +161,7 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule> implem
 
         boardAndAlightRoute(routeIndex, route, pattern, stopPositions);
       }
+
       // Called here (per worker) rather than via the lifecycle event, because a via search has
       // multiple workers sharing the same lifecycle. Via search events MUST be propagated before
       // the next segment do the transit routing.

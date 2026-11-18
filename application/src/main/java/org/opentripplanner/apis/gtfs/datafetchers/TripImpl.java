@@ -64,6 +64,7 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
       TransitAlertService alertService = getTransitAlertService(environment);
       var args = new GraphQLTypes.GraphQLTripAlertsArgs(environment.getArguments());
       List<GraphQLTypes.GraphQLTripAlertType> types = args.getGraphQLTypes();
+
       if (types != null) {
         Collection<TransitAlert> alerts = new ArrayList<>();
         types.forEach(type -> {
@@ -147,6 +148,7 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
             : LocalDate.now();
 
         TripPattern tripPattern = transitService.findPattern(trip, serviceDate);
+
         if (tripPattern == null) {
           return null;
         }
@@ -155,6 +157,7 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
         Timetable timetable = transitService.findTimetable(tripPattern, serviceDate);
 
         var tripTimes = timetable.getTripTimes(trip);
+
         if (tripTimes == null) {
           return null;
         }
@@ -203,6 +206,7 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
             : LocalDate.now();
 
         TripPattern tripPattern = transitService.findPattern(trip, serviceDate);
+
         if (tripPattern == null) {
           return null;
         }
@@ -211,6 +215,7 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
         Timetable timetable = transitService.findTimetable(tripPattern, serviceDate);
 
         var tripTimes = timetable.getTripTimes(trip);
+
         if (tripTimes == null) {
           return null;
         }
@@ -227,9 +232,11 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
   public DataFetcher<String> directionId() {
     return environment -> {
       Direction direction = getSource(environment).getDirection();
+
       if (direction == Direction.UNKNOWN) {
         return null;
       }
+
       return Integer.toString(direction.gtfsCode);
     };
   }
@@ -238,14 +245,17 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
   public DataFetcher<Iterable<Iterable<Double>>> geometry() {
     return environment -> {
       TripPattern tripPattern = getTripPattern(environment);
+
       if (tripPattern == null) {
         return null;
       }
 
       LineString geometry = tripPattern.getGeometry();
+
       if (geometry == null) {
         return null;
       }
+
       return Arrays.stream(geometry.getCoordinateSequence().toCoordinateArray())
         .map(coordinate -> Arrays.asList(coordinate.x, coordinate.y))
         .collect(Collectors.toList());
@@ -319,9 +329,11 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
   public DataFetcher<String> semanticHash() {
     return environment -> {
       TripPattern tripPattern = getTripPattern(environment);
+
       if (tripPattern == null) {
         return null;
       }
+
       return SemanticHash.forTripPattern(tripPattern, getSource(environment));
     };
   }
@@ -367,6 +379,7 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
             : LocalDate.now(timeZone);
 
         TripPattern tripPattern = transitService.findPattern(trip, serviceDate);
+
         if (tripPattern == null) {
           return List.of();
         }
@@ -390,9 +403,11 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
   public DataFetcher<Geometry> tripGeometry() {
     return environment -> {
       TripPattern tripPattern = getTripPattern(environment);
+
       if (tripPattern == null) {
         return null;
       }
+
       return tripPattern.getGeometry();
     };
   }
@@ -428,9 +443,11 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
 
   private List<Object> getStops(DataFetchingEnvironment environment) {
     TripPattern tripPattern = getTripPattern(environment);
+
     if (tripPattern == null) {
       return List.of();
     }
+
     return List.copyOf(tripPattern.getStops());
   }
 

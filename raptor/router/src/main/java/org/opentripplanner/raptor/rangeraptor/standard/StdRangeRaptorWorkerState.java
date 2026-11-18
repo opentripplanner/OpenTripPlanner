@@ -130,6 +130,7 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule> imple
   @Override
   public void transferToStops(int fromStop, Iterator<? extends RaptorTransfer> transfers) {
     int arrivalTimeTransit = bestTimes.transitArrivalTime(fromStop);
+
     while (transfers.hasNext()) {
       if (transferToStop(arrivalTimeTransit, fromStop, transfers.next())) {
         break;
@@ -207,6 +208,7 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule> imple
     if (exceedsTimeLimit(arrivalTime)) {
       return true;
     }
+
     if (earlyPruning != null && earlyPruning.exceedsBound(arrivalTime)) {
       return true;
     }
@@ -218,6 +220,7 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule> imple
     } else {
       stopArrivalsState.rejectNewBestTransferTime(fromStop, arrivalTime, transfer);
     }
+
     return false;
   }
 
@@ -234,9 +237,11 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule> imple
 
   private boolean newOverallBestTime(int stop, int alightTime) {
     boolean updated = bestTimes.updateNewBestTime(stop, alightTime);
+
     if (updated) {
       updateEarlyPruning(stop, alightTime);
     }
+
     return updated;
   }
 

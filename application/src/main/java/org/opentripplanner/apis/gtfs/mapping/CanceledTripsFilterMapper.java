@@ -33,6 +33,7 @@ public class CanceledTripsFilterMapper {
     DataFetchingEnvironment env
   ) {
     var filters = mapList(env.getArgument("filters"), "filters");
+
     if (CollectionUtils.isEmpty(filters)) {
       return TripOnServiceDateRequest.of().build();
     }
@@ -51,13 +52,17 @@ public class CanceledTripsFilterMapper {
 
     var filterRequestBuilder = FilterRequest.<TripOnServiceDateSelectRequest>of();
     var includeSelect = toSelectRequest(includes);
+
     if (includeSelect != null) {
       filterRequestBuilder.addSelect(includeSelect);
     }
+
     var excludeSelect = toSelectRequest(excludes);
+
     if (excludeSelect != null) {
       filterRequestBuilder.addNot(excludeSelect);
     }
+
     return filterRequestBuilder.build();
   }
 
@@ -66,20 +71,25 @@ public class CanceledTripsFilterMapper {
     var modes = toTransitModes(inputs);
     var serviceDateRanges = toServiceDateRanges(inputs);
     var runningTimePeriods = toRunningTimePeriods(inputs);
+
     if (modes == null && serviceDateRanges == null && runningTimePeriods == null) {
       return null;
     }
 
     var builder = TripOnServiceDateSelectRequest.of();
+
     if (modes != null) {
       builder.withTransportModes(MainAndSubMode.ofTransitModes(modes));
     }
+
     if (serviceDateRanges != null) {
       builder.withServiceDateRanges(serviceDateRanges);
     }
+
     if (runningTimePeriods != null) {
       builder.withRunningTimePeriods(runningTimePeriods);
     }
+
     return builder.build();
   }
 
@@ -88,6 +98,7 @@ public class CanceledTripsFilterMapper {
     if (inputs == null) {
       return null;
     }
+
     if (
       inputs
         .stream()
@@ -101,13 +112,16 @@ public class CanceledTripsFilterMapper {
         "Mode filter must be either null or have at least one entry."
       );
     }
+
     var modes = inputs
       .stream()
       .flatMap(include -> {
         var modeValues = list(include.get("modes"), "filters.*.modes");
+
         if (modeValues == null) {
           return Stream.of();
         }
+
         return modeValues.stream().map(CanceledTripsFilterMapper::mapTransitMode);
       })
       .collect(Collectors.toSet());
@@ -120,6 +134,7 @@ public class CanceledTripsFilterMapper {
     if (inputs == null) {
       return null;
     }
+
     if (
       inputs
         .stream()
@@ -138,9 +153,11 @@ public class CanceledTripsFilterMapper {
       .stream()
       .flatMap(input -> {
         var rangeInputs = mapList(input.get("serviceDateRanges"), "filters.*.serviceDateRanges");
+
         if (rangeInputs == null) {
           return Stream.of();
         }
+
         return rangeInputs.stream().map(CanceledTripsFilterMapper::mapLocalDateRange);
       })
       .toList();
@@ -160,13 +177,16 @@ public class CanceledTripsFilterMapper {
     if (inputs == null) {
       return null;
     }
+
     var periods = inputs
       .stream()
       .flatMap(input -> {
         var rangeInputs = mapList(input.get(RUNNING_TIME_RANGES), RUNNING_TIME_RANGES_PATH);
+
         if (rangeInputs == null) {
           return Stream.<TimePeriod>of();
         }
+
         OffsetDateTimeRangeUtil.requireNonEmpty(rangeInputs, RUNNING_TIME_RANGES_PATH);
         return rangeInputs.stream().map(CanceledTripsFilterMapper::mapTimePeriod);
       })
@@ -188,6 +208,7 @@ public class CanceledTripsFilterMapper {
     if (value == null) {
       return null;
     }
+
     return switch (value) {
       case OffsetDateTime offsetDateTime -> offsetDateTime;
       case String stringValue -> parseOffsetDateTime(stringValue, path);
@@ -209,6 +230,7 @@ public class CanceledTripsFilterMapper {
       case String stringValue -> stringValue;
       default -> throw new InvalidInputException("Invalid mode value: " + value);
     };
+
     try {
       return TransitMode.valueOf(mode);
     } catch (IllegalArgumentException e) {
@@ -221,6 +243,7 @@ public class CanceledTripsFilterMapper {
     if (value == null) {
       return null;
     }
+
     return switch (value) {
       case LocalDate localDate -> localDate;
       case String stringValue -> LocalDate.parse(stringValue);
@@ -233,36 +256,46 @@ public class CanceledTripsFilterMapper {
     if (value == null) {
       return null;
     }
+
     if (value instanceof List<?> list) {
       return new ArrayList<>(list);
     }
+
     throw new InvalidInputException("Expected list at '" + path + "'.");
   }
 
   @Nullable
   private static List<Map<String, Object>> mapList(@Nullable Object value, String path) {
     var list = list(value, path);
+
     if (list == null) {
       return null;
     }
+
     var result = new ArrayList<Map<String, Object>>(list.size());
+
     for (var item : list) {
       if (!(item instanceof Map<?, ?> map)) {
         throw new InvalidInputException("Expected object entries in list at '" + path + "'.");
       }
+
       result.add(stringObjectMap(map, path));
     }
+
     return result;
   }
 
   private static Map<String, Object> stringObjectMap(Map<?, ?> source, String path) {
     var result = new LinkedHashMap<String, Object>(source.size());
+
     for (var entry : source.entrySet()) {
       if (!(entry.getKey() instanceof String key)) {
         throw new InvalidInputException("Expected string keys in object at '" + path + "'.");
       }
+
       result.put(key, entry.getValue());
     }
+
     return result;
   }
 }

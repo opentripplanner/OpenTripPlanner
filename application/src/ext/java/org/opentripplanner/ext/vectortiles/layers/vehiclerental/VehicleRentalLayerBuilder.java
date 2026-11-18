@@ -37,6 +37,7 @@ abstract class VehicleRentalLayerBuilder<T extends VehicleRentalPlace> extends L
     if (service == null) {
       return List.of();
     }
+
     return getVehicleRentalPlaces(service)
       .stream()
       .map(rental -> {

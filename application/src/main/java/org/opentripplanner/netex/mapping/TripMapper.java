@@ -119,6 +119,7 @@ class TripMapper {
 
     if (serviceJourney.getTransportMode() != null) {
       NetexMainAndSubMode transitMode = null;
+
       try {
         transitMode = transportModeMapper.map(
           serviceJourney.getTransportMode(),
@@ -133,6 +134,7 @@ class TripMapper {
         );
         return null;
       }
+
       builder.withMode(transitMode.mainMode());
       builder.withNetexSubmode(transitMode.subMode());
       builder.withCarsAllowed(
@@ -158,6 +160,7 @@ class TripMapper {
 
   private DirectionTypeEnumeration resolveDirectionType(ServiceJourney serviceJourney) {
     Route netexRoute = lookUpNetexRoute(serviceJourney);
+
     if (netexRoute != null && netexRoute.getDirectionType() != null) {
       return netexRoute.getDirectionType();
     } else {
@@ -170,11 +173,13 @@ class TripMapper {
       JourneyPattern_VersionStructure journeyPattern = journeyPatternsById.lookup(
         serviceJourney.getJourneyPatternRef().getValue().getRef()
       );
+
       if (journeyPattern != null && journeyPattern.getRouteRef() != null) {
         String routeRef = journeyPattern.getRouteRef().getRef();
         return routeById.lookup(routeRef);
       }
     }
+
     return null;
   }
 
@@ -195,6 +200,7 @@ class TripMapper {
       );
       lineRef = JourneyPatternHelper.getLineFromRoute(routeById, journeyPattern);
     }
+
     org.opentripplanner.transit.model.network.Route route = otpRouteById.get(
       idFactory.createId(lineRef)
     );
@@ -207,15 +213,18 @@ class TripMapper {
         lineRef
       );
     }
+
     return route;
   }
 
   @Nullable
   private Operator findOperator(ServiceJourney serviceJourney) {
     var opeRef = serviceJourney.getOperatorRef();
+
     if (opeRef == null) {
       return null;
     }
+
     return operatorsById.get(idFactory.createId(opeRef.getRef()));
   }
 }

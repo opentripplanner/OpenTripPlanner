@@ -22,6 +22,7 @@ public class DataOverlayConfigMapper {
     if (node.isEmpty()) {
       return null;
     }
+
     return new DataOverlayConfig(
       node.of("fileName").since(NA).summary("TODO").asString(),
       node.of("latitudeVariable").since(NA).summary("TODO").asString(),

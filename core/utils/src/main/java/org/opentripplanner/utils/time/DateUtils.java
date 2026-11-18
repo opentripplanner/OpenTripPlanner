@@ -50,36 +50,45 @@ public class DateUtils {
   @Nullable
   public static ZonedDateTime toZonedDateTime(String date, String time, ZoneId tz) {
     ZonedDateTime retVal = ZonedDateTime.ofInstant(Instant.now(), tz);
+
     if (date != null) {
       LocalDate localDate = parseDate(date);
+
       if (localDate == null) {
         //unparseable date
         return null;
       }
+
       boolean timed = false;
+
       if (time != null) {
         LocalTime localTime = parseTime(time);
+
         if (localTime != null) {
           retVal = LocalDateTime.of(localDate, localTime).atZone(tz);
           timed = true;
         }
       }
+
       if (!timed) {
         //assume t = now
         retVal = LocalDateTime.of(localDate, retVal.toLocalTime()).atZone(tz);
       }
     } else if (time != null) {
       LocalTime localTime = parseTime(time);
+
       if (localTime != null) {
         retVal = LocalDateTime.of(retVal.toLocalDate(), localTime).atZone(tz);
       }
     }
+
     return retVal;
   }
 
   // TODO: could be replaced with Apache's DateFormat.parseDate ???
   public static LocalDate parseDate(String input) {
     LocalDate retVal = null;
+
     try {
       String newString = input
         .trim()
@@ -108,8 +117,10 @@ public class DateUtils {
       for (DateTimeFormatter dateTimeFormatter : dateTimeFormatterList) {
         try {
           retVal = LocalDate.parse(newString, dateTimeFormatter);
+
           if (retVal != null) {
             int year = retVal.getYear();
+
             if (year >= SANITY_CHECK_CUTOFF_YEAR) {
               break;
             }
@@ -133,11 +144,13 @@ public class DateUtils {
 
   public static String trim(String str) {
     String retVal = str;
+
     try {
       retVal = str.trim();
       retVal = retVal.replaceAll("%20;", "");
       retVal = retVal.replaceAll("%20", "");
     } catch (Exception ex) {}
+
     return retVal;
   }
 
@@ -166,6 +179,7 @@ public class DateUtils {
     int hour = 0;
     int min = 0;
     int sec = 0;
+
     try {
       String[] hms = time.toUpperCase().split(":");
 
@@ -183,25 +197,32 @@ public class DateUtils {
         }
 
         int suffex = hms[1].lastIndexOf(' ');
+
         if (suffex < 1) {
           suffex = hms[1].lastIndexOf("AM");
+
           if (suffex < 1) {
             suffex = hms[1].lastIndexOf("PM");
           }
         }
+
         hms[1] = hms[1].substring(0, suffex);
       }
 
       int h = Integer.parseInt(trim(hms[0]));
+
       if (amPm && h == 12) {
         h = 0;
       }
+
       hour = h + addHours;
 
       min = Integer.parseInt(trim(hms[1]));
+
       if (hms.length > 2) {
         sec = Integer.parseInt(trim(hms[2]));
       }
+
       return LocalTime.of(hour, min, sec);
     } catch (Exception e) {
       throw new RuntimeException("Could not parse time: " + time, e);

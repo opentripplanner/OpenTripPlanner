@@ -72,9 +72,11 @@ public class OtpHttpResponse {
    */
   public Optional<String> header(String name) {
     List<String> values = headers.get(normalizeName(name));
+
     if (values == null || values.isEmpty()) {
       return Optional.empty();
     }
+
     return Optional.of(values.get(0));
   }
 
@@ -131,6 +133,7 @@ public class OtpHttpResponse {
 
     // Make the map and all lists immutable
     Map<String, List<String>> immutableMap = new HashMap<>();
+
     for (Map.Entry<String, List<String>> entry : headerMap.entrySet()) {
       immutableMap.put(entry.getKey(), Collections.unmodifiableList(entry.getValue()));
     }

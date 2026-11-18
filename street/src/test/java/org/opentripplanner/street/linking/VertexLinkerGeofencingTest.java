@@ -186,11 +186,13 @@ class VertexLinkerGeofencingTest {
         return sv;
       }
     }
+
     for (var edge : location.getIncoming()) {
       if (edge.getFromVertex() instanceof SplitterVertex sv) {
         return sv;
       }
     }
+
     return fail("No SplitterVertex found connected to the temporary location");
   }
 

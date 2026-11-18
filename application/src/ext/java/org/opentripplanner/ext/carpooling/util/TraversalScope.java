@@ -50,9 +50,11 @@ public final class TraversalScope implements SkipEdgeStrategy<State, Edge> {
    */
   public static TraversalScope withOwnLinkingOf(Vertex... starts) {
     var ownTemporaryVertices = new HashSet<Vertex>();
+
     for (var start : starts) {
       ownTemporaryVertices.addAll(ownLinking(start));
     }
+
     return ownTemporaryVertices.isEmpty() ? STATIC_GRAPH : new TraversalScope(ownTemporaryVertices);
   }
 
@@ -80,6 +82,7 @@ public final class TraversalScope implements SkipEdgeStrategy<State, Edge> {
   List<Vertex> permanentBoundary(Vertex origin) {
     var seen = new HashSet<>(ownTemporaryVertices);
     var boundary = new ArrayList<Vertex>();
+
     for (var temporaryVertex : ownTemporaryVertices) {
       forEachNeighbor(temporaryVertex, neighbor -> {
         if (seen.add(neighbor)) {
@@ -87,6 +90,7 @@ public final class TraversalScope implements SkipEdgeStrategy<State, Edge> {
         }
       });
     }
+
     Coordinate originCoordinate = origin.getCoordinate();
     boundary.sort(
       Comparator.comparingDouble(v ->
@@ -104,10 +108,12 @@ public final class TraversalScope implements SkipEdgeStrategy<State, Edge> {
     if (isPermanent(start)) {
       return Set.of();
     }
+
     var own = new HashSet<Vertex>();
     var queue = new ArrayDeque<Vertex>();
     own.add(start);
     queue.add(start);
+
     while (!queue.isEmpty()) {
       forEachNeighbor(queue.poll(), neighbor -> {
         if (!isPermanent(neighbor) && own.add(neighbor)) {
@@ -115,6 +121,7 @@ public final class TraversalScope implements SkipEdgeStrategy<State, Edge> {
         }
       });
     }
+
     return own;
   }
 

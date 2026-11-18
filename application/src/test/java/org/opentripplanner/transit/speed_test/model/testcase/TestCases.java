@@ -49,6 +49,7 @@ public class TestCases {
     if (numberOfTestCases() <= 3) {
       return List.copyOf(cases);
     }
+
     var samples = new HashSet<TestCase>();
 
     var groupByModes = cases.stream().collect(Collectors.groupingBy(tc -> tc.definition().modes()));
@@ -60,6 +61,7 @@ public class TestCases {
         samples.add(it.getFirst());
       }
     }
+
     // There are at least 4 cases, so we split the set in 4 groups and pick the first element in
     // the 3 last groups.
     int step = numberOfTestCases() / 4;
@@ -69,6 +71,7 @@ public class TestCases {
       samples.add(cases.get(index));
       index += step;
     }
+
     return samples.stream().sorted(Comparator.comparing(TestCase::id)).toList();
   }
 

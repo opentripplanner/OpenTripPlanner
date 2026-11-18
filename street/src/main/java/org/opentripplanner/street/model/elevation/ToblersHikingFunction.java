@@ -93,6 +93,7 @@ public class ToblersHikingFunction {
           ", but must be greater then 1."
       );
     }
+
     this.walkDistMultiplierMaxLimit = walkDistMultiplierMaxLimit;
   }
 

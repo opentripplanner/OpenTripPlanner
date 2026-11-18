@@ -78,6 +78,7 @@ public class BookingInfoMapper {
           flexibleLine.getBookingNote()
         );
       }
+
       return this;
     }
 
@@ -96,11 +97,13 @@ public class BookingInfoMapper {
           flexibleServiceProperties.getBookingNote()
         );
       }
+
       return this;
     }
 
     private NetexBookingInfoBuilder withStopPoint(StopPointInJourneyPattern stopPoint) {
       BookingArrangementsStructure bookingArrangements = stopPoint.getBookingArrangements();
+
       if (bookingArrangements != null) {
         this.hasBookingInfo = true;
         this.stopPointRef = ref("StopPoint", stopPoint);
@@ -113,6 +116,7 @@ public class BookingInfoMapper {
           bookingArrangements.getBookingNote()
         );
       }
+
       return this;
     }
 
@@ -120,6 +124,7 @@ public class BookingInfoMapper {
       if (!hasBookingInfo) {
         return null;
       }
+
       String entityRefs = flexibleLineRef + '/' + serviceJourneyRef + '/' + stopPointRef;
       return build(
         bookingContact,
@@ -244,6 +249,7 @@ public class BookingInfoMapper {
       if (bookingMethods != null && !bookingMethods.isEmpty()) {
         this.bookingMethods = bookingMethods;
       }
+
       this.bookingContact = getOrDefault(bookingContact, this.bookingContact);
       this.minimumBookingPeriod = getOrDefault(minimumBookingPeriod, this.minimumBookingPeriod);
       this.latestBookingTime = getOrDefault(latestBookingTime, this.latestBookingTime);

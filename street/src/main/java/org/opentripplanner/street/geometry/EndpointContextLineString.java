@@ -57,15 +57,18 @@ public final class EndpointContextLineString {
     if (lineString == null) {
       return null;
     }
+
     if (lineString.getNumPoints() == 2) {
       return STRAIGHT_LINE_PACKED;
     }
+
     double x0 = reverse ? xb : xa;
     double y0 = reverse ? yb : ya;
     double x1 = reverse ? xa : xb;
     double y1 = reverse ? ya : yb;
     CoordinateSequence seq = lineString.getCoordinateSequence();
     int n = seq.size();
+
     /*
      * Check if the lineString is really sticking to the given end-points. TODO: If this is not
      * guaranteed, store all delta (from 0 to n-1) -- but how to mark it? A prefix?
@@ -80,6 +83,7 @@ public final class EndpointContextLineString {
         "EndpointContextLineString geometry must stick to given end points. If you need to relax this, please read source code."
       );
     }
+
     int oix = CompactLineString.toFixedPoint(x0);
     int oiy = CompactLineString.toFixedPoint(y0);
     return CompactLineString.packIntermediateDeltas(lineString, oix, oiy);
@@ -113,11 +117,13 @@ public final class EndpointContextLineString {
     double[] c = new double[(intermediateCount + 2) * 2];
     c[0] = x0;
     c[1] = y0;
+
     if (intermediateCount > 0) {
       int oix = CompactLineString.toFixedPoint(x0);
       int oiy = CompactLineString.toFixedPoint(y0);
       CompactLineString.decodeInto(packedCoords, c, 2, oix, oiy, false);
     }
+
     c[c.length - 2] = x1;
     c[c.length - 1] = y1;
     LineString out = GeometryUtils.makeLineString(c);
@@ -182,15 +188,18 @@ public final class EndpointContextLineString {
       int oix = CompactLineString.toFixedPoint(x0);
       int oiy = CompactLineString.toFixedPoint(y0);
       var decoder = new DlugoszVarLenIntPacker.Decoder(packedCoords);
+
       while (decoder.hasNext()) {
         oix += decoder.next();
         oiy += decoder.next();
         double curX = CompactLineString.toFloatingPoint(oix) * xscale;
         double curY = CompactLineString.toFloatingPoint(oiy);
         double distSq = segmentDistanceSq(pxs, py, prevX, prevY, curX, curY);
+
         if (distSq < minDistSq) {
           minDistSq = distSq;
         }
+
         prevX = curX;
         prevY = curY;
       }
@@ -199,9 +208,11 @@ public final class EndpointContextLineString {
     // Final implicit segment to the other endpoint (the only segment for a straight line).
     double endX = x1 * xscale;
     double distSq = segmentDistanceSq(pxs, py, prevX, prevY, endX, y1);
+
     if (distSq < minDistSq) {
       minDistSq = distSq;
     }
+
     return minDistSq;
   }
 
@@ -222,11 +233,13 @@ public final class EndpointContextLineString {
     double dy = by - ay;
     double lengthSq = dx * dx + dy * dy;
     double t = lengthSq == 0.0 ? 0.0 : ((px - ax) * dx + (py - ay) * dy) / lengthSq;
+
     if (t < 0.0) {
       t = 0.0;
     } else if (t > 1.0) {
       t = 1.0;
     }
+
     double closestX = ax + t * dx;
     double closestY = ay + t * dy;
     double ex = px - closestX;

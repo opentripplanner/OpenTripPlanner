@@ -88,6 +88,7 @@ public class JourneyRequest implements Serializable {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     JourneyRequest that = (JourneyRequest) o;
     return (
       wheelchair == that.wheelchair &&

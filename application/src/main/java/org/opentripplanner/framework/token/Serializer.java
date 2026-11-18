@@ -19,9 +19,11 @@ class Serializer {
   static String serialize(TokenDefinition definition, Object[] values) {
     var s = new Serializer(definition, values);
     s.writeVersion(definition.version());
+
     for (var fieldName : definition.fieldNames()) {
       s.write(fieldName);
     }
+
     return s.serialize();
   }
 
@@ -46,6 +48,7 @@ class Serializer {
     if (value != null) {
       buf.append(tokenFormatter.encode(value));
     }
+
     buf.append(TokenFormatterConfiguration.fieldSeparator());
   }
 }

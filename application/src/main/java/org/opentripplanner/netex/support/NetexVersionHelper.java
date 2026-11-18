@@ -107,6 +107,7 @@ public class NetexVersionHelper {
         firstTime = p.getFromDate();
       }
     }
+
     return firstTime;
   }
 }

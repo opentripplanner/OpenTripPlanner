@@ -62,9 +62,11 @@ class SecureXmlTest {
 
   private static List<String> causeMessages(Throwable ex) {
     var messages = new ArrayList<String>();
+
     for (var t = ex; t != null; t = t.getCause() == t ? null : t.getCause()) {
       messages.add(t.getMessage());
     }
+
     return messages;
   }
 

@@ -67,6 +67,7 @@ class QuayMapper {
     Accessibility wheelchair
   ) {
     WgsCoordinate coordinate;
+
     try {
       coordinate = WgsCoordinateMapper.mapToDomain(quay.getCentroid());
     } catch (InvalidCoordinateException e) {

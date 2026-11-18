@@ -64,9 +64,11 @@ public final class ItineraryReference {
     // List.copyOf() also rejects null elements and guards against a caller mutating the list
     // after construction.
     this.legReferences = List.copyOf(Objects.requireNonNull(legReferences));
+
     if (this.legReferences.isEmpty()) {
       throw new IllegalArgumentException("legReferences must not be empty");
     }
+
     this.from = from;
     this.to = to;
     this.accessMode = Objects.requireNonNull(accessMode);
@@ -158,9 +160,11 @@ public final class ItineraryReference {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     ItineraryReference that = (ItineraryReference) o;
     return (
       Double.compare(walkSpeed, that.walkSpeed) == 0 &&

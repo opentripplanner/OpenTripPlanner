@@ -34,6 +34,7 @@ class ResourceBundleSingletonTest {
   @Test
   void doesNotFallBackToDefaultLocale() {
     var defaultLocale = Locale.getDefault();
+
     try {
       Locale.setDefault(Locale.GERMAN);
       assertEquals("unnamed", ResourceBundleSingleton.INSTANCE.localize(KEY, Locale.CHINESE));

@@ -28,9 +28,11 @@ public final class IntUtils {
    */
   public static String intArrayToString(int... values) {
     var buf = new StringBuilder();
+
     for (int it : values) {
       buf.append(", ").append(it);
     }
+
     return buf.isEmpty() ? "" : buf.substring(2);
   }
 
@@ -60,9 +62,11 @@ public final class IntUtils {
    */
   public static int[] shiftArray(int offset, int[] array) {
     int[] a = Arrays.copyOf(array, array.length);
+
     for (int i = 0; i < array.length; ++i) {
       a[i] += offset;
     }
+
     return a;
   }
 
@@ -86,6 +90,7 @@ public final class IntUtils {
       .orElse(0d);
 
     double sum = 0.0;
+
     for (double num : v) {
       sum += Math.pow(num - average, 2);
     }
@@ -103,6 +108,7 @@ public final class IntUtils {
         "The %s is not in range[%d, %d]: %d".formatted(field(field), min, max, value)
       );
     }
+
     return value;
   }
 
@@ -129,6 +135,7 @@ public final class IntUtils {
         "Negative value not expected for %s: %d".formatted(field(field), value)
       );
     }
+
     return value;
   }
 

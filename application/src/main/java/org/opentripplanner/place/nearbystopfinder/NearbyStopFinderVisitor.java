@@ -64,6 +64,7 @@ class NearbyStopFinderVisitor implements TraverseVisitor<State, Edge> {
 
     if (vertex instanceof TransitStopVertex tsv && state.isFinal()) {
       var stopId = tsv.getId();
+
       if (!ignoreStops.contains(stopId)) {
         transitStopsFound.add(NearbyStop.nearbyStopForState(state, stopId));
       }

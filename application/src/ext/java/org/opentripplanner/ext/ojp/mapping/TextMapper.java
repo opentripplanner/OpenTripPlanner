@@ -33,9 +33,11 @@ class TextMapper {
       return null;
     } else {
       var t = new DefaultedTextStructure().withValue(string);
+
       if (lang != null) {
         t.withLang(lang);
       }
+
       return new InternationalTextStructure().withText(t);
     }
   }

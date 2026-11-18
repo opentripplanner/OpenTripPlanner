@@ -55,11 +55,13 @@ class DelegatingTransitAlertServiceImplTest {
     List<TransitAlert>... alertsPerDelegate
   ) {
     var service = new DelegatingTransitAlertServiceImpl();
+
     for (var alerts : alertsPerDelegate) {
       var delegate = new TransitAlertServiceImpl();
       delegate.setAlerts(alerts);
       service.addDelegate(delegate);
     }
+
     return service;
   }
 

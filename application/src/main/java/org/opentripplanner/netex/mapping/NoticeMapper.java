@@ -37,6 +37,7 @@ class NoticeMapper {
 
       cache.add(otpNotice);
     }
+
     return otpNotice;
   }
 }

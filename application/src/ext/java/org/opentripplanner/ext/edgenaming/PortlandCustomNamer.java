@@ -49,25 +49,31 @@ class PortlandCustomNamer implements EdgeNamer {
   @Override
   public I18NString name(OsmEntity entity) {
     var defaultName = entity.getAssumedName();
+
     if (!entity.hasTag("name")) {
       // this is already a generated name, so there's no need to add any
       // additional data
       return defaultName;
     }
+
     if (entity.isTag("footway", "sidewalk") || entity.isTag("path", "sidewalk")) {
       if (isStreet(defaultName.toString())) {
         return NonLocalizedString.ofNullable(sidewalk(defaultName.toString()));
       }
     }
+
     String highway = entity.getTag("highway");
+
     if ("footway".equals(highway) || "path".equals(highway) || "cycleway".equals(highway)) {
       if (!isObviouslyPath(defaultName.toString())) {
         return NonLocalizedString.ofNullable(path(defaultName.toString()));
       }
     }
+
     if ("pedestrian".equals(highway)) {
       return NonLocalizedString.ofNullable(pedestrianStreet(defaultName.toString()));
     }
+
     return defaultName;
   }
 
@@ -80,6 +86,7 @@ class PortlandCustomNamer implements EdgeNamer {
         // this edge already has a real name so there is nothing to do
         return;
       }
+
       if (isHighwayLink) {
         if (edge.isBack()) {
           nameByDestination.add(edge);
@@ -101,6 +108,7 @@ class PortlandCustomNamer implements EdgeNamer {
     for (StreetEdge e : nameByOrigin) {
       nameAccordingToOrigin(e, 15);
     }
+
     for (StreetEdge e : nameByDestination) {
       nameAccordingToDestination(e, 15);
     }
@@ -112,6 +120,7 @@ class PortlandCustomNamer implements EdgeNamer {
         return true;
       }
     }
+
     return false;
   }
 
@@ -121,6 +130,7 @@ class PortlandCustomNamer implements EdgeNamer {
         return true;
       }
     }
+
     return false;
   }
 
@@ -128,6 +138,7 @@ class PortlandCustomNamer implements EdgeNamer {
     if (!name.toLowerCase().contains("path")) {
       name = name + " (path)".intern();
     }
+
     return name;
   }
 
@@ -135,6 +146,7 @@ class PortlandCustomNamer implements EdgeNamer {
     if (!name.toLowerCase().contains("pedestrian street")) {
       name = name + " (pedestrian street)".intern();
     }
+
     return name;
   }
 
@@ -142,6 +154,7 @@ class PortlandCustomNamer implements EdgeNamer {
     if (!name.toLowerCase().contains("sidewalk")) {
       name = name + " (sidewalk)".intern();
     }
+
     return name;
   }
 
@@ -149,12 +162,15 @@ class PortlandCustomNamer implements EdgeNamer {
     if (maxDepth == 0) {
       return null;
     }
+
     for (StreetEdge out : e.getToVertex().getOutgoingStreetEdges()) {
       if (out.nameIsDerived()) {
         String name = nameAccordingToDestination(out, maxDepth - 1);
+
         if (name == null) {
           continue;
         }
+
         e.overrideName(new NonLocalizedString(name));
         return name;
       } else {
@@ -163,6 +179,7 @@ class PortlandCustomNamer implements EdgeNamer {
         return name;
       }
     }
+
     return null;
   }
 
@@ -170,12 +187,15 @@ class PortlandCustomNamer implements EdgeNamer {
     if (maxDepth == 0) {
       return null;
     }
+
     for (StreetEdge in : e.getFromVertex().getIncomingStreetEdges()) {
       if (in.nameIsDerived()) {
         String name = nameAccordingToOrigin(in, maxDepth - 1);
+
         if (name == null) {
           continue;
         }
+
         e.overrideName(new NonLocalizedString(name));
         return name;
       } else {
@@ -184,6 +204,7 @@ class PortlandCustomNamer implements EdgeNamer {
         return name;
       }
     }
+
     return null;
   }
 

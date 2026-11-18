@@ -41,6 +41,7 @@ public class CustomDocumentation {
     if (profile == ApiDocumentationProfile.DEFAULT) {
       return EMPTY;
     }
+
     var map = loadCustomDocumentationFromPropertiesFile(profile);
     return map.isEmpty() ? EMPTY : new CustomDocumentation(map);
   }
@@ -121,9 +122,11 @@ public class CustomDocumentation {
 
   private Optional<String> appendText(String key, @Nullable String originalText) {
     String value = textMap.get(key + APPEND_SUFFIX);
+
     if (value == null) {
       return Optional.empty();
     }
+
     return originalText == null ? Optional.of(value) : Optional.of(originalText + "\n\n" + value);
   }
 
@@ -135,20 +138,25 @@ public class CustomDocumentation {
     try {
       final String resource = resourceName(profile);
       var input = ClassLoader.getSystemResourceAsStream(resource);
+
       if (input == null) {
         throw new OtpAppException("Resource not found: %s", resource);
       }
+
       var props = new Properties();
       props.load(new InputStreamReader(input, StandardCharsets.UTF_8));
       Map<String, String> map = new HashMap<>();
 
       for (String key : props.stringPropertyNames()) {
         String value = props.getProperty(key);
+
         if (value == null) {
           value = "";
         }
+
         map.put(key, value);
       }
+
       return TextVariablesSubstitution.insertVariables(map, varName ->
         errorHandlerVariableSubstitution(varName, resource)
       );

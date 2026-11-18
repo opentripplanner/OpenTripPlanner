@@ -41,6 +41,7 @@ class TransferRules {
     } else if (cat1 == null || cat2 == null) {
       return false;
     }
+
     return cat1.id().getId().equals(cat2.id().getId());
   }
 
@@ -50,6 +51,7 @@ class TransferRules {
     } else if (medium == null || medium1 == null) {
       return false;
     }
+
     return medium.id().getId().equals(medium1.id().getId());
   }
 }

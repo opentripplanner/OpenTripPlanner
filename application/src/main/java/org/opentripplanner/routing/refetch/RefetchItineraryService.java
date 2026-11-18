@@ -109,8 +109,10 @@ public class RefetchItineraryService {
       var transitLegs = getScheduledTransitLegs(legReferences);
 
       Set<Vertex> fromVertices = null;
+
       if (from != null) {
         var fromStop = Objects.requireNonNull(transitLegs.getFirst().from().stop);
+
         if (!stopMatchesLocation(fromStop, from)) {
           fromVertices = linkingContextFactory.getOrCreateStreetVertices(
             temporaryVerticesContainer,
@@ -120,9 +122,12 @@ public class RefetchItineraryService {
           );
         }
       }
+
       Set<Vertex> toVertices = null;
+
       if (to != null) {
         var toStop = Objects.requireNonNull(transitLegs.getLast().to().stop);
+
         if (!stopMatchesLocation(toStop, to)) {
           toVertices = linkingContextFactory.getOrCreateStreetVertices(
             temporaryVerticesContainer,
@@ -139,16 +144,21 @@ public class RefetchItineraryService {
 
   private boolean stopMatchesLocation(StopLocation stop, GenericLocation location) {
     var locationId = location.stopId();
+
     if (locationId == null) {
       return false;
     }
+
     if (stop.getId().equals(locationId)) {
       return true;
     }
+
     var stopGroup = transitService.getStopLocationsGroup(locationId);
+
     if (stopGroup == null) {
       return false;
     }
+
     // See if the location is a StopLocationGroup and contains the stop
     return stopGroup
       .getChildStops()
@@ -158,12 +168,15 @@ public class RefetchItineraryService {
 
   private List<ScheduledTransitLeg> getScheduledTransitLegs(List<LegReference> legReferences) {
     var transitLegs = new ArrayList<ScheduledTransitLeg>(legReferences.size());
+
     for (LegReference legReference : legReferences) {
       if (legReference instanceof ScheduledTransitLegReference scheduledTransitLeg) {
         var transitLeg = scheduledTransitLeg.getLeg(transitService, transitAlertService);
+
         if (transitLeg == null) {
           throw new RefetchItineraryException("Could not find leg " + scheduledTransitLeg);
         }
+
         transitLegs.add(transitLeg);
       } else {
         throw new RefetchItineraryException(
@@ -171,6 +184,7 @@ public class RefetchItineraryService {
         );
       }
     }
+
     return transitLegs;
   }
 
@@ -184,6 +198,7 @@ public class RefetchItineraryService {
     var transfers = regularTransfers.forRequest(routeRequest);
 
     var legs = new ArrayList<Leg>();
+
     if (fromVertices != null) {
       var mode = routeRequest.journey().access().mode();
       var firstLeg = transitLegs.getFirst();
@@ -227,6 +242,7 @@ public class RefetchItineraryService {
         nextTransitLeg.boardStopPosInPattern(),
         transferToStop
       );
+
       if (constrainedTransfer != null) {
         transitLeg = transitLeg.copyOf().withTransferToNextLeg(constrainedTransfer).build();
         prevLegConstrainedTransfer = constrainedTransfer;
@@ -263,12 +279,14 @@ public class RefetchItineraryService {
     }
 
     var lastTransitLeg = transitLegs.getLast();
+
     if (prevLegConstrainedTransfer != null) {
       lastTransitLeg = lastTransitLeg
         .copyOf()
         .withTransferFromPreviousLeg(prevLegConstrainedTransfer)
         .build();
     }
+
     legs.add(lastTransitLeg);
 
     if (toVertices != null) {
@@ -287,6 +305,7 @@ public class RefetchItineraryService {
       ).orElseThrow(() -> new RefetchItineraryException("Could not calculate egress"));
       legs.addAll(egress);
     }
+
     return Itinerary.ofScheduledTransit(legs)
       // We don't try to calculate a cost for the refetched itinerary.
       .withGeneralizedCost(Cost.ZERO)
@@ -365,10 +384,12 @@ public class RefetchItineraryService {
     StreetSearchRequest transferRequest
   ) {
     var path = transfers.findPath(from.getIndex(), to.getIndex());
+
     if (path == null || CollectionUtils.isEmpty(path.edges())) {
       // We don't support straight line transfers currently.
       return Optional.empty();
     }
+
     return EdgeTraverser.createPath(path.edges(), transferRequest).map(this::streetPathToLegs);
   }
 

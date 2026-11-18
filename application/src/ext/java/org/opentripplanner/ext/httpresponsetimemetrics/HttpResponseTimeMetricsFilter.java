@@ -151,6 +151,7 @@ public class HttpResponseTimeMetricsFilter
         result.put(key, timer);
       }
     }
+
     return Map.copyOf(result);
   }
 
@@ -160,9 +161,11 @@ public class HttpResponseTimeMetricsFilter
 
     String path = getRequestPath(requestContext);
     String matchedEndpoint = findMatchingEndpoint(path);
+
     if (matchedEndpoint == null) {
       return;
     }
+
     requestContext.setProperty(START_TIME_PROPERTY, System.nanoTime());
     requestContext.setProperty(ENDPOINT_PROPERTY, matchedEndpoint);
 
@@ -178,6 +181,7 @@ public class HttpResponseTimeMetricsFilter
         return endpoint;
       }
     }
+
     return null;
   }
 
@@ -191,6 +195,7 @@ public class HttpResponseTimeMetricsFilter
     ContainerResponseContext responseContext
   ) {
     Long startTime = (Long) requestContext.getProperty(START_TIME_PROPERTY);
+
     if (startTime == null) {
       return;
     }
@@ -213,10 +218,12 @@ public class HttpResponseTimeMetricsFilter
   private String resolveClientTag(@Nullable String clientName) {
     if (clientName != null) {
       String lowercaseName = clientName.toLowerCase(Locale.ROOT);
+
       if (monitoredClients.contains(lowercaseName)) {
         return lowercaseName;
       }
     }
+
     return OTHER_CLIENT;
   }
 }

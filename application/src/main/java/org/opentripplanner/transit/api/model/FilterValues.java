@@ -104,6 +104,7 @@ public abstract class FilterValues<E> {
         )
       );
     }
+
     return values;
   }
 
@@ -112,9 +113,11 @@ public abstract class FilterValues<E> {
     if (this == o) {
       return true;
     }
+
     if (!(o instanceof FilterValues<?> that)) {
       return false;
     }
+
     return Objects.equals(values, that.values) && Objects.equals(name, that.name);
   }
 

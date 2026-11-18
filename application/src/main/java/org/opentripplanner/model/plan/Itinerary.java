@@ -649,6 +649,7 @@ public class Itinerary implements ItinerarySortKey {
       } else if (leg instanceof StreetLeg streetLeg) {
         buf.street(streetLeg.getMode().name(), leg.startTime(), leg.endTime());
       }
+
       buf.stop(leg.to().name.toString());
     }
 

@@ -38,18 +38,23 @@ public class FilterMapper {
         throw new IllegalStateException("Unexpected value: " + filter);
       }
     }
+
     if (!selectedAgencies.isEmpty()) {
       builder.withIncludeAgencies(selectedAgencies);
     }
+
     if (!selectedRoutes.isEmpty()) {
       builder.withIncludeRoutes(selectedRoutes);
     }
+
     if (!excludedAgencies.isEmpty()) {
       builder.withExcludeAgencies(excludedAgencies);
     }
+
     if (!excludedRoutes.isEmpty()) {
       builder.withExcludeRoutes(excludedRoutes);
     }
+
     return builder.build();
   }
 

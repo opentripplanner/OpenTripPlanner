@@ -117,6 +117,7 @@ public class TestVehicleRentalStationBuilder {
     // If no vehicle types are specified, use the default type
     Map<RentalVehicleType, Integer> typesAvailable;
     Map<RentalVehicleType, Integer> spacesAvailableMap;
+
     if (vehicleTypesAvailable.isEmpty() || vehicleSpacesAvailable.isEmpty()) {
       typesAvailable = Map.of(RentalVehicleType.getDefaultType(NETWORK_1), vehicles);
       spacesAvailableMap = Map.of(RentalVehicleType.getDefaultType(NETWORK_1), spaces);

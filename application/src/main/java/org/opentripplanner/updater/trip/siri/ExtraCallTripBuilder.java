@@ -86,6 +86,7 @@ class ExtraCallTripBuilder {
   TripUpdate build() throws UpdateException {
     TripPattern originalPattern = buffer.findPattern(trip);
     long numExtraCalls = calls.stream().filter(CallWrapper::isExtraCall).count();
+
     if (calls.size() - numExtraCalls != originalPattern.numberOfStops()) {
       // A trip update with extra calls is expected to have the same number of non-extra calls as
       // the number of stops in the original scheduled trip
@@ -97,6 +98,7 @@ class ExtraCallTripBuilder {
     }
 
     FeedScopedId calServiceId = buffer.getOrCreateServiceIdForDate(serviceDate);
+
     if (calServiceId == null) {
       throw UpdateException.of(trip.getId(), NO_START_DATE);
     }
@@ -108,6 +110,7 @@ class ExtraCallTripBuilder {
     // since adding extra stops change the timings of later stops in the trip pattern.
     var aimedStopTimes = new ArrayList<StopTime>();
     int extraCallCounter = 0;
+
     for (int stopSequence = 0; stopSequence < calls.size(); stopSequence++) {
       CallWrapper call = calls.get(stopSequence);
       StopTime stopTime = stopTimesMapper.createAimedStopTime(
@@ -133,6 +136,7 @@ class ExtraCallTripBuilder {
           stopSequence - extraCallCounter
         );
         StopLocation stopInNewPattern = stopTime.getStop();
+
         if (
           !stopInNewPattern.equals(stopInOriginalPattern) &&
           !stopInNewPattern.isPartOfSameStationAs(stopInOriginalPattern)
@@ -180,13 +184,17 @@ class ExtraCallTripBuilder {
     }
 
     builder.withVehicleId(FeedScopedId.ofNullable(trip.getId().getFeedId(), vehicleRef));
+
     if (cancellation || stopPattern.isAllStopsNonRoutable()) {
       builder.withCanceled();
     }
+
     if (added) {
       builder.withAdded();
     }
+
     builder.withModifiedTripPattern();
+
     /* Validate */
     try {
       return new TripUpdate(

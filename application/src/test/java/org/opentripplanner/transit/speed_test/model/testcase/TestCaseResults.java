@@ -98,12 +98,15 @@ class TestCaseResults {
     if (matchedResults.isEmpty()) {
       return TestStatus.NA;
     }
+
     if (matchedResults.stream().anyMatch(DiffEntry::leftOnly)) {
       return TestStatus.FAILED;
     }
+
     if (matchedResults.stream().anyMatch(DiffEntry::rightOnly)) {
       return TestStatus.WARN;
     }
+
     return TestStatus.OK;
   }
 }

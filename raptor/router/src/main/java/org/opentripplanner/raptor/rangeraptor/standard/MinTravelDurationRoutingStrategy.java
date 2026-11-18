@@ -95,6 +95,7 @@ public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule
       boardSlack,
       onTripIndex
     );
+
     if (boarding.empty()) {
       boardSameTrip(boarding.earliestBoardTime(), stopPos);
     } else {

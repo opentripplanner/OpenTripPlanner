@@ -33,8 +33,10 @@ final class PathKey {
       if (leg.isTransitLeg()) {
         result = 31 * result + leg.asTransitLeg().trip().pattern().debugInfo().hashCode();
       }
+
       leg = leg.nextLeg();
     }
+
     result = 31 * result + leg.toTime();
 
     return result;
@@ -45,9 +47,11 @@ final class PathKey {
     if (this == o) {
       return true;
     }
+
     if (o.getClass() != PathKey.class) {
       return false;
     }
+
     return hash == ((PathKey) o).hash;
   }
 

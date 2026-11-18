@@ -127,12 +127,14 @@ class MissingElevationHandler {
 
     while (!pq.empty()) {
       ElevationRepairState currentState = pq.extract_min();
+
       if (elevations.containsKey(currentState.currentVertex)) {
         continue;
       }
 
       if (pending.containsKey(currentState.currentVertex)) {
         var otherState = pending.get(currentState.currentVertex);
+
         if (otherState.initialVertex != currentState.currentVertex) {
           interpolateElevationsAlongBackPath(otherState, currentState, elevations, pending);
           interpolateElevationsAlongBackPath(currentState, otherState, elevations, pending);
@@ -146,6 +148,7 @@ class MissingElevationHandler {
       for (Edge e : currentState.currentVertex.getIncoming()) {
         var nsVertex = e.getFromVertex();
         var nsDistance = currentState.distance + e.getDistanceMeters();
+
         if (elevations.containsKey(nsVertex) || nsDistance > maxElevationPropagationMeters) {
           continue;
         }
@@ -156,6 +159,7 @@ class MissingElevationHandler {
       for (Edge e : currentState.currentVertex.getOutgoing()) {
         var nsVertex = e.getToVertex();
         var nsDistance = currentState.distance + e.getDistanceMeters();
+
         if (elevations.containsKey(nsVertex) || nsDistance > maxElevationPropagationMeters) {
           continue;
         }
@@ -177,10 +181,12 @@ class MissingElevationHandler {
     Map<Vertex, Double> elevations
   ) {
     var backState = elevationRepairState.previousState;
+
     while (backState != null) {
       if (elevations.containsKey(backState.currentVertex)) {
         return elevations.get(backState.currentVertex);
       }
+
       backState = backState.previousState;
     }
 
@@ -197,6 +203,7 @@ class MissingElevationHandler {
     var totalDistance = stateToBackTrack.distance + alternateState.distance;
 
     var currentState = stateToBackTrack;
+
     while (currentState != null) {
       if (!elevations.containsKey(currentState.currentVertex)) {
         var elevation =
@@ -223,6 +230,7 @@ class MissingElevationHandler {
       if (!edge.isElevationFlattened() && !edge.isSlopeOverride()) {
         issueStore.add(new ElevationProfileFailure(edge, "Failed to propagate elevation data"));
       }
+
       return;
     }
 

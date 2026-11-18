@@ -63,6 +63,7 @@ public final class CompactLineString implements Serializable {
     if (packed == null) {
       return null;
     }
+
     return packed.length == 0 ? STRAIGHT_LINE : new CompactLineString(packed);
   }
 
@@ -75,6 +76,7 @@ public final class CompactLineString implements Serializable {
     if (lineString == null) {
       return null;
     }
+
     LineString padded = GeometryUtils.addStartEndCoordinatesToLineString(
       new Coordinate(0.0, 0.0),
       lineString,
@@ -91,9 +93,11 @@ public final class CompactLineString implements Serializable {
    */
   LineString toLineString(boolean reverse) {
     int n = coordinateCount();
+
     if (n == 0) {
       return GeometryUtils.emptyLineString();
     }
+
     double[] c = new double[n * 2];
     decodeInto(packed, c, 0, 0, 0, false);
     LineString out = GeometryUtils.makeLineString(c);
@@ -147,19 +151,24 @@ public final class CompactLineString implements Serializable {
     if (packed == null || packed.length == 0) {
       return offset;
     }
+
     int writeIdx = offset;
     boolean skip = skipFirstCoord;
     var decoder = new DlugoszVarLenIntPacker.Decoder(packed);
+
     while (decoder.hasNext()) {
       oix += decoder.next();
       oiy += decoder.next();
+
       if (skip) {
         skip = false;
         continue;
       }
+
       out[writeIdx++] = toFloatingPoint(oix);
       out[writeIdx++] = toFloatingPoint(oiy);
     }
+
     return writeIdx;
   }
 
@@ -177,6 +186,7 @@ public final class CompactLineString implements Serializable {
     CoordinateSequence seq = lineString.getCoordinateSequence();
     int n = seq.size();
     int[] coords = new int[(n - 2) * 2];
+
     for (int i = 1; i < n - 1; i++) {
       // Round to fixed point before taking the delta to prevent rounding errors from accumulating.
       int ix = toFixedPoint(seq.getX(i));
@@ -186,6 +196,7 @@ public final class CompactLineString implements Serializable {
       oix = ix;
       oiy = iy;
     }
+
     return DlugoszVarLenIntPacker.pack(coords);
   }
 

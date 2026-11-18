@@ -70,6 +70,7 @@ public class AtlantaFareService extends DefaultFareService {
       if (s == null) {
         return false;
       }
+
       return routeNames.contains(s.toLowerCase());
     }
   }
@@ -100,6 +101,7 @@ public class AtlantaFareService extends DefaultFareService {
     public boolean addLeg(Leg leg, Money defaultFare) {
       // A transfer will always contain at least one ride.
       RideType toRideType = classify(leg);
+
       if (legs.size() == 0) {
         legs.add(leg);
         fares.put(fareType, defaultFare);
@@ -144,15 +146,18 @@ public class AtlantaFareService extends DefaultFareService {
 
       // All conditions below this point "use" the transfer, so we add the ride.
       legs.add(leg);
+
       if (transferClassification.type.equals(TransferType.FREE_TRANSFER)) {
         fares.put(fareType, Money.ofFractionalAmount(currency, 0));
         lastFareWithTransfer = defaultFare;
         return true;
       } else if (transferClassification.type.equals(TransferType.TRANSFER_PAY_DIFFERENCE)) {
         Money newCost = Money.ZERO_USD;
+
         if (defaultFare.greaterThan(lastFareWithTransfer)) {
           newCost = defaultFare.minus(lastFareWithTransfer);
         }
+
         fares.put(fareType, newCost);
         lastFareWithTransfer = defaultFare;
         return true;
@@ -161,6 +166,7 @@ public class AtlantaFareService extends DefaultFareService {
         lastFareWithTransfer = defaultFare;
         return true;
       }
+
       return true;
     }
 
@@ -204,6 +210,7 @@ public class AtlantaFareService extends DefaultFareService {
   private static RideType classify(Leg ride) {
     Route getRoute = ride.route();
     String shortName = getRoute.getShortName();
+
     if (shortName != null) {
       shortName = shortName.toLowerCase();
     }
@@ -215,11 +222,13 @@ public class AtlantaFareService extends DefaultFareService {
         } else if (COBB_FREE_RIDE_SHORT_NAMES.contains(shortName)) {
           return RideType.FREE_RIDE;
         }
+
         return RideType.COBB_LOCAL;
       }
       case XPRESS_AGENCY_ID -> {
         // Get hour of trip start
         long hours = ride.startTime().withZoneSameInstant(NEW_YORK_ZONE_ID).getHour();
+
         if (hours >= 12) {
           return RideType.XPRESS_AFTERNOON;
         } else {
@@ -232,6 +241,7 @@ public class AtlantaFareService extends DefaultFareService {
         } else if (RideType.GCT_EXPRESS_Z2.routeNamesContains(shortName)) {
           return RideType.GCT_EXPRESS_Z2;
         }
+
         return RideType.GCT_LOCAL;
       }
       // Also catches MARTA_AGENCY_ID
@@ -240,6 +250,7 @@ public class AtlantaFareService extends DefaultFareService {
         if (RideType.STREETCAR.routeNamesContains(shortName)) {
           return RideType.STREETCAR;
         }
+
         return RideType.MARTA;
       }
     }
@@ -271,8 +282,10 @@ public class AtlantaFareService extends DefaultFareService {
           if (fromRideType == RideType.COBB_LOCAL || fromRideType == RideType.COBB_EXPRESS) {
             return new TransferMeta(TransferType.FREE_TRANSFER);
           }
+
           return new TransferMeta(TransferType.END_TRANSFER);
         }
+
         return switch (fromRideType) {
           case COBB_LOCAL, COBB_EXPRESS, MARTA -> new TransferMeta(TransferType.FREE_TRANSFER);
           default -> new TransferMeta(TransferType.END_TRANSFER);
@@ -285,6 +298,7 @@ public class AtlantaFareService extends DefaultFareService {
             default -> new TransferMeta(TransferType.END_TRANSFER);
           };
         }
+
         // Electronic payment
         return switch (fromRideType) {
           case COBB_EXPRESS, MARTA -> new TransferMeta(TransferType.FREE_TRANSFER);
@@ -295,6 +309,7 @@ public class AtlantaFareService extends DefaultFareService {
         if (!isElectronicPayment(fareType)) {
           return new TransferMeta(TransferType.END_TRANSFER);
         }
+
         return switch (fromRideType) {
           case
             MARTA,
@@ -310,9 +325,11 @@ public class AtlantaFareService extends DefaultFareService {
       case XPRESS_MORNING:
       case XPRESS_AFTERNOON:
         boolean payOnExit = toRideType == RideType.XPRESS_AFTERNOON;
+
         if (!isElectronicPayment(fareType)) {
           return new TransferMeta(TransferType.END_TRANSFER);
         }
+
         return switch (fromRideType) {
           case
             MARTA,
@@ -324,7 +341,7 @@ public class AtlantaFareService extends DefaultFareService {
             TransferType.FREE_TRANSFER,
             Money.ZERO_USD,
             payOnExit
-          );
+            );
           case COBB_LOCAL -> new TransferMeta(
             TransferType.TRANSFER_WITH_UPCHARGE,
             usDollars(1.50f),
@@ -341,6 +358,7 @@ public class AtlantaFareService extends DefaultFareService {
         if (!isElectronicPayment(fareType)) {
           return new TransferMeta(TransferType.END_TRANSFER);
         }
+
         return switch (fromRideType) {
           case MARTA, GCT_LOCAL, GCT_EXPRESS_Z1, GCT_EXPRESS_Z2 -> new TransferMeta(
             TransferType.FREE_TRANSFER
@@ -352,6 +370,7 @@ public class AtlantaFareService extends DefaultFareService {
         if (!isElectronicPayment(fareType)) {
           return new TransferMeta(TransferType.END_TRANSFER);
         }
+
         return switch (fromRideType) {
           case MARTA -> new TransferMeta(TransferType.FREE_TRANSFER);
           case GCT_LOCAL, GCT_EXPRESS_Z1, GCT_EXPRESS_Z2 -> new TransferMeta(
@@ -401,12 +420,16 @@ public class AtlantaFareService extends DefaultFareService {
     Collection<FareRuleSet> fareRules
   ) {
     List<ATLTransfer> transfers = new ArrayList<>();
+
     for (var ride : legs) {
       Money defaultFare = getLegPrice(ride, fareType, fareRules);
+
       if (transfers.isEmpty()) {
         transfers.add(new ATLTransfer(currency, fareType));
       }
+
       ATLTransfer latestTransfer = transfers.get(transfers.size() - 1);
+
       if (!latestTransfer.addLeg(ride, defaultFare)) {
         // Transfer is invalid, create a new one.
         ATLTransfer newXfer = new ATLTransfer(currency, fareType);
@@ -416,9 +439,11 @@ public class AtlantaFareService extends DefaultFareService {
     }
 
     Money cost = Money.ZERO_USD;
+
     for (ATLTransfer transfer : transfers) {
       cost = cost.plus(transfer.getTotal());
     }
+
     var fareProduct = FareProduct.of(
       new FeedScopedId(FEED_ID, fareType.name()),
       fareType.name(),

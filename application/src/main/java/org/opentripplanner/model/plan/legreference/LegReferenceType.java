@@ -50,6 +50,7 @@ enum LegReferenceType {
         if (legReferenceType.version > other.version) {
           return legReferenceType;
         }
+
         return other;
       });
   }

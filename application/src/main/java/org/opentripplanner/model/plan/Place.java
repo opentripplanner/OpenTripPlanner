@@ -164,6 +164,7 @@ public class Place {
         name = new LocalizedString("partOf", s.getIntersectionName(), flexArea.getName());
       }
     }
+
     // The actual vertex is used because the StopLocation coordinates may not be equal to the vertex's
     // coordinates.
     return new Place(
@@ -184,10 +185,13 @@ public class Place {
     if (location == null) {
       return Place.noCoords(defaultName);
     }
+
     var coord = location.wgsCoordinate();
+
     if (coord == null) {
       return Place.noCoords(NonLocalizedString.ofNullableOrElse(location.label(), defaultName));
     }
+
     return Place.normal(coord, NonLocalizedString.ofNullableOrElse(location.label(), defaultName));
   }
 
@@ -206,6 +210,7 @@ public class Place {
   public static Place forVehicleParkingEntrance(VehicleParkingEntranceVertex vertex, State state) {
     TraverseMode traverseMode = null;
     final StreetSearchRequest request = state.getRequest();
+
     if (request.mode().includesDriving()) {
       traverseMode = TraverseMode.CAR;
     } else if (request.mode().includesBiking()) {
@@ -238,9 +243,11 @@ public class Place {
     if (this == other) {
       return true;
     }
+
     if (coordinate != null) {
       return coordinate.sameLocation(other.coordinate);
     }
+
     return stop != null && stop.equals(other.stop);
   }
 
@@ -250,6 +257,7 @@ public class Place {
    */
   public String toStringShort() {
     StringBuilder buf = new StringBuilder(name.toString());
+
     if (stop != null) {
       buf.append(" (").append(stop.getId()).append(")");
     } else {

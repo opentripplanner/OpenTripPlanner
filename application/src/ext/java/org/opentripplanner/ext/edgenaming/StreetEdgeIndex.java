@@ -32,6 +32,7 @@ class StreetEdgeIndex {
     // needs to contain one item for each road segment with a unique geometry and name, so we
     // add only one of the two edges.
     var edge = pair.pickAny();
+
     if (edge.getDistanceMeters() <= maxLengthMeters) {
       index.insert(edge.getGeometry().getEnvelopeInternal(), new EdgeOnLevel(way, edge, levels));
     }

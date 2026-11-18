@@ -69,6 +69,7 @@ public class MarkdownFormatter {
     if (text == null || !text.contains("|")) {
       return text;
     }
+
     // Replace '¦' with '\|' when Intellij markdown renderer supports it
     return text.replace("|", "¦");
   }

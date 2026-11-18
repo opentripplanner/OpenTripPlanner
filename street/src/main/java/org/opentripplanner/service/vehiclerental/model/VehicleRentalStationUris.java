@@ -98,9 +98,11 @@ public final class VehicleRentalStationUris {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     VehicleRentalStationUris that = (VehicleRentalStationUris) o;
     return (
       Objects.equals(android, that.android) &&

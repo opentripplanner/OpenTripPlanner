@@ -62,6 +62,7 @@ public final class GtfsBundle {
     if (feedId == null) {
       feedId = GtfsFeedIdResolver.fromGtfsFeed(getCsvInputSource(), dataSource.uri());
     }
+
     return feedId;
   }
 
@@ -74,6 +75,7 @@ public final class GtfsBundle {
       LOG.warn("unknown CSV source type; cannot check inputs");
       return;
     }
+
     if (!dataSource.exists()) {
       throw new RuntimeException(
         "GTFS Path " + dataSource.path() + " does not exist or " + "cannot be read."
@@ -101,6 +103,7 @@ public final class GtfsBundle {
         public void close() {}
       };
     }
+
     return csvInputSource;
   }
 
@@ -120,14 +123,17 @@ public final class GtfsBundle {
     reader.setDefaultAgencyId(getFeedId());
 
     dao.open();
+
     for (Class<?> entityClass : reader.getEntityClasses()) {
       if (skipEntityClass(entityClass)) {
         LOG.info("Skipping entity: {}", entityClass.getName());
         continue;
       }
+
       LOG.info("Reading entity: {}", entityClass.getName());
       reader.readEntities(entityClass);
     }
+
     dao.close();
     return dao;
   }

@@ -87,6 +87,7 @@ public class GtfsFareServiceFactory implements FareServiceFactory {
     for (FareAttribute fare : fareAttributes) {
       FeedScopedId id = fare.getId();
       FareRuleSet fareRule = fareRuleSet.get(id);
+
       if (fareRule == null) {
         fareRule = new FareRuleSet(fare);
         fareRuleSet.put(id, fareRule);
@@ -100,21 +101,28 @@ public class GtfsFareServiceFactory implements FareServiceFactory {
       FareAttribute fare = rule.getFare();
       FeedScopedId id = fare.getId();
       FareRuleSet fareRule = fareRuleSet.get(id);
+
       if (fareRule == null) {
         // Should never happen by design
         LOG.error("Nonexistent fare ID in fare rule: " + id);
         continue;
       }
+
       String contains = rule.getContainsId();
+
       if (contains != null) {
         fareRule.addContains(contains);
       }
+
       String origin = rule.getOriginId();
       String destination = rule.getDestinationId();
+
       if (origin != null || destination != null) {
         fareRule.addOriginDestination(origin, destination);
       }
+
       Route route = rule.getRoute();
+
       if (route != null) {
         FeedScopedId routeId = route.getId();
         fareRule.addRoute(routeId);

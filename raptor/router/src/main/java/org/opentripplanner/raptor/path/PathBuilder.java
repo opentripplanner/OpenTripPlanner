@@ -262,9 +262,11 @@ public abstract class PathBuilder<T extends RaptorTripSchedule> {
     }
 
     var prev = head.nextTransitLeg();
+
     if (prev == null) {
       return;
     }
+
     var curr = prev.nextTransitLeg();
 
     while (curr != null) {
@@ -282,6 +284,7 @@ public abstract class PathBuilder<T extends RaptorTripSchedule> {
       to.trip(),
       to.fromStopPos()
     );
+
     if (tx != null) {
       from.setConstrainedTransferAfterLeg(tx);
     }

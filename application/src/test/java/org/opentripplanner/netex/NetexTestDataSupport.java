@@ -79,6 +79,7 @@ public final class NetexTestDataSupport {
     if (daysOfWeek == null || daysOfWeek.length == 0) {
       return new DayType().withId(id);
     }
+
     return createDayTypeWithProperties(id, new PropertyOfDay().withDaysOfWeek(daysOfWeek));
   }
 
@@ -98,9 +99,11 @@ public final class NetexTestDataSupport {
 
   public static DayTypeRefs_RelStructure createDayTypeRefList(String... dayTypeIds) {
     var list = new DayTypeRefs_RelStructure();
+
     for (String it : dayTypeIds) {
       list.getDayTypeRef().add(jaxbElement(createDayTypeRef(it), DayTypeRefStructure.class));
     }
+
     return list;
   }
 

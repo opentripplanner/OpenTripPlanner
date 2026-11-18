@@ -87,6 +87,7 @@ public class RaptorSearchWindowCalculator {
     if (!params.isEarliestDepartureTimeSet()) {
       earliestDepartureTime = latestArrivalTime - travelWindow;
     }
+
     return this;
   }
 
@@ -96,6 +97,7 @@ public class RaptorSearchWindowCalculator {
         "This operation is not defined for negative numbers: " + minTravelTimeInSeconds
       );
     }
+
     // We want: 0 -> 0, 59 -> 0, 60 -> 60 ...
     return (minTravelTimeInSeconds / 60) * 60;
   }

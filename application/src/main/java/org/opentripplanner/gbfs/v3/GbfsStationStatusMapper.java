@@ -42,6 +42,7 @@ class GbfsStationStatusMapper {
     if (!statusLookup.containsKey(station.stationId())) {
       return station.copyOf().withRealTimeData(false).build();
     }
+
     GBFSStation status = statusLookup.get(station.stationId());
 
     int vehiclesAvailable =
@@ -90,6 +91,7 @@ class GbfsStationStatusMapper {
    */
   private Map<RentalVehicleType, Integer> vehicleSpaces(GBFSStation status) {
     var docksAvailable = status.getVehicleDocksAvailable();
+
     if (docksAvailable != null) {
       return docksAvailable
         .stream()
@@ -130,6 +132,7 @@ class GbfsStationStatusMapper {
     String network
   ) {
     boolean containsKey = vehicleTypes.containsKey(vehicleTypesAvailable.getVehicleTypeId());
+
     if (!containsKey) {
       LOG_THROTTLE.throttle(() ->
         LOG.info(
@@ -141,6 +144,7 @@ class GbfsStationStatusMapper {
         )
       );
     }
+
     return containsKey;
   }
 

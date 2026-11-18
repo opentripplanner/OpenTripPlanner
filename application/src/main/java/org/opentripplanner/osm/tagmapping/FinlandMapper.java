@@ -253,6 +253,7 @@ class FinlandMapper extends OsmTagMapper {
     if (super.isMotorVehicleThroughTrafficExplicitlyDisallowed(way)) {
       return true;
     }
+
     return way.isOneOfTags("service", NOTHROUGH_DRIVING_TAGS);
   }
 }

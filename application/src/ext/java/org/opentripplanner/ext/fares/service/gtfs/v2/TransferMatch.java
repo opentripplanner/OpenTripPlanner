@@ -21,6 +21,7 @@ public record TransferMatch(
     if (transferRule.fareProducts().isEmpty()) {
       return true;
     }
+
     return transferRule.fareProducts().stream().anyMatch(product::equalEligibility);
   }
 }

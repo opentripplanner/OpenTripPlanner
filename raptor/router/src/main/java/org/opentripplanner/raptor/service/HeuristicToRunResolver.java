@@ -20,6 +20,7 @@ class HeuristicToRunResolver {
     if (!req.profile().isOneOf(STANDARD, MULTI_CRITERIA)) {
       return;
     }
+
     boolean forward = false;
     boolean reverse = false;
 
@@ -47,6 +48,7 @@ class HeuristicToRunResolver {
     if (forward) {
       turnFwdOn.run();
     }
+
     if (reverse) {
       turnRevOn.run();
     }

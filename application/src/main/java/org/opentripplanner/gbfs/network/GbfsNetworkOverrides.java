@@ -44,9 +44,11 @@ public record GbfsNetworkOverrides(
    */
   public Optional<GbfsNetworkParameters> forNetwork(String network) {
     var listed = byNetwork.get(network);
+
     if (listed != null) {
       return Optional.of(listed);
     }
+
     return includeUnlistedNetworks ? Optional.of(defaults) : Optional.empty();
   }
 }

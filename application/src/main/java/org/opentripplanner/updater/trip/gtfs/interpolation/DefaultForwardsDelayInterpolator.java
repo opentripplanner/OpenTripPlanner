@@ -28,11 +28,14 @@ class DefaultForwardsDelayInterpolator implements ForwardsDelayInterpolator {
     Integer firstCanceledStop = null;
     boolean updated = false;
     boolean firstRealUpdateSeen = false;
+
     for (var i = 0; i < builder.numberOfStops(); ++i) {
       boolean noTimeGiven = builder.containsNoRealTimeTimes(i);
+
       if (!noTimeGiven) {
         firstRealUpdateSeen = true;
       }
+
       if (noTimeGiven) {
         if (builder.getStopRealTimeState(i) == StopRealTimeState.DEFAULT) {
           builder.withStopRealTimeState(i, propagatedState);
@@ -42,6 +45,7 @@ class DefaultForwardsDelayInterpolator implements ForwardsDelayInterpolator {
           if (firstCanceledStop == null) {
             firstCanceledStop = i;
           }
+
           continue;
         }
       }
@@ -62,14 +66,17 @@ class DefaultForwardsDelayInterpolator implements ForwardsDelayInterpolator {
         } else if (delay != null) {
           // the arrival delay cannot exceed the given departure time
           var departureTime = builder.getDepartureTime(i);
+
           if (departureTime != null && builder.getScheduledArrivalTime(i) + delay > departureTime) {
             builder.withArrivalTime(i, departureTime);
           } else {
             builder.withArrivalDelay(i, delay);
           }
         }
+
         updated = true;
       }
+
       time = builder.getArrivalTime(i);
       delay = builder.getArrivalDelay(i);
 
@@ -86,14 +93,17 @@ class DefaultForwardsDelayInterpolator implements ForwardsDelayInterpolator {
         } else if (delay != null) {
           builder.withDepartureDelay(i, delay);
         }
+
         updated = true;
       }
+
       time = builder.getDepartureTime(i);
       delay = builder.getDepartureDelay(i);
 
       // interpolate time for canceled stops before this stop
       if (firstCanceledStop != null && firstCanceledStop > 0) {
         Integer prevDeparture = builder.getDepartureTime(firstCanceledStop - 1);
+
         if (prevDeparture != null) {
           int arrival = Objects.requireNonNull(builder.getArrivalTime(i));
           int prevScheduledDeparture = builder.getScheduledDepartureTime(firstCanceledStop - 1);
@@ -124,9 +134,11 @@ class DefaultForwardsDelayInterpolator implements ForwardsDelayInterpolator {
           }
         }
       }
+
       firstCanceledStop = null;
 
       var state = builder.getStopRealTimeState(i);
+
       // NO_DATA should be propagated per the spec, SKIPPED should not
       // GTFS does not support INACCURATE_PREDICTIONS, but I think it should be propagated as well
       if (state == StopRealTimeState.NO_DATA || state == StopRealTimeState.INACCURATE_PREDICTIONS) {

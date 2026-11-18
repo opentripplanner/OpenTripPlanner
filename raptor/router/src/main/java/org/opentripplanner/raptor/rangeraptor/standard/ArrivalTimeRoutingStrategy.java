@@ -98,6 +98,7 @@ public final class ArrivalTimeRoutingStrategy<T extends RaptorTripSchedule> impl
       boardSlack,
       onTripIndex
     );
+
     if (!boarding.empty()) {
       board(boarding);
     }
@@ -116,6 +117,7 @@ public final class ArrivalTimeRoutingStrategy<T extends RaptorTripSchedule> impl
       boardSlack,
       txSearch
     );
+
     if (boarding.empty()) {
       boardWithRegularTransfer(stopIndex, stopPos, boardSlack);
     } else if (!boarding.transferConstraint().isNotAllowed()) {

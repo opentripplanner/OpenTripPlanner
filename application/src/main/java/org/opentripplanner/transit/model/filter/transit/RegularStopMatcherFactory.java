@@ -36,9 +36,11 @@ public class RegularStopMatcherFactory {
     if (request.feedId() != null) {
       expr.matches(feedId(request.feedId()));
     }
+
     if (request.filterByInUse()) {
       expr.matches(inUseMatcher(inUseProvider));
     }
+
     return expr.build();
   }
 

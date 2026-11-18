@@ -85,9 +85,11 @@ public class EnvironmentVariableReplacer {
   @Nullable
   private static String getEnvVarOrProjectInfo(String key) {
     String value = System.getenv(key);
+
     if (value == null) {
       return PROJECT_INFO.get(key);
     }
+
     return value;
   }
 

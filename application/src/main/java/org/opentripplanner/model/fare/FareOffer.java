@@ -65,6 +65,7 @@ public sealed interface FareOffer permits FareOffer.DefaultFareOffer, FareOffer.
     public DependentFareOffer {
       Objects.requireNonNull(fareProduct);
       Objects.requireNonNull(dependencies);
+
       if (dependencies.isEmpty()) {
         throw new IllegalArgumentException("Dependencies must not be empty");
       }

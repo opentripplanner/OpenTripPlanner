@@ -111,6 +111,7 @@ class RegularTransferServiceCache<V> {
    */
   V get(AbstractUserPreferences<?> userPreferences, Factory<V> factory) {
     var slot = retained.get(userPreferences);
+
     if (slot != null) {
       var entry = slot.get();
       count(entry);
@@ -119,17 +120,21 @@ class RegularTransferServiceCache<V> {
       );
       return await(entry);
     }
+
     var entry = entries.get(userPreferences);
+
     if (entry == null) {
       var created = Entry.<V>missing();
       // Stamp the entry before it is visible, or a concurrent eviction takes it for the eldest
       created.lastUse = useCounter.incrementAndGet();
       entry = entries.putIfAbsent(userPreferences, created);
+
       if (entry == null) {
         entry = created;
         evictIfFull(userPreferences);
       }
     }
+
     entry.lastUse = useCounter.incrementAndGet();
     count(entry);
     var claimed = entry;
@@ -191,12 +196,14 @@ class RegularTransferServiceCache<V> {
     );
     retained.forEach((userPreferences, slot) -> {
       var carried = carry(slot.get(), changedFromStops.apply(userPreferences));
+
       if (carried != null) {
         next.retained.get(userPreferences).set(carried);
       }
     });
     entries.forEach((userPreferences, entry) -> {
       var carried = carry(entry, changedFromStops.apply(userPreferences));
+
       if (carried != null) {
         next.entries.put(userPreferences, carried);
       }
@@ -209,25 +216,30 @@ class RegularTransferServiceCache<V> {
   private static <V> Entry<V> carry(Entry<V> entry, Set<Integer> changed) {
     V previous;
     Set<Integer> stale;
+
     if (entry.claimed.get()) {
       if (!entry.value.isDone() || entry.value.isCompletedExceptionally()) {
         return null;
       }
+
       previous = entry.value.join();
       stale = Set.of();
     } else {
       previous = entry.previous;
       stale = entry.changedFromStops;
     }
+
     if (previous == null) {
       // Not created yet, nothing to carry forward
       return null;
     }
+
     if (!changed.isEmpty()) {
       var union = new HashSet<>(stale);
       union.addAll(changed);
       stale = union;
     }
+
     var carried = stale.isEmpty() ? Entry.created(previous) : Entry.stale(previous, stale);
     carried.lastUse = entry.lastUse;
     return carried;
@@ -260,6 +272,7 @@ class RegularTransferServiceCache<V> {
     Runnable onFailure
   ) {
     long start = System.nanoTime();
+
     try {
       var value =
         entry.previous == null
@@ -282,9 +295,11 @@ class RegularTransferServiceCache<V> {
       if (e.getCause() instanceof RuntimeException re) {
         throw re;
       }
+
       if (e.getCause() instanceof Error error) {
         throw error;
       }
+
       throw e;
     }
   }
@@ -297,9 +312,11 @@ class RegularTransferServiceCache<V> {
         .stream()
         .filter(e -> !e.getKey().equals(added))
         .min((a, b) -> Long.compare(a.getValue().lastUse, b.getValue().lastUse));
+
       if (eldest.isEmpty()) {
         return;
       }
+
       if (entries.remove(eldest.get().getKey(), eldest.get().getValue())) {
         counters.evicted();
       }

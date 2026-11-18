@@ -34,6 +34,7 @@ public class SiriAzureETUpdaterParameters
     if (getFullyQualifiedNamespace() != null) {
       return getFullyQualifiedNamespace();
     }
+
     // fallback to service bus url
     if (getServiceBusUrl() != null) {
       try {
@@ -41,15 +42,18 @@ public class SiriAzureETUpdaterParameters
         return new ConnectionStringProperties(getServiceBusUrl()).getEndpoint().toString();
       } catch (IllegalArgumentException ignore) {}
     }
+
     return "unknown";
   }
 
   @Override
   public Optional<URI> buildDataInitializationUrl() throws URISyntaxException {
     var url = getDataInitializationUrl();
+
     if (url == null) {
       return Optional.empty();
     }
+
     return Optional.of(
       new URIBuilder(url)
         .addParameter("fromDateTime", fromDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE))

@@ -26,6 +26,7 @@ public class OTPFeatureTable {
         checkMark(it.isSandbox())
       );
     }
+
     return String.join(NEW_LINE, table.build().toMarkdownRows()) + NEW_LINE;
   }
 }

@@ -17,6 +17,7 @@ public class SiriSeverityMapper {
     if (severity == null) {
       return AlertSeverity.WARNING;
     }
+
     return switch (severity) {
       case UNDEFINED -> AlertSeverity.WARNING;
       case UNKNOWN -> AlertSeverity.UNKNOWN_SEVERITY;

@@ -15,6 +15,7 @@ public class SeverityMapper {
     if (severity == null) {
       return "normal";
     }
+
     switch (severity) {
       case UNKNOWN_SEVERITY:
         return "unknown";

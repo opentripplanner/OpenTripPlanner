@@ -18,10 +18,12 @@ public class LegsToItineraryMapper {
     if (legs.isEmpty()) {
       return Optional.empty();
     }
+
     var cost = Cost.costOfSeconds(legs.stream().mapToDouble(Leg::generalizedCost).sum());
     var builder = Itinerary.ofDirect(legs).withGeneralizedCost(cost);
 
     builder.withArrivedAtDestinationWithRentedVehicle(arrivedAtDestinationWithRentedVehicle);
+
     if (elevationChange != null) {
       builder.addElevationChange(elevationChange);
     }

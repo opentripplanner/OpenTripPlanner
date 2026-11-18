@@ -55,6 +55,7 @@ public class FlexServiceDate {
     Collection<FlexTrip<?, ?>> tripsRunning
   ) {
     int requestedBookingTime;
+
     if (requestedBookingTimeInstant == null) {
       requestedBookingTime = RoutingBookingInfo.NOT_SET;
     } else {
@@ -64,6 +65,7 @@ public class FlexServiceDate {
         requestedBookingTimeInstant
       );
     }
+
     return new FlexServiceDate(
       serviceDate,
       secondsFromStartOfTime,

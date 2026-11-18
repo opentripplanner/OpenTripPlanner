@@ -92,6 +92,7 @@ class BookingRuleMapper {
     if (minutes == BookingRule.NO_VALUE) {
       return null;
     }
+
     return Duration.ofMinutes(minutes);
   }
 

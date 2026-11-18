@@ -90,9 +90,11 @@ public class VehicleWalkingRequest {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     VehicleWalkingRequest that = (VehicleWalkingRequest) o;
     return (
       speed == that.speed &&

@@ -120,6 +120,7 @@ class DataSourcesView {
       radioBtn.addActionListener(this::onDataSourceChange);
       addComp(radioBtn, column);
     }
+
     addComp(column, listPanel);
   }
 

@@ -76,6 +76,7 @@ public class TestRouteData {
       0
     );
     int id = 0;
+
     for (Trip trip : trips) {
       var tripSchedule = new TripScheduleWithOffset(patternForDates, id);
       id += 1;
@@ -150,11 +151,13 @@ public class TestRouteData {
 
   public int stopPosition(StopLocation stop) {
     List<StopTime> times = firstTrip().getStopTimes();
+
     for (int i = 0; i < times.size(); ++i) {
       if (stop == times.get(i).getStop()) {
         return i;
       }
     }
+
     throw new IllegalArgumentException();
   }
 
@@ -180,9 +183,11 @@ public class TestRouteData {
   private List<StopTime> stopTimes(Trip trip, List<RegularStop> stops, String timesAsString) {
     var times = TimeUtils.times(timesAsString);
     var stopTimes = new ArrayList<StopTime>();
+
     for (int i = 0; i < stops.size(); i++) {
       stopTimes.add(stopTime(trip, stops.get(i), times[i], i + 1));
     }
+
     return stopTimes;
   }
 
@@ -229,6 +234,7 @@ public class TestRouteData {
       if (stops == null) {
         withStops(List.of(STOP_A, STOP_B));
       }
+
       return stops;
     }
 
@@ -241,12 +247,15 @@ public class TestRouteData {
       if (times == null) {
         var buf = new StringBuilder();
         int t = TimeUtils.time("10:00");
+
         for (int i = 0; i < stops.size(); i++) {
           t += 600;
           buf.append(" ").append(TimeUtils.timeToStrLong(t));
         }
+
         this.times = List.of(buf.substring(1));
       }
+
       return times;
     }
 
@@ -257,12 +266,15 @@ public class TestRouteData {
 
     public TestRouteData build() {
       var routeBuilder = TransitRepositoryForTest.route(route).withMode(mode).withShortName(route);
+
       if (agency != null) {
         routeBuilder.withAgency(TransitRepositoryForTest.agency(agency));
       }
+
       if (submode != null) {
         routeBuilder.withNetexSubmode(submode);
       }
+
       return new TestRouteData(routeBuilder.build(), stops(), times());
     }
   }

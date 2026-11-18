@@ -21,6 +21,7 @@ class GtfsImport {
     if (defaultFeedId != null) {
       reader.setDefaultAgencyId(defaultFeedId);
     }
+
     this.feedId = resolveFeedId(defaultFeedId, reader, path.toURI());
     readDao(reader);
   }

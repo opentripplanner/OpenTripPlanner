@@ -39,6 +39,7 @@ public class EnvironmentVariableReplacerTest {
     if (envVar == null) {
       throw new IllegalStateException("No environment variables for testing found.");
     }
+
     envName = envVar.getKey();
     envValue = envVar.getValue();
   }

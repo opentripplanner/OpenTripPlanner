@@ -110,9 +110,11 @@ class DefaultRegularTransferRepositorySnapshot<
     AbstractUserPreferences<?> userPreferences
   ) {
     var entry = entryByPreferences.get(userPreferences);
+
     if (entry != null && entry.source() == UserPreferenceSource.PROFILE) {
       return new RegularTransferCacheStatistics.KeyInfo(entry.source(), entry.id(), entry.id());
     }
+
     var closestProfile = closestProfileOrNull(userPreferences);
     var closest = closestProfile == null ? null : entryByPreferences.get(closestProfile);
     return new RegularTransferCacheStatistics.KeyInfo(

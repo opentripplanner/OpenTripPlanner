@@ -177,11 +177,13 @@ public class RegularTransferRepositoryLifecycle<
     ProfileUserPreferences.resolveAll(parameters, mapper).forEach((preferences, profile) ->
       result.add(new WarmupEntry(profile.id(), UserPreferenceSource.PROFILE, preferences))
     );
+
     for (var warmup : parameters.warmup()) {
       result.add(
         new WarmupEntry(warmup.id(), UserPreferenceSource.WARMUP, warmup.userPreferences())
       );
     }
+
     return List.copyOf(result);
   }
 
@@ -231,9 +233,11 @@ public class RegularTransferRepositoryLifecycle<
     AbstractUserPreferences<?> userPreferences
   ) {
     var profile = matcher.closestProfile(frozen.paths(), userPreferences);
+
     if (profile == null) {
       return Set.of();
     }
+
     return frozen.changedFromStops().getOrDefault(profile, Set.of());
   }
 }

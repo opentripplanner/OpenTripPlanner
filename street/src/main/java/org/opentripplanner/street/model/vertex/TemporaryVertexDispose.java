@@ -54,13 +54,16 @@ class TemporaryVertexDispose {
     // stack overflow in the case of deep temporary graphs.
     while (!todo.isEmpty()) {
       Vertex current = next();
+
       if (isNotAlreadyProcessed(current)) {
         for (Edge edge : current.getOutgoing()) {
           disposeVertex(edge.getToVertex(), edge, true);
         }
+
         for (Edge edge : current.getIncoming()) {
           disposeVertex(edge.getFromVertex(), edge, false);
         }
+
         done.add(current);
       }
     }

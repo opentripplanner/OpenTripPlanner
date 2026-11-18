@@ -76,9 +76,11 @@ public final class ElevatorPreferences implements Serializable {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     ElevatorPreferences that = (ElevatorPreferences) o;
     return (
       Objects.equals(boardCost, that.boardCost) &&

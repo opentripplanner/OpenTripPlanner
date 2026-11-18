@@ -20,6 +20,7 @@ class TestPagingUtils {
     if (value == null) {
       return "";
     }
+
     return value
       .toString()
       .replaceAll("2020-02-01T(\\d\\d:\\d\\d:\\d\\d)Z", "$1-1d")
@@ -33,6 +34,7 @@ class TestPagingUtils {
     if (it == null) {
       return "";
     }
+
     var value = it.keyAsString();
     value = cleanStr(value);
     // indent cost with one digit

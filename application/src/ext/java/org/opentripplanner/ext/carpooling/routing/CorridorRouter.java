@@ -51,6 +51,7 @@ public class CorridorRouter implements CarpoolRouter {
     tripSegments.clear();
     waypoints = trip.vertices();
     var legDurations = trip.corridor().legDurations();
+
     for (int leg = 0; leg < legDurations.size(); leg++) {
       register(waypoints.get(leg), waypoints.get(leg + 1), (int) legDurations.get(leg).toSeconds());
     }
@@ -84,12 +85,15 @@ public class CorridorRouter implements CarpoolRouter {
   @Nullable
   public RoutedSegment route(Vertex from, Vertex to) {
     var tripSegment = tripSegments.get(new Pair<>(from, to));
+
     if (tripSegment != null) {
       return tripSegment;
     }
+
     if (passengerVertices.contains(from) || passengerVertices.contains(to)) {
       return passengerRouter.route(from, to);
     }
+
     return null;
   }
 
@@ -125,13 +129,16 @@ public class CorridorRouter implements CarpoolRouter {
     public StreetPath path() {
       if (path == null) {
         var segment = pathRouter.route(from, to);
+
         if (segment == null) {
           throw new IllegalStateException(
             "The corridor holds a duration for " + from + " -> " + to + " but it cannot be routed"
           );
         }
+
         path = segment.path();
       }
+
       return path;
     }
 

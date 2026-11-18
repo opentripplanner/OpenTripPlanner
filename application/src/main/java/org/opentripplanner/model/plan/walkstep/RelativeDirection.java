@@ -40,9 +40,11 @@ public enum RelativeDirection {
 
   public static RelativeDirection calculate(double angle, boolean roundabout) {
     double cwAngle = angle;
+
     if (cwAngle < 0) {
       cwAngle += Math.PI * 2;
     }
+
     double ccwAngle = Math.PI * 2 - cwAngle;
 
     if (roundabout) {

@@ -163,6 +163,7 @@ public class AlternativeLegs {
         if (!servicesRunning.contains(tripTimes.getServiceCode())) {
           continue;
         }
+
         if (skipByTripCancellationOrDeletion(tripTimes, false)) {
           continue;
         }

@@ -120,6 +120,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
         StdWorkerState.class
       );
     }
+
     return (StdRangeRaptorWorkerState<T>) state;
   }
 
@@ -130,6 +131,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
     if (bestTimes == null) {
       bestTimes = new BestTimes(ctx.nStops(), ctx.calculator(), ctx.lifeCycle());
     }
+
     return bestTimes;
   }
 
@@ -208,6 +210,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
       // Default to simple version
       withArrivedAtDestinationCheck(createSimpleArrivedAtDestinationCheck());
     }
+
     return arrivedAtDestinationCheck;
   }
 
@@ -227,6 +230,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
         )
       );
     }
+
     return stopArrivals;
   }
 
@@ -243,6 +247,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
     if (bestNumberOfTransfers == null) {
       withBestNumberOfTransfers(createSimpleBestNumberOfTransfers());
     }
+
     return bestNumberOfTransfers;
   }
 
@@ -279,6 +284,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
     if (!ctx.earlyTransferPruning()) {
       return null;
     }
+
     return new StdTransferEarlyPruning<T>(
       egressPaths().listAll(),
       ctx.nRounds(),
@@ -314,13 +320,16 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
             "."
         );
       }
+
       if (oneOfInstanceTypes.contains(type)) {
         throw new IllegalStateException(
           "An instance for is already initialized for type: " + type.getSimpleName()
         );
       }
+
       oneOfInstanceTypes.add(type);
     }
+
     return instance;
   }
 }

@@ -59,13 +59,16 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
     var availability = parseAvailability(jsonNode);
 
     I18NString note = null;
+
     if (jsonNode.has("notes") && !jsonNode.get("notes").isEmpty()) {
       var noteFieldIterator = jsonNode.path("notes").properties().iterator();
       Map<String, String> noteLocalizations = new HashMap<>();
+
       while (noteFieldIterator.hasNext()) {
         var noteFiled = noteFieldIterator.next();
         noteLocalizations.put(noteFiled.getKey(), noteFiled.getValue().asString());
       }
+
       note = TranslatedString.getI18NString(noteLocalizations, false);
     }
 
@@ -171,11 +174,13 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
     if (!jsonNode.has(fieldName)) {
       return null;
     }
+
     return jsonNode.get(fieldName).asInt();
   }
 
   private FeedScopedId createIdForNode(JsonNode jsonNode) {
     String id;
+
     if (jsonNode.has("id")) {
       id = jsonNode.path("id").asString();
     } else {
@@ -186,16 +191,19 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
         jsonNode.path("coords").path("lat").asDouble()
       );
     }
+
     return new FeedScopedId(feedId, id);
   }
 
   private List<String> parseTags(JsonNode node, String... tagNames) {
     var tagList = new ArrayList<String>();
+
     for (var tagName : tagNames) {
       if (node.has(tagName)) {
         tagList.add(tagName + ":" + node.get(tagName).asString());
       }
     }
+
     return tagList;
   }
 

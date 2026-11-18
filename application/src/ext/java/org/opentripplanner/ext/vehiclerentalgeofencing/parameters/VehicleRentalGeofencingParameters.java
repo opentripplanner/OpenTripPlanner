@@ -23,6 +23,7 @@ public record VehicleRentalGeofencingParameters(
 ) {
   public VehicleRentalGeofencingParameters {
     Objects.requireNonNull(url);
+
     if (headers == null) {
       headers = HttpHeaders.empty();
     }

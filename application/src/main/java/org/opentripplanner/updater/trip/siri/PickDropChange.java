@@ -55,6 +55,7 @@ public final class PickDropChange {
     if (cancelled) {
       return scheduled.isNotRoutable() ? Optional.empty() : Optional.of(CANCELLED);
     }
+
     return switch (activity) {
       case UNSPECIFIED -> Optional.empty();
       case ALLOWED -> scheduled.isNotRoutable() ? Optional.of(SCHEDULED) : Optional.empty();
@@ -99,6 +100,7 @@ public final class PickDropChange {
     if (activity == null) {
       return Activity.UNSPECIFIED;
     }
+
     return switch (activity) {
       case ALIGHTING -> Activity.ALLOWED;
       case NO_ALIGHTING -> Activity.NOT_ALLOWED;
@@ -110,6 +112,7 @@ public final class PickDropChange {
     if (activity == null) {
       return Activity.UNSPECIFIED;
     }
+
     return switch (activity) {
       case BOARDING -> Activity.ALLOWED;
       case NO_BOARDING -> Activity.NOT_ALLOWED;

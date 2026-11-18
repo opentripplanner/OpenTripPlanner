@@ -43,9 +43,11 @@ class PathTailC2Calculator {
       if (curr.isTransit()) {
         calculateC2AtStopPos(curr, curr.fromStopPos(), ptpIter);
       }
+
       curr = curr.prev();
       curr.c2(ptpIter.currC2());
     }
+
     curr.c2(ptpIter.currC2());
     return ptpIter;
   }
@@ -59,8 +61,10 @@ class PathTailC2Calculator {
       if (tail.isC2Set()) {
         return tail;
       }
+
       tail = tail.next();
     }
+
     return tail;
   }
 
@@ -70,6 +74,7 @@ class PathTailC2Calculator {
     PassThroughPointsIterator ptpIter
   ) {
     var pattern = leg.trip().pattern();
+
     for (int pos = leg.toStopPos(); pos >= stopPos; --pos) {
       if (ptpIter.isPassThroughPoint(pattern.stopIndex(pos))) {
         ptpIter.next();

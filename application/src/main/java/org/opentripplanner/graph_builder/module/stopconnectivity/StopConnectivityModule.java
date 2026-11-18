@@ -47,6 +47,7 @@ public class StopConnectivityModule implements GraphBuilderModule {
     if (!graph.hasStreets) {
       return;
     }
+
     var progress = ProgressTracker.track(
       "Stop connectivity analysis",
       5000,
@@ -73,6 +74,7 @@ public class StopConnectivityModule implements GraphBuilderModule {
 
   private static IsolatedStop checkFerryStop(TransitStopVertex stop, ProgressTracker progress) {
     progress.step(i -> LOG.info(i));
+
     if (stop.isConnectedToGraph()) {
       return null;
     } else {
@@ -101,6 +103,7 @@ public class StopConnectivityModule implements GraphBuilderModule {
 
     for (var state : spt.getAllStates()) {
       maxWalk_s = Math.max(maxWalk_s, state.getElapsedTimeSeconds());
+
       if (maxWalk_s > DURATION.toSeconds()) {
         allowsTenMinuteWalking = true;
         break;
@@ -108,6 +111,7 @@ public class StopConnectivityModule implements GraphBuilderModule {
     }
 
     progress.step(i -> LOG.info(i));
+
     if (allowsTenMinuteWalking) {
       return null;
     } else {

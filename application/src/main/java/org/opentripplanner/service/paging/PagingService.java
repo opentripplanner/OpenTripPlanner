@@ -66,6 +66,7 @@ public class PagingService {
     if (nextPageCursor == null) {
       this.nextPageCursor = pageCursorFactory().nextPageCursor();
     }
+
     return nextPageCursor;
   }
 
@@ -73,6 +74,7 @@ public class PagingService {
     if (previousPageCursor == null) {
       this.previousPageCursor = pageCursorFactory().previousPageCursor();
     }
+
     return previousPageCursor;
   }
 
@@ -81,6 +83,7 @@ public class PagingService {
     if (noSuccessfulTransitSearchPerformed()) {
       return null;
     }
+
     var edt = previousPageCursor().latestDepartureTime();
     var ldt = nextPageCursor().earliestDepartureTime();
 
@@ -171,6 +174,7 @@ public class PagingService {
     if (pageCursor == null) {
       return itinerariesSortOrder.isSortedForDepartAfterSearch();
     }
+
     return pageCursor.type().isNext();
   }
 
@@ -180,6 +184,7 @@ public class PagingService {
         pageCursor == null ? null : pageCursor.type()
       );
     }
+
     return pageCursorFactory;
   }
 
@@ -210,9 +215,11 @@ public class PagingService {
     if (raptorSearchWindowUsed == null) {
       throw new IllegalStateException("SearchWindow not set");
     }
+
     if (earliestDepartureTime == null) {
       throw new IllegalStateException("Earliest departure time not set");
     }
+
     if (pageCursorInput == null) {
       throw new IllegalStateException("Page cursor input not set");
     }

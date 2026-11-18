@@ -38,6 +38,7 @@ public record BicycleMaxDurations(
     if (maxDurationAllowAllModes == null && maxDuration == null && maxDurationAllowsCar == null) {
       throw new IllegalArgumentException("At least one bicycle max duration is required.");
     }
+
     requirePositiveIfSet("maxDurationAllowAllModes", maxDurationAllowAllModes);
     requirePositiveIfSet("maxDuration", maxDuration);
     requirePositiveIfSet("maxDurationAllowsCar", maxDurationAllowsCar);

@@ -152,33 +152,41 @@ class CallWrapperParsingTest {
 
   private static EstimatedCall estimatedCall(String stopRef, Integer order, Integer visitNumber) {
     var call = new EstimatedCall();
+
     if (stopRef != null) {
       var ref = new StopPointRefStructure();
       ref.setValue(stopRef);
       call.setStopPointRef(ref);
     }
+
     if (order != null) {
       call.setOrder(BigInteger.valueOf(order));
     }
+
     if (visitNumber != null) {
       call.setVisitNumber(BigInteger.valueOf(visitNumber));
     }
+
     return call;
   }
 
   private static RecordedCall recordedCall(String stopRef, Integer order, Integer visitNumber) {
     var call = new RecordedCall();
+
     if (stopRef != null) {
       var ref = new StopPointRefStructure();
       ref.setValue(stopRef);
       call.setStopPointRef(ref);
     }
+
     if (order != null) {
       call.setOrder(BigInteger.valueOf(order));
     }
+
     if (visitNumber != null) {
       call.setVisitNumber(BigInteger.valueOf(visitNumber));
     }
+
     return call;
   }
 }

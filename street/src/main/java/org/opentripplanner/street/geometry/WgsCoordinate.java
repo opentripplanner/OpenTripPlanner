@@ -70,6 +70,7 @@ public final class WgsCoordinate implements Serializable {
     if (latitude != null && longitude != null) {
       return new WgsCoordinate(latitude, longitude);
     }
+
     throw new IllegalArgumentException(
       "Both 'latitude' and 'longitude' must have a value or both must be 'null'."
     );
@@ -84,6 +85,7 @@ public final class WgsCoordinate implements Serializable {
         "Unable to calculate mean for an empty set of coordinates"
       );
     }
+
     if (coordinates.size() == 1) {
       return coordinates.iterator().next();
     }
@@ -238,9 +240,11 @@ public final class WgsCoordinate implements Serializable {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     WgsCoordinate other = (WgsCoordinate) o;
     return latitude == other.latitude && longitude == other.longitude;
   }

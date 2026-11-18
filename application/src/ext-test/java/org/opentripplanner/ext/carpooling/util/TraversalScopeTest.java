@@ -129,6 +129,7 @@ class TraversalScopeTest extends GraphRoutingTest {
         return edge;
       }
     }
+
     throw new AssertionError("The test graph has no edge matching the required shape");
   }
 }

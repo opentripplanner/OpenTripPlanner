@@ -87,9 +87,11 @@ public class OtpConfigLoader {
    */
   public BuildConfig loadBuildConfig() {
     JsonNode node = loadFromFile(BUILD_CONFIG_FILENAME);
+
     if (node.isMissingNode()) {
       return BuildConfig.DEFAULT;
     }
+
     return new BuildConfig(node, BUILD_CONFIG_FILENAME, true);
   }
 
@@ -100,17 +102,21 @@ public class OtpConfigLoader {
    */
   public RouterConfig loadRouterConfig() {
     JsonNode node = loadFromFile(ROUTER_CONFIG_FILENAME);
+
     if (node.isMissingNode()) {
       return RouterConfig.DEFAULT;
     }
+
     return new RouterConfig(node, ROUTER_CONFIG_FILENAME, true);
   }
 
   public DebugUiConfig loadDebugUiConfig() {
     JsonNode node = loadFromFile(DEBUG_UI_CONFIG_FILENAME);
+
     if (node.isMissingNode()) {
       return DebugUiConfig.DEFAULT;
     }
+
     return new DebugUiConfig(node, DEBUG_UI_CONFIG_FILENAME, true);
   }
 

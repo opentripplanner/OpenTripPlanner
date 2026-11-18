@@ -98,6 +98,7 @@ public class DebugRaptor implements Serializable {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     DebugRaptor that = (DebugRaptor) o;
     return (
       debugPathFromStopIndex == that.debugPathFromStopIndex &&
@@ -127,13 +128,17 @@ public class DebugRaptor implements Serializable {
     }
 
     var buf = new StringBuilder();
+
     for (int i = 0; i < stops.size(); ++i) {
       buf.append(stops.get(i));
+
       if (i > FIRST_STOP_INDEX && i == fromStopIndex) {
         buf.append("*");
       }
+
       buf.append(", ");
     }
+
     return buf.substring(0, buf.length() - 2);
   }
 }

@@ -47,15 +47,19 @@ public class DisposableEdgeCollection {
         graph.removeEdge(e, scope);
       }
     }
+
     Collection<Vertex> vertices = new ArrayList<>();
+
     for (Edge e : edges) {
       vertices.add(e.getFromVertex());
       vertices.add(e.getToVertex());
       graph.removeEdge(e);
     }
+
     for (Vertex v : vertices) {
       graph.removeIfUnconnected(v);
     }
+
     edges.clear();
   }
 

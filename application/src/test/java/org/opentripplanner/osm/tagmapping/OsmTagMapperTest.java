@@ -572,6 +572,7 @@ class OsmTagMapperTest {
   @ValueSource(strings = { "residential", "tertiary", "secondary", "primary" })
   void anyCyclewayIsSaferThanNone(String highway) {
     var none = bicycleSafety("highway=" + highway);
+
     for (var cycleway : List.of("lane", "shared_lane", "track")) {
       assertThat(bicycleSafety("highway=%s;cycleway=%s".formatted(highway, cycleway))).isLessThan(
         none
@@ -616,10 +617,12 @@ class OsmTagMapperTest {
 
   private static OsmWay wayWithTags(String tags) {
     var builder = OsmWay.of();
+
     for (var tag : tags.split(";")) {
       var keyValue = tag.split("=");
       builder.withTag(keyValue[0], keyValue[1]);
     }
+
     return builder.build();
   }
 

@@ -45,9 +45,11 @@ public class StopsCursor<T extends RaptorTripSchedule> {
 
   public boolean reachedOnStreet(int round, int stop) {
     var a = arrivals.get(round, stop);
+
     if (a == null) {
       return false;
     }
+
     return a.arrivedByAccessOnStreet() || a.arrivedByTransfer();
   }
 
@@ -119,6 +121,7 @@ public class StopsCursor<T extends RaptorTripSchedule> {
         return new Transfer<>(round, stop, arrival, this);
       }
     }
+
     // On on-board arrivals can always be used, we do not care what the *stopReachedOnBoard* is.
     if (arrival.arrivedByAccessOnBoard()) {
       return newAccessViewByExactArrivalTime(
@@ -129,6 +132,7 @@ public class StopsCursor<T extends RaptorTripSchedule> {
     } else if (arrival.arrivedByTransit()) {
       return new Transit<>(round, stop, arrival, this);
     }
+
     // Should never get here...
     throw new IllegalStateException("Unknown arrival: " + arrival);
   }
@@ -149,6 +153,7 @@ public class StopsCursor<T extends RaptorTripSchedule> {
     } else if (arrival.arrivedByTransit()) {
       return new Transit<>(round, stop, arrival, this);
     }
+
     // Should never get here...
     throw new IllegalStateException("Unknown arrival: " + arrival);
   }

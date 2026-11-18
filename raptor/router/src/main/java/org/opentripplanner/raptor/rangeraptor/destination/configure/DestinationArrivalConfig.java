@@ -110,6 +110,7 @@ public class DestinationArrivalConfig<T extends RaptorTripSchedule> {
     if (ctx.searchParams().timetable()) {
       return ParetoSetTime.USE_TIMETABLE;
     }
+
     return preferLatestDeparture
       ? ParetoSetTime.USE_DEPARTURE_TIME
       : ParetoSetTime.USE_ARRIVAL_TIME;

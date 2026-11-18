@@ -90,9 +90,11 @@ public class VertexCreationService {
     // for park and ride we will start in car mode and walk to the end vertex
     boolean parkAndRideDepart = streetMode == StreetMode.CAR_TO_PARK && type == LocationType.FROM;
     boolean onlyCarAvailable = streetMode == StreetMode.CAR;
+
     if (onlyCarAvailable || parkAndRideDepart) {
       nonTransitMode = TraverseMode.CAR;
     }
+
     return nonTransitMode;
   }
 

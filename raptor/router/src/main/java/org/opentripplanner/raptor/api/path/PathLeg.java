@@ -82,6 +82,7 @@ public interface PathLeg<T extends RaptorTripSchedule> {
     if (c1() < 0) {
       return c1();
     }
+
     return stream().mapToInt(PathLeg::c1).sum();
   }
 
@@ -185,12 +186,15 @@ public interface PathLeg<T extends RaptorTripSchedule> {
   @Nullable
   default TransitPathLeg<T> nextTransitLeg() {
     PathLeg<T> leg = nextLeg();
+
     while (!leg.isEgressLeg()) {
       if (leg.isTransitLeg()) {
         return leg.asTransitLeg();
       }
+
       leg = leg.nextLeg();
     }
+
     return null;
   }
 

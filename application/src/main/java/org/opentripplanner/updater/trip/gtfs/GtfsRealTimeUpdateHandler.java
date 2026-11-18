@@ -84,6 +84,7 @@ public class GtfsRealTimeUpdateHandler {
 
     for (var rawTripUpdate : updates) {
       UpdateSuccess result;
+
       try {
         if (fuzzyTripMatcher != null) {
           var trip = fuzzyTripMatcher.match(feedId, rawTripUpdate.getTrip());
@@ -112,6 +113,7 @@ public class GtfsRealTimeUpdateHandler {
     if (updateIncrementality == FULL_DATASET) {
       ResultLogger.logUpdateResult(feedId, "gtfs-rt-trip-updates", updateResult);
     }
+
     return updateResult;
   }
 

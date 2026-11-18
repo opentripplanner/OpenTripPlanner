@@ -45,9 +45,11 @@ public class SpeedIntegrationTest {
   @BeforeAll
   static void setup() {
     var dir = ClassLoader.getSystemResource("speedtest");
+
     if (dir == null) {
       throw new IllegalStateException("Unable to locate rootDir.");
     }
+
     model = buildNewPortlandGraph(false);
     model.index();
     regularTransferBuildRepository = TestServerContext.createRegularTransferBuildRepository(

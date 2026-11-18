@@ -46,9 +46,11 @@ public class CompositeUtil {
     if (list.isEmpty()) {
       return null;
     }
+
     if (list.size() == 1) {
       return list.getFirst();
     }
+
     return compositeFactory.apply(list);
   }
 }

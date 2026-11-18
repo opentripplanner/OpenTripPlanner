@@ -38,6 +38,7 @@ class ElevationEdgeRenderer implements EdgeVertexRenderer {
   @Override
   public Optional<VertexVisualAttributes> renderVertex(Vertex v) {
     var elevation = findElevationForVertex(v);
+
     if (elevation != null) {
       return Optional.of(
         new VertexVisualAttributes(colorPalette.getColor(elevation), elevation.toString())
@@ -61,13 +62,17 @@ class ElevationEdgeRenderer implements EdgeVertexRenderer {
 
         var list = new ArrayList<EdgeSegmentColor>();
         var profile = streetEdge.getElevationProfile();
+
         for (int i = 0; i < profile.size(); ++i) {
           var point = profile.getCoordinate(i);
+
           if (i != 0) {
             list.add(new EdgeSegmentColor(point.x / edgeLength, color));
           }
+
           color = colorPalette.getColor(point.y);
         }
+
         return list;
       } else {
         return List.of(new EdgeSegmentColor(1.0d, Color.GRAY));

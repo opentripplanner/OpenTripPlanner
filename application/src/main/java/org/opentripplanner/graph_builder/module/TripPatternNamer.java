@@ -71,6 +71,7 @@ public class TripPatternNamer implements GraphBuilderModule {
 
     /* Group TripPatterns by Route */
     Multimap<Route, TripPattern> patternsByRoute = ArrayListMultimap.create();
+
     for (TripPattern ttp : tableTripPatterns) {
       patternsByRoute.put(ttp.getRoute(), ttp);
     }
@@ -83,6 +84,7 @@ public class TripPatternNamer implements GraphBuilderModule {
       if (routeTripPatterns.stream().allMatch(tripPattern -> tripPattern.getName() != null)) {
         continue;
       }
+
       String routeName = route.getName();
 
       /* Simplest case: there's only one route variant, so we'll just give it the route's name. */
@@ -102,22 +104,28 @@ public class TripPatternNamer implements GraphBuilderModule {
         StopLocation end = pattern.lastStop();
         String headsign =
           pattern.getTripHeadsign() != null ? pattern.getTripHeadsign().toString() : null;
+
         if (headsign != null) {
           signs.put(headsign, pattern);
         }
+
         starts.put(start, pattern);
         ends.put(end, pattern);
+
         for (StopLocation stop : pattern.getStops()) {
           vias.put(stop, pattern);
         }
       }
+
       PATTERN: for (TripPattern pattern : routeTripPatterns) {
         if (pattern.getName() != null) {
           continue;
         }
+
         StringBuilder sb = new StringBuilder(routeName);
         String headsign =
           pattern.getTripHeadsign() != null ? pattern.getTripHeadsign().toString() : null;
+
         if (headsign != null && signs.get(headsign).size() == 1) {
           pattern.initName(sb.append(" ").append(headsign).toString());
           continue;
@@ -126,6 +134,7 @@ public class TripPatternNamer implements GraphBuilderModule {
         /* First try to name with destination. */
         var end = pattern.lastStop();
         sb.append(" to ").append(stopNameAndId(end));
+
         if (ends.get(end).size() == 1) {
           pattern.initName(sb.toString());
           // only pattern with this last stop
@@ -135,6 +144,7 @@ public class TripPatternNamer implements GraphBuilderModule {
         /* Then try to name with origin. */
         var start = pattern.firstStop();
         sb.append(" from ").append(stopNameAndId(start));
+
         if (starts.get(start).size() == 1) {
           pattern.initName(sb.toString());
           // only pattern with this first stop
@@ -146,6 +156,7 @@ public class TripPatternNamer implements GraphBuilderModule {
         Set<TripPattern> remainingPatterns = new HashSet<>(tripPatterns);
         // set intersection
         remainingPatterns.retainAll(ends.get(end));
+
         if (remainingPatterns.size() == 1) {
           pattern.initName(sb.toString());
           continue;
@@ -156,8 +167,10 @@ public class TripPatternNamer implements GraphBuilderModule {
           if (via.equals(start) || via.equals(end)) {
             continue;
           }
+
           Set<TripPattern> intersection = new HashSet<>(remainingPatterns);
           intersection.retainAll(vias.get(via));
+
           if (intersection.size() == 1) {
             sb.append(" via ").append(stopNameAndId(via));
             pattern.initName(sb.toString());
@@ -177,15 +190,18 @@ public class TripPatternNamer implements GraphBuilderModule {
             .map(TripTimes::getTrip)
             .ifPresent(value -> sb.append(" like trip ").append(value.getId()));
         }
+
         pattern.initName(sb.toString());
       }
     }
 
     if (LOG.isDebugEnabled()) {
       LOG.debug("Done generating unique names for stop patterns on each route.");
+
       for (Route route : patternsByRoute.keySet()) {
         Collection<TripPattern> routeTripPatterns = patternsByRoute.get(route);
         LOG.debug("Named {} patterns in route {}", routeTripPatterns.size(), route.getName());
+
         for (TripPattern pattern : routeTripPatterns) {
           LOG.debug("    {} ({} stops)", pattern.getName(), pattern.numberOfStops());
         }

@@ -62,12 +62,15 @@ public interface TransferPoint {
     if (point.isTripTransferPoint()) {
       return point.asTripTransferPoint().getTrip().getRoute();
     }
+
     if (point.isRouteStopTransferPoint()) {
       return point.asRouteStopTransferPoint().getRoute();
     }
+
     if (point.isRouteStationTransferPoint()) {
       return point.asRouteStationTransferPoint().getRoute();
     }
+
     return null;
   }
 

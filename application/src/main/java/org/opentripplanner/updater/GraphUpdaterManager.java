@@ -77,6 +77,7 @@ public class GraphUpdaterManager implements GraphUpdaterStatus {
    */
   private static <C> void setup(GraphUpdater<C> updater, WriteToGraphCallbacks callbacks) {
     var callback = callbacks.forDomain(updater.writeDomain());
+
     if (callback == null) {
       throw new IllegalArgumentException(
         "No WriteToGraphCallback configured for write domain %s (required by %s)".formatted(
@@ -85,6 +86,7 @@ public class GraphUpdaterManager implements GraphUpdaterStatus {
         )
       );
     }
+
     updater.setup(callback);
   }
 
@@ -101,8 +103,10 @@ public class GraphUpdaterManager implements GraphUpdaterStatus {
           LOG.error("Error while running updater {}:", updater.getClass().getName(), e);
         }
       };
+
       if (updater instanceof PollingGraphUpdater<?> pollingGraphUpdater) {
         LOG.info("Scheduling polling updater {}", updater);
+
         if (pollingGraphUpdater.runOnlyOnce()) {
           pollingUpdaterPool.schedule(runUpdater, 0, TimeUnit.SECONDS);
         } else {
@@ -118,6 +122,7 @@ public class GraphUpdaterManager implements GraphUpdaterStatus {
         nonPollingUpdaterPool.execute(runUpdater);
       }
     }
+
     reportReadinessForUpdaters();
   }
 
@@ -136,6 +141,7 @@ public class GraphUpdaterManager implements GraphUpdaterStatus {
   public void stop(boolean cancelRunningTasks) {
     // TODO: find a better way to stop these threads
     LOG.info("Stopping updater manager with {} updaters.", numberOfUpdaters());
+
     if (cancelRunningTasks) {
       pollingUpdaterPool.shutdownNow();
       nonPollingUpdaterPool.shutdownNow();
@@ -148,9 +154,11 @@ public class GraphUpdaterManager implements GraphUpdaterStatus {
       boolean ok =
         pollingUpdaterPool.awaitTermination(15, TimeUnit.SECONDS) &&
         nonPollingUpdaterPool.awaitTermination(15, TimeUnit.SECONDS);
+
       if (!ok) {
         LOG.warn("Timeout waiting for updaters to finish.");
       }
+
       shutdownGraphWriter.run();
     } catch (InterruptedException e) {
       LOG.warn("Interrupted while waiting for updaters to finish.");
@@ -159,6 +167,7 @@ public class GraphUpdaterManager implements GraphUpdaterStatus {
     for (GraphUpdater<?> updater : updaterList) {
       updater.teardown();
     }
+
     updaterList.clear();
     LOG.info("Stopped updater manager");
   }
@@ -186,9 +195,11 @@ public class GraphUpdaterManager implements GraphUpdaterStatus {
   public Map<Integer, String> getUpdaterDescriptions() {
     Map<Integer, String> ret = new TreeMap<>();
     int i = 0;
+
     for (GraphUpdater<?> updater : updaterList) {
       ret.put(i++, updater.toString());
     }
+
     return ret;
   }
 
@@ -196,6 +207,7 @@ public class GraphUpdaterManager implements GraphUpdaterStatus {
     if (id >= updaterList.size()) {
       return null;
     }
+
     return updaterList.get(id);
   }
 
@@ -240,6 +252,7 @@ public class GraphUpdaterManager implements GraphUpdaterStatus {
               );
               return;
             }
+
             //noinspection BusyWait
             Thread.sleep(1000);
           } catch (InterruptedException e) {

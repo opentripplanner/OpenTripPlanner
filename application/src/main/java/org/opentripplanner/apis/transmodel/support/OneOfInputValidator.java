@@ -44,6 +44,7 @@ public class OneOfInputValidator {
         )
       );
     }
+
     if (fieldsInInput.size() > 1) {
       throw new InvalidInputException(
         "Only one entry in '%s @oneOf' is allowed. Set: '%s'".formatted(
@@ -56,6 +57,7 @@ public class OneOfInputValidator {
     // This is not done in the "standard" validator, so if this is replaced by another validator
     // we should consider adding this validation.
     var field = fieldsInInput.getFirst();
+
     if (map.get(field) instanceof Collection<?> c) {
       if (c.isEmpty()) {
         throw new InvalidInputException(
@@ -63,6 +65,7 @@ public class OneOfInputValidator {
         );
       }
     }
+
     return field;
   }
 }

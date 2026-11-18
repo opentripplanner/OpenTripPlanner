@@ -26,6 +26,7 @@ public class EnumMapper {
     if (text == null) {
       return Optional.empty();
     }
+
     var name = text.toUpperCase().replace('-', '_');
     return Arrays.stream(type.getEnumConstants())
       .filter(it -> it.name().toUpperCase().equals(name))
@@ -47,6 +48,7 @@ public class EnumMapper {
   @SuppressWarnings("rawtypes")
   public static <T extends DocumentedEnum> String docEnumValueList(T[] enumValues) {
     var buf = new StringBuilder();
+
     for (T it : enumValues) {
       buf
         .append(" - `")
@@ -55,6 +57,7 @@ public class EnumMapper {
         .append(it.enumValueDescription().replace("\n", "\n   ").trim())
         .append("\n");
     }
+
     return buf.toString();
   }
 }

@@ -31,6 +31,7 @@ public class OsmRelationBuilder {
     if (key != null && value != null) {
       this.tags.put(key.toLowerCase(), value);
     }
+
     return this;
   }
 

@@ -39,12 +39,14 @@ class TransitFilterOldWayMapper {
     ) {
       return;
     }
+
     var selectorBuilders = new ArrayList<SelectRequest.Builder>();
 
     var whiteListedAgencies = new ArrayList<FeedScopedId>();
     callWith.argument("whiteListed.authorities", (Collection<String> authorities) ->
       whiteListedAgencies.addAll(idMapper.parseListNullSafe(authorities))
     );
+
     if (!whiteListedAgencies.isEmpty()) {
       selectorBuilders.add(SelectRequest.of().withAgencies(whiteListedAgencies));
     }
@@ -53,12 +55,14 @@ class TransitFilterOldWayMapper {
     callWith.argument("whiteListed.lines", (List<String> lines) ->
       whiteListedLines.addAll(idMapper.parseListNullSafe(lines))
     );
+
     if (!whiteListedLines.isEmpty()) {
       selectorBuilders.add(SelectRequest.of().withRoutes(whiteListedLines));
     }
 
     // Create modes filter for the request
     final var tModes = mapTransitModes(environment);
+
     if (tModes.isEmpty()) {
       transitBuilder.disable();
       return;
@@ -75,6 +79,7 @@ class TransitFilterOldWayMapper {
       callWith.argument("banned.authorities", (Collection<String> authorities) ->
         bannedAgencies.addAll(idMapper.parseListNullSafe(authorities))
       );
+
       if (!bannedAgencies.isEmpty()) {
         filterBuilder.addNot(SelectRequest.of().withAgencies(bannedAgencies).build());
       }
@@ -83,6 +88,7 @@ class TransitFilterOldWayMapper {
       callWith.argument("banned.lines", (List<String> lines) ->
         bannedLines.addAll(idMapper.parseListNullSafe(lines))
       );
+
       if (!bannedLines.isEmpty()) {
         filterBuilder.addNot(SelectRequest.of().withRoutes(bannedLines).build());
       }
@@ -96,10 +102,13 @@ class TransitFilterOldWayMapper {
    */
   private static List<MainAndSubMode> mapTransitModes(DataFetchingEnvironment environment) {
     final List<MainAndSubMode> tModes = new ArrayList<>();
+
     if (!GqlUtil.hasArgument(environment, "modes")) {
       return MainAndSubMode.all();
     }
+
     Map<String, Object> modesInput = environment.getArgument("modes");
+
     if (modesInput.get("transportModes") == null) {
       return MainAndSubMode.all();
     }
@@ -114,6 +123,7 @@ class TransitFilterOldWayMapper {
         var transportSubModes = (List<TransmodelTransportSubmode>) modeWithSubmodes.get(
           "transportSubModes"
         );
+
         if (transportSubModes != null) {
           for (TransmodelTransportSubmode submode : transportSubModes) {
             tModes.add(new MainAndSubMode(mainMode, SubMode.of(submode.getValue())));
@@ -123,6 +133,7 @@ class TransitFilterOldWayMapper {
         }
       }
     }
+
     return tModes;
   }
 
@@ -137,6 +148,7 @@ class TransitFilterOldWayMapper {
     if (selectors.isEmpty()) {
       return List.of(SelectRequest.of().withTransportModes(tModes).build());
     }
+
     return selectors
       .stream()
       .peek(it -> it.withTransportModes(tModes))

@@ -101,6 +101,7 @@ public class StateEditor {
       // check that time changes are coherent with edge traversal
       // direction
       double timeDelta = time_ms - backState.getTimeMilliseconds();
+
       if (traversingBackward ? timeDelta > 0 : timeDelta < 0) {
         throw new IllegalStateException(
           "Time was incremented the wrong direction during state editing, while traversing " +
@@ -108,6 +109,7 @@ public class StateEditor {
         );
       }
     }
+
     return new State(
       request,
       weight,
@@ -140,12 +142,14 @@ public class StateEditor {
         "A state's weight is being incremented by " + weight + " while traversing edge " + backEdge
       );
     }
+
     if (weight < 0) {
       throw new IllegalArgumentException(
         "A state's weight is being incremented by a negative amount while traversing edge " +
           backEdge
       );
     }
+
     this.weight += weight;
   }
 
@@ -160,6 +164,7 @@ public class StateEditor {
         "A state's time is being incremented by a negative amount while traversing edge " + backEdge
       );
     }
+
     this.time_ms += traversingBackward ? -milliseconds : milliseconds;
   }
 
@@ -174,6 +179,7 @@ public class StateEditor {
     if (length < 0) {
       throw new IllegalArgumentException("Traversal distance cannot be negative");
     }
+
     this.traversalDistance_m += length;
   }
 
@@ -205,6 +211,7 @@ public class StateEditor {
       stateData.currentGeofencingZones,
       arriveBy
     );
+
     if (newZones != null) {
       cloneStateDataAsNeeded();
       stateData.currentGeofencingZones = newZones;
@@ -261,6 +268,7 @@ public class StateEditor {
     if (stateData.committedNetworks.contains(network)) {
       return;
     }
+
     cloneStateDataAsNeeded();
     var newSet = new HashSet<>(stateData.committedNetworks);
     newSet.add(network);
@@ -292,6 +300,7 @@ public class StateEditor {
     boolean reverse
   ) {
     cloneStateDataAsNeeded();
+
     if (reverse) {
       stateData.vehicleRentalState = VehicleRentalState.BEFORE_RENTING;
       stateData.currentMode = TraverseMode.WALK;
@@ -315,6 +324,7 @@ public class StateEditor {
     boolean reverse
   ) {
     cloneStateDataAsNeeded();
+
     if (reverse) {
       stateData.mayKeepRentedVehicleAtDestination = mayKeep;
       stateData.vehicleRentalState = VehicleRentalState.BEFORE_RENTING;
@@ -340,6 +350,7 @@ public class StateEditor {
     boolean reverse
   ) {
     cloneStateDataAsNeeded();
+
     if (reverse) {
       stateData.mayKeepRentedVehicleAtDestination = false;
       stateData.vehicleRentalState = VehicleRentalState.RENTING_FROM_STATION;
@@ -365,6 +376,7 @@ public class StateEditor {
     boolean reverse
   ) {
     cloneStateDataAsNeeded();
+
     if (reverse) {
       stateData.mayKeepRentedVehicleAtDestination = false;
       stateData.vehicleRentalState = VehicleRentalState.RENTING_FLOATING;
@@ -414,6 +426,7 @@ public class StateEditor {
   public void setCarPickupState(CarPickupState carPickupState) {
     cloneStateDataAsNeeded();
     stateData.carPickupState = carPickupState;
+
     switch (carPickupState) {
       case WALK_TO_PICKUP, WALK_FROM_DROP_OFF -> stateData.currentMode = TraverseMode.WALK;
       case IN_CAR -> stateData.currentMode = TraverseMode.CAR;

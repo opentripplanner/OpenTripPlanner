@@ -186,17 +186,21 @@ class AddedTripBuilder {
     }
 
     FeedScopedId calServiceId = buffer.getOrCreateServiceIdForDate(serviceDate);
+
     if (calServiceId == null) {
       throw UpdateException.of(tripId, NO_START_DATE);
     }
 
     boolean isAddedRoute = false;
     Route route = entityResolver.resolveRoute(lineRef);
+
     if (route == null) {
       Agency agency = resolveAgency();
+
       if (agency == null) {
         throw UpdateException.of(tripId, CANNOT_RESOLVE_AGENCY);
       }
+
       route = createRoute(agency);
       isAddedRoute = true;
       LOG.info("Adding route {} to transitRepository.", route);
@@ -208,6 +212,7 @@ class AddedTripBuilder {
 
     // Create the "scheduled version" of the trip
     var aimedStopTimes = new ArrayList<StopTime>();
+
     for (int stopSequence = 0; stopSequence < calls.size(); stopSequence++) {
       StopTime stopTime = stopTimesMapper.createAimedStopTime(
         trip,
@@ -263,9 +268,11 @@ class AddedTripBuilder {
     }
 
     builder.withVehicleId(FeedScopedId.ofNullable(tripId.getFeedId(), vehicleRef));
+
     if (cancellation || stopPattern.isAllStopsNonRoutable()) {
       builder.withCanceled();
     }
+
     builder.withAdded();
 
     /* Validate */
@@ -357,6 +364,7 @@ class AddedTripBuilder {
     if (replacedRoute == null) {
       return null;
     }
+
     TransitMode replacedRouteMode = replacedRoute.getMode();
 
     if (replacedRouteMode != TransitMode.RAIL) {

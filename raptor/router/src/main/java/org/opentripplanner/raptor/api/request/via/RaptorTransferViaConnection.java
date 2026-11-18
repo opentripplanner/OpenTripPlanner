@@ -44,6 +44,7 @@ public final class RaptorTransferViaConnection extends ViaConnection {
     if (!super.sameTypeAndStop(right, getClass())) {
       return true;
     }
+
     var r = (RaptorTransferViaConnection) right;
     return toStop() != r.toStop() || durationInSeconds() < r.durationInSeconds() || c1() < r.c1();
   }
@@ -53,6 +54,7 @@ public final class RaptorTransferViaConnection extends ViaConnection {
     if (!super.sameTypeAndStop(other, getClass())) {
       return false;
     }
+
     var o = (RaptorTransferViaConnection) other;
     return toStop() == o.toStop() && durationInSeconds() == o.durationInSeconds() && c1() == o.c1();
   }

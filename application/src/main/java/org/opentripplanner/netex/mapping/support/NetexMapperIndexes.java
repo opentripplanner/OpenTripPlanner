@@ -89,11 +89,13 @@ public class NetexMapperIndexes {
     ReadOnlyHierarchicalMapById<DatedServiceJourney> datedServiceJourneys
   ) {
     Multimap<String, DatedServiceJourney> dsjBySJId = ArrayListMultimap.create();
+
     for (DatedServiceJourney dsj : datedServiceJourneys.localValues()) {
       // The validation step ensure no NPE occurs here
       String sjId = dsj.getJourneyRef().getValue().getRef();
       dsjBySJId.put(sjId, dsj);
     }
+
     return dsjBySJId;
   }
 }

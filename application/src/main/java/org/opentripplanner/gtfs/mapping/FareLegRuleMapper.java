@@ -79,9 +79,11 @@ class FareLegRuleMapper {
     org.onebusaway.gtfs.model.FareLegRule fareLegRule
   ) {
     final Integer distanceType = fareLegRule.getDistanceType();
+
     if (distanceType == null) {
       return null;
     }
+
     return switch (distanceType) {
       case 0 -> new FareDistance.Stops(
         optionalInt(fareLegRule.getMinDistance()).orElse(0),
@@ -96,6 +98,7 @@ class FareLegRuleMapper {
     if (id == null) {
       return List.of();
     }
+
     var groupId = idFactory.createId(id, "fare leg rule's timeframe group id");
     return timeframeMapper.findTimeframes(groupId);
   }

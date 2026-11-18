@@ -54,9 +54,11 @@ public final class TripStopTime<T extends RaptorTripSchedule> implements StopTim
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     TripStopTime<?> that = (TripStopTime<?>) o;
 
     return (

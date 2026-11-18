@@ -127,6 +127,7 @@ public final class TripPattern
           "Cannot provide both scheduled timetable and scheduled timetable builder"
         );
       }
+
       this.scheduledTimetable = builder.getScheduledTimetable();
     } else {
       this.scheduledTimetable = builder
@@ -564,6 +565,7 @@ public final class TripPattern
       var tripTimes = originalTripPattern.getScheduledTimetable().getRepresentativeTripTimes();
       return getTripHeadSignFromTripTimes(tripTimes);
     }
+
     return null;
   }
 }

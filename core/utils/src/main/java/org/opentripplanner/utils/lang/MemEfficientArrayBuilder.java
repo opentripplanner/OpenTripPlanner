@@ -46,10 +46,12 @@ public final class MemEfficientArrayBuilder<T> {
       if (value == original[index]) {
         return this;
       }
+
       array = Arrays.copyOf(original, original.length);
     } else if (value == array[index]) {
       return this;
     }
+
     array[index] = value;
     return this;
   }
@@ -87,6 +89,7 @@ public final class MemEfficientArrayBuilder<T> {
     if (isNotModified()) {
       return original;
     }
+
     return Arrays.equals(candidate, array) ? candidate : array;
   }
 

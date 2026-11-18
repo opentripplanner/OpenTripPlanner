@@ -121,9 +121,11 @@ public sealed class Cost implements Serializable, Comparable<Cost> permits Norma
     if (this == o) {
       return true;
     }
+
     if (o == null) {
       return false;
     }
+
     return o instanceof Cost c ? value == c.value : false;
   }
 

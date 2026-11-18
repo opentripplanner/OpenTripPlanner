@@ -59,11 +59,13 @@ public class TokenDefinitionBuilder {
    */
   public TokenDefinitionBuilder deprecate(String fieldName) {
     int index = indexOfField(fieldName);
+
     if (index < 0) {
       throw new IllegalArgumentException(
         "The field '" + fieldName + "' does not exist! Deprecation failed."
       );
     }
+
     fields.set(index, fields.get(index).deprecate());
     return this;
   }
@@ -74,6 +76,7 @@ public class TokenDefinitionBuilder {
         return i;
       }
     }
+
     return -1;
   }
 

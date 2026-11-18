@@ -26,9 +26,11 @@ class InvalidTripIdTest {
     var env = TransitTestEnvironment.of().build();
     var rt = GtfsRtTestHelper.of(env);
     var tripDescriptorBuilder = GtfsRealtime.TripDescriptor.newBuilder();
+
     if (tripId != null) {
       tripDescriptorBuilder.setTripId(tripId);
     }
+
     tripDescriptorBuilder.setScheduleRelationship(SCHEDULED);
     var tripUpdateBuilder = GtfsRealtime.TripUpdate.newBuilder();
 

@@ -116,9 +116,11 @@ public class WheelchairRequest {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     WheelchairRequest that = (WheelchairRequest) o;
     return (
       Double.compare(that.inaccessibleStreetReluctance, inaccessibleStreetReluctance) == 0 &&

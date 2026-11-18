@@ -63,9 +63,11 @@ public class Token {
   public <T extends Enum<T>> Optional<T> getEnum(String fieldName, Class<T> enumClass) {
     try {
       String value = (String) get(fieldName, TokenType.ENUM);
+
       if (value == null) {
         return Optional.empty();
       }
+
       return Optional.of(Enum.valueOf(enumClass, value));
     } catch (IllegalArgumentException ignore) {
       return Optional.empty();

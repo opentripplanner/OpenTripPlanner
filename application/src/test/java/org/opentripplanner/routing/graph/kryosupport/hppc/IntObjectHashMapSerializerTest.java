@@ -50,6 +50,7 @@ class IntObjectHashMapSerializerTest {
   void serializedFormIsIndependentOfIterationOrder() {
     // HPPC containers iterate in a per-instance order, so each instance has a different order.
     var expected = write(map(5, 3, 9, 1, 7, 100, 200, 300));
+
     for (int i = 0; i < 20; i++) {
       assertArrayEquals(expected, write(map(300, 200, 100, 7, 1, 9, 3, 5)));
     }
@@ -57,9 +58,11 @@ class IntObjectHashMapSerializerTest {
 
   private static IntObjectHashMap<String> map(int... keys) {
     var map = new IntObjectHashMap<String>();
+
     for (int key : keys) {
       map.put(key, "v" + key);
     }
+
     return map;
   }
 }

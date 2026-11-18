@@ -31,6 +31,7 @@ public class TaxiServiceModule {
     if (OTPFeature.TaxiRouting.isOff() || taxiRepository == null) {
       return null;
     }
+
     return new DefaultTaxiService(
       taxiRepository.getRoutes(),
       graph,

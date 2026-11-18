@@ -35,9 +35,11 @@ public class CarParkImpl implements GraphQLDataFetchers.GraphQLCarPark {
   public DataFetcher<Integer> maxCapacity() {
     return environment -> {
       var availability = getSource(environment).getCapacity();
+
       if (availability == null) {
         return null;
       }
+
       return availability.getCarSpaces();
     };
   }
@@ -62,9 +64,11 @@ public class CarParkImpl implements GraphQLDataFetchers.GraphQLCarPark {
   public DataFetcher<Integer> spacesAvailable() {
     return environment -> {
       var availability = getSource(environment).getAvailability();
+
       if (availability == null) {
         return null;
       }
+
       return availability.getCarSpaces();
     };
   }

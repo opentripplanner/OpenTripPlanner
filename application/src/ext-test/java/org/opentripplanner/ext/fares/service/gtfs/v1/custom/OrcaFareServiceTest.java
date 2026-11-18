@@ -110,6 +110,7 @@ public class OrcaFareServiceTest {
       // Collect all valid offers for this leg
       for (var offer : legProducts) {
         var product = offer.fareProduct();
+
         if (
           product.category().name().equals(expectedCategoryName) &&
           product.medium().name().equals(expectedMediumName) &&
@@ -141,6 +142,7 @@ public class OrcaFareServiceTest {
 
   private static String getRiderCategoryName(FareType fareType) {
     var splitFareType = fareType.toString().split("electronic");
+
     if (splitFareType.length > 1) {
       return splitFareType[1].toLowerCase();
     } else {
@@ -686,6 +688,7 @@ public class OrcaFareServiceTest {
     calculateFare(rides, fareType, metroFare.plus(monorailFare.times(2)));
 
     var fares = orcaFareService.calculateFaresForType(USD, fareType, rides, null);
+
     for (var monorailRide : rides.subList(1, rides.size())) {
       var offers = fares.getLegProducts().get(monorailRide);
       assertEquals(1, offers.size());
@@ -912,9 +915,11 @@ public class OrcaFareServiceTest {
 
     FeedScopedId routeFeedScopeId = new FeedScopedId(agencyId, routeId);
     NonLocalizedString longName = null;
+
     if (routeLongName != null) {
       longName = new NonLocalizedString(routeLongName);
     }
+
     Route route = Route.of(routeFeedScopeId)
       .withAgency(agency)
       .withShortName(shortName)
@@ -950,6 +955,7 @@ public class OrcaFareServiceTest {
       ) {
         return Optional.of(ZERO_USD);
       }
+
       return Optional.of(DEFAULT_TEST_RIDE_PRICE);
     }
   }

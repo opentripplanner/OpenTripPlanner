@@ -43,6 +43,7 @@ public class PlannerErrorMapper {
         } else {
           throw new IllegalArgumentException();
         }
+
         break;
       case NO_STOPS_IN_RANGE:
         api = new PlannerError(Message.LOCATION_NOT_ACCESSIBLE);

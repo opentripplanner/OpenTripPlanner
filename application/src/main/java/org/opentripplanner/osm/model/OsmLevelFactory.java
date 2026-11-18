@@ -41,6 +41,7 @@ public class OsmLevelFactory {
     } else if (entity.hasTag("layer")) {
       return createLevelListFromTag(entity.getTag("layer"), null, OsmLevelSource.LAYER_TAG, entity);
     }
+
     return List.of();
   }
 
@@ -53,8 +54,10 @@ public class OsmLevelFactory {
     List<OsmLevel> levels;
 
     String[] levelArray = levelTag.split(";");
+
     if (nameTag != null) {
       String[] nameArray = nameTag.split(";");
+
       // If the levelTag and nameTag contain multi-level info, the amount of level names in the
       // nameTag needs to equal the amount of levels in the levelTag.
       // Otherwise the nameTag data won't be used because the names can't be reliably mapped.
@@ -84,6 +87,7 @@ public class OsmLevelFactory {
         return false;
       }
     }
+
     return true;
   }
 
@@ -93,11 +97,13 @@ public class OsmLevelFactory {
     OsmLevelSource source
   ) {
     List<OsmLevel> levels = new ArrayList<>();
+
     if (nameArray != null) {
       for (int i = 0; i < levelArray.length; i++) {
         levels.add(createOsmLevelFromTagSubstrings(levelArray[i], nameArray[i], source));
       }
     }
+
     return levels;
   }
 
@@ -106,9 +112,11 @@ public class OsmLevelFactory {
     OsmLevelSource source
   ) {
     List<OsmLevel> levels = new ArrayList<>();
+
     for (String level : levelArray) {
       levels.add(createOsmLevelFromTagSubstrings(level, null, source));
     }
+
     return levels;
   }
 
@@ -123,6 +131,7 @@ public class OsmLevelFactory {
   ) {
     try {
       Double level = Double.parseDouble(levelString);
+
       if (nameString != null) {
         return new OsmLevel(level, nameString, source);
       } else {

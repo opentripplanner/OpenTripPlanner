@@ -135,6 +135,7 @@ public class GtfsContextBuilder {
     if (calendarService == null) {
       calendarService = new CalendarServiceImpl(transitBuilder.buildCalendarServiceData());
     }
+
     return calendarService;
   }
 
@@ -142,6 +143,7 @@ public class GtfsContextBuilder {
     if (deduplicator == null) {
       deduplicator = new Deduplicator();
     }
+
     return deduplicator;
   }
 

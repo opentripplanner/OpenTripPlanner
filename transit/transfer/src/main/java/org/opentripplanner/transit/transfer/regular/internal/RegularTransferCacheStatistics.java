@@ -96,12 +96,15 @@ abstract class RegularTransferCacheStatistics {
     @Override
     void record(AbstractUserPreferences<?> key) {
       var counter = counters.get(key);
+
       if (counter == null) {
         if (counters.size() >= capacity) {
           makeRoom();
         }
+
         counter = counters.computeIfAbsent(key, k -> new Counter());
       }
+
       counter.hits.increment();
     }
 

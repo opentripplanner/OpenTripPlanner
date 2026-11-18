@@ -28,6 +28,7 @@ public class RemoveFilter implements ItineraryListFilter {
   @Override
   public List<Itinerary> filter(List<Itinerary> itineraries) {
     List<Itinerary> filterInput;
+
     if (flagger.skipAlreadyFlaggedItineraries()) {
       filterInput = itineraries
         .stream()

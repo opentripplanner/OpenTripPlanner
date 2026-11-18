@@ -93,6 +93,7 @@ public class McMaxLimitFilter implements RemoveItineraryFlagger {
     if (itineraries.size() <= minNumItineraries) {
       return List.of();
     }
+
     var state = new State(itineraries, comparators);
     state.findAllSingleItemGroupsAndAddTheItemToTheResult();
     state.findTheBestItemsUntilAllGroupsAreRepresentedInTheResult();

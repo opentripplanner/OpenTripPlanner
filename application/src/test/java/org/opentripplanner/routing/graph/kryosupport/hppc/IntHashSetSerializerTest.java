@@ -50,11 +50,14 @@ class IntHashSetSerializerTest {
   void serializedFormIsIndependentOfIterationOrder() {
     // HPPC containers iterate in a per-instance order, so each instance has a different order.
     var expected = write(IntHashSet.from(5, 3, 9, 1, 7, 100, 200, 300));
+
     for (int i = 0; i < 20; i++) {
       var set = new IntHashSet();
+
       for (int v : new int[] { 300, 200, 100, 7, 1, 9, 3, 5 }) {
         set.add(v);
       }
+
       assertArrayEquals(expected, write(set));
     }
   }

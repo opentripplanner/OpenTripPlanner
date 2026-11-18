@@ -77,6 +77,7 @@ public class RaptorModuleTestCaseFactory {
         it.withRequestAdditions(requestAdditions);
       }
     }
+
     return cases.stream().map(RaptorModuleTestCase.Builder::build).toList();
   }
 }

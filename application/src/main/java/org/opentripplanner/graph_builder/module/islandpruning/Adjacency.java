@@ -21,17 +21,21 @@ class Adjacency {
    */
   Adjacency(int vertexCount, IntArrayList... edgeLists) {
     offsets = new int[vertexCount + 1];
+
     for (var edges : edgeLists) {
       for (int i = 0; i < edges.size(); i++) {
         offsets[edges.get(i) + 1]++;
       }
     }
+
     for (int v = 0; v < vertexCount; v++) {
       offsets[v + 1] += offsets[v];
     }
+
     targets = new int[offsets[vertexCount]];
     int[] next = new int[vertexCount];
     System.arraycopy(offsets, 0, next, 0, vertexCount);
+
     for (var edges : edgeLists) {
       for (int i = 0; i < edges.size(); i += 2) {
         int from = edges.get(i);

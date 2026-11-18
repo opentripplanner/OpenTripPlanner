@@ -136,10 +136,12 @@ class GtfsWarmupQueryExecutor implements WarmupQueryStrategy {
       .build();
 
     var result = graphQL.execute(input);
+
     if (!result.getErrors().isEmpty()) {
       LOG.warn("Warmup query had GraphQL errors: {}", result.getErrors());
       return false;
     }
+
     return true;
   }
 

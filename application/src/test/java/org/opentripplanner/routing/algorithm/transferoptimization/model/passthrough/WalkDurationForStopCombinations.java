@@ -35,6 +35,7 @@ class WalkDurationForStopCombinations {
         stopCost[i] += passThroughPointExtraCost;
       }
     }
+
     return this;
   }
 

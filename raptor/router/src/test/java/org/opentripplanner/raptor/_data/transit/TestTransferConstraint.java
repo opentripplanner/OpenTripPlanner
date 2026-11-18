@@ -68,9 +68,11 @@ public class TestTransferConstraint implements Serializable, RaptorTransferConst
     if (this == o) {
       return true;
     }
+
     if (!(o instanceof final TestTransferConstraint that)) {
       return false;
     }
+
     return type == that.type;
   }
 

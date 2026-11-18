@@ -101,6 +101,7 @@ public final class RangeRaptor<T extends RaptorTripSchedule> implements RaptorRo
       // depart later, because the arrival time given departure at time t is upper-bounded by
       // the arrival time given departure at minute t + 1.
       final IntIterator it = calculator.rangeRaptorMinutes();
+
       while (it.hasNext()) {
         iterationDepartureTime = it.next();
         runRaptorForMinute(iterationDepartureTime);
@@ -110,6 +111,7 @@ public final class RangeRaptor<T extends RaptorTripSchedule> implements RaptorRo
       // which falls outside the search-window due to the added time-penalty.
       if (!calculator.oneIterationOnly()) {
         final IntIterator as = accessPaths.iterateOverPathsWithPenalty(iterationDepartureTime);
+
         while (as.hasNext()) {
           iterationDepartureTime = as.next();
           runRaptorForMinute(iterationDepartureTime);
@@ -157,6 +159,7 @@ public final class RangeRaptor<T extends RaptorTripSchedule> implements RaptorRo
     if (round() < minNumberOfRounds) {
       return true;
     }
+
     return worker.hasMoreRounds() && roundTracker.hasMoreRounds();
   }
 

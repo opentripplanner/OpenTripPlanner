@@ -110,6 +110,7 @@ public interface TransitCalculator<T extends RaptorTripSchedule> extends TimeCal
     if (egressPath.hasRides()) {
       departureTime = calculator.plusDuration(departureTime, transferSlack);
     }
+
     int timeShiftedDepartureTime = calculator.searchForward()
       ? egressPath.earliestDepartureTime(departureTime)
       : egressPath.latestArrivalTime(departureTime);
@@ -117,6 +118,7 @@ public interface TransitCalculator<T extends RaptorTripSchedule> extends TimeCal
     if (timeShiftedDepartureTime == TIME_NOT_SET) {
       return TIME_NOT_SET;
     }
+
     return includeTimeShift ? timeShiftedDepartureTime : departureTime;
   }
 }

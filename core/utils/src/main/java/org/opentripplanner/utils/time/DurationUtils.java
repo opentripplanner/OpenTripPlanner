@@ -45,6 +45,7 @@ public class DurationUtils {
       buf.append("-");
       timeMilliseconds = -timeMilliseconds;
     }
+
     int millis = (int) timeMilliseconds % THOUSAND;
     int time = (int) (timeMilliseconds / THOUSAND);
     int sec = time % 60;
@@ -57,18 +58,23 @@ public class DurationUtils {
     if (day != 0) {
       buf.append(day).append('d');
     }
+
     if (hour != 0) {
       buf.append(hour).append('h');
     }
+
     if (min != 0) {
       buf.append(min).append('m');
     }
+
     if (sec != 0) {
       buf.append(sec).append('s');
     }
+
     if (millis != 0) {
       buf.append(millis).append("ms");
     }
+
     return buf.length() == 0 ? "0s" : buf.toString();
   }
 
@@ -104,6 +110,7 @@ public class DurationUtils {
     if (duration.matches("-?\\d+")) {
       return Duration.of(Integer.parseInt(duration), unit);
     }
+
     return duration(duration);
   }
 
@@ -113,8 +120,10 @@ public class DurationUtils {
    */
   public static Duration duration(String duration) {
     var d = duration.toUpperCase();
+
     if (!(d.startsWith("P") || d.startsWith("-P"))) {
       int pos = d.indexOf('D') + 1;
+
       if (pos > 0) {
         var days = d.substring(0, pos);
         d = pos == d.length() ? "P" + days : "P" + days + "T" + d.substring(pos);
@@ -122,6 +131,7 @@ public class DurationUtils {
         d = "PT" + d;
       }
     }
+
     try {
       return Duration.parse(d);
     } catch (DateTimeParseException e) {
@@ -144,6 +154,7 @@ public class DurationUtils {
     if (duration == null || duration.isBlank()) {
       return Optional.empty();
     }
+
     var s = duration.trim();
 
     return Optional.of(
@@ -162,6 +173,7 @@ public class DurationUtils {
     if (durations == null || durations.isBlank()) {
       return List.of();
     }
+
     return Arrays.stream(durations.split("[,;\\s]+"))
       .map(DurationUtils::duration)
       .collect(Collectors.toList());
@@ -171,15 +183,19 @@ public class DurationUtils {
     if (timeMs == 0) {
       return "0 seconds";
     }
+
     if (timeMs == 1000) {
       return "1 second";
     }
+
     if (timeMs < 100) {
       return msToSecondsStr("%.3f", timeMs);
     }
+
     if (timeMs < 995) {
       return msToSecondsStr("%.2f", timeMs);
     }
+
     if (timeMs < 9950) {
       return msToSecondsStr("%.1f", timeMs);
     } else {
@@ -189,9 +205,11 @@ public class DurationUtils {
 
   public static Duration requireNonNegative(Duration value) {
     Objects.requireNonNull(value);
+
     if (value.isNegative()) {
       throw new IllegalArgumentException("Duration can't be negative: " + value);
     }
+
     return value;
   }
 
@@ -202,11 +220,13 @@ public class DurationUtils {
    */
   public static Duration requirePositive(Duration value, String subject) {
     Objects.requireNonNull(value);
+
     if (value.isZero() || value.isNegative()) {
       throw new IllegalArgumentException(
         "Duration %s must be positive: %s".formatted(subject, value)
       );
     }
+
     return value;
   }
 
@@ -217,11 +237,13 @@ public class DurationUtils {
    */
   public static Duration requireNonNegative(Duration value, String subject) {
     Objects.requireNonNull(value);
+
     if (value.isNegative()) {
       throw new IllegalArgumentException(
         "Duration %s can't be negative: %s".formatted(subject, value)
       );
     }
+
     return value;
   }
 
@@ -232,6 +254,7 @@ public class DurationUtils {
    */
   public static Duration requireNonNegative(Duration value, Duration maxLimit, String subject) {
     requireNonNegative(value, subject);
+
     if (value.compareTo(maxLimit) >= 0) {
       throw new IllegalArgumentException(
         "Duration %s can't be longer or equals too %s: %s".formatted(
@@ -241,6 +264,7 @@ public class DurationUtils {
         )
       );
     }
+
     return value;
   }
 

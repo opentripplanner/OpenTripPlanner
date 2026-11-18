@@ -114,6 +114,7 @@ class StopMapper {
         return true;
       }
     }
+
     return false;
   }
 

@@ -118,11 +118,14 @@ public class StreetPathToLegsMapper {
     List<Leg> legs = new ArrayList<>();
     WalkStep previousStep = null;
     var subPaths = slicePath(path);
+
     if (subPaths.isEmpty()) {
       return List.of();
     }
+
     var delay =
       startTime != null ? Duration.between(subPaths.getFirst().startTime(), startTime) : null;
+
     for (var subPath : subPaths) {
       if (
         OTPFeature.FlexRouting.isOn() && subPath.states().get(1).backEdge instanceof FlexTripEdge
@@ -131,16 +134,19 @@ public class StreetPathToLegsMapper {
         previousStep = null;
         continue;
       }
+
       StreetLeg leg = generateLeg(subPath, previousStep, viaLocations, delay);
       legs.add(leg);
 
       List<WalkStep> walkSteps = leg.listWalkSteps();
+
       if (!walkSteps.isEmpty()) {
         previousStep = walkSteps.getLast();
       } else {
         previousStep = null;
       }
     }
+
     return legs;
   }
 
@@ -152,6 +158,7 @@ public class StreetPathToLegsMapper {
    */
   private static List<StreetPath> slicePath(StreetPath streetPath) {
     var states = streetPath.states();
+
     // Trivial case
     if (states.stream().allMatch(state -> state.getBackMode() == null)) {
       return List.of();
@@ -345,6 +352,7 @@ public class StreetPathToLegsMapper {
 
     if (firstState.isRentingVehicle()) {
       String vehicleRentalNetwork = firstState.getVehicleRentalNetwork();
+
       if (vehicleRentalNetwork != null) {
         leg.withVehicleRentalNetwork(vehicleRentalNetwork);
       }
@@ -357,6 +365,7 @@ public class StreetPathToLegsMapper {
     if (delay != null) {
       return state.getTime().atZone(timeZone).plus(delay);
     }
+
     return state.getTime().atZone(timeZone);
   }
 }

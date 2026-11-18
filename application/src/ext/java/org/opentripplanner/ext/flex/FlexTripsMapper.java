@@ -32,6 +32,7 @@ public class FlexTripsMapper {
 
     for (Trip trip : stopTimesByTrip.keys()) {
       var stopTimes = stopTimesByTrip.get(trip);
+
       if (UnscheduledTrip.isUnscheduledTrip(stopTimes)) {
         var timePenalty = builder.getFlexTimePenalty().getOrDefault(trip, TimePenalty.NONE);
         result.add(
@@ -67,6 +68,7 @@ public class FlexTripsMapper {
       //noinspection Convert2MethodRef
       progress.step(m -> LOG.info(m));
     }
+
     LOG.info(progress.completeMessage());
     LOG.info("Done creating flex trips. Created a total of {} trips.", result.size());
     return result;

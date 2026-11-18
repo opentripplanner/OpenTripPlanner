@@ -91,6 +91,7 @@ public class WheelchairCostCalculator<T extends DefaultTripSchedule> implements
         case NOT_POSSIBLE -> RaptorCostConverter.toRaptorCost(requirements.inaccessibleCost());
       };
     }
+
     return costIndex;
   }
 }

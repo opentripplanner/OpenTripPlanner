@@ -127,6 +127,7 @@ public class TransitGroupPriorityService {
     if (!enabled) {
       return baseGroupId;
     }
+
     for (var it : agencyMatchersIds) {
       if (it.matcher().match(entity)) {
         var agencyId = entity.agencyId();
@@ -136,6 +137,7 @@ public class TransitGroupPriorityService {
           groupId = nextGroupId();
           it.ids.put(agencyId, groupId);
         }
+
         return groupId;
       }
     }
@@ -145,6 +147,7 @@ public class TransitGroupPriorityService {
         return it.groupId();
       }
     }
+
     // Fallback to base-group-id
     return baseGroupId;
   }

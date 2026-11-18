@@ -47,6 +47,7 @@ public record InsertionCandidate(
         "pickupPosition must be >= 1 (pickup at trip origin is invalid); got " + pickupPosition
       );
     }
+
     if (dropoffPosition <= pickupPosition) {
       throw new IllegalArgumentException(
         "dropoffPosition (" +
@@ -94,6 +95,7 @@ public record InsertionCandidate(
     if (pickupPosition == 0) {
       return List.of();
     }
+
     return routeSegments.subList(0, pickupPosition);
   }
 
@@ -123,6 +125,7 @@ public record InsertionCandidate(
     if (dropoffPosition >= routeSegments.size()) {
       return List.of();
     }
+
     return routeSegments.subList(dropoffPosition, routeSegments.size());
   }
 

@@ -38,14 +38,18 @@ public class SemanticHash {
     Base64.Encoder encoder = Base64.getUrlEncoder().withoutPadding();
     StringBuilder sb = new StringBuilder(50);
     sb.append(encoder.encodeToString(forStopPattern(tripPattern, murmur).asBytes()));
+
     if (trip != null) {
       var tripTimes = tripPattern.getScheduledTimetable().getTripTimes(trip);
+
       if (tripTimes == null) {
         return null;
       }
+
       sb.append(':');
       sb.append(encoder.encodeToString(forTripTimes(tripTimes, murmur).asBytes()));
     }
+
     return sb.toString();
   }
 
@@ -60,18 +64,21 @@ public class SemanticHash {
     Hasher hasher = hashFunction.newHasher();
     var stops = tripPattern.getStops();
     int size = stops.size();
+
     for (StopLocation stop : stops) {
       // Truncate the lat and lon to 6 decimal places in case they move slightly between
       // feed versions
       hasher.putLong((long) (stop.getLat() * 1000000));
       hasher.putLong((long) (stop.getLon() * 1000000));
     }
+
     // Use hops rather than stops because boarding at stop 0 and alight at last stop are
     // not important and have changed between OTP versions.
     for (int hop = 0; hop < size - 1; hop++) {
       hasher.putInt(tripPattern.getBoardType(hop).ordinal());
       hasher.putInt(tripPattern.getAlightType(hop + 1).ordinal());
     }
+
     return hasher.hash();
   }
 
@@ -85,10 +92,12 @@ public class SemanticHash {
    */
   private static HashCode forTripTimes(TripTimes<?> tripTimes, final HashFunction hashFunction) {
     final Hasher hasher = hashFunction.newHasher();
+
     for (int hop = 0; hop < tripTimes.getNumStops() - 1; hop++) {
       hasher.putInt(tripTimes.getScheduledDepartureTime(hop));
       hasher.putInt(tripTimes.getScheduledArrivalTime(hop + 1));
     }
+
     return hasher.hash();
   }
 }

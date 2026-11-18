@@ -40,12 +40,15 @@ public class TwoWayLinearSearch {
     if (lowerBound >= upperBound) {
       return OptionalInt.empty();
     }
+
     if (startIndex < lowerBound) {
       startIndex = lowerBound;
     }
+
     if (startIndex >= upperBound) {
       startIndex = upperBound - 1;
     }
+
     if (test.apply(startIndex)) {
       return OptionalInt.of(startIndex);
     }
@@ -57,12 +60,14 @@ public class TwoWayLinearSearch {
     for (int offset = 1; offset <= size; ++offset) {
       // Forward search
       int i = startIndex + offset;
+
       if (test.apply(i)) {
         return OptionalInt.of(i);
       }
 
       // Backward search
       i = startIndex - offset;
+
       if (test.apply(i)) {
         return OptionalInt.of(i);
       }

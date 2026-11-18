@@ -169,6 +169,7 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
         } catch (IllegalStateException e) {
           subscriber.stopAsync();
         }
+
         Thread.sleep(reconnectPeriod.toMillis());
       }
     } catch (InterruptedException ie) {
@@ -188,6 +189,7 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
    */
   private static String buildSubscriptionId() {
     String hostname = System.getenv("HOSTNAME");
+
     if (hostname == null || hostname.isEmpty()) {
       return SUBSCRIPTION_PREFIX + "otp-" + UUID.randomUUID();
     } else {
@@ -251,11 +253,13 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
    */
   private Optional<ServiceDelivery> serviceDelivery(ByteString data) {
     Siri siri;
+
     try {
       siri = SiriXml.parseXml(data.newInput());
     } catch (XMLStreamException | JAXBException e) {
       throw new RuntimeException(e);
     }
+
     return Optional.ofNullable(siri.getServiceDelivery());
   }
 
@@ -317,6 +321,7 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
         LOG.info("Stopping SIRI-ET PubSub subscriber '{}'.", subscriptionName);
         subscriber.stopAsync();
       }
+
       deleteSubscription();
     });
   }
@@ -345,6 +350,7 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
 
   private void logPubsubMessage(ServiceDelivery serviceDelivery) {
     int numberOfUpdatedTrips = 0;
+
     try {
       numberOfUpdatedTrips = serviceDelivery
         .getEstimatedTimetableDeliveries()
@@ -356,6 +362,7 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
     } catch (Exception e) {
       //ignore
     }
+
     long numberOfUpdates = UPDATE_COUNTER.addAndGet(numberOfUpdatedTrips);
     long numberOfMessages = MESSAGE_COUNTER.incrementAndGet();
 

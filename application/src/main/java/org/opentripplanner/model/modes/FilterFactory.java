@@ -28,6 +28,7 @@ class FilterFactory {
     if (mode.getReplacement() != ReplacementRequirement.IGNORED) {
       return new AllowNarrowedTransitModeFilter(mode);
     }
+
     if (mode.getSubMode() == null) {
       return new AllowMainModeFilter(mode.getMode());
     } else {
@@ -73,6 +74,7 @@ class FilterFactory {
     } else if (mainModeFilters.size() > 1) {
       result.add(new AllowMainModesFilter(mainModeFilters));
     }
+
     // else ignore empty list
 
     var subModeFiltersByMainMode = stream(map, AllowMainAndSubModeFilter.class).collect(

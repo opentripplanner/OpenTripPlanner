@@ -57,10 +57,12 @@ class OsmParser extends BinaryParser {
   // we implement our own.
   public String internalize(String s) {
     String fromTable = stringTable.get(s);
+
     if (fromTable == null) {
       stringTable.put(s, s);
       return s;
     }
+
     return fromTable;
   }
 
@@ -76,6 +78,7 @@ class OsmParser extends BinaryParser {
     if (nextDataBlockIndex > 0) {
       blockContentKnown = true;
     }
+
     nextDataBlockIndex = 0;
     this.parsePhase = phase;
   }
@@ -85,6 +88,7 @@ class OsmParser extends BinaryParser {
     if ("OSMData".equals(block.getType())) {
       return skipDataBlock(nextDataBlockIndex++);
     }
+
     return super.skipBlock(block);
   }
 
@@ -92,18 +96,22 @@ class OsmParser extends BinaryParser {
   public void parse(Osmformat.PrimitiveBlock block) {
     if (!blockContentKnown) {
       int index = nextParsedBlockIndex++;
+
       for (var group : block.getPrimitivegroupList()) {
         if (group.hasDense() || group.getNodesCount() > 0) {
           blocksWithNodes.set(index);
         }
+
         if (group.getWaysCount() > 0) {
           blocksWithWays.set(index);
         }
+
         if (group.getRelationsCount() > 0) {
           blocksWithRelations.set(index);
         }
       }
     }
+
     super.parse(block);
   }
 
@@ -114,6 +122,7 @@ class OsmParser extends BinaryParser {
     if (!blockContentKnown) {
       return false;
     }
+
     return !switch (parsePhase) {
       case Relations -> blocksWithRelations.get(index);
       case Ways -> blocksWithWays.get(index);
@@ -137,6 +146,7 @@ class OsmParser extends BinaryParser {
       }
 
       long lastMid = 0;
+
       for (int j = 0; j < i.getMemidsCount(); j++) {
         OsmRelationMember relMember = new OsmRelationMember();
         long mid = lastMid + i.getMemids(j);
@@ -188,6 +198,7 @@ class OsmParser extends BinaryParser {
       double lonf = parseLon(lon);
 
       var builder = OsmNode.of().withId(id).withOsmProvider(provider).withLatLon(latf, lonf);
+
       // If empty, assume that nothing here has keys or vals.
       if (nodes.getKeysValsCount() > 0) {
         while (nodes.getKeysVals(j) != 0) {
@@ -198,6 +209,7 @@ class OsmParser extends BinaryParser {
           String value = internalize(getStringById(valid));
           builder.withTag(key, value);
         }
+
         // Skip over the '0' delimiter.
         j++;
       }
@@ -244,6 +256,7 @@ class OsmParser extends BinaryParser {
       }
 
       long lastId = 0;
+
       for (long j : i.getRefsList()) {
         builder.addNodeRef(j + lastId);
         lastId = j + lastId;
@@ -260,10 +273,12 @@ class OsmParser extends BinaryParser {
         // We can parse this.
         continue;
       }
+
       if (s.equals("DenseNodes")) {
         // We can parse this.
         continue;
       }
+
       throw new IllegalStateException("File requires unknown feature: " + s);
     }
   }

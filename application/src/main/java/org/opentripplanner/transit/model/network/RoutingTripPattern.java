@@ -143,9 +143,11 @@ public class RoutingTripPattern implements RaptorTripPattern, Serializable {
     if (this == o) {
       return true;
     }
+
     if (!(o instanceof RoutingTripPattern that)) {
       return false;
     }
+
     return index == that.patternIndex();
   }
 

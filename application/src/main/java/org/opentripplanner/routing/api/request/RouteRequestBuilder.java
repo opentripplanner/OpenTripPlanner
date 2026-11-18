@@ -168,6 +168,7 @@ public class RouteRequestBuilder implements Serializable {
         "A default request can only be created based on another default request!"
       );
     }
+
     return build();
   }
 

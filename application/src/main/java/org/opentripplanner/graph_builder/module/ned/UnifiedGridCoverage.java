@@ -70,6 +70,7 @@ public class UnifiedGridCoverage extends AbstractCoverage {
         Envelope intersection = regionEnvelope.intersection(datumEnvelope);
         datumRegionIndex.insert(intersection, new DatumRegion(datum, regionCoverageInterpolator));
       }
+
       regions.add(regionCoverageInterpolator);
     }
   }
@@ -99,6 +100,7 @@ public class UnifiedGridCoverage extends AbstractCoverage {
     Coordinate pointCoordinate = new Coordinate(x, y);
     Envelope envelope = new Envelope(pointCoordinate);
     List<DatumRegion> coverageCandidates = datumRegionIndex.query(envelope);
+
     if (coverageCandidates.size() > 0) {
       // Found a match for coverage/datum.
       DatumRegion datumRegion = coverageCandidates.get(0);
@@ -106,6 +108,7 @@ public class UnifiedGridCoverage extends AbstractCoverage {
       result[0] += datumRegion.datum.interpolatedHeight(x, y);
       return result;
     }
+
     throw new PointOutsideCoverageException("Point not found: " + point);
   }
 

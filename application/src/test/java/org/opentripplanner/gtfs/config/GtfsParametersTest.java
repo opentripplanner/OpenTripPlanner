@@ -51,6 +51,7 @@ class GtfsParametersTest {
     } catch (URISyntaxException e) {
       throw new RuntimeException(e);
     }
+
     EXPECTED_FEED_TO_STRING =
       "GtfsFeedParameters{" +
       "feedId: '" +

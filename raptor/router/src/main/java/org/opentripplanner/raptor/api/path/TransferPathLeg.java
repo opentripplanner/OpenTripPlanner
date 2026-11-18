@@ -94,9 +94,11 @@ public final class TransferPathLeg<T extends RaptorTripSchedule> implements Path
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     TransferPathLeg<?> that = (TransferPathLeg<?>) o;
     return (
       toStop == that.toStop &&

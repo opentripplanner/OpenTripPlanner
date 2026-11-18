@@ -136,16 +136,20 @@ public class LinkingContextFactory {
     LinkingContextRequest request
   ) {
     var from = request.from();
+
     if (from == null) {
       return Set.of();
     }
+
     var modes =
       request.accessMode() != StreetMode.NOT_SET
         ? EnumSet.of(request.accessMode())
         : EnumSet.noneOf(StreetMode.class);
+
     if (request.directMode() != StreetMode.NOT_SET) {
       modes.add(request.directMode());
     }
+
     return getStreetVerticesForLocation(container, from, modes, LocationType.FROM);
   }
 
@@ -154,16 +158,20 @@ public class LinkingContextFactory {
     LinkingContextRequest request
   ) {
     var to = request.to();
+
     if (to == null) {
       return Set.of();
     }
+
     var modes =
       request.egressMode() != StreetMode.NOT_SET
         ? EnumSet.of(request.egressMode())
         : EnumSet.noneOf(StreetMode.class);
+
     if (request.directMode() != StreetMode.NOT_SET) {
       modes.add(request.directMode());
     }
+
     return getStreetVerticesForLocation(container, to, modes, LocationType.TO);
   }
 
@@ -172,22 +180,29 @@ public class LinkingContextFactory {
     LinkingContextRequest request
   ) {
     var visitViaLocationsWithCoordinates = request.viaLocationsWithCoordinates();
+
     if (visitViaLocationsWithCoordinates.isEmpty()) {
       return Map.of();
     }
+
     var modes = EnumSet.noneOf(StreetMode.class);
+
     if (request.accessMode() != StreetMode.NOT_SET) {
       modes.add(request.accessMode());
     }
+
     if (request.egressMode() != StreetMode.NOT_SET) {
       modes.add(request.egressMode());
     }
+
     if (request.transferMode() != StreetMode.NOT_SET) {
       modes.add(request.transferMode());
     }
+
     if (request.directMode() != StreetMode.NOT_SET) {
       modes.add(request.directMode());
     }
+
     return visitViaLocationsWithCoordinates
       .stream()
       .collect(
@@ -208,6 +223,7 @@ public class LinkingContextFactory {
     if (location != null && location.stopId() != null) {
       return findStopOrChildStopVertices(location.stopId());
     }
+
     return Set.of();
   }
 
@@ -233,9 +249,11 @@ public class LinkingContextFactory {
     Map<GenericLocation, Set<Vertex>> visitViaLocationVertices
   ) {
     addAdjustedEdgesBetween(container, fromVertices, toVertices);
+
     if (visitViaLocationsWithCoordinates.isEmpty()) {
       return;
     }
+
     addAdjustedEdgesBetween(
       container,
       fromVertices,
@@ -247,6 +265,7 @@ public class LinkingContextFactory {
       toVertices
     );
     var i = 1;
+
     while (i < visitViaLocationsWithCoordinates.size()) {
       Set<Vertex> fromViaVertices = visitViaLocationVertices.get(
         visitViaLocationsWithCoordinates.get(i - 1)
@@ -289,10 +308,12 @@ public class LinkingContextFactory {
       .toList();
 
     var results = new HashSet<Vertex>();
+
     if (location.stopId() != null) {
       if (!modes.stream().allMatch(TraverseMode::isDrivingIsh)) {
         results.addAll(getStreetVerticesForStop(location));
       }
+
       if (modes.stream().anyMatch(TraverseMode::isDrivingIsh)) {
         // Ensure that there is a car routable vertex (that can originate from stop's coordinate).
         var carRoutableVertex = getCarRoutableStreetVertex(container, location, type);
@@ -320,21 +341,25 @@ public class LinkingContextFactory {
   private Set<Vertex> getStreetVerticesForStop(GenericLocation location) {
     // check if there is a stop by the given id
     var stopVertex = graph.findStopVertex(location.stopId());
+
     if (stopVertex.isPresent()) {
       return Set.of(stopVertex.get());
     }
 
     // station centroids may be used instead of child stop vertices for stations
     var centroidVertex = graph.findStationCentroidVertex(location.stopId());
+
     if (centroidVertex.isPresent()) {
       return Set.of(centroidVertex.get());
     }
 
     // in the regular case you want to resolve a (multi-modal) station into its child stops
     var childVertices = findStopOrChildStopVertices(location.stopId());
+
     if (!childVertices.isEmpty()) {
       return childVertices.stream().map(Vertex.class::cast).collect(Collectors.toUnmodifiableSet());
     }
+
     return Set.of();
   }
 
@@ -348,9 +373,11 @@ public class LinkingContextFactory {
     LocationType type
   ) {
     Coordinate coordinate = location.getCoordinate();
+
     // Fetch coordinate from stop, if not given in request
     if (coordinate == null) {
       var stopVertex = graph.getStopVertex(location.stopId());
+
       if (stopVertex != null) {
         coordinate = stopVertex.getCoordinate();
       } else {
@@ -362,9 +389,11 @@ public class LinkingContextFactory {
           .orElse(null);
       }
     }
+
     if (coordinate == null) {
       return Optional.empty();
     }
+
     return Optional.of(
       vertexCreationService.createVertexFromCoordinate(
         container,

@@ -39,12 +39,16 @@ public class RouteMatcherFactory {
     if (request.flexibleOnly()) {
       expr.matches(isFlexRoute(isFlexRoutePredicate));
     }
+
     expr.atLeastOneMatch(request.agencies(), RouteMatcherFactory::agencies);
     expr.atLeastOneMatch(request.transitModes(), RouteMatcherFactory::transitModes);
+
     if (request.shortName() != null) {
       expr.matches(shortName(request.shortName()));
     }
+
     expr.atLeastOneMatch(request.shortNames(), RouteMatcherFactory::shortNames);
+
     if (request.longName() != null) {
       expr.matches(longName(request.longName()));
     }

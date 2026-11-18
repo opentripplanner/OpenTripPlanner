@@ -247,6 +247,7 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
     if (this.occupancyStatus == null) {
       return OccupancyStatus.NO_DATA_AVAILABLE;
     }
+
     return this.occupancyStatus[stopPos];
   }
 
@@ -267,22 +268,26 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
   @Override
   public List<ReplacedByRelation> getArrivalReplacedByRelations(int stopPos) {
     var result = new ArrayList<ReplacedByRelation>();
+
     for (var replacedBy : this.partialReplacedBys) {
       if (stopPos > replacedBy.fromPos() && stopPos <= replacedBy.toPos()) {
         result.add(new ReplacedByRelation(replacedBy.replacedBy()));
       }
     }
+
     return result;
   }
 
   @Override
   public List<ReplacedByRelation> getDepartureReplacedByRelations(int stopPos) {
     var result = new ArrayList<ReplacedByRelation>();
+
     for (var replacedBy : this.partialReplacedBys) {
       if (stopPos >= replacedBy.fromPos() && stopPos < replacedBy.toPos()) {
         result.add(new ReplacedByRelation(replacedBy.replacedBy()));
       }
     }
+
     return result;
   }
 
@@ -398,9 +403,11 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     RealTimeTripTimes that = (RealTimeTripTimes) o;
     return (
       Objects.equals(scheduledTripTimes, that.scheduledTripTimes) &&

@@ -58,9 +58,11 @@ public abstract sealed class AbstractUserPreferences<S extends AbstractUserPrefe
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     AbstractUserPreferences that = (AbstractUserPreferences) o;
     return reluctance.equals(that.reluctance);
   }
@@ -79,6 +81,7 @@ public abstract sealed class AbstractUserPreferences<S extends AbstractUserPrefe
     if (getClass() != other.getClass()) {
       return 1000.0;
     }
+
     return reluctanceWeight() * reluctance.normalizedDistance(other.reluctance);
   }
 

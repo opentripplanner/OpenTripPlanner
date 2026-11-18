@@ -41,9 +41,11 @@ class EndpointContextLineStringTest {
     LineString reversed = ls.reverse();
     byte[] coordsRev = EndpointContextLineString.compact(X_1, Y_1, X_0, Y_0, ls, true);
     assertEquals(coords.length, coordsRev.length);
+
     for (int i = 0; i < coords.length; i++) {
       assertEquals(coords[i], coordsRev[i]);
     }
+
     LineString ls3 = EndpointContextLineString.uncompact(X_1, Y_1, X_0, Y_0, coordsRev, true);
     assertTrue(reversed.equalsExact(ls3, TOLERANCE));
   }

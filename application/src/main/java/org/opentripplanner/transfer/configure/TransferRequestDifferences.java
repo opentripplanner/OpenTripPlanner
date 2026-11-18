@@ -87,6 +87,7 @@ final class TransferRequestDifferences {
     RouteRequest routingDefaults
   ) {
     var warnings = new ArrayList<String>();
+
     for (var type : TransferProfileType.values()) {
       parameters
         .profiles()
@@ -95,6 +96,7 @@ final class TransferRequestDifferences {
         .findFirst()
         .ifPresent(profile -> {
           var differences = of(type, profile.routingRequest(), routingDefaults);
+
           if (!differences.isEmpty()) {
             warnings.add(
               "The street parameters of the '%s' transfers are different from routingDefaults in router-config.json. The transfers are found with the values of transfers in build-config.json. Differences: %s".formatted(
@@ -105,6 +107,7 @@ final class TransferRequestDifferences {
           }
         });
     }
+
     return warnings;
   }
 
@@ -115,12 +118,15 @@ final class TransferRequestDifferences {
     RouteRequest routingDefaults
   ) {
     var result = new ArrayList<String>();
+
     for (var parameter : parametersOf(type)) {
       if (!parameter.isComparable().test(transfers, routingDefaults)) {
         continue;
       }
+
       var transferValue = parameter.value().apply(transfers);
       var defaultValue = parameter.value().apply(routingDefaults);
+
       if (!Objects.equals(transferValue, defaultValue)) {
         result.add(
           "%s: %s (transfers), %s (routingDefaults)".formatted(
@@ -131,6 +137,7 @@ final class TransferRequestDifferences {
         );
       }
     }
+
     return result;
   }
 

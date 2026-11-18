@@ -216,6 +216,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
     }
 
     var itineraries = List.<Itinerary>of();
+
     try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
       var pathRouter = new CarpoolStreetRouter(
         streetLimitationParametersService,
@@ -237,6 +238,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
       var passengerDropoffVertex = streetVertexUtils.createPassengerVertex(
         carpoolingRequest.getPassengerDropoff()
       );
+
       if (passengerPickupVertex == null || passengerDropoffVertex == null) {
         LOG.info("Could not link passenger origin/destination to graph");
         return List.of();
@@ -252,6 +254,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
         passengerDropoffVertex,
         maxWalkToCarpool
       );
+
       if (pickupSnap == null || dropoffSnap == null) {
         LOG.debug(
           "No car-reachable pickup/dropoff reachable within {} from passenger origin/destination",
@@ -303,9 +306,11 @@ public class DefaultCarpoolingService implements CarpoolingService {
       );
 
       var insertionCandidates = new ArrayList<InsertionCandidate>();
+
       for (var trip : candidateTrips) {
         corridorRouter.beginTrip(trip);
         var candidate = insertionEvaluator.findBestInsertion(trip, snap);
+
         if (candidate != null) {
           insertionCandidates.add(candidate);
         }
@@ -434,6 +439,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
             passengerAccessEgressVertex,
             maxWalkToCarpool
           );
+
       if (passengerSnap == null) {
         LOG.debug(
           "No car-reachable vertex reachable within {} from passenger coords {}",
@@ -442,6 +448,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
         );
         return List.of();
       }
+
       var passengerVertex = passengerSnap.vertex();
 
       var passenger = accessOrEgress.isAccess()
@@ -462,15 +469,19 @@ public class DefaultCarpoolingService implements CarpoolingService {
       boolean access = accessOrEgress.isAccess();
       var stopSnaps = new HashMap<FeedScopedId, SnapResult>();
       var servingTrips = new ArrayList<TripStops>();
+
       for (var trip : candidateTrips) {
         var stops = usableStops(trip, access, stopSnaps, streetSearchRequest, maxWalkToCarpool);
+
         if (!stops.isEmpty()) {
           servingTrips.add(new TripStops(trip, stops));
         }
       }
+
       if (servingTrips.isEmpty()) {
         return List.of();
       }
+
       var trips = servingTrips.stream().map(TripStops::trip).toList();
 
       // The leg includes the passenger's walk to or from the car, so the ride is that much shorter.
@@ -503,12 +514,15 @@ public class DefaultCarpoolingService implements CarpoolingService {
       var carpoolReluctance = request.preferences().car().reluctance();
 
       var accessEgresses = new ArrayList<CarpoolAccessEgress>();
+
       for (var tripStops : servingTrips) {
         var trip = tripStops.trip();
         corridorRouter.beginTrip(trip);
+
         for (var usable : tripStops.stops()) {
           corridorRouter.registerStop(usable.stop(), usable.snap().vertex(), access);
         }
+
         var viableStops = viableAccessEgress(
           tripStops.stops(),
           accessOrEgress,
@@ -516,6 +530,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
           transitServiceResolver
         );
         var tripWithViableAccessEgress = new TripWithViableAccessEgress(trip, viableStops);
+
         for (var candidate : insertionEvaluator.findBestInsertions(tripWithViableAccessEgress)) {
           var accessEgress = createCarpoolAccessEgress(
             candidate,
@@ -524,12 +539,15 @@ public class DefaultCarpoolingService implements CarpoolingService {
             accessOrEgress,
             passengerLocation
           );
+
           if (accessEgress.durationInSeconds() > maxLegSeconds) {
             continue;
           }
+
           accessEgresses.add(accessEgress);
         }
       }
+
       LOG.debug(
         "{} carpool {} candidates from {} trips",
         accessEgresses.size(),
@@ -557,19 +575,25 @@ public class DefaultCarpoolingService implements CarpoolingService {
     Duration maxWalk
   ) {
     var usable = new ArrayList<UsableStop>();
+
     for (var stop : trip.corridor().stops()) {
       if (access ? !stop.servesDropoff() : !stop.servesPickup()) {
         continue;
       }
+
       if (!stopSnaps.containsKey(stop.stopId())) {
         stopSnaps.put(stop.stopId(), stopSnap(stop.stopId(), access, streetSearchRequest));
       }
+
       var snap = stopSnaps.get(stop.stopId());
+
       if (snap == null || StreetPathUtils.durationOrZero(snap.walkPath()).compareTo(maxWalk) > 0) {
         continue;
       }
+
       usable.add(new UsableStop(stop, snap));
     }
+
     return usable;
   }
 
@@ -582,11 +606,13 @@ public class DefaultCarpoolingService implements CarpoolingService {
   ) {
     boolean access = accessOrEgress.isAccess();
     var snapByStop = new LinkedHashMap<FeedScopedId, SnapResult>();
+
     for (var usable : stops) {
       snapByStop.putIfAbsent(usable.stop().stopId(), usable.snap());
     }
 
     var viable = new ArrayList<ViableAccessEgress>(snapByStop.size());
+
     for (var entry : snapByStop.entrySet()) {
       var stop = transitServiceResolver.getStopLocation(entry.getKey());
       var snap = entry.getValue();
@@ -603,6 +629,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
         )
       );
     }
+
     return viable;
   }
 
@@ -618,9 +645,11 @@ public class DefaultCarpoolingService implements CarpoolingService {
     StreetSearchRequest streetSearchRequest
   ) {
     var snap = access ? stopIndex.dropoffSnap(stopId) : stopIndex.pickupSnap(stopId);
+
     if (snap == null || snap.walkPath() == null) {
       return snap;
     }
+
     var walk = StreetPathUtils.replay(snap.walkPath(), streetSearchRequest);
     return walk == null ? null : new SnapResult(snap.vertex(), walk);
   }
@@ -628,11 +657,13 @@ public class DefaultCarpoolingService implements CarpoolingService {
   private void validateRequest(RouteRequest request) throws RoutingValidationException {
     Objects.requireNonNull(request.from());
     Objects.requireNonNull(request.to());
+
     if (request.from().wgsCoordinate() == null) {
       throw new RoutingValidationException(
         List.of(new RoutingError(RoutingErrorCode.LOCATION_NOT_FOUND, InputField.FROM_PLACE))
       );
     }
+
     if (request.to().wgsCoordinate() == null) {
       throw new RoutingValidationException(
         List.of(new RoutingError(RoutingErrorCode.LOCATION_NOT_FOUND, InputField.TO_PLACE))

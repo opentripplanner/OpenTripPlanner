@@ -159,9 +159,11 @@ public final class TransferPreferences implements Serializable {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     TransferPreferences that = (TransferPreferences) o;
     return (
       cost.equals(that.cost) &&

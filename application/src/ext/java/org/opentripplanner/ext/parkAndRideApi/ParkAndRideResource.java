@@ -68,6 +68,7 @@ public class ParkAndRideResource {
     @QueryParam("maxTransitDistance") Double maxTransitDistance
   ) {
     Envelope envelope;
+
     if (lowerLeft != null) {
       envelope = getEnvelope(lowerLeft, upperRight);
     } else {

@@ -235,6 +235,7 @@ public class StopPlaceType {
           )
           .dataFetcher(environment -> {
             var quays = ((MonoOrMultiModalStation) environment.getSource()).getChildStops();
+
             if (TRUE.equals(environment.getArgument("filterByInUse"))) {
               quays = quays
                 .stream()
@@ -243,6 +244,7 @@ public class StopPlaceType {
                 })
                 .collect(Collectors.toList());
             }
+
             return quays;
           })
           .build()
@@ -397,6 +399,7 @@ public class StopPlaceType {
               var mapper = new TripTimeOnDateFilterMapper(idMapper);
               requestBuilder.withTransitFilters(mapper.mapFilters(filtersInput));
             }
+
             requestBuilder
               .withIncludeAgencies(
                 whiteListed.authorityIds.isEmpty() ? null : whiteListed.authorityIds
@@ -453,6 +456,7 @@ public class StopPlaceType {
     if (multiModalStation != null) {
       return new MonoOrMultiModalStation(multiModalStation);
     }
+
     return null;
   }
 
@@ -503,6 +507,7 @@ public class StopPlaceType {
       stations.forEach(it -> {
         MultiModalStation p = transitService.findMultiModalStation(it);
         result.add(new MonoOrMultiModalStation(it, p));
+
         if (p != null) {
           result.add(new MonoOrMultiModalStation(p));
         }
@@ -515,6 +520,7 @@ public class StopPlaceType {
       Set<MonoOrMultiModalStation> result = new HashSet<>();
       stations.forEach(it -> {
         MultiModalStation p = transitService.findMultiModalStation(it);
+
         if (p != null) {
           result.add(new MonoOrMultiModalStation(p));
         } else {
@@ -536,6 +542,7 @@ public class StopPlaceType {
         return true;
       }
     }
+
     return false;
   }
 }

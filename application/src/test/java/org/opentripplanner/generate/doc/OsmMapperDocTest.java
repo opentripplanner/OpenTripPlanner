@@ -94,6 +94,7 @@ public class OsmMapperDocTest {
         )
       );
     }
+
     return propTable.build();
   }
 
@@ -132,6 +133,7 @@ public class OsmMapperDocTest {
         )
       );
     }
+
     return propTable.build();
   }
 
@@ -146,21 +148,27 @@ public class OsmMapperDocTest {
       return value.toString();
     } else {
       StringBuilder result = new StringBuilder();
+
       if (value != NONE) {
         result.append("no direction: ").append(value);
       }
+
       if (forward != NONE) {
         if (!result.isEmpty()) {
           result.append("<br>");
         }
+
         result.append("forward: ").append(forward);
       }
+
       if (backward != NONE) {
         if (!result.isEmpty()) {
           result.append("<br>");
         }
+
         result.append("backward: ").append(backward);
       }
+
       return result.toString();
     }
   }

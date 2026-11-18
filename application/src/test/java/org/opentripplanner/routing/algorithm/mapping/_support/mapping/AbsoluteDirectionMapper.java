@@ -10,6 +10,7 @@ class AbsoluteDirectionMapper {
     if (domain == null) {
       return null;
     }
+
     switch (domain) {
       case NORTH:
         return ApiAbsoluteDirection.NORTH;

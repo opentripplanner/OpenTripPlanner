@@ -34,12 +34,15 @@ public class RouterResultPathAggregator<T extends RaptorTripSchedule> implements
   ) {
     this.paths = ParetoSet.of(comparator);
     RaptorRouterResult<T> first = null;
+
     for (var it : results) {
       if (first == null) {
         first = it;
       }
+
       this.paths.addAll(it.extractPaths());
     }
+
     this.master = first;
   }
 

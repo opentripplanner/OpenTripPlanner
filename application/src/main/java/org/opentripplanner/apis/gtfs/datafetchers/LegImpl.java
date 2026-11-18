@@ -86,6 +86,7 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
       if (getSource(environment).alightRule() == null) {
         return GraphQLTypes.GraphQLPickupDropoffType.SCHEDULED;
       }
+
       return PickDropMapper.map(getSource(environment).alightRule());
     };
   }
@@ -117,18 +118,23 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
       DataLoader<Itinerary, ItineraryFare> loader = environment.getDataLoader(
         ItineraryFareDataLoader.KEY
       );
+
       if (ctx == null || loader == null) {
         return List.of();
       }
+
       Itinerary itinerary = (Itinerary) ctx.get(ItineraryImpl.ITINERARY_CONTEXT_KEY);
+
       if (itinerary == null) {
         return List.of();
       }
+
       Leg leg = getSource(environment);
       return loader.load(itinerary).thenApply(fare -> {
         if (fare == null || fare.isEmpty()) {
           return List.<FareOffer>of();
         }
+
         var legOffers = new ArrayList<>(fare.getLegProducts().get(leg));
         // Itinerary-level products (e.g. day passes) only apply to transit legs
         var itineraryOffers = leg.isTransitLeg()
@@ -190,9 +196,11 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   public DataFetcher<Iterable<Object>> intermediateStops() {
     return env -> {
       var intermediateStops = getSource(env).listIntermediateStops();
+
       if (intermediateStops == null) {
         return null;
       }
+
       var args = new GraphQLTypes.GraphQLLegIntermediateStopsArgs(env.getArguments());
       var filter = new StopArrivalByTypeFilter(args.getGraphQLInclude());
       return filter
@@ -213,18 +221,23 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   public DataFetcher<String> mode() {
     return environment -> {
       Leg leg = getSource(environment);
+
       if (leg instanceof StreetLeg s) {
         return s.getMode().name();
       }
+
       if (leg instanceof TransitLeg s) {
         return s.mode().name();
       }
+
       if (leg instanceof CarpoolLeg cl) {
         return cl.mode().name();
       }
+
       if (leg instanceof TaxiLeg taxiLeg) {
         return taxiLeg.mode().name();
       }
+
       throw new IllegalStateException("Unhandled leg type: " + leg);
     };
   }
@@ -240,6 +253,7 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
       if (getSource(environment).boardRule() == null) {
         return GraphQLTypes.GraphQLPickupDropoffType.SCHEDULED;
       }
+
       return PickDropMapper.map(getSource(environment).boardRule());
     };
   }
@@ -253,9 +267,11 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   public DataFetcher<GraphQLTypes.GraphQLRealtimeState> realtimeState() {
     return environment -> {
       var leg = getSource(environment);
+
       if (leg instanceof ScheduledTransitLeg stl) {
         return RealtimeStateMapper.map(stl.tripTimes());
       }
+
       return null;
     };
   }
@@ -269,6 +285,7 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   public DataFetcher<RideEstimate> rideHailingEstimate() {
     return environment -> {
       Leg leg = getSource(environment);
+
       if (leg instanceof RideHailingLeg rhl) {
         return rhl.rideEstimate();
       } else {
@@ -342,9 +359,11 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
     return environment -> {
       Leg leg = getSource(environment);
       Trip trip = leg.trip();
+
       if (trip == null || leg.serviceDate() == null) {
         return null;
       }
+
       return new ApiTransitService(transitService(environment))
         .findOrCreateTripOnServiceDate(trip.getId(), leg.serviceDate())
         .orElse(null);
@@ -420,9 +439,11 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   public DataFetcher<String> id() {
     return environment -> {
       var ref = getSource(environment).legReference();
+
       if (ref == null) {
         return null;
       }
+
       return LegReferenceSerializer.encode(ref);
     };
   }

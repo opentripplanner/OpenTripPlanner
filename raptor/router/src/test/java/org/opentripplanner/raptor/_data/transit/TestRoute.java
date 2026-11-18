@@ -89,6 +89,7 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
       var tripSchedule = builder.pattern(pattern).build();
       schedules.add(tripSchedule);
     }
+
     return this;
   }
 
@@ -126,6 +127,7 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
   ) {
     for (int i = 0; i < timetable().numberOfTripSchedules(); i++) {
       var trip = timetable().getTripSchedule(i);
+
       if (toTrip == trip) {
         this.transferConstraintsForwardSearch.addConstraintTransfers(
           fromTrip,
@@ -137,6 +139,7 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
           constraint
         );
       }
+
       // Reverse search transfer, the {@code source/target} is the trips in order of the
       // reverse search, which is opposite from {@code from/to} in the result path.
       if (fromTrip == trip) {

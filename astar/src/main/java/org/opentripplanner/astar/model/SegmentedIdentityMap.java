@@ -38,15 +38,19 @@ class SegmentedIdentityMap<K, V> {
     int hash = System.identityHashCode(key);
     int slot = hash & slotMask;
     Object[] seg = segments[(hash >>> slotBits) & segmentMask];
+
     while (true) {
       int i = slot * 2;
       Object k = seg[i];
+
       if (k == null) {
         return null;
       }
+
       if (k == key) {
         return (V) seg[i + 1];
       }
+
       slot = (slot + 1) & slotMask;
     }
   }
@@ -56,22 +60,28 @@ class SegmentedIdentityMap<K, V> {
     int hash = System.identityHashCode(key);
     int slot = hash & slotMask;
     Object[] seg = segments[(hash >>> slotBits) & segmentMask];
+
     while (true) {
       int i = slot * 2;
       Object k = seg[i];
+
       if (k == null) {
         seg[i] = key;
         seg[i + 1] = value;
+
         if (++size > threshold) {
           resize();
         }
+
         return null;
       }
+
       if (k == key) {
         V old = (V) seg[i + 1];
         seg[i + 1] = value;
         return old;
       }
+
       slot = (slot + 1) & slotMask;
     }
   }
@@ -85,6 +95,7 @@ class SegmentedIdentityMap<K, V> {
     for (Object[] seg : segments) {
       for (int i = 0; i < seg.length; i += 2) {
         Object k = seg[i];
+
         if (k != null) {
           action.accept((K) k);
         }
@@ -106,20 +117,26 @@ class SegmentedIdentityMap<K, V> {
   private void resize() {
     Object[][] oldSegments = segments;
     int oldTotalSlots = (slotMask + 1) * (segmentMask + 1);
+
     if (oldTotalSlots >= MAX_CAPACITY) {
       throw new IllegalStateException("SegmentedIdentityMap capacity exhausted");
     }
+
     initSegments(oldTotalSlots * 2);
+
     for (Object[] oldSeg : oldSegments) {
       for (int j = 0; j < oldSeg.length; j += 2) {
         Object k = oldSeg[j];
+
         if (k != null) {
           int hash = System.identityHashCode(k);
           int slot = hash & slotMask;
           Object[] seg = segments[(hash >>> slotBits) & segmentMask];
+
           while (seg[slot * 2] != null) {
             slot = (slot + 1) & slotMask;
           }
+
           seg[slot * 2] = k;
           seg[slot * 2 + 1] = oldSeg[j + 1];
         }
@@ -135,6 +152,7 @@ class SegmentedIdentityMap<K, V> {
     this.segmentMask = segmentCount - 1;
     this.threshold = (totalSlots * 2) / 3;
     this.segments = new Object[segmentCount][];
+
     for (int i = 0; i < segmentCount; i++) {
       segments[i] = new Object[slotsPerSegment * 2];
     }
@@ -146,9 +164,11 @@ class SegmentedIdentityMap<K, V> {
   private static int tableSizeFor(int expectedSize) {
     int minCapacity = expectedSize + expectedSize / 2 + 1;
     int capacity = Integer.highestOneBit(minCapacity);
+
     if (capacity < minCapacity) {
       capacity *= 2;
     }
+
     return Math.max(capacity, 4);
   }
 }

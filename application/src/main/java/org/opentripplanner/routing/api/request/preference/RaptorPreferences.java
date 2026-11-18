@@ -79,9 +79,11 @@ public final class RaptorPreferences implements Serializable {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     RaptorPreferences that = (RaptorPreferences) o;
 
     return (

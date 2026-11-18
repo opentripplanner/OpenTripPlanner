@@ -196,6 +196,7 @@ public class SpeedTest {
       // The speed test does not use GBFS vehicle rental.
       GbfsNetworkOverrides.none()
     );
+
     if (transitRepository.getUpdaterManager() != null) {
       transitRepository.getUpdaterManager().startUpdaters();
     }
@@ -404,6 +405,7 @@ public class SpeedTest {
 
   private void forceGCToAvoidGCLater() {
     WeakReference<?> ref = new WeakReference<>(new Object());
+
     while (ref.get() != null) {
       System.gc();
     }
@@ -424,9 +426,11 @@ public class SpeedTest {
   private void saveTestCasesToResultFile() {
     for (var p : opts.profiles()) {
       var currentTestCases = lastSampleResult.get(p);
+
       if (currentTestCases.isFiltered()) {
         continue;
       }
+
       tcIO.writeResultsToFile(p, currentTestCases);
     }
   }
@@ -460,6 +464,7 @@ public class SpeedTest {
     if (config.ignoreStreetResults()) {
       stream = stream.filter(Predicate.not(Itinerary::isStreetOnly));
     }
+
     return stream.limit(opts.numOfItineraries()).toList();
   }
 }

@@ -38,14 +38,17 @@ class DuplicatedTripHandler {
     if (updateIncrementality == UpdateIncrementality.DIFFERENTIAL) {
       throw UpdateException.of(tripUpdate.tripId(), NOT_IMPLEMENTED_DIFFERENTIAL_DUPLICATED);
     }
+
     tripUpdate.validateDuplicated();
 
     var originalTrip = buffer.getTrip(tripUpdate.tripId());
+
     if (originalTrip == null) {
       throw UpdateException.of(tripUpdate.tripId(), TRIP_NOT_FOUND);
     }
 
     var serviceId = buffer.getOrCreateServiceIdForDate(tripUpdate.startDate());
+
     if (serviceId == null) {
       throw UpdateException.of(tripUpdate.tripId(), OUTSIDE_SERVICE_PERIOD);
     }

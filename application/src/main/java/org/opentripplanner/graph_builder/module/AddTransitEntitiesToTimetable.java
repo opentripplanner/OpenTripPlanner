@@ -40,6 +40,7 @@ public class AddTransitEntitiesToTimetable {
     for (var tripOnServiceDate : dataImport.getTripOnServiceDates()) {
       timetableDataImport.addTripOnServiceDate(tripOnServiceDate);
     }
+
     transitRepository.addOperators(dataImport.getAllOperators());
     transitRepository.addNoticeAssignments(dataImport.getNoticeAssignments());
     transitRepository.addScheduledStopPointMapping(dataImport.stopsByScheduledStopPoint());

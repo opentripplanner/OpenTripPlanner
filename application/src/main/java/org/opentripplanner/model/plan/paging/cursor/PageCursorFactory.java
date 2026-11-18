@@ -81,11 +81,13 @@ public class PageCursorFactory {
    */
   public PageCursorFactory withPageCursorInput(PageCursorInput pageCursorInput) {
     this.pageCursorInput = pageCursorInput;
+
     // If the whole search window was not used (i.e. if there were removed itineraries)
     if (pageCursorInput.pageCut() != null) {
       this.wholeSearchWindowUsed = false;
       this.itineraryPageCut = pageCursorInput.pageCut();
     }
+
     return this;
   }
 
@@ -143,6 +145,7 @@ public class PageCursorFactory {
         return edt;
       }
     }
+
     return null;
   }
 
@@ -201,14 +204,17 @@ public class PageCursorFactory {
 
   private Instant edtAfterUsedSw() {
     Instant defaultEdt = currentEdt.plus(currentSearchWindow);
+
     if (firstSearchLatestItineraryDeparture != null) {
       Instant edtFromLatestItineraryDeparture = firstSearchLatestItineraryDeparture.plus(
         SEARCH_WINDOW_END_EXCLUSIVITY_TIME_ADDITION
       );
+
       if (edtFromLatestItineraryDeparture.isBefore(defaultEdt)) {
         return edtFromLatestItineraryDeparture;
       }
     }
+
     return defaultEdt;
   }
 }

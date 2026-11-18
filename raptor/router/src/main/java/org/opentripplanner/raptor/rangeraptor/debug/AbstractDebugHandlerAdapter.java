@@ -107,6 +107,7 @@ abstract class AbstractDebugHandlerAdapter<T> implements DebugHandler<T> {
       if (!pathStops.hasNext()) {
         return false;
       }
+
       Integer visitedStop = stopsVisited.next();
       Integer pathStop = pathStops.next();
 
@@ -114,6 +115,7 @@ abstract class AbstractDebugHandlerAdapter<T> implements DebugHandler<T> {
         return false;
       }
     }
+
     return true;
   }
 }

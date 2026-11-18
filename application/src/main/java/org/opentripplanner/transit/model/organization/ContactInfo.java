@@ -80,9 +80,11 @@ public class ContactInfo implements TransitObject<ContactInfo, ContactInfoBuilde
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     ContactInfo that = (ContactInfo) o;
     return (
       Objects.equals(contactPerson, that.contactPerson) &&

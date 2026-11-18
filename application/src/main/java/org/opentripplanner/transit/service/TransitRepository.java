@@ -117,6 +117,7 @@ public class TransitRepository implements Serializable {
    */
   public void index() {
     assertModificationsAllowed();
+
     if (index == null) {
       LOG.info("Index timetable repository...");
       this.index = new TransitRepositoryIndex(this);
@@ -208,6 +209,7 @@ public class TransitRepository implements Serializable {
     if (timeZone != null) {
       return timeZone;
     }
+
     LOG.warn("graph contains no agencies (yet); API request times will be interpreted as GMT.");
     return ZoneId.of("GMT");
   }
@@ -217,9 +219,11 @@ public class TransitRepository implements Serializable {
    */
   public void initTimeZone(ZoneId timeZone) {
     assertModificationsAllowed();
+
     if (timeZone == null || timeZone.equals(this.timeZone)) {
       return;
     }
+
     invalidateIndex();
     this.timeZone = ObjectUtils.requireNotInitialized(this.timeZone, timeZone);
     this.timeZoneExplicitlySet = true;
@@ -235,9 +239,11 @@ public class TransitRepository implements Serializable {
    */
   public Set<ZoneId> getAgencyTimeZones() {
     Set<ZoneId> ret = new HashSet<>();
+
     for (Agency agency : agencies) {
       ret.add(agency.getTimezone());
     }
+
     return ret;
   }
 
@@ -393,6 +399,7 @@ public class TransitRepository implements Serializable {
     if (index == null) {
       throw new IllegalStateException("The transit repository is not indexed, call index() first.");
     }
+
     return index;
   }
 

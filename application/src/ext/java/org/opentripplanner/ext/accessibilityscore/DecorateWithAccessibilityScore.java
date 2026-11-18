@@ -51,9 +51,11 @@ public class DecorateWithAccessibilityScore implements ItineraryDecorator {
         return leg;
       }
     });
+
     if (i.isWalkOnly() || i.hasTransit()) {
       builder.withAccessibilityScore(compute(builder.legs()));
     }
+
     return builder.build();
   }
 
@@ -127,6 +129,7 @@ public class DecorateWithAccessibilityScore implements ItineraryDecorator {
       .filter(WheelchairTraversalInformation.class::isInstance)
       .map(WheelchairTraversalInformation.class::cast)
       .allMatch(WheelchairTraversalInformation::isWheelchairAccessible);
+
     if (allEdgesAreAccessible) {
       score += 0.5f;
     }

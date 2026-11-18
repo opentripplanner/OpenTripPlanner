@@ -47,6 +47,7 @@ public class AbortOnUnprocessableRequestExecutionStrategy
       logCancellationProgress();
       throw (RuntimeException) e;
     }
+
     return super.handleFetchingException(environment, params, e);
   }
 

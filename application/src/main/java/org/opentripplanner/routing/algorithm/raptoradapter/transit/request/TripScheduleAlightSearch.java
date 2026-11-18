@@ -112,6 +112,7 @@ public final class TripScheduleAlightSearch<T extends RaptorTripSchedule> implem
         return findBoardingSearchForwardInTime(0);
       }
     }
+
     // We have already found a candidate in a previous search;
     // Hence searching forward from the lower bound is the fastest way to proceed.
     // We have to add 1 to the lower bound for go from exclusive to inclusive
@@ -169,9 +170,11 @@ public final class TripScheduleAlightSearch<T extends RaptorTripSchedule> implem
         break;
       }
     }
+
     if (candidateTripIndex != RaptorConstants.NOT_FOUND) {
       candidateTrip = timetable.getTripSchedule(candidateTripIndex);
     }
+
     return this;
   }
 
@@ -191,6 +194,7 @@ public final class TripScheduleAlightSearch<T extends RaptorTripSchedule> implem
         return this;
       }
     }
+
     return this;
   }
 
@@ -218,6 +222,7 @@ public final class TripScheduleAlightSearch<T extends RaptorTripSchedule> implem
         upper = m;
       }
     }
+
     return lower;
   }
 }
