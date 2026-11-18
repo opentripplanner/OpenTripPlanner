@@ -46,3 +46,17 @@ beeac076c0b9f0a8aaa1424ef1d6df3a6fa8f6ab
 
 # javadoc formatting
 fdfd6688a87eae0b10326f8b193421646b18b59e
+
+# Java code formatter (java-formatter-maven-plugin): blank lines, switch arms, headers and wrapping
+5051b0d374c3b1cd5d6517b6f1f32f5e231520b6
+713f0cbfd2242934ec188c6d93614a9d7b31e96a
+e28a5aeeecc9a1c2d3e386d64c1291ad9265752e
+0916ca67190341e3188f4de6751a6f6a23a9c3ad
+
+# Java code formatter: Javadoc and comment rules
+38cee054bd7ada790988a284aef70c5def4b3860
+185d10ef2fda6d75aefc38e11dec4dcbdd7d1123
+dd7a4735f86452319c4c1ad078b557de44da4e77
+bd81f64afc26c3acef1913f8f33aade3915042bb
+1aee124913f1bf7d64a52cc00b22ce16421e518e
+7fddfd51b389e00c41df598f845563c2a95654f5
