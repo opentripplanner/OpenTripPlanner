@@ -95,6 +95,10 @@
         <plugin.spotless.version>3.10.4</plugin.spotless.version>
         <plugin.spotless.goal>apply</plugin.spotless.goal>
         <plugin.spotless.skip>false</plugin.spotless.skip>
+        <!-- The Java code formatter, see .jcf/config.properties for the format options -->
+        <plugin.jcf.version>1.0.0</plugin.jcf.version>
+        <plugin.jcf.goal>format</plugin.jcf.goal>
+        <plugin.jcf.skip>true</plugin.jcf.skip>
         <!-- Javadoc formatting (Eclipse formatter + Javadoc regex fixes) is opt-in, see the
              'javadocFormatting' profile. Enable with '-DjavadocFormattingSkip=false'. -->
         <javadocFormattingSkip>true</javadocFormattingSkip>
@@ -130,6 +134,37 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
                     <version>3.6.2</version>
+                </plugin>
+                <plugin>
+                    <!--
+                      Formats the Java source code, or checks that it is formatted. How the code is
+                      formatted is configured in '.jcf/config.properties', not here. The source roots
+                      are listed explicitly because the sandbox roots ('src/ext/java' and
+                      'src/ext-test/java') are added by the build-helper plugin after this plugin
+                      has run.
+                    -->
+                    <groupId>org.opentripplanner.java.code.formatter</groupId>
+                    <artifactId>java-formatter-maven-plugin</artifactId>
+                    <version>${plugin.jcf.version}</version>
+                    <configuration>
+                        <skip>${plugin.jcf.skip}</skip>
+                        <sourceRoots>
+                            <sourceRoot>src/main/java</sourceRoot>
+                            <sourceRoot>src/test/java</sourceRoot>
+                            <sourceRoot>src/test-fixtures/java</sourceRoot>
+                            <sourceRoot>src/ext/java</sourceRoot>
+                            <sourceRoot>src/ext-test/java</sourceRoot>
+                        </sourceRoots>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>java-format</id>
+                            <phase>validate</phase>
+                            <goals>
+                                <goal>${plugin.jcf.goal}</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <!--
@@ -236,6 +271,10 @@
             </plugins>
         </pluginManagement>
         <plugins>
+            <plugin>
+                <groupId>org.opentripplanner.java.code.formatter</groupId>
+                <artifactId>java-formatter-maven-plugin</artifactId>
+            </plugin>
             <plugin>
                 <groupId>com.diffplug.spotless</groupId>
                 <artifactId>spotless-maven-plugin</artifactId>

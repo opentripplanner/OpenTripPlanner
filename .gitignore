@@ -56,3 +56,6 @@ graph.obj
 
 # EPSG files
 application/v??.?.??
+
+# The Java code formatter keeps a cache of formatted files
+.jcf/cache
