@@ -5,7 +5,7 @@ domain-specific language. In cases where GTFS does not provide an alternative, w
 information about the used terminology is in [the Dictionary](/doc/dev/Dictionary.md). We follow the
 [Google Java Style Guide - Naming](https://google.github.io/styleguide/javaguide.html#s5-naming)
 conventions. The code formatting part of that style guide is not relevant, as OTP code is
-auto-formatted using Prettier. If in doubt, check the Oxford Dictionary (American).
+auto-formatted by the Java code formatter. If in doubt, check the Oxford Dictionary (American).
 
 ## Packages
 

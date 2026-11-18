@@ -2,22 +2,25 @@
 
 ## Java
 
-The OpenTripPlanner Java code style is revised in OTP v2.2. We use the
-[Prettier Java](https://github.com/jhipster/prettier-java) as is. Maven is set up to run Prettier
-through the [Spotless](https://github.com/diffplug/spotless) Maven plugin. A check is run in the CI
-build, which fails the build preventing merging a PR if the code style is incorrect.
+The OpenTripPlanner Java code style is revised in OTP v2.2. Since OTP v2.11 the code is formatted
+with the [Java code formatter](https://github.com/opentripplanner/java-code-fomatter) (JCF). It
+formats Java code and Javadoc, and is run by the `java-formatter-maven-plugin`. A check is run in
+the CI build, which fails the build preventing merging a PR if the code style is incorrect. The
+style is described in the
+[style guide](https://github.com/opentripplanner/java-code-fomatter/blob/main/docs/style.md) of the
+formatter. In short: code with the same scope has the same indentation, and a long line is wrapped
+at the operator that binds the weakest, with the operator first on the wrapped line.
 
-Note! Spotless runs Prettier with Node, so `node` and `npm` must be available on the `PATH`. The
-Prettier and Prettier Java versions, as well as the formatting options, are configured in the root
-`pom.xml` (`prettier.version`, `prettier.java.version` and the Spotless plugin configuration).
+The formatter needs Maven to run on JDK 25 or newer. The options are in `.jcf/config.properties` in
+the root of the repository (100-char width, 2-space indent). All comment rules are on. The formatter
+keeps a cache of formatted files in `.jcf/cache`, which is not checked in. Never hand-edit it, it is
+safe to delete.
 
-In addition to running Prettier, Spotless removes unused imports from Java files before formatting
-them. Imports that are only referenced from Javadoc (for example `{@link Foo}`) are kept.
-
-Prettier does not format the _content_ of Javadoc comments, it only re-indents them. Spotless can
-therefore run the Eclipse JDT formatter before Prettier, configured to format Javadoc comments only.
-This is opt-in: run Maven with `-DjavadocFormattingSkip=false` to enable it. Javadoc formatting is
-not checked in the CI build.
+The formatter does not remove unused imports, and does not format Markdown, JSON and GraphQL files.
+Spotless is used for that: it removes unused imports from Java files (imports that are only
+referenced from Javadoc, for example `{@link Foo}`, are kept) and runs Prettier on `*.md`, `*.json`
+and `*.graphql` files. Spotless runs Prettier with Node, so `node` and `npm` must be available on
+the `PATH`. The Prettier version, as well as the Spotless configuration, is in the root `pom.xml`.
 
 Additionally since OTP v2.9, we are using Checkstyle to check for code style issues with a Maven
 plugin. There is also a checkstyle plugin for IntelliJ IDEA which can be used to spot and fix
@@ -27,7 +30,7 @@ can be found in [#6913](https://github.com/opentripplanner/OpenTripPlanner/issue
 
 #### Preventing Javadoc formatting
 
-The Javadoc formatter re-flows paragraphs, so text which must keep its line breaks (CSV samples,
+The formatter re-flows Javadoc paragraphs, so text which must keep its line breaks (CSV samples,
 ASCII tables, code snippets) needs to be marked. Use code blocks or `<pre>` blocks to prevent
 formatting. The following two options are available:
 
@@ -84,21 +87,20 @@ To skip Checkstyle, use the profile `checkstyleSkip`:
 ```
 
 OpenRewrite can be used to fix some of the checkstyle issues automatically. The following command
-runs OpenRewrite and Prettier, but not checkstyle:
+runs OpenRewrite and the formatters, but not checkstyle:
 
 ```shell
-% mvn rewrite:run spotless:apply -P rewrite
+% mvn rewrite:run jcf:format spotless:apply -P rewrite
 ```
 
-### How to Run Prettier
+### How to Run the Formatter
 
 There are two ways to format the code before checking it in. You may run a normal build with Maven;
-it takes a bit of time, but it reformats the entire codebase. Only code you have changed should be
-formatted, since the existing code is already formatted. The second way is to set up Prettier and
-run it manually or hook it into your IDE, so it runs every time a file is changed.
+the formatter is fast, and a cache makes a repeated run skip the files that are already formatted.
+Or you can run the formatter manually or hook it into your IDE.
 
-Prettier will automatically format all code in the Maven "validate" phase, which runs before the
-test, package, and install phases. So formatting will happen for example when you run:
+The formatter runs automatically in the Maven "validate" phase, which runs before the test, package,
+and install phases. So formatting will happen for example when you run:
 
 ```shell
 % mvn test
@@ -107,76 +109,50 @@ test, package, and install phases. So formatting will happen for example when yo
 You can manually run _only_ the formatting process with:
 
 ```shell
-% mvn spotless:apply
+% mvn jcf:format
 ```
 
-To skip the Prettier formating, use the profile `prettierSkip`:
+To skip the formatting, use the profile `jcfSkip`, or its short alias `-Djcf`. It also skips
+Spotless (unused imports, Markdown, JSON and GraphQL):
 
 ```shell
-% mvn test -P prettierSkip
+% mvn test -P jcfSkip
+% mvn test -Djcf
 ```
 
-To check for formatting errors, use the profile `prettierCheck`:
+To check for formatting errors, use the profile `jcfCheck`:
 
 ```shell
-% mvn test -P prettierCheck
+% mvn test -P jcfCheck
 ```
 
 The check is run by the CI server and will fail the build if the code is incorrectly formatted.
 
 ### IntelliJ and Code Style Formatting
 
-You should use the Prettier Maven plugin to reformat the code or run Prettier with Node (faster).
-
-Prettier does _not_ format the doc and Markdown files, only Java code. So, for other files you
+The formatter does _not_ format the doc and Markdown files, only Java code. So, for other files you
 should use the _project_ code style. It is automatically imported when you first open the project.
 But, if you have set a custom code style in your settings (as we used until OTP v2.1), then you need
 to change to the _Project_ code style. Open the `Preferences` from the menu and select _Editor >
 Code Style_. Then select **Project** in the \_Scheme drop down.
 
-#### Run Prettier Maven Plugin as an External Tool in IntelliJ
+Do not use IntelliJ's _Reformat Code_ for Java files, use the formatter in the build, as described
+below.
 
-You can run Spotless as an external tool in IntelliJ. Set it up as an `External tool` and assign a
-keyboard shortcut to the tool execution.
+#### Run the Formatter as an External Tool in IntelliJ
 
-![External Tool Dialog](../images/ExternalToolDialog.png)
+You can run the formatter as an external tool in IntelliJ. Set it up as an `External tool` and
+assign a keyboard shortcut to the tool execution.
 
 ```text
-Name:              Prettier Format Current File
+Name:              Format Java Code
 Program:           mvn
-Arguments:         spotless:apply -DspotlessFiles=$FilePathRelativeToProjectRoot$
+Arguments:         jcf:format
 Working Directory: $ProjectFileDir$
 ```
 
 > **Tip!** Add an unused key shortcut to execute the external tool. Then you can use the old
 > shortcut to format other file types.
-
-#### Install File Watchers Plugin in IntelliJ
-
-You can also configure IntelliJ to run Prettier every time IntelliJ saves a Java file. But if you
-are editing the file at the same time, you will get a warning that the file in memory and the file
-on disk both changed, and asked to select one of them.
-
-1. In the menu, open _Preferences..._ and select _Plugins_.
-2. Search for "File Watchers" in the Marketplace.
-3. Run _Install_.
-
-##### Configure File Watchers
-
-You can run Prettier upon every file save in IntelliJ using the File Watchers plugin. There are
-several ways to set it up. Below is how to configure it using Maven to run the formatter. The Maven
-way works without any installation of other components but might be a bit slow. So you might want to
-install [prettier-java](https://github.com/jhipster/prettier-java/) in your shell and run it
-instead.
-
-```text
-Name:              Format files with Prettier
-File Type:         Java
-Scope:             Project Files
-Program:           mvn
-Arguments:         spotless:apply -DspotlessFiles=$FilePathRelativeToProjectRoot$
-Working Directory: $ProjectFileDir$
-```
 
 ### Other IDEs
 
