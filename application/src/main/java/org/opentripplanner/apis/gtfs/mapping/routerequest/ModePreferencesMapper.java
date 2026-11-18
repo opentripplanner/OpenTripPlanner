@@ -8,7 +8,6 @@ import graphql.schema.DataFetchingEnvironment;
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.mapping.TransitModeMapper;
@@ -22,6 +21,7 @@ import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.transit.model.basic.DistanceCategory;
 import org.opentripplanner.transit.model.basic.NarrowedTransitMode;
 import org.opentripplanner.transit.model.basic.ReplacementRequirement;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.utils.collection.CollectionUtils;
 import org.opentripplanner.utils.time.DurationUtils;
 
@@ -95,7 +95,7 @@ public class ModePreferencesMapper {
         if (planTransitModes.isEmpty()) {
           throw new InvalidInputException("Transit modes must not be empty.");
         }
-        var narrowedModes = planTransitModes.stream().flatMap(ModePreferencesMapper::map).toList();
+        var narrowedModes = planTransitModes.stream().map(ModePreferencesMapper::map).toList();
         setTransitFilters(journey, narrowedModes, args);
       }
     }
@@ -122,32 +122,28 @@ public class ModePreferencesMapper {
     };
   }
 
-  /**
-   * Map one transit mode input to the narrowed modes it selects. A list of distance categories is
-   * mapped to one narrowed mode per category, which are combined with OR like all transit modes.
-   */
-  private static Stream<NarrowedTransitMode> map(
-    GraphQLTypes.GraphQLPlanTransitModePreferenceInput input
-  ) {
+  private static NarrowedTransitMode map(GraphQLTypes.GraphQLPlanTransitModePreferenceInput input) {
     var mode = TransitModeMapper.map(input.getGraphQLMode());
-    var replacement = map(input.getGraphQLReplacement());
-    var categories = input.getGraphQLDistanceCategories();
-    if (categories == null) {
-      return Stream.of(NarrowedTransitMode.of(mode).withReplacement(replacement).build());
+    return NarrowedTransitMode.of(mode)
+      .withReplacement(map(input.getGraphQLReplacement()))
+      .withDistanceCategories(mapDistanceCategories(mode, input.getGraphQLDistanceCategories()))
+      .build();
+  }
+
+  @Nullable
+  private static List<DistanceCategory> mapDistanceCategories(
+    TransitMode mode,
+    @Nullable List<GraphQLTypes.GraphQLDistanceCategory> input
+  ) {
+    if (input == null) {
+      return null;
     }
-    if (categories.isEmpty()) {
+    if (input.isEmpty()) {
       throw new InvalidInputException(
         "The distance categories of transit mode " + mode + " must not be empty."
       );
     }
-    return categories
-      .stream()
-      .map(category ->
-        NarrowedTransitMode.of(mode)
-          .withReplacement(replacement)
-          .withDistanceCategory(map(category))
-          .build()
-      );
+    return input.stream().map(ModePreferencesMapper::map).toList();
   }
 
   /**

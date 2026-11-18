@@ -1,11 +1,11 @@
 package org.opentripplanner.model.modes;
 
 import org.jspecify.annotations.Nullable;
-import org.opentripplanner.transit.model.basic.DistanceCategory;
 import org.opentripplanner.transit.model.basic.NarrowedTransitMode;
 import org.opentripplanner.transit.model.basic.ReplacementRequirement;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.service.DistanceCategoryHelper;
 import org.opentripplanner.transit.service.ReplacementHelper;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
@@ -66,10 +66,12 @@ public class AllowNarrowedTransitModeFilter implements AllowTransitModeFilter {
     SubMode netexSubmode,
     @Nullable Integer gtfsExtendedType
   ) {
-    var category = mode.getDistanceCategory();
+    var categories = mode.getDistanceCategories();
     return (
-      category == null ||
-      DistanceCategory.of(transitMode, netexSubmode, gtfsExtendedType) == category
+      categories == null ||
+      categories.contains(
+        DistanceCategoryHelper.distanceCategory(transitMode, netexSubmode, gtfsExtendedType)
+      )
     );
   }
 
@@ -114,7 +116,7 @@ public class AllowNarrowedTransitModeFilter implements AllowTransitModeFilter {
       .addEnum("mode", mode.getMode())
       .addObj("subMode", mode.getSubMode())
       .addEnum("isReplacement", mode.getReplacement())
-      .addEnum("distanceCategory", mode.getDistanceCategory())
+      .addCol("distanceCategories", mode.getDistanceCategories())
       .toString();
   }
 }

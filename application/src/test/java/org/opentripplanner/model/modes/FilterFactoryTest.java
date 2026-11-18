@@ -117,16 +117,13 @@ public class FilterFactoryTest {
     var filter = FilterFactory.create(
       List.of(
         NarrowedTransitMode.of(TransitMode.RAIL)
-          .withDistanceCategory(DistanceCategory.LOCAL)
-          .build(),
-        NarrowedTransitMode.of(TransitMode.RAIL)
-          .withDistanceCategory(DistanceCategory.REGIONAL)
+          .withDistanceCategories(List.of(DistanceCategory.LOCAL, DistanceCategory.REGIONAL))
           .build(),
         NarrowedTransitMode.of(TransitMode.BUS).build()
       )
     );
     assertEquals(
-      "FilterCollection[AllowMainModeFilter{mainMode: BUS}, AllowNarrowedTransitModesFilter{mainMode: RAIL, filters: [AllowNarrowedTransitModeFilter{mode: RAIL, isReplacement: IGNORED, distanceCategory: LOCAL}, AllowNarrowedTransitModeFilter{mode: RAIL, isReplacement: IGNORED, distanceCategory: REGIONAL}]}]",
+      "FilterCollection[AllowMainModeFilter{mainMode: BUS}, AllowNarrowedTransitModeFilter{mode: RAIL, isReplacement: IGNORED, distanceCategories: [LOCAL, REGIONAL]}]",
       filter.toString()
     );
   }
@@ -137,7 +134,7 @@ public class FilterFactoryTest {
       List.of(
         NarrowedTransitMode.of(TransitMode.RAIL).build(),
         NarrowedTransitMode.of(TransitMode.RAIL)
-          .withDistanceCategory(DistanceCategory.LONG_DISTANCE)
+          .withDistanceCategories(List.of(DistanceCategory.LONG_DISTANCE))
           .build()
       )
     );
@@ -149,16 +146,16 @@ public class FilterFactoryTest {
     var filter = FilterFactory.create(
       List.of(
         NarrowedTransitMode.of(TransitMode.RAIL)
-          .withDistanceCategory(DistanceCategory.LOCAL)
+          .withDistanceCategories(List.of(DistanceCategory.LOCAL))
           .build(),
         NarrowedTransitMode.of(TransitMode.RAIL)
-          .withDistanceCategory(DistanceCategory.LOCAL)
+          .withDistanceCategories(List.of(DistanceCategory.LOCAL))
           .build()
       )
     );
     // A single filter, not an AllowNarrowedTransitModesFilter with two identical filters
     assertEquals(
-      "AllowNarrowedTransitModeFilter{mode: RAIL, isReplacement: IGNORED, distanceCategory: LOCAL}",
+      "AllowNarrowedTransitModeFilter{mode: RAIL, isReplacement: IGNORED, distanceCategories: [LOCAL]}",
       filter.toString()
     );
   }

@@ -235,7 +235,7 @@ class RouteRequestMapperModesTest {
     var env = testCtx.executionContext(modesArgs);
     var routeRequest = RouteRequestMapper.toRouteRequest(env, testCtx.context());
     assertEquals(
-      "[(select: [(transportModes: [BUS, COACH::::IGNORED::LONG_DISTANCE, FERRY::::FORBIDDEN::LONG_DISTANCE, FERRY::::FORBIDDEN::REGIONAL, RAIL::::IGNORED::LOCAL, RAIL::::IGNORED::REGIONAL])])]",
+      "[(select: [(transportModes: [BUS, COACH::::IGNORED::[LONG_DISTANCE], FERRY::::FORBIDDEN::[REGIONAL, LONG_DISTANCE], RAIL::::IGNORED::[LOCAL, REGIONAL]])])]",
       routeRequest.journey().transit().filters().toString()
     );
   }

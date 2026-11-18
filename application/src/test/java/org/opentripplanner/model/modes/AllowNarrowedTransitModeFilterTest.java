@@ -3,6 +3,7 @@ package org.opentripplanner.model.modes;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model.basic.DistanceCategory;
 import org.opentripplanner.transit.model.basic.NarrowedTransitMode;
@@ -75,7 +76,7 @@ public class AllowNarrowedTransitModeFilterTest {
   void matchDistanceCategory() {
     var regionalRail = new AllowNarrowedTransitModeFilter(
       NarrowedTransitMode.of(TransitMode.RAIL)
-        .withDistanceCategory(DistanceCategory.REGIONAL)
+        .withDistanceCategories(List.of(DistanceCategory.REGIONAL))
         .build()
     );
 
@@ -93,7 +94,7 @@ public class AllowNarrowedTransitModeFilterTest {
     // Every trip has a category. Trips which aren't mapped get the default of their mode.
     var regionalRail = new AllowNarrowedTransitModeFilter(
       NarrowedTransitMode.of(TransitMode.RAIL)
-        .withDistanceCategory(DistanceCategory.REGIONAL)
+        .withDistanceCategories(List.of(DistanceCategory.REGIONAL))
         .build()
     );
     assertTrue(regionalRail.match(TransitMode.RAIL, SubMode.UNKNOWN, null));
@@ -102,7 +103,7 @@ public class AllowNarrowedTransitModeFilterTest {
 
     var longDistanceRail = new AllowNarrowedTransitModeFilter(
       NarrowedTransitMode.of(TransitMode.RAIL)
-        .withDistanceCategory(DistanceCategory.LONG_DISTANCE)
+        .withDistanceCategories(List.of(DistanceCategory.LONG_DISTANCE))
         .build()
     );
     assertFalse(longDistanceRail.match(TransitMode.RAIL, SubMode.UNKNOWN, 2));
@@ -111,7 +112,9 @@ public class AllowNarrowedTransitModeFilterTest {
   @Test
   void matchDistanceCategoryOfAnyMode() {
     var localBus = new AllowNarrowedTransitModeFilter(
-      NarrowedTransitMode.of(TransitMode.BUS).withDistanceCategory(DistanceCategory.LOCAL).build()
+      NarrowedTransitMode.of(TransitMode.BUS)
+        .withDistanceCategories(List.of(DistanceCategory.LOCAL))
+        .build()
     );
     assertTrue(localBus.match(TransitMode.BUS, LOCAL_BUS, null));
     assertTrue(localBus.match(TransitMode.BUS, SubMode.UNKNOWN, 704));
@@ -121,13 +124,31 @@ public class AllowNarrowedTransitModeFilterTest {
 
     var regionalBus = new AllowNarrowedTransitModeFilter(
       NarrowedTransitMode.of(TransitMode.BUS)
-        .withDistanceCategory(DistanceCategory.REGIONAL)
+        .withDistanceCategories(List.of(DistanceCategory.REGIONAL))
         .build()
     );
     assertTrue(regionalBus.match(TransitMode.BUS, REGIONAL_BUS, null));
-    assertTrue(regionalBus.match(TransitMode.BUS, RAIL_REPLACEMENT_BUS, null));
-    assertTrue(regionalBus.match(TransitMode.BUS, SubMode.UNKNOWN, 714));
     assertFalse(regionalBus.match(TransitMode.BUS, LOCAL_BUS, null));
+
+    // Rail replacement buses keep the default category of buses
+    assertTrue(localBus.match(TransitMode.BUS, RAIL_REPLACEMENT_BUS, null));
+    assertTrue(localBus.match(TransitMode.BUS, SubMode.UNKNOWN, 714));
+    assertFalse(regionalBus.match(TransitMode.BUS, RAIL_REPLACEMENT_BUS, null));
+  }
+
+  @Test
+  void matchOneOfSeveralDistanceCategories() {
+    var localAndRegionalRail = new AllowNarrowedTransitModeFilter(
+      NarrowedTransitMode.of(TransitMode.RAIL)
+        .withDistanceCategories(List.of(DistanceCategory.LOCAL, DistanceCategory.REGIONAL))
+        .build()
+    );
+    assertTrue(localAndRegionalRail.match(TransitMode.RAIL, SUBURBAN_RAILWAY, null));
+    assertTrue(localAndRegionalRail.match(TransitMode.RAIL, REGIONAL_RAIL, null));
+    assertFalse(localAndRegionalRail.match(TransitMode.RAIL, LONG_DISTANCE_RAIL, null));
+    assertFalse(
+      localAndRegionalRail.match(TransitMode.RAIL, SubMode.UNKNOWN, GTFS_LONG_DISTANCE_RAIL)
+    );
   }
 
   @Test
@@ -136,7 +157,7 @@ public class AllowNarrowedTransitModeFilterTest {
     var nonReplacementRegionalRail = new AllowNarrowedTransitModeFilter(
       NarrowedTransitMode.of(TransitMode.RAIL)
         .withReplacement(ReplacementRequirement.FORBIDDEN)
-        .withDistanceCategory(DistanceCategory.REGIONAL)
+        .withDistanceCategories(List.of(DistanceCategory.REGIONAL))
         .build()
     );
     assertTrue(nonReplacementRegionalRail.match(TransitMode.RAIL, REGIONAL_RAIL, null));
@@ -153,7 +174,7 @@ public class AllowNarrowedTransitModeFilterTest {
     var replacementRegionalRail = new AllowNarrowedTransitModeFilter(
       NarrowedTransitMode.of(TransitMode.RAIL)
         .withReplacement(ReplacementRequirement.REQUIRED)
-        .withDistanceCategory(DistanceCategory.REGIONAL)
+        .withDistanceCategories(List.of(DistanceCategory.REGIONAL))
         .build()
     );
     assertTrue(replacementRegionalRail.match(TransitMode.RAIL, REPLACEMENT_RAIL_SERVICE, null));
@@ -165,7 +186,7 @@ public class AllowNarrowedTransitModeFilterTest {
     var replacementLocalRail = new AllowNarrowedTransitModeFilter(
       NarrowedTransitMode.of(TransitMode.RAIL)
         .withReplacement(ReplacementRequirement.REQUIRED)
-        .withDistanceCategory(DistanceCategory.LOCAL)
+        .withDistanceCategories(List.of(DistanceCategory.LOCAL))
         .build()
     );
     assertFalse(replacementLocalRail.match(TransitMode.RAIL, REPLACEMENT_RAIL_SERVICE, null));
@@ -176,7 +197,7 @@ public class AllowNarrowedTransitModeFilterTest {
     var filter = new AllowNarrowedTransitModeFilter(
       NarrowedTransitMode.of(TransitMode.RAIL)
         .withSubMode(REGIONAL_RAIL)
-        .withDistanceCategory(DistanceCategory.REGIONAL)
+        .withDistanceCategories(List.of(DistanceCategory.REGIONAL))
         .build()
     );
     assertTrue(filter.match(TransitMode.RAIL, REGIONAL_RAIL, null));
@@ -192,12 +213,12 @@ public class AllowNarrowedTransitModeFilterTest {
   void inheritedSubmodeOfOtherModeGivesDefaultCategoryOfMode() {
     var regionalCoach = new AllowNarrowedTransitModeFilter(
       NarrowedTransitMode.of(TransitMode.COACH)
-        .withDistanceCategory(DistanceCategory.REGIONAL)
+        .withDistanceCategories(List.of(DistanceCategory.REGIONAL))
         .build()
     );
     var longDistanceCoach = new AllowNarrowedTransitModeFilter(
       NarrowedTransitMode.of(TransitMode.COACH)
-        .withDistanceCategory(DistanceCategory.LONG_DISTANCE)
+        .withDistanceCategories(List.of(DistanceCategory.LONG_DISTANCE))
         .build()
     );
     assertFalse(regionalCoach.match(TransitMode.COACH, REGIONAL_RAIL, null));
@@ -205,11 +226,13 @@ public class AllowNarrowedTransitModeFilterTest {
 
     var regionalBus = new AllowNarrowedTransitModeFilter(
       NarrowedTransitMode.of(TransitMode.BUS)
-        .withDistanceCategory(DistanceCategory.REGIONAL)
+        .withDistanceCategories(List.of(DistanceCategory.REGIONAL))
         .build()
     );
     var localBus = new AllowNarrowedTransitModeFilter(
-      NarrowedTransitMode.of(TransitMode.BUS).withDistanceCategory(DistanceCategory.LOCAL).build()
+      NarrowedTransitMode.of(TransitMode.BUS)
+        .withDistanceCategories(List.of(DistanceCategory.LOCAL))
+        .build()
     );
     assertFalse(regionalBus.match(TransitMode.BUS, REGIONAL_RAIL, null));
     assertTrue(localBus.match(TransitMode.BUS, REGIONAL_RAIL, null));

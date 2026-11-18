@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.model.basic;
+package org.opentripplanner.transit.service;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.opentripplanner.transit.model.basic.DistanceCategory.LOCAL;
@@ -11,8 +11,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.opentripplanner.gtfs.mapping.TransitModeMapper;
+import org.opentripplanner.transit.model.basic.DistanceCategory;
+import org.opentripplanner.transit.model.basic.SubMode;
+import org.opentripplanner.transit.model.basic.TransitMode;
 
-class DistanceCategoryTest {
+class DistanceCategoryHelperTest {
 
   /**
    * The agreed categorization of the GTFS extended route types. The OTP mode is not part of the
@@ -72,7 +75,8 @@ class DistanceCategoryTest {
     "711, LOCAL",
     "712, LOCAL",
     "713, LOCAL",
-    "714, REGIONAL",
+    // Rail replacement buses keep the bus default like replacement rail (110) keeps the rail default
+    "714, LOCAL",
     "715, LOCAL",
     "716, LOCAL",
     // Trolleybus and tram
@@ -108,7 +112,9 @@ class DistanceCategoryTest {
   })
   void ofGtfsExtendedType(int gtfsType, DistanceCategory expected) {
     var mode = TransitModeMapper.mapMode(gtfsType);
-    assertThat(DistanceCategory.of(mode, SubMode.UNKNOWN, gtfsType)).isEqualTo(expected);
+    assertThat(DistanceCategoryHelper.distanceCategory(mode, SubMode.UNKNOWN, gtfsType)).isEqualTo(
+      expected
+    );
   }
 
   /**
@@ -153,7 +159,7 @@ class DistanceCategoryTest {
     "BUS, regionalBus, REGIONAL",
     "BUS, shuttleBus, LOCAL",
     "BUS, postBus, REGIONAL",
-    "BUS, railReplacementBus, REGIONAL",
+    "BUS, railReplacementBus, LOCAL",
     // Tram
     "TRAM, cityTram, LOCAL",
     "TRAM, localTram, LOCAL",
@@ -182,7 +188,9 @@ class DistanceCategoryTest {
     "AIRPLANE, shortHaulInternationalFlight, LONG_DISTANCE",
   })
   void ofNetexSubmode(TransitMode mode, String submode, DistanceCategory expected) {
-    assertThat(DistanceCategory.of(mode, SubMode.of(submode), null)).isEqualTo(expected);
+    assertThat(DistanceCategoryHelper.distanceCategory(mode, SubMode.of(submode), null)).isEqualTo(
+      expected
+    );
   }
 
   private static final Map<TransitMode, DistanceCategory> DEFAULT_CATEGORIES = Map.ofEntries(
@@ -217,17 +225,31 @@ class DistanceCategoryTest {
   void unmappedTripsGetTheDefaultCategoryOfTheirMode(TransitMode mode) {
     var expected = DEFAULT_CATEGORIES.get(mode);
 
-    assertThat(DistanceCategory.of(mode, SubMode.UNKNOWN, null)).isEqualTo(expected);
-    assertThat(DistanceCategory.of(mode, SubMode.of("unknown"), null)).isEqualTo(expected);
-    assertThat(DistanceCategory.of(mode, SubMode.UNKNOWN, 99999)).isEqualTo(expected);
+    assertThat(DistanceCategoryHelper.distanceCategory(mode, SubMode.UNKNOWN, null)).isEqualTo(
+      expected
+    );
+    assertThat(
+      DistanceCategoryHelper.distanceCategory(mode, SubMode.of("unknown"), null)
+    ).isEqualTo(expected);
+    assertThat(DistanceCategoryHelper.distanceCategory(mode, SubMode.UNKNOWN, 99999)).isEqualTo(
+      expected
+    );
   }
 
   @Test
   void plainGtfsRouteTypes() {
-    assertThat(DistanceCategory.of(TransitMode.RAIL, SubMode.UNKNOWN, 2)).isEqualTo(REGIONAL);
-    assertThat(DistanceCategory.of(TransitMode.BUS, SubMode.UNKNOWN, 3)).isEqualTo(LOCAL);
-    assertThat(DistanceCategory.of(TransitMode.TRAM, SubMode.UNKNOWN, 0)).isEqualTo(LOCAL);
-    assertThat(DistanceCategory.of(TransitMode.FERRY, SubMode.UNKNOWN, 4)).isEqualTo(REGIONAL);
+    assertThat(
+      DistanceCategoryHelper.distanceCategory(TransitMode.RAIL, SubMode.UNKNOWN, 2)
+    ).isEqualTo(REGIONAL);
+    assertThat(
+      DistanceCategoryHelper.distanceCategory(TransitMode.BUS, SubMode.UNKNOWN, 3)
+    ).isEqualTo(LOCAL);
+    assertThat(
+      DistanceCategoryHelper.distanceCategory(TransitMode.TRAM, SubMode.UNKNOWN, 0)
+    ).isEqualTo(LOCAL);
+    assertThat(
+      DistanceCategoryHelper.distanceCategory(TransitMode.FERRY, SubMode.UNKNOWN, 4)
+    ).isEqualTo(REGIONAL);
   }
 
   /**
@@ -239,23 +261,37 @@ class DistanceCategoryTest {
   void submodeOrRouteTypeOfOtherModeIsIgnored() {
     var regionalRail = SubMode.of("regionalRail");
     var suburbanRailway = SubMode.of("suburbanRailway");
-    assertThat(DistanceCategory.of(TransitMode.BUS, suburbanRailway, null)).isEqualTo(LOCAL);
-    assertThat(DistanceCategory.of(TransitMode.COACH, regionalRail, null)).isEqualTo(LONG_DISTANCE);
-    assertThat(DistanceCategory.of(TransitMode.COACH, suburbanRailway, null)).isEqualTo(
-      LONG_DISTANCE
-    );
-    assertThat(DistanceCategory.of(TransitMode.RAIL, SubMode.of("shuttleCoach"), null)).isEqualTo(
-      REGIONAL
-    );
-    assertThat(DistanceCategory.of(TransitMode.BUS, SubMode.UNKNOWN, 106)).isEqualTo(LOCAL);
-    assertThat(DistanceCategory.of(TransitMode.RAIL, SubMode.UNKNOWN, 204)).isEqualTo(REGIONAL);
+    assertThat(
+      DistanceCategoryHelper.distanceCategory(TransitMode.BUS, suburbanRailway, null)
+    ).isEqualTo(LOCAL);
+    assertThat(
+      DistanceCategoryHelper.distanceCategory(TransitMode.COACH, regionalRail, null)
+    ).isEqualTo(LONG_DISTANCE);
+    assertThat(
+      DistanceCategoryHelper.distanceCategory(TransitMode.COACH, suburbanRailway, null)
+    ).isEqualTo(LONG_DISTANCE);
+    assertThat(
+      DistanceCategoryHelper.distanceCategory(TransitMode.RAIL, SubMode.of("shuttleCoach"), null)
+    ).isEqualTo(REGIONAL);
+    assertThat(
+      DistanceCategoryHelper.distanceCategory(TransitMode.BUS, SubMode.UNKNOWN, 106)
+    ).isEqualTo(LOCAL);
+    assertThat(
+      DistanceCategoryHelper.distanceCategory(TransitMode.RAIL, SubMode.UNKNOWN, 204)
+    ).isEqualTo(REGIONAL);
   }
 
   @Test
   void netexSubmodeTakesPrecedenceOverGtfsExtendedType() {
     var rail = TransitMode.RAIL;
-    assertThat(DistanceCategory.of(rail, SubMode.of("longDistance"), 109)).isEqualTo(LONG_DISTANCE);
-    assertThat(DistanceCategory.of(rail, SubMode.of("suburbanRailway"), 101)).isEqualTo(LOCAL);
-    assertThat(DistanceCategory.of(rail, SubMode.of("railShuttle"), 102)).isEqualTo(LOCAL);
+    assertThat(
+      DistanceCategoryHelper.distanceCategory(rail, SubMode.of("longDistance"), 109)
+    ).isEqualTo(LONG_DISTANCE);
+    assertThat(
+      DistanceCategoryHelper.distanceCategory(rail, SubMode.of("suburbanRailway"), 101)
+    ).isEqualTo(LOCAL);
+    assertThat(
+      DistanceCategoryHelper.distanceCategory(rail, SubMode.of("railShuttle"), 102)
+    ).isEqualTo(LOCAL);
   }
 }

@@ -1,8 +1,11 @@
 package org.opentripplanner.transit.model.basic;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 
@@ -31,13 +34,16 @@ public final class NarrowedTransitMode {
   private final ReplacementRequirement replacement;
 
   @Nullable
-  private final DistanceCategory distanceCategory;
+  private final Set<DistanceCategory> distanceCategories;
 
   private NarrowedTransitMode(Builder builder) {
     this.mode = builder.mode;
     this.subMode = builder.subMode;
     this.replacement = builder.replacement;
-    this.distanceCategory = builder.distanceCategory;
+    this.distanceCategories =
+      builder.distanceCategories == null
+        ? null
+        : Collections.unmodifiableSet(EnumSet.copyOf(builder.distanceCategories));
   }
 
   /**
@@ -65,7 +71,7 @@ public final class NarrowedTransitMode {
    * faster {@link MainAndSubMode} based filters.
    */
   public boolean isConvertibleToMainAndSubMode() {
-    return this.replacement == ReplacementRequirement.IGNORED && this.distanceCategory == null;
+    return this.replacement == ReplacementRequirement.IGNORED && this.distanceCategories == null;
   }
 
   public MainAndSubMode toMainAndSubMode() {
@@ -92,11 +98,12 @@ public final class NarrowedTransitMode {
   }
 
   /**
-   * null here means that we don't care about the distance category of the trip
+   * A trip must have one of these distance categories. null here means that we don't care about
+   * the distance category of the trip. Never empty.
    */
   @Nullable
-  public DistanceCategory getDistanceCategory() {
-    return distanceCategory;
+  public Set<DistanceCategory> getDistanceCategories() {
+    return distanceCategories;
   }
 
   @Override
@@ -112,18 +119,18 @@ public final class NarrowedTransitMode {
       mode == that.mode &&
       Objects.equals(subMode, that.subMode) &&
       replacement == that.replacement &&
-      distanceCategory == that.distanceCategory
+      Objects.equals(distanceCategories, that.distanceCategories)
     );
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(mode, subMode, replacement, distanceCategory);
+    return Objects.hash(mode, subMode, replacement, distanceCategories);
   }
 
   @Override
   public String toString() {
-    if (distanceCategory != null) {
+    if (distanceCategories != null) {
       return (
         mode.name() +
         "::" +
@@ -131,7 +138,7 @@ public final class NarrowedTransitMode {
         "::" +
         replacement +
         "::" +
-        distanceCategory
+        distanceCategories
       );
     }
     if (replacement != ReplacementRequirement.IGNORED) {
@@ -165,7 +172,7 @@ public final class NarrowedTransitMode {
     private ReplacementRequirement replacement = ReplacementRequirement.IGNORED;
 
     @Nullable
-    private DistanceCategory distanceCategory;
+    private Collection<DistanceCategory> distanceCategories;
 
     private Builder(TransitMode mode) {
       this.mode = Objects.requireNonNull(mode);
@@ -185,10 +192,17 @@ public final class NarrowedTransitMode {
     }
 
     /**
-     * Only match trips with the given distance category, or any category if null.
+     * Only match trips with one of the given distance categories, or any category if null.
+     *
+     * @throws IllegalArgumentException if the categories are empty, as no trip would match
      */
-    public Builder withDistanceCategory(@Nullable DistanceCategory distanceCategory) {
-      this.distanceCategory = distanceCategory;
+    public Builder withDistanceCategories(
+      @Nullable Collection<DistanceCategory> distanceCategories
+    ) {
+      if (distanceCategories != null && distanceCategories.isEmpty()) {
+        throw new IllegalArgumentException("The distance categories must not be empty");
+      }
+      this.distanceCategories = distanceCategories;
       return this;
     }
 
