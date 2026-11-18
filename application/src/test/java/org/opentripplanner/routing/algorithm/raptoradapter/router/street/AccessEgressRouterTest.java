@@ -27,6 +27,7 @@ import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.transit.service.TransitServiceResolver;
 
 class AccessEgressRouterTest extends GraphRoutingTest {
 
@@ -272,7 +273,7 @@ class AccessEgressRouterTest extends GraphRoutingTest {
       var linkingContextFactory = new LinkingContextFactory(
         graph,
         vertexCreationService,
-        transitService
+        new TransitServiceResolver(transitService)
       );
       var linkingRequest = LinkingContextRequestMapper.map(request);
       var linkingContext = linkingContextFactory.create(verticesContainer, linkingRequest);

@@ -38,6 +38,7 @@ import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
+import org.opentripplanner.transit.service.NoopSiteResolver;
 import org.opentripplanner.transit.service.TransitRepository;
 
 public class BarrierRoutingTest {
@@ -190,7 +191,11 @@ public class BarrierRoutingTest {
     var request = builder.buildRequest();
     var vertexLinker = VertexLinkerTestFactory.of(graph);
     var vertexCreationService = new VertexCreationService(vertexLinker);
-    var linkingContextFactory = new LinkingContextFactory(graph, vertexCreationService, null);
+    var linkingContextFactory = new LinkingContextFactory(
+      graph,
+      vertexCreationService,
+      new NoopSiteResolver()
+    );
     var linkingRequest = LinkingContextRequestMapper.map(request);
     var linkingContext = linkingContextFactory.create(temporaryVerticesContainer, linkingRequest);
     var transitService = TestServerContext.createTransitService(

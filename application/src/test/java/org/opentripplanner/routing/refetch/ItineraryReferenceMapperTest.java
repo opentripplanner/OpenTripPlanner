@@ -38,6 +38,7 @@ import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model.TripInput;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.service.TransitServiceResolver;
 import org.opentripplanner.transit.transfer.regular.FixedRegularTransfers;
 
 /**
@@ -383,7 +384,7 @@ class ItineraryReferenceMapperTest {
     var linkingContextFactory = new LinkingContextFactory(
       GRAPH,
       vertexCreationService,
-      TRANSIT_ENV.transitService()
+      new TransitServiceResolver(TRANSIT_ENV.transitService())
     );
 
     return new RefetchItineraryService(

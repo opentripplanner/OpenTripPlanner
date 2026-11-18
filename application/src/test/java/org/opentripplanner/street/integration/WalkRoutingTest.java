@@ -20,6 +20,7 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.TemporaryVerticesContainer;
 import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
+import org.opentripplanner.transit.service.NoopSiteResolver;
 import org.opentripplanner.transit.service.TransitRepository;
 
 class WalkRoutingTest {
@@ -67,7 +68,11 @@ class WalkRoutingTest {
     try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
       var vertexLinker = VertexLinkerTestFactory.of(graph);
       var vertexCreationService = new VertexCreationService(vertexLinker);
-      var linkingContextFactory = new LinkingContextFactory(graph, vertexCreationService, null);
+      var linkingContextFactory = new LinkingContextFactory(
+        graph,
+        vertexCreationService,
+        new NoopSiteResolver()
+      );
       var linkingRequest = LinkingContextRequestMapper.map(request);
       var linkingContext = linkingContextFactory.create(temporaryVerticesContainer, linkingRequest);
       var transitService = TestServerContext.createTransitService(

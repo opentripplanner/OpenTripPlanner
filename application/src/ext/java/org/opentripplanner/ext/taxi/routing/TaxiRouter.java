@@ -24,8 +24,8 @@ import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
-import org.opentripplanner.transit.service.GenericLocationHelper;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.transit.service.TransitServiceResolver;
 import org.opentripplanner.utils.lang.Sandbox;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,8 +75,9 @@ public class TaxiRouter {
     RouteRequest request,
     LinkingContext linkingContext
   ) {
-    WgsCoordinate pickup = GenericLocationHelper.findCoordinate(transitService, request.from());
-    WgsCoordinate dropoff = GenericLocationHelper.findCoordinate(transitService, request.to());
+    var siteResolver = new TransitServiceResolver(transitService);
+    WgsCoordinate pickup = siteResolver.findCoordinate(request.from());
+    WgsCoordinate dropoff = siteResolver.findCoordinate(request.to());
     if (
       pickup == null || dropoff == null || taxiRouteIndex.findFirstRoute(pickup, dropoff).isEmpty()
     ) {
@@ -120,7 +121,7 @@ public class TaxiRouter {
     RouteRequest request
   ) {
     var location = type.isAccess() ? request.from() : request.to();
-    var coordinate = GenericLocationHelper.findCoordinate(transitService, location);
+    var coordinate = new TransitServiceResolver(transitService).findCoordinate(location);
     return coordinate == null
       ? List.of()
       : filterNearbyStops(transitService, nearbyStops, coordinate);

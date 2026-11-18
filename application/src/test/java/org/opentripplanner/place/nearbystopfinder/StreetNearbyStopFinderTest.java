@@ -24,6 +24,7 @@ import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
+import org.opentripplanner.transit.service.NoopSiteResolver;
 
 class StreetNearbyStopFinderTest extends GraphRoutingTest {
 
@@ -68,7 +69,7 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
           linkingContextFactory = new LinkingContextFactory(
             graph(),
             new VertexCreationService(vertexLinker),
-            null
+            new NoopSiteResolver()
           );
         }
       }

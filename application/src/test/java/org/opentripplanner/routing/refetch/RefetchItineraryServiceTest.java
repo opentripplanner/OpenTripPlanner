@@ -46,6 +46,7 @@ import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model.TripInput;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.transit.service.NoopSiteResolver;
 import org.opentripplanner.transit.transfer.regular.FixedRegularTransfers;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 import org.opentripplanner.updater.trip.gtfs.GtfsRtTestHelper;
@@ -466,7 +467,7 @@ public class RefetchItineraryServiceTest {
     LinkingContextFactory linkingContextFactory = new LinkingContextFactory(
       GRAPH,
       vertexCreationService,
-      null
+      new NoopSiteResolver()
     );
 
     var streetLimitationParametersService = new StreetLimitationParametersService() {

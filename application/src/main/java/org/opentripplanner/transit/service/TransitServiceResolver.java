@@ -1,7 +1,11 @@
 package org.opentripplanner.transit.service;
 
+import java.util.List;
 import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.model.GenericLocation;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.SiteResolver;
 import org.opentripplanner.transit.StopResolver;
 import org.opentripplanner.transit.model.site.Entrance;
@@ -32,5 +36,31 @@ public class TransitServiceResolver implements SiteResolver, StopResolver {
   @Override
   public Entrance getEntrance(FeedScopedId id) {
     return transitService.getEntrance(id);
+  }
+
+  @Override
+  public List<FeedScopedId> findStopOrChildIds(FeedScopedId id) {
+    return transitService.findStopOrChildIds(id);
+  }
+
+  @Override
+  @Nullable
+  public WgsCoordinate findCoordinate(GenericLocation location) {
+    if (location.wgsCoordinate() != null) {
+      return location.wgsCoordinate();
+    }
+    var id = location.stopId();
+    if (id == null) {
+      return null;
+    }
+    var stop = transitService.getStopLocation(id);
+    if (stop != null) {
+      return stop.getCoordinate();
+    }
+    var group = transitService.getStopLocationsGroup(id);
+    if (group != null) {
+      return group.getCoordinate();
+    }
+    return null;
   }
 }

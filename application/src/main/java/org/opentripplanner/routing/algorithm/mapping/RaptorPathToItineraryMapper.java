@@ -53,7 +53,6 @@ import org.opentripplanner.streetadapter.StreetSearchRequestMapper;
 import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
-import org.opentripplanner.transit.service.GenericLocationHelper;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.transit.service.TransitServiceResolver;
 import org.opentripplanner.transit.transfer.regular.api.RegularTransfersService;
@@ -78,6 +77,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
   private final StreetPathToLegsMapper streetPathToLegsMapper;
   private final TransitService transitService;
+  private final TransitServiceResolver siteResolver;
   private final CarpoolItineraryMapper carpoolItineraryMapper;
 
   @Nullable
@@ -109,8 +109,9 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     this.transferMode = request.journey().transfer().mode();
     this.request = request;
     this.transferStreetRequest = StreetSearchRequestMapper.mapToTransferRequest(request).build();
+    this.siteResolver = new TransitServiceResolver(transitService);
     this.streetPathToLegsMapper = new StreetPathToLegsMapper(
-      new TransitServiceResolver(transitService),
+      siteResolver,
       transitService.getTimeZone(),
       streetDetailsService,
       graph.ellipsoidToGeoidDifference
@@ -227,9 +228,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     if (taxiService != null && request.journey().access().mode() == StreetMode.TAXI) {
       return taxiService.decorateAccessEgressLegs(
         legs,
-        Objects.requireNonNull(
-          GenericLocationHelper.findCoordinate(transitService, request.from())
-        ),
+        Objects.requireNonNull(siteResolver.findCoordinate(request.from())),
         raptorTransitData.getStopByIndex(accessPathLeg.access().stop()).getCoordinate()
       );
     }
@@ -397,7 +396,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       return taxiService.decorateAccessEgressLegs(
         legs,
         raptorTransitData.getStopByIndex(egressPathLeg.egress().stop()).getCoordinate(),
-        Objects.requireNonNull(GenericLocationHelper.findCoordinate(transitService, request.to()))
+        Objects.requireNonNull(siteResolver.findCoordinate(request.to()))
       );
     }
     return legs;

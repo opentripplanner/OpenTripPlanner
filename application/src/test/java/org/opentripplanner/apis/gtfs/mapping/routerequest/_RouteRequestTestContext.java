@@ -37,6 +37,7 @@ import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.transit.service.TransitServiceResolver;
 import org.opentripplanner.transit.transfer.regular.NoRegularTransfers;
 
 class _RouteRequestTestContext {
@@ -77,7 +78,7 @@ class _RouteRequestTestContext {
     var linkingContextFactory = new LinkingContextFactory(
       graph,
       vertexCreationService,
-      transitService
+      new TransitServiceResolver(transitService)
     );
     this.context = new TestGtfsGraphQLRequestContext(
       new TestRoutingService(List.of()),

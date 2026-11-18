@@ -62,6 +62,7 @@ import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.transit.service.TransitServiceResolver;
 import org.opentripplanner.transit.transfer.regular.NoRegularTransfers;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
@@ -284,7 +285,7 @@ public class TestServerContext {
     return new LinkingContextFactory(
       graph,
       new VertexCreationService(vertexLinker),
-      transitService
+      new TransitServiceResolver(transitService)
     );
   }
 }

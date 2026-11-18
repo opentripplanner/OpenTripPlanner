@@ -44,6 +44,7 @@ import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.transit.service.TransitServiceResolver;
 
 class LinkingContextFactoryTest {
 
@@ -113,7 +114,7 @@ class LinkingContextFactoryTest {
   private final LinkingContextFactory linkingContextFactory = new LinkingContextFactory(
     graph,
     vertexCreationService,
-    transitService
+    new TransitServiceResolver(transitService)
   );
 
   @Test
@@ -129,24 +130,6 @@ class LinkingContextFactoryTest {
     var linkingContext = linkingContextFactory.create(container, request);
     assertThat(linkingContext.findVertices(from)).hasSize(1);
     assertThat(linkingContext.findVertices(to)).hasSize(1);
-  }
-
-  @Test
-  void stopIdWithoutTransitServiceThrows() {
-    var container = new TemporaryVerticesContainer();
-    var request = LinkingContextRequest.of()
-      .withFrom(stopToLocation(stopA))
-      .withTo(stopToLocation(stopB))
-      .withDirectMode(StreetMode.WALK)
-      .build();
-    var factoryWithoutTransitService = new LinkingContextFactory(
-      graph,
-      vertexCreationService,
-      null
-    );
-    assertThrows(IllegalStateException.class, () ->
-      factoryWithoutTransitService.create(container, request)
-    );
   }
 
   @Test

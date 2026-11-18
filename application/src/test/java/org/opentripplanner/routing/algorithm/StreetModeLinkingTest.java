@@ -38,6 +38,7 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.transit.service.TransitServiceResolver;
 
 /**
  * This tests linking of GenericLocations to streets for each StreetMode. The test has 5 parallel
@@ -245,7 +246,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
         var linkingContextFactory = new LinkingContextFactory(
           graph,
           vertexCreationService,
-          transitService
+          new TransitServiceResolver(transitService)
         );
         var request = LinkingContextRequest.of()
           .withFrom(location)

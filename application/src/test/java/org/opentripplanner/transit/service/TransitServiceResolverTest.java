@@ -17,7 +17,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 
-class GenericLocationHelperTest {
+class TransitServiceResolverTest {
 
   private static final TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
   private static final WgsCoordinate EXPLICIT = new WgsCoordinate(59.9, 10.7);
@@ -35,16 +35,18 @@ class GenericLocationHelperTest {
     .withName(I18NString.of("GOS"))
     .build();
 
-  private final TransitService service = new DefaultTransitService(
-    new TransitRepository(
-      TEST_MODEL.siteRepositoryBuilder()
-        .withRegularStop(STOP)
-        .withStation(STATION)
-        .withMultiModalStation(MM_STATION)
-        .withGroupOfStation(GO_STATIONS)
-        .build()
-    ),
-    DefaultTimetableRepository.scheduledOnly(new TimetableDataImport().toScheduledTimetableData())
+  private final TransitServiceResolver resolver = new TransitServiceResolver(
+    new DefaultTransitService(
+      new TransitRepository(
+        TEST_MODEL.siteRepositoryBuilder()
+          .withRegularStop(STOP)
+          .withStation(STATION)
+          .withMultiModalStation(MM_STATION)
+          .withGroupOfStation(GO_STATIONS)
+          .build()
+      ),
+      DefaultTimetableRepository.scheduledOnly(new TimetableDataImport().toScheduledTimetableData())
+    )
   );
 
   @Test
@@ -55,40 +57,29 @@ class GenericLocationHelperTest {
       EXPLICIT.longitude(),
       null
     );
-    assertEquals(EXPLICIT, GenericLocationHelper.findCoordinate(service, location));
+    assertEquals(EXPLICIT, resolver.findCoordinate(location));
   }
 
   @Test
   void stopIdResolvesToStopCoordinate() {
-    var result = GenericLocationHelper.findCoordinate(
-      service,
-      GenericLocation.fromStopId(STOP.getId())
-    );
+    var result = resolver.findCoordinate(GenericLocation.fromStopId(STOP.getId()));
     assertEquals(STOP.getCoordinate(), result);
   }
 
   @Test
   void stationIdResolvesToStationCoordinate() {
-    var result = GenericLocationHelper.findCoordinate(
-      service,
-      GenericLocation.fromStopId(STATION.getId())
-    );
+    var result = resolver.findCoordinate(GenericLocation.fromStopId(STATION.getId()));
     assertEquals(STATION.getCoordinate(), result);
   }
 
   @Test
   void groupOfStationsIdResolvesToGroupCoordinate() {
-    var result = GenericLocationHelper.findCoordinate(
-      service,
-      GenericLocation.fromStopId(GO_STATIONS.getId())
-    );
+    var result = resolver.findCoordinate(GenericLocation.fromStopId(GO_STATIONS.getId()));
     assertEquals(GO_STATIONS.getCoordinate(), result);
   }
 
   @Test
   void unknownStopIdResolvesToNull() {
-    assertNull(
-      GenericLocationHelper.findCoordinate(service, GenericLocation.fromStopId(id("unknown")))
-    );
+    assertNull(resolver.findCoordinate(GenericLocation.fromStopId(id("unknown"))));
   }
 }

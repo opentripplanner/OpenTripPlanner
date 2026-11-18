@@ -58,6 +58,7 @@ import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.transit.service.TransitServiceResolver;
 import org.opentripplanner.transit.transfer.regular.NoRegularTransfers;
 
 class LegacyRouteRequestMapperTest implements PlanTestConstants {
@@ -85,7 +86,7 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
     var linkingContextFactory = new LinkingContextFactory(
       graph,
       vertexCreationService,
-      transitService
+      new TransitServiceResolver(transitService)
     );
     CONTEXT = new TestGtfsGraphQLRequestContext(
       new TestRoutingService(List.of()),

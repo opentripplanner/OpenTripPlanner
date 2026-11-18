@@ -29,6 +29,7 @@ import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.transit.service.TransitServiceResolver;
 
 class StreetNearbyPlaceFinderTest extends GraphRoutingTest {
 
@@ -136,7 +137,7 @@ class StreetNearbyPlaceFinderTest extends GraphRoutingTest {
     var linkingContextFactory = new LinkingContextFactory(
       otpModel.graph(),
       new VertexCreationService(vertexLinker),
-      transitService
+      new TransitServiceResolver(transitService)
     );
     nearbyPlaceFinder = new StreetNearbyPlaceFinder(linkingContextFactory);
   }

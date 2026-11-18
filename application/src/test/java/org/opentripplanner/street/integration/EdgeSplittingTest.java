@@ -41,6 +41,7 @@ import org.opentripplanner.street.search.request.StreetSearchRequestBuilder;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.streetadapter.StreetSearchRequestMapper;
 import org.opentripplanner.streetadapter.VertexFactory;
+import org.opentripplanner.transit.service.NoopSiteResolver;
 
 public class EdgeSplittingTest {
 
@@ -287,7 +288,11 @@ public class EdgeSplittingTest {
     try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
       var vertexLinker = VertexLinkerTestFactory.of(graph);
       var vertexCreationService = new VertexCreationService(vertexLinker);
-      var linkingContextFactory = new LinkingContextFactory(graph, vertexCreationService, null);
+      var linkingContextFactory = new LinkingContextFactory(
+        graph,
+        vertexCreationService,
+        new NoopSiteResolver()
+      );
       var linkingRequest = LinkingContextRequestMapper.map(walking);
       var linkingContext = linkingContextFactory.create(temporaryVerticesContainer, linkingRequest);
       var fromVertices = linkingContext.findVertices(from);

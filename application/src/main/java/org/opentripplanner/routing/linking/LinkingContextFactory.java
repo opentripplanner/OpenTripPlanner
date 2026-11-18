@@ -30,8 +30,7 @@ import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.transit.service.GenericLocationHelper;
-import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.transit.SiteResolver;
 
 /**
  * This is a factory that is responsible for linking origin, destination and visit via locations
@@ -45,21 +44,16 @@ public class LinkingContextFactory {
   private final Graph graph;
   private final VertexCreationService vertexCreationService;
 
-  /**
-   * Resolves stop, station, and group ids to child stops and coordinates. Non-null during runtime
-   * only, it is {@code null} during graph build.
-   */
-  @Nullable
-  private final TransitService transitService;
+  private final SiteResolver siteResolver;
 
   public LinkingContextFactory(
     Graph graph,
     VertexCreationService vertexCreationService,
-    @Nullable TransitService transitService
+    SiteResolver siteResolver
   ) {
     this.graph = graph;
     this.vertexCreationService = vertexCreationService;
-    this.transitService = transitService;
+    this.siteResolver = siteResolver;
   }
 
   /**
@@ -336,8 +330,7 @@ public class LinkingContextFactory {
     GenericLocation location,
     LocationType type
   ) {
-    assertTransitServiceAvailable();
-    var coordinate = GenericLocationHelper.findCoordinate(transitService, location);
+    var coordinate = siteResolver.findCoordinate(location);
     if (coordinate == null) {
       return Optional.empty();
     }
@@ -434,19 +427,10 @@ public class LinkingContextFactory {
   }
 
   private Set<TransitStopVertex> findStopOrChildStopVertices(FeedScopedId stopId) {
-    assertTransitServiceAvailable();
-    return transitService
+    return siteResolver
       .findStopOrChildIds(stopId)
       .stream()
       .flatMap(id -> graph.findStopVertex(id).stream())
       .collect(Collectors.toUnmodifiableSet());
-  }
-
-  private void assertTransitServiceAvailable() {
-    if (transitService == null) {
-      throw new IllegalStateException(
-        "A TransitService is required to resolve stop or station ids, but none was provided."
-      );
-    }
   }
 }
