@@ -90,7 +90,6 @@ public class StreetSearchRequestMapper {
   ///
   /// - they are always depart-at
   /// - their start time is always the epoch (0)
-  ///
   public static StreetSearchRequestBuilder mapToTransferRequest(RouteRequest request) {
     return map(request)
       .withFromEnvelope(null)

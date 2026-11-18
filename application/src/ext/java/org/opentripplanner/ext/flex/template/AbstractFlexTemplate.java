@@ -53,16 +53,15 @@ abstract class AbstractFlexTemplate {
   protected final FlexParameters flexParameters;
 
   /**
-   * @param trip               The FlexTrip used for this template
-   * @param accessEgress       Path from origin/destination to the point of boarding/alighting for
-   *     this flex trip
-   * @param transferStop       The stop location where this FlexTrip transfers to another transit
-   *     service.
-   * @param boardStopPosition  The stop-board-position in the trip pattern
+   * @param trip The FlexTrip used for this template
+   * @param accessEgress Path from origin/destination to the point of boarding/alighting for this
+   *     flex trip
+   * @param transferStop The stop location where this FlexTrip transfers to another transit service.
+   * @param boardStopPosition The stop-board-position in the trip pattern
    * @param alightStopPosition The stop-alight-position in the trip pattern
-   * @param date               The service date of this FlexTrip
-   * @param calculator         Calculates the path and duration of the FlexTrip
-   * @param flexParameters     Flex configuration parameters (maxTransferDuration, etc.)
+   * @param date The service date of this FlexTrip
+   * @param calculator Calculates the path and duration of the FlexTrip
+   * @param flexParameters Flex configuration parameters (maxTransferDuration, etc.)
    */
   AbstractFlexTemplate(
     FlexTrip<?, ?> trip,

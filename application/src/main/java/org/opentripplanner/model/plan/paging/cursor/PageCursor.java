@@ -14,15 +14,14 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * as base64 when passed on to the client. The base64 encoding is done to prevent the client from
  * using the information inside the cursor.
  * <p>
- * The PageCursor class is internal to the router, only the serialized string is passed to/from
- * the clients.
+ * The PageCursor class is internal to the router, only the serialized string is passed to/from the
+ * clients.
  * <p>
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE
  *
  * @param generalizedCostMaxLimit The cost limit is used to filter itineraries based on the
- *     generalized-cost computed in the first page. This is resource
- *     intensive to compute so we do not want to compute it again in
- *     next/previous pages.
+ *     generalized-cost computed in the first page. This is resource intensive to compute so we do
+ *     not want to compute it again in next/previous pages.
  */
 public record PageCursor(
   PageType type,

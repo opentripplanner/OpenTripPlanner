@@ -8,7 +8,6 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
 /**
  * Parameters applied to OSM ways, usually based on their tags: - Which modes can traverse it -
  * Dangerousness on a bicycle in both directions (OSM ways can be bidirectional).
- *
  */
 public class WayProperties {
 

@@ -157,7 +157,7 @@ public class Timetable implements Serializable {
    * have the same directions and picks up one arbitrarily.
    *
    * @param scheduledTripTimes all the scheduled-based trip times in a timetable.
-   * @param frequencies        all the frequency-based trip times in a timetable.
+   * @param frequencies all the frequency-based trip times in a timetable.
    */
   static Direction getDirection(
     Collection<TripTimes<?>> scheduledTripTimes,
@@ -173,8 +173,7 @@ public class Timetable implements Serializable {
    * Return an arbitrary TripTimes.
    *
    * @param scheduledTripTimes all the scheduled-based trip times in a timetable.
-   * @param frequencies        all the frequency-based trip times in a timetable.
-   *
+   * @param frequencies all the frequency-based trip times in a timetable.
    */
   private static TripTimes<?> getRepresentativeTripTimes(
     Collection<TripTimes<?>> scheduledTripTimes,

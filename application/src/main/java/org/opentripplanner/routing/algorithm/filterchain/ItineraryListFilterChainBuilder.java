@@ -116,8 +116,8 @@ public class ItineraryListFilterChainBuilder {
    * The maximum number of itineraries returned. This will remove all itineraries at the end of the
    * list AFTER the final sort of the itineraries.
    * <p>
-   * Se also the {@link #withMaxNumberOfItinerariesCropSection(ListSection)} to change which end
-   * of the list is cropped.
+   * Se also the {@link #withMaxNumberOfItinerariesCropSection(ListSection)} to change which end of
+   * the list is cropped.
    * <p>
    * Use {@code -1} to disable.
    */
@@ -158,9 +158,9 @@ public class ItineraryListFilterChainBuilder {
    * with a high relative cost. The limit is applied to itineraries with at least one transit leg.
    * Street-only itineraries are not considered.
    * <p>
-   * For all pairs {code (i1, i2)} in the set of returned itineraries, a generalized cost limit
-   * is computed. If the generalized-cost of i1 is less then the generalized-cost of i2, i2 is
-   * dropped if:
+   * For all pairs {code (i1, i2)} in the set of returned itineraries, a generalized cost limit is
+   * computed. If the generalized-cost of i1 is less then the generalized-cost of i2, i2 is dropped
+   * if:
    * <pre>
    * t0 := is the time between i1 and i2.
    *

@@ -16,8 +16,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * Configure system related features - a system feature is a non-functional feature. It describes
  * how the system should work, but not change the output of a travel request.
  * <p>
- * Some parameters in this class are related to functional-features, but does not have a clear
- * place where they belong. We should refactor and move these.
+ * Some parameters in this class are related to functional-features, but does not have a clear place
+ * where they belong. We should refactor and move these.
  * <p>
  * See the configuration for documentation of each field.
  * <p>

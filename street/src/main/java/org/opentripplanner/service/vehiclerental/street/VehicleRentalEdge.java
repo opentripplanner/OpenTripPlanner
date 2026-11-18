@@ -266,7 +266,7 @@ public class VehicleRentalEdge extends Edge {
 
   /**
    * @param stationNetwork The station network where we want to drop the bike off.
-   * @param rentedNetwork  The networks of the station we rented the bike from.
+   * @param rentedNetwork The networks of the station we rented the bike from.
    * @return true if the bike can be dropped off here, false if not.
    */
   private boolean hasCompatibleNetworks(String stationNetwork, @Nullable String rentedNetwork) {

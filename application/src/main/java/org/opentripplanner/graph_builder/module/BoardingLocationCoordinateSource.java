@@ -4,8 +4,8 @@ import org.opentripplanner.core.model.doc.DocumentedEnum;
 
 /**
  * Selects which coordinate is used to place an
- * {@link org.opentripplanner.street.model.vertex.OsmBoardingLocationVertex}
- * when a transit stop is linked to an OSM {@code boarding_location} (way, area or node).
+ * {@link org.opentripplanner.street.model.vertex.OsmBoardingLocationVertex} when a transit stop is
+ * linked to an OSM {@code boarding_location} (way, area or node).
  *
  * @see OsmBoardingLocationsModule
  */

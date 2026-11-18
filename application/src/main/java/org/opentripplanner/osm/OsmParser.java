@@ -20,7 +20,6 @@ import org.opentripplanner.osm.model.OsmWayBuilder;
 
 /**
  * Parser for the OpenStreetMap PBF Format.
- *
  */
 class OsmParser extends BinaryParser {
 

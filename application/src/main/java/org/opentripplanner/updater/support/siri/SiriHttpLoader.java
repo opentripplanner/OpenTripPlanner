@@ -117,7 +117,6 @@ public class SiriHttpLoader implements SiriLoader {
     }
 
     /**
-     *
      * @return time spent creating the request body.
      */
     long creating() {
@@ -125,7 +124,6 @@ public class SiriHttpLoader implements SiriLoader {
     }
 
     /**
-     *
      * @return time spent fetching the response.
      */
     long fetching() {
@@ -133,7 +131,6 @@ public class SiriHttpLoader implements SiriLoader {
     }
 
     /**
-     *
      * @return time spent unmarshalling the response.
      */
     long unmarshalling() {

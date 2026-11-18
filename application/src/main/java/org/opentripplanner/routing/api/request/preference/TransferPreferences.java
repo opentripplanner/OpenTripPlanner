@@ -100,13 +100,13 @@ public final class TransferPreferences implements Serializable {
    * How much worse is waiting for a transit vehicle than being on a transit vehicle, as a
    * multiplier. The default value treats wait and on-vehicle time as the same.
    * <p>
-   * It may be tempting to set this higher than walkReluctance (as studies often find this kind
-   * of preferences among riders) but the planner will take this literally and walk down a transit
-   * line to avoid waiting at a stop. This used to be set less than 1 (0.95) which would make
-   * waiting offboard preferable to waiting onboard in an interlined trip. That is also undesirable.
+   * It may be tempting to set this higher than walkReluctance (as studies often find this kind of
+   * preferences among riders) but the planner will take this literally and walk down a transit line
+   * to avoid waiting at a stop. This used to be set less than 1 (0.95) which would make waiting
+   * offboard preferable to waiting onboard in an interlined trip. That is also undesirable.
    * <p>
-   * If we only tried the shortest possible transfer at each stop to neighboring stop patterns,
-   * this problem could disappear.
+   * If we only tried the shortest possible transfer at each stop to neighboring stop patterns, this
+   * problem could disappear.
    */
   public double waitReluctance() {
     return waitReluctance;
@@ -145,8 +145,8 @@ public final class TransferPreferences implements Serializable {
    * Penalty for using a non-preferred transfer
    *
    * @deprecated TODO OTP2 Regression. Not currently working in OTP2. We might not implement the old
-   *     functionality the same way, but we will try to map this parameter so it does work
-   *     similar as before.
+   *     functionality the same way, but we will try to map this parameter so it does work similar
+   *     as before.
    */
   @Deprecated
   public int nonpreferredCost() {

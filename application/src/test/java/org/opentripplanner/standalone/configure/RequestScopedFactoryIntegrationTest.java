@@ -125,7 +125,9 @@ class RequestScopedFactoryIntegrationTest {
     of(StreetLimitationParametersService.class)
   );
 
-  /** Nothing exposed directly by {@link RequestScopedFactory} is a hand-memoized, non-Dagger value. */
+  /**
+   * Nothing exposed directly by {@link RequestScopedFactory} is a hand-memoized, non-Dagger value.
+   */
   /**
    * Guards against the #7441 regression: a binding reached through a nested consumer ({@link
    * GtfsGraphQLRequestContext}) must resolve to the same shared instance as the direct accessor
@@ -181,8 +183,8 @@ class RequestScopedFactoryIntegrationTest {
   }
 
   /**
-   * A request reads the regular transfers of the snapshot it started with, also after an update
-   * is committed. Requests started after the commit see the update.
+   * A request reads the regular transfers of the snapshot it started with, also after an update is
+   * committed. Requests started after the commit see the update.
    */
   @Test
   void requestsReadTheRegularTransfersOfTheirSnapshot() throws Exception {

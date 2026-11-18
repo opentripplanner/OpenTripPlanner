@@ -41,15 +41,11 @@ import org.opentripplanner.core.model.transaction.WriteContext;
  * between the two transaction strategies:
  * <ul>
  *   <li>CustomerRepository uses copy-on-write and a lifecycle manager, so it supports atomic
- *       commits
- *       and rollback on failure.</li>
+ *       commits and rollback on failure.</li>
  *   <li>OrderRepository returns the same mutable instance for each transaction and freezes it into
- *       a
- *       snapshot on commit. It does not support atomic commits or rollback on failure, but is more
- *       memory
- *       efficient, like OTP. It is more efficient since it only copies the internal data structure
- *       on
- *       commit.</li>
+ *       a snapshot on commit. It does not support atomic commits or rollback on failure, but is
+ *       more memory efficient, like OTP. It is more efficient since it only copies the internal
+ *       data structure on commit.</li>
  * </ul>
  * The test also demonstrates the transaction visibility contract: state changes are not visible to
  * other tasks until the transaction commits, and the transaction scope is reflected in the
@@ -171,8 +167,8 @@ public class TransactionFrameworkTest {
    *       discards the in-progress copy, so the next task starts from the last committed
    *       snapshot.</li>
    *   <li>OrderRepository returns {@code this} from {@code copyOnWrite}, so mutations written
-   *       before
-   *       the failure are NOT discarded by rollback and leak into the next committed snapshot.</li>
+   *       before the failure are NOT discarded by rollback and leak into the next committed
+   *       snapshot.</li>
    * </ul>
    */
   @Test

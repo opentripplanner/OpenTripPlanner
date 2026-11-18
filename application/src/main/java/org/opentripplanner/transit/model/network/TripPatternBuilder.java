@@ -121,8 +121,8 @@ public final class TripPatternBuilder
    * Indicate that this TripPattern is created in RealTime, and that the stop pattern of the
    * original scheduled trip is changed.
    * <p>
-   * TODO - ENCAPSULATE realTimeTripPattern & stopPatternModifiedInRealTime initialization The
-   * next 2 methods (withRealTimeTripPattern() and withStopPatternModifiedInRealTime()) are internal
+   * TODO - ENCAPSULATE realTimeTripPattern & stopPatternModifiedInRealTime initialization The next
+   * 2 methods (withRealTimeTripPattern() and withStopPatternModifiedInRealTime()) are internal
    * domain business rules, and should be enforced by the aggregate root, not delegated to the
    * creators(updaters) and unit-tests. A better solution to this would be to make static factory
    * methods, but it does not make the problem go away. If, e.g. the Route is chosen as the
@@ -242,8 +242,8 @@ public final class TripPatternBuilder
    * {@code null} each hop is synthesized as a straight line between consecutive stops and the
    * distance is measured with {@link SphericalDistanceLibrary} (haversine).
    * <p>
-   * Distances are accumulated in {@code double} and rounded to the nearest meter only when
-   * writing each entry of the cumulative table, which bounds the rounding error of any
+   * Distances are accumulated in {@code double} and rounded to the nearest meter only when writing
+   * each entry of the cumulative table, which bounds the rounding error of any
    * {@code distanceBetween(board, alight)} query to at most 1 meter independent of leg length.
    * <p>
    * Package-private so test fixtures (e.g. {@code TripPatternGeometryTest}) can exercise this

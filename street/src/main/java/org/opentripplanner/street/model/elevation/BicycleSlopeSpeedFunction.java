@@ -88,7 +88,7 @@ public final class BicycleSlopeSpeedFunction {
    * Evaluate the spline at the given slope and altitude. The slope is clamped to
    * {@code [MIN_SLOPE, MAX_SLOPE]} before evaluation to keep the spline inside its valid domain.
    *
-   * @param slope    {@code rise / run} along the edge (no unit, e.g. {@code 0.05} for 5%)
+   * @param slope {@code rise / run} along the edge (no unit, e.g. {@code 0.05} for 5%)
    * @param altitude metres above sea level at the start of the segment
    * @return speed coefficient: {@code > 1.0} on downhills (faster), {@code < 1.0} on uphills
    */

@@ -65,8 +65,8 @@ import org.slf4j.LoggerFactory;
  * Default implementation of {@link CarpoolingService} that orchestrates the carpooling routing
  * algorithm: pre-filtering, insertion evaluation, and post-filtering.
  * <p>
- * This service is the main entry point for carpool routing functionality. It coordinates
- * multiple components to efficiently find viable carpool matches while minimizing expensive routing
+ * This service is the main entry point for carpool routing functionality. It coordinates multiple
+ * components to efficiently find viable carpool matches while minimizing expensive routing
  * calculations through strategic filtering and early rejection.
  *
  * <h2>Algorithm Phases</h2>
@@ -74,18 +74,14 @@ import org.slf4j.LoggerFactory;
  * The service executes routing requests in three phases:
  * <ol>
  *   <li><strong>Pre-filtering ({@link TripPreFilters}):</strong> Once the passenger is snapped to
- *       the
- *       street network, quickly eliminates trips that cannot serve the passenger in time, have no
- *       free
- *       seat, or whose corridor cannot reach the passenger.</li>
+ *       the street network, quickly eliminates trips that cannot serve the passenger in time, have
+ *       no free seat, or whose corridor cannot reach the passenger.</li>
  *   <li><strong>Insertion Evaluation ({@link InsertionEvaluator}):</strong> For trips that pass
  *       filtering, computes the driving times. Evaluates all feasible insertion positions and
- *       selects the
- *       one minimizing additional travel time while satisfying delay constraints.</li>
+ *       selects the one minimizing additional travel time while satisfying delay constraints.</li>
  *   <li><strong>Post-filtering ({@link ItineraryPostFilters}, direct routing only):</strong>
  *       Re-checks the fully-routed {@link Itinerary} against tight time bounds that the loose
- *       pre-filter
- *       could not enforce. Access/egress routing skips this phase because it emits
+ *       pre-filter could not enforce. Access/egress routing skips this phase because it emits
  *       {@link CarpoolAccessEgress} objects rather than itineraries.</li>
  * </ol>
  *
@@ -129,19 +125,17 @@ public class DefaultCarpoolingService implements CarpoolingService {
   /**
    * Creates a new carpooling service with the specified dependencies.
    * <p>
-   * The service is initialized with standard pre- and post-filters; both filter sets are
-   * hardcoded today and could be made configurable in future versions.
+   * The service is initialized with standard pre- and post-filters; both filter sets are hardcoded
+   * today and could be made configurable in future versions.
    *
-   * @param repository                        provides access to active driver trips, must not be
-   *     null
+   * @param repository provides access to active driver trips, must not be null
    * @param streetLimitationParametersService provides street routing configuration including speed
    *     limits, must not be null
-   * @param vertexCreationService             creates request-scoped, bidirectionally-linked
-   *     temporary vertices from coordinates, must not be null
-   * @param carReachableVertexSnapper         snaps passenger-side locations onto car-reachable
-   *     vertices, must not be null
-   * @param stopIndex                         the transit stops with their car-reachable snaps, must
-   *     not be null
+   * @param vertexCreationService creates request-scoped, bidirectionally-linked temporary vertices
+   *     from coordinates, must not be null
+   * @param carReachableVertexSnapper snaps passenger-side locations onto car-reachable vertices,
+   *     must not be null
+   * @param stopIndex the transit stops with their car-reachable snaps, must not be null
    * @throws NullPointerException if any parameter is null
    */
   public DefaultCarpoolingService(
@@ -185,10 +179,8 @@ public class DefaultCarpoolingService implements CarpoolingService {
    *       passenger, are evaluated.</li>
    *   <li><strong>Insertion evaluation:</strong> Insertion positions are evaluated with the driving
    *       times of the trips' corridors and the street trees of the passenger's pickup and dropoff,
-   *       via
-   *       {@link CorridorRouter}, to find the insertion that minimizes additional driver travel
-   *       time
-   *       while respecting delay constraints.</li>
+   *       via {@link CorridorRouter}, to find the insertion that minimizes additional driver travel
+   *       time while respecting delay constraints.</li>
    *   <li><strong>Post-filtering:</strong> Routed itineraries are re-checked against tight time
    *       bounds that the loose pre-filter could not enforce.</li>
    * </ol>
@@ -350,28 +342,24 @@ public class DefaultCarpoolingService implements CarpoolingService {
    * The method proceeds as follows:
    * <ol>
    *   <li>Once the passenger is snapped to the street network, pre-filters the trips by time
-   *       window,
-   *       by free seats and by whether their corridor can reach the passenger. Of the survivors, at
-   *       most
-   *       {@link CarpoolingParameters#maxCandidateTripsPerRequest()}, those passing closest to the
-   *       passenger, are evaluated.</li>
+   *       window, by free seats and by whether their corridor can reach the passenger. Of the
+   *       survivors, at most {@link CarpoolingParameters#maxCandidateTripsPerRequest()}, those
+   *       passing closest to the passenger, are evaluated.</li>
    *   <li>Takes the transit stops each trip can serve from its {@link CarpoolCorridor}, keeping
-   *       those
-   *       the passenger can walk to or from within the walk budget; a trip without such a stop is
-   *       left
-   *       out.</li>
+   *       those the passenger can walk to or from within the walk budget; a trip without such a
+   *       stop is left out.</li>
    *   <li>Evaluates the insertion positions with the driving times of the corridor and the
    *       passenger's two street trees, via {@link CorridorRouter}.</li>
    *   <li>Converts the best insertions into {@link CarpoolAccessEgress} objects with timing
    *       information relative to {@code transitSearchTimeZero} for Raptor integration.</li>
    * </ol>
    *
-   * @param request                the routing request
-   * @param streetRequest          the street routing parameters for the access or egress leg
-   * @param accessOrEgress         whether this is an access leg (origin to transit) or egress leg
-   *     (transit to destination)
+   * @param request the routing request
+   * @param streetRequest the street routing parameters for the access or egress leg
+   * @param accessOrEgress whether this is an access leg (origin to transit) or egress leg (transit
+   *     to destination)
    * @param transitServiceResolver used for resolving stop locations
-   * @param transitSearchTimeZero  the reference time for computing relative start/end times used by
+   * @param transitSearchTimeZero the reference time for computing relative start/end times used by
    *     Raptor
    * @return a list of {@link CarpoolAccessEgress} results for Raptor, or an empty list if the
    *     request mode is not CARPOOL or no viable matches are found

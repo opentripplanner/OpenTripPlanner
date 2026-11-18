@@ -26,20 +26,19 @@ public class MultilingualStringMapper {
   }
 
   /**
-   * Extract the string value from a MultilingualString.
-   * In NeTEx 2.0, MultilingualString uses a mixed content model where the text is stored in
-   * getContent() as a list of plain text nodes and optional nested {@code <Text lang="..">}
-   * elements holding alternative translations. The plain text is used when present; otherwise
-   * the first non-blank nested {@code <Text>} element is used.
+   * Extract the string value from a MultilingualString. In NeTEx 2.0, MultilingualString uses a
+   * mixed content model where the text is stored in getContent() as a list of plain text nodes and
+   * optional nested {@code <Text lang="..">} elements holding alternative translations. The plain
+   * text is used when present; otherwise the first non-blank nested {@code <Text>} element is used.
    * <p>
    * Returns {@code null} only if the element is absent. An empty element (e.g.
    * {@code <Description/>}) returns an empty string, like {@code getValue()} did before NeTEx 2.0.
    * Use {@link #nullableValueOf(MultilingualString)} to map empty values to {@code null}.
    * <p>
    * Tabs, carriage returns and line feeds are each replaced by a space ({@code xs:normalizedString}
-   * semantics), like the {@code NormalizedStringAdapter} applied to {@code getValue()} before
-   * NeTEx 2.0. Text is neither trimmed nor collapsed. A text which needs no normalization is
-   * returned as the same instance JAXB unmarshalled, so that equal strings stay shared.
+   * semantics), like the {@code NormalizedStringAdapter} applied to {@code getValue()} before NeTEx
+   * 2.0. Text is neither trimmed nor collapsed. A text which needs no normalization is returned as
+   * the same instance JAXB unmarshalled, so that equal strings stay shared.
    */
   @Nullable
   public static String getStringValue(@Nullable MultilingualString multilingualString) {

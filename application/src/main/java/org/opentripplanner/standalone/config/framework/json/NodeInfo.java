@@ -14,18 +14,18 @@ import org.opentripplanner.utils.tostring.ValueObjectToStringBuilder;
  * <p>
  * TODO DOC - Add Unit tests on this class using the builder
  *
- * @param name         The parameter name in the JSON config file.
- * @param summary      Short one sentence description of the parameter used for documentation.
- * @param description  Long optional multi-line documentation of a parameter - use markdown.
- * @param type         The NodeAdaptor supported type.
- * @param enumType     If type is ENUM, ENUM_MAP or ENUM_SET, then this contains the enum type.
- * @param elementType  If the type is an ARRAY or a MAP then this is the type of the value.
- * @param since        This is the first OTP version this feature existed in.
+ * @param name The parameter name in the JSON config file.
+ * @param summary Short one sentence description of the parameter used for documentation.
+ * @param description Long optional multi-line documentation of a parameter - use markdown.
+ * @param type The NodeAdaptor supported type.
+ * @param enumType If type is ENUM, ENUM_MAP or ENUM_SET, then this contains the enum type.
+ * @param elementType If the type is an ARRAY or a MAP then this is the type of the value.
+ * @param since This is the first OTP version this feature existed in.
  * @param defaultValue The default value used if this parameter is not present in the documentation.
- * @param required     The config parameter is required. OTP will not start unless this parameter is
+ * @param required The config parameter is required. OTP will not start unless this parameter is
  *     set.
- * @param skipChild    Skip generating doc for this node - the child(this) is documented in the
- *     parent node.
+ * @param skipChild Skip generating doc for this node - the child(this) is documented in the parent
+ *     node.
  */
 public record NodeInfo(
   String name,

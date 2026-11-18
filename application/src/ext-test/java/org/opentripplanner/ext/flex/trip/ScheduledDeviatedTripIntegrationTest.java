@@ -47,8 +47,8 @@ import org.opentripplanner.utils.time.ServiceDateUtils;
  * contains both flex zones but also scheduled stops. Inside the zone, passengers can get on or off
  * anywhere, so there it works more like a taxi.
  * <p>
- * This service is not being offered anymore, but we keep the test because others of the same
- * type still exist.
+ * This service is not being offered anymore, but we keep the test because others of the same type
+ * still exist.
  */
 class ScheduledDeviatedTripIntegrationTest {
 
@@ -183,8 +183,8 @@ class ScheduledDeviatedTripIntegrationTest {
   /**
    * We add flex trips, that can potentially not have a departure and arrival time, to the trip.
    * <p>
-   * Normally these trip times are interpolated/repaired during the graph build but for flex this
-   * is exactly what we don't want. Here we check that the interpolation process is skipped.
+   * Normally these trip times are interpolated/repaired during the graph build but for flex this is
+   * exactly what we don't want. Here we check that the interpolation process is skipped.
    *
    * @see ValidateAndInterpolateStopTimesForEachTrip#interpolateStopTimes(List)
    */

@@ -13,7 +13,7 @@ public class GenericUnaryMatcher<T> implements Matcher<T> {
   private final Predicate<T> matchPredicate;
 
   /**
-   * @param typeName       The typeName appears in the toString for easier debugging.
+   * @param typeName The typeName appears in the toString for easier debugging.
    * @param matchPredicate The predicate that will be used to test the entity being matched.
    */
   public GenericUnaryMatcher(String typeName, Predicate<T> matchPredicate) {

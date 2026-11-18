@@ -6,9 +6,9 @@ import org.opentripplanner.core.model.id.FeedScopedId;
  * This exception is used by the main OTP business logic to signal that one of the ids passed in is
  * not found. This exception should be handled in a generic way in each API.
  * <p>
- * When an entity is not found, it indicates that there is a system integration error. This
- * should not be used if the user type in the id, then the client should validate the id before it
- * is passed into OTP.
+ * When an entity is not found, it indicates that there is a system integration error. This should
+ * not be used if the user type in the id, then the client should validate the id before it is
+ * passed into OTP.
  */
 public class EntityNotFoundException extends RuntimeException {
 

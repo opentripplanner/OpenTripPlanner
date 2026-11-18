@@ -22,8 +22,8 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  *   <li>all such {@code egressPaths} are added to the last segment.</li>
  * </ul>
  * <p>
- * Each segment is linked to the next by copying stop arrivals at via stops from one segment to
- * the following segment. This is implemented using Pareto set event listeners.
+ * Each segment is linked to the next by copying stop arrivals at via stops from one segment to the
+ * following segment. This is implemented using Pareto set event listeners.
  */
 @SuppressWarnings("ClassCanBeRecord")
 public class SearchContextViaSegments<T extends RaptorTripSchedule> {

@@ -61,12 +61,12 @@ import org.slf4j.LoggerFactory;
  * realtime updates, falling back on the scheduled Timetable if no updates have been applied for a
  * given TripPattern.
  * <p>
- * This is a central part of managing concurrency when many routing searches may be happening,
- * but realtime updates are also streaming in which change the vehicle arrival and departure times.
- * Any given request will only see one unchanging snapshot over the course of its search.
+ * This is a central part of managing concurrency when many routing searches may be happening, but
+ * realtime updates are also streaming in which change the vehicle arrival and departure times. Any
+ * given request will only see one unchanging snapshot over the course of its search.
  * <p>
- * A mutable instance first serves as a buffer to accumulate a batch of incoming updates on top
- * of any already known updates to the base schedules. From time to time such a batch of updates is
+ * A mutable instance first serves as a buffer to accumulate a batch of incoming updates on top of
+ * any already known updates to the base schedules. From time to time such a batch of updates is
  * committed (like a database transaction). At this point an immutable copy is created and becomes
  * available for use by new incoming routing requests.
  * <p>
@@ -75,13 +75,13 @@ import org.slf4j.LoggerFactory;
  * provide a consistent view not only of trips that have been boarded, but of relative arrival and
  * departure times of other trips that have not necessarily been boarded.
  * <p>
- * An instance may only be modified by a single thread. This makes it easier to reason about how
- * the snapshot is built up and used. Write operations are applied one by one, in order, with no
+ * An instance may only be modified by a single thread. This makes it easier to reason about how the
+ * snapshot is built up and used. Write operations are applied one by one, in order, with no
  * concurrent access. Read operations are then allowed concurrently by many threads after writing is
  * forbidden.
  * <p>
- * The fact that TripPattern instances carry a reference only to their scheduled Timetable and
- * not to their realtime timetable is largely due to historical path-dependence in OTP development.
+ * The fact that TripPattern instances carry a reference only to their scheduled Timetable and not
+ * to their realtime timetable is largely due to historical path-dependence in OTP development.
  * Streaming realtime support was added around 2013 as a sort of sandbox feature that was switched
  * off by default. Looking up realtime timetables during routing was a fringe feature that needed to
  * impose near-zero cost and avoid introducing complexity into the primary codebase. Now over ten
@@ -91,9 +91,9 @@ import org.slf4j.LoggerFactory;
  * network. It would also be possible to make the realtime version of Timetables or TripTimes the
  * primary view, and include references back to their scheduled versions.
  * <p>
- * Implementation note: when a snapshot is committed, the mutable state of this class is stored
- * in final fields and completely initialized in the constructor. This provides an additional
- * guarantee of safe-publication without synchronization. (see
+ * Implementation note: when a snapshot is committed, the mutable state of this class is stored in
+ * final fields and completely initialized in the constructor. This provides an additional guarantee
+ * of safe-publication without synchronization. (see
  * <a href="https://docs.oracle.com/javase/specs/jls/se7/html/jls-17.html#jls-17.5">final Field
  * Semantics</a>)
  */
@@ -117,13 +117,13 @@ public class DefaultTimetableRepository implements TimetableRepository {
    * include ones from the scheduled GTFS, as well as ones added by realtime messages and tracked by
    * the TripPatternCache.
    * <p>
-   * Note that the keys do not include all scheduled TripPatterns, only those for which we have
-   * at least one update, and those for which we had updates before but just recently cleared.
+   * Note that the keys do not include all scheduled TripPatterns, only those for which we have at
+   * least one update, and those for which we had updates before but just recently cleared.
    * <p>
-   * The members of the SortedSet (the Timetable for a particular day) are treated as
-   * copy-on-write when we're updating them. If an update will modify the timetable for a particular
-   * day, that timetable is replicated before any modifications are applied to avoid affecting any
-   * previous snapshots still in circulation which reference that same Timetable instance.
+   * The members of the SortedSet (the Timetable for a particular day) are treated as copy-on-write
+   * when we're updating them. If an update will modify the timetable for a particular day, that
+   * timetable is replicated before any modifications are applied to avoid affecting any previous
+   * snapshots still in circulation which reference that same Timetable instance.
    * <p>
    * Alternative implementations: A. This could be an array indexed using the integer pattern
    * indexes. B. It could be made into a flat hashtable with compound keys (TripPattern, LocalDate).
@@ -155,8 +155,8 @@ public class DefaultTimetableRepository implements TimetableRepository {
 
   /**
    * The realTimeAdded* maps are indexes on the trips created at runtime (extra-journey), and the
-   * Route, TripPattern, TripOnServiceDate they refer to.
-   * They are meant to override the corresponding indexes in ScheduledTimetableData.
+   * Route, TripPattern, TripOnServiceDate they refer to. They are meant to override the
+   * corresponding indexes in ScheduledTimetableData.
    */
   private final Map<FeedScopedId, Route> realtimeAddedRoutes;
   private final Map<FeedScopedId, Trip> realTimeAddedTrips;
@@ -238,8 +238,8 @@ public class DefaultTimetableRepository implements TimetableRepository {
 
   /**
    * @param scheduledTimetableData the scheduled (non-realtime) timetable data. Its trip calendars
-   *     are the initial calendars of this repository; real-time changes
-   *     replace the repository's own calendars, never these.
+   *     are the initial calendars of this repository; real-time changes replace the repository's
+   *     own calendars, never these.
    */
   public DefaultTimetableRepository(
     RaptorTransitData raptorTransitData,
@@ -1050,11 +1050,10 @@ public class DefaultTimetableRepository implements TimetableRepository {
   /**
    * Replace the original Timetable by the updated one in the timetable index. The SortedSet that
    * holds the collection of Timetables for that pattern (sorted by service date) is shared between
-   * multiple snapshots and must be copied as well.<br/>
-   * Note on performance: if multiple Timetables are modified in a SortedSet, the SortedSet will be
-   * copied multiple times. The impact on memory/garbage collection is assumed to be minimal since
-   * the collection is small. The SortedSet is made immutable to prevent change after snapshot
-   * publication.
+   * multiple snapshots and must be copied as well.<br/> Note on performance: if multiple Timetables
+   * are modified in a SortedSet, the SortedSet will be copied multiple times. The impact on
+   * memory/garbage collection is assumed to be minimal since the collection is small. The SortedSet
+   * is made immutable to prevent change after snapshot publication.
    */
   private void swapTimetable(TripPattern pattern, Timetable original, Timetable updated) {
     SortedSet<Timetable> sortedTimetables = timetables.get(pattern.getId());

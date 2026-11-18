@@ -62,9 +62,8 @@ public class DebugEvent<E> {
    *   <li>REJECT - The element is rejected, there is a better alternative.
    *   <li>DROP - The element is dropped from the list of alternatives. Be aware that that this does
    *       not necessarily mean that the path is not part of the final result. If an element is
-   *       dropped in
-   *       a later round or iteration the original element path might already be added to the final
-   *       result; hence dropping the element have no effect on the result.
+   *       dropped in a later round or iteration the original element path might already be added to
+   *       the final result; hence dropping the element have no effect on the result.
    * </ul>
    */
   public Action action() {

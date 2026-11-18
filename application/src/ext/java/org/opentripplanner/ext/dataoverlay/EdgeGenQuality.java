@@ -24,7 +24,7 @@ class EdgeGenQuality<E extends Number> {
   /**
    * Adds a property value for given time
    *
-   * @param time          time
+   * @param time time
    * @param propertyValue propertyValue
    */
   void addPropertyValueSample(int time, E propertyValue) {

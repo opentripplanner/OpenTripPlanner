@@ -85,8 +85,8 @@ public class DoubleUtils {
 
   /**
    * Round {@code value} to the nearest multiple of the step of its bucket, see
-   * {@link #roundToStep(double, double)}. A small value can be rounded to a finer step than a
-   * large one.
+   * {@link #roundToStep(double, double)}. A small value can be rounded to a finer step than a large
+   * one.
    * <p>
    * The {@code steps} are rows of {@code {upperLimit, step}}, sorted by the upper limit in
    * ascending order. The step of the first row that has an upper limit greater than the value is

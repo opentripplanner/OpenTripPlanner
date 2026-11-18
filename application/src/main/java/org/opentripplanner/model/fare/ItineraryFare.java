@@ -13,7 +13,6 @@ import org.opentripplanner.utils.lang.Sandbox;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- *
  * ItineraryFares is a set of fares for different legs, rider categories or fare media.
  */
 @Sandbox

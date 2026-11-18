@@ -28,14 +28,13 @@ import tools.jackson.databind.JsonNode;
  * that needs it (e.g. to verify request-vs-application scoping) doesn't have to hand-supply all
  * {@code @BindsInstance} inputs itself.
  * <p>
- * There are no "heavy" resources in OTP (no database, no external service) — every repository is
- * an in-memory object — so every default except the transit repository is a fresh, empty instance.
+ * There are no "heavy" resources in OTP (no database, no external service) — every repository is an
+ * in-memory object — so every default except the transit repository is a fresh, empty instance.
  * That's normally fine: a test that doesn't care about vehicle parking data, for example, doesn't
  * need real vehicle parking data to exercise the DI wiring around it.
  * <p>
- * Add a {@code withRepositoryX}/{@code withTestEnvironmentX} method to the builder on a need
- * basis, when a test actually needs to override one of the other defaults — don't add one
- * speculatively.
+ * Add a {@code withRepositoryX}/{@code withTestEnvironmentX} method to the builder on a need basis,
+ * when a test actually needs to override one of the other defaults — don't add one speculatively.
  */
 public final class TestConstructApplicationFactoryBuilder {
 

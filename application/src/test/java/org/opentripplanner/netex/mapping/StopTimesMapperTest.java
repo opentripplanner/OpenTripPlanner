@@ -86,8 +86,8 @@ public class StopTimesMapperTest {
 
   /**
    * If a PassengerStopAssignment refers to a StopPlace instead of a Quay, the stop should be
-   * resolved to one of the StopPlace's (Station's) child stops - the one with the smallest id,
-   * see {@link StopTimesMapper}.
+   * resolved to one of the StopPlace's (Station's) child stops - the one with the smallest id, see
+   * {@link StopTimesMapper}.
    */
   @Test
   public void testMapStopTimesWithPassengerStopAssignmentToStopPlace() {

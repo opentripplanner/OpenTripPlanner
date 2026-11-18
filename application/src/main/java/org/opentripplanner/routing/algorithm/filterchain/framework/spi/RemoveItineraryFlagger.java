@@ -13,8 +13,7 @@ import org.opentripplanner.model.plan.Itinerary;
  * Override one of the default methods in this interface to make a filter:
  * <ul>
  *   <li>{@link #shouldBeFlaggedForRemoval()} - If filtering is done based on looking at one
- *       itinerary
- *       at the time.</li>
+ *       itinerary at the time.</li>
  *   <li>{@link #flagForRemoval(List)}}) - If you need more than one itinerary to decide which to
  *       delete.</li>
  * </ul>

@@ -16,8 +16,7 @@ class GsHelper {
    * validated here, but the following is:
    * <ul>
    *   <li>Bucket names must contain only lowercase letters, numbers, dashes (-), underscores (_),
-   *       and
-   *       dots (.)
+   *       and dots (.)
    *   <li>Bucket names must contain 3 to 222 characters.
    *   <li>Object names must be at least one character.
    *   <li>Object names should avoid using control characters this is enforced here, and is strictly

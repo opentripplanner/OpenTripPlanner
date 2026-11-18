@@ -70,14 +70,13 @@ public interface CarpoolingRepository {
    * purged once its service date has passed (see {@code TimetableRepository#purgeExpiredData}),
    * with the difference that carpool trips carry a concrete instant rather than a service date.
    * <p>
-   * The scan is throttled so that it runs at most once per sweep interval no matter how often it
-   * is called. The throttle state lives on the repository rather than on the caller, so when
-   * several updaters (one per SIRI feed) share a repository, the trips are swept at most once per
-   * interval in total instead of once per feed. Calls made before the interval has elapsed are a
-   * no-op and return {@code 0}. The method is safe to call concurrently from multiple updater
-   * threads.
+   * The scan is throttled so that it runs at most once per sweep interval no matter how often it is
+   * called. The throttle state lives on the repository rather than on the caller, so when several
+   * updaters (one per SIRI feed) share a repository, the trips are swept at most once per interval
+   * in total instead of once per feed. Calls made before the interval has elapsed are a no-op and
+   * return {@code 0}. The method is safe to call concurrently from multiple updater threads.
    *
-   * @param now    the current instant, used both as the throttle reference and to derive the expiry
+   * @param now the current instant, used both as the throttle reference and to derive the expiry
    *     cut-off
    * @param expiry how long a trip is retained after its latest end time before it becomes eligible
    *     for removal

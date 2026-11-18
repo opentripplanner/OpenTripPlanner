@@ -238,8 +238,7 @@ public class TripPatternForDates
    *
    * @return {@code true} If you do not want to use the built-in trip search and instead will
    *     provide your own. Make sure to implement the
-   *     {@link #createCustomizedTripSearch(SearchDirection)} for both forward and reverse
-   *     searches.
+   *     {@link #createCustomizedTripSearch(SearchDirection)} for both forward and reverse searches.
    */
   public boolean useCustomizedTripSearch() {
     return isFrequencyBased;

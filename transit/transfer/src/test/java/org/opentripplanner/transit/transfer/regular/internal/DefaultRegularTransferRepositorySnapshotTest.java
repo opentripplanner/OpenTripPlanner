@@ -37,8 +37,7 @@ import org.opentripplanner.transit.transfer.regular.spi.TransferSearch;
 
 /**
  * The Raptor transfers of a snapshot: derived from its paths under the request-time preferences,
- * cached, and carried forward to the next snapshot - patched for the stops whose transfers
- * changed.
+ * cached, and carried forward to the next snapshot - patched for the stops whose transfers changed.
  */
 class DefaultRegularTransferRepositorySnapshotTest {
 
@@ -394,8 +393,8 @@ class DefaultRegularTransferRepositorySnapshotTest {
   }
 
   /**
-   * Publish the paths of the repository, and continue with the repository of the next
-   * transaction, as the framework does.
+   * Publish the paths of the repository, and continue with the repository of the next transaction,
+   * as the framework does.
    */
   private RegularTransferRepositorySnapshot<FakePath, WalkPreferences> freeze() {
     var snapshot = lifecycle.freeze(repository);

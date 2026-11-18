@@ -217,8 +217,8 @@ public class GraphSerializationTest {
 
   /**
    * The scheduled entities are not compared with the object differ (identity-keyed maps), so
-   * compare their ids, the order of the trips on service date (it is the order of replacements)
-   * and the calendars.
+   * compare their ids, the order of the trips on service date (it is the order of replacements) and
+   * the calendars.
    */
   private static void assertSameScheduledData(
     TimetableDataImport original,

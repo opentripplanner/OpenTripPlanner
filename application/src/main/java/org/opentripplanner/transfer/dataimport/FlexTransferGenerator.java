@@ -42,8 +42,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * {@link GraphBuilderModule} module that generates the transfers used by FLEX routing: walking
- * connectors between {@link RegularStop}s and the flex {@code AreaStop}/{@code GroupStop}s, in
- * both directions - stop-to-flex-stop (used for flex egress) and flex-stop-to-stop (used for flex
+ * connectors between {@link RegularStop}s and the flex {@code AreaStop}/{@code GroupStop}s, in both
+ * directions - stop-to-flex-stop (used for flex egress) and flex-stop-to-stop (used for flex
  * access).
  * <p>
  * It will use the street network if OSM data has already been loaded into the graph. Otherwise it

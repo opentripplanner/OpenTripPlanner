@@ -31,7 +31,7 @@ public interface NearbyStopFinder {
   /**
    * Search closest stops from a given coordinate, extending up to a specified max radius.
    *
-   * @param coordinate   Origin
+   * @param coordinate Origin
    * @param radiusMeters Search radius from the origin in meters
    */
   List<NearbyStop> findNearbyStops(Coordinate coordinate, double radiusMeters);

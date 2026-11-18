@@ -11,8 +11,8 @@ import org.opentripplanner.raptor.util.paretoset.ParetoSet;
 /**
  * Aggregates the results of multiple Raptor searches (a multi-segment search).
  * <p>
- * The methods {@link #extractPaths()} and {@link #isDestinationReached()} return fully
- * aggregated results based on all segments.
+ * The methods {@link #extractPaths()} and {@link #isDestinationReached()} return fully aggregated
+ * results based on all segments.
  * <p>
  * The other methods that report per-stop statistics are <b>not</b> fully aggregated across
  * segments. Instead, they return the statistics from the first segment only. These statistics are

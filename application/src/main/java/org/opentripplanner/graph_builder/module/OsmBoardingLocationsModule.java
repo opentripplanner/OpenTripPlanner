@@ -57,10 +57,10 @@ import org.slf4j.LoggerFactory;
  * gives the corresponding GTFS stop ID for the stop but the exact tag name is configurable. See
  * <a href="https://wiki.openstreetmap.org/wiki/Key:public_transport">the OSM wiki page</a>.
  * <p>
- * This module will attempt to link all transit stops and platforms to such nodes or way
- * centroids in the OSM data, based on the stop ID or stop code and ref tag. It is run before the
- * main transit stop linker, and if no linkage was created here, the main linker should create one
- * based on distance or other heuristics.
+ * This module will attempt to link all transit stops and platforms to such nodes or way centroids
+ * in the OSM data, based on the stop ID or stop code and ref tag. It is run before the main transit
+ * stop linker, and if no linkage was created here, the main linker should create one based on
+ * distance or other heuristics.
  */
 public class OsmBoardingLocationsModule implements GraphBuilderModule {
 
@@ -165,9 +165,8 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
    * <p>
    * In {@code OSM} mode a vertex at the platform centroid, shared by all stops on the platform, is
    * connected to the area's visibility vertices. In {@code TRANSIT} mode the stop gets its own
-   * vertex
-   * at its own coordinate, connected to the area directly when it lies inside, or else through an
-   * access point just inside the area (see {@link #linkIntoPlatformArea}).
+   * vertex at its own coordinate, connected to the area directly when it lies inside, or else
+   * through an access point just inside the area (see {@link #linkIntoPlatformArea}).
    *
    * @return if the vertex has been connected
    */
@@ -208,8 +207,8 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
    * <p>
    * In {@code OSM} mode the stop is attached where the way passes closest to the platform centroid,
    * splitting the way if needed. In {@code TRANSIT} mode it is attached where the way passes
-   * closest
-   * to the stop's own coordinate, over an edge of the true length (see {@link #linkToPlatformWay}).
+   * closest to the stop's own coordinate, over an edge of the true length (see
+   * {@link #linkToPlatformWay}).
    *
    * @return if the vertex has been connected
    */
@@ -361,8 +360,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
    * Attach the stop to the tagged OSM node. In {@code TRANSIT} mode the stop keeps its own
    * coordinate and reaches the node over an edge of the real length, so that the coordinate a stop
    * is placed at comes from the transit data on every linking path. In {@code OSM} mode it takes
-   * the
-   * node's coordinate as its position on the street network, as it always has.
+   * the node's coordinate as its position on the street network, as it always has.
    */
   private void linkToNode(
     TransitStopVertex ts,
@@ -475,10 +473,9 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   /**
    * The point just inside {@code areaGeometry} standing in for a {@code transitCoordinate} outside
    * it, or {@code transitCoordinate} itself when already inside. It is the foot of the
-   * perpendicular
-   * plus a margin: the shortest way onto the platform. Aiming at {@code interiorPoint} instead
-   * would,
-   * on a long narrow platform, cross the boundary tens of metres away.
+   * perpendicular plus a margin: the shortest way onto the platform. Aiming at
+   * {@code interiorPoint} instead would, on a long narrow platform, cross the boundary tens of
+   * metres away.
    *
    * @param interiorPoint the platform's always-inside point, a fallback if the step lands outside
    */

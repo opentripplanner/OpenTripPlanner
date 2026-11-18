@@ -46,8 +46,8 @@ public class OsmNode extends OsmEntity {
   }
 
   /**
-   * Checks if this node blocks traversal in any way
-   * Only applies to able-bodied pedestrians, does not check for accessibility
+   * Checks if this node blocks traversal in any way Only applies to able-bodied pedestrians, does
+   * not check for accessibility
    *
    * @return true if it does
    */
@@ -136,8 +136,8 @@ public class OsmNode extends OsmEntity {
   /**
    * Check if this node represents access to a platform.
    * <p>
-   * If this node appears inside a platform area and belongs to the same public transport
-   * relation, the platform will be kept even if it isn't physically linked to this node so that
+   * If this node appears inside a platform area and belongs to the same public transport relation,
+   * the platform will be kept even if it isn't physically linked to this node so that
    * {@link org.opentripplanner.graph_builder.module.OsmBoardingLocationsModule} can associate the
    * transit stop with the physical platform.
    */

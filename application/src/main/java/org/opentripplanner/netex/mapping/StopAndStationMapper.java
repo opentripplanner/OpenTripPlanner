@@ -44,8 +44,8 @@ import org.opentripplanner.transit.service.SiteRepositoryBuilder;
  * present in the OTP model we have to choose which version should be mapped based on both of these
  * parameters.
  * <p>
- * To ensure compatibility with older data sets, we also have to keep quays that are only present
- * in older versions of the StopPlace.
+ * To ensure compatibility with older data sets, we also have to keep quays that are only present in
+ * older versions of the StopPlace.
  */
 class StopAndStationMapper {
 
@@ -217,8 +217,7 @@ class StopAndStationMapper {
   /**
    * Return the list of quays for the given {@code stopPlace} or an empty list if no quays exist.
    * <p>
-   * We do not support quay references, all quays must be included as part of the given
-   * stopPlace.
+   * We do not support quay references, all quays must be included as part of the given stopPlace.
    */
   private List<Quay> listOfQuays(StopPlace stopPlace) {
     Quays_RelStructure quays = stopPlace.getQuays();
@@ -251,7 +250,7 @@ class StopAndStationMapper {
   /**
    * Get WheelChairBoarding from Quay and parent Station.
    *
-   * @param quay      NeTEx quay could contain information about accessibility
+   * @param quay NeTEx quay could contain information about accessibility
    * @param stopPlace Parent StopPlace for given Quay
    * @return not null value with default NO_INFORMATION if nothing defined in quay or parentStation.
    */

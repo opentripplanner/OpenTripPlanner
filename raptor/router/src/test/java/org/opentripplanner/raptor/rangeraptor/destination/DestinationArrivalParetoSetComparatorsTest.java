@@ -34,9 +34,9 @@ import org.opentripplanner.raptor.spi.SearchDirection;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 
 /**
- * Verify the comparators using an independent oracle. For every time/cost combination, the
- * criteria used are listed in a table. The production comparator must give the same answer as the
- * oracle (left is better than right in at least one criterion) for every pair in a grid of values.
+ * Verify the comparators using an independent oracle. For every time/cost combination, the criteria
+ * used are listed in a table. The production comparator must give the same answer as the oracle
+ * (left is better than right in at least one criterion) for every pair in a grid of values.
  * <p>
  * See the section "Destination pareto-set" in {@code org/opentripplanner/raptor/package.md}.
  */
@@ -154,9 +154,9 @@ class DestinationArrivalParetoSetComparatorsTest {
   }
 
   /**
-   * A journey that leaves later and arrives later, with the same duration, is only interesting
-   * for a timetable search. The duration is the same, so the journey is dominated if the
-   * duration is used.
+   * A journey that leaves later and arrives later, with the same duration, is only interesting for
+   * a timetable search. The duration is the same, so the journey is dominated if the duration is
+   * used.
    */
   @Test
   void laterDepartureWithSameDurationIsOnlyKeptByTimetable() {
@@ -239,8 +239,8 @@ class DestinationArrivalParetoSetComparatorsTest {
   }
 
   /**
-   * A forward journey departs before it arrives. In a reverse search the times are reversed.
-   * Each criterion has a small domain so the grid is complete, but not too big.
+   * A forward journey departs before it arrives. In a reverse search the times are reversed. Each
+   * criterion has a small domain so the grid is complete, but not too big.
    */
   private static List<DestinationArrival<RaptorTripSchedule>> grid(boolean reverse) {
     var list = new ArrayList<DestinationArrival<RaptorTripSchedule>>();
@@ -267,9 +267,8 @@ class DestinationArrivalParetoSetComparatorsTest {
   }
 
   /**
-   * Create a real destination arrival, not a probe. A probe always has the iteration departure
-   * time as the departure time, so it cannot be used to test the departure time or duration
-   * criteria.
+   * Create a real destination arrival, not a probe. A probe always has the iteration departure time
+   * as the departure time, so it cannot be used to test the departure time or duration criteria.
    */
   private static DestinationArrival<RaptorTripSchedule> arrival(
     int iterationDepartureTime,

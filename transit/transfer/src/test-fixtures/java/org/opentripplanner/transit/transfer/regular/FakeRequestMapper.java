@@ -6,8 +6,8 @@ import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferen
 import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
 
 /**
- * Test double: the request is the walk preferences themselves, so a test can use the preferences
- * as the routing request.
+ * Test double: the request is the walk preferences themselves, so a test can use the preferences as
+ * the routing request.
  */
 public class FakeRequestMapper implements TransferRequestMapper<WalkPreferences> {
 

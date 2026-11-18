@@ -84,7 +84,7 @@ public class TripPatternTest {
   /**
    * Create TripPattern between to stops
    *
-   * @param origin      Start stop
+   * @param origin Start stop
    * @param destination End stop
    * @return TripPattern with stopPattern
    */
@@ -117,9 +117,9 @@ public class TripPatternTest {
   /**
    * Create LineString of coordinates and stops.
    *
-   * @param origin      First stop will become the first coordinate
+   * @param origin First stop will become the first coordinate
    * @param destination Last stop will become the last coordinate
-   * @param coordinate  Coordinate to inject between stops
+   * @param coordinate Coordinate to inject between stops
    * @return LineString with all coordinates
    */
   private List<LineString> getLineStrings(

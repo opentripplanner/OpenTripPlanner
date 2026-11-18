@@ -26,8 +26,8 @@ import org.opentripplanner.raptor.spi.SearchDirection;
  * is used to insert the access into the Raptor rounds at the correct moment (round), so the
  * number-of-transfers criteria become correct.
  * <p>
- * This class also provides an iterator to iterate over iteration steps in the Raptor algorithm
- * to cover extra minutes outside the search-window for access with a time-penalty.
+ * This class also provides an iterator to iterate over iteration steps in the Raptor algorithm to
+ * cover extra minutes outside the search-window for access with a time-penalty.
  */
 public class AccessPaths {
 

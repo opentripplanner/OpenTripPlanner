@@ -12,9 +12,8 @@ import org.opentripplanner.transit.transfer.regular.api.report.TransferCacheRepo
 import org.opentripplanner.transit.transfer.regular.api.report.UserPreferenceSource;
 
 /**
- * The number of requests that used each key of the cache of the Raptor transfers, for the report
- * of the cache. The statistics outlive the snapshots, the keys of all snapshots are counted
- * together.
+ * The number of requests that used each key of the cache of the Raptor transfers, for the report of
+ * the cache. The statistics outlive the snapshots, the keys of all snapshots are counted together.
  * <p>
  * The number of keys is bounded: if the limit is reached, the key with the fewest hits is dropped
  * to make room for a new key. A dropped key starts again with a count of one if it is used again,
@@ -30,7 +29,9 @@ abstract class RegularTransferCacheStatistics {
   /** The smallest number of keys tracked. */
   static final int MIN_CAPACITY = 100;
 
-  /** The number of keys tracked is this many times the size of the cache, if it is above the min. */
+  /**
+   * The number of keys tracked is this many times the size of the cache, if it is above the min.
+   */
   static final int CACHE_SIZE_FACTOR = 3;
 
   /** No statistics are collected. */
@@ -60,7 +61,7 @@ abstract class RegularTransferCacheStatistics {
   /**
    * What is known about a key, resolved when the report is built.
    *
-   * @param id               the id of the profile or the warmup entry, {@code null} if on demand
+   * @param id the id of the profile or the warmup entry, {@code null} if on demand
    * @param closestProfileId the id of the closest profile, {@code null} if there is none
    */
   record KeyInfo(
@@ -76,7 +77,7 @@ abstract class RegularTransferCacheStatistics {
    * The tracked keys, the most used first.
    *
    * @param isCached whether the Raptor transfers of a key are in the cache now
-   * @param keyInfo  resolves what is known about a key, it is only called when the report is built
+   * @param keyInfo resolves what is known about a key, it is only called when the report is built
    */
   abstract List<TransferCacheReportEntry> entries(
     Predicate<AbstractUserPreferences<?>> isCached,

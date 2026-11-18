@@ -356,7 +356,7 @@ class AddedTripBuilder {
   /**
    * Resolves submode based on added trip's mode and replacedRoute's mode
    *
-   * @param transitMode   Mode of the added trip
+   * @param transitMode Mode of the added trip
    * @param replacedRoute Route that is being replaced
    * @return String-representation of submode
    */

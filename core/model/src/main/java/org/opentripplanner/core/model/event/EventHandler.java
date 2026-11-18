@@ -22,7 +22,7 @@ public interface EventHandler<E extends DomainEvent, M> {
   /**
    * Handle the event, writing to the provided mutable repository.
    *
-   * @param event      the domain event
+   * @param event the domain event
    * @param repository the mutable repository for this handler, injected by the {@link WriteContext}
    */
   void handle(E event, M repository);

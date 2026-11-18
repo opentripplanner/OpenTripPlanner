@@ -87,8 +87,8 @@ public class GraphFileHeader implements Serializable {
    * The OTP serialization version id. If OTP and a Graph.obj file have the same id, then OTP is
    * compatible with the graph and should be able to deserialize it.
    * <p>
-   * The returned id do NOT include the prefix '0's. In the serialized form as bytes it have a
-   * fixed length {@link #ID_LENGTH} and is padded with {@link #ID_PREFIX}.
+   * The returned id do NOT include the prefix '0's. In the serialized form as bytes it have a fixed
+   * length {@link #ID_LENGTH} and is padded with {@link #ID_PREFIX}.
    */
   public String otpSerializationVersionId() {
     return otpSerializationVersionId;

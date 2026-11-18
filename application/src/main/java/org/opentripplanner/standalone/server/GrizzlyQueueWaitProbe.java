@@ -11,9 +11,9 @@ import org.glassfish.grizzly.threadpool.ThreadPoolProbe;
  * The queue wait time is stored in a {@link ThreadLocal} so that downstream code running in the
  * same worker thread (e.g., Jersey filters) can retrieve it.
  * <p>
- * The probe tracks task submission time in a {@link ConcurrentHashMap} keyed by the task's
- * object identity. This is safe because Grizzly creates a new {@link Runnable} for each dispatched
- * task and the entry is short-lived (removed on dequeue or cancel).
+ * The probe tracks task submission time in a {@link ConcurrentHashMap} keyed by the task's object
+ * identity. This is safe because Grizzly creates a new {@link Runnable} for each dispatched task
+ * and the entry is short-lived (removed on dequeue or cancel).
  */
 public class GrizzlyQueueWaitProbe extends ThreadPoolProbe.Adapter {
 

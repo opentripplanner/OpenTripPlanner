@@ -27,10 +27,10 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  * created OUTSIDE Raptor, which is the case in the
  * {@link org.opentripplanner.routing.algorithm.transferoptimization.OptimizeTransferService}.
  * <p>
- * The path builder comes in two versions. One which adds new legs to the tail of the path,
- * allowing us to add legs starting with the access leg and ending with the egress leg. The other
- * adds legs in the opposite order, from egress to access. Hence, the forward and reverse mappers
- * are simplified using the head and tail builder respectively. See
+ * The path builder comes in two versions. One which adds new legs to the tail of the path, allowing
+ * us to add legs starting with the access leg and ending with the egress leg. The other adds legs
+ * in the opposite order, from egress to access. Hence, the forward and reverse mappers are
+ * simplified using the head and tail builder respectively. See
  * {@link #headPathBuilder( RaptorSlackProvider, int, RaptorCostCalculator, RaptorStopNameResolver, RaptorPathConstrainedTransferSearch)}
  * and
  * {@link #tailPathBuilder(RaptorSlackProvider, int, RaptorCostCalculator, RaptorStopNameResolver, RaptorPathConstrainedTransferSearch)}.

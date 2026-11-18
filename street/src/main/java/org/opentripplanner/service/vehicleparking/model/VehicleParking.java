@@ -17,8 +17,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 /**
  * Vehicle parking locations, which may allow bicycle and/or car parking.
  * <p>
- * All fields are immutable except for the availability, capacity which may be updated by
- * updaters. If any other properties change a new VehicleParking instance should be created.
+ * All fields are immutable except for the availability, capacity which may be updated by updaters.
+ * If any other properties change a new VehicleParking instance should be created.
  */
 public class VehicleParking implements Serializable {
 

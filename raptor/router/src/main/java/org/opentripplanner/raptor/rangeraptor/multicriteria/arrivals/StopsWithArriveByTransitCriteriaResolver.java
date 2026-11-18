@@ -19,8 +19,7 @@ import org.opentripplanner.raptor.rangeraptor.transit.ViaConnections;
  * <ol>
  *   <li><b>On-board access:</b> an access path arrives at the stop on-board a transit service (e.g.
  *       flex), meaning you are allowed to continue with a transfer in the next round. The access
- *       should
- *       not be dominated by a transfer arrival - since using the access+transfer might be
+ *       should not be dominated by a transfer arrival - since using the access+transfer might be
  *       optimal.</li>
  *   <li><b>Egress which starts on-street(on foot):</b> an egress path leaving the stop on foot can
  *       only be used if the stop is reached by transit.</li>
@@ -30,7 +29,6 @@ import org.opentripplanner.raptor.rangeraptor.transit.ViaConnections;
  * </ol>
  *
  * For all other stops the Raptor algorithm with rounds and iterations take care of this.
- *
  */
 public class StopsWithArriveByTransitCriteriaResolver {
 

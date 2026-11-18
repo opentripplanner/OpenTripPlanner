@@ -17,9 +17,9 @@ import org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.StdStopArriv
 import org.opentripplanner.raptor.rangeraptor.transit.ForwardTransitCalculator;
 
 /**
- * The stop-arrival state is mutable and reused by the following Range Raptor iterations. An
- * arrival chain taken from the cursor must keep its values, so it can be stored as part of a
- * destination arrival and used after the iteration is complete.
+ * The stop-arrival state is mutable and reused by the following Range Raptor iterations. An arrival
+ * chain taken from the cursor must keep its values, so it can be stored as part of a destination
+ * arrival and used after the iteration is complete.
  */
 class StopsCursorSnapshotTest implements RaptorTestConstants {
 

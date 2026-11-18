@@ -32,9 +32,9 @@ import org.slf4j.LoggerFactory;
  * <p>
  * If possible the forward and reverse heuristics will be run in parallel.
  * <p>
- * Depending on which optimization is enabled and which search parameters are set a forward
- * and/or a reverse "single-iteration" raptor search is performed and heuristics are collected. This
- * is used to configure the "main" multi-iteration RangeRaptor search.
+ * Depending on which optimization is enabled and which search parameters are set a forward and/or a
+ * reverse "single-iteration" raptor search is performed and heuristics are collected. This is used
+ * to configure the "main" multi-iteration RangeRaptor search.
  */
 public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
 

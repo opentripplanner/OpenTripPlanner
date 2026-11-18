@@ -34,8 +34,8 @@ import org.slf4j.LoggerFactory;
  * A trip planning request. Some parameters may not be honored by the trip planner for some or all
  * itineraries.
  * <p>
- * All defaults should be specified here in the RouteRequest, NOT as default values of parameters
- * in web services that create RouteRequests. This establishes a priority chain for default values:
+ * All defaults should be specified here in the RouteRequest, NOT as default values of parameters in
+ * web services that create RouteRequests. This establishes a priority chain for default values:
  * RouteRequest field initializers, then JSON router config, then query parameters.
  */
 public class RouteRequest implements Serializable {
@@ -157,9 +157,9 @@ public class RouteRequest implements Serializable {
    * The epoch date/time in seconds that the trip should depart (or arrive, for requests where
    * arriveBy is true)
    * <p>
-   * The search time for the current request. If the client have moved to the next page then this
-   * is the adjusted search time - the dateTime passed in is ignored and replaced with by a time
-   * from the pageToken.
+   * The search time for the current request. If the client have moved to the next page then this is
+   * the adjusted search time - the dateTime passed in is ignored and replaced with by a time from
+   * the pageToken.
    * <p>
    * This method returns {@code null} for default requests.
    */
@@ -188,8 +188,8 @@ public class RouteRequest implements Serializable {
    * used for many things, for example finding the days to search, but the transit search is using
    * the cursor[if exist], not the date-time.
    * <p>
-   * The direct mode is also unset when there is a page cursor because for anything other than
-   * the initial page we don't want to see direct results. If the direct mode was given in the first
+   * The direct mode is also unset when there is a page cursor because for anything other than the
+   * initial page we don't want to see direct results. If the direct mode was given in the first
    * request, the generalized cost of the direct mode itinerary from the initial request is stored
    * in the page cursor for use with
    * {@link org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetter}
@@ -236,7 +236,7 @@ public class RouteRequest implements Serializable {
    * <p>
    * TODO - Refactor and make separate requests for one-to-one and the other searches.
    *
-   * @throws RoutingValidationException   if either origin or destination is missing.
+   * @throws RoutingValidationException if either origin or destination is missing.
    * @throws InvalidRoutingInputException if the destination is an on-board location.
    */
   public void validateOriginAndDestination() {
@@ -358,13 +358,13 @@ public class RouteRequest implements Serializable {
    * <p>
    * All optimal itineraries that depart within the search window are guaranteed to be found.
    * <p>
-   * This is sometimes referred to as the Range Raptor Search Window - but could be used in a
-   * none Transit search as well; Hence this is named search-window and not raptor-search-window. Do
-   * not confuse this with the travel-window, which is the time between EDT to LAT.
+   * This is sometimes referred to as the Range Raptor Search Window - but could be used in a none
+   * Transit search as well; Hence this is named search-window and not raptor-search-window. Do not
+   * confuse this with the travel-window, which is the time between EDT to LAT.
    * <p>
-   * Use {@code null} to unset, and {@link Duration#ZERO} to do one Raptor iteration. The value
-   * is dynamically assigned a suitable value, if not set. In a small-to-medium size operation, you
-   * may use a fixed value, like 60 minutes. If you have a mixture of high-frequency city routes and
+   * Use {@code null} to unset, and {@link Duration#ZERO} to do one Raptor iteration. The value is
+   * dynamically assigned a suitable value, if not set. In a small-to-medium size operation, you may
+   * use a fixed value, like 60 minutes. If you have a mixture of high-frequency city routes and
    * infrequent long distant journeys, the best option is normally to use the dynamic auto
    * assignment.
    * <p>
@@ -411,18 +411,16 @@ public class RouteRequest implements Serializable {
    *   <li>The traveler want to find the best alternative within a time window. Set
    *       {@code timetableView=true} and {@code arriveBy=false}. This is the default, and if the
    *       intention of the traveler is unknown, this gives the best result. This use-case includes
-   *       all
-   *       itineraries in the two next use-cases. This option also work well with paging.
+   *       all itineraries in the two next use-cases. This option also work well with paging.
    * <p>
-   *       Setting the {@code arriveBy=false}, covers the same use-case, but the input time is
-   *       interpreted as latest-arrival-time, and not earliest-departure-time.</li>
+   * Setting the {@code arriveBy=false}, covers the same use-case, but the input time is interpreted
+   * as latest-arrival-time, and not earliest-departure-time.</li>
    *   <li>The traveler want to find the best alternative with departure after a specific time. For
    *       example: I am at the station now and want to get home as quickly as possible. Set
    *       {@code timetableView=true} and {@code arriveBy=false}. Do not support paging.</li>
    *   <li>Traveler want to find the best alternative with arrival before specific time. For example
    *       going to a meeting. Set {@code timetableView=true} and {@code arriveBy=false}. Do not
-   *       support
-   *       paging.</li>
+   *       support paging.</li>
    * </ul>
    * Default: true
    */
@@ -444,8 +442,8 @@ public class RouteRequest implements Serializable {
    * find all pareto-optimal itineraries when paging. Also, a large search-window and a small {@code
    * numItineraries} waste computer CPU calculation time.
    * <p>
-   * The default value is 50. This is a reasonably high threshold to prevent large amount of data
-   * to be returned. Consider tuning the search-window instead of setting this to a small value.
+   * The default value is 50. This is a reasonably high threshold to prevent large amount of data to
+   * be returned. Consider tuning the search-window instead of setting this to a small value.
    */
   public int numItineraries() {
     return numItineraries;

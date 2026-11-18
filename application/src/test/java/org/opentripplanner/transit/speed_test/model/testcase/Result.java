@@ -15,11 +15,11 @@ import org.opentripplanner.utils.time.TimeUtils;
  *
  * @param agencies Alphabetical distinct list of agencies. A {@code List} is used because the order
  *     is important.
- * @param modes    Alphabetical distinct list of modes. A {@code List} is used because the order is
+ * @param modes Alphabetical distinct list of modes. A {@code List} is used because the order is
  *     important.
- * @param routes   A list of routes in tha same order as they appear in the journey.
- * @param stops    A list of stops in tha same order as they appear in the journey.
- * @param details  Summary description of the journey, like: "Walk 2m ~ Stop A ~ Route L1 12:00 -
+ * @param routes A list of routes in tha same order as they appear in the journey.
+ * @param stops A list of stops in tha same order as they appear in the journey.
+ * @param details Summary description of the journey, like: "Walk 2m ~ Stop A ~ Route L1 12:00 -
  *     12:30 ~ Stop B ~ Walk 3m"
  */
 public record Result(

@@ -8,22 +8,21 @@ import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
- * Calculates the departure time of a journey in a FORWARD search, after the access is
- * time-shifted. Raptor departs from the origin at the iteration departure time, but the access
- * is moved as late as possible to fit the first transit leg. The result is the same departure time
- * as the one found in the path, but it is calculated from the arrival chain, without building the
- * path. The calculation mirrors the time-shifting of the access in the path builder.
+ * Calculates the departure time of a journey in a FORWARD search, after the access is time-shifted.
+ * Raptor departs from the origin at the iteration departure time, but the access is moved as late
+ * as possible to fit the first transit leg. The result is the same departure time as the one found
+ * in the path, but it is calculated from the arrival chain, without building the path. The
+ * calculation mirrors the time-shifting of the access in the path builder.
  * <p>
- * The time-penalty is included: the access in the arrival chain is decorated with the
- * time-penalty, so the returned time is the departure time <em>inclusive</em> time-penalty.
+ * The time-penalty is included: the access in the arrival chain is decorated with the time-penalty,
+ * so the returned time is the departure time <em>inclusive</em> time-penalty.
  * <p>
- * The departure time is used to calculate the journey duration, which is a pareto criterion in
- * the destination pareto-set for searches that are not timetable searches. See
+ * The departure time is used to calculate the journey duration, which is a pareto criterion in the
+ * destination pareto-set for searches that are not timetable searches. See
  * {@code org/opentripplanner/raptor/package.md}, section "Destination pareto-set".
  * <p>
- * <a href="https://github.com/opentripplanner/OpenTripPlanner/issues/8095">
- *     This class duplicates logic found in Raptor and the path builder
- * </a>.
+ * <a href="https://github.com/opentripplanner/OpenTripPlanner/issues/8095"> This class duplicates
+ * logic found in Raptor and the path builder </a>.
  */
 public final class TimeShiftedDepartureTime<T extends RaptorTripSchedule> {
 

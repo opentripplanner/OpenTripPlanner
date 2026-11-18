@@ -46,12 +46,11 @@ import uk.org.siri.siri21.WorkflowStatusEnumeration;
  * known that their entity IDs are all drawn from the same namespace (i.e. they are functionally
  * fragments of the same feed).
  * <p>
- * TODO RT_AB: Internal FeedScopedId creation strategy should probably be pluggable or
- * configurable. TG has indicated this is a necessary condition for moving this updater out of
- * sandbox.
+ * TODO RT_AB: Internal FeedScopedId creation strategy should probably be pluggable or configurable.
+ * TG has indicated this is a necessary condition for moving this updater out of sandbox.
  * <p>
- * TODO RT_AB: The name should be clarified, as there is no such thing as "SIRI Alerts", and it
- * is referencing the internal model concept of "Alerts" which are derived from GTFS terminology.
+ * TODO RT_AB: The name should be clarified, as there is no such thing as "SIRI Alerts", and it is
+ * referencing the internal model concept of "Alerts" which are derived from GTFS terminology.
  */
 public class SiriAlertsUpdateHandler {
 

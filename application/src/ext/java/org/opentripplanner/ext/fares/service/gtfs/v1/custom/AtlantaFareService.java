@@ -93,7 +93,7 @@ public class AtlantaFareService extends DefaultFareService {
     /**
      * Adds a leg to this transfer.
      *
-     * @param leg         Ride to be added
+     * @param leg Ride to be added
      * @param defaultFare Default fare to use for transfer calculations (usually from GTFS)
      * @return Whether the added ride is valid or not. If invalid, then this transfer has ended and
      *     a new one is needed for the ride.
@@ -192,8 +192,8 @@ public class AtlantaFareService extends DefaultFareService {
     /**
      * Create a TransferMeta
      *
-     * @param type      Type of transfer
-     * @param upcharge  Upcharge for the transfer in cents
+     * @param type Type of transfer
+     * @param upcharge Upcharge for the transfer in cents
      * @param payOnExit Whether the fare is charged at end of leg
      */
     public TransferMeta(TransferType type, Money upcharge, boolean payOnExit) {

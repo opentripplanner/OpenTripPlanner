@@ -10,8 +10,7 @@ package org.opentripplanner.core.model.transaction;
  *       {@link RepositoryRegistry} and call {@link #repositorySnapshot(TransactionScope)}, which
  *       guarantees a consistent read view across all repositories for the duration of the request.
  *   <li><em>Updaters</em> obtain write access exclusively through a {@link WriteContext} provided
- *       by
- *       the {@link UpdateManager}. Handles are read-only from the public API.
+ *       by the {@link UpdateManager}. Handles are read-only from the public API.
  * </ul>
  *
  * The {@code M} type parameter is not used by the public API, but allows the framework to return a

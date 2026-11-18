@@ -10,9 +10,9 @@ import org.slf4j.LoggerFactory;
 /**
  * Pre-filters carpool trip candidates based on time compatibility with the passenger request.
  * <p>
- * A trip is rejected when it cannot serve the passenger inside the passenger's window. Trips
- * that pass are still subject to expensive routing and a tighter post-filter on the actual
- * itinerary times.
+ * A trip is rejected when it cannot serve the passenger inside the passenger's window. Trips that
+ * pass are still subject to expensive routing and a tighter post-filter on the actual itinerary
+ * times.
  *
  * <h2>Variables</h2>
  *
@@ -43,12 +43,9 @@ import org.slf4j.LoggerFactory;
  *       before it.</li>
  *   <li><strong>{@code tripEnd}</strong> — {@code tripStart} plus the routed baseline to the
  *       destination, with the dwell at each intermediate stop, plus the destination's deviation
- *       budget:
- *       no insertion delays the destination beyond its budget, so no pickup or dropoff happens
- *       after it.
- *       The end time of the trip data is not used: the routed baseline may take longer than the
- *       driver's
- *       schedule.</li>
+ *       budget: no insertion delays the destination beyond its budget, so no pickup or dropoff
+ *       happens after it. The end time of the trip data is not used: the routed baseline may take
+ *       longer than the driver's schedule.</li>
  * </ul>
  *
  * <h3>The passenger</h3>
@@ -56,12 +53,10 @@ import org.slf4j.LoggerFactory;
  * <ul>
  *   <li><strong>{@code Wp}</strong>, <strong>{@code Wd}</strong> — the passenger's walk from the
  *       origin to the snapped pickup and from the snapped dropoff to the destination; zero when
- *       there is
- *       none, or when that end of the ride is a transit stop.</li>
+ *       there is none, or when that end of the ride is a transit stop.</li>
  *   <li><strong>{@code J}</strong> = {@link CarpoolingRequest#getMaxJourneyDuration()} — bounds the
  *       transit ride of unknown duration that separates the carpool from the request anchor for
- *       access
- *       with arriveBy=true and egress with arriveBy=false.</li>
+ *       access with arriveBy=true and egress with arriveBy=false.</li>
  * </ul>
  *
  * <h2>Rules</h2>
@@ -88,12 +83,10 @@ import org.slf4j.LoggerFactory;
  *   <li>Arrive-by with the passenger at the dropoff (direct, egress): the passenger arrives between
  *       EAT and LAT and is dropped off {@code Wd} earlier.</li>
  *   <li>Egress with arriveBy=false: the passenger reaches the carpool by transit after leaving at
- *       EDT
- *       or later, and is dropped off in time to arrive within {@code J} of LDT.</li>
+ *       EDT or later, and is dropped off in time to arrive within {@code J} of LDT.</li>
  *   <li>Access with arriveBy=true: the passenger is picked up before arriving by LAT, and, the
  *       journey lasting at most {@code J}, after leaving at {@code EAT − J} or later and walking to
- *       the
- *       pickup.</li>
+ *       the pickup.</li>
  * </ul>
  *
  * <h3>Behavior with missing inputs</h3>

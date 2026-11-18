@@ -127,7 +127,6 @@ public class ServiceDateUtils {
   /// to 23:59:59. There is **no** such check performed > in fall. The method returns the first-day
   /// of winter-time, when the time is in the 1 hour gap > between last day of summer and first day
   /// of winter. This overselection should not cause any > problems.
-  ///
   public static List<LocalDate> calculateRunningDates(
     Instant startTime,
     Duration window,

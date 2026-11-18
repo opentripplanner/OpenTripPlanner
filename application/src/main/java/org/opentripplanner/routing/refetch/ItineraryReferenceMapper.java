@@ -79,8 +79,8 @@ public final class ItineraryReferenceMapper {
 
   /**
    * Builds the request for a refetch: the values stored in {@code ref} on top of
-   * {@code defaultRouteRequest}. Values that are not stored, like
-   * {@code maxAccessEgressDuration}, come from {@code defaultRouteRequest}.
+   * {@code defaultRouteRequest}. Values that are not stored, like {@code maxAccessEgressDuration},
+   * come from {@code defaultRouteRequest}.
    *
    * @throws RefetchItineraryException if the request cannot be built
    */
@@ -152,8 +152,7 @@ public final class ItineraryReferenceMapper {
 
   /**
    * A transit leg without a reference (for example flex) cannot be stored. Skipping it would give
-   * an
-   * id for a different trip, so the whole itinerary is unsupported.
+   * an id for a different trip, so the whole itinerary is unsupported.
    */
   private static LegReference requireLegReference(Leg leg) {
     if (leg instanceof FrequencyTransitLeg) {

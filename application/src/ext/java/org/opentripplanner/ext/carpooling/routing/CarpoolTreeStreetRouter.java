@@ -31,8 +31,8 @@ import org.slf4j.LoggerFactory;
  * are never routed through never incur the cost of tree expansion. Results are cached to avoid
  * redundant tree lookups.
  * <p>
- * Vertices must be registered via {@link #addVertex} before routing. The router first attempts
- * to use a forward tree from the origin; if unavailable, it falls back to a reverse tree to the
+ * Vertices must be registered via {@link #addVertex} before routing. The router first attempts to
+ * use a forward tree from the origin; if unavailable, it falls back to a reverse tree to the
  * destination.
  * <p>
  * This class is not thread-safe. Each instance should be used from a single thread.
@@ -153,8 +153,8 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
    * previously computed tree may not contain edges leading to the late-added vertex, making it
    * unreachable.
    *
-   * @param vertex      the street vertex to build trees from/to
-   * @param direction   whether to build a forward tree ({@link Direction#FROM}) or a reverse tree
+   * @param vertex the street vertex to build trees from/to
+   * @param direction whether to build a forward tree ({@link Direction#FROM}) or a reverse tree
    *     ({@link Direction#TO})
    * @param searchLimit maximum duration for the tree expansion
    * @throws IllegalStateException if called after {@link #route} has already been invoked
@@ -263,12 +263,11 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
    * repeated queries for the same vertex pair are free. The tree for a vertex is computed on the
    * first {@link #route} call that needs it.
    * <p>
-   * The method first looks for a forward tree rooted at {@code from}; if none exists it falls
-   * back to a reverse tree rooted at {@code to}. At least one of the two endpoints must therefore
-   * have been registered with {@link #addVertex} in the matching direction; a call whose endpoints
-   * were both left unregistered cannot be served and returns {@code null}. A registered endpoint
-   * whose tree does not reach the other endpoint within its search limit returns {@code null} as
-   * well.
+   * The method first looks for a forward tree rooted at {@code from}; if none exists it falls back
+   * to a reverse tree rooted at {@code to}. At least one of the two endpoints must therefore have
+   * been registered with {@link #addVertex} in the matching direction; a call whose endpoints were
+   * both left unregistered cannot be served and returns {@code null}. A registered endpoint whose
+   * tree does not reach the other endpoint within its search limit returns {@code null} as well.
    */
   @Override
   public RoutedSegment route(Vertex from, Vertex to) {

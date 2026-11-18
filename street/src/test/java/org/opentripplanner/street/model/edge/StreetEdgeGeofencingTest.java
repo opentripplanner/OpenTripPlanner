@@ -196,7 +196,6 @@ class StreetEdgeGeofencingTest {
      * The no-traversal pre-traversal should fork (drop + continue riding), not force drop. The
      * boundary vertex V2 has outgoing edges that don't enter the zone (V2→V4). The rider should be
      * able to continue riding from V2 toward V4 without dropping.
-     *
      */
     @Test
     public void noTraversalBoundaryShouldForkNotForceDrop() {

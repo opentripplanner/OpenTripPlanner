@@ -22,8 +22,8 @@ import tools.jackson.databind.node.MissingNode;
 /**
  * Generic config file loader. This is used to load all configuration files.
  * <p>
- * This class is also provide logging when a config file is loaded. We load and parse config
- * files early to reveal syntax errors without waiting for graph build.
+ * This class is also provide logging when a config file is loaded. We load and parse config files
+ * early to reveal syntax errors without waiting for graph build.
  */
 public class ConfigFileLoader {
 
@@ -92,8 +92,8 @@ public class ConfigFileLoader {
    * keys are allowed. Returns an empty node if the file does not exist. Throws an exception if the
    * file contains syntax errors or cannot be parsed for some other reason.
    * <p>
-   * We do not require any JSON config files to be present because that would get in the way of
-   * the simplest rapid deployment workflow. Therefore we return an empty JSON node when the file is
+   * We do not require any JSON config files to be present because that would get in the way of the
+   * simplest rapid deployment workflow. Therefore we return an empty JSON node when the file is
    * missing, causing us to fall back on all the default values as if there was a JSON file present
    * with no fields defined.
    */

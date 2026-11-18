@@ -501,8 +501,8 @@ public class ElevationModule implements GraphBuilderModule {
    * interpolator instance for each thread to avoid other threads waiting for a lock to be released
    * on the Coverage interpolator instance.
    * <p>
-   * This method will get/lazy-create a thread-specific Coverage interpolator instance. Since
-   * these interpolator instances take some time to create, they are lazy-created instead of created
+   * This method will get/lazy-create a thread-specific Coverage interpolator instance. Since these
+   * interpolator instances take some time to create, they are lazy-created instead of created
    * upfront because it could lock all other threads even if other threads don't need an
    * interpolator right away if they happen to process a lot of cached data initially.
    */
@@ -566,7 +566,7 @@ public class ElevationModule implements GraphBuilderModule {
    *
    * @param coverage the specific Coverage instance to use in order to avoid competition between
    *     threads
-   * @param c        the coordinate (NAD83)
+   * @param c the coordinate (NAD83)
    * @return elevation in meters
    */
   private double getElevation(Coverage coverage, Coordinate c)
@@ -579,14 +579,14 @@ public class ElevationModule implements GraphBuilderModule {
    *
    * @param coverage the specific Coverage instance to use in order to avoid competition between
    *     threads
-   * @param x        the query longitude (NAD83)
-   * @param y        the query latitude (NAD83)
+   * @param x the query longitude (NAD83)
+   * @param y the query latitude (NAD83)
    * @return elevation in meters
-   * @throws PointOutsideCoverageException  if the point lies outside the elevation tile area.
-   * @throws TransformException             if computing the EllipsoidToGeoidDifference fails.
+   * @throws PointOutsideCoverageException if the point lies outside the elevation tile area.
+   * @throws TransformException if computing the EllipsoidToGeoidDifference fails.
    * @throws ArrayIndexOutOfBoundsException at the edges of some elevation tiles with NoData
-   *     regions, see <a href=
-   *     "https://github.com/opentripplanner/OpenTripPlanner/issues/2792">#2792</a>.
+   *     regions, see
+   *     <a href= "https://github.com/opentripplanner/OpenTripPlanner/issues/2792">#2792</a>.
    */
   private double getElevation(Coverage coverage, double x, double y)
     throws PointOutsideCoverageException, TransformException {

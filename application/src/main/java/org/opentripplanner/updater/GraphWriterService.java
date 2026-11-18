@@ -21,8 +21,7 @@ import org.slf4j.LoggerFactory;
  * update context of its domain: transit tasks get access to the mutable realtime-timetable
  * repository, street tasks get access to the street model.
  * <p>
- * This class will eventually be removed once all updaters submit directly to
- * {@link UpdateManager}.
+ * This class will eventually be removed once all updaters submit directly to {@link UpdateManager}.
  *
  * @param <C> the update context of this domain, see {@link GraphWriterRunnable}
  */

@@ -17,9 +17,9 @@ public interface TransitObject<
    * The copy method is used to mutate the existing object by creating a builder and setting
    * {@code this} as the "original".
    * <p>
-   * Note! Do not mutate nested transit entities. When crossing aggregate root boundaries, then
-   * you need to fetch the entity from the transit service before changing it. Changing a nested
-   * entity will cause the data to become inconsistent.
+   * Note! Do not mutate nested transit entities. When crossing aggregate root boundaries, then you
+   * need to fetch the entity from the transit service before changing it. Changing a nested entity
+   * will cause the data to become inconsistent.
    * <p>
    * The exception is when a builder reference another builder, and not the entity object. The
    * nested entity is a <em>composed</em> part of the parent, and not shared with other entities.

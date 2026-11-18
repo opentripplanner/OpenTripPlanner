@@ -312,8 +312,8 @@ public class DurationUtils {
    * <p>
    * Background: There are multiple ways to express -1.5 hours: "PT-1H-30M" and "-PT1H30M".
    * <p>
-   * The first version is what you get when calling toString() but it's quite confusing.
-   * Therefore, this method makes sure that you get the second form "-PT1H30M".
+   * The first version is what you get when calling toString() but it's quite confusing. Therefore,
+   * this method makes sure that you get the second form "-PT1H30M".
    */
   public static String formatDurationWithLeadingMinus(Duration duration) {
     if (duration.isNegative()) {

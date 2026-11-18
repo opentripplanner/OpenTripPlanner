@@ -10,8 +10,8 @@ import org.opentripplanner.transit.model.network.TripPattern;
 @FunctionalInterface
 public interface PatternsByStopLookup {
   /**
-   * Return the scheduled trip patterns visiting the stop with the given id, or an empty
-   * collection if no pattern visits it.
+   * Return the scheduled trip patterns visiting the stop with the given id, or an empty collection
+   * if no pattern visits it.
    */
   Collection<TripPattern> findPatterns(FeedScopedId stopId);
 }

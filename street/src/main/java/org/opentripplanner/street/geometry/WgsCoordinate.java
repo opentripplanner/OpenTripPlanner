@@ -127,8 +127,8 @@ public final class WgsCoordinate implements Serializable {
    *      | 8mm | 8mm |
    *      x --- y --- z
    *     </pre>
-   * Then {@code x.sameLocation(y)} is {@code true} and {@code y.sameLocation(z)} is
-   * {@code true}, but {@code x.sameLocation(z)} is {@code false}.
+   * Then {@code x.sameLocation(y)} is {@code true} and {@code y.sameLocation(z)} is {@code true},
+   * but {@code x.sameLocation(z)} is {@code false}.
    */
   public boolean sameLocation(WgsCoordinate other) {
     return equals(other);

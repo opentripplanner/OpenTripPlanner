@@ -29,19 +29,13 @@ import org.opentripplanner.transit.model.timetable.Trip;
  * {@link TripTransferPoint}.</li>
  * <li>{@link TripTransferPoint} A transfer from/to a Trip at the given stop position(not stop). The
  *     GTFS Transfers may specify a transfer from/to a trip and stop/station. But in OTP we map the
- *     stop
- *     to a stop position in pattern. The OTP model {@link TripTransferPoint} does NOT reference the
- *     stop/station, but the {@code stopPositionInPattern} instead. There is two reasons for this.
- *     In
- *     NeTEx the an interchange is from a trip and stop-point, so this model fits better with NeTEx.
- *     The
- *     second reason is that real-time updates could invalidate the trip-transfer-point, since the
- *     stop
- *     could change to another platform(common for railway stations). To account for this the
- *     RT-update
- *     would need to patch the trip-transfer-point. We simplify the RT-updates by converting the
- *     stop to
- *     a stop-position-in-pattern.
+ *     stop to a stop position in pattern. The OTP model {@link TripTransferPoint} does NOT
+ *     reference the stop/station, but the {@code stopPositionInPattern} instead. There is two
+ *     reasons for this. In NeTEx the an interchange is from a trip and stop-point, so this model
+ *     fits better with NeTEx. The second reason is that real-time updates could invalidate the
+ *     trip-transfer-point, since the stop could change to another platform(common for railway
+ *     stations). To account for this the RT-update would need to patch the trip-transfer-point. We
+ *     simplify the RT-updates by converting the stop to a stop-position-in-pattern.
  * <p>
  * This is the most specific point type.</li>
  * </ol>
@@ -79,8 +73,7 @@ public interface TransferPoint {
   boolean appliesToAllTrips();
 
   /**
-   * <a href=
-   * "https://developers.google.com/transit/gtfs/reference/gtfs-extensions#specificity-of-a-transfer">
+   * <a href= "https://developers.google.com/transit/gtfs/reference/gtfs-extensions#specificity-of-a-transfer">
    * Specificity of a transfer </a>
    */
   int getSpecificityRanking();

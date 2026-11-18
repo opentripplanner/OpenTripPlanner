@@ -13,8 +13,8 @@ import org.opentripplanner.transit.model.site.StopLocation;
  * doing this, we explicitly list all external services needed and make testing easier. This also
  * serves as documentation.
  * <p>
- * The implementation of this interface will for the most part just delegate to the implementing
- * OTP service - look in these services for the documentation.
+ * The implementation of this interface will for the most part just delegate to the implementing OTP
+ * service - look in these services for the documentation.
  */
 public interface FlexAccessEgressCallbackAdapter {
   /** Adapter, look at implementing service for documentation. */

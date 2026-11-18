@@ -34,9 +34,9 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
  * stop). Trips are assumed to be non-overtaking, so that an earlier trip never arrives after a
  * later trip.
  * <p>
- * The key of the TripPattern includes the Route, StopPattern, TransitMode, and SubMode. All
- * trips grouped under a TripPattern should have the same values for these characteristics (with
- * possible exceptions for TransitMode and SubMode).
+ * The key of the TripPattern includes the Route, StopPattern, TransitMode, and SubMode. All trips
+ * grouped under a TripPattern should have the same values for these characteristics (with possible
+ * exceptions for TransitMode and SubMode).
  * <p>
  * TODO RT_AB: We need to clarify exactly which characteristics are identical across the trips.
  * Grouping into patterns serves more than one purpose: it conserves memory by not replicating
@@ -52,8 +52,8 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
  * we can not support it - wheelchair is not part of the TripPattern key. Putting everything into
  * the key is not a good options either, the fragmentation will have a negative performance impact.
  * <p>
- * This is called a JOURNEY_PATTERN in the Transmodel vocabulary. However, GTFS calls a
- * Transmodel JOURNEY a "trip", thus TripPattern.
+ * This is called a JOURNEY_PATTERN in the Transmodel vocabulary. However, GTFS calls a Transmodel
+ * JOURNEY a "trip", thus TripPattern.
  * <p>
  * The {@code id} is a unique identifier for this trip pattern. For GTFS feeds this is generally
  * generated in the format FeedId:Agency:RouteId:DirectionId:PatternNumber. For NeTEx the
@@ -221,8 +221,8 @@ public final class TripPattern
    * contains a full set of stops/pickup/dropoff for a pattern. This will wipe out any changes to
    * the stop-pattern from previous updates.
    * <p>
-   * Be aware, if the same update is applied twice, then the first instance will be reused to
-   * avoid unnecessary objects creation and gc.
+   * Be aware, if the same update is applied twice, then the first instance will be reused to avoid
+   * unnecessary objects creation and gc.
    */
   public StopPattern.StopPatternBuilder copyPlannedStopPattern() {
     return isModified()
@@ -318,8 +318,8 @@ public final class TripPattern
    * position, ONLY use this method if you would like to search the stop-pattern for if it contains
    * a bording for the given stop.
    * <p>
-   * Returns whether passengers can board at a given stop SOMEWHERE in the pattern, considering
-   * all stops in case the pattern visit the same stop twice.
+   * Returns whether passengers can board at a given stop SOMEWHERE in the pattern, considering all
+   * stops in case the pattern visit the same stop twice.
    * <p>
    * WARNING! This is an inefficient method iterating over the stops, do not use it in routing.
    * <p>
@@ -335,8 +335,8 @@ public final class TripPattern
    * Use {@link #canAlight(int)} if you want to check if a stop can be alighted at a given stop
    * position, ONLY use this method if you would like to search the stop-pattern for a alighting.
    * <p>
-   * Returns whether passengers can alight at a given stop SOMEWHERE in the pattern, considering
-   * all stops in case the pattern visit the same stop twice.
+   * Returns whether passengers can alight at a given stop SOMEWHERE in the pattern, considering all
+   * stops in case the pattern visit the same stop twice.
    * <p>
    * WARNING! This is an inefficient method iterating over the stops, do not use it in routing.
    * <p>
@@ -440,8 +440,8 @@ public final class TripPattern
    * (and also a new TripPattern) that did not exist in the scheduled data. For such cases, this
    * field will be {@code true}.
    * <p>
-   * Returns {@code true} if this TripPattern is a modified version of a scheduled TripPattern.
-   * If this method returns {@code false}, this TripPattern is either a scheduled TripPattern or a
+   * Returns {@code true} if this TripPattern is a modified version of a scheduled TripPattern. If
+   * this method returns {@code false}, this TripPattern is either a scheduled TripPattern or a
    * TripPattern generated from scratch in real-time (GTFS ADDED/NeTEx ExtraJourney).
    */
   public boolean isStopPatternModifiedInRealTime() {
@@ -459,8 +459,7 @@ public final class TripPattern
 
   /**
    * @deprecated This method is not clearly defined. Use {@link #isStopPatternModifiedInRealTime()}
-   *     or {@link #isRealTimeTripPattern()} if possible, or clarify what this is needed
-   *     for.
+   *     or {@link #isRealTimeTripPattern()} if possible, or clarify what this is needed for.
    */
   @Deprecated
   public boolean isModified() {

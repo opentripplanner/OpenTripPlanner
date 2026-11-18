@@ -11,9 +11,9 @@ import java.util.Objects;
  * {@link #build(Object[])} method to also make sure that the existing update is reused
  * (deduplicated).
  * <p>
- * Arrays are mutable, so be careful as this class helps you reuse the original if it has the
- * same values. It protects the original while in scope, but you should only use it if you do not
- * modify the original or the result on the outside. This builder does not help protect the arrays.
+ * Arrays are mutable, so be careful as this class helps you reuse the original if it has the same
+ * values. It protects the original while in scope, but you should only use it if you do not modify
+ * the original or the result on the outside. This builder does not help protect the arrays.
  */
 public final class MemEfficientArrayBuilder<T> {
 

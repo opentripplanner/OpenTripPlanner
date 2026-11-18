@@ -35,8 +35,8 @@ public class CharacterEscapeFormatter {
   private final char substitutionChar;
 
   /**
-   * @param escapeChar       the character used as an escape character.
-   * @param specialChar      the character to be removed/replaced in the encoded text.
+   * @param escapeChar the character used as an escape character.
+   * @param specialChar the character to be removed/replaced in the encoded text.
    * @param substitutionChar the character used together with the escape character to put in the
    *     encoded text as a placeholder for the special character.
    */

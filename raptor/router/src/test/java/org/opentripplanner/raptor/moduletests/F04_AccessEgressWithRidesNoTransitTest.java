@@ -25,8 +25,8 @@ import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 /**
  * FEATURE UNDER TEST
  * <p>
- * Raptor should be able to connect to Flex services with and without a walking transfer in
- * between. There is no regular scheduled transit involved in this test, only flex.
+ * Raptor should be able to connect to Flex services with and without a walking transfer in between.
+ * There is no regular scheduled transit involved in this test, only flex.
  * <p>
  * There is one test for each of the following cases:
  * <pre>

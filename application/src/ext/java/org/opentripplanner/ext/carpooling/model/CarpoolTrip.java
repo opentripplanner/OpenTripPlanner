@@ -15,26 +15,25 @@ import org.opentripplanner.transit.model.organization.ContactInfo;
 /**
  * Represents a driver's carpool journey with planned route, timing, and passenger capacity.
  * <p>
- * A carpool trip models a driver offering their vehicle journey for passengers to join. It
- * includes the driver's planned route as a sequence of stops, total vehicle capacity, and timing
- * constraints including a deviation budget that allows the driver to slightly adjust their route to
- * accommodate passengers.
+ * A carpool trip models a driver offering their vehicle journey for passengers to join. It includes
+ * the driver's planned route as a sequence of stops, total vehicle capacity, and timing constraints
+ * including a deviation budget that allows the driver to slightly adjust their route to accommodate
+ * passengers.
  *
  * <h2>Core Concepts</h2>
  * <ul>
  *   <li><strong>Origin/Destination Areas:</strong> Start and end zones for the driver's
  *       journey</li>
  *   <li><strong>Stops:</strong> Ordered sequence of waypoints along the route where passengers can
- *       be
- *       picked up or dropped off. Stops are dynamically updated as bookings occur.</li>
+ *       be picked up or dropped off. Stops are dynamically updated as bookings occur.</li>
  *   <li><strong>Total Capacity:</strong> Number of seats in the car, including the driver seat</li>
  * </ul>
  *
  * <h2>Data Source</h2>
  * <p>
- * Trips are typically created from SIRI-ET messages provided by external carpooling platforms.
- * The platform manages driver registrations, trip creation, and real-time updates as passengers
- * book or cancel rides.
+ * Trips are typically created from SIRI-ET messages provided by external carpooling platforms. The
+ * platform manages driver registrations, trip creation, and real-time updates as passengers book or
+ * cancel rides.
  *
  * <h2>Immutability</h2>
  * <p>
@@ -48,8 +47,8 @@ import org.opentripplanner.transit.model.organization.ContactInfo;
  * <ol>
  *   <li>Filters check basic compatibility (capacity, timing, direction)</li>
  *   <li>Insertion strategy finds optimal pickup/dropoff positions along the route, keeping every
- *       leg
- *       the passenger rides within capacity and every later stop within its deviation budget</li>
+ *       leg the passenger rides within capacity and every later stop within its deviation
+ *       budget</li>
  * </ol>
  *
  * @see CarpoolStop for individual stop details
@@ -173,8 +172,8 @@ public class CarpoolTrip
   /**
    * Builds the full list of route points including origin area, all stops, and destination area.
    * <p>
-   * This list represents the complete path of the carpool trip, useful for distance and
-   * direction calculations during filtering and matching.
+   * This list represents the complete path of the carpool trip, useful for distance and direction
+   * calculations during filtering and matching.
    *
    * @return a list of coordinates representing the full route of the trip
    */

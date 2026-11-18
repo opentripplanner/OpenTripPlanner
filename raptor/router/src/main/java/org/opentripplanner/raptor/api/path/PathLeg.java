@@ -157,8 +157,7 @@ public interface PathLeg<T extends RaptorTripSchedule> {
    *   <li>A transfer leg can only be followed by a transit leg.
    *   <li>An egress leg is always the last leg and this method will throw a
    *       {@link UnsupportedOperationException}. Use the {@link #isEgressLeg()} to check if the
-   *       last leg
-   *       is reached.
+   *       last leg is reached.
    * </ul>
    *
    * @return Next leg in path.

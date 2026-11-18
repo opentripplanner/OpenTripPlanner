@@ -20,8 +20,8 @@ import org.opentripplanner.utils.lang.StringUtils;
  * parameter value can be generated. The value is made available in the logs as well if they have an
  * associated logKey.
  * <p>
- * The {@link org.opentripplanner.framework.concurrent.OtpRequestThreadFactory} work together
- * with this filter to propagate the log context to all threads.
+ * The {@link org.opentripplanner.framework.concurrent.OtpRequestThreadFactory} work together with
+ * this filter to propagate the log context to all threads.
  */
 public class RequestTraceFilter implements ContainerRequestFilter, ContainerResponseFilter {
 

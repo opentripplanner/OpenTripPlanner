@@ -22,9 +22,9 @@ import org.locationtech.jts.geom.LineString;
  * original {@link Coordinate} instance: there is no scale/unscale round-trip, and so no rounding
  * error that could move a point off its original location.
  * <p>
- * JTS ships its own Douglas-Peucker simplifier, but it treats coordinates as planar (Cartesian)
- * and does not apply the longitude correction above, so it distorts distances when applied directly
- * to WGS84 coordinates. This implementation exists to support those coordinates correctly.
+ * JTS ships its own Douglas-Peucker simplifier, but it treats coordinates as planar (Cartesian) and
+ * does not apply the longitude correction above, so it distorts distances when applied directly to
+ * WGS84 coordinates. This implementation exists to support those coordinates correctly.
  */
 public class DouglasPeuckerAlgorithm {
 
@@ -96,9 +96,9 @@ public class DouglasPeuckerAlgorithm {
    * endpoints if it exceeds {@code toleranceDegrees}, then splits into two halves and keeps going.
    * The result is stored in the {@link #keep} BitSet.
    * <p>
-   * This is iterative, with the pending ranges on an explicit heap-allocated {@code stack},
-   * rather than recursive: a naive recursive version can recurse as deep as the input is long (e.g.
-   * a shape whose furthest point from the chord always lands near one end), which risks a
+   * This is iterative, with the pending ranges on an explicit heap-allocated {@code stack}, rather
+   * than recursive: a naive recursive version can recurse as deep as the input is long (e.g. a
+   * shape whose furthest point from the chord always lands near one end), which risks a
    * {@link StackOverflowError} on the JVM call stack for long, detailed shapes.
    */
   private void douglasPeucker(int start, int end) {

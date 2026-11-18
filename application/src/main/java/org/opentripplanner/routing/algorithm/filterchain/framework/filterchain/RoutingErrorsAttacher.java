@@ -25,8 +25,7 @@ public class RoutingErrorsAttacher {
    *
    * @param originalItineraries The original result of the routing before the filter chain.
    * @param filteredItineraries The itineraries after being run through the filter chain so they
-   *     have the {@link org.opentripplanner.model.SystemNotice}s to look up
-   *     the error from.
+   *     have the {@link org.opentripplanner.model.SystemNotice}s to look up the error from.
    */
   public static List<RoutingError> computeErrors(
     List<Itinerary> originalItineraries,

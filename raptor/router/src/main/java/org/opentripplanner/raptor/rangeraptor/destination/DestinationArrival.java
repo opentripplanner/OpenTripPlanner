@@ -10,15 +10,12 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * A light-weight journey arrival at the destination, made of the last stop arrival and the egress.
- * It holds the values
- * of the journey needed to compare it with other journeys: departure time, arrival time, number of
- * transfers and cost.
- * The arrival chain is reachable through {@link #previous()}, so a path can be built from it when
- * needed.
+ * It holds the values of the journey needed to compare it with other journeys: departure time,
+ * arrival time, number of transfers and cost. The arrival chain is reachable through
+ * {@link #previous()}, so a path can be built from it when needed.
  * <p>
  * In addition to the criteria of the stop arrivals, the destination also needs a number of
- * transfers and a time
- * criterion, because the arrivals come from different Range Raptor iterations.
+ * transfers and a time criterion, because the arrivals come from different Range Raptor iterations.
  * See {@code org/opentripplanner/raptor/package.md}, section "Destination pareto-set".
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
@@ -38,12 +35,12 @@ public class DestinationArrival<T extends RaptorTripSchedule> implements Arrival
 
   /**
    * @param iterationDepartureTime The departure time of the Range Raptor iteration.
-   * @param departureTime The departure time of the journey in the search direction, with the
-   *     access time-shifted. See {@link TimeShiftedDepartureTime}. Use the
-   *     {@code iterationDepartureTime} if it is not needed.
+   * @param departureTime The departure time of the journey in the search direction, with the access
+   *     time-shifted. See {@link TimeShiftedDepartureTime}. Use the {@code iterationDepartureTime}
+   *     if it is not needed.
    * @param arrivalTime The destination arrival time. If the egress has a time-penalty, the time
-   *     already includes it, since Raptor decorates the egress and adds the
-   *     penalty to the egress duration. It is the time used for comparison.
+   *     already includes it, since Raptor decorates the egress and adds the penalty to the egress
+   *     duration. It is the time used for comparison.
    */
   public DestinationArrival(
     RaptorAccessEgress egress,
@@ -66,12 +63,12 @@ public class DestinationArrival<T extends RaptorTripSchedule> implements Arrival
 
   /**
    * Create a mutable probe for pareto qualification checks only. The probe has no arrival chain
-   * ({@link #previous()} returns {@code null}) and must never be used for path building or be
-   * added to a pareto set. Create ONE probe and reuse it with {@link #setProbeValues}; this
-   * avoids allocating an object for every qualification check.
+   * ({@link #previous()} returns {@code null}) and must never be used for path building or be added
+   * to a pareto set. Create ONE probe and reuse it with {@link #setProbeValues}; this avoids
+   * allocating an object for every qualification check.
    * <p>
-   * A probe is mutable and NOT thread-safe. Do not share a probe between threads; create one
-   * probe per thread if qualification checks are run in parallel.
+   * A probe is mutable and NOT thread-safe. Do not share a probe between threads; create one probe
+   * per thread if qualification checks are run in parallel.
    */
   static <T extends RaptorTripSchedule> DestinationArrival<T> createProbe() {
     return new DestinationArrival<>();

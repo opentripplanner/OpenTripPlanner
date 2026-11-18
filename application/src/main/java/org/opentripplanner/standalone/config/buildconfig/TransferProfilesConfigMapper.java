@@ -241,8 +241,8 @@ public class TransferProfilesConfigMapper {
   }
 
   /**
-   * The reuse limit of a profile, {@code null} if it is not set. The profile uses the default
-   * limit then, see {@code TransferProfileState}.
+   * The reuse limit of a profile, {@code null} if it is not set. The profile uses the default limit
+   * then, see {@code TransferProfileState}.
    */
   @Nullable
   private static CostLinearFunction mapReuseLimit(ConfiguredProfile profile) {

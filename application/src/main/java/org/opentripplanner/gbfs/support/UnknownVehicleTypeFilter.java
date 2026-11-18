@@ -23,8 +23,8 @@ public class UnknownVehicleTypeFilter {
    * vehicle type is unknown.
    *
    * @param vehicleTypeId the vehicle type ID to check
-   * @param stationId     the station ID (for logging)
-   * @param field         the field name (for logging)
+   * @param stationId the station ID (for logging)
+   * @param field the field name (for logging)
    * @return true if the vehicle type exists, false otherwise
    */
   public boolean filterUnknownVehicleType(String vehicleTypeId, String stationId, String field) {

@@ -7,8 +7,8 @@ import org.opentripplanner.transit.transfer.regular.api.parameters.TransferParam
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
 
 /**
- * How far from a stop the transfers of a {@link TransferProfileType} are searched. The limit
- * bounds the discovery search, that is, the street search made when the transfers are generated.
+ * How far from a stop the transfers of a {@link TransferProfileType} are searched. The limit bounds
+ * the discovery search, that is, the street search made when the transfers are generated.
  * Re-costing a stored path under the preferences of a request never drops it.
  * <p>
  * The street search is made once from each stop, with the longest duration that applies to the

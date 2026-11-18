@@ -15,8 +15,8 @@ import java.util.List;
  * at-symbol syntax (see http://jcommander.org/#Syntax). When stand-alone OTP is started as a
  * daemon, parameters are loaded from such a file, located by default in '/etc/opentripplanner.cfg'.
  * <p>
- * Note that JCommander-annotated parameters can be any type that can be constructed from a
- * string. This module also contains classes for validating parameters. See:
+ * Note that JCommander-annotated parameters can be any type that can be constructed from a string.
+ * This module also contains classes for validating parameters. See:
  * http://jcommander.org/#Parameter_validation
  * <p>
  * Some parameter fields are not initialized so when inferring other parameters, we can check for

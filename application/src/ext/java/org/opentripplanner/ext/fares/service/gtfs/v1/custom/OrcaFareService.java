@@ -32,8 +32,8 @@ import org.opentripplanner.transit.model.network.Route;
 
 public class OrcaFareService extends DefaultFareService {
 
-  /***
-   * FareOfferExtended is used to store a FareOffer along with a separate start time that is used
+  /**
+   * * FareOfferExtended is used to store a FareOffer along with a separate start time that is used
    * for the validity period. This is intended to allow us to extend the expiry time without
    * affecting the FareOffer's start time, because that would cause the unique ID to change. The ID
    * needs to stay consistent to indicate that this isn't a new fare product that the user has to

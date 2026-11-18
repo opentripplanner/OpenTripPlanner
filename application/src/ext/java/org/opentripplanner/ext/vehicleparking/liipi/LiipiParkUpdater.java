@@ -169,8 +169,8 @@ public class LiipiParkUpdater implements DataSource<VehicleParking> {
 
   /**
    * @return true if facilities and hubs have not been successfully downloaded before, or
-   *     facilitiesFrequencySec > 0 and over facilitiesFrequencySec has passed since last
-   *     successful fetch
+   *     facilitiesFrequencySec > 0 and over facilitiesFrequencySec has passed since last successful
+   *     fetch
    */
   private boolean fetchFacilitiesAndHubsNow() {
     if (parks == null) {

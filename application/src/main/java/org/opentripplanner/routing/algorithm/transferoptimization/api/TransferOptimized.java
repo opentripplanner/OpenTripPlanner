@@ -17,9 +17,9 @@ import org.opentripplanner.routing.algorithm.transferoptimization.model.Transfer
  * look at the wait-time-optimized-cost or the generalized-cost (from routing) - if this is the
  * same, then we use the break-tie-cost.
  * <p>
- * The wait-time-optimized-cost is typically the same when we can do a in-station/same-stop
- * transfer at multiple locations. The break-tie-cost just looks at the transit departure-times and
- * try to do the transfers as early as possible in the journey to minimize risk.
+ * The wait-time-optimized-cost is typically the same when we can do a in-station/same-stop transfer
+ * at multiple locations. The break-tie-cost just looks at the transit departure-times and try to do
+ * the transfers as early as possible in the journey to minimize risk.
  * <p>
  * The wait-time-optimized-cost uses the generalized-cost as a baseline and adjust it to optimize
  * the wait-time. The cost of waiting is changed while the rest of the cost parts are kept as is. If

@@ -25,8 +25,8 @@ import org.opentripplanner.street.graph.Graph;
  * {@link org.opentripplanner.street.graph.Graph} and indexed here at construction; zones applied by
  * an updater are indexed as they are registered.
  * <p>
- * Indices are keyed by network. A network has exactly one source of zones, so a later
- * registration replaces an earlier one rather than adding a second index alongside it.
+ * Indices are keyed by network. A network has exactly one source of zones, so a later registration
+ * replaces an earlier one rather than adding a second index alongside it.
  */
 @Singleton
 public class DefaultVehicleRentalRepository implements VehicleRentalRepository {

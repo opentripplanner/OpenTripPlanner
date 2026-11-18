@@ -9,13 +9,13 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * The relative importance of the time, the slope and the safety when a vehicle (a bicycle) is
- * routed. One of the three is the same as the optimization for the shortest duration
- * (time), the flattest streets (slope) or the safest streets (safety).
+ * routed. One of the three is the same as the optimization for the shortest duration (time), the
+ * flattest streets (slope) or the safest streets (safety).
  * <p>
  * The values are normalized: they sum to exactly 1.0, and each is a multiple of
- * {@link NormalizedRatio#STEP}, so the class
- * can be used as a part of a cache key. The values given to {@link #of(double, double, double)} are
- * relative to each other, for example {@code of(0.1, 0, 0)} is the same as {@code of(1, 0, 0)}.
+ * {@link NormalizedRatio#STEP}, so the class can be used as a part of a cache key. The values given
+ * to {@link #of(double, double, double)} are relative to each other, for example
+ * {@code of(0.1, 0, 0)} is the same as {@code of(1, 0, 0)}.
  * <p>
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */
@@ -88,17 +88,17 @@ public final class TimeSlopeSafetyTrianglePreference
    * <p>
    * The distance is from this triangle, of the user, to the triangle {@code other} of a profile.
    * The time and the slope count 1, and the safety counts {@link #LESS_SAFETY_WEIGHT} if the user
-   * wants less safety than the profile has, and {@link #MORE_SAFETY_WEIGHT} if the user wants
-   * more. The distance is therefore <b>asymmetric</b>.
+   * wants less safety than the profile has, and {@link #MORE_SAFETY_WEIGHT} if the user wants more.
+   * The distance is therefore <b>asymmetric</b>.
    * <p>
-   * The time and the slope are a fair substitute for each other, but neither is for the safety.
-   * A safe profile used for a user with a flat triangle costs 23% extra, a time profile used for a
+   * The time and the slope are a fair substitute for each other, but neither is for the safety. A
+   * safe profile used for a user with a flat triangle costs 23% extra, a time profile used for a
    * flat user only 3-5%. The cost grows steeply with the difference in safety, so the safety is
    * weighted high. A path found with less safety than the user wants is much worse than one found
    * with more safety, so the weight is larger when the user wants more: a user with a triangle of
    * one third each (stored as 0.35, 0.35 and 0.30) is then closer to a safe profile than to a fast
-   * one. Both weights are rough defaults, how much the safety matters depends on the safety
-   * values of the street data (the OSM tag mapping).
+   * one. Both weights are rough defaults, how much the safety matters depends on the safety values
+   * of the street data (the OSM tag mapping).
    */
   @Override
   public double normalizedDistance(TimeSlopeSafetyTrianglePreference other) {

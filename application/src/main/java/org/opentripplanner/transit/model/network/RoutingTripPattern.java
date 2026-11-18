@@ -60,8 +60,8 @@ public class RoutingTripPattern implements RaptorTripPattern, Serializable {
    * OTP. This is used to optimize routing, we do not access the trip pattern instance only keep the
    * {code index}. The index will not change.
    * <p>
-   * Do NOT expose this index in the APIs, it is not guaranteed to be the same across different
-   * OTP instances, use the {code id} for external references.
+   * Do NOT expose this index in the APIs, it is not guaranteed to be the same across different OTP
+   * instances, use the {code id} for external references.
    */
   public int patternIndex() {
     return index;
@@ -69,8 +69,8 @@ public class RoutingTripPattern implements RaptorTripPattern, Serializable {
 
   /**
    * @deprecated This create a circular dependency: TripPattern ⇔ RoutingTripPattern, also the
-   *     RoutingTripPattern should be a pure-syntetic-value-object to allow it to be fast to
-   *     create and load from memory - with no concurency risk.
+   *     RoutingTripPattern should be a pure-syntetic-value-object to allow it to be fast to create
+   *     and load from memory - with no concurency risk.
    */
   @Deprecated
   public final TripPattern getPattern() {

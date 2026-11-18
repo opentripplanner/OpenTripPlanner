@@ -14,14 +14,14 @@ import org.opentripplanner.utils.time.ServiceDateUtils;
 /**
  * Value object representing a service date range from a starting date until an end date.
  * <p>
- * Internally the range is always stored as [startInclusive, endExclusive). Use the factory
- * methods {@link #ofInclusiveEnd(LocalDate, LocalDate)} and
- * {@link #ofExclusiveEnd(LocalDate, LocalDate)} to construct instances according to the need, but
- * preferable use the exclusive end version unless the inclusivity comes from the input data.
- * {@link #toString()} output mirrors the convention used at construction time.
+ * Internally the range is always stored as [startInclusive, endExclusive). Use the factory methods
+ * {@link #ofInclusiveEnd(LocalDate, LocalDate)} and {@link #ofExclusiveEnd(LocalDate, LocalDate)}
+ * to construct instances according to the need, but preferable use the exclusive end version unless
+ * the inclusivity comes from the input data. {@link #toString()} output mirrors the convention used
+ * at construction time.
  * <p>
- * {@code null} is accepted in all factory method parameters and is treated as unbounded
- * (equivalent to {@link LocalDate#MIN} / {@link LocalDate#MAX}).
+ * {@code null} is accepted in all factory method parameters and is treated as unbounded (equivalent
+ * to {@link LocalDate#MIN} / {@link LocalDate#MAX}).
  */
 public final class LocalDateRange {
 
@@ -54,7 +54,7 @@ public final class LocalDateRange {
    * Create an range with an inclusive start and an inclusive end.
    *
    * @param start inclusive start, or {@code null} for unbounded start
-   * @param end   inclusive end, or {@code null} for unbounded end
+   * @param end inclusive end, or {@code null} for unbounded end
    */
   public static LocalDateRange ofInclusiveEnd(@Nullable LocalDate start, @Nullable LocalDate end) {
     var startInclusive = start == null ? MIN : start;
@@ -74,7 +74,7 @@ public final class LocalDateRange {
    * Create a range with an inclusive start and an exclusive end.
    *
    * @param start inclusive start, or {@code null} for unbounded start
-   * @param end   exclusive end (first date outside the range), or {@code null} for unbounded end
+   * @param end exclusive end (first date outside the range), or {@code null} for unbounded end
    */
   public static LocalDateRange ofExclusiveEnd(@Nullable LocalDate start, @Nullable LocalDate end) {
     var startInclusive = start == null ? MIN : start;
@@ -169,7 +169,7 @@ public final class LocalDateRange {
    *
    * @param defaultInclusiveStart the start used when this range is unbounded (or wider) at the
    *     start
-   * @param defaultExclusiveEnd   the exclusive end used when this range is unbounded (or wider) at
+   * @param defaultExclusiveEnd the exclusive end used when this range is unbounded (or wider) at
    *     the end
    * @throws IllegalArgumentException if the effective range spans more than
    *     {@value #MAX_DAYS_AS_LOCAL_DATES} days

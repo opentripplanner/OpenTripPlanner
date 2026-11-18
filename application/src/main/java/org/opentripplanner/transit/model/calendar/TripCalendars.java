@@ -113,7 +113,7 @@ public class TripCalendars implements Serializable {
   /**
    * Determine whether the given service id is active on the specified service date.
    *
-   * @param serviceId   the target service id
+   * @param serviceId the target service id
    * @param serviceDate the target service date
    * @return {@code true} if the service id is active on the given service date
    */
@@ -157,8 +157,7 @@ public class TripCalendars implements Serializable {
   }
 
   /**
-   * The time when the transit service starts, in the given time zone. EPOCH if there is no
-   * transit.
+   * The time when the transit service starts, in the given time zone. EPOCH if there is no transit.
    */
   public Instant transitServiceStarts(ZoneId timeZone) {
     return startDate()
@@ -222,8 +221,8 @@ public class TripCalendars implements Serializable {
 
   /**
    * Efficiently assign each of the given service ids the next free service code, in iteration
-   * order:
-   * the code is the number of service codes registered before it. Used during graph build only.
+   * order: the code is the number of service codes registered before it. Used during graph build
+   * only.
    *
    * @throws IllegalArgumentException if service id is added more than once.
    * @return a new instance with the service codes registered.
@@ -286,13 +285,12 @@ public class TripCalendars implements Serializable {
    * realtime data update. It makes sure the date is in the existing transit service period, i.e.
    * within {@link #startDate()} and {@link #endDate()}.
    * <p>
-   * Unlike the other modification methods, this one only produces (and passes to
-   * {@code onUpdate}) a new instance if the service id was not already registered — the common
-   * case, where the same date has already been seen by an earlier call, is a pure read with no
-   * allocation.
+   * Unlike the other modification methods, this one only produces (and passes to {@code onUpdate})
+   * a new instance if the service id was not already registered — the common case, where the same
+   * date has already been seen by an earlier call, is a pure read with no allocation.
    *
    * @param serviceDate service date for the added service id
-   * @param onUpdate    callback invoked with the new instance, if and only if a new service id was
+   * @param onUpdate callback invoked with the new instance, if and only if a new service id was
    *     registered
    * @return service-id for date if it exists or is created. If the given service date is outside
    *     the service period {@code null} is returned.

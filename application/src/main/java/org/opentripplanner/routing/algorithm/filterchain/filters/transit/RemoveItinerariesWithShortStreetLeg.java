@@ -18,8 +18,8 @@ import org.opentripplanner.street.search.TraverseMode;
  * legs to reach a train station. A user would not expect to see a bike+transit shorter than 200m
  * leg when it's presented right next to a walk+transit leg of the same length.
  * <p>
- * In other words, this offloads the comparison part of the filter chain to a system outside of
- * OTP and that is the reason for this non-standard approach.
+ * In other words, this offloads the comparison part of the filter chain to a system outside of OTP
+ * and that is the reason for this non-standard approach.
  */
 public class RemoveItinerariesWithShortStreetLeg implements RemoveItineraryFlagger {
 

@@ -70,8 +70,8 @@ public class SearchParams {
    * The earliest a journey can depart from the origin. The unit is seconds since midnight.
    * Inclusive.
    * <p>
-   * In the case of a 'depart after' search this is a required. In the case of a 'arrive by'
-   * search this is optional, but it will improve performance if it is set.
+   * In the case of a 'depart after' search this is a required. In the case of a 'arrive by' search
+   * this is optional, but it will improve performance if it is set.
    */
   public int earliestDepartureTime() {
     return earliestDepartureTime;
@@ -85,8 +85,8 @@ public class SearchParams {
    * The latest a journey may arrive at the destination. The unit is seconds since midnight.
    * Exclusive.
    * <p>
-   * In the case of a 'arrive by' search this is a required. In the case of a 'depart after'
-   * search this is optional, but it will improve performance if it is set.
+   * In the case of a 'arrive by' search this is a required. In the case of a 'depart after' search
+   * this is optional, but it will improve performance if it is set.
    */
   public int latestArrivalTime() {
     return latestArrivalTime;

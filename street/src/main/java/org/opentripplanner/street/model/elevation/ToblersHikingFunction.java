@@ -80,9 +80,8 @@ public class ToblersHikingFunction {
 
   /**
    * @param walkDistMultiplierMaxLimit this property is used to set a maximum limit for the
-   *     horizontal walking distance multiplier. Must be less than
-   *     1.0. See the table in the class documentation for finding
-   *     reasonable values for this constant.
+   *     horizontal walking distance multiplier. Must be less than 1.0. See the table in the class
+   *     documentation for finding reasonable values for this constant.
    */
   public ToblersHikingFunction(double walkDistMultiplierMaxLimit) {
     if (walkDistMultiplierMaxLimit < 1.0) {

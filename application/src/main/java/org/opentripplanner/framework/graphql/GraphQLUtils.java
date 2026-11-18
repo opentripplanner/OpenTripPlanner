@@ -18,8 +18,7 @@ public class GraphQLUtils {
    * <ol>
    *   <li>{@code language} parameter of a queried field.</li>
    *   <li>Locale from the DataFetchingEnvironment's local context (for journey planning queries
-   *       this
-   *       is {@code locale} parameter).</li>
+   *       this is {@code locale} parameter).</li>
    *   <li>DataFetchingEnvironment's locale which comes from the accept-language header.</li>
    *   <li>Default locale.</li>
    * </ol>
@@ -41,8 +40,7 @@ public class GraphQLUtils {
    * <ol>
    *   <li>{@code language} parameter of a queried field.</li>
    *   <li>Locale from the DataFetchingEnvironment's local context (for journey planning queries
-   *       this
-   *       is {@code locale} parameter).</li>
+   *       this is {@code locale} parameter).</li>
    *   <li>DataFetchingEnvironment's locale which comes from the accept-language header.</li>
    *   <li>Default locale.</li>
    * </ol>
@@ -62,8 +60,7 @@ public class GraphQLUtils {
    * <ol>
    *   <li>{@code localeString}.</li>
    *   <li>Locale from the DataFetchingEnvironment's local context (for journey planning queries
-   *       this
-   *       is {@code locale} parameter).</li>
+   *       this is {@code locale} parameter).</li>
    *   <li>DataFetchingEnvironment's locale which comes from the accept-language header.</li>
    *   <li>Default locale.</li>
    * </ol>
@@ -84,8 +81,7 @@ public class GraphQLUtils {
    * <ol>
    *   <li>{@code locale}.</li>
    *   <li>Locale from the DataFetchingEnvironment's local context (for journey planning queries
-   *       this
-   *       is {@code locale} parameter).</li>
+   *       this is {@code locale} parameter).</li>
    *   <li>DataFetchingEnvironment's locale which comes from the accept-language header.</li>
    *   <li>Default locale.</li>
    * </ol>
@@ -102,8 +98,7 @@ public class GraphQLUtils {
    * Returns locale from this prioritized list:
    * <ol>
    *   <li>Locale from the DataFetchingEnvironment's local context (for journey planning queries
-   *       this
-   *       is {@code locale} parameter).</li>
+   *       this is {@code locale} parameter).</li>
    *   <li>DataFetchingEnvironment's locale which comes from the accept-language header.</li>
    *   <li>Default locale.</li>
    * </ol>

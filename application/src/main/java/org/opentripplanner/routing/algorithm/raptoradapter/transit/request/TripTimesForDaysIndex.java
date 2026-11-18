@@ -16,8 +16,8 @@ import java.util.List;
  * contains two pointers, the first is the day and the second is the trip index on that day: ```
  * tripIndexForTripPatternPerDates -> (day, tripIndexForTripPatternPerDate) ```
  * <p>
- * This class might at first look a bit complicated. A much easier approach would be to just sort
- * on departure times using a Java built in sort, but sorting is expensive. This code will merge the
+ * This class might at first look a bit complicated. A much easier approach would be to just sort on
+ * departure times using a Java built in sort, but sorting is expensive. This code will merge the
  * timetables instead - which is faster. In 99% of the cases we will just do one extra comparison
  * for each departure time.
  */
@@ -39,9 +39,9 @@ final class TripTimesForDaysIndex {
    * <p>
    * Implementation notes!
    * <p>
-   * We need to order trips based on the "actual" departure time, not day and departure-time. We
-   * do this by merging the trip-departure times for each day. Each day is already sorted, so we
-   * need to merge the end of each 'day' with the start of the next 'day+1'. We avoid sorting for
+   * We need to order trips based on the "actual" departure time, not day and departure-time. We do
+   * this by merging the trip-departure times for each day. Each day is already sorted, so we need
+   * to merge the end of each 'day' with the start of the next 'day+1'. We avoid sorting for
    * performance reasons.
    */
   TripTimesForDaysIndex(List<int[]> firstStopDepartureTimesPerDay) {

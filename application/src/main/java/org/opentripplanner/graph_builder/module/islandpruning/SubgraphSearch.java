@@ -41,8 +41,8 @@ class SubgraphSearch {
 
   /**
    * @param newgraphs put new subgraphs here
-   * @param anchors   optional isolation mapping from a previous round
-   * @param islands   final list of islands or null
+   * @param anchors optional isolation mapping from a previous round
+   * @param islands final list of islands or null
    */
   int collectSubGraphs(
     Adjacency neighbours,

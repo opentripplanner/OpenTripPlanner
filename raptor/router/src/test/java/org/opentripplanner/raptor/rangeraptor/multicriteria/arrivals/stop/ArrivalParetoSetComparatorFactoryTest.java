@@ -28,23 +28,20 @@ class ArrivalParetoSetComparatorFactoryTest implements RaptorTestConstants {
   /// - `c1` : Lower c1 is better
   /// - `c2` : Lower c2 is better or used to relax c1
   /// - `arriveOnBoard` : arrive-on-board is better then arrive-on-street. It allowes you to
-  ///   continue
-  ///   with a transfer
+  ///   continue with a transfer
   ///
   /// EXPECTED
   ///
   /// The last column is the expected result. The factory can create 4 variants of the factory with
-  /// 2
-  /// pareto-comparators in each (with and without arrive-on-board `...]` or `..., arriveOnBoard]`):
+  /// 2 pareto-comparators in each (with and without arrive-on-board `...]` or
+  /// `..., arriveOnBoard]`):
   /// - With c1 `[arrivalTime, round, c1, ...`
   /// - With c1 & c2 `[arrivalTime, round, c1, c2, ...`
   /// - With c2 enable relaxed c1(+10) `[arrivalTime, round, c2 ? c1(+10) : c1, ...`
   ///
-  /// For each of the 6 pareto-function variations we determine the dominance `NONE ≡ | LEFT ≺ |
-  /// RIGHT ≻ | BOTH ∥`. The last column consist a string with the expected result for these
-  /// 6 variants.
-  ///
-  ///
+  /// For each of the 6 pareto-function variations we determine the dominance
+  /// `NONE ≡ | LEFT ≺ | RIGHT ≻ | BOTH ∥`. The last column consist a string with the expected
+  /// result for these 6 variants.
   @ParameterizedTest
   @CsvSource(
     value = {

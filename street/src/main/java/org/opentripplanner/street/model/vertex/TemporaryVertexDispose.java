@@ -73,9 +73,9 @@ class TemporaryVertexDispose {
    * Add the temporary vertex to processing queue OR disconnect edge from vertex if vertex is part
    * of the main graph.
    *
-   * @param v             the vertex to dispose
+   * @param v the vertex to dispose
    * @param connectedEdge the connected temporary edge
-   * @param incoming      true if the edge is an incoming edge, false if it is an outgoing edge
+   * @param incoming true if the edge is an incoming edge, false if it is an outgoing edge
    */
   private void disposeVertex(Vertex v, Edge connectedEdge, boolean incoming) {
     if (v instanceof TemporaryVertex) {
@@ -89,9 +89,9 @@ class TemporaryVertexDispose {
    * We have reached a NONE temporary Vertex and need to remove the temporary `connectedEdge` from
    * the Vertex part of the main graph.
    *
-   * @param v             the vertex part of the main graph
+   * @param v the vertex part of the main graph
    * @param connectedEdge the connected temporary edge to be removed
-   * @param incoming      true if the edge is an incoming edge, false if it is an outgoing edge
+   * @param incoming true if the edge is an incoming edge, false if it is an outgoing edge
    */
   private void removeEdgeFromMainGraphVertex(Vertex v, Edge connectedEdge, boolean incoming) {
     if (incoming) {

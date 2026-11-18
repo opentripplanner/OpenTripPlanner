@@ -13,10 +13,9 @@ class WgsCoordinateMapper {
    *
    * @return {@code null} if the point or its location is missing.
    * @throws InvalidCoordinateException if the location is present but cannot be mapped to a valid
-   *     WGS84 coordinate, e.g. one of latitude/longitude is missing
-   *     or a value is out of range. The caller is expected to
-   *     report a data import issue and skip the entity - invalid
-   *     input data must not abort the graph build.
+   *     WGS84 coordinate, e.g. one of latitude/longitude is missing or a value is out of range. The
+   *     caller is expected to report a data import issue and skip the entity - invalid input data
+   *     must not abort the graph build.
    */
   @Nullable
   static WgsCoordinate mapToDomain(SimplePoint_VersionStructure point)
@@ -46,8 +45,8 @@ class WgsCoordinateMapper {
   }
 
   /**
-   * Signals that a NeTEx location is present, but does not represent a valid WGS84 coordinate.
-   * This is a checked exception to force every mapper to handle invalid input data explicitly.
+   * Signals that a NeTEx location is present, but does not represent a valid WGS84 coordinate. This
+   * is a checked exception to force every mapper to handle invalid input data explicitly.
    */
   static class InvalidCoordinateException extends Exception {
 

@@ -8,7 +8,6 @@ import tools.jackson.databind.json.JsonMapper;
 /**
  * Helper class to build up JSON nodes that can be pretty-printed and inserted into the
  * documentation.
- *
  */
 public class JsonExampleBuilder {
 

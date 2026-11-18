@@ -34,10 +34,9 @@ public interface RaptorTripSchedule {
 
   /// The relative-travel-duration is a proxy for time spent on transit from the boarding stop to
   /// the alight stop. We do not know the alight stop, so it is impossible to calculate the
-  /// "correct"
-  /// time. The only thing that matters is that the relative difference between two boardings is
-  /// correct. Compute a relative-time that can be used to compare the travel-time cost for any two
-  /// boardings in the same pattern.
+  /// "correct" time. The only thing that matters is that the relative difference between two
+  /// boardings is correct. Compute a relative-time that can be used to compare the travel-time cost
+  /// for any two boardings in the same pattern.
   ///
   /// Two invariants must hold:
   ///
@@ -45,12 +44,11 @@ public interface RaptorTripSchedule {
   ///   in the pattern), `relativeTravelDuration(boardAtI) - relativeTravelDuration(boardAtJ)` must
   ///   equal the actual transit duration from stop `i` to stop `j`. If the board time at position 3
   ///   is 10:00 and at the next stop is 10:05, then the value at position 3 is larger by 5*60s =
-  ///   300
-  ///   than at the next stop.
+  ///   300 than at the next stop.
   /// - All trips in the same pattern should return the same value for at least one stop. If you
   ///   choose to anchor the relative duration to the last stop, and the value for one trip at the
-  ///   last stop is 56_000, then it must be 56_000 at the last stop for all other trips in the
-  ///   same pattern.
+  ///   last stop is 56_000, then it must be 56_000 at the last stop for all other trips in the same
+  ///   pattern.
   int relativeTravelDuration(int boardTime);
 
   /**
@@ -95,9 +93,9 @@ public interface RaptorTripSchedule {
    * <p>
    * Consider using position-based methods in {@link RaptorTripPattern} if possible.
    *
-   * @param startStopPos          the start stop position to search from
+   * @param startStopPos the start stop position to search from
    * @param earliestDepartureTime the earliest departure time to search for (inclusive)
-   * @param stop                  the stop index to search for
+   * @param stop the stop index to search for
    * @return the stop position in the trip pattern if found; otherwise, -1
    */
   default int findDepartureStopPosition(int startStopPos, int earliestDepartureTime, int stop) {

@@ -17,9 +17,9 @@ import org.opentripplanner.raptor.configure.RaptorTestFactory;
 /**
  * FEATURE UNDER TEST
  * <p>
- * A pass-through via stop is satisfied only by a transit arrival (boarding or alighting a
- * vehicle). A walk-transfer arrival at the via stop does not satisfy the pass-through constraint,
- * even if it arrives earlier and at lower cost than the transit arrival.
+ * A pass-through via stop is satisfied only by a transit arrival (boarding or alighting a vehicle).
+ * A walk-transfer arrival at the via stop does not satisfy the pass-through constraint, even if it
+ * arrives earlier and at lower cost than the transit arrival.
  */
 class J07_PassThroughWithTransfersTest implements RaptorTestConstants {
 

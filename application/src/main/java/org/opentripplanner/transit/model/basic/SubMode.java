@@ -19,8 +19,8 @@ import org.slf4j.LoggerFactory;
  * Naming; This class is named SubMode, not NetexSubMode because we want to migrate gtfsRouteType
  * into the same concept.
  * <p>
- * This class is thread-safe, and the performance overhead should affect the graph built time,
- * but not routing.
+ * This class is thread-safe, and the performance overhead should affect the graph built time, but
+ * not routing.
  */
 public record SubMode(String name, int index) implements Serializable {
   private static final int NON_EXISTING_SUB_MODE_INDEX = 1_000_000;

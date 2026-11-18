@@ -46,20 +46,17 @@ public final class TransferParameters<R> {
   private final List<WarmupParameters> warmup;
 
   /**
-   * @param profiles           the profiles of all types, in the order declared in the
-   *     configuration. At least one is required, and the ids must be unique.
-   *     The user preferences of the profiles must be unique too, but that is
-   *     checked when the profiles are created, since a profile without
+   * @param profiles the profiles of all types, in the order declared in the configuration. At least
+   *     one is required, and the ids must be unique. The user preferences of the profiles must be
+   *     unique too, but that is checked when the profiles are created, since a profile without
    *     preferences gets them from its request.
-   * @param maxDurations       the max durations of a profile type, shared by all profiles of the
-   *     type. Each type with a profile needs one, and it must be of the kind
-   *     of the type: {@link BicycleMaxDurations} for bicycle and
-   *     {@link CarMaxDuration} for car, and {@link PlainMaxDuration} for the
-   *     other types.
-   * @param warmup             the preferences to create Raptor transfers for when the server
-   *     starts, see {@link WarmupParameters}. The ids must be unique among
-   *     the profiles and the warmup entries, and there must be a profile of
-   *     the type of each entry.
+   * @param maxDurations the max durations of a profile type, shared by all profiles of the type.
+   *     Each type with a profile needs one, and it must be of the kind of the type:
+   *     {@link BicycleMaxDurations} for bicycle and {@link CarMaxDuration} for car, and
+   *     {@link PlainMaxDuration} for the other types.
+   * @param warmup the preferences to create Raptor transfers for when the server starts, see
+   *     {@link WarmupParameters}. The ids must be unique among the profiles and the warmup entries,
+   *     and there must be a profile of the type of each entry.
    */
   public TransferParameters(
     List<TransferProfile<R>> profiles,

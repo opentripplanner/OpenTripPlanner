@@ -44,8 +44,8 @@ public class RaptorConstants {
    * real-world values are better than this, only one comparison is needed to check if a new
    * candidate value is the new best-value.
    * <p>
-   * We also avoid using the same value as {@link #NOT_SET}, so we accidentally do not confuse
-   * these two different states.
+   * We also avoid using the same value as {@link #NOT_SET}, so we accidentally do not confuse these
+   * two different states.
    */
   public static final int UNREACHED_HIGH = 2_000_000_000;
 

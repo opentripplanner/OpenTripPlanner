@@ -12,11 +12,10 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * horizontal position/distance from the first position. The {@code y} is the vertical position at
  * {@code x}.
  * <p>
- * The unit is meters and the resolution is centimeters. The profile is normalized to
- * centi-meters.
+ * The unit is meters and the resolution is centimeters. The profile is normalized to centi-meters.
  * <p>
- * This class is immutable, but NOT THREAD-SAFE. This is because the gained/lost properties are
- * lazy initialized. The risk of using this in a multithreaded setting in minimal, since setting the
+ * This class is immutable, but NOT THREAD-SAFE. This is because the gained/lost properties are lazy
+ * initialized. The risk of using this in a multithreaded setting in minimal, since setting the
  * gained/lost fields should be atomic and calculating it twice should result in the same value.
  */
 public class ElevationProfile {

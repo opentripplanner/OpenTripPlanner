@@ -13,8 +13,8 @@ import org.opentripplanner.street.search.state.State;
  * Implementation note: This class keeps the final A* state in search order, not in chronological
  * order. For egress searches this State is unreversed ({@code request.arriveBy() == true}) —
  * reversal is deferred to {@link #streetPath()}, which is only called for winning paths during
- * itinerary mapping. This avoids the cost of cloning and reversing the entire State chain for
- * every egress candidate.
+ * itinerary mapping. This avoids the cost of cloning and reversing the entire State chain for every
+ * egress candidate.
  * <p>
  * The scalar values extracted below ({@code getElapsedTimeSeconds}, {@code getWeight},
  * {@code containsOnlyWalkMode}) are direction-independent and produce identical results on both
@@ -111,8 +111,8 @@ public class DefaultAccessEgress implements RoutingAccessEgress {
   }
 
   /**
-   * The street path of this access/egress in chronological order. The path is built on every
-   * call, so only call this for paths which are actually used, like when mapping an itinerary.
+   * The street path of this access/egress in chronological order. The path is built on every call,
+   * so only call this for paths which are actually used, like when mapping an itinerary.
    */
   public StreetPath streetPath() {
     return new StreetPath(finalState);

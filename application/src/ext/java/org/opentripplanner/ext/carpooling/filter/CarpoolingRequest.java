@@ -15,8 +15,8 @@ import org.opentripplanner.street.geometry.WgsCoordinate;
  * journey the search accepts, and — for transit-combined searches — whether the carpool leg is
  * access or egress.
  * <p>
- * Instances are constructed from a {@link org.opentripplanner.routing.api.request.RouteRequest}
- * via the {@link #of} factory methods.
+ * Instances are constructed from a {@link org.opentripplanner.routing.api.request.RouteRequest} via
+ * the {@link #of} factory methods.
  */
 public class CarpoolingRequest {
 

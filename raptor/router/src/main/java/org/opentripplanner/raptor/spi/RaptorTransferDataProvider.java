@@ -4,10 +4,8 @@ import java.util.Iterator;
 
 /**
  * This interface is responsible for providing all regular and constrained transfers from a given
- * stop to all possible
- * stops around that stop. The implementation may implement a lightweight {@link RaptorTransfer}
- * representation for
- * regular stops.
+ * stop to all possible stops around that stop. The implementation may implement a lightweight
+ * {@link RaptorTransfer} representation for regular stops.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */

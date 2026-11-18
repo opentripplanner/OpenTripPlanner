@@ -60,8 +60,8 @@ class StationMapper {
    * Map a NeTEx StopPlace to a Station.
    *
    * @return {@code null} if the StopPlace cannot be mapped because it has no valid coordinates,
-   *     neither on the StopPlace itself nor on any of its quays. A data import issue is
-   *     reported in that case.
+   *     neither on the StopPlace itself nor on any of its quays. A data import issue is reported in
+   *     that case.
    */
   @Nullable
   Station map(StopPlace stopPlace) {
@@ -150,8 +150,8 @@ class StationMapper {
   }
 
   /**
-   * Map the centroid to a coordinate. If the centroid is missing or invalid, the mean coordinate
-   * of the quays with valid coordinates is returned instead.
+   * Map the centroid to a coordinate. If the centroid is missing or invalid, the mean coordinate of
+   * the quays with valid coordinates is returned instead.
    *
    * @return {@code null} if no coordinate can be derived at all.
    */

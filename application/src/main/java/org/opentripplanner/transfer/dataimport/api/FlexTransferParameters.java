@@ -6,8 +6,8 @@ import java.util.Objects;
 import org.opentripplanner.routing.api.request.RouteRequest;
 
 /**
- * The configuration of the transfers created for flex routing, {@code transfers.flex} in the
- * build config.
+ * The configuration of the transfers created for flex routing, {@code transfers.flex} in the build
+ * config.
  *
  * @param maxDuration the longest transfer between two stops
  * @param requests the routing requests the transfers are created with

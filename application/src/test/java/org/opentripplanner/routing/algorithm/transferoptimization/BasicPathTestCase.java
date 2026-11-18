@@ -24,8 +24,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultC
 /**
  * This class is used to create a journeys with stop arrivals.
  * <p>
- * It creates different data structures representing the same 'basic' trip to be used in
- * unit-tests:
+ * It creates different data structures representing the same 'basic' trip to be used in unit-tests:
  * <pre>
  *   ~
  *   Origin 10:00:15
@@ -41,8 +40,8 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultC
  *   Transfers: 2
  *   Generalized-cost: $8154
  * </pre>
- * The Trip has 2 transfers, 1 connected by walking and without. The trip start at 10:00 and
- * ends at 12:00, total 2 hours.
+ * The Trip has 2 transfers, 1 connected by walking and without. The trip start at 10:00 and ends at
+ * 12:00, total 2 hours.
  *
  * @deprecated This was earlier part of Raptor and should not be used outside the Raptor module. Use
  *     the OTP model entities instead.

@@ -58,8 +58,8 @@ public class DirectTransitPreferences {
   }
 
   /// This is used to limit the results from the search. Paths are compared with the cheapest path
-  /// in the search window and are included in the result if they fall within the limit given by
-  /// the costRelaxFunction.
+  /// in the search window and are included in the result if they fall within the limit given by the
+  /// costRelaxFunction.
   public CostLinearFunction costRelaxFunction() {
     return costRelaxFunction;
   }

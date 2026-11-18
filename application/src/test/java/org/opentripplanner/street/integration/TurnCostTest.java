@@ -221,9 +221,9 @@ public class TurnCostTest {
     return path;
   }
 
-  /****
-   * Private Methods
-   ****/
+  /**
+   * ** Private Methods **
+   */
 
   private StreetVertex vertex(String label, double lat, double lon) {
     return StreetModelForTest.intersectionVertex(label, lat, lon);

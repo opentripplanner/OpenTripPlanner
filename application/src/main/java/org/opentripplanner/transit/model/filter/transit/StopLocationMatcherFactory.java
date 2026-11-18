@@ -10,8 +10,8 @@ import org.opentripplanner.transit.model.site.StopLocation;
 /**
  * A factory for creating matchers for StopLocations.
  * <p>
- * This factory creates matchers for {@link StopLocation} objects based on the criteria specified
- * in a request. The resulting matcher can be used to filter a list of StopLocations.
+ * This factory creates matchers for {@link StopLocation} objects based on the criteria specified in
+ * a request. The resulting matcher can be used to filter a list of StopLocations.
  */
 public class StopLocationMatcherFactory {
 

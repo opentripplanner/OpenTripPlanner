@@ -16,9 +16,9 @@ import org.opentripplanner.transit.service.TransitService;
 /**
  * A request-scoped view over a {@link RealtimeVehicleRepositorySnapshot}.
  * <p>
- * A new instance should be created for each request, with the request's {@link TransitService}
- * and a vehicle snapshot resolved from the same transaction scope, so that the whole request sees
- * one consistent view of the realtime data.
+ * A new instance should be created for each request, with the request's {@link TransitService} and
+ * a vehicle snapshot resolved from the same transaction scope, so that the whole request sees one
+ * consistent view of the realtime data.
  */
 public class DefaultRealtimeVehicleService implements RealtimeVehicleService {
 

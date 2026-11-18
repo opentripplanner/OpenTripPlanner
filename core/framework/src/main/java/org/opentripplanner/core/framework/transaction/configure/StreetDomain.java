@@ -13,8 +13,8 @@ import org.opentripplanner.core.model.transaction.UpdateManager;
  * domain: the street graph and the vehicle-rental and vehicle-parking repositories, updated by the
  * GBFS and parking updaters.
  * <p>
- * The expensive street work — linking rental vertices and applying geofencing zones — runs on
- * this domain's writer thread and no longer delays timetable updates queued on the transit domain's
+ * The expensive street work — linking rental vertices and applying geofencing zones — runs on this
+ * domain's writer thread and no longer delays timetable updates queued on the transit domain's
  * writer thread. See also {@link TransitDomain}.
  */
 @Qualifier

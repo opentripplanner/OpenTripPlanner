@@ -119,10 +119,10 @@ public abstract class SiriAzureUpdaterConfig {
   /**
    * Get current date with offset for a custom midnight, using a zonedDateTime as input.
    *
-   * @param time           ZonedDateTime to calculate date from
+   * @param time ZonedDateTime to calculate date from
    * @param customMidnight In order to match the custom day break handling, this value will
-   *     configure a custom midnight. For example: 4 - Then a new day will begin
-   *     at 4am. Int value of a 24 hour clock
+   *     configure a custom midnight. For example: 4 - Then a new day will begin at 4am. Int value
+   *     of a 24 hour clock
    * @return LocalDate
    */
   public static LocalDate getDateBasedOnCustomMidnight(ZonedDateTime time, int customMidnight) {

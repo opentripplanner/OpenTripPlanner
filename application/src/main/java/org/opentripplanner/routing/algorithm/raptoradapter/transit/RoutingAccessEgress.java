@@ -17,9 +17,9 @@ public interface RoutingAccessEgress extends RaptorAccessEgress {
   RoutingAccessEgress withPenalty(TimeAndCost penalty);
 
   /**
-   * Return true if a vehicle picked up at a rental station is still rented at the end of the
-   * street search, which is at the transit stop. For an egress, the search runs backward in time,
-   * so this means the passenger arrives at the destination with the rented vehicle.
+   * Return true if a vehicle picked up at a rental station is still rented at the end of the street
+   * search, which is at the transit stop. For an egress, the search runs backward in time, so this
+   * means the passenger arrives at the destination with the rented vehicle.
    */
   boolean isRentingVehicleFromStation();
 

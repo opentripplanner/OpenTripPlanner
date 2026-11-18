@@ -22,9 +22,9 @@ import org.opentripplanner.transit.model.site.RegularStop;
 
 /**
  * Focused test for {@link ItineraryImpl#itineraryId}, the GTFS API's exposure of a stable,
- * refetchable
- * itinerary id (#7878). See {@link org.opentripplanner.routing.refetch.ItineraryReferenceMapper}
- * for the shared core this delegates to.
+ * refetchable itinerary id (#7878). See
+ * {@link org.opentripplanner.routing.refetch.ItineraryReferenceMapper} for the shared core this
+ * delegates to.
  */
 class ItineraryImplTest {
 

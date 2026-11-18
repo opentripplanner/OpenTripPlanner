@@ -68,8 +68,8 @@ public class APIEndpoints {
    * List all mandatory and feature enabled endpoints as Jersey resource classes: define web
    * services, i.e. an HTTP APIs.
    * <p>
-   * Some of the endpoints can be turned on/off using {@link OTPFeature}s, this method check if
-   * an endpoint is enabled before adding it to the list.
+   * Some of the endpoints can be turned on/off using {@link OTPFeature}s, this method check if an
+   * endpoint is enabled before adding it to the list.
    *
    * @return all mandatory and feature enabled endpoints are returned.
    */
@@ -81,7 +81,7 @@ public class APIEndpoints {
    * Add feature to list of classes if the feature is enabled (turned on).
    *
    * @param apiFeature the feature to check.
-   * @param resource   the resource to enable if feature is enabled.
+   * @param resource the resource to enable if feature is enabled.
    */
   private void addIfEnabled(OTPFeature apiFeature, Class<?> resource) {
     if (apiFeature.isOn()) {

@@ -8,7 +8,7 @@ import org.opentripplanner.utils.lang.StringUtils;
 
 /**
  * Responsible for creating feed-scoped from OBA's {@code AgencyAndId} or strings.
- **/
+ */
 class IdFactory {
 
   private final String feedId;

@@ -76,9 +76,9 @@ class AccessEgressFetcher {
    * Creates an {@code AccessEgressFetcher} for a single route request.
    *
    * @param transitSearchTimeZero the point in time all times in seconds are counted from
-   * @param additionalSearchDays  extra search days beyond the departure day, required for flex
+   * @param additionalSearchDays extra search days beyond the departure day, required for flex
    *     routing
-   * @param linkingContext        contains temporary vertices for request locations.
+   * @param linkingContext contains temporary vertices for request locations.
    */
   public AccessEgressFetcher(
     RouteRequest request,

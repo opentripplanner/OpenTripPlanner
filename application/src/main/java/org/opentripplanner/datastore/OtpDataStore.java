@@ -173,8 +173,8 @@ public class OtpDataStore {
    * {@code null}, defaults to the OTP base directory (the same directory that contains
    * {@code build-config.json}).
    * <p>
-   * Using the data-store abstraction means the cache works with any configured repository —
-   * local filesystem, GCS bucket, etc.
+   * Using the data-store abstraction means the cache works with any configured repository — local
+   * filesystem, GCS bucket, etc.
    */
   public CompositeDataSource getCacheDir(@Nullable URI path) {
     assertDataStoreIsOpened();

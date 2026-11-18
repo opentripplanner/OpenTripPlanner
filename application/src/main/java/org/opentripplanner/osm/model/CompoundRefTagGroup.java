@@ -15,8 +15,8 @@ import java.util.stream.Collectors;
  * filtering out null or blank values. The group can then produce a single compound value by mapping
  * each tag to its corresponding value and joining the results with a colon delimiter.
  * <p>
- * A compound value is only produced when all tags in the group resolve to a non-null value. If
- * any tag cannot be resolved, the compound value is considered incomplete and absent.
+ * A compound value is only produced when all tags in the group resolve to a non-null value. If any
+ * tag cannot be resolved, the compound value is considered incomplete and absent.
  * <p>
  * Instances are created via the factory method {@link #of(String...)}.
  */

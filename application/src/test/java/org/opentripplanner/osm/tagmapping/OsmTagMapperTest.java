@@ -504,13 +504,13 @@ class OsmTagMapperTest {
   /**
    * Bicycle safety of a road by its cycleway tagging - lower is safer.
    * <p>
-   * The overall pattern: prefer smaller roads and more defined cycle infrastructure.
-   * For example, `highway=residential` beats `highway=primary` and `cycleway=track` beats
+   * The overall pattern: prefer smaller roads and more defined cycle infrastructure. For example,
+   * `highway=residential` beats `highway=primary` and `cycleway=track` beats
    * `cycleway=shared_lane`.
    * <p>
    * The precise safety output is somewhat arbitrary, making this test brittle, but we shouldn't
-   * change it accidentally,
-   * and the relative ordering is hopefully more stable and less controversial.
+   * change it accidentally, and the relative ordering is hopefully more stable and less
+   * controversial.
    */
   @ParameterizedTest
   @CsvSource(

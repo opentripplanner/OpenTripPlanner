@@ -41,7 +41,7 @@ public class LocalizedString implements I18NString, Serializable {
   /**
    * Creates String which can be localized
    *
-   * @param key    key of translation for this way set in OSM and translations read from properties
+   * @param key key of translation for this way set in OSM and translations read from properties
    *     files
    * @param params Values with which tagNames are replaced in translations.
    */

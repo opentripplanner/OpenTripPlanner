@@ -23,7 +23,7 @@ public final class JAXBUtils {
    * There is currently no nillable elements in NeTEx.
    *
    * @param type the Java type of the wrapped element.
-   * @param c    the collection of JAXBElement wrappers.
+   * @param c the collection of JAXBElement wrappers.
    */
   public static <S extends JAXBElement<?>, T> Stream<T> streamJAXBElementValue(
     Class<T> type,
@@ -43,7 +43,7 @@ public final class JAXBUtils {
    * and apply a consumer on each value. Null values are filtered out.
    *
    * @param type the Java type of the wrapped element.
-   * @param c    the collection of JAXBElement wrappers.
+   * @param c the collection of JAXBElement wrappers.
    * @param body a consumer to apply on each unwrapped value.
    */
   public static <S extends JAXBElement<?>, T> void forEachJAXBElementValue(

@@ -15,12 +15,10 @@ import org.opentripplanner.core.model.id.FeedScopedId;
  *
  * @param tripOnDateReference Identifies the trip and service date, either by trip ID + service date
  *     or by a trip-on-service-date ID.
- * @param stopLocationId      The stop location at which the traveler is considered to be boarding.
- *     Used together with the trip to identify the exact stop position in the
- *     pattern.
- * @param aimedDepartureTime  The aimed departure time at this stop. Used for disambiguation when
- *     the stop appears more than once in the pattern. May be null if not
- *     needed.
+ * @param stopLocationId The stop location at which the traveler is considered to be boarding. Used
+ *     together with the trip to identify the exact stop position in the pattern.
+ * @param aimedDepartureTime The aimed departure time at this stop. Used for disambiguation when the
+ *     stop appears more than once in the pattern. May be null if not needed.
  */
 public record TripLocation(
   TripOnDateReference tripOnDateReference,

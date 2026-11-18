@@ -27,8 +27,8 @@ public final class RegularTransferFactory {
   /**
    * Check the profiles that can not be checked when the parameters are created: the user
    * preferences of the profiles must be unique, and a profile without preferences gets them from
-   * its request with the {@code mapper}. Call it when the configuration is read, to fail before
-   * the graph build starts.
+   * its request with the {@code mapper}. Call it when the configuration is read, to fail before the
+   * graph build starts.
    *
    * @throws IllegalArgumentException if two profiles have equal user preferences
    */
@@ -75,10 +75,10 @@ public final class RegularTransferFactory {
    * stored under, and the {@code mapper} to map the routing requests to user preferences.
    *
    * @param numberOfStops the size of the stop index space ({@code RaptorStopIndex.size()}), not the
-   *     number of regular stops. The index space is shared with the flex stops,
-   *     which do not take part in Raptor, so the Raptor transfer data is larger
-   *     than needed. This goes away when the stop index moves into Raptor.
-   * @param cacheMaxSize  the max number of Raptor transfers cached for other user preferences than
+   *     number of regular stops. The index space is shared with the flex stops, which do not take
+   *     part in Raptor, so the Raptor transfer data is larger than needed. This goes away when the
+   *     stop index moves into Raptor.
+   * @param cacheMaxSize the max number of Raptor transfers cached for other user preferences than
    *     the ones of the profiles and the warmup entries, which are always cached
    */
   public static <P, R> RepositoryHandle<

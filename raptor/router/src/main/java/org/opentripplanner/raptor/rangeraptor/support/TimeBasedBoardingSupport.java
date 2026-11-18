@@ -17,10 +17,10 @@ import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
 /**
  * Shared boarding logic for all time-dependent {@link RoutingStrategy}s.
  * <p>
- * Handles trip search creation and earliest-board-time calculation for both regular and
- * constrained (guaranteed/stay-seated) boardings. The choice between an exact trip search and a
- * standard trip search depends on whether this is the first iteration and the first round, and
- * whether time-dependent access is in use.
+ * Handles trip search creation and earliest-board-time calculation for both regular and constrained
+ * (guaranteed/stay-seated) boardings. The choice between an exact trip search and a standard trip
+ * search depends on whether this is the first iteration and the first round, and whether
+ * time-dependent access is in use.
  */
 public final class TimeBasedBoardingSupport<T extends RaptorTripSchedule> {
 
@@ -36,8 +36,8 @@ public final class TimeBasedBoardingSupport<T extends RaptorTripSchedule> {
   /**
    * @param hasTimeDependentAccess {@code true} if any access path is time-dependent, which disables
    *     the exact-trip-search optimisation in round 1
-   * @param calculator             direction-aware arithmetic for forward/reverse searches
-   * @param subscriptions          worker lifecycle hooks used to track iteration and round state
+   * @param calculator direction-aware arithmetic for forward/reverse searches
+   * @param subscriptions worker lifecycle hooks used to track iteration and round state
    */
   public TimeBasedBoardingSupport(
     boolean hasTimeDependentAccess,
@@ -79,9 +79,9 @@ public final class TimeBasedBoardingSupport<T extends RaptorTripSchedule> {
    * {@code boardSlack} to the previous arrival time to derive the earliest board time.
    *
    * @param prevArrivalTime the time at which the traveller arrives at the board stop
-   * @param stopPos         the stop position within the pattern's stop sequence
-   * @param boardSlack      minimum seconds between arrival and boarding
-   * @param onTripIndex     upper bound on the trip index (used when already on a trip); pass
+   * @param stopPos the stop position within the pattern's stop sequence
+   * @param boardSlack minimum seconds between arrival and boarding
+   * @param onTripIndex upper bound on the trip index (used when already on a trip); pass
    *     {@link RaptorTripScheduleSearch#UNBOUNDED_TRIP_INDEX} for no bound
    * @return the board event, or an empty event if no trip is found
    */
@@ -107,12 +107,11 @@ public final class TimeBasedBoardingSupport<T extends RaptorTripSchedule> {
    *
    * @param prevTransitStopArrival the transit arrival that is the source of a potential constrained
    *     transfer; {@code null} if the traveller did not arrive by transit
-   * @param prevArrivalTime        the wall-clock arrival time at the board stop; may differ from
-   *     {@code prevTransitStopArrival} when a walking transfer bridges
-   *     the two stops
-   * @param boardSlack             minimum seconds between {@code prevArrivalTime} and boarding;
-   *     stay-seated and guaranteed transfers may override this
-   * @param txSearch               the constrained transfer search for the target pattern
+   * @param prevArrivalTime the wall-clock arrival time at the board stop; may differ from
+   *     {@code prevTransitStopArrival} when a walking transfer bridges the two stops
+   * @param boardSlack minimum seconds between {@code prevArrivalTime} and boarding; stay-seated and
+   *     guaranteed transfers may override this
+   * @param txSearch the constrained transfer search for the target pattern
    * @return the constrained board event, or an empty event if no constrained transfer is found
    */
   public RaptorBoardOrAlightEvent<T> searchForConstrainedBoarding(
@@ -148,8 +147,8 @@ public final class TimeBasedBoardingSupport<T extends RaptorTripSchedule> {
   /**
    * Compute the earliest time at which a trip may be boarded.
    * <p>
-   * In a forward search this adds board slack; in a reverse search it subtracts alight slack.
-   * The direction-specific arithmetic is delegated to the {@link RaptorTransitCalculator}.
+   * In a forward search this adds board slack; in a reverse search it subtracts alight slack. The
+   * direction-specific arithmetic is delegated to the {@link RaptorTransitCalculator}.
    */
   private int earliestBoardTime(int prevArrivalTime, int boardSlack) {
     return calculator.plusDuration(prevArrivalTime, boardSlack);
@@ -158,15 +157,15 @@ public final class TimeBasedBoardingSupport<T extends RaptorTripSchedule> {
   /**
    * Create a trip search appropriate for the current iteration and round.
    * <p>
-   * For every iteration after the first, and only in round 1, an <em>exact</em> trip search is
-   * used when there is no time-dependent access. This restricts the first departure to fall within
-   * the iteration's time-window — preventing the access path from being time-shifted past the
-   * previous iteration's departure time. The restriction also enables departure-time to be used as
-   * a pareto criterion in timetable view.
+   * For every iteration after the first, and only in round 1, an <em>exact</em> trip search is used
+   * when there is no time-dependent access. This restricts the first departure to fall within the
+   * iteration's time-window — preventing the access path from being time-shifted past the previous
+   * iteration's departure time. The restriction also enables departure-time to be used as a pareto
+   * criterion in timetable view.
    * <p>
-   * The optimisation is skipped for the first iteration because a traveller could board a bus,
-   * ride one stop, walk back to the origin, and then wait to board a later trip — results that
-   * would correctly be dominated by later iterations, but only after those iterations run.
+   * The optimisation is skipped for the first iteration because a traveller could board a bus, ride
+   * one stop, walk back to the origin, and then wait to board a later trip — results that would
+   * correctly be dominated by later iterations, but only after those iterations run.
    */
   private RaptorTripScheduleSearch<T> createTripSearch(RaptorTimeTable<T> timeTable) {
     if (!inFirstIteration && isFirstRound(round) && !hasTimeDependentAccess) {

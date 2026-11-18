@@ -27,8 +27,8 @@ import org.opentripplanner.utils.time.TimeUtils;
  * test focus on paging back and forth, matching itineraries with departure time at the exact same
  * time as the search-window earliest-departure-time.
  * <p>
- * Note! We are not doing the actual search, just emulating the search using the
- * {@link TestDriver} mock.
+ * Note! We are not doing the actual search, just emulating the search using the {@link TestDriver}
+ * mock.
  * <p>
  * All components required to test paging is used including the {@link PagingService} and the 3
  * filters:

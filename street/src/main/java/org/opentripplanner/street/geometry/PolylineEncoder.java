@@ -46,8 +46,7 @@ public class PolylineEncoder {
    * The algorithm works by:
    * <ol>
    *   <li>Converting each coordinate (latitude/longitude) to a fixed-precision integer by
-   *       multiplying
-   *       by 10^5</li>
+   *       multiplying by 10^5</li>
    *   <li>Computing deltas (differences) from the previous point to reduce the magnitude of numbers
    *       (the first point uses absolute coordinates)</li>
    *   <li>Encoding each delta as a signed integer using bit manipulation</li>
@@ -87,8 +86,8 @@ public class PolylineEncoder {
   /**
    * Encodes a coordinate sequence using the Google Polyline encoding algorithm.
    * <p>
-   * This variant reads coordinates directly from the sequence using
-   * {@code getX(i)}/{@code getY(i)} to avoid allocating intermediate {@code Coordinate} objects.
+   * This variant reads coordinates directly from the sequence using {@code getX(i)}/{@code getY(i)}
+   * to avoid allocating intermediate {@code Coordinate} objects.
    */
   public static PolylineEncoderResult encodeCoordinateSequence(CoordinateSequence seq) {
     StringBuilder encodedPoints = new StringBuilder();
@@ -119,14 +118,13 @@ public class PolylineEncoder {
    * <ol>
    *   <li>Left-shift the number by 1 bit (equivalent to multiplying by 2)</li>
    *   <li>If the number is negative, invert all bits using the bitwise NOT operator (~). This
-   *       ensures
-   *       negative values are distinguishable from positive values.</li>
+   *       ensures negative values are distinguishable from positive values.</li>
    *   <li>Pass the result to encodeNumber() for conversion to 5-bit chunks and ASCII</li>
    * </ol>
    * <p>
-   * This approach encodes the sign information in the least significant bit after the left
-   * shift: positive numbers have their bits shifted left (LSB = 0), while negative numbers have
-   * their bits shifted left and then inverted (LSB = 1 after inversion).
+   * This approach encodes the sign information in the least significant bit after the left shift:
+   * positive numbers have their bits shifted left (LSB = 0), while negative numbers have their bits
+   * shifted left and then inverted (LSB = 1 after inversion).
    *
    * @param num the signed integer to encode (typically a coordinate delta)
    * @return the encoded string representation

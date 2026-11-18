@@ -55,9 +55,9 @@ public final class PathParetoSetComparators {
    * @param timeConfig Which time information (arrival-time, departure-time, or timetable) to
    *     include in comparator.
    * @param costConfig Supported configurations of c1, c2 and relaxed cost(c1).
-   * @param relaxC1    Relax function for the generalized cost
-   * @param c2Comp     Dominance function for accumulated criteria TWO. If function is null, C2 will
-   *     not be included in the comparison.
+   * @param relaxC1 Relax function for the generalized cost
+   * @param c2Comp Dominance function for accumulated criteria TWO. If function is null, C2 will not
+   *     be included in the comparison.
    */
   public static <T extends RaptorTripSchedule> ParetoComparator<RaptorPath<T>> paretoComparator(
     ParetoSetTime timeConfig,

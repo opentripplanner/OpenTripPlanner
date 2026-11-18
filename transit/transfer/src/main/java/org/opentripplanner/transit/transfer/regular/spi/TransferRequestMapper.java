@@ -6,8 +6,8 @@ import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUser
 /**
  * Maps between the {@link AbstractUserPreferences user preferences} the regular-transfer module
  * stores and caches transfers under, and the request {@code R} the {@link TransferPathProvider}
- * searches with. {@code R} stays opaque to the module, this mapper is the only place that knows
- * how the two relate.
+ * searches with. {@code R} stays opaque to the module, this mapper is the only place that knows how
+ * the two relate.
  * <p>
  * Implementations are immutable and thread-safe.
  *

@@ -12,8 +12,8 @@ import java.util.Iterator;
  * <p>
  * Use this when you want to concatenate several big {@link Collection}s for read-only access.
  * <p>
- * This list will reflect any changes in the underlying {@link Collection}s, so keeping a
- * reference to it is safe.
+ * This list will reflect any changes in the underlying {@link Collection}s, so keeping a reference
+ * to it is safe.
  * <p>
  * Any attempts to modify the view will throw an exception - it is READ-ONLY, even when the
  * underlying collections are modifiable.

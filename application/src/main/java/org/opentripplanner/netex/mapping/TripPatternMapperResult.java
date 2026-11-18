@@ -14,7 +14,7 @@ import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
  *
  * @param scheduledStopPointsIndex A map from trip/serviceJourney id to an ordered list of scheduled
  *     stop point ids.
- * @param stopTimeByNetexId        stopTimes by the timetabled-passing-time id
+ * @param stopTimeByNetexId stopTimes by the timetabled-passing-time id
  */
 record TripPatternMapperResult(
   TripPattern tripPattern,

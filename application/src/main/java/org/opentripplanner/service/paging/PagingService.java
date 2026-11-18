@@ -167,8 +167,8 @@ public class PagingService {
    * but is {@code true} if we should crop the search-window head(in the beginning) or tail(in the
    * end).
    * <p>
-   * For the first search we look if the sort is ascending(crop tail) or descending(crop head),
-   * and for paged results we look at the paging type: next(tail) and previous(head).
+   * For the first search we look if the sort is ascending(crop tail) or descending(crop head), and
+   * for paged results we look at the paging type: next(tail) and previous(head).
    */
   private boolean doCropSearchWindowAtTail() {
     if (pageCursor == null) {

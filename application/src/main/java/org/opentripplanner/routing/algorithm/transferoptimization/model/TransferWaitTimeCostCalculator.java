@@ -7,8 +7,7 @@ import static org.opentripplanner.raptor.spi.RaptorCostConverter.toRaptorCost;
  * waiting time cost. The goal is to maximize the overall waiting time and distribute the waiting
  * time evenly between each transfer.
  * <p>
- * This implementation is a BEST GUESS, we do not have any scientific support for the function
- * used.
+ * This implementation is a BEST GUESS, we do not have any scientific support for the function used.
  * <p>
  * First let look at an example. The transfer times(t) are in minutes:
  * <pre>
@@ -99,8 +98,7 @@ import static org.opentripplanner.raptor.spi.RaptorCostConverter.toRaptorCost;
  *       journey. This makes sure we do not stay on a trip longer than needed and avoid
  *       back-travel.</li>
  *   <li>Second, we want to avoid VERY short transfers. The function above favor the set of
- *       transfers
- *       [3,5] over [2,6] and [2,6] over [1,7] - a linear function would not.</li>
+ *       transfers [3,5] over [2,6] and [2,6] over [1,7] - a linear function would not.</li>
  *   <li>Any 1/logN would be suitable, but log with base 10 is chosen (Supported in Java).</li>
  *   <li>We use this only to adjust the transfers within a single itinerary, not to compare two
  *       itineraries with each other.</li>

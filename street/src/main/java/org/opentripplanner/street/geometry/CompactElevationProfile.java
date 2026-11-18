@@ -11,8 +11,7 @@ import org.opentripplanner.utils.lang.IntUtils;
  * <ul>
  *   <li>Store intermediate point in fixed floating points with fixed precision, using delta coding
  *       from the previous point, and variable length coding (most of the delta coordinates will
- *       thus fits
- *       in 1 or 2 bytes).</li>
+ *       thus fits in 1 or 2 bytes).</li>
  * </ul>
  * <p>
  * Performance hit should be low as we do not need the elevation profile itself during a path
@@ -91,7 +90,7 @@ public final class CompactElevationProfile implements Serializable {
    * the length of the geometry.
    *
    * @param packedCoords Compacted coordinates
-   * @param lengthM      The length of the edge in meters. This is used as the x-value of the final
+   * @param lengthM The length of the edge in meters. This is used as the x-value of the final
    *     height sample
    * @return The elevation profile
    */

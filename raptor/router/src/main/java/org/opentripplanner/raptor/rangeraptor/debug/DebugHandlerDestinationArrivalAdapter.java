@@ -7,9 +7,9 @@ import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.spi.RaptorConstants;
 
 /**
- * Debug adapter for destination arrivals. The arrival is identified by the last stop arrival
- * before the egress. An arrival without a stop arrival chain, like the probe used for
- * qualification checks, is not part of the search and is never reported.
+ * Debug adapter for destination arrivals. The arrival is identified by the last stop arrival before
+ * the egress. An arrival without a stop arrival chain, like the probe used for qualification
+ * checks, is not part of the search and is never reported.
  */
 final class DebugHandlerDestinationArrivalAdapter
   extends AbstractDebugHandlerAdapter<ArrivalView<?>>

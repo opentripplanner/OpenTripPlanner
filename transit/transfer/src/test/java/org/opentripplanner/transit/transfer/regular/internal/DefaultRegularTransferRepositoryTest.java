@@ -13,8 +13,8 @@ import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySna
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 
 /**
- * The write side of the runtime repository: replacing and resetting the transfers from a stop,
- * on top of the paths generated at graph build, and tracking the changed stops.
+ * The write side of the runtime repository: replacing and resetting the transfers from a stop, on
+ * top of the paths generated at graph build, and tracking the changed stops.
  */
 class DefaultRegularTransferRepositoryTest {
 
@@ -241,8 +241,8 @@ class DefaultRegularTransferRepositoryTest {
   }
 
   /**
-   * Publish the paths of the repository, and continue with the repository of the next
-   * transaction, as the framework does.
+   * Publish the paths of the repository, and continue with the repository of the next transaction,
+   * as the framework does.
    */
   private RegularTransferRepositorySnapshot<String, WalkPreferences> freeze() {
     var snapshot = lifecycle.freeze(repository);

@@ -166,7 +166,7 @@ public class StreetPath {
   /// Get a specific section of this path as a new path.
   ///
   /// @param startIdx the first state index (inclusive)
-  /// @param endIdx   the end state index (exclusive)
+  /// @param endIdx the end state index (exclusive)
   public StreetPath subPath(int startIdx, int endIdx) {
     var subStates = states.subList(startIdx, endIdx);
     var subEdges = edges.subList(startIdx, endIdx - 1);

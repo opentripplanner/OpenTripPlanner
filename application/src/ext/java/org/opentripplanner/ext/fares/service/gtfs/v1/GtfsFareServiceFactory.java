@@ -28,7 +28,6 @@ import tools.jackson.databind.JsonNode;
 /**
  * Implements the default GTFS fare rules as described in
  * http://groups.google.com/group/gtfs-changes/msg/4f81b826cb732f3b as well as Fares V2.
- *
  */
 public class GtfsFareServiceFactory implements FareServiceFactory {
 

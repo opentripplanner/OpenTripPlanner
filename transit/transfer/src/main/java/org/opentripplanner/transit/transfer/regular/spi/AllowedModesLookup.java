@@ -7,8 +7,7 @@ import org.opentripplanner.transit.transfer.regular.api.maxduration.MaxDurations
 
 /**
  * Which modes a stop is allowed for, that is, which modes are allowed on a trip that visits the
- * stop. It is used to select the max duration of a transfer, see
- * {@link MaxDurationsPreference}.
+ * stop. It is used to select the max duration of a transfer, see {@link MaxDurationsPreference}.
  * <p>
  * Implementations are immutable and thread-safe.
  */

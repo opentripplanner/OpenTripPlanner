@@ -5,7 +5,6 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.utils.lang.Sandbox;
 
 /**
- *
  * The fare medium to "hold" a fare.
  * <p>
  * This can be cash, an app, smartcards, credit cards and others.

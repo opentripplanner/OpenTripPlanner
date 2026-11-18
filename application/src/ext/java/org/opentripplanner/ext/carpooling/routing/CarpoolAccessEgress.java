@@ -16,9 +16,9 @@ import org.opentripplanner.street.model.path.StreetPath;
  * carpool-side data (walks, shared segments, ride duration) and this class adds the Raptor framing
  * (stop index, departure time anchor, c1, penalty, reluctance).
  * <p>
- * The walk paths' A* weights are used as-is for the walk portion of the cost; they already
- * encode the user's walk preferences (reluctance, safety, slope, ...) from the search that produced
- * them. The ride portion is weighted by {@code carpoolReluctance}.
+ * The walk paths' A* weights are used as-is for the walk portion of the cost; they already encode
+ * the user's walk preferences (reluctance, safety, slope, ...) from the search that produced them.
+ * The ride portion is weighted by {@code carpoolReluctance}.
  */
 public class CarpoolAccessEgress implements RoutingAccessEgress {
 
@@ -54,28 +54,24 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
   private final EndpointLabel endLabel;
 
   /**
-   * @param stop                   Raptor stop index of the transit-side endpoint — the stop the
-   *     passenger boards transit at (for access) or alights from transit
-   *     at (for egress).
+   * @param stop Raptor stop index of the transit-side endpoint — the stop the passenger boards
+   *     transit at (for access) or alights from transit at (for egress).
    * @param passengerDepartureTime see {@link #passengerDepartureTime}.
-   * @param insertionCandidate     the carpool-side data: walks bracketing the ride, the shared ride
-   *     itself, the trip and pickup/dropoff positions. Everything except
-   *     Raptor framing flows from here.
-   * @param penalty                optional Raptor time/cost penalty added on top of the leg,
-   *     applied via {@link #withPenalty(TimeAndCost)}; pass
-   *     {@link TimeAndCost#ZERO} for no penalty.
-   * @param carpoolReluctance      multiplier on ride seconds when computing {@link #c1()}; the walk
-   *     portions are billed at the walks' own A* weights and are not
-   *     multiplied by this.
-   * @param startLabel             label data for the first leg's {@code from} place. For an access
-   *     this is the passenger origin
-   *     ({@link EndpointLabel#forLocation(org.opentripplanner.model.GenericLocation)});
-   *     for an egress it is the transit stop the passenger alighted from
-   *     ({@link EndpointLabel#forStop(org.opentripplanner.transit.model.site.StopLocation)}).
-   *     The mapper resolves the label into a {@code Place}.
-   * @param endLabel               symmetric to {@code startLabel}: label data for the last leg's
-   *     {@code to} place. Transit stop for an access, passenger
-   *     destination for an egress.
+   * @param insertionCandidate the carpool-side data: walks bracketing the ride, the shared ride
+   *     itself, the trip and pickup/dropoff positions. Everything except Raptor framing flows from
+   *     here.
+   * @param penalty optional Raptor time/cost penalty added on top of the leg, applied via
+   *     {@link #withPenalty(TimeAndCost)}; pass {@link TimeAndCost#ZERO} for no penalty.
+   * @param carpoolReluctance multiplier on ride seconds when computing {@link #c1()}; the walk
+   *     portions are billed at the walks' own A* weights and are not multiplied by this.
+   * @param startLabel label data for the first leg's {@code from} place. For an access this is the
+   *     passenger origin
+   *     ({@link EndpointLabel#forLocation(org.opentripplanner.model.GenericLocation)}); for an
+   *     egress it is the transit stop the passenger alighted from
+   *     ({@link EndpointLabel#forStop(org.opentripplanner.transit.model.site.StopLocation)}). The
+   *     mapper resolves the label into a {@code Place}.
+   * @param endLabel symmetric to {@code startLabel}: label data for the last leg's {@code to}
+   *     place. Transit stop for an access, passenger destination for an egress.
    */
   public CarpoolAccessEgress(
     int stop,

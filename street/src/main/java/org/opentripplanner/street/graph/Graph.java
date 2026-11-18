@@ -36,10 +36,10 @@ import org.slf4j.LoggerFactory;
  * algorithms are defined. A graph is made up of vertices and edges. These are also referred to as
  * nodes and arcs or links, but in OTP we always use the vertices and edges terminology.
  * <p>
- * In OTP1, the Graph contained vertices and edges representing the entire transportation
- * network, including edges representing both street segments and public transit lines connecting
- * stops. In OTP2, the Graph edges now represent only the street network. Transit routing is
- * performed on other data structures suited to the Raptor algorithm (the TransitRepository). Some
+ * In OTP1, the Graph contained vertices and edges representing the entire transportation network,
+ * including edges representing both street segments and public transit lines connecting stops. In
+ * OTP2, the Graph edges now represent only the street network. Transit routing is performed on
+ * other data structures suited to the Raptor algorithm (the TransitRepository). Some
  * transit-related vertices are still present in the Graph, specifically those representing transit
  * stops, entrances, and elevators. Their presence in the street graph creates a connection between
  * the two routable data structures (identifying where stops in the TransitRepository are located
@@ -50,11 +50,10 @@ import org.slf4j.LoggerFactory;
  * sometimes serves as a catch-all, as it used to be the root of the object tree representing the
  * whole transportation network. This use of the Graph object is being phased out and discouraged.
  * <p>
- * In some sense the Graph is just some indexes into a set of vertices. The Graph used to hold
- * lists of edges for each vertex, but those lists are now attached to the vertices themselves.
+ * In some sense the Graph is just some indexes into a set of vertices. The Graph used to hold lists
+ * of edges for each vertex, but those lists are now attached to the vertices themselves.
  * <p>
- * TODO RT_AB: I favor renaming to StreetGraph to emphasize what it represents. TG agreed in
- * review.
+ * TODO RT_AB: I favor renaming to StreetGraph to emphasize what it represents. TG agreed in review.
  */
 public class Graph implements Serializable {
 
@@ -309,8 +308,7 @@ public class Graph implements Serializable {
   /**
    * Index this graph if it hasn't been already. If the index already exists, this is a no-op.
    * <p>
-   * TODO: The indexing process (and the index itself) should be completely hidden from the
-   * callers.
+   * TODO: The indexing process (and the index itself) should be completely hidden from the callers.
    */
   public void requestIndex() {
     if (streetIndex == null) {

@@ -35,8 +35,8 @@ import org.slf4j.LoggerFactory;
  * discard this history and break the bookkeeping that determines which old patterns need to be
  * removed.
  * <p>
- * <b>Future improvement:</b> The per-date caches maintained here duplicate information that
- * would ideally come from a single authoritative datasource. However,
+ * <b>Future improvement:</b> The per-date caches maintained here duplicate information that would
+ * ideally come from a single authoritative datasource. However,
  * {@link org.opentripplanner.transit.repository.TimetableRepository} only stores real-time
  * timetables, while these caches also cover scheduled trip patterns sourced from
  * {@link RaptorTransitData}. Once scheduled and real-time data live in the same structure, the
@@ -73,8 +73,7 @@ public class TimetableUpdateMapper {
   ///
   /// This method bridges the different update approaches:
   /// 1. `updatedTimetables` and `timetables` only contains [Timetable]s with real-time updates.
-  ///    This
-  ///    means that removed items are not present.
+  ///    This means that removed items are not present.
   /// 2. [RaptorTransitData] requires applying the changes to a previous snapshot: adding, updating
   ///    and removing timetables.
   ///
@@ -90,8 +89,8 @@ public class TimetableUpdateMapper {
   ///    1. an update was received
   ///    2. no update was received, and so the previous updated should be removed. If the update was
   ///       for a scheduled trip, then the schedule should be restored.
-  /// 3. Remove the `oldTripPatternsForDate` and add the `newTripPatternsForDate` to
-  ///    the [RaptorTransitData].
+  /// 3. Remove the `oldTripPatternsForDate` and add the `newTripPatternsForDate` to the
+  ///    [RaptorTransitData].
   public RaptorTransitData map(
     RaptorTransitData oldRaptorTransitData,
     Collection<Timetable> updatedTimetables,

@@ -22,7 +22,7 @@ import org.opentripplanner.utils.time.DurationUtils;
  * <pre>
  * f(x) = 2h30m15s + 1.45 x
  *       |---   body    ---|
- *</pre>
+ * </pre>
  * <p>
  * The variable name can be one of `t`, `T`, `x` or `X`.
  * <p>
@@ -129,10 +129,8 @@ public class LinearFunctionSerialization {
   /**
    * Parse a String as a Duration. Unfortunately, to be backwards compatible we need to support
    * decimal numbers. If the text represents a decimal number, then the value is converted to
-   * seconds. <br/>
-   * The parsing function {@link DurationUtils#parseSecondsOrDuration(String)} cannot be used here
-   * since it supports only integer seconds, not decimal seconds.
-   *
+   * seconds. <br/> The parsing function {@link DurationUtils#parseSecondsOrDuration(String)} cannot
+   * be used here since it supports only integer seconds, not decimal seconds.
    */
   private static Duration parseDecimalSecondsOrDuration(String text) {
     try {

@@ -148,7 +148,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
    * the {@link OsmBoardingLocationsModule}, which runs before this one, often links stops to
    * walkable edges only.
    *
-   * @param stopVertex                    The transit stop vertex to be checked.
+   * @param stopVertex The transit stop vertex to be checked.
    * @param stopLocationsUsedForFlexTrips A set of stop locations that are used for flexible trips.
    */
   private static boolean isAlreadyLinked(

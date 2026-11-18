@@ -19,7 +19,7 @@ class TripAssert {
   }
 
   /**
-   * @param arrivalTime  The search add the boardSlack, so we use 'arrivalTime' as input to the
+   * @param arrivalTime The search add the boardSlack, so we use 'arrivalTime' as input to the
    *     search
    * @param stopPosition The stop position to board
    */
@@ -30,9 +30,9 @@ class TripAssert {
   }
 
   /**
-   * @param arrivalTime    The search add the boardSlack, so we use 'arrivalTime' as input to the
+   * @param arrivalTime The search add the boardSlack, so we use 'arrivalTime' as input to the
    *     search
-   * @param stopPosition   The stop position to board
+   * @param stopPosition The stop position to board
    * @param tripIndexLimit the index of a previous tripSchedule found, used to search for a better
    *     trip. (exclusive)
    */

@@ -46,13 +46,13 @@ public class StopTimesHelper {
    * <p>
    * TODO: Add frequency based trips
    *
-   * @param stop                         Stop object to perform the search for
-   * @param startTime                    Start time for the search.
-   * @param timeRange                    Searches forward for timeRange from startTime
+   * @param stop Stop object to perform the search for
+   * @param startTime Start time for the search.
+   * @param timeRange Searches forward for timeRange from startTime
    * @param numberOfDeparturesPerPattern Number of departures to fetch per pattern
-   * @param arrivalDeparture             Filter by arrivals, departures, or both
-   * @param includeCancelledTrips        If true, cancelled trips will also be included in result
-   * @param tripTimeOnDateMatcher        An optional matcher to filter out trip times
+   * @param arrivalDeparture Filter by arrivals, departures, or both
+   * @param includeCancelledTrips If true, cancelled trips will also be included in result
+   * @param tripTimeOnDateMatcher An optional matcher to filter out trip times
    */
   List<StopTimesInPattern> stopTimesForStop(
     StopLocation stop,
@@ -162,7 +162,7 @@ public class StopTimesHelper {
    * Get a list of all trips that pass through a stop during a single ServiceDate. Useful when
    * creating complete stop timetables for a single day.
    *
-   * @param stop        Stop object to perform the search for
+   * @param stop Stop object to perform the search for
    * @param serviceDate Return all departures for the specified date
    */
   List<StopTimesInPattern> stopTimesForStop(
@@ -222,16 +222,15 @@ public class StopTimesHelper {
    * <p>
    * TODO: Add frequency based trips
    *
-   * @param stop                         Stop object to perform the search for
-   * @param pattern                      Pattern object to perform the search for
-   * @param startTime                    Start time for the search.
-   * @param timeRange                    Searches forward for timeRange from startTime
+   * @param stop Stop object to perform the search for
+   * @param pattern Pattern object to perform the search for
+   * @param startTime Start time for the search.
+   * @param timeRange Searches forward for timeRange from startTime
    * @param numberOfDeparturesPerPattern Number of departures to fetch per pattern
-   * @param arrivalDeparture             Filter by arrivals, departures, or both.
-   * @param includeCancellations         If the result should include those trip times where either
-   *     the entire trip or the stop at the given stop location has
-   *     been cancelled. Deleted trips are never returned no matter
-   *     the value of this parameter.
+   * @param arrivalDeparture Filter by arrivals, departures, or both.
+   * @param includeCancellations If the result should include those trip times where either the
+   *     entire trip or the stop at the given stop location has been cancelled. Deleted trips are
+   *     never returned no matter the value of this parameter.
    */
   List<TripTimeOnDate> stopTimesForPatternAtStop(
     StopLocation stop,

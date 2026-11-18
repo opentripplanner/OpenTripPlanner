@@ -11,10 +11,10 @@ import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUser
 
 /**
  * Default {@link RegularTransfersService}, created by
- * {@link DefaultRegularTransferRepositorySnapshot#forRequest}. It holds the user preferences of
- * the request and the profile closest to them, both found once, and reads the paths and the cache
- * of the Raptor transfers of the snapshot it is created from. The paths are immutable and the
- * cache is thread-safe, so the view is thread-safe.
+ * {@link DefaultRegularTransferRepositorySnapshot#forRequest}. It holds the user preferences of the
+ * request and the profile closest to them, both found once, and reads the paths and the cache of
+ * the Raptor transfers of the snapshot it is created from. The paths are immutable and the cache is
+ * thread-safe, so the view is thread-safe.
  *
  * @param
  *     <p>
@@ -32,8 +32,8 @@ final class DefaultRegularTransfersService<P> implements RegularTransfersService
 
   /**
    * @param userPreferences the user preferences of the request, the key of the cache
-   * @param profile         the stored profile closest to {@code userPreferences}, the paths are
-   *     read from it. {@code null} if there are no stored paths.
+   * @param profile the stored profile closest to {@code userPreferences}, the paths are read from
+   *     it. {@code null} if there are no stored paths.
    */
   DefaultRegularTransfersService(
     OverlaidTemplatePaths<P> paths,

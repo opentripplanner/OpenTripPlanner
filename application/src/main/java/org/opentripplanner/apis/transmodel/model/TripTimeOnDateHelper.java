@@ -97,11 +97,11 @@ public class TripTimeOnDateHelper {
   /**
    * Find trip time shorts for all intermediate stops for a leg.
    * <p>
-   * Intermediate stops without scheduled times are skipped. This is the case for the flexible
-   * area stops of a flex service journey with fixed endpoints: the trip is routed as a regular
-   * scheduled leg, but the flexible-area stop in between carries no scheduled arrival/departure
-   * time (only a time window), so it cannot be rendered as an {@code EstimatedCall} and is not a
-   * boardable stop. See issue #7034.
+   * Intermediate stops without scheduled times are skipped. This is the case for the flexible area
+   * stops of a flex service journey with fixed endpoints: the trip is routed as a regular scheduled
+   * leg, but the flexible-area stop in between carries no scheduled arrival/departure time (only a
+   * time window), so it cannot be rendered as an {@code EstimatedCall} and is not a boardable stop.
+   * See issue #7034.
    */
   public static List<TripTimeOnDate> getIntermediateTripTimeOnDatesForLeg(Leg leg) {
     if (!leg.isScheduledTransitLeg()) {

@@ -15,8 +15,8 @@ import org.opentripplanner.core.model.id.FeedScopedId;
  * drops those that aren't supported:
  * https://github.com/CI-CMG/mapbox-vector-tile/blob/master/src/main/java/edu/colorado/cires/cmg/mvt/encoding/MvtValue.java#L18-L40
  * <p>
- * For this reason this class also has a static initializer that automatically converts common
- * OTP classes into vector tile-compatible strings.
+ * For this reason this class also has a static initializer that automatically converts common OTP
+ * classes into vector tile-compatible strings.
  */
 public record KeyValue(String key, Object value) {
   /**

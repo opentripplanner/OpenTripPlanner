@@ -263,7 +263,6 @@ public class TestTransitData
   /// 10:05 11:05
   /// 11:05 12:05
   /// ```
-  ///
   public TestTransitData withTimetables(String routeTimetables) {
     int routeIndex = 0;
 

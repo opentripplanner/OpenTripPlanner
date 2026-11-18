@@ -56,7 +56,7 @@ class TripTimesUpdater {
    * Timetable when several updates are applied to it at once. We assume here that all trips in a
    * timetable are from the same feed, which should always be the case.
    *
-   * @param tripUpdate     GTFS-RT trip update
+   * @param tripUpdate GTFS-RT trip update
    * @param backwardsDelay Defines when delays are propagated to previous stops and if these stops
    *     are given the NO_DATA flag
    * @return {@link TripTimesPatch} contains a new copy of updated TripTimes after TripUpdate has
@@ -167,12 +167,12 @@ class TripTimesUpdater {
   /**
    * Add a new or replacement trip to the snapshot
    *
-   * @param trip                   trip
-   * @param tripUpdate             information about the trip
+   * @param trip trip
+   * @param tripUpdate information about the trip
    * @param stopAndStopTimeUpdates updates for the stops
-   * @param added                  whether this trip was added (extra Trip)
-   * @param tripPatternModified    whether the trip Pattern was tripPatternModified
-   * @param serviceCode            serviceCode of the trip
+   * @param added whether this trip was added (extra Trip)
+   * @param tripPatternModified whether the trip Pattern was tripPatternModified
+   * @param serviceCode serviceCode of the trip
    * @throws UpdateException if there are any errors with the TripUpdate
    */
   public TripTimesWithStopPattern createNewTripTimesFromGtfsRt(

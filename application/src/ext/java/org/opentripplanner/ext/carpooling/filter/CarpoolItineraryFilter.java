@@ -16,7 +16,7 @@ public interface CarpoolItineraryFilter {
    * Returns {@code true} if the itinerary satisfies this filter's criteria.
    *
    * @param itinerary the routed itinerary to evaluate
-   * @param request   the passenger's journey preferences
+   * @param request the passenger's journey preferences
    * @return {@code true} if the itinerary passes the filter, {@code false} otherwise
    */
   boolean isValidItinerary(Itinerary itinerary, CarpoolingRequest request);

@@ -264,10 +264,10 @@ public class TestTransitData
    * Create constraint for a given transfer. If trip passes through the stop more than once
    * constraint will be placed on stop position for the first visit.
    *
-   * @param fromTrip   initial trip
-   * @param fromStop   initial stop index
-   * @param toTrip     destination trip
-   * @param toStop     destination trip index
+   * @param fromTrip initial trip
+   * @param fromStop initial stop index
+   * @param toTrip destination trip
+   * @param toStop destination trip index
    * @param constraint constraint to set
    */
   public TestTransitData withConstrainedTransfer(

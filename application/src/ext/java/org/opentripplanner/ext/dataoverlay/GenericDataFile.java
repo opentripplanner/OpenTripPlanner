@@ -36,7 +36,7 @@ public class GenericDataFile {
    * Reads and parses the .nc file according to configuration into map of variable names and arrays
    * of their values from the .nc file
    *
-   * @param file              input .nc data grid file
+   * @param file input .nc data grid file
    * @param dataOverlayConfig settings which describe the file variables selection
    */
   public GenericDataFile(File file, DataOverlayConfig dataOverlayConfig) {

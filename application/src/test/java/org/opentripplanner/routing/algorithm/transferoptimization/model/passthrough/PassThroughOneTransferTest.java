@@ -26,8 +26,8 @@ import org.opentripplanner.raptorlegacy._data.transit.TestTripSchedule;
  * <p>
  * TEST SETUP
  * <p>
- * We will use 2 trips with a fixed set of transfers for each test. Each trip has 5 stops and
- * plenty of slack to do the transfers for all possible stops combinations. We will set the transfer
+ * We will use 2 trips with a fixed set of transfers for each test. Each trip has 5 stops and plenty
+ * of slack to do the transfers for all possible stops combinations. We will set the transfer
  * durations to get different generalized-costs for each possible path. We will set the cost so the
  * transfers which do not contain any transfer-points have the lowest cost - is optimal on
  * generalized-cost. We do this to make sure the subject-under-test is using the pass-through-
@@ -119,8 +119,8 @@ public class PassThroughOneTransferTest implements RaptorTestConstants {
    *                                    \
    *                                     Destination
    * </pre>
-   * With this setup we will try all possible combinations of pass-through points and make
-   * sure the correct path is chosen.
+   * With this setup we will try all possible combinations of pass-through points and make sure the
+   * correct path is chosen.
    * <p>
    * We will adjust the transfer walk duration so that paths containing the transfer-point get a
    * high cost, and paths without it get a lower cost.

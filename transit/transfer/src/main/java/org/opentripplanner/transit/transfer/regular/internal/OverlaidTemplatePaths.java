@@ -10,8 +10,8 @@ import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUser
  * The runtime path templates: the paths generated at graph build (the base), with the transfers
  * from some stops replaced at runtime (the overlay).
  * <p>
- * The unit of change is a <em>leaf</em>, all paths from one {@code fromStop} under one profile.
- * A replaced leaf hides the base leaf completely; an empty replaced leaf means the stop has no
+ * The unit of change is a <em>leaf</em>, all paths from one {@code fromStop} under one profile. A
+ * replaced leaf hides the base leaf completely; an empty replaced leaf means the stop has no
  * transfers. Resetting a leaf removes it from the overlay, so the base leaf is used again.
  * <p>
  * <b>Copy-on-write.</b> The base is shared by all instances and never modified. The leaves in the

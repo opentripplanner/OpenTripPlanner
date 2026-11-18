@@ -13,9 +13,9 @@ import org.opentripplanner.utils.time.DurationUtils;
 /**
  * The progress tracker notify the caller based a time interval.
  * <p>
- * To avoid the caller from being notified to often the tracker uses a 'timer'. The 'timer'
- * prevent notification unless a minimum amount of time is passed since last time the caller was
- * notified. The quiet period is set to 5 seconds.
+ * To avoid the caller from being notified to often the tracker uses a 'timer'. The 'timer' prevent
+ * notification unless a minimum amount of time is passed since last time the caller was notified.
+ * The quiet period is set to 5 seconds.
  * <p>
  * There is also a 'minBlockSize' which prevent the tracker of calling the
  * {@link System#currentTimeMillis()} for each step, instead the timer is checked once for each
@@ -87,12 +87,12 @@ public class ProgressTracker {
   /**
    * Track progress for the given action.
    *
-   * @param actionName   the action name to include in the notification strings.
+   * @param actionName the action name to include in the notification strings.
    * @param minBlockSize the minimum number of steps between each time check. A reasonably value is
-   *     to use the number of steps which would take approximately 1 second. Set
-   *     this lower if the time variation for each step is big.
-   * @param size         The expected number the step method is called. If negative the size is
-   *     considered unknown.
+   *     to use the number of steps which would take approximately 1 second. Set this lower if the
+   *     time variation for each step is big.
+   * @param size The expected number the step method is called. If negative the size is considered
+   *     unknown.
    */
   public static ProgressTracker track(String actionName, int minBlockSize, long size) {
     return new ProgressTracker(actionName, minBlockSize, size, QUIET_PERIOD_MILLISECONDS, false);
@@ -101,14 +101,13 @@ public class ProgressTracker {
   /**
    * Create an InputStream that decorate another InputStream with progress logging.
    *
-   * @param actionName           the action name to include in the notification strings.
-   * @param minBlockSize         the minimum number of steps between each time check. A reasonably
-   *     value is to use the number of steps which would take approximately
-   *     1 second. Set this lower if the time variation for each step is
-   *     big.
-   * @param size                 The expected number the step method is called. If negative the size
-   *     is considered unknown.
-   * @param inputStream          the "real" input stream to delegate all operations to.
+   * @param actionName the action name to include in the notification strings.
+   * @param minBlockSize the minimum number of steps between each time check. A reasonably value is
+   *     to use the number of steps which would take approximately 1 second. Set this lower if the
+   *     time variation for each step is big.
+   * @param size The expected number the step method is called. If negative the size is considered
+   *     unknown.
+   * @param inputStream the "real" input stream to delegate all operations to.
    * @param progressNotification the progress notification handler/subscriber.
    */
   public static InputStream track(
@@ -128,14 +127,13 @@ public class ProgressTracker {
   /**
    * Create an OutputStream that decorate another OutputStream with progress logging.
    *
-   * @param actionName           the action name to include in the notification strings.
-   * @param minBlockSize         the minimum number of steps between each time check. A reasonably
-   *     value is to use the number of steps which would take approximately
-   *     1 second. Set this lower if the time variation for each step is
-   *     big.
-   * @param size                 The expected number the step method is called. If negative the size
-   *     is considered unknown.
-   * @param outputStream         the "real" input stream to delegate all operations to.
+   * @param actionName the action name to include in the notification strings.
+   * @param minBlockSize the minimum number of steps between each time check. A reasonably value is
+   *     to use the number of steps which would take approximately 1 second. Set this lower if the
+   *     time variation for each step is big.
+   * @param size The expected number the step method is called. If negative the size is considered
+   *     unknown.
+   * @param outputStream the "real" input stream to delegate all operations to.
    * @param progressNotification the progress notification handler/subscriber.
    */
   public static OutputStream track(
@@ -160,8 +158,8 @@ public class ProgressTracker {
    * This method calls {@code progressNotification} with the {@link #startMessage()} if it is the
    * first step, if not it calls the {@link #steps(int, Consumer)}.
    * <p>
-   * This method is used if you would like to avoid logging the start message - in case the
-   * progress completes before reaching the first {@link #startOrStep(Consumer)} statement.
+   * This method is used if you would like to avoid logging the start message - in case the progress
+   * completes before reaching the first {@link #startOrStep(Consumer)} statement.
    */
   public void startOrStep(Consumer<String> progressNotification) {
     long counter = stepCounter.incrementAndGet();
@@ -194,7 +192,7 @@ public class ProgressTracker {
    * elements processed. Then this method gives you the flexibility to "jump" a number of given
    * {@code deltaSteps} for each invocation.
    *
-   * @param deltaSteps           number of steps performed for this invocation.
+   * @param deltaSteps number of steps performed for this invocation.
    * @param progressNotification the notification callback
    */
   public void steps(int deltaSteps, Consumer<String> progressNotification) {

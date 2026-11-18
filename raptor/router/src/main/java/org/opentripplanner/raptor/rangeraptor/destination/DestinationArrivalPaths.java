@@ -57,8 +57,8 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
   private final RaptorCostCalculator<T> costCalculator;
 
   /**
-   * Used to calculate the time-shifted departure time of the arrival. Null if the pareto
-   * comparator does not use the departure time, then the iteration departure time is used.
+   * Used to calculate the time-shifted departure time of the arrival. Null if the pareto comparator
+   * does not use the departure time, then the iteration departure time is used.
    */
   @Nullable
   private final TimeShiftedDepartureTime<T> departureTimeCalculator;
@@ -134,11 +134,10 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
    * <p>
    * <b>Do NOT replace this method with one creating a new {@link DestinationArrival} per call.</b>
    * It is called for every stop arrival in every round, so it is one of the hottest code paths in
-   * McRaptor. The pareto-set needs an element to compare with, and an object created here is
-   * not reliably removed by the JVM's escape analysis. The result is millions of short-lived
-   * objects and a measurable slowdown of the search. Instead, the same primitive signature is
-   * used and the values are written into a single reusable probe. The probe is never stored by
-   * the pareto set.
+   * McRaptor. The pareto-set needs an element to compare with, and an object created here is not
+   * reliably removed by the JVM's escape analysis. The result is millions of short-lived objects
+   * and a measurable slowdown of the search. Instead, the same primitive signature is used and the
+   * values are written into a single reusable probe. The probe is never stored by the pareto set.
    * <p>
    * <b>Thread-safety:</b> This method is NOT thread-safe, because the probe is shared by all
    * callers of this instance. An instance belongs to one search and is used by one thread only.

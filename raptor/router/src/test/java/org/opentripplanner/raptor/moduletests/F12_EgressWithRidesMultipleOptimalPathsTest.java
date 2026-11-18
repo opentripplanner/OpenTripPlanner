@@ -31,9 +31,9 @@ import org.opentripplanner.raptor.spi.TestSlackProvider;
 /**
  * FEATURE UNDER TEST
  * <p>
- * This test focuses on on-foot and flex egresses. You are not allowed to have two walk legs
- * after each other, so depending on how you arrived at the stop where the egress starts, the
- * walking option might not be possible.
+ * This test focuses on on-foot and flex egresses. You are not allowed to have two walk legs after
+ * each other, so depending on how you arrived at the stop where the egress starts, the walking
+ * option might not be possible.
  * <p>
  * Test case: <img src="images/F12.svg" width="432" height="212" />
  * <pre>
@@ -44,9 +44,9 @@ import org.opentripplanner.raptor.spi.TestSlackProvider;
  * // Not allowed
  * A ~ L2 ~ B ~ Walk 2m ~ C ~ Walk ~ D
  * </pre>
- * To alternate which egress leg is the best, we change the egress walk between 5 minutes
- * (walking is better than the path with flex) and 7 minutes (the path with flex egress becomes the
- * fastest option). Note! There is 1 minute transfer slack.
+ * To alternate which egress leg is the best, we change the egress walk between 5 minutes (walking
+ * is better than the path with flex) and 7 minutes (the path with flex egress becomes the fastest
+ * option). Note! There is 1 minute transfer slack.
  */
 public class F12_EgressWithRidesMultipleOptimalPathsTest implements RaptorTestConstants {
 

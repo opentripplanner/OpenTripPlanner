@@ -22,8 +22,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Wires the regular-transfer repository for routing. The runtime repository is created from the
- * build repository and registered on the transit domain's transaction framework; requests read
- * its snapshot through the returned handle, updaters write through it.
+ * build repository and registered on the transit domain's transaction framework; requests read its
+ * snapshot through the returned handle, updaters write through it.
  */
 @Module
 public class RegularTransferRepositoryModule {

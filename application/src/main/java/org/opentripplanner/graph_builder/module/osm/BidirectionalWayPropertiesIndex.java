@@ -18,18 +18,16 @@ import org.slf4j.LoggerFactory;
 /// CPU cores.
 ///
 /// Most ways in a graph share the same permissions and safety values (e.g. plain
-/// `highway=residential` ways with no overrides), so the resulting
-/// [BidirectionalWayProperties] instances are interned/deduplicated. The index is backed by a
-/// primitive-long-keyed map, which avoids the overhead of boxing millions of `Long` keys in a graph
-/// with a large number of ways.
+/// `highway=residential` ways with no overrides), so the resulting [BidirectionalWayProperties]
+/// instances are interned/deduplicated. The index is backed by a primitive-long-keyed map, which
+/// avoids the overhead of boxing millions of `Long` keys in a graph with a large number of ways.
 ///
 /// ### Memory consumption
 ///
 /// The map is backed by HPPC's open-addressing `LongObjectHashMap`, sized upfront to the number of
 /// ways at its default 0.75 load factor, so it never shrinks below that once built. For a graph
-/// with
-/// 2 million ways that means a capacity of roughly 4 million slots (rounded up to a power of two),
-/// backed by two parallel arrays:
+/// with 2 million ways that means a capacity of roughly 4 million slots (rounded up to a power of
+/// two), backed by two parallel arrays:
 ///
 /// | Array | Purpose | Size |
 /// |---|---|---|

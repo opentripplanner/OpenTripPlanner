@@ -43,7 +43,7 @@ class GenericEdgeUpdater {
   /**
    * Calculates the generic data start time and sets the earlier parsed map of generic data file
    *
-   * @param dataFile    map of generic grid data from .nc file
+   * @param dataFile map of generic grid data from .nc file
    * @param streetEdges collection of all street edges to be updated
    */
   GenericEdgeUpdater(
@@ -146,10 +146,10 @@ class GenericEdgeUpdater {
    * Each cell of returned array represent an average of quality of the selected property in time
    *
    * @param fromLongitude from longitude
-   * @param fromLatitude  from latitude
-   * @param toLongitude   to longitude
-   * @param toLatitude    to latitude
-   * @param propertyName  propertyName
+   * @param fromLatitude from latitude
+   * @param toLongitude to longitude
+   * @param toLatitude to latitude
+   * @param propertyName propertyName
    * @return array of propertyName values samples in time
    */
   private float[] getAverageValue(
@@ -178,10 +178,10 @@ class GenericEdgeUpdater {
    * Each list cell represent an average of grid data in time
    *
    * @param fromLongitude from longitude
-   * @param fromLatitude  from latitude
-   * @param toLongitude   to longitude
-   * @param toLatitude    to latitude
-   * @param propertyName  propertyName
+   * @param fromLatitude from latitude
+   * @param toLongitude to longitude
+   * @param toLatitude to latitude
+   * @param propertyName propertyName
    * @return closest grid data samples for given line
    */
   private <E> List<List<E>> getClosestSamples(
@@ -210,7 +210,7 @@ class GenericEdgeUpdater {
    * <p>
    * Returned array represent value for selected property time
    *
-   * @param samplePoint  point
+   * @param samplePoint point
    * @param propertyName propertyName
    * @return result the closest value for selected property for given point
    */
@@ -287,9 +287,9 @@ class GenericEdgeUpdater {
    * Returns azimuth for given coordinates
    *
    * @param fromLongitude from longitude
-   * @param fromLatitude  from latitude
-   * @param toLongitude   to longitude
-   * @param toLatitude    to latitude
+   * @param fromLatitude from latitude
+   * @param toLongitude to longitude
+   * @param toLatitude to latitude
    * @return azimuth
    */
   private double getAzimuth(
@@ -310,9 +310,9 @@ class GenericEdgeUpdater {
    * Returns distance between given coordinates
    *
    * @param fromLongitude from longitude
-   * @param fromLatitude  from latitude
-   * @param toLongitude   to longitude
-   * @param toLatitude    to latitude
+   * @param fromLatitude from latitude
+   * @param toLongitude to longitude
+   * @param toLatitude to latitude
    * @return distance between given coordinates
    */
   private double getDistance(
@@ -333,9 +333,9 @@ class GenericEdgeUpdater {
    * Moves point a given amount from given coordinate towards given azimuth
    *
    * @param longitude longitude
-   * @param latitude  latitude
-   * @param azimuth   azimuth
-   * @param amount    amount
+   * @param latitude latitude
+   * @param azimuth azimuth
+   * @param amount amount
    * @return moved point
    */
   private Point2D moveTo(double longitude, double latitude, double azimuth, double amount) {

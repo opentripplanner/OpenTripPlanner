@@ -37,8 +37,8 @@ import org.opentripplanner.transit.repository.ScheduledTimetableData;
  * added, which is the order returned by {@link
  * ScheduledTimetableData#getReplacedByTripOnServiceDate}.
  * <p>
- * Converting the content freezes the data import: later modifications would not be reflected in
- * the converted data, so they fail.
+ * Converting the content freezes the data import: later modifications would not be reflected in the
+ * converted data, so they fail.
  */
 public class TimetableDataImport {
 
@@ -121,8 +121,8 @@ public class TimetableDataImport {
   }
 
   /**
-   * The trip calendars built so far. The service codes running on each date are not computed
-   * before the conversion into {@link ScheduledTimetableData}.
+   * The trip calendars built so far. The service codes running on each date are not computed before
+   * the conversion into {@link ScheduledTimetableData}.
    */
   public TripCalendars getTripCalendars() {
     return tripCalendars;

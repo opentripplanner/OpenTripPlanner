@@ -22,8 +22,8 @@ public class DefaultRegularTransferBuildRepository<P> implements RegularTransfer
   private final TemplatePathsByUserProfile<P> paths = new TemplatePathsByUserProfile<>();
 
   /**
-   * Set when this repository is converted into the runtime repository. Not serialized, a
-   * loaded graph can be extended by a new graph build.
+   * Set when this repository is converted into the runtime repository. Not serialized, a loaded
+   * graph can be extended by a new graph build.
    */
   private transient boolean sealed = false;
 

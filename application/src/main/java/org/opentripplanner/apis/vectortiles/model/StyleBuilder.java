@@ -209,8 +209,8 @@ public class StyleBuilder {
    * The scale of the property can be any number, but the color scale is limited to be between
    * minValue and maxValue.
    * <p>
-   * minValue is displayed as a bright green and the higher the number gets, the "redder" the
-   * color becomes.
+   * minValue is displayed as a bright green and the higher the number gets, the "redder" the color
+   * becomes.
    */
   public StyleBuilder lineColorFromProperty(String propertyName, double minValue, double maxValue) {
     var multiplier = List.of(
@@ -225,11 +225,11 @@ public class StyleBuilder {
   /**
    * Generates the line color based off a numeric property in the feature.
    * <p>
-   * The scale of the property can be any positive number. RGB values (0, 255) are computed with
-   * the following formula: log2(propertyValue) * logMultiplier.
+   * The scale of the property can be any positive number. RGB values (0, 255) are computed with the
+   * following formula: log2(propertyValue) * logMultiplier.
    * <p>
-   * Values less than or equal to 1 is displayed as a bright green, and the higher the number
-   * gets, the "redder" the color becomes. logMultiplier controls the minimum value where the color
+   * Values less than or equal to 1 is displayed as a bright green, and the higher the number gets,
+   * the "redder" the color becomes. logMultiplier controls the minimum value where the color
    * becomes completely red, where all higher values are displayed the same.
    */
   public StyleBuilder log2LineColorFromProperty(String propertyName, double logMultiplier) {

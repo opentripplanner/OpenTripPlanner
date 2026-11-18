@@ -23,15 +23,13 @@ import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 /**
  * FEATURE UNDER TEST
  * <p>
- * Egress stops must use the 4D Pareto comparator (arrivalTime, paretoRound, cost,
- * arrivedOnBoard). Regular transit intermediary stops use the 3D comparator (no arrivedOnBoard
- * dimension).
+ * Egress stops must use the 4D Pareto comparator (arrivalTime, paretoRound, cost, arrivedOnBoard).
+ * Regular transit intermediary stops use the 3D comparator (no arrivedOnBoard dimension).
  * <p>
  * At stop C, two arrivals compete:
  * <ol>
  *   <li>Walk-transfer via R1(A→B) + walk B→C: round=1, arrives ~0:09, cost low,
- *       arrivedOnBoard=false
- *       — does NOT fire walk egress</li>
+ *       arrivedOnBoard=false — does NOT fire walk egress</li>
  *   <li>Transit via R1(A→B) + R2(B→C): round=2, arrives 0:15, cost higher, arrivedOnBoard=true —
  *       fires walk egress</li>
  * </ol>

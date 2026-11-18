@@ -65,7 +65,7 @@ public class DestinationArrivalConfig<T extends RaptorTripSchedule> {
    * Create a {@link DestinationArrivalPaths} for McRaptor.
    *
    * @param costConfig Supported configurations of c1, c2 and relaxed cost(c1).
-   * @param c2Comp     Dominance function for c2; {@code null} means c2 is not used.
+   * @param c2Comp Dominance function for c2; {@code null} means c2 is not used.
    */
   public DestinationArrivalPaths<T> createMcDestArrivalPaths(
     ParetoSetCost costConfig,

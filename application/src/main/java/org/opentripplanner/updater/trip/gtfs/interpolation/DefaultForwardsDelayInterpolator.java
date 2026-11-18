@@ -13,9 +13,9 @@ import org.opentripplanner.transit.model.timetable.StopRealTimeState;
  * provided in the update, a delay computed by comparing the time against the GTFS schedule time) is
  * propagated to all subsequent stops.
  * <p>
- * This means that updating a stop time for a certain stop will change all subsequent stops in
- * the absence of any other information. Note that updates with a schedule relationship of SKIPPED
- * will not stop delay propagation, but updates with schedule relationships of SCHEDULED (also the
+ * This means that updating a stop time for a certain stop will change all subsequent stops in the
+ * absence of any other information. Note that updates with a schedule relationship of SKIPPED will
+ * not stop delay propagation, but updates with schedule relationships of SCHEDULED (also the
  * default value if schedule relationship is not provided) or NO_DATA will.
  */
 class DefaultForwardsDelayInterpolator implements ForwardsDelayInterpolator {

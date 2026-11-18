@@ -89,9 +89,9 @@ public final class TripScheduleAlightSearch<T extends RaptorTripSchedule> implem
    * Find the last trip leaving from the given stop BEFORE the the {@code latestAlightTime}, but
    * after the given trip ({@code tripIndexLowerBound}).
    *
-   * @param latestAlightTime      The latest acceptable alight time (exclusive).
+   * @param latestAlightTime The latest acceptable alight time (exclusive).
    * @param stopPositionInPattern The stop to board.
-   * @param tripIndexLowerBound   Upper bound for trip index to search for (exclusive).
+   * @param tripIndexLowerBound Upper bound for trip index to search for (exclusive).
    */
   @Override
   public RaptorBoardOrAlightEvent<T> search(
@@ -202,8 +202,8 @@ public final class TripScheduleAlightSearch<T extends RaptorTripSchedule> implem
    * Do a binary search to find the approximate lower bound index for where to start the search. We
    * IGNORE if the trip schedule is in service.
    * <p>
-   * This is just a guess, and we return when the trip with a best valid arrival is in the range
-   * of the next {@link #binarySearchThreshold}.
+   * This is just a guess, and we return when the trip with a best valid arrival is in the range of
+   * the next {@link #binarySearchThreshold}.
    *
    * @return a better lower bound index (inclusive)
    */

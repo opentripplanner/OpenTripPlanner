@@ -15,8 +15,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * of parameters, so if you do not find the parameter you want (e.g. snow_depth) in the
  * {@link ParameterName}, then request your parameter to be added.
  * <p>
- * This class contain helper logic to convert parameters to and from a string representation used
- * by the APIs(the REST API is the only supported API). The parameter string format is:
+ * This class contain helper logic to convert parameters to and from a string representation used by
+ * the APIs(the REST API is the only supported API). The parameter string format is:
  * <p>
  * [{@link ParameterName}] {@code + ' ' +} [{@link ParameterType}] (lower case is used)
  * <p>

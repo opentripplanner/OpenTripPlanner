@@ -34,9 +34,9 @@ class DataOverlayStreetEdgeCostExtension implements StreetEdgeCostExtension, Ser
   /**
    * Sets the abstract grid data
    *
-   * @param dataStartTime  the time when the grid records start
+   * @param dataStartTime the time when the grid records start
    * @param variableValues map of variable names and arrays of their values
-   * @param timeUnit       time unit of the data overlay
+   * @param timeUnit time unit of the data overlay
    */
   DataOverlayStreetEdgeCostExtension(
     Instant dataStartTime,
@@ -120,10 +120,10 @@ class DataOverlayStreetEdgeCostExtension implements StreetEdgeCostExtension, Ser
   /**
    * Uses the formula from the penalty parameter and calculates the penalty based on that
    *
-   * @param formula   penalty formula
-   * @param value     data
+   * @param formula penalty formula
+   * @param value data
    * @param threshold threshold parameter value
-   * @param penalty   penalty parameter value
+   * @param penalty penalty parameter value
    * @return penalty
    */
   private double calculatePenaltyFromParameters(

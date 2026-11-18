@@ -44,8 +44,8 @@ public enum ResourceBundleSingleton {
   }
 
   /**
-   * Load a bundle for the given locale without falling back to the JVM default locale. If no
-   * bundle matches the requested language, the root bundle is returned.
+   * Load a bundle for the given locale without falling back to the JVM default locale. If no bundle
+   * matches the requested language, the root bundle is returned.
    * <p>
    * The {@link ResourceBundle.Control} based {@code getBundle} overloads throw
    * {@link UnsupportedOperationException} when called from a named module, so the no-fallback

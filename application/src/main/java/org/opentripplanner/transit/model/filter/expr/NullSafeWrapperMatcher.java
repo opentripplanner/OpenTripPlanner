@@ -17,7 +17,7 @@ public class NullSafeWrapperMatcher<T, V> implements Matcher<T> {
   private final Matcher<T> valueMatcher;
 
   /**
-   * @param typeName      The typeName appears in the toString for easier debugging.
+   * @param typeName The typeName appears in the toString for easier debugging.
    * @param valueProvider The function that maps the entity being matched by this matcher (T) to the
    *     value being checked for non-null.
    */

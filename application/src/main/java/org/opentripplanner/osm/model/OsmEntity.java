@@ -303,8 +303,7 @@ public abstract class OsmEntity {
    *
    * @param mode The OSM tag of the access mode, such as "motorcar" or "foot"
    * @return an optional value if the mode is allowed or denied access through tagging for the mode
-   *     or a parent mode, either with a directional suffix or not, empty if it is not
-   *     specified.
+   *     or a parent mode, either with a directional suffix or not, empty if it is not specified.
    */
   protected Optional<Permission> checkModePermission(String mode, TraverseDirection direction) {
     if (isTagless()) {
@@ -588,8 +587,8 @@ public abstract class OsmEntity {
    * Replace various pattern by the OSM tag values, with I18n support.
    *
    * @param pattern Pattern containing options tags to replace, such as "text" or "note: {note}".
-   *     Tag names between {} are replaced by the OSM tag value, if it is present (or the
-   *     empty string if not).
+   *     Tag names between {} are replaced by the OSM tag value, if it is present (or the empty
+   *     string if not).
    * @return A map language code → text, with at least one entry for the default language, and any
    *     other language found in OSM tag.
    */
@@ -791,8 +790,8 @@ public abstract class OsmEntity {
    * Is this a public transport boarding location where passengers wait for transit and that can be
    * linked to a transit stop vertex later on.
    * <p>
-   * This intentionally excludes railway=stop and public_transport=stop because these are
-   * supposed to be placed on the tracks not on the platform.
+   * This intentionally excludes railway=stop and public_transport=stop because these are supposed
+   * to be placed on the tracks not on the platform.
    *
    * @return whether the node is a place used to board a public transport vehicle
    */
@@ -816,7 +815,7 @@ public abstract class OsmEntity {
    * However, they are filtered out if they are tagged usage=tourism. This prevents miniature
    * tourist railways like the one in Portland's Zoo (https://www.openstreetmap.org/way/119108622)
    * from being linked to transit stops that are underneath it.
-   **/
+   */
   public boolean isPlatform() {
     var isPlatform =
       isTag("public_transport", "platform") || isOneOfTags("railway", RAILWAY_PLATFORM_VALUES);
@@ -1005,8 +1004,8 @@ public abstract class OsmEntity {
   /**
    * Is this entity unnamed?
    * <p>
-   * Perhaps this entity has a name that isn't in the source data, but it's also possible that
-   * it's explicitly tagged as not having one.
+   * Perhaps this entity has a name that isn't in the source data, but it's also possible that it's
+   * explicitly tagged as not having one.
    *
    * @see OsmEntity#isExplicitlyUnnamed()
    */
@@ -1018,8 +1017,7 @@ public abstract class OsmEntity {
    * Whether this entity explicitly doesn't have a name. This is different to no name being set on
    * the entity in OSM.
    *
-   * @see OsmEntity#isNamed()
-   *     @link https://wiki.openstreetmap.org/wiki/Tag:noname%3Dyes
+   * @see OsmEntity#isNamed() @link https://wiki.openstreetmap.org/wiki/Tag:noname%3Dyes
    */
   public boolean isExplicitlyUnnamed() {
     return isTagTrue("noname");

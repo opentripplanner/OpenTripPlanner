@@ -67,9 +67,8 @@ public interface RaptorTripPattern {
    * <p>
    * {@code -1} is returned if not found.
    *
-   * @param startPos        the stop position in the pattern to start the search (exclusive). Note!
-   *     Only defined for range {@code [0..N]} (N = number of stops in the
-   *     pattern).
+   * @param startPos the stop position in the pattern to start the search (exclusive). Note! Only
+   *     defined for range {@code [0..N]} (N = number of stops in the pattern).
    * @param alightStopIndex the stopIndex to find
    */
   default int findAlightStopPositionBefore(int startPos, int alightStopIndex) {
@@ -91,9 +90,8 @@ public interface RaptorTripPattern {
    * <p>
    * {@code -1} is returned if not found.
    *
-   * @param startPos        the stop position in the pattern to start the search (exclusive). Note!
-   *     Only defined for range {@code [0..N-1]} (N = number of stops in the
-   *     pattern).
+   * @param startPos the stop position in the pattern to start the search (exclusive). Note! Only
+   *     defined for range {@code [0..N-1]} (N = number of stops in the pattern).
    * @param alightStopIndex the stopIndex to find
    */
   default int findAlightStopPositionAfter(int startPos, int alightStopIndex) {
@@ -115,7 +113,7 @@ public interface RaptorTripPattern {
    * <p>
    * {@code -1} is returned if not found.
    *
-   * @param startPos  the stop position in the pattern to start the search (inclusive)
+   * @param startPos the stop position in the pattern to start the search (inclusive)
    * @param stopIndex the stopIndex to find
    */
   default int findStopPositionBefore(int startPos, int stopIndex) {
@@ -135,9 +133,8 @@ public interface RaptorTripPattern {
    * <p>
    * {@code -1} is returned if not found.
    *
-   * @param startPos       the stop position in the pattern to start the search (exclusive). Note!
-   *     Only defined for range {@code [0..N-1]} (N = number of stops in the
-   *     pattern).
+   * @param startPos the stop position in the pattern to start the search (exclusive). Note! Only
+   *     defined for range {@code [0..N-1]} (N = number of stops in the pattern).
    * @param boardStopIndex the stopIndex to find
    */
   default int findBoardStopPositionBefore(int startPos, int boardStopIndex) {
@@ -159,9 +156,8 @@ public interface RaptorTripPattern {
    * <p>
    * {@code -1} is returned if not found.
    *
-   * @param startPos       the stop position in the pattern to start the search (inclusive). Note!
-   *     Only defined for range {@code [0..N-1]} (N = number of stops in the
-   *     pattern).
+   * @param startPos the stop position in the pattern to start the search (inclusive). Note! Only
+   *     defined for range {@code [0..N-1]} (N = number of stops in the pattern).
    * @param boardStopIndex the stopIndex to find
    */
   default int findBoardStopPositionAfter(int startPos, int boardStopIndex) {

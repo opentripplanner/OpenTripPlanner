@@ -42,7 +42,7 @@ public class TripPatternForDateMapper {
   /**
    * This method is THREAD SAFE.
    *
-   * @param timetable   The timetable to be mapped to TripPatternForDate - READ ONLY
+   * @param timetable The timetable to be mapped to TripPatternForDate - READ ONLY
    * @param serviceDate The date to map the TripPatternForDate for - READ ONLY
    * @return TripPatternForDate for this timetable and serviceDate
    */

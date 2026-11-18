@@ -20,8 +20,8 @@ import org.slf4j.LoggerFactory;
  * routing data structures, and other lazily initialized components. It alternates between depart-at
  * / arrive-by and cycles through access/egress modes (walk, bike, car-to-park).
  * <p>
- * It starts after Raptor transit data is created and stops when the health probe reports "UP"
- * (all updaters primed).
+ * It starts after Raptor transit data is created and stops when the health probe reports "UP" (all
+ * updaters primed).
  */
 class WarmupWorker implements Runnable {
 

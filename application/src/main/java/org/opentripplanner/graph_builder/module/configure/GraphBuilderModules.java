@@ -78,7 +78,7 @@ public class GraphBuilderModules {
 
   /**
    * TODO: The transfer analyzer should have its own search radius, it should not be a transfer
-   *       duration, since it is only used to find the nearby stops it analyzes.
+   * duration, since it is only used to find the nearby stops it analyzes.
    */
   private static final Duration ANALYZER_MAX_DURATION = Duration.ofMinutes(30);
 

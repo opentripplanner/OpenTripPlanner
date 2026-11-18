@@ -83,9 +83,8 @@ class VehicleParkingMapper {
   }
 
   /**
-   * Map the centroid to a coordinate. A parking lot without a valid coordinate cannot be linked
-   * to the street network, so a missing or invalid centroid is reported and {@code null} is
-   * returned.
+   * Map the centroid to a coordinate. A parking lot without a valid coordinate cannot be linked to
+   * the street network, so a missing or invalid centroid is reported and {@code null} is returned.
    */
   @Nullable
   private WgsCoordinate mapCoordinate(Parking parking) {

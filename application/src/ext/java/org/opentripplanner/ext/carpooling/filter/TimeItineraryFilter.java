@@ -27,13 +27,11 @@ import org.slf4j.LoggerFactory;
  *   <li><strong>EDT</strong> — earliest departure time = {@code requestedDateTime} (when
  *       {@code arriveBy = false}).</li>
  *   <li><strong>LDT</strong> — latest departure time = {@code requestedDateTime + searchWindow}
- *       (when
- *       {@code arriveBy = false}).</li>
+ *       (when {@code arriveBy = false}).</li>
  *   <li><strong>LAT</strong> — latest arrival time = {@code requestedDateTime} (when
  *       {@code arriveBy = true}).</li>
  *   <li><strong>EAT</strong> — earliest arrival time = {@code requestedDateTime − searchWindow}
- *       (when
- *       {@code arriveBy = true}).</li>
+ *       (when {@code arriveBy = true}).</li>
  * </ul>
  *
  * <h2>Rules</h2>

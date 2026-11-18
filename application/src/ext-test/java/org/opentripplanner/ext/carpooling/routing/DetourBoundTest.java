@@ -11,8 +11,7 @@ import org.opentripplanner.street.model.vertex.SimpleVertex;
 
 /**
  * A 10 km leg with a limit of 1500 s and a top speed of 10 m/s. Each kilometre takes at least 100
- * s,
- * so the leg itself takes at least 1000 s and leaves 500 s for a detour.
+ * s, so the leg itself takes at least 1000 s and leaves 500 s for a detour.
  */
 class DetourBoundTest {
 

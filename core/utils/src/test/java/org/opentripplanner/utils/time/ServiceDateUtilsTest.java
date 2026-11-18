@@ -158,7 +158,6 @@ public class ServiceDateUtilsTest {
   /// light savings is adjusted:
   /// - 29. March 2026 02:00 -> 03:00 First summer service-day start at 23:00, 1h overlap
   /// - 25. October 2026 03:00 -> 02:00 First winter service-day start at 01:00, 1h gap
-  ///
   @ParameterizedTest
   @CsvSource(
     value = """

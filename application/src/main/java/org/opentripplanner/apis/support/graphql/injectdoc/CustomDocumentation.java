@@ -55,8 +55,7 @@ public class CustomDocumentation {
    * text is resolved by:
    * <ol>
    *   <li>first looking up the given {@code key} + {@code ".description"}. If a value is found,
-   *       then
-   *       the value is returned.
+   *       then the value is returned.
    *   <li>then {@code key} + {@code ".description.append"} is used. If a value is found the
    *       {@code originalDoc} + {@code value} is returned.</li>
    * </ol>

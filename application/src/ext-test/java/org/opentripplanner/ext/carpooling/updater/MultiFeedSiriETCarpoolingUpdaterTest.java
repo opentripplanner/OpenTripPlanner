@@ -31,10 +31,10 @@ import org.opentripplanner.updater.trip.siri.updater.DefaultSiriETUpdaterParamet
  * feeds; their feedIds are the only thing that should keep their trips apart in the shared
  * repository.
  * <p>
- * The {@code processEstimatedTimetableDeliveries} pipeline is called once per updater per
- * polling cycle and receives only the deliveries fetched from that updater's source URL — there is
- * no per-call feed multiplexing inside a single delivery list, so the tests below invoke each
- * updater explicitly.
+ * The {@code processEstimatedTimetableDeliveries} pipeline is called once per updater per polling
+ * cycle and receives only the deliveries fetched from that updater's source URL — there is no
+ * per-call feed multiplexing inside a single delivery list, so the tests below invoke each updater
+ * explicitly.
  */
 class MultiFeedSiriETCarpoolingUpdaterTest {
 

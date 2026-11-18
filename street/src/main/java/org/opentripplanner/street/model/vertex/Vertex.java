@@ -265,7 +265,7 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
    * location.
    *
    * @see WgsCoordinate#sameLocation(WgsCoordinate)
-   **/
+   */
   public boolean sameLocation(Vertex other) {
     return new WgsCoordinate(getLat(), getLon()).sameLocation(
       new WgsCoordinate(other.getLat(), other.getLon())

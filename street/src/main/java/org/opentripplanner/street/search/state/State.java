@@ -144,8 +144,8 @@ public final class State implements AStarState<State, Edge, Vertex> {
    * Takes two nullable states and returns an array of states (possibly empty) which is guaranteed
    * to contain no nulls.
    * <p>
-   * This method is optimized for a low number of allocations and therefore doesn't use any
-   * streams or collections to filter out the nulls.
+   * This method is optimized for a low number of allocations and therefore doesn't use any streams
+   * or collections to filter out the nulls.
    */
   public static State[] ofNullable(@Nullable State s1, @Nullable State s2) {
     if (s1 == null && s2 == null) {

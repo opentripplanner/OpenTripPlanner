@@ -56,15 +56,14 @@ public class TripPatternCache {
    * checked by stop pattern; if no entry exists, a new realtime-modified pattern is created,
    * stored, and returned.
    * <p>
-   * The caller is responsible for resolving {@code originalTripPattern} before calling this
-   * method.
+   * The caller is responsible for resolving {@code originalTripPattern} before calling this method.
    *
-   * @param stopPattern         stop pattern to retrieve/create a trip pattern for
-   * @param trip                trip whose route, mode, and submode are copied when a new pattern is
-   *     created; also used to generate the new pattern's id
+   * @param stopPattern stop pattern to retrieve/create a trip pattern for
+   * @param trip trip whose route, mode, and submode are copied when a new pattern is created; also
+   *     used to generate the new pattern's id
    * @param originalTripPattern the current pattern for {@code trip} — either the static scheduled
-   *     pattern, or a previously RT-modified pattern if the trip was already
-   *     updated. {@code null} for genuinely new added trips.
+   *     pattern, or a previously RT-modified pattern if the trip was already updated. {@code null}
+   *     for genuinely new added trips.
    * @return the original, cached, or newly created trip pattern
    */
   public synchronized TripPattern getOrCreateTripPattern(

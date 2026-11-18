@@ -111,8 +111,8 @@ public class ParameterBuilder {
    * the value passed to {@code #asNnnn(defaultValue)} is derived from other parameters and the
    * <em>code</em> default is just a fallback.
    * <p>
-   * If the given default value is not of type String, then {@code String.valueOf(defaultValue)}
-   * is applied, there is
+   * If the given default value is not of type String, then {@code String.valueOf(defaultValue)} is
+   * applied, there is
    */
   public ParameterBuilder docDefaultValue(Object defaultValue) {
     this.docDefaultValue = defaultValue;
@@ -214,8 +214,8 @@ public class ParameterBuilder {
 
   /**
    * @deprecated Avoid using required enum types, when adding/removing new Enum values you
-   *     potentially break forward/backward compatibility. If the new enum value is used in
-   *     the config, an earlier version of OTP can not read the required value.
+   *     potentially break forward/backward compatibility. If the new enum value is used in the
+   *     config, an earlier version of OTP can not read the required value.
    */
   @Deprecated
   public <T extends Enum<T>> T asEnum(Class<T> enumType) {

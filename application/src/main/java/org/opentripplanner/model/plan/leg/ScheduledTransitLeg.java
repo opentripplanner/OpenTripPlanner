@@ -431,8 +431,8 @@ public class ScheduledTransitLeg implements TransitLeg {
   /**
    * Should be used for debug logging only
    * <p>
-   * The {@code legGeometry} and {@code transitAlerts} are skipped to avoid spamming logs.
-   * Explicit access should be used if needed.
+   * The {@code legGeometry} and {@code transitAlerts} are skipped to avoid spamming logs. Explicit
+   * access should be used if needed.
    */
   @Override
   public String toString() {

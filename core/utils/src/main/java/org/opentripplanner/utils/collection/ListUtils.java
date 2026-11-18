@@ -70,7 +70,7 @@ public class ListUtils {
    *
    * @param maxSize the maximum number of elements in each sublist, must be at least 1
    * @throws IllegalArgumentException if {@code maxSize} is less than 1
-   * @throws NullPointerException     if {@code list} is {@code null}
+   * @throws NullPointerException if {@code list} is {@code null}
    */
   public static <T> List<List<T>> partition(List<T> list, int maxSize) {
     if (maxSize < 1) {

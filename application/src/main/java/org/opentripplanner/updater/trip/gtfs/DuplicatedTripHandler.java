@@ -103,8 +103,7 @@ class DuplicatedTripHandler {
 
   /// The spec is silent about how these ids should be constructed, so we create a new ID ourselves.
   /// It is therefore not possible to send a spec-compliant vehicle position update for this trip.
-  /// If
-  /// this is a requirement, then we need to update the spec.
+  /// If this is a requirement, then we need to update the spec.
   private static FeedScopedId duplicatedTripId(TripUpdate tripUpdate) {
     var localDateTime = tripUpdate.startDate().atTime(tripUpdate.startTime().orElseThrow());
     return new FeedScopedId(

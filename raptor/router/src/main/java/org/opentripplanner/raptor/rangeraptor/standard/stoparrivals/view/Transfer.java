@@ -17,8 +17,8 @@ final class Transfer<T extends RaptorTripSchedule> extends StopArrivalViewAdapte
   private final ArrivalView<T> previous;
 
   /**
-   * The values are copied from the mutable state, so the arrival and its chain stay valid after
-   * the state is overwritten by the following iterations.
+   * The values are copied from the mutable state, so the arrival and its chain stay valid after the
+   * state is overwritten by the following iterations.
    */
   Transfer(int round, int stop, StopArrivalState<T> arrival, StopsCursor<T> cursor) {
     super(round, stop);

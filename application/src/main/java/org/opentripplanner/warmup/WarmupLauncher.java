@@ -40,9 +40,9 @@ public class WarmupLauncher {
   /**
    * Start the application warmup thread if configured and applicable.
    * <p>
-   * No warmup is started if parameters are null (warmup section absent in router-config.json),
-   * if no updaters are configured (health probe would immediately return "UP"), or if the selected
-   * API schema is not available.
+   * No warmup is started if parameters are null (warmup section absent in router-config.json), if
+   * no updaters are configured (health probe would immediately return "UP"), or if the selected API
+   * schema is not available.
    */
   public void start() {
     if (parameters == null) {

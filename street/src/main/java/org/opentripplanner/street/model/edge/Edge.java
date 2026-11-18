@@ -107,8 +107,8 @@ public abstract class Edge implements AStarEdge<State, Edge, Vertex>, Serializab
    * makes edge lookups in sets and maps efficient and avoids ambiguity during graph construction,
    * where structurally similar edges may coexist.
    * <p>
-   * <strong>Do not use this method to test whether two edges represent the same street segment
-   * or share the same content.</strong>
+   * <strong>Do not use this method to test whether two edges represent the same street segment or
+   * share the same content.</strong>
    */
   @Override
   public boolean equals(Object o) {
@@ -172,8 +172,8 @@ public abstract class Edge implements AStarEdge<State, Edge, Vertex>, Serializab
    * Returns true if this edge has a generated name that is derived from its properties, like
    * "path", "stairs" or "tunnel".
    * <p>
-   * Returns false if the field reflects the real world name, like "Fifth Avenue", "Hauptstraße"
-   * or "Øvre Holmegate".
+   * Returns false if the field reflects the real world name, like "Fifth Avenue", "Hauptstraße" or
+   * "Øvre Holmegate".
    */
   public boolean nameIsDerived() {
     return false;

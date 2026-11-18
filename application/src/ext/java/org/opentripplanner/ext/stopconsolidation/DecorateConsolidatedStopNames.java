@@ -41,9 +41,9 @@ public class DecorateConsolidatedStopNames implements ItineraryDecorator {
    * its name with the primary name of the agency that is operating the route, so that the name in
    * the result matches the physical signage on the stop.
    * <p>
-   * If the leg has a "to" stop that is a primary stop, then we don't want to show the stop
-   * that's on the signage but what is shown _inside_ the vehicle. That's why we use the
-   * agency-specific (aka secondary) stop.
+   * If the leg has a "to" stop that is a primary stop, then we don't want to show the stop that's
+   * on the signage but what is shown _inside_ the vehicle. That's why we use the agency-specific
+   * (aka secondary) stop.
    * <p>
    * This follows the somewhat idiosyncratic logic of the consolidated stops feature.
    */

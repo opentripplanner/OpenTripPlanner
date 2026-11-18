@@ -137,9 +137,9 @@ public class Station
    * GTFS feeds. This should work by adding adjusting the cost for all board-/alight- events in the
    * routing search.
    * <p>
-   * To not interfere with request parameters this must be implemented in a neutral way. This
-   * mean that the {@link StopTransferPriority#ALLOWED} (which is default) should a nett-effect of
-   * adding 0 - zero cost.
+   * To not interfere with request parameters this must be implemented in a neutral way. This mean
+   * that the {@link StopTransferPriority#ALLOWED} (which is default) should a nett-effect of adding
+   * 0 - zero cost.
    */
   public StopTransferPriority getPriority() {
     return priority;

@@ -24,8 +24,8 @@ import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
  * commits. Request threads read a snapshot resolved at the start of the request, through the
  * request-scoped {@link org.opentripplanner.transit.service.TransitService}.
  * <p>
- * The trip calendar is included here (rather than being its own repository) because every
- * consumer that needs realtime timetable data also needs the calendar — new service ids created for
+ * The trip calendar is included here (rather than being its own repository) because every consumer
+ * that needs realtime timetable data also needs the calendar — new service ids created for
  * real-time-added trips must be visible in the same transaction as the trips that use them.
  */
 public interface TimetableRepositorySnapshot {
@@ -67,8 +67,8 @@ public interface TimetableRepositorySnapshot {
   Collection<Route> listRoutes();
 
   /**
-   * Return the trip for the given id, including trips created by real-time updates, falling back
-   * to the scheduled trip if there is no real-time-added trip with this id.
+   * Return the trip for the given id, including trips created by real-time updates, falling back to
+   * the scheduled trip if there is no real-time-added trip with this id.
    */
   @Nullable
   Trip getTrip(FeedScopedId id);
@@ -85,8 +85,8 @@ public interface TimetableRepositorySnapshot {
   Collection<Trip> listTrips();
 
   /**
-   * Return true if a trip with the given id exists, either in the scheduled data or among the
-   * trips created by real-time updates.
+   * Return true if a trip with the given id exists, either in the scheduled data or among the trips
+   * created by real-time updates.
    */
   boolean containsTrip(FeedScopedId id);
 
@@ -161,8 +161,8 @@ public interface TimetableRepositorySnapshot {
   Collection<TripPattern> findPatterns(StopLocation stop, boolean includeRealtimeUpdates);
 
   /**
-   * Return the routes of the scheduled trip patterns and of the flex trips visiting the given
-   * stop. Routes created by real-time updates are not included.
+   * Return the routes of the scheduled trip patterns and of the flex trips visiting the given stop.
+   * Routes created by real-time updates are not included.
    */
   Set<Route> findRoutes(StopLocation stop);
 
@@ -191,8 +191,8 @@ public interface TimetableRepositorySnapshot {
   FlexIndex getFlexIndex();
 
   /**
-   * Checks if the last scheduled service date for the stop is on or after the given date. This
-   * does not include real-time updates.
+   * Checks if the last scheduled service date for the stop is on or after the given date. This does
+   * not include real-time updates.
    */
   boolean hasScheduledServicesAfter(LocalDate date, StopLocation stop);
 

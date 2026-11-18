@@ -36,8 +36,8 @@ public interface StopLocation extends LogInfo, TransitEntity {
    * This is used to optimize routing, we do not access the stop instance only keep the {code
    * index}. The index will not change.
    * <p>
-   * Do NOT expose this index in the APIs, it is not guaranteed to be the same across different
-   * OTP instances, use the {code id} for external references.
+   * Do NOT expose this index in the APIs, it is not guaranteed to be the same across different OTP
+   * instances, use the {code id} for external references.
    */
   int getIndex();
 

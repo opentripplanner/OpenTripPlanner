@@ -68,8 +68,8 @@ public class TestArrivals {
   }
 
   /// This finds the first boarding after the previous arrival. This might not be correct. A none
-  /// zero board-slack or constrained transfer could cause problems, if needed, add andother
-  /// factory method.
+  /// zero board-slack or constrained transfer could cause problems, if needed, add andother factory
+  /// method.
   public static ArrivalView<TestTripSchedule> bus(
     int round,
     int stop,

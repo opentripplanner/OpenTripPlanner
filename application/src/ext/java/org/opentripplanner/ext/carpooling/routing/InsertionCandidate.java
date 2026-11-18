@@ -18,9 +18,9 @@ import org.opentripplanner.transit.model.site.StopLocation;
  * - Timing information
  * </pre>
  * <p>
- * {@code pickupPosition} and {@code dropoffPosition} are 0-based indices of the passenger's
- * pickup and dropoff stops in the modified route (the route after the passenger's stops have been
- * inserted into the carpool trip).
+ * {@code pickupPosition} and {@code dropoffPosition} are 0-based indices of the passenger's pickup
+ * and dropoff stops in the modified route (the route after the passenger's stops have been inserted
+ * into the carpool trip).
  */
 public record InsertionCandidate(
   CarpoolTrip trip,

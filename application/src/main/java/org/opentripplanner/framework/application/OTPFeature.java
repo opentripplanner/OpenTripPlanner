@@ -11,8 +11,7 @@ import org.slf4j.LoggerFactory;
 /**
  * The purpose of this class is to be able to turn features on and off.
  * <p>
- * This configuration is optional and found under "feature" in the top level 'otp-config.json'
- * file.
+ * This configuration is optional and found under "feature" in the top level 'otp-config.json' file.
  */
 public enum OTPFeature {
   AlertMetrics(

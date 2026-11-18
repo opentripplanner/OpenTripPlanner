@@ -28,14 +28,14 @@ public final class StopArrival {
   public final ViaLocationType viaLocationType;
 
   /**
-   * @param arrival          The time the rider will arrive at the place.
-   * @param departure        The time the rider will depart the place.
+   * @param arrival The time the rider will arrive at the place.
+   * @param departure The time the rider will depart the place.
    * @param stopPosInPattern For transit trips, the stop index (numbered from zero from the start of
    *     the trip).
    * @param gtfsStopSequence For transit trips, the sequence number of the stop. Per GTFS, these
    *     numbers are increasing.
-   * @param viaLocationType  Categorization for a via location, if the place is a via location in
-   *     the request.
+   * @param viaLocationType Categorization for a via location, if the place is a via location in the
+   *     request.
    */
   public StopArrival(
     Place place,

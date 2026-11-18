@@ -67,7 +67,9 @@ public record LinkedGraph(Graph rawGraph, DefaultDataImportIssueStore issueStore
     return new GraphSummarizer(rawGraph).summarizeEdges();
   }
 
-  /** A link that draws the graph on a map, for the message of a failing {@link #summarizeEdges()}. */
+  /**
+   * A link that draws the graph on a map, for the message of a failing {@link #summarizeEdges()}.
+   */
   public String geoJsonUrl() {
     return new GraphSummarizer(rawGraph).geoJsonUrl();
   }

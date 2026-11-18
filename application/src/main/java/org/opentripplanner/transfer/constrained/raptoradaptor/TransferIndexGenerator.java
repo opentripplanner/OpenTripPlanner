@@ -119,7 +119,6 @@ public class TransferIndexGenerator {
    * RoutingTripPattern is created (index = N), and routing tries result.toStop(N) on a cached array
    * of size N, it throws IndexOutOfBoundsException. Hence, the additional check against the
    * previous processed number of patterns.
-   *
    */
   private boolean isCacheValid(int nPatterns) {
     return !dirty && nPatterns == prevProcessedNumberOfPatterns && cachedResult != null;

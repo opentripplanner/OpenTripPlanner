@@ -105,8 +105,7 @@ public class GeometryUtils {
   /// Concatenate a number of [LineString]s.
   ///
   /// This method also ensures that if the first coordinate of a consecutive line string is
-  /// identical
-  /// with the last one of the previous line string, it is only added once to the result.
+  /// identical with the last one of the previous line string, it is only added once to the result.
   ///
   /// For the best performance and lowest number of allocations pass in an [Iterable] rather than a
   /// materialized [Collection].
@@ -329,8 +328,8 @@ public class GeometryUtils {
   /**
    * Split a line string into its constituent segments and convert each into an envelope.
    * <p>
-   * All segments form the complete line string again so [A,B,C,D] will be split into the
-   * segments [[A,B],[B,C],[C,D]].
+   * All segments form the complete line string again so [A,B,C,D] will be split into the segments
+   * [[A,B],[B,C],[C,D]].
    */
   public static Stream<Envelope> toEnvelopes(LineString ls) {
     CoordinateSequence seq = ls.getCoordinateSequence();

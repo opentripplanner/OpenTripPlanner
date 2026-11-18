@@ -11,9 +11,9 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * <p>
  * Note: The returned iterators do not implement the {@code Flyweight} pattern described in
  * {@link org.opentripplanner.raptor.spi.RaptorTransferDataProvider} - each
- * {@link DefaultRaptorTransfer}
- * is a normal, independent object. Raptor does not consume flyweight-style transfer iterators
- * anymore; this can be revisited once that support is added on the routing side.
+ * {@link DefaultRaptorTransfer} is a normal, independent object. Raptor does not consume
+ * flyweight-style transfer iterators anymore; this can be revisited once that support is added on
+ * the routing side.
  * <p>
  * This class is immutable and thread-safe.
  */

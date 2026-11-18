@@ -10,8 +10,8 @@ import org.opentripplanner.raptor.spi.RaptorConstants;
  */
 public interface RaptorStopIndex {
   /**
-   * The raptor stop index of the stop, or {@link RaptorConstants#NOT_FOUND} if the id is not in
-   * the index.
+   * The raptor stop index of the stop, or {@link RaptorConstants#NOT_FOUND} if the id is not in the
+   * index.
    */
   int toStopIndex(FeedScopedId stopId);
 
@@ -23,8 +23,8 @@ public interface RaptorStopIndex {
   FeedScopedId toStopId(int stopIndex);
 
   /**
-   * The size of the index space: all valid stop indexes are in {@code [0, size())}. Some indexes
-   * in the range may not be used.
+   * The size of the index space: all valid stop indexes are in {@code [0, size())}. Some indexes in
+   * the range may not be used.
    */
   int size();
 }

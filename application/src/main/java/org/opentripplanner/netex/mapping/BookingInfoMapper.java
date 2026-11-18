@@ -28,8 +28,7 @@ import org.opentripplanner.transit.model.timetable.booking.BookingTime;
  * Maps booking info from NeTEx BookingArrangements, FlexibleServiceProperties, and FlexibleLine
  * into OTP BookingInfo.
  * <p>
- * The precedence is as follows: 1. BookingArrangements 2. FlexibleServiceProperties 3.
- * FlexibleLine
+ * The precedence is as follows: 1. BookingArrangements 2. FlexibleServiceProperties 3. FlexibleLine
  */
 public class BookingInfoMapper {
 

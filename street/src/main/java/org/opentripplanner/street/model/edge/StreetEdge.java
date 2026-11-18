@@ -49,8 +49,8 @@ public class StreetEdge
 
   /**
    * Fixed extra weight (about 10 minutes of walking) added once when a wheelchair user crosses a
-   * wheelchair-inaccessible barrier vertex, e.g. a raised kerb. It is a point obstacle, so the
-   * cost does not depend on the length of the adjacent edges.
+   * wheelchair-inaccessible barrier vertex, e.g. a raised kerb. It is a point obstacle, so the cost
+   * does not depend on the length of the adjacent edges.
    */
   private static final double WHEELCHAIR_INACCESSIBLE_BARRIER_COST = 600;
 
@@ -166,8 +166,8 @@ public class StreetEdge
    * This checks if start or end vertex is bollard If it is it creates intersection of street edge
    * permissions and from/to barriers. Then it checks if mode is allowed to traverse the edge.
    * <p>
-   * By default CAR isn't allowed to traverse barrier but foot and bicycle are. This can be
-   * changed with different tags
+   * By default CAR isn't allowed to traverse barrier but foot and bicycle are. This can be changed
+   * with different tags
    * <p>
    * If start/end isn't bollard it just checks the street permissions.
    * <p>
@@ -395,9 +395,8 @@ public class StreetEdge
   }
 
   /**
-   * Update the name of the edge after it has been constructed and set the
-   * nameIsDerived property to false, indicating to the code that maps from edges to steps that this
-   * is a real street name.
+   * Update the name of the edge after it has been constructed and set the nameIsDerived property to
+   * false, indicating to the code that maps from edges to steps that this is a real street name.
    *
    * @see Edge#nameIsDerived()
    */
@@ -1065,7 +1064,7 @@ public class StreetEdge
    * Interpolate between flat distance and slope-adjusted distance. Formula: flat + (sloped - flat)
    * × sensitivity = flat × (1 - sensitivity) + sloped × sensitivity
    *
-   * @param slopedDistance   the slope-adjusted effective distance
+   * @param slopedDistance the slope-adjusted effective distance
    * @param slopeSensitivity 0.0 = ignore slope (use flat distance), 1.0 = full slope effect
    */
   private double interpolateSlopeEffect(double slopedDistance, double slopeSensitivity) {
@@ -1130,9 +1129,9 @@ public class StreetEdge
 
   /**
    * Checks if the vertex is a {@link BarrierVertex} that is wheelchair-inaccessible, e.g. a
-   * {@code barrier=kerb} node without a {@code kerb=flush/lowered/no} tag. Only the edge ending
-   * at the vertex is charged, so that crossing the barrier is penalised once, not once per
-   * adjacent edge.
+   * {@code barrier=kerb} node without a {@code kerb=flush/lowered/no} tag. Only the edge ending at
+   * the vertex is charged, so that crossing the barrier is penalised once, not once per adjacent
+   * edge.
    */
   private static boolean isWheelchairInaccessibleBarrier(Vertex vertex) {
     return (

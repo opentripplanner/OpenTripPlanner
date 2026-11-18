@@ -23,8 +23,8 @@ import org.opentripplanner.utils.text.FileSizeToTextConverter;
  * The data source metadata should be fetched once. The data is NOT updated even if the source
  * itself changes. If this happens it might cause the streaming to fail.
  * <p>
- * Concurrent modifications to underlying data-sources is not accounted for, and there is no need
- * to support that in the implementation of this class. This means that we assume all input- and
+ * Concurrent modifications to underlying data-sources is not accounted for, and there is no need to
+ * support that in the implementation of this class. This means that we assume all input- and
  * output-files in OTP are stable (not changed in any way) during the period OTP need to access
  * these files.
  */
@@ -51,8 +51,8 @@ public interface DataSource {
   /**
    * Return the URI of the datasource. The URI can be used to identify uniquely the data source.
    * <p>
-   * Note! Do NOT use this to load the file(s), use the datasource abstraction - if you bypass
-   * the framework your code might not work with all supported datasources like filesystems,
+   * Note! Do NOT use this to load the file(s), use the datasource abstraction - if you bypass the
+   * framework your code might not work with all supported datasources like filesystems,
    * zip-archives and cloud storage.
    */
   URI uri();
@@ -85,8 +85,8 @@ public interface DataSource {
 
   /**
    * @return {@code true} if it is possible to write to data source. Also, return {@code true} if if
-   *     it is not easy to check. No guarantee is given and the {@link #asOutputStream()} may
-   *     fail. This method can be used to avoid consuming a lot of resource before writing to a
+   *     it is not easy to check. No guarantee is given and the {@link #asOutputStream()} may fail.
+   *     This method can be used to avoid consuming a lot of resource before writing to a
    *     datasource, if this method return {@code false}.
    */
   default boolean isWritable() {
@@ -97,8 +97,7 @@ public interface DataSource {
    * Connect to this data source and make it available as an input stream. The caller is responsible
    * to close the connection.
    * <p>
-   * Note! This method might get called several times, and each time a new Stream should be
-   * created.
+   * Note! This method might get called several times, and each time a new Stream should be created.
    */
   default InputStream asInputStream() {
     throw new UnsupportedOperationException(

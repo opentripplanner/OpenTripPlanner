@@ -93,7 +93,7 @@ public class SimpleIntersectionTraversalCalculator
 
   /**
    * Since doing a left turn on a bike is quite dangerous we add a duration for it
-   **/
+   */
   public double getAcrossTrafficBicycleTurnMultiplier() {
     return acrossTrafficBicycleTurnMultiplier;
   }
@@ -103,7 +103,7 @@ public class SimpleIntersectionTraversalCalculator
    * multiple traffic lights which are synchronized. Therefore, this penalty should not be too high,
    * so it's reasonable on average until we have implemented some logic for combining these traffic
    * lights in intersections.
-   **/
+   */
   public double getExpectedWalkingAndCyclingTrafficLightTimeSec() {
     return 15;
   }
@@ -124,8 +124,8 @@ public class SimpleIntersectionTraversalCalculator
   /**
    * Returns if this angle represents a turn across incoming traffic.
    * <p>
-   * In right hand traffic countries (US) this is a left turn. In left hand traffic (UK)
-   * countries this is a right turn.
+   * In right hand traffic countries (US) this is a left turn. In left hand traffic (UK) countries
+   * this is a right turn.
    */
   protected boolean isTurnAcrossTraffic(int turnAngle) {
     return switch (drivingDirection) {

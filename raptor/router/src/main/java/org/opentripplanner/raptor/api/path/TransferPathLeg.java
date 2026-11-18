@@ -21,10 +21,10 @@ public final class TransferPathLeg<T extends RaptorTripSchedule> implements Path
 
   /**
    * @param toStop the stop this transfer leg arrives at, travelling in the direction from origin to
-   *     destination. This must be passed in rather than derived from
-   *     {@code transfer.stop()}: in a reverse search, a transfer obtained through
-   *     {@code RaptorTransitDataProvider#getTransfersToStop(int)} reports {@code stop()}
-   *     as the leg's origin, not its destination (see
+   *     destination. This must be passed in rather than derived from {@code transfer.stop()}: in a
+   *     reverse search, a transfer obtained through
+   *     {@code RaptorTransitDataProvider#getTransfersToStop(int)} reports {@code stop()} as the
+   *     leg's origin, not its destination (see
    *     {@link org.opentripplanner.raptor.path.PathBuilderLeg#transferLeg}).
    */
   public TransferPathLeg(

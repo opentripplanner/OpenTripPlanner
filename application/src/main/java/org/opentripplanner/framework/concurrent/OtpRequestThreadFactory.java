@@ -15,8 +15,8 @@ import org.opentripplanner.framework.application.LogMDCSupport;
  * The ActuatorAPI is a border-line use-cases for this; It is included because there is no risk
  * involved and that is the simplest solution.
  * <p>
- * We do not apply this to the main grizzly threads either. The factory is used for "child"
- * threads and the "grizzly" threads are the root parents.
+ * We do not apply this to the main grizzly threads either. The factory is used for "child" threads
+ * and the "grizzly" threads are the root parents.
  */
 public class OtpRequestThreadFactory implements ThreadFactory {
 

@@ -103,8 +103,8 @@ public class RequestScopedModule {
   }
 
   /**
-   * The regular-transfer snapshot of this request's {@link TransactionScope}, so the transfers
-   * used for routing and the paths recovered for the itineraries come from the same snapshot.
+   * The regular-transfer snapshot of this request's {@link TransactionScope}, so the transfers used
+   * for routing and the paths recovered for the itineraries come from the same snapshot.
    */
   @Provides
   @HttpRequestScoped

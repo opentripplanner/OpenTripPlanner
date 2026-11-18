@@ -17,10 +17,9 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexLabel;
 
 /**
- * Verifies that a node which is wheelchair-inaccessible but does not restrict any other travel
- * mode (e.g. {@code barrier=kerb} with a raised/rolled kerb) still gets its own
- * {@link BarrierVertex}, even when it sits in the middle of a way rather than at an
- * OSM-level intersection.
+ * Verifies that a node which is wheelchair-inaccessible but does not restrict any other travel mode
+ * (e.g. {@code barrier=kerb} with a raised/rolled kerb) still gets its own {@link BarrierVertex},
+ * even when it sits in the middle of a way rather than at an OSM-level intersection.
  */
 class WheelchairBarrierNodeTest {
 

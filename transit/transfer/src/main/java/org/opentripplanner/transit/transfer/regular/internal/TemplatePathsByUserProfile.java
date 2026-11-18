@@ -12,8 +12,8 @@ import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUser
 
 /**
  * The {@code P} path templates generated at graph build, keyed by
- * {@code (userPreferences, fromStop, toStop)}. Each user preferences key is a transfer profile,
- * its paths are held by a {@link TemplatePathsByStop}.
+ * {@code (userPreferences, fromStop, toStop)}. Each user preferences key is a transfer profile, its
+ * paths are held by a {@link TemplatePathsByStop}.
  * <p>
  * Written only at graph build, by the build repository. Once the build repository is sealed, this
  * map is never modified again: it is the immutable base the runtime repository and all its
@@ -85,8 +85,8 @@ final class TemplatePathsByUserProfile<P> implements Serializable {
   }
 
   /**
-   * Distances within this limit are equal. The distance is a sum of floating point numbers, so
-   * two distances that are the same by the numbers can differ in the last digits.
+   * Distances within this limit are equal. The distance is a sum of floating point numbers, so two
+   * distances that are the same by the numbers can differ in the last digits.
    */
   static final double DISTANCE_EPSILON = 1e-9;
 

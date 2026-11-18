@@ -175,11 +175,11 @@ public class TimeUtils {
   /**
    * This method take a date, a time in seconds and a zoneId and create a {@link ZonedDateTime}.
    * <p>
-   * This method follow the GTFS specification for time: "The time is measured from 'noon minus
-   * 12h' of the service day (effectively midnight except for days on which daylight savings time
-   * changes occur." See https://developers.google.com/transit/gtfs/reference#field_types
+   * This method follow the GTFS specification for time: "The time is measured from 'noon minus 12h'
+   * of the service day (effectively midnight except for days on which daylight savings time changes
+   * occur." See https://developers.google.com/transit/gtfs/reference#field_types
    *
-   * @param date    the "service" date
+   * @param date the "service" date
    * @param seconds number of seconds since noon minus 12 hours (midnight).
    */
   public static ZonedDateTime zonedDateTime(LocalDate date, int seconds, ZoneId zoneId) {
@@ -290,7 +290,6 @@ public class TimeUtils {
   }
 
   /**
-   *
    * Truncates the time to the nearest second. If the given {@code dateTime} is {@code null}, then
    * {@code null} is returned
    */

@@ -50,20 +50,19 @@ import org.opentripplanner.utils.lang.StringUtils;
  *   <li>An optional leading {@link StreetLeg} (WALK) from the passenger-side location (origin for
  *       direct/access, transit stop for egress) to the snapped carpool pickup vertex.</li>
  *   <li>A {@link CarpoolLeg} covering the shared ride between pickup and dropoff. The boarding
- *       dwell
- *       at the pickup is included in this leg's duration, not added before it.</li>
+ *       dwell at the pickup is included in this leg's duration, not added before it.</li>
  *   <li>An optional trailing {@link StreetLeg} (WALK) from the snapped dropoff vertex to the
  *       dropoff-side location (destination for direct/egress, transit stop for access).</li>
  * </ol>
  *
  * <h2>Time Calculation</h2>
  * <p>
- * The carpool leg's start time is the moment the driver arrives at the pickup (trip start +
- * pickup travel). If a leading walk leg exists, its start is back-shifted by the walk's duration;
- * the trailing walk leg's end is forward-shifted similarly. The itinerary is <em>not</em> shifted
- * to match the passenger's requested departure time — the driver is on a committed schedule and
- * cannot wait. Whether the passenger should show up early or be matched at all is a filtering
- * concern upstream of this mapper.
+ * The carpool leg's start time is the moment the driver arrives at the pickup (trip start + pickup
+ * travel). If a leading walk leg exists, its start is back-shifted by the walk's duration; the
+ * trailing walk leg's end is forward-shifted similarly. The itinerary is <em>not</em> shifted to
+ * match the passenger's requested departure time — the driver is on a committed schedule and cannot
+ * wait. Whether the passenger should show up early or be matched at all is a filtering concern
+ * upstream of this mapper.
  *
  * <h2>Place naming</h2>
  * <p>
@@ -74,14 +73,11 @@ import org.opentripplanner.utils.lang.StringUtils;
  *       {@link Place#forStop(StopLocation)}.</li>
  *   <li>Else if the endpoint is the user's input location, label with the user-supplied label when
  *       present, falling back to the localized {@code "origin"} / {@code "destination"} names that
- *       the
- *       standard request flow produces.
+ *       the standard request flow produces.
  *   <li>Else (intermediate boundaries between walk and carpool legs) fall back to vertex-based
- *       naming
- *       via {@link #makePlace(Vertex)}: {@link StreetVertex#getIntersectionName()} for street
- *       intersections (composed from OSM street names; mode-agnostic), the vertex's pre-set name
- *       for
- *       {@link TemporaryStreetLocation}s.</li>
+ *       naming via {@link #makePlace(Vertex)}: {@link StreetVertex#getIntersectionName()} for
+ *       street intersections (composed from OSM street names; mode-agnostic), the vertex's pre-set
+ *       name for {@link TemporaryStreetLocation}s.</li>
  * </ol>
  *
  * <h2>Package Location</h2>
@@ -104,14 +100,14 @@ public class CarpoolItineraryMapper {
    * {@link StreetLeg} from the passenger's origin to the snapped pickup vertex and optionally
    * followed by a WALK leg from the snapped dropoff vertex to the destination.
    *
-   * @param candidate         the insertion candidate containing route segments, trip details, and
-   *     optional walk paths around the carpool pickup/dropoff
+   * @param candidate the insertion candidate containing route segments, trip details, and optional
+   *     walk paths around the carpool pickup/dropoff
    * @param carpoolReluctance multiplier applied to ride seconds when computing the carpool leg's
    *     {@code generalizedCost}.
-   * @param fromLocation      the request's {@code from} location (passenger origin), used to label
-   *     the first leg's {@code from} place.
-   * @param toLocation        the request's {@code to} location (passenger destination), used to
-   *     label the last leg's {@code to} place.
+   * @param fromLocation the request's {@code from} location (passenger origin), used to label the
+   *     first leg's {@code from} place.
+   * @param toLocation the request's {@code to} location (passenger destination), used to label the
+   *     last leg's {@code to} place.
    * @return an itinerary for the passenger's journey, or {@code null} if the candidate has no
    *     shared segments (a safety check that should not trigger for valid candidates)
    */
@@ -233,9 +229,9 @@ public class CarpoolItineraryMapper {
    * their corresponding path is {@code null}; the walk legs' outer times are derived from
    * {@code carpoolStart}/{@code carpoolEnd} plus the walk durations.
    * <p>
-   * Boundary-place precedence at the chain's outermost endpoints follows the
-   * {@link EndpointLabel} contract: a stop wins over a user location, which wins over the
-   * vertex-derived fallback name via {@link #makePlace(Vertex)}.
+   * Boundary-place precedence at the chain's outermost endpoints follows the {@link EndpointLabel}
+   * contract: a stop wins over a user location, which wins over the vertex-derived fallback name
+   * via {@link #makePlace(Vertex)}.
    */
   private static Itinerary buildItinerary(
     List<StreetPath> pathsWithNewPassenger,
@@ -309,19 +305,18 @@ public class CarpoolItineraryMapper {
    * bookable in advance. See
    * {@code org.opentripplanner.apis.transmodel.mapping.BookingInfoMapper#mapToBookWhen}.
    *
-   * @param contact       the trip's public-contact details, or {@code null} if the trip publishes
-   *     none.
+   * @param contact the trip's public-contact details, or {@code null} if the trip publishes none.
    * @param tripStartTime the driver's trip start time; only the time-of-day is used, as the
    *     placeholder source for {@code latestBookingTime}.
-   * @param pickup        the carpool boarding coordinate (where the passenger gets into the car),
-   *     expanded into the booking URL's {@code {from}} placeholder.
-   * @param dropoff       the carpool alighting coordinate (where the passenger gets out of the
-   *     car), expanded into the booking URL's {@code {to}} placeholder.
+   * @param pickup the carpool boarding coordinate (where the passenger gets into the car), expanded
+   *     into the booking URL's {@code {from}} placeholder.
+   * @param dropoff the carpool alighting coordinate (where the passenger gets out of the car),
+   *     expanded into the booking URL's {@code {to}} placeholder.
    * @return a booking info populated with the contact details and derived booking methods
    *     (CALL_OFFICE if phone is set, ONLINE if a booking URL is set), or {@code null} when no
    *     actionable booking method can be derived — i.e. {@code contact} is {@code null}, or it
-   *     carries neither a phone number nor a booking URL. Consumers may therefore treat a
-   *     non-null return as "this leg has at least one booking method."
+   *     carries neither a phone number nor a booking URL. Consumers may therefore treat a non-null
+   *     return as "this leg has at least one booking method."
    */
   @Nullable
   static BookingInfo toBookingInfo(

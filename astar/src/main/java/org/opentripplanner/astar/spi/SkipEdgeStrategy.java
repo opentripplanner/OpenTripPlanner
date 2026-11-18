@@ -14,7 +14,7 @@ public interface SkipEdgeStrategy<
 > {
   /**
    * @param current the current vertex
-   * @param edge    the current edge to potentially be skipped
+   * @param edge the current edge to potentially be skipped
    * @return true if the given edge should not be considered for traversal
    */
   boolean shouldSkipEdge(State current, Edge edge);

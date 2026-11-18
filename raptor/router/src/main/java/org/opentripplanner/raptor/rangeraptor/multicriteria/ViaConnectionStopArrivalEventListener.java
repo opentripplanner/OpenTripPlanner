@@ -59,8 +59,7 @@ public final class ViaConnectionStopArrivalEventListener<T extends RaptorTripSch
 
   /**
    * @param publishTransfersEventHandler A callback used to publish via-transfer-connections. This
-   *     should be done in the same phase as all other transfers
-   *     processed by the Raptor algorithm.
+   *     should be done in the same phase as all other transfers processed by the Raptor algorithm.
    */
   private ViaConnectionStopArrivalEventListener(
     McStopArrivalFactory<T> stopArrivalFactory,

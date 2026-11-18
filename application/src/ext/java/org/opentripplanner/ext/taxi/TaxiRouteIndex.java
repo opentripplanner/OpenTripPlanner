@@ -19,8 +19,8 @@ import org.opentripplanner.street.geometry.WgsCoordinate;
  * prepared geometries are much faster than plain {@link org.locationtech.jts.geom.Geometry} for
  * repeated contains/intersects checks.
  * <p>
- * TODO: Multi-provider support. Currently only the first matching route is used. In the future
- * all matching providers should be available so users can choose.
+ * TODO: Multi-provider support. Currently only the first matching route is used. In the future all
+ * matching providers should be available so users can choose.
  */
 public class TaxiRouteIndex {
 

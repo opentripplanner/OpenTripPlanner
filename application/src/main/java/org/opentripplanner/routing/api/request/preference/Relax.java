@@ -29,8 +29,7 @@ public record Relax(double ratio, int slack) {
   /**
    * {@code true} if {@link #NORMAL}, this is the same as <em>not</em> applying the function.
    * <p>
-   * The relax operation should be skipped to save resources in this case, but it is safe to do
-   * it.
+   * The relax operation should be skipped to save resources in this case, but it is safe to do it.
    */
   public boolean hasNoEffect() {
     return NORMAL.equals(this);

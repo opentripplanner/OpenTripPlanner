@@ -5,17 +5,17 @@ package org.opentripplanner.raptor.api.request;
  * consumption).
  */
 public interface RaptorTuningParameters {
-  /** see {@link org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig} **/
+  /** see {@link org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig} * */
   default int maxNumberOfTransfers() {
     return 12;
   }
 
-  /** see {@link org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig} **/
+  /** see {@link org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig} * */
   default int scheduledTripBinarySearchThreshold() {
     return 50;
   }
 
-  /** see {@link org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig} **/
+  /** see {@link org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig} * */
   default int iterationDepartureStepInSeconds() {
     return 60;
   }

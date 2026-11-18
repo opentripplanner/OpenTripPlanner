@@ -23,12 +23,12 @@ import org.opentripplanner.utils.lang.MemEfficientArrayBuilder;
  * which a trip (GTFS) or vehicle journey (Transmodel) calls, irrespective of the day on which
  * service runs.
  * <p>
- * An important detail: Routes in GTFS are not a structurally important element, they just serve
- * as user-facing information. It is possible for the same journey pattern to appear in more than
- * one route.
+ * An important detail: Routes in GTFS are not a structurally important element, they just serve as
+ * user-facing information. It is possible for the same journey pattern to appear in more than one
+ * route.
  * <p>
- * OTP already has several classes that represent this same thing: A TripPattern in the context
- * of routing. It represents all trips with the same stop pattern A ScheduledStopPattern in the GTFS
+ * OTP already has several classes that represent this same thing: A TripPattern in the context of
+ * routing. It represents all trips with the same stop pattern A ScheduledStopPattern in the GTFS
  * loading process. A RouteVariant in the TransitIndex, which has a unique human-readable name and
  * belongs to a particular route.
  * <p>
@@ -39,8 +39,8 @@ import org.opentripplanner.utils.lang.MemEfficientArrayBuilder;
  * complexity since we only consider the trip that departs soonest for each pattern. Field
  * calendarId has been removed. See issue #1320.
  * <p>
- * A StopPattern is very closely related to a TripPattern -- it essentially serves as the unique
- * key for a TripPattern. Should the route be included in the StopPattern?
+ * A StopPattern is very closely related to a TripPattern -- it essentially serves as the unique key
+ * for a TripPattern. Should the route be included in the StopPattern?
  */
 public final class StopPattern implements Serializable {
 
@@ -212,8 +212,8 @@ public final class StopPattern implements Serializable {
    * Use {@link #canAlight(int)} if you want to check if a stop can be alighted at a given stop
    * position, ONLY use this method if you would like to search the stop-pattern for a alighting.
    * <p>
-   * Returns whether passengers can alight at a given stop SOMEWHERE in the pattern, considering
-   * all stops in case the pattern visit the same stop twice.
+   * Returns whether passengers can alight at a given stop SOMEWHERE in the pattern, considering all
+   * stops in case the pattern visit the same stop twice.
    * <p>
    * WARNING! This is an inefficient method iterating over the stops, do not use it in routing.
    * <p>
@@ -241,8 +241,8 @@ public final class StopPattern implements Serializable {
    * Use {@link #canBoard(int)} if you want to check if a stop can be boarded at a given stop
    * position, ONLY use this method if you would like to search the stop-pattern for a boarding.
    * <p>
-   * Returns whether passengers can board at a given stop SOMEWHERE in the pattern, considering
-   * all stops in case the pattern visit the same stop twice.
+   * Returns whether passengers can board at a given stop SOMEWHERE in the pattern, considering all
+   * stops in case the pattern visit the same stop twice.
    * <p>
    * WARNING! This is an inefficient method iterating over the stops, do not use it in routing.
    * <p>

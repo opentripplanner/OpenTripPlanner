@@ -29,8 +29,8 @@ import org.slf4j.LoggerFactory;
  * querying, and it's up to the client to filter them out (with whatever knowledge it has on the
  * location of the object).
  * <p>
- * Note: For performance reasons, write operation are not synchronized, it must be taken care by
- * the client. Read-only operation are multi-thread-safe though.
+ * Note: For performance reasons, write operation are not synchronized, it must be taken care by the
+ * client. Read-only operation are multi-thread-safe though.
  *
  * @param <T> Type of objects to be spatial indexed.
  * @author laurent
@@ -279,9 +279,9 @@ public class HashGridSpatialIndex<T> implements Serializable {
   /**
    * Visit each bin touching the envelope.
    *
-   * @param envelope      Self-descripting.
+   * @param envelope Self-descripting.
    * @param createIfEmpty Create a new bin if not existing.
-   * @param binVisitor    The callback to call for each visited bin.
+   * @param binVisitor The callback to call for each visited bin.
    */
   private void visit(Envelope envelope, boolean createIfEmpty, final BinVisitor<T> binVisitor) {
     Coordinate min = new Coordinate(envelope.getMinX(), envelope.getMinY());

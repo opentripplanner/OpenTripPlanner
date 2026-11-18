@@ -10,8 +10,8 @@ import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
 import org.opentripplanner.transit.transfer.regular.spi.TransferSearch;
 
 /**
- * Lifecycles for tests that only read and write the stored paths, not the Raptor transfers
- * derived from them.
+ * Lifecycles for tests that only read and write the stored paths, not the Raptor transfers derived
+ * from them.
  */
 final class TestLifecycles {
 
@@ -28,8 +28,8 @@ final class TestLifecycles {
   }
 
   /**
-   * Create the runtime repository from the build repository, and return its initial snapshot,
-   * which cannot derive Raptor transfers.
+   * Create the runtime repository from the build repository, and return its initial snapshot, which
+   * cannot derive Raptor transfers.
    */
   static <P> RegularTransferRepositorySnapshot<P, WalkPreferences> initialSnapshot(
     RegularTransferBuildRepository<P> buildRepository

@@ -10,8 +10,8 @@ public class StringUtils {
   /**
    * Regex to find unprintable characters like newlines and 'ZERO WIDTH SPACE' (U+200B).
    * <p>
-   * \p{C} was chosen over \p{Cntrl} because it also recognises invisible control characters in
-   * the middle of a word.
+   * \p{C} was chosen over \p{Cntrl} because it also recognises invisible control characters in the
+   * middle of a word.
    */
   private static final String INVISIBLE_CHARS_REGEX = "\\p{C}";
   /**
@@ -72,8 +72,8 @@ public class StringUtils {
    * Add the given number of characters to the buffer.
    *
    * @param buffer the buffer to append to.
-   * @param ch     the character to add to the buffer.
-   * @param count  the number of characters to add. If 0 or negative nothing is added.
+   * @param ch the character to add to the buffer.
+   * @param count the number of characters to add. If 0 or negative nothing is added.
    * @return the given buffer input for convenient chaining
    */
   public static StringBuilder append(StringBuilder buffer, char ch, int count) {

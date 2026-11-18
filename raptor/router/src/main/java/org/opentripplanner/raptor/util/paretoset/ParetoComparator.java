@@ -13,7 +13,6 @@ package org.opentripplanner.raptor.util.paretoset;
 /// {@link #leftDominanceExist(Object, Object)}.
 ///
 /// @param <T> the Pareto set element type.
-///
 @FunctionalInterface
 public interface ParetoComparator<T> {
   /**

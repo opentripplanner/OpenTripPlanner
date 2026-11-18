@@ -64,8 +64,7 @@ public class RaptorRoutingRequestTransitData
   private final List<TripPatternForDates> patternIndex;
 
   /**
-   * The regular transfers of this request, built from the regular-transfer snapshot of the
-   * request.
+   * The regular transfers of this request, built from the regular-transfer snapshot of the request.
    */
   private final RaptorRegularTransferService regularTransferService;
 

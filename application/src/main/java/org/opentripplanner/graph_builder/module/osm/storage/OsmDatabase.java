@@ -689,9 +689,9 @@ public class OsmDatabase {
   /**
    * Process an OSM public transport stop area relation.
    * <p>
-   * This goes through all public_transport=stop_area relations and adds the parent (either an
-   * area or multipolygon relation) as the key and a Set of transit stop nodes that should be
-   * included in the parent area as the value into stopsInAreas. This improves
+   * This goes through all public_transport=stop_area relations and adds the parent (either an area
+   * or multipolygon relation) as the key and a Set of transit stop nodes that should be included in
+   * the parent area as the value into stopsInAreas. This improves
    * {@link org.opentripplanner.graph_builder.module.OsmBoardingLocationsModule} by enabling us to
    * have unconnected stop nodes within the areas by creating relations.
    *
@@ -752,8 +752,8 @@ public class OsmDatabase {
   }
 
   /**
-   * Return the map values ordered by key. HPPC hash containers iterate in a per-instance order,
-   * so sorting is needed to get a deterministic result.
+   * Return the map values ordered by key. HPPC hash containers iterate in a per-instance order, so
+   * sorting is needed to get a deterministic result.
    */
   private static <V> List<V> values(LongObjectMap<V> map) {
     long[] keys = map.keys().toArray();

@@ -46,7 +46,7 @@ public class StreetTransferPathProvider implements TransferPathProvider<NearbySt
    *     paths are found for the others.
    * @param isTransferTarget only the stops accepted by this predicate have transfers to them, the
    *     paths to the others are dropped.
-   * @param allowedModes     the modes the stops are allowed for, to select the max duration of a
+   * @param allowedModes the modes the stops are allowed for, to select the max duration of a
    *     transfer
    */
   public StreetTransferPathProvider(
@@ -64,8 +64,8 @@ public class StreetTransferPathProvider implements TransferPathProvider<NearbySt
   }
 
   /**
-   * Create the nearby-stop finder for {@code graph}: it searches the streets if the graph has
-   * them, and uses the straight-line distance otherwise, like
+   * Create the nearby-stop finder for {@code graph}: it searches the streets if the graph has them,
+   * and uses the straight-line distance otherwise, like
    * {@code FlexTransferGenerator.createNearbyStopFinder}.
    */
   public static NearbyStopFinder createNearbyStopFinder(

@@ -31,8 +31,8 @@ import org.opentripplanner.street.search.state.StateEditor;
 /**
  * Tests for propulsion-aware cost calculation in StreetEdge.
  * <p>
- * Verifies that different propulsion types (ELECTRIC, ELECTRIC_ASSIST, HUMAN) result in
- * appropriate cost calculations, especially regarding slope effects:
+ * Verifies that different propulsion types (ELECTRIC, ELECTRIC_ASSIST, HUMAN) result in appropriate
+ * cost calculations, especially regarding slope effects:
  * <pre>
  * - ELECTRIC (e-scooters): Use flat distance (constant speed, motor does all work)
  * - ELECTRIC_ASSIST (e-bikes): Reduced slope sensitivity (default 30% of human-powered effect)

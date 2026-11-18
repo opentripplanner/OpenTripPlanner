@@ -21,8 +21,8 @@ import org.opentripplanner.street.model.vertex.Vertex;
  * <pre>
  *   beforeStart — · — a0 — · — passenger — · — a1 — · — afterEnd
  * </pre>
- * A search checks its limit when it starts down a street, so a limit cuts the road only at
- * an intersection.
+ * A search checks its limit when it starts down a street, so a limit cuts the road only at an
+ * intersection.
  */
 class PassengerTreesRouterTest extends GraphRoutingTest {
 

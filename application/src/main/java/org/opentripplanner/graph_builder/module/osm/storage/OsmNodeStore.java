@@ -17,13 +17,13 @@ import org.opentripplanner.osm.model.OsmNode;
 
 /**
  * A memory-efficient store for the {@link OsmNode}s used in ways/areas, keyed by their OSM ID.
- *
- * <p>This is the single largest in-memory structure during OSM processing, so instead of a {@code
- * LongObjectMap<OsmNode>} (which needs a full {@link OsmNode} object, including a nested tags map,
- * per node) node data is split into three parallel, node ID-keyed stores. {@link #get(long)}
- * reassembles an {@link OsmNode} on demand from these.
- *
- * <p>Because nodes are reassembled on every {@link #get(long)} call, two {@link OsmNode} instances
+ * <p>
+ * This is the single largest in-memory structure during OSM processing, so instead of a
+ * {@code LongObjectMap<OsmNode>} (which needs a full {@link OsmNode} object, including a nested
+ * tags map, per node) node data is split into three parallel, node ID-keyed stores.
+ * {@link #get(long)} reassembles an {@link OsmNode} on demand from these.
+ * <p>
+ * Because nodes are reassembled on every {@link #get(long)} call, two {@link OsmNode} instances
  * returned for the same ID are generally <b>not</b> the same object. Callers must rely on {@link
  * OsmEntity#equals} (which compares by ID and type) rather than reference equality.
  */
@@ -158,9 +158,9 @@ class OsmNodeStore {
    * fixed-point {@code int} (by scaling with {@link #FIXED_POINT_FACTOR} and rounding), then the
    * latitude occupies the high 32 bits and the longitude the low 32 bits.
    * <p>
-   * Latitude must be in {@code [-90, 90]} and longitude in {@code [-180, 180]}, so both
-   * fixed-point values comfortably fit in a (signed) {@code int}. Packing relies on
-   * two's-complement bit patterns: {@code lonFixed} is masked with {@code 0xFFFFFFFFL} before the
+   * Latitude must be in {@code [-90, 90]} and longitude in {@code [-180, 180]}, so both fixed-point
+   * values comfortably fit in a (signed) {@code int}. Packing relies on two's-complement bit
+   * patterns: {@code lonFixed} is masked with {@code 0xFFFFFFFFL} before the
    * {@code long}/{@code int} widths differ (this zero-extends it, dropping its sign), and OR-ing it
    * into the low bits of the shifted {@code latFixed} recombines the two without the sign bits
    * interfering with each other. {@link #unpackLat} and {@link #unpackLon} reverse this by

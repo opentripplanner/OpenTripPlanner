@@ -19,15 +19,15 @@ import org.opentripplanner.transit.transfer.regular.api.report.RegularTransferCa
  * Cache of the Raptor transfers derived from the paths of one snapshot, keyed on the request-time
  * user preferences. Each {@link DefaultRegularTransferRepositorySnapshot} owns one.
  * <p>
- * <b>Retained keys.</b> The keys given on construction - the preferences of the profiles and of
- * the warmup entries - are retained: they are never evicted and do not count against the max size.
- * The set of retained keys is immutable, and is passed on to the cache of the next snapshot. All
- * other keys are cached in a bounded LRU of at most {@code maxSize} values.
+ * <b>Retained keys.</b> The keys given on construction - the preferences of the profiles and of the
+ * warmup entries - are retained: they are never evicted and do not count against the max size. The
+ * set of retained keys is immutable, and is passed on to the cache of the next snapshot. All other
+ * keys are cached in a bounded LRU of at most {@code maxSize} values.
  * <p>
- * <b>Single-flight.</b> The first request missing a key creates the value; concurrent requests
- * for the same key wait for it instead of creating it again. Requests for other keys never wait.
- * A failed creation is not cached: all waiting requests get the exception, and the next request
- * tries again.
+ * <b>Single-flight.</b> The first request missing a key creates the value; concurrent requests for
+ * the same key wait for it instead of creating it again. Requests for other keys never wait. A
+ * failed creation is not cached: all waiting requests get the exception, and the next request tries
+ * again.
  * <p>
  * <b>Carried forward.</b> When a new snapshot is published, its cache is created from the cache of
  * the previous snapshot with {@link #carryForward}. A value is kept if the paths it was derived
@@ -73,7 +73,7 @@ class RegularTransferServiceCache<V> {
   }
 
   /**
-   * @param maxSize      the max number of values in the cache, not counting the retained ones
+   * @param maxSize the max number of values in the cache, not counting the retained ones
    * @param retainedKeys the keys that are never evicted
    */
   RegularTransferServiceCache(int maxSize, Set<AbstractUserPreferences<?>> retainedKeys) {
@@ -106,8 +106,8 @@ class RegularTransferServiceCache<V> {
   }
 
   /**
-   * Return the cached value for {@code userPreferences}. On a miss, create it with
-   * {@code factory}; for a stale entry, patch the old value with {@code factory}.
+   * Return the cached value for {@code userPreferences}. On a miss, create it with {@code factory};
+   * for a stale entry, patch the old value with {@code factory}.
    */
   V get(AbstractUserPreferences<?> userPreferences, Factory<V> factory) {
     var slot = retained.get(userPreferences);
@@ -152,9 +152,8 @@ class RegularTransferServiceCache<V> {
   }
 
   /**
-   * The number of values in the cache now, including the retained ones. Values still being
-   * created, and failed ones, are not counted. The size is not exact if the cache is used at the
-   * same time.
+   * The number of values in the cache now, including the retained ones. Values still being created,
+   * and failed ones, are not counted. The size is not exact if the cache is used at the same time.
    */
   int size() {
     long size = entries.values().stream().filter(Entry::isCreated).count();

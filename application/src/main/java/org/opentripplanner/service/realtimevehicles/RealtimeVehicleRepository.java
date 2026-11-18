@@ -19,8 +19,7 @@ public interface RealtimeVehicleRepository {
    * the pattern is a realtime-added one, then the original (scheduled) one is used as the key for
    * the map storing the information.
    * <p>
-   * Before storing the new vehicles, it removes the previous updates for the given
-   * {@code feedId}.
+   * Before storing the new vehicles, it removes the previous updates for the given {@code feedId}.
    */
   void setRealtimeVehiclesForFeed(String feedId, Multimap<TripPattern, RealtimeVehicle> updates);
 }

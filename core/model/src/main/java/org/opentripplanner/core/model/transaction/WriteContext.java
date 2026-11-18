@@ -6,8 +6,8 @@ import org.opentripplanner.core.model.event.EventHandler;
 /**
  * Task-scoped coordination point for write access during a single update.
  * <p>
- * A {@code WriteContext} is created fresh for each task submitted to the {@link UpdateManager}
- * and lives only for the duration of that task. It is the sole entry point for:
+ * A {@code WriteContext} is created fresh for each task submitted to the {@link UpdateManager} and
+ * lives only for the duration of that task. It is the sole entry point for:
  * <ul>
  *   <li>Getting a mutable repository within the context</li>
  *   <li>Publishing domain events</li>
@@ -21,7 +21,7 @@ public interface WriteContext {
    * Return the mutable repository for the given handle within the context of a transaction.
    *
    * @param handle the repository handle
-   * @param <M>    the mutable repository type
+   * @param <M> the mutable repository type
    * @return the mutable repository for this task
    */
   <M> M repository(RepositoryHandle<?, M> handle);

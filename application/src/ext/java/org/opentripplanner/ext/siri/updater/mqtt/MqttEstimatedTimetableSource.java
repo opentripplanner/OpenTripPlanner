@@ -53,10 +53,10 @@ import uk.org.siri.siri21.Siri;
  * {@code connectionStartupTimeout} after startup regardless of the connection state. This
  * guarantees OTP eventually becomes ready even if the broker is never reachable, or if the
  * connection repeatedly fails during the MQTT handshake (e.g. the server closes the connection
- * without ever sending a CONNACK, so {@link #onConnect()} never fires) and HiveMQ keeps retrying
- * in a connect/disconnect loop. The MQTT client continues retrying in the background; once the
- * broker becomes available live messages are processed normally, even after the updater has been
- * marked primed.
+ * without ever sending a CONNACK, so {@link #onConnect()} never fires) and HiveMQ keeps retrying in
+ * a connect/disconnect loop. The MQTT client continues retrying in the background; once the broker
+ * becomes available live messages are processed normally, even after the updater has been marked
+ * primed.
  */
 public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSource {
 

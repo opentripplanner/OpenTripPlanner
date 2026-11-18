@@ -142,8 +142,7 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
    * A path of an earlier profile is used instead of the path found for a target stop if it is
    * equivalent: re-costed with the preferences of this profile, it costs about the same, see
    * {@link TransferParameters#DEFAULT_REUSE_LIMIT}. The path is then stored once, for both
-   * profiles.
-   * If several are equivalent, the one that costs least is used.
+   * profiles. If several are equivalent, the one that costs least is used.
    *
    * @param pathsOfEarlierProfiles the paths from this stop of the profiles that are generated
    *     before this profile, by target stop
@@ -212,10 +211,10 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
 
   /**
    * The cheapest, for the profile, of the paths of the earlier profiles to the target stop that is
-   * equivalent to the path the profile found itself, or {@code null} if there is none. A path
-   * that several profiles share is only checked once. A path of an earlier profile may not be
-   * possible with the preferences of this profile, for example a path of another type, and it may
-   * be longer than the max duration of this profile.
+   * equivalent to the path the profile found itself, or {@code null} if there is none. A path that
+   * several profiles share is only checked once. A path of an earlier profile may not be possible
+   * with the preferences of this profile, for example a path of another type, and it may be longer
+   * than the max duration of this profile.
    */
   @Nullable
   private P findEquivalentPath(

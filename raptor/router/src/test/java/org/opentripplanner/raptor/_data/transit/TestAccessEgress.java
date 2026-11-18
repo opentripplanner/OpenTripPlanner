@@ -143,9 +143,9 @@ public class TestAccessEgress implements RaptorAccessEgress {
   /**
    * Add opening and closing hours and return a new object.
    * <p>
-   * Opening and closing is specified as seconds since the start of "RAPTOR time" to limit the
-   * time periods that the access is traversable, which is repeatead every 24 hours. This allows
-   * access to only be traversable between given times like 08:00 and 16:00 every day.
+   * Opening and closing is specified as seconds since the start of "RAPTOR time" to limit the time
+   * periods that the access is traversable, which is repeatead every 24 hours. This allows access
+   * to only be traversable between given times like 08:00 and 16:00 every day.
    */
   public TestAccessEgress openingHours(int opening, int closing) {
     return copyOf().withOpeningHours(opening, closing).build();

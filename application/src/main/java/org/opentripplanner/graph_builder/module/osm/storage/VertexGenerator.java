@@ -96,9 +96,8 @@ public class VertexGenerator {
    * nodes like elevators. When there is an elevator or other Z-dimension discontinuity, a single
    * node can appear in several entities at different levels.
    *
-   * @param node                  The node to fetch a label for.
-   * @param entity                The entity it is connected to, e.g. used for fetching level
-   *     information.
+   * @param node The node to fetch a label for.
+   * @param entity The entity it is connected to, e.g. used for fetching level information.
    * @param linearBarrierNodeType How should the node be handled if it is on a linear barrier
    * @return The graph vertex. This is not always an OSM vertex; it can also be a
    *     {@link OsmBoardingLocationVertex}
@@ -391,7 +390,7 @@ public class VertexGenerator {
    * mark the level as the same.
    *
    * @param entity an entity on a level
-   * @param node   the node to create the elevator vertex from
+   * @param node the node to create the elevator vertex from
    */
   private OsmElevatorVertex getElevatorVertex(OsmNode node, OsmEntity entity) {
     Map<OsmElevatorKey, OsmElevatorVertex> elevatorVertices = getElevatorVertices(node);

@@ -9,17 +9,17 @@ import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
 import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 
 /**
- * Default {@link RegularTransferRepository}: the mutable paths of one transaction, only accessed
- * on the writer thread. A repository continues from a snapshot, the base, with a copy of its
- * paths; the first repository continues from the paths generated at graph build instead. Copying
- * the paths copies only the transfers replaced at runtime, see {@link OverlaidTemplatePaths}.
+ * Default {@link RegularTransferRepository}: the mutable paths of one transaction, only accessed on
+ * the writer thread. A repository continues from a snapshot, the base, with a copy of its paths;
+ * the first repository continues from the paths generated at graph build instead. Copying the paths
+ * copies only the transfers replaced at runtime, see {@link OverlaidTemplatePaths}.
  * <p>
  * Besides the current paths, the repository tracks the stops whose transfers changed since the
- * base, by profile. The Raptor transfers derived from the paths of the base only need to be
- * updated for these stops.
+ * base, by profile. The Raptor transfers derived from the paths of the base only need to be updated
+ * for these stops.
  * <p>
- * A repository is frozen once, and its paths are published in a snapshot without a copy. Hence,
- * a frozen repository cannot be written to again. A repository that is never frozen, because its
+ * A repository is frozen once, and its paths are published in a snapshot without a copy. Hence, a
+ * frozen repository cannot be written to again. A repository that is never frozen, because its
  * transaction failed, is discarded with its changes.
  *
  * @param
@@ -78,9 +78,9 @@ class DefaultRegularTransferRepository<P> implements RegularTransferRepository<P
 
   /**
    * Return the paths, to be published in an immutable snapshot, the base, and the stops whose
-   * transfers changed since the base. The paths are not copied, so the repository cannot be
-   * written to or frozen afterward. Only the lifecycle should have access to this, hence the
-   * package local access.
+   * transfers changed since the base. The paths are not copied, so the repository cannot be written
+   * to or frozen afterward. Only the lifecycle should have access to this, hence the package local
+   * access.
    *
    * @throws IllegalStateException if the repository is already frozen
    */
@@ -103,9 +103,9 @@ class DefaultRegularTransferRepository<P> implements RegularTransferRepository<P
   }
 
   /**
-   * The paths of a snapshot, the snapshot they continue from - {@code null} for the paths
-   * generated at graph build - and the stops whose transfers changed since then, by profile. The
-   * sets of stops must not be modified.
+   * The paths of a snapshot, the snapshot they continue from - {@code null} for the paths generated
+   * at graph build - and the stops whose transfers changed since then, by profile. The sets of
+   * stops must not be modified.
    */
   record Frozen<P>(
     OverlaidTemplatePaths<P> paths,

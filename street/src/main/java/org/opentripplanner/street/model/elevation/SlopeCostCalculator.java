@@ -11,8 +11,8 @@ import org.locationtech.jts.geom.CoordinateSequence;
  * ({@link #ENERGY_PER_METER_ON_FLAT} + {@link #ENERGY_SLOPE_FACTOR}&middot;slope&sup3;) and the
  * walking effective length uses {@link ToblersHikingFunction}.
  * <p>
- * Segments with a slope above &plusmn;100% are treated as raster/OSM data glitches and flattened
- * to zero entirely (see {@link #MAX_ABS_SLOPE}); the real slope is preserved for everything between
+ * Segments with a slope above &plusmn;100% are treated as raster/OSM data glitches and flattened to
+ * zero entirely (see {@link #MAX_ABS_SLOPE}); the real slope is preserved for everything between
  * &plusmn;35% and &plusmn;100% so that wheelchair reluctance, walking length and bike energy still
  * see genuine steep terrain. The B-spline itself clamps its input to &plusmn;35% internally to stay
  * within its valid domain.
@@ -135,8 +135,8 @@ public class SlopeCostCalculator {
   /**
    * We use the Tobler function {@link ToblersHikingFunction} to calculate this.
    * <p>
-   * When testing this we get good results in general, but for some edges the elevation profile
-   * is not accurate. A (serpentine) road is usually build with a constant slope, but the elevation
+   * When testing this we get good results in general, but for some edges the elevation profile is
+   * not accurate. A (serpentine) road is usually build with a constant slope, but the elevation
    * profile in OTP is not as smooth, resulting in an extra penalty for these roads.
    */
   static double calculateEffectiveWalkLength(double run, double rise) {

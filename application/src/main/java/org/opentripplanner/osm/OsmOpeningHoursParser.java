@@ -460,8 +460,8 @@ public class OsmOpeningHoursParser {
   /**
    * Checks if rule doesn't have any modifiers or if the modifier is open or unknown.
    * <p>
-   * TODO if a modifier only has a comment (such as "by appointment"), we don't consider the rule
-   * to be of the open type but maybe we should
+   * TODO if a modifier only has a comment (such as "by appointment"), we don't consider the rule to
+   * be of the open type but maybe we should
    */
   private boolean isOpenRule(Rule rule) {
     var modifier = rule.getModifier();
@@ -486,8 +486,8 @@ public class OsmOpeningHoursParser {
   /**
    * Checks if rule has times defined and there is a {@link TimeSpan} definition with start time.
    * <p>
-   * TODO We filter out {@link TimeSpan} that have events like "sunrise-sunset" but maybe they
-   * could be implemented
+   * TODO We filter out {@link TimeSpan} that have events like "sunrise-sunset" but maybe they could
+   * be implemented
    */
   private boolean hasTimes(Rule rule) {
     return (

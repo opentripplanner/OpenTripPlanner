@@ -23,7 +23,7 @@ public enum ParetoDominance {
 
   /// Create a dominance value from two directional dominance flags. For `x`(left) and `y`(right):
   ///
-  /// @param leftDominanceExist  `x` has at least one criteria that is better than `y`.
+  /// @param leftDominanceExist `x` has at least one criteria that is better than `y`.
   /// @param rightDominanceExist `y` has at least one criteria that is better than `x`.
   public static ParetoDominance of(boolean leftDominanceExist, boolean rightDominanceExist) {
     if (leftDominanceExist) {
@@ -36,8 +36,8 @@ public enum ParetoDominance {
   /**
    * Parse a dominance value from either its symbol or enum name.
    * <p>
-   * Accepted symbols are `≺`, `≻`, `∥`, and `≡`. If the input is not a single-character symbol,
-   * the value is parsed as an enum name (case-insensitive).
+   * Accepted symbols are `≺`, `≻`, `∥`, and `≡`. If the input is not a single-character symbol, the
+   * value is parsed as an enum name (case-insensitive).
    */
   public static ParetoDominance of(String value) {
     if (value.length() == 1) {

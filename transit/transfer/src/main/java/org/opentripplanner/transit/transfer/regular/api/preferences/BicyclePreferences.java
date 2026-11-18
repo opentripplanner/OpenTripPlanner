@@ -7,10 +7,9 @@ import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfi
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * The preferences of the bicycle transfers: speed and reluctance for a traveler that rides
- * a bicycle, how the route is optimized, and the preferences for walking with it. The values are
- * normalized(rounded) so the
- * class can used as a cache key.
+ * The preferences of the bicycle transfers: speed and reluctance for a traveler that rides a
+ * bicycle, how the route is optimized, and the preferences for walking with it. The values are
+ * normalized(rounded) so the class can used as a cache key.
  * <p>
  * See the configuration for documentation of each field.
  * <p>
@@ -85,19 +84,19 @@ public final class BicyclePreferences
    * <p>
    * The distance is the sum of the reluctance, the speed, the optimize triangle and the walking
    * with the bicycle. The reluctance and the speed are weighted so a reference change counts
-   * {@link DistanceWeight#REFERENCE_DISTANCE}: 2.0 to 2.5 for the reluctance and 5.0 to 5.4 m/s
-   * for the speed. The distance is symmetric, except for the safety of the triangle, see
+   * {@link DistanceWeight#REFERENCE_DISTANCE}: 2.0 to 2.5 for the reluctance and 5.0 to 5.4 m/s for
+   * the speed. The distance is symmetric, except for the safety of the triangle, see
    * {@link TimeSlopeSafetyTrianglePreference#normalizedDistance}.
    * <p>
-   * For the bicycle all the fields matter. The triangle is the largest term; each of the speed,
-   * the reluctance and the reluctance of walking the bicycle changes the path of 7-54% of the
+   * For the bicycle all the fields matter. The triangle is the largest term; each of the speed, the
+   * reluctance and the reluctance of walking the bicycle changes the path of 7-54% of the
    * transfers, by 2.5-11% on those.
    * <p>
-   * The triangle sums the distance of three values, so it is divided by 3.0: on average it
-   * counts as one field, not as three. Its safety weights (3 and 8) are much larger than the
-   * weights of the other fields, so the triangle dominates the distance on purpose. A mismatch in
-   * the safety of the triangle is the main cause of extra cost. The triangle is not weighted by
-   * the reference change.
+   * The triangle sums the distance of three values, so it is divided by 3.0: on average it counts
+   * as one field, not as three. Its safety weights (3 and 8) are much larger than the weights of
+   * the other fields, so the triangle dominates the distance on purpose. A mismatch in the safety
+   * of the triangle is the main cause of extra cost. The triangle is not weighted by the reference
+   * change.
    */
   @Override
   public double normalizedDistance(AbstractUserPreferences other) {

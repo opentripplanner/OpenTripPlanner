@@ -46,9 +46,8 @@ public class CarpoolSiriMapper {
 
   /**
    * @param feedId the feed prefix used for every {@link FeedScopedId} this mapper produces. Owned
-   *     by the enclosing updater instance and supplied from {@code router-config.json},
-   *     so one OTP can run multiple carpool updaters side-by-side without trip-id
-   *     collisions across feeds.
+   *     by the enclosing updater instance and supplied from {@code router-config.json}, so one OTP
+   *     can run multiple carpool updaters side-by-side without trip-id collisions across feeds.
    */
   public CarpoolSiriMapper(String feedId, Duration maxTripDuration) {
     this.feedId = feedId;
@@ -72,11 +71,9 @@ public class CarpoolSiriMapper {
    * non-cancelled calls remain.
    *
    * @throws IllegalArgumentException if the raw message is malformed (fewer than 2 calls before
-   *     filtering, calls out of order, missing flexible areas, no
-   *     departure time on the first call or no arrival time on the
-   *     last call, end time not after start time, etc.) or if the trip
-   *     span or its straight-line drive time exceeds the maximum trip
-   *     duration
+   *     filtering, calls out of order, missing flexible areas, no departure time on the first call
+   *     or no arrival time on the last call, end time not after start time, etc.) or if the trip
+   *     span or its straight-line drive time exceeds the maximum trip duration
    */
   @Nullable
   public CarpoolTrip mapSiriToCarpoolTrip(EstimatedVehicleJourney journey) {
@@ -266,11 +263,11 @@ public class CarpoolSiriMapper {
   /**
    * Build a CarpoolStop from an EstimatedCall with special handling for first/last positions.
    *
-   * @param call      The SIRI EstimatedCall containing stop information
-   * @param tripId    The trip ID for generating unique stop IDs
+   * @param call The SIRI EstimatedCall containing stop information
+   * @param tripId The trip ID for generating unique stop IDs
    * @param stopIndex The 0-based index of this stop in the call list
-   * @param isFirst   true if this is the first stop (origin)
-   * @param isLast    true if this is the last stop (destination)
+   * @param isFirst true if this is the first stop (origin)
+   * @param isLast true if this is the last stop (destination)
    * @return A CarpoolStop representing the stop
    */
   private CarpoolStop buildCarpoolStopForPosition(

@@ -111,10 +111,10 @@ class PlatformAreaTest {
   }
 
   /**
-   * A stop whose coordinate falls just outside the polygon reaches the
-   * platform through an access point placed just inside on its behalf, over an edge that costs only
-   * the few centimetres it is actually off by - and the access point is as well connected as a
-   * boarding location placed inside in the first place.
+   * A stop whose coordinate falls just outside the polygon reaches the platform through an access
+   * point placed just inside on its behalf, over an edge that costs only the few centimetres it is
+   * actually off by - and the access point is as well connected as a boarding location placed
+   * inside in the first place.
    */
   @Test
   void aStopJustOutsideReachesThePlatformViaAnAccessPoint() {
@@ -206,8 +206,7 @@ class PlatformAreaTest {
   /**
    * On a long narrow platform the line from an outside stop to the platform's interior point is so
    * oblique that it first crosses the boundary tens of metres away. The access point must sit at
-   * the
-   * foot of the perpendicular instead, next to the stop.
+   * the foot of the perpendicular instead, next to the stop.
    */
   @Test
   void theAccessPointSitsNextToTheStopOnALongPlatform() {
@@ -249,8 +248,8 @@ class PlatformAreaTest {
   /**
    * The edge to an access point runs across the platform, so it must carry the platform's
    * permission, safety factors and wheelchair accessibility rather than the edge builder's
-   * defaults,
-   * which would claim a wheelchair-accessible walk across a platform mapped as not accessible.
+   * defaults, which would claim a wheelchair-accessible walk across a platform mapped as not
+   * accessible.
    */
   @Test
   void theConnectorCarriesThePlatformProperties() {

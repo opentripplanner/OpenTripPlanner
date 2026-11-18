@@ -22,8 +22,7 @@ public class Money implements Comparable<Money>, Serializable {
   private final int amount;
 
   /**
-   *
-   * @param currency        The currency of the money amount
+   * @param currency The currency of the money amount
    * @param minorUnitAmount The amount in the smaller currency unit, so for 1.50 EUR pass 150.
    */
   private Money(Currency currency, int minorUnitAmount) {

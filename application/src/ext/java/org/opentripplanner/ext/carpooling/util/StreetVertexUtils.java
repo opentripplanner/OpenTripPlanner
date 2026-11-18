@@ -15,8 +15,8 @@ import org.opentripplanner.street.search.TraverseMode;
  * {@link LocationType#VISIT_VIA_LOCATION}), so each can serve as both an arrival and a departure
  * point.
  * <p>
- * Vertices and edges created here are registered with the given
- * {@link TemporaryVerticesContainer}; closing it removes them from the graph.
+ * Vertices and edges created here are registered with the given {@link TemporaryVerticesContainer};
+ * closing it removes them from the graph.
  */
 public class StreetVertexUtils {
 

@@ -7,10 +7,10 @@ import org.opentripplanner.model.GenericLocation;
 /**
  * Represents a point to pass on trip.
  *
- * @param point            Coordinates of Via point
+ * @param point Coordinates of Via point
  * @param passThroughPoint Does the via point represent a pass through
- * @param minSlack         Minimum time that is allowed to wait for interchange.
- * @param maxSlack         Maximum time to wait for next departure.
+ * @param minSlack Minimum time that is allowed to wait for interchange.
+ * @param maxSlack Maximum time to wait for next departure.
  * @deprecated We will replace the complex via-search with a simpler version part of the existing
  *     trip search.
  */

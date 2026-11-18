@@ -50,10 +50,9 @@ public sealed class ParetoSet<T> extends AbstractCollection<T> permits ParetoSet
 
   /**
    * Create a new ParetoSet with a comparator and a drop event listener. To add more than one
-   * listener use the
-   * {@link ParetoSetEventListenerComposite}.
+   * listener use the {@link ParetoSetEventListenerComposite}.
    *
-   * @param comparator    The comparator to use with this set
+   * @param comparator The comparator to use with this set
    * @param eventListener The event listener registered to listen for accept, drop and reject
    *     events.
    */
@@ -73,8 +72,8 @@ public sealed class ParetoSet<T> extends AbstractCollection<T> permits ParetoSet
   /**
    * Return an iterator over the contained collection.
    * <p>
-   * This is NOT thread-safe and the behavior is undefined if the collection is modified during
-   * the iteration.
+   * This is NOT thread-safe and the behavior is undefined if the collection is modified during the
+   * iteration.
    */
   public final Iterator<T> iterator() {
     return tailIterator(0);

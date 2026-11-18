@@ -162,9 +162,9 @@ public class DefaultFareService implements FareService {
   /**
    * Builds the Fare object for the given currency, fareType and fareRules.
    * <p>
-   * Besides calculating the lowest fare, we also break down the fare and which routes correspond
-   * to which components. Note that even if we cannot get a lowest fare (if some rides don't have
-   * fare rules), there will still be a breakdown for those parts which have fares.
+   * Besides calculating the lowest fare, we also break down the fare and which routes correspond to
+   * which components. Note that even if we cannot get a lowest fare (if some rides don't have fare
+   * rules), there will still be a breakdown for those parts which have fares.
    * <p>
    * As an example, given the rides A-B and B-C. Where A-B and B-C have fares of 10 each, 2 fare
    * detail objects are added, one with fare 10 for A-B and one with fare 10 for B-C.

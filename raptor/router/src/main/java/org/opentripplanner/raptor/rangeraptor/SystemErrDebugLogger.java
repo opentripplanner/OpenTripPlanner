@@ -94,8 +94,8 @@ public class SystemErrDebugLogger implements DebugLogger {
   }
 
   /**
-   * This should be passed into the {@link DebugRequestBuilder#withDestinationArrivalListener}
-   * using a lambda to enable debugging destination arrivals put in the final result pareto-set.
+   * This should be passed into the {@link DebugRequestBuilder#withDestinationArrivalListener} using
+   * a lambda to enable debugging destination arrivals put in the final result pareto-set.
    */
   public void destinationArrivalListener(DebugEvent<ArrivalView<?>> e) {
     if (printPathHeader) {

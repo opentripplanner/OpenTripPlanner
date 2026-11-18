@@ -73,9 +73,8 @@ public class SiriRealTimeUpdateHandler {
    * Method to apply estimated timetables to the most recent version of the timetable snapshot.
    *
    * @param incrementality the incrementality of the update, for example if updates represent all
-   *     updates that are active right now, i.e. all previous updates should be
-   *     disregarded
-   * @param updates        SIRI EstimatedTimetable deliveries that should be applied atomically.
+   *     updates that are active right now, i.e. all previous updates should be disregarded
+   * @param updates SIRI EstimatedTimetable deliveries that should be applied atomically.
    */
   public UpdateResult applyEstimatedTimetable(
     EntityResolver entityResolver,
@@ -200,8 +199,7 @@ public class SiriRealTimeUpdateHandler {
   /**
    * Get the latest timetable for TripPattern for a given service date.
    * <p>
-   * Snapshot timetable is used as source if initialised, trip patterns scheduled timetable if
-   * not.
+   * Snapshot timetable is used as source if initialised, trip patterns scheduled timetable if not.
    */
   private Timetable getCurrentTimetable(TripPattern tripPattern, LocalDate serviceDate) {
     return buffer.resolve(tripPattern, serviceDate);

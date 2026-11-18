@@ -32,8 +32,8 @@ import org.opentripplanner.utils.time.ServiceDateUtils;
 /**
  * A helper class for setting up and interacting with transit data for tests.
  * <p>
- * The builder is used to create a SiteRepository and a TransitRepository that can then be
- * queried by a TransitService.
+ * The builder is used to create a SiteRepository and a TransitRepository that can then be queried
+ * by a TransitService.
  */
 public final class TransitTestEnvironment {
 

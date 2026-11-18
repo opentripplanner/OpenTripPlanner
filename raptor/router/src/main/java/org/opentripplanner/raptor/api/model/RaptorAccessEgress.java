@@ -24,9 +24,9 @@ public interface RaptorAccessEgress {
    * instance of a given {@code type} type passed into Raptor. The first element matching the given
    * {@code type} in the chain of delegates (see {@link AbstractAccessEgressDecorator}) is returned.
    * <p>
-   * This method is primarily for use outside Raptor to get the base access-egress instant to
-   * access the EXTENDED state of the base type - state not part of the Raptor interface. This is
-   * useful in the caller to get access to additional information stored in the base type.
+   * This method is primarily for use outside Raptor to get the base access-egress instant to access
+   * the EXTENDED state of the base type - state not part of the Raptor interface. This is useful in
+   * the caller to get access to additional information stored in the base type.
    * <p>
    * Be careful, calling methods part of the {@link RaptorAccessEgress} interface on the returned
    * value will no longer be decorated - not be the value used by Raptor.
@@ -85,14 +85,14 @@ public interface RaptorAccessEgress {
    * are optimal on time. In the case of park&ride the time-penalty enables Raptor to choose one of
    * the shortest access/egress paths over the longer ones.
    * <p>
-   * Another example is FLEX, where we in many use-cases want regular transit to win if there is
-   * a comparable offer. FLEX should be presented when there is no transit alternative, or when it
-   * is much better than the alternatives; the time-penalty sets how much better it must be. To
-   * achieve this, we must add an extra duration to the time of the FLEX access/egress. Adding only
-   * extra cost does not work: the FLEX would still be optimal on time and the transit optimal on
-   * cost, so both would be kept. The time-penalty makes the transit win on time as well, unless the
-   * FLEX is faster by more than the penalty. Keeping a large number of optimal access paths has a
-   * negative impact on performance as well.
+   * Another example is FLEX, where we in many use-cases want regular transit to win if there is a
+   * comparable offer. FLEX should be presented when there is no transit alternative, or when it is
+   * much better than the alternatives; the time-penalty sets how much better it must be. To achieve
+   * this, we must add an extra duration to the time of the FLEX access/egress. Adding only extra
+   * cost does not work: the FLEX would still be optimal on time and the transit optimal on cost, so
+   * both would be kept. The time-penalty makes the transit win on time as well, unless the FLEX is
+   * faster by more than the penalty. Keeping a large number of optimal access paths has a negative
+   * impact on performance as well.
    * <p>
    * The unit is seconds and the default value is {@link RaptorConstants#TIME_NOT_SET}.
    */
@@ -123,8 +123,8 @@ public interface RaptorAccessEgress {
    * Returns the latest possible arrival time for the path. Used in DRT systems or bike shares where
    * they can have operation time limitations.
    * <p>
-   * Returns {@link RaptorConstants#TIME_NOT_SET} if transfer is not possible before the
-   * requested arrival time.
+   * Returns {@link RaptorConstants#TIME_NOT_SET} if transfer is not possible before the requested
+   * arrival time.
    */
   int latestArrivalTime(int requestedArrivalTime);
 
@@ -133,8 +133,8 @@ public interface RaptorAccessEgress {
    * via-locations. If so, Raptor needs to know how many via-locations are included so it can skip
    * these.
    * <p>
-   * If the access/egress {@code stop} is a via-location then this method should include it in
-   * the count.
+   * If the access/egress {@code stop} is a via-location then this method should include it in the
+   * count.
    * <p>
    * The default is zero via-lcations visited.
    */
@@ -178,8 +178,7 @@ public interface RaptorAccessEgress {
    * Return the opening hours in a short human-readable way for the departure at the origin. Do not
    * parse this. This should only be used for things like testing, debugging and logging.
    * <p>
-   * This method return {@code null} if there are no opening hours, see
-   * {@link #hasOpeningHours()}.
+   * This method return {@code null} if there are no opening hours, see {@link #hasOpeningHours()}.
    */
   @Nullable
   default String openingHoursToString() {

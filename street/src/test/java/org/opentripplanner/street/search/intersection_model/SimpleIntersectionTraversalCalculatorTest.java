@@ -468,9 +468,9 @@ public class SimpleIntersectionTraversalCalculatorTest {
     assertEquals(8.0, traversalCost, 0.0);
   }
 
-  /****
-   * Private Methods
-   ****/
+  /**
+   * ** Private Methods **
+   */
 
   private static IntersectionVertex vertex(
     String label,

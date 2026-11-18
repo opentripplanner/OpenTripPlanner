@@ -21,9 +21,8 @@ import org.slf4j.LoggerFactory;
  * add the least driving while every later stop stays within its deviation budget and a seat is free
  * on every leg the passenger rides.
  * <p>
- * A point's detour in a leg is the drive via the point, minus the leg, plus the dwell. The
- * pickup's detour delays every stop after the pickup, and both detours every stop after the
- * dropoff.
+ * A point's detour in a leg is the drive via the point, minus the leg, plus the dwell. The pickup's
+ * detour delays every stop after the pickup, and both detours every stop after the dropoff.
  * <p>
  * Not thread-safe; one instance per request.
  */
@@ -38,7 +37,7 @@ public class InsertionEvaluator {
 
   /**
    * @param carpoolRouter routes a street segment between two vertices of the candidate route
-   * @param stopDuration  dwell added at each intermediate stop, the passenger's included
+   * @param stopDuration dwell added at each intermediate stop, the passenger's included
    */
   public InsertionEvaluator(CarpoolRouter carpoolRouter, Duration stopDuration) {
     this.carpoolRouter = carpoolRouter;
@@ -47,8 +46,8 @@ public class InsertionEvaluator {
 
   /**
    * @return A list containing the best insertion that can be found for every stop in the list
-   *     tripWithViableAccessEgress.viableAccessEgress. If there are no valid insertions for a
-   *     stop, then no candidate for that stop will be returned.
+   *     tripWithViableAccessEgress.viableAccessEgress. If there are no valid insertions for a stop,
+   *     then no candidate for that stop will be returned.
    */
   public List<InsertionCandidate> findBestInsertions(
     TripWithViableAccessEgress tripWithViableAccessEgress

@@ -48,12 +48,12 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
   private final ParetoComparator<McStopArrival<T>> comparator;
 
   /**
-   * @param nStops              total number of stops in the transit network.
+   * @param nStops total number of stops in the transit network.
    * @param onBoardArrivalStops stops where on-board arrivals is better than on-street arrivals;
-   *     these stops need a pareto comparator that also considers whether the
-   *     traveller arrived on board.
-   * @param arrivalListeners    per-stop listeners (via, egress, debug), keyed by stop index.
-   * @param comparatorFactory   factory for creating the Pareto comparators used per stop.
+   *     these stops need a pareto comparator that also considers whether the traveller arrived on
+   *     board.
+   * @param arrivalListeners per-stop listeners (via, egress, debug), keyed by stop index.
+   * @param comparatorFactory factory for creating the Pareto comparators used per stop.
    * @param debugHandlerFactory factory for debug handlers and loggers.
    */
   public McStopArrivals(
@@ -179,12 +179,10 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
    * <ul>
    *   <li>Called from the <b>boarding step</b>: returns transit and transfer arrivals from the
    *       previous round (the marker was advanced past them at the end of that round's transit
-   *       scan, but
-   *       the arrivals remain readable).</li>
+   *       scan, but the arrivals remain readable).</li>
    *   <li>Called from the <b>transfer step</b>: returns only the transit alights from the current
    *       round (the marker was just advanced past the previous round's arrivals and the new
-   *       transit
-   *       alights were committed).</li>
+   *       transit alights were committed).</li>
    * </ul>
    */
   public Iterable<McStopArrival<T>> listArrivalsAfterMarker(final int stop) {
@@ -197,18 +195,15 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
    * For each touched stop, advance the marker to the end of its Pareto set, then clear the
    * touched-stop tracking.
    * <p>
-   * Called at two points in the round lifecycle (see {@link McRangeRaptorWorkerState} for the
-   * full lifecycle description):
+   * Called at two points in the round lifecycle (see {@link McRangeRaptorWorkerState} for the full
+   * lifecycle description):
    * <ul>
    *   <li><b>Setup iteration</b>: advances the marker past all arrivals, including transfer
-   *       arrivals
-   *       left over from the previous iteration's last round, so they are not re-explored in the
-   *       new
-   *       iteration.</li>
+   *       arrivals left over from the previous iteration's last round, so they are not re-explored
+   *       in the new iteration.</li>
    *   <li><b>Transits for round complete</b>: advances the marker past the previous round's
-   *       arrivals
-   *       before committing the current round's transit alights. This makes the new transit alights
-   *       visible to the transfer step while hiding the older arrivals.</li>
+   *       arrivals before committing the current round's transit alights. This makes the new
+   *       transit alights visible to the transfer step while hiding the older arrivals.</li>
    * </ul>
    */
   public void clearTouchedStopsAndSetStopMarkers() {
@@ -235,16 +230,15 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
    * arrival is grouped by route index so that the routing loop can retrieve all on-board arrivals
    * for a route in one call to {@link #consumeOnTripStopArrivalsForRoute}.
    * <p>
-   * Also ensures the Pareto set for {@code applyToStopIndex} is initialised and marks the stop
-   * as touched so the routing loop will visit it.
+   * Also ensures the Pareto set for {@code applyToStopIndex} is initialised and marks the stop as
+   * touched so the routing loop will visit it.
    *
-   * @param boardingArrival            the arrival state from which boarding occurs.
-   * @param startRoutingAtStopIndex    the stop index where the new ride is applied in the
-   *     algorithm. The next stop in pattern will be the first
-   *     possible stop to alight. The boarding might be at an earlier
-   *     stop.
+   * @param boardingArrival the arrival state from which boarding occurs.
+   * @param startRoutingAtStopIndex the stop index where the new ride is applied in the algorithm.
+   *     The next stop in pattern will be the first possible stop to alight. The boarding might be
+   *     at an earlier stop.
    * @param startRoutingAtStopPosition Same as above, but the stop position in the trip pattern.
-   * @param boardingConstraint         the trip and stop-position for where the boarding happens.
+   * @param boardingConstraint the trip and stop-position for where the boarding happens.
    */
   public void addOnBoardTripArrival(
     ArrivalView<T> boardingArrival,

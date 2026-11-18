@@ -26,15 +26,15 @@ import org.opentripplanner.utils.time.TimeUtils;
  * <p>
  * {@code ClassName{field1:value, field2:value, ...}}
  * <p>
- * Fields equals to 'ignoreValue' is NOT added to the result string. This produces a short and
- * easy to read result. You should use {@code null} as 'ignoreValue' if the field is nullable.
+ * Fields equals to 'ignoreValue' is NOT added to the result string. This produces a short and easy
+ * to read result. You should use {@code null} as 'ignoreValue' if the field is nullable.
  * <p>
  * The naming of the 'add' methods should give a hint to which type the value have, this make it
  * easier to choose the right method and less error prune as compared with relaying on pure
  * override, which often result in a wrong method call.
  * <p>
- * The builder should be independent of locale, the value should always be formatted the same
- * way, this allows us to use the toString in unit tests.
+ * The builder should be independent of locale, the value should always be formatted the same way,
+ * this allows us to use the toString in unit tests.
  */
 public class ToStringBuilder {
 

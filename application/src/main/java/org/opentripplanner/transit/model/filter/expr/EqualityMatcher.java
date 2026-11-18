@@ -18,8 +18,8 @@ public class EqualityMatcher<T, V> implements Matcher<T> {
   private final Function<T, V> valueProvider;
 
   /**
-   * @param typeName      The typeName appears in the toString for easier debugging.
-   * @param value         The value that this matcher will check equality for.
+   * @param typeName The typeName appears in the toString for easier debugging.
+   * @param value The value that this matcher will check equality for.
    * @param valueProvider The function that maps the entity being matched by this matcher (T) to the
    *     value being matched by this matcher.
    */

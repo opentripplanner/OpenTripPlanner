@@ -25,8 +25,8 @@ import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
  * public transportation network, with the lookups (by id, by trip, by route, by stop, ...) over
  * them.
  * <p>
- * Immutable: it holds immutable copies of the data it is created from and never changes, so it
- * can be shared freely, for example between threads.
+ * Immutable: it holds immutable copies of the data it is created from and never changes, so it can
+ * be shared freely, for example between threads.
  */
 public final class ScheduledTimetableData {
 
@@ -58,8 +58,8 @@ public final class ScheduledTimetableData {
    *
    * @param tripPatternForId the scheduled trip patterns, by id
    * @param tripOnServiceDateById the scheduled trips on service date, by id
-   * @param replacedByTripOnServiceDates for each trip on service date id, the trips on service
-   *     date replacing it, in the order they were added
+   * @param replacedByTripOnServiceDates for each trip on service date id, the trips on service date
+   *     replacing it, in the order they were added
    * @param flexTripForId the flex trips, by id
    * @param tripCalendars the scheduled trip calendars; the service codes running on each date are
    *     computed here
@@ -179,8 +179,8 @@ public final class ScheduledTimetableData {
   }
 
   /**
-   * Checks if the last scheduled service date for the stop is on or after the given date. This
-   * does not include real-time updates.
+   * Checks if the last scheduled service date for the stop is on or after the given date. This does
+   * not include real-time updates.
    */
   public boolean hasScheduledServicesAfter(LocalDate date, StopLocation stop) {
     return index.hasScheduledServicesAfter(date, stop);

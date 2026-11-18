@@ -55,18 +55,18 @@ public record ScheduledTransitLegReference(
   /**
    * Reconstruct a scheduled transit leg from this scheduled transit leg reference.
    * <p>
-   * The method attempts to find a leg which starts and ends in the same station of the given
-   * stops. The transit model could have been modified between the time the reference is created and
-   * the time the transit leg is reconstructed (either because new planned data have been rolled
-   * out, or because a realtime update has modified a trip).
+   * The method attempts to find a leg which starts and ends in the same station of the given stops.
+   * The transit model could have been modified between the time the reference is created and the
+   * time the transit leg is reconstructed (either because new planned data have been rolled out, or
+   * because a realtime update has modified a trip).
    * <p>
-   * If there are multiple possibilities, the stop which has the closest stop position in pattern
-   * to the given reference is used. However, if the stop is on a different platform and a call at
-   * the exact stop is immediately before / after it, the exact stop is used.
+   * If there are multiple possibilities, the stop which has the closest stop position in pattern to
+   * the given reference is used. However, if the stop is on a different platform and a call at the
+   * exact stop is immediately before / after it, the exact stop is used.
    * <p>
-   * As examples, if E1 and E2 are in the same station and the reference for an A(0)-E2(2) leg
-   * was constructed on a trip which now becomes A-B-C-D-E1-F-G-H-E2, it will become an A(0)-E1(4)
-   * leg, however, if it now becomes A-B-C-D-E1-E2, it will become an A(0)-E2(5) leg.
+   * As examples, if E1 and E2 are in the same station and the reference for an A(0)-E2(2) leg was
+   * constructed on a trip which now becomes A-B-C-D-E1-F-G-H-E2, it will become an A(0)-E1(4) leg,
+   * however, if it now becomes A-B-C-D-E1-E2, it will become an A(0)-E2(5) leg.
    * <p>
    * If it is not possible to reconstruct the leg, which may be because the trip no longer runs
    * between the stations given, or the trip runs between them in the reverse order, the method
@@ -234,8 +234,8 @@ public record ScheduledTransitLegReference(
    * pattern.
    *
    * @return The match closest to the given stop position in the given pattern, except that if an
-   *     exact match is next to the same station match of a different platform, the exact match
-   *     is returned.
+   *     exact match is next to the same station match of a different platform, the exact match is
+   *     returned.
    */
   private OptionalInt findStopPositionInPattern(
     TripPattern tripPattern,

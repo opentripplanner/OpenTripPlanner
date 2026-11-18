@@ -18,8 +18,7 @@ import org.slf4j.LoggerFactory;
  *   <li>The command line parameters don´t match the input files.</li>
  *   <li>When a exception occurs it is preferable to catch it at the right level, were most context
  *       information is available. At this point the exception should be logged with a stacktrace.
- *       Then
- *       this exception can be re-thrown to terminate the application or request.</li>
+ *       Then this exception can be re-thrown to terminate the application or request.</li>
  * </ul>
  * <p>
  * Do not use this exception to terminate OTP in case of an unknown/unexpected event, then the

@@ -96,8 +96,8 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
    * transfers. This cost is not related in any way to the path generalized-cost. It takes only the
    * transfer constraint attributes in consideration.
    * <p>
-   * When comparing paths that ride the same trips, this can be used to find the optimal places
-   * to do the transfers. The cost is created to prioritize the following:
+   * When comparing paths that ride the same trips, this can be used to find the optimal places to
+   * do the transfers. The cost is created to prioritize the following:
    * <ol>
    *   <li>{@code stay-seated} - cost: 10 points</li>
    *   <li>{@code guaranteed} - cost: 20 points</li>
@@ -135,8 +135,8 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
    * A facilitated transfer is allowed even if there might not be enough time to walk or if the
    * alight-slack or board-slack is too tight. We ignore slack for facilitated transfers.
    * <p>
-   * This is an aggregated field, which encapsulates an OTP specific rule. A facilitated transfer
-   * is either stay-seated or guaranteed. High priority transfers are not facilitated.
+   * This is an aggregated field, which encapsulates an OTP specific rule. A facilitated transfer is
+   * either stay-seated or guaranteed. High priority transfers are not facilitated.
    */
   public boolean isFacilitated() {
     return staySeated || guaranteed;
