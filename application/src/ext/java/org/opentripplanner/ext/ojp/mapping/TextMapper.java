@@ -2,6 +2,7 @@ package org.opentripplanner.ext.ojp.mapping;
 
 import de.vdv.ojp20.InternationalTextStructure;
 import de.vdv.ojp20.siri.DefaultedTextStructure;
+import de.vdv.ojp20.siri.NaturalLanguageStringStructure;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.i18n.I18NString;
 
@@ -32,7 +33,7 @@ class TextMapper {
     if (string == null) {
       return null;
     } else {
-      var t = new DefaultedTextStructure().withValue(string);
+      var t = new NaturalLanguageStringStructure().withValue(string);
       if (lang != null) {
         t.withLang(lang);
       }
