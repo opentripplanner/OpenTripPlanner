@@ -60,8 +60,8 @@ public class GtfsConfig {
           .of("stationTransferPreference")
           .since(V2_3)
           .summary(
-            "Should there be some preference or aversion for transfers at stops that are part of a station." +
-              documentationAddition
+            "Should there be some preference or aversion for transfers at stops that are part of a station."
+            + documentationAddition
           )
           .description(
             """
@@ -93,8 +93,8 @@ public class GtfsConfig {
           .of("blockBasedInterlining")
           .since(V2_3)
           .summary(
-            "Whether to create stay-seated transfers in between two trips with the same block id." +
-              documentationAddition
+            "Whether to create stay-seated transfers in between two trips with the same block id."
+            + documentationAddition
           )
           .docDefaultValue(docDefaults.blockBasedInterlining())
           .asBoolean(defaults.blockBasedInterlining())
@@ -104,8 +104,8 @@ public class GtfsConfig {
           .of("maxInterlineDistance")
           .since(V2_3)
           .summary(
-            "Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle." +
-              documentationAddition
+            "Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle."
+            + documentationAddition
           )
           .docDefaultValue(docDefaults.maxInterlineDistance())
           .asInt(defaults.maxInterlineDistance())
@@ -115,8 +115,8 @@ public class GtfsConfig {
           .of("isTaxiData")
           .since(V2_11)
           .summary(
-            "When true, this GTFS feed is used exclusively as a source of taxi provider data." +
-              documentationAddition
+            "When true, this GTFS feed is used exclusively as a source of taxi provider data."
+            + documentationAddition
           )
           .description(
             """

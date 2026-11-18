@@ -683,9 +683,9 @@ class TransferProfilesConfigMapperTest {
   void theBicycleLimitsOfAllowedStopsMustBeLongerThanTheLimitForAllStops() {
     for (var parameter : List.of("maxDuration", "maxDurationAllowsCar")) {
       var root = newNodeAdapterForTest(
-        "{ transfers: { bicycle: { maxDuration: '30m', profiles: [{ id: 'b' }], maxDurationAllowAllModes: '20m', " +
-          parameter +
-          ": '20m' } } }"
+        "{ transfers: { bicycle: { maxDuration: '30m', profiles: [{ id: 'b' }], maxDurationAllowAllModes: '20m', "
+        + parameter
+        + ": '20m' } } }"
       );
 
       var ex = assertThrows(OtpAppException.class, () -> TransferProfilesConfigMapper.map(root));
