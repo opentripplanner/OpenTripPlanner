@@ -46,15 +46,17 @@ public class StopCallImpl implements GraphQLDataFetchers.GraphQLStopCall {
   public DataFetcher<CallSchedule> schedule() {
     return environment -> {
       var tripTime = getSource(environment);
+      var transitService = getTransitService(environment);
+      var scheduledStop = tripTime.getScheduledStop(transitService.findPattern(tripTime.getTrip()));
 
       if (tripTime.hasScheduledTimes()) {
         var scheduledArrival = getZonedDateTime(environment, tripTime.getScheduledArrival());
         var scheduledDeparture = getZonedDateTime(environment, tripTime.getScheduledDeparture());
         return new CallSchedule(
-          new ArrivalDepartureTime(scheduledArrival, scheduledDeparture, tripTime.isTimepoint())
+          new ArrivalDepartureTime(scheduledArrival, scheduledDeparture, tripTime.isTimepoint()),
+          scheduledStop
         );
       } else {
-        var transitService = getTransitService(environment);
         var flexTrip = transitService.getFlexIndex().getTripById(tripTime.getTrip().getId());
         if (flexTrip == null) {
           return null;
@@ -67,7 +69,7 @@ public class StopCallImpl implements GraphQLDataFetchers.GraphQLStopCall {
         var start = ServiceDateUtils.toOffsetDateTime(serviceDay, timeZone, startSecs);
         var end = ServiceDateUtils.toOffsetDateTime(serviceDay, timeZone, endSecs);
 
-        return new CallSchedule(new TimeWindow(start, end));
+        return new CallSchedule(new TimeWindow(start, end), scheduledStop);
       }
     };
   }
