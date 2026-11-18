@@ -151,7 +151,8 @@ public final class ItineraryReferenceMapper {
   }
 
   /**
-   * A transit leg without a reference (for example flex) cannot be stored. Skipping it would give an
+   * A transit leg without a reference (for example flex) cannot be stored. Skipping it would give
+   * an
    * id for a different trip, so the whole itinerary is unsupported.
    */
   private static LegReference requireLegReference(Leg leg) {

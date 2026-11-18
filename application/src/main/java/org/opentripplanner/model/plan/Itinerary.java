@@ -451,7 +451,8 @@ public class Itinerary implements ItinerarySortKey {
    * on-street legs don't have an unfair advantage over those combining access/egress with transit
    * and using a penalty when being processed by the itinerary filter chain.
    *
-   * @see org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressPenaltyDecorator
+   * @see
+   *     org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressPenaltyDecorator
    */
   @Override
   public NormalizedCost generalizedCostIncludingPenalty() {

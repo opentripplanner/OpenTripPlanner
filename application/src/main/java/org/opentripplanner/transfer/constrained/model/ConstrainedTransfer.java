@@ -74,7 +74,8 @@ public final class ConstrainedTransfer implements RaptorConstrainedTransfer, Ser
    * The ranking implemented here is slightly modified:
    * <ul>
    *   <li>The specification do not say anything about Stations even if Stations can be used to
-   *       specify a transfer-point. In OTP stops are more specific than station, so we use the following
+   *       specify a transfer-point. In OTP stops are more specific than station, so we use the
+   *       following
    *       transfer-point ranking:
    *   <ol>
    *     <li>Station: 0 (zero)</li>

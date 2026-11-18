@@ -178,10 +178,12 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
    * The semantics depend on when this is called in the round lifecycle:
    * <ul>
    *   <li>Called from the <b>boarding step</b>: returns transit and transfer arrivals from the
-   *       previous round (the marker was advanced past them at the end of that round's transit scan, but
+   *       previous round (the marker was advanced past them at the end of that round's transit
+   *       scan, but
    *       the arrivals remain readable).</li>
    *   <li>Called from the <b>transfer step</b>: returns only the transit alights from the current
-   *       round (the marker was just advanced past the previous round's arrivals and the new transit
+   *       round (the marker was just advanced past the previous round's arrivals and the new
+   *       transit
    *       alights were committed).</li>
    * </ul>
    */
@@ -198,10 +200,13 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
    * Called at two points in the round lifecycle (see {@link McRangeRaptorWorkerState} for the
    * full lifecycle description):
    * <ul>
-   *   <li><b>Setup iteration</b>: advances the marker past all arrivals, including transfer arrivals
-   *       left over from the previous iteration's last round, so they are not re-explored in the new
+   *   <li><b>Setup iteration</b>: advances the marker past all arrivals, including transfer
+   *       arrivals
+   *       left over from the previous iteration's last round, so they are not re-explored in the
+   *       new
    *       iteration.</li>
-   *   <li><b>Transits for round complete</b>: advances the marker past the previous round's arrivals
+   *   <li><b>Transits for round complete</b>: advances the marker past the previous round's
+   *       arrivals
    *       before committing the current round's transit alights. This makes the new transit alights
    *       visible to the transfer step while hiding the older arrivals.</li>
    * </ul>

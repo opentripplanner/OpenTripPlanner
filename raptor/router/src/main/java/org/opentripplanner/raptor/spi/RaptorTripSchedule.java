@@ -33,7 +33,8 @@ public interface RaptorTripSchedule {
   int departure(int stopPosInPattern);
 
   /// The relative-travel-duration is a proxy for time spent on transit from the boarding stop to
-  /// the alight stop. We do not know the alight stop, so it is impossible to calculate the "correct"
+  /// the alight stop. We do not know the alight stop, so it is impossible to calculate the
+  /// "correct"
   /// time. The only thing that matters is that the relative difference between two boardings is
   /// correct. Compute a relative-time that can be used to compare the travel-time cost for any two
   /// boardings in the same pattern.
@@ -43,7 +44,8 @@ public interface RaptorTripSchedule {
   /// - For two boardings at stop positions `i` and `j` on the same trip (where `i` comes before `j`
   ///   in the pattern), `relativeTravelDuration(boardAtI) - relativeTravelDuration(boardAtJ)` must
   ///   equal the actual transit duration from stop `i` to stop `j`. If the board time at position 3
-  ///   is 10:00 and at the next stop is 10:05, then the value at position 3 is larger by 5*60s = 300
+  ///   is 10:00 and at the next stop is 10:05, then the value at position 3 is larger by 5*60s =
+  ///   300
   ///   than at the next stop.
   /// - All trips in the same pattern should return the same value for at least one stop. If you
   ///   choose to anchor the relative duration to the last stop, and the value for one trip at the

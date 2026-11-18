@@ -30,19 +30,26 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * "bag" of {@code patternRides} in {@link MultiCriteriaRoutingStrategy} for the given pattern. The
  * main differences are:
  * <ul>
- *   <li>Alight-/arrival specific cost is not included when comparing pattern-rides. This is ok, since
- *       we add this before adding a path to the stop-arrivals at a given stop. This assumes that the cost
+ *   <li>Alight-/arrival specific cost is not included when comparing pattern-rides. This is ok,
+ *       since
+ *       we add this before adding a path to the stop-arrivals at a given stop. This assumes that
+ *       the cost
  *       of alighting/arrival is the same for all paths arriving by the same trip. This allow us to
  *       eliminate paths, without doing the actual stop-arrival cost calculation.</li>
  *   <li>An earlier-departing trip (lower {@code tripSortIndex}) dominates a later one when its cost
- *       is equal or better. This reduces the on-board optimal set compared with treating all trips as
+ *       is equal or better. This reduces the on-board optimal set compared with treating all trips
+ *       as
  *       incomparable.
  *       <p>
  *       For circular patterns with a "tail" (stops that only appear after the loop completes), a
- *       passenger heading to a tail stop should board on the second pass through a loop stop, thereby
- *       skipping the full circle. On the second pass, an earlier-departing trip is typically available:
- *       the earlier trip's second pass will reach the tail stop no later than the later trip's first
- *       pass. The earlier-departure dominance therefore remains correct even for tail-stop destinations.
+ *       passenger heading to a tail stop should board on the second pass through a loop stop,
+ *       thereby
+ *       skipping the full circle. On the second pass, an earlier-departing trip is typically
+ *       available:
+ *       the earlier trip's second pass will reach the tail stop no later than the later trip's
+ *       first
+ *       pass. The earlier-departure dominance therefore remains correct even for tail-stop
+ *       destinations.
  *   </li>
  *   <li>We do not have to update all elements in the "pattern-bag" for every stop visited. The
  *       {@code relative-cost} is calculated once - when adding the path to the "pattern-bag" of

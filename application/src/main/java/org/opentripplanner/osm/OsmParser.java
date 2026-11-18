@@ -116,7 +116,8 @@ class OsmParser extends BinaryParser {
   }
 
   /**
-   * Whether the data block with the given index (among the data blocks) can be skipped in the current phase.
+   * Whether the data block with the given index (among the data blocks) can be skipped in the
+   * current phase.
    */
   private boolean skipDataBlock(int index) {
     if (!blockContentKnown) {

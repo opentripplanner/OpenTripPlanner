@@ -44,7 +44,8 @@ import org.slf4j.LoggerFactory;
  * <p>
  * The scheduled trip patterns, trips and trip calendars are not part of this repository.
  * <p>
- * A TransitRepository instance also includes references to some transient indexes of its contents, to
+ * A TransitRepository instance also includes references to some transient indexes of its contents,
+ * to
  * the RaptorTransitData derived from it, and to some other services and utilities that operate upon
  * its contents.
  * <p>

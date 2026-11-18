@@ -12,7 +12,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * routed. One of the three is the same as the optimization for the shortest duration
  * (time), the flattest streets (slope) or the safest streets (safety).
  * <p>
- * The values are normalized: they sum to exactly 1.0, and each is a multiple of {@link NormalizedRatio#STEP}, so the class
+ * The values are normalized: they sum to exactly 1.0, and each is a multiple of
+ * {@link NormalizedRatio#STEP}, so the class
  * can be used as a part of a cache key. The values given to {@link #of(double, double, double)} are
  * relative to each other, for example {@code of(0.1, 0, 0)} is the same as {@code of(1, 0, 0)}.
  * <p>

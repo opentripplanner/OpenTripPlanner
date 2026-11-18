@@ -32,15 +32,20 @@ import org.slf4j.LoggerFactory;
 /**
  * Handles taxi routing, filtering and decoration, backed by a single {@link TaxiRouteIndex}.
  * <ol>
- *   <li>Before a direct taxi street search runs, {@link #routeDirect} checks that the request origin
+ *   <li>Before a direct taxi street search runs, {@link #routeDirect} checks that the request
+ *       origin
  *       and destination are covered by a common taxi provider; if not, an empty result is returned
  *       immediately without running {@link DirectStreetRouter}.
- *   <li>Before a transit search runs, {@link #filterNearbyStops} drops candidate access/egress stops
- *       whose logical endpoints (the request origin/destination and the stop) are not covered by a common
+ *   <li>Before a transit search runs, {@link #filterNearbyStops} drops candidate access/egress
+ *       stops
+ *       whose logical endpoints (the request origin/destination and the stop) are not covered by a
+ *       common
  *       taxi provider, so RAPTOR never considers a combination that would later be rejected.
  *   <li>Once a search has produced results, {@link #decorateItineraries} (direct routing) and
- *       {@link #decorateAccessEgressLegs} (transit access/egress) replace each {@link TraverseMode#CAR}
- *       {@link StreetLeg} with a {@link TaxiLeg} decorated with the matching provider, looked up using
+ *       {@link #decorateAccessEgressLegs} (transit access/egress) replace each
+ *       {@link TraverseMode#CAR}
+ *       {@link StreetLeg} with a {@link TaxiLeg} decorated with the matching provider, looked up
+ *       using
  *       the same logical coordinates rather than the leg's own local coordinates, which may differ
  *       slightly when the route is a walk-drive-walk chain.
  * </ol>

@@ -34,7 +34,8 @@ import org.opentripplanner.raptor.configure.RaptorTestFactory;
  * <p>
  * At stop D (the via FROM-stop), two arrivals compete:
  * <ol>
- *   <li>Walk-transfer via R1(A→B) + walk B→D: round=1, arrives 0:09, cost low, arrivedOnBoard=false —
+ *   <li>Walk-transfer via R1(A→B) + walk B→D: round=1, arrives 0:09, cost low, arrivedOnBoard=false
+ *       —
  *       does NOT fire the via connection to F</li>
  *   <li>Transit via R1(A→C) + R2(C→D): round=2, arrives 0:15, cost higher, arrivedOnBoard=true —
  *       fires the via connection to F</li>

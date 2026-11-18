@@ -8,7 +8,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * The preferences of the bicycle transfers: speed and reluctance for a traveler that rides
- * a bicycle, how the route is optimized, and the preferences for walking with it. The values are normalized(rounded) so the
+ * a bicycle, how the route is optimized, and the preferences for walking with it. The values are
+ * normalized(rounded) so the
  * class can used as a cache key.
  * <p>
  * See the configuration for documentation of each field.

@@ -22,8 +22,10 @@ import org.opentripplanner.transit.model.organization.ContactInfo;
  *
  * <h2>Core Concepts</h2>
  * <ul>
- *   <li><strong>Origin/Destination Areas:</strong> Start and end zones for the driver's journey</li>
- *   <li><strong>Stops:</strong> Ordered sequence of waypoints along the route where passengers can be
+ *   <li><strong>Origin/Destination Areas:</strong> Start and end zones for the driver's
+ *       journey</li>
+ *   <li><strong>Stops:</strong> Ordered sequence of waypoints along the route where passengers can
+ *       be
  *       picked up or dropped off. Stops are dynamically updated as bookings occur.</li>
  *   <li><strong>Total Capacity:</strong> Number of seats in the car, including the driver seat</li>
  * </ul>
@@ -45,7 +47,8 @@ import org.opentripplanner.transit.model.organization.ContactInfo;
  * The routing algorithm uses trips to find compatible matches for passenger requests:
  * <ol>
  *   <li>Filters check basic compatibility (capacity, timing, direction)</li>
- *   <li>Insertion strategy finds optimal pickup/dropoff positions along the route, keeping every leg
+ *   <li>Insertion strategy finds optimal pickup/dropoff positions along the route, keeping every
+ *       leg
  *       the passenger rides within capacity and every later stop within its deviation budget</li>
  * </ol>
  *

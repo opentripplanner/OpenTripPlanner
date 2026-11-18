@@ -96,8 +96,10 @@ import static org.opentripplanner.raptor.spi.RaptorCostConverter.toRaptorCost;
  * <b>Why use a 1/log function?</b>
  * <ol>
  *   <li>First of all we want to maximize the total transfers time across all transfers in the
- *       journey. This makes sure we do not stay on a trip longer than needed and avoid back-travel.</li>
- *   <li>Second, we want to avoid VERY short transfers. The function above favor the set of transfers
+ *       journey. This makes sure we do not stay on a trip longer than needed and avoid
+ *       back-travel.</li>
+ *   <li>Second, we want to avoid VERY short transfers. The function above favor the set of
+ *       transfers
  *       [3,5] over [2,6] and [2,6] over [1,7] - a linear function would not.</li>
  *   <li>Any 1/logN would be suitable, but log with base 10 is chosen (Supported in Java).</li>
  *   <li>We use this only to adjust the transfers within a single itinerary, not to compare two

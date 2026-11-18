@@ -29,7 +29,8 @@ import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
  * <p>
  * At stop C, two arrivals compete:
  * <ol>
- *   <li>Walk-transfer via R1(A→B) + walk B→C: round=1, arrives ~0:09, cost low, arrivedOnBoard=false
+ *   <li>Walk-transfer via R1(A→B) + walk B→C: round=1, arrives ~0:09, cost low,
+ *       arrivedOnBoard=false
  *       — does NOT fire walk egress</li>
  *   <li>Transit via R1(A→B) + R2(B→C): round=2, arrives 0:15, cost higher, arrivedOnBoard=true —
  *       fires walk egress</li>

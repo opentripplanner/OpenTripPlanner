@@ -45,7 +45,8 @@ public class PolylineEncoder {
    * <p>
    * The algorithm works by:
    * <ol>
-   *   <li>Converting each coordinate (latitude/longitude) to a fixed-precision integer by multiplying
+   *   <li>Converting each coordinate (latitude/longitude) to a fixed-precision integer by
+   *       multiplying
    *       by 10^5</li>
    *   <li>Computing deltas (differences) from the previous point to reduce the magnitude of numbers
    *       (the first point uses absolute coordinates)</li>
@@ -117,7 +118,8 @@ public class PolylineEncoder {
    * The encoding process:
    * <ol>
    *   <li>Left-shift the number by 1 bit (equivalent to multiplying by 2)</li>
-   *   <li>If the number is negative, invert all bits using the bitwise NOT operator (~). This ensures
+   *   <li>If the number is negative, invert all bits using the bitwise NOT operator (~). This
+   *       ensures
    *       negative values are distinguishable from positive values.</li>
    *   <li>Pass the result to encodeNumber() for conversion to 5-bit chunks and ASCII</li>
    * </ol>

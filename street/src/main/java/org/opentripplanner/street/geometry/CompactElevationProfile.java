@@ -10,7 +10,8 @@ import org.opentripplanner.utils.lang.IntUtils;
  * Compact elevation profile. To optimize storage, we use the following tricks:
  * <ul>
  *   <li>Store intermediate point in fixed floating points with fixed precision, using delta coding
- *       from the previous point, and variable length coding (most of the delta coordinates will thus fits
+ *       from the previous point, and variable length coding (most of the delta coordinates will
+ *       thus fits
  *       in 1 or 2 bytes).</li>
  * </ul>
  * <p>

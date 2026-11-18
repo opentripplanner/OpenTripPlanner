@@ -40,11 +40,15 @@ import org.opentripplanner.core.model.transaction.WriteContext;
  * data is a very simple candy shop with a customer and order repositories. There is a difference
  * between the two transaction strategies:
  * <ul>
- *   <li>CustomerRepository uses copy-on-write and a lifecycle manager, so it supports atomic commits
+ *   <li>CustomerRepository uses copy-on-write and a lifecycle manager, so it supports atomic
+ *       commits
  *       and rollback on failure.</li>
- *   <li>OrderRepository returns the same mutable instance for each transaction and freezes it into a
- *       snapshot on commit. It does not support atomic commits or rollback on failure, but is more memory
- *       efficient, like OTP. It is more efficient since it only copies the internal data structure on
+ *   <li>OrderRepository returns the same mutable instance for each transaction and freezes it into
+ *       a
+ *       snapshot on commit. It does not support atomic commits or rollback on failure, but is more
+ *       memory
+ *       efficient, like OTP. It is more efficient since it only copies the internal data structure
+ *       on
  *       commit.</li>
  * </ul>
  * The test also demonstrates the transaction visibility contract: state changes are not visible to
@@ -164,8 +168,10 @@ public class TransactionFrameworkTest {
    * Demonstrates the rollback contract difference between the two lifecycle strategies:
    * <ul>
    *   <li>CustomerRepository uses copy-on-write via {@code CustomerRepositoryLifecycle}: rollback
-   *       discards the in-progress copy, so the next task starts from the last committed snapshot.</li>
-   *   <li>OrderRepository returns {@code this} from {@code copyOnWrite}, so mutations written before
+   *       discards the in-progress copy, so the next task starts from the last committed
+   *       snapshot.</li>
+   *   <li>OrderRepository returns {@code this} from {@code copyOnWrite}, so mutations written
+   *       before
    *       the failure are NOT discarded by rollback and leak into the next committed snapshot.</li>
    * </ul>
    */

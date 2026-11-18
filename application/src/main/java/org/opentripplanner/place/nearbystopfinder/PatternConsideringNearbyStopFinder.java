@@ -22,7 +22,8 @@ import org.opentripplanner.transit.service.SiteRepository;
  * <ul>
  *   <li>Are served by trip patterns where boarding/alighting is possible, OR</li>
  *   <li>Are served by flex trips (if a flex index is given), OR</li>
- *   <li>Are sometimes used by real-time trips (if IncludeStopsUsedRealTimeInTransfers is enabled)</li>
+ *   <li>Are sometimes used by real-time trips (if IncludeStopsUsedRealTimeInTransfers is
+ *       enabled)</li>
  * </ul>
  * <p>
  * For each trip pattern, only the closest stop is included to reduce the number of transfers

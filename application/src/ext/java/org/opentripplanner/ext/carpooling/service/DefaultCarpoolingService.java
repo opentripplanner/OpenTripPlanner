@@ -73,14 +73,18 @@ import org.slf4j.LoggerFactory;
  * <p>
  * The service executes routing requests in three phases:
  * <ol>
- *   <li><strong>Pre-filtering ({@link TripPreFilters}):</strong> Once the passenger is snapped to the
- *       street network, quickly eliminates trips that cannot serve the passenger in time, have no free
+ *   <li><strong>Pre-filtering ({@link TripPreFilters}):</strong> Once the passenger is snapped to
+ *       the
+ *       street network, quickly eliminates trips that cannot serve the passenger in time, have no
+ *       free
  *       seat, or whose corridor cannot reach the passenger.</li>
  *   <li><strong>Insertion Evaluation ({@link InsertionEvaluator}):</strong> For trips that pass
- *       filtering, computes the driving times. Evaluates all feasible insertion positions and selects the
+ *       filtering, computes the driving times. Evaluates all feasible insertion positions and
+ *       selects the
  *       one minimizing additional travel time while satisfying delay constraints.</li>
  *   <li><strong>Post-filtering ({@link ItineraryPostFilters}, direct routing only):</strong>
- *       Re-checks the fully-routed {@link Itinerary} against tight time bounds that the loose pre-filter
+ *       Re-checks the fully-routed {@link Itinerary} against tight time bounds that the loose
+ *       pre-filter
  *       could not enforce. Access/egress routing skips this phase because it emits
  *       {@link CarpoolAccessEgress} objects rather than itineraries.</li>
  * </ol>
@@ -89,7 +93,8 @@ import org.slf4j.LoggerFactory;
  * <ul>
  *   <li><strong>{@link CarpoolingRepository}:</strong> Source of available driver trips</li>
  *   <li><strong>{@link VertexCreationService}:</strong> Links coordinates to graph vertices</li>
- *   <li><strong>{@link StreetLimitationParametersService}:</strong> Street routing configuration</li>
+ *   <li><strong>{@link StreetLimitationParametersService}:</strong> Street routing
+ *       configuration</li>
  *   <li><strong>{@link TripPreFilters}:</strong> Pre-screening filters</li>
  *   <li><strong>{@link InsertionEvaluator}:</strong> Routing evaluation and selection</li>
  *   <li><strong>{@link CarpoolItineraryMapper}:</strong> Maps insertions to OTP itineraries</li>
@@ -179,8 +184,10 @@ public class DefaultCarpoolingService implements CarpoolingService {
    *       {@link CarpoolingParameters#maxCandidateTripsPerRequest()}, those passing closest to the
    *       passenger, are evaluated.</li>
    *   <li><strong>Insertion evaluation:</strong> Insertion positions are evaluated with the driving
-   *       times of the trips' corridors and the street trees of the passenger's pickup and dropoff, via
-   *       {@link CorridorRouter}, to find the insertion that minimizes additional driver travel time
+   *       times of the trips' corridors and the street trees of the passenger's pickup and dropoff,
+   *       via
+   *       {@link CorridorRouter}, to find the insertion that minimizes additional driver travel
+   *       time
    *       while respecting delay constraints.</li>
    *   <li><strong>Post-filtering:</strong> Routed itineraries are re-checked against tight time
    *       bounds that the loose pre-filter could not enforce.</li>
@@ -342,12 +349,16 @@ public class DefaultCarpoolingService implements CarpoolingService {
    * <p>
    * The method proceeds as follows:
    * <ol>
-   *   <li>Once the passenger is snapped to the street network, pre-filters the trips by time window,
-   *       by free seats and by whether their corridor can reach the passenger. Of the survivors, at most
+   *   <li>Once the passenger is snapped to the street network, pre-filters the trips by time
+   *       window,
+   *       by free seats and by whether their corridor can reach the passenger. Of the survivors, at
+   *       most
    *       {@link CarpoolingParameters#maxCandidateTripsPerRequest()}, those passing closest to the
    *       passenger, are evaluated.</li>
-   *   <li>Takes the transit stops each trip can serve from its {@link CarpoolCorridor}, keeping those
-   *       the passenger can walk to or from within the walk budget; a trip without such a stop is left
+   *   <li>Takes the transit stops each trip can serve from its {@link CarpoolCorridor}, keeping
+   *       those
+   *       the passenger can walk to or from within the walk budget; a trip without such a stop is
+   *       left
    *       out.</li>
    *   <li>Evaluates the insertion positions with the driving times of the corridor and the
    *       passenger's two street trees, via {@link CorridorRouter}.</li>

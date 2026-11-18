@@ -26,7 +26,8 @@ import org.slf4j.LoggerFactory;
 /// ### Memory consumption
 ///
 /// The map is backed by HPPC's open-addressing `LongObjectHashMap`, sized upfront to the number of
-/// ways at its default 0.75 load factor, so it never shrinks below that once built. For a graph with
+/// ways at its default 0.75 load factor, so it never shrinks below that once built. For a graph
+/// with
 /// 2 million ways that means a capacity of roughly 4 million slots (rounded up to a power of two),
 /// backed by two parallel arrays:
 ///

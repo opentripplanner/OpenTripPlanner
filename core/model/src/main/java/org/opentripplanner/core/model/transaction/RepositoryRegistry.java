@@ -10,13 +10,17 @@ import java.util.function.Consumer;
  * <ol>
  *   <li>Create one {@code RepositoryRegistry} for the application lifetime.
  *   <li>For each domain repository, call
- *       {@link #registerRepositorySnapshot(Object, RepositoryLifecycle)} during wiring (e.g. in a Dagger
- *       module). Keep the returned {@link RepositoryHandle} for injection into services and updaters.
- *   <li>At the start of each request, call {@link #scope()} to obtain a {@link TransactionScope} that
+ *       {@link #registerRepositorySnapshot(Object, RepositoryLifecycle)} during wiring (e.g. in a
+ *       Dagger
+ *       module). Keep the returned {@link RepositoryHandle} for injection into services and
+ *       updaters.
+ *   <li>At the start of each request, call {@link #scope()} to obtain a {@link TransactionScope}
+ *       that
  *       captures a consistent snapshot of all repositories at that point in time.
  *   <li>To perform writes, use {@link UpdateManager#submit(Consumer)} to add tasks to the manager
  *       queue.
- *   <li>Commits are either performed after each submitted task or, if periodic commits are configured
+ *   <li>Commits are either performed after each submitted task or, if periodic commits are
+ *       configured
  *       via {@code maxSnapshotFrequency}, in the specified frequency.
  * </ol>
  */

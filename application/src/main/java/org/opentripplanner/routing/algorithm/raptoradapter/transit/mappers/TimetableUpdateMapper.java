@@ -74,7 +74,8 @@ public class TimetableUpdateMapper {
   /// Updates the real-time [RaptorTransitData] to use the modified timetables.
   ///
   /// This method bridges the different update approaches:
-  /// 1. `updatedTimetables` and `timetables` only contains [Timetable]s with real-time updates. This
+  /// 1. `updatedTimetables` and `timetables` only contains [Timetable]s with real-time updates.
+  ///    This
   ///    means that removed items are not present.
   /// 2. [RaptorTransitData] requires applying the changes to a previous snapshot: adding, updating
   ///    and removing timetables.

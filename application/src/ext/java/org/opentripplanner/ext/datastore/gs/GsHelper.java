@@ -15,7 +15,8 @@ class GsHelper {
    * GCS URL pattern for the Scheme Specific Part, without the 'gs:' prefix Not all rules are
    * validated here, but the following is:
    * <ul>
-   *   <li>Bucket names must contain only lowercase letters, numbers, dashes (-), underscores (_), and
+   *   <li>Bucket names must contain only lowercase letters, numbers, dashes (-), underscores (_),
+   *       and
    *       dots (.)
    *   <li>Bucket names must contain 3 to 222 characters.
    *   <li>Object names must be at least one character.

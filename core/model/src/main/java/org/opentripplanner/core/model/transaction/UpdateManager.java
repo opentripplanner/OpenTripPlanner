@@ -18,7 +18,8 @@ import org.opentripplanner.core.model.event.EventHandler;
  * <ol>
  *   <li>At startup, register {@link EventHandler}s via
  *       {@link #register(EventHandler, RepositoryHandle)}.
- *   <li>When an updater has work to do, call {@link #submit(Consumer)} with a lambda that receives a
+ *   <li>When an updater has work to do, call {@link #submit(Consumer)} with a lambda that receives
+ *       a
  *       fresh {@link WriteContext}. Construct the updater service inside the lambda.
  *   <li>The {@code WriteContext} provides repository snapshot access and event publication.
  *   <li>Either the caller needs to commit or the manager can be set up to auto-commit periodically.

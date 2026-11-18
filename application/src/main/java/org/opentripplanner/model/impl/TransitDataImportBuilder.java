@@ -266,7 +266,8 @@ public class TransitDataImportBuilder {
   }
 
   /**
-   * @see org.opentripplanner.transit.service.TransitRepository#findStopByScheduledStopPoint(FeedScopedId)
+   * @see
+   *     org.opentripplanner.transit.service.TransitRepository#findStopByScheduledStopPoint(FeedScopedId)
    */
   public Map<FeedScopedId, RegularStop> stopsByScheduledStopPoints() {
     return stopsByScheduledStopPoints;

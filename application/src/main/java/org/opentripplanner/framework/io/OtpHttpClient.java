@@ -44,7 +44,6 @@ import tools.jackson.databind.ObjectMapper;
  * objects.
  *
  * <p>
- * <p>
  * <h3>Exception management</h3>
  * Exceptions thrown during network operations or response mapping are wrapped in
  * {@link OtpHttpClientException}

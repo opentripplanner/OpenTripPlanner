@@ -4,7 +4,8 @@ import org.opentripplanner.raptor.spi.RaptorStopNameResolver;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 
 /// A via-connection is used to define one of the physical locations in a via location Raptor must
-/// visit. At least one connection in a {@link RaptorViaLocation} must be used. A connection can be a
+/// visit. At least one connection in a {@link RaptorViaLocation} must be used. A connection can be
+/// a
 /// single stop or a stop and a transfer to another stop. The last is useful if you want to use the
 /// connection to visit something other than a stop, like a street location. This is not an
 /// alternative to transfers. Raptor supports several use-cases through via-connections:
@@ -13,13 +14,15 @@ import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 /// #4 Route via a pass-through-stop
 ///
 /// Raptor will allow a path to go through a pass-through-stop. The stop can be visited on-board
-/// transit, or at the alight- or board-stop. The from-stop and to-stop must be the same (there is no
+/// transit, or at the alight- or board-stop. The from-stop and to-stop must be the same (there is
+/// no
 /// to-stop defined), and the minimum-wait-time must be zero.
 ///
 ///
 /// #4 Route via a single stop with a minimum-wait-time
 ///
-/// Raptor will allow a path to go through a single stop, the path must either alight or board at the
+/// Raptor will allow a path to go through a single stop, the path must either alight or board at
+/// the
 /// given stop. The from-stop and to-stop is the same (there is no to-stop defined). A
 /// minimum-wait-time can be applied at the given stop.
 ///
@@ -66,8 +69,10 @@ public abstract sealed class ViaConnection
   ///
   /// **Notes**
   /// - If the connection is connecting diffrent stops, they by definition dominates each other.
-  /// - Only parameters having a direct effect on one of the search ciriteria should be included. For
-  ///   example _minimum wait time_ should be included in the comparason, because it has an effect on
+  /// - Only parameters having a direct effect on one of the search ciriteria should be included.
+  ///   For
+  ///   example _minimum wait time_ should be included in the comparason, because it has an effect
+  ///   on
   ///   the arrivel time.
   abstract boolean leftDominanceExist(ViaConnection right);
 

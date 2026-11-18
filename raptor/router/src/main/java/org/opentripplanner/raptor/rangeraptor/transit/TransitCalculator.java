@@ -20,9 +20,12 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  * "target", in stead of "from/to" and "board/alight".
  * <ul>
  *   <li>In a FORWARD search the "source" means "from" and "TARGET" means "to".</li>
- *   <li>In a BACKWARD search the "source" means "to" and "TARGET" means "from". The traversal of the
- *       graph happens from the destination towards the origin - backwards in time. The "from/to" refer to
- *       the "natural way" we think about a journey, while "source/target" the destination is the source
+ *   <li>In a BACKWARD search the "source" means "to" and "TARGET" means "from". The traversal of
+ *       the
+ *       graph happens from the destination towards the origin - backwards in time. The "from/to"
+ *       refer to
+ *       the "natural way" we think about a journey, while "source/target" the destination is the
+ *       source
  *       and the origin is the target in a BACKWARD search.</li>
  * </ul>
  * "Source" and "target" may apply to stop-arrival, trip, board-/aligh-slack, and so on.

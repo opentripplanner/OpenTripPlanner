@@ -50,8 +50,6 @@ import uk.org.siri.siri21.Siri;
  * <a href="https://cloud.google.com/docs/authentication/getting-started">ServiceAccount need access
  * to create subscription ("editor")</a>
  * <p>
- * <p>
- * <p>
  * Startup-flow: 1. Create subscription to topic. Subscription will receive all updates after
  * creation. 2. Fetch current data to initialize state. 3. Flag updater as initialized 3. Start
  * receiving updates from Pubsub-subscription

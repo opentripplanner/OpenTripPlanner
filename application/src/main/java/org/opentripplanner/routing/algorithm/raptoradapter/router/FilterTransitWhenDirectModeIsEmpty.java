@@ -17,7 +17,8 @@ import org.opentripplanner.street.model.StreetMode;
  * <ul>
  *   <li>Itinerary-1: {@code Origin ~ Walk 100m ~ Destination} (Street search)</li>
  *   <li>Itinerary-2:
- *       {@code Origin ~ Walk 120m ~ Stop A ~ Bus 10:00 10:05 ~ Stop B ~ Walk 200m ~ Destination} (Raptor
+ *       {@code Origin ~ Walk 120m ~ Stop A ~ Bus 10:00 10:05 ~ Stop B ~ Walk 200m ~ Destination}
+ *       (Raptor
  *       search)</li>
  * </ul>
  * <p>

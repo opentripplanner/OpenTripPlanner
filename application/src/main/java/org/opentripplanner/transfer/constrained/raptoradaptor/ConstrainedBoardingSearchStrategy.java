@@ -29,7 +29,8 @@ interface ConstrainedBoardingSearchStrategy {
   /**
    * <ol>
    *   <li>In a forward search iterate in departure order.
-   *   <li>In a reverse search iterate in reverse departure order, starting with the last trip in the
+   *   <li>In a reverse search iterate in reverse departure order, starting with the last trip in
+   *       the
    *       schedule.
    * </ol>
    */
@@ -37,7 +38,8 @@ interface ConstrainedBoardingSearchStrategy {
 
   /**
    * <ol>
-   *   <li>In a forward search add {@code u} and {@code v} together. Example: {@code plus(5, 2) => 7}
+   *   <li>In a forward search add {@code u} and {@code v} together. Example:
+   *       {@code plus(5, 2) => 7}
    *   <li>In a reverse search subtract {@code v} from {@code u}. Example: {@code plus(5, 2) => 3}
    * </ol>
    */

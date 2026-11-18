@@ -44,13 +44,16 @@ import org.opentripplanner.transit.model.organization.ContactInfo;
  *   <li>{@code A} — carpool trip origin (where the driver starts).
  *   <li>{@code D} — carpool trip destination (where the driver ends).
  *   <li>{@code B} — drivable mid-route intersection nearest to the passenger's origin; the snapper
- *       resolves it as the car-reachable pickup vertex because {@code P} sits on a pedestrian-only side
+ *       resolves it as the car-reachable pickup vertex because {@code P} sits on a pedestrian-only
+ *       side
  *       branch the car cannot enter.
  *   <li>{@code C} — drivable mid-route intersection nearest to the passenger's destination; the
  *       snapper resolves it as the car-reachable dropoff vertex for the same reason.
- *   <li>{@code P} — passenger origin, off the drivable network on a pedestrian-only side branch from
+ *   <li>{@code P} — passenger origin, off the drivable network on a pedestrian-only side branch
+ *       from
  *       B.
- *   <li>{@code Q} — passenger destination, off the drivable network on a pedestrian-only side branch
+ *   <li>{@code Q} — passenger destination, off the drivable network on a pedestrian-only side
+ *       branch
  *       from C.
  * </ul>
  *

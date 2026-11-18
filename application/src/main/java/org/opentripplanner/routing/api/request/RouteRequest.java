@@ -410,7 +410,8 @@ public class RouteRequest implements Serializable {
    * <ul>
    *   <li>The traveler want to find the best alternative within a time window. Set
    *       {@code timetableView=true} and {@code arriveBy=false}. This is the default, and if the
-   *       intention of the traveler is unknown, this gives the best result. This use-case includes all
+   *       intention of the traveler is unknown, this gives the best result. This use-case includes
+   *       all
    *       itineraries in the two next use-cases. This option also work well with paging.
    *       <p>
    *       Setting the {@code arriveBy=false}, covers the same use-case, but the input time is
@@ -419,7 +420,8 @@ public class RouteRequest implements Serializable {
    *       example: I am at the station now and want to get home as quickly as possible. Set
    *       {@code timetableView=true} and {@code arriveBy=false}. Do not support paging.</li>
    *   <li>Traveler want to find the best alternative with arrival before specific time. For example
-   *       going to a meeting. Set {@code timetableView=true} and {@code arriveBy=false}. Do not support
+   *       going to a meeting. Set {@code timetableView=true} and {@code arriveBy=false}. Do not
+   *       support
    *       paging.</li>
    * </ul>
    * Default: true

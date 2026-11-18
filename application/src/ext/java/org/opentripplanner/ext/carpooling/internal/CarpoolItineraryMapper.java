@@ -49,7 +49,8 @@ import org.opentripplanner.utils.lang.StringUtils;
  * <ol>
  *   <li>An optional leading {@link StreetLeg} (WALK) from the passenger-side location (origin for
  *       direct/access, transit stop for egress) to the snapped carpool pickup vertex.</li>
- *   <li>A {@link CarpoolLeg} covering the shared ride between pickup and dropoff. The boarding dwell
+ *   <li>A {@link CarpoolLeg} covering the shared ride between pickup and dropoff. The boarding
+ *       dwell
  *       at the pickup is included in this leg's duration, not added before it.</li>
  *   <li>An optional trailing {@link StreetLeg} (WALK) from the snapped dropoff vertex to the
  *       dropoff-side location (destination for direct/egress, transit stop for access).</li>
@@ -72,11 +73,14 @@ import org.opentripplanner.utils.lang.StringUtils;
  *   <li>If the endpoint is a transit stop (access/egress), label with the stop's name via
  *       {@link Place#forStop(StopLocation)}.</li>
  *   <li>Else if the endpoint is the user's input location, label with the user-supplied label when
- *       present, falling back to the localized {@code "origin"} / {@code "destination"} names that the
+ *       present, falling back to the localized {@code "origin"} / {@code "destination"} names that
+ *       the
  *       standard request flow produces.
- *   <li>Else (intermediate boundaries between walk and carpool legs) fall back to vertex-based naming
+ *   <li>Else (intermediate boundaries between walk and carpool legs) fall back to vertex-based
+ *       naming
  *       via {@link #makePlace(Vertex)}: {@link StreetVertex#getIntersectionName()} for street
- *       intersections (composed from OSM street names; mode-agnostic), the vertex's pre-set name for
+ *       intersections (composed from OSM street names; mode-agnostic), the vertex's pre-set name
+ *       for
  *       {@link TemporaryStreetLocation}s.</li>
  * </ol>
  *

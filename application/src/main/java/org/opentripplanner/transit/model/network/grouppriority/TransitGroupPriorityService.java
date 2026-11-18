@@ -27,9 +27,11 @@ public class TransitGroupPriorityService {
    *
    * There are two ways we can treat the base (local-traffic) transit priority group:
    * <ol>
-   *   <li>We can assign group id 1 (one) to the base group and it will be treated as any other group.
+   *   <li>We can assign group id 1 (one) to the base group and it will be treated as any other
+   *       group.
    *   </li>
-   *   <li>We can assign group id 0 (zero) to the base and it will not be added to the set of groups a
+   *   <li>We can assign group id 0 (zero) to the base and it will not be added to the set of groups
+   *       a
    *       given path has.</li>
    * </ol>
    * When we compare paths, we compare sets of group ids. A set is dominating another set if it is a

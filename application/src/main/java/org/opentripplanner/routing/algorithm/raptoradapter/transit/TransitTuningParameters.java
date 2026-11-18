@@ -60,7 +60,6 @@ public interface TransitTuningParameters {
    * The extra time is added to the search-window for the next request if the current result have
    * few itineraries.
    * <p>
-   * <p>
    * The default values are: {@link #PAGING_SEARCH_WINDOW_ADJUSTMENTS}
    */
   List<Duration> pagingSearchWindowAdjustments();

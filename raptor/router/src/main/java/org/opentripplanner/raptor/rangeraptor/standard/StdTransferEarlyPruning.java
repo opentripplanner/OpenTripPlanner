@@ -24,11 +24,14 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  * Two bounds are maintained for correctness with Range Raptor:
  * <ol>
  *   <li>A per-round bound ({@code bestDestArrivalByRound}) tracking the best destination arrival
- *       across all Range Raptor iterations for the current round. This ensures that a fast path from an
- *       earlier iteration (later departure) does not incorrectly prune a path in the current iteration,
+ *       across all Range Raptor iterations for the current round. This ensures that a fast path
+ *       from an
+ *       earlier iteration (later departure) does not incorrectly prune a path in the current
+ *       iteration,
  *       since the Pareto set includes both departure time and arrival time.</li>
  *   <li>A within-iteration bound ({@code bestDestCurrentIteration}) tracking the best destination
- *       arrival seen in earlier rounds of the current iteration. Within a fixed departure-time iteration,
+ *       arrival seen in earlier rounds of the current iteration. Within a fixed departure-time
+ *       iteration,
  *       rounds are processed sequentially, so this bound is safe to apply.</li>
  * </ol>
  * See: Rohovyi, Abuaisha, Walsh — "Early Pruning for Public Transport Routing", WCTR 2026
@@ -44,7 +47,8 @@ public class StdTransferEarlyPruning<T extends RaptorTripSchedule> {
   /**
    * Minimum egress duration per egress stop. The map is sparse — it holds only egress stops, so its
    * memory scales with the number of egress paths rather than the number of stops in the graph,
-   * which matters for large transit networks (100 000+ stops). The {@code getOrDefault} lookup is O(1),
+   * which matters for large transit networks (100 000+ stops). The {@code getOrDefault} lookup is
+   * O(1),
    * keeping {@link #updateArrival(int, int)} cheap; that method is called on every best-time
    * improvement during both the transit and transfer phases.
    */

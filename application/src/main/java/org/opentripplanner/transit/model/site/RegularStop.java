@@ -127,10 +127,13 @@ public final class RegularStop
    * <p>
    * Common use cases:
    * <ul>
-   *   <li><b>Rail platform assignment:</b> Scheduled trips may reference a limited set of platforms,
-   *       while real-time updates assign trips to all available platforms. This is common when the actual
+   *   <li><b>Rail platform assignment:</b> Scheduled trips may reference a limited set of
+   *       platforms,
+   *       while real-time updates assign trips to all available platforms. This is common when the
+   *       actual
    *       platform is assigned AFTER the trips are planned.</li>
-   *   <li><b>Rail Replacement Bus Services:</b> Some stops are reserved for replacement services that
+   *   <li><b>Rail Replacement Bus Services:</b> Some stops are reserved for replacement services
+   *       that
    *       are added via real-time updates rather than scheduled in advance.</li>
    * </ul>
    * <p>

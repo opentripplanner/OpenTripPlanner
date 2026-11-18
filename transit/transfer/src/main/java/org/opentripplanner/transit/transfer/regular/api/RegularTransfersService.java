@@ -22,7 +22,8 @@ public interface RegularTransfersService<P> {
    * The Raptor transfers for the request: the paths stored under the profile closest to the user
    * preferences of the request, re-costed under the user preferences of the request.
    * <p>
-   * The result is cached in the snapshot, in a bounded and thread-safe cache. The cached transfers are always derived from the paths of
+   * The result is cached in the snapshot, in a bounded and thread-safe cache. The cached transfers
+   * are always derived from the paths of
    * the snapshot: a value cached by the previous snapshot is reused if the paths it was derived
    * from did not change, and updated for the stops whose transfers changed otherwise. Normalizing
    * the preferences, so that equivalent requests share a cache entry, is the responsibility of

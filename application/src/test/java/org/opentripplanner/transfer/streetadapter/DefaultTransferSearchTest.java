@@ -228,7 +228,10 @@ class DefaultTransferSearchTest {
     }
   }
 
-  /** A path without edges is a straight line, costed with the speed along the line and the reluctance of the transfer mode. */
+  /**
+   * A path without edges is a straight line, costed with the speed along the line and the
+   * reluctance of the transfer mode.
+   */
   @Nested
   class DurationAndCostOfAPathWithoutEdges {
 

@@ -27,7 +27,8 @@ public class TestTableParser {
    * <ul>
    *   <li>Supported types are boolean, int, double and strings</li>
    *   <li>Use '#' to add comments/header line.</li>
-   *   <li>A double pipe({@code '||'}) is optional and is usually used to separate input from expected
+   *   <li>A double pipe({@code '||'}) is optional and is usually used to separate input from
+   *       expected
    *       result.</li>
    * </ul>
    */

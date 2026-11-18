@@ -59,7 +59,8 @@ class PlatformWayTest {
   }
 
   /**
-   * A stop attaches to the way at one point, but the forward and back edge are split separately into
+   * A stop attaches to the way at one point, but the forward and back edge are split separately
+   * into
    * two co-located vertices. Both must be linked, or the stop is reachable from one end only.
    */
   @Test

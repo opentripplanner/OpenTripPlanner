@@ -77,7 +77,8 @@ public abstract class SphericalDistanceLibrary {
    * <p>
    * The algorithm:
    * <ol>
-   *   <li>Projects the point onto the infinite line passing through segmentStart and segmentEnd</li>
+   *   <li>Projects the point onto the infinite line passing through segmentStart and
+   *       segmentEnd</li>
    *   <li>Clamps the projection to stay within the segment [segmentStart, segmentEnd]</li>
    *   <li>Calculates the spherical distance from the point to the closest point on the segment</li>
    * </ol>

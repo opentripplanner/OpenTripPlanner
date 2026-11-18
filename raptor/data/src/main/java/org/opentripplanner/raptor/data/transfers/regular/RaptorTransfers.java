@@ -14,7 +14,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * <p>
  * A microbenchmark of the iteration shows it ~2.4x faster per transfer than a list of transfer
  * objects per stop (~1.3 ns vs ~3.3 ns). The rows still hold one object per transfer. A packed
- * {@code int[]} layout was ~3.5-4x faster per lookup in a prototype, but it needs a change in Raptor
+ * {@code int[]} layout was ~3.5-4x faster per lookup in a prototype, but it needs a change in
+ * Raptor
  * first, so it is not done yet.
  * <p>
  * The transfers of each stop are sorted by duration. The Raptor search stops at the first transfer

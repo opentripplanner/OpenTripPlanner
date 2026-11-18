@@ -10,13 +10,15 @@ package org.opentripplanner.raptor.spi;
  */
 public interface RaptorDataProvider<T extends RaptorTripSchedule> {
   /**
-   * Return the transfer provider for this data set. This is used to find both regular and constrained transfers
+   * Return the transfer provider for this data set. This is used to find both regular and
+   * constrained transfers
    * between stops.
    */
   RaptorTransitDataProvider<T> transitData();
 
   /**
-   * Return the transfer provider for this data set. This is used to find both regular and constrained transfers
+   * Return the transfer provider for this data set. This is used to find both regular and
+   * constrained transfers
    * between stops.
    */
   RaptorTransferDataProvider<T> transferData();

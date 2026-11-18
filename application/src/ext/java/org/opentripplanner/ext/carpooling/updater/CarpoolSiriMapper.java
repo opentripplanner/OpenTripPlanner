@@ -394,7 +394,8 @@ public class CarpoolSiriMapper {
    * Fallbacks:
    * <ul>
    *   <li>Returns {@link CarpoolStop#DEFAULT_DEVIATION_BUDGET} if either timestamp is missing. This
-   *       is intentionally permissive — the absence of a commitment should not block insertions.</li>
+   *       is intentionally permissive — the absence of a commitment should not block
+   *       insertions.</li>
    *   <li>Returns {@link Duration#ZERO} if {@code latestExpectedArrivalTime} is before the arrival
    *       time — the schedule has slipped past the commitment, so no further deviation is
    *       acceptable.</li>

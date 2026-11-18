@@ -164,7 +164,8 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
    * Connect a transit stop vertex into a boarding location area in the index.
    * <p>
    * In {@code OSM} mode a vertex at the platform centroid, shared by all stops on the platform, is
-   * connected to the area's visibility vertices. In {@code TRANSIT} mode the stop gets its own vertex
+   * connected to the area's visibility vertices. In {@code TRANSIT} mode the stop gets its own
+   * vertex
    * at its own coordinate, connected to the area directly when it lies inside, or else through an
    * access point just inside the area (see {@link #linkIntoPlatformArea}).
    *
@@ -206,7 +207,8 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
    * Connect a transit stop vertex to a boarding location way in the index.
    * <p>
    * In {@code OSM} mode the stop is attached where the way passes closest to the platform centroid,
-   * splitting the way if needed. In {@code TRANSIT} mode it is attached where the way passes closest
+   * splitting the way if needed. In {@code TRANSIT} mode it is attached where the way passes
+   * closest
    * to the stop's own coordinate, over an edge of the true length (see {@link #linkToPlatformWay}).
    *
    * @return if the vertex has been connected
@@ -358,7 +360,8 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   /**
    * Attach the stop to the tagged OSM node. In {@code TRANSIT} mode the stop keeps its own
    * coordinate and reaches the node over an edge of the real length, so that the coordinate a stop
-   * is placed at comes from the transit data on every linking path. In {@code OSM} mode it takes the
+   * is placed at comes from the transit data on every linking path. In {@code OSM} mode it takes
+   * the
    * node's coordinate as its position on the street network, as it always has.
    */
   private void linkToNode(
@@ -427,7 +430,8 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
    * placed just inside takes the visibility edges on its behalf, joined to the boarding location by
    * one edge of the true length.
    *
-   * @param area the matched platform sub-area, whose properties the edge to the access point carries
+   * @param area the matched platform sub-area, whose properties the edge to the access point
+   *     carries
    */
   private void linkIntoPlatformArea(
     OsmBoardingLocationVertex boardingLocation,
@@ -470,8 +474,10 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
 
   /**
    * The point just inside {@code areaGeometry} standing in for a {@code transitCoordinate} outside
-   * it, or {@code transitCoordinate} itself when already inside. It is the foot of the perpendicular
-   * plus a margin: the shortest way onto the platform. Aiming at {@code interiorPoint} instead would,
+   * it, or {@code transitCoordinate} itself when already inside. It is the foot of the
+   * perpendicular
+   * plus a margin: the shortest way onto the platform. Aiming at {@code interiorPoint} instead
+   * would,
    * on a long narrow platform, cross the boundary tens of metres away.
    *
    * @param interiorPoint the platform's always-inside point, a fallback if the step lands outside

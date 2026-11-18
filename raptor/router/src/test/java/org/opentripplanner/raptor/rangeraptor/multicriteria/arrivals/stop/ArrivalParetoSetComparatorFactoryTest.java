@@ -27,12 +27,14 @@ class ArrivalParetoSetComparatorFactoryTest implements RaptorTestConstants {
   ///   the pareto-set compare function.
   /// - `c1` : Lower c1 is better
   /// - `c2` : Lower c2 is better or used to relax c1
-  /// - `arriveOnBoard` : arrive-on-board is better then arrive-on-street. It allowes you to continue
+  /// - `arriveOnBoard` : arrive-on-board is better then arrive-on-street. It allowes you to
+  ///   continue
   ///   with a transfer
   ///
   /// EXPECTED
   ///
-  /// The last column is the expected result. The factory can create 4 variants of the factory with 2
+  /// The last column is the expected result. The factory can create 4 variants of the factory with
+  /// 2
   /// pareto-comparators in each (with and without arrive-on-board `...]` or `..., arriveOnBoard]`):
   /// - With c1 `[arrivalTime, round, c1, ...`
   /// - With c1 & c2 `[arrivalTime, round, c1, c2, ...`

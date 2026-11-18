@@ -94,7 +94,8 @@ class DouglasPeuckerAlgorithmTest {
   }
 
   /// A spike that overshoots past `end` while staying on (near) the same bearing as the start-end
-  /// chord is the classic Douglas-Peucker failure mode: measured against the *infinite line* through
+  /// chord is the classic Douglas-Peucker failure mode: measured against the *infinite line*
+  /// through
   /// start/end, the spike looks colinear (~0 distance) no matter how far out it goes, so a naive
   /// implementation erases it at any tolerance. Measuring against the *segment* instead - clamping
   /// the projection to [start, end] - fixes this: the spike's distance becomes the real distance to

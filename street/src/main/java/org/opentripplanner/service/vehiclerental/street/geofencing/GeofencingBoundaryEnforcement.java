@@ -24,9 +24,11 @@ import org.opentripplanner.street.search.state.State;
  *
  * <ul>
  *   <li>A drop event in the rendered itinerary lands on the back-edge of the renting state. Forking
- *       at the crossing position would place the drop on the boundary edge itself — on the wrong side.
+ *       at the crossing position would place the drop on the boundary edge itself — on the wrong
+ *       side.
  *       Approaching keeps the drop entirely outside.</li>
- *   <li>The ride branch continues exploration from its vertex. Forking at the crossing position means
+ *   <li>The ride branch continues exploration from its vertex. Forking at the crossing position
+ *       means
  *       exploration starts already inside the zone.</li>
  * </ul>
  */

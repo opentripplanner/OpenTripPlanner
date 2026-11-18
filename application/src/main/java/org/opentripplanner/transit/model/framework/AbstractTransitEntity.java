@@ -9,7 +9,8 @@ import org.opentripplanner.core.model.id.FeedScopedId;
  * common implementation of the identity:
  * <ol>
  *   <li>{@code id} - All entities should have an id. The id should be unique within the context the
- *       entity live. For aggregates which live in a global space the id must be unique. This apply to all
+ *       entity live. For aggregates which live in a global space the id must be unique. This apply
+ *       to all
  *       entities listed in the index service.</li>
  *   <li>The {@code hashCode()/equals()} method is consistent and based on the id (identity). We
  *       frequently use this to index and lookup entities.</li>

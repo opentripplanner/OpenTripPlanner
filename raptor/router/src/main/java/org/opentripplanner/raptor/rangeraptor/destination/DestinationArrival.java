@@ -9,11 +9,15 @@ import org.opentripplanner.raptor.api.view.PathLegType;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
- * A light-weight journey arrival at the destination, made of the last stop arrival and the egress. It holds the values
- * of the journey needed to compare it with other journeys: departure time, arrival time, number of transfers and cost.
- * The arrival chain is reachable through {@link #previous()}, so a path can be built from it when needed.
+ * A light-weight journey arrival at the destination, made of the last stop arrival and the egress.
+ * It holds the values
+ * of the journey needed to compare it with other journeys: departure time, arrival time, number of
+ * transfers and cost.
+ * The arrival chain is reachable through {@link #previous()}, so a path can be built from it when
+ * needed.
  * <p>
- * In addition to the criteria of the stop arrivals, the destination also needs a number of transfers and a time
+ * In addition to the criteria of the stop arrivals, the destination also needs a number of
+ * transfers and a time
  * criterion, because the arrivals come from different Range Raptor iterations.
  * See {@code org/opentripplanner/raptor/package.md}, section "Destination pareto-set".
  *

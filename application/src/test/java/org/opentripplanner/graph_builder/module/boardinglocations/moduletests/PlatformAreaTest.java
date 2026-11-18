@@ -205,7 +205,8 @@ class PlatformAreaTest {
 
   /**
    * On a long narrow platform the line from an outside stop to the platform's interior point is so
-   * oblique that it first crosses the boundary tens of metres away. The access point must sit at the
+   * oblique that it first crosses the boundary tens of metres away. The access point must sit at
+   * the
    * foot of the perpendicular instead, next to the stop.
    */
   @Test
@@ -247,7 +248,8 @@ class PlatformAreaTest {
 
   /**
    * The edge to an access point runs across the platform, so it must carry the platform's
-   * permission, safety factors and wheelchair accessibility rather than the edge builder's defaults,
+   * permission, safety factors and wheelchair accessibility rather than the edge builder's
+   * defaults,
    * which would claim a wheelchair-accessible walk across a platform mapped as not accessible.
    */
   @Test

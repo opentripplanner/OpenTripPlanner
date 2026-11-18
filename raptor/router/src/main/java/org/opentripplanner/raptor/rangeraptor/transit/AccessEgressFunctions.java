@@ -35,8 +35,10 @@ public final class AccessEgressFunctions {
    *   <li>time duration is lower</li>
    *   <li>number of rides is lower</li>
    *   <li>number of via locations is higher</li>
-   *   <li>reached the stop on-board, and not on foot. This is optimal because arriving on foot limits
-   *       your options, you are not allowed to continue on foot and transfer(walk) to a nearby stop.</li>
+   *   <li>reached the stop on-board, and not on foot. This is optimal because arriving on foot
+   *       limits
+   *       your options, you are not allowed to continue on foot and transfer(walk) to a nearby
+   *       stop.</li>
    *   <li>No opening hours is better than being restricted</li>
    *   <li>If both have opening hours, both need to be accepted</li>
    * </ol>

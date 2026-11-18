@@ -41,7 +41,8 @@ public interface RaptorAccessEgress {
   /**
    * <ul>
    *   <li>Access: The first stop in the journey, where the access path just arrived at.
-   *   <li>Egress: Last stop before destination, hence not the arrival point, but the departure stop.
+   *   <li>Egress: Last stop before destination, hence not the arrival point, but the departure
+   *       stop.
    * </ul>
    * The journey origin, destination and transit path board stop must be part of the context; hence
    * not a member attribute of this type.

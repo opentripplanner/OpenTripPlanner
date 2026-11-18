@@ -221,7 +221,8 @@ public class TripCalendars implements Serializable {
   }
 
   /**
-   * Efficiently assign each of the given service ids the next free service code, in iteration order:
+   * Efficiently assign each of the given service ids the next free service code, in iteration
+   * order:
    * the code is the number of service codes registered before it. Used during graph build only.
    *
    * @throws IllegalArgumentException if service id is added more than once.

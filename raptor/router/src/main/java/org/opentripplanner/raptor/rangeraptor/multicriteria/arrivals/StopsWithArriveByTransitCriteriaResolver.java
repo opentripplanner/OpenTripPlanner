@@ -19,8 +19,10 @@ import org.opentripplanner.raptor.rangeraptor.transit.ViaConnections;
  * A stop is included in the result when at least one of the following holds:
  * <ol>
  *   <li><b>On-board access:</b> an access path arrives at the stop on-board a transit service (e.g.
- *       flex), meaning you are allowed to continue with a transfer in the next round. The access should
- *       not be dominated by a transfer arrival - since using the access+transfer might be optimal.</li>
+ *       flex), meaning you are allowed to continue with a transfer in the next round. The access
+ *       should
+ *       not be dominated by a transfer arrival - since using the access+transfer might be
+ *       optimal.</li>
  *   <li><b>Egress which starts on-street(on foot):</b> an egress path leaving the stop on foot can
  *       only be used if the stop is reached by transit.</li>
  *   <li><b>Via transfer:</b> a via-connection departs from the stop as a transfer. Arriving at the

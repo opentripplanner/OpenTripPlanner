@@ -24,7 +24,8 @@ import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
  * FEATURE UNDER TEST
  * <p>
  * An arrive-by search without timetable view, where we prefer the latest departure arriving before
- * the latest-arrival-time ({@code preferLateArrival}, also known as {@code departAsLateAsPossible}).
+ * the latest-arrival-time ({@code preferLateArrival}, also known as
+ * {@code departAsLateAsPossible}).
  * The destination pareto-set must prefer the latest departure (and for multi-criteria the shorter
  * duration), not the latest arrival. The latest-arrival-time must be enforced for every egress.
  * <p>
