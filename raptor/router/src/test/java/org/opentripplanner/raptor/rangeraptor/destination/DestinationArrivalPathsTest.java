@@ -108,7 +108,7 @@ class DestinationArrivalPathsTest {
     subject.add(stopArrival(ALIGHT_TIME - 100), egress());
     assertTrue(mappedArrivals.isEmpty(), "No paths should be built during the search");
 
-    var paths = subject.listPaths();
+    var paths = subject.listPathsWithTransit();
     assertEquals(1, paths.size());
     assertEquals(1, mappedArrivals.size());
     assertEquals(
@@ -168,7 +168,7 @@ class DestinationArrivalPathsTest {
     assertFalse(subject.qualify(arrivalTime, 0, 0, 0));
 
     // The set is not modified by qualify
-    assertEquals(1, subject.listPaths().size());
+    assertEquals(1, subject.listPathsWithTransit().size());
   }
 
   @Test
@@ -197,7 +197,7 @@ class DestinationArrivalPathsTest {
     subject.add(stopArrival(ALIGHT_TIME), egress());
     lifeCycle.setupIteration(ITERATION_DEPARTURE_TIME - 60);
 
-    assertEquals(1, subject.listPaths().size());
+    assertEquals(1, subject.listPathsWithTransit().size());
     assertEquals(
       ITERATION_DEPARTURE_TIME,
       mappedArrivals.getFirst().iterationDepartureTime(),
@@ -214,7 +214,7 @@ class DestinationArrivalPathsTest {
     var subject = create(USE_ARRIVAL_TIME, NO_TIME_LIMIT);
 
     subject.add(stopArrival(ALIGHT_TIME), penalisedEgress(EGRESS_DURATION, TIME_PENALTY));
-    subject.listPaths();
+    subject.listPathsWithTransit();
 
     assertEquals(
       ALIGHT_TIME + EGRESS_DURATION + TIME_PENALTY,
@@ -230,7 +230,7 @@ class DestinationArrivalPathsTest {
     // The plain egress is slower than the penalised egress including the penalty
     subject.add(stopArrival(ALIGHT_TIME), TestAccessEgress.walk(STOP, arrivalWithPenalty + 40));
     subject.add(stopArrival(ALIGHT_TIME), penalisedEgress(EGRESS_DURATION, TIME_PENALTY));
-    var paths = subject.listPaths();
+    var paths = subject.listPathsWithTransit();
 
     assertEquals(1, paths.size());
     assertEquals(ALIGHT_TIME + arrivalWithPenalty, mappedArrivals.getFirst().arrivalTime());
@@ -245,7 +245,7 @@ class DestinationArrivalPathsTest {
     // In a reverse search the egress is the forward access. A shorter total duration is better.
     subject.add(stopArrival(ALIGHT_TIME), penalisedEgress(EGRESS_DURATION, TIME_PENALTY));
     subject.add(stopArrival(ALIGHT_TIME), TestAccessEgress.walk(STOP, durationWithPenalty - 20));
-    var paths = subject.listPaths();
+    var paths = subject.listPathsWithTransit();
 
     assertEquals(1, paths.size());
     assertEquals(ALIGHT_TIME - durationWithPenalty + 20, mappedArrivals.getFirst().arrivalTime());
@@ -284,7 +284,7 @@ class DestinationArrivalPathsTest {
     );
 
     subject.add(transit, egress());
-    subject.listPaths();
+    subject.listPathsWithTransit();
 
     var arrival = mappedArrivals.getFirst();
     assertEquals(boardTime - boardSlack - accessDuration, arrival.departureTime());
@@ -301,7 +301,7 @@ class DestinationArrivalPathsTest {
     lifeCycle.setupIteration(ITERATION_DEPARTURE_TIME - 60);
     subject.add(stopArrival(ALIGHT_TIME), egress());
 
-    var paths = subject.listPaths();
+    var paths = subject.listPathsWithTransit();
     assertEquals(1, paths.size());
     assertEquals(ITERATION_DEPARTURE_TIME, mappedArrivals.getFirst().iterationDepartureTime());
   }
@@ -318,7 +318,7 @@ class DestinationArrivalPathsTest {
     subject.add(stopArrival(ALIGHT_TIME), egress());
 
     // The earlier iteration arrives earlier, but the duration is the same
-    assertEquals(1, subject.listPaths().size());
+    assertEquals(1, subject.listPathsWithTransit().size());
     assertEquals(ALIGHT_TIME + EGRESS_DURATION, mappedArrivals.getFirst().arrivalTime());
   }
 
@@ -331,7 +331,7 @@ class DestinationArrivalPathsTest {
     lifeCycle.setupIteration(ITERATION_DEPARTURE_TIME - 60);
     subject.add(stopArrival(ALIGHT_TIME), egress());
 
-    assertEquals(2, subject.listPaths().size());
+    assertEquals(2, subject.listPathsWithTransit().size());
   }
 
   @Test
@@ -343,7 +343,7 @@ class DestinationArrivalPathsTest {
     lifeCycle.setupIteration(ITERATION_DEPARTURE_TIME - 60);
     subject.add(stopArrival(ALIGHT_TIME), egress());
 
-    var paths = subject.listPaths();
+    var paths = subject.listPathsWithTransit();
     assertEquals(1, paths.size());
     assertEquals(ITERATION_DEPARTURE_TIME - 60, mappedArrivals.getFirst().iterationDepartureTime());
   }
@@ -356,7 +356,9 @@ class DestinationArrivalPathsTest {
     subject.add(stopArrival(ALIGHT_TIME), egress());
     subject.add(accessOnlyArrival(ACCESS_DURATION, TIME_PENALTY), egress());
 
-    assertEquals(1, subject.listPaths().size());
+    // Note(Thomas): This now fails. We get 0 paths here because the one result is a
+    // walk access -> walk egress itinerary, which we now filter out.
+    assertEquals(1, subject.listPathsWithTransit().size());
     assertEquals(ALIGHT_TIME + EGRESS_DURATION, mappedArrivals.getFirst().arrivalTime());
   }
 

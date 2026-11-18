@@ -87,7 +87,7 @@ public class EgressArrivalToPathAdapter<T extends RaptorTripSchedule> implements
 
   @Override
   public boolean arrivedAtDestinationCurrentRound() {
-    return newElementSet();
+    return newElementSet() && !bestArrival.isAccessDirectlyToEgressOnStreet();
   }
 
   private boolean newElementSet() {
@@ -161,6 +161,14 @@ public class EgressArrivalToPathAdapter<T extends RaptorTripSchedule> implements
         .addBool("stopReachedOnBoard", stopReachedOnBoard)
         .addObj("egressPath", egressPath)
         .toString();
+    }
+
+    /**
+     * Only an access can be followed directly by an egress starting on-street, the egress stop
+     * state does not notify about any other on-street arrival with such an egress.
+     */
+    boolean isAccessDirectlyToEgressOnStreet() {
+      return !stopReachedOnBoard && egressPath.arrivedOnStreet();
     }
 
     <T extends RaptorTripSchedule> ArrivalView<T> toArrivalState(StopsCursor<T> cursor) {

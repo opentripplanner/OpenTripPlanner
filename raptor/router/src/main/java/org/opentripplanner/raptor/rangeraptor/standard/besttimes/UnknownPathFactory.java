@@ -3,8 +3,13 @@ package org.opentripplanner.raptor.rangeraptor.standard.besttimes;
 import static org.opentripplanner.raptor.spi.RaptorConstants.TIME_NOT_SET;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
@@ -31,6 +36,9 @@ public class UnknownPathFactory<T extends RaptorTripSchedule> {
 
   private int currentIterationDepartureTime;
 
+  /** The best on-street access arrival in the current iteration, by stop. */
+  private final Map<Integer, AccessArrival> accessArrivalsOnStreet = new HashMap<>();
+
   public UnknownPathFactory(
     BestTimes bestTimes,
     BestNumberOfTransfers bestNumberOfTransfers,
@@ -53,14 +61,38 @@ public class UnknownPathFactory<T extends RaptorTripSchedule> {
 
   private void setIterationDepartureTime(int value) {
     this.currentIterationDepartureTime = value;
+    this.accessArrivalsOnStreet.clear();
+  }
+
+  /**
+   * Register an access arrival, that is an arrival from an access on-street. On-board access does not count.
+   */
+  public void accessArrived(RaptorAccessEgress access, int arrivalTime) {
+    if (access.arrivedOnBoard()) {
+      return;
+    }
+    var existing = accessArrivalsOnStreet.get(access.stop());
+    if (existing == null || transitCalculator.isBefore(arrivalTime, existing.arrivalTime())) {
+      accessArrivalsOnStreet.put(access.stop(), new AccessArrival(arrivalTime, access));
+    }
   }
 
   public Collection<RaptorPath<T>> extractPaths() {
     ParetoSet<RaptorPath<T>> paths = ParetoSet.of(comparator);
+    Set<RaptorPath<T>> accessDirectlyToEgressPaths = Collections.newSetFromMap(
+      new IdentityHashMap<>()
+    );
     for (RaptorAccessEgress egress : egressPaths) {
       createNewPath(egress).ifPresent(paths::add);
+      createAccessDirectlyToEgressPath(egress).ifPresent(p -> {
+        accessDirectlyToEgressPaths.add(p);
+        paths.add(p);
+      });
     }
-    return paths.stream().toList();
+    return paths
+      .stream()
+      .filter(p -> !accessDirectlyToEgressPaths.contains(p))
+      .toList();
   }
 
   /**
@@ -71,7 +103,30 @@ public class UnknownPathFactory<T extends RaptorTripSchedule> {
     if (arrivalTime == RaptorConstants.NOT_FOUND) {
       return Optional.empty();
     }
+    int nTransfer = bestNumberOfTransfers.calculateMinNumberOfTransfers(egress.stop());
+    return createNewPath(egress, arrivalTime, nTransfer);
+  }
 
+  /**
+   * Create a path from an on-street access arrival directly to an egress starting on-street.
+   */
+  private Optional<RaptorPath<T>> createAccessDirectlyToEgressPath(RaptorAccessEgress egress) {
+    if (egress.arrivedOnBoard()) {
+      return Optional.empty();
+    }
+    var access = accessArrivalsOnStreet.get(egress.stop());
+    if (access == null) {
+      return Optional.empty();
+    }
+    int nTransfer = access.access().numberOfRides() - 1;
+    return createNewPath(egress, access.arrivalTime(), nTransfer);
+  }
+
+  private Optional<RaptorPath<T>> createNewPath(
+    RaptorAccessEgress egress,
+    int arrivalTime,
+    int nTransferAtStop
+  ) {
     // We need to skip time-shifting egress(w/opening hours) if we calculate the duration/
     // arrival-time without waiting time
     int egressDepartureTime = skipTimeShiftEgressPaths
@@ -92,8 +147,7 @@ public class UnknownPathFactory<T extends RaptorTripSchedule> {
       egress.durationInSeconds()
     );
 
-    int nTransfer = bestNumberOfTransfers.calculateMinNumberOfTransfers(egress.stop());
-    nTransfer += egress.numberOfRides();
+    int nTransfer = nTransferAtStop + egress.numberOfRides();
 
     return Optional.of(
       new UnknownPath<T>(currentIterationDepartureTime, destinationArrivalTime, nTransfer)
@@ -113,4 +167,6 @@ public class UnknownPathFactory<T extends RaptorTripSchedule> {
     }
     return RaptorConstants.NOT_FOUND;
   }
+
+  private record AccessArrival(int arrivalTime, RaptorAccessEgress access) {}
 }
