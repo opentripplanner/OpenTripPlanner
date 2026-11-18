@@ -24,7 +24,8 @@ import org.slf4j.LoggerFactory;
 /**
  * A spatial index using a 2D fast long hashtable (HPPC lib).
  * <p>
- * Objects to index are placed in all grid bins touching the bounding envelope. We *do not store*
+ * Objects to index are placed in all grid bins touching the bounding envelope, or, for line
+ * strings, in all grid bins the line string passes through. We *do not store*
  * any bouding envelope for each object, so this imply that we will return false positive when
  * querying, and it's up to the client to filter them out (with whatever knowledge it has on the
  * location of the object).
@@ -50,6 +51,12 @@ public class HashGridSpatialIndex<T> implements Serializable {
    * meters.
    */
   private static final double DEFAULT_X_BIN_SIZE = 0.0035;
+
+  /**
+   * Tolerance, in fractions of a bin, by which the row range of a column is widened when a line
+   * segment is rasterized. See {@link #collectSegmentBinKeys}.
+   */
+  private static final double BIN_TOLERANCE = 1e-9;
 
   /* Size of bin in X and Y direction, in coordinates units. */
   private final double xBinSize;
@@ -143,22 +150,21 @@ public class HashGridSpatialIndex<T> implements Serializable {
     }
   }
 
+  /**
+   * Insert an item into the bins that the line string passes through. Unlike
+   * {@link #insert(Envelope, Object)}, the item is not stored in every bin of the (segment)
+   * envelopes, so a long diagonal segment uses a number of bins proportional to its length rather
+   * than to the area of its envelope.
+   */
   public final void insert(LineString geom, final Object item) {
-    Coordinate[] coord = geom.getCoordinates();
-    final LongSet keys = new LongHashSet(coord.length * 8);
-    for (int i = 0; i < coord.length - 1; i++) {
-      // TODO Cut the segment if longer than bin size
-      // to reduce the number of wrong bins
-      Envelope env = new Envelope(coord[i], coord[i + 1]);
-      visit(env, true, (bin, mapKey) -> {
-        keys.add(mapKey);
-        return false;
-      });
+    CoordinateSequence seq = geom.getCoordinateSequence();
+    final LongSet keys = new LongHashSet(seq.size() * 8);
+    for (int i = 0; i < seq.size() - 1; i++) {
+      collectSegmentBinKeys(seq.getX(i), seq.getY(i), seq.getX(i + 1), seq.getY(i + 1), keys);
     }
     keys.forEach(
       (LongProcedure) key -> {
-        // Note: bins have been initialized in the previous visit
-        bins.get(key).add((T) item);
+        getOrCreateBin(key).add((T) item);
         nEntries++;
       }
     );
@@ -213,11 +219,73 @@ public class HashGridSpatialIndex<T> implements Serializable {
   }
 
   /**
+   * Collect the keys of the bins that the segment passes through into {@code out}. A bin that the
+   * segment only touches at a corner or an edge is included as well, so that every query envelope
+   * that intersects the segment visits at least one bin containing the item.
+   * <p>
+   * The segment is walked column by column (constant xKey): within a column it covers the rows
+   * between the y-values at the column's left and right borders. A small tolerance widens each
+   * column's row range so that floating point errors never drop a bin; this can add a bin the
+   * segment passes very close to, which is harmless as queries return false positives anyway. The
+   * result is always a subset of the bins of the segment's envelope.
+   * <p>
+   * If an end point is outside the valid lon/lat range, the bins of the clamped envelope are used,
+   * because clamping the end points individually would change the direction of the segment.
+   */
+  void collectSegmentBinKeys(double x1, double y1, double x2, double y2, LongSet out) {
+    if (!isValidLonLat(x1, y1) || !isValidLonLat(x2, y2)) {
+      collectBinKeys(x1, y1, x2, y2, out);
+      return;
+    }
+    // Walk from left to right
+    if (x1 > x2) {
+      double tx = x1;
+      double ty = y1;
+      x1 = x2;
+      y1 = y2;
+      x2 = tx;
+      y2 = ty;
+    }
+    long minXKey = Math.round(x1 / xBinSize);
+    long maxXKey = Math.round(x2 / xBinSize);
+    long minYKey = Math.round(Math.min(y1, y2) / yBinSize);
+    long maxYKey = Math.round(Math.max(y1, y2) / yBinSize);
+
+    if (minXKey == maxXKey) {
+      addColumn(minXKey, minYKey, maxYKey, out);
+      return;
+    }
+
+    // x2 > x1 here, since the x keys differ
+    double slope = (y2 - y1) / (x2 - x1);
+    for (long xKey = minXKey; xKey <= maxXKey; xKey++) {
+      // The y-values where the segment enters and leaves this column
+      double yIn = xKey == minXKey ? y1 : y1 + ((xKey - 0.5) * xBinSize - x1) * slope;
+      double yOut = xKey == maxXKey ? y2 : y1 + ((xKey + 0.5) * xBinSize - x1) * slope;
+      double yLow = Math.min(yIn, yOut) / yBinSize;
+      double yHigh = Math.max(yIn, yOut) / yBinSize;
+      long fromYKey = Math.max(minYKey, Math.round(yLow - BIN_TOLERANCE));
+      long toYKey = Math.min(maxYKey, Math.round(yHigh + BIN_TOLERANCE));
+      addColumn(xKey, fromYKey, toYKey, out);
+    }
+  }
+
+  private static void addColumn(long xKey, long fromYKey, long toYKey, LongSet out) {
+    for (long yKey = fromYKey; yKey <= toYKey; yKey++) {
+      out.add(binKey(xKey, yKey));
+    }
+  }
+
+  private static boolean isValidLonLat(double x, double y) {
+    return Math.abs(x) <= 180 && Math.abs(y) <= 90;
+  }
+
+  /**
    * Pack (xKey, yKey) into a single {@code long} hash key. The xKey halves are swapped so the
    * default long {@code hashCode} ({@code (int) (v ^ (v >>> 32))}) distributes well — see the note
    * in {@link #visit(Envelope, boolean, BinVisitor)}.
    */
-  private static long binKey(long xKey, long yKey) {
+  static long binKey(long xKey, long yKey) {
     return (yKey << 32) | ((xKey & 0xFFFF) << 16) | ((xKey >> 16) & 0xFFFF);
   }
 
@@ -291,12 +359,7 @@ public class HashGridSpatialIndex<T> implements Serializable {
          * default implementation is: hashInt = (int)(value ^ (value >>> 32));
          */
         long mapKey = binKey(xKey, yKey);
-        ArrayList<T> bin = bins.get(mapKey);
-        if (createIfEmpty && bin == null) {
-          bin = new ArrayList<>();
-          bins.put(mapKey, bin);
-          nBins++;
-        }
+        ArrayList<T> bin = createIfEmpty ? getOrCreateBin(mapKey) : bins.get(mapKey);
         if (bin != null) {
           boolean modified = binVisitor.visit(bin, mapKey);
           if (modified && bin.isEmpty()) {
@@ -306,6 +369,16 @@ public class HashGridSpatialIndex<T> implements Serializable {
         }
       }
     }
+  }
+
+  private ArrayList<T> getOrCreateBin(long key) {
+    ArrayList<T> bin = bins.get(key);
+    if (bin == null) {
+      bin = new ArrayList<>();
+      bins.put(key, bin);
+      nBins++;
+    }
+    return bin;
   }
 
   private interface BinVisitor<T> {
