@@ -1,14 +1,13 @@
 package org.opentripplanner.raptor.rangeraptor.transit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.core.testfixtures.hppc.HppcAsserts.assertThat;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flex;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flexAndWalk;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
@@ -60,13 +59,13 @@ class EgressPathsTest {
       byStop.get(STOP_E).toString()
     );
     // Verify no more stops (A, B, C, D, E)
-    assertEquals(toString(ALL_STOPS), toString(byStop.keys()));
+    assertThat(byStop.keys()).contains(ALL_STOPS);
   }
 
   @Test
   void stops() {
-    assertEquals(toString(ALL_STOPS), toString(subjectStd.stops()));
-    assertEquals(toString(ALL_STOPS), toString(subjectMc.stops()));
+    assertThat(subjectStd.stops()).contains(ALL_STOPS);
+    assertThat(subjectMc.stops()).contains(ALL_STOPS);
   }
 
   @Test
@@ -100,26 +99,14 @@ class EgressPathsTest {
 
   @Test
   void walkToDestinationEgressStops() {
-    assertEquals(
-      toString(new int[] { STOP_A, STOP_E }),
-      toString(subjectStd.egressesWitchStartByWalking())
-    );
-
-    //[2, 6]
-    assertEquals(
-      toString(new int[] { STOP_A, STOP_E }),
-      toString(subjectMc.egressesWitchStartByWalking())
-    );
+    assertThat(subjectStd.egressesWitchStartByWalking()).contains(STOP_A, STOP_E);
+    assertThat(subjectMc.egressesWitchStartByWalking()).contains(STOP_A, STOP_E);
   }
 
   @Test
   void rideToDestinationEgressStops() {
     int[] expected = { STOP_B, STOP_C, STOP_D };
-    assertEquals(toString(expected), toString(subjectStd.egressesWitchStartByARide()));
-    assertEquals(toString(expected), toString(subjectMc.egressesWitchStartByARide()));
-  }
-
-  String toString(int[] ints) {
-    return Arrays.toString(IntStream.of(ints).sorted().toArray());
+    assertThat(subjectStd.egressesWitchStartByARide()).contains(expected);
+    assertThat(subjectMc.egressesWitchStartByARide()).contains(expected);
   }
 }

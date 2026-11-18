@@ -3,16 +3,19 @@ package org.opentripplanner.apis.gtfs;
 import graphql.schema.GraphQLSchema;
 import org.opentripplanner.place.NearbyPlaceFinder;
 import org.opentripplanner.place.NearbyStopFinder;
+import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
+import org.opentripplanner.routing.refetch.RefetchItineraryService;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.shape.ShapeService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
-import org.opentripplanner.transfer.regular.RegularTransferService;
+import org.opentripplanner.transfer.regular.FlexTransferService;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 
 /**
  * A plain, hand-built {@link GtfsGraphQLRequestContext} for tests that don't need (or want) a
@@ -23,7 +26,8 @@ public record TestGtfsGraphQLRequestContext(
   TransitService transitService,
   ShapeService shapeService,
   TransitAlertService transitAlertService,
-  RegularTransferService transferService,
+  FlexTransferService transferService,
+  RegularTransferRepositorySnapshot<NearbyStop, RouteRequest> regularTransfers,
   FareService fareService,
   VehicleRentalService vehicleRentalService,
   VehicleParkingService vehicleParkingService,
@@ -31,5 +35,6 @@ public record TestGtfsGraphQLRequestContext(
   GraphQLSchema schema,
   NearbyPlaceFinder nearbyPlaceFinder,
   NearbyStopFinder nearbyStopFinder,
-  RouteRequest defaultRouteRequest
+  RouteRequest defaultRouteRequest,
+  RefetchItineraryService refetchItineraryService
 ) implements GtfsGraphQLRequestContext {}

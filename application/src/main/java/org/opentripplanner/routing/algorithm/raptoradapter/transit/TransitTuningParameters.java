@@ -2,7 +2,6 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 
 import java.time.Duration;
 import java.util.List;
-import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.opentripplanner.utils.time.DurationUtils;
 
@@ -23,9 +22,10 @@ public interface TransitTuningParameters {
   Integer stopBoardAlightDuringTransferCost(StopTransferPriority key);
 
   /**
-   * The maximum number of transfer RouteRequests for which the pre-calculated transfers should be
-   * cached. If too small, the average request may be slower due to the required re-calculating. If
-   * too large, more memory may be used than needed.
+   * The maximum number of distinct user preferences for which the Raptor transfers are cached, in
+   * addition to the ones of the transfer profiles and warmup entries, which are always cached. If
+   * too small, the average request may be slower due to the required re-calculating. If too
+   * large, more memory may be used than needed.
    */
   int transferCacheMaxSize();
 
@@ -64,11 +64,4 @@ public interface TransitTuningParameters {
    * The default values are: {@link #PAGING_SEARCH_WINDOW_ADJUSTMENTS}
    */
   List<Duration> pagingSearchWindowAdjustments();
-
-  /**
-   * {@link RouteRequest}s which will be used at server startup to pre-fill the raptor transfer
-   * cache.
-   * {@link org.opentripplanner.routing.algorithm.raptoradapter.transit.request.transfercache.RaptorRequestTransferCache}
-   */
-  List<RouteRequest> transferCacheRequests();
 }

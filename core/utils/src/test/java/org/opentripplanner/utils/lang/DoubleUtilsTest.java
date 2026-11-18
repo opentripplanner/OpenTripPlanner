@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.utils.lang.DoubleUtils.requireInRange;
+import static org.opentripplanner.utils.lang.DoubleUtils.requireNonNegative;
 import static org.opentripplanner.utils.lang.DoubleUtils.roundTo1Decimal;
 import static org.opentripplanner.utils.lang.DoubleUtils.roundTo2Decimals;
 import static org.opentripplanner.utils.lang.DoubleUtils.roundTo3Decimals;
@@ -75,8 +76,18 @@ class DoubleUtilsTest {
     requireInRange(10.0, 0d, 10d);
 
     assertThrows(IllegalArgumentException.class, () -> requireInRange(10.1, 0d, 10d));
+    assertThrows(IllegalArgumentException.class, () -> requireInRange(Double.NaN, 0d, 10d));
     var ex = assertThrows(IllegalArgumentException.class, () -> requireInRange(-0.1, 0d, 10d, "t"));
     assertEquals("The t is not in range[0.0, 10.0]: -0.1", ex.getMessage());
+  }
+
+  @Test
+  void testRequireNonNegative() {
+    assertEquals(0.0, requireNonNegative(0.0));
+    assertEquals(7.0, requireNonNegative(7.0));
+
+    assertThrows(IllegalArgumentException.class, () -> requireNonNegative(-0.1));
+    assertThrows(IllegalArgumentException.class, () -> requireNonNegative(Double.NaN));
   }
 
   @Test

@@ -1,22 +1,25 @@
 package org.opentripplanner.graph_builder.module.osm.storage;
 
+import com.carrotsearch.hppc.LongArrayList;
+import com.carrotsearch.hppc.LongHashSet;
+import com.carrotsearch.hppc.LongObjectHashMap;
+import com.carrotsearch.hppc.LongObjectMap;
+import com.carrotsearch.hppc.LongSet;
+import com.carrotsearch.hppc.cursors.LongCursor;
+import com.carrotsearch.hppc.procedures.LongProcedure;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import gnu.trove.iterator.TLongIterator;
-import gnu.trove.list.TLongList;
-import gnu.trove.map.TLongObjectMap;
-import gnu.trove.map.hash.TLongObjectHashMap;
-import gnu.trove.set.TLongSet;
-import gnu.trove.set.hash.TLongHashSet;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.jspecify.annotations.Nullable;
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.framework.collection.TroveUtils;
+import org.opentripplanner.framework.collection.HppcMapSetUtils;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.InvalidOsmGeometry;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionBad;
@@ -51,19 +54,23 @@ public class OsmDatabase {
   private final OsmNodeStore nodes = new OsmNodeStore();
 
   /* Map of all bike parking nodes, keyed by their OSM ID */
-  private final TLongObjectMap<OsmNode> bikeParkingNodes = new TLongObjectHashMap<>();
+  private final LongObjectMap<OsmNode> bikeParkingNodes = new LongObjectHashMap<>();
 
   /* Map of all bike parking nodes, keyed by their OSM ID */
-  private final TLongObjectMap<OsmNode> carParkingNodes = new TLongObjectHashMap<>();
+  private final LongObjectMap<OsmNode> carParkingNodes = new LongObjectHashMap<>();
 
   /* Map of all non-area ways keyed by their OSM ID */
-  private final TLongObjectMap<OsmWay> waysById = new TLongObjectHashMap<>();
+  private final LongObjectMap<OsmWay> waysById = new LongObjectHashMap<>();
+
+  /** Cache of {@link #getWays()}; reset to {@code null} whenever {@link #waysById} changes. */
+  @Nullable
+  private List<OsmWay> waysSortedById = null;
 
   /* Map of all area ways keyed by their OSM ID */
-  private final TLongObjectMap<OsmWay> areaWaysById = new TLongObjectHashMap<>();
+  private final LongObjectMap<OsmWay> areaWaysById = new LongObjectHashMap<>();
 
   /* Map of all relations keyed by their OSM ID */
-  private final TLongObjectMap<OsmRelation> relationsById = new TLongObjectHashMap<>();
+  private final LongObjectMap<OsmRelation> relationsById = new LongObjectHashMap<>();
 
   /* All walkable areas */
   private final List<OsmArea> walkableAreas = new ArrayList<>();
@@ -75,20 +82,20 @@ public class OsmDatabase {
   private final List<OsmArea> bikeParkingAreas = new ArrayList<>();
 
   /* Map of all area OSMWay for a given node */
-  private final TLongObjectMap<Set<OsmWay>> areasForNode = new TLongObjectHashMap<>();
+  private final LongObjectMap<Set<OsmWay>> areasForNode = new LongObjectHashMap<>();
 
   private final List<OsmWay> singleWayAreas = new ArrayList<>();
 
   private final Set<OsmEntity> processedAreas = new HashSet<>();
 
   /* Set of area way IDs */
-  private final TLongSet areaWayIds = new TLongHashSet();
+  private final LongSet areaWayIds = new LongHashSet();
 
   /* Set of all node IDs of kept ways. Needed to mark which nodes to keep in stage 3. */
-  private final TLongSet waysNodeIds = new TLongHashSet();
+  private final LongSet waysNodeIds = new LongHashSet();
 
   /* Set of all node IDs of kept areas. Needed to mark which nodes to keep in stage 3. */
-  private final TLongSet areaNodeIds = new TLongHashSet();
+  private final LongSet areaNodeIds = new LongHashSet();
 
   /**
    * Track which vertical levels OSM entities belong to. Level information can be set for ways,
@@ -139,8 +146,15 @@ public class OsmDatabase {
     return waysById.get(wayId);
   }
 
+  /**
+   * All ways, ordered by OSM id. HPPC hash containers iterate in a per-instance order, so the
+   * explicit ordering keeps the graph build deterministic.
+   */
   public Collection<OsmWay> getWays() {
-    return Collections.unmodifiableCollection(waysById.valueCollection());
+    if (waysSortedById == null) {
+      waysSortedById = Collections.unmodifiableList(values(waysById));
+    }
+    return waysSortedById;
   }
 
   public boolean isAreaWay(long wayId) {
@@ -156,11 +170,11 @@ public class OsmDatabase {
   }
 
   public Collection<OsmNode> getBikeParkingNodes() {
-    return Collections.unmodifiableCollection(bikeParkingNodes.valueCollection());
+    return Collections.unmodifiableCollection(values(bikeParkingNodes));
   }
 
   public Collection<OsmNode> getCarParkingNodes() {
-    return Collections.unmodifiableCollection(carParkingNodes.valueCollection());
+    return Collections.unmodifiableCollection(values(carParkingNodes));
   }
 
   public Collection<OsmArea> getWalkableAreas() {
@@ -290,15 +304,15 @@ public class OsmDatabase {
         singleWayAreas.add(way);
         areaWaysById.put(wayId, way);
         areaWayIds.add(wayId);
-        way.getNodeRefs().forEach(node -> {
-          TroveUtils.addToMapSet(areasForNode, node, way);
-          return true;
-        });
+        way
+          .getNodeRefs()
+          .forEach((LongProcedure) node -> HppcMapSetUtils.addToMapSet(areasForNode, node, way));
       }
       return;
     }
 
     waysById.put(wayId, way);
+    waysSortedById = null;
   }
 
   public void addRelation(OsmRelation relation) {
@@ -350,10 +364,10 @@ public class OsmDatabase {
     // Ways can be tag-filtered in phase 1.
 
     markNodesForKeeping(
-      waysById.valueCollection().stream().filter(OsmWay::isRelevantForRouting).toList(),
+      values(waysById).stream().filter(OsmWay::isRelevantForRouting).toList(),
       waysNodeIds
     );
-    markNodesForKeeping(areaWaysById.valueCollection(), areaNodeIds);
+    markNodesForKeeping(values(areaWaysById), areaNodeIds);
   }
 
   public void doneThirdPhaseNodes() {
@@ -373,10 +387,10 @@ public class OsmDatabase {
     entityLevels.putAll(entity, osmLevelFactory.createOsmLevelsForEntity(entity));
   }
 
-  private void markNodesForKeeping(Collection<OsmWay> osmWays, TLongSet nodeSet) {
+  private void markNodesForKeeping(Collection<OsmWay> osmWays, LongSet nodeSet) {
     for (OsmWay way : osmWays) {
       // Since the way is kept, update nodes-with-neighbors
-      TLongList nodes = way.getNodeRefs();
+      LongArrayList nodes = way.getNodeRefs();
       if (nodes.size() > 1) {
         nodeSet.addAll(nodes);
       }
@@ -391,10 +405,8 @@ public class OsmDatabase {
       if (processedAreas.contains(way)) {
         continue;
       }
-      TLongIterator longIterator = way.getNodeRefs().iterator();
-      while (longIterator.hasNext()) {
-        long nodeRef = longIterator.next();
-        if (!nodes.contains(nodeRef)) {
+      for (LongCursor c : way.getNodeRefs()) {
+        if (!nodes.contains(c.value)) {
           continue AREA;
         }
       }
@@ -403,6 +415,7 @@ public class OsmDatabase {
         // do not keep the way used in an area, it creates duplicated edges from the basic
         // street graph and from the area processing
         waysById.remove(way.getId());
+        waysSortedById = null;
       } catch (OsmArea.AreaConstructionException | Ring.RingConstructionException e) {
         // this area cannot be constructed, but we already have all the
         // necessary nodes to construct it. So, something must be wrong with
@@ -423,7 +436,7 @@ public class OsmDatabase {
    * the used ways.
    */
   private void processMultipolygonRelations() {
-    RELATION: for (OsmRelation relation : relationsById.valueCollection()) {
+    RELATION: for (OsmRelation relation : values(relationsById)) {
       if (processedAreas.contains(relation)) {
         continue;
       }
@@ -444,11 +457,9 @@ public class OsmDatabase {
           // relation includes way which does not exist in the data. Skip.
           continue RELATION;
         }
-        TLongIterator wayNodeIterator = way.getNodeRefs().iterator();
-        while (wayNodeIterator.hasNext()) {
-          long nodeId = wayNodeIterator.next();
-          if (nodes.contains(nodeId)) {
-            TroveUtils.addToMapSet(areasForNode, nodeId, way);
+        for (LongCursor c : way.getNodeRefs()) {
+          if (nodes.contains(c.value)) {
+            HppcMapSetUtils.addToMapSet(areasForNode, c.value, way);
           } else {
             // this area is missing some nodes, perhaps because it is on
             // the edge of the region, so we will simply not route on it.
@@ -493,7 +504,7 @@ public class OsmDatabase {
   private void processRelations() {
     LOG.debug("Processing relations...");
 
-    for (OsmRelation relation : relationsById.valueCollection()) {
+    for (OsmRelation relation : values(relationsById)) {
       if (relation.isRestriction()) {
         processRestriction(relation);
       } else if (relation.isRoute()) {
@@ -513,6 +524,7 @@ public class OsmDatabase {
       if (way != null && isOsmWay && !way.hasTag(key)) {
         var updatedWay = way.copy().withTag(key, "yes").build();
         waysById.put(updatedWay.getId(), updatedWay);
+        waysSortedById = null;
       }
     });
   }
@@ -700,5 +712,19 @@ public class OsmDatabase {
         .filter(node -> getLevelSetForEntity(node).containsAll(areaLevelSet))
         .forEach(node -> stopsInAreas.put(area, node));
     }
+  }
+
+  /**
+   * Return the map values ordered by key. HPPC hash containers iterate in a per-instance order,
+   * so sorting is needed to get a deterministic result.
+   */
+  private static <V> List<V> values(LongObjectMap<V> map) {
+    long[] keys = map.keys().toArray();
+    Arrays.sort(keys);
+    List<V> result = new ArrayList<>(keys.length);
+    for (long key : keys) {
+      result.add(map.get(key));
+    }
+    return result;
   }
 }

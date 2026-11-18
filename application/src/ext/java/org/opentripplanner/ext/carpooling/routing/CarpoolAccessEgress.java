@@ -10,7 +10,6 @@ import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccessEgress;
 import org.opentripplanner.routing.cost.CostLimit;
 import org.opentripplanner.street.model.path.StreetPath;
-import org.opentripplanner.street.search.state.State;
 
 /**
  * Raptor access/egress adapter wrapping an {@link InsertionCandidate}: the candidate carries the
@@ -236,52 +235,10 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
     return endLabel;
   }
 
-  /**
-   * The A* state sitting at the transit-stop endpoint of the passenger leg.
-   * <p>
-   * The transit stop is the chain's far end — its end for an access (passenger origin → … →
-   * stop) and its start for an egress (stop → … → passenger destination). The transit side is
-   * identified from the labels, which carry the stop on the end label for an access and on the
-   * start label for an egress; the returned state is the segment endpoint touching the stop. When
-   * neither label carries a stop (e.g. a direct itinerary), the chain end is used.
-   *
-   * <h4>Limitation: this state does not head a full-leg pointer chain</h4>
-   * <p>
-   * The {@link RoutingAccessEgress#getFinalState()} contract expects the returned state to head
-   * a {@link State#getBackState()} chain that reconstructs the <em>entire</em> street search — that
-   * is the assumption behind callers such as {@code RaptorPathToItineraryMapper}, which wrap the
-   * state in a {@link org.opentripplanner.street.model.path.StreetPath} to rebuild the leg.
-   * <p>
-   * A carpool leg does not honour that assumption today. It is not one A* search but several
-   * independent ones stitched together in the domain layer: an optional walk to the pickup, the
-   * shared ride (segments taken off the driver's committed route), and an optional walk from the
-   * dropoff. These chains are not linked — the first state of each segment is a fresh search origin
-   * with a {@code null} back state, and nothing points across the pickup/dropoff vertices from one
-   * segment into the next. Following {@code getBackState()} from the returned state therefore
-   * reconstructs only the single terminal segment, not the whole walk + ride + walk leg. Splicing
-   * the segments into one continuous back-state chain is possible but not yet done, since no caller
-   * needs it.
-   * <p>
-   * This is sound only because no caller reconstructs a carpool leg from this state. Itinerary
-   * mapping for carpool legs is routed through
-   * {@link org.opentripplanner.ext.carpooling.internal.CarpoolItineraryMapper} instead, which
-   * rebuilds the WALK + CARPOOL + WALK legs directly from the segments and times via the public
-   * accessors. The state returned here is consumed only for the direction-independent scalar checks
-   * performed on every access/egress — notably {@link State#isRentingVehicleFromStation()}, which
-   * is always {@code false} since a passenger rides in the driver's car rather than a
-   * station-rented vehicle. Do not wrap this state in a {@code StreetPath} expecting the full leg;
-   * that path would silently omit the ride and the other walk.
-   */
+  /** Always {@code false}: a passenger rides in the driver's car, not a station-rented vehicle. */
   @Override
-  public State getFinalState() {
-    if (startLabel.stop() != null) {
-      var firstSegment =
-        walkToPickup() != null ? walkToPickup() : pathsWithNewPassenger().getFirst();
-      return firstSegment.states().getFirst();
-    }
-    var lastSegment =
-      walkFromDropoff() != null ? walkFromDropoff() : pathsWithNewPassenger().getLast();
-    return lastSegment.lastState();
+  public boolean isRentingVehicleFromStation() {
+    return false;
   }
 
   /** Always {@code false}: a carpool leg, by definition, contains a vehicle ride. */

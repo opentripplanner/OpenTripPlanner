@@ -29,6 +29,7 @@ import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.apis.support.graphql.DataFetchingSupport;
 import org.opentripplanner.apis.transmodel.TransmodelAPITestContextBuilder;
 import org.opentripplanner.apis.transmodel.TransmodelGraphQLRequestContext;
+import org.opentripplanner.core.model.basic.Ratio;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -221,6 +222,49 @@ public class TripRequestMapperTest implements PlanTestConstants {
     );
     assertEquals(
       "Invalid duration for mode FLEXIBLE. The value 20m1s is greater than the default 20m.",
+      ex.getMessage()
+    );
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+    strings = {
+      "groupSimilarityKeepOne",
+      "groupSimilarityKeepThree",
+      "groupSimilarityKeepNumOfItineraries",
+    }
+  )
+  public void testGroupSimilarityAcceptsOne(String field) {
+    Map<String, Object> arguments = arguments("itineraryFilters", Map.of(field, 1.0));
+
+    var filters = MAPPER.createRequest(executionContext(arguments)).preferences().itineraryFilter();
+
+    assertEquals(
+      Ratio.of(1.0),
+      field.equals("groupSimilarityKeepOne")
+        ? filters.groupSimilarityKeepOne()
+        : filters.groupSimilarityKeepThree()
+    );
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+    strings = {
+      "groupSimilarityKeepOne",
+      "groupSimilarityKeepThree",
+      "groupSimilarityKeepNumOfItineraries",
+    }
+  )
+  public void testGroupSimilarityOutsideRangeIsRejected(String field) {
+    Map<String, Object> arguments = arguments("itineraryFilters", Map.of(field, 1.01));
+
+    var ex = assertThrows(InvalidInputException.class, () ->
+      MAPPER.createRequest(executionContext(arguments))
+    );
+    assertEquals(
+      "Invalid argument 'itineraryFilters." +
+        field +
+        "': Ratio must be in range [0.0, 1.0], but was: 1.01",
       ex.getMessage()
     );
   }

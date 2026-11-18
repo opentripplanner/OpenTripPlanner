@@ -262,7 +262,7 @@ public class TripPatternByLegIdsQuery {
       ctx.transitService(),
       ctx.shapeService(),
       ctx.transitAlertService(),
-      ctx.transferService(),
+      ctx.regularTransfers(),
       ctx.streetDetailsService(),
       ctx.linkingContextFactory(),
       ctx.streetLimitationParametersService()

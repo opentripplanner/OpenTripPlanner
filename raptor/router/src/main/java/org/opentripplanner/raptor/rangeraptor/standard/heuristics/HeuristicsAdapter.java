@@ -1,6 +1,6 @@
 package org.opentripplanner.raptor.rangeraptor.standard.heuristics;
 
-import gnu.trove.map.TIntObjectMap;
+import com.carrotsearch.hppc.IntObjectMap;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.IntUnaryOperator;
@@ -25,7 +25,7 @@ public class HeuristicsAdapter implements Heuristics {
   private static final int NOT_SET = Integer.MAX_VALUE;
   private final SingleCriteriaStopArrivals bestOverallTimes;
   private final SingleCriteriaStopArrivals bestNumOfTransfers;
-  private final TIntObjectMap<List<RaptorAccessEgress>> egressPaths;
+  private final IntObjectMap<List<RaptorAccessEgress>> egressPaths;
   private final TransitCalculator<?> calculator;
   private final RaptorCostCalculator<?> costCalculator;
   private final int nStops;
@@ -114,7 +114,7 @@ public class HeuristicsAdapter implements Heuristics {
       .addObj("aggregatedResults", aggregatedResults)
       .addCol(
         "egress stops reached",
-        Arrays.stream(egressPaths.keys())
+        Arrays.stream(egressPaths.keys().toArray())
           .filter(bestOverallTimes::isReached)
           .mapToObj(
             s -> "[" + s + " " + TimeUtils.timeToStrCompact(bestOverallTimes.value(s)) + "]"
@@ -170,13 +170,14 @@ public class HeuristicsAdapter implements Heuristics {
       SingleCriteriaStopArrivals bestOverallTimes,
       SingleCriteriaStopArrivals bestTransitTimes,
       SingleCriteriaStopArrivals bestNumOfTransfers,
-      TIntObjectMap<List<RaptorAccessEgress>> egressPaths
+      IntObjectMap<List<RaptorAccessEgress>> egressPaths
     ) {
       int bestJourneyTravelDuration = NOT_SET;
       int bestJourneyNumOfTransfers = NOT_SET;
       int bestArrivalTime = NOT_SET;
 
-      for (int stop : egressPaths.keys()) {
+      for (var cursor : egressPaths.keys()) {
+        int stop = cursor.value;
         var list = egressPaths.get(stop);
         boolean stopReached = bestOverallTimes.isReached(stop);
         boolean stopReachedByTransit = bestTransitTimes.isReached(stop);

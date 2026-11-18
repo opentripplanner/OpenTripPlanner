@@ -23,6 +23,7 @@ import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.grouppriority.TransitGroupPriorityItineraryDecorator;
 import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
+import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.raptor.configure.RaptorConfig;
@@ -59,9 +60,10 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.TemporaryVerticesContainer;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
-import org.opentripplanner.transfer.regular.RegularTransferService;
+import org.opentripplanner.transfer.regular.FlexTransferService;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,7 +89,8 @@ public class RoutingWorker {
   private final StreetLimitationParametersService streetLimitationParametersService;
   private final VehicleRentalService vehicleRentalService;
   private final StreetDetailsService streetDetailsService;
-  private final RegularTransferService transferService;
+  private final FlexTransferService transferService;
+  private final RegularTransferRepositorySnapshot<NearbyStop, RouteRequest> regularTransfers;
   private final FlexParameters flexParameters;
   private final List<RideHailingService> rideHailingServices;
   private final ViaCoordinateTransferFactory viaTransferResolver;
@@ -136,7 +139,8 @@ public class RoutingWorker {
     StreetLimitationParametersService streetLimitationParametersService,
     VehicleRentalService vehicleRentalService,
     StreetDetailsService streetDetailsService,
-    RegularTransferService transferService,
+    FlexTransferService transferService,
+    RegularTransferRepositorySnapshot<NearbyStop, RouteRequest> regularTransfers,
     FlexParameters flexParameters,
     List<RideHailingService> rideHailingServices,
     @Nullable DataOverlayParameterBindings dataOverlayParameterBindings,
@@ -165,6 +169,7 @@ public class RoutingWorker {
     this.vehicleRentalService = vehicleRentalService;
     this.streetDetailsService = streetDetailsService;
     this.transferService = transferService;
+    this.regularTransfers = regularTransfers;
     this.flexParameters = flexParameters;
     this.rideHailingServices = rideHailingServices;
     this.dataOverlayParameterBindings = dataOverlayParameterBindings;
@@ -462,6 +467,7 @@ public class RoutingWorker {
         meterRegistry,
         streetDetailsService,
         transferService,
+        regularTransfers,
         flexParameters,
         rideHailingServices,
         dataOverlayParameterBindings,

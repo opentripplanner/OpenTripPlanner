@@ -1,21 +1,24 @@
 package org.opentripplanner.routing.refetch;
 
+import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.CANCELED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
-import com.google.common.collect.ImmutableMultimap;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.GenericLocation;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.legreference.ScheduledTransitLegReference;
+import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
@@ -27,7 +30,6 @@ import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.linking.VisibilityMode;
-import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
 import org.opentripplanner.street.model.edge.Edge;
@@ -39,15 +41,14 @@ import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
 import org.opentripplanner.transfer.constrained.model.TransferConstraint;
 import org.opentripplanner.transfer.constrained.model.TripTransferPoint;
-import org.opentripplanner.transfer.regular.RegularTransferService;
-import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
-import org.opentripplanner.transfer.regular.model.PathTransfer;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model.TripInput;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.transfer.regular.FixedRegularTransfers;
+import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
+import org.opentripplanner.updater.trip.gtfs.GtfsRtTestHelper;
 
 public class RefetchItineraryServiceTest {
 
@@ -106,9 +107,10 @@ public class RefetchItineraryServiceTest {
   private static final Graph GRAPH = G.build();
 
   // Setup transfers
-  private static final RegularTransferService TRANSFER_SERVICE = createTransferService(
-    List.of(makeTransfer(STOP_B, STOP_C, GRAPH))
-  );
+  private static final RegularTransferRepositorySnapshot<
+    NearbyStop,
+    RouteRequest
+  > REGULAR_TRANSFERS = createRegularTransfers(STOP_B, STOP_C, GRAPH);
 
   @Test
   void refetchSimple() {
@@ -188,6 +190,55 @@ public class RefetchItineraryServiceTest {
       itinerary.toStr()
     );
     assertEquals(Duration.ofMinutes(-30), itinerary.totalDuration());
+  }
+
+  /// A trip cancelled by realtime data after the itinerary was planned does not make the refetch
+  /// fail: the complete itinerary comes back, with the cancelled leg still in it and marked as
+  /// cancelled, so a client can tell the traveller about the cancellation.
+  @Test
+  void refetchWithCancelledTrip() {
+    var transitEnv = TRANSIT_ENV.build();
+    var leg1 = legRef("trip1", STOP_A, STOP_B, transitEnv);
+    var leg2 = legRef("trip3", STOP_C, STOP_D, transitEnv);
+
+    var rt = GtfsRtTestHelper.of(transitEnv);
+    assertSuccess(rt.applyTripUpdate(rt.tripUpdate("trip1", CANCELED).build()));
+
+    // The service reads the realtime snapshot it is created with, so create it after the update.
+    var refetch = createRefetchService(transitEnv);
+    var itinerary = refetch.refetchItinerary(null, null, List.of(leg1, leg2), routeRequest());
+
+    assertEquals(
+      "A ~ BUS trip1 10:00 11:00 ~ B ~ Walk 10s ~ C ~ BUS trip3 12:30 13:30 ~ D []",
+      itinerary.toStr()
+    );
+    var cancelledLeg = (ScheduledTransitLeg) itinerary.legs().getFirst();
+    assertTrue(cancelledLeg.tripTimes().isCanceled());
+    assertTrue(cancelledLeg.isRealTimeUpdated());
+    var otherLeg = (ScheduledTransitLeg) itinerary.legs().getLast();
+    assertFalse(otherLeg.tripTimes().isCanceledOrDeleted());
+  }
+
+  /// A new data delivery can remove a trip or give it a different id. A reference created before
+  /// that still points at the old trip id, which can no longer be found, so the refetch fails.
+  @Test
+  void refetchAfterReferencedTripIsNoLongerAvailable() {
+    var oldTransitEnv = TRANSIT_ENV.build();
+    var leg1 = legRef("trip1", STOP_A, STOP_B, oldTransitEnv);
+
+    var newData = TransitTestEnvironment.of(SERVICE_DATE);
+    newData.station("StationA");
+    var stopA = newData.stopAtStation("A", "StationA");
+    var stopB = newData.stop("B");
+    var newTransitEnv = newData
+      .addTrip(TripInput.of("trip1-renamed").addStop(stopA, "10:00").addStop(stopB, "11:00"))
+      .build();
+    var refetch = createRefetchService(newTransitEnv);
+
+    var e = assertThrows(RefetchItineraryException.class, () ->
+      refetch.refetchItinerary(null, null, List.of(leg1), routeRequest())
+    );
+    assertTrue(e.getMessage().startsWith("Could not find leg"));
   }
 
   @Test
@@ -443,19 +494,22 @@ public class RefetchItineraryServiceTest {
       transitEnv.transitService(),
       transitEnv.shapeService(),
       new TransitAlertServiceImpl(),
-      TRANSFER_SERVICE,
+      REGULAR_TRANSFERS,
       streetDetailsService,
       linkingContextFactory,
       streetLimitationParametersService
     );
   }
 
-  public static RegularTransferService createTransferService(List<PathTransfer> transfers) {
-    var transferRepo = TransferServiceTestFactory.defaultTransferRepository();
-    ImmutableMultimap.Builder<StopLocation, PathTransfer> builder = ImmutableMultimap.builder();
-    transfers.forEach(transfer -> builder.put(transfer.from, transfer));
-    transferRepo.addAllTransfersByStops(builder.build());
-    return TransferServiceTestFactory.transferService(transferRepo);
+  public static RegularTransferRepositorySnapshot<NearbyStop, RouteRequest> createRegularTransfers(
+    RegularStop from,
+    RegularStop to,
+    Graph graph
+  ) {
+    var edges = findPath(from, to, graph);
+    var length = edges.stream().mapToDouble(Edge::getDistanceMeters).sum();
+    var path = new NearbyStop(to.getId(), length, edges, null);
+    return FixedRegularTransfers.of().add(from, to, path).snapshot();
   }
 
   public static ConstrainedTransfer staySeated(
@@ -505,12 +559,6 @@ public class RefetchItineraryServiceTest {
     var p2 = new TripTransferPoint(transitEnv.tripData(toTrip).trip(), toPos);
 
     return new ConstrainedTransfer(null, p1, p2, constraint);
-  }
-
-  public static PathTransfer makeTransfer(RegularStop from, RegularStop to, Graph graph) {
-    var edges = findPath(from, to, graph);
-    var length = edges.stream().mapToDouble(Edge::getDistanceMeters).sum();
-    return new PathTransfer(STOP_B, STOP_C, length, edges, EnumSet.of(StreetMode.WALK));
   }
 
   public static List<Edge> findPath(RegularStop from, RegularStop to, Graph graph) {

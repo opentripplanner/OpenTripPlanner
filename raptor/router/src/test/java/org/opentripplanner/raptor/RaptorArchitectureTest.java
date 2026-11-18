@@ -11,7 +11,7 @@ import org.opentripplanner.raptor._support.arch.Package;
 public class RaptorArchitectureTest {
 
   private static final Package OTP_ROOT = Package.of("org.opentripplanner");
-  private static final Package GNU_TROVE = Package.of("gnu.trove..");
+  private static final Package HPPC = Package.of("com.carrotsearch.hppc..");
   private static final Package OTP_UTILS = OTP_ROOT.subPackage("utils..");
 
   /* The Raptor module, all packages that other paths of OTP may use. */
@@ -53,7 +53,7 @@ public class RaptorArchitectureTest {
    */
   private static final Module RR_SHARED_PACKAGES = Module.of(
     OTP_UTILS,
-    GNU_TROVE,
+    HPPC,
     RAPTOR_API,
     RAPTOR_SPI,
     RAPTOR_UTILS,
@@ -100,7 +100,7 @@ public class RaptorArchitectureTest {
 
   @Test
   void enforcePackageDependenciesInRangeRaptorSharedPackages() {
-    RR_INTERNAL_API.dependsOn(OTP_UTILS, GNU_TROVE, RAPTOR_API, RAPTOR_SPI).verify();
+    RR_INTERNAL_API.dependsOn(OTP_UTILS, HPPC, RAPTOR_API, RAPTOR_SPI).verify();
     RR_DEBUG.dependsOn(RR_SHARED_PACKAGES).verify();
     RR_LIFECYCLE.dependsOn(RR_SHARED_PACKAGES).verify();
     RR_TRANSIT.dependsOn(RR_SHARED_PACKAGES, RR_DEBUG, RR_LIFECYCLE).verify();

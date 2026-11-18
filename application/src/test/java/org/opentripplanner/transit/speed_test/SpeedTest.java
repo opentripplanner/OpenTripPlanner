@@ -1,7 +1,6 @@
 package org.opentripplanner.transit.speed_test;
 
 import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
-import static org.opentripplanner.standalone.configure.ConstructApplication.initializeTransferCache;
 import static org.opentripplanner.transit.speed_test.support.AssertSpeedTestSetup.assertTestDateHasData;
 
 import java.lang.ref.WeakReference;
@@ -19,12 +18,14 @@ import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.framework.transaction.TimetableSnapshotParameters;
 import org.opentripplanner.gbfs.network.GbfsNetworkOverrides;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RaptorTransitDataMapper;
 import org.opentripplanner.routing.api.RoutingService;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
@@ -44,6 +45,7 @@ import org.opentripplanner.standalone.config.OtpConfigLoader;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.config.routerconfig.RaptorEnvironmentFactory;
 import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.transfer.configure.StreetTransferFactory;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
@@ -64,6 +66,8 @@ import org.opentripplanner.transit.speed_test.model.testcase.TestStatus;
 import org.opentripplanner.transit.speed_test.model.timer.SpeedTestTimer;
 import org.opentripplanner.transit.speed_test.options.SpeedTestCmdLineOpts;
 import org.opentripplanner.transit.speed_test.options.SpeedTestConfig;
+import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferParameters;
 import org.opentripplanner.updater.configure.UpdaterConfigurator;
 
 /**
@@ -100,7 +104,9 @@ public class SpeedTest {
     TransitRepository transitRepository,
     TimetableDataImport timetableDataImport,
     ShapeDataImport shapeDataImport,
-    TransferRepository transferRepository
+    TransferRepository transferRepository,
+    TransferParameters<RouteRequest> transferProfiles,
+    RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository
   ) {
     this.opts = opts;
     this.config = config;
@@ -124,8 +130,7 @@ public class SpeedTest {
     var scheduledRaptorData = RaptorTransitDataMapper.map(
       tuningParameters,
       transitRepository,
-      scheduledTimetableData,
-      transferRepository
+      scheduledTimetableData
     );
 
     transitRepository.initRaptorTransitData(scheduledRaptorData);
@@ -153,6 +158,16 @@ public class SpeedTest {
     var shapeHandle = registry.registerRepository(
       shapeRepository,
       new ShapeRepositoryLifecycle(shapeRepository)
+    );
+    // Registered before the updaters start, registration is not thread-safe
+    var regularTransferHandle = StreetTransferFactory.registerRepository(
+      registry,
+      regularTransferBuildRepository,
+      transferProfiles,
+      graph,
+      transitRepository,
+      tuningParameters.transferCacheMaxSize(),
+      false
     );
     var threadFactory = Executors.defaultThreadFactory();
     var transitUpdateManager = TransactionFactory.createUpdateManagerWithPeriodicCommits(
@@ -219,6 +234,7 @@ public class SpeedTest {
       TestServerContext.createVehicleRentalService(),
       TestServerContext.createStreetDetailsService(),
       TransferServiceTestFactory.transferService(transferRepository),
+      regularTransferHandle.repositorySnapshot(transactionScope),
       new DelegatingTransitAlertServiceImpl(),
       routerConfig.flexParameters(),
       List.of(),
@@ -234,8 +250,6 @@ public class SpeedTest {
       routerConfig.transitTuningConfig(),
       null
     );
-
-    initializeTransferCache(routerConfig.transitTuningConfig(), transitRepository);
 
     timer.setUp(opts.groupResultsByCategory());
   }
@@ -269,7 +283,9 @@ public class SpeedTest {
         transitRepository,
         timetableDataImport,
         shapeDataImport,
-        transferRepository
+        transferRepository,
+        buildConfig.transferProfiles(),
+        model.regularTransferBuildRepository()
       );
 
       assertTestDateHasData(transitRepository, config, buildConfig);

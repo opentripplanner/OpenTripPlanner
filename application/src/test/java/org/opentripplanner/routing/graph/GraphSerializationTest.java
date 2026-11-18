@@ -41,6 +41,7 @@ import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.framework.model.Gram;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.model.plan.Emission;
+import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
 import org.opentripplanner.service.shape.dataimport.ShapeDataImport;
@@ -63,6 +64,8 @@ import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
+import org.opentripplanner.transit.transfer.regular.configure.RegularTransferFactory;
 import org.slf4j.Logger;
 
 /**
@@ -127,6 +130,7 @@ public class GraphSerializationTest {
       model.timetableDataImport(),
       model.shapeDataImport(),
       model.transferRepository(),
+      RegularTransferFactory.createBuildRepository(),
       weRepo,
       parkingRepository,
       emissionRepository,
@@ -162,6 +166,7 @@ public class GraphSerializationTest {
       model.timetableDataImport(),
       model.shapeDataImport(),
       model.transferRepository(),
+      RegularTransferFactory.createBuildRepository(),
       worldEnvelopeRepository,
       parkingRepository,
       emissionRepository,
@@ -327,6 +332,7 @@ public class GraphSerializationTest {
     TimetableDataImport originalTimetableDataImport,
     ShapeDataImport originalShapeDataImport,
     TransferRepository originalTransferRepository,
+    RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository vehicleParkingRepository,
     EmissionRepository emissionRepository,
@@ -344,6 +350,7 @@ public class GraphSerializationTest {
       originalTimetableDataImport,
       originalShapeDataImport,
       originalTransferRepository,
+      regularTransferBuildRepository,
       worldEnvelopeRepository,
       vehicleParkingRepository,
       BuildConfig.DEFAULT,

@@ -25,6 +25,7 @@ import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.model.projectinfo.GraphFileHeader;
 import org.opentripplanner.model.projectinfo.OtpProjectInfo;
+import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.kryosupport.KryoBuilder;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
@@ -44,6 +45,7 @@ import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.utils.collection.ListUtils;
 import org.opentripplanner.utils.lang.OtpNumberFormat;
 import org.opentripplanner.utils.logging.ProgressTracker;
@@ -75,6 +77,7 @@ public class SerializedGraphObject implements Serializable {
   public final TimetableDataImport timetableDataImport;
   public final ShapeDataImport shapeDataImport;
   public final TransferRepository transferRepository;
+  public final RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository;
   public final WorldEnvelopeRepository worldEnvelopeRepository;
   private final Collection<Edge> edges;
 
@@ -112,6 +115,7 @@ public class SerializedGraphObject implements Serializable {
     TimetableDataImport timetableDataImport,
     ShapeDataImport shapeDataImport,
     TransferRepository transferRepository,
+    RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository parkingRepository,
     BuildConfig buildConfig,
@@ -132,6 +136,7 @@ public class SerializedGraphObject implements Serializable {
     this.timetableDataImport = timetableDataImport;
     this.shapeDataImport = shapeDataImport;
     this.transferRepository = transferRepository;
+    this.regularTransferBuildRepository = regularTransferBuildRepository;
     this.worldEnvelopeRepository = worldEnvelopeRepository;
     this.parkingRepository = parkingRepository;
     this.buildConfig = buildConfig;

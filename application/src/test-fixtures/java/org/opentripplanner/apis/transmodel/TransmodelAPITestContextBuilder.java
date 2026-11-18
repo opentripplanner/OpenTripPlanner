@@ -5,8 +5,8 @@ import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.standalone.api.TestServerContext;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transfer.regular.TransferRepository;
-import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
+import org.opentripplanner.transit.transfer.regular.NoRegularTransfers;
 
 public class TransmodelAPITestContextBuilder {
 
@@ -62,6 +62,7 @@ public class TransmodelAPITestContextBuilder {
     var transitService = transitTestEnvironment.transitService();
     var shapeService = transitTestEnvironment.shapeService();
     var transferRepository = transferRepository();
+    var regularTransfers = NoRegularTransfers.snapshot();
     var graph = graph();
 
     var vertexLinker = VertexLinkerTestFactory.of(graph);
@@ -71,7 +72,8 @@ public class TransmodelAPITestContextBuilder {
         graph,
         transitService,
         shapeService,
-        transferRepository
+        transferRepository,
+        regularTransfers
       ),
       transitService,
       shapeService,
@@ -81,7 +83,7 @@ public class TransmodelAPITestContextBuilder {
       TestServerContext.createVehicleRentalService(),
       TestServerContext.createVehicleParkingService(),
       graph,
-      TransferServiceTestFactory.transferService(transferRepository),
+      regularTransfers,
       TestServerContext.createStreetDetailsService(),
       TestServerContext.createLinkingContextFactory(graph, vertexLinker, transitService),
       TestServerContext.createStreetLimitationParametersService()

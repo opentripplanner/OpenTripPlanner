@@ -161,6 +161,7 @@ public class NetexFeedParameters implements DataSourceConfig {
       sharedGroupFilePattern.equals(that.sharedGroupFilePattern) &&
       groupFilePattern.equals(that.groupFilePattern) &&
       ignoredFeatures.equals(that.ignoredFeatures) &&
+      noTransfersOnIsolatedStops == that.noTransfersOnIsolatedStops &&
       allowStopPlaceAsPassengerStopAssignment == that.allowStopPlaceAsPassengerStopAssignment &&
       ferryIdsNotAllowedForBicycle.equals(that.ferryIdsNotAllowedForBicycle)
     );
@@ -176,6 +177,7 @@ public class NetexFeedParameters implements DataSourceConfig {
       sharedGroupFilePattern,
       groupFilePattern,
       ignoredFeatures,
+      noTransfersOnIsolatedStops,
       allowStopPlaceAsPassengerStopAssignment,
       ferryIdsNotAllowedForBicycle
     );

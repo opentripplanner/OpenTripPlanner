@@ -56,6 +56,7 @@ import org.opentripplanner.transit.repository.TimetableRepositoryLifecycle;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.transit.transfer.regular.NoRegularTransfers;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.alert.gtfs.AlertsUpdateHandler;
 import org.opentripplanner.updater.spi.WriteToGraphCallbacks;
@@ -227,8 +228,7 @@ public abstract class GtfsTest {
     var scheduledRaptorData = RaptorTransitDataMapper.map(
       tuningParameters,
       transitRepository,
-      scheduledTimetableData,
-      transferRepository
+      scheduledTimetableData
     );
     transitRepository.initRaptorTransitData(scheduledRaptorData);
     var registry = TransactionFactory.createRepositoryRegistry();
@@ -297,7 +297,8 @@ public abstract class GtfsTest {
       graph,
       transitService,
       shapeService,
-      transferRepository
+      transferRepository,
+      NoRegularTransfers.snapshot()
     );
   }
 }

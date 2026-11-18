@@ -10,6 +10,7 @@ import org.entur.netex2.model.StopPlace;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.graph_builder.issue.api.Issue;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 
 /**
  * Ensure stop place exists for PassengerStopAssignment.
@@ -32,7 +33,7 @@ class PassengerStopAssignmentToQuaylessStopPlace
   public DataImportIssue logMessage(String stopPointRef, String stopPlaceRef) {
     return Issue.issue(
       "PassengerStopAssignmentToQuaylessStopPlace",
-      "ScheduledStopPoint %s is assigned to StopPlace %s, which contains no quays.",
+      "ScheduledStopPoint %s is assigned to StopPlace %s, which contains no usable quays.",
       stopPointRef,
       stopPlaceRef
     );
@@ -50,7 +51,7 @@ class PassengerStopAssignmentToQuaylessStopPlace
     if (element.getValue() instanceof Quay q) {
       return Optional.ofNullable(q.getCentroid())
         .map(SimplePoint_VersionStructure::getLocation)
-        .filter(PassengerStopAssignmentToQuaylessStopPlace::hasCoordinate)
+        .filter(PassengerStopAssignmentToQuaylessStopPlace::hasValidCoordinate)
         .isPresent();
     }
     // could be a QuayRef which we don't support (yet)
@@ -59,13 +60,20 @@ class PassengerStopAssignmentToQuaylessStopPlace
 
   /**
    * Mirrors the coordinate rules of the stop mapping (see {@code WgsCoordinateMapper}): a location
-   * is usable if it has both latitude and longitude, or a GML position with 2 or 3 values.
+   * is usable if it has both latitude and longitude, or a GML position with 2 or 3 values, and the
+   * values are within the WGS84 range.
    */
-  private static boolean hasCoordinate(LocationStructure location) {
+  private static boolean hasValidCoordinate(LocationStructure location) {
     if (location.getLatitude() != null && location.getLongitude() != null) {
-      return true;
+      return WgsCoordinate.isValid(
+        location.getLatitude().doubleValue(),
+        location.getLongitude().doubleValue()
+      );
     }
     var pos = location.getPos();
-    return pos != null && (pos.getValue().size() == 2 || pos.getValue().size() == 3);
+    if (pos == null || (pos.getValue().size() != 2 && pos.getValue().size() != 3)) {
+      return false;
+    }
+    return WgsCoordinate.isValid(pos.getValue().getFirst(), pos.getValue().get(1));
   }
 }
