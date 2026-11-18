@@ -22,7 +22,7 @@ public interface RoutingStrategy<T extends RaptorTripSchedule> {
    * {@link RaptorAccessEgress#arrivedOnBoard()}.
    *
    * @param departureTime The access departure time. The current iteration departure time or the
-   *                      time-shifted departure time for access with opening hours.
+   *     time-shifted departure time for access with opening hours.
    */
   void addAccessStopArrival(RaptorAccessEgress accessPath, int departureTime);
 
@@ -76,8 +76,8 @@ public interface RoutingStrategy<T extends RaptorTripSchedule> {
 
   /**
    * @return all on-board trip access arrivals for the given {@code routeIndex}. The arrivals are
-   *         removed from state and can only be fetched once. The method returns {@code null} if no
-   *         arrivals exist - this should be very efficient to check.
+   *     removed from state and can only be fetched once. The method returns {@code null} if no
+   *     arrivals exist - this should be very efficient to check.
    */
   @Nullable
   default OnTripAccessArrivals<T> consumeStartOnBoardStopArrivalsForRoute(int routeIndex) {

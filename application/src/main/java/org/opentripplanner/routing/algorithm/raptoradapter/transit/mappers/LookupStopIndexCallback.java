@@ -17,7 +17,7 @@ public interface LookupStopIndexCallback {
    * the given id.
    *
    * @return a stream of stop indexes. We return a stream here because we need to merge this with
-   *         the indexes of other stops.
+   *     the indexes of other stops.
    */
   IntStream lookupStopLocationIndexes(FeedScopedId stopLocationId);
 

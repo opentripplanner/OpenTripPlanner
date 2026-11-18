@@ -78,7 +78,7 @@ public record ScheduledTransitLegReference(
    * data, using it gives a better guarantee to reconstruct correctly the original leg.
    *
    * @return The reconstructed leg usable in the current transit model, {@code null} if it is not
-   *         possible to reconstruct the leg.
+   *     possible to reconstruct the leg.
    */
   @Override
   @Nullable
@@ -234,8 +234,8 @@ public record ScheduledTransitLegReference(
    * pattern.
    *
    * @return The match closest to the given stop position in the given pattern, except that if an
-   *         exact match is next to the same station match of a different platform, the exact match
-   *         is returned.
+   *     exact match is next to the same station match of a different platform, the exact match
+   *     is returned.
    */
   private OptionalInt findStopPositionInPattern(
     TripPattern tripPattern,

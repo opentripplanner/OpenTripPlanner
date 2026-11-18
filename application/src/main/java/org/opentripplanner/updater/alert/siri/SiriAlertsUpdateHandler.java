@@ -311,7 +311,7 @@ public class SiriAlertsUpdateHandler {
 
   /**
    * @return True if list have at least one element. {@code false} is returned if the given list is
-   *         empty or {@code null}.
+   *     empty or {@code null}.
    */
   private boolean isNotEmpty(List<?> list) {
     return list != null && !list.isEmpty();

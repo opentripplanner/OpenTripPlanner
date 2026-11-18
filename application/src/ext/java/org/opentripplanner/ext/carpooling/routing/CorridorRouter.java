@@ -31,9 +31,9 @@ public class CorridorRouter implements CarpoolRouter {
 
   /**
    * @param passengerRouter   the tree router with the passenger's vertices registered in both
-   *                          directions
+   *     directions
    * @param passengerVertices the passenger's snapped vertices: the pickup and the dropoff of a
-   *                          direct request, the one vertex of an access/egress request
+   *     direct request, the one vertex of an access/egress request
    * @param pathRouter        finds a corridor segment's path
    */
   public CorridorRouter(

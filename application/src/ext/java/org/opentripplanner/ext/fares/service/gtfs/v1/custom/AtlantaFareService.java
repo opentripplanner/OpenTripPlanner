@@ -96,7 +96,7 @@ public class AtlantaFareService extends DefaultFareService {
      * @param leg         Ride to be added
      * @param defaultFare Default fare to use for transfer calculations (usually from GTFS)
      * @return Whether the added ride is valid or not. If invalid, then this transfer has ended and
-     *         a new one is needed for the ride.
+     *     a new one is needed for the ride.
      */
     public boolean addLeg(Leg leg, Money defaultFare) {
       // A transfer will always contain at least one ride.

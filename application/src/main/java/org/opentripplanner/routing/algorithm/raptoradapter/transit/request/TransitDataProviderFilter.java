@@ -33,7 +33,7 @@ public interface TransitDataProviderFilter {
    * input values, create a clone of the bitset and subtract the unavailable stops.
    *
    * @param tripPattern      Trip pattern that should contain boarding/alighting information, e.g.
-   *                         wheelchair accessibility for each stop.
+   *     wheelchair accessibility for each stop.
    * @param boardingPossible Initial information regarding boarding/alighting possible
    * @param boardAlight      Whether we are filtering boarding or alighting stops
    * @return Information if stops are available for boarding or alighting

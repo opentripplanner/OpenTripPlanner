@@ -23,9 +23,9 @@ import org.opentripplanner.utils.tostring.ValueObjectToStringBuilder;
  * @param since        This is the first OTP version this feature existed in.
  * @param defaultValue The default value used if this parameter is not present in the documentation.
  * @param required     The config parameter is required. OTP will not start unless this parameter is
- *                     set.
+ *     set.
  * @param skipChild    Skip generating doc for this node - the child(this) is documented in the
- *                     parent node.
+ *     parent node.
  */
 public record NodeInfo(
   String name,

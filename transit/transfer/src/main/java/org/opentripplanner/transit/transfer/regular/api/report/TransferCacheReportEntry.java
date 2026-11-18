@@ -10,9 +10,9 @@ import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfi
  * @param type              the profile type of the preferences
  * @param source            how the key came to be, see {@link UserPreferenceSource}
  * @param id                the id of the profile or the warmup entry, {@code null} if the key was
- *                          created on demand
+ *     created on demand
  * @param closestProfileId  the id of the profile closest to the key, the paths of the transfers
- *                          are read from. {@code null} if there is no profile
+ *     are read from. {@code null} if there is no profile
  * @param userPreferences   the user preferences of the key, as text
  * @param hits              the number of requests that used the key
  * @param cached            whether the Raptor transfers of the key are in the cache now

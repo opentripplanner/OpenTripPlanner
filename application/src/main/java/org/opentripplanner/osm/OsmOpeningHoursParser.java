@@ -421,7 +421,7 @@ public class OsmOpeningHoursParser {
    * </pre>
    *
    * @return a list of new {@link OHCalendarBuilder.OpeningHoursBuilder} created while splitting
-   *         existing builders.
+   *     existing builders.
    */
   private List<OHCalendarBuilder.OpeningHoursBuilder> splitPreviousBuilders(
     OHCalendarBuilder.OpeningHoursBuilder closedOpeningHoursBuilder,

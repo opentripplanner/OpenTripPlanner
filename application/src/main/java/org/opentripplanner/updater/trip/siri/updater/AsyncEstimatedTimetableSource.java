@@ -16,7 +16,7 @@ public interface AsyncEstimatedTimetableSource {
    * recent history of SIRI-ET messages produced by this feed and made available by a message cache.
    *
    * @param serviceDeliveryConsumer apply asynchronously the updates to the transit model. Return a
-   *                                future indicating when the updates are applied.
+   *     future indicating when the updates are applied.
    */
   void start(Function<ServiceDelivery, Future<?>> serviceDeliveryConsumer);
 

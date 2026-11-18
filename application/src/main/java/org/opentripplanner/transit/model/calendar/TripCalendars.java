@@ -293,9 +293,9 @@ public class TripCalendars implements Serializable {
    *
    * @param serviceDate service date for the added service id
    * @param onUpdate    callback invoked with the new instance, if and only if a new service id was
-   *                    registered
+   *     registered
    * @return service-id for date if it exists or is created. If the given service date is outside
-   *         the service period {@code null} is returned.
+   *     the service period {@code null} is returned.
    */
   @Nullable
   public FeedScopedId getOrCreateServiceIdForDate(

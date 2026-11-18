@@ -24,8 +24,8 @@ public class TwoWayLinearSearch {
    * ...
    *
    * @param startIndex the index to start searching from; if not within bounds, the method returns
-   *                   empty. If the {@code startIndex} is out of bound, the start position is
-   *                   adjusted to the closest position inside the search range.
+   *     empty. If the {@code startIndex} is out of bound, the start position is
+   *     adjusted to the closest position inside the search range.
    * @param lowerBound the lower bound of the search range (inclusive)
    * @param upperBound the upper bound of the search range (exclusive)
    * @param test       a function that tests if an index satisfies the search condition

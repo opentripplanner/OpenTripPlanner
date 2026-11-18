@@ -14,11 +14,11 @@ import java.util.Optional;
  *
  * @param defaults                the values applied to a network that is not listed
  * @param includeUnlistedNetworks whether a network present in the GBFS manifest but absent from
- *                                {@code networks} is loaded at all. Kept separate from
- *                                {@code defaults} so that adding defaults to avoid repetition
- *                                cannot silently widen which networks OTP loads.
+ *     {@code networks} is loaded at all. Kept separate from
+ *     {@code defaults} so that adding defaults to avoid repetition
+ *     cannot silently widen which networks OTP loads.
  * @param byNetwork               the resolved parameters for each listed network, keyed by GBFS
- *                                {@code system_id}
+ *     {@code system_id}
  */
 public record GbfsNetworkOverrides(
   GbfsNetworkParameters defaults,

@@ -87,7 +87,7 @@ public sealed interface EntitySelector {
   /// stopConditions and the line can be restricted to certain directions.
   ///
   /// @param directions If set the selector will only match trips with one of the specified
-  ///                   directions. An empty list will match nothing.
+  ///     directions. An empty list will match nothing.
   record StopAndRoute(
     FeedScopedId stopId,
     FeedScopedId routeId,

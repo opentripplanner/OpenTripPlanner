@@ -208,7 +208,7 @@ public sealed class ParetoSet<T> extends AbstractCollection<T> permits ParetoSet
    * current set of elements in this set at the time of creation.
    *
    * @param startIndexInclusive the first element to include in the iterator, unlike the elements in
-   *                            this set the index is cached until an iterator is created.
+   *     this set the index is cached until an iterator is created.
    */
   final Iterable<T> tail(final int startIndexInclusive) {
     return () -> tailIterator(startIndexInclusive);

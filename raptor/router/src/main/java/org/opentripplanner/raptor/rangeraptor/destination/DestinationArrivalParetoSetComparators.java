@@ -55,13 +55,13 @@ public final class DestinationArrivalParetoSetComparators {
   /**
    * @param timeConfig Which time criteria to use, see {@link ParetoSetTime}.
    * @param direction  The search direction. The time criteria are defined for the journey, so the
-   *                   direction decides which {@link DestinationArrival} field and numeric
-   *                   direction each criterion maps to.
+   *     direction decides which {@link DestinationArrival} field and numeric
+   *     direction each criterion maps to.
    * @param costConfig Supported configurations of c1, c2 and relaxed cost(c1).
    * @param relaxC1    Relax function for the generalized cost, used with
-   *                   {@link ParetoSetCost#USE_C1_RELAXED_IF_C2_IS_OPTIMAL}.
+   *     {@link ParetoSetCost#USE_C1_RELAXED_IF_C2_IS_OPTIMAL}.
    * @param c2Comp     Dominance function for c2, used with
-   *                   {@link ParetoSetCost#USE_C1_RELAXED_IF_C2_IS_OPTIMAL}.
+   *     {@link ParetoSetCost#USE_C1_RELAXED_IF_C2_IS_OPTIMAL}.
    */
   public static <T extends RaptorTripSchedule> ParetoComparator<
     DestinationArrival<T>

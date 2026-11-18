@@ -459,8 +459,8 @@ public final class TripPattern
 
   /**
    * @deprecated This method is not clearly defined. Use {@link #isStopPatternModifiedInRealTime()}
-   *             or {@link #isRealTimeTripPattern()} if possible, or clarify what this is needed
-   *             for.
+   *     or {@link #isRealTimeTripPattern()} if possible, or clarify what this is needed
+   *     for.
    */
   @Deprecated
   public boolean isModified() {

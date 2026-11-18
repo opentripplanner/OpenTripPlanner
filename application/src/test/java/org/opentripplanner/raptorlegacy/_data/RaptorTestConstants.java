@@ -11,7 +11,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultC
 
 /**
  * @deprecated This was earlier part of Raptor and should not be used outside the Raptor module. Use
- *             the OTP model entities instead.
+ *     the OTP model entities instead.
  */
 @Deprecated
 public interface RaptorTestConstants {

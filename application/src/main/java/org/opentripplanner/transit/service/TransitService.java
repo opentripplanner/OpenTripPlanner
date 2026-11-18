@@ -293,9 +293,9 @@ public interface TransitService {
    * @param numberOfDeparturesPerPattern Number of departures to fetch per pattern
    * @param arrivalDeparture             Filter by arrivals, departures, or both
    * @param includeCancellations         If the result should include those trip times where either
-   *                                     the entire trip or the stop at the given stop location has
-   *                                     been cancelled. Deleted trips are never returned no matter
-   *                                     the value of this parameter.
+   *     the entire trip or the stop at the given stop location has
+   *     been cancelled. Deleted trips are never returned no matter
+   *     the value of this parameter.
    */
   List<TripTimeOnDate> findTripTimesOnDate(
     StopLocation stop,
@@ -463,7 +463,7 @@ public interface TransitService {
 
   /**
    * @return the current (real-time if available, otherwise scheduled) trip times for the given trip
-   *         on the given service date, or empty if the trip does not run on that date.
+   *     on the given service date, or empty if the trip does not run on that date.
    */
   Optional<TripTimes<?>> findTripTimes(Trip trip, LocalDate serviceDate);
 

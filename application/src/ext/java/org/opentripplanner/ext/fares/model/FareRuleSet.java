@@ -85,7 +85,7 @@ public class FareRuleSet implements Serializable {
    * @param tripsVisited  [Not implemented] A set containing the trip IDs visited
    * @param transfersUsed Number of transfers already used
    * @param tripTime      Time from beginning of first leg to beginning of current leg to be
-   *                      evaluated
+   *     evaluated
    * @param journeyTime   Total journey time from beginning of first leg to end of current leg
    * @return True if this FareAttribute should apply to this leg
    */

@@ -72,7 +72,7 @@ public class LuceneIndex implements Serializable {
 
   /**
    * @param transitService a service without real-time data, the index is built once from the
-   *                       scheduled data.
+   *     scheduled data.
    */
   public LuceneIndex(
     TransitService transitService,

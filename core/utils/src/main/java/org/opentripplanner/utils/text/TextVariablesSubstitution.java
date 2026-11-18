@@ -59,7 +59,7 @@ public class TextVariablesSubstitution {
    * variable token.
    *
    * @param errorHandler The error handler is called if a variable key does not exist in the
-   *                     {@code variableProvider}.
+   *     {@code variableProvider}.
    * @return the new value with all variables replaced.
    */
   public static String insertVariables(

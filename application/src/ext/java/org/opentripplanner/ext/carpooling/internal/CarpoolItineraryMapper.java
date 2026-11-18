@@ -105,15 +105,15 @@ public class CarpoolItineraryMapper {
    * followed by a WALK leg from the snapped dropoff vertex to the destination.
    *
    * @param candidate         the insertion candidate containing route segments, trip details, and
-   *                          optional walk paths around the carpool pickup/dropoff
+   *     optional walk paths around the carpool pickup/dropoff
    * @param carpoolReluctance multiplier applied to ride seconds when computing the carpool leg's
-   *                          {@code generalizedCost}.
+   *     {@code generalizedCost}.
    * @param fromLocation      the request's {@code from} location (passenger origin), used to label
-   *                          the first leg's {@code from} place.
+   *     the first leg's {@code from} place.
    * @param toLocation        the request's {@code to} location (passenger destination), used to
-   *                          label the last leg's {@code to} place.
+   *     label the last leg's {@code to} place.
    * @return an itinerary for the passenger's journey, or {@code null} if the candidate has no
-   *         shared segments (a safety check that should not trigger for valid candidates)
+   *     shared segments (a safety check that should not trigger for valid candidates)
    */
   @Nullable
   public Itinerary toItinerary(
@@ -200,7 +200,7 @@ public class CarpoolItineraryMapper {
    * values Raptor used during the search.
    *
    * @return the itinerary, or {@code null} if the access/egress has no shared segments (a safety
-   *         check that should not trigger for valid legs)
+   *     check that should not trigger for valid legs)
    */
   @Nullable
   public Itinerary toItinerary(CarpoolAccessEgress accessEgress) {
@@ -310,18 +310,18 @@ public class CarpoolItineraryMapper {
    * {@code org.opentripplanner.apis.transmodel.mapping.BookingInfoMapper#mapToBookWhen}.
    *
    * @param contact       the trip's public-contact details, or {@code null} if the trip publishes
-   *                      none.
+   *     none.
    * @param tripStartTime the driver's trip start time; only the time-of-day is used, as the
-   *                      placeholder source for {@code latestBookingTime}.
+   *     placeholder source for {@code latestBookingTime}.
    * @param pickup        the carpool boarding coordinate (where the passenger gets into the car),
-   *                      expanded into the booking URL's {@code {from}} placeholder.
+   *     expanded into the booking URL's {@code {from}} placeholder.
    * @param dropoff       the carpool alighting coordinate (where the passenger gets out of the
-   *                      car), expanded into the booking URL's {@code {to}} placeholder.
+   *     car), expanded into the booking URL's {@code {to}} placeholder.
    * @return a booking info populated with the contact details and derived booking methods
-   *         (CALL_OFFICE if phone is set, ONLINE if a booking URL is set), or {@code null} when no
-   *         actionable booking method can be derived — i.e. {@code contact} is {@code null}, or it
-   *         carries neither a phone number nor a booking URL. Consumers may therefore treat a
-   *         non-null return as "this leg has at least one booking method."
+   *     (CALL_OFFICE if phone is set, ONLINE if a booking URL is set), or {@code null} when no
+   *     actionable booking method can be derived — i.e. {@code contact} is {@code null}, or it
+   *     carries neither a phone number nor a booking URL. Consumers may therefore treat a
+   *     non-null return as "this leg has at least one booking method."
    */
   @Nullable
   static BookingInfo toBookingInfo(

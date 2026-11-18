@@ -101,7 +101,7 @@ final class TemplatePathsByUserProfile<P> implements Serializable {
    * ordered by their values, so the result is always the same.
    *
    * @throws IllegalArgumentException if paths are stored, but not for the type of the preferences.
-   *                                  A request can only use the transfers of a configured type.
+   *     A request can only use the transfers of a configured type.
    */
   @Nullable
   AbstractUserPreferences<?> closestProfile(

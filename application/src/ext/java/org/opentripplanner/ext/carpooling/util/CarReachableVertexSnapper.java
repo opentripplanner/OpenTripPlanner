@@ -111,12 +111,12 @@ public final class CarReachableVertexSnapper {
 
   /**
    * @param baseRequest   walk preferences for the walk A*; mode is forced to
-   *                      {@link StreetMode#WALK} and {@code arriveBy} overridden. The reachability
-   *                      probe ignores it (always plain {@link StreetMode#CAR}).
+   *     {@link StreetMode#WALK} and {@code arriveBy} overridden. The reachability
+   *     probe ignores it (always plain {@link StreetMode#CAR}).
    * @param vertexToSnap  the vertex to snap; returned unchanged when it can already be snapped to.
    * @param maxWalk       walk budget for reaching a car-reachable vertex.
    * @param arriveBy      {@code false} to walk forward from {@code vertexToSnap}, {@code true} to
-   *                      walk backward to it.
+   *     walk backward to it.
    * @param permanentOnly reject temporary vertices.
    * @return the snap result, or {@code null} if none is reachable within {@code maxWalk}.
    */

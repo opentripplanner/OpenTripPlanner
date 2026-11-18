@@ -133,7 +133,7 @@ public class TransferWaitTimeCostCalculator {
    * </pre>
    *
    * @param backTravelWaitTimeFactor This factor is used to calculate a cost, with should balance
-   *                                 the wait time against extra transit time and less walking.
+   *     the wait time against extra transit time and less walking.
    */
   public TransferWaitTimeCostCalculator(
     double backTravelWaitTimeFactor,

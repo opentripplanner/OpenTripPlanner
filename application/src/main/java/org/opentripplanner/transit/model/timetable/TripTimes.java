@@ -186,7 +186,7 @@ public sealed interface TripTimes<T extends TripTimes<T>>
 
   /**
    * @return the id of the vehicle operating this trip, as supplied by real-time updates, or empty
-   *         if no vehicle has been reported.
+   *     if no vehicle has been reported.
    */
   Optional<FeedScopedId> getVehicleId();
 
@@ -208,7 +208,7 @@ public sealed interface TripTimes<T extends TripTimes<T>>
    * GTFS (Headsign) and Netex (DestinationDisplay), the Via concept is only present in Transmodel.
    *
    * @return a list of via names visible at the given stop position, or an empty list if there are
-   *         no vias.
+   *     no vias.
    */
   List<String> getHeadsignVias(int stopPos);
 
@@ -219,10 +219,10 @@ public sealed interface TripTimes<T extends TripTimes<T>>
    * scheduled departure from the first stop and ends at the scheduled arrival at the last stop.
    *
    * @param startOfService the start of the service day the trip is running on, see
-   *                       {@link org.opentripplanner.utils.time.ServiceDateUtils#asStartOfService}.
+   *     {@link org.opentripplanner.utils.time.ServiceDateUtils#asStartOfService}.
    * @return {@code null} if the schedule of the trip cannot be resolved, either because the trip
-   *         has no stops or because the departure from the first stop or the arrival at the last
-   *         stop is missing or inconsistent.
+   *     has no stops or because the departure from the first stop or the arrival at the last
+   *     stop is missing or inconsistent.
    */
   @Nullable
   default TimePeriod scheduledRunningTime(Instant startOfService) {

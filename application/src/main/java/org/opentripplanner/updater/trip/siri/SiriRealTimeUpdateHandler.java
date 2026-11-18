@@ -73,8 +73,8 @@ public class SiriRealTimeUpdateHandler {
    * Method to apply estimated timetables to the most recent version of the timetable snapshot.
    *
    * @param incrementality the incrementality of the update, for example if updates represent all
-   *                       updates that are active right now, i.e. all previous updates should be
-   *                       disregarded
+   *     updates that are active right now, i.e. all previous updates should be
+   *     disregarded
    * @param updates        SIRI EstimatedTimetable deliveries that should be applied atomically.
    */
   public UpdateResult applyEstimatedTimetable(

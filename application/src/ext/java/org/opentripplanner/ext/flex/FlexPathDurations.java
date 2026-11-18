@@ -12,17 +12,17 @@ import org.opentripplanner.utils.time.DurationUtils;
  * this futher.
  *
  * @param access The duration of the walking in the beginning of the Flex path. Should be zero or a
- *               positive number. Zero means that the path start with the flex trip, there is no
- *               access.
+ *     positive number. Zero means that the path start with the flex trip, there is no
+ *     access.
  * @param trip   The duration of the flex ride. Should be zero or a positive number (zero is a valid
- *               value since timetables have usually a 1-minute resolution: it is then possible to
- *               have a 0-second trip between 2 stops).
+ *     value since timetables have usually a 1-minute resolution: it is then possible to
+ *     have a 0-second trip between 2 stops).
  * @param egress The duration of the walking at the end of the Flex path. Should be zero or a
- *               positive number. Zero means that the path ends after the flex trip, there is no
- *               egress.
+ *     positive number. Zero means that the path ends after the flex trip, there is no
+ *     egress.
  * @param offset The flex trip times is using service-time(noon minus 12 hours) as "midnight", the
- *               {@code offset} is the duration from router midnight to service-time midnight. This
- *               is used to handle day-light-saving-time adjustments.
+ *     {@code offset} is the duration from router midnight to service-time midnight. This
+ *     is used to handle day-light-saving-time adjustments.
  */
 public record FlexPathDurations(int access, int trip, int egress, int offset) {
   public FlexPathDurations {

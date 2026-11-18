@@ -17,7 +17,7 @@ import org.slf4j.Logger;
  * THREAD SAFETY - The implementation is not thread safe.
  *
  * @deprecated TODO: Rewrite the same way as the {@link Throttle} is done. See
- *             {@link AbstractFilterLogger} for deprecation details.
+ *     {@link AbstractFilterLogger} for deprecation details.
  */
 @Deprecated
 public class MaxCountLogger extends AbstractFilterLogger {

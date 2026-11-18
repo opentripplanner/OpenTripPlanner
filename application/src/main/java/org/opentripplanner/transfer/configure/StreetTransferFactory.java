@@ -55,13 +55,13 @@ public final class StreetTransferFactory {
    * {@code buildRepository}.
    *
    * @param stopPatterns the trip patterns visiting the stops. With the feature
-   *                     {@code ConsiderPatternsForDirectTransfers} only the stops visited by a
-   *                     pattern have transfers from them, and only the closest stop of each pattern
-   *                     is a transfer to; see {@link #isTransferSource}
+   *     {@code ConsiderPatternsForDirectTransfers} only the stops visited by a
+   *     pattern have transfers from them, and only the closest stop of each pattern
+   *     is a transfer to; see {@link #isTransferSource}
    * @param allowedModes the modes the stops are allowed for, to select the max duration of the
-   *                     transfers, see {@code MaxDurationsPreference}
+   *     transfers, see {@code MaxDurationsPreference}
    * @param flexIndex    the flex trips to consider when the transfer stops are found, or
-   *                     {@code null} to ignore flex trips
+   *     {@code null} to ignore flex trips
    */
   public static RegularTransferGenerator createGenerator(
     Graph graph,
@@ -101,9 +101,9 @@ public final class StreetTransferFactory {
    * start. The transit repository must be indexed.
    *
    * @param cacheMaxSize           the max number of Raptor transfers cached for other user
-   *                               preferences than the ones of the profiles and the warmup entries
+   *     preferences than the ones of the profiles and the warmup entries
    * @param collectCacheStatistics whether to count the requests that use each key of the cache of
-   *                               the Raptor transfers, for the report of the cache
+   *     the Raptor transfers, for the report of the cache
    */
   public static RepositoryHandle<
     RegularTransferRepositorySnapshot<NearbyStop, RouteRequest>,

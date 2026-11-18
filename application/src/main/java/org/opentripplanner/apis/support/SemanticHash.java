@@ -30,7 +30,7 @@ public class SemanticHash {
    * TODO deal with frequency-based trips
    *
    * @param trip a trip object within this pattern, or null to hash the pattern itself independent
-   *             any specific trip.
+   *     any specific trip.
    * @return the semantic hash of a Trip in this pattern as a printable String.
    */
   public static String forTripPattern(TripPattern tripPattern, Trip trip) {

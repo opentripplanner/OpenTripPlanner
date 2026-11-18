@@ -136,7 +136,7 @@ public record InsertionCandidate(
    * {@link #getPassengerRideDuration()}.
    *
    * @return {@link Duration#ZERO} when the passenger boards at the trip origin (no pickup
-   *         segments).
+   *     segments).
    */
   public Duration getDurationUntilPickupArrival() {
     return totalSegmentDuration(getSegmentsBeforePickup(), stopDuration);

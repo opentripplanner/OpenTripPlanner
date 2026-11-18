@@ -291,7 +291,7 @@ public abstract class OsmEntity {
    *
    * @param mode The OSM tag of the access mode, such as "motorcar" or "foot"
    * @return an optional value if the mode is allowed or denied access through tagging for the mode
-   *         or a parent mode, empty if it is not specified.
+   *     or a parent mode, empty if it is not specified.
    */
   protected Optional<Permission> checkModePermission(String mode) {
     return checkModePermission(mode, DIRECTIONLESS);
@@ -303,8 +303,8 @@ public abstract class OsmEntity {
    *
    * @param mode The OSM tag of the access mode, such as "motorcar" or "foot"
    * @return an optional value if the mode is allowed or denied access through tagging for the mode
-   *         or a parent mode, either with a directional suffix or not, empty if it is not
-   *         specified.
+   *     or a parent mode, either with a directional suffix or not, empty if it is not
+   *     specified.
    */
   protected Optional<Permission> checkModePermission(String mode, TraverseDirection direction) {
     if (isTagless()) {
@@ -352,7 +352,7 @@ public abstract class OsmEntity {
 
   /**
    * @return Converts a tag to lower case and returns the associated value. Returns null if tag is
-   *         not present.
+   *     not present.
    */
   @Nullable
   public final String getTag(String tag) {
@@ -366,7 +366,7 @@ public abstract class OsmEntity {
 
   /**
    * @return Converts a tag to lower case and returns the associated value. An empty Optional if tag
-   *         is not present.
+   *     is not present.
    */
   public Optional<String> getTagOpt(String network) {
     return Optional.ofNullable(getTag(network));
@@ -588,10 +588,10 @@ public abstract class OsmEntity {
    * Replace various pattern by the OSM tag values, with I18n support.
    *
    * @param pattern Pattern containing options tags to replace, such as "text" or "note: {note}".
-   *                Tag names between {} are replaced by the OSM tag value, if it is present (or the
-   *                empty string if not).
+   *     Tag names between {} are replaced by the OSM tag value, if it is present (or the
+   *     empty string if not).
    * @return A map language code → text, with at least one entry for the default language, and any
-   *         other language found in OSM tag.
+   *     other language found in OSM tag.
    */
   public Map<String, String> generateI18NForPattern(String pattern) {
     Map<String, StringBuffer> i18n = new HashMap<>();
@@ -676,7 +676,7 @@ public abstract class OsmEntity {
    * Returns true if access is generally denied to this element (potentially with exceptions).
    *
    * @return true if access is denied in general, regardless if permission is explicitly given when
-   *         traversing in a specific (forward or backward) direction.
+   *     traversing in a specific (forward or backward) direction.
    */
   public boolean isGeneralAccessDenied() {
     return isGeneralAccessDenied(DIRECTIONLESS);
@@ -735,7 +735,7 @@ public abstract class OsmEntity {
    * Check if the way is explicitly set as one-way for the specified traversal mode
    *
    * @return empty if it is not explicitly set, value containing empty if it is explicitly set as
-   *         two-way.
+   *     two-way.
    */
   private Optional<Optional<TraverseDirection>> isExplicitlyOneWay(@Nullable String mode) {
     String key = mode == null ? "oneway" : "oneway:" + mode;
@@ -958,8 +958,8 @@ public abstract class OsmEntity {
 
   /**
    * @return true if there is no explicit tag that makes this unsuitable for wheelchair use. In
-   *         other words: we assume that something is wheelchair-accessible in the absence of other
-   *         information.
+   *     other words: we assume that something is wheelchair-accessible in the absence of other
+   *     information.
    */
   public boolean isWheelchairAccessible() {
     if (this.isTagless()) {
@@ -1019,7 +1019,7 @@ public abstract class OsmEntity {
    * the entity in OSM.
    *
    * @see OsmEntity#isNamed()
-   * @link https://wiki.openstreetmap.org/wiki/Tag:noname%3Dyes
+   *     @link https://wiki.openstreetmap.org/wiki/Tag:noname%3Dyes
    */
   public boolean isExplicitlyUnnamed() {
     return isTagTrue("noname");

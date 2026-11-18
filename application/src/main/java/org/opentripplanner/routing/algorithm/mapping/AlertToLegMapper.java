@@ -42,7 +42,7 @@ public class AlertToLegMapper {
    * Takes the (immutable) leg and returns a copy of it with the alerts attached.
    *
    * @param isFirstLeg Whether the leg is a first leg of the itinerary. This affects the matched
-   *                   stop condition.
+   *     stop condition.
    */
   public TransitLeg decorateWithAlerts(TransitLeg leg, boolean isFirstLeg) {
     ZonedDateTime legStartTime = leg.startTime();

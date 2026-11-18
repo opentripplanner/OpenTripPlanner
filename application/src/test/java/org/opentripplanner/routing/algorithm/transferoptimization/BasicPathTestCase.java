@@ -45,7 +45,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultC
  * ends at 12:00, total 2 hours.
  *
  * @deprecated This was earlier part of Raptor and should not be used outside the Raptor module. Use
- *             the OTP model entities instead.
+ *     the OTP model entities instead.
  */
 @Deprecated
 public class BasicPathTestCase implements RaptorTestConstants {

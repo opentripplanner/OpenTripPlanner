@@ -133,15 +133,15 @@ public class DefaultCarpoolingService implements CarpoolingService {
    * hardcoded today and could be made configurable in future versions.
    *
    * @param repository                        provides access to active driver trips, must not be
-   *                                          null
+   *     null
    * @param streetLimitationParametersService provides street routing configuration including speed
-   *                                          limits, must not be null
+   *     limits, must not be null
    * @param vertexCreationService             creates request-scoped, bidirectionally-linked
-   *                                          temporary vertices from coordinates, must not be null
+   *     temporary vertices from coordinates, must not be null
    * @param carReachableVertexSnapper         snaps passenger-side locations onto car-reachable
-   *                                          vertices, must not be null
+   *     vertices, must not be null
    * @param stopIndex                         the transit stops with their car-reachable snaps, must
-   *                                          not be null
+   *     not be null
    * @throws NullPointerException if any parameter is null
    */
   public DefaultCarpoolingService(
@@ -195,7 +195,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
    *
    * @param request the routing request. Must have {@link StreetMode#CARPOOL} as the direct mode.
    * @return a list of carpool itineraries, or an empty list if no viable matches are found or the
-   *         direct mode is not CARPOOL
+   *     direct mode is not CARPOOL
    * @throws RoutingValidationException if origin or destination coordinates are missing
    */
   @Override
@@ -369,12 +369,12 @@ public class DefaultCarpoolingService implements CarpoolingService {
    * @param request                the routing request
    * @param streetRequest          the street routing parameters for the access or egress leg
    * @param accessOrEgress         whether this is an access leg (origin to transit) or egress leg
-   *                               (transit to destination)
+   *     (transit to destination)
    * @param transitServiceResolver used for resolving stop locations
    * @param transitSearchTimeZero  the reference time for computing relative start/end times used by
-   *                               Raptor
+   *     Raptor
    * @return a list of {@link CarpoolAccessEgress} results for Raptor, or an empty list if the
-   *         request mode is not CARPOOL or no viable matches are found
+   *     request mode is not CARPOOL or no viable matches are found
    * @throws RoutingValidationException if origin or destination coordinates are missing
    */
   @Override

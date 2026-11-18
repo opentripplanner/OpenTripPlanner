@@ -23,7 +23,7 @@ public class PolylineEncoder {
    *
    * @param geometry the JTS Geometry to encode (LineString, MultiLineString, Polygon, or Point)
    * @return a PolylineEncoderResult containing the encoded polyline string and the number of
-   *         coordinates
+   *     coordinates
    * @throws IllegalArgumentException if the geometry type is not supported
    */
   public static PolylineEncoderResult encodeGeometry(Geometry geometry) {

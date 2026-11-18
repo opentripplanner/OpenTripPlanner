@@ -20,11 +20,11 @@ public class CompositeUtil {
    * @param compositeFactory      Factory method to create a new composite.
    * @param isComposite           used to test if an instance is of a composite type.
    * @param listCompositeChildren is a function used to extract all children out of a composite
-   *                              instance.
+   *     instance.
    * @return {@code null} if the list of children is empty - ignoring {@code null} elements.
-   *         Returning THE element if just one element exists. And returning a composite with a list
-   *         of children if more than one element exists. The order is kept "as is". Any composite
-   *         children flattened, the children are inserted in it place.
+   *     Returning THE element if just one element exists. And returning a composite with a list
+   *     of children if more than one element exists. The order is kept "as is". Any composite
+   *     children flattened, the children are inserted in it place.
    */
   @Nullable
   @SafeVarargs

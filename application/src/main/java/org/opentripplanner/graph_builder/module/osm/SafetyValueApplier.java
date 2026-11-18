@@ -38,7 +38,7 @@ public class SafetyValueApplier {
    * Get the best bike safety in the whole graph.
    *
    * @return The bike safety of the safest way in the graph, i.e. the way with the lowest bike
-   *         safety value.
+   *     safety value.
    */
   float getBestBikeSafety() {
     return bestBikeSafety;
@@ -48,7 +48,7 @@ public class SafetyValueApplier {
    * Get the best walk safety in the whole graph.
    *
    * @return The walk safety of the safest way in the graph, i.e. the way with the lowest walk
-   *         safety value.
+   *     safety value.
    */
   float getBestWalkSafety() {
     return bestWalkSafety;

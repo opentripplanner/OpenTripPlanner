@@ -22,7 +22,7 @@ public class PowerOfTwoThrottle {
    * value of the counter as its argument.
    *
    * @param body An {@code IntConsumer} representing the action to be executed when the throttling
-   *             condition fails. The current counter-value is passed to this consumer.
+   *     condition fails. The current counter-value is passed to this consumer.
    */
   public void throttle(IntConsumer body) {
     if (!throttle()) {

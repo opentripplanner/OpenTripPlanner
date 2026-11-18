@@ -159,7 +159,7 @@ public class CarpoolTrip
    * element is the origin and the last is the destination.
    *
    * @return an immutable list of stops along the carpool route, in visit order; never null, and
-   *         always contains at least the origin and destination
+   *     always contains at least the origin and destination
    */
   public List<CarpoolStop> stops() {
     return stops;

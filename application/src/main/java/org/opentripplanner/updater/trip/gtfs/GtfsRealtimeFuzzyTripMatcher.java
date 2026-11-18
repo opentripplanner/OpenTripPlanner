@@ -114,7 +114,7 @@ public class GtfsRealtimeFuzzyTripMatcher {
    * @param patterns the trip patterns of the route
    * @param servicesRunningForDate the service codes running on the service date of the trip
    * @param startTime the departure time from the first stop, in seconds since the start of the
-   *                  service day
+   *     service day
    * @return the matching trip, or {@code null} if there is none
    */
   @Nullable

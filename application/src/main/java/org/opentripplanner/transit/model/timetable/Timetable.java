@@ -146,7 +146,7 @@ public class Timetable implements Serializable {
 
   /**
    * @return true if the timetable was created by a real-time update, false if this timetable is
-   *         based on scheduled data. Only real-time timetables have a service date.
+   *     based on scheduled data. Only real-time timetables have a service date.
    */
   public boolean isCreatedByRealTimeUpdater() {
     return serviceDate != null;

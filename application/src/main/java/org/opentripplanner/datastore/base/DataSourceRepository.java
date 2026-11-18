@@ -23,7 +23,7 @@ import org.opentripplanner.datastore.api.FileType;
 public interface DataSourceRepository {
   /**
    * @return a description that identify the datasource which is helpful to the user in case an
-   *         error occurs when using the repository.
+   *     error occurs when using the repository.
    */
   String description();
 

@@ -86,9 +86,9 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
    * Constructs an itinerary mapper for a request and a set of results
    *
    * @param raptorTransitData     the currently active transit layer (may have real-time data
-   *                              applied)
+   *     applied)
    * @param regularTransfers      the request's regular transfers, used to recover the street
-   *                              path of a regular transfer
+   *     path of a regular transfer
    * @param transitSearchTimeZero the point in time all times in seconds are counted from
    * @param request               the current routing request
    */

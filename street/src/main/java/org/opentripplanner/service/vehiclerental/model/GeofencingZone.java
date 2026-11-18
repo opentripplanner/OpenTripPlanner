@@ -205,7 +205,7 @@ public final class GeofencingZone implements Serializable {
    * @param network       the committed rental network (null returns false)
    * @param fieldAccessor accessor for the field to resolve
    * @return true if the resolved value is TRUE, false if no zone specifies the field or if the
-   *         resolved value is FALSE
+   *     resolved value is FALSE
    */
   public static boolean resolveField(
     Set<GeofencingZone> zones,

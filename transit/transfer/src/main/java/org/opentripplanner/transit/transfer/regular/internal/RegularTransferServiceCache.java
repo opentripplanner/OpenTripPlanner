@@ -183,7 +183,7 @@ class RegularTransferServiceCache<V> {
    * dropped - the next snapshot creates it from scratch. The retained keys are the same.
    *
    * @param changedFromStops the stops whose transfers changed, for the user preferences of an
-   *                         entry; empty if none changed
+   *     entry; empty if none changed
    */
   RegularTransferServiceCache<V> carryForward(
     Function<AbstractUserPreferences<?>, Set<Integer>> changedFromStops

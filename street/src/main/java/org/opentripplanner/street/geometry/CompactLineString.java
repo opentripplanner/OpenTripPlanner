@@ -130,14 +130,14 @@ public final class CompactLineString implements Serializable {
    *
    * @param packed         the compact line string, or {@code null} / empty for a no-op
    * @param out            target array to write decoded coordinates into (flat: [x0, y0, x1, y1,
-   *                       …])
+   *     …])
    * @param offset         starting index in {@code out} to write to
    * @param oix            initial x in fixed-point (start of delta chain)
    * @param oiy            initial y in fixed-point (start of delta chain)
    * @param skipFirstCoord skip writing the first decoded coordinate. Deltas still accumulate so the
-   *                       remaining coordinates land at their correct absolute positions. Used to
-   *                       drop the shared seam coord at hop seams in transit-pattern leg-geometry
-   *                       concatenation.
+   *     remaining coordinates land at their correct absolute positions. Used to
+   *     drop the shared seam coord at hop seams in transit-pattern leg-geometry
+   *     concatenation.
    * @return the offset of the first unwritten slot in {@code out}
    */
   static int decodeInto(

@@ -22,7 +22,7 @@ public interface TransferSearch<P> {
    * was found under. There may be several candidates to the same stop.
    *
    * @param maxDurations how far to search, the limit of the profile type. It bounds this
-   *                     discovery search only, see {@link #computePathCriteria}.
+   *     discovery search only, see {@link #computePathCriteria}.
    */
   Collection<TransferPath<P>> findNearbyStops(
     FeedScopedId fromStop,

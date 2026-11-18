@@ -27,8 +27,8 @@ final class TransferRequestDifferences {
 
   /**
    * @param isComparable whether the parameter is compared for the two requests, for example the
-   *                     costs of a stop are only compared if both requests use stops with unknown
-   *                     accessibility
+   *     costs of a stop are only compared if both requests use stops with unknown
+   *     accessibility
    */
   private record Parameter(
     String name,

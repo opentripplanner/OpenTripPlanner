@@ -11,17 +11,17 @@ import org.opentripplanner.transit.model.site.StopLocation;
  *
  * @param transitStop     the transit stop
  * @param transitVertex   the street graph vertex where the driver stops to pick up or drop off the
- *                        passenger at the transit-stop side (already snapped to a car-reachable
- *                        vertex)
+ *     passenger at the transit-stop side (already snapped to a car-reachable
+ *     vertex)
  * @param passengerVertex the street graph vertex where the driver stops at the passenger side —
- *                        origin for access, destination for egress — already snapped to a
- *                        car-reachable vertex
+ *     origin for access, destination for egress — already snapped to a
+ *     car-reachable vertex
  * @param accessEgress    whether this represents access (origin to transit) or egress (transit to
- *                        destination)
+ *     destination)
  * @param walkToPickup    walk path from the passenger-side (or transit-stop-side) location to the
- *                        snapped pickup vertex. Null if no walking is needed at the pickup end.
+ *     snapped pickup vertex. Null if no walking is needed at the pickup end.
  * @param walkFromDropoff walk path from the snapped dropoff vertex to the final location. Null if
- *                        no walking is needed at the dropoff end.
+ *     no walking is needed at the dropoff end.
  */
 public record ViableAccessEgress(
   StopLocation transitStop,

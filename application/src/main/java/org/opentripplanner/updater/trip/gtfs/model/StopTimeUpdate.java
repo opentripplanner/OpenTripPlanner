@@ -51,7 +51,7 @@ public final class StopTimeUpdate {
 
   /**
    * @return the effective pickup type even if it is not explicitly specified, for the use in NEW
-   *         trips.
+   *     trips.
    */
   public PickDrop effectivePickup() {
     return getEffectivePickDrop(
@@ -66,7 +66,7 @@ public final class StopTimeUpdate {
 
   /**
    * @return the effective dropoff type even if it is not explicitly specified, for the use in NEW
-   *         trips.
+   *     trips.
    */
   public PickDrop effectiveDropoff() {
     return getEffectivePickDrop(

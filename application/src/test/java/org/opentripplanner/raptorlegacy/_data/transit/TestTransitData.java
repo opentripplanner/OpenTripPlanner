@@ -36,7 +36,7 @@ import org.opentripplanner.transfer.constrained.model.TransferConstraint;
 
 /**
  * @deprecated This was earlier part of Raptor and should not be used outside the Raptor module. Use
- *             the OTP model entities instead.
+ *     the OTP model entities instead.
  */
 @Deprecated
 @SuppressWarnings("UnusedReturnValue")

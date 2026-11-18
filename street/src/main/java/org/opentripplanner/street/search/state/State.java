@@ -345,7 +345,7 @@ public final class State implements AStarState<State, Edge, Vertex> {
 
   /**
    * @return The current mode of this state. When doing a rental request, this can for example
-   *         indicate if the state is currently using a vehicle or not.
+   *     indicate if the state is currently using a vehicle or not.
    */
   public TraverseMode currentMode() {
     return stateData.currentMode;
@@ -370,7 +370,7 @@ public final class State implements AStarState<State, Edge, Vertex> {
    * duration. This is the result of combining the functions from GraphPath optimize and reverse.
    *
    * @return a state at the other end (or this end, in the case of a forward search) of a reversed
-   *         path
+   *     path
    */
   public State reverse() {
     State orig = this;

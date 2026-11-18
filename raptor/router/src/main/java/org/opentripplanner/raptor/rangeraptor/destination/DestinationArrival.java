@@ -39,11 +39,11 @@ public class DestinationArrival<T extends RaptorTripSchedule> implements Arrival
   /**
    * @param iterationDepartureTime The departure time of the Range Raptor iteration.
    * @param departureTime The departure time of the journey in the search direction, with the
-   *                      access time-shifted. See {@link TimeShiftedDepartureTime}. Use the
-   *                      {@code iterationDepartureTime} if it is not needed.
+   *     access time-shifted. See {@link TimeShiftedDepartureTime}. Use the
+   *     {@code iterationDepartureTime} if it is not needed.
    * @param arrivalTime The destination arrival time. If the egress has a time-penalty, the time
-   *                    already includes it, since Raptor decorates the egress and adds the
-   *                    penalty to the egress duration. It is the time used for comparison.
+   *     already includes it, since Raptor decorates the egress and adds the
+   *     penalty to the egress duration. It is the time used for comparison.
    */
   public DestinationArrival(
     RaptorAccessEgress egress,

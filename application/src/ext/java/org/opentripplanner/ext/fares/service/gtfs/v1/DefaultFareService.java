@@ -337,7 +337,7 @@ public class DefaultFareService implements FareService {
    * @see DefaultFareService#combineInterlinedLegs(List)
    * @see
    *     HighestFareInFreeTransferWindowFareService#shouldCombineInterlinedLegs(ScheduledTransitLeg,
-   *      ScheduledTransitLeg)
+   *     ScheduledTransitLeg)
    * @see HSLFareService#shouldCombineInterlinedLegs(ScheduledTransitLeg, ScheduledTransitLeg)
    */
   protected boolean shouldCombineInterlinedLegs(

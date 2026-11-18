@@ -60,8 +60,8 @@ class StationMapper {
    * Map a NeTEx StopPlace to a Station.
    *
    * @return {@code null} if the StopPlace cannot be mapped because it has no valid coordinates,
-   *         neither on the StopPlace itself nor on any of its quays. A data import issue is
-   *         reported in that case.
+   *     neither on the StopPlace itself nor on any of its quays. A data import issue is
+   *     reported in that case.
    */
   @Nullable
   Station map(StopPlace stopPlace) {

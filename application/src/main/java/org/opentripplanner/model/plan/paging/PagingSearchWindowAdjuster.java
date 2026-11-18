@@ -43,12 +43,12 @@ public final class PagingSearchWindowAdjuster {
    * @param searchWindowUsed         The search window used by raptor
    * @param searchWindowStartTime    The start time for the search window used
    * @param rmItineraryDepartureTime If the search-window is cropped, this is the departure time of
-   *                                 the first removed itinerary. This should be {@code null} if the
-   *                                 search-window is not cropped in the itinerary filter.
+   *     the first removed itinerary. This should be {@code null} if the
+   *     search-window is not cropped in the itinerary filter.
    * @param cropSearchWindowTail     This indicates which end of the search-window to crop. If
-   *                                 {@code true} the search-window is cropped at the end, and if
-   *                                 {@code false} it is cropped in the beginning. If no
-   *                                 rmItineraryDepartureTime exist, then we do not care.
+   *     {@code true} the search-window is cropped at the end, and if
+   *     {@code false} it is cropped in the beginning. If no
+   *     rmItineraryDepartureTime exist, then we do not care.
    */
   public Duration decreaseSearchWindow(
     Duration searchWindowUsed,

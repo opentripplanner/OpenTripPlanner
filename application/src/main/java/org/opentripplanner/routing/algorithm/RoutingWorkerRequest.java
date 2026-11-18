@@ -15,7 +15,7 @@ public final class RoutingWorkerRequest {
 
   /**
    * @param request the route request ready for routing. It should already be pre-processed to have
-   *                e.g. page cursor applied
+   *     e.g. page cursor applied
    */
   public RoutingWorkerRequest(
     RouteRequest request,

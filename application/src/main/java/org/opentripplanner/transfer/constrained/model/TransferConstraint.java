@@ -106,7 +106,7 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
    * In addition, the {@code priority} cost is added. See {@link TransferPriority#cost()}.
    *
    * @param c The transfer to return a cost for, or {@code null} if the transfer is a regular OSM
-   *          street generated transfer.
+   *     street generated transfer.
    */
   public static int cost(@Nullable TransferConstraint c) {
     return c == null ? DEFAULT_COST : c.cost();

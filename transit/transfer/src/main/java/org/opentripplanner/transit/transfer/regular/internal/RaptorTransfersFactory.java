@@ -40,8 +40,8 @@ final class RaptorTransfersFactory<P, R> {
 
   /**
    * @param profileRequests the configured routing request of each profile, by the user preferences
-   *                        of the profile. The request-time preferences are applied on top of the
-   *                        request of the profile the paths are stored under.
+   *     of the profile. The request-time preferences are applied on top of the
+   *     request of the profile the paths are stored under.
    */
   RaptorTransfersFactory(
     int nStops,

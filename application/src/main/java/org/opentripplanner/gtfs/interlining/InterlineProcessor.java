@@ -196,7 +196,7 @@ public class InterlineProcessor {
    * from each other. Then creates interline between the trips.
    *
    * @return true if interline has been created or if there is an issue preventing an interline
-   *         creation for certain service dates.
+   *     creation for certain service dates.
    */
   private boolean createInterline(
     TripTimes<?> fromTripTimes,
@@ -256,7 +256,7 @@ public class InterlineProcessor {
    * {@link #getAndCopyDaysForService(FeedScopedId)}
    *
    * @return {@link BitSet} which index starts at the first overall date of the services and the
-   *         last index is the last date.
+   *     last index is the last date.
    */
   private BitSet getDaysForService(FeedScopedId serviceId) {
     BitSet daysForService = this.daysOfServices.get(serviceId);
@@ -283,7 +283,7 @@ public class InterlineProcessor {
    * it, {@link #getDaysForService(FeedScopedId)} can be used instead.
    *
    * @return {@link BitSet} which index starts at the first overall date of the services and the
-   *         last index is the last date.
+   *     last index is the last date.
    */
   private BitSet getAndCopyDaysForService(FeedScopedId serviceId) {
     return (BitSet) getDaysForService(serviceId).clone();

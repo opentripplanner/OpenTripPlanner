@@ -24,7 +24,7 @@ public class UpdaterStatusResource {
     @Context TransitService transitService,
     /**
      * @deprecated The support for multiple routers are removed from OTP2. See
-     *             https://github.com/opentripplanner/OpenTripPlanner/issues/2760
+     *     https://github.com/opentripplanner/OpenTripPlanner/issues/2760
      */
     @Deprecated @PathParam("ignoreRouterId") String ignoreRouterId
   ) {

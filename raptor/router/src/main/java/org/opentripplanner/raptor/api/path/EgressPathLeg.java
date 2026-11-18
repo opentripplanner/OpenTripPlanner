@@ -54,7 +54,7 @@ public final class EgressPathLeg<T extends RaptorTripSchedule> implements PathLe
 
   /**
    * @throws UnsupportedOperationException - an egress leg is the last leg in a path and does not
-   *                                       have a next leg.
+   *     have a next leg.
    */
   @Override
   public TransitPathLeg<T> nextLeg() {

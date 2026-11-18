@@ -50,7 +50,7 @@ public interface CarpoolingRepository {
    * failures later.
    *
    * @param trip the carpool trip to insert or update, must not be null. If a trip with the same ID
-   *             exists, it will be completely replaced.
+   *     exists, it will be completely replaced.
    * @throws IllegalArgumentException if trip is null
    */
   void upsertCarpoolTrip(RoutableCarpoolTrip trip);
@@ -78,9 +78,9 @@ public interface CarpoolingRepository {
    * threads.
    *
    * @param now    the current instant, used both as the throttle reference and to derive the expiry
-   *               cut-off
+   *     cut-off
    * @param expiry how long a trip is retained after its latest end time before it becomes eligible
-   *               for removal
+   *     for removal
    * @return the number of trips removed, or {@code 0} when the call was throttled
    */
   int removeExpiredTrips(Instant now, Duration expiry);

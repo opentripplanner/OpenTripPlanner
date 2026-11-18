@@ -59,10 +59,10 @@ public final class ScheduledTimetableData {
    * @param tripPatternForId the scheduled trip patterns, by id
    * @param tripOnServiceDateById the scheduled trips on service date, by id
    * @param replacedByTripOnServiceDates for each trip on service date id, the trips on service
-   *                                     date replacing it, in the order they were added
+   *     date replacing it, in the order they were added
    * @param flexTripForId the flex trips, by id
    * @param tripCalendars the scheduled trip calendars; the service codes running on each date are
-   *                      computed here
+   *     computed here
    */
   public static ScheduledTimetableData of(
     Map<FeedScopedId, TripPattern> tripPatternForId,

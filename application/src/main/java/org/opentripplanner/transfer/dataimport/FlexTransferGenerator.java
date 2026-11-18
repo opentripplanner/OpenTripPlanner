@@ -104,7 +104,7 @@ public class FlexTransferGenerator implements GraphBuilderModule {
 
   /**
    * @param flexIndex the flex trips of the imported transit data, only requested when the module
-   *                  runs
+   *     runs
    */
   public FlexTransferGenerator(
     Graph graph,

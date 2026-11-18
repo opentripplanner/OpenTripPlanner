@@ -43,7 +43,7 @@ public class GtfsFeedIdResolver {
    * @param dataSourceId Any id which identify the data sorce, for example the URI.
    * @return A GtfsFeedId
    * @see <a href=
-   *      "http://developer.trimet.org/gtfs_ext.shtml">http://developer.trimet.org/gtfs_ext.shtml</a>
+   *     "http://developer.trimet.org/gtfs_ext.shtml">http://developer.trimet.org/gtfs_ext.shtml</a>
    */
   public static String fromGtfsFeed(CsvInputSource source, Object dataSourceId) {
     return FEED_ID_MAP.computeIfAbsent(dataSourceId, ignore -> readFeedIdFromDataSource(source));

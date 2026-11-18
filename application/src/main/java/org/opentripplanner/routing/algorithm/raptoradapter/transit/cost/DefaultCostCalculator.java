@@ -31,9 +31,9 @@ public final class DefaultCostCalculator<T extends DefaultTripSchedule> implemen
    * (in Raptor the unit for cost is centi-seconds).
    *
    * @param stopBoardAlightTransferCosts Unit centi-seconds. This parameter is used "as-is" and not
-   *                                     transformed into the Raptor cast unit to avoid the
-   *                                     transformation for each request. Use {@code null} to ignore
-   *                                     stop cost.
+   *     transformed into the Raptor cast unit to avoid the
+   *     transformation for each request. Use {@code null} to ignore
+   *     stop cost.
    */
   public DefaultCostCalculator(
     int boardCost,

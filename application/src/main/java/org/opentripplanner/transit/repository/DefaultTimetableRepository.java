@@ -238,8 +238,8 @@ public class DefaultTimetableRepository implements TimetableRepository {
 
   /**
    * @param scheduledTimetableData the scheduled (non-realtime) timetable data. Its trip calendars
-   *                               are the initial calendars of this repository; real-time changes
-   *                               replace the repository's own calendars, never these.
+   *     are the initial calendars of this repository; real-time changes
+   *     replace the repository's own calendars, never these.
    */
   public DefaultTimetableRepository(
     RaptorTransitData raptorTransitData,
@@ -796,8 +796,8 @@ public class DefaultTimetableRepository implements TimetableRepository {
    * data, remaining on that pattern unless it's changed again by a future realtime update.
    *
    * @return true if the trip was found to be shifted to a different trip pattern by a realtime
-   *         message and an attempt was made to re-associate it with its originally scheduled trip
-   *         pattern.
+   *     message and an attempt was made to re-associate it with its originally scheduled trip
+   *     pattern.
    */
   public boolean revertTripToScheduledTripPattern(FeedScopedId tripId, LocalDate serviceDate) {
     validateNotReadOnly();

@@ -11,7 +11,7 @@ public class StopConditionsHelper {
    *
    * @param stopConditions    StopConditions set of the EntitySelector
    * @param requestConditions StopConditions requested by the client/matching the usage of the stop
-   *                          in a leg
+   *     in a leg
    */
   public static boolean matchesStopCondition(
     Collection<StopCondition> stopConditions,

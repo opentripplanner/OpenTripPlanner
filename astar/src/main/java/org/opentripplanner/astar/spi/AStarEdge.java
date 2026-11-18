@@ -23,24 +23,24 @@ public interface AStarEdge<
    *
    * @param s0 The 'current' state when arriving at the fromVertex.
    * @return The array of states that are the result of the state (the passenger) moving
-   *         (traversing) through the edge.
+   *     (traversing) through the edge.
    *     <p>
-   *         In most cases this is a single state where, for example, the weight (cost) and time
-   *         are increased according to the properties of the edge.
+   *     In most cases this is a single state where, for example, the weight (cost) and time
+   *     are increased according to the properties of the edge.
    *     <p>
-   *         However, it is also possible that this edge is not traversable for the current
-   *         state, for example if it's a walk-only edge but the state is arriving in a car. In such
-   *         a case an empty array is returned (see
-   *         {@link org.opentripplanner.street.search.state.State#empty()}). The Astar algorithm
-   *         won't then explore this state any further as the destination is not reachable through
-   *         this state/edge combination.
+   *     However, it is also possible that this edge is not traversable for the current
+   *     state, for example if it's a walk-only edge but the state is arriving in a car. In such
+   *     a case an empty array is returned (see
+   *     {@link org.opentripplanner.street.search.state.State#empty()}). The Astar algorithm
+   *     won't then explore this state any further as the destination is not reachable through
+   *     this state/edge combination.
    *     <p>
-   *         Lastly, there can also be cases where more than one state is returned: For example
-   *         when a state is renting a free-floating vehicle but the edge is in a no-drop-off zone.
-   *         In such a case two resulting states are possible: one where the state continues on the
-   *         rental vehicle (as you may exit the no-drop-off zone later) and a second state where
-   *         the vehicle is speculatively dropped off and the passenger continues on foot in case
-   *         that the destination is inside the zone.
+   *     Lastly, there can also be cases where more than one state is returned: For example
+   *     when a state is renting a free-floating vehicle but the edge is in a no-drop-off zone.
+   *     In such a case two resulting states are possible: one where the state continues on the
+   *     rental vehicle (as you may exit the no-drop-off zone later) and a second state where
+   *     the vehicle is speculatively dropped off and the passenger continues on foot in case
+   *     that the destination is inside the zone.
    */
   State[] traverse(State s0);
 }

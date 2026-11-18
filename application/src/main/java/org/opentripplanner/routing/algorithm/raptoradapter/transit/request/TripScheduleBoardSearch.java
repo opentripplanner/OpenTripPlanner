@@ -90,8 +90,8 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule> impleme
    * @param earliestTime          The time of arrival at the given stop for the previous trip.
    * @param stopPositionInPattern The stop to board
    * @param tripIndexUpperBound   Upper bound for trip index to search for. Exclusive - search start
-   *                              at {@code tripIndexUpperBound - 1}. Use {@code -1} (negative
-   *                              value) for an unbounded search.
+   *     at {@code tripIndexUpperBound - 1}. Use {@code -1} (negative
+   *     value) for an unbounded search.
    */
   @Override
   public RaptorBoardOrAlightEvent<T> search(

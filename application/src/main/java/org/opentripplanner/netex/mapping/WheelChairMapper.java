@@ -15,7 +15,7 @@ public class WheelChairMapper {
    *
    * @param accessibilityAssessment NeTEx object wrapping information regarding WheelChairBoarding
    * @param defaultValue            If no {@link AccessibilityAssessment} is defined, default to
-   *                                this value
+   *     this value
    * @return Mapped enumerator, {@link Accessibility#NO_INFORMATION} if no value is found
    */
   public static Accessibility wheelchairAccessibility(

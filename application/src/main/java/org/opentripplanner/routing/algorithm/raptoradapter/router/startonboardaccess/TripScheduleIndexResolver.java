@@ -35,7 +35,7 @@ public class TripScheduleIndexResolver {
    *
    * @param tripAndServiceDate the trip and service date to look up
    * @param location           the resolved boarding location, containing the stop index and stop
-   *                           position
+   *     position
    */
   public RaptorTripScheduleReference resolve(
     TripAndServiceDate tripAndServiceDate,

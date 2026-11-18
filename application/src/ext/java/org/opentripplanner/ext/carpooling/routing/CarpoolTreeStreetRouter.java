@@ -155,7 +155,7 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
    *
    * @param vertex      the street vertex to build trees from/to
    * @param direction   whether to build a forward tree ({@link Direction#FROM}) or a reverse tree
-   *                    ({@link Direction#TO})
+   *     ({@link Direction#TO})
    * @param searchLimit maximum duration for the tree expansion
    * @throws IllegalStateException if called after {@link #route} has already been invoked
    */

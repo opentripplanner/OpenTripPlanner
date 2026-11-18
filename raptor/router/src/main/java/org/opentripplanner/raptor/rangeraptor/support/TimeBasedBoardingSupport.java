@@ -35,7 +35,7 @@ public final class TimeBasedBoardingSupport<T extends RaptorTripSchedule> {
 
   /**
    * @param hasTimeDependentAccess {@code true} if any access path is time-dependent, which disables
-   *                               the exact-trip-search optimisation in round 1
+   *     the exact-trip-search optimisation in round 1
    * @param calculator             direction-aware arithmetic for forward/reverse searches
    * @param subscriptions          worker lifecycle hooks used to track iteration and round state
    */
@@ -82,7 +82,7 @@ public final class TimeBasedBoardingSupport<T extends RaptorTripSchedule> {
    * @param stopPos         the stop position within the pattern's stop sequence
    * @param boardSlack      minimum seconds between arrival and boarding
    * @param onTripIndex     upper bound on the trip index (used when already on a trip); pass
-   *                        {@link RaptorTripScheduleSearch#UNBOUNDED_TRIP_INDEX} for no bound
+   *     {@link RaptorTripScheduleSearch#UNBOUNDED_TRIP_INDEX} for no bound
    * @return the board event, or an empty event if no trip is found
    */
   public RaptorBoardOrAlightEvent<T> searchForRegularBoarding(
@@ -106,12 +106,12 @@ public final class TimeBasedBoardingSupport<T extends RaptorTripSchedule> {
    * with the earliest board time computed from {@code prevArrivalTime} and {@code boardSlack}.
    *
    * @param prevTransitStopArrival the transit arrival that is the source of a potential constrained
-   *                               transfer; {@code null} if the traveller did not arrive by transit
+   *     transfer; {@code null} if the traveller did not arrive by transit
    * @param prevArrivalTime        the wall-clock arrival time at the board stop; may differ from
-   *                               {@code prevTransitStopArrival} when a walking transfer bridges
-   *                               the two stops
+   *     {@code prevTransitStopArrival} when a walking transfer bridges
+   *     the two stops
    * @param boardSlack             minimum seconds between {@code prevArrivalTime} and boarding;
-   *                               stay-seated and guaranteed transfers may override this
+   *     stay-seated and guaranteed transfers may override this
    * @param txSearch               the constrained transfer search for the target pattern
    * @return the constrained board event, or an empty event if no constrained transfer is found
    */

@@ -43,7 +43,7 @@ public final class EndpointContextLineString {
    * @param xb         X coordinate of end point B
    * @param yb         Y coordinate of end point B
    * @param lineString The geometry to compact. The first and last coordinate must equal A and B
-   *                   (or, when {@code reverse} is true, B and A).
+   *     (or, when {@code reverse} is true, B and A).
    * @param reverse    True if A and B are inverted (B is start, A is end).
    */
   public static byte[] compact(
@@ -155,9 +155,9 @@ public final class EndpointContextLineString {
    * @param xb           X (longitude) of end point B
    * @param yb           Y (latitude) of end point B
    * @param packedCoords the endpoint-context packed intermediate points (may be empty/null for a
-   *                     straight line)
+   *     straight line)
    * @param reverse      True if A and B are inverted (B is start, A is end) — must match
-   *                     compaction.
+   *     compaction.
    * @param px           X (longitude) of the query point
    * @param py           Y (latitude) of the query point
    * @param xscale       cos(latitude) of the projection centre, as used by the linker

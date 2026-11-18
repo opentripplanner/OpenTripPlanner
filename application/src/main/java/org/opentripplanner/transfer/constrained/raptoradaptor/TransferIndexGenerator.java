@@ -150,7 +150,7 @@ public class TransferIndexGenerator {
 
   /**
    * @return true if any new entries were added to the lookup maps, false if all entries already
-   *         existed.
+   *     existed.
    */
   private boolean setupPattern(TripPattern tripPattern, List<Trip> trips) {
     boolean added = false;

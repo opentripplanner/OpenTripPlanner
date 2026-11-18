@@ -30,8 +30,8 @@ public class WalkerBoundaryHandler {
    * Dispatches HAVE_RENTED walker enforcement at paired zone boundaries.
    *
    * @return the enforcement result, or {@code null} if no boundary triggered (state isn't a
-   *         HAVE_RENTED walker, no paired boundaries, or no boundary direction matched the
-   *         walker-exit-in-forward condition).
+   *     HAVE_RENTED walker, no paired boundaries, or no boundary direction matched the
+   *     walker-exit-in-forward condition).
    */
   public static State @Nullable [] apply(
     State s0,

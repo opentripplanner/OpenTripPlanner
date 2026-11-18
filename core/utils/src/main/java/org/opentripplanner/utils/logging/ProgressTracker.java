@@ -89,10 +89,10 @@ public class ProgressTracker {
    *
    * @param actionName   the action name to include in the notification strings.
    * @param minBlockSize the minimum number of steps between each time check. A reasonably value is
-   *                     to use the number of steps which would take approximately 1 second. Set
-   *                     this lower if the time variation for each step is big.
+   *     to use the number of steps which would take approximately 1 second. Set
+   *     this lower if the time variation for each step is big.
    * @param size         The expected number the step method is called. If negative the size is
-   *                     considered unknown.
+   *     considered unknown.
    */
   public static ProgressTracker track(String actionName, int minBlockSize, long size) {
     return new ProgressTracker(actionName, minBlockSize, size, QUIET_PERIOD_MILLISECONDS, false);
@@ -103,11 +103,11 @@ public class ProgressTracker {
    *
    * @param actionName           the action name to include in the notification strings.
    * @param minBlockSize         the minimum number of steps between each time check. A reasonably
-   *                             value is to use the number of steps which would take approximately
-   *                             1 second. Set this lower if the time variation for each step is
-   *                             big.
+   *     value is to use the number of steps which would take approximately
+   *     1 second. Set this lower if the time variation for each step is
+   *     big.
    * @param size                 The expected number the step method is called. If negative the size
-   *                             is considered unknown.
+   *     is considered unknown.
    * @param inputStream          the "real" input stream to delegate all operations to.
    * @param progressNotification the progress notification handler/subscriber.
    */
@@ -130,11 +130,11 @@ public class ProgressTracker {
    *
    * @param actionName           the action name to include in the notification strings.
    * @param minBlockSize         the minimum number of steps between each time check. A reasonably
-   *                             value is to use the number of steps which would take approximately
-   *                             1 second. Set this lower if the time variation for each step is
-   *                             big.
+   *     value is to use the number of steps which would take approximately
+   *     1 second. Set this lower if the time variation for each step is
+   *     big.
    * @param size                 The expected number the step method is called. If negative the size
-   *                             is considered unknown.
+   *     is considered unknown.
    * @param outputStream         the "real" input stream to delegate all operations to.
    * @param progressNotification the progress notification handler/subscriber.
    */

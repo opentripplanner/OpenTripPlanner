@@ -299,7 +299,7 @@ public class OHCalendarBuilder {
      * </pre>
      *
      * @return a list of new {@link OHCalendarBuilder.OpeningHoursBuilder} created while splitting
-     *         existing builders.
+     *     existing builders.
      */
     public OpeningHoursBuilderAndNewBuilders createBuildersForRelativeComplement(
       OpeningHoursBuilder otherBuilder

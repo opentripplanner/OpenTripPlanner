@@ -33,7 +33,7 @@ public class DateScalarFactory {
 
   /**
    * @param description Nullable description that allows caller to pass in null which leads to the
-   *                    description from schema.graphqls to be used.
+   *     description from schema.graphqls to be used.
    */
   private static GraphQLScalarType createDateScalar(
     String scalarName,

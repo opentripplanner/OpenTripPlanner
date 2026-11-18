@@ -235,7 +235,7 @@ public class GraphBuilderDataSources implements Closeable {
 
   /**
    * @return {@code true} if and only if the data source exist, proper command line parameters is
-   *         set and not disabled by the loaded configuration files.
+   *     set and not disabled by the loaded configuration files.
    */
   private boolean has(FileType type) {
     return inputData.containsKey(type);

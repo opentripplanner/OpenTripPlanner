@@ -87,7 +87,7 @@ public class OtpDataStore {
    *
    * @param path the location where the graph file must exist.
    * @return The graph file - the graph is not loaded, you can use the
-   *         {@link SerializedGraphObject#load(File)} to load the graph.
+   *     {@link SerializedGraphObject#load(File)} to load the graph.
    */
   public static File graphFile(File path) {
     return new File(path, GRAPH_FILENAME);
@@ -142,7 +142,7 @@ public class OtpDataStore {
    * This method should not be called after this data store is closed. The behavior is undefined.
    *
    * @return The collection may contain elements of type {@link DataSource} or
-   *         {@link CompositeDataSource}.
+   *     {@link CompositeDataSource}.
    */
   public Collection<DataSource> listExistingSourcesFor(FileType type) {
     assertDataStoreIsOpened();

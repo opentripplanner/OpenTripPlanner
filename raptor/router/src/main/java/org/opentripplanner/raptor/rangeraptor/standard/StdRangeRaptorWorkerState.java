@@ -196,8 +196,8 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule> imple
 
   /**
    * @return {@code true} if the transfer loop should terminate early. The transfers are sorted by
-   *         duration, so if a transfer exceeds the time limit or the early pruning bound, so will
-   *         all later transfers also exceed the time limit or the early pruning bound.
+   *     duration, so if a transfer exceeds the time limit or the early pruning bound, so will
+   *     all later transfers also exceed the time limit or the early pruning bound.
    */
   private boolean transferToStop(int arrivalTimeTransit, int fromStop, RaptorTransfer transfer) {
     final int arrivalTime = calculator.plusDuration(

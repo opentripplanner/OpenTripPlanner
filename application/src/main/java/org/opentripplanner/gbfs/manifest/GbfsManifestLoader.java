@@ -31,8 +31,8 @@ public class GbfsManifestLoader {
    * Loads the manifest from a remote URL or a local {@code file:} path.
    *
    * @return the parsed manifest, or {@code null} if it could not be fetched or parsed. Failing to
-   *         reach a manifest must not fail the whole graph build or server startup, so this is
-   *         logged and reported to the caller rather than thrown.
+   *     reach a manifest must not fail the whole graph build or server startup, so this is
+   *     logged and reported to the caller rather than thrown.
    */
   @Nullable
   public static GBFSManifest loadManifest(URI url, HttpHeaders headers) {

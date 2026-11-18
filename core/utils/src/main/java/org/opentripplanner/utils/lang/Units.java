@@ -17,7 +17,7 @@ import java.util.Locale;
  * </ul>
  *
  * @deprecated Convert primitive types to type-safe value objects. The need for this class should
- *             then go away.
+ *     then go away.
  */
 @Deprecated
 public class Units {

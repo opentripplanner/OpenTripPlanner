@@ -212,7 +212,7 @@ public class OsmDatabase {
 
   /**
    * @return If a single level is defined for an entity return that level, otherwise the default
-   *         level is returned.
+   *     level is returned.
    */
   public OsmLevel findSingleLevelForEntity(OsmEntity entity) {
     List<OsmLevel> levels = entityLevels.get(entity);
@@ -226,7 +226,7 @@ public class OsmDatabase {
 
   /**
    * @return All defined levels for an entity. If no levels are found a list with the default level
-   *         is returned.
+   *     is returned.
    */
   public List<OsmLevel> getLevelsForEntity(OsmEntity entity) {
     if (entityLevels.containsKey(entity)) {
@@ -238,7 +238,7 @@ public class OsmDatabase {
 
   /**
    * @return A set of all defined levels for an entity. If no levels are found a set with the
-   *         default level is returned.
+   *     default level is returned.
    */
   public Set<OsmLevel> getLevelSetForEntity(OsmEntity entity) {
     if (entityLevels.containsKey(entity)) {

@@ -20,7 +20,7 @@ public final class ApplicationShutdownSupport {
    * @param hookName     the name of the thread
    * @param shutdownHook the payload to be executed in the thread
    * @return an Optional possibly containing the created thread, needed to un-schedule the shutdown
-   *         hook
+   *     hook
    */
   public static Optional<Thread> addShutdownHook(String hookName, Runnable shutdownHook) {
     final Thread shutdownThread = new Thread(shutdownHook, hookName);

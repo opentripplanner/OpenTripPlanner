@@ -10,13 +10,13 @@ import org.opentripplanner.core.model.id.FeedScopedId;
  * @param id                 the id of the profile
  * @param preferences        the user preferences of the profile, for the log
  * @param reuseLimit         the limit for when the path of an earlier profile is used instead of a
- *                           path found by the profile, for the log
+ *     path found by the profile, for the log
  * @param paths              the number of paths of the profile, also the ones that use a path of
- *                           an earlier profile
+ *     an earlier profile
  * @param reused             the number of paths that are the path of an earlier profile, so the
- *                           path is stored once for both profiles
+ *     path is stored once for both profiles
  * @param stopsWithTransfers the stops that are the start or the end of at least one path of the
- *                           profile
+ *     profile
  */
 public record RegularTransferProfileStatistics(
   String id,

@@ -39,8 +39,8 @@ class FareLookupService implements Serializable {
   private final FreeTransferEligibility freeTransferEligibility;
 
   /// @param freeTransferEligibility A bi-predicate that determines if a free transfer applies to a
-  ///                                given transfer match and fare product. This needs to be
-  ///                                configurable because of custom fare services.
+  ///     given transfer match and fare product. This needs to be
+  ///     configurable because of custom fare services.
   FareLookupService(
     List<FareLegRule> legRules,
     List<FareTransferRule> fareTransferRules,

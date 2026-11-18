@@ -38,7 +38,7 @@ public class CharacterEscapeFormatter {
    * @param escapeChar       the character used as an escape character.
    * @param specialChar      the character to be removed/replaced in the encoded text.
    * @param substitutionChar the character used together with the escape character to put in the
-   *                         encoded text as a placeholder for the special character.
+   *     encoded text as a placeholder for the special character.
    */
   public CharacterEscapeFormatter(char escapeChar, char specialChar, char substitutionChar) {
     this.escapeChar = escapeChar;

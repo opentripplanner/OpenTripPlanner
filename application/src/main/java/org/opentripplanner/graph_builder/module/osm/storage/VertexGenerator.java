@@ -98,10 +98,10 @@ public class VertexGenerator {
    *
    * @param node                  The node to fetch a label for.
    * @param entity                The entity it is connected to, e.g. used for fetching level
-   *                              information.
+   *     information.
    * @param linearBarrierNodeType How should the node be handled if it is on a linear barrier
    * @return The graph vertex. This is not always an OSM vertex; it can also be a
-   *         {@link OsmBoardingLocationVertex}
+   *     {@link OsmBoardingLocationVertex}
    */
   public IntersectionVertex getVertexForOsmNode(
     OsmNode node,

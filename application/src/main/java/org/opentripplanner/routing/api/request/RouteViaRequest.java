@@ -17,7 +17,7 @@ import org.opentripplanner.routing.api.request.request.JourneyRequest;
  * Trip planning request with a list of via points.
  *
  * @deprecated We will replace the complex via-search with a simpler version part of the existing
- *             trip search.
+ *     trip search.
  */
 @Deprecated
 public class RouteViaRequest implements Serializable {

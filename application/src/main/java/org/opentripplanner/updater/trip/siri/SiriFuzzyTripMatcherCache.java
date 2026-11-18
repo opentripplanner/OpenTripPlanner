@@ -30,7 +30,7 @@ public class SiriFuzzyTripMatcherCache {
 
   /**
    * @param index a transit service without real-time data, the cache is built from the scheduled
-   *              trips only.
+   *     trips only.
    */
   public static SiriFuzzyTripMatcherCache create(TransitService index) {
     var internalPlanningCodes = ImmutableSetMultimap.<String, Trip>builder();

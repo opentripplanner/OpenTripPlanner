@@ -37,11 +37,11 @@ public class TokenSchema {
    * Take a look at the unit tests to see an example on merging a schema.
    *
    * @param baseVersion The initial version for the first definition. The version number is
-   *                    automatically incremented when new definitions are added. If there is many
-   *                    definitions, the oldest definitions can be merged into one. The new
-   *                    definition base version should match the highest version number of the
-   *                    definitions merged into one. For example, if version 3, 4 and 5 is merged,
-   *                    the new merged base version is 5. Legal range is [1, 1_000_000]
+   *     automatically incremented when new definitions are added. If there is many
+   *     definitions, the oldest definitions can be merged into one. The new
+   *     definition base version should match the highest version number of the
+   *     definitions merged into one. For example, if version 3, 4 and 5 is merged,
+   *     the new merged base version is 5. Legal range is [1, 1_000_000]
    */
   public static TokenDefinitionBuilder ofVersion(int baseVersion) {
     return new TokenDefinitionBuilder(baseVersion);

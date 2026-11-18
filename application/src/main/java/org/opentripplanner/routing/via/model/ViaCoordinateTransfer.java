@@ -34,11 +34,11 @@ public class ViaCoordinateTransfer implements RaptorTransfer {
    * @param fromEdges                the street path FROM the alighting stop to the given via point.
    * @param toEdges                  the street path TO the departing stop from the given via point.
    * @param durationInSeconds        How long it takes the traverse the from and to edges, exclusive
-   *                                 via `minimum-wait-time`.
+   *     via `minimum-wait-time`.
    * @param generalizedCostInSeconds The total cost traversing the from and to edges in the OTP
-   *                                 domain generalized-cost. The unit is equivalent to seconds. The
-   *                                 cost will be converted to Raptor units and cached for optimal
-   *                                 performance.
+   *     domain generalized-cost. The unit is equivalent to seconds. The
+   *     cost will be converted to Raptor units and cached for optimal
+   *     performance.
    */
   public ViaCoordinateTransfer(
     WgsCoordinate coordinate,

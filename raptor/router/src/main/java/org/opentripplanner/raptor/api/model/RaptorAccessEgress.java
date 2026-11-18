@@ -32,7 +32,7 @@ public interface RaptorAccessEgress {
    * value will no longer be decorated - not be the value used by Raptor.
    *
    * @throws IllegalStateException if the given {@code parentType} does not exist in the chain of
-   *                               delegates including the first and last element.
+   *     delegates including the first and last element.
    */
   default <T extends RaptorAccessEgress> Optional<T> findOriginal(Class<T> type) {
     return AbstractAccessEgressDecorator.findType(this, type);

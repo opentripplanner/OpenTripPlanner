@@ -24,10 +24,10 @@ import org.opentripplanner.transit.model.site.StopLocation;
  * carries the two pre-resolved candidates.
  *
  * @param stop     the transit-side stop, set on the transit end of an access/egress chain;
- *                 {@code null} when the endpoint is not a transit stop.
+ *     {@code null} when the endpoint is not a transit stop.
  * @param location the passenger-side input location (the request's {@code from} or {@code to}), set
- *                 on the user end of an access/egress chain or on both ends of a direct carpool
- *                 itinerary; {@code null} when the endpoint is not the user's input.
+ *     on the user end of an access/egress chain or on both ends of a direct carpool
+ *     itinerary; {@code null} when the endpoint is not the user's input.
  */
 public record EndpointLabel(@Nullable StopLocation stop, @Nullable GenericLocation location) {
   /**

@@ -33,7 +33,7 @@ final class DefaultRegularTransfersService<P> implements RegularTransfersService
   /**
    * @param userPreferences the user preferences of the request, the key of the cache
    * @param profile         the stored profile closest to {@code userPreferences}, the paths are
-   *                        read from it. {@code null} if there are no stored paths.
+   *     read from it. {@code null} if there are no stored paths.
    */
   DefaultRegularTransfersService(
     OverlaidTemplatePaths<P> paths,

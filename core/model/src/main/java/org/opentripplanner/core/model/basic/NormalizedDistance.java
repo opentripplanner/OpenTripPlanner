@@ -14,10 +14,10 @@ package org.opentripplanner.core.model.basic;
  *      liniear, then make sure to distribute the values between 0.0 and 1.0 roughly according to
  *      the shape of the
  *      function.
- *  </li>
+ *      </li>
  *  <li>
  *      Return the absolute value of {@code a' - b'}
- *  </li>
+ *      </li>
  * </ol>
  */
 public interface NormalizedDistance<T> {

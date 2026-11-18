@@ -15,7 +15,7 @@ interface NearbyStopFilter {
    *
    * @param id               the stop-location to check
    * @param reverseDirection true for arrival searches (checks boarding), false for departure
-   *                         searches (checks alighting)
+   *     searches (checks alighting)
    * @return true if the stop has relevant trip patterns or flex trips
    */
   boolean includeFromStop(FeedScopedId id, boolean reverseDirection);
@@ -29,7 +29,7 @@ interface NearbyStopFilter {
    *
    * @param nearbyStops      the stops to filter, typically from a street search
    * @param reverseDirection true for arrival searches (filters by boarding), false for departure
-   *                         searches (filters by alighting)
+   *     searches (filters by alighting)
    * @return filtered stops, one per relevant trip pattern/flex trip
    */
   Collection<NearbyStop> filterToStops(

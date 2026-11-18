@@ -82,7 +82,7 @@ final class RegularTransferStatistics {
   /**
    * @param stopsOfEachPattern the stops of each scheduled trip pattern
    * @param stopsWithTransfers the stops that are the start or the end of at least one transfer of
-   *                           any profile
+   *     any profile
    */
   static RegularTransferStatistics of(
     Collection<FeedScopedId> stopIds,

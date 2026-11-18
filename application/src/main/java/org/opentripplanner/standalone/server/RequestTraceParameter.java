@@ -26,9 +26,9 @@ import org.opentripplanner.utils.lang.StringUtils;
  *
  * @param httpRequestHeader   The HTTP request header to look for.
  * @param httpResponseHeader  The HTTP response header to set. If not set the value is not included
- *                            in the response.
+ *     in the response.
  * @param logKey              The key used to store the value in the log events using the logging
- *                            framework(Mapped Diagnostic Context).
+ *     framework(Mapped Diagnostic Context).
  * @param generateIdIfMissing If {@code true}, OTP will generate a value if no value is passed in.
  */
 public record RequestTraceParameter(

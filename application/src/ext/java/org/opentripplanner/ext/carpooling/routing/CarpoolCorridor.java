@@ -16,10 +16,10 @@ import org.opentripplanner.street.model.vertex.Vertex;
  *
  * @param legDurations routed driving time of each leg
  * @param legLimits    the most each leg may take once a passenger is inserted: its duration plus
- *                     its deviation budget
+ *     its deviation budget
  * @param stops        the stops a driver can serve, with per-leg driving times
  * @param waypoints    the permanent street vertices the trip's route points resolve to, one per
- *                     route point, in route order
+ *     route point, in route order
  * @param maxCarSpeed  the fastest car speed in the street graph, in metres per second
  */
 public record CarpoolCorridor(

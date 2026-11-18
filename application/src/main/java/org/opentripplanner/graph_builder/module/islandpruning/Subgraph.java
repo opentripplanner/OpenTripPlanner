@@ -185,7 +185,7 @@ class Subgraph {
    * Checks whether the subgraph has only transit-stops for ferries
    *
    * @return true if only ferries stop at the subgraph and false if other or no modes are stopping
-   *         at the subgraph
+   *     at the subgraph
    */
   boolean hasOnlyFerryStops() {
     for (TransitStopVertex v : stopVertices) {

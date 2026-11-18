@@ -135,7 +135,7 @@ public class SameEdgeAdjuster {
    * {@link RoutingErrorCode#WALKING_BETTER_THAN_TRANSIT} in this case.
    *
    * @throws RoutingValidationException if the from and to vertices are at the same geographical
-   *                                    location.
+   *     location.
    */
   private static void validateDistinctVertices(StreetVertex from, StreetVertex to) {
     if (from.sameLocation(to)) {

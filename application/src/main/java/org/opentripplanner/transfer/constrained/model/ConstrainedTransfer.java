@@ -85,10 +85,13 @@ public final class ConstrainedTransfer implements RaptorConstrainedTransfer, Ser
    * </ol>
    * </li>
    * <li>Two transfers may have the same ranking if we add together the from-point and to-point
-   * ranking. For example, {@code from trip(3) + to stop(1) == from route(2) + to route(2)} have the
-   * same ranking. To avoid this problem, we give the from-point a small advantage. We multiply the
-   * from point with 11 and the to point with 10, this break the ties in favor of the from point. In
-   * the example above the ConstrainedTransfer specificityRanking is:
+   *     ranking. For example, {@code from trip(3) + to stop(1) == from route(2) + to route(2)} have
+   *     the
+   *     same ranking. To avoid this problem, we give the from-point a small advantage. We multiply
+   *     the
+   *     from point with 11 and the to point with 10, this break the ties in favor of the from
+   *     point. In
+   *     the example above the ConstrainedTransfer specificityRanking is:
    * <pre>
    * Case 1: from trip to stop :=  11 * 3 + 10 * 1 = 43
    * Case 2: from route to route :=  11 * 2 + 10 * 2 = 42

@@ -47,8 +47,8 @@ public class InsertionEvaluator {
 
   /**
    * @return A list containing the best insertion that can be found for every stop in the list
-   *         tripWithViableAccessEgress.viableAccessEgress. If there are no valid insertions for a
-   *         stop, then no candidate for that stop will be returned.
+   *     tripWithViableAccessEgress.viableAccessEgress. If there are no valid insertions for a
+   *     stop, then no candidate for that stop will be returned.
    */
   public List<InsertionCandidate> findBestInsertions(
     TripWithViableAccessEgress tripWithViableAccessEgress
@@ -83,7 +83,7 @@ public class InsertionEvaluator {
    * take it within the budgets and the capacity.
    *
    * @param snap pickup/dropoff vertices (already snapped to car-reachable vertices by the caller)
-   *             and the optional walk paths bracketing the carpool ride
+   *     and the optional walk paths bracketing the carpool ride
    */
   @Nullable
   public InsertionCandidate findBestInsertion(
@@ -315,7 +315,7 @@ public class InsertionEvaluator {
      * The trip's segments with the passenger's pickup and dropoff in the given legs.
      *
      * @param pickupToDropoff the segment from the pickup to the dropoff, the passenger's own ride;
-     *                        used, and non-null, only when both are in the same leg
+     *     used, and non-null, only when both are in the same leg
      */
     private List<RoutedSegment> routeWith(
       int pickupLeg,

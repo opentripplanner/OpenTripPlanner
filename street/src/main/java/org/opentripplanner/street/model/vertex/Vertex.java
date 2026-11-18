@@ -196,7 +196,7 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
    * that it does not have to operate on geographical coordinates and trust them for equality.
    *
    * @return The representative parent Vertex of a group of vertices that are same for most
-   *         purposes.
+   *     purposes.
    */
   public Vertex getParent() {
     return this;

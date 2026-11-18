@@ -29,7 +29,7 @@ public class TransitGroupPriorityService {
    * <ol>
    *   <li>We can assign group id 1 (one) to the base group and it will be treated as any other
    *       group.
-   *   </li>
+   *       </li>
    *   <li>We can assign group id 0 (zero) to the base and it will not be added to the set of groups
    *       a
    *       given path has.</li>

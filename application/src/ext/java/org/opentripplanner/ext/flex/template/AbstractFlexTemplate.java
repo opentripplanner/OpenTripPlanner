@@ -55,9 +55,9 @@ abstract class AbstractFlexTemplate {
   /**
    * @param trip               The FlexTrip used for this template
    * @param accessEgress       Path from origin/destination to the point of boarding/alighting for
-   *                           this flex trip
+   *     this flex trip
    * @param transferStop       The stop location where this FlexTrip transfers to another transit
-   *                           service.
+   *     service.
    * @param boardStopPosition  The stop-board-position in the trip pattern
    * @param alightStopPosition The stop-alight-position in the trip pattern
    * @param date               The service date of this FlexTrip

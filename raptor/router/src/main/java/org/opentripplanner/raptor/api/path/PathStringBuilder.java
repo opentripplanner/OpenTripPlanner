@@ -29,7 +29,7 @@ public class PathStringBuilder {
 
   /**
    * @param stopNameResolver Used to translate stopIndexes to stopNames, if {@code null} the index
-   *                         is used in the result string.
+   *     is used in the result string.
    */
   public PathStringBuilder(@Nullable RaptorStopNameResolver stopNameResolver) {
     this.stopNameResolver = RaptorStopNameResolver.nullSafe(stopNameResolver);

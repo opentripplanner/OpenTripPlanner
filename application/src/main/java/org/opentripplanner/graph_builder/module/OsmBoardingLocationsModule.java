@@ -91,7 +91,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
 
   /**
    * @param transitRepository This module requires the timetable repository because at the time of
-   *                          the instantiation the site repository is empty.
+   *     the instantiation the site repository is empty.
    */
   public OsmBoardingLocationsModule(
     Graph graph,
@@ -243,7 +243,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
    * Split the platform's edges where the stop meets them and attach it there.
    *
    * @return whether the stop was attached; on failure the caller falls back to looking for a
-   *         platform mapped as an area
+   *     platform mapped as an area
    */
   private boolean linkToPlatform(
     TransitStopVertex ts,

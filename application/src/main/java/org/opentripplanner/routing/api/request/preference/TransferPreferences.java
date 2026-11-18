@@ -145,8 +145,8 @@ public final class TransferPreferences implements Serializable {
    * Penalty for using a non-preferred transfer
    *
    * @deprecated TODO OTP2 Regression. Not currently working in OTP2. We might not implement the old
-   *             functionality the same way, but we will try to map this parameter so it does work
-   *             similar as before.
+   *     functionality the same way, but we will try to map this parameter so it does work
+   *     similar as before.
    */
   @Deprecated
   public int nonpreferredCost() {

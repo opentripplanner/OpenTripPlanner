@@ -20,11 +20,11 @@ public class ContainsMatcher<S, T> implements Matcher<S> {
 
   /**
    * @param relationshipName The name of the type of relationship between the main entity and the
-   *                         entity matched by the valueMatcher.
+   *     entity matched by the valueMatcher.
    * @param valuesProvider   The function that maps the entity being matched by this matcher (S) to
-   *                         the iterable of items being matched by valueMatcher.
+   *     the iterable of items being matched by valueMatcher.
    * @param valueMatcher     The matcher that is applied each of the iterable entities returned from
-   *                         the valuesProvider function.
+   *     the valuesProvider function.
    */
   public ContainsMatcher(
     String relationshipName,

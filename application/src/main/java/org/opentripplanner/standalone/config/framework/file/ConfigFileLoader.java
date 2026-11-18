@@ -118,7 +118,7 @@ public class ConfigFileLoader {
    * jsonAsString} input.
    *
    * @param source is used only to generate a human friendly error message in case of an error
-   *               parsing the JSON or inserting environment variables.
+   *     parsing the JSON or inserting environment variables.
    */
   private JsonNode stringToJsonNode(String jsonAsString, String source) {
     try {

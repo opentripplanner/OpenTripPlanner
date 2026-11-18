@@ -80,14 +80,14 @@ public class RegularTransferRepositoryLifecycle<
 
   /**
    * @param profiles               the configuration of the profiles the paths are stored under, the
-   *                               Raptor transfers are derived with the request of the profile
-   *                               closest to the request
+   *     Raptor transfers are derived with the request of the profile
+   *     closest to the request
    * @param cacheMaxSize           the max number of Raptor transfers cached for other preferences
-   *                               than the ones of the profiles and the warmup entries, which are
-   *                               always cached
+   *     than the ones of the profiles and the warmup entries, which are
+   *     always cached
    * @param collectCacheStatistics whether to count the requests that use each key of the cache,
-   *                               for the report of the cache, see
-   *                               {@link RegularTransferRepositorySnapshot#cacheReport}
+   *     for the report of the cache, see
+   *     {@link RegularTransferRepositorySnapshot#cacheReport}
    */
   public RegularTransferRepositoryLifecycle(
     TransferPathProvider<P, R> pathProvider,

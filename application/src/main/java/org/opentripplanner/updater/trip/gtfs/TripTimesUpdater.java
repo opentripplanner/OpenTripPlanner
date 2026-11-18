@@ -58,10 +58,10 @@ class TripTimesUpdater {
    *
    * @param tripUpdate     GTFS-RT trip update
    * @param backwardsDelay Defines when delays are propagated to previous stops and if these stops
-   *                       are given the NO_DATA flag
+   *     are given the NO_DATA flag
    * @return {@link TripTimesPatch} contains a new copy of updated TripTimes after TripUpdate has
-   *         been applied on TripTimes of trip with the id specified in the trip descriptor of the
-   *         TripUpdate and a list of stop indices that have been skipped with the realtime update.
+   *     been applied on TripTimes of trip with the id specified in the trip descriptor of the
+   *     TripUpdate and a list of stop indices that have been skipped with the realtime update.
    * @throws UpdateException if there are any problems with the data
    */
   public TripTimesPatch createUpdatedTripTimesFromGtfsRt(

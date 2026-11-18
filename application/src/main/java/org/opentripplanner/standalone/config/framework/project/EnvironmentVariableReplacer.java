@@ -59,9 +59,9 @@ public class EnvironmentVariableReplacer {
    * environment variable.
    *
    * @param source is used only to generate a human friendly error message in case the text contains
-   *               a placeholder which cannot be found.
+   *     a placeholder which cannot be found.
    * @throws IllegalArgumentException if a placeholder exists in the {@code text}, but the
-   *                                  environment variable does not exist.
+   *     environment variable does not exist.
    */
   public static String insertEnvironmentVariables(String text, String source) {
     return insertVariables(text, source, EnvironmentVariableReplacer::getEnvVarOrProjectInfo);

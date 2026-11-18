@@ -565,7 +565,7 @@ public class ElevationModule implements GraphBuilderModule {
    * Method for retrieving the elevation at a given Coordinate.
    *
    * @param coverage the specific Coverage instance to use in order to avoid competition between
-   *                 threads
+   *     threads
    * @param c        the coordinate (NAD83)
    * @return elevation in meters
    */
@@ -578,15 +578,15 @@ public class ElevationModule implements GraphBuilderModule {
    * Method for retrieving the elevation at a given (x, y) pair.
    *
    * @param coverage the specific Coverage instance to use in order to avoid competition between
-   *                 threads
+   *     threads
    * @param x        the query longitude (NAD83)
    * @param y        the query latitude (NAD83)
    * @return elevation in meters
    * @throws PointOutsideCoverageException  if the point lies outside the elevation tile area.
    * @throws TransformException             if computing the EllipsoidToGeoidDifference fails.
    * @throws ArrayIndexOutOfBoundsException at the edges of some elevation tiles with NoData
-   *                                        regions, see <a href=
-   *                                        "https://github.com/opentripplanner/OpenTripPlanner/issues/2792">#2792</a>.
+   *     regions, see <a href=
+   *     "https://github.com/opentripplanner/OpenTripPlanner/issues/2792">#2792</a>.
    */
   private double getElevation(Coverage coverage, double x, double y)
     throws PointOutsideCoverageException, TransformException {

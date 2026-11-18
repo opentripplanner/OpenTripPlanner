@@ -23,7 +23,7 @@ public class TripScheduleSearchFactory {
    * Create a new search based on the given direction: <ou>
    * <li>FORWARD -> Board search</li>
    * <li>REVERSE -> Alight search</li>
-   * </ou>
+   *     </ou>
    */
   public static <T extends RaptorTripSchedule> RaptorTripScheduleSearch<T> create(
     SearchDirection searchDirection,

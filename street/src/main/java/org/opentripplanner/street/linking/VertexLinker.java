@@ -190,8 +190,8 @@ public class VertexLinker {
    * @param scope         The scope of the split
    * @param edgeFunction  How the provided vertex should be linked into the street graph
    * @return A DisposableEdgeCollection with edges created by this method. It is the caller's
-   *         responsibility to call the dispose method on this object when the edges are no longer
-   *         needed.
+   *     responsibility to call the dispose method on this object when the edges are no longer
+   *     needed.
    */
   private DisposableEdgeCollection link(
     Vertex vertex,

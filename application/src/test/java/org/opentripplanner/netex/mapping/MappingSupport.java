@@ -33,7 +33,7 @@ public class MappingSupport {
    *
    * @param id    the ref is set to point to this id.
    * @param clazz the class used to create a new instance. The class must have a default
-   *              constructor.
+   *     constructor.
    * @param <T>   the type of the created ref structure
    */
   @SuppressWarnings("unchecked")

@@ -133,7 +133,7 @@ public class TripPatternForDates
 
   /**
    * @deprecated This is exposed because it is needed in the TripFrequencyNnnSearch classes, but is
-   *             an implementation detail that should not leak outside the class.
+   *     an implementation detail that should not leak outside the class.
    */
   @Deprecated
   public int tripPatternForDateOffsets(int dayIndex) {
@@ -237,9 +237,9 @@ public class TripPatternForDates
    * be able to override this - for example for frequency based trips.
    *
    * @return {@code true} If you do not want to use the built-in trip search and instead will
-   *         provide your own. Make sure to implement the
-   *         {@link #createCustomizedTripSearch(SearchDirection)} for both forward and reverse
-   *         searches.
+   *     provide your own. Make sure to implement the
+   *     {@link #createCustomizedTripSearch(SearchDirection)} for both forward and reverse
+   *     searches.
    */
   public boolean useCustomizedTripSearch() {
     return isFrequencyBased;

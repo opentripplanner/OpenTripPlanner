@@ -38,11 +38,11 @@ public final class OnTripAccessArrivals<T extends RaptorTripSchedule> {
   /// Adds an on-board arrival, indexing it by its boarding stop position in the pattern.
   ///
   /// @param startRoutingAtStopPosition The stop position in trip pattern where the algorithm will
-  ///                                   inject the boarding. The boarding position can be any
-  ///                                   position BEFORE or equal to this. The effect is that the
-  ///                                   algorithm will not alight before the next stop after this.
-  ///                                   This is used to support pass-through where we do not want to
-  ///                                   alight before the pass-through stop.
+  ///     inject the boarding. The boarding position can be any
+  ///     position BEFORE or equal to this. The effect is that the
+  ///     algorithm will not alight before the next stop after this.
+  ///     This is used to support pass-through where we do not want to
+  ///     alight before the pass-through stop.
   public void add(
     ArrivalView<T> accessStopArrival,
     int startRoutingAtStopPosition,

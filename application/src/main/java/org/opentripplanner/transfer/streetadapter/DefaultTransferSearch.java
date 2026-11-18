@@ -59,12 +59,12 @@ final class DefaultTransferSearch implements TransferSearch<NearbyStop> {
 
   /**
    * @param isTransferSource only the stops accepted by this predicate have transfers from them, no
-   *                         paths are found for the others.
+   *     paths are found for the others.
    * @param isTransferTarget only the stops accepted by this predicate have transfers to them, the
-   *                         paths to the others are dropped.
+   *     paths to the others are dropped.
    * @param allowedModes     the modes the stops are allowed for, used to find the max duration of
-   *                         the transfers from a stop and of each transfer, see
-   *                         {@link MaxDurationsPreference}
+   *     the transfers from a stop and of each transfer, see
+   *     {@link MaxDurationsPreference}
    */
   DefaultTransferSearch(
     Graph graph,

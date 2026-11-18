@@ -50,8 +50,8 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
   /**
    * @param nStops              total number of stops in the transit network.
    * @param onBoardArrivalStops stops where on-board arrivals is better than on-street arrivals;
-   *                            these stops need a pareto comparator that also considers whether the
-   *                            traveller arrived on board.
+   *     these stops need a pareto comparator that also considers whether the
+   *     traveller arrived on board.
    * @param arrivalListeners    per-stop listeners (via, egress, debug), keyed by stop index.
    * @param comparatorFactory   factory for creating the Pareto comparators used per stop.
    * @param debugHandlerFactory factory for debug handlers and loggers.
@@ -240,9 +240,9 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
    *
    * @param boardingArrival            the arrival state from which boarding occurs.
    * @param startRoutingAtStopIndex    the stop index where the new ride is applied in the
-   *                                   algorithm. The next stop in pattern will be the first
-   *                                   possible stop to alight. The boarding might be at an earlier
-   *                                   stop.
+   *     algorithm. The next stop in pattern will be the first
+   *     possible stop to alight. The boarding might be at an earlier
+   *     stop.
    * @param startRoutingAtStopPosition Same as above, but the stop position in the trip pattern.
    * @param boardingConstraint         the trip and stop-position for where the boarding happens.
    */

@@ -34,17 +34,17 @@ public interface DataSource {
 
   /**
    * @return the short name identifying the source within its scope (withing a {@link OtpDataStore}
-   *         or {@link CompositeDataSource}) Including the file extension.
+   *     or {@link CompositeDataSource}) Including the file extension.
    *     <p>
-   *         Examples:
+   *     Examples:
    *     <p>
-   *         {@code build-config.json, gtfs.zip and stops.txt}
+   *     {@code build-config.json, gtfs.zip and stops.txt}
    */
   String name();
 
   /**
    * @return the full path (or description) to be used when describing this data source. This method
-   *         is mainly used for humans to identify the source in logs and error handling.
+   *     is mainly used for humans to identify the source in logs and error handling.
    */
   String path();
 
@@ -85,9 +85,9 @@ public interface DataSource {
 
   /**
    * @return {@code true} if it is possible to write to data source. Also, return {@code true} if if
-   *         it is not easy to check. No guarantee is given and the {@link #asOutputStream()} may
-   *         fail. This method can be used to avoid consuming a lot of resource before writing to a
-   *         datasource, if this method return {@code false}.
+   *     it is not easy to check. No guarantee is given and the {@link #asOutputStream()} may
+   *     fail. This method can be used to avoid consuming a lot of resource before writing to a
+   *     datasource, if this method return {@code false}.
    */
   default boolean isWritable() {
     return true;

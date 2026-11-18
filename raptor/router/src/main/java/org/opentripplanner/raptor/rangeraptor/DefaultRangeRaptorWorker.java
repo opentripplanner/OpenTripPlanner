@@ -84,7 +84,7 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule> implem
 
   /**
    * @param accessPaths can be null in case the worker is chained - only the first worker has
-   *                    access.
+   *     access.
    */
   public DefaultRangeRaptorWorker(
     RaptorWorkerState<T> state,

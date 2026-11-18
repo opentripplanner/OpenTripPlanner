@@ -15,7 +15,7 @@ public interface EstimatedTimetableSource {
    * Wait for one message to arrive, and decode it into a List of TripUpdates. Blocking call.
    *
    * @return a Siri-object potentially containing updates for several trips, or empty if an
-   *         exception occurred while processing the message.
+   *     exception occurred while processing the message.
    */
   Optional<Siri> getUpdates();
 

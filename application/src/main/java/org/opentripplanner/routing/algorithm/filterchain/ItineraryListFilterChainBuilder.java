@@ -170,7 +170,7 @@ public class ItineraryListFilterChainBuilder {
    * </pre>
    *
    * @param transitGeneralizedCostFilterParams container for costFactor, minimumCostDifference and
-   *                                           itineraryIntervalRelaxFactor
+   *     itineraryIntervalRelaxFactor
    */
   public ItineraryListFilterChainBuilder withTransitGeneralizedCostLimit(
     TransitGeneralizedCostFilterParams transitGeneralizedCostFilterParams

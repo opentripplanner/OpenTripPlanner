@@ -145,7 +145,7 @@ public final class RegularStop
    * it will only degrade performance.
    *
    * @return {@code true} if this stop may be used by real-time trips despite having no scheduled
-   *         patterns, {@code false} otherwise
+   *     patterns, {@code false} otherwise
    */
   public boolean isSometimesUsedRealtime() {
     return sometimesUsedRealtime;

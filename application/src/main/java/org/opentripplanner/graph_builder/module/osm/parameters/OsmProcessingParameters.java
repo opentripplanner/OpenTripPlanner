@@ -9,11 +9,11 @@ import org.opentripplanner.osm.model.CompoundRefTagGroup;
 /**
  * @param boardingAreaRefTags          The ref tags to extract boarding locations from.
  * @param elevatorRefTags              Groups of OSM tags whose values are combined into elevator
- *                                     ids. The first group (in order) that resolves to a value is
- *                                     used.
+ *     ids. The first group (in order) that resolves to a value is
+ *     used.
  * @param edgeNamer                    Controls naming of edges.
  * @param maxAreaNodes                 Maximum number of nodes of an area to try to generate
- *                                     visibility lines from.
+ *     visibility lines from.
  * @param areaVisibility               Whether to create visibility lines crossing walkable areas.
  * @param platformEntriesLinking       Whether platform entries should be linked
  * @param staticParkAndRide            Whether we should create car P+R stations from OSM data.

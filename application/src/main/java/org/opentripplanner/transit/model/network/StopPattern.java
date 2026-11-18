@@ -313,7 +313,7 @@ public final class StopPattern implements Serializable {
    * @param other Other instance of stop pattern with list of stops.
    * @param index Given index for stop
    * @return true if the stops have the same stations, else false. If any station is null then
-   *         false.
+   *     false.
    */
   boolean sameStations(StopPattern other, int index) {
     var otherOrigin = other.getStop(index).getParentStation();

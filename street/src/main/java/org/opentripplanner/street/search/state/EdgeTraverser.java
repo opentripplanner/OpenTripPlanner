@@ -22,7 +22,7 @@ public class EdgeTraverser {
   /// Create a path from a set of edges and a street search request.
   ///
   /// @return Empty if the list of edges is empty or if the edges can't be traversed using the
-  ///         given request
+  ///     given request
   public static Optional<StreetPath> createPath(List<Edge> edges, StreetSearchRequest request) {
     if (edges.isEmpty()) {
       return Optional.empty();

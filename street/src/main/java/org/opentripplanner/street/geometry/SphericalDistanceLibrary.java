@@ -91,7 +91,7 @@ public abstract class SphericalDistanceLibrary {
    * @param segmentStart Start of the line segment (longitude, latitude degrees)
    * @param segmentEnd   End of the line segment (longitude, latitude degrees)
    * @return The (approximated) distance, in meters, from the point to the closest point on the line
-   *         segment
+   *     segment
    */
   public static double fastDistance(
     Coordinate point,
@@ -208,8 +208,8 @@ public abstract class SphericalDistanceLibrary {
   /**
    * @param distanceMeters Distance in meters.
    * @return The number of degree for the given distance. For degrees latitude, this is nearly
-   *         correct. For degrees longitude, this is an overestimate because meridians converge
-   *         toward the poles.
+   *     correct. For degrees longitude, this is an overestimate because meridians converge
+   *     toward the poles.
    */
   public static double metersToDegrees(double distanceMeters) {
     return (360 * distanceMeters) / (2 * Math.PI * RADIUS_OF_EARTH_IN_M);
@@ -217,8 +217,8 @@ public abstract class SphericalDistanceLibrary {
 
   /**
    * @return the approximate number of meters for the given number of degrees latitude. If degrees
-   *         longitude are supplied, this is an overestimate anywhere off the equator because
-   *         meridians converge toward the poles.
+   *     longitude are supplied, this is an overestimate anywhere off the equator because
+   *     meridians converge toward the poles.
    */
   public static double degreesLatitudeToMeters(double degreesLatitude) {
     return (2 * Math.PI * RADIUS_OF_EARTH_IN_M * degreesLatitude) / 360;
@@ -228,7 +228,7 @@ public abstract class SphericalDistanceLibrary {
    * @param distanceMeters Distance in meters.
    * @param latDeg         Latitude of center point, in degree.
    * @return The number of longitude degree for the given distance. This is a slight overestimate as
-   *         the number of degree of longitude for a given distance depends on the exact latitude.
+   *     the number of degree of longitude for a given distance depends on the exact latitude.
    */
   public static double metersToLonDegrees(double distanceMeters, double latDeg) {
     double dLatDeg = (360 * distanceMeters) / (2 * Math.PI * RADIUS_OF_EARTH_IN_M);

@@ -60,7 +60,7 @@ public class AddTransitEntitiesToGraph {
 
   /**
    * @param subwayAccessTime a positive integer for the extra time to access a subway platform, if
-   *                         negative the default value of zero is used.
+   *     negative the default value of zero is used.
    */
   private AddTransitEntitiesToGraph(
     TransitDataImport dataImport,

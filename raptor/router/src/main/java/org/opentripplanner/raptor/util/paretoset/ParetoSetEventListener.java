@@ -34,7 +34,7 @@ public interface ParetoSetEventListener<T> {
    *
    * @param element           The new element that is rejected.
    * @param rejectedByElement One of the existing elements in the set which dominates the new
-   *                          rejected element.
+   *     rejected element.
    */
   default void notifyElementRejected(T element, T rejectedByElement) {}
 }

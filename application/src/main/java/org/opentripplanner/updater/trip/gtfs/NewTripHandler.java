@@ -188,9 +188,9 @@ class NewTripHandler {
    * The whole update is rejected if a single stop cannot be resolved.
    *
    * @throws UpdateException {@code INVALID_STOP_REFERENCE} if a stop time update has no stop id - a
-   *                         new trip has no pattern yet, so a stop sequence alone cannot be
-   *                         resolved to a stop - or {@code UNKNOWN_STOP} if the stop id is not
-   *                         present in the site repository.
+   *     new trip has no pattern yet, so a stop sequence alone cannot be
+   *     resolved to a stop - or {@code UNKNOWN_STOP} if the stop id is not
+   *     present in the site repository.
    */
   private List<StopAndStopTimeUpdate> resolveStops(
     FeedScopedId tripId,

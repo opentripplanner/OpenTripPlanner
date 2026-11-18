@@ -75,11 +75,11 @@ public final class RegularTransferFactory {
    * stored under, and the {@code mapper} to map the routing requests to user preferences.
    *
    * @param numberOfStops the size of the stop index space ({@code RaptorStopIndex.size()}), not the
-   *                      number of regular stops. The index space is shared with the flex stops,
-   *                      which do not take part in Raptor, so the Raptor transfer data is larger
-   *                      than needed. This goes away when the stop index moves into Raptor.
+   *     number of regular stops. The index space is shared with the flex stops,
+   *     which do not take part in Raptor, so the Raptor transfer data is larger
+   *     than needed. This goes away when the stop index moves into Raptor.
    * @param cacheMaxSize  the max number of Raptor transfers cached for other user preferences than
-   *                      the ones of the profiles and the warmup entries, which are always cached
+   *     the ones of the profiles and the warmup entries, which are always cached
    */
   public static <P, R> RepositoryHandle<
     RegularTransferRepositorySnapshot<P, R>,

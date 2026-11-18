@@ -50,7 +50,7 @@ public class ShortestPathTree<
    *
    * @param newState the State to add to the SPT, if it is deemed non-dominated
    * @return a boolean value indicating whether the state was added to the tree and should therefore
-   *         be enqueued
+   *     be enqueued
    */
   @SuppressWarnings("unchecked")
   public boolean add(State newState) {

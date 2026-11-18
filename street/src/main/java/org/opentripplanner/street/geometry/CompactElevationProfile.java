@@ -92,7 +92,7 @@ public final class CompactElevationProfile implements Serializable {
    *
    * @param packedCoords Compacted coordinates
    * @param lengthM      The length of the edge in meters. This is used as the x-value of the final
-   *                     height sample
+   *     height sample
    * @return The elevation profile
    */
   public static PackedCoordinateSequence uncompactElevationProfileWithRegularSamples(

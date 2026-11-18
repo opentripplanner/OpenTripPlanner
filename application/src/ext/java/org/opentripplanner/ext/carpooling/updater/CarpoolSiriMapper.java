@@ -46,9 +46,9 @@ public class CarpoolSiriMapper {
 
   /**
    * @param feedId the feed prefix used for every {@link FeedScopedId} this mapper produces. Owned
-   *               by the enclosing updater instance and supplied from {@code router-config.json},
-   *               so one OTP can run multiple carpool updaters side-by-side without trip-id
-   *               collisions across feeds.
+   *     by the enclosing updater instance and supplied from {@code router-config.json},
+   *     so one OTP can run multiple carpool updaters side-by-side without trip-id
+   *     collisions across feeds.
    */
   public CarpoolSiriMapper(String feedId, Duration maxTripDuration) {
     this.feedId = feedId;
@@ -72,11 +72,11 @@ public class CarpoolSiriMapper {
    * non-cancelled calls remain.
    *
    * @throws IllegalArgumentException if the raw message is malformed (fewer than 2 calls before
-   *                                  filtering, calls out of order, missing flexible areas, no
-   *                                  departure time on the first call or no arrival time on the
-   *                                  last call, end time not after start time, etc.) or if the trip
-   *                                  span or its straight-line drive time exceeds the maximum trip
-   *                                  duration
+   *     filtering, calls out of order, missing flexible areas, no
+   *     departure time on the first call or no arrival time on the
+   *     last call, end time not after start time, etc.) or if the trip
+   *     span or its straight-line drive time exceeds the maximum trip
+   *     duration
    */
   @Nullable
   public CarpoolTrip mapSiriToCarpoolTrip(EstimatedVehicleJourney journey) {

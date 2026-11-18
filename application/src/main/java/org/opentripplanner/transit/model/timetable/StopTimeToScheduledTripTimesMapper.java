@@ -71,7 +71,7 @@ class StopTimeToScheduledTripTimesMapper {
 
   /**
    * @return either an array of headsigns (one for each stop on this trip) or null if the headsign
-   *         is the same at all stops (including null) and can be found in the Trip object.
+   *     is the same at all stops (including null) and can be found in the Trip object.
    */
   private I18NString[] makeHeadsignsArray(final Collection<StopTime> stopTimes) {
     final I18NString tripHeadsign = trip.getHeadsign();
@@ -118,8 +118,8 @@ class StopTimeToScheduledTripTimesMapper {
    * stop sequence.
    *
    * @return May be null if no stop in the entire sequence of stops has any via strings. Any
-   *         subarray may also be null or empty if no Via strings are displayed at that particular
-   *         stop.
+   *     subarray may also be null or empty if no Via strings are displayed at that particular
+   *     stop.
    * @see org.opentripplanner.transit.model.timetable.TripTimes#getHeadsignVias(int)
    */
   private String @Nullable [][] makeHeadsignViasArray(final Collection<StopTime> stopTimes) {

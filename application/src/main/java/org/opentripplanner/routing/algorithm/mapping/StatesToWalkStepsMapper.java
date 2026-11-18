@@ -80,7 +80,7 @@ public class StatesToWalkStepsMapper {
    * Converts a list of street edges to a list of turn-by-turn directions.
    *
    * @param previousStep the last walking step of a non-transit leg that immediately precedes this
-   *                     one or null, if first leg
+   *     one or null, if first leg
    */
   public StatesToWalkStepsMapper(
     List<State> states,

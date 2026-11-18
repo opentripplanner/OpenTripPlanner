@@ -107,7 +107,7 @@ public class StopsCursor<T extends RaptorTripSchedule> {
    * The returned arrival can be access(including flex), transfer or transit.
    *
    * @param stopReachedOnBoard if {@code true} the arrival returned must arrive onboard a vehicle,
-   *                           if {@code false} the BEST arrival is returned on-street or on-board.
+   *     if {@code false} the BEST arrival is returned on-street or on-board.
    */
   public ArrivalView<T> stop(int round, int stop, boolean stopReachedOnBoard) {
     var arrival = arrivals.get(round, stop);

@@ -62,10 +62,10 @@ public class TranslatedString implements I18NString, Serializable {
    * called from a real-time updater as this is not thread-safe and may cause a memory leak.
    *
    * @param translations          A Map of languages and translations, a null language is the
-   *                              default translation
+   *     default translation
    * @param forceTranslatedString Should the language information be kept, even when only a single
-   *                              translation is provided. This is useful when the language
-   *                              information is important or is presented to the user.
+   *     translation is provided. This is useful when the language
+   *     information is important or is presented to the user.
    */
   public static I18NString getDeduplicatedI18NString(
     Map<String, String> translations,
@@ -82,10 +82,10 @@ public class TranslatedString implements I18NString, Serializable {
    * {@link #getDeduplicatedI18NString(Map, boolean)} instead.
    *
    * @param translations          A Map of languages and translations, a null language is the
-   *                              default translation
+   *     default translation
    * @param forceTranslatedString Should the language information be kept, even when only a single
-   *                              translation is provided. This is useful when the language
-   *                              information is important or is presented to the user.
+   *     translation is provided. This is useful when the language
+   *     information is important or is presented to the user.
    */
   public static I18NString getI18NString(
     Map<String, String> translations,
@@ -99,14 +99,14 @@ public class TranslatedString implements I18NString, Serializable {
    * otherwise a TranslatedString
    *
    * @param translations          A Map of languages and translations, a null language is the
-   *                              default translation
+   *     default translation
    * @param intern                Should the resulting I18NString be interned. This should be used
-   *                              when calling this method during graph building. This should not be
-   *                              called from a real-time updater as this is not thread-safe and may
-   *                              cause a memory leak.
+   *     when calling this method during graph building. This should not be
+   *     called from a real-time updater as this is not thread-safe and may
+   *     cause a memory leak.
    * @param forceTranslatedString Should the language information be kept, even when only a single
-   *                              translation is provided. This is useful when the language
-   *                              information is important or is presented to the user.
+   *     translation is provided. This is useful when the language
+   *     information is important or is presented to the user.
    */
   static I18NString getI18NString(
     Map<String, String> translations,

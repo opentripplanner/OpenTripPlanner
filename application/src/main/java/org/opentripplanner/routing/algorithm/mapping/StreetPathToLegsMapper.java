@@ -103,8 +103,8 @@ public class StreetPathToLegsMapper {
    * are returned in the order they are traversed in the path.
    *
    * @param startTime The legs are time shifted to so that the first leg starts at this time and the
-   *                  next legs have the same delay as the first leg. If this is null, no time
-   *                  shifting happens.
+   *     next legs have the same delay as the first leg. If this is null, no time
+   *     shifting happens.
    */
   public List<Leg> map(StreetPath path, RouteRequest request, @Nullable ZonedDateTime startTime) {
     return map(path, request.listViaLocations(), startTime);
@@ -300,7 +300,7 @@ public class StreetPathToLegsMapper {
    *
    * @param subPath      The street path to base the leg on
    * @param previousStep the previous walk step, so that the first relative turn direction is
-   *                     calculated correctly
+   *     calculated correctly
    * @return The generated leg
    */
   private StreetLeg generateLeg(

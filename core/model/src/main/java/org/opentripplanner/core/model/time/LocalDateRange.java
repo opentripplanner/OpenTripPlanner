@@ -168,11 +168,11 @@ public final class LocalDateRange {
    * the two do not overlap an empty list is returned.
    *
    * @param defaultInclusiveStart the start used when this range is unbounded (or wider) at the
-   *                              start
+   *     start
    * @param defaultExclusiveEnd   the exclusive end used when this range is unbounded (or wider) at
-   *                              the end
+   *     the end
    * @throws IllegalArgumentException if the effective range spans more than
-   *                                  {@value #MAX_DAYS_AS_LOCAL_DATES} days
+   *     {@value #MAX_DAYS_AS_LOCAL_DATES} days
    */
   public List<LocalDate> asLocalDates(
     LocalDate defaultInclusiveStart,

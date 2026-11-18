@@ -47,9 +47,9 @@ public class CompoundRefTagGroup {
    * is returned. Each resolved value is stripped of surrounding whitespace before joining.
    *
    * @param tagToValueMapper a function that maps an OpenStreetMap tag name to its corresponding
-   *                         value, or null if the tag cannot be resolved
+   *     value, or null if the tag cannot be resolved
    * @return an Optional containing the colon-delimited compound value if all tags resolved to
-   *         non-null values, or an empty Optional if any tag could not be resolved
+   *     non-null values, or an empty Optional if any tag could not be resolved
    */
   public Optional<String> compoundValue(Function<String, String> tagToValueMapper) {
     List<String> values = tags.stream().map(tagToValueMapper).toList();
