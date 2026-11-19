@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.service;
 
 import java.util.List;
+import java.util.Optional;
 import org.apache.commons.lang3.NotImplementedException;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
@@ -33,7 +34,7 @@ public class NoopSiteResolver implements SiteResolver {
   }
 
   @Override
-  public WgsCoordinate findCoordinate(GenericLocation location) {
+  public Optional<WgsCoordinate> findCoordinate(GenericLocation location) {
     throw new NotImplementedException();
   }
 }

@@ -1,7 +1,7 @@
 package org.opentripplanner.transit;
 
 import java.util.List;
-import org.jspecify.annotations.Nullable;
+import java.util.Optional;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.street.geometry.WgsCoordinate;
@@ -21,7 +21,5 @@ public interface SiteResolver extends EntranceResolver {
   StopLocation getStopLocation(FeedScopedId id);
   Entrance getEntrance(FeedScopedId id);
   List<FeedScopedId> findStopOrChildIds(FeedScopedId id);
-
-  @Nullable
-  WgsCoordinate findCoordinate(GenericLocation location);
+  Optional<WgsCoordinate> findCoordinate(GenericLocation location);
 }

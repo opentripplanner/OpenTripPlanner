@@ -330,19 +330,17 @@ public class LinkingContextFactory {
     GenericLocation location,
     LocationType type
   ) {
-    var coordinate = siteResolver.findCoordinate(location);
-    if (coordinate == null) {
-      return Optional.empty();
-    }
-    return Optional.of(
-      vertexCreationService.createVertexFromCoordinate(
-        container,
-        coordinate.asJtsCoordinate(),
-        location.label(),
-        List.of(TraverseMode.CAR),
-        type
-      )
-    );
+    return siteResolver
+      .findCoordinate(location)
+      .map(coordinate ->
+        vertexCreationService.createVertexFromCoordinate(
+          container,
+          coordinate.asJtsCoordinate(),
+          location.label(),
+          List.of(TraverseMode.CAR),
+          type
+        )
+      );
   }
 
   private void checkIfVerticesFound(

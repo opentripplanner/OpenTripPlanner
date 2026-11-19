@@ -76,11 +76,15 @@ public class TaxiRouter {
     LinkingContext linkingContext
   ) {
     var siteResolver = new TransitServiceResolver(transitService);
-    WgsCoordinate pickup = siteResolver.findCoordinate(request.from());
-    WgsCoordinate dropoff = siteResolver.findCoordinate(request.to());
-    if (
-      pickup == null || dropoff == null || taxiRouteIndex.findFirstRoute(pickup, dropoff).isEmpty()
-    ) {
+    var pickupOptional = siteResolver.findCoordinate(request.from());
+    var dropoffOptional = siteResolver.findCoordinate(request.to());
+    if (pickupOptional.isEmpty() || dropoffOptional.isEmpty()) {
+      return List.of();
+    }
+
+    WgsCoordinate pickup = pickupOptional.get();
+    WgsCoordinate dropoff = dropoffOptional.get();
+    if (taxiRouteIndex.findFirstRoute(pickup, dropoff).isEmpty()) {
       return List.of();
     }
 
@@ -120,11 +124,12 @@ public class TaxiRouter {
     AccessEgressType type,
     RouteRequest request
   ) {
+    var siteResolver = new TransitServiceResolver(transitService);
     var location = type.isAccess() ? request.from() : request.to();
-    var coordinate = new TransitServiceResolver(transitService).findCoordinate(location);
-    return coordinate == null
-      ? List.of()
-      : filterNearbyStops(transitService, nearbyStops, coordinate);
+    return siteResolver
+      .findCoordinate(location)
+      .map(coordinate -> filterNearbyStops(transitService, nearbyStops, coordinate))
+      .orElse(List.of());
   }
 
   private Collection<NearbyStop> filterNearbyStops(

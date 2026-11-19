@@ -2,7 +2,7 @@ package org.opentripplanner.transit.service;
 
 import java.util.List;
 import java.util.Objects;
-import org.jspecify.annotations.Nullable;
+import java.util.Optional;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.street.geometry.WgsCoordinate;
@@ -44,23 +44,22 @@ public class TransitServiceResolver implements SiteResolver, StopResolver {
   }
 
   @Override
-  @Nullable
-  public WgsCoordinate findCoordinate(GenericLocation location) {
+  public Optional<WgsCoordinate> findCoordinate(GenericLocation location) {
     if (location.wgsCoordinate() != null) {
-      return location.wgsCoordinate();
+      return Optional.of(location.wgsCoordinate());
     }
     var id = location.stopId();
     if (id == null) {
-      return null;
+      return Optional.empty();
     }
     var stop = transitService.getStopLocation(id);
     if (stop != null) {
-      return stop.getCoordinate();
+      return Optional.of(stop.getCoordinate());
     }
     var group = transitService.getStopLocationsGroup(id);
     if (group != null) {
-      return group.getCoordinate();
+      return Optional.of(group.getCoordinate());
     }
-    return null;
+    return Optional.empty();
   }
 }

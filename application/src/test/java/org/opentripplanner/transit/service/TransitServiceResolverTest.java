@@ -1,10 +1,10 @@
 package org.opentripplanner.transit.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.model.GenericLocation;
@@ -57,29 +57,32 @@ class TransitServiceResolverTest {
       EXPLICIT.longitude(),
       null
     );
-    assertEquals(EXPLICIT, resolver.findCoordinate(location));
+    assertEquals(Optional.of(EXPLICIT), resolver.findCoordinate(location));
   }
 
   @Test
   void stopIdResolvesToStopCoordinate() {
     var result = resolver.findCoordinate(GenericLocation.fromStopId(STOP.getId()));
-    assertEquals(STOP.getCoordinate(), result);
+    assertEquals(Optional.of(STOP.getCoordinate()), result);
   }
 
   @Test
   void stationIdResolvesToStationCoordinate() {
     var result = resolver.findCoordinate(GenericLocation.fromStopId(STATION.getId()));
-    assertEquals(STATION.getCoordinate(), result);
+    assertEquals(Optional.of(STATION.getCoordinate()), result);
   }
 
   @Test
   void groupOfStationsIdResolvesToGroupCoordinate() {
     var result = resolver.findCoordinate(GenericLocation.fromStopId(GO_STATIONS.getId()));
-    assertEquals(GO_STATIONS.getCoordinate(), result);
+    assertEquals(Optional.of(GO_STATIONS.getCoordinate()), result);
   }
 
   @Test
-  void unknownStopIdResolvesToNull() {
-    assertNull(resolver.findCoordinate(GenericLocation.fromStopId(id("unknown"))));
+  void unknownStopIdResolvesToEmpty() {
+    assertEquals(
+      Optional.empty(),
+      resolver.findCoordinate(GenericLocation.fromStopId(id("unknown")))
+    );
   }
 }
