@@ -130,6 +130,12 @@ public class WalkStepBuilder {
     return this;
   }
 
+  public WalkStepBuilder withEdges(List<Edge> edges) {
+    this.edges.clear();
+    this.edges.addAll(edges);
+    return this;
+  }
+
   public WalkStepBuilder addEdge(Edge edge) {
     this.edges.add(edge);
     return this;
