@@ -24,7 +24,6 @@ public class DestinationArrival<T extends RaptorTripSchedule> implements Arrival
 
   private final ArrivalView<T> previous;
   private final RaptorAccessEgress egress;
-  private final boolean includesTransit;
 
   // The fields below are not final only to let a single probe be reused for qualification checks, see setProbeValues().
   private int iterationDepartureTime;
@@ -60,9 +59,6 @@ public class DestinationArrival<T extends RaptorTripSchedule> implements Arrival
     this.numberOfTransfers = previous.round() - 1 + egress.numberOfRides();
     this.c1 = previous.c1() + additionalC1;
     this.c2 = c2;
-    this.includesTransit = !(
-      previous.arrivedBy(ACCESS) && !previous.arrivedOnBoard() && egress.arrivedOnStreet()
-    );
   }
 
   /**
@@ -82,7 +78,6 @@ public class DestinationArrival<T extends RaptorTripSchedule> implements Arrival
   private DestinationArrival() {
     this.previous = null;
     this.egress = null;
-    this.includesTransit = true;
   }
 
   /**
@@ -126,10 +121,11 @@ public class DestinationArrival<T extends RaptorTripSchedule> implements Arrival
 
   /**
    * Return {@code true} if the arrival includes transit. Most arrivals do, but some don't, for
-   * example an access that arrives on-street, directly followed by an egress that starts on-street.
+   * example an access that arrives on-street, directly followed by an egress that arrives
+   * on-street.
    */
   public boolean includesTransit() {
-    return includesTransit;
+    return !(previous.arrivedBy(ACCESS) && !previous.arrivedOnBoard() && egress.arrivedOnStreet());
   }
 
   @Override
