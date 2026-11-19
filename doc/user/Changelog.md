@@ -70,6 +70,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Make explicit nulls in estimatedCalls filters behave as omitted instead of throwing [#8207](https://github.com/opentripplanner/OpenTripPlanner/pull/8207)
 - Add debugging layers for street and pathway edges [#8214](https://github.com/opentripplanner/OpenTripPlanner/pull/8214)
 - Build the debug client into the jar instead of publishing it to a CDN [#8151](https://github.com/opentripplanner/OpenTripPlanner/pull/8151)
+- Add destinationDisplay with headsign to StopCall in the GTFS GraphQL API [#8174](https://github.com/opentripplanner/OpenTripPlanner/pull/8174)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.10.0 (2026-09-09)
