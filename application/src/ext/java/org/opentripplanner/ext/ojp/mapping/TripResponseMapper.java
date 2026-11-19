@@ -180,8 +180,13 @@ public class TripResponseMapper {
     return baseLeg(index, tl).withTimedLeg(timedLeg);
   }
 
+  @Nullable
   private LegTrackStructure mapLegTrack(Leg tl) {
-    final var shape = mapShape(tl.legGeometry());
+    var geometry = tl.legGeometry();
+    if (geometry == null) {
+      return null;
+    }
+    final var shape = mapShape(geometry);
     return new LegTrackStructure().withTrackSection(
       new TrackSectionStructure().withDuration(tl.duration()).withLinkProjection(shape)
     );

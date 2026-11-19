@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
+import static org.opentripplanner.ext.ojp.mapping.TripResponseMapper.OptionalFeature.INTERMEDIATE_STOPS;
+import static org.opentripplanner.ext.ojp.mapping.TripResponseMapper.OptionalFeature.LEG_PROJECTIONS;
 
 import de.vdv.ojp20.LineDirectionFilterStructure;
 import de.vdv.ojp20.ModeAndModeOfOperationFilterStructure;
@@ -23,6 +25,7 @@ import de.vdv.ojp20.siri.StopPointRefStructure;
 import de.vdv.ojp20.siri.VehicleModesOfTransportEnumeration;
 import java.time.Duration;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -304,6 +307,42 @@ class RouteRequestMapperTest {
     var tripRequest = baseRequest().withParams(tripParamStructure);
 
     assertThrows(IllegalArgumentException.class, () -> mapper.map(tripRequest));
+  }
+
+  private static Stream<Arguments> optionalFeaturesCases() {
+    return Stream.of(
+      Arguments.of(null, Set.of()),
+      Arguments.of(new TripParamStructure(), Set.of()),
+      Arguments.of(
+        new TripParamStructure()
+          .withIncludeIntermediateStops(false)
+          .withIncludeLegProjection(false),
+        Set.of()
+      ),
+      Arguments.of(
+        new TripParamStructure().withIncludeIntermediateStops(true),
+        Set.of(INTERMEDIATE_STOPS)
+      ),
+      Arguments.of(
+        new TripParamStructure().withIncludeLegProjection(true),
+        Set.of(LEG_PROJECTIONS)
+      ),
+      Arguments.of(
+        new TripParamStructure().withIncludeIntermediateStops(true).withIncludeLegProjection(true),
+        Set.of(INTERMEDIATE_STOPS, LEG_PROJECTIONS)
+      )
+    );
+  }
+
+  @ParameterizedTest
+  @MethodSource("optionalFeaturesCases")
+  void optionalFeatures(
+    TripParamStructure params,
+    Set<TripResponseMapper.OptionalFeature> expected
+  ) {
+    var tripRequest = baseRequest().withParams(params);
+
+    assertEquals(expected, RouteRequestMapper.optionalFeatures(tripRequest));
   }
 
   private static OJPTripRequestStructure baseRequest() {
