@@ -3,7 +3,9 @@ package org.opentripplanner.ext.ojp.mapping;
 import static java.lang.Boolean.FALSE;
 import static java.time.ZoneOffset.UTC;
 import static org.opentripplanner.ext.ojp.mapping.TripResponseMapper.OptionalFeature.INTERMEDIATE_STOPS;
+import static org.opentripplanner.ext.ojp.mapping.TripResponseMapper.OptionalFeature.LEG_PROJECTIONS;
 
+import com.google.common.collect.ImmutableSet;
 import de.vdv.ojp20.ModeAndModeOfOperationFilterStructure;
 import de.vdv.ojp20.OJPTripRequestStructure;
 import de.vdv.ojp20.PlaceContextStructure;
@@ -14,6 +16,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
@@ -139,16 +142,25 @@ public class RouteRequestMapper {
   public static Set<TripResponseMapper.OptionalFeature> optionalFeatures(
     OJPTripRequestStructure tr
   ) {
-    var includeIntermediateStops = Optional.ofNullable(tr.getParams())
-      .map(TripParamStructure::isIncludeIntermediateStops)
+    var builder = ImmutableSet.<TripResponseMapper.OptionalFeature>builder();
+
+    if (optionalFeature(tr, TripParamStructure::isIncludeIntermediateStops)) {
+      builder.add(INTERMEDIATE_STOPS);
+    }
+    if (optionalFeature(tr, TripParamStructure::isIncludeLegProjection)) {
+      builder.add(LEG_PROJECTIONS);
+    }
+    return builder.build();
+  }
+
+  private static boolean optionalFeature(
+    OJPTripRequestStructure tr,
+    Function<TripParamStructure, Boolean> isIncludeIntermediateStops
+  ) {
+    return Optional.ofNullable(tr.getParams())
+      .map(isIncludeIntermediateStops)
       .filter(b -> !FALSE.equals(b))
       .isPresent();
-
-    if (includeIntermediateStops) {
-      return Set.of(INTERMEDIATE_STOPS);
-    } else {
-      return Set.of();
-    }
   }
 
   private static void addTime(

@@ -2,6 +2,7 @@ package org.opentripplanner.ext.ojp.mapping;
 
 import static org.opentripplanner.ext.ojp.mapping.JaxbElementMapper.jaxbElement;
 import static org.opentripplanner.ext.ojp.mapping.TextMapper.internationalText;
+import static org.opentripplanner.ext.ojp.mapping.TripResponseMapper.OptionalFeature.LEG_PROJECTIONS;
 
 import de.vdv.ojp20.ContinuousLegStructure;
 import de.vdv.ojp20.ContinuousServiceStructure;
@@ -9,6 +10,8 @@ import de.vdv.ojp20.LegAlightStructure;
 import de.vdv.ojp20.LegBoardStructure;
 import de.vdv.ojp20.LegIntermediateStructure;
 import de.vdv.ojp20.LegStructure;
+import de.vdv.ojp20.LegTrackStructure;
+import de.vdv.ojp20.LinearShapeStructure;
 import de.vdv.ojp20.OJP;
 import de.vdv.ojp20.OJPResponseStructure;
 import de.vdv.ojp20.OJPTripDeliveryStructure;
@@ -17,8 +20,10 @@ import de.vdv.ojp20.PlaceRefStructure;
 import de.vdv.ojp20.ServiceArrivalStructure;
 import de.vdv.ojp20.ServiceDepartureStructure;
 import de.vdv.ojp20.TimedLegStructure;
+import de.vdv.ojp20.TrackSectionStructure;
 import de.vdv.ojp20.TripResultStructure;
 import de.vdv.ojp20.TripStructure;
+import de.vdv.ojp20.siri.LocationStructure;
 import jakarta.xml.bind.JAXBElement;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -29,6 +34,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -46,6 +52,7 @@ public class TripResponseMapper {
 
   public enum OptionalFeature {
     INTERMEDIATE_STOPS,
+    LEG_PROJECTIONS,
   }
 
   private final StopRefMapper stopPointRefMapper;
@@ -115,16 +122,19 @@ public class TripResponseMapper {
   }
 
   private LegStructure mapStreetLeg(int index, StreetLeg sl) {
-    return baseLeg(index, sl).withContinuousLeg(
-      new ContinuousLegStructure()
-        .withLegStart(placeRef(sl.from()))
-        .withLegEnd(placeRef(sl.to()))
-        .withTimeWindowStart(new XmlDateTime(sl.startTime()))
-        .withTimeWindowEnd(new XmlDateTime(sl.endTime()))
-        .withDuration(sl.duration())
-        .withLength((int) sl.distanceMeters())
-        .withService(mapContinuousService(sl))
-    );
+    var cl = new ContinuousLegStructure()
+      .withLegStart(placeRef(sl.from()))
+      .withLegEnd(placeRef(sl.to()))
+      .withTimeWindowStart(new XmlDateTime(sl.startTime()))
+      .withTimeWindowEnd(new XmlDateTime(sl.endTime()))
+      .withDuration(sl.duration())
+      .withLength((int) sl.distanceMeters())
+      .withService(mapContinuousService(sl));
+
+    if (optionalFeatures.contains(LEG_PROJECTIONS)) {
+      cl.withLegTrack(mapLegTrack(sl));
+    }
+    return baseLeg(index, sl).withContinuousLeg(cl);
   }
 
   private static ContinuousServiceStructure mapContinuousService(StreetLeg sl) {
@@ -164,7 +174,28 @@ public class TripResponseMapper {
     if (optionalFeatures.contains(OptionalFeature.INTERMEDIATE_STOPS)) {
       timedLeg.withLegIntermediate(mapIntermediateStops(tl.listIntermediateStops()));
     }
+    if (optionalFeatures.contains(LEG_PROJECTIONS)) {
+      timedLeg.withLegTrack(mapLegTrack(tl));
+    }
     return baseLeg(index, tl).withTimedLeg(timedLeg);
+  }
+
+  private LegTrackStructure mapLegTrack(Leg tl) {
+    final var shape = mapShape(tl.legGeometry());
+    return new LegTrackStructure().withTrackSection(
+      new TrackSectionStructure().withDuration(tl.duration()).withLinkProjection(shape)
+    );
+  }
+
+  private static LinearShapeStructure mapShape(LineString lineString) {
+    var shape = new LinearShapeStructure();
+    var seq = lineString.getCoordinateSequence();
+    for (int index = 0; index < seq.size(); index++) {
+      shape
+        .getPosition()
+        .add(new LocationStructure().withLatitude(seq.getY(index)).withLongitude(seq.getX(index)));
+    }
+    return shape;
   }
 
   private List<LegIntermediateStructure> mapIntermediateStops(List<StopArrival> sas) {

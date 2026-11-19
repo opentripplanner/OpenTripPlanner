@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.ojp.mapping;
 
 import de.vdv.ojp20.InternationalTextStructure;
-import de.vdv.ojp20.siri.DefaultedTextStructure;
 import de.vdv.ojp20.siri.NaturalLanguageStringStructure;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.i18n.I18NString;
