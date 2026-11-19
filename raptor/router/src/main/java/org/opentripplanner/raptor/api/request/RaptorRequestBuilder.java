@@ -11,7 +11,6 @@ import org.opentripplanner.raptor.spi.SearchDirection;
 /**
  * This is a Request builder to help construct valid requests. Se the request classes for
  * documentation on each parameter.
- * <p>
  * <ul>
  *   <li>{@link RaptorRequest}
  *   <li>{@link DebugRequest}
@@ -151,14 +150,17 @@ public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
     if (searchDirection.isInReverse()) {
       name += "-Rev";
     }
+
     if (Optimization.PARALLEL.isOneOf(optimizations)) {
       // Run search in parallel
       name += "-LL";
     }
+
     if (Optimization.PARETO_CHECK_AGAINST_DESTINATION.isOneOf(optimizations)) {
       // Heuristic to prune on pareto optimal Destination arrivals
       name += "-DP";
     }
+
     return name;
   }
 

@@ -30,8 +30,10 @@ public class AllowNarrowedTransitModeFilterTest {
 
   @Test
   void match() {
-    // filter.match will always be called with either netexSubmode == SubMode.UNKNOWN or gtfsExtendedType == null
-    // depending on the data source type. Both can be true if the data is from a GTFS source and the extended
+    // filter.match will always be called with either netexSubmode == SubMode.UNKNOWN or
+    // gtfsExtendedType == null
+    // depending on the data source type. Both can be true if the data is from a GTFS source and the
+    // extended
     // type just happens to be not set.
     assertTrue(fullFilter.match(TransitMode.BUS, LOCAL_BUS, null));
     assertTrue(fullFilter.match(TransitMode.BUS, SubMode.UNKNOWN, 714));

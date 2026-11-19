@@ -352,9 +352,11 @@ class OsmWayTest {
   @MethodSource("createRampAsTurnLaneCases")
   void rampAsTurnLane(String turnValue, boolean oneWay, boolean expected) {
     var builder = WayTestData.motorwayRamp().copy();
+
     if (oneWay) {
       builder.withTag("oneway", "yes");
     }
+
     builder.withTag("turn:lanes", turnValue);
     var ramp = builder.build();
 

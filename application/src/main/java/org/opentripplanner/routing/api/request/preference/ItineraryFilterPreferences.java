@@ -11,7 +11,6 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * Group by Similarity filter parameters. See the configuration for documentation of each field.
- *
  * <p>
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */
@@ -200,9 +199,11 @@ public final class ItineraryFilterPreferences {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     ItineraryFilterPreferences that = (ItineraryFilterPreferences) o;
     return (
       accessibilityScore == that.accessibilityScore &&

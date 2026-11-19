@@ -7,7 +7,7 @@ import org.opentripplanner.core.model.doc.DocumentedEnum;
 
 /**
  * This is temporary and will be removed in a future version of OTP.
- *
+ * <p>
  * Enum to specify the type of rental data that is allowed to be read from the data source.
  */
 public enum RentalPickupType implements DocumentedEnum<RentalPickupType> {

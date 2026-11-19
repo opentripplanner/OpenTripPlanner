@@ -77,6 +77,7 @@ class GraphBuildCacheManagerTest {
     // Write a file with a mismatched version ID directly — simulates a stale cache from an
     // older OTP build. The manager must reject it and return null rather than using stale data.
     var entry = new DirectoryDataSource(tempDir, FileType.UNKNOWN).entry(ELEVATION.cacheFileName());
+
     try (var output = new Output(entry.asOutputStream())) {
       KryoBuilder.create().writeClassAndObject(
         output,
@@ -92,6 +93,7 @@ class GraphBuildCacheManagerTest {
   @Test
   void loadReturnsNullOnCorruptFile() throws IOException {
     var cacheFile = new File(tempDir, ELEVATION.cacheFileName());
+
     try (var out = new FileOutputStream(cacheFile)) {
       out.write(new byte[] { 0x01, 0x02, 0x03, 0x04, 0x05 });
     }

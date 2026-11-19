@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Utility class for parsing OpenStreetMap format opening hours into {@link OHCalendar}.
- *
+ * <p>
  * Part of the code is copied from https://github.com/leonardehrenfried/opening-hours-evaluator
  */
 public class OsmOpeningHoursParser {
@@ -107,9 +107,11 @@ public class OsmOpeningHoursParser {
   public OHCalendar parseOpeningHours(String openingHoursTag, String id, String link)
     throws OpeningHoursParseException {
     ZoneId zoneId = zoneIdSupplier.get();
+
     if (zoneId == null) {
       return null;
     }
+
     return parseOpeningHours(openingHoursTag, id, link, zoneId);
   }
 
@@ -129,6 +131,7 @@ public class OsmOpeningHoursParser {
     List<OHCalendarBuilder.OpeningHoursBuilder> openingHoursBuilders = new ArrayList<>();
     rulesWithoutFallback.forEach(rule -> {
       List<OHCalendarBuilder.OpeningHoursBuilder> openingHoursBuildersForRule = new ArrayList<>();
+
       if (is247Rule(rule)) {
         openingHoursBuildersForRule.add(createOHCalendarBuilderForOpen247(calendarBuilder));
       } else if (rule.getYears() != null) {
@@ -144,6 +147,7 @@ public class OsmOpeningHoursParser {
           createOHCalendarBuildersForDayRanges(calendarBuilder, rule)
         );
       }
+
       if (isClosedRule(rule) && hasTimes(rule)) {
         // Regardless if the rules is additive or not, we should handle it as such if it closes
         // the object for a time range https://github.com/opening-hours/opening_hours.js/issues/53.
@@ -155,13 +159,15 @@ public class OsmOpeningHoursParser {
       } else if (!rule.isAdditive()) {
         openingHoursBuildersForRule
           .stream()
-          // If a builder is after midnight, there is always another one that can be used to set days
+          // If a builder is after midnight, there is always another one that can be used to set
+          // days
           // off in other builders without having to shift the days in two directions
           .filter(openingHoursBuilder -> !openingHoursBuilder.isAfterMidnight())
           .forEach(openingHoursBuilder ->
             editPreviousBuilders(openingHoursBuilder, openingHoursBuilders)
           );
       }
+
       if (isOpenRule(rule)) {
         openingHoursBuilders.addAll(
           openingHoursBuildersForRule
@@ -198,7 +204,6 @@ public class OsmOpeningHoursParser {
    * Creates a {@link OHCalendarBuilder.OpeningHoursBuilder} that is open according to the
    * {@link TimeSpan} in the rule on the days defined in the rule's {@link DateRange} and
    * {@link WeekDayRange}.
-   *
    * <p>
    * TODO there are some unhandled things here
    */
@@ -220,6 +225,7 @@ public class OsmOpeningHoursParser {
                 dateRange.toString(),
                 weekDayRange.toString()
               );
+
               if (rule.getTimes() != null) {
                 return rule
                   .getTimes()
@@ -236,9 +242,11 @@ public class OsmOpeningHoursParser {
                       )
                   );
               }
+
               return Stream.of();
             });
         }
+
         return Stream.of();
       })
       .collect(Collectors.toList());
@@ -247,7 +255,6 @@ public class OsmOpeningHoursParser {
   /**
    * Sets provided {@link WeekDayRange} to be open according to the {@link DateRange} on a
    * {@link OHCalendarBuilder.OpeningHoursBuilder}.
-   *
    * <p>
    * TODO there are a lot of unhandled things here
    */
@@ -258,10 +265,12 @@ public class OsmOpeningHoursParser {
   ) {
     var startDate = dateRange.getStartDate();
     var endDate = dateRange.getEndDate();
+
     if (weekDayRange != null) {
       if (weekDayRange.getStartDay() == null || startDate == null || startDate.getMonth() == null) {
         return openingHoursBuilder;
       }
+
       DayOfWeek startDayOfWeek = DAY_OF_WEEK_MAP.getOrDefault(weekDayRange.getStartDay(), null);
       DayOfWeek endDayOfWeek =
         weekDayRange.getEndDay() != null
@@ -274,6 +283,7 @@ public class OsmOpeningHoursParser {
           : null;
       openingHoursBuilder.on(startMonth, endMonth, startDayOfWeek, endDayOfWeek);
     }
+
     return openingHoursBuilder;
   }
 
@@ -289,6 +299,7 @@ public class OsmOpeningHoursParser {
     if (rule.getTimes() == null) {
       return createOHCalendarBuildersForOpen24DayRanges(calendarBuilder, rule.getDays());
     }
+
     return rule
       .getDays()
       .stream()
@@ -310,7 +321,6 @@ public class OsmOpeningHoursParser {
 
   /**
    * Sets provided weekday(s) to be open on a {@link OHCalendarBuilder.OpeningHoursBuilder}.
-   *
    * <p>
    * TODO there are a some unhandled things here
    */
@@ -321,7 +331,9 @@ public class OsmOpeningHoursParser {
     if (weekDayRange.getStartDay() == null) {
       return openingHoursBuilder;
     }
+
     DayOfWeek startDayOfWeek = DAY_OF_WEEK_MAP.getOrDefault(weekDayRange.getStartDay(), null);
+
     if (weekDayRange.getEndDay() != null) {
       return openingHoursBuilder.on(
         startDayOfWeek,
@@ -343,9 +355,11 @@ public class OsmOpeningHoursParser {
     TimeSpan timeSpan
   ) {
     if (timeSpan.getStart() < 0) {
-      // TODO We filter out timespans that have events like "sunrise-sunset" but maybe they could be implemented
+      // TODO We filter out timespans that have events like "sunrise-sunset" but maybe they could be
+      // implemented
       return List.of();
     }
+
     if (timeSpan.getEnd() > 1440) {
       return List.of(
         calendarBuilder.openingHours(description, getStartTime(timeSpan.getStart()), LocalTime.MAX),
@@ -357,6 +371,7 @@ public class OsmOpeningHoursParser {
         )
       );
     }
+
     return List.of(
       calendarBuilder.openingHours(
         description,
@@ -408,7 +423,7 @@ public class OsmOpeningHoursParser {
    * </pre>
    *
    * @return a list of new {@link OHCalendarBuilder.OpeningHoursBuilder} created while splitting
-   *         existing builders.
+   *     existing builders.
    */
   private List<OHCalendarBuilder.OpeningHoursBuilder> splitPreviousBuilders(
     OHCalendarBuilder.OpeningHoursBuilder closedOpeningHoursBuilder,
@@ -440,15 +455,15 @@ public class OsmOpeningHoursParser {
     if (endTimeMinutes < 0) {
       return LocalTime.MAX;
     }
+
     return LocalTime.ofSecondOfDay(Math.min(endTimeMinutes * 60, 86399));
   }
 
   /**
    * Checks if rule doesn't have any modifiers or if the modifier is open or unknown.
-   *
    * <p>
-   * TODO if a modifier only has a comment (such as "by appointment"), we don't consider the rule
-   * to be of the open type but maybe we should
+   * TODO if a modifier only has a comment (such as "by appointment"), we don't consider the rule to
+   * be of the open type but maybe we should
    */
   private boolean isOpenRule(Rule rule) {
     var modifier = rule.getModifier();
@@ -472,10 +487,9 @@ public class OsmOpeningHoursParser {
 
   /**
    * Checks if rule has times defined and there is a {@link TimeSpan} definition with start time.
-   *
    * <p>
-   * TODO We filter out {@link TimeSpan} that have events like "sunrise-sunset" but maybe they
-   * could be implemented
+   * TODO We filter out {@link TimeSpan} that have events like "sunrise-sunset" but maybe they could
+   * be implemented
    */
   private boolean hasTimes(Rule rule) {
     return (
@@ -524,6 +538,7 @@ public class OsmOpeningHoursParser {
             ohTag,
             id
           );
+
     if (issueStore != null) {
       issueStore.add("UnhandledOHRule", message);
     } else {

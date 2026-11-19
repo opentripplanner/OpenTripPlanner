@@ -46,6 +46,7 @@ public class ExpressionBuilder<T> {
     if (filterValues.includeEverything()) {
       return this;
     }
+
     matchers.add(
       new NegationMatcher<>(
         "matchesNone",

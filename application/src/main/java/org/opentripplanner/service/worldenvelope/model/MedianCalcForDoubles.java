@@ -15,6 +15,7 @@ class MedianCalcForDoubles {
     if (size <= 0) {
       throw new IllegalStateException("The set must contain at least one element. n: " + size);
     }
+
     this.array = new double[size];
   }
 
@@ -31,11 +32,13 @@ class MedianCalcForDoubles {
 
   public double median() {
     int n = array.length;
+
     if (index != n) {
       throw new IllegalStateException(
         "The correct number of values are not added. Index: " + index + ", n: " + n
       );
     }
+
     Arrays.sort(array);
 
     if (n % 2 == 1) {

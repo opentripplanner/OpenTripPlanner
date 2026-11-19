@@ -88,15 +88,19 @@ public enum RaptorModuleTestConfig {
     RaptorRequestBuilder<T> builder
   ) {
     builder.profile(profile);
+
     if (oneIteration) {
       builder.searchParams().searchOneIterationOnly();
     }
+
     if (reverse) {
       builder.searchDirection(SearchDirection.REVERSE);
     }
+
     if (this == TC_MULTI_CRITERIA_DEST_PRUNING) {
       builder.enableOptimization(Optimization.PARETO_CHECK_AGAINST_DESTINATION);
     }
+
     return builder;
   }
 }

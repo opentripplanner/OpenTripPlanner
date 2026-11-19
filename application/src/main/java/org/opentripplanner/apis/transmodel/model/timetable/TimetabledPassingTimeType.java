@@ -112,9 +112,11 @@ public class TimetabledPassingTimeType {
           .dataFetcher(environment -> {
             TripTimeOnDate tripTimeOnDate = environment.getSource();
             FlexTrip<?, ?> flexTrip = getFlexTrip(environment, tripTimeOnDate);
+
             if (flexTrip == null) {
               return null;
             }
+
             return missingValueToNull(
               flexTrip.earliestDepartureTime(tripTimeOnDate.getStopPosition())
             );
@@ -131,9 +133,11 @@ public class TimetabledPassingTimeType {
           .dataFetcher(environment -> {
             TripTimeOnDate tripTimeOnDate = environment.getSource();
             FlexTrip<?, ?> flexTrip = getFlexTrip(environment, tripTimeOnDate);
+
             if (flexTrip == null) {
               return null;
             }
+
             return missingValueToNull(flexTrip.latestArrivalTime(tripTimeOnDate.getStopPosition()));
           })
           .build()
@@ -184,6 +188,7 @@ public class TimetabledPassingTimeType {
     if (OTPFeature.FlexRouting.isOff()) {
       return null;
     }
+
     return GqlUtil.getTransitService(environment)
       .getFlexIndex()
       .getTripById(tripTimeOnDate.getTrip().getId());

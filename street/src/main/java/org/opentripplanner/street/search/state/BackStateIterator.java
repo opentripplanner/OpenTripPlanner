@@ -24,6 +24,7 @@ class BackStateIterator implements Iterator<State> {
     if (!hasNext()) {
       throw new NoSuchElementException("No more back states available");
     }
+
     var ret = current;
     current = current.getBackState();
     return ret;

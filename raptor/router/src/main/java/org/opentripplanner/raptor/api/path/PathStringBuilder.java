@@ -29,7 +29,7 @@ public class PathStringBuilder {
 
   /**
    * @param stopNameResolver Used to translate stopIndexes to stopNames, if {@code null} the index
-   *                         is used in the result string.
+   *     is used in the result string.
    */
   public PathStringBuilder(@Nullable RaptorStopNameResolver stopNameResolver) {
     this.stopNameResolver = RaptorStopNameResolver.nullSafe(stopNameResolver);
@@ -59,6 +59,7 @@ public class PathStringBuilder {
     if (leg.isFree()) {
       return this;
     }
+
     return legSep().text(leg.asString(false, false, null));
   }
 
@@ -83,6 +84,7 @@ public class PathStringBuilder {
     if (c1 == RaptorCostCalculator.ZERO_COST) {
       return this;
     }
+
     return text(C1.format(c1));
   }
 
@@ -90,6 +92,7 @@ public class PathStringBuilder {
     if (c2 == RaptorConstants.NOT_SET) {
       return this;
     }
+
     return text(C2.format(c2));
   }
 
@@ -97,6 +100,7 @@ public class PathStringBuilder {
     if (wtc == defaultValue) {
       return this;
     }
+
     return text(WAIT_TIME_COST.format(wtc));
   }
 
@@ -104,6 +108,7 @@ public class PathStringBuilder {
     if (transferPriorityCost == defaultValue) {
       return this;
     }
+
     return text(TRANSFER_PRIORITY.format(transferPriorityCost));
   }
 
@@ -149,6 +154,7 @@ public class PathStringBuilder {
     if (appendToSummary != null) {
       appendToSummary.accept(this);
     }
+
     return summaryEnd();
   }
 
@@ -178,6 +184,7 @@ public class PathStringBuilder {
     if (addPadding) {
       text("~");
     }
+
     return this;
   }
 
@@ -185,6 +192,7 @@ public class PathStringBuilder {
     if (addPadding) {
       buf.append(' ');
     }
+
     return this;
   }
 

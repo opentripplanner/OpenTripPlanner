@@ -91,17 +91,19 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
 
   private RoutingStrategy<T> createWorkerStrategy() {
     return switch (ctx.profile()) {
-      case STANDARD, BEST_TIME -> new ArrivalTimeRoutingStrategy<>(
-        resolveState(),
-        ctx.createTimeBasedBoardingSupport(),
-        ctx.calculator()
-      );
-      case MIN_TRAVEL_DURATION -> new MinTravelDurationRoutingStrategy<>(
-        resolveState(),
-        ctx.createTimeBasedBoardingSupport(),
-        ctx.calculator(),
-        ctx.lifeCycle()
-      );
+      case STANDARD, BEST_TIME
+        -> new ArrivalTimeRoutingStrategy<>(
+          resolveState(),
+          ctx.createTimeBasedBoardingSupport(),
+          ctx.calculator()
+        );
+      case MIN_TRAVEL_DURATION
+        -> new MinTravelDurationRoutingStrategy<>(
+          resolveState(),
+          ctx.createTimeBasedBoardingSupport(),
+          ctx.calculator(),
+          ctx.lifeCycle()
+        );
       case MULTI_CRITERIA -> throw new IllegalArgumentException(ctx.profile().toString());
     };
   }
@@ -120,6 +122,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
         StdWorkerState.class
       );
     }
+
     return (StdRangeRaptorWorkerState<T>) state;
   }
 
@@ -130,6 +133,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
     if (bestTimes == null) {
       bestTimes = new BestTimes(ctx.nStops(), ctx.calculator(), ctx.lifeCycle());
     }
+
     return bestTimes;
   }
 
@@ -208,6 +212,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
       // Default to simple version
       withArrivedAtDestinationCheck(createSimpleArrivedAtDestinationCheck());
     }
+
     return arrivedAtDestinationCheck;
   }
 
@@ -227,6 +232,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
         )
       );
     }
+
     return stopArrivals;
   }
 
@@ -243,6 +249,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
     if (bestNumberOfTransfers == null) {
       withBestNumberOfTransfers(createSimpleBestNumberOfTransfers());
     }
+
     return bestNumberOfTransfers;
   }
 
@@ -279,6 +286,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
     if (!ctx.earlyTransferPruning()) {
       return null;
     }
+
     return new StdTransferEarlyPruning<T>(
       egressPaths().listAll(),
       ctx.nRounds(),
@@ -314,13 +322,16 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
             "."
         );
       }
+
       if (oneOfInstanceTypes.contains(type)) {
         throw new IllegalStateException(
           "An instance for is already initialized for type: " + type.getSimpleName()
         );
       }
+
       oneOfInstanceTypes.add(type);
     }
+
     return instance;
   }
 }

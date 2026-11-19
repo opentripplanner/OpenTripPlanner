@@ -11,12 +11,12 @@ import org.opentripplanner.street.search.state.State;
  * which solutions are retained. In the general case, one branch does not necessarily win out over
  * the other, i.e. multiple states can coexist at a single Vertex.
  * <p>
- * Even functions where one state always wins (least weight, fastest travel time) are applied
- * within a multi-state shortest path tree because bike rental, car or bike parking, and turn
- * restrictions all require multiple incomparable states at the same vertex. These need the graph to
- * be "replicated" into separate layers, which is achieved by applying the main dominance logic
- * (lowest weight, lowest cost, Pareto) conditionally, only when the two states have identical
- * bike/car/turn direction status.
+ * Even functions where one state always wins (least weight, fastest travel time) are applied within
+ * a multi-state shortest path tree because bike rental, car or bike parking, and turn restrictions
+ * all require multiple incomparable states at the same vertex. These need the graph to be
+ * "replicated" into separate layers, which is achieved by applying the main dominance logic (lowest
+ * weight, lowest cost, Pareto) conditionally, only when the two states have identical bike/car/turn
+ * direction status.
  * <p>
  * Dominance functions are serializable so that routing requests may passed between machines in
  * different JVMs, for instance in OTPA Cluster.
@@ -31,7 +31,8 @@ public abstract class DominanceFunctions implements Serializable, DominanceFunct
    */
   @Override
   public boolean betterOrEqualAndComparable(State a, State b) {
-    // Does one state represent riding a rented bike and the other represent walking before/after rental?
+    // Does one state represent riding a rented bike and the other represent walking before/after
+    // rental?
     if (!a.isCompatibleVehicleRentalState(b)) {
       return false;
     }
@@ -44,7 +45,8 @@ public abstract class DominanceFunctions implements Serializable, DominanceFunct
       }
     }
 
-    // Does one state represent driving a vehicle and the other represent walking after the vehicle was parked?
+    // Does one state represent driving a vehicle and the other represent walking after the vehicle
+    // was parked?
     if (a.isVehicleParked() != b.isVehicleParked()) {
       return false;
     }
@@ -156,10 +158,13 @@ public abstract class DominanceFunctions implements Serializable, DominanceFunct
 
     @Override
     public boolean betterOrEqual(State a, State b) {
-      // The key problem in pareto-dominance in OTP is that the elements of the state vector are not orthogonal.
+      // The key problem in pareto-dominance in OTP is that the elements of the state vector are not
+      // orthogonal.
       // When walk distance increases, weight increases. When time increases weight increases.
-      // It's easy to get big groups of very similar states that don't represent significantly different outcomes.
-      // Our solution to this is to give existing states some slack to dominate new states more easily.
+      // It's easy to get big groups of very similar states that don't represent significantly
+      // different outcomes.
+      // Our solution to this is to give existing states some slack to dominate new states more
+      // easily.
 
       final double EPSILON = 1e-4;
       return (

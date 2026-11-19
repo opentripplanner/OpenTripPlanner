@@ -59,6 +59,7 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
 
     if (target.getDegreeIn() == 1) {
       Edge edge = target.getIncoming().iterator().next();
+
       if (edge instanceof FreeEdge) {
         target = edge.getFromVertex();
       }
@@ -81,8 +82,10 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
       lon
     );
 
-    // After parking or finishing the rental of a vehicle, you can't ever move faster than walking speed.
+    // After parking or finishing the rental of a vehicle, you can't ever move faster than walking
+    // speed.
     boolean useWalkSpeed;
+
     if (arriveBy) {
       useWalkSpeed = s.getVehicleRentalState() == VehicleRentalState.BEFORE_RENTING;
     } else {
@@ -157,13 +160,14 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
       case SHORTEST_DURATION -> 1.0;
       case SAFE_STREETS -> safety;
       case FLAT_STREETS -> 1.0;
-      case TRIANGLE -> scaleSafety(
-        safety,
-        Objects.requireNonNull(
-          triangle,
-          "triangle must not be null if vehicleRoutingOptimizeType is TRIANGLE."
-        ).safety()
-      );
+      case TRIANGLE
+        -> scaleSafety(
+          safety,
+          Objects.requireNonNull(
+            triangle,
+            "triangle must not be null if vehicleRoutingOptimizeType is TRIANGLE."
+          ).safety()
+        );
     };
   }
 

@@ -32,10 +32,10 @@ public interface CompositeDataSource extends DataSource, Closeable {
   DataSource entry(String name);
 
   /**
-   * Release the resources held by this data source, like the in-memory copy of a streamed zip
-   * file. The content is not available after the data source is closed, an implementation may
-   * throw an {@link IllegalStateException} if it is accessed again. Closing a data source more
-   * than once has no effect.
+   * Release the resources held by this data source, like the in-memory copy of a streamed zip file.
+   * The content is not available after the data source is closed, an implementation may throw an
+   * {@link IllegalStateException} if it is accessed again. Closing a data source more than once has
+   * no effect.
    */
   @Override
   void close() throws IOException;

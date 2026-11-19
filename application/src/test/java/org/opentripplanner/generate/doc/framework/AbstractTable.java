@@ -52,12 +52,15 @@ abstract class AbstractTable {
       if (skipNodes.skipDetails(it) || skipNodes.skipDetailsForNestedElements(it)) {
         continue;
       }
+
       if (!it.type().isComplex()) {
         continue;
       }
+
       if (it.type() == ENUM_SET) {
         continue;
       }
+
       //noinspection ConstantConditions
       if (it.type() == ENUM_MAP && it.elementType().isSimple()) {
         continue;
@@ -80,9 +83,11 @@ abstract class AbstractTable {
 
     for (String childName : node.listChildrenByName()) {
       NodeAdapter child = node.child(childName);
+
       if (!skipNestedObjectRow) {
         addRow(node, table, info.arraysChild());
       }
+
       addParametersToTable(child, table);
     }
   }
@@ -93,12 +98,15 @@ abstract class AbstractTable {
     if (info.isTypeQualifier()) {
       parameter += " = " + info.toMarkdownString(node.typeQualifier());
     }
+
     var link = skipNodes.linkOverview(info);
+
     if (link.isPresent()) {
       parameter = MarkdownFormatter.linkToDoc(info.name(), link.get());
     } else if (info.printDetails()) {
       parameter = MarkdownFormatter.linkToAnchor(parameter, anchor(node, parameter));
     }
+
     int indentLevel = node.level() - rootLevel;
     return MarkdownFormatter.indentInTable(indentLevel) + parameter;
   }
@@ -112,6 +120,7 @@ abstract class AbstractTable {
     if (info.defaultValue() == null) {
       return "";
     }
+
     var defaultValue = info.type().quote(info.defaultValue());
     return escapeInTable(code(defaultValue));
   }

@@ -19,8 +19,7 @@ class RequestStreetModesMapper {
   /**
    * Maps GraphQL Modes input type to RequestModes.
    * <p>
-   * This only maps access, egress, direct & transfer modes. Transport modes are set using
-   * filters.
+   * This only maps access, egress, direct & transfer modes. Transport modes are set using filters.
    */
   static RequestModes mapRequestStreetModes(Map<String, ?> modesInput) {
     RequestModesBuilder mBuilder = RequestModes.of();
@@ -29,8 +28,10 @@ class RequestStreetModesMapper {
     ensureValueAndSet(accessMode, mBuilder::withAccessMode);
     ensureValueAndSet((StreetMode) modesInput.get(EGRESS_MODE_KEY), mBuilder::withEgressMode);
     ensureValueAndSet((StreetMode) modesInput.get(DIRECT_MODE_KEY), mBuilder::withDirectMode);
-    // The only cases in which the transferMode isn't WALK are when the accessMode is either BIKE or CAR.
-    // In these cases, the transferMode is the same as the accessMode. This check is not strictly necessary
+    // The only cases in which the transferMode isn't WALK are when the accessMode is either BIKE or
+    // CAR.
+    // In these cases, the transferMode is the same as the accessMode. This check is not strictly
+    // necessary
     // if there is a need for more freedom for specifying the transferMode.
     Optional.ofNullable(accessMode).filter(IS_BIKE_OR_CAR).ifPresent(mBuilder::withTransferMode);
 

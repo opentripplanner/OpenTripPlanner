@@ -15,24 +15,25 @@ import org.opentripplanner.transit.model.organization.ContactInfo;
 /**
  * Represents a driver's carpool journey with planned route, timing, and passenger capacity.
  * <p>
- * A carpool trip models a driver offering their vehicle journey for passengers to join. It
- * includes the driver's planned route as a sequence of stops, total vehicle capacity, and timing
- * constraints including a deviation budget that allows the driver to slightly adjust their route to
- * accommodate passengers.
+ * A carpool trip models a driver offering their vehicle journey for passengers to join. It includes
+ * the driver's planned route as a sequence of stops, total vehicle capacity, and timing constraints
+ * including a deviation budget that allows the driver to slightly adjust their route to accommodate
+ * passengers.
  *
  * <h2>Core Concepts</h2>
  * <ul>
- *   <li><strong>Origin/Destination Areas:</strong> Start and end zones for the driver's journey</li>
- *   <li><strong>Stops:</strong> Ordered sequence of waypoints along the route where passengers can be
- *       picked up or dropped off. Stops are dynamically updated as bookings occur.</li>
+ *   <li><strong>Origin/Destination Areas:</strong> Start and end zones for the driver's
+ *       journey</li>
+ *   <li><strong>Stops:</strong> Ordered sequence of waypoints along the route where passengers can
+ *       be picked up or dropped off. Stops are dynamically updated as bookings occur.</li>
  *   <li><strong>Total Capacity:</strong> Number of seats in the car, including the driver seat</li>
  * </ul>
  *
  * <h2>Data Source</h2>
  * <p>
- * Trips are typically created from SIRI-ET messages provided by external carpooling platforms.
- * The platform manages driver registrations, trip creation, and real-time updates as passengers
- * book or cancel rides.
+ * Trips are typically created from SIRI-ET messages provided by external carpooling platforms. The
+ * platform manages driver registrations, trip creation, and real-time updates as passengers book or
+ * cancel rides.
  *
  * <h2>Immutability</h2>
  * <p>
@@ -45,8 +46,9 @@ import org.opentripplanner.transit.model.organization.ContactInfo;
  * The routing algorithm uses trips to find compatible matches for passenger requests:
  * <ol>
  *   <li>Filters check basic compatibility (capacity, timing, direction)</li>
- *   <li>Insertion strategy finds optimal pickup/dropoff positions along the route, keeping every leg
- *       the passenger rides within capacity and every later stop within its deviation budget</li>
+ *   <li>Insertion strategy finds optimal pickup/dropoff positions along the route, keeping every
+ *       leg the passenger rides within capacity and every later stop within its deviation
+ *       budget</li>
  * </ol>
  *
  * @see CarpoolStop for individual stop details
@@ -81,20 +83,26 @@ public class CarpoolTrip
     this.provider = builder.provider();
     this.totalCapacity = builder.totalCapacity();
     this.stops = Collections.unmodifiableList(builder.stops());
+
     if (stops.size() < 2) {
       throw new IllegalArgumentException(
         "Carpool trip " + getId() + " must contain at least an origin and a destination stop"
       );
     }
+
     this.legDeviationBudgets = new Duration[stops.size() - 1];
     var budget = stops.getLast().getDeviationBudget();
+
     for (int leg = legDeviationBudgets.length - 1; leg >= 0; leg--) {
       var stopBudget = stops.get(leg + 1).getDeviationBudget();
+
       if (stopBudget.compareTo(budget) < 0) {
         budget = stopBudget;
       }
+
       legDeviationBudgets[leg] = budget;
     }
+
     this.publicContactInformation = builder.publicContactInformation();
   }
 
@@ -150,7 +158,7 @@ public class CarpoolTrip
    * element is the origin and the last is the destination.
    *
    * @return an immutable list of stops along the carpool route, in visit order; never null, and
-   *         always contains at least the origin and destination
+   *     always contains at least the origin and destination
    */
   public List<CarpoolStop> stops() {
     return stops;
@@ -164,8 +172,8 @@ public class CarpoolTrip
   /**
    * Builds the full list of route points including origin area, all stops, and destination area.
    * <p>
-   * This list represents the complete path of the carpool trip, useful for distance and
-   * direction calculations during filtering and matching.
+   * This list represents the complete path of the carpool trip, useful for distance and direction
+   * calculations during filtering and matching.
    *
    * @return a list of coordinates representing the full route of the trip
    */
@@ -227,11 +235,13 @@ public class CarpoolTrip
     if (stops.size() != otherStops.size()) {
       return false;
     }
+
     for (int i = 0; i < stops.size(); i++) {
       if (!stops.get(i).sameAs(otherStops.get(i))) {
         return false;
       }
     }
+
     return true;
   }
 

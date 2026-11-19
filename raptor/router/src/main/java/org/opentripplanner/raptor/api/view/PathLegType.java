@@ -2,7 +2,6 @@ package org.opentripplanner.raptor.api.view;
 
 /**
  * In Raptor each leg can be either access, transit, transfer or egress.
- *
  */
 public enum PathLegType {
   /**

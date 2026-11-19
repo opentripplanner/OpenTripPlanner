@@ -94,11 +94,13 @@ public final class PassengerTrees {
    */
   Duration limit(Vertex point, Direction direction) {
     var limit = Duration.ZERO;
+
     for (var trip : trips) {
       for (int leg = 0; leg < trip.corridor().legCount(); leg++) {
         limit = max(limit, legReach(trip, leg, point, direction));
       }
     }
+
     return min(limit, maxTree);
   }
 
@@ -112,17 +114,21 @@ public final class PassengerTrees {
    */
   Map<Vertex, Duration> waypointReach(Vertex point, Direction direction, boolean pickup) {
     var reach = new HashMap<Vertex, Duration>();
+
     for (var trip : trips) {
       var stops = trip.vertices();
       int stopNeverNeeded = pickup ? stops.size() - 1 : 0;
+
       for (int leg = 0; leg < trip.corridor().legCount(); leg++) {
         int farStop = direction == Direction.FROM ? leg + 1 : leg;
         var legReach = legReach(trip, leg, point, direction);
+
         if (farStop != stopNeverNeeded && !legReach.isNegative()) {
           reach.merge(stops.get(farStop), legReach, PassengerTrees::max);
         }
       }
     }
+
     return reach;
   }
 

@@ -10,8 +10,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * The walk preferences contain all speed, reluctance, cost and factor preferences for walking
- * related to street and transit routing. The values are normalized(rounded) so the class
- * can used as a cache key.
+ * related to street and transit routing. The values are normalized(rounded) so the class can used
+ * as a cache key.
  * <p>
  * See the configuration for documentation of each field.
  * <p>
@@ -108,8 +108,8 @@ public final class WalkPreferences
    * factor and the right speed, 3% extra against 0.5%.
    * <p>
    * The safety factor is <b>asymmetric</b>: its distance is multiplied by
-   * {@link #MORE_SAFETY_WEIGHT_FACTOR} if the user wants more safety than the profile has. Using
-   * a profile with safety factor 0 for a user with 1.0 costs 11-13% extra, the reverse costs
+   * {@link #MORE_SAFETY_WEIGHT_FACTOR} if the user wants more safety than the profile has. Using a
+   * profile with safety factor 0 for a user with 1.0 costs 11-13% extra, the reverse costs
    * 2.6-3.8%. The factor is a rough default, how much it matters depends on the safety values of
    * the street data (the OSM tag mapping). The effect is also not linear: it is steep near 0 and
    * flat near 1 (0.5 to 1.0 costs 0.3-0.5%, 0 to 0.5 costs 5-6%). A logarithmic scale
@@ -119,15 +119,19 @@ public final class WalkPreferences
   @Override
   public double normalizedDistance(AbstractUserPreferences other) {
     double distance = super.normalizedDistance(other);
+
     if (other instanceof WalkPreferences that) {
       distance += SPEED_WEIGHT * speed.normalizedDistance(that.speed);
       double safetyDistance =
         SAFETY_FACTOR_WEIGHT * safetyFactor.normalizedDistance(that.safetyFactor);
+
       if (safetyFactor.asDouble() > that.safetyFactor.asDouble()) {
         safetyDistance *= MORE_SAFETY_WEIGHT_FACTOR;
       }
+
       distance += safetyDistance;
     }
+
     return distance;
   }
 
@@ -136,6 +140,7 @@ public final class WalkPreferences
     if (!(obj instanceof WalkPreferences that)) {
       return false;
     }
+
     return super.equals(obj) && speed.equals(that.speed) && safetyFactor.equals(that.safetyFactor);
   }
 

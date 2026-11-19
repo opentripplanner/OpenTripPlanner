@@ -14,13 +14,13 @@ import org.opentripplanner.raptor.rangeraptor.transit.ViaConnections;
  * dominated by on-street arrivals(transfers & access). This is because at these stops arriving
  * on-board will give you an advantage - e.g. you must arrive by transit to continue using a
  * via-connection, transfer or egress.
- *
  * <p>
  * A stop is included in the result when at least one of the following holds:
  * <ol>
  *   <li><b>On-board access:</b> an access path arrives at the stop on-board a transit service (e.g.
- *       flex), meaning you are allowed to continue with a transfer in the next round. The access should
- *       not be dominated by a transfer arrival - since using the access+transfer might be optimal.</li>
+ *       flex), meaning you are allowed to continue with a transfer in the next round. The access
+ *       should not be dominated by a transfer arrival - since using the access+transfer might be
+ *       optimal.</li>
  *   <li><b>Egress which starts on-street(on foot):</b> an egress path leaving the stop on foot can
  *       only be used if the stop is reached by transit.</li>
  *   <li><b>Via transfer:</b> a via-connection departs from the stop as a transfer. Arriving at the
@@ -29,7 +29,6 @@ import org.opentripplanner.raptor.rangeraptor.transit.ViaConnections;
  * </ol>
  *
  * For all other stops the Raptor algorithm with rounds and iterations take care of this.
- *
  */
 public class StopsWithArriveByTransitCriteriaResolver {
 
@@ -69,9 +68,11 @@ public class StopsWithArriveByTransitCriteriaResolver {
 
   private void addAllEgressStopsUsingStreetToDestination(EgressPaths egressPaths) {
     var egressByStop = egressPaths.byStop();
+
     for (var cursor : egressByStop.keys()) {
       int stop = cursor.value;
       var egressList = egressByStop.get(stop);
+
       if (egressList.stream().anyMatch(e -> e.arrivedOnStreet())) {
         stops.add(stop);
       }
@@ -86,6 +87,7 @@ public class StopsWithArriveByTransitCriteriaResolver {
     for (var cursor : viaConnections.byFromStop()) {
       int stop = cursor.key;
       var viaConnectionsFromStop = cursor.value;
+
       if (
         viaConnectionsFromStop.stream().anyMatch(via -> via instanceof RaptorTransferViaConnection)
       ) {

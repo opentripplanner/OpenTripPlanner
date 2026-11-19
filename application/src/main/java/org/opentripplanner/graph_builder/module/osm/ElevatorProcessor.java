@@ -44,27 +44,27 @@ import org.slf4j.LoggerFactory;
 /**
  * Contains the logic for extracting elevator data from OSM and converting it to edges.
  * <p>
- * It depends heavily on the idiosyncratic processing of the OSM data in {@link OsmModule} which
- * is the reason this is not a public class.
+ * It depends heavily on the idiosyncratic processing of the OSM data in {@link OsmModule} which is
+ * the reason this is not a public class.
  * <p>
  * Elevators have three types of edges: ElevatorAlightEdges, ElevatorHopEdges, and
  * ElevatorBoardEdges. Elevators also have two types of vertices: the OsmElevatorVertex and the
  * ElevatorHopVertex.
  * <p>
- * For elevator nodes, the build process first generates OsmElevatorVertices during previous
- * phases of the graph build. These vertices serve as attachment points to the graph for elevators.
+ * For elevator nodes, the build process first generates OsmElevatorVertices during previous phases
+ * of the graph build. These vertices serve as attachment points to the graph for elevators.
  * Elevator ways connect to the graph by using existing intersection vertices that are also part of
  * the elevator way.
  * <p>
- * The next step is to iterate over these attachment points and generate the ElevatorBoardEdges
- * and ElevatorAlightEdges. The other end for these edges is an ElevatorHopVertex. The
- * ElevatorBoardEdge allows boarding while the ElevatorAlightEdge allows alighting the elevator.
+ * The next step is to iterate over these attachment points and generate the ElevatorBoardEdges and
+ * ElevatorAlightEdges. The other end for these edges is an ElevatorHopVertex. The ElevatorBoardEdge
+ * allows boarding while the ElevatorAlightEdge allows alighting the elevator.
  * <p>
- * The last step is to connect all ElevatorHopVertices with ElevatorHopEdges. The amount of
- * levels between ElevatorHopVertices is stored in the edge. This incurs a cost dependent on the
- * amount of levels traveled. If the ElevatorHopVertices are on the same level (for example because
- * of bad data), the ElevatorHopEdge can have a cost of zero, but the board cost still applies in
- * the ElevatorBoardEdge.
+ * The last step is to connect all ElevatorHopVertices with ElevatorHopEdges. The amount of levels
+ * between ElevatorHopVertices is stored in the edge. This incurs a cost dependent on the amount of
+ * levels traveled. If the ElevatorHopVertices are on the same level (for example because of bad
+ * data), the ElevatorHopEdge can have a cost of zero, but the board cost still applies in the
+ * ElevatorBoardEdge.
  * <p>
  * With two connected ways to a node (which can be on the same level), after building the
  * ElevatorAlightEdge and ElevatorBoardEdge the graph will look like this (side view):
@@ -78,8 +78,8 @@ import org.slf4j.LoggerFactory;
  * == ElevatorBoardEdge and ElevatorAlightEdge
  * </pre>
  * <p>
- * Another loop fills in the ElevatorHopEdges. After filling in the ElevatorHopEdges when a node
- * has 3 connected ways the graph will look like this (side view):
+ * Another loop fills in the ElevatorHopEdges. After filling in the ElevatorHopEdges when a node has
+ * 3 connected ways the graph will look like this (side view):
  * <pre>
  * +==X
  * |
@@ -155,6 +155,7 @@ class ElevatorProcessor {
       }
 
       List<OsmElevatorKey> osmElevatorKeys = new ArrayList<>(vertices.keySet());
+
       if (
         osmElevatorKeys
           .stream()
@@ -164,6 +165,7 @@ class ElevatorProcessor {
       ) {
         issueStore.add(new AllWaysOfElevatorNodeOnSameLevel(node));
       }
+
       // Sort to make logic correct and create a deterministic order.
       osmElevatorKeys.sort(
         Comparator.comparing((OsmElevatorKey key) -> verticeLevels.get(key))
@@ -171,6 +173,7 @@ class ElevatorProcessor {
           .thenComparing(OsmElevatorKey::osmEntityType)
       );
       List<ElevatorHopVertex> elevatorHopVertices = new ArrayList<>();
+
       for (OsmElevatorKey key : osmElevatorKeys) {
         OsmElevatorVertex sourceVertex = vertices.get(key);
         OsmLevel level = verticeLevels.get(key);
@@ -216,6 +219,7 @@ class ElevatorProcessor {
       if (!isElevatorWay(way)) {
         continue;
       }
+
       List<OsmLevel> nodeLevels = osmdb.getLevelsForEntity(way);
       List<Long> nodes = Arrays.stream(way.getNodeRefs().toArray())
         .filter(vertexGenerator::hasIntersectionVertex)
@@ -261,6 +265,7 @@ class ElevatorProcessor {
       }
 
       List<ElevatorHopVertex> elevatorHopVertices = new ArrayList<>();
+
       for (int i = 0; i < nodes.size(); i++) {
         Long node = nodes.get(i);
         var sourceVertex = vertexGenerator.getIntersectionVertex(node);

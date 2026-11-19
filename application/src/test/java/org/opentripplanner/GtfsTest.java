@@ -105,9 +105,11 @@ public abstract class GtfsTest {
     if (fromVertex != null && !fromVertex.isEmpty()) {
       builder.withFrom(GenericLocation.fromStopId(FeedScopedId.of(FEED_ID, fromVertex)));
     }
+
     if (toVertex != null && !toVertex.isEmpty()) {
       builder.withTo(GenericLocation.fromStopId(FeedScopedId.of(FEED_ID, toVertex)));
     }
+
     builder.withJourney(journeyBuilder -> {
       journeyBuilder.withWheelchair(wheelchairAccessible);
 
@@ -120,6 +122,7 @@ public abstract class GtfsTest {
       journeyBuilder.withModes(requestModesBuilder.build());
 
       var filterRequestBuilder = TransitFilterRequest.of();
+
       if (preferredMode != null) {
         filterRequestBuilder.addSelect(
           SelectRequest.of().addTransportMode(new MainAndSubMode(preferredMode, null)).build()
@@ -178,6 +181,7 @@ public abstract class GtfsTest {
     assertEquals(endTime, leg.endTime().toInstant().toEpochMilli());
     assertEquals(toStopId, leg.to().stop.getId().getId());
     assertEquals(FEED_ID, leg.to().stop.getId().getFeedId());
+
     if (fromStopId != null) {
       assertEquals(FEED_ID, leg.from().stop.getId().getFeedId());
       assertEquals(fromStopId, leg.from().stop.getId().getId());
@@ -253,9 +257,11 @@ public abstract class GtfsTest {
       FeedMessage feedMessage = FeedMessage.parseFrom(inputStream);
       List<FeedEntity> feedEntityList = feedMessage.getEntityList();
       List<TripUpdate> updates = new ArrayList<>(feedEntityList.size());
+
       for (FeedEntity feedEntity : feedEntityList) {
         updates.add(feedEntity.getTripUpdate());
       }
+
       updateManager
         .submit(ctx -> {
           var buffer = ctx.repository(timetableHandle);
@@ -276,6 +282,7 @@ public abstract class GtfsTest {
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
+
     var transitService = new DefaultTransitService(
       transitRepository,
       timetableHandle.repositorySnapshot(registry.scope())

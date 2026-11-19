@@ -28,11 +28,10 @@ import org.slf4j.LoggerFactory;
  * Graph builder module that loads GBFS geofencing zones during graph build and applies them to
  * edges.
  * <p>
- * The networks to load are discovered from a GBFS v3 manifest: a dataset is loaded when the
- * shared {@code gbfs} configuration puts it in the {@link GeofencingZoneOtpPhase#GRAPH_BUILD} phase
- * and its feed actually publishes a {@code geofencing_zones} feed. Zones are applied per network,
- * so {@code requireDropOffInsideBusinessArea} takes effect for exactly the networks that enable it.
- *
+ * The networks to load are discovered from a GBFS v3 manifest: a dataset is loaded when the shared
+ * {@code gbfs} configuration puts it in the {@link GeofencingZoneOtpPhase#GRAPH_BUILD} phase and
+ * its feed actually publishes a {@code geofencing_zones} feed. Zones are applied per network, so
+ * {@code requireDropOffInsideBusinessArea} takes effect for exactly the networks that enable it.
  * <p>
  * The zones are recorded on the {@link Graph}, which carries them into the serialized graph. The
  * serve phase indexes them when it creates the vehicle rental repository; nothing indexes them
@@ -69,6 +68,7 @@ public class VehicleRentalGeofencingGraphBuilder implements GraphBuilderModule {
     LOG.info("Loading GBFS geofencing zones from manifest {}", parameters.url());
 
     var manifest = GbfsManifestLoader.loadManifest(parameters.url(), parameters.headers());
+
     if (
       manifest == null || manifest.getData() == null || manifest.getData().getDatasets() == null
     ) {
@@ -88,6 +88,7 @@ public class VehicleRentalGeofencingGraphBuilder implements GraphBuilderModule {
         httpClientFactory,
         issueStore
       );
+
       for (var network : networks) {
         try {
           applyNetwork(network, httpClientFactory);
@@ -119,22 +120,27 @@ public class VehicleRentalGeofencingGraphBuilder implements GraphBuilderModule {
       var network = dataset.getSystemId();
 
       var override = overrides.forNetwork(network);
+
       if (override.isEmpty()) {
         LOG.warn("Network not configured in OTP, skipping: {}", network);
         continue;
       }
+
       var parameters = override.get();
+
       if (parameters.geofencingZonePhase() != GeofencingZoneOtpPhase.GRAPH_BUILD) {
         continue;
       }
 
       var url = GbfsManifestLoader.selectBestVersion(dataset);
+
       if (url.isEmpty()) {
         LOG.warn("No suitable GBFS version found for network {}", network);
         continue;
       }
 
       GbfsAutoConfiguration autoConfiguration;
+
       try {
         autoConfiguration = GbfsAutoConfiguration.fetch(
           url.get(),
@@ -153,11 +159,13 @@ public class VehicleRentalGeofencingGraphBuilder implements GraphBuilderModule {
 
       selected.add(new SelectedNetwork(network, parameters, autoConfiguration));
     }
+
     return selected;
   }
 
   private void applyNetwork(SelectedNetwork network, OtpHttpClientFactory clientFactory) {
     var zones = loadGeofencingZones(network, clientFactory);
+
     if (zones.isEmpty()) {
       LOG.info("No geofencing zones loaded for network {}", network.network());
       return;

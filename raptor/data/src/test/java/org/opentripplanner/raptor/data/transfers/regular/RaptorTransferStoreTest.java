@@ -84,10 +84,12 @@ class RaptorTransferStoreTest {
 
   private static List<TxEntry> collect(Iterator<? extends RaptorTransfer> it) {
     List<TxEntry> result = new ArrayList<>();
+
     while (it.hasNext()) {
       RaptorTransfer t = it.next();
       result.add(new TxEntry(t.stop(), t.durationInSeconds(), t.c1()));
     }
+
     return result;
   }
 

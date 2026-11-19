@@ -59,7 +59,9 @@ class NewTripHandler {
     if (buffer.getScheduledTrip(tripUpdate.tripId()) != null) {
       throw UpdateException.of(tripUpdate.tripId(), TRIP_ALREADY_EXISTS);
     }
+
     var serviceId = buffer.getOrCreateServiceIdForDate(tripUpdate.startDate());
+
     if (serviceId == null) {
       throw UpdateException.of(tripUpdate.tripId(), OUTSIDE_SERVICE_PERIOD);
     }
@@ -92,6 +94,7 @@ class NewTripHandler {
     final Set<FeedScopedId> serviceIds = buffer
       .getTripCalendars()
       .listServiceIdsOnServiceDate(tripUpdate.startDate());
+
     if (!serviceIds.contains(trip.getServiceId())) {
       // TODO: should we support this and change service id of trip?
       throw UpdateException.of(tripUpdate.tripId(), NO_SERVICE_ON_DATE);
@@ -158,6 +161,7 @@ class NewTripHandler {
     );
 
     TripPattern hideTripInScheduledPattern = null;
+
     if (modified) {
       hideTripInScheduledPattern = getPatternForTripId(trip.getId());
     }
@@ -166,6 +170,7 @@ class NewTripHandler {
       .withRouteCreation(hasANewRouteBeenCreated)
       .withRevertPreviousRealTimeUpdates(true)
       .withHideTripInScheduledPattern(hideTripInScheduledPattern);
+
     if (added) {
       builder
         .withAddedTripOnServiceDate(
@@ -173,6 +178,7 @@ class NewTripHandler {
         )
         .withTripCreation(true);
     }
+
     return TripUpdateApplier.apply(buffer, builder.build());
   }
 
@@ -182,29 +188,34 @@ class NewTripHandler {
    * The whole update is rejected if a single stop cannot be resolved.
    *
    * @throws UpdateException {@code INVALID_STOP_REFERENCE} if a stop time update has no stop id - a
-   *                         new trip has no pattern yet, so a stop sequence alone cannot be
-   *                         resolved to a stop - or {@code UNKNOWN_STOP} if the stop id is not
-   *                         present in the site repository.
+   *     new trip has no pattern yet, so a stop sequence alone cannot be resolved to a stop - or
+   *     {@code UNKNOWN_STOP} if the stop id is not present in the site repository.
    */
   private List<StopAndStopTimeUpdate> resolveStops(
     FeedScopedId tripId,
     List<StopTimeUpdate> stopTimeUpdates
   ) throws UpdateException {
     var stops = new ArrayList<StopAndStopTimeUpdate>(stopTimeUpdates.size());
+
     for (int listIndex = 0; listIndex < stopTimeUpdates.size(); listIndex++) {
       var stopTimeUpdate = stopTimeUpdates.get(listIndex);
       var stopId = stopTimeUpdate.stopId();
+
       if (stopId.isEmpty()) {
         throw UpdateException.of(tripId, INVALID_STOP_REFERENCE, listIndex);
       }
+
       var stop = transitRepository
         .getSiteRepository()
         .getRegularStop(new FeedScopedId(tripId.getFeedId(), stopId.get()));
+
       if (stop == null) {
         throw UpdateException.of(tripId, UNKNOWN_STOP, listIndex);
       }
+
       stops.add(new StopAndStopTimeUpdate(stop, stopTimeUpdate));
     }
+
     return stops;
   }
 

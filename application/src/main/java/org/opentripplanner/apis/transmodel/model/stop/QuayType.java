@@ -124,6 +124,7 @@ public class QuayType {
           .type(stopPlaceType)
           .dataFetcher(env -> {
             Station station = ((StopLocation) env.getSource()).getParentStation();
+
             if (station != null) {
               return new MonoOrMultiModalStation(
                 station,
@@ -334,6 +335,7 @@ public class QuayType {
               var mapper = new TripTimeOnDateFilterMapper(idMapper);
               requestBuilder.withTransitFilters(mapper.mapFilters(filtersInput));
             }
+
             requestBuilder
               .withIncludeAgencies(
                 whiteListed.authorityIds.isEmpty() ? null : whiteListed.authorityIds

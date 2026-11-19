@@ -78,6 +78,7 @@ class NormalizedRatioTest {
   void theNormalizedRatioCanBeSerialized() throws IOException, ClassNotFoundException {
     var subject = normalized(0.35);
     var bytes = new ByteArrayOutputStream();
+
     try (var out = new ObjectOutputStream(bytes)) {
       out.writeObject(subject);
     }

@@ -27,9 +27,11 @@ final class ProfileMatcher {
    */
   ProfileMatcher(List<AbstractUserPreferences<?>> declaredProfiles) {
     var order = new HashMap<AbstractUserPreferences<?>, Integer>();
+
     for (var profile : declaredProfiles) {
       order.putIfAbsent(profile, order.size());
     }
+
     this.declarationOrder = Comparator.comparingInt(p -> order.getOrDefault(p, Integer.MAX_VALUE));
   }
 

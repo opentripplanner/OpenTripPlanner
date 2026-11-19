@@ -39,6 +39,7 @@ public class AccessEgressMapper {
 
   private RoutingAccessEgress mapNearbyStop(NearbyStop nearbyStop) {
     var stop = resolver.getStopLocation(nearbyStop.stopId());
+
     if (!(stop instanceof RegularStop)) {
       return null;
     }

@@ -47,7 +47,8 @@ class LocationGroupMapper {
 
   private GroupStop doMap(LocationGroup element) {
     var id = idFactory.createId(element.getId(), "location group");
-    // the GTFS spec allows name-less location groups: https://gtfs.org/documentation/schedule/reference/#location_groupstxt
+    // the GTFS spec allows name-less location groups:
+    // https://gtfs.org/documentation/schedule/reference/#location_groupstxt
     var name = NonLocalizedString.ofNullableOrElse(element.getName(), FALLBACK_NAME);
     var groupStopBuilder = siteRepositoryBuilder.groupStop(id).withName(name);
 
@@ -56,13 +57,15 @@ class LocationGroupMapper {
         location,
         "Location group '%s' contains a null element.".formatted(element.getId())
       );
+
       switch (location) {
         case Stop stop -> groupStopBuilder.addLocation(stopMapper.map(stop));
         case Location loc -> groupStopBuilder.addLocation(locationMapper.map(loc));
         case LocationGroup _ -> throw new RuntimeException("Nested GroupStops are not allowed");
-        default -> throw new RuntimeException(
-          "Unknown location type: " + location.getClass().getSimpleName()
-        );
+        default
+          -> throw new RuntimeException(
+            "Unknown location type: " + location.getClass().getSimpleName()
+          );
       }
     }
 

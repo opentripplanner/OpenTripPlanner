@@ -22,8 +22,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * selected set is filtered, and are elements dropped. Dropped elements represent none optimal
  * paths.
  * <p>
- * Elements in the reminding set which can not be boarded is kept in the remaining set for the
- * next call to the {@link #next(int)} method.
+ * Elements in the reminding set which can not be boarded is kept in the remaining set for the next
+ * call to the {@link #next(int)} method.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
@@ -51,6 +51,7 @@ class TransitPathLegSelector<T extends RaptorTripSchedule> {
           prevStopPosition
       );
     }
+
     prevStopPosition = fromStopPosition;
 
     Set<OptimizedPathTail<T>> candidates = new HashSet<>();

@@ -57,6 +57,7 @@ class TimeSlopeSafetyTrianglePreferenceTest {
           if (t + sl + sa == 0) {
             continue;
           }
+
           var subject = TimeSlopeSafetyTrianglePreference.of(t / 40.0, sl / 40.0, sa / 40.0);
           double sum =
             subject.time().asDouble() + subject.slope().asDouble() + subject.safety().asDouble();

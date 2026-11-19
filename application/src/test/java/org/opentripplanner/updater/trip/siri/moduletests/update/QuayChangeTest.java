@@ -138,7 +138,8 @@ class QuayChangeTest implements RealtimeTestConstants {
 
     var result2 = siri.applyEstimatedTimetable(updatedTimes);
     assertSuccess(result2);
-    // Quay change must be preserved - still PATTERN_MODIFIED on RT pattern, not reverted to scheduled
+    // Quay change must be preserved - still PATTERN_MODIFIED on RT pattern, not reverted to
+    // scheduled
     assertEquals(
       "P U | A [R] 0:00:16 0:00:16 | C 0:00:35 0:00:35",
       env.tripData(TRIP_1_ID).showTimetable()

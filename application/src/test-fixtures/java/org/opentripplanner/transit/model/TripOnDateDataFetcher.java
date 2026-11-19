@@ -37,6 +37,7 @@ public class TripOnDateDataFetcher {
     if (trip != null) {
       return trip;
     }
+
     trip = transitService.getTrip(tripId);
     return trip;
   }

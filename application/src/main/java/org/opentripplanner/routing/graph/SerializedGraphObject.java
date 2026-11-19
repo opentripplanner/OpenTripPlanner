@@ -54,13 +54,13 @@ import org.slf4j.LoggerFactory;
 /**
  * This is the class that get serialized/deserialized into/from the file <em>graph.obj</em>.
  * <p>
- * The Graph object does not contain a collection of edges. The set of edges is generated on
- * demand from the vertices. However, when serializing, we intentionally do not serialize the
- * vertices' edge lists to prevent excessive recursion. So we need to save the edges along with the
- * graph. We used to make two serialization calls, one for the graph and one for the edges. But we
- * need the serializer to know that vertices referenced by the edges are the same vertices stored in
- * the graph itself. The easiest way to do this is to make only one serialization call, serializing
- * a single object that contains both the graph and the edge collection.
+ * The Graph object does not contain a collection of edges. The set of edges is generated on demand
+ * from the vertices. However, when serializing, we intentionally do not serialize the vertices'
+ * edge lists to prevent excessive recursion. So we need to save the edges along with the graph. We
+ * used to make two serialization calls, one for the graph and one for the edges. But we need the
+ * serializer to know that vertices referenced by the edges are the same vertices stored in the
+ * graph itself. The easiest way to do this is to make only one serialization call, serializing a
+ * single object that contains both the graph and the edge collection.
  */
 public class SerializedGraphObject implements Serializable {
 
@@ -157,6 +157,7 @@ public class SerializedGraphObject implements Serializable {
           graphOutput.path()
         );
       }
+
       if (!graphOutput.isWritable()) {
         throw new RuntimeException("Cannot create or write to graph at: " + graphOutput.path());
       }
@@ -185,6 +186,7 @@ public class SerializedGraphObject implements Serializable {
     for (Vertex v : graph.getVertices()) {
       v.initEdgeLists();
     }
+
     for (Edge e : edges) {
       Vertex fromVertex = e.getFromVertex();
       Vertex toVertex = e.getToVertex();
@@ -238,6 +240,7 @@ public class SerializedGraphObject implements Serializable {
         LOG.error("IO exception while loading graph: {}", ke.getLocalizedMessage(), ke);
         return null;
       }
+
       LOG.warn(
         "Deserialization exception while loading graph: {}\n{}",
         sourceDescription,

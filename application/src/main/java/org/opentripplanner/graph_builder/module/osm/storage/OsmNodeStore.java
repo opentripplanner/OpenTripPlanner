@@ -17,13 +17,13 @@ import org.opentripplanner.osm.model.OsmNode;
 
 /**
  * A memory-efficient store for the {@link OsmNode}s used in ways/areas, keyed by their OSM ID.
- *
- * <p>This is the single largest in-memory structure during OSM processing, so instead of a {@code
- * LongObjectMap<OsmNode>} (which needs a full {@link OsmNode} object, including a nested tags map,
- * per node) node data is split into three parallel, node ID-keyed stores. {@link #get(long)}
- * reassembles an {@link OsmNode} on demand from these.
- *
- * <p>Because nodes are reassembled on every {@link #get(long)} call, two {@link OsmNode} instances
+ * <p>
+ * This is the single largest in-memory structure during OSM processing, so instead of a
+ * {@code LongObjectMap<OsmNode>} (which needs a full {@link OsmNode} object, including a nested
+ * tags map, per node) node data is split into three parallel, node ID-keyed stores.
+ * {@link #get(long)} reassembles an {@link OsmNode} on demand from these.
+ * <p>
+ * Because nodes are reassembled on every {@link #get(long)} call, two {@link OsmNode} instances
  * returned for the same ID are generally <b>not</b> the same object. Callers must rely on {@link
  * OsmEntity#equals} (which compares by ID and type) rather than reference equality.
  */
@@ -61,15 +61,20 @@ class OsmNodeStore {
    */
   void add(OsmNode node) {
     long id = node.getId();
+
     if (coordinatesById.containsKey(id)) {
       return;
     }
+
     coordinatesById.put(id, packCoordinate(node.lat, node.lon));
     byte providerIndex = providerIndex(node.getOsmProvider());
+
     if (providerIndex != 0) {
       nonDefaultProviderIndexById.put(id, providerIndex);
     }
+
     var tags = node.getTags();
+
     if (!tags.isEmpty()) {
       tagsById.put(id, tags);
     }
@@ -83,20 +88,25 @@ class OsmNodeStore {
     if (!coordinatesById.containsKey(id)) {
       return null;
     }
+
     long packedCoordinate = coordinatesById.get(id);
     var provider = providers.get(nonDefaultProviderIndexById.get(id));
     var builder = OsmNode.of()
       .withId(id)
       .withLatLon(unpackLat(packedCoordinate), unpackLon(packedCoordinate));
+
     // OsmNodeBuilder.withOsmProvider() rejects null, but some (mostly test) nodes are built
     // without ever setting a provider, so only call it when there actually is one.
     if (provider != null) {
       builder.withOsmProvider(provider);
     }
+
     var tags = tagsById.get(id);
+
     if (tags != null) {
       builder.withTags(tags);
     }
+
     return builder.build();
   }
 
@@ -114,6 +124,7 @@ class OsmNodeStore {
     if (!coordinatesById.containsKey(id)) {
       return null;
     }
+
     long packedCoordinate = coordinatesById.get(id);
     return new Coordinate(unpackLon(packedCoordinate), unpackLat(packedCoordinate));
   }
@@ -133,9 +144,11 @@ class OsmNodeStore {
         return (byte) i;
       }
     }
+
     if (providers.size() >= Byte.MAX_VALUE) {
       throw new IllegalStateException("Too many distinct OSM providers, cannot index as a byte");
     }
+
     providers.add(provider);
     return (byte) (providers.size() - 1);
   }
@@ -145,9 +158,9 @@ class OsmNodeStore {
    * fixed-point {@code int} (by scaling with {@link #FIXED_POINT_FACTOR} and rounding), then the
    * latitude occupies the high 32 bits and the longitude the low 32 bits.
    * <p>
-   * Latitude must be in {@code [-90, 90]} and longitude in {@code [-180, 180]}, so both
-   * fixed-point values comfortably fit in a (signed) {@code int}. Packing relies on
-   * two's-complement bit patterns: {@code lonFixed} is masked with {@code 0xFFFFFFFFL} before the
+   * Latitude must be in {@code [-90, 90]} and longitude in {@code [-180, 180]}, so both fixed-point
+   * values comfortably fit in a (signed) {@code int}. Packing relies on two's-complement bit
+   * patterns: {@code lonFixed} is masked with {@code 0xFFFFFFFFL} before the
    * {@code long}/{@code int} widths differ (this zero-extends it, dropping its sign), and OR-ing it
    * into the low bits of the shifted {@code latFixed} recombines the two without the sign bits
    * interfering with each other. {@link #unpackLat} and {@link #unpackLon} reverse this by
@@ -159,6 +172,7 @@ class OsmNodeStore {
     if (lat < -90 || lat > 90 || lon < -180 || lon > 180) {
       throw new IllegalArgumentException("Invalid coordinate: lat=%s, lon=%s".formatted(lat, lon));
     }
+
     int latFixed = (int) Math.round(lat * FIXED_POINT_FACTOR);
     int lonFixed = (int) Math.round(lon * FIXED_POINT_FACTOR);
     return ((long) latFixed << 32) | (lonFixed & 0xFFFFFFFFL);

@@ -13,7 +13,6 @@ import org.opentripplanner.utils.lang.Sandbox;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- *
  * ItineraryFares is a set of fares for different legs, rider categories or fare media.
  */
 @Sandbox
@@ -70,9 +69,11 @@ public class ItineraryFare {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     ItineraryFare fare1 = (ItineraryFare) o;
     return (
       Objects.equals(itineraryProducts, fare1.itineraryProducts) &&

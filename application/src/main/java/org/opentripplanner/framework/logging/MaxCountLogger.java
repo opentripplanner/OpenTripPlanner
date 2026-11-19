@@ -15,10 +15,9 @@ import org.slf4j.Logger;
  * message. After a given limit this logger will be muted and no more log events are logged.
  * <p>
  * THREAD SAFETY - The implementation is not thread safe.
- * <p>
  *
  * @deprecated TODO: Rewrite the same way as the {@link Throttle} is done. See
- *             {@link AbstractFilterLogger} for deprecation details.
+ *     {@link AbstractFilterLogger} for deprecation details.
  */
 @Deprecated
 public class MaxCountLogger extends AbstractFilterLogger {

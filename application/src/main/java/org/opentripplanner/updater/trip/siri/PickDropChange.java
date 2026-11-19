@@ -15,10 +15,10 @@ import uk.org.siri.siri21.DepartureBoardingActivityEnumeration;
  * The pick/drop intent of a single call end (arrival or departure), captured from the SIRI data but
  * resolved to an OTP {@link PickDrop} only later, once the scheduled value is known.
  * <p>
- * This decouples the {@link CallWrapper} from the point where the scheduled pick/drop is
- * available: a caller can hold a {@code PickDropChange} and invoke {@link #applyTo(PickDrop)}
- * whenever it has the scheduled value, without keeping the wrapper (or any SIRI/JAXB type) in
- * scope. The SIRI enumerations are normalized away at construction, so this object carries no JAXB.
+ * This decouples the {@link CallWrapper} from the point where the scheduled pick/drop is available:
+ * a caller can hold a {@code PickDropChange} and invoke {@link #applyTo(PickDrop)} whenever it has
+ * the scheduled value, without keeping the wrapper (or any SIRI/JAXB type) in scope. The SIRI
+ * enumerations are normalized away at construction, so this object carries no JAXB.
  */
 public final class PickDropChange {
 
@@ -55,6 +55,7 @@ public final class PickDropChange {
     if (cancelled) {
       return scheduled.isNotRoutable() ? Optional.empty() : Optional.of(CANCELLED);
     }
+
     return switch (activity) {
       case UNSPECIFIED -> Optional.empty();
       case ALLOWED -> scheduled.isNotRoutable() ? Optional.of(SCHEDULED) : Optional.empty();
@@ -99,6 +100,7 @@ public final class PickDropChange {
     if (activity == null) {
       return Activity.UNSPECIFIED;
     }
+
     return switch (activity) {
       case ALIGHTING -> Activity.ALLOWED;
       case NO_ALIGHTING -> Activity.NOT_ALLOWED;
@@ -110,6 +112,7 @@ public final class PickDropChange {
     if (activity == null) {
       return Activity.UNSPECIFIED;
     }
+
     return switch (activity) {
       case BOARDING -> Activity.ALLOWED;
       case NO_BOARDING -> Activity.NOT_ALLOWED;

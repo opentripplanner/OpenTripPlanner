@@ -80,6 +80,7 @@ public class PathDiff<T extends RaptorTripSchedule> {
       if (skipEquals && e.isEqual()) {
         continue;
       }
+
       PathDiff<? extends T> it = e.element();
       tbl.addRow(
         e.status("EQ", "DROPPED", "NEW"),
@@ -92,6 +93,7 @@ public class PathDiff<T extends RaptorTripSchedule> {
         it.path.toString()
       );
     }
+
     logger.accept("Compare " + leftLabel + " with " + rightLabel + "\n" + tbl.toString());
   }
 
@@ -127,12 +129,15 @@ public class PathDiff<T extends RaptorTripSchedule> {
 
   private static <T> int compareLists(List<T> a, List<T> b, Comparator<T> comparator) {
     int size = Math.min(a.size(), b.size());
+
     for (int i = 0; i < size; i++) {
       int c = comparator.compare(a.get(i), b.get(i));
+
       if (c != 0) {
         return c;
       }
     }
+
     return a.size() - b.size();
   }
 }

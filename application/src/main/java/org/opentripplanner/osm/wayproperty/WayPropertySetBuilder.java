@@ -83,6 +83,7 @@ public class WayPropertySetBuilder {
     if (!this.defaultWalkSafetyForPermission.equals(WayPropertySet.DEFAULT_WALK_SAFETY_RESOLVER)) {
       throw new IllegalStateException("A custom default walk safety resolver was already set");
     }
+
     this.defaultWalkSafetyForPermission = defaultWalkSafetyForPermission;
   }
 
@@ -99,6 +100,7 @@ public class WayPropertySetBuilder {
     ) {
       throw new IllegalStateException("A custom default cycling safety resolver was already set");
     }
+
     this.defaultBicycleSafetyForPermission = defaultBicycleSafetyForPermission;
   }
 

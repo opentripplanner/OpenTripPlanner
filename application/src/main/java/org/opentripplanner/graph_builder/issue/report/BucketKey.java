@@ -17,6 +17,7 @@ record BucketKey(String issueType, Integer index) implements Comparable<BucketKe
       if (index == null) {
         return o.index == null ? 0 : -1;
       }
+
       return index.compareTo(o.index);
     }
 

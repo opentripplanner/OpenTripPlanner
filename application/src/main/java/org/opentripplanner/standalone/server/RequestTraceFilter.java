@@ -20,8 +20,8 @@ import org.opentripplanner.utils.lang.StringUtils;
  * parameter value can be generated. The value is made available in the logs as well if they have an
  * associated logKey.
  * <p>
- * The {@link org.opentripplanner.framework.concurrent.OtpRequestThreadFactory} work together
- * with this filter to propagate the log context to all threads.
+ * The {@link org.opentripplanner.framework.concurrent.OtpRequestThreadFactory} work together with
+ * this filter to propagate the log context to all threads.
  */
 public class RequestTraceFilter implements ContainerRequestFilter, ContainerResponseFilter {
 
@@ -67,12 +67,15 @@ public class RequestTraceFilter implements ContainerRequestFilter, ContainerResp
     for (var it : traceParameters) {
       if (it.hasLogKey()) {
         String value = null;
+
         if (it.hasHttpRequestHeader()) {
           value = retrieveHTTPHeaderValue(requestContext, it.httpRequestHeader());
         }
+
         if (value == null && it.generateIdIfMissing()) {
           value = generateUniqueId();
         }
+
         // Put value, even if it is empty. This will clear any value set in the thread from
         // before. This happens if the previous request did not clean up after it-self.
         LogMDCSupport.putLocal(it.logKey(), value);
@@ -94,6 +97,7 @@ public class RequestTraceFilter implements ContainerRequestFilter, ContainerResp
         var value = resolveValueForResponse(it, requestContext);
         setHttpResponseHeaderValue(responseContext, it.httpResponseHeader(), value);
       }
+
       if (it.hasLogKey()) {
         LogMDCSupport.removeLocal(it.logKey());
       }
@@ -117,12 +121,15 @@ public class RequestTraceFilter implements ContainerRequestFilter, ContainerResp
     if (p.hasHttpRequestHeader()) {
       value = retrieveHTTPHeaderValue(requestContext, p.httpRequestHeader());
     }
+
     if (value == null && p.hasLogKey()) {
       value = LogMDCSupport.getLocalValue(p.logKey());
     }
+
     if (value == null && p.generateIdIfMissing()) {
       value = generateUniqueId();
     }
+
     return value;
   }
 
@@ -146,9 +153,11 @@ public class RequestTraceFilter implements ContainerRequestFilter, ContainerResp
     String httpHeader
   ) {
     String value = requestContext.getHeaderString(httpHeader);
+
     if (StringUtils.hasNoValue(value)) {
       return null;
     }
+
     return HTTP_HEADER_VALUE_CHECK.matcher(value).matches() ? value : null;
   }
 }

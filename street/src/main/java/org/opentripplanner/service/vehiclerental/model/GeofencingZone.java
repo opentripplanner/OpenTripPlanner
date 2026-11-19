@@ -14,9 +14,9 @@ import org.opentripplanner.core.model.id.FeedScopedId;
  * A geofencing zone describing restrictions for traversing with a rental vehicle or dropping it off
  * inside the zone.
  * <p>
- * Restriction fields ({@code dropOffBanned}, {@code traversalBanned}, {@code rideStartBanned})
- * are nullable: {@code null} means the zone does not specify that field, allowing lower-priority
- * zones to contribute a value via per-field precedence resolution. {@code true} means banned,
+ * Restriction fields ({@code dropOffBanned}, {@code traversalBanned}, {@code rideStartBanned}) are
+ * nullable: {@code null} means the zone does not specify that field, allowing lower-priority zones
+ * to contribute a value via per-field precedence resolution. {@code true} means banned,
  * {@code false} means explicitly allowed.
  * <p>
  * The {@code businessArea} flag is set at construction time. A zone is a business area when all
@@ -154,9 +154,11 @@ public final class GeofencingZone implements Serializable {
     if (this == other) {
       return true;
     }
+
     if (other == null) {
       return false;
     }
+
     return (
       priority == other.priority &&
       businessArea == other.businessArea &&
@@ -176,9 +178,11 @@ public final class GeofencingZone implements Serializable {
     if (this == o) {
       return true;
     }
+
     if (!(o instanceof GeofencingZone other)) {
       return false;
     }
+
     return priority == other.priority && id.equals(other.id);
   }
 
@@ -197,11 +201,11 @@ public final class GeofencingZone implements Serializable {
    * network, using per-field precedence. For each field independently, the highest-priority zone
    * (lowest priority value) that specifies (non-null) the field wins.
    *
-   * @param zones         the set of zones currently containing the state
-   * @param network       the committed rental network (null returns false)
+   * @param zones the set of zones currently containing the state
+   * @param network the committed rental network (null returns false)
    * @param fieldAccessor accessor for the field to resolve
    * @return true if the resolved value is TRUE, false if no zone specifies the field or if the
-   *         resolved value is FALSE
+   *     resolved value is FALSE
    */
   public static boolean resolveField(
     Set<GeofencingZone> zones,
@@ -211,18 +215,23 @@ public final class GeofencingZone implements Serializable {
     if (zones.isEmpty() || network == null) {
       return false;
     }
+
     Boolean bestValue = null;
     int bestPriority = Integer.MAX_VALUE;
+
     for (var zone : zones) {
       if (!zone.id().getFeedId().equals(network)) {
         continue;
       }
+
       Boolean value = fieldAccessor.apply(zone);
+
       if (value != null && zone.priority() < bestPriority) {
         bestPriority = zone.priority();
         bestValue = value;
       }
     }
+
     return Boolean.TRUE.equals(bestValue);
   }
 }

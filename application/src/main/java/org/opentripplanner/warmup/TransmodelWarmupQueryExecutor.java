@@ -134,10 +134,12 @@ class TransmodelWarmupQueryExecutor implements WarmupQueryStrategy {
     try (var strategy = new AbortOnUnprocessableRequestExecutionStrategy()) {
       var graphQL = GraphQL.newGraphQL(schema).queryExecutionStrategy(strategy).build();
       var result = graphQL.execute(input);
+
       if (!result.getErrors().isEmpty()) {
         LOG.warn("Warmup query had GraphQL errors: {}", result.getErrors());
         return false;
       }
+
       return true;
     }
   }

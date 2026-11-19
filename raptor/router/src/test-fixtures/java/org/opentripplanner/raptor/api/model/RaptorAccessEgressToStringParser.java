@@ -86,15 +86,18 @@ public final class RaptorAccessEgressToStringParser {
 
   private RaptorAccessEgressToStringParser parse() {
     var m = PARSE_INPUT.matcher(input);
+
     if (!m.matches()) {
       throw new IllegalArgumentException("'" + input + "' does not match :/" + PARSE_INPUT + "'");
     }
+
     var stopValue = m.group(4);
     this.stopIndex = stopValue.matches("\\d+")
       ? Integer.parseInt(stopValue)
       : stopIndexResolver.applyAsInt(stopValue);
 
     this.label = m.group(1);
+
     if ("Free".equals(label)) {
       this.free = true;
       this.duration = RaptorConstants.ZERO;
@@ -107,8 +110,10 @@ public final class RaptorAccessEgressToStringParser {
     if ("Flex".equals(label)) {
       stopReachedOnBoard = true;
     }
+
     while (tokens.hasNext()) {
       var token = tokens.next();
+
       if (StringUtils.hasValue(token)) {
         if ("closed".equals(token)) {
           this.closed = true;
@@ -118,18 +123,23 @@ public final class RaptorAccessEgressToStringParser {
         }
       }
     }
+
     var openingHoures = m.group(3);
+
     if (StringUtils.hasValue(openingHoures)) {
       var hours = openingHoures.substring(5, openingHoures.length() - 2).split(" +");
       this.openFrom = TimeUtils.time(hours[0]);
       this.openTo = TimeUtils.time(hours[1]);
     }
+
     int rides = getField(RaptorValueType.RIDES).map(RaptorValue::value).orElse(0);
+
     if (label.startsWith("Flex") && rides == 0) {
       throw new IllegalArgumentException(
         "A Flex access/egress must have at leas one ride: " + input
       );
     }
+
     return this;
   }
 }

@@ -47,7 +47,8 @@ public class AccessEgressRouter {
       linkingContext
     );
 
-    // When looking for street accesses/egresses we ignore the already found direct accesses/egresses
+    // When looking for street accesses/egresses we ignore the already found direct
+    // accesses/egresses
     var ignoreStops = zeroDistanceAccessEgress
       .stream()
       .map(NearbyStop::stopId)

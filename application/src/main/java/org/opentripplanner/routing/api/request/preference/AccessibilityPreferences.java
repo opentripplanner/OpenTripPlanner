@@ -97,9 +97,11 @@ public final class AccessibilityPreferences {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     AccessibilityPreferences that = (AccessibilityPreferences) o;
     return (
       onlyConsiderAccessible == that.onlyConsiderAccessible &&

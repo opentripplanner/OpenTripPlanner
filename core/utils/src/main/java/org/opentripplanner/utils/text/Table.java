@@ -69,6 +69,7 @@ public class Table {
     for (var row : rows) {
       list.add(f.format(row));
     }
+
     return list;
   }
 
@@ -101,9 +102,11 @@ public class Table {
     var list = new ArrayList<String>();
     var f = TableRowFormatter.logFormatter(aligns, widths);
     list.add(f.format(headers));
+
     for (var row : rows) {
       list.add(f.format(row));
     }
+
     return list;
   }
 
@@ -150,9 +153,11 @@ public class Table {
         .map(String::trim)
         .toList()
     );
+
     while (list.size() < nColumns) {
       list.add(EMPTY_STRING);
     }
+
     return list;
   }
 

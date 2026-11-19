@@ -14,8 +14,8 @@ import tools.jackson.databind.node.MissingNode;
  * load the config from the {@code baseDirectory}, and then if not found the config is read from the
  * serialized graph.
  * <p>
- * OTP load the following configuration files, see {@link OtpFileNames}. All files are loaded
- * from the same base directory.
+ * OTP load the following configuration files, see {@link OtpFileNames}. All files are loaded from
+ * the same base directory.
  * <p>
  * Comments and unquoted keys are allowed in the these configuration files. The configuration is
  * cached, and not reloaded even if it is changed on the filesystem. Changing some parameters would
@@ -94,10 +94,12 @@ public class ConfigModel {
       LOG.info("Using the transfer profiles of the graph embedded JSON build configuration.");
       this.transferParameters = buildConfig.transferProfiles();
     }
+
     if (this.routerConfig.isDefault()) {
       LOG.info("Using the graph embedded JSON router configuration.");
       this.routerConfig = routerConfig;
     }
+
     OtpConfigLoader.logConfigVersion(
       this.otpConfig.configVersion,
       this.buildConfig.configVersion,

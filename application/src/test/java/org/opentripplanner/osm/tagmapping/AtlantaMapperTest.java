@@ -16,7 +16,8 @@ class AtlantaMapperTest {
   // TODO: Handle exceptions such as:
   //  - Northside Drive between Marietta Street and Tech Parkway (northbound)
   //    (https://www.openstreetmap.org/way/96395009, no sidewalk, but possible to bike)
-  //  - Portions of Freedom Parkway that are freeway/motorway-like (https://www.openstreetmap.org/way/88171817)
+  //  - Portions of Freedom Parkway that are freeway/motorway-like
+  //    (https://www.openstreetmap.org/way/88171817)
 
   @Test
   public void peachtreeRoad() {
@@ -36,7 +37,8 @@ class AtlantaMapperTest {
 
   @Test
   public void deKalbAvenue() {
-    // "Outer" ramps from DeKalb Ave onto Moreland Ave in Atlanta have sidewalks, and bikes are allowed.
+    // "Outer" ramps from DeKalb Ave onto Moreland Ave in Atlanta have sidewalks, and bikes are
+    // allowed.
     // https://www.openstreetmap.org/way/9164434
     OsmWay morelandRamp = OsmWay.of()
       .withTag("highway", "trunk_link")

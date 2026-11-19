@@ -11,11 +11,9 @@ import org.opentripplanner.raptor.spi.RaptorCostConverter;
  * unboxing as well as casting between different primitive types. This should be fast, but it is not
  * critical.
  * <p>
- * This is used with Raptor, in other places the general-purpose
- * {@link CostLinearFunction} is preferred. Be
- * aware, the {@link #calculateRaptorCost(int)} slightly differs from
- * {@link CostLinearFunction#calculate(Cost)} due
- * to rounding.
+ * This is used with Raptor, in other places the general-purpose {@link CostLinearFunction} is
+ * preferred. Be aware, the {@link #calculateRaptorCost(int)} slightly differs from
+ * {@link CostLinearFunction#calculate(Cost)} due to rounding.
  */
 class RaptorCostLinearFunction {
 
@@ -34,6 +32,7 @@ class RaptorCostLinearFunction {
     if (constantSeconds == 0 && coefficient == 0.0) {
       return ZERO_FUNCTION;
     }
+
     return new RaptorCostLinearFunction(constantSeconds, coefficient);
   }
 
@@ -57,9 +56,11 @@ class RaptorCostLinearFunction {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     RaptorCostLinearFunction that = (RaptorCostLinearFunction) o;
     return constant == that.constant && coefficient == that.coefficient;
   }

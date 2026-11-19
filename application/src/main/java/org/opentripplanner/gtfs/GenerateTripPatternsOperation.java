@@ -134,11 +134,13 @@ public class GenerateTripPatternsOperation {
 
     List<StopTime> stopTimes = transitServiceBuilder.getStopTimesSortedByTrip().get(trip);
 
-    // If after filtering this trip does not contain at least 2 stoptimes, it does not serve any purpose.
+    // If after filtering this trip does not contain at least 2 stoptimes, it does not serve any
+    // purpose.
     var staticTripWithFewerThan2Stops =
       !FlexTrip.containsFlexStops(stopTimes) && stopTimes.size() < 2;
     // flex trips are allowed to have a single stop because that can be an area or a group of stops
     var flexTripWithZeroStops = FlexTrip.containsFlexStops(stopTimes) && stopTimes.size() < 1;
+
     if (staticTripWithFewerThan2Stops || flexTripWithZeroStops) {
       issueStore.add(new TripDegenerate(trip));
       return;
@@ -152,8 +154,10 @@ public class GenerateTripPatternsOperation {
     // Create a TripTimes object for this list of stoptimes, which form one trip.
     ScheduledTripTimes tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, deduplicator);
 
-    // If this trip is referenced by one or more lines in frequencies.txt, wrap it in a FrequencyEntry.
+    // If this trip is referenced by one or more lines in frequencies.txt, wrap it in a
+    // FrequencyEntry.
     List<Frequency> frequencies = frequenciesForTrip.get(trip);
+
     if (!frequencies.isEmpty()) {
       for (Frequency freq : frequencies) {
         tripPatternBuilder.withScheduledTimeTableBuilder(builder ->
@@ -162,7 +166,8 @@ public class GenerateTripPatternsOperation {
         freqCount++;
       }
     }
-    // This trip was not frequency-based. Add the TripTimes directly to the TripPattern's scheduled timetable.
+    // This trip was not frequency-based. Add the TripTimes directly to the TripPattern's scheduled
+    // timetable.
     else {
       tripPatternBuilder.withScheduledTimeTableBuilder(builder -> builder.addTripTimes(tripTimes));
       scheduledCount++;
@@ -172,6 +177,7 @@ public class GenerateTripPatternsOperation {
   private TripPatternBuilder findOrCreateTripPattern(StopPattern stopPattern, Trip trip) {
     Route route = trip.getRoute();
     Direction direction = trip.getDirection();
+
     for (TripPatternBuilder tripPatternBuilder : tripPatternBuilders.get(stopPattern)) {
       if (
         tripPatternBuilder.getRoute().equals(route) &&
@@ -182,6 +188,7 @@ public class GenerateTripPatternsOperation {
         return tripPatternBuilder;
       }
     }
+
     FeedScopedId patternId = generateUniqueIdForTripPattern(route, direction);
     TripPatternBuilder tripPatternBuilder = TripPattern.of(patternId)
       .withRoute(route)

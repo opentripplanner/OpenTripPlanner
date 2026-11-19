@@ -18,11 +18,14 @@ public class QualifiedMode implements Serializable {
 
       String[] elements = qMode.split("_");
       mode.append(elements[0].trim());
+
       for (int i = 1; i < elements.length; i++) {
         String element = elements[i].trim();
+
         if (element.isBlank()) {
           continue;
         }
+
         try {
           Qualifier q = Qualifier.valueOf(element);
           qualifiers.add(q);
@@ -57,16 +60,19 @@ public class QualifiedMode implements Serializable {
       QualifiedMode qmOther = (QualifiedMode) other;
       return qmOther.mode.equals(this.mode) && qmOther.qualifiers.equals(this.qualifiers);
     }
+
     return false;
   }
 
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append(mode);
+
     for (Qualifier qualifier : qualifiers) {
       sb.append("_");
       sb.append(qualifier);
     }
+
     return sb.toString();
   }
 }

@@ -83,4 +83,5 @@ class OptimizedPathTest implements RaptorTestConstants {
     assertEquals(exp, path.toString(this::stopIndexToName));
   }
 }
+
 // 881 100 + 130 200 = 1 011 300

@@ -16,6 +16,7 @@ public interface BikeWalkableEdge {
     var shouldIncludeCost = !parentState.isBackWalkingBike() && hadBackModeSet(parentState);
 
     editor.setBackWalkingBike(true);
+
     if (shouldIncludeCost) {
       editor.incrementWeight(preferences.bike().walking().mountDismountCost().toSeconds());
       editor.incrementTimeInMilliseconds(
@@ -29,6 +30,7 @@ public interface BikeWalkableEdge {
     var shouldIncludeCost = parentState.isBackWalkingBike();
 
     editor.setBackWalkingBike(false);
+
     if (shouldIncludeCost) {
       editor.incrementWeight(preferences.bike().walking().mountDismountCost().toSeconds());
       editor.incrementTimeInMilliseconds(
@@ -42,6 +44,7 @@ public interface BikeWalkableEdge {
       if (state.getBackMode() != null) {
         return state.getBackMode().isOnStreetNonTransit();
       }
+
       state = state.getBackState();
     } while (state != null);
 

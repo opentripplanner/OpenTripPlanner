@@ -131,6 +131,7 @@ public class WayPropertySet {
     WayProperties result = defaultProperties;
     int bestScore = 0;
     List<MixinProperties> matchedMixins = new ArrayList<>();
+
     for (WayPropertyPicker picker : wayProperties) {
       OsmSpecifier specifier = picker.specifier();
       WayProperties wayProperties = switch (direction) {
@@ -139,6 +140,7 @@ public class WayPropertySet {
         case BACKWARD -> picker.backwardProperties();
       };
       var score = specifier.matchScore(entity, direction);
+
       if (score > bestScore) {
         result = wayProperties;
         bestScore = score;
@@ -147,6 +149,7 @@ public class WayPropertySet {
 
     for (var mixin : mixins) {
       var score = mixin.specifier().matchScore(entity, direction);
+
       if (score > 0) {
         matchedMixins.add(mixin);
       }
@@ -175,24 +178,29 @@ public class WayPropertySet {
     if (!matchedMixins.isEmpty()) {
       result = applyMixins(result, matchedMixins, direction);
     }
+
     return result;
   }
 
   public I18NString getCreativeName(OsmEntity entity) {
     CreativeNamer bestNamer = null;
     int bestScore = 0;
+
     for (CreativeNamerPicker picker : creativeNamers) {
       OsmSpecifier specifier = picker.specifier();
       CreativeNamer namer = picker.namer();
       int score = specifier.matchScore(entity, DIRECTIONLESS);
+
       if (score > bestScore) {
         bestNamer = namer;
         bestScore = score;
       }
     }
+
     if (bestNamer == null) {
       return null;
     }
+
     return bestNamer.generateCreativeName(entity);
   }
 
@@ -213,6 +221,7 @@ public class WayPropertySet {
     Float currentSpeed;
 
     var motorCar = way.getTag("maxspeed:motorcar");
+
     if (motorCar != null) {
       speed = SpeedParser.getMetersSecondFromSpeed(motorCar);
     }
@@ -228,6 +237,7 @@ public class WayPropertySet {
     if (speed == null && way.hasTag("maxspeed:lanes")) {
       for (String lane : way.getTag("maxspeed:lanes").split("\\|")) {
         currentSpeed = SpeedParser.getMetersSecondFromSpeed(lane);
+
         // Pick the largest speed from the tag
         // currentSpeed might be null if it was invalid, for instance 10|fast|20
         if (currentSpeed != null && (speed == null || currentSpeed > speed)) {
@@ -237,6 +247,7 @@ public class WayPropertySet {
     }
 
     var maxSpeed = way.getTag("maxspeed");
+
     if (maxSpeed != null && speed == null) {
       speed = SpeedParser.getMetersSecondFromSpeed(maxSpeed);
     }
@@ -271,6 +282,7 @@ public class WayPropertySet {
     for (SpeedPicker picker : speedPickers) {
       OsmSpecifier specifier = picker.specifier();
       score = specifier.matchScore(way, direction);
+
       if (score > bestScore) {
         bestScore = score;
         bestSpeed = picker.speed();
@@ -287,14 +299,17 @@ public class WayPropertySet {
   public boolean getSlopeOverride(OsmEntity way) {
     boolean result = false;
     int bestScore = 0;
+
     for (SlopeOverridePicker picker : slopeOverrides) {
       OsmSpecifier specifier = picker.specifier();
       int score = specifier.matchScore(way, DIRECTIONLESS);
+
       if (score > bestScore) {
         result = picker.override();
         bestScore = score;
       }
     }
+
     return result;
   }
 
@@ -318,6 +333,7 @@ public class WayPropertySet {
         slopeOverrides.equals(other.slopeOverrides)
       );
     }
+
     return false;
   }
 
@@ -349,6 +365,7 @@ public class WayPropertySet {
     double bicycle = result.bicycleSafety();
     double walk = result.walkSafety();
     StreetTraversalPermission permission = result.getPermission();
+
     for (var mixin : mixins) {
       var properties = mixin.getDirectionalProperties(direction);
       bicycle *= properties.bicycleSafety();
@@ -357,6 +374,7 @@ public class WayPropertySet {
         .add(properties.addedPermission())
         .remove(properties.removedPermission());
     }
+
     return result
       .mutate()
       .bicycleSafety(bicycle)

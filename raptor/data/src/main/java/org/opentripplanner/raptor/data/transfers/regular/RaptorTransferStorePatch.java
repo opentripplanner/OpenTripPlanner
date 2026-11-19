@@ -14,9 +14,9 @@ import java.util.Set;
  * the store: the new store shares every row that is not affected with the original one.
  * <p>
  * Each replaced from-stop gets its complete new set of transfers - there is no way to change a
- * single transfer. A replaced from-stop without any added transfer has no transfers afterward.
- * The reverse rows ({@code toStops}) are derived: every stop that was a target of a replaced
- * from-stop before or after the patch gets a rebuilt row.
+ * single transfer. A replaced from-stop without any added transfer has no transfers afterward. The
+ * reverse rows ({@code toStops}) are derived: every stop that was a target of a replaced from-stop
+ * before or after the patch gets a rebuilt row.
  * <p>
  * This class is not thread-safe, and can only build one store.
  */
@@ -55,6 +55,7 @@ public final class RaptorTransferStorePatch {
   public RaptorTransferStorePatch addTransfer(int fromStop, int toStop, int duration, int c1) {
     assertNotBuilt();
     var transfers = newTransfersByFromStop.get(fromStop);
+
     if (transfers == null) {
       throw new IllegalArgumentException(
         "Transfers can only be added from a replaced stop, call replaceTransfersFrom(" +
@@ -62,6 +63,7 @@ public final class RaptorTransferStorePatch {
           ") first."
       );
     }
+
     transfers.add(toStop);
     transfers.add(duration);
     transfers.add(c1);
@@ -71,9 +73,11 @@ public final class RaptorTransferStorePatch {
   public RaptorTransferStore build() {
     assertNotBuilt();
     built = true;
+
     if (newTransfersByFromStop.isEmpty()) {
       return new RaptorTransferStore(fromStops, toStops);
     }
+
     return new RaptorTransferStore(
       fromStops.withRows(newFromRows()),
       toStops.withRows(newToRows())
@@ -84,19 +88,21 @@ public final class RaptorTransferStorePatch {
     var rows = new HashMap<Integer, DefaultRaptorTransfer[]>();
     newTransfersByFromStop.forEach((fromStop, triples) -> {
       var row = new DefaultRaptorTransfer[triples.size() / 3];
+
       for (int i = 0; i < row.length; ++i) {
         int j = i * 3;
         row[i] = new DefaultRaptorTransfer(triples.get(j), triples.get(j + 1), triples.get(j + 2));
       }
+
       rows.put(fromStop, row.length == 0 ? EMPTY_ARRAY : row);
     });
     return rows;
   }
 
   /**
-   * Rebuild the reverse row of every stop that is a target of a replaced from-stop, before or
-   * after the patch: drop the transfers from the replaced from-stops, and add their new ones.
-   * The transfers from other stops are kept, in their original order.
+   * Rebuild the reverse row of every stop that is a target of a replaced from-stop, before or after
+   * the patch: drop the transfers from the replaced from-stops, and add their new ones. The
+   * transfers from other stops are kept, in their original order.
    */
   private Map<Integer, DefaultRaptorTransfer[]> newToRows() {
     Set<Integer> replaced = newTransfersByFromStop.keySet();
@@ -113,6 +119,7 @@ public final class RaptorTransferStorePatch {
 
     // Old targets of the replaced from-stops, read from the forward rows before the patch
     var affected = new HashSet<>(added.keySet());
+
     for (int fromStop : replaced) {
       for (var transfer : fromStops.row(fromStop)) {
         affected.add(transfer.stop());
@@ -120,17 +127,21 @@ public final class RaptorTransferStorePatch {
     }
 
     var rows = new HashMap<Integer, DefaultRaptorTransfer[]>();
+
     for (int toStop : affected) {
       var row = new ArrayList<DefaultRaptorTransfer>();
+
       for (var transfer : toStops.row(toStop)) {
         // In a reverse row, stop() is the from-stop of the transfer
         if (!replaced.contains(transfer.stop())) {
           row.add(transfer);
         }
       }
+
       row.addAll(added.getOrDefault(toStop, List.of()));
       rows.put(toStop, row.isEmpty() ? EMPTY_ARRAY : row.toArray(EMPTY_ARRAY));
     }
+
     return rows;
   }
 

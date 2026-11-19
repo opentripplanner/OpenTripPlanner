@@ -53,9 +53,11 @@ public class VehicleAssignment implements Serializable {
     if (this == o) {
       return true;
     }
+
     if (!(o instanceof VehicleAssignment other)) {
       return false;
     }
+
     return (
       Objects.equals(vehicleId, other.vehicleId) &&
       Objects.equals(vehicleTypeId, other.vehicleTypeId)

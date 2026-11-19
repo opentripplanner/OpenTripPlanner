@@ -89,6 +89,7 @@ class TransmodelGraph {
         instrumentation
       );
     }
+
     return instrumentation;
   }
 
@@ -122,10 +123,12 @@ class TransmodelGraph {
    */
   private static ExecutionResult limitMaxNumberOfErrors(ExecutionResult result) {
     var errors = result.getErrors();
+
     if (errors.size() > MAX_ERROR_TO_RETURN) {
       final var errorsShortList = errors.stream().limit(MAX_ERROR_TO_RETURN).toList();
       result = result.transform(b -> b.errors(errorsShortList));
     }
+
     return result;
   }
 }

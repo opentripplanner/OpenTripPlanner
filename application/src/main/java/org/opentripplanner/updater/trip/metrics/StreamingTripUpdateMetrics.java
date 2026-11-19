@@ -38,15 +38,18 @@ public class StreamingTripUpdateMetrics extends TripUpdateMetrics {
     if (producer != null && !producer.isEmpty()) {
       return tags.and(Tag.of("producer", producer));
     }
+
     return tags.and(Tag.of("producer", "unknown_producer"));
   }
 
   private void incrementFailureCounts(UpdateResult result) {
     for (UpdateError error : result.errors()) {
       Tags tags = Tags.concat(baseTags, Tags.of("errorType", error.errorType().name()));
+
       if (producerMetrics) {
         tags = andProducerMetrics(tags, error.producer());
       }
+
       Counter.builder(METRICS_PREFIX + "." + "failed")
         .description("Total failed trip updates")
         .tags(tags)
@@ -58,9 +61,11 @@ public class StreamingTripUpdateMetrics extends TripUpdateMetrics {
   private void incrementSuccessCounts(UpdateResult result) {
     for (UpdateSuccess success : result.successes()) {
       Tags tags = Tags.of(baseTags);
+
       if (producerMetrics) {
         tags = andProducerMetrics(tags, success.producer());
       }
+
       Counter.builder(METRICS_PREFIX + "." + "successful")
         .description("Total successfully applied trip updates")
         .tags(tags)

@@ -37,6 +37,7 @@ public class TripTimeOnDateFilterMapper {
     for (var filterInput : filters) {
       var select = (List<Map<String, List<?>>>) filterInput.get("select");
       var not = (List<Map<String, List<?>>>) filterInput.get("not");
+
       if (select == null && not == null) {
         throw new InvalidInputException("A filter must have at least one of 'select' or 'not'.");
       }
@@ -45,18 +46,23 @@ public class TripTimeOnDateFilterMapper {
 
       if (select != null) {
         validateFieldNotEmpty("select", select);
+
         for (var it : select) {
           filterRequestBuilder.addSelect(mapSelectRequest(it));
         }
       }
+
       if (not != null) {
         validateFieldNotEmpty("not", not);
+
         for (var it : not) {
           filterRequestBuilder.addNot(mapSelectRequest(it));
         }
       }
+
       filterRequests.add(filterRequestBuilder.build());
     }
+
     return filterRequests;
   }
 
@@ -67,22 +73,26 @@ public class TripTimeOnDateFilterMapper {
     var builder = TripTimeOnDateSelectRequest.of();
 
     var lines = (List<String>) input.get("lines");
+
     if (lines != null) {
       validateFieldNotEmpty("lines", lines);
       builder.withRoutes(idMapper.parseListNullSafe(lines));
     }
 
     var authorities = (List<String>) input.get("authorities");
+
     if (authorities != null) {
       validateFieldNotEmpty("authorities", authorities);
       builder.withAgencies(idMapper.parseListNullSafe(authorities));
     }
 
     var transportModes = (List<Map<String, ?>>) input.get("transportModes");
+
     if (transportModes != null) {
       validateFieldNotEmpty("transportModes", transportModes);
 
       var tModes = new ArrayList<MainAndSubMode>();
+
       for (Map<String, ?> modeWithSubModes : transportModes) {
         validateMainModePresent(modeWithSubModes);
 
@@ -92,6 +102,7 @@ public class TripTimeOnDateFilterMapper {
         var transportSubModes = (List<TransmodelTransportSubmode>) modeWithSubModes.get(
           "transportSubModes"
         );
+
         if (transportSubModes != null) {
           for (var subMode : transportSubModes) {
             tModes.add(new MainAndSubMode(mainMode, SubMode.of(subMode.getValue())));
@@ -100,6 +111,7 @@ public class TripTimeOnDateFilterMapper {
           tModes.add(new MainAndSubMode(mainMode));
         }
       }
+
       builder.withTransportModes(tModes);
     }
 

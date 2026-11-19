@@ -173,7 +173,8 @@ class StreetLinkerModuleTest {
 
     assertTrue(model.stopVertex().isConnectedToGraph());
 
-    // Because the stop is used by a carsAllowed trip it needs to be linked to both the walk and car edge
+    // Because the stop is used by a carsAllowed trip it needs to be linked to both the walk and car
+    // edge
     assertThat(model.stopVertex().getOutgoing()).hasSize(2);
     var linkToWalk = model.outgoingLinks().getFirst();
     SplitterVertex walkSplit = (SplitterVertex) linkToWalk.getToVertex();

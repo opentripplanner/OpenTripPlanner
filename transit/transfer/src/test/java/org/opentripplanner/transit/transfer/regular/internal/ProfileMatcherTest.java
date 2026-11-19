@@ -43,9 +43,11 @@ class ProfileMatcherTest {
 
   private static OverlaidTemplatePaths<String> overlaid(AbstractUserPreferences<?>... profiles) {
     var paths = new TemplatePathsByUserProfile<String>();
+
     for (var profile : profiles) {
       paths.setPaths(profile, 1, Map.of(2, "path"));
     }
+
     return new OverlaidTemplatePaths<>(paths);
   }
 

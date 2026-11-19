@@ -23,12 +23,14 @@ class TransactionManager {
     if (repositories.stream().noneMatch(TransactionalRepository::modified)) {
       return;
     }
+
     var currentTx = currentTransaction.get();
     var nextTx = next();
 
     for (var repository : repositories) {
       repository.commit(currentTx, nextTx);
     }
+
     currentTransaction.set(nextTx);
   }
 

@@ -17,7 +17,6 @@ import org.opentripplanner.updater.trip.siri.SiriTestHelper;
 /**
  * Tests for the handling of SIRI ET updates where real-time times are partially or fully absent for
  * stops in a trip.
- *
  * <p>
  * The key behaviours under test:
  * <ul>
@@ -243,7 +242,6 @@ class MissingRealtimeTest implements RealtimeTestConstants {
    * A journey-level cancellation with no stop times provided must set {@code isCanceled = true} and
    * leave {@code timesModified = false}. The trip is "updated" because it is cancelled (prefix "C
    * U"), but no time modifications were made, so the scheduled times are shown.
-   *
    * <p>
    * This verifies that {@code hasAnyUpdates()} is driven by the cancellation flag alone and does
    * not require {@code timesModified} to be {@code true}.

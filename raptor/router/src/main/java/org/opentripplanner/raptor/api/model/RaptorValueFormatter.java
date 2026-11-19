@@ -44,9 +44,11 @@ final class RaptorValueFormatter {
       value /= 100;
       return FORMAT_INT.get().format(value);
     }
+
     if (Math.abs(value) >= 1_000_000) {
       return FORMAT_INT.get().format(value / 100);
     }
+
     return FORMAT_CENTI.get().format(value / 100.0);
   }
 

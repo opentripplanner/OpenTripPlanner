@@ -51,12 +51,14 @@ class BackwardsDelayRequiredInterpolatorTest {
       OptionalInt.of(firstUpdateIndex),
       new BackwardsDelayRequiredInterpolator(false).propagateBackwards(builder)
     );
+
     // everything before the first given update should be given the scheduled time
     for (var i = 0; i < firstUpdateIndex; ++i) {
       assertEquals(0, builder.getArrivalDelay(i));
       assertEquals(0, builder.getDepartureDelay(i));
       assertEquals(StopRealTimeState.DEFAULT, builder.getStopRealTimeState(i));
     }
+
     // nothing after the first given update should be touched
     for (var i = firstUpdateIndex; i < STOP_COUNT; i++) {
       assertEquals(reference.getArrivalDelay(i), builder.getArrivalDelay(i));
@@ -81,12 +83,14 @@ class BackwardsDelayRequiredInterpolatorTest {
       OptionalInt.of(firstUpdateIndex),
       new BackwardsDelayRequiredInterpolator(true).propagateBackwards(builder)
     );
+
     // everything before the first given update should be given the scheduled time
     for (var i = 0; i < firstUpdateIndex; ++i) {
       assertEquals(0, builder.getArrivalDelay(i));
       assertEquals(0, builder.getDepartureDelay(i));
       assertEquals(StopRealTimeState.NO_DATA, builder.getStopRealTimeState(i));
     }
+
     // nothing after the first given update should be touched
     for (var i = firstUpdateIndex; i < STOP_COUNT; i++) {
       assertEquals(reference.getArrivalDelay(i), builder.getArrivalDelay(i));
@@ -107,6 +111,7 @@ class BackwardsDelayRequiredInterpolatorTest {
       OptionalInt.of(firstUpdateIndex),
       new BackwardsDelayRequiredInterpolator(true).propagateBackwards(builder)
     );
+
     // everything before the first given update should be given the scheduled time and set NO_DATA
     // unless the stop has been canceled
     for (var i = 0; i < firstUpdateIndex; ++i) {
@@ -159,16 +164,19 @@ class BackwardsDelayRequiredInterpolatorTest {
       OptionalInt.of(firstUpdateIndex),
       new BackwardsDelayRequiredInterpolator(true).propagateBackwards(builder)
     );
+
     // everything before the first given update should be given the scheduled time
     for (var i = 0; i < firstUpdateIndex; ++i) {
       assertEquals(0, builder.getArrivalDelay(i));
       assertEquals(0, builder.getDepartureDelay(i));
       assertEquals(StopRealTimeState.NO_DATA, builder.getStopRealTimeState(i));
     }
+
     // the arrival should be fill in as well
     assertEquals(0, builder.getArrivalDelay(firstUpdateIndex));
     // TODO: It is not possible to specify NO_DATA just for the arrival yet
     assertEquals(StopRealTimeState.DEFAULT, builder.getStopRealTimeState(firstUpdateIndex));
+
     // nothing after the first given update should be touched
     for (var i = firstUpdateIndex + 1; i < STOP_COUNT; i++) {
       assertEquals(reference.getArrivalDelay(i), builder.getArrivalDelay(i));

@@ -104,11 +104,13 @@ public class StreetSearchRequest implements AStarRequest {
     this.intersectionTraversalCalculator = requireNonNull(builder.intersectionTraversalCalculator);
     this.extensionRequestContexts = List.copyOf(requireNonNull(builder.extensionRequestContexts));
     this.timeout = requireNonNull(builder.timeout);
+
     if (!arriveBy && !builder.arriveByDestinationZones.isEmpty()) {
       throw new IllegalArgumentException(
         "Unexpected non-empty arriveByDestinationZones when arriveBy is false"
       );
     }
+
     this.arriveByDestinationZones = Set.copyOf(builder.arriveByDestinationZones);
   }
 
@@ -271,7 +273,8 @@ public class StreetSearchRequest implements AStarRequest {
         TAXI,
         CAR_HAILING,
         CARPOOL,
-        FLEXIBLE -> null;
+        FLEXIBLE
+          -> null;
     };
   }
 

@@ -23,8 +23,8 @@ import org.opentripplanner.model.plan.paging.cursor.PageType;
  * - ARRIVE BY search -> verify NEXT -> search previous -> verify NEXT & PREVIOUS
  * - ARRIVE BY search -> verify PREVIOUS -> search previous -> verify NEXT & PREVIOUS
  * </pre>
- * Note! We are not doing the actual search, just emulating the search using the
- * {@link TestDriver} mock.
+ * Note! We are not doing the actual search, just emulating the search using the {@link TestDriver}
+ * mock.
  * <p>
  * All components required to test paging is used including the {@link PagingService} and the 3
  * filters:
@@ -33,7 +33,6 @@ import org.opentripplanner.model.plan.paging.cursor.PageType;
  *   <li>OutsideSearchWindowFilter</li>
  *   <li>NumItinerariesFilter</li>
  * </ol>
- * <p>
  */
 @SuppressWarnings("DataFlowIssue")
 class PS2_ManyParetoOptimalItinerariesTest {

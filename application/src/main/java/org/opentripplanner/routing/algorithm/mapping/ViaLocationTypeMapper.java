@@ -29,6 +29,7 @@ public class ViaLocationTypeMapper {
                 ? ViaLocationType.PASS_THROUGH
                 : ViaLocationType.VISIT;
             }
+
             return null;
           })
       )

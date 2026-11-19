@@ -179,7 +179,7 @@ class WayPropertySetTest {
    * Convenience function to get a speed picker for a given specifier and speed.
    *
    * @param specifier The OSM specifier, e.g. highway=motorway
-   * @param speed     The speed, in meters per second
+   * @param speed The speed, in meters per second
    */
   private SpeedPicker getSpeedPicker(String specifier, float speed) {
     return new SpeedPicker(new BestMatchSpecifier(specifier), speed);

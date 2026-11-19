@@ -14,7 +14,6 @@ import org.opentripplanner.street.graph.summary.GraphSummarizer;
 /**
  * Tests that a re-entrant (concave) corner of an L-shaped platform enters the visibility vertex set
  * via {@code isNodeConvex}, enabling the shortest path between two stair entries.
- *
  * <p>
  * The platform is an L-shape made of two rectangles:
  * <pre>
@@ -25,7 +24,6 @@ import org.opentripplanner.street.graph.summary.GraphSummarizer;
  * Corner C is the re-entrant corner (interior angle &gt; 180° in the polygon sense).
  * {@code Ring.isNodeConvex(C)} returns {@code true} for a CW ring because the cross-product at a
  * re-entrant corner is positive. This adds C to {@code visibilityVertices}.
- *
  * <p>
  * Stairs connect from outside to the top-left (A) and the bottom-right (F). The direct
  * line-of-sight from A to F grazes the re-entrant corner C exactly (the segment A–F passes through

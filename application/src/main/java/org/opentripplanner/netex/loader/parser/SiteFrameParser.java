@@ -54,9 +54,11 @@ class SiteFrameParser extends NetexParser<Site_VersionFrameStructure> {
     if (frame.getStopPlaces() != null) {
       parseStopPlaces(frame.getStopPlaces().getStopPlace());
     }
+
     if (frame.getGroupsOfStopPlaces() != null) {
       parseGroupsOfStopPlaces(frame.getGroupsOfStopPlaces().getGroupOfStopPlaces());
     }
+
     if (OTPFeature.FlexRouting.isOn() && frame.getFlexibleStopPlaces() != null) {
       parseFlexibleStopPlaces(frame.getFlexibleStopPlaces().getFlexibleStopPlace());
     }
@@ -68,6 +70,7 @@ class SiteFrameParser extends NetexParser<Site_VersionFrameStructure> {
     if (!ignoredFeatures.contains(PARKING) && frame.getParkings() != null) {
       parseParkings(frame.getParkings().getParking());
     }
+
     // Keep list sorted alphabetically
     warnOnMissingMapping(LOG, frame.getAccesses());
     warnOnMissingMapping(LOG, frame.getAddresses());
@@ -139,6 +142,7 @@ class SiteFrameParser extends NetexParser<Site_VersionFrameStructure> {
     if (quayRefOrQuay == null) {
       return;
     }
+
     JAXBUtils.forEachJAXBElementValue(Quay.class, quayRefOrQuay.getQuayRefOrQuay(), quays::add);
   }
 

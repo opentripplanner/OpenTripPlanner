@@ -11,8 +11,7 @@ import org.slf4j.LoggerFactory;
 /**
  * The purpose of this class is to be able to turn features on and off.
  * <p>
- * This configuration is optional and found under "feature" in the top level 'otp-config.json'
- * file.
+ * This configuration is optional and found under "feature" in the top level 'otp-config.json' file.
  */
 public enum OTPFeature {
   AlertMetrics(
@@ -69,7 +68,6 @@ public enum OTPFeature {
    * time, but the definitive transfer time. Use this to override what we think the transfer will
    * take according to OSM data, for example if you want to set a very low transfer time like 1
    * minute, when walking the distance take 1m30s.
-   *
    * <p>
    * TODO Harmonize the JavaDoc with the user doc and delete JavaDoc
    */
@@ -193,6 +191,7 @@ public enum OTPFeature {
     LOG.info("Features turned on: \n\t{}", valuesAsString(true));
     LOG.info("Features turned off: \n\t{}", valuesAsString(false));
     var featureWarnings = enabledValuesWithSevereWarningAsString();
+
     if (!featureWarnings.isBlank()) {
       LOG.warn("FEATURES THAT SHOULD BE TURNED OFF IN PRODUCTION: \n\t{}", featureWarnings);
     }
@@ -200,7 +199,7 @@ public enum OTPFeature {
 
   /**
    * FOR TEST ONLY
-   *
+   * <p>
    * This method will run the given {@code task} with the feature turned ON. When the task complete
    * the feature is set back to its original value.
    * <p>
@@ -215,7 +214,7 @@ public enum OTPFeature {
 
   /**
    * FOR TEST ONLY
-   *
+   * <p>
    * See {@link #testOn(Runnable)}
    */
   public void testOff(Runnable task) {
@@ -273,6 +272,7 @@ public enum OTPFeature {
   private void testEnabled(boolean enabled, Runnable task) {
     synchronized (TEST_LOCK) {
       boolean originalValue = this.enabled;
+
       try {
         set(enabled);
         task.run();

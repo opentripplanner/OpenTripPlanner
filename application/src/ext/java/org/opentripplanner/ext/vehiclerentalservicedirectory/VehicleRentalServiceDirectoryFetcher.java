@@ -124,6 +124,7 @@ public class VehicleRentalServiceDirectoryFetcher {
         )
       );
     }
+
     return dataSources;
   }
 
@@ -131,9 +132,11 @@ public class VehicleRentalServiceDirectoryFetcher {
     List<GbfsVehicleRentalDataSourceParameters> dataSources
   ) {
     List<GraphUpdater<?>> updaters = new ArrayList<>();
+
     for (var it : dataSources) {
       updaters.add(fetchAndCreateUpdater(it));
     }
+
     LOG.info("{} updaters fetched", updaters.size());
     return updaters;
   }

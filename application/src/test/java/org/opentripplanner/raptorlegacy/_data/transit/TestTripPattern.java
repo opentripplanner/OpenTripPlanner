@@ -5,9 +5,8 @@ import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- *
  * @deprecated This was earlier part of Raptor and should not be used outside the Raptor module. Use
- *             the OTP model entities instead.
+ *     the OTP model entities instead.
  */
 @Deprecated
 public class TestTripPattern implements RaptorTripPattern {
@@ -83,18 +82,23 @@ public class TestTripPattern implements RaptorTripPattern {
    */
   public void restrictions(String codes) {
     String[] split = codes.split(" ");
+
     for (int i = 0; i < split.length; i++) {
       String restriction = split[i];
       restrictions[i] = 0;
+
       if (restriction.contains("*")) {
         continue;
       }
+
       if (!restriction.contains("B")) {
         restrictions[i] |= BOARDING_MASK;
       }
+
       if (!restriction.contains("A")) {
         restrictions[i] |= ALIGHTING_MASK;
       }
+
       if (!restriction.contains("W")) {
         restrictions[i] |= WHEELCHAIR_MASK;
       }

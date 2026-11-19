@@ -38,7 +38,7 @@ public class SafetyValueApplier {
    * Get the best bike safety in the whole graph.
    *
    * @return The bike safety of the safest way in the graph, i.e. the way with the lowest bike
-   *         safety value.
+   *     safety value.
    */
   float getBestBikeSafety() {
     return bestBikeSafety;
@@ -48,7 +48,7 @@ public class SafetyValueApplier {
    * Get the best walk safety in the whole graph.
    *
    * @return The walk safety of the safest way in the graph, i.e. the way with the lowest walk
-   *         safety value.
+   *     safety value.
    */
   float getBestWalkSafety() {
     return bestWalkSafety;
@@ -71,6 +71,7 @@ public class SafetyValueApplier {
     if (street != null) {
       float bicycleSafety = (float) forwardWayData.bicycleSafety();
       street.setBicycleSafetyFactor(bicycleSafety);
+
       if (bicycleSafety < bestBikeSafety) {
         bestBikeSafety = bicycleSafety;
         LOG.debug(
@@ -79,8 +80,10 @@ public class SafetyValueApplier {
           street
         );
       }
+
       float walkSafety = (float) forwardWayData.walkSafety();
       street.setWalkSafetyFactor(walkSafety);
+
       if (walkSafety < bestWalkSafety) {
         bestWalkSafety = walkSafety;
         LOG.debug(
@@ -89,6 +92,7 @@ public class SafetyValueApplier {
           street
         );
       }
+
       street.setMotorVehicleNoThruTraffic(motorVehicleNoThrough);
       street.setBicycleNoThruTraffic(bicycleNoThrough);
       street.setWalkNoThruTraffic(walkNoThrough);
@@ -96,6 +100,7 @@ public class SafetyValueApplier {
 
     if (backStreet != null) {
       float bicycleSafety = (float) backwardWayData.bicycleSafety();
+
       if (bicycleSafety < bestBikeSafety) {
         bestBikeSafety = bicycleSafety;
         LOG.debug(
@@ -104,8 +109,10 @@ public class SafetyValueApplier {
           backStreet
         );
       }
+
       backStreet.setBicycleSafetyFactor(bicycleSafety);
       float walkSafety = (float) backwardWayData.walkSafety();
+
       if (walkSafety < bestWalkSafety) {
         bestWalkSafety = walkSafety;
         LOG.debug(
@@ -114,6 +121,7 @@ public class SafetyValueApplier {
           backStreet
         );
       }
+
       backStreet.setWalkSafetyFactor((float) walkSafety);
       backStreet.setMotorVehicleNoThruTraffic(motorVehicleNoThrough);
       backStreet.setBicycleNoThruTraffic(bicycleNoThrough);

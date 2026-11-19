@@ -45,9 +45,11 @@ public class BoardAndAlightTime {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     BoardAndAlightTime that = (BoardAndAlightTime) o;
     return boardStopPos == that.boardStopPos && alightStopPos == that.alightStopPos;
   }

@@ -80,9 +80,11 @@ public class ElevationModuleTest {
     );
     Coordinate[] coordinates = geometry.getCoordinates();
     double length = 0;
+
     for (int i = 1; i < coordinates.length; ++i) {
       length += SphericalDistanceLibrary.distance(coordinates[i - 1], coordinates[i]);
     }
+
     StreetEdge edge = new StreetEdgeBuilder<>()
       .withFromVertex(from)
       .withToVertex(to)

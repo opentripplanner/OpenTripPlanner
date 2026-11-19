@@ -156,6 +156,7 @@ class TripPatternMapper {
 
     this.datedServiceJourneyById = datedServiceJourneyById;
     this.serviceJourneyById = serviceJourneyById;
+
     // Index service journey by pattern id
     for (ServiceJourney sj : serviceJourneyById.localValues()) {
       this.serviceJourneysByPatternId.put(sj.getJourneyPatternRef().getValue().getRef(), sj);
@@ -225,12 +226,14 @@ class TripPatternMapper {
 
     var tripPatternModes = new HashSet<TransitMode>();
     var tripPatternSubmodes = new HashSet<SubMode>();
+
     for (Trip trip : trips) {
       tripPatternModes.add(trip.getMode());
       tripPatternSubmodes.add(trip.getNetexSubMode());
     }
 
     boolean hasMultipleModes = tripPatternModes.size() > 1;
+
     if (hasMultipleModes) {
       issueStore.add(
         "ServiceJourneyPatternHasMultipleModes",
@@ -241,6 +244,7 @@ class TripPatternMapper {
     }
 
     boolean hasMultipleSubmodes = tripPatternSubmodes.size() > 1;
+
     if (hasMultipleSubmodes) {
       issueStore.add(
         "ServiceJourneyPatternHasMultipleSubModes",
@@ -286,6 +290,7 @@ class TripPatternMapper {
     Trip trip
   ) {
     var tripsOnServiceDates = new ArrayList<TripOnServiceDate>();
+
     if (datedServiceJourneysBySJId.containsKey(serviceJourney.getId())) {
       for (DatedServiceJourney datedServiceJourney : datedServiceJourneysBySJId.get(
         serviceJourney.getId()
@@ -293,6 +298,7 @@ class TripPatternMapper {
         tripsOnServiceDates.add(mapDatedServiceJourney(journeyPattern, trip, datedServiceJourney));
       }
     }
+
     return tripsOnServiceDates;
   }
 
@@ -314,6 +320,7 @@ class TripPatternMapper {
     );
 
     List<TripOnServiceDate> replacementFor;
+
     if (datedServiceJourney.getReplacedJourneys() != null) {
       replacementFor = datedServiceJourney
         .getReplacedJourneys()
@@ -332,8 +339,10 @@ class TripPatternMapper {
             );
             return null;
           }
+
           String serviceJourneyRef = replacement.getJourneyRef().getValue().getRef();
           ServiceJourney serviceJourney = serviceJourneyById.lookup(serviceJourneyRef);
+
           if (serviceJourney == null) {
             issueStore.add(
               "InvalidDatedServiceJourneyRef",
@@ -343,6 +352,7 @@ class TripPatternMapper {
             );
             return null;
           }
+
           return mapDatedServiceJourney(
             journeyPattern,
             mapTrip(journeyPattern, serviceJourney),
@@ -373,6 +383,7 @@ class TripPatternMapper {
     JourneyPattern_VersionStructure journeyPattern
   ) {
     String lineId = null;
+
     if (journeyPattern.getRouteRef() != null) {
       Route route = routeById.lookup(journeyPattern.getRouteRef().getRef());
       lineId = route.getLineRef().getValue().getRef();
@@ -380,6 +391,7 @@ class TripPatternMapper {
       RouteView routeView = journeyPattern.getRouteView();
       lineId = routeView.getLineRef().getValue().getRef();
     }
+
     return otpRouteById.get(idFactory.createId(lineId));
   }
 
@@ -388,8 +400,10 @@ class TripPatternMapper {
     Map<Trip, List<StopTime>> tripStopTimes
   ) {
     var tripTimesResult = new ArrayList<TripTimes<?>>();
+
     for (Trip trip : trips) {
       List<StopTime> stopTimes = tripStopTimes.get(trip);
+
       if (stopTimes.isEmpty()) {
         issueStore.add(
           "TripWithoutTripTimes",
@@ -405,6 +419,7 @@ class TripPatternMapper {
         }
       }
     }
+
     return tripTimesResult;
   }
 
@@ -425,9 +440,11 @@ class TripPatternMapper {
     ServiceJourney serviceJourney
   ) {
     var times = serviceJourney.getPassingTimes().getTimetabledPassingTime();
+
     if (times == null || times.isEmpty()) {
       return HEADSIGN_EMPTY;
     }
+
     String headsign = stopTimesMapper.findTripHeadsign(journeyPattern, times.get(0));
     return headsign == null ? HEADSIGN_EMPTY : headsign;
   }

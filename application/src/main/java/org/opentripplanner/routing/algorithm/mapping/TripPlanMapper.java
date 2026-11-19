@@ -49,6 +49,7 @@ public class TripPlanMapper {
       from = legs.getFirst().from();
       to = legs.getLast().to();
     }
+
     return new TripPlan(from, to, dateTime, itineraries);
   }
 }

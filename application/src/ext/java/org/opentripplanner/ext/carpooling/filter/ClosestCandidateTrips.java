@@ -35,17 +35,23 @@ public final class ClosestCandidateTrips {
     if (max <= 0) {
       throw new IllegalArgumentException("max must be positive");
     }
+
     if (trips.size() <= max) {
       return List.copyOf(trips);
     }
+
     var scored = new ArrayList<Scored>(trips.size());
+
     for (var trip : trips) {
       double score = 0;
+
       for (var point : passengerPoints) {
         score += distanceToRoute(trip.trip(), point);
       }
+
       scored.add(new Scored(trip, score));
     }
+
     scored.sort(Comparator.comparingDouble(Scored::metres));
     return scored.subList(0, max).stream().map(Scored::trip).toList();
   }
@@ -55,6 +61,7 @@ public final class ClosestCandidateTrips {
     List<WgsCoordinate> route = trip.routePoints();
     Coordinate p = point.asJtsCoordinate();
     double best = Double.POSITIVE_INFINITY;
+
     for (int i = 0; i < route.size() - 1; i++) {
       double d = SphericalDistanceLibrary.fastDistance(
         p,
@@ -63,6 +70,7 @@ public final class ClosestCandidateTrips {
       );
       best = Math.min(best, d);
     }
+
     return best;
   }
 

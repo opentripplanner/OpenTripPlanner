@@ -364,6 +364,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
       List<String> filterByNetwork = args.getGraphQLFilterByNetwork();
 
       List<PlaceAtDistance> places;
+
       try {
         places = new ArrayList<>(
           getNearbyPlaceFinder(environment).findClosestPlaces(
@@ -396,9 +397,11 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
       GtfsGraphQLRequestContext context = environment.<GtfsGraphQLRequestContext>getContext();
       var args = new GraphQLTypes.GraphQLQueryTypeItineraryArgs(environment.getArguments());
       var reference = ItineraryReference.decode(args.getGraphQLId());
+
       if (reference == null) {
         return null;
       }
+
       try {
         // The id holds no locale, so names use the language of this request, like leg(id:).
         var locale = environment.getLocale();
@@ -437,9 +440,11 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
       var args = new GraphQLTypes.GraphQLQueryTypeLegArgs(environment.getArguments());
       String id = args.getGraphQLId();
       LegReference ref = LegReferenceSerializer.decode(id);
+
       if (ref == null) {
         return null;
       }
+
       return ref.getLeg(transitService, getTransitAlertService(environment));
     };
   }
@@ -647,6 +652,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
       }
 
       var formFactorArgs = args.getGraphQLFormFactors();
+
       if (formFactorArgs != null) {
         var requiredFormFactors = formFactorArgs.stream().map(GraphQLUtils::toModel).toList();
 
@@ -720,6 +726,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
         );
         routeStream = filter.filterRoutes(routeStream.toList()).stream();
       }
+
       return routeStream.toList();
     };
   }
@@ -842,6 +849,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
       );
 
       List<NearbyStop> stops;
+
       try {
         stops = getNearbyStopFinder(environment).findNearbyStops(
           new Coordinate(args.getGraphQLLon(), args.getGraphQLLat()),
@@ -1106,6 +1114,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
     if (id == null) {
       return null;
     }
+
     return FeedScopedId.parseOptional(id).map(mapping).orElse(null);
   }
 }

@@ -11,12 +11,15 @@ public class FileSizeToTextConverter {
     if (n >= 1_000_000_000) {
       return String.format(Locale.ROOT, "%.1f GB", n / 1_000_000_000.0);
     }
+
     if (n >= 1_000_000) {
       return String.format(Locale.ROOT, "%.1f MB", n / 1_000_000.0);
     }
+
     if (n >= 1_000) {
       return String.format(Locale.ROOT, "%d kB", n / 1_000);
     }
+
     if (n == 1) {
       return String.format(Locale.ROOT, "%d byte", n);
     } else {

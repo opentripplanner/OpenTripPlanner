@@ -43,6 +43,7 @@ public class OtpRetry {
   public void execute(Runnable retryable) throws InterruptedException {
     int attempts = 0;
     long sleepTime = initialRetryInterval.toMillis();
+
     while (true) {
       try {
         retryable.run();
@@ -51,10 +52,13 @@ public class OtpRetry {
         if (!retryableException.test(e)) {
           throw new OtpRetryException("Operation failed with non-retryable exception", e);
         }
+
         attempts++;
+
         if (attempts > maxAttempts) {
           throw new OtpRetryException("Operation failed after " + attempts + " attempts", e);
         }
+
         LOG.info(
           "Operation {} failed with retryable exception: {}. Retrying {}/{} in {} millis",
           name,

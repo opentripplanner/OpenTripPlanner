@@ -56,12 +56,12 @@ class TripTimesUpdater {
    * Timetable when several updates are applied to it at once. We assume here that all trips in a
    * timetable are from the same feed, which should always be the case.
    *
-   * @param tripUpdate     GTFS-RT trip update
+   * @param tripUpdate GTFS-RT trip update
    * @param backwardsDelay Defines when delays are propagated to previous stops and if these stops
-   *                       are given the NO_DATA flag
+   *     are given the NO_DATA flag
    * @return {@link TripTimesPatch} contains a new copy of updated TripTimes after TripUpdate has
-   *         been applied on TripTimes of trip with the id specified in the trip descriptor of the
-   *         TripUpdate and a list of stop indices that have been skipped with the realtime update.
+   *     been applied on TripTimes of trip with the id specified in the trip descriptor of the
+   *     TripUpdate and a list of stop indices that have been skipped with the realtime update.
    * @throws UpdateException if there are any problems with the data
    */
   public TripTimesPatch createUpdatedTripTimesFromGtfsRt(
@@ -73,6 +73,7 @@ class TripTimesUpdater {
     var tripId = tripUpdate.tripId();
 
     var tripTimes = timetable.getTripTimes(tripId);
+
     if (tripTimes == null) {
       throw UpdateException.of(tripId, TRIP_NOT_FOUND_IN_PATTERN);
     }
@@ -118,6 +119,7 @@ class TripTimesUpdater {
         .ifPresent(x -> replacedStopIndices.put(pos, x));
 
       var scheduleRelationship = update.scheduleRelationship();
+
       // Handle each schedule relationship case
       if (scheduleRelationship == ScheduleRelationship.SKIPPED) {
         // Set status to cancelled
@@ -133,9 +135,11 @@ class TripTimesUpdater {
         if (!update.isArrivalValid()) {
           throw UpdateException.of(tripId, INVALID_ARRIVAL_TIME, i);
         }
+
         if (!update.isDepartureValid()) {
           throw UpdateException.of(tripId, INVALID_DEPARTURE_TIME, i);
         }
+
         setArrivalAndDeparture(builder, pos, update, today);
       }
     }
@@ -150,6 +154,7 @@ class TripTimesUpdater {
     tripUpdate.vehicleId().ifPresent(builder::withVehicleId);
 
     builder.withRealTimeUpdated();
+
     // Validate for non-increasing times. Log error if present.
     try {
       var result = builder.build();
@@ -162,12 +167,12 @@ class TripTimesUpdater {
   /**
    * Add a new or replacement trip to the snapshot
    *
-   * @param trip                   trip
-   * @param tripUpdate             information about the trip
+   * @param trip trip
+   * @param tripUpdate information about the trip
    * @param stopAndStopTimeUpdates updates for the stops
-   * @param added                  whether this trip was added (extra Trip)
-   * @param tripPatternModified    whether the trip Pattern was tripPatternModified
-   * @param serviceCode            serviceCode of the trip
+   * @param added whether this trip was added (extra Trip)
+   * @param tripPatternModified whether the trip Pattern was tripPatternModified
+   * @param serviceCode serviceCode of the trip
    * @throws UpdateException if there are any errors with the TripUpdate
    */
   public TripTimesWithStopPattern createNewTripTimesFromGtfsRt(
@@ -186,6 +191,7 @@ class TripTimesUpdater {
 
     // Create StopTimes based on the scheduled times
     final List<StopTime> stopTimes = new ArrayList<>(stopAndStopTimeUpdates.size());
+
     for (final StopAndStopTimeUpdate item : stopAndStopTimeUpdates) {
       final var update = item.stopTimeUpdate();
 
@@ -195,22 +201,30 @@ class TripTimesUpdater {
       stopTime.setStop(item.stop());
       // Set arrival time
       final var arrival = update.scheduledArrivalTimeWithRealTimeFallback();
+
       if (arrival.isPresent()) {
         final var arrivalTime = arrival.getAsLong() - midnightSecondsSinceEpoch;
+
         if (arrivalTime < 0 || arrivalTime > MAX_ARRIVAL_DEPARTURE_TIME) {
           throw UpdateException.of(trip.getId(), INVALID_ARRIVAL_TIME);
         }
+
         stopTime.setArrivalTime((int) arrivalTime);
       }
+
       // Set departure time
       final var departure = update.scheduledDepartureTimeWithRealTimeFallback();
+
       if (departure.isPresent()) {
         final long departureTime = departure.getAsLong() - midnightSecondsSinceEpoch;
+
         if (departureTime < 0 || departureTime > MAX_ARRIVAL_DEPARTURE_TIME) {
           throw UpdateException.of(trip.getId(), INVALID_DEPARTURE_TIME);
         }
+
         stopTime.setDepartureTime((int) departureTime);
       }
+
       // Exact time
       stopTime.setTimepoint(1);
       update.stopSequence().ifPresent(stopTime::setStopSequence);
@@ -237,9 +251,11 @@ class TripTimesUpdater {
       }
 
       setArrivalAndDeparture(builder, stopIndex, addedStopTime, midnightSecondsSinceEpoch);
+
       if (builder.getArrivalTime(stopIndex) == null) {
         builder.withArrivalDelay(stopIndex, 0);
       }
+
       if (builder.getDepartureTime(stopIndex) == null) {
         builder.withDepartureDelay(stopIndex, 0);
       }
@@ -247,9 +263,11 @@ class TripTimesUpdater {
 
     // Set service code of new trip times
     builder.withServiceCode(serviceCode);
+
     if (added) {
       builder.withAdded();
     }
+
     if (tripPatternModified) {
       builder.withModifiedTripPattern();
     }

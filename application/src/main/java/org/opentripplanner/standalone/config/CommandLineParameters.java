@@ -15,8 +15,8 @@ import java.util.List;
  * at-symbol syntax (see http://jcommander.org/#Syntax). When stand-alone OTP is started as a
  * daemon, parameters are loaded from such a file, located by default in '/etc/opentripplanner.cfg'.
  * <p>
- * Note that JCommander-annotated parameters can be any type that can be constructed from a
- * string. This module also contains classes for validating parameters. See:
+ * Note that JCommander-annotated parameters can be any type that can be constructed from a string.
+ * This module also contains classes for validating parameters. See:
  * http://jcommander.org/#Parameter_validation
  * <p>
  * Some parameter fields are not initialized so when inferring other parameters, we can check for
@@ -196,6 +196,7 @@ public class CommandLineParameters {
 
   public String logTaskInfo() {
     var mainCommands = new ArrayList<String>();
+
     if (doBuildStreet() & doBuildTransit()) {
       mainCommands.add("Build Street & Transit Graph");
     } else if (doBuildStreet()) {
@@ -203,9 +204,11 @@ public class CommandLineParameters {
     } else if (doBuildTransit()) {
       mainCommands.add("Build Transit Graph");
     }
+
     if (doServe()) {
       mainCommands.add("Run Server");
     }
+
     return String.join(", ", mainCommands);
   }
 
@@ -217,6 +220,7 @@ public class CommandLineParameters {
     ServerSocket socket = null;
     boolean portUnavailable = false;
     String reason = null;
+
     try {
       socket = new ServerSocket(port);
     } catch (IOException e) {
@@ -231,6 +235,7 @@ public class CommandLineParameters {
         }
       }
     }
+
     if (portUnavailable) {
       String msg = String.format(": port %d is not available. %s.", port, reason);
       throw new ParameterException(msg);
@@ -258,18 +263,23 @@ public class CommandLineParameters {
     if (cmds.isEmpty()) {
       throw new ParameterException("Nothing to do." + TIP);
     }
+
     if (cmds.size() != 1) {
       throw new ParameterException(String.join(", ", cmds) + " can not be used together." + TIP);
     }
+
     if (load) {
       validateParamNotSet("--load", save, "--save");
     }
+
     if (build) {
       validateSaveAndOrServeSet("--build");
     }
+
     if (loadStreet) {
       validateSaveAndOrServeSet("--loadStreet");
     }
+
     if (buildStreet) {
       validateParamNotSet("--buildStreet", serve, "--serve");
     }
@@ -291,11 +301,13 @@ public class CommandLineParameters {
 
   private List<String> listParams(List<String> names, List<Boolean> parms) {
     List<String> cmds = new ArrayList<>();
+
     for (int i = 0; i < parms.size(); ++i) {
       if (parms.get(i)) {
         cmds.add(names.get(i));
       }
     }
+
     return cmds;
   }
 
@@ -304,10 +316,12 @@ public class CommandLineParameters {
     @Override
     public void validate(String name, String value) throws ParameterException {
       File file = new File(value);
+
       if (!file.isDirectory()) {
         String msg = String.format("%s: '%s' is not a directory.", name, value);
         throw new ParameterException(msg);
       }
+
       if (!file.canRead()) {
         String msg = String.format("%s: directory '%s' is not readable.", name, value);
         throw new ParameterException(msg);
@@ -321,6 +335,7 @@ public class CommandLineParameters {
     public void validate(String name, String value) throws ParameterException {
       new ReadableDirectory().validate(name, value);
       File file = new File(value);
+
       if (!file.canWrite()) {
         String msg = String.format("%s: directory '%s' is not writable.", name, value);
         throw new ParameterException(msg);
@@ -333,6 +348,7 @@ public class CommandLineParameters {
     @Override
     public void validate(String name, String value) throws ParameterException {
       int i = Integer.parseInt(value);
+
       if (i <= 0) {
         String msg = String.format("%s must be a positive integer.", name);
         throw new ParameterException(msg);

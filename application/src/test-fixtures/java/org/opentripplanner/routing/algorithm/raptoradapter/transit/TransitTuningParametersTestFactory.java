@@ -37,6 +37,7 @@ public class TransitTuningParametersTestFactory {
           case PREFERRED:
             return 0;
         }
+
         throw new IllegalArgumentException("Unknown key: " + key);
       }
 

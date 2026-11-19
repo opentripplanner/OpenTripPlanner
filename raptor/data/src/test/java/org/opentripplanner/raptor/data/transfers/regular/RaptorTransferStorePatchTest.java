@@ -140,13 +140,16 @@ class RaptorTransferStorePatchTest {
     int nStops = 50;
     var random = new Random(42);
     Map<Integer, List<int[]>> transfersByFromStop = new HashMap<>();
+
     for (int fromStop = 0; fromStop < nStops; ++fromStop) {
       transfersByFromStop.put(fromStop, randomTransfers(random, nStops, fromStop));
     }
+
     var store = build(nStops, transfersByFromStop);
 
     for (int round = 0; round < 10; ++round) {
       var replaced = new HashSet<Integer>();
+
       for (int i = 0; i < 5; ++i) {
         int fromStop = random.nextInt(nStops);
         // Every fourth replaced stop loses all its transfers
@@ -155,16 +158,21 @@ class RaptorTransferStorePatchTest {
         transfersByFromStop.put(fromStop, transfers);
         replaced.add(fromStop);
       }
+
       var patch = store.patch();
+
       for (int fromStop : replaced) {
         patch.replaceTransfersFrom(fromStop);
+
         for (int[] t : transfersByFromStop.get(fromStop)) {
           patch.addTransfer(fromStop, t[0], t[1], t[2]);
         }
       }
+
       store = patch.build();
 
       var expected = build(nStops, transfersByFromStop);
+
       for (int stop = 0; stop < nStops; ++stop) {
         assertThat(from(store, stop)).containsExactlyElementsIn(from(expected, stop));
         assertThat(to(store, stop)).containsExactlyElementsIn(to(expected, stop));
@@ -174,11 +182,13 @@ class RaptorTransferStorePatchTest {
 
   private static List<int[]> randomTransfers(Random random, int nStops, int fromStop) {
     List<int[]> transfers = new ArrayList<>();
+
     for (int toStop = 0; toStop < nStops; ++toStop) {
       if (toStop != fromStop && random.nextInt(8) == 0) {
         transfers.add(new int[] { toStop, random.nextInt(1000), random.nextInt(1000) });
       }
     }
+
     return transfers;
   }
 
@@ -208,10 +218,12 @@ class RaptorTransferStorePatchTest {
 
   private static List<TxEntry> collect(Iterator<? extends RaptorTransfer> it) {
     List<TxEntry> result = new ArrayList<>();
+
     while (it.hasNext()) {
       RaptorTransfer t = it.next();
       result.add(new TxEntry(t.stop(), t.durationInSeconds(), t.c1()));
     }
+
     return result;
   }
 

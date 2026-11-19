@@ -50,13 +50,9 @@ import uk.org.siri.siri21.Siri;
  * <a href="https://cloud.google.com/docs/authentication/getting-started">ServiceAccount need access
  * to create subscription ("editor")</a>
  * <p>
- * <p>
- * <p>
  * Startup-flow: 1. Create subscription to topic. Subscription will receive all updates after
  * creation. 2. Fetch current data to initialize state. 3. Flag updater as initialized 3. Start
  * receiving updates from Pubsub-subscription
- *
- *
  * <pre>
  *   "type": "google-pubsub-siri-et-updater",
  *   "projectName":"project-1234",                                                      // Google Cloud project name
@@ -169,6 +165,7 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
         } catch (IllegalStateException e) {
           subscriber.stopAsync();
         }
+
         Thread.sleep(reconnectPeriod.toMillis());
       }
     } catch (InterruptedException ie) {
@@ -188,6 +185,7 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
    */
   private static String buildSubscriptionId() {
     String hostname = System.getenv("HOSTNAME");
+
     if (hostname == null || hostname.isEmpty()) {
       return SUBSCRIPTION_PREFIX + "otp-" + UUID.randomUUID();
     } else {
@@ -224,8 +222,8 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
       //   Credentials are provided through "workload identity"
       //   (https://cloud.google.com/kubernetes-engine/docs/concepts/workload-identity)
       throw new RuntimeException(
-        "Unable to initialize Google Pubsub-updater: System.getenv('GOOGLE_APPLICATION_CREDENTIALS') = " +
-          System.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+        "Unable to initialize Google Pubsub-updater: System.getenv('GOOGLE_APPLICATION_CREDENTIALS') = "
+        + System.getenv("GOOGLE_APPLICATION_CREDENTIALS")
       );
     }
   }
@@ -251,11 +249,13 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
    */
   private Optional<ServiceDelivery> serviceDelivery(ByteString data) {
     Siri siri;
+
     try {
       siri = SiriXml.parseXml(data.newInput());
     } catch (XMLStreamException | JAXBException e) {
       throw new RuntimeException(e);
     }
+
     return Optional.ofNullable(siri.getServiceDelivery());
   }
 
@@ -317,6 +317,7 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
         LOG.info("Stopping SIRI-ET PubSub subscriber '{}'.", subscriptionName);
         subscriber.stopAsync();
       }
+
       deleteSubscription();
     });
   }
@@ -345,6 +346,7 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
 
   private void logPubsubMessage(ServiceDelivery serviceDelivery) {
     int numberOfUpdatedTrips = 0;
+
     try {
       numberOfUpdatedTrips = serviceDelivery
         .getEstimatedTimetableDeliveries()
@@ -356,6 +358,7 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
     } catch (Exception e) {
       //ignore
     }
+
     long numberOfUpdates = UPDATE_COUNTER.addAndGet(numberOfUpdatedTrips);
     long numberOfMessages = MESSAGE_COUNTER.incrementAndGet();
 

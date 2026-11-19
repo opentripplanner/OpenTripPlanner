@@ -15,14 +15,16 @@ import org.opentripplanner.transit.transfer.regular.spi.TransferSearch;
  * and stored under, and the street search created once for it, from the routing request of the
  * profile with the preferences applied.
  * <p>
- * Duration limits and any other search-shaping detail are entirely the
- * {@link TransferPathProvider} implementation's responsibility - the regular-transfer module never
- * sees stop-classification data.
+ * Duration limits and any other search-shaping detail are entirely the {@link TransferPathProvider}
+ * implementation's responsibility - the regular-transfer module never sees stop-classification
+ * data.
  * <p>
  * A profile is identified by its user preferences, the request and the search are derived from
  * them.
  *
- * @param <P> the street path type
+ * @param
+ *     <p>
+ *     the street path type
  * @param <R> the request type
  */
 final class TransferProfileState<P, R> {
@@ -34,10 +36,10 @@ final class TransferProfileState<P, R> {
   private final TransferSearch<P> search;
 
   /**
-   * @param parameters   the configuration of the profile
+   * @param parameters the configuration of the profile
    * @param maxDurations the max durations of the type of the profile
    * @param pathProvider creates the search of this profile
-   * @param mapper       applies the user preferences of the profile on its routing request
+   * @param mapper applies the user preferences of the profile on its routing request
    */
   TransferProfileState(
     TransferProfile<R> parameters,
@@ -90,9 +92,11 @@ final class TransferProfileState<P, R> {
     if (obj == this) {
       return true;
     }
+
     if (obj == null || obj.getClass() != this.getClass()) {
       return false;
     }
+
     var that = (TransferProfileState<?, ?>) obj;
     return userPreferences.equals(that.userPreferences);
   }

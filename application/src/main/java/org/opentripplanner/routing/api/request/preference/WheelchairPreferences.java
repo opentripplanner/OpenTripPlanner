@@ -126,9 +126,11 @@ public class WheelchairPreferences implements Serializable {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     WheelchairPreferences that = (WheelchairPreferences) o;
     return (
       Double.compare(that.inaccessibleStreetReluctance, inaccessibleStreetReluctance) == 0 &&

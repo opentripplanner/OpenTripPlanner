@@ -43,8 +43,8 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  *       randomized schedules)
  * </ul>
  * <p>
- * This class originated as a rewrite of <a href="https://github.com/conveyal/r5">Conveyals
- * RAPTOR code</a>.
+ * This class originated as a rewrite of <a href="https://github.com/conveyal/r5">Conveyals RAPTOR
+ * code</a>.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
@@ -84,7 +84,7 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule> implem
 
   /**
    * @param accessPaths can be null in case the worker is chained - only the first worker has
-   *                    access.
+   *     access.
    */
   public DefaultRangeRaptorWorker(
     RaptorWorkerState<T> state,
@@ -161,6 +161,7 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule> implem
 
         boardAndAlightRoute(routeIndex, route, pattern, stopPositions);
       }
+
       // Called here (per worker) rather than via the lifecycle event, because a via search has
       // multiple workers sharing the same lifecycle. Via search events MUST be propagated before
       // the next segment do the transit routing.

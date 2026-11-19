@@ -9,9 +9,9 @@ public class StopConditionsHelper {
    * conditions. Also returns true, if the EntitySelector or the request don't specify any stop
    * conditions.
    *
-   * @param stopConditions    StopConditions set of the EntitySelector
+   * @param stopConditions StopConditions set of the EntitySelector
    * @param requestConditions StopConditions requested by the client/matching the usage of the stop
-   *                          in a leg
+   *     in a leg
    */
   public static boolean matchesStopCondition(
     Collection<StopCondition> stopConditions,
@@ -21,16 +21,19 @@ public class StopConditionsHelper {
       //No StopConditions are set - return true
       return true;
     }
+
     if (requestConditions == null || requestConditions.isEmpty()) {
       //No StopConditions to filter on - return true
       return true;
     }
+
     for (StopCondition requestCondition : requestConditions) {
       if (stopConditions.contains(requestCondition)) {
         // Return true on first match
         return true;
       }
     }
+
     return false;
   }
 
@@ -45,6 +48,7 @@ public class StopConditionsHelper {
     } else if (entitySelector instanceof EntitySelector.StopAndTrip stopAndTrip) {
       return matchesStopCondition(stopAndTrip.stopConditions(), requestConditions);
     }
+
     // Always return true when no StopConditions exist
     return true;
   }

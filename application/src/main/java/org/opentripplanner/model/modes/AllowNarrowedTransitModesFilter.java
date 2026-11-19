@@ -45,9 +45,11 @@ public class AllowNarrowedTransitModesFilter implements AllowTransitModeFilter {
     if (this == obj) {
       return true;
     }
+
     if (obj == null || getClass() != obj.getClass()) {
       return false;
     }
+
     AllowNarrowedTransitModesFilter that = (AllowNarrowedTransitModesFilter) obj;
     return mainMode == that.mainMode && filters.equals(that.filters);
   }

@@ -23,8 +23,8 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 /**
  * Generates the configuration reference of {@code doc/user/TransferConfiguration.md}, from the
- * documentation of the parameters in the config code. The {@code transfers} section is read from
- * a build config with only the transfer configuration, which sets every parameter.
+ * documentation of the parameters in the config code. The {@code transfers} section is read from a
+ * build config with only the transfer configuration, which sets every parameter.
  */
 @GeneratesDocumentation
 public class TransferConfigurationDocTest {

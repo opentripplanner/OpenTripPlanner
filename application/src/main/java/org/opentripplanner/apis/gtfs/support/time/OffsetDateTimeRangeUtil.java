@@ -25,6 +25,7 @@ public class OffsetDateTimeRangeUtil {
     if (ranges == null) {
       return null;
     }
+
     requireNonEmpty(ranges, fieldName);
     return ranges
       .stream()

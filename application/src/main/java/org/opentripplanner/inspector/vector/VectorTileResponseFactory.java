@@ -35,6 +35,7 @@ public class VectorTileResponseFactory {
       .stream()
       .map(LayerParameters::name)
       .collect(Collectors.toSet());
+
     if (!availableLayerNames.containsAll(requestedLayers)) {
       return Response.status(Response.Status.NOT_FOUND)
         .header(HttpHeaders.CONTENT_TYPE, HttpUtils.TEXT_PLAIN)
@@ -62,9 +63,11 @@ public class VectorTileResponseFactory {
     }
 
     CacheControl cacheControl = new CacheControl();
+
     if (cacheMaxSeconds != Integer.MAX_VALUE) {
       cacheControl.setMaxAge(cacheMaxSeconds);
     }
+
     return Response.status(Response.Status.OK)
       .cacheControl(cacheControl)
       .entity(mvtBuilder.build().toByteArray())

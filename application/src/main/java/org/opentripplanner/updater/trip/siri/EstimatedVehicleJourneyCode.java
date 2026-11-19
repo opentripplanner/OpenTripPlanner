@@ -47,6 +47,7 @@ class EstimatedVehicleJourneyCode {
       String remainder = String.join(":", Arrays.copyOfRange(parts, 2, parts.length));
       return parts[0] + ":" + targetType + ":" + remainder;
     }
+
     return code;
   }
 }

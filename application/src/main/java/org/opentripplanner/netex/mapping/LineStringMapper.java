@@ -47,13 +47,17 @@ class LineStringMapper {
         .toArray();
       return swapLatLon(values);
     }
+
     var list = new DoubleArrayList();
+
     for (Object o : lineString.getPosOrPointProperty()) {
       if (o instanceof DirectPositionType directPosition) {
         var values = directPosition.getValue();
+
         if (values == null || values.size() != 2) {
           continue;
         }
+
         list.add(values.getLast());
         list.add(values.getFirst());
       } else {
@@ -64,6 +68,7 @@ class LineStringMapper {
         );
       }
     }
+
     return list.toArray();
   }
 
@@ -78,6 +83,7 @@ class LineStringMapper {
       coords[i] = coords[i + 1];
       coords[i + 1] = lat;
     }
+
     return coords;
   }
 
@@ -99,11 +105,13 @@ class LineStringMapper {
       );
       return false;
     }
+
     return true;
   }
 
   private boolean isGeometryValid(LineString geometry, String id) {
     var sequence = geometry.getCoordinateSequence();
+
     if (sequence.size() < 2) {
       issueStore.add(
         "ServiceLinkGeometryError",
@@ -113,6 +121,7 @@ class LineStringMapper {
       );
       return false;
     }
+
     if (geometry.getLength() == 0) {
       issueStore.add(
         "ServiceLinkGeometryError",
@@ -121,6 +130,7 @@ class LineStringMapper {
       );
       return false;
     }
+
     for (int i = 0; i < sequence.size(); i++) {
       if (Double.isNaN(sequence.getX(i)) || Double.isNaN(sequence.getY(i))) {
         issueStore.add(
@@ -132,6 +142,7 @@ class LineStringMapper {
         return false;
       }
     }
+
     return true;
   }
 }

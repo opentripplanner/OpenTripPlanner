@@ -142,11 +142,13 @@ class DeleteResultHandlerTest {
 
     private static List<Itinerary> expected(List<Itinerary> all, List<Boolean> index) {
       var list = new ArrayList<Itinerary>();
+
       for (int i = 0; i < 3; i++) {
         if (index.get(i)) {
           list.add(all.get(i));
         }
       }
+
       return list;
     }
 
@@ -160,6 +162,7 @@ class DeleteResultHandlerTest {
       if (tag == null) {
         return;
       }
+
       it.flagForDeletion(new SystemNotice(tag, "Any Text"));
     }
 

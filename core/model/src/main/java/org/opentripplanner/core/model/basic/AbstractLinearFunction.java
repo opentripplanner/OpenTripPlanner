@@ -112,9 +112,11 @@ public abstract class AbstractLinearFunction<T> implements Serializable {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     var that = (AbstractLinearFunction<?>) o;
     return Objects.equals(that.coefficient, coefficient) && Objects.equals(constant, that.constant);
   }

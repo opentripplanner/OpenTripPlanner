@@ -73,9 +73,11 @@ public final class FareProduct implements Serializable {
     if (medium != null) {
       buf.append(medium.id()).append(medium.name());
     }
+
     if (category != null) {
       buf.append(category.id()).append(category.name());
     }
+
     return UUID.nameUUIDFromBytes(buf.toString().getBytes(StandardCharsets.UTF_8)).toString();
   }
 
@@ -115,9 +117,11 @@ public final class FareProduct implements Serializable {
     if (obj == this) {
       return true;
     }
+
     if (obj == null || obj.getClass() != this.getClass()) {
       return false;
     }
+
     var that = (FareProduct) obj;
     return (
       Objects.equals(this.id, that.id) &&

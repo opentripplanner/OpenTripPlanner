@@ -52,9 +52,11 @@ public final class Frequency implements Serializable {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     Frequency frequency = (Frequency) o;
     return (
       startTime == frequency.startTime &&

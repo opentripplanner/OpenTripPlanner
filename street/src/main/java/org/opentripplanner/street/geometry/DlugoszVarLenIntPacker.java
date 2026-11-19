@@ -17,7 +17,9 @@ class DlugoszVarLenIntPacker {
     if (arr == null) {
       return null;
     }
+
     ByteArrayOutputStream baos = new ByteArrayOutputStream(arr.length);
+
     for (int i : arr) {
       if (i >= -64 && i <= 63) {
         // 0xxx xxxx -> 7 bits value
@@ -71,6 +73,7 @@ class DlugoszVarLenIntPacker {
         baos.write((int) (ui & 0xFF));
       }
     }
+
     return baos.toByteArray();
   }
 
@@ -78,12 +81,15 @@ class DlugoszVarLenIntPacker {
     if (arr == null) {
       return null;
     }
+
     int[] out = new int[countValues(arr)];
     var decoder = new Decoder(arr);
     int idx = 0;
+
     while (decoder.hasNext()) {
       out[idx++] = decoder.next();
     }
+
     return out;
   }
 
@@ -95,10 +101,13 @@ class DlugoszVarLenIntPacker {
     if (arr == null) {
       return 0;
     }
+
     int n = 0;
     int pos = 0;
+
     while (pos < arr.length) {
       int v1 = arr[pos] & 0xFF;
+
       if ((v1 & 0x80) == 0x00) {
         pos += 1;
       } else if ((v1 & 0xC0) == 0x80) {
@@ -110,8 +119,10 @@ class DlugoszVarLenIntPacker {
       } else {
         pos += 5;
       }
+
       n++;
     }
+
     return n;
   }
 
@@ -146,6 +157,7 @@ class DlugoszVarLenIntPacker {
       int v1 = arr[p] & 0xFF;
       int sv;
       int width;
+
       if ((v1 & 0x80) == 0x00) {
         // 0xxx xxxx -> 7 bits value
         sv = (v1 & 0x7F) - 64;
@@ -180,6 +192,7 @@ class DlugoszVarLenIntPacker {
         sv = (int) lsv;
         width = 5;
       }
+
       pos = p + width;
       return sv;
     }

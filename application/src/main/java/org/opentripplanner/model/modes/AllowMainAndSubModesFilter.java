@@ -20,10 +20,12 @@ class AllowMainAndSubModesFilter implements AllowTransitModeFilter {
   AllowMainAndSubModesFilter(Collection<AllowMainAndSubModeFilter> filters) {
     this.mainMode = filters.iterator().next().mainMode();
     this.subModes = new BitSet();
+
     for (var it : filters) {
       if (it.mainMode() != this.mainMode) {
         throw new IllegalArgumentException("Main mode is not the same: " + filters);
       }
+
       this.subModes.set(it.subMode().index());
     }
   }
@@ -53,9 +55,11 @@ class AllowMainAndSubModesFilter implements AllowTransitModeFilter {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     AllowMainAndSubModesFilter that = (AllowMainAndSubModesFilter) o;
     return mainMode == that.mainMode && subModes.equals(that.subModes);
   }

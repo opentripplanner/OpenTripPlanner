@@ -60,6 +60,7 @@ public class RangeRaptorWorkerComposite<T extends RaptorTripSchedule> implements
         return true;
       }
     }
+
     return false;
   }
 
@@ -105,6 +106,7 @@ public class RangeRaptorWorkerComposite<T extends RaptorTripSchedule> implements
         return true;
       }
     }
+
     return false;
   }
 
@@ -116,6 +118,7 @@ public class RangeRaptorWorkerComposite<T extends RaptorTripSchedule> implements
         comparator
       );
     }
+
     return result;
   }
 }

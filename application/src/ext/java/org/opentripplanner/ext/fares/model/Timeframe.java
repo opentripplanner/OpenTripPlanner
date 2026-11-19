@@ -44,9 +44,11 @@ public class Timeframe implements Serializable {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     var that = (Timeframe) o;
     return serviceId.equals(that.serviceId) && start.equals(that.start) && end.equals(that.end);
   }

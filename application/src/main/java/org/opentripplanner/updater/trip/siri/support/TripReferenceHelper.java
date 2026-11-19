@@ -25,22 +25,28 @@ public class TripReferenceHelper {
     if (journey == null) {
       return null;
     }
+
     FramedVehicleJourneyRefStructure framed = journey.getFramedVehicleJourneyRef();
+
     if (framed != null && framed.getDatedVehicleJourneyRef() != null) {
       var dataFrameRef = framed.getDataFrameRef();
       return dataFrameRef != null
         ? "%s (%s)".formatted(framed.getDatedVehicleJourneyRef(), dataFrameRef.getValue())
         : framed.getDatedVehicleJourneyRef();
     }
+
     if (journey.getDatedVehicleJourneyRef() != null) {
       return journey.getDatedVehicleJourneyRef().getValue();
     }
+
     if (journey.getEstimatedVehicleJourneyCode() != null) {
       return journey.getEstimatedVehicleJourneyCode();
     }
+
     if (journey.getVehicleRef() != null) {
       return journey.getVehicleRef().getValue();
     }
+
     return null;
   }
 }

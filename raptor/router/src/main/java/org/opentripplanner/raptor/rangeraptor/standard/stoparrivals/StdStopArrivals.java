@@ -36,6 +36,7 @@ public final class StdStopArrivals<T extends RaptorTripSchedule> implements Best
   ) {
     for (int i = 1; i < arrivals.length; i++) {
       final int round = i;
+
       for (var cursor : egressPaths.byStop()) {
         int stop = cursor.key;
         arrivals[round][stop] = new EgressStopArrivalState<>(
@@ -59,6 +60,7 @@ public final class StdStopArrivals<T extends RaptorTripSchedule> implements Best
         return i - 1;
       }
     }
+
     return unreachedMinNumberOfTransfers();
   }
 
@@ -125,6 +127,7 @@ public final class StdStopArrivals<T extends RaptorTripSchedule> implements Best
       stopIndex = state.transferFromStop();
       state = arrivals[prevRound][stopIndex];
     }
+
     return state.arrivedByTransit()
       ? TransitArrival.create(state.trip(), stopIndex, state.onBoardArrivalTime())
       : null;
@@ -134,6 +137,7 @@ public final class StdStopArrivals<T extends RaptorTripSchedule> implements Best
     if (arrivals[round][stop] == null) {
       arrivals[round][stop] = StopArrivalState.create();
     }
+
     return get(round, stop);
   }
 }

@@ -37,6 +37,7 @@ class MultiModalStationMapper {
       );
 
     WgsCoordinate coordinate;
+
     try {
       coordinate = WgsCoordinateMapper.mapToDomain(stopPlace.getCentroid());
     } catch (InvalidCoordinateException e) {

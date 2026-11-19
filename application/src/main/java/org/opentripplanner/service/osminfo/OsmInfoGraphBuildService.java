@@ -12,7 +12,7 @@ import org.opentripplanner.street.model.edge.Edge;
  * edges/vertexes with transit stops/platforms. We do not want to put data in the OTP street graph
  * unless it is relevant for routing. So, for information that is read by the OsmGraphBuilder, but
  * needed later on, we have this service.
- *
+ * <p>
  * THIS SERVICE IS ONLY AVAILABLE DURING GRAPH BUILD, NOT DURING ROUTING. *
  */
 public interface OsmInfoGraphBuildService {

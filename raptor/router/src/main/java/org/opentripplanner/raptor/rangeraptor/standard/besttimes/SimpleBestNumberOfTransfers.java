@@ -31,6 +31,7 @@ public class SimpleBestNumberOfTransfers implements BestNumberOfTransfers {
    */
   void arriveAtStop(int stop) {
     final int numOfTransfers = round - 1;
+
     if (numOfTransfers < bestNumOfTransfers[stop]) {
       bestNumOfTransfers[stop] = numOfTransfers;
     }

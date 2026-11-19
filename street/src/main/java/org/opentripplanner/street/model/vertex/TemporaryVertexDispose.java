@@ -54,13 +54,16 @@ class TemporaryVertexDispose {
     // stack overflow in the case of deep temporary graphs.
     while (!todo.isEmpty()) {
       Vertex current = next();
+
       if (isNotAlreadyProcessed(current)) {
         for (Edge edge : current.getOutgoing()) {
           disposeVertex(edge.getToVertex(), edge, true);
         }
+
         for (Edge edge : current.getIncoming()) {
           disposeVertex(edge.getFromVertex(), edge, false);
         }
+
         done.add(current);
       }
     }
@@ -70,9 +73,9 @@ class TemporaryVertexDispose {
    * Add the temporary vertex to processing queue OR disconnect edge from vertex if vertex is part
    * of the main graph.
    *
-   * @param v             the vertex to dispose
+   * @param v the vertex to dispose
    * @param connectedEdge the connected temporary edge
-   * @param incoming      true if the edge is an incoming edge, false if it is an outgoing edge
+   * @param incoming true if the edge is an incoming edge, false if it is an outgoing edge
    */
   private void disposeVertex(Vertex v, Edge connectedEdge, boolean incoming) {
     if (v instanceof TemporaryVertex) {
@@ -86,9 +89,9 @@ class TemporaryVertexDispose {
    * We have reached a NONE temporary Vertex and need to remove the temporary `connectedEdge` from
    * the Vertex part of the main graph.
    *
-   * @param v             the vertex part of the main graph
+   * @param v the vertex part of the main graph
    * @param connectedEdge the connected temporary edge to be removed
-   * @param incoming      true if the edge is an incoming edge, false if it is an outgoing edge
+   * @param incoming true if the edge is an incoming edge, false if it is an outgoing edge
    */
   private void removeEdgeFromMainGraphVertex(Vertex v, Edge connectedEdge, boolean incoming) {
     if (incoming) {

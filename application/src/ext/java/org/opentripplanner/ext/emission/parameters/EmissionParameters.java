@@ -56,6 +56,7 @@ public class EmissionParameters {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     var that = (EmissionParameters) o;
     return Objects.equals(car, that.car) && Objects.equals(feeds, that.feeds);
   }

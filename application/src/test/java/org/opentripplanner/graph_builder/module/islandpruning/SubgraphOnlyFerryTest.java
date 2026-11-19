@@ -56,6 +56,7 @@ class SubgraphOnlyFerryTest {
   private static Subgraph subgraph(TransitStopVertex... transitStopVertex) {
     var index = new VertexIndex(Arrays.asList(transitStopVertex));
     Subgraph subgraph = new Subgraph(index);
+
     for (var v : transitStopVertex) {
       subgraph.addVertex(index.idOf(v));
     }

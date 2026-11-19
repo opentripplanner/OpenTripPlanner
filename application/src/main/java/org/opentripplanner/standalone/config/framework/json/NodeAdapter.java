@@ -167,6 +167,7 @@ public class NodeAdapter {
     for (String p : unusedParams()) {
       logger.accept("Unexpected config parameter: '" + p + "' in '" + source + "'");
     }
+
     allWarnings().forEach(logger);
   }
 
@@ -219,6 +220,7 @@ public class NodeAdapter {
     if (childrenByName.containsKey(paramName)) {
       return childrenByName.get(paramName);
     }
+
     return new NodeAdapter(node, this, paramName);
   }
 
@@ -246,6 +248,7 @@ public class NodeAdapter {
 
     while (it.hasNext()) {
       String fieldName = it.next();
+
       if (!parameterNames.contains(fieldName)) {
         unusedParams.add(fullPath(fieldName) + ":" + json.get(fieldName));
       }
@@ -255,6 +258,7 @@ public class NodeAdapter {
       // Recursive call to get child unused parameters
       unusedParams.addAll(c.unusedParams());
     }
+
     unusedParams.sort(String::compareTo);
     return unusedParams;
   }
@@ -270,6 +274,7 @@ public class NodeAdapter {
     if (info.required()) {
       assertRequiredFieldExist(info.name());
     }
+
     return json.path(info.name());
   }
 
@@ -335,6 +340,7 @@ public class NodeAdapter {
 
   private void assertParameterInfoIsEqual(NodeInfo info) {
     var other = parameters.get(info.name());
+
     if (!other.equals(info)) {
       throw new OtpAppException(
         "Two different parameter definitions exist: " + other + " != " + info

@@ -31,7 +31,7 @@ public class LocalizedString implements I18NString, Serializable {
    * Creates String which can be localized
    *
    * @param key key of translation for this way set in OSM and translations read from properties
-   *            files
+   *     files
    */
   public LocalizedString(String key) {
     this.key = key;
@@ -41,8 +41,8 @@ public class LocalizedString implements I18NString, Serializable {
   /**
    * Creates String which can be localized
    *
-   * @param key    key of translation for this way set in OSM and translations read from properties
-   *               files
+   * @param key key of translation for this way set in OSM and translations read from properties
+   *     files
    * @param params Values with which tagNames are replaced in translations.
    */
   public LocalizedString(String key, I18NString... params) {
@@ -84,9 +84,11 @@ public class LocalizedString implements I18NString, Serializable {
     if (this.key == null) {
       return null;
     }
+
     //replaces {name}, {ref} etc with %s to be used as parameters
     //in string formatting with values from way tags values
     String translation = ResourceBundleSingleton.INSTANCE.localize(this.key, locale);
+
     if (this.params != null) {
       translation = PATTERN_MATCHER.matcher(translation).replaceAll("%s");
       return String.format(

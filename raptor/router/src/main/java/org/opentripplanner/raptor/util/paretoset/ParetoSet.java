@@ -49,11 +49,12 @@ public sealed class ParetoSet<T> extends AbstractCollection<T> permits ParetoSet
   }
 
   /**
-   * Create a new ParetoSet with a comparator and a drop event listener. To add more than one listener use the
-   * {@link ParetoSetEventListenerComposite}.
+   * Create a new ParetoSet with a comparator and a drop event listener. To add more than one
+   * listener use the {@link ParetoSetEventListenerComposite}.
    *
-   * @param comparator    The comparator to use with this set
-   * @param eventListener The event listener registered to listen for accept, drop and reject events.
+   * @param comparator The comparator to use with this set
+   * @param eventListener The event listener registered to listen for accept, drop and reject
+   *     events.
    */
   public static <T> ParetoSet<T> of(
     ParetoComparator<T> comparator,
@@ -71,8 +72,8 @@ public sealed class ParetoSet<T> extends AbstractCollection<T> permits ParetoSet
   /**
    * Return an iterator over the contained collection.
    * <p>
-   * This is NOT thread-safe and the behavior is undefined if the collection is modified during
-   * the iteration.
+   * This is NOT thread-safe and the behavior is undefined if the collection is modified during the
+   * iteration.
    */
   public final Iterator<T> iterator() {
     return tailIterator(0);
@@ -206,7 +207,7 @@ public sealed class ParetoSet<T> extends AbstractCollection<T> permits ParetoSet
    * current set of elements in this set at the time of creation.
    *
    * @param startIndexInclusive the first element to include in the iterator, unlike the elements in
-   *                            this set the index is cached until an iterator is created.
+   *     this set the index is cached until an iterator is created.
    */
   final Iterable<T> tail(final int startIndexInclusive) {
     return () -> tailIterator(startIndexInclusive);
@@ -250,6 +251,7 @@ public sealed class ParetoSet<T> extends AbstractCollection<T> permits ParetoSet
 
     while (j < size) {
       notifyElementMoved(j, i);
+
       // Move next element(j) forward if it is not dominated by the new value
       if (!leftVectorDominatesRightVector(newValue, elements[j])) {
         elements[i] = elements[j];
@@ -257,9 +259,11 @@ public sealed class ParetoSet<T> extends AbstractCollection<T> permits ParetoSet
       } else {
         notifyElementDropped(elements[j], newValue);
       }
+
       // Goto the next element
       ++j;
     }
+
     notifyElementMoved(j, i);
     notifyElementAccepted(newValue);
     elements[i] = newValue;

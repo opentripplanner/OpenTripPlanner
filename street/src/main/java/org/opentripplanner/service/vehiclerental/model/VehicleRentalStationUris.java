@@ -9,7 +9,6 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * Contains rental URIs for Android, iOS, and web in the android, ios, and web fields. See the
  * <a href="https://github.com/NABSA/gbfs/blob/v2.2/gbfs.md#station_informationjson">GBFS
  * station_information.json specification</a> for more details.
- * <p>
  */
 public final class VehicleRentalStationUris {
 
@@ -98,9 +97,11 @@ public final class VehicleRentalStationUris {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     VehicleRentalStationUris that = (VehicleRentalStationUris) o;
     return (
       Objects.equals(android, that.android) &&

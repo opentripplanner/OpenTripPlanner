@@ -46,8 +46,8 @@ public class RealTimeTripTimesBuilder {
    * RealTimeTripTimes based on the scheduled info. RT updates are NOT cumulative and this enforces
    * copying the scheduled information, not the previous real-time update.
    * <p>
-   * The arrival and departure times are left uninitialized by this constructor, and they need to
-   * be set explicitly.
+   * The arrival and departure times are left uninitialized by this constructor, and they need to be
+   * set explicitly.
    */
   RealTimeTripTimesBuilder(ScheduledTripTimes tripTimes) {
     this.scheduledTripTimes = tripTimes;
@@ -100,14 +100,17 @@ public class RealTimeTripTimesBuilder {
 
   public int[] arrivalTimes() {
     var result = new int[arrivalTimes.length];
+
     for (int i = 0; i < arrivalTimes.length; i++) {
       if (arrivalTimes[i] == null) {
         throw new DataValidationException(
           new TimetableValidationError(MISSING_ARRIVAL_TIME, i, getTrip())
         );
       }
+
       result[i] = arrivalTimes[i];
     }
+
     return result;
   }
 
@@ -126,6 +129,7 @@ public class RealTimeTripTimesBuilder {
     if (arrivalTimes[stop] == null) {
       return null;
     }
+
     return arrivalTimes[stop] - getScheduledArrivalTime(stop);
   }
 
@@ -152,14 +156,17 @@ public class RealTimeTripTimesBuilder {
 
   public int[] departureTimes() {
     var result = new int[departureTimes.length];
+
     for (int i = 0; i < departureTimes.length; i++) {
       if (departureTimes[i] == null) {
         throw new DataValidationException(
           new TimetableValidationError(MISSING_DEPARTURE_TIME, i, getTrip())
         );
       }
+
       result[i] = departureTimes[i];
     }
+
     return result;
   }
 
@@ -169,6 +176,7 @@ public class RealTimeTripTimesBuilder {
     if (departureTimes[stop] == null) {
       return null;
     }
+
     return departureTimes[stop] - getScheduledDepartureTime(stop);
   }
 
@@ -279,6 +287,7 @@ public class RealTimeTripTimesBuilder {
     if (stop > numberOfStops()) {
       throw new IllegalArgumentException("Stop index out of range");
     }
+
     this.hasArrived.set(stop, arrived);
     return this;
   }
@@ -287,6 +296,7 @@ public class RealTimeTripTimesBuilder {
     if (stop > numberOfStops()) {
       throw new IllegalArgumentException("Stop index out of range");
     }
+
     this.hasDeparted.set(stop, departed);
     return this;
   }
@@ -296,6 +306,7 @@ public class RealTimeTripTimesBuilder {
     if (tripHeadsign == null) {
       return scheduledTripTimes.getTripHeadsign();
     }
+
     return tripHeadsign;
   }
 
@@ -308,11 +319,13 @@ public class RealTimeTripTimesBuilder {
     var result = scheduledTripTimes.copyHeadsigns(
       () -> new I18NString[scheduledTripTimes.getNumStops()]
     );
+
     for (var i = 0; i < result.length; i++) {
       if (stopHeadsigns[i] != null) {
         result[i] = stopHeadsigns[i];
       }
     }
+
     return result;
   }
 
@@ -334,6 +347,7 @@ public class RealTimeTripTimesBuilder {
     if (wheelchairAccessibility == null) {
       return scheduledTripTimes.getWheelchairAccessibility();
     }
+
     return wheelchairAccessibility;
   }
 
@@ -382,16 +396,19 @@ public class RealTimeTripTimesBuilder {
    */
   public boolean copyMissingTimesFromScheduledTimetable() {
     var hasCopiedTimes = false;
+
     for (var i = 0; i < scheduledTripTimes.getNumStops(); i++) {
       if (arrivalTimes[i] == null) {
         arrivalTimes[i] = getScheduledArrivalTime(i);
         hasCopiedTimes = true;
       }
+
       if (departureTimes[i] == null) {
         departureTimes[i] = getScheduledDepartureTime(i);
         hasCopiedTimes = true;
       }
     }
+
     return hasCopiedTimes;
   }
 

@@ -79,7 +79,8 @@ public class GeotiffGridCoverageFactoryImpl implements ElevationGridCoverageFact
   public GridCoverage2D getUninterpolatedGridCoverage() {
     if (coverage == null) {
       try {
-        // There is a serious standardization failure around the axis order of WGS84. See issue #1930.
+        // There is a serious standardization failure around the axis order of WGS84. See issue
+        // #1930.
         // GeoTools assumes strict EPSG axis order of (latitude, longitude) unless told otherwise.
         // Both NED and SRTM data use the longitude-first axis order, so OTP makes grid coverages
         // for unprojected DEMs assuming coordinates are in (longitude, latitude) order.
@@ -92,6 +93,7 @@ public class GeotiffGridCoverageFactoryImpl implements ElevationGridCoverageFact
         throw new RuntimeException("Error getting coverage automatically. ", e);
       }
     }
+
     return coverage;
   }
 

@@ -35,6 +35,7 @@ public class AllowNarrowedTransitModeFilter implements AllowTransitModeFilter {
     if (mode.getMode() != transitMode) {
       return false;
     }
+
     // Three-valued boolean logic here. If more dimensions are added to NarrowedTransitMode
     // (like express/local trains etc), they can be implemented symmetrically.
     // See truth table:
@@ -47,9 +48,11 @@ public class AllowNarrowedTransitModeFilter implements AllowTransitModeFilter {
     //  subModeIgnored x | T  F  T
     var subModeIgnored = mode.getSubMode() == null;
     var replacementIgnored = mode.getReplacement() == ReplacementRequirement.IGNORED;
+
     if (subModeIgnored && replacementIgnored) {
       return true;
     }
+
     var subModeMatches = netexSubmode.equals(mode.getSubMode());
     var isTripReplacement = isTripReplacement(netexSubmode, gtfsExtendedType);
     var replacementMatches = mode.getReplacement() == mapReplacement(isTripReplacement);
@@ -84,9 +87,11 @@ public class AllowNarrowedTransitModeFilter implements AllowTransitModeFilter {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     AllowNarrowedTransitModeFilter that = (AllowNarrowedTransitModeFilter) o;
     return (
       Objects.equals(mode.getMode(), that.mode.getMode()) &&

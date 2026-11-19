@@ -64,11 +64,13 @@ public class RouteRequestMapper {
 
       return builder.buildRequest();
     }
+
     throw new IllegalArgumentException("TripRequest must have one origin and one destination.");
   }
 
   private void addTransitFilters(OJPTripRequestStructure tr, RouteRequestBuilder builder) {
     var includedAgencies = filterMapper.includedAgencies(tr);
+
     if (!includedAgencies.isEmpty()) {
       builder.withJourney(j ->
         j.withTransit(t ->
@@ -78,6 +80,7 @@ public class RouteRequestMapper {
     }
 
     var excludedAgencies = filterMapper.excludedAgencies(tr);
+
     if (!excludedAgencies.isEmpty()) {
       builder.withJourney(j ->
         j.withTransit(t ->
@@ -87,6 +90,7 @@ public class RouteRequestMapper {
     }
 
     var includedRoutes = filterMapper.includedRoutes(tr);
+
     if (!includedRoutes.isEmpty()) {
       builder.withJourney(j ->
         j.withTransit(t ->
@@ -96,6 +100,7 @@ public class RouteRequestMapper {
     }
 
     var excludedRoutes = filterMapper.excludedRoutes(tr);
+
     if (!excludedRoutes.isEmpty()) {
       builder.withJourney(j ->
         j.withTransit(t ->
@@ -202,6 +207,7 @@ public class RouteRequestMapper {
 
   private static void addIncludedModes(OJPTripRequestStructure tr, RouteRequestBuilder builder) {
     var includedModes = filterModes(tr, f -> FALSE.equals(f.isExclude()));
+
     if (!includedModes.isEmpty()) {
       builder.withJourney(r ->
         r.withTransit(t ->
@@ -215,6 +221,7 @@ public class RouteRequestMapper {
 
   private static void addExcludedModes(OJPTripRequestStructure tr, RouteRequestBuilder builder) {
     var excludedModes = filterModes(tr, f -> !FALSE.equals(f.isExclude()));
+
     if (!excludedModes.isEmpty()) {
       builder.withJourney(r ->
         r.withTransit(t ->

@@ -111,6 +111,7 @@ public class ByteArrayDataSource implements DataSource {
       out = new ByteArrayOutputStream(1024);
       buffer = null;
     }
+
     return out;
   }
 

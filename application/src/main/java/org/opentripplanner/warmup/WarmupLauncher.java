@@ -40,24 +40,28 @@ public class WarmupLauncher {
   /**
    * Start the application warmup thread if configured and applicable.
    * <p>
-   * No warmup is started if parameters are null (warmup section absent in router-config.json),
-   * if no updaters are configured (health probe would immediately return "UP"), or if the selected
-   * API schema is not available.
+   * No warmup is started if parameters are null (warmup section absent in router-config.json), if
+   * no updaters are configured (health probe would immediately return "UP"), or if the selected API
+   * schema is not available.
    */
   public void start() {
     if (parameters == null) {
       return;
     }
+
     GraphUpdaterManager updaterManager = transitRepository.getUpdaterManager();
+
     if (updaterManager == null) {
       LOG.info("Application warmup configured but no updaters found. Skipping warmup.");
       return;
     }
+
     var requestScopedFactory = requestScopedFactorySupplier.get();
     var schema = switch (parameters.api()) {
       case TRANSMODEL -> requestScopedFactory.transmodelGraphQLSchema();
       case GTFS -> requestScopedFactory.gtfsRequestContext().schema();
     };
+
     if (schema == null) {
       LOG.warn(
         "Application warmup configured for {} API, but the schema is not available. " +
@@ -66,6 +70,7 @@ public class WarmupLauncher {
       );
       return;
     }
+
     var worker = new WarmupWorker(parameters, requestScopedFactory, () -> updaterManager);
     var thread = new Thread(worker, "app-warmup");
     thread.setDaemon(true);

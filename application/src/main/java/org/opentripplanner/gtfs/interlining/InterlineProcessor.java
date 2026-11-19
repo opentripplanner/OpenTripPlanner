@@ -65,6 +65,7 @@ public class InterlineProcessor {
     if (daysInTransitService == 0) {
       return List.of();
     }
+
     var interlinedTrips = this.getInterlinedTrips(tripPatterns);
     var transfers = interlinedTrips
       .entries()
@@ -101,6 +102,7 @@ public class InterlineProcessor {
 
       transferService.addAll(transfers);
     }
+
     return transfers;
   }
 
@@ -128,11 +130,14 @@ public class InterlineProcessor {
     ListMultimap<String, TripTimes<?>> tripTimesForBlockId = ArrayListMultimap.create();
 
     LOG.info("Finding interlining trips based on block IDs.");
+
     for (TripPattern pattern : tripPatterns) {
       Timetable timetable = pattern.getScheduledTimetable();
+
       /* TODO: Block semantics seem undefined for frequency trips, so skip them? */
       for (TripTimes<?> tripTimes : timetable.getTripTimes()) {
         Trip trip = tripTimes.getTrip();
+
         if (StringUtils.hasValue(trip.getGtfsBlockId())) {
           tripTimesForBlockId.put(trip.getGtfsBlockId(), tripTimes);
           // For space efficiency, only record times that are part of a block.
@@ -141,7 +146,8 @@ public class InterlineProcessor {
       }
     }
 
-    // Associate pairs of TripPatterns with lists of trips that continue from one pattern to the other.
+    // Associate pairs of TripPatterns with lists of trips that continue from one pattern to the
+    // other.
     Multimap<TripPatternPair, TripPair> interlines = ArrayListMultimap.create();
 
     // Sort trips within each block by first departure time, then iterate over trips in this block,
@@ -150,25 +156,31 @@ public class InterlineProcessor {
     for (String blockId : tripTimesForBlockId.keySet()) {
       List<TripTimes<?>> blockTripTimes = tripTimesForBlockId.get(blockId);
       Collections.sort(blockTripTimes);
+
       for (int i = 0; i < blockTripTimes.size(); i++) {
         var fromTripTimes = blockTripTimes.get(i);
         var fromServiceId = fromTripTimes.getTrip().getServiceId();
         BitSet uncoveredDays = getAndCopyDaysForService(fromServiceId);
+
         for (int j = i + 1; j < blockTripTimes.size(); j++) {
           var toTripTimes = blockTripTimes.get(j);
           var toServiceId = toTripTimes.getTrip().getServiceId();
+
           if (
             toServiceId.equals(fromServiceId) &&
             createInterline(fromTripTimes, toTripTimes, blockId, patternForTripTimes, interlines)
           ) {
             break;
           }
+
           BitSet daysForToTripTimes = getDaysForService(toTripTimes.getTrip().getServiceId());
+
           if (
             uncoveredDays.intersects(daysForToTripTimes) &&
             createInterline(fromTripTimes, toTripTimes, blockId, patternForTripTimes, interlines)
           ) {
             uncoveredDays.andNot(daysForToTripTimes);
+
             if (uncoveredDays.isEmpty()) {
               break;
             }
@@ -185,7 +197,7 @@ public class InterlineProcessor {
    * from each other. Then creates interline between the trips.
    *
    * @return true if interline has been created or if there is an issue preventing an interline
-   *         creation for certain service dates.
+   *     creation for certain service dates.
    */
   private boolean createInterline(
     TripTimes<?> fromTripTimes,
@@ -205,6 +217,7 @@ public class InterlineProcessor {
       );
       return true;
     }
+
     var fromPattern = patternForTripTimes.get(fromTripTimes);
     var toPattern = patternForTripTimes.get(toTripTimes);
     var fromStop = fromPattern.lastStop();
@@ -215,6 +228,7 @@ public class InterlineProcessor {
       toStop.getLat(),
       toStop.getLon()
     );
+
     if (teleportationDistance > maxInterlineDistance) {
       issueStore.add(
         new InterliningTeleport(
@@ -225,7 +239,8 @@ public class InterlineProcessor {
           toStop
         )
       );
-      // Only skip this particular interline edge; there may be other valid ones in the block for the
+      // Only skip this particular interline edge; there may be other valid ones in the block for
+      // the
       // from trip.
       return false;
     } else {
@@ -243,21 +258,25 @@ public class InterlineProcessor {
    * {@link #getAndCopyDaysForService(FeedScopedId)}
    *
    * @return {@link BitSet} which index starts at the first overall date of the services and the
-   *         last index is the last date.
+   *     last index is the last date.
    */
   private BitSet getDaysForService(FeedScopedId serviceId) {
     BitSet daysForService = this.daysOfServices.get(serviceId);
+
     if (daysForService == null) {
       daysForService = new BitSet(daysInTransitService);
       var serviceDates = calendarServiceData.getServiceDatesForServiceId(serviceId);
+
       if (serviceDates != null) {
         for (LocalDate serviceDate : serviceDates) {
           int daysBetween = (int) ChronoUnit.DAYS.between(transitServiceStart, serviceDate);
           daysForService.set(daysBetween);
         }
       }
+
       daysOfServices.put(serviceId, daysForService);
     }
+
     return daysForService;
   }
 
@@ -266,7 +285,7 @@ public class InterlineProcessor {
    * it, {@link #getDaysForService(FeedScopedId)} can be used instead.
    *
    * @return {@link BitSet} which index starts at the first overall date of the services and the
-   *         last index is the last date.
+   *     last index is the last date.
    */
   private BitSet getAndCopyDaysForService(FeedScopedId serviceId) {
     return (BitSet) getDaysForService(serviceId).clone();

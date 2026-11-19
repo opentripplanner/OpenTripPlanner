@@ -9,10 +9,9 @@ import org.opentripplanner.core.model.transaction.WriteContext;
 
 /**
  * Task-scoped implementation of {@link WriteContext}.
- *
  * <p>
- * Created fresh for each task submitted to {@link DefaultUpdateManager}. Holds the registered
- * event handler map and gets mutable repositories by casting each {@link RepositoryHandle} to
+ * Created fresh for each task submitted to {@link DefaultUpdateManager}. Holds the registered event
+ * handler map and gets mutable repositories by casting each {@link RepositoryHandle} to
  * {@link DefaultRepositoryHandle}.
  */
 class DefaultWriteContext implements WriteContext {
@@ -34,6 +33,7 @@ class DefaultWriteContext implements WriteContext {
       event.getClass(),
       Collections.emptyList()
     );
+
     for (var entry : entries) {
       dispatch(entry, event);
     }

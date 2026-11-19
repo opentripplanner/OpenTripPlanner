@@ -143,9 +143,9 @@ public class TestOsmProvider implements OsmProvider {
     }
 
     /**
-     * Add a way running through {@code middle}, with a node {@link #WAY_ARM_LENGTH_METERS} to either
-     * side of it. A tagged node only becomes a vertex when a routable way uses it, so this is the
-     * smallest way that makes one linkable.
+     * Add a way running through {@code middle}, with a node {@link #WAY_ARM_LENGTH_METERS} to
+     * either side of it. A tagged node only becomes a vertex when a routable way uses it, so this
+     * is the smallest way that makes one linkable.
      */
     public Builder addWayThroughNode(OsmNode middle) {
       var coordinate = new WgsCoordinate(middle.lat, middle.lon);

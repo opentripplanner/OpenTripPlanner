@@ -85,7 +85,7 @@ public class FrequencyEntry implements Serializable {
         The TripTimes getDepartureTime / getArrivalTime methods do not care when the search is happening.
         The Frequency equivalents need to know when the search is happening, and need to be able to say
         no trip is possible. Therefore we need to add another specialized method.
-  
+
         Fortunately all uses of the TripTimes itself in traversing edges use relative times,
         so we can fall back on the underlying TripTimes.
      */
@@ -102,15 +102,18 @@ public class FrequencyEntry implements Serializable {
   }
 
   public int nextDepartureTime(int stop, int time) {
-    // Start time and end time are for the first stop in the trip. Find the time offset for this stop.
+    // Start time and end time are for the first stop in the trip. Find the time offset for this
+    // stop.
     int stopOffset = tripTimes.getDepartureTime(stop) - tripTimes.getDepartureTime(0);
     // First time a vehicle passes by this stop.
     int beg = startTime + stopOffset;
     // Latest a vehicle can pass by this stop.
     int end = endTime + stopOffset;
+
     if (time > end) {
       return -1;
     }
+
     if (exactTimes) {
       for (int dep = beg; dep < end; dep += headway_s) {
         if (dep >= time) {
@@ -119,16 +122,19 @@ public class FrequencyEntry implements Serializable {
       }
     } else {
       int dep = time + headway_s;
+
       // TODO it might work better to step forward until in range
       // this would work better for time window edges.
       if (dep < beg) {
         return beg;
       }
+
       // not quite right
       if (dep < end) {
         return dep;
       }
     }
+
     return -1;
   }
 
@@ -138,29 +144,36 @@ public class FrequencyEntry implements Serializable {
     int beg = startTime + stopOffset;
     // Latest a vehicle can pass by this stop.
     int end = endTime + stopOffset;
+
     if (t < beg) {
       return -1;
     }
+
     if (exactTimes) {
       // we can't start from end in case end - beg is not a multiple of headway
       int arr;
+
       for (arr = beg + headway_s; arr < end; arr += headway_s) {
         if (arr > t) {
           return arr - headway_s;
         }
       }
+
       // if t > end, return last valid arrival time
       return arr - headway_s;
     } else {
       int dep = t - headway_s;
+
       if (dep > end) {
         return end;
       }
+
       // not quite right
       if (dep > beg) {
         return dep;
       }
     }
+
     return -1;
   }
 

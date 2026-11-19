@@ -115,14 +115,17 @@ public class SiriSXUpdater
    */
   private void updateSiri() {
     boolean moreData = false;
+
     do {
       var updates = getUpdates();
+
       if (updates.isPresent()) {
         ServiceDelivery serviceDelivery = updates.get().getServiceDelivery();
         moreData = Boolean.TRUE.equals(serviceDelivery.isMoreData());
         // Mark this updater as primed after last page of updates. Copy moreData into a final
         // primitive, because the object moreData persists across iterations.
         final boolean markPrimed = !moreData;
+
         if (serviceDelivery.getSituationExchangeDeliveries() != null) {
           // FIXME RT_AB: This is submitting a reference to a method on a long-lived instance as a
           //   GraphWriterRunnable. These runnables were originally intended to be small,
@@ -133,7 +136,8 @@ public class SiriSXUpdater
           //   Such runnables should be illustrated in documentation as e.g. a little box labeled
           //   "change trip ABC123 by making stop 53 late by 2 minutes."
           //   Also clarify how this runnable works without even using the supplied
-          //   (graph, transitRepository) parameters. There are multiple TransitAlertServices and they
+          //   (graph, transitRepository) parameters. There are multiple TransitAlertServices and
+          //   they
           //   are not versioned along with the Graph, they are attached to updaters.
           //
           // This is submitting a runnable to an executor, but that runnable only writes back to
@@ -157,6 +161,7 @@ public class SiriSXUpdater
 
           updateGraph(context -> {
             updateHandler.update(serviceDelivery, context);
+
             if (markPrimed) {
               primed = true;
             }
@@ -168,18 +173,22 @@ public class SiriSXUpdater
 
   private Optional<Siri> getUpdates() {
     long t1 = System.currentTimeMillis();
+
     try {
       Optional<Siri> siri = siriHttpLoader.fetchSXFeed(requestorRef);
+
       if (siri.isEmpty()) {
         return Optional.empty();
       }
 
       ServiceDelivery serviceDelivery = siri.get().getServiceDelivery();
+
       if (serviceDelivery == null) {
         throw new RuntimeException("Failed to get serviceDelivery " + url);
       }
 
       ZonedDateTime responseTimestamp = serviceDelivery.getResponseTimestamp();
+
       if (responseTimestamp.isBefore(lastTimestamp)) {
         LOG.info("Ignoring feed with an old timestamp.");
         return Optional.empty();
@@ -201,6 +210,7 @@ public class SiriSXUpdater
         System.currentTimeMillis() - t1
       );
     }
+
     return Optional.empty();
   }
 

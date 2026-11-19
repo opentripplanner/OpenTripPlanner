@@ -153,9 +153,11 @@ public class AlertImpl implements GraphQLDataFetchers.GraphQLAlert {
   public DataFetcher<Long> effectiveEndDate() {
     return environment -> {
       Instant effectiveEndDate = getSource(environment).getEffectiveEndDate();
+
       if (effectiveEndDate == null) {
         return null;
       }
+
       return effectiveEndDate.getEpochSecond();
     };
   }
@@ -164,9 +166,11 @@ public class AlertImpl implements GraphQLDataFetchers.GraphQLAlert {
   public DataFetcher<Long> effectiveStartDate() {
     return environment -> {
       Instant effectiveStartDate = getSource(environment).getEffectiveStartDate();
+
       if (effectiveStartDate == null) {
         return null;
       }
+
       return effectiveStartDate.getEpochSecond();
     };
   }
@@ -190,21 +194,25 @@ public class AlertImpl implements GraphQLDataFetchers.GraphQLAlert {
             Object stop = getStopOrStation(getTransitService(environment), id);
             return List.of(getAlertEntityOrUnknown(stop, id.toString(), "stop"));
           }
+
           if (entitySelector instanceof EntitySelector.Agency) {
             FeedScopedId id = ((EntitySelector.Agency) entitySelector).agencyId();
             Agency agency = getTransitService(environment).getAgency(id);
             return List.of(getAlertEntityOrUnknown(agency, id.toString(), "agency"));
           }
+
           if (entitySelector instanceof EntitySelector.Route) {
             FeedScopedId id = ((EntitySelector.Route) entitySelector).routeId();
             Route route = getTransitService(environment).getRoute(id);
             return List.of(getAlertEntityOrUnknown(route, id.toString(), "route"));
           }
+
           if (entitySelector instanceof EntitySelector.Trip) {
             FeedScopedId id = ((EntitySelector.Trip) entitySelector).tripId();
             Trip trip = getTransitService(environment).getTrip(id);
             return List.of(getAlertEntityOrUnknown(trip, id.toString(), "trip"));
           }
+
           if (entitySelector instanceof EntitySelector.StopAndRoute stopAndRoute) {
             FeedScopedId stopId = stopAndRoute.stopId();
             FeedScopedId routeId = stopAndRoute.routeId();
@@ -223,6 +231,7 @@ public class AlertImpl implements GraphQLDataFetchers.GraphQLAlert {
                   )
             );
           }
+
           if (entitySelector instanceof EntitySelector.StopAndTrip stopAndTrip) {
             FeedScopedId stopId = stopAndTrip.stopId();
             FeedScopedId tripId = stopAndTrip.tripId();
@@ -241,6 +250,7 @@ public class AlertImpl implements GraphQLDataFetchers.GraphQLAlert {
                   )
             );
           }
+
           if (entitySelector instanceof EntitySelector.RouteTypeAndAgency) {
             FeedScopedId agencyId = ((EntitySelector.RouteTypeAndAgency) entitySelector).agencyId();
             int routeType = ((EntitySelector.RouteTypeAndAgency) entitySelector).routeType();
@@ -258,11 +268,13 @@ public class AlertImpl implements GraphQLDataFetchers.GraphQLAlert {
                   )
             );
           }
+
           if (entitySelector instanceof EntitySelector.RouteType) {
             int routeType = ((EntitySelector.RouteType) entitySelector).routeType();
             String feedId = ((EntitySelector.RouteType) entitySelector).feedId();
             return List.of(new RouteTypeModel(null, routeType, feedId));
           }
+
           if (entitySelector instanceof EntitySelector.DirectionAndRoute) {
             Direction direction = ((DirectionAndRoute) entitySelector).direction();
             FeedScopedId routeId = ((EntitySelector.DirectionAndRoute) entitySelector).routeId();
@@ -284,12 +296,14 @@ public class AlertImpl implements GraphQLDataFetchers.GraphQLAlert {
                   )
                 );
           }
+
           if (entitySelector instanceof EntitySelector.Unknown) {
             final List<Object> objects = List.of(
               new UnknownModel(((EntitySelector.Unknown) entitySelector).description())
             );
             return objects;
           }
+
           return List.of();
         })
         .flatMap(Collection::stream)
@@ -359,6 +373,7 @@ public class AlertImpl implements GraphQLDataFetchers.GraphQLAlert {
     if (entity != null) {
       return entity;
     }
+
     return new UnknownModel(
       String.format(
         "Alert's entity selector was %s with id %s but the %s doesn't exist.",
@@ -390,6 +405,7 @@ public class AlertImpl implements GraphQLDataFetchers.GraphQLAlert {
         )
       );
     }
+
     if (entityA == null) {
       return new UnknownModel(
         String.format(
@@ -402,6 +418,7 @@ public class AlertImpl implements GraphQLDataFetchers.GraphQLAlert {
         )
       );
     }
+
     return new UnknownModel(
       String.format(
         "Alert's entity selector was %s with id %s and %s with id %s but the %s doesn't exist.",

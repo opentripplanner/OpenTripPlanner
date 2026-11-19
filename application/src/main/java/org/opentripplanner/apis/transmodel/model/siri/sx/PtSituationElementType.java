@@ -210,6 +210,7 @@ public class PtSituationElementType {
           .description("Advice of situation in all different translations available")
           .dataFetcher(environment -> {
             I18NString adviceText = environment.<TransitAlert>getSource().adviceText();
+
             if (adviceText instanceof TranslatedString translatedString) {
               return translatedString.getTranslations();
             } else if (adviceText != null) {
@@ -227,9 +228,11 @@ public class PtSituationElementType {
           .description("Optional links to more information.")
           .dataFetcher(environment -> {
             List<AlertUrl> siriUrls = environment.<TransitAlert>getSource().siriUrls();
+
             if (!siriUrls.isEmpty()) {
               return siriUrls;
             }
+
             return emptyList();
           })
           .build()
@@ -369,9 +372,11 @@ public class PtSituationElementType {
             TransitAlert alert = environment.getSource();
             String feedId = alert.getId().getFeedId();
             String codespace = alert.siriCodespace();
+
             if (codespace == null) {
               return null;
             }
+
             return GqlUtil.getTransitService(environment)
               .listAgencies()
               .stream()

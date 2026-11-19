@@ -91,6 +91,7 @@ public class McArrivalsEventListenerFactory<T extends RaptorTripSchedule> {
     if (!processed) {
       throw new IllegalStateException("Call the create() method before accessing the result!");
     }
+
     return result;
   }
 }

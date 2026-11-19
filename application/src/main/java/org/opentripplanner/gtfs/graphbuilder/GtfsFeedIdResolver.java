@@ -31,18 +31,19 @@ public class GtfsFeedIdResolver {
    * <p>
    * This will try to fetch the experimental feed_id field from the feed_info.txt file.
    * <p>
-   * If the feed does not contain a feed_info.txt or a feed_id field, a default GtfsFeedId will
-   * be created.
+   * If the feed does not contain a feed_info.txt or a feed_id field, a default GtfsFeedId will be
+   * created.
+   *
    * <h5>THIS METHOD IS THREAD SAFE!</h5>
    * <p>
-   * The generated {@code feedId}s are cached in a synchronized map and only inserted if it does
-   * not exist already. The single access point(this method) guarantee thread-safety.
+   * The generated {@code feedId}s are cached in a synchronized map and only inserted if it does not
+   * exist already. The single access point(this method) guarantee thread-safety.
    *
-   * @param source       the input source
+   * @param source the input source
    * @param dataSourceId Any id which identify the data sorce, for example the URI.
    * @return A GtfsFeedId
-   * @see <a href=
-   *      "http://developer.trimet.org/gtfs_ext.shtml">http://developer.trimet.org/gtfs_ext.shtml</a>
+   * @see
+   *     <a href= "http://developer.trimet.org/gtfs_ext.shtml">http://developer.trimet.org/gtfs_ext.shtml</a>
    */
   public static String fromGtfsFeed(CsvInputSource source, Object dataSourceId) {
     return FEED_ID_MAP.computeIfAbsent(dataSourceId, ignore -> readFeedIdFromDataSource(source));
@@ -66,6 +67,7 @@ public class GtfsFeedIdResolver {
           return normalizeId(result.get("feed_id"));
         }
       }
+
       return generateId();
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -87,6 +89,7 @@ public class GtfsFeedIdResolver {
     if (StringUtils.hasNoValue(id)) {
       return null;
     }
+
     // Colon is used as a separator in OTP so that's why we strip it out - it will confuse the
     // parsers in the API (but those could be updated if someone is keen to use colons as the feed
     // id).

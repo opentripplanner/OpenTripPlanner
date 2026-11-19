@@ -44,9 +44,12 @@ public class DirectStreetRouter {
     if (request.journey().direct().mode() == StreetMode.NOT_SET) {
       return Collections.emptyList();
     }
+
     OTPRequestTimeoutException.checkForTimeout();
+
     try {
       var maxCarSpeed = streetLimitationParametersService.maxCarSpeed();
+
       if (!straightLineDistanceIsWithinLimit(request, maxCarSpeed, linkingContext)) {
         return Collections.emptyList();
       }
@@ -71,6 +74,7 @@ public class DirectStreetRouter {
         graph.ellipsoidToGeoidDifference
       );
       List<Itinerary> itineraries = new ArrayList<>();
+
       for (var path : paths) {
         var legs = streetPathToLegsMapper.map(path, request);
         var itinerary = LegsToItineraryMapper.map(
@@ -80,6 +84,7 @@ public class DirectStreetRouter {
         );
         itinerary.ifPresent(itineraries::add);
       }
+
       return ItinerariesHelper.decorateItinerariesWithRequestData(
         itineraries,
         request.journey().wheelchair(),

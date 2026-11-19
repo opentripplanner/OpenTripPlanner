@@ -40,6 +40,7 @@ final class TranslationHelper {
 
     for (Map.Entry<String, List<Translation>> i : byTableName.entrySet()) {
       String tableName = i.getKey();
+
       if (tableName.equals(TABLE_FEED_INFO)) {
         // will create with following structure:
         // {<tableName>={""=[Translation@1, ..., Translation@Z]}}
@@ -106,6 +107,7 @@ final class TranslationHelper {
     }
 
     Field field;
+
     try {
       field = clazz.getDeclaredField(fieldName);
     } catch (NoSuchFieldException e) {
@@ -130,8 +132,10 @@ final class TranslationHelper {
 
     List<Translation> translationList = null;
     String key = recordSubId != null ? String.join("_", recordId, recordSubId) : recordId;
+
     if (tableName.equals(TABLE_FEED_INFO)) {
       Map<String, List<Translation>> feeds = translationMap.get(tableName);
+
       if (feeds != null) {
         translationList = feeds.get("");
       }
@@ -139,29 +143,36 @@ final class TranslationHelper {
       Map<String, List<Translation>> translationsByKey = translationMap.get(
         tableName + "_by_record"
       );
+
       if (translationsByKey != null) {
         translationList = translationsByKey.get(key);
       }
+
       if (translationList == null) {
         Map<String, List<Translation>> translationsByValue = translationMap.get(
           tableName + "_by_field"
         );
+
         if (translationsByValue != null) {
           translationList = translationsByValue.get(defaultValue);
         }
       }
     }
+
     if (translationList != null) {
       HashMap<String, String> hm = new HashMap<>();
       hm.put(null, defaultValue);
       hm.put(feedLanguage, defaultValue);
+
       for (Translation translation : translationList) {
         if (translationFieldName.equals(translation.getFieldName())) {
           hm.put(translation.getLanguage(), translation.getTranslation());
         }
       }
+
       return TranslatedString.getDeduplicatedI18NString(hm, false);
     }
+
     return NonLocalizedString.ofNullable(defaultValue);
   }
 
@@ -183,12 +194,15 @@ final class TranslationHelper {
     for (int i = 0; i < fieldName.length(); i++) {
       char c = fieldName.charAt(i);
       boolean isUpperCase = Character.isUpperCase(c);
+
       if (isUpperCase) {
         c = Character.toLowerCase(c);
       }
+
       if (isUpperCase && !wasUpperCase) {
         b.append('_');
       }
+
       b.append(c);
       wasUpperCase = isUpperCase;
     }

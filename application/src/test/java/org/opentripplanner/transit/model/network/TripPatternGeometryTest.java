@@ -52,11 +52,13 @@ class TripPatternGeometryTest {
 
   private static StopPattern stopPattern(StopLocation... stops) {
     var builder = StopPattern.create(stops.length);
+
     for (int i = 0; i < stops.length; i++) {
       builder.stops.with(i, stops[i]);
       builder.pickups.with(i, PickDrop.SCHEDULED);
       builder.dropoffs.with(i, PickDrop.SCHEDULED);
     }
+
     return builder.build();
   }
 
@@ -104,19 +106,23 @@ class TripPatternGeometryTest {
     // full-pattern leg within 1 m.
     int numberOfStops = 20;
     RegularStop[] stops = new RegularStop[numberOfStops];
+
     for (int i = 0; i < numberOfStops; i++) {
       // ~111 m spacing (at 60°N, 0.001° latitude ≈ 111 m).
       double lat = 60.0 + i * 0.001;
       stops[i] = TEST_ENV.stop("TPG-long-" + i, b -> b.withCoordinate(lat, 10.0));
     }
+
     StopPattern pattern = stopPattern(stops);
 
     var subject = TripPatternBuilder.buildHopGeometries(pattern, null);
 
     double exactSum = 0;
+
     for (int i = 0; i < numberOfStops - 1; i++) {
       exactSum += exactDistance(stops[i], stops[i + 1]);
     }
+
     assertEquals(exactSum, subject.distanceBetween(0, numberOfStops - 1), 1.0);
   }
 

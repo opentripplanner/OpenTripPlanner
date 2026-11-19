@@ -28,6 +28,7 @@ public final class TimePeriod {
         "The start of a time period must not be after its end: %s > %s".formatted(start, end)
       );
     }
+
     this.start = start;
     this.end = end;
   }
@@ -101,6 +102,7 @@ public final class TimePeriod {
     if (this == o) {
       return true;
     }
+
     return (
       o instanceof TimePeriod other &&
       Objects.equals(start, other.start) &&

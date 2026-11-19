@@ -10,8 +10,8 @@ import org.opentripplanner.utils.lang.IntUtils;
  * Compact elevation profile. To optimize storage, we use the following tricks:
  * <ul>
  *   <li>Store intermediate point in fixed floating points with fixed precision, using delta coding
- *       from the previous point, and variable length coding (most of the delta coordinates will thus fits
- *       in 1 or 2 bytes).</li>
+ *       from the previous point, and variable length coding (most of the delta coordinates will
+ *       thus fits in 1 or 2 bytes).</li>
  * </ul>
  * <p>
  * Performance hit should be low as we do not need the elevation profile itself during a path
@@ -64,8 +64,10 @@ public final class CompactElevationProfile implements Serializable {
     if (elevation == null) {
       return null;
     }
+
     int oiy = 0;
     int[] coords = new int[elevation.size()];
+
     for (int i = 0; i < elevation.size(); i++) {
       /*
        * Note: We should do the rounding *before* the delta to prevent rounding errors from
@@ -77,6 +79,7 @@ public final class CompactElevationProfile implements Serializable {
       coords[i] = diy;
       oiy = iy;
     }
+
     return DlugoszVarLenIntPacker.pack(coords);
   }
 
@@ -87,8 +90,8 @@ public final class CompactElevationProfile implements Serializable {
    * the length of the geometry.
    *
    * @param packedCoords Compacted coordinates
-   * @param lengthM      The length of the edge in meters. This is used as the x-value of the final
-   *                     height sample
+   * @param lengthM The length of the edge in meters. This is used as the x-value of the final
+   *     height sample
    * @return The elevation profile
    */
   public static PackedCoordinateSequence uncompactElevationProfileWithRegularSamples(
@@ -98,10 +101,12 @@ public final class CompactElevationProfile implements Serializable {
     if (packedCoords == null) {
       return null;
     }
+
     int[] coords = DlugoszVarLenIntPacker.unpack(packedCoords);
     int size = coords.length;
     Coordinate[] c = new Coordinate[size];
     int oiy = 0;
+
     for (int i = 0; i < c.length; i++) {
       int iy = oiy + coords[i];
       c[i] = new Coordinate(
@@ -110,6 +115,7 @@ public final class CompactElevationProfile implements Serializable {
       );
       oiy = iy;
     }
+
     return new PackedCoordinateSequence.Double(c, 2);
   }
 

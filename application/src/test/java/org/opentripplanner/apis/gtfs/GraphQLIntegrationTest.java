@@ -630,6 +630,7 @@ class GraphQLIntegrationTest {
 
           return stl.copyOf().withTripTimes(builder.build()).build();
         }
+
         return tl;
       })
       .build();
@@ -669,12 +670,15 @@ class GraphQLIntegrationTest {
 
     var expectedJson = Files.readString(expectationFile);
     var unorderedArrays = UNORDERED_ARRAYS.getOrDefault(path.getFileName().toString(), List.of());
+
     if (unorderedArrays.isEmpty()) {
       assertEqualJson(expectedJson, actualJson);
       return;
     }
+
     var expected = JSON_MAPPER.readTree(expectedJson);
     var actual = JSON_MAPPER.readTree(actualJson);
+
     for (var pointer : unorderedArrays) {
       assertThat(ImmutableList.copyOf(actual.at(pointer))).containsExactlyElementsIn(
         ImmutableList.copyOf(expected.at(pointer))
@@ -683,6 +687,7 @@ class GraphQLIntegrationTest {
       ((ArrayNode) actual.at(pointer)).removeAll();
       ((ArrayNode) expected.at(pointer)).removeAll();
     }
+
     assertEqualJson(expected.toString(), actual.toString());
   }
 
@@ -739,6 +744,7 @@ class GraphQLIntegrationTest {
   private static String responseBody(Response response) {
     if (response instanceof OutboundJaxrsResponse outbound) {
       var entity = outbound.getContext().getEntity();
+
       if (entity instanceof StreamingOutput streaming) {
         try {
           var baos = new ByteArrayOutputStream();
@@ -748,8 +754,10 @@ class GraphQLIntegrationTest {
           fail("Failed to read streaming response: " + e.getMessage());
         }
       }
+
       return (String) entity;
     }
+
     fail("expected an outbound response but got %s".formatted(response.getClass().getSimpleName()));
     return null;
   }

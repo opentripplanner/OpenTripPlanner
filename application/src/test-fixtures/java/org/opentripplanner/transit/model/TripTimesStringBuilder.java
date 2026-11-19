@@ -34,13 +34,16 @@ public class TripTimesStringBuilder {
     }
 
     StringBuilder s = new StringBuilder(TripTimesStateDecoder.summarizeFromTripTimes(tripTimes));
+
     for (int i = 0; i < tripTimes.getNumStops(); i++) {
       var depart = tripTimes.getDepartureTime(i);
       var arrive = tripTimes.getArrivalTime(i);
       var flags = new ArrayList<String>();
+
       if (tripTimes.isCanceledStop(i)) {
         flags.add("C");
       }
+
       if (tripTimes.hasArrived(i)) {
         if (tripTimes.hasDeparted(i)) {
           flags.add("R");
@@ -48,25 +51,31 @@ public class TripTimesStringBuilder {
           flags.add("A");
         }
       }
+
       if (tripTimes.isPredictionInaccurate(i)) {
         flags.add("PI");
       }
+
       if (tripTimes.isNoDataStop(i)) {
         flags.add("ND");
       }
+
       if (tripTimes.isExtraCall(i)) {
         flags.add("EC");
       }
 
       s.append(" | ").append(stops.get(i).getName());
+
       if (!flags.isEmpty()) {
         s.append(" [").append(String.join(",", flags)).append("]");
       }
+
       s.append(" ")
         .append(TimeUtils.timeToStrCompact(arrive))
         .append(" ")
         .append(TimeUtils.timeToStrCompact(depart));
     }
+
     return s.toString();
   }
 }

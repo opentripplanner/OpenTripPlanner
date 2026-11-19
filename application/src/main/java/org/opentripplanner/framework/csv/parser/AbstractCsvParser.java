@@ -56,9 +56,11 @@ public abstract class AbstractCsvParser<T> {
   public boolean headersMatch() {
     try {
       ++lineNumber;
+
       if (!reader.readHeaders()) {
         return false;
       }
+
       var rawHeaders = Arrays.stream(reader.getHeaders()).toList();
       // All defined headers must exist, but there might be extra headers - these are ignored
       return rawHeaders.containsAll(headers());
@@ -72,6 +74,7 @@ public abstract class AbstractCsvParser<T> {
     while (true) {
       try {
         this.next = null;
+
         if (reader.readRecord()) {
           ++lineNumber;
           this.next = createNextRow();
@@ -128,10 +131,12 @@ public abstract class AbstractCsvParser<T> {
   protected String getString(String columnName) throws HandledCsvParseException {
     try {
       var value = reader.get(columnName);
+
       if (StringUtils.hasNoValue(value)) {
         issueStore.add(new ValueMissingIssue(columnName, line(), issueType));
         throw new HandledCsvParseException();
       }
+
       return value;
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -140,6 +145,7 @@ public abstract class AbstractCsvParser<T> {
 
   protected LocalDate getLocalDate(String columnName) throws HandledCsvParseException {
     var value = getString(columnName);
+
     try {
       return LocalDate.parse(
         value,
@@ -176,6 +182,7 @@ public abstract class AbstractCsvParser<T> {
   private <T> T getNumber(String columnName, String type, Function<String, T> mapper)
     throws HandledCsvParseException {
     var value = getString(columnName);
+
     try {
       return mapper.apply(value);
     } catch (NumberFormatException e) {

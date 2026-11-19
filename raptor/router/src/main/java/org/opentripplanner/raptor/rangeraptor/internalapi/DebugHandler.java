@@ -19,8 +19,8 @@ public interface DebugHandler<T> {
    * Callback to notify that the given element is accepted into the given collection. For example
    * this happens when a new stop arrival is accepted at a particular stop.
    * <p>
-   * The handler will do the last check to see if this stop is in the request stop list or in
-   * debug request path.
+   * The handler will do the last check to see if this stop is in the request stop list or in debug
+   * request path.
    */
   void accept(T element);
 
@@ -30,7 +30,7 @@ public interface DebugHandler<T> {
    * The same check as in {@link #accept(Object)} is performed before reporting back to the API
    * listeners.
    *
-   * @param element           the rejected element
+   * @param element the rejected element
    * @param rejectedByElement the dominating element. Optional can be {@code null}
    */
   void reject(T element, T rejectedByElement, String reason);

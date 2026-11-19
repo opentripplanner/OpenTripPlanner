@@ -68,6 +68,7 @@ public class MultiLineToStringBuilder {
     if (ignoreValue.test(value)) {
       items.add(new Item(label, toString.apply(value)));
     }
+
     return this;
   }
 
@@ -100,9 +101,11 @@ public class MultiLineToStringBuilder {
 
   private String padRight(String value, int size) {
     var buf = new StringBuilder(value);
+
     while (buf.length() < size) {
       buf.append('.');
     }
+
     return buf.toString();
   }
 

@@ -97,6 +97,7 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
         .collect(Collectors.toMap(nearbyStop -> getRegularStop(nearbyStop.stopId()), t -> t));
 
       Map<RegularStop, NearbyStop> stopsStreets = new HashMap<>();
+
       try {
         /* Find nearby stops by street distance */
         streetNearbyStopFinder

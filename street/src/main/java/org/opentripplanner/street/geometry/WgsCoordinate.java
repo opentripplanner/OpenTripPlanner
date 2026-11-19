@@ -70,6 +70,7 @@ public final class WgsCoordinate implements Serializable {
     if (latitude != null && longitude != null) {
       return new WgsCoordinate(latitude, longitude);
     }
+
     throw new IllegalArgumentException(
       "Both 'latitude' and 'longitude' must have a value or both must be 'null'."
     );
@@ -84,6 +85,7 @@ public final class WgsCoordinate implements Serializable {
         "Unable to calculate mean for an empty set of coordinates"
       );
     }
+
     if (coordinates.size() == 1) {
       return coordinates.iterator().next();
     }
@@ -117,7 +119,7 @@ public final class WgsCoordinate implements Serializable {
    * Compare to coordinates and return {@code true} if they are close together - have the same
    * location. The comparison uses an EPSILON of 1E-7 for each axis, for both latitude and
    * longitude.
-   *
+   * <p>
    * When we compare two coordinates we want to see if they are within a given distance, roughly
    * within a square centimeter. This is not <em>transitive</em>, hence violating the equals/hasCode
    * guideline. Consider 3 point along one of the axis:
@@ -125,8 +127,8 @@ public final class WgsCoordinate implements Serializable {
    *      | 8mm | 8mm |
    *      x --- y --- z
    *     </pre>
-   * Then {@code x.sameLocation(y)} is {@code true} and {@code y.sameLocation(z)} is
-   * {@code true}, but {@code x.sameLocation(z)} is {@code false}.
+   * Then {@code x.sameLocation(y)} is {@code true} and {@code y.sameLocation(z)} is {@code true},
+   * but {@code x.sameLocation(z)} is {@code false}.
    */
   public boolean sameLocation(WgsCoordinate other) {
     return equals(other);
@@ -238,9 +240,11 @@ public final class WgsCoordinate implements Serializable {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     WgsCoordinate other = (WgsCoordinate) o;
     return latitude == other.latitude && longitude == other.longitude;
   }

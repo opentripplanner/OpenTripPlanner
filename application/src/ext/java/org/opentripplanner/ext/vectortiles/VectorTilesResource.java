@@ -60,7 +60,7 @@ public class VectorTilesResource {
     @Context Request grizzlyRequest,
     /**
      * @deprecated The support for multiple routers are removed from OTP2. See
-     *             https://github.com/opentripplanner/OpenTripPlanner/issues/2760
+     *     https://github.com/opentripplanner/OpenTripPlanner/issues/2760
      */
     @Deprecated @PathParam("ignoreRouterId") String ignoreRouterId
   ) {
@@ -148,38 +148,41 @@ public class VectorTilesResource {
     LayerBuilderContext context
   ) {
     return switch (layerParameters.type()) {
-      case Stop -> new StopsLayerBuilder(
-        context.transitService(),
-        context.transitAlertService(),
-        layerParameters,
-        locale
-      );
+      case Stop
+        -> new StopsLayerBuilder(
+          context.transitService(),
+          context.transitAlertService(),
+          layerParameters,
+          locale
+        );
       case Station -> new StationsLayerBuilder(context.transitService(), layerParameters, locale);
       case AreaStop -> new AreaStopsLayerBuilder(context.transitService(), layerParameters, locale);
-      case VehicleRental -> new VehicleRentalPlacesLayerBuilder(
-        context.vehicleRentalService(),
-        layerParameters,
-        locale
-      );
-      case VehicleRentalStation -> new VehicleRentalStationsLayerBuilder(
-        context.vehicleRentalService(),
-        layerParameters,
-        locale
-      );
-      case VehicleRentalVehicle -> new VehicleRentalVehiclesLayerBuilder(
-        context.vehicleRentalService(),
-        layerParameters
-      );
-      case VehicleParking -> new VehicleParkingsLayerBuilder(
-        context.vehicleParkingService(),
-        layerParameters,
-        locale
-      );
-      case VehicleParkingGroup -> new VehicleParkingGroupsLayerBuilder(
-        context.vehicleParkingService(),
-        layerParameters,
-        locale
-      );
+      case VehicleRental
+        -> new VehicleRentalPlacesLayerBuilder(
+          context.vehicleRentalService(),
+          layerParameters,
+          locale
+        );
+      case VehicleRentalStation
+        -> new VehicleRentalStationsLayerBuilder(
+          context.vehicleRentalService(),
+          layerParameters,
+          locale
+        );
+      case VehicleRentalVehicle
+        -> new VehicleRentalVehiclesLayerBuilder(context.vehicleRentalService(), layerParameters);
+      case VehicleParking
+        -> new VehicleParkingsLayerBuilder(
+          context.vehicleParkingService(),
+          layerParameters,
+          locale
+        );
+      case VehicleParkingGroup
+        -> new VehicleParkingGroupsLayerBuilder(
+          context.vehicleParkingService(),
+          layerParameters,
+          locale
+        );
     };
   }
 

@@ -35,6 +35,7 @@ public class SiriAzureSXUpdaterParameters extends SiriAzureUpdaterParameters {
   @Override
   public Optional<URI> buildDataInitializationUrl() throws URISyntaxException {
     var url = getDataInitializationUrl();
+
     if (url == null) {
       return Optional.empty();
     }

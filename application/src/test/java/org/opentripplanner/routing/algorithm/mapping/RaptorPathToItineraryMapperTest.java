@@ -277,6 +277,7 @@ public class RaptorPathToItineraryMapperTest {
   private TripTimes<?> buildTripTimes(TripPattern originalPattern) {
     var trip = TransitRepositoryForTest.trip("test").build();
     var stopTimes = new ArrayList<StopTime>();
+
     for (int i = 0; i < originalPattern.numberOfStops(); i++) {
       var st = new StopTime();
       st.setTrip(trip);
@@ -286,6 +287,7 @@ public class RaptorPathToItineraryMapperTest {
       st.setDepartureTime(TRANSIT_START + i * 300);
       stopTimes.add(st);
     }
+
     return TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
   }
 

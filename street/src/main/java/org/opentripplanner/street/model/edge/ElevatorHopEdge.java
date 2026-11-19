@@ -167,6 +167,7 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
     if (mode == TraverseMode.BICYCLE && !permission.allows(StreetTraversalPermission.BICYCLE)) {
       return State.empty();
     }
+
     // there are elevators which allow cars
     if (mode == TraverseMode.CAR && !permission.allows(StreetTraversalPermission.CAR)) {
       return State.empty();

@@ -26,7 +26,7 @@ public class RouteMatcherFactory {
    * transit service which has access to all routes and we don't want to pass all the routes into
    * this factory.
    *
-   * @param request              the criteria for filtering Routes.
+   * @param request the criteria for filtering Routes.
    * @param isFlexRoutePredicate a function that determines if a Route is a flexible route.
    * @return a matcher for filtering Routes.
    */
@@ -39,12 +39,16 @@ public class RouteMatcherFactory {
     if (request.flexibleOnly()) {
       expr.matches(isFlexRoute(isFlexRoutePredicate));
     }
+
     expr.atLeastOneMatch(request.agencies(), RouteMatcherFactory::agencies);
     expr.atLeastOneMatch(request.transitModes(), RouteMatcherFactory::transitModes);
+
     if (request.shortName() != null) {
       expr.matches(shortName(request.shortName()));
     }
+
     expr.atLeastOneMatch(request.shortNames(), RouteMatcherFactory::shortNames);
+
     if (request.longName() != null) {
       expr.matches(longName(request.longName()));
     }

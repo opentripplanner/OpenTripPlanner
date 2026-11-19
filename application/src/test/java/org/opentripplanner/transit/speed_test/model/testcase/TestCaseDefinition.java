@@ -29,6 +29,7 @@ public record TestCaseDefinition(
   public String toString() {
     var viaLoc = "";
     var viaCoordinate = "";
+
     if (viaLocation != null) {
       viaLoc = " - via " + viaLocation.label();
       viaCoordinate = " - via " + coordinateString(viaLocation.coordinateLocation());
@@ -67,9 +68,11 @@ public record TestCaseDefinition(
 
   private String coordinateString(GenericLocation location) {
     var coord = location.wgsCoordinate();
+
     if (coord == null) {
       return ValueObjectToStringBuilder.of().addCoordinate(null, null).toString();
     }
+
     return ValueObjectToStringBuilder.of()
       .addCoordinate(coord.latitude(), coord.longitude())
       .toString();

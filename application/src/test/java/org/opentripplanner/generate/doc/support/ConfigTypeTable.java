@@ -17,6 +17,7 @@ public class ConfigTypeTable {
     for (var it : ConfigType.values()) {
       tbl.addRow(MarkdownFormatter.code(it.docName()), it.description(), it.examplesToMarkdown());
     }
+
     var rows = tbl.build().toMarkdownRows();
     return String.join(NEW_LINE, rows) + NEW_LINE;
   }

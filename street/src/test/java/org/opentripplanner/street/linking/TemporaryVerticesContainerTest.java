@@ -39,6 +39,7 @@ public class TemporaryVerticesContainerTest {
     graph.addVertex(intersectionVertexB);
     graph.addVertex(intersectionVertexC);
     graph.index();
+
     try (var container = new TemporaryVerticesContainer()) {
       var vertexLinker = new VertexLinker(
         graph,
@@ -68,6 +69,7 @@ public class TemporaryVerticesContainerTest {
       assertThat(intersectionVertexC.getIncoming()).hasSize(1);
       assertThat(intersectionVertexC.getOutgoing()).hasSize(0);
     }
+
     // After container is closed, only vertex from B -> C should remain
     assertThat(intersectionVertexB.getOutgoing()).hasSize(1);
     var edge = intersectionVertexB.getOutgoing().iterator().next();

@@ -6,7 +6,6 @@ package org.opentripplanner.utils.lang;
  * reference and create another heavy object instance such as with the BitSet class.
  * <p>
  * Usage is rather simple:
- *
  * <pre>
  *
  * short flags; // or int, long, byte
@@ -35,6 +34,7 @@ public final class BitSetUtils {
     } else {
       bitset &= ~(1 << index);
     }
+
     return bitset;
   }
 
@@ -48,6 +48,7 @@ public final class BitSetUtils {
     } else {
       bitset &= ~(1 << index);
     }
+
     return bitset;
   }
 
@@ -61,6 +62,7 @@ public final class BitSetUtils {
     } else {
       bitset &= ~(1 << index);
     }
+
     return bitset;
   }
 
@@ -74,6 +76,7 @@ public final class BitSetUtils {
     } else {
       bitset &= ~(1L << index);
     }
+
     return bitset;
   }
 }

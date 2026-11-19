@@ -10,9 +10,9 @@ import org.slf4j.LoggerFactory;
 /**
  * Pre-filters carpool trip candidates based on time compatibility with the passenger request.
  * <p>
- * A trip is rejected when it cannot serve the passenger inside the passenger's window. Trips
- * that pass are still subject to expensive routing and a tighter post-filter on the actual
- * itinerary times.
+ * A trip is rejected when it cannot serve the passenger inside the passenger's window. Trips that
+ * pass are still subject to expensive routing and a tighter post-filter on the actual itinerary
+ * times.
  *
  * <h2>Variables</h2>
  *
@@ -42,21 +42,21 @@ import org.slf4j.LoggerFactory;
  *   <li><strong>{@code tripStart}</strong> — the trip's start time: no pickup or dropoff happens
  *       before it.</li>
  *   <li><strong>{@code tripEnd}</strong> — {@code tripStart} plus the routed baseline to the
- *       destination, with the dwell at each intermediate stop, plus the destination's deviation budget:
- *       no insertion delays the destination beyond its budget, so no pickup or dropoff happens after it.
- *       The end time of the trip data is not used: the routed baseline may take longer than the driver's
- *       schedule.</li>
+ *       destination, with the dwell at each intermediate stop, plus the destination's deviation
+ *       budget: no insertion delays the destination beyond its budget, so no pickup or dropoff
+ *       happens after it. The end time of the trip data is not used: the routed baseline may take
+ *       longer than the driver's schedule.</li>
  * </ul>
  *
  * <h3>The passenger</h3>
  *
  * <ul>
  *   <li><strong>{@code Wp}</strong>, <strong>{@code Wd}</strong> — the passenger's walk from the
- *       origin to the snapped pickup and from the snapped dropoff to the destination; zero when there is
- *       none, or when that end of the ride is a transit stop.</li>
+ *       origin to the snapped pickup and from the snapped dropoff to the destination; zero when
+ *       there is none, or when that end of the ride is a transit stop.</li>
  *   <li><strong>{@code J}</strong> = {@link CarpoolingRequest#getMaxJourneyDuration()} — bounds the
- *       transit ride of unknown duration that separates the carpool from the request anchor for access
- *       with arriveBy=true and egress with arriveBy=false.</li>
+ *       transit ride of unknown duration that separates the carpool from the request anchor for
+ *       access with arriveBy=true and egress with arriveBy=false.</li>
  * </ul>
  *
  * <h2>Rules</h2>
@@ -82,11 +82,11 @@ import org.slf4j.LoggerFactory;
  *       origin between EDT and LDT and is picked up {@code Wp} later.</li>
  *   <li>Arrive-by with the passenger at the dropoff (direct, egress): the passenger arrives between
  *       EAT and LAT and is dropped off {@code Wd} earlier.</li>
- *   <li>Egress with arriveBy=false: the passenger reaches the carpool by transit after leaving at EDT
- *       or later, and is dropped off in time to arrive within {@code J} of LDT.</li>
+ *   <li>Egress with arriveBy=false: the passenger reaches the carpool by transit after leaving at
+ *       EDT or later, and is dropped off in time to arrive within {@code J} of LDT.</li>
  *   <li>Access with arriveBy=true: the passenger is picked up before arriving by LAT, and, the
- *       journey lasting at most {@code J}, after leaving at {@code EAT − J} or later and walking to the
- *       pickup.</li>
+ *       journey lasting at most {@code J}, after leaving at {@code EAT − J} or later and walking to
+ *       the pickup.</li>
  * </ul>
  *
  * <h3>Behavior with missing inputs</h3>
@@ -103,6 +103,7 @@ public class TimeTripFilter implements CarpoolTripFilter {
   public boolean isCandidateTrip(RoutableCarpoolTrip trip, SnappedPassenger passenger) {
     var request = passenger.request();
     var requestedDateTime = request.getRequestedDateTime();
+
     if (requestedDateTime == null) {
       return true;
     }
@@ -113,12 +114,15 @@ public class TimeTripFilter implements CarpoolTripFilter {
     var window = request.isArriveByRequest()
       ? arriveByWindow(passenger, requestedDateTime)
       : departAfterWindow(passenger, requestedDateTime);
+
     if (tripEnd.isBefore(window.earliest())) {
       return reject(trip.trip(), "tripEnd", tripEnd, "is before", window.earliest());
     }
+
     if (tripStart.isAfter(window.latest())) {
       return reject(trip.trip(), "tripStart", tripStart, "is after", window.latest());
     }
+
     return true;
   }
 
@@ -130,9 +134,11 @@ public class TimeTripFilter implements CarpoolTripFilter {
   static Instant tripEnd(RoutableCarpoolTrip trip, Duration stopDuration) {
     var corridor = trip.corridor();
     var end = trip.trip().startTime().toInstant();
+
     for (var leg : corridor.legDurations()) {
       end = end.plus(leg);
     }
+
     end = end.plus(stopDuration.multipliedBy(corridor.legCount() - 1));
     return end.plus(trip.trip().legDeviationBudget(corridor.legCount() - 1));
   }
@@ -141,10 +147,12 @@ public class TimeTripFilter implements CarpoolTripFilter {
   private static Window departAfterWindow(SnappedPassenger passenger, Instant edt) {
     var request = passenger.request();
     var ldt = edt.plus(request.getSearchWindow());
+
     if (request.isEgressRequest()) {
       var latest = ldt.plus(request.getMaxJourneyDuration()).minus(passenger.walkFromDropoff());
       return new Window(edt, latest);
     }
+
     var walk = passenger.walkToPickup();
     return new Window(edt.plus(walk), ldt.plus(walk));
   }
@@ -153,10 +161,12 @@ public class TimeTripFilter implements CarpoolTripFilter {
   private static Window arriveByWindow(SnappedPassenger passenger, Instant lat) {
     var request = passenger.request();
     var eat = lat.minus(request.getSearchWindow());
+
     if (request.isAccessRequest()) {
       var earliest = eat.minus(request.getMaxJourneyDuration()).plus(passenger.walkToPickup());
       return new Window(earliest, lat);
     }
+
     var walk = passenger.walkFromDropoff();
     return new Window(eat.minus(walk), lat.minus(walk));
   }

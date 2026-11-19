@@ -16,6 +16,7 @@ public class AlertCauseMapper {
     if (cause == null) {
       return GraphQLAlertCauseType.UNKNOWN_CAUSE;
     }
+
     return switch (cause) {
       case UNKNOWN_CAUSE -> GraphQLAlertCauseType.UNKNOWN_CAUSE;
       case OTHER_CAUSE -> GraphQLAlertCauseType.OTHER_CAUSE;

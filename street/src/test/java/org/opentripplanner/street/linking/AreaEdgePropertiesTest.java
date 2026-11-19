@@ -12,7 +12,8 @@ import org.opentripplanner.street.model.edge.Area;
 
 class AreaEdgePropertiesTest {
 
-  // A flat, pedestrian-and-bicycle, wheelchair-accessible square and a steep, pedestrian-only "steps"
+  // A flat, pedestrian-and-bicycle, wheelchair-accessible square and a steep, pedestrian-only
+  // "steps"
   // tile that is not wheelchair accessible.
   private static final Area FRIENDLY = area(
     "square",

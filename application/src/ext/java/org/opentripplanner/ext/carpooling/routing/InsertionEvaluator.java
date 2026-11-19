@@ -21,9 +21,8 @@ import org.slf4j.LoggerFactory;
  * add the least driving while every later stop stays within its deviation budget and a seat is free
  * on every leg the passenger rides.
  * <p>
- * A point's detour in a leg is the drive via the point, minus the leg, plus the dwell. The
- * pickup's detour delays every stop after the pickup, and both detours every stop after the
- * dropoff.
+ * A point's detour in a leg is the drive via the point, minus the leg, plus the dwell. The pickup's
+ * detour delays every stop after the pickup, and both detours every stop after the dropoff.
  * <p>
  * Not thread-safe; one instance per request.
  */
@@ -38,7 +37,7 @@ public class InsertionEvaluator {
 
   /**
    * @param carpoolRouter routes a street segment between two vertices of the candidate route
-   * @param stopDuration  dwell added at each intermediate stop, the passenger's included
+   * @param stopDuration dwell added at each intermediate stop, the passenger's included
    */
   public InsertionEvaluator(CarpoolRouter carpoolRouter, Duration stopDuration) {
     this.carpoolRouter = carpoolRouter;
@@ -47,27 +46,34 @@ public class InsertionEvaluator {
 
   /**
    * @return A list containing the best insertion that can be found for every stop in the list
-   *         tripWithViableAccessEgress.viableAccessEgress. If there are no valid insertions for a
-   *         stop, then no candidate for that stop will be returned.
+   *     tripWithViableAccessEgress.viableAccessEgress. If there are no valid insertions for a stop,
+   *     then no candidate for that stop will be returned.
    */
   public List<InsertionCandidate> findBestInsertions(
     TripWithViableAccessEgress tripWithViableAccessEgress
   ) {
     var viableStops = tripWithViableAccessEgress.viableAccessEgress();
+
     if (viableStops.isEmpty()) {
       return List.of();
     }
+
     var plan = plan(tripWithViableAccessEgress.routableTrip());
+
     if (plan == null) {
       return List.of();
     }
+
     var candidates = new ArrayList<InsertionCandidate>();
+
     for (var viable : viableStops) {
       var candidate = plan.best(toPassengerSnap(viable), viable.transitStop());
+
       if (candidate != null) {
         candidates.add(candidate);
       }
     }
+
     return candidates;
   }
 
@@ -76,7 +82,7 @@ public class InsertionEvaluator {
    * take it within the budgets and the capacity.
    *
    * @param snap pickup/dropoff vertices (already snapped to car-reachable vertices by the caller)
-   *             and the optional walk paths bracketing the carpool ride
+   *     and the optional walk paths bracketing the carpool ride
    */
   @Nullable
   public InsertionCandidate findBestInsertion(
@@ -91,13 +97,16 @@ public class InsertionEvaluator {
   private TripInsertionPlan plan(RoutableCarpoolTrip routableTrip) {
     var waypoints = routableTrip.vertices();
     var baseline = new RoutedSegment[waypoints.size() - 1];
+
     for (int leg = 0; leg < baseline.length; leg++) {
       baseline[leg] = carpoolRouter.route(waypoints.get(leg), waypoints.get(leg + 1));
+
       if (baseline[leg] == null) {
         LOG.info("Could not route leg {} of carpool trip {}", leg, routableTrip.trip().getId());
         return null;
       }
     }
+
     return new TripInsertionPlan(routableTrip, baseline);
   }
 
@@ -155,17 +164,23 @@ public class InsertionEvaluator {
       this.dwell = stopDuration.toSeconds();
       this.legCount = baseline.length;
       this.legSeconds = new long[legCount];
+
       for (int leg = 0; leg < legCount; leg++) {
         legSeconds[leg] = baseline[leg].durationSeconds();
       }
+
       CarpoolTrip trip = routableTrip.trip();
       this.legBudget = new long[legCount];
+
       for (int leg = 0; leg < legCount; leg++) {
         legBudget[leg] = trip.legDeviationBudget(leg).toSeconds();
       }
+
       this.capacityOk = new boolean[legCount][legCount];
+
       for (int firstLeg = 0; firstLeg < legCount; firstLeg++) {
         boolean ok = true;
+
         for (int lastLeg = firstLeg; lastLeg < legCount && ok; lastLeg++) {
           ok = trip.hasFreeSeat(lastLeg);
           capacityOk[firstLeg][lastLeg] = ok;
@@ -188,67 +203,87 @@ public class InsertionEvaluator {
           // The car is full on the pickup's leg, so no dropoff leg works with a pickup in it.
           continue;
         }
+
         RoutedSegment toPickup = pickupTimes.fromLegStart(pickupLeg);
+
         if (toPickup == null) {
           continue;
         }
+
         for (int dropoffLeg = pickupLeg; dropoffLeg < legCount; dropoffLeg++) {
           if (!capacityOk[pickupLeg][dropoffLeg]) {
             // The car is full somewhere between the two legs, so on every longer span too.
             break;
           }
+
           long detour;
+
           if (pickupLeg == dropoffLeg) {
             // Pickup and dropoff in the same leg: leg start → pickup → dropoff → leg end.
             RoutedSegment fromDropoff = dropoffTimes.toLegEnd(pickupLeg);
+
             if (fromDropoff == null) {
               continue;
             }
+
             RoutedSegment pickupToDropoff = pickupToDropoff(pickup, dropoff);
+
             if (pickupToDropoff == null) {
               continue;
             }
+
             detour =
               toPickup.durationSeconds() +
               pickupToDropoff.durationSeconds() +
               fromDropoff.durationSeconds() -
               legSeconds[pickupLeg] +
               2 * dwell;
+
             if (detour > legBudget[pickupLeg]) {
               continue;
             }
           } else {
             RoutedSegment fromPickup = pickupTimes.toLegEnd(pickupLeg);
+
             if (fromPickup == null) {
               break;
             }
+
             long pickupDetour =
               toPickup.durationSeconds() +
               fromPickup.durationSeconds() -
               legSeconds[pickupLeg] +
               dwell;
+
             if (pickupDetour > legBudget[pickupLeg]) {
               // The pickup's detour delays every later stop, so no later dropoff leg works either.
               break;
             }
+
             RoutedSegment toDropoff = dropoffTimes.fromLegStart(dropoffLeg);
+
             if (toDropoff == null) {
               continue;
             }
+
             RoutedSegment fromDropoff = dropoffTimes.toLegEnd(dropoffLeg);
+
             if (fromDropoff == null) {
               continue;
             }
+
             long dropoffDetour =
               toDropoff.durationSeconds() +
               fromDropoff.durationSeconds() -
               legSeconds[dropoffLeg] +
               dwell;
             detour = pickupDetour + dropoffDetour;
+
             if (detour > legBudget[dropoffLeg]) {
               continue;
             }
           }
+
           if (detour < bestDetour) {
             bestDetour = detour;
             bestPickupLeg = pickupLeg;
@@ -256,9 +291,11 @@ public class InsertionEvaluator {
           }
         }
       }
+
       if (bestPickupLeg < 0) {
         return null;
       }
+
       var pickupToDropoff =
         bestPickupLeg == bestDropoffLeg ? pickupToDropoff(pickup, dropoff) : null;
       return new InsertionCandidate(
@@ -277,7 +314,7 @@ public class InsertionEvaluator {
      * The trip's segments with the passenger's pickup and dropoff in the given legs.
      *
      * @param pickupToDropoff the segment from the pickup to the dropoff, the passenger's own ride;
-     *                        used, and non-null, only when both are in the same leg
+     *     used, and non-null, only when both are in the same leg
      */
     private List<RoutedSegment> routeWith(
       int pickupLeg,
@@ -287,6 +324,7 @@ public class InsertionEvaluator {
       @Nullable RoutedSegment pickupToDropoff
     ) {
       var segments = new ArrayList<RoutedSegment>(legCount + 2);
+
       for (int leg = 0; leg < legCount; leg++) {
         if (leg == pickupLeg && leg == dropoffLeg) {
           segments.add(Objects.requireNonNull(pickupTimes.fromLegStart(leg)));
@@ -302,6 +340,7 @@ public class InsertionEvaluator {
           segments.add(baseline[leg]);
         }
       }
+
       return segments;
     }
 
@@ -338,6 +377,7 @@ public class InsertionEvaluator {
           fromLegStartRouted[leg] = true;
           fromLegStart[leg] = carpoolRouter.route(routableTrip.vertices().get(leg), point);
         }
+
         return fromLegStart[leg];
       }
 
@@ -348,6 +388,7 @@ public class InsertionEvaluator {
           toLegEndRouted[leg] = true;
           toLegEnd[leg] = carpoolRouter.route(point, routableTrip.vertices().get(leg + 1));
         }
+
         return toLegEnd[leg];
       }
     }

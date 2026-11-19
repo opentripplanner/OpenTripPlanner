@@ -45,6 +45,7 @@ public class PagingServiceFactory {
     if (searchParamsUsed == null || !searchParamsUsed.isSearchWindowSet()) {
       return null;
     }
+
     return Duration.ofSeconds(searchParamsUsed.searchWindowInSeconds());
   }
 
@@ -52,6 +53,7 @@ public class PagingServiceFactory {
     if (searchParamsUsed == null || !searchParamsUsed.isEarliestDepartureTimeSet()) {
       return null;
     }
+
     return transitSearchStartTime.plusSeconds(searchParamsUsed.earliestDepartureTime());
   }
 
@@ -59,6 +61,7 @@ public class PagingServiceFactory {
     if (searchParamsUsed == null || !searchParamsUsed.isLatestArrivalTimeSet()) {
       return null;
     }
+
     return transitSearchStartTime.plusSeconds(searchParamsUsed.latestArrivalTime());
   }
 }

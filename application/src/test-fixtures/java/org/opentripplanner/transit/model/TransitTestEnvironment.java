@@ -32,8 +32,8 @@ import org.opentripplanner.utils.time.ServiceDateUtils;
 /**
  * A helper class for setting up and interacting with transit data for tests.
  * <p>
- * The builder is used to create a SiteRepository and a TransitRepository that can then be
- * queried by a TransitService.
+ * The builder is used to create a SiteRepository and a TransitRepository that can then be queried
+ * by a TransitService.
  */
 public final class TransitTestEnvironment {
 
@@ -83,7 +83,8 @@ public final class TransitTestEnvironment {
       new TimetableRepositoryLifecycle(timetableSnapshot, false, () -> defaultServiceDate)
     );
     var threadFactory = Thread.ofPlatform().name("test-commit").factory();
-    // Use atomic commits (commit immediately after each task) so test assertions see results right away
+    // Use atomic commits (commit immediately after each task) so test assertions see results right
+    // away
     this.updateManager = TransactionFactory.createUpdateManagerWithAtomicCommits(
       "test",
       repositoryRegistry,

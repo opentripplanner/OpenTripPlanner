@@ -39,34 +39,41 @@ public class StopsVisitedByPatterns implements PatternsByStopLookup {
   /** The ids of the stops of each scheduled trip pattern. */
   public Collection<List<FeedScopedId>> stopsOfEachPattern() {
     var result = new ArrayList<List<FeedScopedId>>();
+
     for (TripPattern pattern : timetableDataImport.getAllTripPatterns()) {
       result.add(pattern.getStops().stream().map(StopLocation::getId).toList());
     }
+
     return result;
   }
 
   /** Thread-safe, the transfers are generated in parallel. */
   private Map<FeedScopedId, List<TripPattern>> index() {
     var result = patternsByStop;
+
     if (result == null) {
       synchronized (this) {
         result = patternsByStop;
+
         if (result == null) {
           result = createIndex();
           patternsByStop = result;
         }
       }
     }
+
     return result;
   }
 
   private Map<FeedScopedId, List<TripPattern>> createIndex() {
     var index = new HashMap<FeedScopedId, List<TripPattern>>();
+
     for (TripPattern pattern : timetableDataImport.getAllTripPatterns()) {
       for (StopLocation stop : pattern.getStops()) {
         index.computeIfAbsent(stop.getId(), id -> new ArrayList<>()).add(pattern);
       }
     }
+
     return index;
   }
 }

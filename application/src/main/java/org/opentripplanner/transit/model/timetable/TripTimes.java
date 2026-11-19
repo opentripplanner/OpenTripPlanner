@@ -186,7 +186,7 @@ public sealed interface TripTimes<T extends TripTimes<T>>
 
   /**
    * @return the id of the vehicle operating this trip, as supplied by real-time updates, or empty
-   *         if no vehicle has been reported.
+   *     if no vehicle has been reported.
    */
   Optional<FeedScopedId> getVehicleId();
 
@@ -208,7 +208,7 @@ public sealed interface TripTimes<T extends TripTimes<T>>
    * GTFS (Headsign) and Netex (DestinationDisplay), the Via concept is only present in Transmodel.
    *
    * @return a list of via names visible at the given stop position, or an empty list if there are
-   *         no vias.
+   *     no vias.
    */
   List<String> getHeadsignVias(int stopPos);
 
@@ -217,22 +217,24 @@ public sealed interface TripTimes<T extends TripTimes<T>>
   /**
    * resolves a trip's runtime on a service day, according to its schedule. The period starts at the
    * scheduled departure from the first stop and ends at the scheduled arrival at the last stop.
-   * <p>
    *
    * @param startOfService the start of the service day the trip is running on, see
-   *                       {@link org.opentripplanner.utils.time.ServiceDateUtils#asStartOfService}.
+   *     {@link org.opentripplanner.utils.time.ServiceDateUtils#asStartOfService}.
    * @return {@code null} if the schedule of the trip cannot be resolved, either because the trip
-   *         has no stops or because the departure from the first stop or the arrival at the last
-   *         stop is missing or inconsistent.
+   *     has no stops or because the departure from the first stop or the arrival at the last stop
+   *     is missing or inconsistent.
    */
   @Nullable
   default TimePeriod scheduledRunningTime(Instant startOfService) {
     int numStops = getNumStops();
+
     if (numStops == 0) {
       return null;
     }
+
     int departure = getScheduledDepartureTime(0);
     int arrival = getScheduledArrivalTime(numStops - 1);
+
     if (
       departure == StopTime.MISSING_VALUE ||
       arrival == StopTime.MISSING_VALUE ||
@@ -240,6 +242,7 @@ public sealed interface TripTimes<T extends TripTimes<T>>
     ) {
       return null;
     }
+
     return TimePeriod.of(
       startOfService.plusSeconds(departure),
       startOfService.plusSeconds(arrival)
@@ -252,9 +255,9 @@ public sealed interface TripTimes<T extends TripTimes<T>>
    * that the times are increasing at every stop. It should therefore be used at the end of updating
    * trip times, after any propagating or interpolating delay operations.
    * <p>
-   * The dwell time at the first and at the last stop is checked as well, even though raptor
-   * ignores those times. Scheduled times of a real-time added trip are used as-is when the trip is
-   * later cancelled, so they must pass the very same validation as the real-time times, or the
+   * The dwell time at the first and at the last stop is checked as well, even though raptor ignores
+   * those times. Scheduled times of a real-time added trip are used as-is when the trip is later
+   * cancelled, so they must pass the very same validation as the real-time times, or the
    * cancellation would be rejected and the trip would be stuck in the graph as running.
    *
    * @throws DataValidationException of the first error found.
@@ -278,6 +281,7 @@ public sealed interface TripTimes<T extends TripTimes<T>>
           new TimetableValidationError(NEGATIVE_DWELL_TIME, stopPos, getTrip())
         );
       }
+
       if (stopPos > 0 && getDepartureTime(stopPos - 1) > arrival) {
         throw new DataValidationException(
           new TimetableValidationError(NEGATIVE_HOP_TIME, stopPos, getTrip())
@@ -324,10 +328,10 @@ public sealed interface TripTimes<T extends TripTimes<T>>
   /**
    * Returns the GTFS sequence number of the given 0-based stop position within the pattern.
    * <p>
-   * These are the GTFS stop sequence numbers, which show the order in which the vehicle visits
-   * the stops. Despite the fact that the StopPattern or TripPattern enclosing this class provides
-   * an ordered list of Stops, the original stop sequence numbers may still be needed for matching
-   * with GTFS-RT update messages. Unfortunately, each individual trip can have totally different
+   * These are the GTFS stop sequence numbers, which show the order in which the vehicle visits the
+   * stops. Despite the fact that the StopPattern or TripPattern enclosing this class provides an
+   * ordered list of Stops, the original stop sequence numbers may still be needed for matching with
+   * GTFS-RT update messages. Unfortunately, each individual trip can have totally different
    * sequence numbers for the same stops, so we need to store them at the individual trip level. An
    * effort is made to re-use the sequence number arrays when they are the same across different
    * trips in the same pattern.

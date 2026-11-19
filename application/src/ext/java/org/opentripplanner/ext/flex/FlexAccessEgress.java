@@ -67,9 +67,11 @@ public final class FlexAccessEgress {
       alightStopPosition,
       pathDurations.trip()
     );
+
     if (earliestDepartureTime == MISSING_VALUE) {
       return MISSING_VALUE;
     }
+
     return pathDurations.mapToRouterDepartureTime(earliestDepartureTime);
   }
 
@@ -81,12 +83,15 @@ public final class FlexAccessEgress {
       alightStopPosition,
       pathDurations.trip()
     );
+
     if (latestArrivalTime == MISSING_VALUE) {
       return MISSING_VALUE;
     }
+
     if (routingBookingInfo.exceedsMinimumBookingNotice(latestArrivalTime - pathDurations.trip())) {
       return MISSING_VALUE;
     }
+
     return pathDurations.mapToRouterArrivalTime(latestArrivalTime);
   }
 

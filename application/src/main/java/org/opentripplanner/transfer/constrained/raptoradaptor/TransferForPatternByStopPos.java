@@ -25,10 +25,12 @@ public class TransferForPatternByStopPos {
 
   public void add(int targetStopPos, TransferForPattern transfer) {
     var c = transfers.get(targetStopPos);
+
     if (c == null) {
       c = new ArrayList<>();
       transfers.put(targetStopPos, c);
     }
+
     c.add(transfer);
   }
 

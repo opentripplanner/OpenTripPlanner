@@ -41,10 +41,13 @@ class NorwayMapperTest {
       { NaN, NaN, NaN, 1.83, 1.83, 1.83, 1.83 },
     };
     ArrayList<Arguments> argumentsList = new ArrayList<>();
+
     for (int i = 0; i < expectedHighways.length; i++) {
       var highway = expectedHighways[i];
+
       for (int j = 0; j < expectedMaxspeeds.length; j++) {
         var expectedSafety = expectedBicycleSafetyMatrix[i][j];
+
         if (!Double.isNaN(expectedSafety)) {
           var maxspeed = expectedMaxspeeds[j];
           var way = OsmWay.of();
@@ -54,25 +57,30 @@ class NorwayMapperTest {
         }
       }
     }
+
     return argumentsList;
   }
 
   static List<Arguments> createBicycleSafetyWithoutExplicitMaxspeed() {
     Double[] expectedBicycleSafety = { 3.75, 3.75, 3.43, 3.43, 3.43, 1.83 };
     ArrayList<Arguments> argumentsList = new ArrayList<>();
+
     for (int i = 0; i < expectedHighways.length; i++) {
       var highway = expectedHighways[i];
       var expectedSafety = expectedBicycleSafety[i];
       var way = OsmWay.of().withTag("highway", highway).build();
       argumentsList.add(Arguments.of(way, expectedSafety));
     }
+
     return argumentsList;
   }
 
   static List<Arguments> createLinkRoadLikeMainCases() {
     ArrayList<Arguments> argumentsList = new ArrayList<>();
+
     for (var i = 0; i < 4; i++) {
       var highway = expectedHighways[i];
+
       for (var maxspeed : expectedMaxspeeds) {
         var mainRoad = OsmWay.of();
         mainRoad.withTag("highway", highway);
@@ -83,6 +91,7 @@ class NorwayMapperTest {
         argumentsList.add(Arguments.of(mainRoad.build(), linkRoad.build()));
       }
     }
+
     return argumentsList;
   }
 

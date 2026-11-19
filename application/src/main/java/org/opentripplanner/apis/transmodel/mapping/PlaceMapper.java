@@ -14,6 +14,7 @@ public class PlaceMapper {
     if (api == null) {
       return null;
     }
+
     return api.stream().map(PlaceMapper::mapToDomain).distinct().collect(Collectors.toList());
   }
 

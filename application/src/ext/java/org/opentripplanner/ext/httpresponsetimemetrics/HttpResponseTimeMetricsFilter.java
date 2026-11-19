@@ -29,9 +29,9 @@ import org.opentripplanner.standalone.server.GrizzlyQueueWaitProbe;
  * The metric {@code http.client.requests} is recorded as a Timer with percentile histograms,
  * allowing analysis of response time distribution per client.
  * <p>
- * A second set of timers records the total client-perceived time, including any time spent
- * waiting in the Grizzly thread pool queue before a worker thread picked up the request. The queue
- * wait time is captured via {@link GrizzlyQueueWaitProbe}.
+ * A second set of timers records the total client-perceived time, including any time spent waiting
+ * in the Grizzly thread pool queue before a worker thread picked up the request. The queue wait
+ * time is captured via {@link GrizzlyQueueWaitProbe}.
  * <p>
  * All timers are pre-created at startup for each combination of monitored client and endpoint to
  * ensure predictable metric cardinality.
@@ -59,13 +59,13 @@ public class HttpResponseTimeMetricsFilter
   /**
    * Creates a filter for recording HTTP response time metrics.
    *
-   * @param clientHeader            the HTTP header name used to identify the client
-   * @param monitoredClients        the set of client names to track individually (case-insensitive)
-   * @param monitoredEndpoints      the set of endpoint paths to monitor (matched by suffix)
-   * @param metricName              the name of the metric to record
+   * @param clientHeader the HTTP header name used to identify the client
+   * @param monitoredClients the set of client names to track individually (case-insensitive)
+   * @param monitoredEndpoints the set of endpoint paths to monitor (matched by suffix)
+   * @param metricName the name of the metric to record
    * @param minExpectedResponseTime minimum expected response time for histogram buckets
    * @param maxExpectedResponseTime maximum expected response time for histogram buckets
-   * @param registry                the meter registry to record metrics to
+   * @param registry the meter registry to record metrics to
    */
   public HttpResponseTimeMetricsFilter(
     String clientHeader,
@@ -101,10 +101,10 @@ public class HttpResponseTimeMetricsFilter
   /**
    * Creates a filter using the global meter registry.
    *
-   * @param clientHeader            the HTTP header name used to identify the client
-   * @param monitoredClients        the set of client names to track individually
-   * @param monitoredEndpoints      the set of endpoint paths to monitor
-   * @param metricName              the name of the metric to record
+   * @param clientHeader the HTTP header name used to identify the client
+   * @param monitoredClients the set of client names to track individually
+   * @param monitoredEndpoints the set of endpoint paths to monitor
+   * @param metricName the name of the metric to record
    * @param minExpectedResponseTime minimum expected response time for histogram buckets
    * @param maxExpectedResponseTime maximum expected response time for histogram buckets
    */
@@ -151,6 +151,7 @@ public class HttpResponseTimeMetricsFilter
         result.put(key, timer);
       }
     }
+
     return Map.copyOf(result);
   }
 
@@ -160,9 +161,11 @@ public class HttpResponseTimeMetricsFilter
 
     String path = getRequestPath(requestContext);
     String matchedEndpoint = findMatchingEndpoint(path);
+
     if (matchedEndpoint == null) {
       return;
     }
+
     requestContext.setProperty(START_TIME_PROPERTY, System.nanoTime());
     requestContext.setProperty(ENDPOINT_PROPERTY, matchedEndpoint);
 
@@ -178,6 +181,7 @@ public class HttpResponseTimeMetricsFilter
         return endpoint;
       }
     }
+
     return null;
   }
 
@@ -191,6 +195,7 @@ public class HttpResponseTimeMetricsFilter
     ContainerResponseContext responseContext
   ) {
     Long startTime = (Long) requestContext.getProperty(START_TIME_PROPERTY);
+
     if (startTime == null) {
       return;
     }
@@ -213,10 +218,12 @@ public class HttpResponseTimeMetricsFilter
   private String resolveClientTag(@Nullable String clientName) {
     if (clientName != null) {
       String lowercaseName = clientName.toLowerCase(Locale.ROOT);
+
       if (monitoredClients.contains(lowercaseName)) {
         return lowercaseName;
       }
     }
+
     return OTHER_CLIENT;
   }
 }

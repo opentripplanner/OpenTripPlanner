@@ -130,6 +130,7 @@ class StreetIndex {
 
   private static LineString edgeGeometryOrStraightLine(Edge e) {
     LineString geometry = e.getGeometry();
+
     if (geometry == null) {
       Coordinate[] coordinates = new Coordinate[] {
         e.getFromVertex().getCoordinate(),
@@ -137,6 +138,7 @@ class StreetIndex {
       };
       geometry = GeometryUtils.getGeometryFactory().createLineString(coordinates);
     }
+
     return geometry;
   }
 
@@ -149,6 +151,7 @@ class StreetIndex {
         LineString geometry = edgeGeometryOrStraightLine(e);
         edgeIndex.insert(geometry, e, Scope.PERMANENT);
       }
+
       Envelope env = new Envelope(gv.getCoordinate());
       vertexIndex.insert(env, gv);
 
@@ -165,9 +168,11 @@ class StreetIndex {
   private static Map<FeedScopedId, TransitStopVertex> indexStopIds(Graph graph) {
     var vertices = graph.findVertices(TransitStopVertex.class);
     var map = new HashMap<FeedScopedId, TransitStopVertex>();
+
     for (TransitStopVertex it : vertices) {
       map.put(it.getId(), it);
     }
+
     return Map.copyOf(map);
   }
 

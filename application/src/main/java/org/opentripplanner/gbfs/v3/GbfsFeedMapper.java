@@ -56,10 +56,12 @@ public class GbfsFeedMapper implements org.opentripplanner.gbfs.GbfsFeedMapper {
     final Map<String, RentalVehicleType> vehicleTypes = getVehicleTypes(system);
 
     List<VehicleRentalPlace> stations = new ArrayList<>();
+
     if (params.allowStationRental()) {
       // Both station information and status are required for all systems using stations
       var stationInformation = loader.getFeed(GBFSStationInformation.class);
       var stationStatus = loader.getFeed(GBFSStationStatus.class);
+
       if (stationInformation != null && stationStatus != null) {
         // Index all the station status entries on their station ID.
         // in case of duplicates entries (stations with identical unique id),
@@ -86,7 +88,8 @@ public class GbfsFeedMapper implements org.opentripplanner.gbfs.GbfsFeedMapper {
           params.overloadingAllowed()
         );
 
-        // Iterate over all known stations, and if we have any status information add it to those station objects.
+        // Iterate over all known stations, and if we have any status information add it to those
+        // station objects.
         stations.addAll(
           stationInformation
             .getData()
@@ -103,6 +106,7 @@ public class GbfsFeedMapper implements org.opentripplanner.gbfs.GbfsFeedMapper {
     // Append the floating bike stations.
     if (OTPFeature.FloatingBike.isOn() && params.allowFreeFloatingRental()) {
       var freeBikeStatus = loader.getFeed(GBFSVehicleStatus.class);
+
       if (freeBikeStatus != null) {
         GbfsVehicleStatusMapper freeVehicleStatusMapper = new GbfsVehicleStatusMapper(
           system,
@@ -122,6 +126,7 @@ public class GbfsFeedMapper implements org.opentripplanner.gbfs.GbfsFeedMapper {
 
     if (params.geofencingZones()) {
       var zones = loader.getFeed(GBFSGeofencingZones.class);
+
       if (zones != null) {
         var mapper = new GbfsGeofencingZoneMapper(system.systemId());
         this.geofencingZones = mapper.mapGeofencingZone(zones);
@@ -132,9 +137,11 @@ public class GbfsFeedMapper implements org.opentripplanner.gbfs.GbfsFeedMapper {
             params.network()
           );
         }
+
         logGeofencingZonesDoesNotExistWarning = false;
       }
     }
+
     return stations;
   }
 
@@ -157,11 +164,13 @@ public class GbfsFeedMapper implements org.opentripplanner.gbfs.GbfsFeedMapper {
 
   private Map<String, RentalVehicleType> getVehicleTypes(VehicleRentalSystem system) {
     var rawVehicleTypes = loader.getFeed(GBFSVehicleTypes.class);
+
     if (rawVehicleTypes != null) {
       GbfsVehicleTypeMapper vehicleTypeMapper = new GbfsVehicleTypeMapper(system.systemId());
       List<GBFSVehicleType> gbfsVehicleTypes = rawVehicleTypes.getData().getVehicleTypes();
       return mapVehicleTypes(vehicleTypeMapper, gbfsVehicleTypes);
     }
+
     return Map.of();
   }
 

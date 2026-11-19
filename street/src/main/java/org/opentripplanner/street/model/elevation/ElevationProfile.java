@@ -12,11 +12,10 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * horizontal position/distance from the first position. The {@code y} is the vertical position at
  * {@code x}.
  * <p>
- * The unit is meters and the resolution is centimeters. The profile is normalized to
- * centi-meters.
+ * The unit is meters and the resolution is centimeters. The profile is normalized to centi-meters.
  * <p>
- * This class is immutable, but NOT THREAD-SAFE. This is because the gained/lost properties are
- * lazy initialized. The risk of using this in a multithreaded setting in minimal, since setting the
+ * This class is immutable, but NOT THREAD-SAFE. This is because the gained/lost properties are lazy
+ * initialized. The risk of using this in a multithreaded setting in minimal, since setting the
  * gained/lost fields should be atomic and calculating it twice should result in the same value.
  */
 public class ElevationProfile {
@@ -57,6 +56,7 @@ public class ElevationProfile {
     if (gained == null) {
       this.gained = calculateElevationChange(steps, v -> v > 0.0);
     }
+
     return gained;
   }
 
@@ -69,6 +69,7 @@ public class ElevationProfile {
     if (lost == null) {
       this.lost = calculateElevationChange(steps, v -> v < 0.0);
     }
+
     return lost;
   }
 
@@ -118,9 +119,11 @@ public class ElevationProfile {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     ElevationProfile that = (ElevationProfile) o;
     return Objects.equals(steps, that.steps);
   }
@@ -137,21 +140,26 @@ public class ElevationProfile {
     if (profile == null) {
       return null;
     }
+
     double sum = 0.0;
     boolean first = true;
     double prevElevation = 0.0;
 
     for (var p2 : profile) {
       double elevation = p2.y();
+
       if (!first) {
         double change = elevation - prevElevation;
+
         if (elevationFilter.test(change)) {
           sum += Math.abs(change);
         }
       }
+
       prevElevation = elevation;
       first = false;
     }
+
     return DoubleUtils.roundTo2Decimals(sum);
   }
 
@@ -205,9 +213,11 @@ public class ElevationProfile {
       if (this == o) {
         return true;
       }
+
       if (o == null || getClass() != o.getClass()) {
         return false;
       }
+
       var that = (Step) o;
       return that.x == x && that.y == y;
     }
@@ -244,6 +254,7 @@ public class ElevationProfile {
       if (Double.isNaN(y)) {
         return stepYUnknown(x);
       }
+
       this.steps.add(new Step(x, y));
       return this;
     }
@@ -271,6 +282,7 @@ public class ElevationProfile {
       if (steps.size() == original.steps.size()) {
         return original;
       }
+
       removeDuplicateSteps();
       return new ElevationProfile(this);
     }

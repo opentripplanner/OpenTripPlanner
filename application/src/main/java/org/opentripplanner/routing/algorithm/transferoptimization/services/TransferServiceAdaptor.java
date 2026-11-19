@@ -56,7 +56,7 @@ public class TransferServiceAdaptor<T extends RaptorTripSchedule> {
 
   /**
    * @param toStopPosition First possible stop position in target trip. This is needed because trip
-   *                       pattern may visit same stop more than once.
+   *     pattern may visit same stop more than once.
    */
   @Nullable
   protected ConstrainedTransfer findTransfer(

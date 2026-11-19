@@ -60,7 +60,7 @@ class DeferredForkHandlerTest {
   /**
    * Build a HAVE_RENTED state where backState had the given zone but current state doesn't. This
    * simulates a walker that just exited a restricted zone.
-   *
+   * <p>
    * Chain: v1 →(rent)→ v2 →(drop + set zones)→ v3 →(traverse, zones cleared)→ v4
    */
   private State createHaveRentedWithZoneExit(GeofencingZone zone) {
@@ -85,7 +85,7 @@ class DeferredForkHandlerTest {
   /**
    * Build a HAVE_RENTED state where s0 gained a BA zone that backState didn't have. This simulates
    * a walker that just entered a BA in arrive-by (= exited in forward time).
-   *
+   * <p>
    * Chain: v1 →(rent)→ v2 →(drop, no zones)→ v3 →(traverse, BA zone gained)→ v4
    */
   private State createHaveRentedWithZoneGain(GeofencingZone zone) {
@@ -221,16 +221,19 @@ class DeferredForkHandlerTest {
       boolean hasWalking = false;
       boolean hasRenting = false;
       boolean hasGeneric = false;
+
       for (var s : result) {
         if (s.getVehicleRentalState() == VehicleRentalState.HAVE_RENTED) {
           hasWalking = true;
         }
+
         if (
           s.getVehicleRentalState() == VehicleRentalState.RENTING_FLOATING &&
           NETWORK.equals(s.getVehicleRentalNetwork())
         ) {
           hasRenting = true;
         }
+
         if (
           s.getVehicleRentalState() == VehicleRentalState.RENTING_FLOATING &&
           s.getVehicleRentalNetwork() == null
@@ -238,6 +241,7 @@ class DeferredForkHandlerTest {
           hasGeneric = true;
         }
       }
+
       assertTrue(hasWalking, "should have walking branch");
       assertTrue(hasRenting, "should have per-network renting branch");
       assertTrue(hasGeneric, "should have generic renting branch");
@@ -270,6 +274,7 @@ class DeferredForkHandlerTest {
       var result = DeferredForkHandler.applyDeferredFork(state, edgeTraversal());
 
       assertNotNull(result);
+
       for (var s : result) {
         if (s.getVehicleRentalState() == VehicleRentalState.RENTING_FLOATING) {
           assertNull(
@@ -310,6 +315,7 @@ class DeferredForkHandlerTest {
       var result = DeferredForkHandler.applyDeferredFork(state, edgeTraversal());
 
       assertNotNull(result);
+
       // Should only have walking branch — renting vetoed by pre-traversal check
       for (var s : result) {
         if (

@@ -209,6 +209,7 @@ public class TripMatcherFactoryTest {
     } else if (feedScopedId.equals(id("RUT:route:trip:2"))) {
       return Set.of(LocalDate.of(2024, 2, 23));
     }
+
     return Set.of();
   }
 }

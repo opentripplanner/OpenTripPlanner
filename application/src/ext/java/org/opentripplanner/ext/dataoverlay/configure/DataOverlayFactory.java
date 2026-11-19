@@ -20,6 +20,7 @@ public class DataOverlayFactory {
     }
 
     File dataFile = new File(config.getFileName());
+
     if (dataFile.exists()) {
       return new EdgeUpdaterModule(
         graph,

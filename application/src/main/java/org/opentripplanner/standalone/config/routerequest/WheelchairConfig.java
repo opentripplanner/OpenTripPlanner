@@ -147,8 +147,8 @@ public class WheelchairConfig {
       onlyConsiderAccessible && (adapter.exist("unknownCost") || adapter.exist("inaccessibleCost"))
     ) {
       throw new IllegalStateException(
-        "If `onlyConsiderAccessible` is set then `unknownCost` and `inaccessibleCost` may not be set at " +
-          adapter.contextPath()
+        "If `onlyConsiderAccessible` is set then `unknownCost` and `inaccessibleCost` may not be set at "
+        + adapter.contextPath()
       );
     }
 

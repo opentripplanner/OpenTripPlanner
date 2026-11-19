@@ -125,6 +125,7 @@ public class DefaultTransitService implements TransitService {
 
     // This check is made here to avoid changing TripTimeOnDate.fromTripTimes
     var times = timetable.getTripTimes(trip);
+
     if (
       times == null ||
       !this.getServiceCodesRunningForDate(serviceDate).contains(times.getServiceCode())
@@ -360,16 +361,21 @@ public class DefaultTransitService implements TransitService {
     var trip = tripOnServiceDate.getTrip();
     var serviceDate = tripOnServiceDate.getServiceDate();
     var pattern = findPattern(trip, serviceDate);
+
     if (pattern == null) {
       return null;
     }
+
     var tripTimes = findTimetable(pattern, serviceDate).getTripTimes(trip);
+
     if (tripTimes == null) {
       tripTimes = pattern.getScheduledTimetable().getTripTimes(trip);
     }
+
     if (tripTimes == null) {
       return null;
     }
+
     ZoneId timeZone = trip.getRoute().getAgency().getTimezone();
     return tripTimes.scheduledRunningTime(
       ServiceDateUtils.asStartOfService(serviceDate, timeZone).toInstant()
@@ -727,8 +733,10 @@ public class DefaultTransitService implements TransitService {
       } else if (t2.getServiceDate().isBefore(t1.getServiceDate())) {
         return 1;
       }
+
       var departure1 = getDepartureTime(t1);
       var departure2 = getDepartureTime(t2);
+
       if (departure1 < departure2) {
         return -1;
       } else if (departure1 > departure2) {

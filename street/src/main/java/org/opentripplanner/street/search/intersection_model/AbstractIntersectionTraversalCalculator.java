@@ -32,7 +32,6 @@ public abstract class AbstractIntersectionTraversalCalculator
 
   /**
    * Computes the turn duration in seconds for non-driving traversal modes.
-   * <p>
    */
   protected double computeNonDrivingTraversalDuration(
     StreetEdge from,
@@ -61,9 +60,11 @@ public abstract class AbstractIntersectionTraversalCalculator
     if (turnAngle >= 180) {
       turnAngle -= 360;
     }
+
     if (turnAngle < -180) {
       turnAngle += 360;
     }
+
     return turnAngle;
   }
 }

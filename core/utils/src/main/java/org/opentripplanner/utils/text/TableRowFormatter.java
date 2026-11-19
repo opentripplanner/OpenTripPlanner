@@ -38,22 +38,27 @@ class TableRowFormatter {
 
   String format(List<?> values) {
     var buf = new StringBuilder();
+
     for (int i = 0; i < values.size(); ++i) {
       if (i != 0) {
         buf.append(AIR).append(SEP).append(AIR);
       } else if (includeBoarder) {
         buf.append(SEP).append(AIR);
       }
+
       buf.append(normalizeText(values, i));
     }
+
     if (includeBoarder) {
       buf.append(AIR).append(SEP);
     }
+
     return buf.toString();
   }
 
   String markdownHeaderLine() {
     var buf = new StringBuilder(SEP);
+
     for (int i = 0; i < widths.size(); ++i) {
       var align = alignment.get(i);
       addAlignChar(buf, align == Table.Align.Center);
@@ -61,6 +66,7 @@ class TableRowFormatter {
       addAlignChar(buf, align == Table.Align.Center || align == Table.Align.Right);
       buf.append(SEP);
     }
+
     return buf.toString();
   }
 

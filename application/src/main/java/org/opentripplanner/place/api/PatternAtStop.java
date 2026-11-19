@@ -55,13 +55,11 @@ public class PatternAtStop {
   /**
    * Returns a list of stop times for the specific pattern at the stop.
    *
-   * @param transitService               An instance of the TransitService to be used for the
-   *                                     timetable search
-   * @param startTime                    Start time for the search.
-   * @param timeRange                    Searches forward for timeRange from startTime
+   * @param transitService An instance of the TransitService to be used for the timetable search
+   * @param startTime Start time for the search.
+   * @param timeRange Searches forward for timeRange from startTime
    * @param numberOfDeparturesPerPattern Number of departures to fetch
-   * @param arrivalDeparture             Filter by arrivals, departures, or both
-   *
+   * @param arrivalDeparture Filter by arrivals, departures, or both
    * @return A list of stop times
    */
   public List<TripTimeOnDate> getStoptimes(
@@ -92,9 +90,11 @@ public class PatternAtStop {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     final PatternAtStop that = (PatternAtStop) o;
     return (
       Objects.equals(id, that.id) &&

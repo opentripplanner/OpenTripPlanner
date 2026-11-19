@@ -15,8 +15,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * of parameters, so if you do not find the parameter you want (e.g. snow_depth) in the
  * {@link ParameterName}, then request your parameter to be added.
  * <p>
- * This class contain helper logic to convert parameters to and from a string representation used
- * by the APIs(the REST API is the only supported API). The parameter string format is:
+ * This class contain helper logic to convert parameters to and from a string representation used by
+ * the APIs(the REST API is the only supported API). The parameter string format is:
  * <p>
  * [{@link ParameterName}] {@code + ' ' +} [{@link ParameterType}] (lower case is used)
  * <p>
@@ -62,11 +62,13 @@ public class DataOverlayParameters implements Serializable {
    */
   public static List<String> parametersAsString() {
     var list = new ArrayList<String>();
+
     for (ParameterName name : ParameterName.values()) {
       for (ParameterType type : ParameterType.values()) {
         list.add((name + "_" + type).toLowerCase());
       }
     }
+
     return list;
   }
 
@@ -94,9 +96,11 @@ public class DataOverlayParameters implements Serializable {
   static Parameter resolveKey(String parameter) {
     try {
       int pos = parameter.lastIndexOf('_');
+
       if (pos < 0 || pos > parameter.length() - 2) {
         return null;
       }
+
       var name = ParameterName.valueOf(parameter.substring(0, pos).toUpperCase());
       var type = ParameterType.valueOf(parameter.substring(pos + 1).toUpperCase());
       return new Parameter(name, type);
@@ -123,9 +127,11 @@ public class DataOverlayParameters implements Serializable {
     var buf = ToStringBuilder.of(DataOverlayParameters.class);
     // Map keys to String and sort to make the toSting() deterministic
     var keys = values.keySet().stream().map(Parameter::keyString).sorted().toList();
+
     for (String key : keys) {
       buf.addObj(key, get(key));
     }
+
     return buf.toString();
   }
 }

@@ -11,7 +11,7 @@ import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
  * zone tracking in the routing algorithm — it does not enforce any restrictions itself. Applied to
  * both vertices of a boundary-crossing edge with opposite entering flags.
  *
- * @param zone     the geofencing zone whose boundary this vertex lies on
+ * @param zone the geofencing zone whose boundary this vertex lies on
  * @param entering true if traversing away from this vertex enters the zone; false if it exits
  */
 public record GeofencingBoundaryExtension(GeofencingZone zone, boolean entering) {
@@ -33,17 +33,21 @@ public record GeofencingBoundaryExtension(GeofencingZone zone, boolean entering)
     if (boundaries.isEmpty() || network == null) {
       return false;
     }
+
     for (var boundary : boundaries) {
       if (!boundary.entering()) {
         continue;
       }
+
       if (!boundary.zone().id().getFeedId().equals(network)) {
         continue;
       }
+
       if (Boolean.TRUE.equals(boundary.zone().traversalBanned())) {
         return true;
       }
     }
+
     return false;
   }
 
@@ -66,19 +70,24 @@ public record GeofencingBoundaryExtension(GeofencingZone zone, boolean entering)
 
     for (var boundary : fromBoundaries) {
       boolean paired = false;
+
       for (var toBoundary : toBoundaries) {
         if (toBoundary.isPairedWith(boundary)) {
           paired = true;
           break;
         }
       }
+
       if (!paired) {
         continue;
       }
+
       if (newZones == null) {
         newZones = new HashSet<>(currentZones);
       }
+
       boolean effectiveEntering = boundary.entering() ^ arriveBy;
+
       if (effectiveEntering) {
         newZones.add(boundary.zone());
       } else {

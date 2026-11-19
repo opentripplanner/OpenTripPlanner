@@ -17,8 +17,8 @@ import org.jspecify.annotations.Nullable;
  * <p>
  * Two shapes of check are needed, since a single-component factory and a per-request factory
  * disagree on what "correctly scoped" even means: {@link #assertSingleInstanceScope} invokes each
- * accessor twice on one instance; {@link #assertRequestScope} invokes twice on one request
- * instance and once on a second, independent one.
+ * accessor twice on one instance; {@link #assertRequestScope} invokes twice on one request instance
+ * and once on a second, independent one.
  */
 final class DaggerScopeAssertions {
 
@@ -131,8 +131,8 @@ final class DaggerScopeAssertions {
   /**
    * For a single-component factory (e.g. {@code ConstructApplicationFactory}): every accessor is
    * invoked twice on {@code instance} and must be classified as a singleton (same instance both
-   * times), a known unscoped bug (different instances — tracked, not yet fixed), or built fresh
-   * by design (different instances, expected).
+   * times), a known unscoped bug (different instances — tracked, not yet fixed), or built fresh by
+   * design (different instances, expected).
    */
   private static void assertSingleInstanceScope(
     Class<?> accessorInterface,
@@ -152,12 +152,15 @@ final class DaggerScopeAssertions {
       );
 
       var failures = new ArrayList<String>();
+
       for (var method : accessors) {
         var key = DaggerBindingKey.ofAccessor(method);
         var first = method.invoke(instance);
+
         if (nullIsHandled(method, first, failures)) {
           continue;
         }
+
         var second = method.invoke(instance);
 
         if (singletons.contains(key) && first != second) {
@@ -172,6 +175,7 @@ final class DaggerScopeAssertions {
           failures.add(method.getName() + "() should build a fresh instance every call");
         }
       }
+
       assertThat(failures).isEmpty();
     } catch (ReflectiveOperationException e) {
       throw new RuntimeException(e);
@@ -183,8 +187,8 @@ final class DaggerScopeAssertions {
    * GtfsGraphQLRequestContext}): every accessor is invoked twice on {@code requestOne} and once
    * on the independent {@code requestTwo}, and must be classified as an application singleton
    * (stable within and across requests), correctly request-scoped (stable within one request,
-   * different across requests), a known unscoped bug (different even within one request —
-   * tracked, not yet fixed).
+   * different across requests), a known unscoped bug (different even within one request — tracked,
+   * not yet fixed).
    */
   private static void assertRequestScope(
     Class<?> accessorInterface,
@@ -205,12 +209,15 @@ final class DaggerScopeAssertions {
       );
 
       var failures = new ArrayList<String>();
+
       for (var method : accessors) {
         var key = DaggerBindingKey.ofAccessor(method);
         var withinRequestFirst = method.invoke(requestOne);
+
         if (nullIsHandled(method, withinRequestFirst, failures)) {
           continue;
         }
+
         var withinRequestSecond = method.invoke(requestOne);
         var acrossRequests = method.invoke(requestTwo);
 
@@ -222,6 +229,7 @@ final class DaggerScopeAssertions {
                 key
             );
           }
+
           continue;
         }
 
@@ -244,6 +252,7 @@ final class DaggerScopeAssertions {
           );
         }
       }
+
       assertThat(failures).isEmpty();
     } catch (ReflectiveOperationException e) {
       throw new RuntimeException(e);
@@ -262,9 +271,11 @@ final class DaggerScopeAssertions {
     if (value != null) {
       return false;
     }
+
     if (!isMarkedNullable(accessor)) {
       failures.add(accessor.getName() + "() returned null but is not annotated @Nullable");
     }
+
     return true;
   }
 

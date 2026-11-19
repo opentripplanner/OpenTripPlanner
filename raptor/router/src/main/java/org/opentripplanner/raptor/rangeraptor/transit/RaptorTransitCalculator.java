@@ -27,10 +27,10 @@ import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
  * "target", instead of "from/to" and "board/alight".
  * <ul>
  *   <li>In a FORWARD search the "source" means "from" and "target" means "to".</li>
- *   <li>In a BACKWARD search the "source" means "to" and "target" means "from". The traversal of the
- *       graph happens from the destination towards the origin - backwards in time. The "from/to" refer to
- *       the "natural way" we think about a journey, while "source/target" the destination is the source
- *       and the origin is the target in a BACKWARD search.</li>
+ *   <li>In a BACKWARD search the "source" means "to" and "target" means "from". The traversal of
+ *       the graph happens from the destination towards the origin - backwards in time. The
+ *       "from/to" refer to the "natural way" we think about a journey, while "source/target" the
+ *       destination is the source and the origin is the target in a BACKWARD search.</li>
  * </ul>
  * "Source" and "target" may apply to stop-arrival, trip, board-/aligh-slack, and so on.
  * <p>
@@ -157,9 +157,9 @@ public interface RaptorTransitCalculator<T extends RaptorTripSchedule> extends
    * This method removes the time-penalty from the given time if the provided accessEgress has a
    * time-penalty, if not the given time is returned without any change.
    * <p>
-   * You may use this method to enforce time constraints like the arriveBy time passed into
-   * Raptor. This should not be applied to the time Raptor uses for the comparison, like in the
-   * ParetoSet. The arrival-times used in a pareto-set must include the time-penalty.
+   * You may use this method to enforce time constraints like the arriveBy time passed into Raptor.
+   * This should not be applied to the time Raptor uses for the comparison, like in the ParetoSet.
+   * The arrival-times used in a pareto-set must include the time-penalty.
    */
   default int timeMinusPenalty(int time, RaptorAccessEgress accessEgress) {
     return accessEgress.hasTimePenalty() ? minusDuration(time, accessEgress.timePenalty()) : time;

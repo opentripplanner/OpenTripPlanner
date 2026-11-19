@@ -57,11 +57,13 @@ class TripReferenceHelperTest {
   private static FramedVehicleJourneyRefStructure framed(String vehicleJourneyRef, String date) {
     var framed = new FramedVehicleJourneyRefStructure();
     framed.setDatedVehicleJourneyRef(vehicleJourneyRef);
+
     if (date != null) {
       var dataFrameRef = new DataFrameRefStructure();
       dataFrameRef.setValue(date);
       framed.setDataFrameRef(dataFrameRef);
     }
+
     return framed;
   }
 

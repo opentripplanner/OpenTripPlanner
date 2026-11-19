@@ -33,6 +33,7 @@ public class CachedValue<T> {
         this.timeout = calculateTimeout();
       }
     }
+
     return value;
   }
 

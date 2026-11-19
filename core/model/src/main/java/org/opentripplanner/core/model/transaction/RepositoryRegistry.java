@@ -6,18 +6,18 @@ import java.util.function.Consumer;
  * Application-scoped registry for transactional repositories.
  * <p>
  * This is the entry point for wiring the transaction framework. Typical usage:
- *
  * <ol>
  *   <li>Create one {@code RepositoryRegistry} for the application lifetime.
  *   <li>For each domain repository, call
- *       {@link #registerRepositorySnapshot(Object, RepositoryLifecycle)} during wiring (e.g. in a Dagger
- *       module). Keep the returned {@link RepositoryHandle} for injection into services and updaters.
- *   <li>At the start of each request, call {@link #scope()} to obtain a {@link TransactionScope} that
- *       captures a consistent snapshot of all repositories at that point in time.
+ *       {@link #registerRepositorySnapshot(Object, RepositoryLifecycle)} during wiring (e.g. in a
+ *       Dagger module). Keep the returned {@link RepositoryHandle} for injection into services and
+ *       updaters.
+ *   <li>At the start of each request, call {@link #scope()} to obtain a {@link TransactionScope}
+ *       that captures a consistent snapshot of all repositories at that point in time.
  *   <li>To perform writes, use {@link UpdateManager#submit(Consumer)} to add tasks to the manager
  *       queue.
- *   <li>Commits are either performed after each submitted task or, if periodic commits are configured
- *       via {@code maxSnapshotFrequency}, in the specified frequency.
+ *   <li>Commits are either performed after each submitted task or, if periodic commits are
+ *       configured via {@code maxSnapshotFrequency}, in the specified frequency.
  * </ol>
  */
 public interface RepositoryRegistry {
@@ -29,9 +29,9 @@ public interface RepositoryRegistry {
    * is done, this could lead to concurrency issues.
    *
    * @param initialRepositorySnapshot the initial read-only snapshot for the repository
-   * @param lifecycle                 the lifecycle strategy for the given repository/snapshot
-   * @param <S>                       the read-only repository snapshot type
-   * @param <M>                       the mutable repository type
+   * @param lifecycle the lifecycle strategy for the given repository/snapshot
+   * @param <S> the read-only repository snapshot type
+   * @param <M> the mutable repository type
    * @return an application-scoped handle for accessing the repository and snapshot
    */
   <S, M> RepositoryHandle<S, M> registerRepositorySnapshot(

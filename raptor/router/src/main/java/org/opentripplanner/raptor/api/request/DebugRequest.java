@@ -13,8 +13,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * This class configure the amount of debugging you want for your request. Debugging is supported by
  * an event model and event listeners must be provided to receive any debug info.
  * <p>
- * To debug unexpected results is sometimes very time-consuming. This class make it possible to
- * list all stop arrival events during the search for a given list of stops and/or a path.
+ * To debug unexpected results is sometimes very time-consuming. This class make it possible to list
+ * all stop arrival events during the search for a given list of stops and/or a path.
  * <p>
  * The debug events are not returned as part of the result, instead they are posted to registered
  * listeners. The events are temporary objects; hence you should not hold a reference to the event
@@ -40,8 +40,8 @@ public record DebugRequest(
   /** List of stops in a particular path to debug. Only one path can be debugged per request. */
   List<Integer> path,
   /**
-   * The first stop to start recording debug information in the path specified in this request.
-   * This will filter away all events in the beginning of the path reducing the number of events
+   * The first stop to start recording debug information in the path specified in this request. This
+   * will filter away all events in the beginning of the path reducing the number of events
    * significantly; Hence make it easier to inspect events towards the end of the trip.
    */
   int debugPathFromStopIndex,
@@ -65,9 +65,11 @@ public record DebugRequest(
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     DebugRequest that = (DebugRequest) o;
     return (
       debugPathFromStopIndex == that.debugPathFromStopIndex &&

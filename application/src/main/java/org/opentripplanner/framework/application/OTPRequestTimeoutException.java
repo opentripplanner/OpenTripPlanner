@@ -38,6 +38,7 @@ public class OTPRequestTimeoutException extends RuntimeException {
   private static void logDebug() {
     if (LOG.isDebugEnabled()) {
       var st = Thread.currentThread().getStackTrace();
+
       if (st.length > 5) {
         LOG.debug(
           "checkForTimeout() - Thread {} is interrupted!\n    {}\n    {}\n    {}",

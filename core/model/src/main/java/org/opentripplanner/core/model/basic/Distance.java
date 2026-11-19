@@ -51,6 +51,7 @@ public class Distance {
     if (value == null) {
       return Optional.empty();
     }
+
     return of((int) (value * multiplier), validationErrorHandler);
   }
 
@@ -81,6 +82,7 @@ public class Distance {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     var other = (Distance) o;
     return this.millimeters == other.millimeters;
   }

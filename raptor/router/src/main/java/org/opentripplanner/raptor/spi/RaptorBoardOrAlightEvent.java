@@ -5,8 +5,8 @@ package org.opentripplanner.raptor.spi;
  * specific stop. This is used as a result for the trip search, but may also be used in other
  * situation where a search is unnecessary like a guaranteed transfer.
  * <p>
- * An instance of this class is passed on to the algorithm to perform the boarding and contain
- * the necessary information to do so.
+ * An instance of this class is passed on to the algorithm to perform the boarding and contain the
+ * necessary information to do so.
  * <p>
  * The instance can represent both the result of a forward search and the result of a reverse
  * search. For a reverse search (searching backward in time) the trip arrival times should be used.
@@ -70,8 +70,8 @@ public interface RaptorBoardOrAlightEvent<T extends RaptorTripSchedule> {
   /**
    * Create an empty event with the given {@code earliestBoardTime}.
    * <p>
-   * Sometimes we need to override the search result and force an empty result. This method can
-   * be used in none-performance critical parts of the code. The preferred way for
+   * Sometimes we need to override the search result and force an empty result. This method can be
+   * used in none-performance critical parts of the code. The preferred way for
    * {@link RaptorConstrainedBoardingSearch}s is to clear its state and implement the fly-weight
    * pattern, avoiding creating new instances.
    */

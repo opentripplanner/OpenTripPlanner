@@ -44,10 +44,12 @@ class HttpUtilsTest {
       "http://example.com/otp/debug/vectortiles",
       HttpUtils.resolveBaseUrl(host, "otp/debug/vectortiles")
     );
+
     // leading and trailing slashes of a path are optional
     for (var basePath : List.of("/gateway/tiles", "gateway/tiles/", "/gateway/tiles/")) {
       assertEquals("http://example.com/gateway/tiles", HttpUtils.resolveBaseUrl(host, basePath));
     }
+
     // a full URL is used as is, apart from a trailing slash
     assertEquals(
       "https://api.example.com/tiles",

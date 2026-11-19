@@ -76,6 +76,7 @@ public class DoubleUtils {
     if (Double.isNaN(value) || Double.isInfinite(value)) {
       return value;
     }
+
     return BigDecimal.valueOf(value)
       .divide(BigDecimal.valueOf(step), 0, RoundingMode.HALF_EVEN)
       .multiply(BigDecimal.valueOf(step))
@@ -84,8 +85,8 @@ public class DoubleUtils {
 
   /**
    * Round {@code value} to the nearest multiple of the step of its bucket, see
-   * {@link #roundToStep(double, double)}. A small value can be rounded to a finer step than a
-   * large one.
+   * {@link #roundToStep(double, double)}. A small value can be rounded to a finer step than a large
+   * one.
    * <p>
    * The {@code steps} are rows of {@code {upperLimit, step}}, sorted by the upper limit in
    * ascending order. The step of the first row that has an upper limit greater than the value is
@@ -115,6 +116,7 @@ public class DoubleUtils {
     if (Double.isNaN(value) || value < 0) {
       throw new IllegalArgumentException("Value is required to be non-negative, but was: " + value);
     }
+
     return value;
   }
 
@@ -138,6 +140,7 @@ public class DoubleUtils {
         )
       );
     }
+
     return value;
   }
 
@@ -147,6 +150,7 @@ public class DoubleUtils {
     if (Double.isNaN(value) || Double.isInfinite(value)) {
       return value;
     }
+
     return BigDecimal.valueOf(value).setScale(decimals, RoundingMode.HALF_UP).doubleValue();
   }
 
@@ -154,11 +158,13 @@ public class DoubleUtils {
     if (scale.length == 0) {
       throw new IllegalArgumentException("The step table can not be empty.");
     }
+
     for (double[] limit : scale) {
       if (value < limit[0]) {
         return limit[1];
       }
     }
+
     return scale[scale.length - 1][1];
   }
 }

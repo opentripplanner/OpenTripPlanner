@@ -32,6 +32,7 @@ public final class ViewUtils {
     if (DEBUG_LAYOUT) {
       c.setBorder(BorderFactory.createLineBorder(Color.green));
     }
+
     panel.add(c);
   }
 

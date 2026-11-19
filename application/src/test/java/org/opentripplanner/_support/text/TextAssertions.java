@@ -11,7 +11,6 @@ public final class TextAssertions {
   private static final int END_OF_TEXT = -111;
 
   /**
-   *
    * Assert to texts are equals line by line. Empty lines and white-space in the start and end of a
    * line is ignored.
    */
@@ -52,12 +51,15 @@ public final class TextAssertions {
 
   private static int next(String[] lines, int index) {
     ++index;
+
     while (index < lines.length) {
       if (!lines[index].isBlank()) {
         return index;
       }
+
       ++index;
     }
+
     return END_OF_TEXT;
   }
 }

@@ -57,9 +57,11 @@ public class GraphFileHeader implements Serializable {
           prettyBytesToString(buf)
       );
     }
+
     String header = new String(buf, 0, HEADER_LENGTH, CHARSET);
 
     Matcher m = HEADER_PATTERN.matcher(header);
+
     if (!m.matches()) {
       throw new OtpAppException(
         "The file is no recognized as an OTP Graph file. The header do not match \"" +
@@ -68,6 +70,7 @@ public class GraphFileHeader implements Serializable {
           prettyBytesToString(buf)
       );
     }
+
     return new GraphFileHeader(m.group(1));
   }
 
@@ -84,8 +87,8 @@ public class GraphFileHeader implements Serializable {
    * The OTP serialization version id. If OTP and a Graph.obj file have the same id, then OTP is
    * compatible with the graph and should be able to deserialize it.
    * <p>
-   * The returned id do NOT include the prefix '0's. In the serialized form as bytes it have a
-   * fixed length {@link #ID_LENGTH} and is padded with {@link #ID_PREFIX}.
+   * The returned id do NOT include the prefix '0's. In the serialized form as bytes it have a fixed
+   * length {@link #ID_LENGTH} and is padded with {@link #ID_PREFIX}.
    */
   public String otpSerializationVersionId() {
     return otpSerializationVersionId;
@@ -113,9 +116,11 @@ public class GraphFileHeader implements Serializable {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     GraphFileHeader that = (GraphFileHeader) o;
     return otpSerializationVersionId.equals(that.otpSerializationVersionId);
   }
@@ -131,9 +136,11 @@ public class GraphFileHeader implements Serializable {
    */
   static String padId(String text) {
     StringBuilder buf = new StringBuilder();
+
     while (buf.length() + text.length() < ID_LENGTH) {
       buf.append(ID_PREFIX);
     }
+
     buf.append(text);
     return buf.toString();
   }
@@ -143,9 +150,11 @@ public class GraphFileHeader implements Serializable {
    */
   static String stripId(String text) {
     int pos = 0;
+
     while (pos < text.length() && text.charAt(pos) == ID_PREFIX) {
       ++pos;
     }
+
     return text.substring(pos);
   }
 
@@ -154,10 +163,13 @@ public class GraphFileHeader implements Serializable {
     if (text == null || text.length == 0) {
       return "[empty]";
     }
+
     StringBuilder buf = new StringBuilder();
+
     for (int v : text) {
       buf.append(" ").append(String.format("%02X", v));
     }
+
     return buf.substring(1) + "  \"" + new String(text, CHARSET) + "\"";
   }
 }

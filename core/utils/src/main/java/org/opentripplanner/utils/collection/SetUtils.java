@@ -23,6 +23,7 @@ public class SetUtils {
    */
   public static <T> Set<T> intersection(Collection<Set<T>> colls) {
     var list = List.copyOf(colls);
+
     if (list.isEmpty()) {
       return Set.of();
     } else if (list.size() == 1) {
@@ -39,6 +40,7 @@ public class SetUtils {
     if (input == null) {
       return Set.of();
     }
+
     return Set.copyOf(input);
   }
 }

@@ -46,6 +46,7 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
       TransitAlertService alertService = getTransitAlertService(environment);
       var args = new GraphQLTypes.GraphQLPatternAlertsArgs(environment.getArguments());
       List<GraphQLTypes.GraphQLPatternAlertType> types = args.getGraphQLTypes();
+
       if (types != null) {
         Collection<TransitAlert> alerts = new ArrayList<>();
         types.forEach(type -> {
@@ -153,6 +154,7 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
   public DataFetcher<Iterable<Coordinate>> geometry() {
     return environment -> {
       LineString geometry = getSource(environment).getGeometry();
+
       if (geometry == null) {
         return null;
       } else {
@@ -271,11 +273,13 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
       var requestBuilder = TripOnServiceDateRequest.of().withIncludePatterns(
         FilterValues.ofEmptyIsEverything("patterns", List.of(pattern.getId()))
       );
+
       if (serviceDateRanges != null) {
         requestBuilder.withIncludeServiceDateRanges(
           FilterValues.ofRequired("serviceDateRanges", serviceDateRanges)
         );
       }
+
       if (runningTimePeriods != null) {
         requestBuilder.withIncludeRunningTimePeriods(
           FilterValues.ofRequired("runningTimeRanges", runningTimePeriods)

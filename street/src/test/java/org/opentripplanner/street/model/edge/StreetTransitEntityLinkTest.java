@@ -72,11 +72,13 @@ class StreetTransitEntityLinkTest {
 
       var req = StreetSearchRequest.of().withMode(StreetMode.BIKE);
       AccessibilityRequest feature;
+
       if (onlyAccessible) {
         feature = AccessibilityRequest.ofOnlyAccessible();
       } else {
         feature = AccessibilityRequest.ofCost(100, 100);
       }
+
       req.withWheelchairEnabled(true);
       req.withWheelchair(b ->
         b

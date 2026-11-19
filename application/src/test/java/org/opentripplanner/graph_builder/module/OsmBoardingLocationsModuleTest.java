@@ -266,6 +266,7 @@ class OsmBoardingLocationsModuleTest {
         if (platformVertex == null) {
           platformVertex = factory.transitStop(ofStop(platform));
         }
+
         return platformVertex;
       }
     }
@@ -413,6 +414,7 @@ class OsmBoardingLocationsModuleTest {
       var backwardEdges = getEdge(end, splitVertex).flatMap(first ->
         getEdge(splitVertex, begin).map(second -> List.of(first, second))
       );
+
       for (var edgeList : List.of(forwardEdges, backwardEdges)) {
         edgeList.ifPresent(edges ->
           assertEquals(

@@ -57,11 +57,12 @@ public class LayerFilters {
   public static Predicate<RegularStop> forType(FilterType type, TransitService transitService) {
     return switch (type) {
       case NONE -> NO_FILTER;
-      case SUNDAY_TO_SUNDAY_SERVICE_WEEK -> buildCurrentServiceWeekPredicate(
-        transitService::findPatterns,
-        trip -> transitService.getTripCalendars().listServiceDates(trip.getServiceId()),
-        () -> LocalDate.now(transitService.getTimeZone())
-      );
+      case SUNDAY_TO_SUNDAY_SERVICE_WEEK
+        -> buildCurrentServiceWeekPredicate(
+          transitService::findPatterns,
+          trip -> transitService.getTripCalendars().listServiceDates(trip.getServiceId()),
+          () -> LocalDate.now(transitService.getTimeZone())
+        );
     };
   }
 

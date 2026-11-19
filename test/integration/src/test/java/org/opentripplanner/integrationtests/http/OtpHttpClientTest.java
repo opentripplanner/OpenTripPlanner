@@ -58,6 +58,7 @@ class OtpHttpClientTest {
       exchange.getResponseHeaders().add("X-Custom-Header", "custom-value");
       exchange.getResponseHeaders().add("ETag", "\"12345\"");
       exchange.sendResponseHeaders(200, response.length());
+
       try (OutputStream os = exchange.getResponseBody()) {
         os.write(response.getBytes(StandardCharsets.UTF_8));
       }
@@ -70,6 +71,7 @@ class OtpHttpClientTest {
       exchange.getResponseHeaders().add("Set-Cookie", "cookie2=value2");
       exchange.getResponseHeaders().add("Set-Cookie", "cookie3=value3");
       exchange.sendResponseHeaders(200, response.length());
+
       try (OutputStream os = exchange.getResponseBody()) {
         os.write(response.getBytes(StandardCharsets.UTF_8));
       }
@@ -82,6 +84,7 @@ class OtpHttpClientTest {
       exchange.getResponseHeaders().add("Last-Modified", "Wed, 21 Oct 2015 07:28:00 GMT");
       exchange.getResponseHeaders().add("ETag", "\"abc123\"");
       exchange.sendResponseHeaders(200, response.length());
+
       try (OutputStream os = exchange.getResponseBody()) {
         os.write(response.getBytes(StandardCharsets.UTF_8));
       }
@@ -92,6 +95,7 @@ class OtpHttpClientTest {
       String response = "plain text response";
       exchange.getResponseHeaders().add("Content-Type", "text/plain");
       exchange.sendResponseHeaders(200, response.length());
+
       try (OutputStream os = exchange.getResponseBody()) {
         os.write(response.getBytes(StandardCharsets.UTF_8));
       }
@@ -265,6 +269,7 @@ class OtpHttpClientTest {
 
     String result = client.getAndMap(uri, Duration.ofSeconds(5), HttpHeaders.empty(), response -> {
       assertTrue(response.header("Content-Type").isPresent());
+
       try {
         return new String(response.body().readAllBytes(), StandardCharsets.UTF_8);
       } catch (IOException e) {

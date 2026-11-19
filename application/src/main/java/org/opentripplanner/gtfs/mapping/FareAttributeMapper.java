@@ -44,12 +44,15 @@ class FareAttributeMapper {
     if (rhs.getId().getAgencyId() != null && rhs.getAgencyId() != null) {
       builder.withAgency(new FeedScopedId(rhs.getId().getAgencyId(), rhs.getAgencyId()));
     }
+
     if (rhs.isTransfersSet()) {
       builder.withTransfers(rhs.getTransfers());
     }
+
     if (rhs.isTransferDurationSet()) {
       builder.withTransferDuration(rhs.getTransferDuration());
     }
+
     if (rhs.isJourneyDurationSet()) {
       builder.withJourneyDuration(rhs.getJourneyDuration());
     }

@@ -23,6 +23,7 @@ class OsmNodePair {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     OsmNodePair that = (OsmNodePair) o;
     return Objects.equals(first, that.first) && Objects.equals(second, that.second);
   }

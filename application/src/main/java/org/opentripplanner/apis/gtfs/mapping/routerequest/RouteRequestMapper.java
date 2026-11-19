@@ -44,9 +44,11 @@ public class RouteRequestMapper {
     }
 
     var bookingTime = args.getGraphQLFlex().getGraphQLBookingTime();
+
     if (bookingTime != null) {
       request.withBookingTime(bookingTime.toInstant());
     }
+
     boolean isTripPlannedForNow = RouteRequest.isAPIGtfsTripPlannedForNow(request.dateTime());
 
     request.withFrom(parseGenericLocation(args.getGraphQLOrigin()));
@@ -59,11 +61,13 @@ public class RouteRequestMapper {
 
     if (args.getGraphQLBefore() != null) {
       request.withPageCursorFromEncoded(args.getGraphQLBefore());
+
       if (args.getGraphQLLast() != null) {
         request.withNumItineraries(args.getGraphQLLast());
       }
     } else if (args.getGraphQLAfter() != null) {
       request.withPageCursorFromEncoded(args.getGraphQLAfter());
+
       if (args.getGraphQLFirst() != null) {
         request.withNumItineraries(args.getGraphQLFirst());
       }
@@ -118,16 +122,19 @@ public class RouteRequestMapper {
         ItineraryFilterDebugProfileMapper.map(filters.getGraphQLItineraryFilterDebugProfile())
       );
     }
+
     if (filters.getGraphQLGroupSimilarityKeepOne() != null) {
       filterPreferences.withGroupSimilarityKeepOne(
         Ratio.of(filters.getGraphQLGroupSimilarityKeepOne())
       );
     }
+
     if (filters.getGraphQLGroupSimilarityKeepThree() != null) {
       filterPreferences.withGroupSimilarityKeepThree(
         Ratio.of(filters.getGraphQLGroupSimilarityKeepThree())
       );
     }
+
     if (filters.getGraphQLGroupedOtherThanSameLegsMaxCostMultiplier() != null) {
       filterPreferences.withGroupedOtherThanSameLegsMaxCostMultiplier(
         filters.getGraphQLGroupedOtherThanSameLegsMaxCostMultiplier()
@@ -185,6 +192,7 @@ public class RouteRequestMapper {
     GraphQLTypes.GraphQLPlanLabeledLocationInput locationInput
   ) {
     var stopLocation = locationInput.getGraphQLLocation().getGraphQLStopLocation();
+
     if (stopLocation.getGraphQLStopLocationId() != null) {
       var stopId = stopLocation.getGraphQLStopLocationId();
       return FeedScopedId.parseOptional(stopId)

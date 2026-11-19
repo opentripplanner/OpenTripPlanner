@@ -130,9 +130,11 @@ class StopImplTest {
   private static FlexTransferService flexTransfers(PathTransfer... transfers) {
     var repository = TransferServiceTestFactory.defaultTransferRepository();
     var byStop = ImmutableMultimap.<StopLocation, PathTransfer>builder();
+
     for (var transfer : transfers) {
       byStop.put(transfer.from, transfer);
     }
+
     repository.addAllTransfersByStops(byStop.build());
     return TransferServiceTestFactory.transferService(repository);
   }

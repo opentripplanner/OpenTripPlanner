@@ -23,12 +23,12 @@ import org.opentripplanner.utils.lang.MemEfficientArrayBuilder;
  * which a trip (GTFS) or vehicle journey (Transmodel) calls, irrespective of the day on which
  * service runs.
  * <p>
- * An important detail: Routes in GTFS are not a structurally important element, they just serve
- * as user-facing information. It is possible for the same journey pattern to appear in more than
- * one route.
+ * An important detail: Routes in GTFS are not a structurally important element, they just serve as
+ * user-facing information. It is possible for the same journey pattern to appear in more than one
+ * route.
  * <p>
- * OTP already has several classes that represent this same thing: A TripPattern in the context
- * of routing. It represents all trips with the same stop pattern A ScheduledStopPattern in the GTFS
+ * OTP already has several classes that represent this same thing: A TripPattern in the context of
+ * routing. It represents all trips with the same stop pattern A ScheduledStopPattern in the GTFS
  * loading process. A RouteVariant in the TransitIndex, which has a unique human-readable name and
  * belongs to a particular route.
  * <p>
@@ -39,8 +39,8 @@ import org.opentripplanner.utils.lang.MemEfficientArrayBuilder;
  * complexity since we only consider the trip that departs soonest for each pattern. Field
  * calendarId has been removed. See issue #1320.
  * <p>
- * A StopPattern is very closely related to a TripPattern -- it essentially serves as the unique
- * key for a TripPattern. Should the route be included in the StopPattern?
+ * A StopPattern is very closely related to a TripPattern -- it essentially serves as the unique key
+ * for a TripPattern. Should the route be included in the StopPattern?
  */
 public final class StopPattern implements Serializable {
 
@@ -64,9 +64,11 @@ public final class StopPattern implements Serializable {
   public StopPattern(Collection<StopTime> stopTimes) {
     this(stopTimes.size());
     int size = stopTimes.size();
+
     if (size == 0) {
       return;
     }
+
     Iterator<StopTime> stopTimeIterator = stopTimes.iterator();
 
     for (int i = 0; i < size; ++i) {
@@ -135,9 +137,11 @@ public final class StopPattern implements Serializable {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("StopPattern: ");
+
     for (int i = 0, j = stops.length; i < j; ++i) {
       sb.append(String.format("%s_%s%s ", stops[i].getCode(), pickups[i], dropoffs[i]));
     }
+
     return sb.toString();
   }
 
@@ -162,6 +166,7 @@ public final class StopPattern implements Serializable {
         return i;
       }
     }
+
     return -1;
   }
 
@@ -207,8 +212,8 @@ public final class StopPattern implements Serializable {
    * Use {@link #canAlight(int)} if you want to check if a stop can be alighted at a given stop
    * position, ONLY use this method if you would like to search the stop-pattern for a alighting.
    * <p>
-   * Returns whether passengers can alight at a given stop SOMEWHERE in the pattern, considering
-   * all stops in case the pattern visit the same stop twice.
+   * Returns whether passengers can alight at a given stop SOMEWHERE in the pattern, considering all
+   * stops in case the pattern visit the same stop twice.
    * <p>
    * WARNING! This is an inefficient method iterating over the stops, do not use it in routing.
    * <p>
@@ -223,6 +228,7 @@ public final class StopPattern implements Serializable {
         return true;
       }
     }
+
     return false;
   }
 
@@ -235,8 +241,8 @@ public final class StopPattern implements Serializable {
    * Use {@link #canBoard(int)} if you want to check if a stop can be boarded at a given stop
    * position, ONLY use this method if you would like to search the stop-pattern for a boarding.
    * <p>
-   * Returns whether passengers can board at a given stop SOMEWHERE in the pattern, considering
-   * all stops in case the pattern visit the same stop twice.
+   * Returns whether passengers can board at a given stop SOMEWHERE in the pattern, considering all
+   * stops in case the pattern visit the same stop twice.
    * <p>
    * WARNING! This is an inefficient method iterating over the stops, do not use it in routing.
    * <p>
@@ -251,6 +257,7 @@ public final class StopPattern implements Serializable {
         return true;
       }
     }
+
     return false;
   }
 
@@ -280,6 +287,7 @@ public final class StopPattern implements Serializable {
         return i;
       }
     }
+
     return -1;
   }
 
@@ -305,7 +313,7 @@ public final class StopPattern implements Serializable {
    * @param other Other instance of stop pattern with list of stops.
    * @param index Given index for stop
    * @return true if the stops have the same stations, else false. If any station is null then
-   *         false.
+   *     false.
    */
   boolean sameStations(StopPattern other, int index) {
     var otherOrigin = other.getStop(index).getParentStation();
@@ -351,6 +359,7 @@ public final class StopPattern implements Serializable {
       for (var entry : updatedPickups.entrySet()) {
         pickups.with(entry.getKey(), entry.getValue());
       }
+
       return this;
     }
 
@@ -363,6 +372,7 @@ public final class StopPattern implements Serializable {
       for (var entry : updatedDropoffs.entrySet()) {
         dropoffs.with(entry.getKey(), entry.getValue());
       }
+
       return this;
     }
 
@@ -372,11 +382,13 @@ public final class StopPattern implements Serializable {
     public StopPatternBuilder replaceStop(FeedScopedId old, StopLocation newStop) {
       Objects.requireNonNull(old);
       Objects.requireNonNull(newStop);
+
       for (int i = 0; i < stops.size(); i++) {
         if (stops.getOrOriginal(i).getId().equals(old)) {
           stops.with(i, newStop);
         }
       }
+
       return this;
     }
 
@@ -385,9 +397,11 @@ public final class StopPattern implements Serializable {
      */
     public StopPatternBuilder replaceStops(Map<Integer, StopLocation> newStops) {
       Objects.requireNonNull(newStops);
+
       for (var entry : newStops.entrySet()) {
         stops.with(entry.getKey(), entry.getValue());
       }
+
       return this;
     }
 

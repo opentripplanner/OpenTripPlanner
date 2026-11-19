@@ -22,6 +22,7 @@ class ModeCombinations {
         )
       );
     }
+
     this.accessModes = List.copyOf(accessModes);
     this.egressModes = List.copyOf(egressModes);
   }

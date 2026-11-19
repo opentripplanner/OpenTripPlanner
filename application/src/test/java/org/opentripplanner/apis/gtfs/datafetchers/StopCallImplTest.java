@@ -90,6 +90,7 @@ class StopCallImplTest {
 
     // Only the last stop is canceled
     var expectedCanceled = List.of(false, false, true);
+
     for (int stopPos = 0; stopPos < expectedCanceled.size(); stopPos++) {
       var call = new TripTimeOnDate(tripTimes, stopPos, pattern, SERVICE_DATE, MIDNIGHT);
       assertCanceledInRealTime(expectedCanceled.get(stopPos), call, realtimeEnv.transitService());
@@ -124,12 +125,14 @@ class StopCallImplTest {
     var canceled = List.of(false, true, false);
     var stops = List.of(STOP_A, STOP_B, STOP_C);
     var stopPattern = StopPattern.create(stops.size());
+
     for (int i = 0; i < stops.size(); i++) {
       var pickDrop = canceled.get(i) ? PickDrop.CANCELLED : PickDrop.SCHEDULED;
       stopPattern.stops.with(i, stops.get(i));
       stopPattern.pickups.with(i, pickDrop);
       stopPattern.dropoffs.with(i, pickDrop);
     }
+
     var pattern = TripPattern.of(id("PatternWithCanceledStop"))
       .withRoute(scheduledPattern.getRoute())
       .withMode(scheduledPattern.getMode())
@@ -159,7 +162,8 @@ class StopCallImplTest {
         realtimeEnv.transitService()
       );
 
-      // using try-catch is not very nice here - ideally we would just add it to the method signature.
+      // using try-catch is not very nice here - ideally we would just add it to the method
+      // signature.
       // however, this test is run with the flex feature enabled in a runnable which prevents this.
       try {
         CallSchedule schedule = impl.schedule().get(env);

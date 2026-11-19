@@ -7,8 +7,8 @@ package org.opentripplanner.transfer.constrained.model;
  * <ol>
  *   <li>{@code 0 or empty -> PREFERRED}. Recommended transfer point between routes.</li>
  *   <li>{@code 1 -> ALLOWED}. Timed transfer point between two routes. The departing vehicle is
- *       expected to wait for the arriving one and leave sufficient time for a rider to transfer between
- *       routes. The transfer is also set as GUARANTEED.</li>
+ *       expected to wait for the arriving one and leave sufficient time for a rider to transfer
+ *       between routes. The transfer is also set as GUARANTEED.</li>
  *   <li>{@code 3 -> NOT_ALLOWED}. Transfers are not possible /li>
  * </ol>
  * <p>
@@ -65,7 +65,6 @@ public enum TransferPriority {
    * This method returns a cost for how good a transfer priority is compared to other transfer
    * priorities. The cost can only be used to compare transfers and should not be mixed with the
    * generalized-cost. A regular transfer (without any constraints) has the same cost as ALLOWED.
-   * <p>
    * <ol>
    *   <li>{@code PREFERRED} - cost: 1 points.</li>
    *   <li>{@code RECOMMENDED} - cost: 2 points.</li>

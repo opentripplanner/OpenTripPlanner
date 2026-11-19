@@ -20,8 +20,8 @@ import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 /**
  * FEATURE UNDER TEST
  * <p>
- * Raptor should return a path if it exists for a basic case with one route with one trip
- * including boarding/alighting restrictions and, an access and an egress path.
+ * Raptor should return a path if it exists for a basic case with one route with one trip including
+ * boarding/alighting restrictions and, an access and an egress path.
  */
 public class D01_SingeRouteBoardAlightRestrictionsTest implements RaptorTestConstants {
 
@@ -31,7 +31,7 @@ public class D01_SingeRouteBoardAlightRestrictionsTest implements RaptorTestCons
 
   /**
    * Stops: 0..3
-   *
+   * <p>
    * Route restrictions at stop (B:Board, A:Alight, W:Wheelchair):
    * <pre>
    *   Stop:  B   C   D

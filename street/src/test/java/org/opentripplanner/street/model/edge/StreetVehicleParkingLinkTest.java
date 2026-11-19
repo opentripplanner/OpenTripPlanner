@@ -70,6 +70,7 @@ class StreetVehicleParkingLinkTest {
     );
 
     var result = traverse(streetVertex, edge, req.build());
+
     if (shouldTraverse) {
       assertFalse(State.isEmpty(result));
     } else {

@@ -49,8 +49,8 @@ public class OtpConfig {
    * server and verify that it uses the correct version of the config. The version must be injected
    * into the config in the operation deployment pipeline. How this is done is up to the deployment.
    * <p>
-   * The config-version have no effect on OTP, and is provided as is on the API. There is not
-   * syntax or format check on the version and it can be any string.
+   * The config-version have no effect on OTP, and is provided as is on the API. There is not syntax
+   * or format check on the version and it can be any string.
    * <p>
    * This parameter is optional, and the default is {@code null}.
    */

@@ -46,12 +46,11 @@ import uk.org.siri.siri21.WorkflowStatusEnumeration;
  * known that their entity IDs are all drawn from the same namespace (i.e. they are functionally
  * fragments of the same feed).
  * <p>
- * TODO RT_AB: Internal FeedScopedId creation strategy should probably be pluggable or
- * configurable. TG has indicated this is a necessary condition for moving this updater out of
- * sandbox.
+ * TODO RT_AB: Internal FeedScopedId creation strategy should probably be pluggable or configurable.
+ * TG has indicated this is a necessary condition for moving this updater out of sandbox.
  * <p>
- * TODO RT_AB: The name should be clarified, as there is no such thing as "SIRI Alerts", and it
- * is referencing the internal model concept of "Alerts" which are derived from GTFS terminology.
+ * TODO RT_AB: The name should be clarified, as there is no such thing as "SIRI Alerts", and it is
+ * referencing the internal model concept of "Alerts" which are derived from GTFS terminology.
  */
 public class SiriAlertsUpdateHandler {
 
@@ -80,12 +79,16 @@ public class SiriAlertsUpdateHandler {
   }
 
   public void update(ServiceDelivery delivery, TransitRealTimeUpdateContext context) {
-    for (SituationExchangeDeliveryStructure sxDelivery : delivery.getSituationExchangeDeliveries()) {
+    for (
+      SituationExchangeDeliveryStructure sxDelivery : delivery.getSituationExchangeDeliveries()
+    ) {
       SituationExchangeDeliveryStructure.Situations situations = sxDelivery.getSituations();
+
       if (situations != null) {
         long t1 = System.currentTimeMillis();
         int addedCounter = 0;
         int expiredCounter = 0;
+
         for (PtSituationElement sxElement : situations.getPtSituationElements()) {
           boolean expireSituation =
             sxElement.getProgress() != null &&
@@ -94,6 +97,7 @@ public class SiriAlertsUpdateHandler {
           if (sxElement.getSituationNumber() == null) {
             continue;
           }
+
           String situationNumber = sxElement.getSituationNumber().getValue();
           FeedScopedId id = new FeedScopedId(feedId, situationNumber);
 
@@ -102,6 +106,7 @@ public class SiriAlertsUpdateHandler {
             expiredCounter++;
           } else {
             TransitAlert alert = null;
+
             try {
               alert = mapSituationToAlert(sxElement, context);
               addedCounter++;
@@ -112,6 +117,7 @@ public class SiriAlertsUpdateHandler {
                 e
               );
             }
+
             if (alert != null) {
               alerts.removeIf(transitAlert -> transitAlert.getId().equals(id));
               alerts.add(alert);
@@ -159,15 +165,18 @@ public class SiriAlertsUpdateHandler {
     if (situation.getCreationTime() != null) {
       alert.withCreationTime(situation.getCreationTime());
     }
+
     if (situation.getVersionedAtTime() != null) {
       alert.withUpdatedTime(situation.getVersionedAtTime());
     }
+
     if (situation.getVersion() != null && situation.getVersion().getValue() != null) {
       alert.withVersion(situation.getVersion().getValue().intValue());
     }
 
     if (situation.getValidityPeriods().size() > 0) {
       ArrayList<TimePeriod> periods = new ArrayList<>();
+
       for (HalfOpenTimestampOutputRangeStructure activePeriod : situation.getValidityPeriods()) {
         final Instant start =
           activePeriod.getStartTime() != null
@@ -178,6 +187,7 @@ public class SiriAlertsUpdateHandler {
 
         periods.add(TimePeriod.of(start, end));
       }
+
       alert.withCalendar(AlertCalendar.of(periods));
     } else {
       // Per the GTFS-rt spec, if an alert has no TimeRanges, than it should always be shown.
@@ -249,11 +259,13 @@ public class SiriAlertsUpdateHandler {
     if (infoLinks != null) {
       if (isNotEmpty(infoLinks.getInfoLinks())) {
         InfoLinkStructure infoLinkStructure = infoLinks.getInfoLinks().get(0);
+
         if (infoLinkStructure != null && infoLinkStructure.getUri() != null) {
           return new NonLocalizedString(infoLinkStructure.getUri());
         }
       }
     }
+
     return null;
   }
 
@@ -263,17 +275,20 @@ public class SiriAlertsUpdateHandler {
   private List<AlertUrl> mapInfoLinks(PtSituationElement situation) {
     PtSituationElement.InfoLinks infoLinks = situation.getInfoLinks();
     List<AlertUrl> alertUrls = new ArrayList<>();
+
     if (infoLinks != null) {
       if (isNotEmpty(infoLinks.getInfoLinks())) {
         for (InfoLinkStructure infoLink : infoLinks.getInfoLinks()) {
           String label = null;
           List<NaturalLanguageStringStructure> labels = infoLink.getLabels();
+
           if (labels != null && !labels.isEmpty()) {
             NaturalLanguageStringStructure lbl = labels.get(0);
             label = lbl.getValue();
           }
 
           var uri = infoLink.getUri();
+
           if (uri != null) {
             alertUrls.add(new AlertUrl(uri, label));
           } else {
@@ -289,12 +304,13 @@ public class SiriAlertsUpdateHandler {
         }
       }
     }
+
     return alertUrls;
   }
 
   /**
    * @return True if list have at least one element. {@code false} is returned if the given list is
-   *         empty or {@code null}.
+   *     empty or {@code null}.
    */
   private boolean isNotEmpty(List<?> list) {
     return list != null && !list.isEmpty();
@@ -307,16 +323,20 @@ public class SiriAlertsUpdateHandler {
    */
   private I18NString mapTranslatedString(List<DefaultedTextStructure> input) {
     Map<String, String> translations = new HashMap<>();
+
     if (input != null && input.size() > 0) {
       for (DefaultedTextStructure textStructure : input) {
         String language = "";
         String value = "";
+
         if (textStructure.getLang() != null) {
           language = textStructure.getLang();
         }
+
         if (textStructure.getValue() != null) {
           value = textStructure.getValue();
         }
+
         translations.put(language, value);
       }
     } else {

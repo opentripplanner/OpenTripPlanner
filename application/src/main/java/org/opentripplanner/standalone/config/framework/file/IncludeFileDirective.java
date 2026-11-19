@@ -46,9 +46,9 @@ public class IncludeFileDirective {
    * corresponding environment variable.
    *
    * @param source is used only to generate human friendly error message in case the text contain a
-   *               placeholder which can not be found.
+   *     placeholder which can not be found.
    * @throws IllegalArgumentException if a placeholder exist in the {@code text}, but the
-   *                                  environment variable do not exist.
+   *     environment variable do not exist.
    */
   public static String includeFileDirective(File configDir, String text, String source) {
     return new IncludeFileDirective(configDir).includeFileDirective(text, source);
@@ -88,6 +88,7 @@ public class IncludeFileDirective {
           "The file is not found for directive '" + directive + "' in config '" + source + "'."
         );
       }
+
       replacements.put(directive, file);
     }
 
@@ -98,6 +99,7 @@ public class IncludeFileDirective {
       // If the insert text is a legal JSON object or array, then
       // ignore the optional quotes matched by the directive pattern
       var json = fileText.trim();
+
       if (
         (json.startsWith("{") && json.endsWith("}")) || (json.startsWith("[") && json.endsWith("]"))
       ) {
@@ -109,6 +111,7 @@ public class IncludeFileDirective {
         text = text.replace(entry.getKey(), startQuote + fileText + endQuote);
       }
     }
+
     return text;
   }
 }

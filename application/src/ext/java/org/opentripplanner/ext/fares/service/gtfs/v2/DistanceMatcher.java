@@ -9,6 +9,7 @@ class DistanceMatcher {
   static boolean matchesDistance(TransitLeg leg, FareLegRule rule) {
     // If no valid distance type is given, do not consider distances in fare computation
     FareDistance distance = rule.fareDistance();
+
     if (distance instanceof FareDistance.Stops(int min, int max)) {
       // the board stop does not contribute towards the final count, but the alight stop does
       // therefore we add 1

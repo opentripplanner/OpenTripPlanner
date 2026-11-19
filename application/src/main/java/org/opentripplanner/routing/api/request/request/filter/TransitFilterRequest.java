@@ -58,6 +58,7 @@ public class TransitFilterRequest implements Serializable, TransitFilter {
         return true;
       }
     }
+
     return false;
   }
 
@@ -65,12 +66,14 @@ public class TransitFilterRequest implements Serializable, TransitFilter {
   public boolean matchTripPattern(TripPattern tripPattern) {
     if (select.length != 0) {
       var anyMatch = false;
+
       for (SelectRequest s : select) {
         if (s.matchesPatternSelect(tripPattern)) {
           anyMatch = true;
           break;
         }
       }
+
       if (!anyMatch) {
         return false;
       }
@@ -89,12 +92,14 @@ public class TransitFilterRequest implements Serializable, TransitFilter {
   public boolean matchTripTimes(TripTimes<?> tripTimes) {
     if (select.length != 0) {
       var anyMatch = false;
+
       for (var selectRequest : select) {
         if (selectRequest.matchesSelect(tripTimes)) {
           anyMatch = true;
           break;
         }
       }
+
       if (!anyMatch) {
         return false;
       }
@@ -114,6 +119,7 @@ public class TransitFilterRequest implements Serializable, TransitFilter {
     if (select.length == 0 && not.length == 0) {
       return "ALL";
     }
+
     return ToStringBuilder.ofEmbeddedType()
       .addCol("select", Arrays.asList(select))
       .addCol("not", Arrays.asList(not))

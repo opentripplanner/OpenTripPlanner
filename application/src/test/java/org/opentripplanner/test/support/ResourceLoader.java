@@ -65,11 +65,13 @@ public class ResourceLoader {
   public File file(String path) {
     URL resource = url(path);
     File file;
+
     try {
       file = new File(new URI(resource.toString()));
     } catch (URISyntaxException e) {
       throw new RuntimeException(e);
     }
+
     assertFileExists(file);
     return file;
   }
@@ -112,9 +114,11 @@ public class ResourceLoader {
   public URL url(String name) {
     var resource = clazz.getResource(name);
     var msg = "Resource '%s' not found in package '%s'".formatted(name, clazz.getPackageName());
+
     if (resource == null) {
       throw new IllegalArgumentException(msg);
     }
+
     return resource;
   }
 
@@ -134,6 +138,7 @@ public class ResourceLoader {
    */
   public List<String> lines(String s, int lines) {
     var path = file(s).toPath();
+
     try {
       return Files.readAllLines(path, StandardCharsets.UTF_8).stream().limit(lines).toList();
     } catch (IOException e) {

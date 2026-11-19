@@ -32,11 +32,12 @@ public sealed interface Condition {
    * Test to what degree the OSM entity matches with this operation when taking the ':left' key
    * suffixes into account.
    * <p>
-   * For example, it should not match a way with `cycleway:right=lane` when the `cycleway=lane`
-   * was required but `cycleway:left=lane` should match.
+   * For example, it should not match a way with `cycleway:right=lane` when the `cycleway=lane` was
+   * required but `cycleway:left=lane` should match.
    */
   default boolean isLeftMatch(OsmEntity way) {
     var leftKey = this.key() + ":left";
+
     if (way.hasTag(leftKey)) {
       return isExtendedKeyMatch(way, leftKey);
     } else {
@@ -48,11 +49,12 @@ public sealed interface Condition {
    * Test to what degree the OSM entity matches with this operation when taking the ':right' key
    * suffixes into account.
    * <p>
-   * For example, it should not match a way with `cycleway:left=lane` when the `cycleway=lane`
-   * was required but `cycleway:right=lane` should match.
+   * For example, it should not match a way with `cycleway:left=lane` when the `cycleway=lane` was
+   * required but `cycleway:right=lane` should match.
    */
   default boolean isRightMatch(OsmEntity way) {
     var rightKey = this.key() + ":right";
+
     if (way.hasTag(rightKey)) {
       return isExtendedKeyMatch(way, rightKey);
     } else {
@@ -66,6 +68,7 @@ public sealed interface Condition {
    */
   default boolean isExplicitBothMatch(OsmEntity way) {
     var bothKey = this.key() + ":both";
+
     if (way.hasTag(bothKey)) {
       return isExtendedKeyMatch(way, bothKey);
     } else {
@@ -75,6 +78,7 @@ public sealed interface Condition {
 
   default boolean isForwardMatch(OsmEntity way) {
     var forwardKey = this.key() + ":forward";
+
     if (way.hasTag(forwardKey)) {
       return isExtendedKeyMatch(way, forwardKey);
     } else {
@@ -89,6 +93,7 @@ public sealed interface Condition {
 
   default boolean isBackwardMatch(OsmEntity way) {
     var backwardKey = this.key() + ":backward";
+
     if (way.hasTag(backwardKey)) {
       return isExtendedKeyMatch(way, backwardKey);
     } else {

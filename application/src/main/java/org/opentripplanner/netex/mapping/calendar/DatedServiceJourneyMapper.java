@@ -25,6 +25,7 @@ public class DatedServiceJourneyMapper {
     ReadOnlyHierarchicalMapById<OperatingDay> operatingDayById
   ) {
     List<LocalDate> result = new ArrayList<>();
+
     for (DatedServiceJourney dsj : dsjs) {
       // TODO This currently skips mapping of any trips containing ServiceAlteration CANCELLATION
       //      or REPLACED. In the future we will want to import these and allow them to be routed
@@ -34,6 +35,7 @@ public class DatedServiceJourneyMapper {
       }
 
       OperatingDay opDay = operatingDay(dsj, operatingDayById);
+
       if (opDay != null) {
         result.add(OperatingDayMapper.map(opDay));
       } else {
@@ -43,6 +45,7 @@ public class DatedServiceJourneyMapper {
         );
       }
     }
+
     return result;
   }
 

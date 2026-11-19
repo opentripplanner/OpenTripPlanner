@@ -39,6 +39,7 @@ public class GenericLocation {
         "GenericLocation requires either a stop id, a coordinate or a trip location"
       );
     }
+
     this.label = label;
     this.stopId = stopId;
     this.coordinate = coordinate;
@@ -109,6 +110,7 @@ public class GenericLocation {
     if (this.coordinate == null) {
       return null;
     }
+
     return coordinate.asJtsCoordinate();
   }
 
@@ -161,6 +163,7 @@ public class GenericLocation {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     var that = (GenericLocation) o;
     return (
       Objects.equals(label, that.label) &&
@@ -178,13 +181,17 @@ public class GenericLocation {
   @Override
   public String toString() {
     ValueObjectToStringBuilder buf = ValueObjectToStringBuilder.of().skipNull();
+
     if (StringUtils.hasValue(label)) {
       buf.addText(label).addText(" ");
     }
+
     buf.addObj(stopId);
+
     if (coordinate != null) {
       buf.addCoordinate(coordinate.latitude(), coordinate.longitude());
     }
+
     buf.addObj(tripLocation);
     return buf.toString();
   }

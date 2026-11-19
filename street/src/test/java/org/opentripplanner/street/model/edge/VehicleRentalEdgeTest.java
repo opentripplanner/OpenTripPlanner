@@ -428,6 +428,7 @@ class VehicleRentalEdgeTest {
     StreetSearchRequestBuilder streetSearchRequestBuilder = StreetSearchRequest.of()
       .withMode(CAR_RENTAL)
       .withArriveBy(arriveBy);
+
     if (rentalDuration != null) {
       var now = Instant.now();
       var rentalPeriod = arriveBy
@@ -435,6 +436,7 @@ class VehicleRentalEdgeTest {
         : RentalPeriod.createFromEarliestDepartureTime(now, rentalDuration);
       streetSearchRequestBuilder.withRentalPeriod(rentalPeriod);
     }
+
     this.request = streetSearchRequestBuilder.build();
   }
 

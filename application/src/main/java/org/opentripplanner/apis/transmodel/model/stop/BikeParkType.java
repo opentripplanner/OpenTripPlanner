@@ -47,6 +47,7 @@ public class BikeParkType {
           .dataFetcher(environment -> {
             var vehicleParking = (VehicleParking) environment.getSource();
             var availability = vehicleParking.getAvailability();
+
             if (availability != null) {
               return availability.getBicycleSpaces();
             } else {

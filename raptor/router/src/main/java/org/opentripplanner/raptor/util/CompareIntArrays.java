@@ -106,6 +106,7 @@ public class CompareIntArrays {
       size = a.length;
       s.compareAll(a, b);
     }
+
     return s.result(size);
   }
 
@@ -125,9 +126,11 @@ public class CompareIntArrays {
         if (hh.length() < 2000) {
           addResult(i, u, v);
         }
+
         countDiff(a[i], b[i]);
       }
     }
+
     if (hh.length() == 0) {
       hh += "ALL STOPS";
       aValues += "  ARE";
@@ -142,6 +145,7 @@ public class CompareIntArrays {
       bNotReached++;
     } else {
       int c = comparator.compare(a, b);
+
       if (c < 0) {
         aLess++;
       } else if (c > 0) {
@@ -167,6 +171,7 @@ public class CompareIntArrays {
     result += String.format(f, "Stop", hh);
     result += String.format(f, aName, aValues);
     result += String.format(f, bName, bValues);
+
     if (diffTot() != 0) {
       result += String.format(
         "Number of diffs: %d of %d, %s better: %d and not reached: %d, %s better: %d and not reached: %d.%n",
@@ -180,6 +185,7 @@ public class CompareIntArrays {
         bNotReached
       );
     }
+
     return result;
   }
 

@@ -47,9 +47,9 @@ public class BestTimesOnlyStopArrivalsState<T extends RaptorTripSchedule> implem
    * This implementation does NOT return the "best time in the previous round"; It returns the
    * overall "best time" across all rounds including the current.
    * <p>
-   * This is a simplification, *bestTimes* might get updated during the current round; Hence
-   * leading to a new boarding at the alight stop in the same round. If we do not count rounds or
-   * track paths, this is OK.
+   * This is a simplification, *bestTimes* might get updated during the current round; Hence leading
+   * to a new boarding at the alight stop in the same round. If we do not count rounds or track
+   * paths, this is OK.
    * <p>
    * Because this rarely happens and heuristics does not need to be exact - it only need to be
    * optimistic. So if we arrive at a stop one or two rounds to early, the only effect is that the

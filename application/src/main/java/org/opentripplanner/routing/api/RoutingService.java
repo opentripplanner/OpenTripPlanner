@@ -10,7 +10,7 @@ public interface RoutingService {
 
   /**
    * @deprecated We will replace the complex via-search with a simpler version part of the existing
-   *             trip search.
+   *     trip search.
    */
   @Deprecated
   ViaRoutingResponse route(RouteViaRequest request);

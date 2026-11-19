@@ -51,6 +51,7 @@ class StateGeofencingEnforcementTest {
     if (zones.length > 0) {
       editor.initializeGeofencingZones(Set.of(zones));
     }
+
     return editor.makeState();
   }
 

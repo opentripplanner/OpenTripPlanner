@@ -8,8 +8,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 /**
  * This trip search will only match trips that is within the given slack of the timeLimit.
  * <p>
- * Let say we want to board a trip and the 'earliest boarding time' is 12:10:00, and the slack is
- * 60 seconds. Then all trip leaving from 12:10:00 to 12:11:00 is accepted. This is used to prevent
+ * Let say we want to board a trip and the 'earliest boarding time' is 12:10:00, and the slack is 60
+ * seconds. Then all trip leaving from 12:10:00 to 12:11:00 is accepted. This is used to prevent
  * boarding trips that depart long after the Range Raptor search window. The Range Raptor algorithm
  * implemented here uses this wrapper for round 1, for all other rounds the normal {@code
  * TripScheduleBoardSearch} or {@code TripScheduleAlightSearch} is used.
@@ -46,9 +46,11 @@ public final class TripScheduleExactMatchSearch<T extends RaptorTripSchedule> im
       stopPositionInPattern,
       tripIndexLimit
     );
+
     if (result.empty() || result.transferConstraint().isNotAllowed()) {
       return result;
     }
+
     return isWithinSlack(timeLimit, result.time())
       ? result
       : RaptorBoardOrAlightEvent.empty(result.earliestBoardTime());

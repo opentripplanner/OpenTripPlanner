@@ -25,6 +25,7 @@ public class TransitPreferencesMapper {
   ) {
     var modes = args.getGraphQLModes();
     var transit = getTransitModes(environment);
+
     if (!Boolean.TRUE.equals(modes.getGraphQLDirectOnly()) && !CollectionUtils.isEmpty(transit)) {
       var reluctanceForMode = transit
         .stream()
@@ -40,86 +41,117 @@ public class TransitPreferencesMapper {
         );
       transitPreferences.withReluctanceForMode(reluctanceForMode);
     }
+
     var transitArgs = args.getGraphQLPreferences().getGraphQLTransit();
+
     if (transitArgs == null) {
       return;
     }
 
     var relax = transitArgs.getGraphQLRelaxTransitGroupPriority();
+
     if (relax != null) {
       Cost constant = Cost.ZERO;
       Double coefficient = 1.0;
+
       if (relax.getGraphQLConstant() != null) {
         constant = relax.getGraphQLConstant();
       }
+
       if (relax.getGraphQLCoefficient() != null) {
         coefficient = relax.getGraphQLCoefficient();
       }
+
       transitPreferences.withRelaxTransitGroupPriority(
         CostLinearFunction.of(constant, coefficient)
       );
     }
 
     var board = transitArgs.getGraphQLBoard();
+
     if (board != null) {
       var slack = board.getGraphQLSlack();
+
       if (slack != null) {
         transitPreferences.withDefaultBoardSlackSec(
           (int) DurationUtils.requireNonNegativeMax2hours(slack, "board slack").toSeconds()
         );
       }
+
       var waitReluctance = board.getGraphQLWaitReluctance();
+
       if (waitReluctance != null) {
         transferPreferences.withWaitReluctance(waitReluctance);
       }
     }
+
     var alight = transitArgs.getGraphQLAlight();
+
     if (alight != null) {
       var slack = alight.getGraphQLSlack();
+
       if (slack != null) {
         transitPreferences.withDefaultAlightSlackSec(
           (int) DurationUtils.requireNonNegativeMax2hours(slack, "alight slack").toSeconds()
         );
       }
     }
+
     var transfer = transitArgs.getGraphQLTransfer();
+
     if (transfer != null) {
       var cost = transfer.getGraphQLCost();
+
       if (cost != null) {
         transferPreferences.withCost(cost.toSeconds());
       }
+
       var slack = transfer.getGraphQLSlack();
+
       if (slack != null) {
         transferPreferences.withSlack(
           DurationUtils.requireNonNegativeMax2hours(slack, "transfer slack")
         );
       }
+
       var maxTransfers = transfer.getGraphQLMaximumTransfers();
+
       if (maxTransfers != null) {
         if (maxTransfers < 0) {
           throw new InvalidInputException("Maximum transfers must be non-negative.");
         }
+
         transferPreferences.withMaxTransfers(maxTransfers + 1);
       }
+
       var additionalTransfers = transfer.getGraphQLMaximumAdditionalTransfers();
+
       if (additionalTransfers != null) {
         if (additionalTransfers < 0) {
           throw new InvalidInputException("Maximum additional transfers must be non-negative.");
         }
+
         transferPreferences.withMaxAdditionalTransfers(additionalTransfers);
       }
     }
+
     var timetable = transitArgs.getGraphQLTimetable();
+
     if (timetable != null) {
       var excludeUpdates = timetable.getGraphQLExcludeRealTimeUpdates();
+
       if (excludeUpdates != null) {
         transitPreferences.withIgnoreRealtimeUpdates(excludeUpdates);
       }
+
       var includePlannedCancellations = timetable.getGraphQLIncludePlannedCancellations();
+
       if (includePlannedCancellations != null) {
         transitPreferences.withIncludePlannedCancellations(includePlannedCancellations);
       }
+
       var includeRealtimeCancellations = timetable.getGraphQLIncludeRealTimeCancellations();
+
       if (includeRealtimeCancellations != null) {
         transitPreferences.withIncludeRealtimeCancellations(includeRealtimeCancellations);
       }

@@ -146,7 +146,7 @@ public class Timetable implements Serializable {
 
   /**
    * @return true if the timetable was created by a real-time update, false if this timetable is
-   *         based on scheduled data. Only real-time timetables have a service date.
+   *     based on scheduled data. Only real-time timetables have a service date.
    */
   public boolean isCreatedByRealTimeUpdater() {
     return serviceDate != null;
@@ -157,7 +157,7 @@ public class Timetable implements Serializable {
    * have the same directions and picks up one arbitrarily.
    *
    * @param scheduledTripTimes all the scheduled-based trip times in a timetable.
-   * @param frequencies        all the frequency-based trip times in a timetable.
+   * @param frequencies all the frequency-based trip times in a timetable.
    */
   static Direction getDirection(
     Collection<TripTimes<?>> scheduledTripTimes,
@@ -173,8 +173,7 @@ public class Timetable implements Serializable {
    * Return an arbitrary TripTimes.
    *
    * @param scheduledTripTimes all the scheduled-based trip times in a timetable.
-   * @param frequencies        all the frequency-based trip times in a timetable.
-   *
+   * @param frequencies all the frequency-based trip times in a timetable.
    */
   private static TripTimes<?> getRepresentativeTripTimes(
     Collection<TripTimes<?>> scheduledTripTimes,
@@ -199,6 +198,7 @@ public class Timetable implements Serializable {
         "Can only copy scheduled timetable for a specific date if a date hasn't been specified yet."
       );
     }
+
     return copyOf().withServiceDate(date).build();
   }
 

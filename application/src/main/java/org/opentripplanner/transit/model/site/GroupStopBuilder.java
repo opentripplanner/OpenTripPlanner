@@ -86,9 +86,11 @@ public class GroupStopBuilder extends AbstractEntityBuilder<GroupStop, GroupStop
 
     int numGeometries = geometry.getNumGeometries();
     Geometry[] newGeometries = new Geometry[numGeometries + 1];
+
     for (int i = 0; i < numGeometries; i++) {
       newGeometries[i] = geometry.getGeometryN(i);
     }
+
     newGeometries[numGeometries] = location.getGeometry();
 
     geometry = new GeometryCollection(newGeometries, GeometryUtils.getGeometryFactory());

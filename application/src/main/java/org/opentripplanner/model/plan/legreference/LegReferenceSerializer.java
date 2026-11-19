@@ -28,11 +28,13 @@ public class LegReferenceSerializer {
     if (legReference == null) {
       return null;
     }
+
     LegReferenceType typeEnum = LegReferenceType.forClass(legReference.getClass()).orElseThrow(() ->
       new IllegalArgumentException("Unknown LegReference type")
     );
 
     var buf = new ByteArrayOutputStream();
+
     try (var out = new ObjectOutputStream(buf)) {
       // The order must be the same in the encode and decode function
       writeEnum(typeEnum, out);
@@ -52,12 +54,14 @@ public class LegReferenceSerializer {
     }
 
     byte[] serializedLegReference;
+
     try {
       serializedLegReference = Base64.getUrlDecoder().decode(legReference);
     } catch (IllegalArgumentException e) {
       LOG.info("Unable to decode leg reference (invalid base64 encoding): '{}'", legReference, e);
       return null;
     }
+
     var input = new ByteArrayInputStream(serializedLegReference);
 
     try (var in = new ObjectInputStream(input)) {
@@ -121,6 +125,7 @@ public class LegReferenceSerializer {
     if (id.isEmpty()) {
       return null;
     }
+
     return FeedScopedId.parseStrict(id);
   }
 }

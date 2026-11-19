@@ -81,6 +81,7 @@ class RegularTransferServiceCacheTest {
     });
 
     var executor = Executors.newSingleThreadExecutor();
+
     try {
       var slowCreation = executor.submit(() -> cache.get(PREFS_1, slow));
       awaitOrFail(creationStarted);
@@ -110,6 +111,7 @@ class RegularTransferServiceCacheTest {
     });
 
     var executor = Executors.newFixedThreadPool(2);
+
     try {
       var first = executor.submit(() -> cache.get(PREFS_1, factory));
       awaitOrFail(creationStarted);
@@ -194,6 +196,7 @@ class RegularTransferServiceCacheTest {
     });
 
     var executor = Executors.newSingleThreadExecutor();
+
     try {
       var slowCreation = executor.submit(() -> cache.get(PREFS_1, slow));
       awaitOrFail(creationStarted);
@@ -346,8 +349,10 @@ class RegularTransferServiceCacheTest {
     var cache = new RegularTransferServiceCache<String>(2, Set.of(PREFS_1));
     var factory = new TestFactory();
     var executor = Executors.newFixedThreadPool(threads);
+
     try {
       var futures = new ArrayList<Future<?>>();
+
       for (int t = 0; t < threads; t++) {
         int offset = t;
         futures.add(
@@ -358,6 +363,7 @@ class RegularTransferServiceCacheTest {
           })
         );
       }
+
       for (var future : futures) {
         future.get(30, TimeUnit.SECONDS);
       }

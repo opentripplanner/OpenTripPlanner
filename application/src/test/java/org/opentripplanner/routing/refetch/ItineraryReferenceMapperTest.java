@@ -41,10 +41,9 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.transfer.regular.FixedRegularTransfers;
 
 /**
- * UC1 acceptance test for a single scheduled-transit itinerary without access, egress or
- * transfers.
- *
- * <p>Proves the chain:
+ * UC1 acceptance test for a single scheduled-transit itinerary without access, egress or transfers.
+ * <p>
+ * Proves the chain:
  * {@code Itinerary -> ItineraryReference -> encode -> decode -> RefetchItineraryService ->
  * same scheduled transit itinerary}.
  */
@@ -513,8 +512,8 @@ class ItineraryReferenceMapperTest {
   /**
    * A {@link org.opentripplanner.model.plan.leg.FrequencyTransitLeg} is a
    * {@code ScheduledTransitLeg} and so passes the supported-leg-reference check, but frequency
-   * trips are not in the timetable's trip-times index, so the leg could never be looked up again
-   * on refetch. Such an itinerary must not get an id at all.
+   * trips are not in the timetable's trip-times index, so the leg could never be looked up again on
+   * refetch. Such an itinerary must not get an id at all.
    */
   @Test
   void frequencyLegIsUnsupported() {
@@ -556,9 +555,11 @@ class ItineraryReferenceMapperTest {
     var stopA = Place.forStop(STOP_A);
     var stopB = Place.forStop(STOP_B);
     var builder = newItinerary(stopA, 0);
+
     for (int i = 0; i <= ItineraryReference.MAX_LEG_REFERENCES; i++) {
       builder.bus(i, i * 100, i * 100 + 50, i % 2 == 0 ? stopB : stopA);
     }
+
     var itinerary = builder.build();
 
     assertThrows(UnsupportedItineraryReferenceException.class, () ->

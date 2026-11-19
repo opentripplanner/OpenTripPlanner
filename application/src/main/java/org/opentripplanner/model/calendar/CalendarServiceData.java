@@ -35,9 +35,11 @@ public class CalendarServiceData implements Serializable {
 
   public Set<FeedScopedId> getServiceIdsForDate(LocalDate date) {
     Set<FeedScopedId> serviceIds = serviceIdsByDate.get(date);
+
     if (serviceIds == null) {
       serviceIds = new HashSet<>();
     }
+
     return serviceIds;
   }
 
@@ -59,9 +61,11 @@ public class CalendarServiceData implements Serializable {
       CAL_SERVICE_FEED_ID,
       ServiceDateUtils.asCompactString(serviceDate)
     );
+
     if (serviceDatesByServiceId.containsKey(serviceId)) {
       return serviceId;
     }
+
     serviceDatesByServiceId.put(serviceId, List.of(serviceDate));
     serviceIdsByDate.computeIfAbsent(serviceDate, d -> new HashSet<>()).add(serviceId);
 

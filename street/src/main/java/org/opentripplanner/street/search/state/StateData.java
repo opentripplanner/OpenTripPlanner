@@ -69,7 +69,6 @@ public class StateData implements Cloneable {
    * Tracks networks for which forking a committed branch from this generic state would be illegal
    * (the path crossed the network's no-traversal zone) or duplicate the deferred BA fork. Read by
    * NetworkCommitmentHandler and VehicleRentalEdge to skip the redundant work.
-   *
    * <p>
    * Not consulted by {@link org.opentripplanner.street.search.strategy.DominanceFunctions} for
    * performance: treating differing sets as incomparable would split the SPT into a plane per
@@ -85,14 +84,8 @@ public class StateData implements Cloneable {
         CARPOOL maps to TraverseMode.WALK because we want results involving only walking when it makes sense,
         but we do not want results that includes driving when there are no available carpooling trips.
        */
-      case
-        NOT_SET,
-        WALK,
-        BIKE_RENTAL,
-        SCOOTER_RENTAL,
-        CAR_RENTAL,
-        FLEXIBLE,
-        CARPOOL -> TraverseMode.WALK;
+      case NOT_SET, WALK, BIKE_RENTAL, SCOOTER_RENTAL, CAR_RENTAL, FLEXIBLE, CARPOOL
+        -> TraverseMode.WALK;
       // when cycling all the way or to a stop, you start on your own bike
       case BIKE, BIKE_TO_PARK -> TraverseMode.BICYCLE;
       // when driving (not car rental) you start in your own car or your driver's car
@@ -125,10 +118,8 @@ public class StateData implements Cloneable {
 
     var baseCaseDatas = switch (request.mode()) {
       case WALK, BIKE, BIKE_TO_PARK, CAR, CAR_TO_PARK, FLEXIBLE, CARPOOL, NOT_SET -> stateDatas;
-      case CAR_PICKUP, TAXI, CAR_HAILING -> stateDatas
-        .stream()
-        .filter(d -> d.carPickupState == CarPickupState.IN_CAR)
-        .toList();
+      case CAR_PICKUP, TAXI, CAR_HAILING
+        -> stateDatas.stream().filter(d -> d.carPickupState == CarPickupState.IN_CAR).toList();
       case BIKE_RENTAL, SCOOTER_RENTAL, CAR_RENTAL -> {
         if (request.arriveBy()) {
           yield stateDatas
@@ -150,6 +141,7 @@ public class StateData implements Cloneable {
         "Unable to create only a single state for %s".formatted(request)
       );
     }
+
     return baseCaseDatas.get(0);
   }
 
@@ -188,6 +180,7 @@ public class StateData implements Cloneable {
       if (arriveBy) {
         var vehicleMode = StreetModeToRentalTraverseModeMapper.map(requestMode);
         var formFactor = StreetModeToFormFactorMapper.map(requestMode);
+
         if (allowArrivingInRentedVehicleAtDestination) {
           var keptVehicleStateData = proto.clone();
           keptVehicleStateData.vehicleRentalState = RENTING_FROM_STATION;
@@ -195,6 +188,7 @@ public class StateData implements Cloneable {
           keptVehicleStateData.mayKeepRentedVehicleAtDestination = true;
           res.add(keptVehicleStateData);
         }
+
         var floatingRentalStateData = proto.clone();
         floatingRentalStateData.vehicleRentalState = RENTING_FLOATING;
         floatingRentalStateData.rentalVehicleFormFactor = formFactor;
@@ -243,10 +237,12 @@ public class StateData implements Cloneable {
     if (vehicleRentalState == RENTING_FROM_STATION && !restrictedNetworks.isEmpty()) {
       return false;
     }
+
     // Populate zone state on arriveBy rental initial states
     if (!destinationZones.isEmpty()) {
       currentGeofencingZones = Set.copyOf(destinationZones);
     }
+
     // Pre-populate committed networks for generic floating states
     if (
       vehicleRentalState == RENTING_FLOATING &&
@@ -255,6 +251,7 @@ public class StateData implements Cloneable {
     ) {
       committedNetworks = Set.copyOf(restrictedNetworks);
     }
+
     return true;
   }
 

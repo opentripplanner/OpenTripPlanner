@@ -42,6 +42,7 @@ public class StreetElevationExtensionBuilder {
     if (elevationProfileHasAtLeastTwoPoints() && (!isSlopeOverride || computed)) {
       return Optional.of(buildInternal());
     }
+
     return Optional.empty();
   }
 

@@ -3,8 +3,9 @@ package org.opentripplanner.graph_builder.module;
 import org.opentripplanner.core.model.doc.DocumentedEnum;
 
 /**
- * Selects which coordinate is used to place an {@link org.opentripplanner.street.model.vertex.OsmBoardingLocationVertex}
- * when a transit stop is linked to an OSM {@code boarding_location} (way, area or node).
+ * Selects which coordinate is used to place an
+ * {@link org.opentripplanner.street.model.vertex.OsmBoardingLocationVertex} when a transit stop is
+ * linked to an OSM {@code boarding_location} (way, area or node).
  *
  * @see OsmBoardingLocationsModule
  */
@@ -18,12 +19,12 @@ public enum BoardingLocationCoordinateSource
     they really are, and every walk to or from the platform starts at that centre rather than at the
     stop."""
   ),
-  TRANSIT(
+    TRANSIT(
     """
     Use the position from the transit data. Each stop keeps its own coordinate and is connected to
     the platform by a walk of the real distance, so stops on one platform stay separate. The OSM
     features themselves are never moved."""
-  );
+    );
 
   private final String description;
 

@@ -76,9 +76,11 @@ public final class FeedInfo implements Serializable {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     FeedInfo feedInfo = (FeedInfo) o;
     return id.equals(feedInfo.id);
   }

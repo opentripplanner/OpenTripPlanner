@@ -72,7 +72,7 @@ public class LuceneIndex implements Serializable {
 
   /**
    * @param transitService a service without real-time data, the index is built once from the
-   *                       scheduled data.
+   *     scheduled data.
    */
   public LuceneIndex(
     TransitService transitService,
@@ -162,6 +162,7 @@ public class LuceneIndex implements Serializable {
         if (suggestFields.contains(field)) {
           return postingsFormat;
         }
+
         return super.getPostingsFormatForField(field);
       }
     };
@@ -183,10 +184,13 @@ public class LuceneIndex implements Serializable {
 
     Document document = new Document();
     document.add(new StoredField(ID, id));
+
     for (var secondaryId : secondaryIds) {
       document.add(new StoredField(SECONDARY_IDS, secondaryId));
     }
+
     document.add(new TextField(TYPE, typeName, Store.YES));
+
     for (var name : names) {
       document.add(new TextField(NAME, Objects.toString(name), Store.YES));
       document.add(new TextField(NAME_NGRAM, Objects.toString(name), Store.YES));
@@ -212,6 +216,7 @@ public class LuceneIndex implements Serializable {
 
   private Stream<Document> findDocuments(String searchTerms, @Nullable WgsCoordinate focusPoint) {
     searchTerms = searchTerms.strip();
+
     try {
       var nameParser = new QueryParser(NAME_NGRAM, analyzer);
       var nameQuery = nameParser.parse(searchTerms);
@@ -241,6 +246,7 @@ public class LuceneIndex implements Serializable {
         .add(fuzzyNameQuery, Occur.SHOULD)
         .add(prefixNameQuery, Occur.SHOULD)
         .add(ngramNameQuery, Occur.SHOULD);
+
       if (focusPoint != null) {
         var distanceBoost = LatLonPoint.newDistanceFeatureQuery(
           LOCATION,
@@ -253,9 +259,11 @@ public class LuceneIndex implements Serializable {
         );
         builder.add(distanceBoost, Occur.SHOULD);
       }
+
       var query = builder.build();
 
       TopDocs topDocs;
+
       if (focusPoint != null) {
         Sort sort = new Sort(
           new SortField("_score", SortField.Type.SCORE),

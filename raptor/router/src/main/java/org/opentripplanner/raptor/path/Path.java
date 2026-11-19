@@ -156,9 +156,11 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     Path<?> path = (Path<?>) o;
     return (
       startTime == path.startTime &&
@@ -183,6 +185,7 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
 
     if (accessLeg != null) {
       int prevToTime = 0;
+
       for (PathLeg<T> leg : accessLeg.iterator()) {
         if (leg == accessLeg) {
           if (!accessLeg.access().isFree()) {
@@ -194,6 +197,7 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
 
           if (detailed) {
             buf.duration(leg.fromTime() - prevToTime);
+
             // Add Transfer constraints info from the previous transit lag
             if (constraintPrevLeg != null) {
               buf.text(constraintPrevLeg.toString());
@@ -208,10 +212,12 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
               transitLeg.fromTime(),
               transitLeg.toTime()
             );
+
             if (detailed) {
               buf.duration(leg.duration());
               buf.c1(leg.c1());
             }
+
             if (transitLeg.getConstrainedTransferAfterLeg() != null) {
               constraintPrevLeg = transitLeg
                 .getConstrainedTransferAfterLeg()
@@ -224,15 +230,18 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
           // Access and Egress
           else if (leg.isEgressLeg()) {
             var egress = leg.asEgressLeg().egress();
+
             if (!egress.isFree()) {
               buf.accessEgress(egress);
               addWalkDetails(detailed, buf, leg);
             }
           }
         }
+
         prevToTime = leg.toTime();
       }
     }
+
     // Add summary info
     buf.summary(startTime, endTime, numberOfTransfers, c1, c2, appendToSummary);
 

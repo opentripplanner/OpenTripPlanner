@@ -67,6 +67,7 @@ public class TimeAndCostPenaltyForEnum<E extends Enum<E>> implements Serializabl
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
@@ -107,6 +108,7 @@ public class TimeAndCostPenaltyForEnum<E extends Enum<E>> implements Serializabl
     for (Map.Entry<F, TimeAndCostPenalty> e : sortedEntryList) {
       builder.addObj(e.getKey().name(), e.getValue());
     }
+
     return builder.toString();
   }
 
@@ -123,11 +125,13 @@ public class TimeAndCostPenaltyForEnum<E extends Enum<E>> implements Serializabl
 
     public Builder<E> with(E key, TimeAndCostPenalty value) {
       Objects.requireNonNull(key);
+
       if (value == null || value.isEmpty()) {
         values.remove(key);
       } else {
         values.put(key, value);
       }
+
       return this;
     }
 
@@ -135,6 +139,7 @@ public class TimeAndCostPenaltyForEnum<E extends Enum<E>> implements Serializabl
       for (Map.Entry<E, TimeAndCostPenalty> e : values.entrySet()) {
         with(e.getKey(), e.getValue());
       }
+
       return this;
     }
 

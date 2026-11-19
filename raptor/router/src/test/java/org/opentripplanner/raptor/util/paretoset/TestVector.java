@@ -49,9 +49,11 @@ class TestVector {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     TestVector v = (TestVector) o;
     return v1 == v.v1 && v2 == v.v2 && v3 == v.v3 && v4 == v.v4 && name.equals(v.name);
   }
@@ -61,12 +63,15 @@ class TestVector {
     if (v2 == NOT_SET) {
       return "%s[%d]".formatted(name, v1);
     }
+
     if (v3 == NOT_SET) {
       return "%s[%d, %d]".formatted(name, v1, v2);
     }
+
     if (v4 == NOT_SET) {
       return "%s[%d, %d, %d]".formatted(name, v1, v2, v3);
     }
+
     return "%s[%d, %d, %d, %d]".formatted(name, v1, v2, v3, v4);
   }
 }

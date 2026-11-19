@@ -14,14 +14,14 @@ import org.opentripplanner.utils.time.ServiceDateUtils;
 /**
  * Value object representing a service date range from a starting date until an end date.
  * <p>
- * Internally the range is always stored as [startInclusive, endExclusive). Use the factory
- * methods {@link #ofInclusiveEnd(LocalDate, LocalDate)} and
- * {@link #ofExclusiveEnd(LocalDate, LocalDate)} to construct instances according to the need, but
- * preferable use the exclusive end version unless the inclusivity comes from the input data.
- * {@link #toString()} output mirrors the convention used at construction time.
+ * Internally the range is always stored as [startInclusive, endExclusive). Use the factory methods
+ * {@link #ofInclusiveEnd(LocalDate, LocalDate)} and {@link #ofExclusiveEnd(LocalDate, LocalDate)}
+ * to construct instances according to the need, but preferable use the exclusive end version unless
+ * the inclusivity comes from the input data. {@link #toString()} output mirrors the convention used
+ * at construction time.
  * <p>
- * {@code null} is accepted in all factory method parameters and is treated as unbounded
- * (equivalent to {@link LocalDate#MIN} / {@link LocalDate#MAX}).
+ * {@code null} is accepted in all factory method parameters and is treated as unbounded (equivalent
+ * to {@link LocalDate#MIN} / {@link LocalDate#MAX}).
  */
 public final class LocalDateRange {
 
@@ -39,6 +39,7 @@ public final class LocalDateRange {
   private LocalDateRange(LocalDate inclusiveStart, LocalDate exclusiveEnd) {
     this.inclusiveStart = inclusiveStart;
     this.exclusiveEnd = exclusiveEnd;
+
     if (exclusiveEnd.isBefore(inclusiveStart)) {
       throw new IllegalArgumentException(
         "Invalid range, the end is before the start: start=" +
@@ -53,16 +54,18 @@ public final class LocalDateRange {
    * Create an range with an inclusive start and an inclusive end.
    *
    * @param start inclusive start, or {@code null} for unbounded start
-   * @param end   inclusive end, or {@code null} for unbounded end
+   * @param end inclusive end, or {@code null} for unbounded end
    */
   public static LocalDateRange ofInclusiveEnd(@Nullable LocalDate start, @Nullable LocalDate end) {
     var startInclusive = start == null ? MIN : start;
     var endInclusive = end == null ? MAX : end;
+
     if (endInclusive.isBefore(startInclusive)) {
       throw new IllegalArgumentException(
         "Invalid range, the end " + end + " is before the start " + start
       );
     }
+
     var endExclusive = endInclusive.equals(MAX) ? MAX : endInclusive.plusDays(1);
     return new LocalDateRange(startInclusive, endExclusive);
   }
@@ -71,7 +74,7 @@ public final class LocalDateRange {
    * Create a range with an inclusive start and an exclusive end.
    *
    * @param start inclusive start, or {@code null} for unbounded start
-   * @param end   exclusive end (first date outside the range), or {@code null} for unbounded end
+   * @param end exclusive end (first date outside the range), or {@code null} for unbounded end
    */
   public static LocalDateRange ofExclusiveEnd(@Nullable LocalDate start, @Nullable LocalDate end) {
     var startInclusive = start == null ? MIN : start;
@@ -147,9 +150,11 @@ public final class LocalDateRange {
   public LocalDateRange intersection(LocalDateRange other) {
     LocalDate newStart = ServiceDateUtils.max(inclusiveStart, other.inclusiveStart);
     LocalDate newEnd = ServiceDateUtils.min(exclusiveEnd, other.exclusiveEnd);
+
     if (!newStart.isBefore(newEnd)) {
       throw new IllegalArgumentException("ranges do not overlap: " + this + " and " + other);
     }
+
     return new LocalDateRange(newStart, newEnd);
   }
 
@@ -163,11 +168,11 @@ public final class LocalDateRange {
    * the two do not overlap an empty list is returned.
    *
    * @param defaultInclusiveStart the start used when this range is unbounded (or wider) at the
-   *                              start
-   * @param defaultExclusiveEnd   the exclusive end used when this range is unbounded (or wider) at
-   *                              the end
+   *     start
+   * @param defaultExclusiveEnd the exclusive end used when this range is unbounded (or wider) at
+   *     the end
    * @throws IllegalArgumentException if the effective range spans more than
-   *                                  {@value #MAX_DAYS_AS_LOCAL_DATES} days
+   *     {@value #MAX_DAYS_AS_LOCAL_DATES} days
    */
   public List<LocalDate> asLocalDates(
     LocalDate defaultInclusiveStart,
@@ -181,6 +186,7 @@ public final class LocalDateRange {
     }
 
     long days = ChronoUnit.DAYS.between(effectiveInclusiveStart, effectiveExclusiveEnd);
+
     if (days > MAX_DAYS_AS_LOCAL_DATES) {
       throw new IllegalArgumentException(
         "The date range [" +
@@ -196,6 +202,7 @@ public final class LocalDateRange {
     }
 
     List<LocalDate> dates = new ArrayList<>((int) days);
+
     for (
       LocalDate date = effectiveInclusiveStart;
       date.isBefore(effectiveExclusiveEnd);
@@ -203,6 +210,7 @@ public final class LocalDateRange {
     ) {
       dates.add(date);
     }
+
     return dates;
   }
 
@@ -223,9 +231,11 @@ public final class LocalDateRange {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     LocalDateRange that = (LocalDateRange) o;
     return inclusiveStart.equals(that.inclusiveStart) && exclusiveEnd.equals(that.exclusiveEnd);
   }

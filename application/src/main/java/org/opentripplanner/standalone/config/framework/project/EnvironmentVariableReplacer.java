@@ -15,7 +15,6 @@ import org.opentripplanner.utils.text.TextVariablesSubstitution;
  * current system environment variable values.
  * <p>
  * The following OTP Project info is also available in addition to system environment variables:
- *
  * <ul>
  *   <li>{@code maven.version} - Full Maven version string, including the SNAPSHOT qualifier if
  *       present.</li>
@@ -60,9 +59,9 @@ public class EnvironmentVariableReplacer {
    * environment variable.
    *
    * @param source is used only to generate a human friendly error message in case the text contains
-   *               a placeholder which cannot be found.
+   *     a placeholder which cannot be found.
    * @throws IllegalArgumentException if a placeholder exists in the {@code text}, but the
-   *                                  environment variable does not exist.
+   *     environment variable does not exist.
    */
   public static String insertEnvironmentVariables(String text, String source) {
     return insertVariables(text, source, EnvironmentVariableReplacer::getEnvVarOrProjectInfo);
@@ -85,9 +84,11 @@ public class EnvironmentVariableReplacer {
   @Nullable
   private static String getEnvVarOrProjectInfo(String key) {
     String value = System.getenv(key);
+
     if (value == null) {
       return PROJECT_INFO.get(key);
     }
+
     return value;
   }
 

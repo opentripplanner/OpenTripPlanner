@@ -83,7 +83,8 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
     var r2 = findTripPatternForDate(tripPattern2.patternIndex(), combinedTripPatterns);
     var r3 = findTripPatternForDate(tripPattern3.patternIndex(), combinedTripPatterns);
 
-    // Check the number of trip schedules available for each pattern after combining dates in the search range
+    // Check the number of trip schedules available for each pattern after combining dates in the
+    // search range
     assertEquals(2, r1.numberOfTripSchedules());
     assertEquals(2, r2.numberOfTripSchedules());
     assertEquals(3, r3.numberOfTripSchedules());
@@ -122,6 +123,7 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
     );
     var tripPattern = createTripPattern(TP_ID_1);
     Map<LocalDate, List<TripPatternForDate>> tripPatternsRunningOnDate = new HashMap<>();
+
     for (var i = -5; i <= 5; ++i) {
       var tripPatternForDate = new TripPatternForDate(
         tripPattern,
@@ -129,6 +131,7 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
         List.of(),
         date.minusDays(i)
       );
+
       for (var runningDate : tripPatternForDate.getRunningPeriodDates()) {
         tripPatternsRunningOnDate.putIfAbsent(runningDate, new ArrayList<>());
         tripPatternsRunningOnDate.get(runningDate).add(tripPatternForDate);
@@ -153,10 +156,12 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
     );
     TripPatternForDates resultPattern = result.getFirst();
     var iterator = resultPattern.tripPatternForDatesIndexIterator(true);
+
     for (var item : expectedDates) {
       assertTrue(iterator.hasNext());
       assertEquals(item, resultPattern.tripPatternForDate(iterator.next()).getServiceDate());
     }
+
     assertFalse(iterator.hasNext());
   }
 

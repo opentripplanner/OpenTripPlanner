@@ -100,6 +100,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
         );
       }
     );
+
     if (transitService == null) {
       transitService = new DefaultTransitService(
         transitRepository,
@@ -108,6 +109,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     } else {
       transitAlertService.getAllAlerts().clear();
     }
+
     if (alertsUpdateHandler == null) {
       transitAlertService = new TransitAlertServiceImpl();
       alertsUpdateHandler = new SiriAlertsUpdateHandler(
@@ -321,14 +323,17 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
     boolean foundStartPointStopCondition = false;
     boolean foundDestinationStopCondition = false;
+
     for (EntitySelector entity : transitAlert.entities()) {
       if (((EntitySelector.Stop) entity).stopConditions().contains(StopCondition.START_POINT)) {
         foundStartPointStopCondition = true;
       }
+
       if (((EntitySelector.Stop) entity).stopConditions().contains(StopCondition.DESTINATION)) {
         foundDestinationStopCondition = true;
       }
     }
+
     assertTrue(
       foundStartPointStopCondition,
       "Alert does not contain default condition START_POINT"
@@ -349,10 +354,12 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
     foundStartPointStopCondition = false;
     foundDestinationStopCondition = false;
+
     for (EntitySelector entity : transitAlert.entities()) {
       if (((EntitySelector.Stop) entity).stopConditions().contains(StopCondition.START_POINT)) {
         foundStartPointStopCondition = true;
       }
+
       if (((EntitySelector.Stop) entity).stopConditions().contains(StopCondition.DESTINATION)) {
         foundDestinationStopCondition = true;
       }
@@ -404,7 +411,8 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
     assertEquals(situationNumber, transitAlert.getId().getId());
 
-    // Effective validity should be calculated based on the actual departures when Operating dat/service date is provided
+    // Effective validity should be calculated based on the actual departures when Operating
+    // dat/service date is provided
     final ZonedDateTime effectiveStartDate = ZonedDateTime.ofInstant(
       transitAlert.getEffectiveStartDate(),
       startTime.getZone()
@@ -462,7 +470,8 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
     assertEquals(situationNumber, transitAlert.getId().getId());
 
-    // Effective validity should be calculated based on the actual departures when Operating dat/service date is provided
+    // Effective validity should be calculated based on the actual departures when Operating
+    // dat/service date is provided
     final ZonedDateTime effectiveStartDate = ZonedDateTime.ofInstant(
       transitAlert.getEffectiveStartDate(),
       startTime.getZone()
@@ -629,7 +638,8 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertTrue(matchesEntity(transitAlert, lineRef));
     assertEquals(situationNumber, transitAlert.getId().getId());
 
-    // Effective validity should be calculated based on the actual departures when Operating dat/service date is provided
+    // Effective validity should be calculated based on the actual departures when Operating
+    // dat/service date is provided
     final ZonedDateTime effectiveStartDate = ZonedDateTime.ofInstant(
       transitAlert.getEffectiveStartDate(),
       startTime.getZone()
@@ -826,7 +836,8 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     alertsUpdateHandler.update(outbound, realTimeUpdateContext);
     alertsUpdateHandler.update(inbound, realTimeUpdateContext);
 
-    // Line and stop-alerts should result in several TransitAlerts. One for each routeId/stop combination
+    // Line and stop-alerts should result in several TransitAlerts. One for each routeId/stop
+    // combination
     var feedRouteId = new FeedScopedId(FEED_ID, routeId);
     var feedStop_0_id = new FeedScopedId(FEED_ID, stopId0);
     var feedStop_1_id = new FeedScopedId(FEED_ID, stopId1);
@@ -1006,6 +1017,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     PtSituationElement element = new PtSituationElement();
     element.setCreationTime(ZonedDateTime.now());
     element.setProgress(WorkflowStatusEnumeration.OPEN);
+
     if (startTime != null || endTime != null) {
       HalfOpenTimestampOutputRangeStructure period = new HalfOpenTimestampOutputRangeStructure();
 
@@ -1016,6 +1028,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
       if (endTime != null) {
         period.setEndTime(endTime);
       }
+
       element.getValidityPeriods().add(period);
     }
 
@@ -1071,6 +1084,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
   private boolean matchesEntity(TransitAlert transitAlert, FeedScopedId feedScopedEntityId) {
     boolean foundMatch = false;
+
     for (EntitySelector entity : transitAlert.entities()) {
       if (!foundMatch) {
         if (entity instanceof EntitySelector.Stop entitySelector) {
@@ -1082,6 +1096,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
         }
       }
     }
+
     return foundMatch;
   }
 
@@ -1171,11 +1186,13 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     FramedVehicleJourneyRefStructure framedVehicleJourneyRef =
       new FramedVehicleJourneyRefStructure();
     framedVehicleJourneyRef.setDatedVehicleJourneyRef(datedVehicleJourney);
+
     if (dataFrameValue != null) {
       DataFrameRefStructure dataFrameRef = new DataFrameRefStructure();
       dataFrameRef.setValue(dataFrameValue);
       framedVehicleJourneyRef.setDataFrameRef(dataFrameRef);
     }
+
     affectedVehicleJourney.setFramedVehicleJourneyRef(framedVehicleJourneyRef);
 
     if (stopIds.length > 0) {
@@ -1193,6 +1210,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
   private AffectedRouteStructure.StopPoints createAffectedStopPoints(String... stopIds) {
     AffectedRouteStructure.StopPoints stopPoints = new AffectedRouteStructure.StopPoints();
+
     for (String stopId : stopIds) {
       AffectedStopPointStructure affectedStopPoint = new AffectedStopPointStructure();
       StopPointRefStructure stopPointRef = new StopPointRefStructure();
@@ -1200,6 +1218,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
       affectedStopPoint.setStopPointRef(stopPointRef);
       stopPoints.getAffectedStopPointsAndLinkProjectionToNextStopPoints().add(affectedStopPoint);
     }
+
     return stopPoints;
   }
 
@@ -1272,6 +1291,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     @Nullable LocalDate serviceDate
   ) {
     boolean foundMatch = false;
+
     for (EntitySelector entity : transitAlert.entities()) {
       if (!foundMatch) {
         if (entity.key() instanceof EntityKey.StopAndRoute stopAndRoute) {
@@ -1283,6 +1303,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
         }
       }
     }
+
     return foundMatch;
   }
 
@@ -1387,8 +1408,10 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
     networks.getAffectedNetworks().add(affectedNetwork);
     affects.setNetworks(networks);
+
     if (stopIds.length > 0) {
       AffectsScopeStructure.StopPoints stopPoints = new AffectsScopeStructure.StopPoints();
+
       for (String stopId : stopIds) {
         AffectedStopPointStructure affectedStopPoint = new AffectedStopPointStructure();
         StopPointRefStructure stopPointRef = new StopPointRefStructure();
@@ -1396,6 +1419,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
         affectedStopPoint.setStopPointRef(stopPointRef);
         stopPoints.getAffectedStopPoints().add(affectedStopPoint);
       }
+
       affects.setStopPoints(stopPoints);
     }
 
@@ -1457,8 +1481,10 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
     networks.getAffectedNetworks().add(affectedNetwork);
     affects.setNetworks(networks);
+
     if (stopIds.length > 0) {
       AffectsScopeStructure.StopPlaces stopPlaces = new AffectsScopeStructure.StopPlaces();
+
       for (String stopId : stopIds) {
         AffectedStopPlaceStructure affectedStopPlaceStructure = new AffectedStopPlaceStructure();
         StopPlaceRef stopPlaceRef = new StopPlaceRef();
@@ -1466,6 +1492,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
         affectedStopPlaceStructure.setStopPlaceRef(stopPlaceRef);
         stopPlaces.getAffectedStopPlaces().add(affectedStopPlaceStructure);
       }
+
       affects.setStopPlaces(stopPlaces);
     }
 

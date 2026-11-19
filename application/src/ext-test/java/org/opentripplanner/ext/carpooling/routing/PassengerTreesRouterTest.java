@@ -21,8 +21,8 @@ import org.opentripplanner.street.model.vertex.Vertex;
  * <pre>
  *   beforeStart — · — a0 — · — passenger — · — a1 — · — afterEnd
  * </pre>
- * A search checks its limit when it starts down a street, so a limit cuts the road only at
- * an intersection.
+ * A search checks its limit when it starts down a street, so a limit cuts the road only at an
+ * intersection.
  */
 class PassengerTreesRouterTest extends GraphRoutingTest {
 
@@ -44,14 +44,17 @@ class PassengerTreesRouterTest extends GraphRoutingTest {
         @Override
         public void build() {
           var road = new ArrayList<IntersectionVertex>();
+
           for (int i = 0; i <= 8; i++) {
             road.add(intersection("v" + i, ORIGIN.moveEastMeters(i * 1_800)));
           }
+
           for (int i = 0; i < 8; i++) {
             // 1.8 km at 10 m/s: three minutes.
             street(road.get(i), road.get(i + 1), 1_800, StreetTraversalPermission.ALL, 10);
             street(road.get(i + 1), road.get(i), 1_800, StreetTraversalPermission.ALL, 10);
           }
+
           beforeStart = road.get(0);
           a0 = road.get(2);
           passenger = road.get(4);

@@ -40,6 +40,7 @@ public class ElevatorIdTest {
 
     var edges = ImmutableList.copyOf(graph.findEdges(ElevatorHopEdge.class));
     assertThat(edges).hasSize(2);
+
     for (var edge : edges) {
       assertThat(edge.id()).hasValue("12345");
     }
@@ -69,6 +70,7 @@ public class ElevatorIdTest {
 
     var edges = ImmutableList.copyOf(graph.findEdges(ElevatorHopEdge.class));
     assertThat(edges).hasSize(2);
+
     for (var edge : edges) {
       assertThat(edge.id()).hasValue("12345");
     }
@@ -98,6 +100,7 @@ public class ElevatorIdTest {
 
     var edges = ImmutableList.copyOf(graph.findEdges(ElevatorHopEdge.class));
     assertThat(edges).hasSize(2);
+
     for (var edge : edges) {
       assertThat(edge.id()).isEmpty();
     }

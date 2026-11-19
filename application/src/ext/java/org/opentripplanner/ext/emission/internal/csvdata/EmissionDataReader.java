@@ -42,6 +42,7 @@ public class EmissionDataReader {
       LOG.info("The {} does not contain any {} file.", catalog.detailedInfo(), EMISSION_FILE_NAME);
       return;
     }
+
     read(emissionDataSource, resolvedFeedId);
   }
 

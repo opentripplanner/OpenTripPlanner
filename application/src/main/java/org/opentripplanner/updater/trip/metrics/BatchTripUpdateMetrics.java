@@ -49,6 +49,7 @@ public class BatchTripUpdateMetrics extends TripUpdateMetrics {
   private void setFailureTypes(UpdateResult result) {
     for (var errorType : result.failures().keySet()) {
       var counter = failuresByType.get(errorType);
+
       if (Objects.isNull(counter)) {
         counter = getGauge(
           "failure_type",
@@ -57,6 +58,7 @@ public class BatchTripUpdateMetrics extends TripUpdateMetrics {
         );
         failuresByType.put(errorType, counter);
       }
+
       counter.set(result.failures().get(errorType).size());
     }
 

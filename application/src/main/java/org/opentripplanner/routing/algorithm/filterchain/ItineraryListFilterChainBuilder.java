@@ -116,8 +116,8 @@ public class ItineraryListFilterChainBuilder {
    * The maximum number of itineraries returned. This will remove all itineraries at the end of the
    * list AFTER the final sort of the itineraries.
    * <p>
-   * Se also the {@link #withMaxNumberOfItinerariesCropSection(ListSection)} to change which end
-   * of the list is cropped.
+   * Se also the {@link #withMaxNumberOfItinerariesCropSection(ListSection)} to change which end of
+   * the list is cropped.
    * <p>
    * Use {@code -1} to disable.
    */
@@ -158,9 +158,9 @@ public class ItineraryListFilterChainBuilder {
    * with a high relative cost. The limit is applied to itineraries with at least one transit leg.
    * Street-only itineraries are not considered.
    * <p>
-   * For all pairs {code (i1, i2)} in the set of returned itineraries, a generalized cost limit
-   * is computed. If the generalized-cost of i1 is less then the generalized-cost of i2, i2 is
-   * dropped if:
+   * For all pairs {code (i1, i2)} in the set of returned itineraries, a generalized cost limit is
+   * computed. If the generalized-cost of i1 is less then the generalized-cost of i2, i2 is dropped
+   * if:
    * <pre>
    * t0 := is the time between i1 and i2.
    *
@@ -170,7 +170,7 @@ public class ItineraryListFilterChainBuilder {
    * </pre>
    *
    * @param transitGeneralizedCostFilterParams container for costFactor, minimumCostDifference and
-   *                                           itineraryIntervalRelaxFactor
+   *     itineraryIntervalRelaxFactor
    */
   public ItineraryListFilterChainBuilder withTransitGeneralizedCostLimit(
     TransitGeneralizedCostFilterParams transitGeneralizedCostFilterParams
@@ -268,6 +268,7 @@ public class ItineraryListFilterChainBuilder {
     if (earliestDepartureTime != null) {
       Objects.requireNonNull(searchWindow);
     }
+
     this.earliestDepartureTime = earliestDepartureTime;
     this.searchWindow = searchWindow;
     return this;
@@ -660,9 +661,11 @@ public class ItineraryListFilterChainBuilder {
       List<SingleCriteriaComparator> comparators = new ArrayList<>();
       comparators.add(SingleCriteriaComparator.compareGeneralizedCost());
       comparators.add(SingleCriteriaComparator.compareNumTransfers());
+
       if (transitGroupPriorityUsed) {
         comparators.add(SingleCriteriaComparator.compareTransitGroupsPriority());
       }
+
       return new McMaxLimitFilter(filterName, maxLimit, comparators);
     }
     // Default is to just use a "hard" max limit

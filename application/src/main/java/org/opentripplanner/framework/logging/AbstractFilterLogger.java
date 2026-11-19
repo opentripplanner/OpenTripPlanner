@@ -17,14 +17,12 @@ import org.slf4j.Marker;
  * <ul>
  *   <li>{@link MaxCountLogger} - Log N events, then mute. This is suitable for data import.</li>
  * </ul>
- *
  * <p>
- * This class wrap the original logger and forward some log events, based on the implementation
- * of the {@link #mute()} method.
- * <p>
+ * This class wrap the original logger and forward some log events, based on the implementation of
+ * the {@link #mute()} method.
  *
  * @deprecated This hide the actual logger in the log, the AbstractFilterLogger becomes thelogger -
- *             this make it difficult to find the log statement in the code when investigating.
+ *     this make it difficult to find the log statement in the code when investigating.
  */
 @Deprecated
 public abstract class AbstractFilterLogger implements Logger {
@@ -170,6 +168,7 @@ public abstract class AbstractFilterLogger implements Logger {
     if (mute()) {
       return;
     }
+
     delegate.info(msg);
   }
 
@@ -178,6 +177,7 @@ public abstract class AbstractFilterLogger implements Logger {
     if (mute()) {
       return;
     }
+
     delegate.info(format, arg);
   }
 
@@ -186,6 +186,7 @@ public abstract class AbstractFilterLogger implements Logger {
     if (mute()) {
       return;
     }
+
     delegate.info(format, arg1, arg2);
   }
 
@@ -194,6 +195,7 @@ public abstract class AbstractFilterLogger implements Logger {
     if (mute()) {
       return;
     }
+
     delegate.info(format, arguments);
   }
 
@@ -202,6 +204,7 @@ public abstract class AbstractFilterLogger implements Logger {
     if (mute()) {
       return;
     }
+
     delegate.info(msg, t);
   }
 
@@ -215,6 +218,7 @@ public abstract class AbstractFilterLogger implements Logger {
     if (mute()) {
       return;
     }
+
     delegate.info(marker, msg);
   }
 
@@ -223,6 +227,7 @@ public abstract class AbstractFilterLogger implements Logger {
     if (mute()) {
       return;
     }
+
     delegate.info(marker, format, arg);
   }
 
@@ -231,6 +236,7 @@ public abstract class AbstractFilterLogger implements Logger {
     if (mute()) {
       return;
     }
+
     delegate.info(marker, format, arg1, arg2);
   }
 
@@ -239,6 +245,7 @@ public abstract class AbstractFilterLogger implements Logger {
     if (mute()) {
       return;
     }
+
     delegate.info(marker, format, arguments);
   }
 
@@ -247,6 +254,7 @@ public abstract class AbstractFilterLogger implements Logger {
     if (mute()) {
       return;
     }
+
     delegate.info(marker, msg, t);
   }
 
@@ -260,6 +268,7 @@ public abstract class AbstractFilterLogger implements Logger {
     if (mute()) {
       return;
     }
+
     delegate.warn(msg);
   }
 
@@ -268,6 +277,7 @@ public abstract class AbstractFilterLogger implements Logger {
     if (mute()) {
       return;
     }
+
     delegate.warn(format, arg);
   }
 
@@ -276,6 +286,7 @@ public abstract class AbstractFilterLogger implements Logger {
     if (mute()) {
       return;
     }
+
     delegate.warn(format, arguments);
   }
 
@@ -284,6 +295,7 @@ public abstract class AbstractFilterLogger implements Logger {
     if (mute()) {
       return;
     }
+
     delegate.warn(format, arg1, arg2);
   }
 
@@ -292,6 +304,7 @@ public abstract class AbstractFilterLogger implements Logger {
     if (mute()) {
       return;
     }
+
     delegate.warn(msg, t);
   }
 
@@ -305,6 +318,7 @@ public abstract class AbstractFilterLogger implements Logger {
     if (mute()) {
       return;
     }
+
     delegate.warn(marker, msg);
   }
 
@@ -313,6 +327,7 @@ public abstract class AbstractFilterLogger implements Logger {
     if (mute()) {
       return;
     }
+
     delegate.warn(marker, format, arg);
   }
 
@@ -321,6 +336,7 @@ public abstract class AbstractFilterLogger implements Logger {
     if (mute()) {
       return;
     }
+
     delegate.warn(marker, format, arg1, arg2);
   }
 
@@ -329,6 +345,7 @@ public abstract class AbstractFilterLogger implements Logger {
     if (mute()) {
       return;
     }
+
     delegate.warn(marker, format, arguments);
   }
 
@@ -337,6 +354,7 @@ public abstract class AbstractFilterLogger implements Logger {
     if (mute()) {
       return;
     }
+
     delegate.warn(marker, msg, t);
   }
 
@@ -350,6 +368,7 @@ public abstract class AbstractFilterLogger implements Logger {
     if (mute()) {
       return;
     }
+
     delegate.error(msg);
   }
 
@@ -358,6 +377,7 @@ public abstract class AbstractFilterLogger implements Logger {
     if (mute()) {
       return;
     }
+
     delegate.error(format, arg);
   }
 
@@ -366,6 +386,7 @@ public abstract class AbstractFilterLogger implements Logger {
     if (mute()) {
       return;
     }
+
     delegate.error(format, arg1, arg2);
   }
 
@@ -374,6 +395,7 @@ public abstract class AbstractFilterLogger implements Logger {
     if (mute()) {
       return;
     }
+
     delegate.error(format, arguments);
   }
 
@@ -382,6 +404,7 @@ public abstract class AbstractFilterLogger implements Logger {
     if (mute()) {
       return;
     }
+
     delegate.error(msg, t);
   }
 
@@ -395,6 +418,7 @@ public abstract class AbstractFilterLogger implements Logger {
     if (mute()) {
       return;
     }
+
     delegate.error(marker, msg);
   }
 
@@ -403,6 +427,7 @@ public abstract class AbstractFilterLogger implements Logger {
     if (mute()) {
       return;
     }
+
     delegate.error(marker, format, arg);
   }
 
@@ -411,6 +436,7 @@ public abstract class AbstractFilterLogger implements Logger {
     if (mute()) {
       return;
     }
+
     delegate.error(marker, format, arg1, arg2);
   }
 
@@ -419,6 +445,7 @@ public abstract class AbstractFilterLogger implements Logger {
     if (mute()) {
       return;
     }
+
     delegate.error(marker, format, arguments);
   }
 
@@ -427,6 +454,7 @@ public abstract class AbstractFilterLogger implements Logger {
     if (mute()) {
       return;
     }
+
     delegate.error(marker, msg, t);
   }
 

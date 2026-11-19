@@ -14,7 +14,6 @@ import org.opentripplanner.street.graph.summary.GraphSummarizer;
 /**
  * Tests that stair connections at two diagonally opposite ring corners produce a surviving diagonal
  * visibility edge via the SPT pruning step.
- *
  * <p>
  * Both corners are {@code isStartingNode} (shared with a stair way), so they enter
  * {@code visibilityVertices} and {@code startingVertices}. The diagonal visibility edge between

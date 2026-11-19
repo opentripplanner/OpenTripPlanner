@@ -30,17 +30,20 @@ public class GraphCoherencyCheckerModule implements GraphBuilderModule {
   public void buildGraph() {
     boolean coherent = true;
     LOG.info("checking graph coherency...");
+
     for (Vertex v : graph.getVertices()) {
       if (v.getOutgoing().isEmpty() && v.getIncoming().isEmpty()) {
         // This is ok for island transit stops etc. Log so that the type can be checked
         issueStore.add("VertexWithoutEdges", "vertex %s has no edges", v);
       }
+
       for (Edge e : v.getOutgoing()) {
         if (e.getFromVertex() != v) {
           issueStore.add("InvalidEdge", "outgoing edge of %s: from vertex %s does not match", v, e);
           coherent = false;
         }
       }
+
       for (Edge e : v.getIncoming()) {
         if (e.getToVertex() != v) {
           issueStore.add("InvalidEdge", "incoming edge of %s: to vertex %s does not match", v, e);
@@ -48,6 +51,7 @@ public class GraphCoherencyCheckerModule implements GraphBuilderModule {
         }
       }
     }
+
     LOG.info("edge lists and from/to members are {}coherent.", coherent ? "" : "not ");
   }
 }

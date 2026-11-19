@@ -55,6 +55,7 @@ class GbfsVehicleStatusMapper {
           )
         );
       }).orElse(null);
+
       // if the propulsion type has an engine current_range_meters is required
       if (
         vehicle.getVehicleTypeId() != null &&
@@ -90,12 +91,15 @@ class GbfsVehicleStatusMapper {
 
   private I18NString getName(GBFSVehicle vehicle) {
     var typeId = vehicle.getVehicleTypeId();
+
     if (typeId != null) {
       var type = vehicleTypes.get(typeId);
+
       if (type != null && type.name() != null) {
         return type.name();
       }
     }
+
     return RentalVehicleType.getDefaultType(system.systemId()).name();
   }
 }

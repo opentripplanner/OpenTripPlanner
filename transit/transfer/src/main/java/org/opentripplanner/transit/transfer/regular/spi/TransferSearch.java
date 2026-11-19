@@ -7,20 +7,22 @@ import org.opentripplanner.transit.transfer.regular.api.maxduration.MaxDurations
 
 /**
  * The street search and re-costing of transfer paths under one set of user preferences, see
- * {@link TransferPathProvider#searchFor}. Creating a search is expensive compared to re-costing
- * one path with it, so a search should be reused for all paths under the same preferences.
+ * {@link TransferPathProvider#searchFor}. Creating a search is expensive compared to re-costing one
+ * path with it, so a search should be reused for all paths under the same preferences.
  * <p>
  * Implementations are immutable and thread-safe.
  *
- * @param <P> the street path type
+ * @param
+ *     <p>
+ *     the street path type
  */
 public interface TransferSearch<P> {
   /**
    * Discover candidate paths from {@code fromStop}, each paired with the {@link PathCriteria} it
    * was found under. There may be several candidates to the same stop.
    *
-   * @param maxDurations how far to search, the limit of the profile type. It bounds this
-   *                     discovery search only, see {@link #computePathCriteria}.
+   * @param maxDurations how far to search, the limit of the profile type. It bounds this discovery
+   *     search only, see {@link #computePathCriteria}.
    */
   Collection<TransferPath<P>> findNearbyStops(
     FeedScopedId fromStop,

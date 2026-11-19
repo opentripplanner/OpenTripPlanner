@@ -29,10 +29,12 @@ class WhitelistedModesFilterHelperTest {
     var resolved = EstimatedCallHelper.getWhitelistedModes(raw);
 
     assertNotNull(resolved);
+
     // All remaining should be TransitMode enum values
     for (var mode : resolved) {
       assertEquals(TransitMode.class, mode.getClass());
     }
+
     // Only one single "unknown" value dropped
     assertEquals(raw.size() - 1, resolved.size());
   }

@@ -21,12 +21,15 @@ public class FlexTransferIndex extends TransferIndex {
     if (indexed) {
       throw new IllegalStateException("Transfer index is already initialized");
     }
+
     super.index(transferRepository);
+
     // Flex transfers should only use WALK mode transfers.
     for (PathTransfer transfer : transferRepository.findTransfersByMode(StreetMode.WALK)) {
       transfersToStop.put(transfer.to, transfer);
       transfersFromStop.put(transfer.from, transfer);
     }
+
     indexed = true;
   }
 

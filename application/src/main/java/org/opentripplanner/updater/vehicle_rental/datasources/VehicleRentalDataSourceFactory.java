@@ -17,10 +17,11 @@ public class VehicleRentalDataSourceFactory {
       // See: https://groups.google.com/g/opentripplanner-users/c/0P8UGBJG-zE/m/xaOZnL3OAgAJ
       // If you want to add your provider-specific updater, you can move them into a sandbox module
       // and become the point of contact for the community.
-      case GBFS -> new GbfsVehicleRentalDataSource(
-        (GbfsVehicleRentalDataSourceParameters) source,
-        otpHttpClientFactory
-      );
+      case GBFS
+        -> new GbfsVehicleRentalDataSource(
+          (GbfsVehicleRentalDataSourceParameters) source,
+          otpHttpClientFactory
+        );
     };
   }
 }

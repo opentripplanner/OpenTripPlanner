@@ -66,6 +66,7 @@ class FlexTemplateFactory {
         }
       }
     }
+
     return result;
   }
 
@@ -82,6 +83,7 @@ class FlexTemplateFactory {
         }
       }
     }
+
     return result;
   }
 
@@ -107,8 +109,8 @@ class FlexTemplateFactory {
    * <p>
    * In GTFS this is no longer allowed according to specification. But it was allowed earlier.
    * <p>
-   * This method simply returns {@code false}, but we keep it here for documentation. If
-   * requested, we can add code to be backward compatible with the old GTFS version here.
+   * This method simply returns {@code false}, but we keep it here for documentation. If requested,
+   * we can add code to be backward compatible with the old GTFS version here.
    */
   private boolean isBoardingAndAlightingAtSameStopPositionAllowed() {
     return false;

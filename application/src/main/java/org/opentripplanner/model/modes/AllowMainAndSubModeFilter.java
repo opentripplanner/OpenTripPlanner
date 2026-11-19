@@ -57,9 +57,11 @@ class AllowMainAndSubModeFilter implements AllowTransitModeFilter {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     AllowMainAndSubModeFilter that = (AllowMainAndSubModeFilter) o;
     return mainMode == that.mainMode && subMode.equals(that.subMode);
   }

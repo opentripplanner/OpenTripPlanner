@@ -26,21 +26,21 @@ import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 /**
  * A factory for creating matchers for TripOnServiceDates.
  * <p>
- * This factory is used to create matchers for {@link TripOnServiceDate} objects based on a
- * request. The resulting matcher can be used to filter a list of TripOnServiceDate objects.
+ * This factory is used to create matchers for {@link TripOnServiceDate} objects based on a request.
+ * The resulting matcher can be used to filter a list of TripOnServiceDate objects.
  */
 public class TripOnServiceDateMatcherFactory {
 
   /**
    * Creates a matcher for TripOnServiceDates.
    *
-   * @param request             the criteria for filtering TripOnServiceDates.
-   * @param patternResolver     resolves the pattern of a trip on a service date, or {@code null} if
-   *                            it has no pattern.
+   * @param request the criteria for filtering TripOnServiceDates.
+   * @param patternResolver resolves the pattern of a trip on a service date, or {@code null} if it
+   *     has no pattern.
    * @param runningTimeResolver resolves a trip's runtime according to its schedule, from the
-   *                            departure from the first stop to the arrival at the last stop.
-   *                            Returns {@code null} if the running time cannot be resolved, in
-   *                            which case the trip never matches a running time filter.
+   *     departure from the first stop to the arrival at the last stop. Returns {@code null} if the
+   *     running time cannot be resolved, in which case the trip never matches a running time
+   *     filter.
    * @return a matcher for filtering TripOnServiceDates.
    */
   public static Matcher<TripOnServiceDate> of(
@@ -66,11 +66,13 @@ public class TripOnServiceDateMatcherFactory {
       request.includeServiceDateRanges(),
       TripOnServiceDateMatcherFactory::serviceDateRange
     );
+
     if (!request.includeRunningTimePeriods().includeEverything()) {
       expr.matches(
         runningTimePeriods(request.includeRunningTimePeriods().get(), runningTimeResolver)
       );
     }
+
     expr.atLeastOneMatch(request.includeAgencies(), TripOnServiceDateMatcherFactory::agencyId);
     expr.atLeastOneMatch(request.includeRoutes(), TripOnServiceDateMatcherFactory::routeId);
     expr.atLeastOneMatch(request.includePatterns(), id -> patternId(id, patternResolver));
@@ -108,6 +110,7 @@ public class TripOnServiceDateMatcherFactory {
       selector.serviceDateRanges(),
       TripOnServiceDateMatcherFactory::serviceDateRange
     );
+
     if (!selector.runningTimePeriods().includeEverything()) {
       expr.matches(runningTimePeriods(selector.runningTimePeriods().get(), runningTimeResolver));
     }
@@ -189,14 +192,17 @@ public class TripOnServiceDateMatcherFactory {
   ) {
     return new GenericUnaryMatcher<>("runningTimePeriod", tripOnServiceDate -> {
       var runningTime = runningTimeResolver.apply(tripOnServiceDate);
+
       if (runningTime == null) {
         return false;
       }
+
       for (var period : periods) {
         if (period.overlaps(runningTime)) {
           return true;
         }
       }
+
       return false;
     });
   }

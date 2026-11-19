@@ -24,15 +24,15 @@ public interface RaptorAccessEgress {
    * instance of a given {@code type} type passed into Raptor. The first element matching the given
    * {@code type} in the chain of delegates (see {@link AbstractAccessEgressDecorator}) is returned.
    * <p>
-   * This method is primarily for use outside Raptor to get the base access-egress instant to
-   * access the EXTENDED state of the base type - state not part of the Raptor interface. This is
-   * useful in the caller to get access to additional information stored in the base type.
+   * This method is primarily for use outside Raptor to get the base access-egress instant to access
+   * the EXTENDED state of the base type - state not part of the Raptor interface. This is useful in
+   * the caller to get access to additional information stored in the base type.
    * <p>
    * Be careful, calling methods part of the {@link RaptorAccessEgress} interface on the returned
    * value will no longer be decorated - not be the value used by Raptor.
    *
    * @throws IllegalStateException if the given {@code parentType} does not exist in the chain of
-   *                               delegates including the first and last element.
+   *     delegates including the first and last element.
    */
   default <T extends RaptorAccessEgress> Optional<T> findOriginal(Class<T> type) {
     return AbstractAccessEgressDecorator.findType(this, type);
@@ -41,7 +41,8 @@ public interface RaptorAccessEgress {
   /**
    * <ul>
    *   <li>Access: The first stop in the journey, where the access path just arrived at.
-   *   <li>Egress: Last stop before destination, hence not the arrival point, but the departure stop.
+   *   <li>Egress: Last stop before destination, hence not the arrival point, but the departure
+   *       stop.
    * </ul>
    * The journey origin, destination and transit path board stop must be part of the context; hence
    * not a member attribute of this type.
@@ -84,16 +85,15 @@ public interface RaptorAccessEgress {
    * are optimal on time. In the case of park&ride the time-penalty enables Raptor to choose one of
    * the shortest access/egress paths over the longer ones.
    * <p>
-   * Another example is FLEX, where we in many use-cases want regular transit to win if there is
-   * a comparable offer. FLEX should be presented when there is no transit alternative, or when it
-   * is much better than the alternatives; the time-penalty sets how much better it must be. To
-   * achieve this, we must add an extra duration to the time of the FLEX access/egress. Adding only
-   * extra cost does not work: the FLEX would still be optimal on time and the transit optimal on
-   * cost, so both would be kept. The time-penalty makes the transit win on time as well, unless the
-   * FLEX is faster by more than the penalty. Keeping a large number of optimal access paths has a
-   * negative impact on performance as well.
+   * Another example is FLEX, where we in many use-cases want regular transit to win if there is a
+   * comparable offer. FLEX should be presented when there is no transit alternative, or when it is
+   * much better than the alternatives; the time-penalty sets how much better it must be. To achieve
+   * this, we must add an extra duration to the time of the FLEX access/egress. Adding only extra
+   * cost does not work: the FLEX would still be optimal on time and the transit optimal on cost, so
+   * both would be kept. The time-penalty makes the transit win on time as well, unless the FLEX is
+   * faster by more than the penalty. Keeping a large number of optimal access paths has a negative
+   * impact on performance as well.
    * <p>
-   *
    * The unit is seconds and the default value is {@link RaptorConstants#TIME_NOT_SET}.
    */
   default int timePenalty() {
@@ -123,8 +123,8 @@ public interface RaptorAccessEgress {
    * Returns the latest possible arrival time for the path. Used in DRT systems or bike shares where
    * they can have operation time limitations.
    * <p>
-   * Returns {@link RaptorConstants#TIME_NOT_SET} if transfer is not possible before the
-   * requested arrival time.
+   * Returns {@link RaptorConstants#TIME_NOT_SET} if transfer is not possible before the requested
+   * arrival time.
    */
   int latestArrivalTime(int requestedArrivalTime);
 
@@ -133,8 +133,8 @@ public interface RaptorAccessEgress {
    * via-locations. If so, Raptor needs to know how many via-locations are included so it can skip
    * these.
    * <p>
-   * If the access/egress {@code stop} is a via-location then this method should include it in
-   * the count.
+   * If the access/egress {@code stop} is a via-location then this method should include it in the
+   * count.
    * <p>
    * The default is zero via-lcations visited.
    */
@@ -178,14 +178,14 @@ public interface RaptorAccessEgress {
    * Return the opening hours in a short human-readable way for the departure at the origin. Do not
    * parse this. This should only be used for things like testing, debugging and logging.
    * <p>
-   * This method return {@code null} if there are no opening hours, see
-   * {@link #hasOpeningHours()}.
+   * This method return {@code null} if there are no opening hours, see {@link #hasOpeningHours()}.
    */
   @Nullable
   default String openingHoursToString() {
     if (!hasOpeningHours()) {
       return null;
     }
+
     // The earliest-departure-time(after 00:00) and latest-arrival-time(before edt+1d). This
     // assumes the access/egress is a continuous period without gaps withing 24 hours from the
     // opening. We ignore the access/egress duration. This is ok for test, debugging and logging.
@@ -195,6 +195,7 @@ public interface RaptorAccessEgress {
     if (edt == TIME_NOT_SET || lat == TIME_NOT_SET) {
       return "closed";
     }
+
     // Opening hours are specified for the departure, not arrival
     int ldt = lat - durationInSeconds();
     return "Open(" + TimeUtils.timeToStrCompact(edt) + " " + TimeUtils.timeToStrCompact(ldt) + ")";
@@ -202,7 +203,7 @@ public interface RaptorAccessEgress {
 
   /*
        ACCESS/TRANSFER/EGRESS PATH CONTAINING MULTIPLE LEGS
-  
+
        The methods below should be only overridden when a RaptorAccessEgress contains information
        about public services, which were generated outside the RAPTOR algorithm. Examples of such
        schemes include flexible transit service and TNC. They should not be used for regular
@@ -223,7 +224,6 @@ public interface RaptorAccessEgress {
    * instead.
    * <p>
    * Examples/guidelines:
-   * <p>
    * <pre>
    * Access/egress  | num-of-rides | Description
    *     walk       |      0       | Plain walking leg
@@ -306,30 +306,39 @@ public interface RaptorAccessEgress {
       // which would be more precise.
       buf.append("Walk");
     }
+
     if (durationInSeconds() != 0) {
       buf.append(' ').append(DurationUtils.durationToStr(durationInSeconds()));
     }
+
     if (includeCost && c1() > 0) {
       buf.append(' ').append(C1.format(c1()));
     }
+
     if (hasRides()) {
       buf.append(' ').append(RIDES.format(numberOfRides()));
     }
+
     if (numberOfViaLocationsVisited() > 0) {
       buf.append(' ').append(VIAS.format(numberOfViaLocationsVisited()));
     }
+
     if (hasTimePenalty()) {
       buf.append(' ').append(TIME_PENALTY.format(timePenalty()));
     }
+
     if (hasOpeningHours()) {
       buf.append(' ').append(openingHoursToString());
     }
+
     if (summary != null) {
       buf.append(' ').append(summary);
     }
+
     if (includeStop) {
       buf.append(" ~ ").append(stop());
     }
+
     return buf.toString();
   }
 }

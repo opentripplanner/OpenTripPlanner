@@ -51,9 +51,11 @@ final class AccessStopArrivalC2<T extends RaptorTripSchedule> extends AbstractSt
         "The arrival should not have been accepted if it does not have a legal arrival-time."
       );
     }
+
     if (newArrivalTime == arrivalTime()) {
       return this;
     }
+
     int newDepartureTime = newArrivalTime - access.durationInSeconds();
 
     return new AccessStopArrivalC2<>(newDepartureTime, access);

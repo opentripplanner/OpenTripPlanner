@@ -25,8 +25,7 @@ public class RoutingErrorsAttacher {
    *
    * @param originalItineraries The original result of the routing before the filter chain.
    * @param filteredItineraries The itineraries after being run through the filter chain so they
-   *                            have the {@link org.opentripplanner.model.SystemNotice}s to look up
-   *                            the error from.
+   *     have the {@link org.opentripplanner.model.SystemNotice}s to look up the error from.
    */
   public static List<RoutingError> computeErrors(
     List<Itinerary> originalItineraries,
@@ -56,6 +55,7 @@ public class RoutingErrorsAttacher {
           .systemNotices()
           .stream()
           .anyMatch(notice -> notice.tag().equals(RemoveTransitIfWalkingIsBetter.TAG));
+
       if (
         filteredItineraries
           .stream()
@@ -65,6 +65,7 @@ public class RoutingErrorsAttacher {
           .stream()
           .flatMap(Itinerary::streetLegs)
           .allMatch(StreetLeg::isWalkingLeg);
+
         if (nonTransitIsWalking) {
           routingErrors.add(new RoutingError(WALKING_BETTER_THAN_TRANSIT, null));
         }
@@ -76,6 +77,7 @@ public class RoutingErrorsAttacher {
         routingErrors.add(new RoutingError(NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW, DATE_TIME));
       }
     }
+
     return routingErrors;
   }
 }

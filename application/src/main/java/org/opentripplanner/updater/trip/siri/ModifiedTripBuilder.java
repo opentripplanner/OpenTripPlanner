@@ -131,6 +131,7 @@ class ModifiedTripBuilder {
     }
 
     StopPattern stopPattern;
+
     try {
       stopPattern = createStopPattern(pattern, calls, entityResolver);
     } catch (UpdateException e) {
@@ -151,6 +152,7 @@ class ModifiedTripBuilder {
           .map(entityResolver::resolveTripOnServiceDate)
           .filter(Objects::nonNull)
           .toList();
+
         for (var part : r.journeyParts()) {
           for (var trip : replacedByTripsOnServiceDate) {
             builder.withPartialReplacedBy(part.fromPos(), part.toPos(), trip);
@@ -165,6 +167,7 @@ class ModifiedTripBuilder {
 
     int numStopsInUpdate = builder.numberOfStops();
     int numStopsInPattern = pattern.numberOfStops();
+
     if (numStopsInUpdate != numStopsInPattern) {
       throw UpdateException.of(existingTripTimes.getTrip().getId(), TOO_FEW_STOPS);
     }
@@ -185,17 +188,22 @@ class ModifiedTripBuilder {
   ) {
     for (int i = 0; i < calls.size(); i++) {
       var call = calls.get(i);
+
       if (id.equals(call.getStopPointRef())) {
         if (time == null) {
           return Optional.of(i);
         }
+
         if (time.equals(call.getAimedArrivalTime()) || time.equals(call.getAimedDepartureTime())) {
-          // The spec is vague in how JourneyPartInfoStructure.startTime and endTime should be interpreted.
-          // If it is provided we require the call to match the aimed arrival time or aimed departure time.
+          // The spec is vague in how JourneyPartInfoStructure.startTime and endTime should be
+          // interpreted.
+          // If it is provided we require the call to match the aimed arrival time or aimed
+          // departure time.
           return Optional.of(i);
         }
       }
     }
+
     return Optional.empty();
   }
 
@@ -216,6 +224,7 @@ class ModifiedTripBuilder {
     Set<CallWrapper> alreadyVisited = new HashSet<>();
 
     List<StopLocation> stopsInPattern = pattern.getStops();
+
     for (int stopIndex = 0; stopIndex < stopsInPattern.size(); stopIndex++) {
       StopLocation stopInPattern = stopsInPattern.get(stopIndex);
       CallWrapper matchingCall = null;
@@ -224,8 +233,10 @@ class ModifiedTripBuilder {
         if (alreadyVisited.contains(call)) {
           continue;
         }
+
         //Current stop is being updated
         RegularStop stopPoint = entityResolver.resolveQuay(call.getStopPointRef());
+
         if (stopInPattern.equals(stopPoint) || stopInPattern.isPartOfSameStationAs(stopPoint)) {
           matchingCall = call;
           break;
@@ -270,11 +281,13 @@ class ModifiedTripBuilder {
     var builder = pattern.copyPlannedStopPattern();
 
     Set<CallWrapper> alreadyVisited = new HashSet<>();
+
     // modify updated stop-times
     for (int i = 0; i < numberOfStops; i++) {
       StopLocation stop = builder.stops.original(i);
 
       boolean matchFound = false;
+
       for (CallWrapper call : calls) {
         if (alreadyVisited.contains(call)) {
           continue;
@@ -282,6 +295,7 @@ class ModifiedTripBuilder {
 
         //Current stop is being updated
         var callStop = entityResolver.resolveQuay(call.getStopPointRef());
+
         if (callStop == null) {
           throw UpdateException.ofStopPosition(UNKNOWN_STOP, i);
         }
@@ -289,6 +303,7 @@ class ModifiedTripBuilder {
         if (!stop.equals(callStop) && !stop.isPartOfSameStationAs(callStop)) {
           continue;
         }
+
         matchFound = true;
 
         // Used in lambda
@@ -308,10 +323,12 @@ class ModifiedTripBuilder {
         alreadyVisited.add(call);
         break;
       }
+
       if (!matchFound) {
         throw UpdateException.ofStopPosition(STOP_MISMATCH, i);
       }
     }
+
     var newStopPattern = builder.build();
     return pattern.isModified() && pattern.getStopPattern().equals(newStopPattern)
       ? pattern.getStopPattern()

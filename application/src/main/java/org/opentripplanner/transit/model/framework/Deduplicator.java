@@ -59,11 +59,14 @@ public class Deduplicator implements DeduplicatorService, Serializable {
     if (original == null) {
       return null;
     }
+
     BitSet canonical = canonicalBitSets.get(original);
+
     if (canonical == null) {
       canonical = original;
       canonicalBitSets.put(canonical, canonical);
     }
+
     incrementEffectCounter(BitSet.class);
     return canonical;
   }
@@ -73,12 +76,15 @@ public class Deduplicator implements DeduplicatorService, Serializable {
     if (original == null) {
       return null;
     }
+
     IntArray intArray = new IntArray(original);
     IntArray canonical = canonicalIntArrays.get(intArray);
+
     if (canonical == null) {
       canonical = intArray;
       canonicalIntArrays.put(canonical, canonical);
     }
+
     incrementEffectCounter(IntArray.class);
     return canonical.array;
   }
@@ -89,6 +95,7 @@ public class Deduplicator implements DeduplicatorService, Serializable {
     if (original == null) {
       return null;
     }
+
     String canonical = canonicalStrings.putIfAbsent(original, original);
     incrementEffectCounter(String.class);
     return canonical == null ? original : canonical;
@@ -99,11 +106,14 @@ public class Deduplicator implements DeduplicatorService, Serializable {
     if (original == null) {
       return null;
     }
+
     StringArray canonical = canonicalStringArrays.get(new StringArray(original));
+
     if (canonical == null) {
       canonical = StringArray.deepDeduplicateOf(original, this);
       canonicalStringArrays.put(canonical, canonical);
     }
+
     incrementEffectCounter(StringArray.class);
     return canonical.array;
   }
@@ -113,11 +123,14 @@ public class Deduplicator implements DeduplicatorService, Serializable {
     if (original == null) {
       return null;
     }
+
     String2DArray canonical = canonicalString2DArrays.get(new String2DArray(original));
+
     if (canonical == null) {
       canonical = String2DArray.deepDeduplicateOf(original, this);
       canonicalString2DArrays.put(canonical, canonical);
     }
+
     incrementEffectCounter(String2DArray.class);
     return canonical.array;
   }
@@ -129,9 +142,11 @@ public class Deduplicator implements DeduplicatorService, Serializable {
     if (String.class == cl) {
       throw new IllegalArgumentException("Use #deduplicateString() instead.");
     }
+
     if (original == null) {
       return null;
     }
+
     Map<T, T> objects = (Map<T, T>) canonicalObjects.computeIfAbsent(cl, c -> new HashMap<T, T>());
     T canonical = objects.putIfAbsent(original, original);
     incrementEffectCounter(objCounterName(cl));
@@ -143,7 +158,9 @@ public class Deduplicator implements DeduplicatorService, Serializable {
     if (original == null) {
       return null;
     }
+
     Map<ObjArray<T>, ObjArray<T>> map;
+
     if (canonicalObjArrays.containsKey(type)) {
       //noinspection unchecked
       map = (Map<ObjArray<T>, ObjArray<T>>) canonicalObjArrays.get(type);
@@ -151,12 +168,14 @@ public class Deduplicator implements DeduplicatorService, Serializable {
       map = new HashMap<>();
       canonicalObjArrays.put(type, map);
     }
+
     ObjArray<T> canonical = map.get(new ObjArray<>(original));
 
     if (canonical == null) {
       canonical = ObjArray.deepDeduplicateOf(type, original, this);
       map.put(canonical, canonical);
     }
+
     incrementEffectCounter(arrayCounterName(type));
     return canonical.array();
   }
@@ -174,6 +193,7 @@ public class Deduplicator implements DeduplicatorService, Serializable {
 
     @SuppressWarnings("unchecked")
     List<T> canonical = (List<T>) canonicalLists.get(original);
+
     if (canonical == null) {
       // The list may contain nulls, hence the use of the old unmodifiable wrapper
       boolean containsNull = original.stream().anyMatch(Objects::isNull);
@@ -278,6 +298,7 @@ public class Deduplicator implements DeduplicatorService, Serializable {
       if (other instanceof IntArray that) {
         return Arrays.equals(array, that.array);
       }
+
       return false;
     }
   }
@@ -293,9 +314,11 @@ public class Deduplicator implements DeduplicatorService, Serializable {
       Deduplicator deduplicator
     ) {
       E[] copy = Arrays.copyOf(array, array.length);
+
       for (int i = 0; i < array.length; i++) {
         copy[i] = deduplicator.deduplicateObject(type, array[i]);
       }
+
       return new ObjArray<>(copy);
     }
 
@@ -309,6 +332,7 @@ public class Deduplicator implements DeduplicatorService, Serializable {
       if (other instanceof ObjArray that) {
         return Arrays.deepEquals(array, that.array);
       }
+
       return false;
     }
   }
@@ -317,9 +341,11 @@ public class Deduplicator implements DeduplicatorService, Serializable {
   private record StringArray(String[] array) implements Serializable {
     private static StringArray deepDeduplicateOf(String[] array, Deduplicator deduplicator) {
       String[] copy = new String[array.length];
+
       for (int i = 0; i < array.length; i++) {
         copy[i] = deduplicator.deduplicateString(array[i]);
       }
+
       return new StringArray(copy);
     }
 
@@ -335,6 +361,7 @@ public class Deduplicator implements DeduplicatorService, Serializable {
       if (other instanceof StringArray that) {
         return Arrays.equals(array, that.array);
       }
+
       return false;
     }
   }
@@ -343,9 +370,11 @@ public class Deduplicator implements DeduplicatorService, Serializable {
   private record String2DArray(String[][] array) implements Serializable {
     private static String2DArray deepDeduplicateOf(String[][] array, Deduplicator deduplicator) {
       var copy = new String[array.length][];
+
       for (int i = 0; i < array.length; i++) {
         copy[i] = deduplicator.deduplicateStringArray(array[i]);
       }
+
       return new String2DArray(copy);
     }
 
@@ -359,6 +388,7 @@ public class Deduplicator implements DeduplicatorService, Serializable {
       if (other instanceof String2DArray that) {
         return Arrays.deepEquals(array, that.array);
       }
+
       return false;
     }
   }

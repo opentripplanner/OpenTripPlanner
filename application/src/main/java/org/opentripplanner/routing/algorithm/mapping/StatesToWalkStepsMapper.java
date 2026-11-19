@@ -80,7 +80,7 @@ public class StatesToWalkStepsMapper {
    * Converts a list of street edges to a list of turn-by-turn directions.
    *
    * @param previousStep the last walking step of a non-transit leg that immediately precedes this
-   *                     one or null, if first leg
+   *     one or null, if first leg
    */
   public StatesToWalkStepsMapper(
     List<State> states,
@@ -102,6 +102,7 @@ public class StatesToWalkStepsMapper {
     for (int i = 0; i < states.size() - 1; i++) {
       processState(states.get(i), states.get(i + 1));
     }
+
     if (states.getLast().getVertex() instanceof StationEntranceVertex stationEntranceVertex) {
       createAndSaveStationEntranceWalkStep(
         states.get(states.size() - 2),
@@ -118,10 +119,13 @@ public class StatesToWalkStepsMapper {
       // Avoid null reference exceptions with pathways which don't have names
       return null;
     }
+
     int idx = streetName.indexOf('(');
+
     if (idx > 0) {
       return streetName.substring(0, idx - 1);
     }
+
     return streetName;
   }
 
@@ -141,13 +145,17 @@ public class StatesToWalkStepsMapper {
 
   private static double getAbsoluteAngleDiff(double thisAngle, double lastAngle) {
     double angleDiff = thisAngle - lastAngle;
+
     if (angleDiff < 0) {
       angleDiff += Math.PI * 2;
     }
+
     double ccwAngleDiff = Math.PI * 2 - angleDiff;
+
     if (ccwAngleDiff < angleDiff) {
       angleDiff = ccwAngleDiff;
     }
+
     return angleDiff;
   }
 
@@ -163,13 +171,17 @@ public class StatesToWalkStepsMapper {
     if (!(edge instanceof StreetEdge elevEdge)) {
       return ElevationProfile.empty();
     }
+
     if (elevEdge.getElevationProfile() == null) {
       return ElevationProfile.empty();
     }
+
     var out = ElevationProfile.of();
+
     for (Coordinate coordinate : elevEdge.getElevationProfile().toCoordinateArray()) {
       out.step(coordinate.x + distanceOffset, coordinate.y + heightOffset);
     }
+
     return out.build();
   }
 
@@ -177,6 +189,7 @@ public class StatesToWalkStepsMapper {
     Edge edge = forwardState.getBackEdge();
 
     boolean createdNewStep = false;
+
     if (edge instanceof FreeEdge) {
       return;
     } else if (edge instanceof StreetTransitEntranceLink link) {
@@ -189,7 +202,9 @@ public class StatesToWalkStepsMapper {
     if (forwardState.getBackMode() == null) {
       return;
     }
+
     Geometry geom = edge.getGeometry();
+
     if (geom == null) {
       return;
     }
@@ -243,9 +258,11 @@ public class StatesToWalkStepsMapper {
       if (roundaboutExit > 0) {
         // ordinal numbers from
         current.withExit(Integer.toString(roundaboutExit));
+
         if (streetNameNoParens.equals(roundaboutPreviousStreet)) {
           current.withStayOn(true);
         }
+
         roundaboutExit = 0;
       }
 
@@ -269,6 +286,7 @@ public class StatesToWalkStepsMapper {
         current.withDirection(direction);
         current.withAbsoluteDirection(thisAngle);
       }
+
       // new step, set distance to length of first edge
       distance = edge.getDistanceMeters();
     } else {
@@ -279,6 +297,7 @@ public class StatesToWalkStepsMapper {
         thisAngle,
         edge.isRoundabout()
       );
+
       if (edge.isRoundabout()) {
         // we are on a roundabout, and have already traversed at least one edge of it.
         if (multipleTurnOptionsInPreviousState(backState)) {
@@ -307,11 +326,13 @@ public class StatesToWalkStepsMapper {
     if (createdNewStep && !modeTransition) {
       // check last three steps for zag
       int lastIndex = steps.size() - 1;
+
       if (lastIndex >= 2) {
         WalkStepBuilder threeBack = steps.get(lastIndex - 2);
         WalkStepBuilder twoBack = steps.get(lastIndex - 1);
         WalkStepBuilder lastStep = steps.get(lastIndex);
         boolean isOnSameStreet = isOnSameStreet(lastStep, twoBack, threeBack);
+
         if (twoBack.distance() < MAX_ZAG_DISTANCE && isOnSameStreet && canZagBeRemoved(twoBack)) {
           if (isUTurn(twoBack, lastStep)) {
             steps.remove(lastIndex - 1);
@@ -328,6 +349,7 @@ public class StatesToWalkStepsMapper {
       if (!createdNewStep && current.elevationProfile() != null) {
         updateElevationProfile(backState, edge);
       }
+
       distance += edge.getDistanceMeters();
     }
 
@@ -348,10 +370,8 @@ public class StatesToWalkStepsMapper {
   /**
    * Determines whether a set of three consecutive instances of {@link WalkStepBuilder} refer to the
    * same street. The purposes of this check are (i) to give a separate instruction when crossing to
-   * the other
-   * side of the same street, if a crosswalk namer is in use (an instruction can be given
-   * to cross
-   * at a particular location because others may not be accessible, practical, etc.), and
+   * the other side of the same street, if a crosswalk namer is in use (an instruction can be given
+   * to cross at a particular location because others may not be accessible, practical, etc.), and
    * (ii) to remove trivial turns when a given street briefly merges with another.
    *
    * @return true if the walk steps refer to the same street, false otherwise.
@@ -364,6 +384,7 @@ public class StatesToWalkStepsMapper {
     String lastStepName = lastStep.directionTextNoParens();
     String twoBackStepName = twoBack.directionTextNoParens();
     String threeBackStepName = threeBack.directionTextNoParens();
+
     if (lastStepName == null || twoBackStepName == null || threeBackStepName == null) {
       return false;
     }
@@ -413,6 +434,7 @@ public class StatesToWalkStepsMapper {
     current = threeBack;
     current.addDistance(twoBack.distance());
     distance += current.distance();
+
     if (twoBack.elevationProfile() != null) {
       if (current.elevationProfile() == null) {
         current.addElevation(twoBack.elevationProfile());
@@ -458,10 +480,12 @@ public class StatesToWalkStepsMapper {
   private void setMotorwayExit(State backState) {
     State exitState = backState;
     Edge exitEdge = exitState.getBackEdge();
+
     while (exitEdge instanceof FreeEdge) {
       exitState = exitState.getBackState();
       exitEdge = exitState.getBackEdge();
     }
+
     if (exitState.getVertex() instanceof ExitVertex) {
       current.withExit(((ExitVertex) exitState.getVertex()).getExitName());
     }
@@ -479,6 +503,7 @@ public class StatesToWalkStepsMapper {
     if (edge instanceof StreetEdge) {
       // the next edges will be PlainStreetEdges, we hope
       double angleDiff = getAbsoluteAngleDiff(thisAngle, lastAngle);
+
       for (StreetEdge alternative : backState.getVertex().getOutgoingStreetEdges()) {
         if (isTurnToOtherStreet(streetName, angleDiff, alternative)) {
           return true;
@@ -489,6 +514,7 @@ public class StatesToWalkStepsMapper {
       // FIXME: this code might be wrong with the removal of the edge-based graph
       State twoStatesBack = backState.getBackState();
       Vertex backVertex = twoStatesBack.getVertex();
+
       for (StreetEdge alternative : backVertex.getOutgoingStreetEdges()) {
         for (StreetEdge innerAlternative : alternative.getToVertex().getOutgoingStreetEdges()) {
           if (isTurnToOtherStreet(streetName, angleDiff, innerAlternative)) {
@@ -497,6 +523,7 @@ public class StatesToWalkStepsMapper {
         }
       }
     }
+
     return false;
   }
 
@@ -526,22 +553,29 @@ public class StatesToWalkStepsMapper {
   private static boolean multipleTurnOptionsInPreviousState(State state) {
     boolean foundAlternatePaths = false;
     TraverseMode requestedMode = state.currentMode();
+
     for (Edge out : state.getBackState().getVertex().getOutgoing()) {
       if (out == state.backEdge) {
         continue;
       }
+
       if (!(out instanceof StreetEdge)) {
         continue;
       }
+
       var outStates = out.traverse(state.getBackState());
+
       if (State.isEmpty(outStates)) {
         continue;
       }
+
       var outState = outStates[0];
+
       if (!outState.getBackMode().equals(requestedMode)) {
         //walking a bike, so, not really an exit
         continue;
       }
+
       // this section handles the case of an option which is only an option if you walk your
       // bike. It is complicated because you will not need to walk your bike until one
       // edge after the current edge.
@@ -549,17 +583,21 @@ public class StatesToWalkStepsMapper {
       //now, from here, try a continuing path.
       Vertex tov = outState.getVertex();
       boolean found = false;
+
       for (Edge out2 : tov.getOutgoing()) {
         var outStates2 = out2.traverse(outState);
+
         if (
           !State.isEmpty(outStates2) && !Objects.equals(outStates2[0].getBackMode(), requestedMode)
         ) {
           // walking a bike, so, not really an exit
           continue;
         }
+
         found = true;
         break;
       }
+
       if (!found) {
         continue;
       }
@@ -568,6 +606,7 @@ public class StatesToWalkStepsMapper {
       foundAlternatePaths = true;
       break;
     }
+
     return foundAlternatePaths;
   }
 
@@ -576,12 +615,14 @@ public class StatesToWalkStepsMapper {
 
     Edge edge = forwardState.getBackEdge();
     double thisAngle = DirectionUtils.getFirstAngle(edge.getGeometry());
+
     if (previous == null) {
       current.withAbsoluteDirection(thisAngle);
       current.withRelativeDirection(RelativeDirection.DEPART);
     } else {
       current.withDirections(previous.getAngle(), thisAngle, false);
     }
+
     // new step, set distance to length of first edge
     distance = edge.getDistanceMeters();
     steps.add(current);

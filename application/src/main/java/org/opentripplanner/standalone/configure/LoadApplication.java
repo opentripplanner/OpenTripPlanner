@@ -108,6 +108,7 @@ public class LoadApplication {
     if (!dataStoreLoaded) {
       throw new IllegalStateException("Validate graphBuilderDataSources before using it");
     }
+
     return factory.graphBuilderDataSources();
   }
 

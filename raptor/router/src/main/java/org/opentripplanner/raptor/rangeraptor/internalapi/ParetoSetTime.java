@@ -2,9 +2,9 @@ package org.opentripplanner.raptor.rangeraptor.internalapi;
 
 /**
  * The time criteria used in the pareto-function. This describes which time values the search
- * compares, nothing else. How the time criteria are combined with the other criteria and the
- * search direction is described in {@code DestinationArrivalParetoSetComparators} and in the
- * "Destination pareto-set" section of {@code org/opentripplanner/raptor/package.md}.
+ * compares, nothing else. How the time criteria are combined with the other criteria and the search
+ * direction is described in {@code DestinationArrivalParetoSetComparators} and in the "Destination
+ * pareto-set" section of {@code org/opentripplanner/raptor/package.md}.
  */
 public enum ParetoSetTime {
   /**

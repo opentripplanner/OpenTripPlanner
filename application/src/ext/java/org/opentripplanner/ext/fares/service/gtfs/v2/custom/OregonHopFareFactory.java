@@ -352,7 +352,8 @@ public class OregonHopFareFactory extends GtfsFareServiceFactory {
         .build()
     );
 
-    // The C-TRAN Data fails to include unlimited free transfers. This corrects the data. TODO: is this correct?
+    // The C-TRAN Data fails to include unlimited free transfers. This corrects the data. TODO: is
+    // this correct?
     this.fareTransferRules.add(
       defaultTransfer()
         .withId(ctranId("EXP_TO_LOCAL_UNLIMITED"))

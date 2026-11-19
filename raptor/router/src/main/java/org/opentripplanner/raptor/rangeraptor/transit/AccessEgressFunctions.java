@@ -22,7 +22,6 @@ import org.slf4j.LoggerFactory;
  * <p>
  * The class also contains the ParetoSet comparator to filter Standard Raptor(not multi-criteria)
  * access and egress.
- * <p>
  */
 public final class AccessEgressFunctions {
 
@@ -35,8 +34,9 @@ public final class AccessEgressFunctions {
    *   <li>time duration is lower</li>
    *   <li>number of rides is lower</li>
    *   <li>number of via locations is higher</li>
-   *   <li>reached the stop on-board, and not on foot. This is optimal because arriving on foot limits
-   *       your options, you are not allowed to continue on foot and transfer(walk) to a nearby stop.</li>
+   *   <li>reached the stop on-board, and not on foot. This is optimal because arriving on foot
+   *       limits your options, you are not allowed to continue on foot and transfer(walk) to a
+   *       nearby stop.</li>
    *   <li>No opening hours is better than being restricted</li>
    *   <li>If both have opening hours, both need to be accepted</li>
    * </ol>
@@ -77,6 +77,7 @@ public final class AccessEgressFunctions {
     Collection<RaptorAccessEgress> paths
   ) {
     var result = removeNonOptimalPaths(paths, MC_COMPARATOR);
+
     if (LOG.isDebugEnabled() && result.size() < paths.size()) {
       var duplicates = new ArrayList<>(paths);
       duplicates.removeAll(result);
@@ -91,6 +92,7 @@ public final class AccessEgressFunctions {
           duplicates.stream().map(Objects::toString).collect(Collectors.joining("\n\t"))
       );
     }
+
     return result;
   }
 
@@ -117,19 +119,24 @@ public final class AccessEgressFunctions {
     int segment
   ) {
     IntObjectMap<List<T>> result = new IntObjectHashMap<>();
+
     for (var cursor : map.keys()) {
       int nRides = cursor.value;
+
       for (var it : map.get(nRides)) {
         if (it != null && it.numberOfViaLocationsVisited() == segment) {
           var list = result.get(nRides);
+
           if (list == null) {
             list = new ArrayList<>();
             result.put(nRides, list);
           }
+
           list.add(it);
         }
       }
     }
+
     return result;
   }
 
@@ -160,6 +167,7 @@ public final class AccessEgressFunctions {
       set.addAll(list);
       result.addAll(set);
     }
+
     return result;
   }
 
@@ -170,6 +178,7 @@ public final class AccessEgressFunctions {
     if (!map.containsKey(key)) {
       map.put(key, new ArrayList<>());
     }
+
     return map.get(key);
   }
 
@@ -182,6 +191,7 @@ public final class AccessEgressFunctions {
     for (RaptorAccessEgress it : input) {
       getOrCreate(groupBy.applyAsInt(it), mapByRound).add(it);
     }
+
     return mapByRound;
   }
 }

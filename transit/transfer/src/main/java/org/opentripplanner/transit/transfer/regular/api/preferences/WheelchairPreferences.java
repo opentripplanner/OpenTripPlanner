@@ -7,9 +7,9 @@ import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfi
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * The preferences of the wheelchair transfers: speed and reluctance for a traveler in a
- * wheelchair. The values are normalized(rounded) so the class can used as a cache key. There is no
- * safety factor, the street search does not use it for a wheelchair.
+ * The preferences of the wheelchair transfers: speed and reluctance for a traveler in a wheelchair.
+ * The values are normalized(rounded) so the class can used as a cache key. There is no safety
+ * factor, the street search does not use it for a wheelchair.
  * <p>
  * See the configuration for documentation of each field.
  * <p>
@@ -67,9 +67,9 @@ public final class WheelchairPreferences
    * {@inheritDoc}
    * <p>
    * The distance is the sum of the reluctance and the speed, each weighted so a reference change
-   * counts {@link DistanceWeight#REFERENCE_DISTANCE}: 2.0 to 2.5 for the reluctance and 1.3 to
-   * 1.4 m/s for the speed. The distance is symmetric. There is no safety factor, the street
-   * search does not use it for a wheelchair.
+   * counts {@link DistanceWeight#REFERENCE_DISTANCE}: 2.0 to 2.5 for the reluctance and 1.3 to 1.4
+   * m/s for the speed. The distance is symmetric. There is no safety factor, the street search does
+   * not use it for a wheelchair.
    * <p>
    * The reluctance hardly matters (it only changes paths where there are elevators). The speed
    * matters more in the data, but the numbers are inflated: the street search can return a path
@@ -79,9 +79,11 @@ public final class WheelchairPreferences
   @Override
   public double normalizedDistance(AbstractUserPreferences other) {
     double distance = super.normalizedDistance(other);
+
     if (other instanceof WheelchairPreferences that) {
       distance += SPEED_WEIGHT * speed.normalizedDistance(that.speed);
     }
+
     return distance;
   }
 
@@ -90,6 +92,7 @@ public final class WheelchairPreferences
     if (!(obj instanceof WheelchairPreferences that)) {
       return false;
     }
+
     return super.equals(obj) && speed.equals(that.speed);
   }
 

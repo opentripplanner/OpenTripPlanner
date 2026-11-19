@@ -22,7 +22,7 @@ import org.opentripplanner.utils.time.DurationUtils;
  * <pre>
  * f(x) = 2h30m15s + 1.45 x
  *       |---   body    ---|
- *</pre>
+ * </pre>
  * <p>
  * The variable name can be one of `t`, `T`, `x` or `X`.
  * <p>
@@ -59,6 +59,7 @@ public class LinearFunctionSerialization {
     if (StringUtils.hasNoValue(text)) {
       return Optional.empty();
     }
+
     Matcher m = PATTERN.matcher(text);
 
     if (m.matches()) {
@@ -71,6 +72,7 @@ public class LinearFunctionSerialization {
 
       return Optional.of(factory.apply(constant, coefficient));
     }
+
     // No function matched
     throw new IllegalArgumentException("Unable to parse function: '" + text + "'");
   }
@@ -101,36 +103,41 @@ public class LinearFunctionSerialization {
 
   private static String coefficientToString(double coefficient, double[][] scale) {
     int decimals = 0;
+
     for (var row : scale) {
       if (coefficient < row[0]) {
         decimals = Math.max(0, BigDecimal.valueOf(row[1]).stripTrailingZeros().scale());
         break;
       }
     }
+
     var text = String.format(Locale.ROOT, "%." + decimals + "f", coefficient);
+
     if (decimals > 1) {
       int end = text.length();
+
       while (text.charAt(end - 1) == '0' && text.charAt(end - 2) != '.') {
         --end;
       }
+
       text = text.substring(0, end);
     }
+
     return text;
   }
 
   /**
    * Parse a String as a Duration. Unfortunately, to be backwards compatible we need to support
    * decimal numbers. If the text represents a decimal number, then the value is converted to
-   * seconds. <br/>
-   * The parsing function {@link DurationUtils#parseSecondsOrDuration(String)} cannot be used here
-   * since it supports only integer seconds, not decimal seconds.
-   *
+   * seconds. <br/> The parsing function {@link DurationUtils#parseSecondsOrDuration(String)} cannot
+   * be used here since it supports only integer seconds, not decimal seconds.
    */
   private static Duration parseDecimalSecondsOrDuration(String text) {
     try {
       if (DECIMAL_NUMBER_PATTERN.matcher(text).matches()) {
         return Duration.ofSeconds(IntUtils.round(Double.parseDouble(text)));
       }
+
       return DurationUtils.duration(text);
     } catch (DateTimeParseException e) {
       throw new IllegalArgumentException("Unable to parse duration: '" + text + "'");

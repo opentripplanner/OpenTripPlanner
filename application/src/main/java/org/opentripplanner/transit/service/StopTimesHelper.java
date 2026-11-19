@@ -46,13 +46,13 @@ public class StopTimesHelper {
    * <p>
    * TODO: Add frequency based trips
    *
-   * @param stop                         Stop object to perform the search for
-   * @param startTime                    Start time for the search.
-   * @param timeRange                    Searches forward for timeRange from startTime
+   * @param stop Stop object to perform the search for
+   * @param startTime Start time for the search.
+   * @param timeRange Searches forward for timeRange from startTime
    * @param numberOfDeparturesPerPattern Number of departures to fetch per pattern
-   * @param arrivalDeparture             Filter by arrivals, departures, or both
-   * @param includeCancelledTrips        If true, cancelled trips will also be included in result
-   * @param tripTimeOnDateMatcher        An optional matcher to filter out trip times
+   * @param arrivalDeparture Filter by arrivals, departures, or both
+   * @param includeCancelledTrips If true, cancelled trips will also be included in result
+   * @param tripTimeOnDateMatcher An optional matcher to filter out trip times
    */
   List<StopTimesInPattern> stopTimesForStop(
     StopLocation stop,
@@ -162,7 +162,7 @@ public class StopTimesHelper {
    * Get a list of all trips that pass through a stop during a single ServiceDate. Useful when
    * creating complete stop timetables for a single day.
    *
-   * @param stop        Stop object to perform the search for
+   * @param stop Stop object to perform the search for
    * @param serviceDate Return all departures for the specified date
    */
   List<StopTimesInPattern> stopTimesForStop(
@@ -183,27 +183,34 @@ public class StopTimesHelper {
       StopTimesInPattern stopTimes = new StopTimesInPattern(pattern);
       Timetable tt = transitService.findTimetable(pattern, serviceDate);
       List<StopLocation> stops = pattern.getStops();
+
       for (int i = 0; i < stops.size(); i++) {
         StopLocation currStop = stops.get(i);
+
         if (currStop == stop) {
           if (skipByPickUpDropOff(pattern, arrivalDeparture, i)) {
             continue;
           }
+
           if (skipByStopCancellation(pattern, includeCancellations, i)) {
             continue;
           }
+
           for (TripTimes<?> t : tt.getTripTimes()) {
             if (TripTimesHelper.skipByTripCancellationOrDeletion(t, includeCancellations)) {
               continue;
             }
+
             if (servicesRunning.contains(t.getServiceCode())) {
               stopTimes.times.add(new TripTimeOnDate(t, i, pattern, serviceDate, midnight));
             }
           }
         }
       }
+
       ret.add(stopTimes);
     }
+
     return ret;
   }
 
@@ -215,16 +222,15 @@ public class StopTimesHelper {
    * <p>
    * TODO: Add frequency based trips
    *
-   * @param stop                         Stop object to perform the search for
-   * @param pattern                      Pattern object to perform the search for
-   * @param startTime                    Start time for the search.
-   * @param timeRange                    Searches forward for timeRange from startTime
+   * @param stop Stop object to perform the search for
+   * @param pattern Pattern object to perform the search for
+   * @param startTime Start time for the search.
+   * @param timeRange Searches forward for timeRange from startTime
    * @param numberOfDeparturesPerPattern Number of departures to fetch per pattern
-   * @param arrivalDeparture             Filter by arrivals, departures, or both.
-   * @param includeCancellations         If the result should include those trip times where either
-   *                                     the entire trip or the stop at the given stop location has
-   *                                     been cancelled. Deleted trips are never returned no matter
-   *                                     the value of this parameter.
+   * @param arrivalDeparture Filter by arrivals, departures, or both.
+   * @param includeCancellations If the result should include those trip times where either the
+   *     entire trip or the stop at the given stop location has been cancelled. Deleted trips are
+   *     never returned no matter the value of this parameter.
    */
   List<TripTimeOnDate> stopTimesForPatternAtStop(
     StopLocation stop,
@@ -255,13 +261,17 @@ public class StopTimesHelper {
     Queue<TripTimeOnDate> pq
   ) {
     List<StopTimesInPattern> result = new ArrayList<>();
+
     if (!pq.isEmpty()) {
       StopTimesInPattern stopTimes = new StopTimesInPattern(pattern);
+
       while (!pq.isEmpty()) {
         stopTimes.times.add(0, pq.poll());
       }
+
       result.add(stopTimes);
     }
+
     return result;
   }
 
@@ -295,7 +305,8 @@ public class StopTimesHelper {
     int maxTripSpanDays = pattern.getScheduledTimetable().getMaxTripSpanDays();
 
     // The `maxTripSpanDays + 1` is used to "overselect" the running-dates to account for up to
-    // 24h delays. This had a performance overhead of ~25% (Bergen, Norway), so we check if there are delays
+    // 24h delays. This had a performance overhead of ~25% (Bergen, Norway), so we check if there
+    // are delays
     // in the loop below and remove the extra day if not.
     var runningDates = calculateRunningDates(startTime, timeRange, zoneId, maxTripSpanDays + 1);
     var firstDay = runningDates.getFirst();
@@ -319,12 +330,15 @@ public class StopTimesHelper {
       var servicesRunning = transitService.getServiceCodesRunningForDate(serviceDate);
 
       List<StopLocation> stops = pattern.getStops();
+
       for (int stopPos = 0; stopPos < stops.size(); stopPos++) {
         StopLocation currStop = stops.get(stopPos);
+
         if (currStop == stop) {
           if (skipByPickUpDropOff(pattern, arrivalDeparture, stopPos)) {
             continue;
           }
+
           if (skipByStopCancellation(pattern, includeCancellations, stopPos)) {
             continue;
           }
@@ -333,6 +347,7 @@ public class StopTimesHelper {
             if (!servicesRunning.contains(tripTimes.getServiceCode())) {
               continue;
             }
+
             if (TripTimesHelper.skipByTripCancellationOrDeletion(tripTimes, includeCancellations)) {
               continue;
             }
@@ -359,6 +374,7 @@ public class StopTimesHelper {
                 serviceDate,
                 serviceDateMidnight.toInstant()
               );
+
               if (tripTimeOnDateMatcher == null || tripTimeOnDateMatcher.match(tripTimeOnDate)) {
                 pq.add(tripTimeOnDate);
               }
@@ -368,6 +384,7 @@ public class StopTimesHelper {
         }
       }
     }
+
     return pq;
   }
 
@@ -382,12 +399,15 @@ public class StopTimesHelper {
     if (noPickup && noDropoff) {
       return true;
     }
+
     if (noPickup && arrivalDeparture == DEPARTURES) {
       return true;
     }
+
     if (noDropoff && arrivalDeparture == ARRIVALS) {
       return true;
     }
+
     return false;
   }
 

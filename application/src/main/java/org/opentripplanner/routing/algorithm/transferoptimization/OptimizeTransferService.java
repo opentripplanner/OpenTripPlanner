@@ -57,6 +57,7 @@ public class OptimizeTransferService<T extends RaptorTripSchedule> {
       LOG.debug("Optimized transfers done in {} ms.", System.currentTimeMillis() - start);
       PathDiff.logDiff("RAPTOR", paths, "OPT", results, false, false, LOG::debug);
     }
+
     return results;
   }
 
@@ -81,6 +82,7 @@ public class OptimizeTransferService<T extends RaptorTripSchedule> {
     if (path.numberOfTransfersExAccessEgress() == 0) {
       return List.of(new OptimizedPath<>(path));
     }
+
     try {
       return optimizePathDomainService.findBestTransitPath(path);
     } catch (RuntimeException e) {

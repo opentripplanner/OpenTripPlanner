@@ -21,6 +21,7 @@ public class BitSetUtilsTest {
       bflags = BitSetUtils.set(bflags, i, false);
       assertFalse(BitSetUtils.get(bflags, i));
     }
+
     for (int i = 0; i < 16; i++) {
       assertFalse(BitSetUtils.get(sflags, i));
       sflags = BitSetUtils.set(sflags, i, true);
@@ -28,6 +29,7 @@ public class BitSetUtilsTest {
       sflags = BitSetUtils.set(sflags, i, false);
       assertFalse(BitSetUtils.get(sflags, i));
     }
+
     for (int i = 0; i < 32; i++) {
       assertFalse(BitSetUtils.get(iflags, i));
       iflags = BitSetUtils.set(iflags, i, true);
@@ -35,6 +37,7 @@ public class BitSetUtilsTest {
       iflags = BitSetUtils.set(iflags, i, false);
       assertFalse(BitSetUtils.get(iflags, i));
     }
+
     for (int i = 0; i < 64; i++) {
       assertFalse(BitSetUtils.get(lflags, i));
       lflags = BitSetUtils.set(lflags, i, true);

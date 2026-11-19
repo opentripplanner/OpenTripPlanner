@@ -49,12 +49,12 @@ import org.slf4j.LoggerFactory;
  * input files should be used and validate the available input files against the command line
  * parameters set.
  * <p>
- * After this class is validated the {@link #has(FileType)} method can be used to determine if
- * the build process should include a file in the build.
+ * After this class is validated the {@link #has(FileType)} method can be used to determine if the
+ * build process should include a file in the build.
  * <p>
- * By separating this from the builder, this class can be constructed early, causing a validation
- * of the available data-sources against the configuration - and then if not valid - abort the
- * entire OTP startup early, before spending time on loading any data - like the streetGraph.
+ * By separating this from the builder, this class can be constructed early, causing a validation of
+ * the available data-sources against the configuration - and then if not valid - abort the entire
+ * OTP startup early, before spending time on loading any data - like the streetGraph.
  */
 @Singleton
 public class GraphBuilderDataSources implements Closeable {
@@ -235,7 +235,7 @@ public class GraphBuilderDataSources implements Closeable {
 
   /**
    * @return {@code true} if and only if the data source exist, proper command line parameters is
-   *         set and not disabled by the loaded configuration files.
+   *     set and not disabled by the loaded configuration files.
    */
   private boolean has(FileType type) {
     return inputData.containsKey(type);
@@ -247,6 +247,7 @@ public class GraphBuilderDataSources implements Closeable {
         return true;
       }
     }
+
     return false;
   }
 
@@ -344,6 +345,7 @@ public class GraphBuilderDataSources implements Closeable {
 
     // Sort data input files by type
     LOG.info("Existing files expected to be read or written:");
+
     for (FileType type : FileType.values()) {
       for (DataSource source : inputData.get(type)) {
         LOG.info(BULLET_POINT + "{}", source.detailedInfo());
@@ -352,6 +354,7 @@ public class GraphBuilderDataSources implements Closeable {
 
     if (!skipData.values().isEmpty()) {
       LOG.info("Files excluded due to command line switches or unknown type:");
+
       for (FileType type : FileType.values()) {
         for (DataSource source : skipData.get(type)) {
           LOG.info(BULLET_POINT + "{}", source.detailedInfo());
@@ -383,6 +386,7 @@ public class GraphBuilderDataSources implements Closeable {
           store.getStreetGraph().path()
         );
       }
+
       if (!hasTransitOrTaxiData()) {
         throw new OtpAppException("Unable to build transit graph, no transit data available.");
       }
@@ -395,6 +399,7 @@ public class GraphBuilderDataSources implements Closeable {
     } else if (cli.doSaveStreetGraph()) {
       return store.getStreetGraph();
     }
+
     return null;
   }
 

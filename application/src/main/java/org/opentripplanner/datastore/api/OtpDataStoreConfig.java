@@ -39,16 +39,14 @@ public interface OtpDataStoreConfig {
   /**
    * List of URIs to GTFS data files .
    * <p>
-   * This parameter is optional. If {@code null} GTFS files are loaded from
-   * {@code baseDirectory}.
+   * This parameter is optional. If {@code null} GTFS files are loaded from {@code baseDirectory}.
    */
   List<URI> gtfsFiles();
 
   /**
    * List of URIs to Netex data files.
    * <p>
-   * This parameter is optional. If {@code null} Netex files are loaded from
-   * {@code baseDirectory}.
+   * This parameter is optional. If {@code null} Netex files are loaded from {@code baseDirectory}.
    */
   List<URI> netexFiles();
 
@@ -86,7 +84,6 @@ public interface OtpDataStoreConfig {
   URI stopConsolidation();
 
   /**
-   *
    * A pattern to lookup local GTFS files
    */
   Pattern gtfsLocalFilePattern();

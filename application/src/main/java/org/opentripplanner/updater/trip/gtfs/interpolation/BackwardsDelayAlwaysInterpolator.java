@@ -12,10 +12,12 @@ class BackwardsDelayAlwaysInterpolator extends AbstractBackwardsDelayInterpolato
   @Override
   protected void fillInMissingTimes(RealTimeTripTimesBuilder builder, int firstUpdatedIndex) {
     var delay = builder.getArrivalDelay(firstUpdatedIndex);
+
     if (delay == null) {
       delay = Objects.requireNonNull(builder.getDepartureDelay(firstUpdatedIndex));
       builder.withArrivalDelay(firstUpdatedIndex, delay);
     }
+
     for (int i = firstUpdatedIndex - 1; i >= 0; i--) {
       builder.withDepartureDelay(i, delay);
       builder.withArrivalDelay(i, delay);

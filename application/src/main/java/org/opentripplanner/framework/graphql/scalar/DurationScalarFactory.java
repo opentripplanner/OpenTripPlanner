@@ -50,6 +50,7 @@ public class DurationScalarFactory {
       if (input instanceof StringValue) {
         return parseValue(((StringValue) input).getValue());
       }
+
       throw new CoercingParseValueException("Expected type 'Duration' but was '" + input + "'.");
     }
   }

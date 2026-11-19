@@ -32,11 +32,13 @@ class EndpointContextLineStringDistanceTest {
   ) {
     LineString geom = EndpointContextLineString.uncompact(ax, ay, bx, by, packed, reverse);
     Coordinate[] coords = new Coordinate[geom.getNumPoints()];
+
     for (int i = 0; i < coords.length; i++) {
       Coordinate c = (Coordinate) geom.getCoordinateN(i).clone();
       c.x *= xscale;
       coords[i] = c;
     }
+
     LineString transformed = GF.createLineString(coords);
     Point p = GF.createPoint(new Coordinate(px * xscale, py));
     return transformed.distance(p);
@@ -45,9 +47,11 @@ class EndpointContextLineStringDistanceTest {
   private static byte[] pack(double ax, double ay, double bx, double by, double... intermediate) {
     Coordinate[] full = new Coordinate[intermediate.length / 2 + 2];
     full[0] = new Coordinate(ax, ay);
+
     for (int i = 0; i < intermediate.length / 2; i++) {
       full[i + 1] = new Coordinate(intermediate[i * 2], intermediate[i * 2 + 1]);
     }
+
     full[full.length - 1] = new Coordinate(bx, by);
     LineString ls = GF.createLineString(full);
     return EndpointContextLineString.compact(ax, ay, bx, by, ls, false);

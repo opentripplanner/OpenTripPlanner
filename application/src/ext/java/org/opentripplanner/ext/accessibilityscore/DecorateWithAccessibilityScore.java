@@ -19,8 +19,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * accessible the itinerary is as a whole. This is not a very scientific method but just a rough
  * guidance that expresses certainty or uncertainty about the accessibility.
  * <p>
- * The intended audience for this score are frontend developers wanting to show a simple UI
- * rather than having to iterate over all the stops and trips.
+ * The intended audience for this score are frontend developers wanting to show a simple UI rather
+ * than having to iterate over all the stops and trips.
  * <p>
  * Note: the information to calculate this score are all available to the frontend, however
  * calculating them on the backend makes life a little easier and changes are automatically applied
@@ -51,9 +51,11 @@ public class DecorateWithAccessibilityScore implements ItineraryDecorator {
         return leg;
       }
     });
+
     if (i.isWalkOnly() || i.hasTransit()) {
       builder.withAccessibilityScore(compute(builder.legs()));
     }
+
     return builder.build();
   }
 
@@ -127,6 +129,7 @@ public class DecorateWithAccessibilityScore implements ItineraryDecorator {
       .filter(WheelchairTraversalInformation.class::isInstance)
       .map(WheelchairTraversalInformation.class::cast)
       .allMatch(WheelchairTraversalInformation::isWheelchairAccessible);
+
     if (allEdgesAreAccessible) {
       score += 0.5f;
     }

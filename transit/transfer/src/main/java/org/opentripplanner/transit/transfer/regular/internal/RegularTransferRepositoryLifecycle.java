@@ -21,8 +21,8 @@ import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
  * Copy-on-write / freeze lifecycle for the regular-transfer repository. Each transaction that
  * writes transfers gets a new repository continuing from the last published snapshot, see
  * {@link #copyOnWrite}, and {@link #freeze} publishes its paths in a new immutable snapshot. Every
- * snapshot is created by {@link #freeze}, including the initial one, from the repository created
- * by the build repository.
+ * snapshot is created by {@link #freeze}, including the initial one, from the repository created by
+ * the build repository.
  * <p>
  * Neither direction copies the paths generated at graph build, only the transfers replaced at
  * runtime, see {@link OverlaidTemplatePaths}. The cache of the Raptor transfers derived from the
@@ -37,7 +37,9 @@ import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
  * This class is only accessed on the writer thread, except the statistics of the cache. They are
  * shared by all snapshots, and are thread-safe.
  *
- * @param <P> the street path type
+ * @param
+ *     <p>
+ *     the street path type
  * @param <R> the request type
  */
 public class RegularTransferRepositoryLifecycle<
@@ -77,15 +79,12 @@ public class RegularTransferRepositoryLifecycle<
   }
 
   /**
-   * @param profiles               the configuration of the profiles the paths are stored under, the
-   *                               Raptor transfers are derived with the request of the profile
-   *                               closest to the request
-   * @param cacheMaxSize           the max number of Raptor transfers cached for other preferences
-   *                               than the ones of the profiles and the warmup entries, which are
-   *                               always cached
-   * @param collectCacheStatistics whether to count the requests that use each key of the cache,
-   *                               for the report of the cache, see
-   *                               {@link RegularTransferRepositorySnapshot#cacheReport}
+   * @param profiles the configuration of the profiles the paths are stored under, the Raptor
+   *     transfers are derived with the request of the profile closest to the request
+   * @param cacheMaxSize the max number of Raptor transfers cached for other preferences than the
+   *     ones of the profiles and the warmup entries, which are always cached
+   * @param collectCacheStatistics whether to count the requests that use each key of the cache, for
+   *     the report of the cache, see {@link RegularTransferRepositorySnapshot#cacheReport}
    */
   public RegularTransferRepositoryLifecycle(
     TransferPathProvider<P, R> pathProvider,
@@ -177,11 +176,13 @@ public class RegularTransferRepositoryLifecycle<
     ProfileUserPreferences.resolveAll(parameters, mapper).forEach((preferences, profile) ->
       result.add(new WarmupEntry(profile.id(), UserPreferenceSource.PROFILE, preferences))
     );
+
     for (var warmup : parameters.warmup()) {
       result.add(
         new WarmupEntry(warmup.id(), UserPreferenceSource.WARMUP, warmup.userPreferences())
       );
     }
+
     return List.copyOf(result);
   }
 
@@ -231,9 +232,11 @@ public class RegularTransferRepositoryLifecycle<
     AbstractUserPreferences<?> userPreferences
   ) {
     var profile = matcher.closestProfile(frozen.paths(), userPreferences);
+
     if (profile == null) {
       return Set.of();
     }
+
     return frozen.changedFromStops().getOrDefault(profile, Set.of());
   }
 }

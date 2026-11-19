@@ -115,6 +115,7 @@ public final class BestTimes {
       setBestTransitTime(stop, time);
       return true;
     }
+
     return false;
   }
 
@@ -126,6 +127,7 @@ public final class BestTimes {
       setTime(stop, time);
       return true;
     }
+
     return false;
   }
 

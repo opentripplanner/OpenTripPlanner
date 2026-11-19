@@ -17,11 +17,10 @@ import org.opentripplanner.transit.model.basic.TransitMode;
  * transit modes in separate parameters. So now this only contains one mode set rather than a
  * sequence of them.
  * <p>
- * This class and QualifiedMode are clearly somewhat inefficient and allow nonsensical
- * combinations like renting and parking a subway. They are not intended for use in routing. Rather,
- * they simply parse the language of mode specifications that may be given in the mode query
- * parameter. They are then converted into more efficient and useful representation in the routing
- * request.
+ * This class and QualifiedMode are clearly somewhat inefficient and allow nonsensical combinations
+ * like renting and parking a subway. They are not intended for use in routing. Rather, they simply
+ * parse the language of mode specifications that may be given in the mode query parameter. They are
+ * then converted into more efficient and useful representation in the routing request.
  */
 public class QualifiedModeSet implements Serializable {
 
@@ -160,10 +159,12 @@ public class QualifiedModeSet implements Serializable {
 
   public String toString() {
     StringBuilder sb = new StringBuilder();
+
     for (QualifiedMode qm : qModes) {
       sb.append(qm.toString());
       sb.append(" ");
     }
+
     return sb.toString();
   }
 
@@ -172,6 +173,7 @@ public class QualifiedModeSet implements Serializable {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     QualifiedModeSet that = (QualifiedModeSet) o;
     return Objects.equals(qModes, that.qModes);
   }

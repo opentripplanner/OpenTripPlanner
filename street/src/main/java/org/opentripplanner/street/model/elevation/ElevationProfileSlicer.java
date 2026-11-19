@@ -29,6 +29,7 @@ public final class ElevationProfileSlicer {
 
     Coordinate[] coordinateArray = elevationProfile.toCoordinateArray();
     double length = coordinateArray[coordinateArray.length - 1].x;
+
     if (end > length) {
       end = length;
     }
@@ -38,6 +39,7 @@ public final class ElevationProfileSlicer {
     boolean started = false;
     Coordinate lastCoord = null;
     List<Coordinate> coordList = new ArrayList<>();
+
     for (Coordinate coord : coordinateArray) {
       if (coord.x >= start && !started) {
         started = true;
@@ -68,6 +70,7 @@ public final class ElevationProfileSlicer {
           double newY = lastCoord.y + p * rise;
           coordList.add(new Coordinate(newLength, newY));
         }
+
         break;
       }
 

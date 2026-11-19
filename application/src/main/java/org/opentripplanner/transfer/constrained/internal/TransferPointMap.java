@@ -68,6 +68,7 @@ class TransferPointMap<E> {
       var sp = point.asStationTransferPoint();
       return stationMap.computeIfAbsent(sp.getStation(), k -> creator.get());
     }
+
     throw new IllegalArgumentException("Unknown TransferPoint type: " + point);
   }
 

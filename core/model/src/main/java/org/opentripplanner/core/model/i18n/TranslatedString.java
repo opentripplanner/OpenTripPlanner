@@ -49,6 +49,7 @@ public class TranslatedString implements I18NString, Serializable {
     for (int i = 0; i < translations.length - 1; i += 2) {
       map.put(translations[i], translations[i + 1]);
     }
+
     return getI18NString(map, false);
   }
 
@@ -57,14 +58,14 @@ public class TranslatedString implements I18NString, Serializable {
    * NonLocalizedString, otherwise a TranslatedString. The resulting I18NString is interned for
    * memory efficiency.
    * <p>
-   * This should be used when calling this method during graph building. This should not be
-   * called from a real-time updater as this is not thread-safe and may cause a memory leak.
+   * This should be used when calling this method during graph building. This should not be called
+   * from a real-time updater as this is not thread-safe and may cause a memory leak.
    *
-   * @param translations          A Map of languages and translations, a null language is the
-   *                              default translation
+   * @param translations A Map of languages and translations, a null language is the default
+   *     translation
    * @param forceTranslatedString Should the language information be kept, even when only a single
-   *                              translation is provided. This is useful when the language
-   *                              information is important or is presented to the user.
+   *     translation is provided. This is useful when the language information is important or is
+   *     presented to the user.
    */
   public static I18NString getDeduplicatedI18NString(
     Map<String, String> translations,
@@ -80,11 +81,11 @@ public class TranslatedString implements I18NString, Serializable {
    * This should be used from real-time updaters to avoid memory leaks. For graph building, use
    * {@link #getDeduplicatedI18NString(Map, boolean)} instead.
    *
-   * @param translations          A Map of languages and translations, a null language is the
-   *                              default translation
+   * @param translations A Map of languages and translations, a null language is the default
+   *     translation
    * @param forceTranslatedString Should the language information be kept, even when only a single
-   *                              translation is provided. This is useful when the language
-   *                              information is important or is presented to the user.
+   *     translation is provided. This is useful when the language information is important or is
+   *     presented to the user.
    */
   public static I18NString getI18NString(
     Map<String, String> translations,
@@ -97,15 +98,14 @@ public class TranslatedString implements I18NString, Serializable {
    * Gets an I18NString. If the translations only have a single value, return a NonLocalizedString,
    * otherwise a TranslatedString
    *
-   * @param translations          A Map of languages and translations, a null language is the
-   *                              default translation
-   * @param intern                Should the resulting I18NString be interned. This should be used
-   *                              when calling this method during graph building. This should not be
-   *                              called from a real-time updater as this is not thread-safe and may
-   *                              cause a memory leak.
+   * @param translations A Map of languages and translations, a null language is the default
+   *     translation
+   * @param intern Should the resulting I18NString be interned. This should be used when calling
+   *     this method during graph building. This should not be called from a real-time updater as
+   *     this is not thread-safe and may cause a memory leak.
    * @param forceTranslatedString Should the language information be kept, even when only a single
-   *                              translation is provided. This is useful when the language
-   *                              information is important or is presented to the user.
+   *     translation is provided. This is useful when the language information is important or is
+   *     presented to the user.
    */
   static I18NString getI18NString(
     Map<String, String> translations,
@@ -115,7 +115,9 @@ public class TranslatedString implements I18NString, Serializable {
     if (translations.isEmpty()) {
       throw new IllegalArgumentException("At least one translation must be provided");
     }
+
     var t = TRANSLATION_CACHE.get(translations);
+
     if (t != null) {
       return t;
     } else {
@@ -125,6 +127,7 @@ public class TranslatedString implements I18NString, Serializable {
       var firstLanguage = translations.keySet().iterator().next();
       boolean onlySingleUntranslatedLanguage =
         translations.size() == 1 && (firstLanguage == null || firstLanguage.isBlank());
+
       if (forceTranslatedString && !onlySingleUntranslatedLanguage) {
         ret = new TranslatedString(translations);
       } else if (allValuesEqual) {
@@ -132,9 +135,11 @@ public class TranslatedString implements I18NString, Serializable {
       } else {
         ret = new TranslatedString(translations);
       }
+
       if (intern) {
         TRANSLATION_CACHE.put(translations, ret);
       }
+
       return ret;
     }
   }
@@ -183,9 +188,11 @@ public class TranslatedString implements I18NString, Serializable {
   @Override
   public String toString(Locale locale) {
     String language = null;
+
     if (locale != null) {
       language = locale.getLanguage().toLowerCase();
     }
+
     return translations.containsKey(language) ? translations.get(language) : toString();
   }
 }

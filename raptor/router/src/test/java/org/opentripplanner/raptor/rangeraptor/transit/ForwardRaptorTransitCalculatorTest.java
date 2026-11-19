@@ -128,6 +128,7 @@ public class ForwardRaptorTransitCalculatorTest {
       assertTrue(it.hasNext());
       assertEquals(v, it.next());
     }
+
     assertFalse(it.hasNext());
   }
 }

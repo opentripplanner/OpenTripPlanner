@@ -44,9 +44,11 @@ public class LinkingNearEndTest {
     var v2 = intersectionVertex(POINTS[POINTS.length - 1]);
     var v1 = intersectionVertex(POINTS[0]);
     var sequence = new CoordinateArrayListSequence();
+
     for (int i = POINTS.length - 1; i >= 0; i--) {
       sequence.add(POINTS[i]);
     }
+
     linking(v2, v1, sequence);
   }
 

@@ -12,7 +12,8 @@ public class TransitModeMapper {
    * @param routeType Route type to be mapped into a mode
    */
   public static TransitMode mapMode(int routeType) {
-    // Should really be reference to org.onebusaway.gtfs.model.Stop.MISSING_VALUE, but it is private.
+    // Should really be reference to org.onebusaway.gtfs.model.Stop.MISSING_VALUE, but it is
+    // private.
     if (routeType == -999) {
       return null;
     }
@@ -28,9 +29,11 @@ public class TransitModeMapper {
       if (routeType >= 401 && routeType <= 402) {
         return TransitMode.SUBWAY;
       }
+
       if (routeType == 405) {
         return TransitMode.MONORAIL;
       }
+
       return TransitMode.RAIL;
     } else if (routeType >= 500 && routeType < 700) {
       // Metro Service and Underground Service
@@ -74,6 +77,7 @@ public class TransitModeMapper {
       // Miscellaneous Service
       return null;
     }
+
     /* Original GTFS route types. Should these be checked before TPEG types? */
     return switch (routeType) {
       case 0 -> TransitMode.TRAM;

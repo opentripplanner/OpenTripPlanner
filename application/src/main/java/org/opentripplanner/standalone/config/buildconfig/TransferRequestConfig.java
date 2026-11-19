@@ -28,6 +28,7 @@ final class TransferRequestConfig {
   /** The request of the profiles of {@code type}, read from the block of the type. */
   static RouteRequest mapRequest(NodeAdapter block, TransferProfileType type) {
     var builder = RouteRequest.defaultValue().copyOf();
+
     switch (type) {
       case WALK -> builder.withPreferences(p -> p.withWalk(walk -> mapWalk(block, walk)));
       case WHEELCHAIR -> builder.withPreferences(p ->
@@ -40,6 +41,7 @@ final class TransferRequestConfig {
         // The street search needs no parameters other than the car reluctance, a user preference
       }
     }
+
     return builder.buildDefault();
   }
 

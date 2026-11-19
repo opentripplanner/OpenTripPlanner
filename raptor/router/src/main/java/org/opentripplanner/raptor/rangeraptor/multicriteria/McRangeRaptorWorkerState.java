@@ -43,19 +43,19 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  * is advanced (never moved back) at the following points:
  * <ol>
  *   <li><b>Setup iteration ({@link #setupIteration})</b> — the marker is advanced past ALL existing
- *       arrivals, including any transfer arrivals left over from the last round of the previous Range
- *       Raptor iteration. Those stale transfers are thereby dropped so they are not re-explored. Access
- *       paths are then added and become the first "after-marker" arrivals, making them visible to
- *       boarding in round 1.</li>
- *   <li><b>Transits for round complete ({@link #transitsForRoundComplete})</b> — first, the marker is
- *       advanced past the arrivals from the previous round (access paths in round 1, or transit +
- *       transfer arrivals from earlier rounds). Then the transit alights cached during this round's
- *       pattern scan are committed, landing after the marker. This makes the new transit alights — and
- *       only those — visible to the transfer step that immediately follows.</li>
- *   <li><b>Transfers for round complete ({@link #transfersForRoundComplete})</b> — transfer arrivals
- *       cached during the transfer step are committed after the marker. They join the transit alights
- *       from step 2, so that boarding in the next round sees both transit and transfer arrivals from the
- *       current round.</li>
+ *       arrivals, including any transfer arrivals left over from the last round of the previous
+ *       Range Raptor iteration. Those stale transfers are thereby dropped so they are not
+ *       re-explored. Access paths are then added and become the first "after-marker" arrivals,
+ *       making them visible to boarding in round 1.</li>
+ *   <li><b>Transits for round complete ({@link #transitsForRoundComplete})</b> — first, the marker
+ *       is advanced past the arrivals from the previous round (access paths in round 1, or transit
+ *       + transfer arrivals from earlier rounds). Then the transit alights cached during this
+ *       round's pattern scan are committed, landing after the marker. This makes the new transit
+ *       alights — and only those — visible to the transfer step that immediately follows.</li>
+ *   <li><b>Transfers for round complete ({@link #transfersForRoundComplete})</b> — transfer
+ *       arrivals cached during the transfer step are committed after the marker. They join the
+ *       transit alights from step 2, so that boarding in the next round sees both transit and
+ *       transfer arrivals from the current round.</li>
  * </ol>
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
@@ -239,6 +239,7 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
     for (McStopArrival<T> arrival : transitArrivalsCache) {
       addStopArrival(arrival);
     }
+
     transitArrivalsCache.clear();
   }
 
@@ -246,6 +247,7 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
     for (McStopArrival<T> arrival : transferArrivalsCache) {
       addStopArrival(arrival);
     }
+
     transferArrivalsCache.clear();
   }
 
@@ -276,9 +278,9 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
    * segment's transit routing in the same round but picked up by transfers and the next transit
    * round.
    * <p>
-   * Access arrivals are committed immediately via {@link #addStopArrival}, matching how the
-   * first segment seeds its own access stops. This allows the via stop to be used as a boarding
-   * point in the current round.
+   * Access arrivals are committed immediately via {@link #addStopArrival}, matching how the first
+   * segment seeds its own access stops. This allows the via stop to be used as a boarding point in
+   * the current round.
    * <p>
    * Walk-transfer arrivals go into {@code transferArrivalsCache}, committed at
    * {@code transfersForRoundComplete} — after {@code applyTransfers} has already run. This prevents
@@ -301,6 +303,7 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
     if (heuristics.rejectDestinationArrivalBasedOnHeuristic(arrival)) {
       return;
     }
+
     arrivals.addStopArrival(arrival);
   }
 

@@ -70,6 +70,7 @@ public class SystemErrDebugLogger implements DebugLogger {
     print(e.element(), e.action().toString(), e.reason());
 
     ArrivalView<?> byElement = e.rejectedDroppedByElement();
+
     if (e.action() == DebugEvent.Action.DROP && byElement != null) {
       print(byElement, "->by", "");
     }
@@ -86,14 +87,15 @@ public class SystemErrDebugLogger implements DebugLogger {
     print(e.element(), e.action().toString());
 
     var byElement = e.rejectedDroppedByElement();
+
     if (e.action() == DebugEvent.Action.DROP && byElement != null) {
       print(byElement, "->by");
     }
   }
 
   /**
-   * This should be passed into the {@link DebugRequestBuilder#withDestinationArrivalListener}
-   * using a lambda to enable debugging destination arrivals put in the final result pareto-set.
+   * This should be passed into the {@link DebugRequestBuilder#withDestinationArrivalListener} using
+   * a lambda to enable debugging destination arrivals put in the final result pareto-set.
    */
   public void destinationArrivalListener(DebugEvent<ArrivalView<?>> e) {
     if (printPathHeader) {
@@ -145,9 +147,11 @@ public class SystemErrDebugLogger implements DebugLogger {
   private static String details(String action, String optReason, @Nullable String element) {
     StringBuilder buf = new StringBuilder();
     buf.append(action).append(": ").append(element);
+
     if (isNotBlank(optReason)) {
       buf.append("  # ").append(optReason);
     }
+
     return buf.toString();
   }
 
@@ -171,6 +175,7 @@ public class SystemErrDebugLogger implements DebugLogger {
     if (!isEnabled() || iterationTime == lastIterationTime) {
       return;
     }
+
     lastIterationTime = iterationTime;
     lastRound = NOT_SET;
     printPathHeader = true;
@@ -223,6 +228,7 @@ public class SystemErrDebugLogger implements DebugLogger {
       case ACCESS -> buf.accessEgress(a.accessPath().access());
       case TRANSIT -> {
         String tripInfo = a.transitPath().trip().pattern().debugInfo();
+
         if (forwardSearch) {
           var t = TripTimesSearch.findTripForwardSearch(a);
           buf.transit(tripInfo, t.boardTime(), t.alightTime());
@@ -245,6 +251,7 @@ public class SystemErrDebugLogger implements DebugLogger {
     if (!isEnabled() || round == lastRound) {
       return;
     }
+
     lastRound = round;
 
     println();
@@ -272,6 +279,7 @@ public class SystemErrDebugLogger implements DebugLogger {
     if (stopIndex == NOT_SET) {
       return "NA";
     }
+
     return stopNameResolver == null
       ? Integer.toString(stopIndex)
       : stopNameResolver.apply(stopIndex);

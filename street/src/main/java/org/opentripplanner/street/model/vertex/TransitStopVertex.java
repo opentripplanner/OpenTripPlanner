@@ -52,11 +52,13 @@ public class TransitStopVertex extends StationElementVertex {
         return true;
       }
     }
+
     for (Edge e : this.getIncoming()) {
       if (e instanceof PathwayEdge) {
         return true;
       }
     }
+
     return false;
   }
 

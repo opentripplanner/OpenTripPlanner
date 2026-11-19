@@ -15,9 +15,8 @@ import org.opentripplanner.service.vehicleparking.model.VehicleParkingGroup;
  * locations within a {@link VehicleParkingGroup}. This class is thread-safe because the collections
  * held here are immutable and only updated in atomic operations that replace the existing
  * collection with a new copy.
- *
- * <P>THIS CLASS IS THREAD-SAFE
  * <p>
+ * THIS CLASS IS THREAD-SAFE
  */
 @Singleton
 public class DefaultVehicleParkingService implements Serializable, VehicleParkingService {

@@ -647,6 +647,7 @@ public class RefetchItineraryServiceTest {
         createEdge(e.from, e.to, e.meters);
         createEdge(e.to, e.from, e.meters);
       }
+
       graph.hasStreets = true;
       graph.index();
       return graph;

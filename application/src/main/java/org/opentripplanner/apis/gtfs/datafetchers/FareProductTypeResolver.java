@@ -18,6 +18,7 @@ public class FareProductTypeResolver implements TypeResolver {
     } else if (o instanceof FareOffer.DependentFareOffer) {
       return schema.getObjectType("DependentFareProduct");
     }
+
     return null;
   }
 }

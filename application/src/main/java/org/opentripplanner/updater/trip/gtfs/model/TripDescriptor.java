@@ -50,6 +50,7 @@ public class TripDescriptor {
           LocalTime.parse(tripDescriptor.getStartTime(), GTFS_LOCAL_TIME_FORMATTER)
         );
       }
+
       return Optional.empty();
     } catch (DateTimeParseException _) {
       throw UpdateException.of(UpdateErrorType.INVALID_INPUT_STRUCTURE);

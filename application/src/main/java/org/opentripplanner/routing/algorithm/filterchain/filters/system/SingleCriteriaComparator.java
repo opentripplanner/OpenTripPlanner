@@ -16,8 +16,8 @@ import org.opentripplanner.transit.model.network.grouppriority.DefaultTransitGro
  * {@link org.opentripplanner.raptor.util.paretoset.ParetoSet} and
  * {@link org.opentripplanner.raptor.util.paretoset.ParetoComparator}.
  * <p>
- * This interface extends {@link Comparator} so elements can be sorted as well. Not all criteria
- * can be sorted, if so the {@link #strictOrder()} should return false (this is the default).
+ * This interface extends {@link Comparator} so elements can be sorted as well. Not all criteria can
+ * be sorted, if so the {@link #strictOrder()} should return false (this is the default).
  */
 @FunctionalInterface
 public interface SingleCriteriaComparator {

@@ -252,7 +252,7 @@ public class NetexEntityIndex {
 
       /**
        * @deprecated This should be replaced with a collection of DayTypeAssignment. The mapper is
-       *             responsible for indexing its data, except for entities by id.
+       *     responsible for indexing its data, except for entities by id.
        */
       @Deprecated
       public ReadOnlyHierarchicalMap<

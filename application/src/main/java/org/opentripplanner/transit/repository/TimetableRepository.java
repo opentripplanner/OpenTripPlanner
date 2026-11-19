@@ -27,7 +27,7 @@ public interface TimetableRepository extends TimetableRepositorySnapshot {
    *
    * @param serviceDate service date for the added service id
    * @return service-id for date if it exists or is created. If the given service date is outside
-   *         the service period {@code null} is returned.
+   *     the service period {@code null} is returned.
    */
   @Nullable
   FeedScopedId getOrCreateServiceIdForDate(LocalDate serviceDate);
@@ -47,14 +47,13 @@ public interface TimetableRepository extends TimetableRepositorySnapshot {
    * If a previous realtime update has changed which trip pattern is associated with the given trip
    * on the given service date, dissociate the trip from that pattern and remove the trip's
    * timetables from that pattern on that particular service date.
-   *
    * <p>
    * For this service date, the trip will revert to its original trip pattern from the scheduled
    * data, remaining on that pattern unless it's changed again by a future realtime update.
    *
    * @return true if the trip was found to be shifted to a different trip pattern by a realtime
-   *         message and an attempt was made to re-associate it with its originally scheduled trip
-   *         pattern.
+   *     message and an attempt was made to re-associate it with its originally scheduled trip
+   *     pattern.
    */
   boolean revertTripToScheduledTripPattern(FeedScopedId tripId, LocalDate serviceDate);
 

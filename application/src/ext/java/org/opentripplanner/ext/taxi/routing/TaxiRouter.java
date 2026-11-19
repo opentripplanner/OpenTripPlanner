@@ -32,22 +32,22 @@ import org.slf4j.LoggerFactory;
 /**
  * Handles taxi routing, filtering and decoration, backed by a single {@link TaxiRouteIndex}.
  * <ol>
- *   <li>Before a direct taxi street search runs, {@link #routeDirect} checks that the request origin
- *       and destination are covered by a common taxi provider; if not, an empty result is returned
- *       immediately without running {@link DirectStreetRouter}.
- *   <li>Before a transit search runs, {@link #filterNearbyStops} drops candidate access/egress stops
- *       whose logical endpoints (the request origin/destination and the stop) are not covered by a common
- *       taxi provider, so RAPTOR never considers a combination that would later be rejected.
+ *   <li>Before a direct taxi street search runs, {@link #routeDirect} checks that the request
+ *       origin and destination are covered by a common taxi provider; if not, an empty result is
+ *       returned immediately without running {@link DirectStreetRouter}.
+ *   <li>Before a transit search runs, {@link #filterNearbyStops} drops candidate access/egress
+ *       stops whose logical endpoints (the request origin/destination and the stop) are not covered
+ *       by a common taxi provider, so RAPTOR never considers a combination that would later be
+ *       rejected.
  *   <li>Once a search has produced results, {@link #decorateItineraries} (direct routing) and
- *       {@link #decorateAccessEgressLegs} (transit access/egress) replace each {@link TraverseMode#CAR}
- *       {@link StreetLeg} with a {@link TaxiLeg} decorated with the matching provider, looked up using
- *       the same logical coordinates rather than the leg's own local coordinates, which may differ
- *       slightly when the route is a walk-drive-walk chain.
+ *       {@link #decorateAccessEgressLegs} (transit access/egress) replace each
+ *       {@link TraverseMode#CAR} {@link StreetLeg} with a {@link TaxiLeg} decorated with the
+ *       matching provider, looked up using the same logical coordinates rather than the leg's own
+ *       local coordinates, which may differ slightly when the route is a walk-drive-walk chain.
  * </ol>
- *
  * <p>
- * TODO: Multi-provider support. Currently only the first matching provider is used. In the
- * future all matching providers should be available so users can choose.
+ * TODO: Multi-provider support. Currently only the first matching provider is used. In the future
+ * all matching providers should be available so users can choose.
  */
 @Sandbox
 public class TaxiRouter {
@@ -76,6 +76,7 @@ public class TaxiRouter {
   ) {
     WgsCoordinate pickup = request.from().wgsCoordinate();
     WgsCoordinate dropoff = request.to().wgsCoordinate();
+
     if (taxiRouteIndex.findFirstRoute(pickup, dropoff).isEmpty()) {
       return List.of();
     }
@@ -99,10 +100,12 @@ public class TaxiRouter {
     WgsCoordinate dropoff
   ) {
     List<Itinerary> result = new ArrayList<>(itineraries.size());
+
     for (Itinerary itinerary : itineraries) {
       var newLegs = decorateLegs(itinerary.legs(), pickup, dropoff);
       result.add(itinerary.copyOf().withLegs(newLegs).build());
     }
+
     return result;
   }
 
@@ -127,15 +130,18 @@ public class TaxiRouter {
     WgsCoordinate coordinate
   ) {
     List<TaxiRoute> routes = taxiRouteIndex.findAllRoutes(coordinate);
+
     if (routes.isEmpty()) {
       return List.of();
     }
 
     List<NearbyStop> result = new ArrayList<>(nearbyStops.size());
+
     for (NearbyStop nearbyStop : nearbyStops) {
       Point stopPoint = GeometryUtils.getGeometryFactory().createPoint(
         transitService.getStopLocation(nearbyStop.stopId()).getCoordinate().asJtsCoordinate()
       );
+
       for (TaxiRoute route : routes) {
         if (taxiRouteIndex.getPreparedGeometry(route).contains(stopPoint)) {
           result.add(nearbyStop);
@@ -143,6 +149,7 @@ public class TaxiRouter {
         }
       }
     }
+
     return result;
   }
 
@@ -172,6 +179,7 @@ public class TaxiRouter {
    */
   private List<Leg> decorateLegs(List<Leg> legs, WgsCoordinate pickup, WgsCoordinate dropoff) {
     var taxiRoute = taxiRouteIndex.findFirstRoute(pickup, dropoff);
+
     if (taxiRoute.isEmpty()) {
       LOG.warn(
         "No taxi provider covers the pre-filtered taxi legs between {} and {}",
@@ -182,6 +190,7 @@ public class TaxiRouter {
     }
 
     List<Leg> newLegs = new ArrayList<>(legs.size());
+
     for (Leg leg : legs) {
       if (leg instanceof StreetLeg streetLeg && streetLeg.getMode() == TraverseMode.CAR) {
         newLegs.add(new TaxiLeg(streetLeg, taxiRoute.get()));
@@ -189,6 +198,7 @@ public class TaxiRouter {
         newLegs.add(leg);
       }
     }
+
     return newLegs;
   }
 }

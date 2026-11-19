@@ -293,8 +293,8 @@ class CarpoolItineraryMapperTest {
    * carpool ends at the stop) carries the transit stop's name. Transit stop wins over both the
    * intersection name and any user-supplied destination label.
    * <p>
-   * The first leg's {@code from} simultaneously verifies that the passenger origin label is
-   * still applied on the user-side end of an access chain.
+   * The first leg's {@code from} simultaneously verifies that the passenger origin label is still
+   * applied on the user-side end of an access chain.
    */
   @Test
   void accessItineraryLastLegToCarriesTransitStopName() {

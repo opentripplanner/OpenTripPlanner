@@ -57,6 +57,7 @@ class TransactionalRepository<S, M> {
     if (repository == null) {
       this.repository = lifecycle.copyOnWrite(currentSnapshot());
     }
+
     return repository;
   }
 

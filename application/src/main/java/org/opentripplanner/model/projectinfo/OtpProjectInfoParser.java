@@ -47,9 +47,11 @@ class OtpProjectInfoParser {
     if (text == null || text.isBlank()) {
       return OtpProjectInfo.UNKNOWN;
     }
+
     if (text.startsWith("${") && text.endsWith("}")) {
       return OtpProjectInfo.UNKNOWN;
     }
+
     return text;
   }
 }

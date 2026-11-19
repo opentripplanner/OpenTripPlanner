@@ -43,11 +43,10 @@ import tools.jackson.databind.ObjectMapper;
  * HTTP client providing convenience methods to send HTTP requests and map HTTP responses to Java
  * objects.
  *
- * <p>
- * <p>
  * <h3>Exception management</h3>
  * Exceptions thrown during network operations or response mapping are wrapped in
  * {@link OtpHttpClientException}
+ *
  * <h3>Resource management</h3>
  * It is recommended to use the <code>getAndMapXXX</code> and <code>postAndMapXXX</code> methods in
  * this class since they ensure that the underlying network resources are properly released. The
@@ -91,6 +90,7 @@ public class OtpHttpClient {
 
           return Collections.emptyList();
         }
+
         return Arrays.stream(response.getHeaders()).toList();
       }
     );
@@ -207,6 +207,7 @@ public class OtpHttpClient {
     ResponseMapper<T> responseMapper
   ) {
     HttpPost httppost = new HttpPost(url);
+
     if (xmlData != null) {
       httppost.setEntity(new StringEntity(xmlData, ContentType.APPLICATION_XML));
     }
@@ -242,6 +243,7 @@ public class OtpHttpClient {
       if (response.getCode() == SC_NO_CONTENT) {
         return Optional.empty();
       }
+
       return Optional.of(mapResponse(response, responseMapper));
     });
   }
@@ -272,10 +274,13 @@ public class OtpHttpClient {
           response.getReasonPhrase()
       );
     }
+
     HttpEntity entity = response.getEntity();
+
     if (entity == null) {
       throw new IOException("HTTP response message entity is empty for url: " + uri);
     }
+
     return entity.getContent();
   }
 
@@ -290,10 +295,13 @@ public class OtpHttpClient {
     final HttpClientResponseHandler<? extends T> responseHandler
   ) {
     Objects.requireNonNull(requestHeaders);
+
     if (timeout != null) {
       httpRequest.setConfig(requestConfig(timeout));
     }
+
     requestHeaders.asMap().forEach(httpRequest::addHeader);
+
     try {
       return httpClient.execute(httpRequest, responseHandler);
     } catch (IOException e) {
@@ -332,6 +340,7 @@ public class OtpHttpClient {
       if (is == null) {
         throw new OtpHttpClientException("HTTP request failed: empty response");
       }
+
       OtpHttpResponse httpResponse = new OtpHttpResponse(
         is,
         response.getHeaders(),
@@ -355,12 +364,15 @@ public class OtpHttpClient {
     ResponseMapper<T> responseMapper
   ) {
     URL downloadUrl;
+
     try {
       downloadUrl = uri.toURL();
     } catch (MalformedURLException e) {
       throw new OtpHttpClientException(e);
     }
+
     String proto = downloadUrl.getProtocol();
+
     if (proto.equals("http") || proto.equals("https")) {
       return executeAndMap(request, timeout, headers, responseMapper);
     } else {

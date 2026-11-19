@@ -120,7 +120,7 @@ public class ItineraryBuilder {
   /**
    * Add the elevation change in meters to the the itinerary summary. The builder will add the
    * change to the {@code elevationGained} and the {@code elevationLost}.
-   *
+   * <p>
    * Note! This is in addition to the elevation added for each leg elevation profile. TODO Why?
    */
   public void addElevationChange(ElevationChange elevationChange) {

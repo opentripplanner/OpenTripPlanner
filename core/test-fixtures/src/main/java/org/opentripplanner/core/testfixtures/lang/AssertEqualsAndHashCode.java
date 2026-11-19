@@ -33,6 +33,7 @@ public class AssertEqualsAndHashCode {
       assertNotEquals(subject, other);
       assertNotEquals(subject.hashCode(), other.hashCode());
     }
+
     return this;
   }
 }

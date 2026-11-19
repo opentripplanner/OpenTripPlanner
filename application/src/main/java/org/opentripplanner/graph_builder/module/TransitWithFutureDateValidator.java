@@ -26,13 +26,16 @@ public class TransitWithFutureDateValidator {
 
     for (FeedScopedId sid : data.getServiceIds()) {
       agencies.add(sid.getFeedId());
+
       for (LocalDate sd : data.getServiceDatesForServiceId(sid)) {
         var t = ServiceDateUtils.asStartOfService(sd, timeZone).toInstant();
+
         if (t.isAfter(now)) {
           agenciesWithFutureDates.add(sid.getFeedId());
         }
       }
     }
+
     for (String agency : agencies) {
       if (!agenciesWithFutureDates.contains(agency)) {
         issueStore.add(new NoFutureDates(agency));

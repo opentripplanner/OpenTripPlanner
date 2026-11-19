@@ -39,6 +39,7 @@ public class LiipiHubToVehicleParkingGroupMapper {
 
   public Map<FeedScopedId, VehicleParkingGroup> parseHub(JsonNode jsonNode) {
     var hubId = LiipiParkToVehicleParkingMapper.createIdForNode(jsonNode, "id", feedId);
+
     try {
       Map<String, String> translations = new HashMap<>();
       JsonNode nameNode = jsonNode.path("name");
@@ -47,6 +48,7 @@ public class LiipiHubToVehicleParkingGroupMapper {
         .iterator()
         .forEachRemaining(lang -> {
           String name = nameNode.path(lang).asString();
+
           if (!name.isEmpty()) {
             translations.put(lang, nameNode.path(lang).asString());
           }
@@ -60,6 +62,7 @@ public class LiipiHubToVehicleParkingGroupMapper {
         .withCoordinate(new WgsCoordinate(geometry.getCentroid()))
         .build();
       var vehicleParkingIds = getVehicleParkingIds((ArrayNode) jsonNode.get("facilityIds"), hubId);
+
       if (vehicleParkingIds == null) {
         return null;
       }
@@ -82,10 +85,13 @@ public class LiipiHubToVehicleParkingGroupMapper {
       LOG.warn("Hub {} contained no facilities", hubId);
       return null;
     }
+
     var vehicleParkingIds = new ArrayList<FeedScopedId>();
+
     for (JsonNode jsonNode : facilityIdsNode) {
       vehicleParkingIds.add(new FeedScopedId(feedId, jsonNode.asString()));
     }
+
     return vehicleParkingIds;
   }
 }

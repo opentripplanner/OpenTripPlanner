@@ -27,17 +27,23 @@ public class BicyclePreferencesMapper {
     }
 
     var speed = args.getGraphQLSpeed();
+
     if (speed != null) {
       preferences.withSpeed(speed);
     }
+
     var reluctance = args.getGraphQLReluctance();
+
     if (reluctance != null) {
       preferences.withReluctance(reluctance);
     }
+
     var boardCost = args.getGraphQLBoardCost();
+
     if (boardCost != null) {
       preferences.withBoardCost(boardCost.toSeconds());
     }
+
     preferences.withWalking(walk -> setBicycleWalkPreferences(walk, args.getGraphQLWalk()));
     preferences.withParking(parking ->
       setBicycleParkingPreferences(parking, args.getGraphQLParking(), environment)
@@ -55,22 +61,30 @@ public class BicyclePreferencesMapper {
     }
 
     var speed = args.getGraphQLSpeed();
+
     if (speed != null) {
       preferences.withSpeed(speed);
     }
+
     var mountTime = args.getGraphQLMountDismountTime();
+
     if (mountTime != null) {
       preferences.withMountDismountTime(
         DurationUtils.requireNonNegativeMax30minutes(mountTime, "bicycle mount dismount time")
       );
     }
+
     var cost = args.getGraphQLCost();
+
     if (cost != null) {
       var reluctance = cost.getGraphQLReluctance();
+
       if (reluctance != null) {
         preferences.withReluctance(reluctance);
       }
+
       var mountCost = cost.getGraphQLMountDismountCost();
+
       if (mountCost != null) {
         preferences.withMountDismountCost(mountCost.toSeconds());
       }
@@ -87,9 +101,11 @@ public class BicyclePreferencesMapper {
     }
 
     var unpreferredCost = args.getGraphQLUnpreferredCost();
+
     if (unpreferredCost != null) {
       preferences.withUnpreferredVehicleParkingTagCost(unpreferredCost.toSeconds());
     }
+
     var filters = getParkingFilters(environment, "bicycle");
     preferences.withRequiredVehicleParkingTags(parseSelectFilters(filters));
     preferences.withBannedVehicleParkingTags(parseNotFilters(filters));
@@ -107,23 +123,32 @@ public class BicyclePreferencesMapper {
     }
 
     var allowedNetworks = args.getGraphQLAllowedNetworks();
+
     if (allowedNetworks != null) {
       if (allowedNetworks.isEmpty()) {
         throw new InvalidInputException("Allowed bicycle rental networks must not be empty.");
       }
+
       preferences.withAllowedNetworks(Set.copyOf(allowedNetworks));
     }
+
     var bannedNetworks = args.getGraphQLBannedNetworks();
+
     if (bannedNetworks != null) {
       preferences.withBannedNetworks(Set.copyOf(bannedNetworks));
     }
+
     var destinationPolicy = args.getGraphQLDestinationBicyclePolicy();
+
     if (destinationPolicy != null) {
       var allowed = destinationPolicy.getGraphQLAllowKeeping();
+
       if (allowed != null) {
         preferences.withAllowArrivingInRentedVehicleAtDestination(allowed);
       }
+
       var cost = destinationPolicy.getGraphQLKeepingCost();
+
       if (cost != null) {
         preferences.withArrivingInRentalVehicleAtDestinationCost(cost.toSeconds());
       }
@@ -140,10 +165,13 @@ public class BicyclePreferencesMapper {
 
     var type = args.getGraphQLType();
     var mappedType = type != null ? VehicleOptimizationTypeMapper.map(type) : null;
+
     if (mappedType != null) {
       preferences.withOptimizeType(mappedType);
     }
+
     var triangleArgs = args.getGraphQLTriangle();
+
     if (isBicycleTriangleSet(triangleArgs)) {
       preferences.withForcedOptimizeTriangle(triangle -> {
         triangle

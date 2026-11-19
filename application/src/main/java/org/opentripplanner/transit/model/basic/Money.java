@@ -22,8 +22,7 @@ public class Money implements Comparable<Money>, Serializable {
   private final int amount;
 
   /**
-   *
-   * @param currency        The currency of the money amount
+   * @param currency The currency of the money amount
    * @param minorUnitAmount The amount in the smaller currency unit, so for 1.50 EUR pass 150.
    */
   private Money(Currency currency, int minorUnitAmount) {
@@ -56,6 +55,7 @@ public class Money implements Comparable<Money>, Serializable {
     if (!first.currency.equals(second.currency)) {
       throw new RuntimeException("Can't operate on %s and %s as the currencies are not equal.");
     }
+
     if (first.greaterThan(second)) {
       return first;
     } else {
@@ -93,6 +93,7 @@ public class Money implements Comparable<Money>, Serializable {
     if (m.currency != currency) {
       throw new RuntimeException("Can't compare " + m.currency + " to " + currency);
     }
+
     return amount - m.amount;
   }
 

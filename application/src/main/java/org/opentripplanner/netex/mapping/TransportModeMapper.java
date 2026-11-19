@@ -45,6 +45,7 @@ class TransportModeMapper {
     if (mode == null) {
       throw new UnsupportedModeException(null);
     }
+
     return switch (mode) {
       case AIR -> TransitMode.AIRPLANE;
       case BUS -> TransitMode.BUS;
@@ -70,6 +71,7 @@ class TransportModeMapper {
     if (submode == null || submode.getWaterSubmode() == null) {
       return CarAccess.NOT_ALLOWED;
     }
+
     return mapCarsAllowed(submode.getWaterSubmode().value());
   }
 
@@ -107,6 +109,7 @@ class TransportModeMapper {
         submode.getSnowAndIceSubmode().value()
       );
     }
+
     throw new IllegalArgumentException();
   }
 

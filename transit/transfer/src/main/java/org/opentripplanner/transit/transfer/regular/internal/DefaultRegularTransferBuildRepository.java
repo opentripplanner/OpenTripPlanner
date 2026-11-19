@@ -13,15 +13,17 @@ import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUser
  * populated in place by the graph-builder module, and survive graph serialization the same way
  * {@code TransferRepository} does.
  *
- * @param <P> the street path type
+ * @param
+ *     <p>
+ *     the street path type
  */
 public class DefaultRegularTransferBuildRepository<P> implements RegularTransferBuildRepository<P> {
 
   private final TemplatePathsByUserProfile<P> paths = new TemplatePathsByUserProfile<>();
 
   /**
-   * Set when this repository is converted into the runtime repository. Not serialized, a
-   * loaded graph can be extended by a new graph build.
+   * Set when this repository is converted into the runtime repository. Not serialized, a loaded
+   * graph can be extended by a new graph build.
    */
   private transient boolean sealed = false;
 
@@ -37,6 +39,7 @@ public class DefaultRegularTransferBuildRepository<P> implements RegularTransfer
           "repository now."
       );
     }
+
     paths.setPaths(userPreferences, fromStop, pathsByToStop);
   }
 

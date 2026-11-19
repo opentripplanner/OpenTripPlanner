@@ -8,10 +8,9 @@ import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
  * Consumer-side abstraction over the registered geofencing zone indices. Defined by the needs of
  * the routing layer (and the debug map layer) so they can query zone membership without depending
  * on the rental service implementation.
- *
  * <p>
- * {@link org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalRepository}
- * holds the zone indices and answers these queries; {@link VehicleRentalService} re-exposes them to
+ * {@link org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalRepository} holds
+ * the zone indices and answers these queries; {@link VehicleRentalService} re-exposes them to
  * read-only consumers. Tests can use {@link #EMPTY}.
  */
 public interface GeofencingZoneService {

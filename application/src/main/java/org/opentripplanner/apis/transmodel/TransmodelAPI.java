@@ -89,6 +89,7 @@ public class TransmodelAPI {
 
     Object queryVariables = queryParameters.getOrDefault("variables", null);
     Map<String, Object> variables;
+
     if (queryVariables instanceof Map queryVariablesAsMap) {
       variables = queryVariablesAsMap;
     } else if (
@@ -102,6 +103,7 @@ public class TransmodelAPI {
     } else {
       variables = Collections.emptyMap();
     }
+
     String operationName = (String) queryParameters.getOrDefault("operationName", null);
     return index.executeGraphQL(
       query,

@@ -26,9 +26,11 @@ class GbfsGeofencingZoneMapper
   public List<GeofencingZone> mapGeofencingZone(GBFSGeofencingZones input) {
     var features = input.getData().getGeofencingZones().getFeatures();
     var zones = new ArrayList<GeofencingZone>();
+
     for (int i = 0; i < features.size(); i++) {
       zones.addAll(toInternalModel(features.get(i), i));
     }
+
     return zones;
   }
 

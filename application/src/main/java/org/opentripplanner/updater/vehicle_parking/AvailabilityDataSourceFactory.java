@@ -12,9 +12,8 @@ public class AvailabilityDataSourceFactory {
   public static DataSource<AvailabiltyUpdate> create(VehicleParkingUpdaterParameters parameters) {
     return switch (parameters.sourceType()) {
       case SIRI_FM -> new SiriFmDataSource((SiriFmUpdaterParameters) parameters);
-      case PARK_API, BICYCLE_PARK_API, LIIPI, BIKEEP, BIKELY -> throw new IllegalArgumentException(
-        "Cannot instantiate SIRI-FM data source"
-      );
+      case PARK_API, BICYCLE_PARK_API, LIIPI, BIKEEP, BIKELY
+        -> throw new IllegalArgumentException("Cannot instantiate SIRI-FM data source");
     };
   }
 }

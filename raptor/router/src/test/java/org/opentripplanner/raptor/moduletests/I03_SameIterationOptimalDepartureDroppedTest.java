@@ -24,22 +24,21 @@ import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig;
 ///
 /// In some cases Raptor drops Pareto optimal results if the optimal departure happens within the
 /// same Range Raptor iteration. Raptor only looks at the _iteration departure time_ (in most
-/// cases), not the actual departure time. This test documents in which cases we drop,
-/// and in which we keep, a path that is optimal on **duration**.
+/// cases), not the actual departure time. This test documents in which cases we drop, and in which
+/// we keep, a path that is optimal on **duration**.
 ///
 /// Notes:
-/// - To support this, we would need to keep the actual departure time in the state, at a cost
-///   to performance (memory/speed). Or, iterate over each second, instead of minutes.
-/// - A proper fix is to compute all exact departure times using the access and all trips
-///   an access can board. Then iterate over these departure times instead of iterating over
-///   minutes.
+/// - To support this, we would need to keep the actual departure time in the state, at a cost to
+///   performance (memory/speed). Or, iterate over each second, instead of minutes.
+/// - A proper fix is to compute all exact departure times using the access and all trips an access
+///   can board. Then iterate over these departure times instead of iterating over minutes.
 ///
 /// **Test**
 ///
 /// The test is set up so that R1 competes with R2+R3. R1 is better than R2+R3 in all criteria,
-/// except departure-time/duration. The test covers both the destination pruning and the
-/// destination arrival, but not the stop arrival. To test the qualify method (MC_DEST_PRUNING),
-/// the arrival at stop D must happen in another iteration; Hence, the two trip in the journey.
+/// except departure-time/duration. The test covers both the destination pruning and the destination
+/// arrival, but not the stop arrival. To test the qualify method (MC_DEST_PRUNING), the arrival at
+/// stop D must happen in another iteration; Hence, the two trip in the journey.
 public class I03_SameIterationOptimalDepartureDroppedTest implements RaptorTestConstants {
 
   private static final String TIME_TABLE = """

@@ -15,14 +15,16 @@ import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUser
  * conversion seals this repository: writing to it afterward throws an
  * {@link IllegalStateException}.
  *
- * @param <P> the street path type
+ * @param
+ *     <p>
+ *     the street path type
  */
 public interface RegularTransferBuildRepository<P> extends Serializable {
   /**
    * Create the first runtime {@link RegularTransferRepository} from the paths generated at graph
-   * build, and seal the build repository: from now on regular transfers can only be updated
-   * through the runtime repositories. They share the paths of the build repository instead of
-   * copying them; the seal keeps them unchanged, writes to the build repository after this throw.
+   * build, and seal the build repository: from now on regular transfers can only be updated through
+   * the runtime repositories. They share the paths of the build repository instead of copying them;
+   * the seal keeps them unchanged, writes to the build repository after this throw.
    */
   RegularTransferRepository<P> createRuntimeRepository();
 

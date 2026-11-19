@@ -42,20 +42,24 @@ public final class DateTimeScalarFactory {
             if (input instanceof Long inputAsLong) {
               return mapToString(Instant.ofEpochMilli(inputAsLong));
             }
+
             if (input instanceof Instant inputAsInstant) {
               return mapToString(inputAsInstant);
             }
+
             if (input instanceof ZonedDateTime zonedDateTime) {
               // We map to an instant first to output in the given timeZone, not in the
               // timeZone of the input.
               return mapToString(zonedDateTime.toInstant());
             }
+
             return null;
           }
 
           @Override
           public Long parseValue(Object input) {
             Instant instant = null;
+
             if (input instanceof CharSequence inputAsCharSequence) {
               try {
                 TemporalAccessor temporalAccessor = PARSER.parseBest(
@@ -89,6 +93,7 @@ public final class DateTimeScalarFactory {
             if (input instanceof StringValue inputAsStringValue) {
               return parseValue(inputAsStringValue.getValue());
             }
+
             return null;
           }
 

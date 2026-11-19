@@ -37,8 +37,7 @@ import org.opentripplanner.transit.transfer.regular.spi.TransferSearch;
 
 /**
  * The Raptor transfers of a snapshot: derived from its paths under the request-time preferences,
- * cached, and carried forward to the next snapshot - patched for the stops whose transfers
- * changed.
+ * cached, and carried forward to the next snapshot - patched for the stops whose transfers changed.
  */
 class DefaultRegularTransferRepositorySnapshotTest {
 
@@ -394,8 +393,8 @@ class DefaultRegularTransferRepositorySnapshotTest {
   }
 
   /**
-   * Publish the paths of the repository, and continue with the repository of the next
-   * transaction, as the framework does.
+   * Publish the paths of the repository, and continue with the repository of the next transaction,
+   * as the framework does.
    */
   private RegularTransferRepositorySnapshot<FakePath, WalkPreferences> freeze() {
     var snapshot = lifecycle.freeze(repository);
@@ -423,6 +422,7 @@ class DefaultRegularTransferRepositorySnapshotTest {
       FakeRequestMapper.INSTANCE,
       Map.<AbstractUserPreferences<?>, WalkPreferences>of(PROFILE, PROFILE)
     ).create(paths, REQUEST, PROFILE);
+
     for (int stop = 0; stop < N_STOPS; ++stop) {
       assertThat(from(transfers, stop)).containsExactlyElementsIn(from(expected, stop));
       assertThat(to(transfers, stop)).containsExactlyElementsIn(to(expected, stop));
@@ -459,10 +459,12 @@ class DefaultRegularTransferRepositorySnapshotTest {
 
   private static List<Tx> collect(Iterator<? extends RaptorTransfer> it) {
     List<Tx> result = new ArrayList<>();
+
     while (it.hasNext()) {
       var transfer = it.next();
       result.add(new Tx(transfer.stop(), transfer.c1()));
     }
+
     return result;
   }
 

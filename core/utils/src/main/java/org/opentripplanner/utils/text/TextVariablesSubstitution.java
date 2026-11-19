@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 
 /**
  * This utility class substitute variable placeholders in a given text on the format ${variable}.
- *
+ * <p>
  * The pattern matching a placeholder must start with '${' and end with '}'. The variable name must
  * consist of only alphanumerical characters (a-z, A-Z, 0-9), dot `.` and underscore '_'.
  */
@@ -44,10 +44,12 @@ public class TextVariablesSubstitution {
     for (String key : result.keySet()) {
       var value = result.get(key);
       var sub = insertVariables(value, result::get, errorHandler);
+
       if (!value.equals(sub)) {
         result.put(key, sub);
       }
     }
+
     return result;
   }
 
@@ -57,7 +59,7 @@ public class TextVariablesSubstitution {
    * variable token.
    *
    * @param errorHandler The error handler is called if a variable key does not exist in the
-   *                     {@code variableProvider}.
+   *     {@code variableProvider}.
    * @return the new value with all variables replaced.
    */
   public static String insertVariables(
@@ -75,6 +77,7 @@ public class TextVariablesSubstitution {
     Consumer<String> errorHandler
   ) {
     boolean matchFound = matcher.find();
+
     if (!matchFound) {
       return text;
     }
@@ -84,19 +87,24 @@ public class TextVariablesSubstitution {
     while (matchFound) {
       String subKey = matcher.group(0);
       String nameOnly = matcher.group(1);
+
       if (!substitutions.containsKey(nameOnly)) {
         String value = variableProvider.apply(nameOnly);
+
         if (value != null) {
           substitutions.put(subKey, value);
         } else {
           errorHandler.accept(nameOnly);
         }
       }
+
       matchFound = matcher.find();
     }
+
     for (Map.Entry<String, String> entry : substitutions.entrySet()) {
       text = text.replace(entry.getKey(), entry.getValue());
     }
+
     return insert(text, PATTERN.matcher(text), variableProvider, errorHandler);
   }
 }

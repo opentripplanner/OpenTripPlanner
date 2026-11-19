@@ -49,6 +49,7 @@ class AreaMatcher {
     Set<FeedScopedId> areasWithRules
   ) {
     var stopAreas = this.stopAreas.get(stop.getId());
+
     if (priorityMatcher.feedContainsRulePriority(stop.getId().getFeedId())) {
       return areaId == null || stopAreas.contains(areaId);
     } else {

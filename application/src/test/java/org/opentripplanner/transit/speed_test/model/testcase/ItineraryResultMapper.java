@@ -23,8 +23,8 @@ import org.opentripplanner.transit.model.site.StopLocation;
  * Map an Itinerary to a result instance. We do this to normalize the Itinerary for the purpose of
  * testing, and serialization of the results.
  * <p>
- * This way we do not need to change the Itinerary class to fit our needs and we avoid the
- * 'feature envy' anti pattern.
+ * This way we do not need to change the Itinerary class to fit our needs and we avoid the 'feature
+ * envy' anti pattern.
  */
 class ItineraryResultMapper {
 
@@ -76,6 +76,7 @@ class ItineraryResultMapper {
 
     for (Leg leg : itin.legs()) {
       var fromStop = leg.from().stop;
+
       if (fromStop != null) {
         buf.stop(formatStop(fromStop));
       }
@@ -97,6 +98,7 @@ class ItineraryResultMapper {
         buf.text(d.description());
       }
     }
+
     return buf.toString();
   }
 
@@ -125,6 +127,7 @@ class ItineraryResultMapper {
         routes.add(it.route().getName());
         modes.add(trLeg.mode());
       }
+
       if (it.to().stop != null) {
         stops.add(it.to().stop.getId().toString());
       }

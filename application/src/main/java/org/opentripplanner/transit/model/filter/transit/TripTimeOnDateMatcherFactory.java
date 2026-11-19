@@ -112,6 +112,7 @@ public class TripTimeOnDateMatcherFactory {
       if (call.getServiceDayMidnight() == TripTimeOnDate.UNDEFINED || !call.hasScheduledTimes()) {
         return false;
       }
+
       return visitOverlaps(period, call.scheduledArrival(), call.scheduledDeparture());
     });
   }

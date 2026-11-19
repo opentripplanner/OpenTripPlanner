@@ -119,11 +119,13 @@ public final class State implements AStarState<State, Edge, Vertex> {
         if (!stateData.applyGeofencingDestinationZones(destinationZones, restrictedNetworks)) {
           continue;
         }
+
         states.add(
           new State(vertex, streetSearchRequest.startTime(), stateData, streetSearchRequest)
         );
       }
     }
+
     return states;
   }
 
@@ -142,8 +144,8 @@ public final class State implements AStarState<State, Edge, Vertex> {
    * Takes two nullable states and returns an array of states (possibly empty) which is guaranteed
    * to contain no nulls.
    * <p>
-   * This method is optimized for a low number of allocations and therefore doesn't use any
-   * streams or collections to filter out the nulls.
+   * This method is optimized for a low number of allocations and therefore doesn't use any streams
+   * or collections to filter out the nulls.
    */
   public static State[] ofNullable(@Nullable State s1, @Nullable State s2) {
     if (s1 == null && s2 == null) {
@@ -269,10 +271,12 @@ public final class State implements AStarState<State, Edge, Vertex> {
    * @return True if the state at vertex can be the end of path.
    */
   public boolean isFinal() {
-    // When drive-to-transit is enabled, we need to check whether the car has been parked (or whether it has been picked up in reverse).
+    // When drive-to-transit is enabled, we need to check whether the car has been parked (or
+    // whether it has been picked up in reverse).
     boolean parkAndRide = request.mode().includesParking();
     boolean vehicleRentingOk;
     boolean vehicleParkAndRideOk;
+
     if (request.arriveBy()) {
       vehicleRentingOk = !request.mode().includesRenting() || !isRentingVehicle();
       vehicleParkAndRideOk = !parkAndRide || !isVehicleParked();
@@ -281,6 +285,7 @@ public final class State implements AStarState<State, Edge, Vertex> {
         !request.mode().includesRenting() || vehicleRentalNotStarted() || vehicleRentalIsFinished();
       vehicleParkAndRideOk = !parkAndRide || isVehicleParked();
     }
+
     return vehicleRentingOk && vehicleParkAndRideOk;
   }
 
@@ -341,7 +346,7 @@ public final class State implements AStarState<State, Edge, Vertex> {
 
   /**
    * @return The current mode of this state. When doing a rental request, this can for example
-   *         indicate if the state is currently using a vehicle or not.
+   *     indicate if the state is currently using a vehicle or not.
    */
   public TraverseMode currentMode() {
     return stateData.currentMode;
@@ -366,7 +371,7 @@ public final class State implements AStarState<State, Edge, Vertex> {
    * duration. This is the result of combining the functions from GraphPath optimize and reverse.
    *
    * @return a state at the other end (or this end, in the case of a forward search) of a reversed
-   *         path
+   *     path
    */
   public State reverse() {
     State orig = this;
@@ -378,8 +383,10 @@ public final class State implements AStarState<State, Edge, Vertex> {
       edge = orig.getBackEdge();
 
       // Not reverse-optimizing, so we don't re-traverse the edges backward.
-      // Instead we just replicate all the states, and replicate the deltas between the state's incremental fields.
-      // TODO determine whether this is really necessary, and whether there's a more maintainable way to do this.
+      // Instead we just replicate all the states, and replicate the deltas between the state's
+      // incremental fields.
+      // TODO determine whether this is really necessary, and whether there's a more maintainable
+      // way to do this.
       StateEditor editor = ret.edit(edge);
       // note the distinction between setFromState and setBackState
       editor.setFromState(orig);
@@ -409,6 +416,7 @@ public final class State implements AStarState<State, Edge, Vertex> {
         }
       } else if (!orig.isRentingVehicle() && orig.getBackState().isRentingVehicle()) {
         var stationVertex = (VehicleRentalPlaceVertex) orig.vertex;
+
         if (orig.getBackState().isRentingVehicleFromStation()) {
           editor.beginVehicleRentingAtStation(
             ((VehicleRentalEdge) edge).formFactor,
@@ -426,6 +434,7 @@ public final class State implements AStarState<State, Edge, Vertex> {
           );
         }
       }
+
       if (orig.isVehicleParked() != orig.getBackState().isVehicleParked()) {
         editor.setVehicleParked(true, orig.getBackState().currentMode());
       }
@@ -458,6 +467,7 @@ public final class State implements AStarState<State, Edge, Vertex> {
         return Optional.of((T) it);
       }
     }
+
     return Optional.empty();
   }
 
@@ -498,6 +508,7 @@ public final class State implements AStarState<State, Edge, Vertex> {
    */
   public boolean containsModeCar() {
     var state = this;
+
     while (state != null) {
       if (state.currentMode().isDrivingIsh()) {
         return true;
@@ -505,6 +516,7 @@ public final class State implements AStarState<State, Edge, Vertex> {
         state = state.getBackState();
       }
     }
+
     return false;
   }
 
@@ -520,6 +532,7 @@ public final class State implements AStarState<State, Edge, Vertex> {
         return false;
       }
     }
+
     return true;
   }
 
@@ -571,10 +584,12 @@ public final class State implements AStarState<State, Edge, Vertex> {
     // have arriveBy true anymore) has times which round correctly, as the rounding rules
     // depend on arriveBy
     var builder = request.copyOfReversed(getTime());
+
     // mutating the builder is a hot spot, only do it if needed
     if (request.mode().includesRenting()) {
       builder.withUseRentalAvailability(false);
     }
+
     var reversedRequest = builder.build();
     StateData newStateData = stateData.clone();
     newStateData.backMode = null;

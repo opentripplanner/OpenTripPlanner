@@ -52,6 +52,7 @@ public class DebugRequestBuilder {
         "The API support only one debug path. " + "Existing: " + path + ", new: " + stopsInPath
       );
     }
+
     this.path = new ArrayList<>(stopsInPath);
     return this;
   }

@@ -285,9 +285,11 @@ public class CarpoolEstimatedVehicleJourneyData {
 
   public static EstimatedVehicleJourney journeyWithTotalCapacity(int capacity) {
     var journey = minimalCompleteJourney();
+
     for (var call : journey.getEstimatedCalls().getEstimatedCalls()) {
       addTotalCapacity(call, capacity);
     }
+
     return journey;
   }
 
@@ -305,9 +307,11 @@ public class CarpoolEstimatedVehicleJourneyData {
   public static EstimatedVehicleJourney journeyWithOnboardCounts(int... onboardCounts) {
     var journey = minimalCompleteJourney();
     var calls = journey.getEstimatedCalls().getEstimatedCalls();
+
     for (int i = 0; i < Math.min(onboardCounts.length, calls.size()); i++) {
       addOnboardCount(calls.get(i), onboardCounts[i]);
     }
+
     return journey;
   }
 

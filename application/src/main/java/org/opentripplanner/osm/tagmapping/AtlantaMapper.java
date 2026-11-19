@@ -19,7 +19,8 @@ class AtlantaMapper extends OsmTagMapper {
   @Override
   public WayPropertySet buildWayPropertySet() {
     var props = WayPropertySet.of();
-    // Replace existing matching properties as the logic is that the first statement registered takes precedence over later statements
+    // Replace existing matching properties as the logic is that the first statement registered
+    // takes precedence over later statements
     props.setProperties("highway=trunk_link", withModes(ALL).bicycleSafety(2.5));
     props.setProperties("highway=trunk", withModes(ALL).bicycleSafety(2.5));
 

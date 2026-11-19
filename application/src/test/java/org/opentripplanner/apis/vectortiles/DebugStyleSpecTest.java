@@ -29,10 +29,12 @@ class DebugStyleSpecTest {
     var file = RESOURCES.testResourceFile("style.json");
     var expectation = readFile(file);
     var newJson = JsonSupport.prettyPrint(json);
+
     // Order of keys in a JSON object can randomly change so only write to file when necessary
     if (!isEqualJson(expectation, json)) {
       writeFile(file, newJson);
     }
+
     assertEqualJson(expectation, newJson);
   }
 
@@ -48,6 +50,7 @@ class DebugStyleSpecTest {
 
     for (var layer : json.path("layers")) {
       var filter = layer.path("filter");
+
       if (!filter.isMissingNode()) {
         assertWithMessage("layer '%s' has a legacy filter: %s", layer.path("id").asText(), filter)
           .that(isLegacyFilter(filter))
@@ -67,21 +70,26 @@ class DebugStyleSpecTest {
     if (!filter.isArray() || filter.isEmpty()) {
       return false;
     }
+
     // "all", "any" and "none" combine sub-filters in both dialects, so a legacy one can hide inside
     var operator = filter.get(0).asText();
+
     if (operator.equals("all") || operator.equals("any") || operator.equals("none")) {
       for (int i = 1; i < filter.size(); i++) {
         if (isLegacyFilter(filter.get(i))) {
           return true;
         }
       }
+
       return false;
     }
+
     for (int i = 1; i < filter.size(); i++) {
       if (filter.get(i).isArray()) {
         return false;
       }
     }
+
     return true;
   }
 

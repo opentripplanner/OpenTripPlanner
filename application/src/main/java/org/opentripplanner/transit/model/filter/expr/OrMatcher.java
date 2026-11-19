@@ -9,7 +9,6 @@ import java.util.List;
 /**
  * Takes a list of matchers and provides a single interface. At least one of the matchers in the
  * list must match for the composite matcher to return a match.
- * <p>
  *
  * @param <T> The entity type the OrMatcher matches.
  */
@@ -30,8 +29,10 @@ public final class OrMatcher<T> implements Matcher<T> {
     if (matchers.size() == 1) {
       return matchers.get(0);
     }
+
     // Collapse nested or matchers
     var expr = new ArrayList<Matcher<T>>();
+
     for (Matcher<T> it : matchers) {
       if (it instanceof OrMatcher<T> orMatcher) {
         expr.addAll(Arrays.asList(orMatcher.matchers));
@@ -39,6 +40,7 @@ public final class OrMatcher<T> implements Matcher<T> {
         expr.add(it);
       }
     }
+
     return new OrMatcher<>(expr);
   }
 
@@ -49,6 +51,7 @@ public final class OrMatcher<T> implements Matcher<T> {
         return true;
       }
     }
+
     return false;
   }
 

@@ -207,6 +207,7 @@ public final class RouteBuilder extends AbstractEntityBuilder<Route, RouteBuilde
     if (groupsOfRoutes == null) {
       groupsOfRoutes = new ArrayList<>();
     }
+
     return groupsOfRoutes;
   }
 

@@ -16,8 +16,6 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * it.
  * <p>
  * Do not confuse this with {@link ConstrainedTransfer}.
- *
- * <p>
  * <pre>
  * TODO Should we just store the NearbyStop as a field here, or even switch to using it instead
  *      where this class is used

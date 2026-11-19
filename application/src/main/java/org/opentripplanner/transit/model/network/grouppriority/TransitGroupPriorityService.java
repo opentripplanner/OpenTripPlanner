@@ -24,13 +24,13 @@ public class TransitGroupPriorityService {
 
   /**
    * IMPLEMENTATION DETAILS
-   *
+   * <p>
    * There are two ways we can treat the base (local-traffic) transit priority group:
    * <ol>
-   *   <li>We can assign group id 1 (one) to the base group and it will be treated as any other group.
-   *   </li>
-   *   <li>We can assign group id 0 (zero) to the base and it will not be added to the set of groups a
-   *       given path has.</li>
+   *   <li>We can assign group id 1 (one) to the base group and it will be treated as any other
+   *       group. </li>
+   *   <li>We can assign group id 0 (zero) to the base and it will not be added to the set of groups
+   *       a given path has.</li>
    * </ol>
    * When we compare paths, we compare sets of group ids. A set is dominating another set if it is a
    * smaller subset or different from the other set.
@@ -97,7 +97,6 @@ public class TransitGroupPriorityService {
 
   /**
    * Fetch/lookup the transit-group-id for the given pattern.
-   * <p>
    *
    * @throws IllegalArgumentException if more than 32 group-ids are requested.
    */
@@ -109,7 +108,6 @@ public class TransitGroupPriorityService {
 
   /**
    * Fetch/lookup the transit-group-id for the given trip.
-   * <p>
    *
    * @throws IllegalArgumentException if more than 32 group-ids are requested.
    */
@@ -119,7 +117,6 @@ public class TransitGroupPriorityService {
 
   /**
    * Fetch/lookup the transit-group-id for the given entity.
-   * <p>
    *
    * @throws IllegalArgumentException if more than 32 group-ids are requested.
    */
@@ -127,6 +124,7 @@ public class TransitGroupPriorityService {
     if (!enabled) {
       return baseGroupId;
     }
+
     for (var it : agencyMatchersIds) {
       if (it.matcher().match(entity)) {
         var agencyId = entity.agencyId();
@@ -136,6 +134,7 @@ public class TransitGroupPriorityService {
           groupId = nextGroupId();
           it.ids.put(agencyId, groupId);
         }
+
         return groupId;
       }
     }
@@ -145,6 +144,7 @@ public class TransitGroupPriorityService {
         return it.groupId();
       }
     }
+
     // Fallback to base-group-id
     return baseGroupId;
   }

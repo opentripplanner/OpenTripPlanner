@@ -37,13 +37,12 @@ public interface RaptorTripScheduleSearch<T extends RaptorTripSchedule> {
    * search. So, the caller MUST copy values over and NOT store references to the result object. As
    * soon as a new call the search is done, the result object is invalid.
    *
-   * @param earliestBoardTime     The time of arrival(departure for reverse search) at the given
-   *                              stop.
+   * @param earliestBoardTime The time of arrival(departure for reverse search) at the given stop.
    * @param stopPositionInPattern The stop to board
-   * @param tripIndexLimit        Upper bound for trip index to search. Inclusive. Use
-   *                              {@code UNBOUNDED_TRIP_INDEX} for an unbounded search. This is an
-   *                              optimization which allow us to search faster, and it excludes
-   *                              results which is less favorable than trips already processed.
+   * @param tripIndexLimit Upper bound for trip index to search. Inclusive. Use
+   *     {@code UNBOUNDED_TRIP_INDEX} for an unbounded search. This is an optimization which allow
+   *     us to search faster, and it excludes results which is less favorable than trips already
+   *     processed.
    */
   @Flyweight
   RaptorBoardOrAlightEvent<T> search(

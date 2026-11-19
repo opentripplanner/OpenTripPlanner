@@ -25,7 +25,7 @@ import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 
 /**
  * This class is responsible for creating a a result collector - the set of paths.
- * <p/>
+ * <p>
  * This class has REQUEST scope, so a new instance should be created for each new request/travel
  * search.
  *
@@ -65,7 +65,7 @@ public class DestinationArrivalConfig<T extends RaptorTripSchedule> {
    * Create a {@link DestinationArrivalPaths} for McRaptor.
    *
    * @param costConfig Supported configurations of c1, c2 and relaxed cost(c1).
-   * @param c2Comp     Dominance function for c2; {@code null} means c2 is not used.
+   * @param c2Comp Dominance function for c2; {@code null} means c2 is not used.
    */
   public DestinationArrivalPaths<T> createMcDestArrivalPaths(
     ParetoSetCost costConfig,
@@ -110,6 +110,7 @@ public class DestinationArrivalConfig<T extends RaptorTripSchedule> {
     if (ctx.searchParams().timetable()) {
       return ParetoSetTime.USE_TIMETABLE;
     }
+
     return preferLatestDeparture
       ? ParetoSetTime.USE_DEPARTURE_TIME
       : ParetoSetTime.USE_ARRIVAL_TIME;

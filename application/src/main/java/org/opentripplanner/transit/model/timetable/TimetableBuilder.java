@@ -47,11 +47,13 @@ public class TimetableBuilder {
    */
   public TimetableBuilder addTripTimes(TripTimes<?> tripTimes) {
     var trip = tripTimes.getTrip();
+
     if (this.tripTimes.containsKey(trip.getId())) {
       throw new IllegalStateException(
         "Error! TripTimes for the same trip is added twice. Trip: " + trip
       );
     }
+
     return addOrUpdateTripTimes(tripTimes);
   }
 
@@ -68,6 +70,7 @@ public class TimetableBuilder {
     for (TripTimes<?> it : tripTimes) {
       addTripTimes(it);
     }
+
     return this;
   }
 
@@ -80,12 +83,12 @@ public class TimetableBuilder {
     for (TripTimes<?> it : tripTimesToBeRemoved) {
       tripTimes.remove(it.getTrip().getId());
     }
+
     return this;
   }
 
   /**
    * Apply the same update to all trip-times including scheduled and frequency based trip times.
-   * <p>
    */
   public TimetableBuilder withAdjustedTimes(Duration timeshift) {
     tripTimes.replaceAll((t, tt) -> withAdjustedTimes(tt, timeshift));

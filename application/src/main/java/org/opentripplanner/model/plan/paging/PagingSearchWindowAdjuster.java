@@ -40,15 +40,14 @@ public final class PagingSearchWindowAdjuster {
    * Take the given search-window and adjust it so it better matches the number-of-itineraries found
    * in the search - this is likely to be a good estimate for the next/previous page.
    *
-   * @param searchWindowUsed         The search window used by raptor
-   * @param searchWindowStartTime    The start time for the search window used
+   * @param searchWindowUsed The search window used by raptor
+   * @param searchWindowStartTime The start time for the search window used
    * @param rmItineraryDepartureTime If the search-window is cropped, this is the departure time of
-   *                                 the first removed itinerary. This should be {@code null} if the
-   *                                 search-window is not cropped in the itinerary filter.
-   * @param cropSearchWindowTail     This indicates which end of the search-window to crop. If
-   *                                 {@code true} the search-window is cropped at the end, and if
-   *                                 {@code false} it is cropped in the beginning. If no
-   *                                 rmItineraryDepartureTime exist, then we do not care.
+   *     the first removed itinerary. This should be {@code null} if the search-window is not
+   *     cropped in the itinerary filter.
+   * @param cropSearchWindowTail This indicates which end of the search-window to crop. If
+   *     {@code true} the search-window is cropped at the end, and if {@code false} it is cropped in
+   *     the beginning. If no rmItineraryDepartureTime exist, then we do not care.
    */
   public Duration decreaseSearchWindow(
     Duration searchWindowUsed,
@@ -86,6 +85,7 @@ public final class PagingSearchWindowAdjuster {
           60 * pagingSearchWindowAdjustments[nActualItinerariesFound]
       );
     }
+
     // No change
     return searchWindowUsed;
   }
@@ -115,15 +115,18 @@ public final class PagingSearchWindowAdjuster {
     if (seconds < minSearchWindow.getSeconds()) {
       return minSearchWindow;
     }
+
     if (seconds > maxSearchWindow.getSeconds()) {
       return maxSearchWindow;
     }
+
     // Round down to the closest minute
     int minutes = seconds / 60;
 
     if (minutes <= 240) {
       return Duration.ofMinutes(ceiling(minutes, 10));
     }
+
     return Duration.ofMinutes(ceiling(minutes, 30));
   }
 }

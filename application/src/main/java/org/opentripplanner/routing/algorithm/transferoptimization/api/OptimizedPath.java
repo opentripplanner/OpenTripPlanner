@@ -64,6 +64,7 @@ public class OptimizedPath<T extends RaptorTripSchedule>
       var c = tx == null ? null : (TransferConstraint) tx.getTransferConstraint();
       return TransferConstraint.cost(c);
     }
+
     // Return zero cost if no transfer exist
     return TransferConstraint.ZERO_COST;
   }

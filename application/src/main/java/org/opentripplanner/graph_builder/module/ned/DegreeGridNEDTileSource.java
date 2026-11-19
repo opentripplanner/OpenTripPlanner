@@ -52,17 +52,21 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
     }
 
     List<DataSource> paths = new ArrayList<>();
+
     for (var tile : tiles) {
       int x = tile.x - 1;
       int y = tile.y + 1;
       DataSource tilePath = getOrDownloadTile(x, y);
+
       if (tilePath != null) {
         paths.add(tilePath);
       }
     }
+
     if (paths.isEmpty()) {
       throw new RuntimeException("No elevation tiles were able to be downloaded!");
     }
+
     nedTiles = paths;
   }
 
@@ -73,24 +77,28 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
 
   private String formatLatLon(int x, int y) {
     String northSouth, eastWest;
+
     if (y < 0) {
       northSouth = "s";
       y = -y;
     } else {
       northSouth = "n";
     }
+
     if (x < 0) {
       eastWest = "w";
       x = -x;
     } else {
       eastWest = "e";
     }
+
     return String.format("%s%d%s%03d", northSouth, y, eastWest, x);
   }
 
   private DataSource getOrDownloadTile(int x, int y) {
     String key = formatLatLon(x, y) + ".tiff";
     DataSource tile = cacheDir.entry(key);
+
     if (tile.exists()) {
       return tile;
     }
@@ -100,20 +108,25 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
         "Cannot download NED tiles from S3: awsAccessKey or awsSecretKey properties are not set"
       );
     }
+
     LOG.info("Downloading NED degree tile {}", key);
     AWSCredentials awsCredentials = new AWSCredentials(awsAccessKey, awsSecretKey);
+
     try {
       S3Service s3Service = new RestS3Service(awsCredentials);
       S3Object object = s3Service.getObject(awsBucketName, key);
 
       InputStream istream = object.getDataInputStream();
+
       try (var ostream = tile.asOutputStream()) {
         byte[] buffer = new byte[4096];
         int read;
+
         while ((read = istream.read(buffer)) != -1) {
           ostream.write(buffer, 0, read);
         }
       }
+
       istream.close();
     } catch (S3ServiceException e) {
       // Check if the error code is a NoSuchKey code which indicates that the file was not found in
@@ -126,10 +139,12 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
         LOG.error("Elevation tile {} missing from s3bucket. Proceeding without tile!", key);
         return null;
       }
+
       throw new RuntimeException(e);
     } catch (ServiceException | IOException e) {
       throw new RuntimeException(e);
     }
+
     return tile;
   }
 

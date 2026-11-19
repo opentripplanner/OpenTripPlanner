@@ -27,8 +27,8 @@ class GbfsVehicleTypeMapper {
    * Maps a GBFS vehicle type to the OTP model, or returns {@code null} when it cannot be mapped and
    * should be ignored.
    * <p>
-   * {@code form_factor} and {@code propulsion_type} are required by the GBFS specification. When
-   * a feed omits one, or sends a value the GBFS model does not recognize, it is deserialized to
+   * {@code form_factor} and {@code propulsion_type} are required by the GBFS specification. When a
+   * feed omits one, or sends a value the GBFS model does not recognize, it is deserialized to
    * {@code null}. Rather than guess a substitute we skip the vehicle type so that a single
    * malformed entry does not abort the whole feed update. Downstream consumers already treat an
    * unknown vehicle type id as either filtered out (stations) or the system default (free-floating
@@ -40,10 +40,12 @@ class GbfsVehicleTypeMapper {
       logIgnoredVehicleType(vehicleType, "form_factor");
       return null;
     }
+
     if (vehicleType.getPropulsionType() == null) {
       logIgnoredVehicleType(vehicleType, "propulsion_type");
       return null;
     }
+
     return new RentalVehicleType(
       new FeedScopedId(systemId, vehicleType.getVehicleTypeId()),
       optionalLocalizedString(vehicleType.getName(), GBFSName::getLanguage, GBFSName::getText),

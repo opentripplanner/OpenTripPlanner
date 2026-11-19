@@ -54,6 +54,7 @@ class GeofencingInterceptorTest {
       if (s0.getVertex().equals(v2)) {
         return s0.edit(testEdge);
       }
+
       return s0.edit(testEdge2);
     };
   }
@@ -63,9 +64,11 @@ class GeofencingInterceptorTest {
     var s0 = new State(v1, req);
     var editor = s0.edit(setupEdge);
     editor.beginFloatingVehicleRenting(RentalFormFactor.SCOOTER_STANDING, null, NETWORK, false);
+
     if (zones.length > 0) {
       editor.initializeGeofencingZones(Set.of(zones));
     }
+
     return editor.makeState();
   }
 
@@ -74,9 +77,11 @@ class GeofencingInterceptorTest {
     var s0 = new State(v1, req);
     var editor = s0.edit(setupEdge);
     editor.beginVehicleRentingAtStation(RentalFormFactor.BICYCLE, null, NETWORK, false, false);
+
     if (zones.length > 0) {
       editor.initializeGeofencingZones(Set.of(zones));
     }
+
     return editor.makeState();
   }
 
@@ -97,14 +102,17 @@ class GeofencingInterceptorTest {
 
       boolean hasDropped = false;
       boolean hasRiding = false;
+
       for (var s : result) {
         if (s.getVehicleRentalState() == VehicleRentalState.HAVE_RENTED) {
           hasDropped = true;
         }
+
         if (s.getVehicleRentalState() == VehicleRentalState.RENTING_FLOATING) {
           hasRiding = true;
         }
       }
+
       assertTrue(hasDropped, "should have a drop branch");
       assertTrue(hasRiding, "should have a ride-through branch");
     }
@@ -217,9 +225,11 @@ class GeofencingInterceptorTest {
       var renting = rentEditor.makeState();
       var dropEditor = renting.edit(testEdge);
       dropEditor.dropFloatingVehicle(RentalFormFactor.SCOOTER_STANDING, null, NETWORK, false);
+
       if (zones.length > 0) {
         dropEditor.initializeGeofencingZones(Set.of(zones));
       }
+
       // Ensure rental chain is valid (not used directly)
       dropEditor.makeState();
 

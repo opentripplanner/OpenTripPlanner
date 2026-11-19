@@ -100,9 +100,11 @@ public final class BikeRequest {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     BikeRequest that = (BikeRequest) o;
     return (
       doubleEquals(that.speed, speed) &&
@@ -214,9 +216,11 @@ public final class BikeRequest {
       var builder = TimeSlopeSafetyTriangle.of();
       body.accept(builder);
       this.optimizeTriangle = builder.build();
+
       if (!builder.isEmpty()) {
         this.optimizeType = TRIANGLE;
       }
+
       return this;
     }
 

@@ -16,8 +16,8 @@ import java.util.List;
  * contains two pointers, the first is the day and the second is the trip index on that day: ```
  * tripIndexForTripPatternPerDates -> (day, tripIndexForTripPatternPerDate) ```
  * <p>
- * This class might at first look a bit complicated. A much easier approach would be to just sort
- * on departure times using a Java built in sort, but sorting is expensive. This code will merge the
+ * This class might at first look a bit complicated. A much easier approach would be to just sort on
+ * departure times using a Java built in sort, but sorting is expensive. This code will merge the
  * timetables instead - which is faster. In 99% of the cases we will just do one extra comparison
  * for each departure time.
  */
@@ -36,12 +36,12 @@ final class TripTimesForDaysIndex {
 
   /**
    * Goal: Read the JavaDoc for the class and factory method, and study the unit-test.
-   *
+   * <p>
    * Implementation notes!
    * <p>
-   * We need to order trips based on the "actual" departure time, not day and departure-time. We
-   * do this by merging the trip-departure times for each day. Each day is already sorted, so we
-   * need to merge the end of each 'day' with the start of the next 'day+1'. We avoid sorting for
+   * We need to order trips based on the "actual" departure time, not day and departure-time. We do
+   * this by merging the trip-departure times for each day. Each day is already sorted, so we need
+   * to merge the end of each 'day' with the start of the next 'day+1'. We avoid sorting for
    * performance reasons.
    */
   TripTimesForDaysIndex(List<int[]> firstStopDepartureTimesPerDay) {
@@ -70,24 +70,32 @@ final class TripTimesForDaysIndex {
         if (i < a.length) {
           tripIndexIndex = setIndexValue(tripIndexIndex, day, i);
         }
+
         ++i;
+
         if (i < a.length) {
           u = a[i];
         } else {
           ++day;
+
           if (day == list.size()) {
             break;
           }
+
           i = j;
           a = list.get(day);
+
           if (i == a.length) {
             ++day;
+
             if (day == list.size()) {
               break;
             }
+
             i = 0;
             a = list.get(day);
           }
+
           j = 0;
           u = safeValueAt(a, i);
           v = safeValueNextDayAt(list, day, j);
@@ -133,10 +141,12 @@ final class TripTimesForDaysIndex {
     for (int i = 0; i < list.size(); ++i) {
       int o = offsets[i];
       int[] a = list.get(i);
+
       for (int j = 0; j < a.length; ++j) {
         a[j] = a[j] + o;
       }
     }
+
     return list;
   }
 
@@ -145,7 +155,9 @@ final class TripTimesForDaysIndex {
     if (tripIndex.length == 0) {
       return "";
     }
+
     var buf = new StringBuilder();
+
     for (int i = 0; i < tripIndex.length; i += 2) {
       buf
         .append(tripIndex[i])
@@ -153,6 +165,7 @@ final class TripTimesForDaysIndex {
         .append(tripIndex[i + 1])
         .append(' ');
     }
+
     return buf.substring(0, buf.length() - 1);
   }
 }

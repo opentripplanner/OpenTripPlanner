@@ -49,8 +49,8 @@ public class StreetEdge
 
   /**
    * Fixed extra weight (about 10 minutes of walking) added once when a wheelchair user crosses a
-   * wheelchair-inaccessible barrier vertex, e.g. a raised kerb. It is a point obstacle, so the
-   * cost does not depend on the length of the adjacent edges.
+   * wheelchair-inaccessible barrier vertex, e.g. a raised kerb. It is a point obstacle, so the cost
+   * does not depend on the length of the adjacent edges.
    */
   private static final double WHEELCHAIR_INACCESSIBLE_BARRIER_COST = 600;
 
@@ -166,8 +166,8 @@ public class StreetEdge
    * This checks if start or end vertex is bollard If it is it creates intersection of street edge
    * permissions and from/to barriers. Then it checks if mode is allowed to traverse the edge.
    * <p>
-   * By default CAR isn't allowed to traverse barrier but foot and bicycle are. This can be
-   * changed with different tags
+   * By default CAR isn't allowed to traverse barrier but foot and bicycle are. This can be changed
+   * with different tags
    * <p>
    * If start/end isn't bollard it just checks the street permissions.
    * <p>
@@ -175,9 +175,11 @@ public class StreetEdge
    */
   public boolean canTraverse(TraverseMode mode) {
     StreetTraversalPermission permission = getPermission();
+
     if (fromv instanceof BarrierVertex bv) {
       permission = permission.intersection(bv.getBarrierPermissions());
     }
+
     if (tov instanceof BarrierVertex bv) {
       permission = permission.intersection(bv.getBarrierPermissions());
     }
@@ -266,9 +268,11 @@ public class StreetEdge
         "A bicycle safety factor may not be set if an elevation extension is set."
       );
     }
+
     if (!Float.isFinite(bicycleSafetyFactor) || bicycleSafetyFactor <= 0) {
       throw new IllegalArgumentException("Invalid bicycleSafetyFactor: " + bicycleSafetyFactor);
     }
+
     this.bicycleSafetyFactor = bicycleSafetyFactor;
   }
 
@@ -288,9 +292,11 @@ public class StreetEdge
         "A walk safety factor may not be set if an elevation extension is set."
       );
     }
+
     if (!Float.isFinite(walkSafetyFactor) || walkSafetyFactor <= 0) {
       throw new IllegalArgumentException("Invalid walkSafetyFactor: " + walkSafetyFactor);
     }
+
     this.walkSafetyFactor = walkSafetyFactor;
   }
 
@@ -328,6 +334,7 @@ public class StreetEdge
     // Geofencing enforcement for rental modes
     if (s0.getRequest().mode().includesRenting()) {
       var geofencingResult = traverseWithGeofencing(s0);
+
       if (geofencingResult != null) {
         return geofencingResult;
       }
@@ -352,6 +359,7 @@ public class StreetEdge
 
     if (canPickupAndDrive(s0) && canTraverse(TraverseMode.CAR)) {
       StateEditor inCar = doTraverse(s0, TraverseMode.CAR, false);
+
       if (inCar != null) {
         driveAfterPickup(s0, inCar);
         State forkState = inCar.makeState();
@@ -366,6 +374,7 @@ public class StreetEdge
       canTraverse(TraverseMode.WALK)
     ) {
       StateEditor dropOff = doTraverse(s0, TraverseMode.WALK, false);
+
       if (dropOff != null) {
         dropOffAfterDriving(s0, dropOff);
         // Only the walk state is returned, since traversing by car was not possible
@@ -386,9 +395,8 @@ public class StreetEdge
   }
 
   /**
-   * Update the name of the edge after it has been constructed and set the
-   * nameIsDerived property to false, indicating to the code that maps from edges to steps that this
-   * is a real street name.
+   * Update the name of the edge after it has been constructed and set the nameIsDerived property to
+   * false, indicating to the code that maps from edges to steps that this is a real street name.
    *
    * @see Edge#nameIsDerived()
    */
@@ -597,10 +605,12 @@ public class StreetEdge
 
     // we have this code implemented in both directions, because splits are fudged half a millimeter
     // when the length of this is odd. We want to make sure the lengths of the split streets end up
-    // exactly the same as their backStreets so that if they are split again the error does not accumulate
+    // exactly the same as their backStreets so that if they are split again the error does not
+    // accumulate
     // and so that the order in which they are split does not matter.
     int l1 = defaultMillimeterLength(geoms.beginning());
     int l2 = defaultMillimeterLength(geoms.ending());
+
     if (!isBack()) {
       // cast before the divide so that the sum is promoted
       double frac = (double) l1 / (l1 + l2);
@@ -624,6 +634,7 @@ public class StreetEdge
       );
       l1 = 1;
     }
+
     if (l2 <= 0) {
       LOG.error(
         "Edge 2 ({}) split at vertex at {},{}  has length {} mm. Setting to 1 mm.",
@@ -665,6 +676,7 @@ public class StreetEdge
       copyPropertiesToSplitEdge(seb1, 0, defaultMillimeterLength(geoms.beginning()) / 1000.0);
       e1 = seb1.buildAndConnect();
     }
+
     if (direction == LinkingDirection.INCOMING || direction == LinkingDirection.BIDIRECTIONAL) {
       var seb2 = new TemporaryPartialStreetEdgeBuilder()
         .withParentEdge(this)
@@ -759,6 +771,7 @@ public class StreetEdge
     int lengthInMillimeter = builder.hasDefaultLength()
       ? defaultMillimeterLength(builder.geometry())
       : builder.millimeterLength();
+
     if (
       lengthInMillimeter == 0 &&
       !(
@@ -773,6 +786,7 @@ public class StreetEdge
         builder.toVertex()
       );
     }
+
     return lengthInMillimeter;
   }
 
@@ -812,11 +826,13 @@ public class StreetEdge
    */
   private StateEditor doTraverse(State s0, TraverseMode traverseMode, boolean walkingBike) {
     Edge backEdge = s0.getBackEdge();
+
     if (backEdge != null) {
       // No illegal U-turns.
       // NOTE(flamholz): we check both directions because both edges get a chance to decide
       // if they are the reverse of the other. Also, because it doesn't matter which direction
-      // we are searching in - these traversals are always disallowed (they are U-turns in one direction
+      // we are searching in - these traversals are always disallowed (they are U-turns in one
+      // direction
       // or the other).
       // TODO profiling indicates that this is a hot spot.
       // isReverseOf is symmetric so we no longer test in both directions. isReverseOf must
@@ -843,13 +859,14 @@ public class StreetEdge
 
     var traversalCosts = switch (traverseMode) {
       case BICYCLE, SCOOTER -> bicycleOrScooterTraversalCost(request, traverseMode, speed, s0);
-      case WALK -> walkingTraversalCosts(
-        request,
-        traverseMode,
-        speed,
-        walkingBike,
-        s0.getRequest().wheelchairEnabled()
-      );
+      case WALK
+        -> walkingTraversalCosts(
+          request,
+          traverseMode,
+          speed,
+          walkingBike,
+          s0.getRequest().wheelchairEnabled()
+        );
       default -> otherTraversalCosts(request, traverseMode, walkingBike, speed);
     };
 
@@ -878,6 +895,7 @@ public class StreetEdge
        */
       var intersectionMode = arriveBy ? backMode : traverseMode;
       boolean walkingBikeThroughIntersection = arriveBy ? s0.isBackWalkingBike() : walkingBike;
+
       if (arriveBy && tov instanceof IntersectionVertex traversedVertex) {
         // arrive-by search
         turnDuration = s0
@@ -909,9 +927,10 @@ public class StreetEdge
       }
 
       var modeReluctance = switch (intersectionMode) {
-        case WALK -> walkingBikeThroughIntersection
-          ? request.bike().walking().reluctance()
-          : request.walk().reluctance();
+        case WALK
+          -> walkingBikeThroughIntersection
+            ? request.bike().walking().reluctance()
+            : request.walk().reluctance();
         case BICYCLE -> request.bike().reluctance();
         case SCOOTER -> request.scooter().reluctance();
         case CAR -> request.car().reluctance();
@@ -970,6 +989,7 @@ public class StreetEdge
     double weight;
     var optimizeType =
       mode == TraverseMode.BICYCLE ? req.bike().optimizeType() : req.scooter().optimizeType();
+
     switch (optimizeType) {
       case SAFE_STREETS -> weight = getEffectiveBicycleSafetyDistance() / speed;
       case FLAT_STREETS ->
@@ -992,6 +1012,7 @@ public class StreetEdge
       }
       default -> weight = getDistanceMeters() / speed;
     }
+
     var reluctance = StreetEdgeReluctanceCalculator.computeReluctance(req, mode, false, isStairs());
     weight *= reluctance;
     return new TraversalCosts(time, weight);
@@ -999,7 +1020,7 @@ public class StreetEdge
 
   /**
    * Calculate effective distance for time/speed based on propulsion type.
-   *
+   * <p>
    * For ELECTRIC (e-scooters): constant speed, ignore slope For ELECTRIC_ASSIST (e-bikes): reduced
    * slope sensitivity (motor helps uphill) For HUMAN and others: full slope effect
    */
@@ -1010,12 +1031,11 @@ public class StreetEdge
     if (propulsion == null) {
       return getEffectiveBikeDistance();
     }
+
     return switch (propulsion) {
       case ELECTRIC -> getDistanceMeters();
-      case ELECTRIC_ASSIST -> interpolateSlopeEffect(
-        getEffectiveBikeDistance(),
-        electricAssistSlopeSensitivity
-      );
+      case ELECTRIC_ASSIST
+        -> interpolateSlopeEffect(getEffectiveBikeDistance(), electricAssistSlopeSensitivity);
       default -> getEffectiveBikeDistance();
     };
   }
@@ -1030,12 +1050,14 @@ public class StreetEdge
     if (propulsion == null) {
       return getEffectiveBikeDistanceForWorkCost();
     }
+
     return switch (propulsion) {
       case ELECTRIC -> getDistanceMeters();
-      case ELECTRIC_ASSIST -> interpolateSlopeEffect(
-        getEffectiveBikeDistanceForWorkCost(),
-        electricAssistSlopeSensitivity
-      );
+      case ELECTRIC_ASSIST
+        -> interpolateSlopeEffect(
+          getEffectiveBikeDistanceForWorkCost(),
+          electricAssistSlopeSensitivity
+        );
       default -> getEffectiveBikeDistanceForWorkCost();
     };
   }
@@ -1044,7 +1066,7 @@ public class StreetEdge
    * Interpolate between flat distance and slope-adjusted distance. Formula: flat + (sloped - flat)
    * × sensitivity = flat × (1 - sensitivity) + sloped × sensitivity
    *
-   * @param slopedDistance   the slope-adjusted effective distance
+   * @param slopedDistance the slope-adjusted effective distance
    * @param slopeSensitivity 0.0 = ignore slope (use flat distance), 1.0 = full slope effect
    */
   private double interpolateSlopeEffect(double slopedDistance, double slopeSensitivity) {
@@ -1060,6 +1082,7 @@ public class StreetEdge
     boolean wheelchair
   ) {
     double time, weight;
+
     if (wheelchair) {
       time = getEffectiveWalkDistance() / speed;
       // Use walk safety and the bike slope model.
@@ -1078,6 +1101,7 @@ public class StreetEdge
         isStairs()
       );
       weight = (blendedDistance / speed) * wheelchairReluctance;
+
       if (BitSetUtils.get(flags, WHEELCHAIR_INACCESSIBLE_BARRIER_FLAG_INDEX)) {
         weight += WHEELCHAIR_INACCESSIBLE_BARRIER_COST;
       }
@@ -1107,9 +1131,9 @@ public class StreetEdge
 
   /**
    * Checks if the vertex is a {@link BarrierVertex} that is wheelchair-inaccessible, e.g. a
-   * {@code barrier=kerb} node without a {@code kerb=flush/lowered/no} tag. Only the edge ending
-   * at the vertex is charged, so that crossing the barrier is penalised once, not once per
-   * adjacent edge.
+   * {@code barrier=kerb} node without a {@code kerb=flush/lowered/no} tag. Only the edge ending at
+   * the vertex is charged, so that crossing the barrier is penalised once, not once per adjacent
+   * edge.
    */
   private static boolean isWheelchairInaccessibleBarrier(Vertex vertex) {
     return (
@@ -1138,7 +1162,8 @@ public class StreetEdge
         s1.setEnteredNoThroughTrafficArea();
       }
     } else if (s0.hasEnteredNoThruTrafficArea()) {
-      // If we transitioned into a no-through-traffic area at some point, check if we are exiting it.
+      // If we transitioned into a no-through-traffic area at some point, check if we are exiting
+      // it.
       return true;
     }
 

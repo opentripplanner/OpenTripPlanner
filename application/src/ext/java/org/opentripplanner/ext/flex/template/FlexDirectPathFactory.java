@@ -149,6 +149,7 @@ public class FlexDirectPathFactory {
         requestedBookingTime,
         trip.getPickupBookingInfo(accessTemplate.boardStopPosition)
       );
+
       if (bookingInfo.exceedsMinimumBookingNotice(latestArrivalTime)) {
         return Optional.empty();
       }

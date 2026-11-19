@@ -171,6 +171,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
         )
       );
     }
+
     return args;
   }
 
@@ -231,6 +232,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
     StreetMode... streetModes
   ) {
     var linker = VertexLinkerTestFactory.of(graph);
+
     for (final StreetMode streetMode : streetModes) {
       try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
         var vertexCreationService = new VertexCreationService(linker);
@@ -253,6 +255,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
           .withDirectMode(streetMode)
           .build();
         var linkingContext2 = linkingContextFactory.create(temporaryVerticesContainer, request2);
+
         if (expectedToStreetName != null) {
           assertToLink(
             expectedToStreetName.name(),

@@ -34,11 +34,13 @@ public class TripStopTimes {
 
   public void addAll(Collection<StopTime> values) {
     Set<Trip> keysUpdated = new HashSet<>();
+
     for (StopTime value : values) {
       Trip key = value.getTrip();
       keysUpdated.add(key);
       map.computeIfAbsent(key, trip -> new ArrayList<>()).add(value);
     }
+
     // Sort and updated stops for all keys touched.
     for (Trip key : keysUpdated) {
       Collections.sort(map.get(key));
@@ -55,6 +57,7 @@ public class TripStopTimes {
 
   public void removeIf(Predicate<Trip> test) {
     List<Trip> removeKeys = map.keySet().stream().filter(test).collect(Collectors.toList());
+
     for (Trip removeKey : removeKeys) {
       map.remove(removeKey);
     }

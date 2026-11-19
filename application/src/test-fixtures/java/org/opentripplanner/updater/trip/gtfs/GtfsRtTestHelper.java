@@ -83,6 +83,7 @@ public class GtfsRtTestHelper {
     UpdateIncrementality incrementality
   ) {
     var resultRef = new AtomicReference<UpdateResult>();
+
     try {
       transitTestEnvironment
         .updateManager()
@@ -105,6 +106,7 @@ public class GtfsRtTestHelper {
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
+
     return resultRef.get();
   }
 }

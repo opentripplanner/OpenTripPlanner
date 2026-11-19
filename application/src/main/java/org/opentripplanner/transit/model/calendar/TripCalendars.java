@@ -90,9 +90,11 @@ public class TripCalendars implements Serializable {
   public Set<LocalDate> listServiceDates(FeedScopedId serviceId) {
     Set<LocalDate> dates = new HashSet<>();
     List<LocalDate> serviceDates = serviceDatesByServiceId.get(serviceId);
+
     if (serviceDates != null) {
       dates.addAll(serviceDates);
     }
+
     return dates;
   }
 
@@ -111,7 +113,7 @@ public class TripCalendars implements Serializable {
   /**
    * Determine whether the given service id is active on the specified service date.
    *
-   * @param serviceId   the target service id
+   * @param serviceId the target service id
    * @param serviceDate the target service date
    * @return {@code true} if the service id is active on the given service date
    */
@@ -155,8 +157,7 @@ public class TripCalendars implements Serializable {
   }
 
   /**
-   * The time when the transit service starts, in the given time zone. EPOCH if there is no
-   * transit.
+   * The time when the transit service starts, in the given time zone. EPOCH if there is no transit.
    */
   public Instant transitServiceStarts(ZoneId timeZone) {
     return startDate()
@@ -196,6 +197,7 @@ public class TripCalendars implements Serializable {
       serviceDatesByServiceId
     );
     Map<LocalDate, Set<FeedScopedId>> newServiceIdsByDate = deepCopy(serviceIdsByDate);
+
     for (FeedScopedId serviceId : data.getServiceIds()) {
       List<LocalDate> dates = data
         .getServiceDatesForServiceId(serviceId)
@@ -203,10 +205,12 @@ public class TripCalendars implements Serializable {
         .sorted()
         .toList();
       newServiceDatesByServiceId.put(serviceId, dates);
+
       for (LocalDate date : dates) {
         newServiceIdsByDate.computeIfAbsent(date, d -> new HashSet<>()).add(serviceId);
       }
     }
+
     return new TripCalendars(
       Collections.unmodifiableMap(newServiceDatesByServiceId),
       freezeServiceIds(newServiceIdsByDate),
@@ -216,20 +220,24 @@ public class TripCalendars implements Serializable {
   }
 
   /**
-   * Efficiently assign each of the given service ids the next free service code, in iteration order:
-   * the code is the number of service codes registered before it. Used during graph build only.
+   * Efficiently assign each of the given service ids the next free service code, in iteration
+   * order: the code is the number of service codes registered before it. Used during graph build
+   * only.
    *
    * @throws IllegalArgumentException if service id is added more than once.
    * @return a new instance with the service codes registered.
    */
   public TripCalendars withNextServiceCodes(Collection<FeedScopedId> serviceIds) {
     Map<FeedScopedId, Integer> updated = new HashMap<>(serviceCodes);
+
     for (FeedScopedId serviceId : serviceIds) {
       var previousValue = updated.put(Objects.requireNonNull(serviceId), updated.size());
+
       if (previousValue != null) {
         throw new IllegalArgumentException("Duplicate service id '%s'".formatted(serviceId));
       }
     }
+
     return new TripCalendars(
       serviceDatesByServiceId,
       serviceIdsByDate,
@@ -247,18 +255,23 @@ public class TripCalendars implements Serializable {
    */
   public TripCalendars initializeServiceCodesRunningForDate() {
     Map<LocalDate, IntSet> newServiceCodesRunningForDate = new HashMap<>();
+
     for (FeedScopedId serviceId : serviceDatesByServiceId.keySet()) {
       Integer code = serviceCodes.get(serviceId);
+
       if (code == null) {
         continue;
       }
+
       List<LocalDate> serviceDates = serviceDatesByServiceId.get(serviceId);
+
       for (LocalDate serviceDate : serviceDates) {
         newServiceCodesRunningForDate
           .computeIfAbsent(serviceDate, ignored -> new IntHashSet())
           .add(code);
       }
     }
+
     return new TripCalendars(
       serviceDatesByServiceId,
       serviceIdsByDate,
@@ -272,16 +285,15 @@ public class TripCalendars implements Serializable {
    * realtime data update. It makes sure the date is in the existing transit service period, i.e.
    * within {@link #startDate()} and {@link #endDate()}.
    * <p>
-   * Unlike the other modification methods, this one only produces (and passes to
-   * {@code onUpdate}) a new instance if the service id was not already registered — the common
-   * case, where the same date has already been seen by an earlier call, is a pure read with no
-   * allocation.
+   * Unlike the other modification methods, this one only produces (and passes to {@code onUpdate})
+   * a new instance if the service id was not already registered — the common case, where the same
+   * date has already been seen by an earlier call, is a pure read with no allocation.
    *
    * @param serviceDate service date for the added service id
-   * @param onUpdate    callback invoked with the new instance, if and only if a new service id was
-   *                    registered
+   * @param onUpdate callback invoked with the new instance, if and only if a new service id was
+   *     registered
    * @return service-id for date if it exists or is created. If the given service date is outside
-   *         the service period {@code null} is returned.
+   *     the service period {@code null} is returned.
    */
   @Nullable
   public FeedScopedId getOrCreateServiceIdForDate(
@@ -296,12 +308,14 @@ public class TripCalendars implements Serializable {
       CAL_SERVICE_FEED_ID,
       ServiceDateUtils.asCompactString(serviceDate)
     );
+
     if (serviceDatesByServiceId.containsKey(serviceId) && serviceCodes.containsKey(serviceId)) {
       return serviceId;
     }
 
     Map<FeedScopedId, List<LocalDate>> newServiceDatesByServiceId = serviceDatesByServiceId;
     Map<LocalDate, Set<FeedScopedId>> newServiceIdsByDate = serviceIdsByDate;
+
     if (!serviceDatesByServiceId.containsKey(serviceId)) {
       newServiceDatesByServiceId = withEntry(
         serviceDatesByServiceId,
@@ -314,6 +328,7 @@ public class TripCalendars implements Serializable {
 
     Map<FeedScopedId, Integer> newServiceCodes = serviceCodes;
     Map<LocalDate, IntSet> newServiceCodesRunningForDate = serviceCodesRunningForDate;
+
     if (!serviceCodes.containsKey(serviceId)) {
       // Calculating new unique serviceCode based on size (!)
       int serviceCode = serviceCodes.size();
@@ -340,6 +355,7 @@ public class TripCalendars implements Serializable {
     if (startDate == null || endDate == null) {
       return false;
     }
+
     return !serviceDate.isBefore(startDate) && !serviceDate.isAfter(endDate);
   }
 

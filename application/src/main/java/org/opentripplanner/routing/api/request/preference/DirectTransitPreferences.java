@@ -58,8 +58,8 @@ public class DirectTransitPreferences {
   }
 
   /// This is used to limit the results from the search. Paths are compared with the cheapest path
-  /// in the search window and are included in the result if they fall within the limit given by
-  /// the costRelaxFunction.
+  /// in the search window and are included in the result if they fall within the limit given by the
+  /// costRelaxFunction.
   public CostLinearFunction costRelaxFunction() {
     return costRelaxFunction;
   }
@@ -85,6 +85,7 @@ public class DirectTransitPreferences {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     DirectTransitPreferences that = (DirectTransitPreferences) o;
     return (
       enabled == that.enabled &&
@@ -109,6 +110,7 @@ public class DirectTransitPreferences {
     if (!enabled) {
       return "DirectTransitPreferences{not enabled}";
     }
+
     return ToStringBuilder.of(DirectTransitPreferences.class)
       .addObj("costRelaxFunction", costRelaxFunction, DEFAULT.costRelaxFunction)
       .addNum(

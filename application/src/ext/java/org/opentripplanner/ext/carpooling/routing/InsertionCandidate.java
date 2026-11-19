@@ -18,9 +18,9 @@ import org.opentripplanner.transit.model.site.StopLocation;
  * - Timing information
  * </pre>
  * <p>
- * {@code pickupPosition} and {@code dropoffPosition} are 0-based indices of the passenger's
- * pickup and dropoff stops in the modified route (the route after the passenger's stops have been
- * inserted into the carpool trip).
+ * {@code pickupPosition} and {@code dropoffPosition} are 0-based indices of the passenger's pickup
+ * and dropoff stops in the modified route (the route after the passenger's stops have been inserted
+ * into the carpool trip).
  */
 public record InsertionCandidate(
   CarpoolTrip trip,
@@ -47,6 +47,7 @@ public record InsertionCandidate(
         "pickupPosition must be >= 1 (pickup at trip origin is invalid); got " + pickupPosition
       );
     }
+
     if (dropoffPosition <= pickupPosition) {
       throw new IllegalArgumentException(
         "dropoffPosition (" +
@@ -94,6 +95,7 @@ public record InsertionCandidate(
     if (pickupPosition == 0) {
       return List.of();
     }
+
     return routeSegments.subList(0, pickupPosition);
   }
 
@@ -123,6 +125,7 @@ public record InsertionCandidate(
     if (dropoffPosition >= routeSegments.size()) {
       return List.of();
     }
+
     return routeSegments.subList(dropoffPosition, routeSegments.size());
   }
 
@@ -133,7 +136,7 @@ public record InsertionCandidate(
    * {@link #getPassengerRideDuration()}.
    *
    * @return {@link Duration#ZERO} when the passenger boards at the trip origin (no pickup
-   *         segments).
+   *     segments).
    */
   public Duration getDurationUntilPickupArrival() {
     return totalSegmentDuration(getSegmentsBeforePickup(), stopDuration);

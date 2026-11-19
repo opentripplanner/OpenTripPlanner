@@ -73,7 +73,11 @@ class TimeTableFrameParser extends NetexParser<Timetable_VersionFrameStructure> 
     if (element == null) {
       return;
     }
-    for (Journey_VersionStructure it : element.getVehicleJourneyOrDatedVehicleJourneyOrNormalDatedVehicleJourney()) {
+
+    for (
+      Journey_VersionStructure it
+      : element.getVehicleJourneyOrDatedVehicleJourneyOrNormalDatedVehicleJourney()
+    ) {
       if (it instanceof ServiceJourney serviceJourney) {
         serviceJourneys.add(serviceJourney);
       } else if (it instanceof DatedServiceJourney datedServiceJourney) {
@@ -88,7 +92,9 @@ class TimeTableFrameParser extends NetexParser<Timetable_VersionFrameStructure> 
     if (element == null) {
       return;
     }
+
     var list = element.getServiceJourneyPatternInterchangeOrServiceJourneyInterchange();
+
     for (Interchange_VersionStructure it : list) {
       if (it instanceof ServiceJourneyInterchange serviceJourneyInterchange) {
         serviceJourneyInterchanges.add(serviceJourneyInterchange);

@@ -43,15 +43,19 @@ public class CallAtStopService {
     throws EntityNotFoundException {
     Collection<StopLocation> stops;
     var stop = transitService.getStopLocation(id);
+
     if (stop != null) {
       stops = List.of(stop);
     } else {
       var station = transitService.getStopLocationsGroup(id);
+
       if (station == null) {
         throw new EntityNotFoundException("StopPointRef", id);
       }
+
       stops = station.getChildStops();
     }
+
     return findCallsAtStop(stops, params);
   }
 
@@ -100,6 +104,7 @@ public class CallAtStopService {
         "Number of departures must be less than " + MAX_DEPARTURES
       );
     }
+
     var builder = TripTimeOnDateRequest.of(stopLocations)
       .withTime(params.time)
       .withArrivalDeparture(params.arrivalDeparture)
@@ -113,9 +118,11 @@ public class CallAtStopService {
     if (params.includesAgencies()) {
       builder.withIncludeAgencies(params.includedAgencies);
     }
+
     if (params.includesRoutes()) {
       builder.withIncludeRoutes(params.includedRoutes);
     }
+
     if (params.includesModes()) {
       builder.withIncludeModes(params.includedModes);
     }

@@ -11,24 +11,23 @@ import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveIti
  * filter is guaranteed to keep at least the given {@code minNumItineraries} and/or the best
  * itinerary for each criterion. The criterion is defined using the list of {@code comparators}.
  * <p>
- * The main usage of this filter is to combine it with a transit grouping filter and for each
- * group make sure there is at least {@code minNumItineraries} and that the best itinerary with
- * respect to each criterion is kept. So, if the grouping is based on time and riding common trips,
- * then this filter will use the remaining criterion (transfers, generalized-cost,
- * [transit-group-priority]) to filter the grouped set of itineraries. DO NOT INCLUDE CRITERIA USED
- * TO GROUP THE ITINERARIES, ONLY THE REMAINING CRITERION USED IN THE RAPTOR SEARCH.
+ * The main usage of this filter is to combine it with a transit grouping filter and for each group
+ * make sure there is at least {@code minNumItineraries} and that the best itinerary with respect to
+ * each criterion is kept. So, if the grouping is based on time and riding common trips, then this
+ * filter will use the remaining criterion (transfers, generalized-cost, [transit-group-priority])
+ * to filter the grouped set of itineraries. DO NOT INCLUDE CRITERIA USED TO GROUP THE ITINERARIES,
+ * ONLY THE REMAINING CRITERION USED IN THE RAPTOR SEARCH.
  * <p>
  * <b>IMPLEMENTATION DETAILS</b>
  * <p>
- * This is not a trivial problem. In most cases, the best itinerary for a given criteria is
- * unique, but there might be ties - same number of transfers, same cost, and/or different priority
- * groups. In case of a tie, we will look if an itinerary is "best-in-group" for more than one
- * criterion, if so we pick the one which is best in the highest number of groups. Again, if there
- * is a tie (best in the same number of groups), then we fall back to the given itinerary sorting
- * order.
+ * This is not a trivial problem. In most cases, the best itinerary for a given criteria is unique,
+ * but there might be ties - same number of transfers, same cost, and/or different priority groups.
+ * In case of a tie, we will look if an itinerary is "best-in-group" for more than one criterion, if
+ * so we pick the one which is best in the highest number of groups. Again, if there is a tie (best
+ * in the same number of groups), then we fall back to the given itinerary sorting order.
  * <p>
- * This filter will use the order of the input itineraries to break ties. So, make sure to call
- * the appropriate sort function before this filter is invoked.
+ * This filter will use the order of the input itineraries to break ties. So, make sure to call the
+ * appropriate sort function before this filter is invoked.
  * <p>
  * Note! For criteria like num-of-transfers or generalized-cost, there is only one set of "best"
  * itineraries, and usually there are only one or a few itineraries. In case there is more than one,
@@ -93,6 +92,7 @@ public class McMaxLimitFilter implements RemoveItineraryFlagger {
     if (itineraries.size() <= minNumItineraries) {
       return List.of();
     }
+
     var state = new State(itineraries, comparators);
     state.findAllSingleItemGroupsAndAddTheItemToTheResult();
     state.findTheBestItemsUntilAllGroupsAreRepresentedInTheResult();

@@ -24,14 +24,17 @@ public class EmpiricalDelayCalendarBuilder {
     LocalDate end
   ) {
     var cal = new ServiceCalendarPeriod(serviceId, start, end);
+
     for (DayOfWeek day : days) {
       if (calendarForDays.containsKey(day)) {
         throw new IllegalStateException(
           "More than one serviceId is defined on " + day + ". This is not allowed."
         );
       }
+
       calendarForDays.put(day, cal);
     }
+
     return this;
   }
 }

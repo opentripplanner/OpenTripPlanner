@@ -30,10 +30,9 @@ import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
  * Responsible for mapping GTFS Transfer into the OTP model.
- *
  * <p>
- * This mapper is stateful and not thread safe. Create a new mapper for every set of transfers
- * you want to map.
+ * This mapper is stateful and not thread safe. Create a new mapper for every set of transfers you
+ * want to map.
  */
 class TransferMapper {
 
@@ -121,6 +120,7 @@ class TransferMapper {
       case RECOMMENDED:
         return TransferPriority.RECOMMENDED;
     }
+
     throw new IllegalArgumentException("Mapping missing for type: " + type);
   }
 
@@ -145,6 +145,7 @@ class TransferMapper {
   private StaySeatedNotAllowed toStaySeatedNotAllowed(Transfer t) {
     Trip fromTrip = tripMapper.map(t.getFromTrip());
     Trip toTrip = tripMapper.map(t.getToTrip());
+
     if (t.getTransferType() == STAY_SEATED_NOT_ALLOWED) {
       return new StaySeatedNotAllowed(fromTrip, toTrip);
     } else {
@@ -237,15 +238,18 @@ class TransferMapper {
     } else {
       station = stationMapper.map(rhsStopOrStation);
     }
+
     if (trip != null) {
       // A trip may visit the same stop twice, but we ignore that and only add the first stop
       // we find. Pattern that start and end at the same stop is supported.
       int stopPositionInPattern;
+
       if (boardTrip) {
         stopPositionInPattern = boardStopPosition(trip, stop, station);
       } else {
         stopPositionInPattern = alightStopPosition(trip, stop, station);
       }
+
       return stopPositionInPattern < 0 ? null : new TripTransferPoint(trip, stopPositionInPattern);
     } else if (route != null) {
       if (stop != null) {
@@ -272,6 +276,7 @@ class TransferMapper {
 
     for (int i = 0; i < stopTimes.size() - 1; i++) {
       StopTime stopTime = stopTimes.get(i);
+
       if (stopTime.getPickupType().isNotRoutable()) {
         continue;
       }
@@ -280,6 +285,7 @@ class TransferMapper {
         return i;
       }
     }
+
     return -1;
   }
 
@@ -293,6 +299,7 @@ class TransferMapper {
 
     for (int i = stopTimes.size() - 1; i > 0; i--) {
       StopTime stopTime = stopTimes.get(i);
+
       if (stopTime.getDropOffType().isNotRoutable()) {
         continue;
       }
@@ -301,6 +308,7 @@ class TransferMapper {
         return i;
       }
     }
+
     return -1;
   }
 }

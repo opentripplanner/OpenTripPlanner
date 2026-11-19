@@ -30,10 +30,12 @@ public final class RaptorTransferStoreBuilder {
     int c1
   ) {
     IntArrayList list = a[sourceStop];
+
     if (list == null) {
       list = new IntArrayList(3);
       a[sourceStop] = list;
     }
+
     list.add(targetStop);
     list.add(duration);
     list.add(c1);
@@ -54,9 +56,11 @@ public final class RaptorTransferStoreBuilder {
 
   private RaptorTransfers mapToArrays(IntArrayList[] transfers) {
     DefaultRaptorTransfer[][] result = new DefaultRaptorTransfer[transfers.length][];
+
     for (int i = 0; i < transfers.length; i++) {
       result[i] = mapToArray(transfers[i]);
     }
+
     return new RaptorTransfers(result);
   }
 
@@ -64,14 +68,17 @@ public final class RaptorTransferStoreBuilder {
     if (transfers == null) {
       return EMPTY_ARRAY;
     }
+
     int[] array = transfers.toArray();
     int size = array.length / 3;
 
     DefaultRaptorTransfer[] result = new DefaultRaptorTransfer[size];
+
     for (int i = 0; i < size; ++i) {
       int j = i * 3;
       result[i] = new DefaultRaptorTransfer(array[j], array[j + 1], array[j + 2]);
     }
+
     return result;
   }
 }

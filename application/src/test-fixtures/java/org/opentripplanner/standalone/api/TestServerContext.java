@@ -76,9 +76,9 @@ public class TestServerContext {
   private TestServerContext() {}
 
   /**
-   * Create a {@link TransitService} for unit testing: indexes the transit repository, builds
-   * raptor transit data, and wraps a pinned timetable snapshot. Regular transfers are not part of
-   * it, see {@link #createRegularTransfers}.
+   * Create a {@link TransitService} for unit testing: indexes the transit repository, builds raptor
+   * transit data, and wraps a pinned timetable snapshot. Regular transfers are not part of it, see
+   * {@link #createRegularTransfers}.
    */
   public static TransitService createTransitService(
     TransitRepository transitRepository,

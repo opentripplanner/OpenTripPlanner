@@ -97,7 +97,8 @@ public class ElevationModule implements GraphBuilderModule {
    * {@link org.eclipse.imagen.ImageN#getDefaultInstance()} before any tile is fetched.
    */
   private final int elevationTileCacheSizeMB;
-  // Keep track of the proportion of elevation fetch operations that fail so we can issue warnings. AtomicInteger is
+  // Keep track of the proportion of elevation fetch operations that fail so we can issue warnings.
+  // AtomicInteger is
   // used to provide thread-safe updating capabilities.
   private final AtomicInteger nPointsEvaluated = new AtomicInteger(0);
   private final AtomicInteger nPointsOutsideDEM = new AtomicInteger(0);
@@ -114,7 +115,8 @@ public class ElevationModule implements GraphBuilderModule {
    * inputs are the same as those that occurred in the graph build that produced this data.
    */
   private HashMap<String, PackedCoordinateSequence> cachedElevations;
-  // the first coordinate in the first StreetWithElevationEdge which is used for initializing coverage instances
+  // the first coordinate in the first StreetWithElevationEdge which is used for initializing
+  // coverage instances
   private Coordinate examplarCoordinate;
   /** Used only when the ElevationModule is requested to be ran with a single thread */
   private Coverage singleThreadedCoverageInterpolator;
@@ -180,14 +182,17 @@ public class ElevationModule implements GraphBuilderModule {
       for (Edge ee : gv.getOutgoing()) {
         if (ee instanceof StreetEdge) {
           if (multiThreadElevationCalculations) {
-            // Multi-threaded execution requested, check and prepare a few things that are used only during
+            // Multi-threaded execution requested, check and prepare a few things that are used only
+            // during
             // multi-threaded runs.
             if (examplarCoordinate == null) {
-              // store the first coordinate of the first StreetEdge for later use in initializing coverage
+              // store the first coordinate of the first StreetEdge for later use in initializing
+              // coverage
               // instances
               examplarCoordinate = ee.getGeometry().getCoordinates()[0];
             }
           }
+
           streetsWithElevationEdges.add((StreetEdge) ee);
         }
       }
@@ -211,8 +216,10 @@ public class ElevationModule implements GraphBuilderModule {
     }
 
     int nPoints = nPointsEvaluated.get() + nPointsOutsideDEM.get();
+
     if (nPoints > 0) {
       double failurePercentage = ((double) nPointsOutsideDEM.get() / nPoints) * 100.0;
+
       if (failurePercentage > 50) {
         issueStore.add(
           new Graphwide(
@@ -232,6 +239,7 @@ public class ElevationModule implements GraphBuilderModule {
     }
 
     int pointsOutsideDEM = nPointsOutsideDEM.get();
+
     if (pointsOutsideDEM > 0) {
       issueStore.add(
         "ElevationProfilePointsOutsideDEM",
@@ -244,6 +252,7 @@ public class ElevationModule implements GraphBuilderModule {
 
     // Iterate again to find edges that had elevation calculated.
     List<StreetEdge> edgesWithCalculatedElevations = new ArrayList<>();
+
     for (StreetEdge edgeWithElevation : streetsWithElevationEdges) {
       if (edgeWithElevation.hasElevationExtension() && !edgeWithElevation.isElevationFlattened()) {
         edgesWithCalculatedElevations.add(edgeWithElevation);
@@ -252,12 +261,14 @@ public class ElevationModule implements GraphBuilderModule {
 
     if (cacheManager.isEnabled(CacheTask.ELEVATION)) {
       HashMap<String, PackedCoordinateSequence> newCachedElevations = new HashMap<>();
+
       for (StreetEdge streetEdge : edgesWithCalculatedElevations) {
         newCachedElevations.put(
           PolylineEncoder.encodeGeometry(streetEdge.getGeometry()).points(),
           streetEdge.getElevationProfile()
         );
       }
+
       cacheManager.save(CacheTask.ELEVATION, newCachedElevations);
     }
 
@@ -297,9 +308,11 @@ public class ElevationModule implements GraphBuilderModule {
     long bytes = elevationTileCacheSizeMB * ONE_MEGABYTE;
     TileCache cache = ImageN.getDefaultInstance().getTileCache();
     long previousBytes = cache.getMemoryCapacity();
+
     if (previousBytes == bytes) {
       return;
     }
+
     cache.setMemoryCapacity(bytes);
     LOG.info(
       "Imagen tile cache memory capacity set to {} MB (was {} MB)",
@@ -379,8 +392,10 @@ public class ElevationModule implements GraphBuilderModule {
    * @param ee the street edge
    */
   private void processEdge(StreetEdge ee) {
-    // First, check if the edge already has been calculated or if it exists in a pre-calculated cache. Checking
-    // with this method avoids potentially waiting for a lock to be released for calculating the thread-specific
+    // First, check if the edge already has been calculated or if it exists in a pre-calculated
+    // cache. Checking
+    // with this method avoids potentially waiting for a lock to be released for calculating the
+    // thread-specific
     // coverage.
     if (ee.hasElevationExtension()) {
       // already set up
@@ -389,10 +404,12 @@ public class ElevationModule implements GraphBuilderModule {
 
     // first try to find a cached value if possible
     Geometry edgeGeometry = ee.getGeometry();
+
     if (cachedElevations != null) {
       PackedCoordinateSequence coordinateSequence = cachedElevations.get(
         PolylineEncoder.encodeGeometry(edgeGeometry).points()
       );
+
       if (coordinateSequence != null) {
         // found a cached value! Set the elevation profile with the pre-calculated data.
         setEdgeElevationProfile(ee, coordinateSequence);
@@ -400,12 +417,14 @@ public class ElevationModule implements GraphBuilderModule {
       }
     }
 
-    // Needs full calculation. Calculate with a thread-specific coverage instance to avoid waiting for any locks on
+    // Needs full calculation. Calculate with a thread-specific coverage instance to avoid waiting
+    // for any locks on
     // coverage instances in other threads.
     Coverage coverage = getThreadSpecificCoverageInterpolator();
 
     // did not find a cached value, calculate
-    // If any of the coordinates throw an error when trying to lookup their value, immediately bail and do not
+    // If any of the coordinates throw an error when trying to lookup their value, immediately bail
+    // and do not
     // process the elevation on the edge
     try {
       Coordinate[] coords = edgeGeometry.getCoordinates();
@@ -415,7 +434,8 @@ public class ElevationModule implements GraphBuilderModule {
       // initial sample (x = 0)
       coordList.add(new Coordinate(0, getElevation(coverage, coords[0])));
 
-      // iterate through coordinates calculating the edge length and creating intermediate elevation coordinates at
+      // iterate through coordinates calculating the edge length and creating intermediate elevation
+      // coordinates at
       // the regularly specified interval
       double edgeLenM = 0;
       double sampleDistance = distanceBetweenSamplesM;
@@ -424,13 +444,16 @@ public class ElevationModule implements GraphBuilderModule {
       double y1 = coords[0].y;
       double x2;
       double y2;
+
       for (int i = 0; i < coords.length - 1; i++) {
         x2 = coords[i + 1].x;
         y2 = coords[i + 1].y;
         double curSegmentDistance = SphericalDistanceLibrary.distance(y1, x1, y2, x2);
         edgeLenM += curSegmentDistance;
+
         while (edgeLenM > sampleDistance) {
-          // if current edge length is longer than the current sample distance, insert new elevation coordinates
+          // if current edge length is longer than the current sample distance, insert new elevation
+          // coordinates
           // as needed until sample distance has caught up
 
           // calculate percent of current segment that distance is between
@@ -447,6 +470,7 @@ public class ElevationModule implements GraphBuilderModule {
           );
           sampleDistance += distanceBetweenSamplesM;
         }
+
         previousDistance = edgeLenM;
         x1 = x2;
         y1 = y2;
@@ -487,19 +511,23 @@ public class ElevationModule implements GraphBuilderModule {
    * interpolator instance for each thread to avoid other threads waiting for a lock to be released
    * on the Coverage interpolator instance.
    * <p>
-   * This method will get/lazy-create a thread-specific Coverage interpolator instance. Since
-   * these interpolator instances take some time to create, they are lazy-created instead of created
+   * This method will get/lazy-create a thread-specific Coverage interpolator instance. Since these
+   * interpolator instances take some time to create, they are lazy-created instead of created
    * upfront because it could lock all other threads even if other threads don't need an
    * interpolator right away if they happen to process a lot of cached data initially.
    */
   private Coverage getThreadSpecificCoverageInterpolator() {
     if (multiThreadElevationCalculations) {
       Coverage coverage = coverageInterpolatorThreadLocal.get();
+
       if (coverage == null) {
         synchronized (gridCoverageFactory) {
           coverage = gridCoverageFactory.getGridCoverage();
-          // The Coverage instance relies on some synchronized static methods shared across all threads that
-          // can cause deadlocks if not fully initialized. Therefore, make a single request for the first
+
+          // The Coverage instance relies on some synchronized static methods shared across all
+          // threads that
+          // can cause deadlocks if not fully initialized. Therefore, make a single request for the
+          // first
           // point on the edge to initialize these other items.
           try {
             getElevation(coverage, examplarCoordinate);
@@ -514,14 +542,17 @@ public class ElevationModule implements GraphBuilderModule {
               e
             );
           }
+
           coverageInterpolatorThreadLocal.set(coverage);
         }
       }
+
       return coverage;
     } else {
       if (singleThreadedCoverageInterpolator == null) {
         singleThreadedCoverageInterpolator = gridCoverageFactory.getGridCoverage();
       }
+
       return singleThreadedCoverageInterpolator;
     }
   }
@@ -533,6 +564,7 @@ public class ElevationModule implements GraphBuilderModule {
         .withComputed(false)
         .build()
         .ifPresent(ee::setElevationExtension);
+
       if (ee.isElevationFlattened()) {
         issueStore.add(new ElevationFlattened(ee));
       }
@@ -545,8 +577,8 @@ public class ElevationModule implements GraphBuilderModule {
    * Method for retrieving the elevation at a given Coordinate.
    *
    * @param coverage the specific Coverage instance to use in order to avoid competition between
-   *                 threads
-   * @param c        the coordinate (NAD83)
+   *     threads
+   * @param c the coordinate (NAD83)
    * @return elevation in meters
    */
   private double getElevation(Coverage coverage, Coordinate c)
@@ -558,24 +590,29 @@ public class ElevationModule implements GraphBuilderModule {
    * Method for retrieving the elevation at a given (x, y) pair.
    *
    * @param coverage the specific Coverage instance to use in order to avoid competition between
-   *                 threads
-   * @param x        the query longitude (NAD83)
-   * @param y        the query latitude (NAD83)
+   *     threads
+   * @param x the query longitude (NAD83)
+   * @param y the query latitude (NAD83)
    * @return elevation in meters
-   * @throws PointOutsideCoverageException  if the point lies outside the elevation tile area.
-   * @throws TransformException             if computing the EllipsoidToGeoidDifference fails.
+   * @throws PointOutsideCoverageException if the point lies outside the elevation tile area.
+   * @throws TransformException if computing the EllipsoidToGeoidDifference fails.
    * @throws ArrayIndexOutOfBoundsException at the edges of some elevation tiles with NoData
-   *                                        regions, see <a href=
-   *                                        "https://github.com/opentripplanner/OpenTripPlanner/issues/2792">#2792</a>.
+   *     regions, see
+   *     <a href= "https://github.com/opentripplanner/OpenTripPlanner/issues/2792">#2792</a>.
    */
   private double getElevation(Coverage coverage, double x, double y)
     throws PointOutsideCoverageException, TransformException {
     double[] values = new double[1];
+
     try {
-      // We specify a CRS here because otherwise the coordinates are assumed to be in the coverage's native CRS.
-      // That assumption is fine when the coverage happens to be in longitude-first WGS84 but we want to support
-      // GeoTIFFs in various projections. Note that GeoTools defaults to strict EPSG axis ordering of (lat, long)
-      // for DefaultGeographicCRS.WGS84, but OTP is using (long, lat) throughout and assumes unprojected DEM
+      // We specify a CRS here because otherwise the coordinates are assumed to be in the coverage's
+      // native CRS.
+      // That assumption is fine when the coverage happens to be in longitude-first WGS84 but we
+      // want to support
+      // GeoTIFFs in various projections. Note that GeoTools defaults to strict EPSG axis ordering
+      // of (lat, long)
+      // for DefaultGeographicCRS.WGS84, but OTP is using (long, lat) throughout and assumes
+      // unprojected DEM
       // rasters to also use (long, lat).
       coverage.evaluate(new Position2D(WGS84_XY, x, y), values);
     } catch (PointOutsideCoverageException e) {
@@ -611,11 +648,14 @@ public class ElevationModule implements GraphBuilderModule {
     int geoidDifferenceCoordinateValueMultiplier = 100;
     int xVal = IntUtils.round(x * geoidDifferenceCoordinateValueMultiplier);
     int yVal = IntUtils.round(y * geoidDifferenceCoordinateValueMultiplier);
-    // create a hash value that can be used to look up the value for the given rounded coordinate. The expected
-    // value of xVal should never be less than -18000 (-180 * 100) or more than 18000 (180 * 100), so multiply the
+    // create a hash value that can be used to look up the value for the given rounded coordinate.
+    // The expected
+    // value of xVal should never be less than -18000 (-180 * 100) or more than 18000 (180 * 100),
+    // so multiply the
     // yVal by a prime number of a magnitude larger so that there won't be any hash collisions.
     int hash = yVal * 104729 + xVal;
     Double difference = geoidDifferenceCache.get(hash);
+
     if (difference == null) {
       difference = computeEllipsoidToGeoidDifference(
         yVal / (1.0 * geoidDifferenceCoordinateValueMultiplier),
@@ -623,6 +663,7 @@ public class ElevationModule implements GraphBuilderModule {
       );
       geoidDifferenceCache.put(hash, difference);
     }
+
     return difference;
   }
 }

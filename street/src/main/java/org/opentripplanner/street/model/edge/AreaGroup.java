@@ -16,7 +16,8 @@ import org.opentripplanner.street.model.vertex.IntersectionVertex;
  */
 public class AreaGroup implements Serializable {
 
-  // Mutable backing set: callers see an unmodifiable view; addVisibilityVertex may append at runtime.
+  // Mutable backing set: callers see an unmodifiable view; addVisibilityVertex may append at
+  // runtime.
   private final HashSet<IntersectionVertex> visibilityVertices;
   private final Polygon geometry;
   private final List<Area> areas;

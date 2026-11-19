@@ -26,6 +26,7 @@ class ItinerariesCalculateLegTotals {
     if (legs.isEmpty()) {
       return;
     }
+
     calculate(legs);
   }
 
@@ -41,6 +42,7 @@ class ItinerariesCalculateLegTotals {
 
       if (leg.isTransitLeg()) {
         transitDuration = transitDuration.plus(dt);
+
         if (!leg.isInterlinedWithPreviousLeg()) {
           ++nTransitLegs;
         }
@@ -70,6 +72,7 @@ class ItinerariesCalculateLegTotals {
         this.elevationLost_m += p.elevationLost();
       }
     }
+
     this.waitingDuration = totalDuration.minus(transitDuration).minus(onStreetDuration);
   }
 }

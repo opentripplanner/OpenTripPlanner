@@ -62,7 +62,9 @@ class UnroutableTest {
       .getShortestPathTree();
 
     State state = spt.getState(to);
-    // At the time of writing this test, the router simply doesn't find a path at all when highway=construction
+
+    // At the time of writing this test, the router simply doesn't find a path at all when
+    // highway=construction
     // is filtered out, thus the null check.
     if (state != null) {
       for (Edge edge : state.listBackEdges()) {

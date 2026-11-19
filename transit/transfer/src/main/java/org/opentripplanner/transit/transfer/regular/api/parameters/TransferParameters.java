@@ -46,20 +46,17 @@ public final class TransferParameters<R> {
   private final List<WarmupParameters> warmup;
 
   /**
-   * @param profiles           the profiles of all types, in the order declared in the
-   *                           configuration. At least one is required, and the ids must be unique.
-   *                           The user preferences of the profiles must be unique too, but that is
-   *                           checked when the profiles are created, since a profile without
-   *                           preferences gets them from its request.
-   * @param maxDurations       the max durations of a profile type, shared by all profiles of the
-   *                           type. Each type with a profile needs one, and it must be of the kind
-   *                           of the type: {@link BicycleMaxDurations} for bicycle and
-   *                           {@link CarMaxDuration} for car, and {@link PlainMaxDuration} for the
-   *                           other types.
-   * @param warmup             the preferences to create Raptor transfers for when the server
-   *                           starts, see {@link WarmupParameters}. The ids must be unique among
-   *                           the profiles and the warmup entries, and there must be a profile of
-   *                           the type of each entry.
+   * @param profiles the profiles of all types, in the order declared in the configuration. At least
+   *     one is required, and the ids must be unique. The user preferences of the profiles must be
+   *     unique too, but that is checked when the profiles are created, since a profile without
+   *     preferences gets them from its request.
+   * @param maxDurations the max durations of a profile type, shared by all profiles of the type.
+   *     Each type with a profile needs one, and it must be of the kind of the type:
+   *     {@link BicycleMaxDurations} for bicycle and {@link CarMaxDuration} for car, and
+   *     {@link PlainMaxDuration} for the other types.
+   * @param warmup the preferences to create Raptor transfers for when the server starts, see
+   *     {@link WarmupParameters}. The ids must be unique among the profiles and the warmup entries,
+   *     and there must be a profile of the type of each entry.
    */
   public TransferParameters(
     List<TransferProfile<R>> profiles,
@@ -105,9 +102,11 @@ public final class TransferParameters<R> {
    */
   public MaxDurationsPreference maxDurations(TransferProfileType type) {
     var result = maxDurations.get(type);
+
     if (result == null) {
       throw new IllegalArgumentException("There are no max durations for the type " + type);
     }
+
     return result;
   }
 
@@ -117,9 +116,11 @@ public final class TransferParameters<R> {
     var result = new EnumMap<TransferProfileType, MaxDurationsPreference>(
       TransferProfileType.class
     );
+
     for (var profile : profiles) {
       result.computeIfAbsent(profile.type(), MaxDurationsPreference::defaultFor);
     }
+
     return result;
   }
 
@@ -149,6 +150,7 @@ public final class TransferParameters<R> {
       case CAR -> maxDurations instanceof CarMaxDuration;
       case WALK, WHEELCHAIR -> maxDurations instanceof PlainMaxDuration;
     };
+
     if (!valid) {
       throw new IllegalArgumentException(
         "The max durations of the type " +
@@ -166,7 +168,9 @@ public final class TransferParameters<R> {
     if (profiles.isEmpty()) {
       throw new IllegalArgumentException("At least one transfer profile is required.");
     }
+
     var ids = new HashSet<String>();
+
     for (var profile : profiles) {
       if (!ids.add(profile.id())) {
         throw new IllegalArgumentException(
@@ -174,6 +178,7 @@ public final class TransferParameters<R> {
         );
       }
     }
+
     for (var entry : warmup) {
       if (!ids.add(entry.id())) {
         throw new IllegalArgumentException(
@@ -183,6 +188,7 @@ public final class TransferParameters<R> {
     }
 
     var types = profiles.stream().map(TransferProfile::type).collect(Collectors.toSet());
+
     for (var entry : warmup) {
       if (!types.contains(entry.userPreferences().type())) {
         throw new IllegalArgumentException(
@@ -201,9 +207,11 @@ public final class TransferParameters<R> {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     var that = (TransferParameters<?>) o;
     return (
       profiles.equals(that.profiles) &&

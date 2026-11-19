@@ -128,21 +128,26 @@ class ParkingProcessor {
     boolean isCarParkAndRide
   ) {
     List<VehicleParking> vehicleParkingToAdd = new ArrayList<>();
+
     for (OsmAreaGroup group : areaGroups) {
       var vehicleParking = buildParkAndRideAreasForGroup(group, isCarParkAndRide);
+
       if (vehicleParking != null) {
         vehicleParkingToAdd.add(vehicleParking);
       }
     }
+
     return vehicleParkingToAdd;
   }
 
   private OHCalendar parseOpeningHours(OsmEntity entity) {
     final var openingHoursTag = entity.getTag("opening_hours");
+
     if (openingHoursTag != null) {
       final ZoneId zoneId = entity.getOsmProvider().getZoneId();
       final var id = entity.getId();
       final var link = entity.url();
+
       try {
         return osmOpeningHoursParser.parseOpeningHours(
           openingHoursTag,
@@ -159,6 +164,7 @@ class ParkingProcessor {
         );
       }
     }
+
     return null;
   }
 
@@ -175,12 +181,15 @@ class ParkingProcessor {
     Envelope envelope
   ) {
     List<VertexAndName> accessVertices = new ArrayList<>();
+
     for (OsmNode node : ring.nodes) {
       envelope.expandToInclude(new Coordinate(node.lon, node.lat));
       var accessVertex = getVertexForOsmNode.apply(node, entity);
+
       if (accessVertex.getIncoming().isEmpty() || accessVertex.getOutgoing().isEmpty()) {
         continue;
       }
+
       accessVertices.add(new VertexAndName(node.getAssumedName(), accessVertex));
     }
 
@@ -205,7 +214,8 @@ class ParkingProcessor {
     OsmEntity entity = null;
 
     // Process all nodes from outer rings
-    // These are IntersectionVertices not OsmVertices because there can be both OsmVertices and TransitStopStreetVertices.
+    // These are IntersectionVertices not OsmVertices because there can be both OsmVertices and
+    // TransitStopStreetVertices.
     for (OsmArea area : group.areas) {
       entity = area.parent;
 
@@ -223,6 +233,7 @@ class ParkingProcessor {
       createParkingEntrancesFromAccessVertices(accessVertices, creativeName, entity);
 
     var access = new ParkingAreaAccessibility(accessVertices);
+
     if (access.walkMismatch()) {
       issueStore.add(new ParkAndRideWalkAccessibilityMismatch(entity));
     }
@@ -232,6 +243,7 @@ class ParkingProcessor {
       // We create an artificial entrance to the centroid and add an issue.
       // The solution would be to connect it to the street network in OSM.
       entrances = createArtificialEntrances(group, creativeName, entity, isCarParkAndRide);
+
       // We only add the issue for car parking lots because the majority of bike facilities are not
       // connected to the street network.
       if (isCarParkAndRide) {
@@ -255,8 +267,8 @@ class ParkingProcessor {
   /**
    * Creates an artificial entrance to a parking facility's centroid.
    * <p>
-   * This is useful if the facility is not linked to the street network in OSM. Without this
-   * method it would not be usable by the routing algorithm as it's unreachable.
+   * This is useful if the facility is not linked to the street network in OSM. Without this method
+   * it would not be usable by the routing algorithm as it's unreachable.
    */
   private List<VehicleParking.VehicleParkingEntranceCreator> createArtificialEntrances(
     OsmAreaGroup group,
@@ -274,7 +286,8 @@ class ParkingProcessor {
         )
         .name(vehicleParkingName)
         .coordinate(new WgsCoordinate(group.union.getInteriorPoint()))
-        // setting the vertex to null signals the rest of the build process that this needs to be linked to the street network
+        // setting the vertex to null signals the rest of the build process that this needs to be
+        // linked to the street network
         .vertex(null)
         .walkAccessible(true)
         .carAccessible(isCarPark)
@@ -289,6 +302,7 @@ class ParkingProcessor {
     List<VehicleParking.VehicleParkingEntranceCreator> entrances
   ) {
     OptionalInt bicycleCapacity, carCapacity, wheelchairAccessibleCarCapacity;
+
     if (isCarParkAndRide) {
       carCapacity = parseCapacity(entity);
       bicycleCapacity = parseCapacity(entity, "capacity:bike");
@@ -300,6 +314,7 @@ class ParkingProcessor {
     }
 
     VehicleParkingSpaces vehicleParkingSpaces = null;
+
     if (
       bicycleCapacity.isPresent() ||
       carCapacity.isPresent() ||
@@ -336,12 +351,15 @@ class ParkingProcessor {
     if (entity.isTagTrue("fee")) {
       tags.add("osm:fee");
     }
+
     if (entity.hasTag("supervised") && !entity.isTagTrue("supervised")) {
       tags.add("osm:supervised");
     }
+
     if (entity.hasTag("covered") && !entity.isTagFalse("covered")) {
       tags.add("osm:covered");
     }
+
     if (entity.hasTag("surveillance") && !entity.isTagFalse("surveillance")) {
       tags.add("osm:surveillance");
     }
@@ -365,15 +383,18 @@ class ParkingProcessor {
     // If there is an explicit name use that. The explicit name is used so that tag-based
     // translations are used, which are not handled by "CreativeNamer"s.
     I18NString creativeName = osmEntity.getAssumedName();
+
     if (creativeName == null) {
       // ... otherwise resort to "CreativeNamer"s
       creativeName = osmEntity.getOsmProvider().getWayPropertySet().getCreativeName(osmEntity);
     }
+
     if (creativeName == null) {
       creativeName = new NonLocalizedString(
         "Park & Ride (%s/%d)".formatted(osmEntity.getClass().getSimpleName(), osmEntity.getId())
       );
     }
+
     return creativeName;
   }
 
@@ -400,6 +421,7 @@ class ParkingProcessor {
 
     for (var access : sortedAccessVertices) {
       I18NString suffix = null;
+
       if (access.name() != null) {
         suffix = access.name();
       }

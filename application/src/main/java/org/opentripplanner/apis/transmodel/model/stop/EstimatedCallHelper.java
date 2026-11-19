@@ -47,16 +47,16 @@ class EstimatedCallHelper {
    * {@link TransitMode}, which would cause a ClassCastException downstream. This method filters out
    * such non-enum entries. Null-valued entries are also filtered out.
    * <p>
-   * A null or empty input is treated as "no filter", so in that case we return null. But note
-   * that an input that contains only "unknown" and/or null will result in an empty list returned
-   * which the filtering engine downstream should interpret as "filter out everything and return
-   * nothing".
+   * A null or empty input is treated as "no filter", so in that case we return null. But note that
+   * an input that contains only "unknown" and/or null will result in an empty list returned which
+   * the filtering engine downstream should interpret as "filter out everything and return nothing".
    */
   @Nullable
   static Collection<TransitMode> getWhitelistedModes(@Nullable Collection<?> raw) {
     if (raw == null || raw.isEmpty()) {
       return null;
     }
+
     return raw.stream().filter(TransitMode.class::isInstance).map(TransitMode.class::cast).toList();
   }
 

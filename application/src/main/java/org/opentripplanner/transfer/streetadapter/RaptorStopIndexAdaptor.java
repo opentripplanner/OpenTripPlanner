@@ -13,10 +13,10 @@ import org.opentripplanner.transit.service.SiteRepository;
  * regular stops, but do not take part in Raptor, so they are not in this index.
  * <p>
  * TODO: This adaptor lives in the transit module for now, but the stop index should move to the
- *       Raptor module. The index is a performance optimization: the memory locality of Raptor's
- *       stop-arrival data depends on it. Because the index space is shared with the flex stops,
- *       Raptor allocates memory for stops that never take part in routing. Generating and
- *       managing the index is a Raptor concern, not a transit model concern.
+ * Raptor module. The index is a performance optimization: the memory locality of Raptor's
+ * stop-arrival data depends on it. Because the index space is shared with the flex stops, Raptor
+ * allocates memory for stops that never take part in routing. Generating and managing the index is
+ * a Raptor concern, not a transit model concern.
  */
 public class RaptorStopIndexAdaptor implements RaptorStopIndex {
 
@@ -38,6 +38,7 @@ public class RaptorStopIndexAdaptor implements RaptorStopIndex {
     if (stopIndex < 0 || stopIndex >= size()) {
       return null;
     }
+
     return siteRepository.stopByIndex(stopIndex) instanceof RegularStop stop ? stop.getId() : null;
   }
 

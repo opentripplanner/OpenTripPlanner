@@ -75,7 +75,7 @@ public enum StreetMode implements DocumentedEnum<StreetMode> {
    * Carpooling is a hybrid mode: like transit, it operates on scheduled trips with set departure
    * times; like street modes, it uses private vehicles traveling on the road network. This street
    * mode is the input for requesting carpool routing, while the transit mode appears in responses.
-   *
+   * <p>
    * The reason why the features DRIVING and PICKUP are not used even though CARPOOLING obviously
    * involves driving and pickup, is because we don't want to get results involving car if there are
    * not carpooling trips available. Carpooling has to be handled differently from ordinary driving.
@@ -197,8 +197,10 @@ public enum StreetMode implements DocumentedEnum<StreetMode> {
       This mode needs to be combined with at least one transit mode otherwise, it behaves like an ordinary car journey.
       _Prerequisite:_ Park-and-ride areas near the stations need to be present in the OSM input file.
       """;
-      case CAR_PICKUP -> "Walking to a pickup point along the road, driving to a drop-off point along the road, and walking the rest of the way. <br/> This can include various taxi-services or kiss & ride.";
-      case TAXI -> "Walking to a pickup point along the road, being driven by a taxi to a drop-off point along the road, and walking the rest of the way.";
+      case CAR_PICKUP
+        -> "Walking to a pickup point along the road, driving to a drop-off point along the road, and walking the rest of the way. <br/> This can include various taxi-services or kiss & ride.";
+      case TAXI
+        -> "Walking to a pickup point along the road, being driven by a taxi to a drop-off point along the road, and walking the rest of the way.";
       case CAR_HAILING -> """
       Using a car hailing app like Uber or Lyft to get to a train station or all the way to the destination.
 
@@ -211,7 +213,8 @@ public enum StreetMode implements DocumentedEnum<StreetMode> {
 
       Use this _street_ mode, if your data source for trips is SIRI, not GTFS static.
       """;
-      case FLEXIBLE -> "Encompasses all types of on-demand and flexible transportation for example GTFS Flex or NeTEx Flexible Stop Places.";
+      case FLEXIBLE
+        -> "Encompasses all types of on-demand and flexible transportation for example GTFS Flex or NeTEx Flexible Stop Places.";
     };
   }
 }

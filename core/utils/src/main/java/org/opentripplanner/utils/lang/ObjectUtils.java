@@ -31,6 +31,7 @@ public class ObjectUtils {
     if (entity == null) {
       return defaultValue;
     }
+
     return ifNotNull(getter.apply(entity), defaultValue);
   }
 
@@ -65,6 +66,7 @@ public class ObjectUtils {
         )
       );
     }
+
     return newValue;
   }
 

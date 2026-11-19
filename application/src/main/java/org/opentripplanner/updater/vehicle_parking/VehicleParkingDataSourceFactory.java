@@ -25,18 +25,21 @@ public class VehicleParkingDataSourceFactory {
     OpeningHoursCalendarService openingHoursCalendarService
   ) {
     return switch (parameters.sourceType()) {
-      case LIIPI -> new LiipiParkUpdater(
-        (LiipiParkUpdaterParameters) parameters,
-        openingHoursCalendarService
-      );
-      case PARK_API -> new CarParkAPIUpdater(
-        (ParkAPIUpdaterParameters) parameters,
-        openingHoursCalendarService
-      );
-      case BICYCLE_PARK_API -> new BicycleParkAPIUpdater(
-        (ParkAPIUpdaterParameters) parameters,
-        openingHoursCalendarService
-      );
+      case LIIPI
+        -> new LiipiParkUpdater(
+          (LiipiParkUpdaterParameters) parameters,
+          openingHoursCalendarService
+        );
+      case PARK_API
+        -> new CarParkAPIUpdater(
+          (ParkAPIUpdaterParameters) parameters,
+          openingHoursCalendarService
+        );
+      case BICYCLE_PARK_API
+        -> new BicycleParkAPIUpdater(
+          (ParkAPIUpdaterParameters) parameters,
+          openingHoursCalendarService
+        );
       case BIKELY -> new BikelyUpdater((BikelyUpdaterParameters) parameters);
       case BIKEEP -> new BikeepUpdater((BikeepUpdaterParameters) parameters);
       case SIRI_FM -> throw new IllegalArgumentException("Cannot instantiate SIRI-FM data source");

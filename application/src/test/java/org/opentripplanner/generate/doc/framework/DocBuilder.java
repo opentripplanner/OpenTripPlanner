@@ -95,6 +95,7 @@ public class DocBuilder {
     if (text == null || text.isBlank()) {
       return this;
     }
+
     buffer.append(text);
     return endParagraph();
   }

@@ -3,9 +3,9 @@ package org.opentripplanner.raptor.spi;
 import java.util.Iterator;
 
 /**
- * This interface is responsible for providing all regular and constrained transfers from a given stop to all possible
- * stops around that stop. The implementation may implement a lightweight {@link RaptorTransfer} representation for
- * regular stops.
+ * This interface is responsible for providing all regular and constrained transfers from a given
+ * stop to all possible stops around that stop. The implementation may implement a lightweight
+ * {@link RaptorTransfer} representation for regular stops.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
@@ -13,12 +13,12 @@ public interface RaptorTransferDataProvider<T extends RaptorTripSchedule> {
   /**
    * This method is responsible for providing all transfers from a given stop to all possible stops
    * around that stop.
-   * <p/>
+   * <p>
    * The implementation may implement a lightweight {@link RaptorTransfer} representation. The
    * iterator element only needs to be valid for the duration og a single iterator step. Hence; It
    * is safe to use a cursor/flyweight pattern to represent both the Transfer and the
    * Iterator<Transfer> - this will most likely be the best performing implementation.
-   * <p/>
+   * <p>
    * Example:
    * <pre>
    * class LightweightTransferIterator implements Iterator&lt;RaptorTransfer&gt;, RaptorTransfer {

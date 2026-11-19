@@ -132,6 +132,7 @@ class AdvancedTokenSchemaTest implements TestTokenSchemaConstants {
       "TokenDefinition{version: 5, fields: [@deprecated EnField:ENUM, ANum:INT, AStr:STRING, ATime:TIME_INSTANT]}",
       "TokenDefinition{version: 6, fields: [ANum:INT, AStr:STRING, ATime:TIME_INSTANT]}"
     );
+
     for (int i = 0; i < TEST_CASES.size(); i++) {
       assertEquals(expected.get(i), TEST_CASES.get(i).subject().currentDefinition().toString());
     }

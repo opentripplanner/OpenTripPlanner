@@ -602,6 +602,7 @@ public class EnumTypes {
     for (var it : mappings) {
       builder.value(it.apiName, it.internal, it.internal.enumValueDescription());
       E enumValue = it.internal.castToEnum();
+
       if (mappedValues.contains(enumValue)) {
         var existing = mappings
           .stream()
@@ -610,13 +611,16 @@ public class EnumTypes {
           .orElse(null);
         throw new IllegalStateException("Enum value mapped twice: " + it + " and " + existing);
       }
+
       mappedValues.add(enumValue);
     }
+
     var missed = EnumSet.complementOf(mappedValues);
 
     if (!missed.isEmpty()) {
       throw new IllegalStateException("Mapping is missing for: " + missed);
     }
+
     return builder.build();
   }
 

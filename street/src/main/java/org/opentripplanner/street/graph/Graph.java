@@ -36,10 +36,10 @@ import org.slf4j.LoggerFactory;
  * algorithms are defined. A graph is made up of vertices and edges. These are also referred to as
  * nodes and arcs or links, but in OTP we always use the vertices and edges terminology.
  * <p>
- * In OTP1, the Graph contained vertices and edges representing the entire transportation
- * network, including edges representing both street segments and public transit lines connecting
- * stops. In OTP2, the Graph edges now represent only the street network. Transit routing is
- * performed on other data structures suited to the Raptor algorithm (the TransitRepository). Some
+ * In OTP1, the Graph contained vertices and edges representing the entire transportation network,
+ * including edges representing both street segments and public transit lines connecting stops. In
+ * OTP2, the Graph edges now represent only the street network. Transit routing is performed on
+ * other data structures suited to the Raptor algorithm (the TransitRepository). Some
  * transit-related vertices are still present in the Graph, specifically those representing transit
  * stops, entrances, and elevators. Their presence in the street graph creates a connection between
  * the two routable data structures (identifying where stops in the TransitRepository are located
@@ -50,11 +50,10 @@ import org.slf4j.LoggerFactory;
  * sometimes serves as a catch-all, as it used to be the root of the object tree representing the
  * whole transportation network. This use of the Graph object is being phased out and discouraged.
  * <p>
- * In some sense the Graph is just some indexes into a set of vertices. The Graph used to hold
- * lists of edges for each vertex, but those lists are now attached to the vertices themselves.
+ * In some sense the Graph is just some indexes into a set of vertices. The Graph used to hold lists
+ * of edges for each vertex, but those lists are now attached to the vertices themselves.
  * <p>
- * TODO RT_AB: I favor renaming to StreetGraph to emphasize what it represents. TG agreed in
- * review.
+ * TODO RT_AB: I favor renaming to StreetGraph to emphasize what it represents. TG agreed in review.
  */
 public class Graph implements Serializable {
 
@@ -128,6 +127,7 @@ public class Graph implements Serializable {
   /** Add the given vertex to the graph. */
   public void addVertex(Vertex v) {
     Vertex old = vertices.put(v.getLabel(), v);
+
     if (old != null) {
       if (old == v) {
         LOG.error("repeatedly added the same vertex: {}", v);
@@ -151,6 +151,7 @@ public class Graph implements Serializable {
 
   public void removeEdge(Edge e, Scope scope) {
     e.remove();
+
     if (streetIndex != null) {
       streetIndex.remove(e, scope);
     }
@@ -256,6 +257,7 @@ public class Graph implements Serializable {
 
   public void remove(Vertex vertex) {
     vertices.remove(vertex.getLabel());
+
     if (streetIndex != null) {
       streetIndex.remove(vertex);
     }
@@ -279,9 +281,11 @@ public class Graph implements Serializable {
    */
   public int countEdges() {
     int ne = 0;
+
     for (Vertex v : getVertices()) {
       ne += v.getDegreeOut();
     }
+
     return ne;
   }
 
@@ -289,7 +293,6 @@ public class Graph implements Serializable {
    * Perform indexing on vertices, edges and create transient data structures. This used to be done
    * in readObject methods upon deserialization, but stand-alone mode now allows passing graphs from
    * graph builder to server in memory, without a round trip through serialization.
-   * <p>
    * <pre>
    * TODO OTP2 - Indexing the streetIndex is not something that should be delegated outside the
    *           - graph. This allows a module to index the streetIndex BEFORE another module add
@@ -305,8 +308,7 @@ public class Graph implements Serializable {
   /**
    * Index this graph if it hasn't been already. If the index already exists, this is a no-op.
    * <p>
-   * TODO: The indexing process (and the index itself) should be completely hidden from the
-   * callers.
+   * TODO: The indexing process (and the index itself) should be completely hidden from the callers.
    */
   public void requestIndex() {
     if (streetIndex == null) {

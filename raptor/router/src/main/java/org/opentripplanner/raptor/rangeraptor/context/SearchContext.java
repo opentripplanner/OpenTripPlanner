@@ -165,6 +165,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
     if (costCalculator == null) {
       this.costCalculator = transitData().multiCriteriaCostCalculator();
     }
+
     return costCalculator;
   }
 
@@ -190,6 +191,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
     if (request.searchParams().isMaxNumberOfTransfersSet()) {
       return request.searchParams().maxNumberOfTransfers() + 1;
     }
+
     return tuningParameters.maxNumberOfTransfers() + 1;
   }
 
@@ -266,12 +268,15 @@ public class SearchContext<T extends RaptorTripSchedule> {
     // For none MC-search we only want the fastest transfer for each stop,
     // no duplicates are accepted
     Map<Integer, RaptorAccessEgress> bestTimePaths = new HashMap<>();
+
     for (RaptorAccessEgress it : paths) {
       RaptorAccessEgress existing = bestTimePaths.get(it.stop());
+
       if (existing == null || it.durationInSeconds() < existing.durationInSeconds()) {
         bestTimePaths.put(it.stop(), it);
       }
     }
+
     return List.copyOf(bestTimePaths.values());
   }
 
@@ -325,6 +330,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
     if (viaConnections.isEmpty()) {
       return List.of(new SearchContextViaSegments<>(this, accessPaths, null, egressPaths));
     }
+
     var list = new ArrayList<SearchContextViaSegments<T>>();
     int nConnections = viaConnections.size();
 
@@ -339,6 +345,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
         )
       );
     }
+
     return List.copyOf(list);
   }
 
@@ -349,6 +356,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
     if (searchParams.timetable()) {
       return USE_TIMETABLE;
     }
+
     boolean preferLatestDeparture =
       searchParams.preferLateArrival() != searchDirection.isInReverse();
 

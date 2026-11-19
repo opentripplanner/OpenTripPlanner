@@ -34,6 +34,7 @@ public class TaxiGraphBuilder implements GraphBuilderModule {
   public void buildGraph() {
     for (var data : gtfsDataSources) {
       var bundle = new GtfsBundle(data.dataSource(), data.config());
+
       try {
         dataReader.read(bundle);
       } catch (IOException e) {

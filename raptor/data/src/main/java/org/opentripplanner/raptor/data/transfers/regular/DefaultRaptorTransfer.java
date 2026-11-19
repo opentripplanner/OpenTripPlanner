@@ -38,6 +38,7 @@ class DefaultRaptorTransfer implements RaptorTransfer, Serializable {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     DefaultRaptorTransfer that = (DefaultRaptorTransfer) o;
     return toStop == that.toStop && duration == that.duration && c1 == that.c1;
   }

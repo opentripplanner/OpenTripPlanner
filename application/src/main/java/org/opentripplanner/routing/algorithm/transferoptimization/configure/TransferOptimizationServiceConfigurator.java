@@ -154,6 +154,7 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
     if (!viaLocations.isEmpty()) {
       filter = new PassThroughPathTailFilter<>(filter, viaLocations);
     }
+
     return filter;
   }
 }

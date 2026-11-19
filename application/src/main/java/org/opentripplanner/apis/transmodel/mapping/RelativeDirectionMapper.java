@@ -26,7 +26,8 @@ public class RelativeDirectionMapper {
         UTURN_RIGHT,
         ENTER_STATION,
         EXIT_STATION,
-        FOLLOW_SIGNS -> relativeDirection;
+        FOLLOW_SIGNS
+          -> relativeDirection;
       // this type should never be exposed by an API
       case ENTER_OR_EXIT_STATION -> RelativeDirection.CONTINUE;
     };

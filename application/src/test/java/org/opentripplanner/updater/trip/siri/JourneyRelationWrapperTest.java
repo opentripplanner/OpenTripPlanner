@@ -97,6 +97,7 @@ class JourneyRelationWrapperTest {
         for (var stop : stopRefs) {
           b.call(stop);
         }
+
         return b;
       })
       .buildEstimatedVehicleJourney();

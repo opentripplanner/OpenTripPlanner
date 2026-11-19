@@ -22,12 +22,12 @@ import org.opentripplanner.transit.model.timetable.Direction;
  * other implementation exists just to combine several instances of this primary implementation into
  * one.
  * <p>
- * TODO RT_AB: investigate why each updater has its own service instead of taking turns
- * sequentially writing to a single service. Original design was for all data and indexes to be
- * associated with the Graph or transit model (i.e. the object graph of instances of the transit
- * model) and for updaters to submit write tasks that would patch the current version in a
- * sequential way, e.g. "add these 10 alerts", "remove these 5 alerts", etc.
- *
+ * TODO RT_AB: investigate why each updater has its own service instead of taking turns sequentially
+ * writing to a single service. Original design was for all data and indexes to be associated with
+ * the Graph or transit model (i.e. the object graph of instances of the transit model) and for
+ * updaters to submit write tasks that would patch the current version in a sequential way, e.g.
+ * "add these 10 alerts", "remove these 5 alerts", etc.
+ * <p>
  * When an alert is added with more than one transit entity, e.g. a Stop and a Trip, both conditions
  * must be met for the alert to be displayed. This is the case in both the Norwegian interpretation
  * of SIRI, and the GTFS-RT alerts specification.
@@ -44,11 +44,13 @@ public class TransitAlertServiceImpl implements TransitAlertService {
     //   it. The consistent approach would be to duplicate the entire service, update it
     //   copy-on-write, and swap in the entire service after the update.
     Multimap<EntityKey, TransitAlert> newAlerts = HashMultimap.create();
+
     for (TransitAlert alert : alerts) {
       for (EntitySelector entity : alert.entities()) {
         newAlerts.put(entity.key(), alert);
       }
     }
+
     this.alerts = newAlerts;
   }
 
@@ -157,6 +159,7 @@ public class TransitAlertServiceImpl implements TransitAlertService {
 
   private Collection<TransitAlert> findMatchingAlerts(EntitySelector entitySelector) {
     Set<TransitAlert> result = new HashSet<>();
+
     for (TransitAlert alert : alerts.get(entitySelector.key())) {
       if (
         alert
@@ -167,6 +170,7 @@ public class TransitAlertServiceImpl implements TransitAlertService {
         result.add(alert);
       }
     }
+
     return result;
   }
 }

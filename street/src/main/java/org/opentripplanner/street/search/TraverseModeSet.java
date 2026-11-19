@@ -81,11 +81,13 @@ public class TraverseModeSet implements Cloneable, Serializable {
 
   public List<TraverseMode> getModes() {
     ArrayList<TraverseMode> modeList = new ArrayList<>();
+
     for (TraverseMode mode : TraverseMode.values()) {
       if ((modes & getMaskForMode(mode)) != 0) {
         modeList.add(mode);
       }
     }
+
     return modeList;
   }
 
@@ -112,6 +114,7 @@ public class TraverseModeSet implements Cloneable, Serializable {
     if (other instanceof TraverseModeSet) {
       return modes == ((TraverseModeSet) other).modes;
     }
+
     return false;
   }
 
@@ -127,15 +130,19 @@ public class TraverseModeSet implements Cloneable, Serializable {
 
   public String toString() {
     StringBuilder out = new StringBuilder();
+
     for (TraverseMode mode : TraverseMode.values()) {
       int mask = getMaskForMode(mode);
+
       if (mask != 0 && (modes & mask) == mask) {
         if (!out.isEmpty()) {
           out.append(", ");
         }
+
         out.append(mode);
       }
     }
+
     return "TraverseMode (" + out + ")";
   }
 

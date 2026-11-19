@@ -170,9 +170,11 @@ class J04_ViaVisitWithAccessTest {
 
   private static RaptorViaLocation viaStop(String label, int... stops) {
     var builder = RaptorViaLocation.viaVisit(label);
+
     for (int stop : stops) {
       builder.addStop(stop);
     }
+
     return builder.build();
   }
 }

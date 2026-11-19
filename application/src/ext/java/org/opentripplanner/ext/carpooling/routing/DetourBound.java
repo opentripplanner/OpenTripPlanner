@@ -31,6 +31,7 @@ final class DetourBound {
     if (maxCarSpeed <= 0) {
       throw new IllegalArgumentException("maxCarSpeed must be positive");
     }
+
     this.start = start;
     this.end = end;
     this.limit = limit;
@@ -88,6 +89,7 @@ final class DetourBound {
       return (current, edge) ->
         !mayPassThroughBefore(current.getElapsedTimeSeconds(), edge.getFromVertex());
     }
+
     return (current, edge) ->
       !mayPassThroughAfter(current.getElapsedTimeSeconds(), edge.getToVertex());
   }

@@ -69,7 +69,6 @@ public class OtpConfigLoader {
    * given {@code configDir} is {@code null} or config file is NOT found.
    * <p>
    * This method also log all loaded parameters to the console.
-   * <p>
    */
   public OtpConfig loadOtpConfig() {
     return new OtpConfig(
@@ -83,34 +82,38 @@ public class OtpConfigLoader {
    * given {@code configDir} is {@code null} or config file is NOT found.
    * <p>
    * This method also log all loaded parameters to the console.
-   * <p>
    */
   public BuildConfig loadBuildConfig() {
     JsonNode node = loadFromFile(BUILD_CONFIG_FILENAME);
+
     if (node.isMissingNode()) {
       return BuildConfig.DEFAULT;
     }
+
     return new BuildConfig(node, BUILD_CONFIG_FILENAME, true);
   }
 
   /**
    * Load the router configuration file as a JsonNode three. An empty node is returned if the given
    * {@code configDir} is {@code null} or config file is NOT found.
-   * <p>
    */
   public RouterConfig loadRouterConfig() {
     JsonNode node = loadFromFile(ROUTER_CONFIG_FILENAME);
+
     if (node.isMissingNode()) {
       return RouterConfig.DEFAULT;
     }
+
     return new RouterConfig(node, ROUTER_CONFIG_FILENAME, true);
   }
 
   public DebugUiConfig loadDebugUiConfig() {
     JsonNode node = loadFromFile(DEBUG_UI_CONFIG_FILENAME);
+
     if (node.isMissingNode()) {
       return DebugUiConfig.DEFAULT;
     }
+
     return new DebugUiConfig(node, DEBUG_UI_CONFIG_FILENAME, true);
   }
 

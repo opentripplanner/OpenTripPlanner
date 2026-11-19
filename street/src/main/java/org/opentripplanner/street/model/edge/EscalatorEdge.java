@@ -30,11 +30,13 @@ public class EscalatorEdge extends Edge {
     if (s0.currentMode() == TraverseMode.WALK && !s0.getRequest().wheelchairEnabled()) {
       var s1 = s0.edit(this);
       double time;
+
       if (duration == null) {
         time = getDistanceMeters() / s0.getRequest().walk().escalator().speed();
       } else {
         time = duration.toSeconds();
       }
+
       s1.incrementWeight(s0.getRequest().walk().escalator().reluctance() * time);
       s1.incrementTimeInSeconds((long) time);
       s1.incrementTraversalDistanceMeters(getDistanceMeters());

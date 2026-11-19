@@ -11,6 +11,7 @@ public class ConfigTypeTableTest {
   @Test
   void configTypeTableTest() {
     var table = configTypeTable();
+
     for (ConfigType it : ConfigType.values()) {
       assertTrue(table.contains(it.docName()), table);
     }

@@ -29,8 +29,8 @@ import org.slf4j.LoggerFactory;
  * querying, and it's up to the client to filter them out (with whatever knowledge it has on the
  * location of the object).
  * <p>
- * Note: For performance reasons, write operation are not synchronized, it must be taken care by
- * the client. Read-only operation are multi-thread-safe though.
+ * Note: For performance reasons, write operation are not synchronized, it must be taken care by the
+ * client. Read-only operation are multi-thread-safe though.
  *
  * @param <T> Type of objects to be spatial indexed.
  * @author laurent
@@ -68,6 +68,7 @@ public class HashGridSpatialIndex<T> implements Serializable {
     if (xBinSize <= 0 || yBinSize <= 0) {
       throw new IllegalStateException("bin size must be positive.");
     }
+
     this.xBinSize = xBinSize;
     this.yBinSize = yBinSize;
     // For 200m bins, 500x500 = 100x100km = 250000 bins
@@ -117,6 +118,7 @@ public class HashGridSpatialIndex<T> implements Serializable {
       for (int i = 0, n = bin.size(); i < n; i++) {
         consumer.accept(bin.get(i));
       }
+
       return false;
     });
   }
@@ -129,12 +131,15 @@ public class HashGridSpatialIndex<T> implements Serializable {
     final IntBox removedCount = new IntBox(0);
     visit(envelope, false, (bin, mapKey) -> {
       boolean removed = bin.remove(item);
+
       if (removed) {
         nEntries--;
         removedCount.inc();
       }
+
       return removed;
     });
+
     if (removedCount.get() > 0) {
       nObjects--;
       return true;
@@ -146,6 +151,7 @@ public class HashGridSpatialIndex<T> implements Serializable {
   public final void insert(LineString geom, final Object item) {
     Coordinate[] coord = geom.getCoordinates();
     final LongSet keys = new LongHashSet(coord.length * 8);
+
     for (int i = 0; i < coord.length - 1; i++) {
       // TODO Cut the segment if longer than bin size
       // to reduce the number of wrong bins
@@ -155,6 +161,7 @@ public class HashGridSpatialIndex<T> implements Serializable {
         return false;
       });
     }
+
     keys.forEach(
       (LongProcedure) key -> {
         // Note: bins have been initialized in the previous visit
@@ -174,15 +181,19 @@ public class HashGridSpatialIndex<T> implements Serializable {
   public Set<T> queryAlongLineStrings(Collection<LineString> lineStrings) {
     Set<T> result = new HashSet<>(1024);
     LongSet keys = new LongHashSet(256);
+
     for (LineString ls : lineStrings) {
       CoordinateSequence seq = ls.getCoordinateSequence();
+
       for (int i = 0; i < seq.size() - 1; i++) {
         collectBinKeys(seq.getX(i), seq.getY(i), seq.getX(i + 1), seq.getY(i + 1), keys);
       }
     }
+
     keys.forEach(
       (LongProcedure) key -> {
         ArrayList<T> bin = bins.get(key);
+
         if (bin != null) {
           result.addAll(bin);
         }
@@ -205,6 +216,7 @@ public class HashGridSpatialIndex<T> implements Serializable {
     long maxXKey = Math.round(maxX / xBinSize);
     long minYKey = Math.round(minY / yBinSize);
     long maxYKey = Math.round(maxY / yBinSize);
+
     for (long xKey = minXKey; xKey <= maxXKey; xKey++) {
       for (long yKey = minYKey; yKey <= maxYKey; yKey++) {
         out.add(binKey(xKey, yKey));
@@ -260,15 +272,16 @@ public class HashGridSpatialIndex<T> implements Serializable {
       );
       return new Coordinate(clampLon(coord.x), clampLat(coord.y));
     }
+
     return coord;
   }
 
   /**
    * Visit each bin touching the envelope.
    *
-   * @param envelope      Self-descripting.
+   * @param envelope Self-descripting.
    * @param createIfEmpty Create a new bin if not existing.
-   * @param binVisitor    The callback to call for each visited bin.
+   * @param binVisitor The callback to call for each visited bin.
    */
   private void visit(Envelope envelope, boolean createIfEmpty, final BinVisitor<T> binVisitor) {
     Coordinate min = new Coordinate(envelope.getMinX(), envelope.getMinY());
@@ -282,6 +295,7 @@ public class HashGridSpatialIndex<T> implements Serializable {
     long maxXKey = Math.round(max.x / xBinSize);
     long minYKey = Math.round(min.y / yBinSize);
     long maxYKey = Math.round(max.y / yBinSize);
+
     for (long xKey = minXKey; xKey <= maxXKey; xKey++) {
       for (long yKey = minYKey; yKey <= maxYKey; yKey++) {
         /*
@@ -292,13 +306,16 @@ public class HashGridSpatialIndex<T> implements Serializable {
          */
         long mapKey = binKey(xKey, yKey);
         ArrayList<T> bin = bins.get(mapKey);
+
         if (createIfEmpty && bin == null) {
           bin = new ArrayList<>();
           bins.put(mapKey, bin);
           nBins++;
         }
+
         if (bin != null) {
           boolean modified = binVisitor.visit(bin, mapKey);
+
           if (modified && bin.isEmpty()) {
             bins.remove(mapKey);
             nBins--;

@@ -198,7 +198,8 @@ public class BikeWalkingTest extends GraphRoutingTest {
     );
   }
 
-  // A cost should be applied, since a mounting / dismounting takes place when entering the street network.
+  // A cost should be applied, since a mounting / dismounting takes place when entering the street
+  // network.
   @Test
   public void testPathwayBiking() {
     assertPath(

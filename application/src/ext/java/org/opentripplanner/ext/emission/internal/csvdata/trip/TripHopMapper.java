@@ -46,12 +46,14 @@ public class TripHopMapper {
     for (Map.Entry<FeedScopedId, EmissionAggregator> it : builders.entrySet()) {
       var builder = it.getValue();
       var emission = builder.build();
+
       if (emission.isPresent()) {
         map.put(it.getKey(), emission.get());
       } else {
         issueStore.addAll(builder.listIssues());
       }
     }
+
     return map;
   }
 }

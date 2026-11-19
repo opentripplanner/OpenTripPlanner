@@ -30,8 +30,8 @@ import org.opentripplanner.transit.transfer.regular.spi.AllowedModesLookup;
  * Connects the regular-transfer module to the street graph: creates the module's generator and
  * repository with a street-search-backed {@link StreetTransferPathProvider} and the
  * {@link RegularTransferPreferencesMapper}, with {@code P = NearbyStop} and
- * {@code R = RouteRequest}. This is the only place those are wired together, so the graph build
- * and the routing use the same mapping.
+ * {@code R = RouteRequest}. This is the only place those are wired together, so the graph build and
+ * the routing use the same mapping.
  */
 public final class StreetTransferFactory {
 
@@ -55,13 +55,13 @@ public final class StreetTransferFactory {
    * {@code buildRepository}.
    *
    * @param stopPatterns the trip patterns visiting the stops. With the feature
-   *                     {@code ConsiderPatternsForDirectTransfers} only the stops visited by a
-   *                     pattern have transfers from them, and only the closest stop of each pattern
-   *                     is a transfer to; see {@link #isTransferSource}
+   *     {@code ConsiderPatternsForDirectTransfers} only the stops visited by a pattern have
+   *     transfers from them, and only the closest stop of each pattern is a transfer to; see
+   *     {@link #isTransferSource}
    * @param allowedModes the modes the stops are allowed for, to select the max duration of the
-   *                     transfers, see {@code MaxDurationsPreference}
-   * @param flexIndex    the flex trips to consider when the transfer stops are found, or
-   *                     {@code null} to ignore flex trips
+   *     transfers, see {@code MaxDurationsPreference}
+   * @param flexIndex the flex trips to consider when the transfer stops are found, or {@code null}
+   *     to ignore flex trips
    */
   public static RegularTransferGenerator createGenerator(
     Graph graph,
@@ -100,10 +100,10 @@ public final class StreetTransferFactory {
    * Registration is not thread-safe, so the handle must be created at startup, before the updaters
    * start. The transit repository must be indexed.
    *
-   * @param cacheMaxSize           the max number of Raptor transfers cached for other user
-   *                               preferences than the ones of the profiles and the warmup entries
+   * @param cacheMaxSize the max number of Raptor transfers cached for other user preferences than
+   *     the ones of the profiles and the warmup entries
    * @param collectCacheStatistics whether to count the requests that use each key of the cache of
-   *                               the Raptor transfers, for the report of the cache
+   *     the Raptor transfers, for the report of the cache
    */
   public static RepositoryHandle<
     RegularTransferRepositorySnapshot<NearbyStop, RouteRequest>,
@@ -156,9 +156,11 @@ public final class StreetTransferFactory {
     if (!transfersAllowed(siteRepository, stopId)) {
       return false;
     }
+
     if (!OTPFeature.ConsiderPatternsForDirectTransfers.isOn()) {
       return true;
     }
+
     return stopPatterns.contains(stopId) || isUsedRealtime(siteRepository, stopId);
   }
 

@@ -96,8 +96,8 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
    * transfers. This cost is not related in any way to the path generalized-cost. It takes only the
    * transfer constraint attributes in consideration.
    * <p>
-   * When comparing paths that ride the same trips, this can be used to find the optimal places
-   * to do the transfers. The cost is created to prioritize the following:
+   * When comparing paths that ride the same trips, this can be used to find the optimal places to
+   * do the transfers. The cost is created to prioritize the following:
    * <ol>
    *   <li>{@code stay-seated} - cost: 10 points</li>
    *   <li>{@code guaranteed} - cost: 20 points</li>
@@ -106,7 +106,7 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
    * In addition, the {@code priority} cost is added. See {@link TransferPriority#cost()}.
    *
    * @param c The transfer to return a cost for, or {@code null} if the transfer is a regular OSM
-   *          street generated transfer.
+   *     street generated transfer.
    */
   public static int cost(@Nullable TransferConstraint c) {
     return c == null ? DEFAULT_COST : c.cost();
@@ -135,8 +135,8 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
    * A facilitated transfer is allowed even if there might not be enough time to walk or if the
    * alight-slack or board-slack is too tight. We ignore slack for facilitated transfers.
    * <p>
-   * This is an aggregated field, which encapsulates an OTP specific rule. A facilitated transfer
-   * is either stay-seated or guaranteed. High priority transfers are not facilitated.
+   * This is an aggregated field, which encapsulates an OTP specific rule. A facilitated transfer is
+   * either stay-seated or guaranteed. High priority transfers are not facilitated.
    */
   public boolean isFacilitated() {
     return staySeated || guaranteed;
@@ -222,6 +222,7 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
     // Ignore transfer, board and alight slack for min-transfer-time
     if (isMinTransferTimeSet()) {
       int minTransferTime = getMinTransferTime() + transferSlack;
+
       if (direction.isForward()) {
         int minTransferBoardTime = sourceTransitArrivalTime + minTransferTime;
         return OTPFeature.MinimumTransferTimeIsDefinitive.isOn()
@@ -234,6 +235,7 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
           : Math.min(minTransferBoardTime, calcRegularTransferTargetTime.getAsInt());
       }
     }
+
     // Transfers with priority only apply to the cost not the transfer time
     return calcRegularTransferTargetTime.getAsInt();
   }
@@ -248,9 +250,11 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
     if (this == o) {
       return true;
     }
+
     if (!(o instanceof final TransferConstraint that)) {
       return false;
     }
+
     return (
       staySeated == that.staySeated &&
       guaranteed == that.guaranteed &&
@@ -281,9 +285,11 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
     if (staySeated) {
       return STAY_SEATED_TRANSFER_COST;
     }
+
     if (guaranteed) {
       return GUARANTEED_TRANSFER_COST;
     }
+
     return NONE_FACILITATED_COST;
   }
 

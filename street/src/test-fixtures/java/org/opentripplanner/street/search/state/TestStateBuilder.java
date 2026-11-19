@@ -116,9 +116,11 @@ public class TestStateBuilder {
     customizer.accept(edgeBuilder);
     var edge = edgeBuilder.buildAndConnect();
     var states = edge.traverse(currentState);
+
     if (states.length != 1) {
       throw new IllegalStateException("Only single state transitions are supported.");
     }
+
     currentState = states[0];
     return this;
   }
@@ -137,9 +139,11 @@ public class TestStateBuilder {
       .buildAndConnect();
 
     var states = edge.traverse(currentState);
+
     if (states.length != 1) {
       throw new IllegalStateException("Only single state transitions are supported.");
     }
+
     currentState = states[0];
     return this;
   }
@@ -150,9 +154,11 @@ public class TestStateBuilder {
     var to = StreetModelFactory.intersectionVertex(count, count);
     var area = StreetModelFactory.areaEdge(from, to, name, StreetTraversalPermission.PEDESTRIAN);
     var states = area.traverse(currentState);
+
     if (states.length != 1) {
       throw new IllegalStateException("Only single state transitions are supported.");
     }
+
     currentState = states[0];
     return this;
   }
@@ -169,9 +175,11 @@ public class TestStateBuilder {
     customizer.accept(builder);
     var edge = builder.build();
     var states = edge.traverse(currentState);
+
     if (states.length != 1) {
       throw new IllegalStateException("Only single state transitions are supported.");
     }
+
     currentState = states[0];
     return this;
   }

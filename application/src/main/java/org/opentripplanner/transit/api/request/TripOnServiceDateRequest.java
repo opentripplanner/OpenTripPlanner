@@ -108,25 +108,31 @@ public class TripOnServiceDateRequest {
 
   public FilterValues<TransitMode> includeModes() {
     List<TransitMode> modesToInclude = null;
+
     if (!filters.isEmpty()) {
       // Since we currently only support a single filter, we only use the first filter and select
       var includes = filters.getFirst().select();
+
       if (includes != null && !includes.getFirst().transportModes().includeEverything()) {
         modesToInclude = extractTransitModes(includes.getFirst());
       }
     }
+
     return FilterValues.ofNullIsEverything("modesToInclude", modesToInclude);
   }
 
   public FilterValues<TransitMode> excludeModes() {
     List<TransitMode> modesToExclude = null;
+
     if (!filters.isEmpty()) {
       // Since we currently only support a single filter, we only use the first filter and select
       var excludes = filters.getFirst().not();
+
       if (excludes != null && !excludes.getFirst().transportModes().includeEverything()) {
         modesToExclude = extractTransitModes(excludes.getFirst());
       }
     }
+
     return FilterValues.ofNullIsEverything("modesToExclude", modesToExclude);
   }
 

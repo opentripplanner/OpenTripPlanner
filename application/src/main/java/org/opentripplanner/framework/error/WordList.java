@@ -56,9 +56,11 @@ public class WordList {
         return words.getFirst();
       default:
         var buf = new StringBuilder(words.get(0));
+
         for (int i = 1; i < words.size() - 1; i++) {
           buf.append(", ").append(words.get(i));
         }
+
         buf.append(" and ").append(words.getLast());
         return buf.toString();
     }

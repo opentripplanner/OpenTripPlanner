@@ -15,14 +15,14 @@ import org.opentripplanner.transit.model.timetable.Direction;
  * A TransitAlertService stores a set of alerts (passenger-facing textual information associated
  * with transit entities such as stops or routes) which are currently active and should be provided
  * to end users when their itineraries include the relevant stop, route, etc.
- *
+ * <p>
  * Its primary purpose is to index those alerts, which may be numerous, so they can be looked up
  * rapidly and attached to the various pieces of an itinerary as it's being returned to the user.
- *
+ * <p>
  * Most elements in an itinerary will have no alerts attached, so those cases need to return
  * quickly. For example, no alerts on board stop A, no alerts on route 1 ridden, no alerts on alight
  * stop B, no alerts on route 2 ridden, yes one alert found on alight stop C.
- *
+ * <p>
  * The fact that alerts are relatively sparse (at the scale of the entire transportation system) is
  * central to this implementation. Adding a list of alerts to every element in the system would mean
  * storing large amounts of null or empty list references. Instead, alerts are looked up in maps
@@ -39,9 +39,11 @@ public interface TransitAlertService {
    */
   default Collection<TransitAlert> findAlerts(TransitAlertRequest request) {
     var alerts = getAllAlerts();
+
     if (request.filters().isEmpty()) {
       return alerts;
     }
+
     var matcher = TransitAlertMatcherFactory.of(request);
     return alerts.stream().filter(matcher::match).toList();
   }

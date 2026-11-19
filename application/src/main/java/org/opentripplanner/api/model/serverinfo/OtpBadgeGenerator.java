@@ -79,10 +79,9 @@ public class OtpBadgeGenerator {
   }
 
   /**
-   *
-   * @param label        The label in the
+   * @param label The label in the
    * @param labelBgColor The background color for the label using a valid SVG color format.
-   * @param body         The text for the body. The background color will be in OTP blue.
+   * @param body The text for the body. The background color will be in OTP blue.
    * @return A string containing the svg xml document.
    */
   public static String generateOtpBadgeSvg(String label, String labelBgColor, String body) {

@@ -29,9 +29,8 @@ public final class TestCostCalculator implements RaptorCostCalculator<TestTripSc
    * (in Raptor the unit for cost is centi-seconds).
    *
    * @param stopBoardAlightTransferCosts Unit centi-seconds. This parameter is used "as-is" and not
-   *                                     transformed into the Raptor cast unit to avoid the
-   *                                     transformation for each request. Use {@code null} to ignore
-   *                                     stop cost.
+   *     transformed into the Raptor cast unit to avoid the transformation for each request. Use
+   *     {@code null} to ignore stop cost.
    */
   public TestCostCalculator(
     int boardCost,
@@ -122,7 +121,8 @@ public final class TestCostCalculator implements RaptorCostCalculator<TestTripSc
       return transferCost;
     } else if (stopBoardAlightTransferCosts != null) {
       // Remove cost that was added during alighting.
-      // We do not want to add this cost on last alighting since it should only be applied on transfers
+      // We do not want to add this cost on last alighting since it should only be applied on
+      // transfers
       // It has to be done here because during alighting we do not know yet if it will be
       // a transfer or not.
       return -stopBoardAlightTransferCosts[stopIndex];
@@ -152,6 +152,7 @@ public final class TestCostCalculator implements RaptorCostCalculator<TestTripSc
     if (stopBoardAlightTransferCosts != null && !firstBoarding) {
       cost += stopBoardAlightTransferCosts[boardStop];
     }
+
     return cost;
   }
 

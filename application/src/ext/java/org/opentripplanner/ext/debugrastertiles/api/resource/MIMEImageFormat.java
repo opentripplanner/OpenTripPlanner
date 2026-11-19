@@ -17,6 +17,7 @@ class MIMEImageFormat {
 
   public MIMEImageFormat(String s) {
     String[] parts = s.split("/");
+
     if (parts.length == 2 && parts[0].equals("image")) {
       if (ACCEPTED_TYPES.contains(parts[1])) {
         type = parts[1];

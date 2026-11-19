@@ -110,7 +110,8 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
       .rail(30, T11_16, T11_20, C)
       .build();
     assertEquals(300, shortBikeToStop.legs().get(0).distanceMeters());
-    // should do nothing to non-bike trips but remove a bike+ride route that cycles only for one minute
+    // should do nothing to non-bike trips but remove a bike+ride route that cycles only for one
+    // minute
     assertEquals(List.of(i1), chain.filter(List.of(i1, shortBikeToStop)));
   }
 

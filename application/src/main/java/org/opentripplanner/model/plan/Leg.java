@@ -350,7 +350,7 @@ public interface Leg {
 
   /**
    * The leg's elevation profile.
-   *
+   * <p>
    * The elevation profile as a comma-separated list of x,y values. x is the distance from the start
    * of the leg, y is the elevation at this distance.
    */
@@ -430,10 +430,10 @@ public interface Leg {
    * A sandbox feature for calculating a numeric score between 0 and 1 which indicates how
    * accessible the itinerary is as a whole. This is not a very scientific method but just a rough
    * guidance that expresses certainty or uncertainty about the accessibility.
-   *
+   * <p>
    * The intended audience for this score are frontend developers wanting to show a simple UI rather
    * than having to iterate over all the stops and trips.
-   *
+   * <p>
    * Note: the information to calculate this score are all available to the frontend, however
    * calculating them on the backend makes life a little easier and changes are automatically
    * applied to all frontends.

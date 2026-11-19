@@ -118,11 +118,13 @@ public class GqlUtil {
     String argumentName
   ) {
     Integer argumentValue = environment.getArgument(argumentName);
+
     if (argumentValue == null || argumentValue < 0) {
       throw new InvalidInputException(
         "The argument '" + argumentName + "' should be a non-null positive value: " + argumentValue
       );
     }
+
     return argumentValue;
   }
 
@@ -136,9 +138,11 @@ public class GqlUtil {
     String argumentName
   ) {
     Double argumentValue = environment.getArgument(argumentName);
+
     if (argumentValue == null) {
       throw new InvalidInputException("The argument '" + argumentName + "' is required.");
     }
+
     return argumentValue;
   }
 
@@ -160,6 +164,7 @@ public class GqlUtil {
     if (args == null) {
       return null;
     }
+
     return args.stream().filter(Objects::nonNull).toList();
   }
 }

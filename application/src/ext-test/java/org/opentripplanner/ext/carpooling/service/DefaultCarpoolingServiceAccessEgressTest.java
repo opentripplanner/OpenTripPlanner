@@ -43,9 +43,8 @@ import org.opentripplanner.transit.service.TransitServiceResolver;
 /**
  * Integration tests for {@link DefaultCarpoolingService#routeAccessEgress}.
  * <p>
- * These tests use a real street graph with transit stops to verify the full access/egress
- * routing pipeline including the stops of the trips' corridors, insertion evaluation, and result
- * mapping.
+ * These tests use a real street graph with transit stops to verify the full access/egress routing
+ * pipeline including the stops of the trips' corridors, insertion evaluation, and result mapping.
  * <p>
  * Graph layout (going east):
  * <pre>
@@ -604,8 +603,8 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
    * pedestrian-plaza stop) is served at the nearest vertex a car can reach and leave, with a walk
    * for the last stretch.
    * <p>
-   * In this graph stopT5 is exactly such a stop: a walk-only side branch off D. A car alone
-   * would never reach it, so without the walk it would not appear in any access result.
+   * In this graph stopT5 is exactly such a stop: a walk-only side branch off D. A car alone would
+   * never reach it, so without the walk it would not appear in any access result.
    */
   @Test
   void aStopWhoseWalkIsLongerThanTheRequestAllowsIsLeftOut() {

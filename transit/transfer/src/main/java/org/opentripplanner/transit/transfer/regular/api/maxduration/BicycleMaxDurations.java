@@ -22,12 +22,11 @@ import org.opentripplanner.utils.time.DurationUtils;
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  *
  * @param maxDurationAllowAllModes the longest transfer between any two stops, or {@code null} if
- *                                 there are no transfers between stops that are not allowed for
- *                                 the modes below
- * @param maxDuration              the longest transfer between two stops that allow bicycles, or
- *                                 {@code null} if there is no limit for these stops
- * @param maxDurationAllowsCar     the longest transfer between two stops that allow cars, or
- *                                 {@code null} if there is no limit for these stops
+ *     there are no transfers between stops that are not allowed for the modes below
+ * @param maxDuration the longest transfer between two stops that allow bicycles, or {@code null} if
+ *     there is no limit for these stops
+ * @param maxDurationAllowsCar the longest transfer between two stops that allow cars, or
+ *     {@code null} if there is no limit for these stops
  */
 public record BicycleMaxDurations(
   @Nullable Duration maxDurationAllowAllModes,
@@ -38,6 +37,7 @@ public record BicycleMaxDurations(
     if (maxDurationAllowAllModes == null && maxDuration == null && maxDurationAllowsCar == null) {
       throw new IllegalArgumentException("At least one bicycle max duration is required.");
     }
+
     requirePositiveIfSet("maxDurationAllowAllModes", maxDurationAllowAllModes);
     requirePositiveIfSet("maxDuration", maxDuration);
     requirePositiveIfSet("maxDurationAllowsCar", maxDurationAllowsCar);

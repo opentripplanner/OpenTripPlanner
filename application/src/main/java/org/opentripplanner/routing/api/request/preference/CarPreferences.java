@@ -116,9 +116,11 @@ public final class CarPreferences implements Serializable {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     CarPreferences that = (CarPreferences) o;
     return (
       DoubleUtils.doubleEquals(that.reluctance, reluctance) &&

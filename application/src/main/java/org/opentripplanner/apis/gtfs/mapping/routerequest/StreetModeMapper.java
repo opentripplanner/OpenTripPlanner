@@ -37,8 +37,10 @@ public class StreetModeMapper {
         "Only one or two modes can be specified for a leg, got: " + modes + "."
       );
     }
+
     if (modes.size() == 1) {
       var mode = modes.getFirst();
+
       // TODO in the future, we will support defining other modes alone as well and filter out legs
       // which don't contain the only specified mode as opposed to also returning legs which contain
       // only walking.
@@ -47,18 +49,22 @@ public class StreetModeMapper {
           "For the time being, " + mode + " needs to be combined with WALK mode for the same leg."
         );
       }
+
       return mode;
     }
+
     if (modes.contains(StreetMode.BIKE)) {
       throw new InvalidInputException(
         "Bicycle can't be combined with other modes for the same leg: " + modes + "."
       );
     }
+
     if (modes.contains(StreetMode.CAR)) {
       throw new InvalidInputException(
         "Car can't be combined with other modes for the same leg: " + modes + "."
       );
     }
+
     if (!modes.contains(StreetMode.WALK)) {
       throw new InvalidInputException(
         "For the time being, WALK needs to be added as a mode for a leg when using " +
@@ -66,6 +72,7 @@ public class StreetModeMapper {
           " and these two can't be used in the same leg."
       );
     }
+
     // Walk is currently always used as an implied mode when mode is not car.
     return modes
       .stream()
@@ -86,6 +93,7 @@ public class StreetModeMapper {
     if (isAlwaysPresentInLeg(mode)) {
       return List.of(mode);
     }
+
     return List.of(StreetMode.WALK, mode);
   }
 
@@ -97,11 +105,13 @@ public class StreetModeMapper {
     modes.add(journey.access().mode());
     modes.add(journey.egress().mode());
     modes.add(journey.transfer().mode());
+
     if (modes.contains(StreetMode.BIKE) && modes.size() != 1) {
       throw new InvalidInputException(
         "If BICYCLE is used for access, egress or transfer, then it should be used for all."
       );
     }
+
     if (modes.contains(StreetMode.CAR) && modes.size() != 1) {
       throw new InvalidInputException(
         "If CAR is used for access, egress or transfer, then it should be used for all."

@@ -111,6 +111,7 @@ public class DefaultTransitDataProviderFilterBuilder {
     if (this.filters == null) {
       this.filters = new ArrayList<>();
     }
+
     this.filters.add(filter);
     return this;
   }
@@ -147,6 +148,7 @@ public class DefaultTransitDataProviderFilterBuilder {
     if (filters == null) {
       return List.of(AllowAllTransitFilter.of());
     }
+
     return filters;
   }
 

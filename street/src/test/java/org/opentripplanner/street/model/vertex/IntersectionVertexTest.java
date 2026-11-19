@@ -96,9 +96,9 @@ public class IntersectionVertexTest {
     assertFalse(iv.inferredFreeFlowing());
   }
 
-  /****
-   * Private Methods
-   ****/
+  /**
+   * ** Private Methods **
+   */
 
   private StreetVertex vertex(String label, double lat, double lon) {
     return StreetModelFactory.intersectionVertex(label, lat, lon);

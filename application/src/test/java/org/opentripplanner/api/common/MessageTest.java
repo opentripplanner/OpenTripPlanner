@@ -35,6 +35,7 @@ public class MessageTest {
   public void testDefaultLanguage() {
     // Keep default locale so we can set it back after the test is done
     Locale sysDefaultLocale = Locale.getDefault();
+
     try {
       // Force default to make test work on non-US machines
       Locale.setDefault(Locale.GERMANY);

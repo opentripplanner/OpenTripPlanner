@@ -41,9 +41,11 @@ class ServiceJourneyNonIncreasingPassingTime
       serviceJourneyInfo.orderedTimetabledPassingTimeInfos();
 
     var previousPassingTime = orderedPassingTimes.get(0);
+
     if (!previousPassingTime.isComplete()) {
       return discard(previousPassingTime, ErrorType.INCOMPLETE);
     }
+
     if (!previousPassingTime.isConsistent()) {
       return discard(previousPassingTime, ErrorType.INCONSISTENT);
     }
@@ -54,6 +56,7 @@ class ServiceJourneyNonIncreasingPassingTime
       if (!currentPassingTime.isComplete()) {
         return discard(currentPassingTime, ErrorType.INCOMPLETE);
       }
+
       if (!currentPassingTime.isConsistent()) {
         return discard(currentPassingTime, ErrorType.INCONSISTENT);
       }
@@ -64,6 +67,7 @@ class ServiceJourneyNonIncreasingPassingTime
 
       previousPassingTime = currentPassingTime;
     }
+
     return Status.OK;
   }
 

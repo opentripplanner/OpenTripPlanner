@@ -44,12 +44,12 @@ import org.slf4j.LoggerFactory;
  * <p>
  * The scheduled trip patterns, trips and trip calendars are not part of this repository.
  * <p>
- * A TransitRepository instance also includes references to some transient indexes of its contents, to
- * the RaptorTransitData derived from it, and to some other services and utilities that operate upon
- * its contents.
+ * A TransitRepository instance also includes references to some transient indexes of its contents,
+ * to the RaptorTransitData derived from it, and to some other services and utilities that operate
+ * upon its contents.
  * <p>
- * The TransitRepository stands in opposition to two other aggregates: the Graph (representing
- * the street network) and the RaptorTransitData (representing many of the same things in the
+ * The TransitRepository stands in opposition to two other aggregates: the Graph (representing the
+ * street network) and the RaptorTransitData (representing many of the same things in the
  * TransitRepository but rearranged to be more efficient for Raptor routing).
  * <p>
  * At this point the TransitRepository is not often read directly. Many requests will look at the
@@ -77,10 +77,10 @@ public class TransitRepository implements Serializable {
    * The RaptorTransitData representation (optimized and rearranged for Raptor) of the scheduled
    * (non-realtime) timetable data.
    * <p>
-   * TODO: This does not belong here: the scheduled timetable data it is derived from is not part
-   *       of this repository. Move it to the timetable repository. It is not part of
-   *       ScheduledTimetableData, since it is also derived from transfers, stops and tuning
-   *       parameters, and contains mutable caches.
+   * TODO: This does not belong here: the scheduled timetable data it is derived from is not part of
+   * this repository. Move it to the timetable repository. It is not part of ScheduledTimetableData,
+   * since it is also derived from transfers, stops and tuning parameters, and contains mutable
+   * caches.
    */
   private transient RaptorTransitData raptorTransitData;
 
@@ -117,6 +117,7 @@ public class TransitRepository implements Serializable {
    */
   public void index() {
     assertModificationsAllowed();
+
     if (index == null) {
       LOG.info("Index timetable repository...");
       this.index = new TransitRepositoryIndex(this);
@@ -208,6 +209,7 @@ public class TransitRepository implements Serializable {
     if (timeZone != null) {
       return timeZone;
     }
+
     LOG.warn("graph contains no agencies (yet); API request times will be interpreted as GMT.");
     return ZoneId.of("GMT");
   }
@@ -217,9 +219,11 @@ public class TransitRepository implements Serializable {
    */
   public void initTimeZone(ZoneId timeZone) {
     assertModificationsAllowed();
+
     if (timeZone == null || timeZone.equals(this.timeZone)) {
       return;
     }
+
     invalidateIndex();
     this.timeZone = ObjectUtils.requireNotInitialized(this.timeZone, timeZone);
     this.timeZoneExplicitlySet = true;
@@ -235,9 +239,11 @@ public class TransitRepository implements Serializable {
    */
   public Set<ZoneId> getAgencyTimeZones() {
     Set<ZoneId> ret = new HashSet<>();
+
     for (Agency agency : agencies) {
       ret.add(agency.getTimezone());
     }
+
     return ret;
   }
 
@@ -246,8 +252,8 @@ public class TransitRepository implements Serializable {
   }
 
   /**
-   * Return the operator for the given id, or {@code null} if there is none. Requires the
-   * repository to be indexed, see {@link #index()}.
+   * Return the operator for the given id, or {@code null} if there is none. Requires the repository
+   * to be indexed, see {@link #index()}.
    */
   @Nullable
   public Operator getOperator(FeedScopedId id) {
@@ -287,28 +293,27 @@ public class TransitRepository implements Serializable {
   /**
    * Return the stop that is associated with the NeTEx concept of a scheduled stop point.
    * <p>
-   * The scheduled stop point is a "location-independent" stop that schedule systems provide
-   * which in turn can be later be resolved to an actual stop.
+   * The scheduled stop point is a "location-independent" stop that schedule systems provide which
+   * in turn can be later be resolved to an actual stop.
    * <p>
-   * This way two schedule systems can use their own IDs for scheduled stop points but the stop
-   * (the actual physical infrastructure) is the same.
+   * This way two schedule systems can use their own IDs for scheduled stop points but the stop (the
+   * actual physical infrastructure) is the same.
    * <p>
-   * SIRI feeds are encouraged to refer to scheduled stop points in an EstimatedCall's
-   * stopPointRef but the specs are unclear and the reality on the ground very mixed.
-   *
+   * SIRI feeds are encouraged to refer to scheduled stop points in an EstimatedCall's stopPointRef
+   * but the specs are unclear and the reality on the ground very mixed.
+   * <p>
    * @link <a href="https://public.3.basecamp.com/p/TcEEP5WrNZJPBxrJU9GAjint">NeTEx Basecamp
-   *       discussion</a>
+   * discussion</a>
    */
   public Optional<RegularStop> findStopByScheduledStopPoint(FeedScopedId scheduledStopPoint) {
     return Optional.ofNullable(stopsByScheduledStopPointRefs.get(scheduledStopPoint));
   }
 
   /**
-   * Sets the updater manager for this repository and makes sure the configured updaters
-   * are correctly applied to {@code transitAlertService}.
+   * Sets the updater manager for this repository and makes sure the configured updaters are
+   * correctly applied to {@code transitAlertService}.
    * <p>
    * Note: before this method is called an empty {@code transitAlertService} is returned instead.
-   * <p>
    * <pre>
    * TODO: This logic is unfortunate and quite brittle. We would like to improve it in the future.
    *       The UpdateManager should live in a DI context(Dagger), not here.
@@ -393,6 +398,7 @@ public class TransitRepository implements Serializable {
     if (index == null) {
       throw new IllegalStateException("The transit repository is not indexed, call index() first.");
     }
+
     return index;
   }
 

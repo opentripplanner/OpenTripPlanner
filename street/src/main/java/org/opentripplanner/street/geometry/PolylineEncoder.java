@@ -10,7 +10,7 @@ import org.locationtech.jts.geom.Polygon;
 
 /**
  * This encodes geometries to the Google Polyline encoding
- *
+ * <p>
  * {@see EncodedPolyline}
  */
 public class PolylineEncoder {
@@ -23,7 +23,7 @@ public class PolylineEncoder {
    *
    * @param geometry the JTS Geometry to encode (LineString, MultiLineString, Polygon, or Point)
    * @return a PolylineEncoderResult containing the encoded polyline string and the number of
-   *         coordinates
+   *     coordinates
    * @throws IllegalArgumentException if the geometry type is not supported
    */
   public static PolylineEncoderResult encodeGeometry(Geometry geometry) {
@@ -45,8 +45,8 @@ public class PolylineEncoder {
    * <p>
    * The algorithm works by:
    * <ol>
-   *   <li>Converting each coordinate (latitude/longitude) to a fixed-precision integer by multiplying
-   *       by 10^5</li>
+   *   <li>Converting each coordinate (latitude/longitude) to a fixed-precision integer by
+   *       multiplying by 10^5</li>
    *   <li>Computing deltas (differences) from the previous point to reduce the magnitude of numbers
    *       (the first point uses absolute coordinates)</li>
    *   <li>Encoding each delta as a signed integer using bit manipulation</li>
@@ -86,8 +86,8 @@ public class PolylineEncoder {
   /**
    * Encodes a coordinate sequence using the Google Polyline encoding algorithm.
    * <p>
-   * This variant reads coordinates directly from the sequence using
-   * {@code getX(i)}/{@code getY(i)} to avoid allocating intermediate {@code Coordinate} objects.
+   * This variant reads coordinates directly from the sequence using {@code getX(i)}/{@code getY(i)}
+   * to avoid allocating intermediate {@code Coordinate} objects.
    */
   public static PolylineEncoderResult encodeCoordinateSequence(CoordinateSequence seq) {
     StringBuilder encodedPoints = new StringBuilder();
@@ -117,23 +117,25 @@ public class PolylineEncoder {
    * The encoding process:
    * <ol>
    *   <li>Left-shift the number by 1 bit (equivalent to multiplying by 2)</li>
-   *   <li>If the number is negative, invert all bits using the bitwise NOT operator (~). This ensures
-   *       negative values are distinguishable from positive values.</li>
+   *   <li>If the number is negative, invert all bits using the bitwise NOT operator (~). This
+   *       ensures negative values are distinguishable from positive values.</li>
    *   <li>Pass the result to encodeNumber() for conversion to 5-bit chunks and ASCII</li>
    * </ol>
    * <p>
-   * This approach encodes the sign information in the least significant bit after the left
-   * shift: positive numbers have their bits shifted left (LSB = 0), while negative numbers have
-   * their bits shifted left and then inverted (LSB = 1 after inversion).
+   * This approach encodes the sign information in the least significant bit after the left shift:
+   * positive numbers have their bits shifted left (LSB = 0), while negative numbers have their bits
+   * shifted left and then inverted (LSB = 1 after inversion).
    *
    * @param num the signed integer to encode (typically a coordinate delta)
    * @return the encoded string representation
    */
   private static String encodeSignedNumber(int num) {
     int sgn_num = num << 1;
+
     if (num < 0) {
       sgn_num = ~sgn_num;
     }
+
     return encodeNumber(sgn_num);
   }
 

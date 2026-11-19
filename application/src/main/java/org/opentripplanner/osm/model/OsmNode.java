@@ -46,8 +46,8 @@ public class OsmNode extends OsmEntity {
   }
 
   /**
-   * Checks if this node blocks traversal in any way
-   * Only applies to able-bodied pedestrians, does not check for accessibility
+   * Checks if this node blocks traversal in any way Only applies to able-bodied pedestrians, does
+   * not check for accessibility
    *
    * @return true if it does
    */
@@ -56,6 +56,7 @@ public class OsmNode extends OsmEntity {
     if (this.isTagless()) {
       return false;
     }
+
     return overridePermissions(ALL) != ALL;
   }
 
@@ -78,6 +79,7 @@ public class OsmNode extends OsmEntity {
     if (this.isTagless()) {
       return false;
     }
+
     return (
       (isStationEntrance() || isTag("entrance", "yes") || isTag("entrance", "main")) &&
       !isTag("access", "private") &&
@@ -88,17 +90,21 @@ public class OsmNode extends OsmEntity {
   /** checks for units (m/ft) in an OSM ele tag value, and returns the value in meters */
   public OptionalDouble parseEleTag() {
     var ele = getTag("ele");
+
     if (ele == null) {
       return OptionalDouble.empty();
     }
+
     ele = ele.toLowerCase();
     double unit = 1;
+
     if (ele.endsWith("m")) {
       ele = ele.replaceFirst("\\s*m", "");
     } else if (ele.endsWith("ft")) {
       ele = ele.replaceFirst("\\s*ft", "");
       unit = 0.3048;
     }
+
     try {
       return OptionalDouble.of(Double.parseDouble(ele) * unit);
     } catch (NumberFormatException e) {
@@ -130,8 +136,8 @@ public class OsmNode extends OsmEntity {
   /**
    * Check if this node represents access to a platform.
    * <p>
-   * If this node appears inside a platform area and belongs to the same public transport
-   * relation, the platform will be kept even if it isn't physically linked to this node so that
+   * If this node appears inside a platform area and belongs to the same public transport relation,
+   * the platform will be kept even if it isn't physically linked to this node so that
    * {@link org.opentripplanner.graph_builder.module.OsmBoardingLocationsModule} can associate the
    * transit stop with the physical platform.
    */

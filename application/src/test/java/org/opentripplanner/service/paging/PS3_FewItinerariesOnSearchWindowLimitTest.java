@@ -27,8 +27,8 @@ import org.opentripplanner.utils.time.TimeUtils;
  * test focus on paging back and forth, matching itineraries with departure time at the exact same
  * time as the search-window earliest-departure-time.
  * <p>
- * Note! We are not doing the actual search, just emulating the search using the
- * {@link TestDriver} mock.
+ * Note! We are not doing the actual search, just emulating the search using the {@link TestDriver}
+ * mock.
  * <p>
  * All components required to test paging is used including the {@link PagingService} and the 3
  * filters:
@@ -37,7 +37,6 @@ import org.opentripplanner.utils.time.TimeUtils;
  *   <li>OutsideSearchWindowFilter</li>
  *   <li>NumItinerariesFilter</li>
  * </ol>
- * <p>
  */
 @SuppressWarnings("DataFlowIssue")
 class PS3_FewItinerariesOnSearchWindowLimitTest {
@@ -133,6 +132,7 @@ class PS3_FewItinerariesOnSearchWindowLimitTest {
           cursor = subject.previousPageCursor();
           currTime -= tc.timeShift;
         }
+
         String description = tc.testDescription();
         assertEquals(tc.gotoPage(), cursor.type(), description);
         assertEquals(expectedSortOrder, cursor.originalSortOrder(), description);
@@ -165,10 +165,12 @@ class PS3_FewItinerariesOnSearchWindowLimitTest {
     Matcher matcher = PAGING_SEQUENCE_TIME_SHIFT_PATTERN.matcher(token);
     int timeShift = SEARCH_WINDOW_SEC;
     String tokenWithTimeShiftRemoved = token;
+
     if (matcher.matches()) {
       tokenWithTimeShiftRemoved = matcher.group(1);
       timeShift = (int) DurationUtils.duration(matcher.group(2)).toSeconds();
     }
+
     switch (tokenWithTimeShiftRemoved) {
       case "-":
         sequence.append(" > -");

@@ -27,6 +27,7 @@ public final class TripFrequencyBoardSearch<T extends DefaultTripSchedule> imple
     int tripIndexLimit
   ) {
     IntIterator indexIterator = patternForDates.tripPatternForDatesIndexIterator(true);
+
     while (indexIterator.hasNext()) {
       int i = indexIterator.next();
       var pattern = patternForDates.tripPatternForDate(i);
@@ -37,6 +38,7 @@ public final class TripFrequencyBoardSearch<T extends DefaultTripSchedule> imple
           stopPositionInPattern,
           earliestBoardTime - offset
         );
+
         if (departureTime != -1) {
           int headway = frequency.routingSlack();
           var tripTimes = frequency.materialize(
@@ -58,6 +60,7 @@ public final class TripFrequencyBoardSearch<T extends DefaultTripSchedule> imple
         }
       }
     }
+
     return RaptorBoardOrAlightEvent.empty(earliestBoardTime);
   }
 }

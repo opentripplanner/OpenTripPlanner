@@ -4,7 +4,6 @@ import java.util.Objects;
 
 /**
  * Value object encapsulating the real-time state of a trip.
- *
  * <p>
  * {@code timesModified} is {@code true} if any stop arrival or departure time was updated via
  * real-time data. The remaining flags represent structural changes:
@@ -16,10 +15,9 @@ import java.util.Objects;
  *       changed by a real-time update.</li>
  *   <li>{@code deleted} – the trip is soft-deleted and must not be visible to end users.</li>
  * </ul>
- *
  * <p>
- * Multiple flags may be {@code true} simultaneously. For example, a trip that has a modified
- * stop pattern will always also have {@code timesModified == true}.
+ * Multiple flags may be {@code true} simultaneously. For example, a trip that has a modified stop
+ * pattern will always also have {@code timesModified == true}.
  */
 public final class RealTimeTripState {
 
@@ -73,9 +71,11 @@ public final class RealTimeTripState {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     RealTimeTripState that = (RealTimeTripState) o;
     return (
       timesModified == that.timesModified &&

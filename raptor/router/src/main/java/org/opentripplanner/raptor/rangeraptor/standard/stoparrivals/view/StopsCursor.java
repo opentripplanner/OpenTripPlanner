@@ -45,9 +45,11 @@ public class StopsCursor<T extends RaptorTripSchedule> {
 
   public boolean reachedOnStreet(int round, int stop) {
     var a = arrivals.get(round, stop);
+
     if (a == null) {
       return false;
     }
+
     return a.arrivedByAccessOnStreet() || a.arrivedByTransfer();
   }
 
@@ -105,7 +107,7 @@ public class StopsCursor<T extends RaptorTripSchedule> {
    * The returned arrival can be access(including flex), transfer or transit.
    *
    * @param stopReachedOnBoard if {@code true} the arrival returned must arrive onboard a vehicle,
-   *                           if {@code false} the BEST arrival is returned on-street or on-board.
+   *     if {@code false} the BEST arrival is returned on-street or on-board.
    */
   public ArrivalView<T> stop(int round, int stop, boolean stopReachedOnBoard) {
     var arrival = arrivals.get(round, stop);
@@ -119,6 +121,7 @@ public class StopsCursor<T extends RaptorTripSchedule> {
         return new Transfer<>(round, stop, arrival, this);
       }
     }
+
     // On on-board arrivals can always be used, we do not care what the *stopReachedOnBoard* is.
     if (arrival.arrivedByAccessOnBoard()) {
       return newAccessViewByExactArrivalTime(
@@ -129,6 +132,7 @@ public class StopsCursor<T extends RaptorTripSchedule> {
     } else if (arrival.arrivedByTransit()) {
       return new Transit<>(round, stop, arrival, this);
     }
+
     // Should never get here...
     throw new IllegalStateException("Unknown arrival: " + arrival);
   }
@@ -149,6 +153,7 @@ public class StopsCursor<T extends RaptorTripSchedule> {
     } else if (arrival.arrivedByTransit()) {
       return new Transit<>(round, stop, arrival, this);
     }
+
     // Should never get here...
     throw new IllegalStateException("Unknown arrival: " + arrival);
   }

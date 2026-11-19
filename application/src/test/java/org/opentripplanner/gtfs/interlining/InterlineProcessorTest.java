@@ -102,9 +102,11 @@ class InterlineProcessorTest implements PlanTestConstants {
   ) {
     var transferService = new DefaultConstrainedTransferService();
     var calendarServiceData = new CalendarServiceData();
+
     for (int i = 0; i < serviceIds.size(); i++) {
       calendarServiceData.putServiceDatesForServiceId(serviceIds.get(i), serviceDates.get(i));
     }
+
     var processor = new InterlineProcessor(
       transferService,
       List.of(),

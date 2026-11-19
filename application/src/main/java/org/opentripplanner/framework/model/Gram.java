@@ -82,9 +82,11 @@ public final class Gram implements Serializable, Comparable<Gram> {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     var that = (Gram) o;
     return value == that.value;
   }
@@ -104,12 +106,15 @@ public final class Gram implements Serializable, Comparable<Gram> {
     if (value % KILO_GRAM_PRECISION == 0) {
       return value / KILO_GRAM_PRECISION + "kg";
     }
+
     if (value % GRAM_PRECISION == 0) {
       return value / GRAM_PRECISION + "g";
     }
+
     if (Math.abs(value) > 1000) {
       return value / 1000.0 + "g";
     }
+
     return value + "mg";
   }
 
@@ -123,22 +128,28 @@ public final class Gram implements Serializable, Comparable<Gram> {
 
   private static Gram parse(String value) {
     var m = PATTERN.matcher(value);
+
     if (!m.matches()) {
       throw new IllegalArgumentException("Parse error! Illegal gram value: '%s'".formatted(value));
     }
+
     var num = m.group(1);
     var unit = m.group(2);
 
     double v = Double.parseDouble(num);
+
     if ("kg".equalsIgnoreCase(unit)) {
       return ofPrecisionDouble(KILO_GRAM_PRECISION * v);
     }
+
     if ("g".equalsIgnoreCase(unit) || unit.isBlank()) {
       return ofPrecisionDouble(GRAM_PRECISION * v);
     }
+
     if ("mg".equalsIgnoreCase(unit)) {
       return ofPrecisionDouble(v);
     }
+
     throw new IllegalArgumentException("Parse error! Illegal gram value: '%s'".formatted(value));
   }
 }

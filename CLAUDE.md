@@ -21,8 +21,8 @@ mvn test
 # Run tests with code coverage
 mvn jacoco:prepare-agent test
 
-# Skip prettier during local builds
-mvn test -Dps          # equivalently: mvn test -PprettierSkip
+# Skip the code formatting (Java formatter and Spotless) during local builds
+mvn test -Djcf         # equivalently: mvn test -PjcfSkip
 
 # Regenerate API/itinerary snapshot tests
 mvn clean -Pclean-test-snapshots
@@ -33,13 +33,13 @@ mvn clean -Pclean-test-snapshots
 Quality gates run in the Maven `validate` / `process-sources` phases and fail the build on
 violations:
 
-- **Prettier**, run through the **Spotless** Maven plugin, auto-formats Java (100-char width,
-  2-space indent; the options are configured in the root `pom.xml`). Spotless also removes unused
-  imports (Javadoc-only references are kept). Requires `node`/`npm` on the `PATH`. CI enforces it;
-  check with `mvn spotless:check`, format with `mvn spotless:apply`. Skip locally with `-Dps`.
-- **Javadoc** formatting is opt-in: run Maven with `-DjavadocFormattingSkip=false` to format Javadoc
-  with the Eclipse JDT formatter (plus some regex fixes), run as a Spotless step before Prettier.
-  The settings live in `eclipse-formatter.properties`.
+- **Java code formatter** (`java-formatter-maven-plugin`) formats Java code and Javadoc (100-char
+  width, 2-space indent, all comment rules on; the options are in `.jcf/config.properties`). It
+  needs Maven on JDK 25+. CI enforces it with `-PjcfCheck`; check with `mvn jcf:check`, format with
+  `mvn jcf:format`. Skip locally with `-Djcf`.
+- **Spotless** removes unused imports from Java (Javadoc-only references are kept) and formats
+  Markdown, JSON and GraphQL with **Prettier**. Requires `node`/`npm` on the `PATH`; check with
+  `mvn spotless:check`, format with `mvn spotless:apply`.
 - **Checkstyle** runs against `checkstyle.xml` in the `process-sources` phase (after Spotless). Skip
   with `-Dcs` (or `-PcheckstyleSkip`).
 

@@ -36,6 +36,7 @@ class HeadsignMapper {
         destinationDisplay
       );
     }
+
     return res;
   }
 

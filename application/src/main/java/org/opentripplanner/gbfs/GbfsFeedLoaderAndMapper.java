@@ -75,12 +75,14 @@ public class GbfsFeedLoaderAndMapper {
             gbfsFeedVersion
           );
         }
+
         yield createV23(autoConfiguration, params, client);
       }
       case null -> createV23(autoConfiguration, params, client);
-      default -> throw new UnsupportedOperationException(
-        "Unsupported GBFS version " + gbfsFeedVersion + " for url " + params.url()
-      );
+      default
+        -> throw new UnsupportedOperationException(
+          "Unsupported GBFS version " + gbfsFeedVersion + " for url " + params.url()
+        );
     };
   }
 

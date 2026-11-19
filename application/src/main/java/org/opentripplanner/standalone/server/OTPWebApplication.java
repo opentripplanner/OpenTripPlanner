@@ -29,8 +29,8 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
  * auto-scanning of any kind, and keeps injection to a bare minimum using HK2, the injection library
  * Jersey itself uses.
  * <p>
- * Jersey has its own ResourceConfig class which is a subclass of Application. We can get away
- * with not using any Jersey-specific "conveniences" and stick with stock JAX-RS.
+ * Jersey has its own ResourceConfig class which is a subclass of Application. We can get away with
+ * not using any Jersey-specific "conveniences" and stick with stock JAX-RS.
  */
 public class OTPWebApplication extends Application {
 
@@ -176,6 +176,7 @@ public class OTPWebApplication extends Application {
     if (traceParameters.isEmpty()) {
       return List.of();
     }
+
     RequestTraceFilter.init(traceParameters);
 
     return List.of(RequestTraceFilter.class);

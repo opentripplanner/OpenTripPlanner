@@ -195,18 +195,23 @@ public class ScheduledTripTimesBuilder {
     if (departureTimes == null) {
       this.departureTimes = arrivalTimes;
     }
+
     if (arrivalTimes == null) {
       this.arrivalTimes = departureTimes;
     }
 
     int shift = departureTimes[0];
+
     if (shift == 0) {
       return;
     }
+
     this.departureTimes = timeShift(departureTimes, shift);
+
     if (arrivalTimes != departureTimes) {
       this.arrivalTimes = timeShift(arrivalTimes, shift);
     }
+
     this.timeShift += shift;
   }
 
@@ -214,9 +219,11 @@ public class ScheduledTripTimesBuilder {
     if (shift == 0) {
       return a;
     }
+
     for (int i = 0; i < a.length; i++) {
       a[i] -= shift;
     }
+
     return a;
   }
 }

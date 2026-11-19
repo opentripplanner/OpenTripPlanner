@@ -31,6 +31,7 @@ class StopFinderTraverseVisitor implements TraverseVisitor<State, Edge> {
   @Override
   public void visitVertex(State state) {
     Vertex vertex = state.getVertex();
+
     if (vertex instanceof TransitStopVertex tsv) {
       stopsFound.add(NearbyStop.nearbyStopForState(state, tsv.getId()));
     }
@@ -48,7 +49,7 @@ class StopFinderTraverseVisitor implements TraverseVisitor<State, Edge> {
 
   /**
    * @return A SkipEdgeStrategy that will stop exploring edges after the distance radius has been
-   *         reached.
+   *     reached.
    */
   SkipEdgeStrategy<State, Edge> getSkipEdgeStrategy() {
     return (current, edge) -> current.getTraversalDistanceMeters() > radiusMeters;

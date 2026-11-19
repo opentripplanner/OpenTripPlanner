@@ -41,7 +41,6 @@ import org.slf4j.LoggerFactory;
  * GTFS-RT decoder Runnable task in the single-threaded executor for handling.
  * <p>
  * Usage example in the file 'router-config.json', inside the 'updaters' array:
- *
  * <pre>
  * {
  *   "id": "hsl-trip-updates",
@@ -143,6 +142,7 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater<TransitRealTimeUpda
         .password(userinfo[1].getBytes(StandardCharsets.UTF_8))
         .build();
     }
+
     return null;
   }
 
@@ -169,6 +169,7 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater<TransitRealTimeUpda
   private void onMessage(Mqtt5Publish message) {
     List<GtfsRealtime.TripUpdate> updates = null;
     UpdateIncrementality updateIncrementality = FULL_DATASET;
+
     try {
       // Decode message
       GtfsRealtime.FeedMessage feedMessage = GtfsRealtime.FeedMessage.parseFrom(
@@ -190,6 +191,7 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater<TransitRealTimeUpda
 
       // Create List of TripUpdates
       updates = new ArrayList<>(feedEntityList.size());
+
       for (GtfsRealtime.FeedEntity feedEntity : feedEntityList) {
         if (feedEntity.hasTripUpdate()) {
           updates.add(feedEntity.getTripUpdate());

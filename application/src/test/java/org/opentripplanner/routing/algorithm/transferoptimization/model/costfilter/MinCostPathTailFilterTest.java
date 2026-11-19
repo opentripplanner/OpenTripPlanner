@@ -94,9 +94,11 @@ class MinCostPathTailFilterTest implements RaptorTestConstants {
       if (this == o) {
         return true;
       }
+
       if (o instanceof A a) {
         return name.equals(a.name) && x == a.x && y == a.y;
       }
+
       return false;
     }
 

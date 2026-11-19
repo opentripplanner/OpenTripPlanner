@@ -11,22 +11,21 @@ import org.opentripplanner.utils.tostring.ValueObjectToStringBuilder;
 
 /**
  * Information about a configuration parameter.
- *
  * <p>
  * TODO DOC - Add Unit tests on this class using the builder
  *
- * @param name         The parameter name in the JSON config file.
- * @param summary      Short one sentence description of the parameter used for documentation.
- * @param description  Long optional multi-line documentation of a parameter - use markdown.
- * @param type         The NodeAdaptor supported type.
- * @param enumType     If type is ENUM, ENUM_MAP or ENUM_SET, then this contains the enum type.
- * @param elementType  If the type is an ARRAY or a MAP then this is the type of the value.
- * @param since        This is the first OTP version this feature existed in.
+ * @param name The parameter name in the JSON config file.
+ * @param summary Short one sentence description of the parameter used for documentation.
+ * @param description Long optional multi-line documentation of a parameter - use markdown.
+ * @param type The NodeAdaptor supported type.
+ * @param enumType If type is ENUM, ENUM_MAP or ENUM_SET, then this contains the enum type.
+ * @param elementType If the type is an ARRAY or a MAP then this is the type of the value.
+ * @param since This is the first OTP version this feature existed in.
  * @param defaultValue The default value used if this parameter is not present in the documentation.
- * @param required     The config parameter is required. OTP will not start unless this parameter is
- *                     set.
- * @param skipChild    Skip generating doc for this node - the child(this) is documented in the
- *                     parent node.
+ * @param required The config parameter is required. OTP will not start unless this parameter is
+ *     set.
+ * @param skipChild Skip generating doc for this node - the child(this) is documented in the parent
+ *     node.
  */
 public record NodeInfo(
   String name,
@@ -61,7 +60,6 @@ public record NodeInfo(
    * For some complex types like Map, we describe the child elements as part of the node-info of the
    * parent. Hence, we need to skip the child when generating documentation. So, this factory method
    * is used to generate a placeholder in these cases.
-   * <p>
    * <pre>
    * TODO DOC: A better way to do this is to remove this and add proper NodeInfo elements for
    *           the child, but that requires a bit of refactoring.
@@ -82,7 +80,6 @@ public record NodeInfo(
    * For array of objects the child elements does not have as part of the node-info of the parent.
    * Hence, we need to skip the child when generating documentation. So, this factory method is used
    * to generate a placeholder in these cases.
-   * <p>
    * <pre>
    * TODO DOC: A better way to do this is to remove this and add proper NodeInfo elements for
    *           the child, but that requires a bit of refactoring.
@@ -142,6 +139,7 @@ public record NodeInfo(
     if (enumType != null) {
       value = StringUtils.kebabCase(value.toString());
     }
+
     return type.quote(value);
   }
 
@@ -150,9 +148,11 @@ public record NodeInfo(
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     NodeInfo leafNode = (NodeInfo) o;
     return Objects.equals(name, leafNode.name);
   }
@@ -178,6 +178,7 @@ public record NodeInfo(
         builder.addText(" Optional");
       }
     }
+
     builder.addText(" Since ").addText(since.toString());
 
     return builder.toString();
@@ -197,13 +198,16 @@ public record NodeInfo(
     if (isTypeQualifier()) {
       return -1;
     }
+
     if (other.isTypeQualifier()) {
       return 1;
     }
+
     // Put simple types before complex
     if (type.isSimple() != other.type.isSimple()) {
       return type.isSimple() ? -1 : 1;
     }
+
     // Sort by name
     return name.compareTo(other.name);
   }

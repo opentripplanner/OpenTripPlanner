@@ -14,7 +14,7 @@ public interface EdgeTraversal {
   /**
    * Traverse the current edge, returning a StateEditor ready for modification.
    *
-   * @param s0   the state to traverse from
+   * @param s0 the state to traverse from
    * @param mode the traverse mode (WALK for drop branches, rental mode for ride branches)
    * @return a StateEditor for the traversed state, or null if traversal is not possible
    */

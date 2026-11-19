@@ -78,6 +78,7 @@ class ScheduledTransitLegReferenceTest {
     // build transit data
     CalendarServiceData calendarServiceData = new CalendarServiceData();
     timetableDataImport.updateCalendarServiceData(calendarServiceData);
+
     for (var item : Map.of(
       SIMPLE_TRIP_ID,
       TransitRepositoryForTest.stopPattern(stop1, stop2, stop3a),
@@ -110,9 +111,11 @@ class ScheduledTransitLegReferenceTest {
           .withServiceDate(SERVICE_DATE)
           .build()
       );
+
       if (item.getKey() == SIMPLE_TRIP_ID) {
         TRIP_ON_SERVICE_DATE_ID = tripOnServiceDateId;
       }
+
       calendarServiceData.putServiceDatesForServiceId(tripPattern.getId(), List.of(SERVICE_DATE));
     }
 
@@ -438,7 +441,8 @@ class ScheduledTransitLegReferenceTest {
       STOP_2_ID,
       null
     );
-    // Should handle gracefully by finding the closest matching stops, not throw ArrayIndexOutOfBoundsException
+    // Should handle gracefully by finding the closest matching stops, not throw
+    // ArrayIndexOutOfBoundsException
     var leg = scheduledTransitLegReference.getLeg(transitService, new TransitAlertServiceImpl());
     assertNotNull(leg);
     assertEquals(0, leg.boardStopPosInPattern());

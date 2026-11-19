@@ -28,6 +28,7 @@ class StreetEdgeSplittingTest {
     GeometryFactory gf = GeometryUtils.getGeometryFactory();
     double x = -122.123;
     double y = 37.363;
+
     for (double delta = 0; delta <= 2; delta += 0.005) {
       StreetVertex v0 = intersectionVertex("zero", x, y);
       StreetVertex v1 = intersectionVertex("one", x + delta, y + delta);

@@ -189,6 +189,7 @@ public class TemporaryVertexDisposeTest {
       edge(o1, o2);
       o1 = o2;
     }
+
     edge(o2, a);
 
     // Verify A is connected to the chain of temporary vertexes.

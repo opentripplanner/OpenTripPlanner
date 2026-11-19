@@ -17,7 +17,7 @@ import org.opentripplanner.routing.api.request.request.JourneyRequest;
  * Trip planning request with a list of via points.
  *
  * @deprecated We will replace the complex via-search with a simpler version part of the existing
- *             trip search.
+ *     trip search.
  */
 @Deprecated
 public class RouteViaRequest implements Serializable {
@@ -96,9 +96,11 @@ public class RouteViaRequest implements Serializable {
     request.withSearchWindow(searchWindow);
     request.withDateTime(dateTime);
     request.withPreferences(preferences);
+
     if (numItineraries != null) {
       request.withNumItineraries(numItineraries);
     }
+
     request.withJourney(j -> j.withWheelchair(wheelchair));
     return request;
   }

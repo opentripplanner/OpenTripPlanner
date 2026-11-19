@@ -6,9 +6,9 @@ import org.opentripplanner.utils.time.TimeUtils;
 /**
  * This class can be used to throttle (logging) events.
  * <p>
- * The primary use-case for this class is to prevent a logger for degrading the performance,
- * because too many events are logged during a short period of time. This could happen if you are
- * parsing thousands or millions of records and each of them will cause a log event to happen.
+ * The primary use-case for this class is to prevent a logger for degrading the performance, because
+ * too many events are logged during a short period of time. This could happen if you are parsing
+ * thousands or millions of records and each of them will cause a log event to happen.
  * <p>
  * To use it, wrap the log statement:
  * <pre>
@@ -61,9 +61,9 @@ public class Throttle {
    * least one event is logged for each throttle time period. This is guaranteed based on the
    * assumption that writing to the {@code timeout} (primitive long) is an atomic operation.
    * <p>
-   * In the worst case scenario, each thread keep their local version of the {@code timeout} and
-   * one log message from each thread is printed every second. This can behave differently from one
-   * JVM to another.
+   * In the worst case scenario, each thread keep their local version of the {@code timeout} and one
+   * log message from each thread is printed every second. This can behave differently from one JVM
+   * to another.
    */
   public boolean throttle() {
     long time = System.currentTimeMillis();
@@ -71,6 +71,7 @@ public class Throttle {
     if (time < timeout) {
       return true;
     }
+
     timeout = time + quietPeriodMilliseconds;
     return false;
   }

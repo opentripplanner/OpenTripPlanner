@@ -89,12 +89,14 @@ public class BikelyUpdater implements DataSource<VehicleParking> {
   @Nullable
   private VehicleParking parseElement(JsonNode jsonNode) {
     var avail = jsonNode.path("doorAvailibilities");
+
     if (avail instanceof ArrayNode && !avail.isEmpty()) {
       int availableSpots = 0;
       int totalSpots = 0;
 
       for (var node : avail) {
         var type = node.get("doorTypeName").asText();
+
         if (INCLUDED_TYPES.contains(type)) {
           availableSpots += node.get("availableSpots").asInt();
           totalSpots += node.get("totalSpots").asInt();

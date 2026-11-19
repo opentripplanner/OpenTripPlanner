@@ -124,6 +124,7 @@ public class MicrometerGraphQLInstrumentation implements Instrumentation {
     if (parameters.getField().getDirective("timingData") == null) {
       return noOp();
     }
+
     Timer.Sample sample = Timer.start(meterRegistry);
     return whenCompleted((res, err) -> {
       String parentType = GraphQLTypeUtil.simplePrint(

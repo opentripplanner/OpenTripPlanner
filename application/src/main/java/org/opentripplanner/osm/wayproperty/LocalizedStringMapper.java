@@ -32,22 +32,23 @@ class LocalizedStringMapper {
   /**
    * Creates String which can be localized.
    * <p>
-   * Uses {@link #getTagNames(String) } to get which tag values are needed for this key. For each
-   * of this tag names tag value is read from OSM way. If tag value is missing it is added as empty
+   * Uses {@link #getTagNames(String) } to get which tag values are needed for this key. For each of
+   * this tag names tag value is read from OSM way. If tag value is missing it is added as empty
    * string.
    * <p>
-   * For example. If key platform has key {ref} current value of tag ref in way is saved to be
-   * used in localizations. It currently assumes that tag exists in way. (otherwise this namer
-   * wouldn't be used)
+   * For example. If key platform has key {ref} current value of tag ref in way is saved to be used
+   * in localizations. It currently assumes that tag exists in way. (otherwise this namer wouldn't
+   * be used)
    *
    * @param key key of translation for this way set in the WayPropertyMapper and translations read
-   *            from properties Files
+   *     from properties Files
    * @param way OSM way from which tag values are read
    */
   LocalizedString map(String key, OsmEntity way) {
     List<I18NString> lparams = new ArrayList<>(4);
     //Which tags do we want from way
     List<String> tagNames = getTagNames(key);
+
     for (String it : tagNames) {
       String param = way.getTag(it);
       lparams.add(new NonLocalizedString(Objects.requireNonNullElse(param, "")));
@@ -71,15 +72,18 @@ class LocalizedStringMapper {
     if (keyTagNames.containsKey(key)) {
       return keyTagNames.get(key);
     }
+
     List<String> tagNames = new ArrayList<>(4);
     String englishTrans = ResourceBundleSingleton.INSTANCE.localize(key, Locale.ENGLISH);
 
     Matcher matcher = PATTERN_MATCHER.matcher(englishTrans);
+
     while (matcher.find()) {
       String tagName = matcher.group(1);
       keyTagNames.put(key, tagName);
       tagNames.add(tagName);
     }
+
     return tagNames;
   }
 }

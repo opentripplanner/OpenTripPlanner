@@ -61,6 +61,7 @@ public class DecorateWithRideHailing implements ItineraryListFilter {
         .toList();
       return builder.withLegs(legs).build();
     }
+
     return i;
   }
 
@@ -72,6 +73,7 @@ public class DecorateWithRideHailing implements ItineraryListFilter {
           leg.to().coordinate,
           wheelchairAccessible
         );
+
         if (estimates.isEmpty()) {
           flagForDeletion(i);
           return leg;

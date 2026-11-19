@@ -76,9 +76,11 @@ public final class ElevatorRequest implements Serializable {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     ElevatorRequest that = (ElevatorRequest) o;
     return (
       Objects.equals(boardCost, that.boardCost) &&

@@ -94,10 +94,12 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
   public void runPolling() {
     int pages = 0;
     boolean moreData;
+
     do {
       moreData = fetchAndProcessUpdates();
       pages++;
     } while (moreData && (runOnlyOnce() || pages < maxPagesPerPoll));
+
     if (moreData) {
       LOG.warn(
         "Read the maximum of {} pages from {} in one poll; the rest follows on the next poll",
@@ -105,7 +107,9 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
         updateSource
       );
     }
+
     removeExpiredTrips();
+
     if (rejectedThisPoll > 0) {
       LOG.warn(
         "Rejected {} new carpool trips: this feed has the maximum of {} trips",
@@ -136,6 +140,7 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
    */
   private boolean fetchAndProcessUpdates() {
     var updates = updateSource.getUpdates();
+
     if (updates.isEmpty()) {
       return false;
     }
@@ -159,6 +164,7 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
 
     for (EstimatedTimetableDeliveryStructure delivery : deliveries) {
       var frames = delivery.getEstimatedJourneyVersionFrames();
+
       for (var frame : frames) {
         var estimatedVehicleJourneys = frame.getEstimatedVehicleJourneies();
 
@@ -181,29 +187,37 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
   void processEstimatedVehicleJourney(EstimatedVehicleJourney estimatedVehicleJourney) {
     try {
       FeedScopedId tripId = mapper.tripId(estimatedVehicleJourney);
+
       if (Boolean.TRUE.equals(estimatedVehicleJourney.isCancellation())) {
         remove(tripId);
         return;
       }
+
       var carpoolTrip = mapper.mapSiriToCarpoolTrip(estimatedVehicleJourney);
+
       if (carpoolTrip == null) {
         remove(tripId);
         return;
       }
+
       if (isUnchanged(tripId, carpoolTrip)) {
         return;
       }
+
       if (isFullFor(tripId)) {
         rejectedThisPoll++;
         LOG.debug("Rejected new carpool trip {}: the feed is full", tripId);
         return;
       }
+
       var routableTrip = resolveTrip(carpoolTrip);
+
       if (routableTrip == null) {
         failedResolutions.put(tripId, carpoolTrip);
         repository.removeCarpoolTrip(tripId);
         return;
       }
+
       failedResolutions.remove(tripId);
       repository.upsertCarpoolTrip(routableTrip);
     } catch (Exception e) {
@@ -253,6 +267,7 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
   @Nullable
   private RoutableCarpoolTrip resolveTrip(CarpoolTrip trip) {
     var failed = failedResolutions.get(trip.getId());
+
     if (failed != null && failed.routePoints().equals(trip.routePoints())) {
       LOG.debug(
         "Skipping carpool trip {}: route-point geometry is unchanged since resolution failed",
@@ -260,18 +275,24 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
       );
       return null;
     }
+
     var existing = repository.getCarpoolTrip(trip.getId());
     boolean sameRoutePoints =
       existing != null && existing.trip().routePoints().equals(trip.routePoints());
+
     // The corridor also depends on the stops' deviation budgets.
     if (sameRoutePoints && sameDeviationBudgets(existing.trip(), trip)) {
       return new RoutableCarpoolTrip(trip, existing.corridor());
     }
+
     var tripOnSameRoute = storedTripOnTheSameRoute(trip);
+
     if (tripOnSameRoute != null) {
       return new RoutableCarpoolTrip(trip, tripOnSameRoute.corridor());
     }
+
     RoutableCarpoolTrip resolved;
+
     try {
       resolved = sameRoutePoints
         ? tripResolver.resolve(trip, existing.vertices())
@@ -284,6 +305,7 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
       );
       return null;
     }
+
     if (resolved == null) {
       LOG.warn(
         "Dropping carpool trip {}: a route point has no car-reachable street vertex, or a leg " +
@@ -291,6 +313,7 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
         trip.getId()
       );
     }
+
     return resolved;
   }
 
@@ -308,6 +331,7 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
         return stored;
       }
     }
+
     return null;
   }
 
@@ -317,6 +341,7 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
         return false;
       }
     }
+
     return true;
   }
 
@@ -333,6 +358,7 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
     if (SiriFileLoader.matchesUrl(config.url())) {
       return new SiriFileLoader(config.url());
     }
+
     return new SiriHttpLoader(
       config.url(),
       config.timeout(),

@@ -149,9 +149,11 @@ class EnglishNgramAnalyzerTest {
       tokenStream = analyzer.tokenStream("name", text);
       CharTermAttribute attr = tokenStream.addAttribute(CharTermAttribute.class);
       tokenStream.reset();
+
       while (tokenStream.incrementToken()) {
         result.add(attr.toString());
       }
+
       return result;
     } catch (IOException e) {
       throw new RuntimeException(e);

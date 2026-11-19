@@ -13,8 +13,8 @@ package org.opentripplanner.raptor.spi;
  * {@link #FORWARD}. {@link #REVERSE} search is supported by the current implementation of
  * RangeRaptor.
  * <p>
- * In the Raptor code we will refer to the origin and and destination assuming the search
- * direction is {@link #FORWARD}.
+ * In the Raptor code we will refer to the origin and and destination assuming the search direction
+ * is {@link #FORWARD}.
  */
 public enum SearchDirection {
   /**

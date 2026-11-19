@@ -22,6 +22,7 @@ class StopTransferPriorityMapper {
       case RECOMMENDED_INTERCHANGE:
         return StopTransferPriority.RECOMMENDED;
     }
+
     throw new IllegalArgumentException("Unsupported interchange weight: " + value);
   }
 }

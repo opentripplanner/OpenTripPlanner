@@ -192,7 +192,6 @@ class StopTimeUpdateTest {
    * {@code &&}, a stop that only received one of the two times (a common SIRI pattern, especially
    * for first/last stops) was incorrectly treated as NO_DATA and its realtime information was
    * discarded entirely.
-   *
    * <p>
    * This test documents the old broken contract so the regression is explicit: if the condition
    * were reverted to {@code &&}, exactly these two cases would silently return {@code false} and

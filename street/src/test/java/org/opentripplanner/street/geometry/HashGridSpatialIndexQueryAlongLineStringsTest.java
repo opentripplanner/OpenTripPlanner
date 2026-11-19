@@ -14,7 +14,6 @@ import org.locationtech.jts.geom.LineString;
 
 /**
  * Behavioral tests for {@link HashGridSpatialIndex#queryAlongLineStrings(java.util.Collection)}.
- *
  * <p>
  * Uses a 1.0×1.0 bin size so coordinates map predictably to bins: a point at {@code (n, m)} with
  * integer {@code n,m} lands in bin {@code (n, m)} via {@code Math.round}. False positives (items in
@@ -143,10 +142,13 @@ class HashGridSpatialIndexQueryAlongLineStringsTest {
     if (xy.length < 4 || xy.length % 2 != 0) {
       throw new IllegalArgumentException("Need an even number of coordinates, at least 4");
     }
+
     var coords = new Coordinate[xy.length / 2];
+
     for (int i = 0; i < coords.length; i++) {
       coords[i] = new Coordinate(xy[i * 2], xy[i * 2 + 1]);
     }
+
     return GF.createLineString(coords);
   }
 }

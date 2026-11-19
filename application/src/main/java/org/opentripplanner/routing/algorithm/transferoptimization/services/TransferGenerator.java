@@ -23,9 +23,9 @@ import org.opentripplanner.transfer.constrained.raptoradaptor.ConstrainedBoardin
  * passed in. The configured slack should be respected, and the transfers found here should be
  * equivalent to the transfers explored during routing (in Raptor).
  * <p>
- * This class also filters away transfers which cannot be used due to time constraints. For
- * example, if a transfer point is before the earliest possible boarding or after the latest
- * possible arrival. Transfer constraints should also be respected.
+ * This class also filters away transfers which cannot be used due to time constraints. For example,
+ * if a transfer point is before the earliest possible boarding or after the latest possible
+ * arrival. Transfer constraints should also be respected.
  * <p>
  * This service does NOT combine transfers between various trips to form full paths. There are
  * potentially millions of permutations, so we do that later when we can prune the result.
@@ -104,6 +104,7 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
 
     while (stopPos < fromTrip.pattern().numberOfStopsInPattern()) {
       boolean alightingPossible = fromTrip.pattern().alightingPossibleAt(stopPos);
+
       if (alightingPossible) {
         var from = TripStopTime.arrival(fromTrip, stopPos);
 
@@ -114,6 +115,7 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
 
       ++stopPos;
     }
+
     return result;
   }
 
@@ -258,6 +260,7 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
           nextLatestArrivalStopPos = Math.max(tx.from().stopPosition(), nextLatestArrivalStopPos);
         }
       }
+
       latestArrivalStopPos = nextLatestArrivalStopPos;
       result.set(i, filteredTransfers);
     }
@@ -267,7 +270,7 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
    * Based on trip pattern and transfer constraint check whether transfer at this point is possible
    *
    * @param stopPosition stop position in destination trip pattern
-   * @param tx           optional transfer constraint
+   * @param tx optional transfer constraint
    * @return whether this transfer is possible
    */
   private boolean transferNotAllowed(int stopPosition, ConstrainedTransfer tx) {
@@ -275,10 +278,12 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
     if (!toTrip.pattern().boardingPossibleAt(stopPosition)) {
       return true;
     }
+
     // Transfer is allowed if no constrained transfer exist
     if (tx == null) {
       return false;
     }
+
     return tx.getTransferConstraint().isNotAllowed();
   }
 }

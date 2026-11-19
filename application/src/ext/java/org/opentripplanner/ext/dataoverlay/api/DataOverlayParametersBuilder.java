@@ -25,22 +25,29 @@ public class DataOverlayParametersBuilder {
    */
   public static DataOverlayParameters parseQueryParams(Map<String, List<String>> params) {
     var result = new DataOverlayParametersBuilder();
+
     for (String key : params.keySet()) {
       var name = resolveKey(key);
+
       if (name != null) {
         List<String> values = params.get(key);
+
         if (values == null || values.isEmpty()) {
           LOG.warn("The data-overlay parameter value is missing. Parameter: {}", key);
           continue;
         }
+
         var value = resolveValue(values.get(0));
+
         if (value == null) {
           LOG.warn("The data-overlay parameter value is null. Parameter: {}", key);
           continue;
         }
+
         result.add(name, value);
       }
     }
+
     return result.build();
   }
 
@@ -56,6 +63,7 @@ public class DataOverlayParametersBuilder {
     if (param != null) {
       values.put(param, value);
     }
+
     return this;
   }
 

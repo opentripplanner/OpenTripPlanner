@@ -47,6 +47,7 @@ class CsvReportBuilder {
     for (String it : headers) {
       addText(it);
     }
+
     newLine();
   }
 
@@ -69,6 +70,7 @@ class CsvReportBuilder {
     if (addIt) {
       buf.append(text);
     }
+
     sep();
   }
 

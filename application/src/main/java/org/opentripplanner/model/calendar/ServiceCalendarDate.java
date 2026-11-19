@@ -71,9 +71,11 @@ public final class ServiceCalendarDate implements Serializable, Comparable<Servi
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     ServiceCalendarDate that = (ServiceCalendarDate) o;
     return Objects.equals(serviceId, that.serviceId) && Objects.equals(date, that.date);
   }
@@ -93,9 +95,11 @@ public final class ServiceCalendarDate implements Serializable, Comparable<Servi
   @Override
   public int compareTo(ServiceCalendarDate other) {
     int c = serviceId.compareTo(other.serviceId);
+
     if (c == 0) {
       c = date.compareTo(other.date);
     }
+
     return c;
   }
 }

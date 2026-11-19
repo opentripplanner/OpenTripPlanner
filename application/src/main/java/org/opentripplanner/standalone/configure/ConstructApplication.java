@@ -60,13 +60,13 @@ import org.slf4j.LoggerFactory;
  * running the application. The whole idea of this class is to separate application construction
  * from running it.
  * <p>
- * The top level construction class(this class) may delegate to other construction classes to
- * inject configuration and services into submodules. An instance of this class is created using the
+ * The top level construction class(this class) may delegate to other construction classes to inject
+ * configuration and services into submodules. An instance of this class is created using the
  * {@link LoadApplication} - An application is constructed AFTER config and input files are loaded.
  * <p>
- * THIS CLASS IS NOT THREAD SAFE - THE APPLICATION SHOULD BE CREATED IN ONE THREAD. The
- * constructor performs the heavy Raptor data mapping before handing results to Dagger; all other
- * wiring is fast (no IO beyond config file reads).
+ * THIS CLASS IS NOT THREAD SAFE - THE APPLICATION SHOULD BE CREATED IN ONE THREAD. The constructor
+ * performs the heavy Raptor data mapping before handing results to Dagger; all other wiring is fast
+ * (no IO beyond config file reads).
  */
 public class ConstructApplication {
 
@@ -130,11 +130,13 @@ public class ConstructApplication {
     var scheduledTimetableData = buildGraph
       ? ScheduledTimetableData.empty()
       : timetableDataImport.toScheduledTimetableData();
+
     if (scheduledTimetableData.getTripCalendars().isEmpty() || !transitRepository.isIndexed()) {
       LOG.warn(
         "Cannot create Raptor data, that requires the graph to have transit data and be indexed."
       );
     }
+
     LOG.info("Creating transit layer for Raptor routing.");
     transitRepository.initRaptorTransitData(
       RaptorTransitDataMapper.map(tuningParameters, transitRepository, scheduledTimetableData)

@@ -50,6 +50,7 @@ public class OjpService {
     var params = seMapper.extractStopEventParams(ser);
 
     List<CallAtStop> callsAtStop = List.of();
+
     if (stopId.isPresent()) {
       callsAtStop = callAtStopService.findCallsAtStop(stopId.get(), params);
     } else if (coordinate.isPresent()) {

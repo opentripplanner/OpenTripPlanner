@@ -20,8 +20,8 @@ import org.apache.lucene.analysis.standard.StandardTokenizer;
  * <p>
  * For example the query of "exanderpl" will match the stop name "Alexanderplatz".
  * <p>
- * It also removes number suffixes in the American street names, like "147th Street", which will
- * be tokenized to "147 Street".
+ * It also removes number suffixes in the American street names, like "147th Street", which will be
+ * tokenized to "147 Street".
  */
 class EnglishNGramAnalyzer extends Analyzer {
 

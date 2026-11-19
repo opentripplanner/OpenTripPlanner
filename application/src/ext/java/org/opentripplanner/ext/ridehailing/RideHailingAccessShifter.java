@@ -48,6 +48,7 @@ public class RideHailingAccessShifter {
         // (there could be walk-only accesses if you're close to the stop)
         if (isAccess && ae instanceof DefaultAccessEgress access && access.containsModeCar()) {
           var duration = fetchArrivalDelay(services, request, now);
+
           if (duration.isSuccess()) {
             return new RideHailingAccessAdapter(access, duration.successValue());
           } else {
@@ -90,6 +91,7 @@ public class RideHailingAccessShifter {
     // away
     if (RideHailingAccessShifter.shouldShift(request, Instant.now())) {
       var shiftingResult = RideHailingAccessShifter.arrivalDelay(request, services, now);
+
       if (shiftingResult.isSuccess()) {
         return Result.success(shiftingResult.successValue());
       } else {
@@ -127,9 +129,11 @@ public class RideHailingAccessShifter {
       if (arrivalTimeOpt.isPresent()) {
         var earliestArrival = arrivalTimeOpt.get();
         var duration = earliestArrival.duration().minus(Duration.between(now, req.dateTime()));
+
         if (duration.isNegative()) {
           duration = Duration.ZERO;
         }
+
         return Result.success(duration);
       } else {
         return Result.failure(Error.NO_ARRIVAL_FOR_LOCATION);

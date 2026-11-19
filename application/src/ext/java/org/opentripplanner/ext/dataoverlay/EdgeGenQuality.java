@@ -24,11 +24,12 @@ class EdgeGenQuality<E extends Number> {
   /**
    * Adds a property value for given time
    *
-   * @param time          time
+   * @param time time
    * @param propertyValue propertyValue
    */
   void addPropertyValueSample(int time, E propertyValue) {
     List<E> existing = gridDataVariableValues.get(time);
+
     if (existing == null) {
       gridDataVariableValues.put(time, List.of(propertyValue));
     } else {
@@ -87,12 +88,14 @@ class EdgeGenQuality<E extends Number> {
    */
   private float calculateAverage(List<E> values) {
     int len = values.size();
+
     if (values.get(0) instanceof Integer) {
       Integer total = 0;
 
       for (E value : values) {
         total += (Integer) value;
       }
+
       return (float) total / len;
     } else if (values.get(0) instanceof Float) {
       float sum = 0f;
@@ -108,6 +111,7 @@ class EdgeGenQuality<E extends Number> {
       for (E value : values) {
         sum += (double) value;
       }
+
       return (float) sum / len;
     } else if (values.get(0) instanceof Long) {
       Long total = 0L;
@@ -115,6 +119,7 @@ class EdgeGenQuality<E extends Number> {
       for (E value : values) {
         total += (Long) value;
       }
+
       return (float) total / len;
     } else {
       throw new UnsupportedOperationException("Unrecognizable format of " + values.get(0));

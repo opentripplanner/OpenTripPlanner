@@ -56,15 +56,14 @@ public class GtfsRealTimeUpdateHandler {
    * Method to apply a trip update list to the most recent version of the timetable snapshot. A
    * GTFS-RT feed is always applied against a single static feed (indicated by feedId).
    * <p>
-   * However, multi-feed support is not completed, and we currently assume there is only one
-   * static feed when matching IDs.
+   * However, multi-feed support is not completed, and we currently assume there is only one static
+   * feed when matching IDs.
    *
    * @param backwardsDelayPropagationType Defines when delays are propagated to previous stops and
-   *                                      if these stops are given the NO_DATA flag.
-   * @param updateIncrementality          Determines the incrementality of the updates. FULL updates
-   *                                      clear the buffer of all previous updates for the given
-   *                                      feed id.
-   * @param updates                       GTFS-RT TripUpdate's that should be applied atomically
+   *     if these stops are given the NO_DATA flag.
+   * @param updateIncrementality Determines the incrementality of the updates. FULL updates clear
+   *     the buffer of all previous updates for the given feed id.
+   * @param updates GTFS-RT TripUpdate's that should be applied atomically
    */
   public UpdateResult applyTripUpdates(
     @Nullable GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher,
@@ -84,6 +83,7 @@ public class GtfsRealTimeUpdateHandler {
 
     for (var rawTripUpdate : updates) {
       UpdateSuccess result;
+
       try {
         if (fuzzyTripMatcher != null) {
           var trip = fuzzyTripMatcher.match(feedId, rawTripUpdate.getTrip());
@@ -112,6 +112,7 @@ public class GtfsRealTimeUpdateHandler {
     if (updateIncrementality == FULL_DATASET) {
       ResultLogger.logUpdateResult(feedId, "gtfs-rt-trip-updates", updateResult);
     }
+
     return updateResult;
   }
 
@@ -128,20 +129,19 @@ public class GtfsRealTimeUpdateHandler {
     // entity carrying only CANCELED or DELETED. This is why the RealTimeTripTimesBuilder never
     // needs to hold both added=true and canceled=true simultaneously for a GTFS-RT source.
     return switch (tripUpdate.scheduleRelationship()) {
-      case SCHEDULED -> scheduledTripHandler.handle(
-        tripUpdate,
-        forwardsDelayPropagationType,
-        backwardsDelayPropagationType
-      );
+      case SCHEDULED
+        -> scheduledTripHandler.handle(
+          tripUpdate,
+          forwardsDelayPropagationType,
+          backwardsDelayPropagationType
+        );
       case NEW, ADDED -> addedTripHandler.handleNew(tripUpdate);
       case CANCELED -> canceledTripHandler.cancel(tripUpdate, updateIncrementality);
       case DELETED -> canceledTripHandler.delete(tripUpdate, updateIncrementality);
       case DUPLICATED -> duplicatedTripHandler.handleDuplicated(tripUpdate, updateIncrementality);
       case REPLACEMENT -> addedTripHandler.handleReplacement(tripUpdate);
-      case UNSCHEDULED -> throw UpdateException.of(
-        tripUpdate.tripId(),
-        NOT_IMPLEMENTED_UNSCHEDULED
-      );
+      case UNSCHEDULED
+        -> throw UpdateException.of(tripUpdate.tripId(), NOT_IMPLEMENTED_UNSCHEDULED);
     };
   }
 }

@@ -9,6 +9,7 @@ public class TripServiceAlterationMapper {
     if (netexValue == null) {
       return TripAlteration.PLANNED;
     }
+
     return switch (netexValue) {
       case PLANNED, PROVISIONAL -> TripAlteration.PLANNED;
       case CANCELLATION -> TripAlteration.CANCELLATION;

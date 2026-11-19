@@ -120,6 +120,7 @@ public class FileDataSourceRepository implements LocalDataSourceRepository {
         }
       }
     }
+
     return existingFiles;
   }
 
@@ -150,13 +151,16 @@ public class FileDataSourceRepository implements LocalDataSourceRepository {
     if (file.exists() && file.isDirectory()) {
       return new DirectoryDataSource(file, type);
     }
+
     if (file.getName().endsWith(".zip")) {
       return new ZipFileDataSource(file, type);
     }
+
     // If writing to a none-existing directory
     if (!file.exists() && type.isOutputDataSource()) {
       return new DirectoryDataSource(file, type);
     }
+
     throw new IllegalArgumentException(
       "The " +
         file +
@@ -180,37 +184,48 @@ public class FileDataSourceRepository implements LocalDataSourceRepository {
 
   private FileType resolveFileType(File file) {
     String name = file.getName();
+
     if (isTransitFile(file, gtfsLocalFilePattern)) {
       return GTFS;
     }
+
     if (isTransitFile(file, netexLocalFilePattern)) {
       return NETEX;
     }
+
     if (osmLocalFilePattern.matcher(name).find()) {
       return OSM;
     }
+
     // Digital elevation model (elevation raster)
     if (demLocalFilePattern.matcher(name).find()) {
       return DEM;
     }
+
     if (EMISSION_PATTERN.matcher(name).find()) {
       return EMISSION;
     }
+
     if (EMPIRICAL_DELAY_PATTERN.matcher(name).find()) {
       return EMPIRICAL_DATA;
     }
+
     if (GRAPH_PATTERN.matcher(name).find()) {
       return GRAPH;
     }
+
     if (CACHE_PATTERN.matcher(name).find()) {
       return CACHE;
     }
+
     if (name.equals(BUILD_REPORT_DIR)) {
       return REPORT;
     }
+
     if (OtpFileNames.isConfigFile(name)) {
       return CONFIG;
     }
+
     return UNKNOWN;
   }
 }

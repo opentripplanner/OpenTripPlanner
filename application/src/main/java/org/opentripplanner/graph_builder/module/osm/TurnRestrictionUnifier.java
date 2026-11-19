@@ -27,10 +27,12 @@ class TurnRestrictionUnifier {
           );
           continue;
         }
+
         if (restrictionTag.possibleTo.isEmpty()) {
           issueStore.add(new TurnRestrictionBad(restrictionTag.relationOsmID, "No to edge found"));
           continue;
         }
+
         for (StreetEdge from : restrictionTag.possibleFrom) {
           if (from == null) {
             issueStore.add(
@@ -38,6 +40,7 @@ class TurnRestrictionUnifier {
             );
             continue;
           }
+
           for (StreetEdge to : restrictionTag.possibleTo) {
             if (to == null) {
               issueStore.add(
@@ -45,7 +48,9 @@ class TurnRestrictionUnifier {
               );
               continue;
             }
+
             int angleDiff = calculateTurnAngle(from, to);
+
             // If the angle seems off for the stated restriction direction, add an issue
             // to the issue store, but do not ignore the restriction.
             switch (restrictionTag.direction) {
@@ -90,6 +95,7 @@ class TurnRestrictionUnifier {
                 }
               }
             }
+
             TurnRestriction restriction = new TurnRestriction(
               from,
               to,

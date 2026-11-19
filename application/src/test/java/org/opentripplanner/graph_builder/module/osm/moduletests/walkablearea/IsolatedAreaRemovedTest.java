@@ -13,12 +13,11 @@ import org.opentripplanner.street.graph.summary.GraphSummarizer;
 
 /**
  * Tests the {@code UnconnectedArea} branch in {@code buildWithVisibility}.
- *
  * <p>
- * A convex outer ring whose corners are all non-convex in the CW-ring sense
- * ({@code isNodeConvex} returns false) and has no external way connections produces an empty
- * {@code visibilityVertices} set. The builder then removes every ring edge it just created and
- * records an {@code UnconnectedArea} issue, leaving the graph empty.
+ * A convex outer ring whose corners are all non-convex in the CW-ring sense ({@code isNodeConvex}
+ * returns false) and has no external way connections produces an empty {@code visibilityVertices}
+ * set. The builder then removes every ring edge it just created and records an
+ * {@code UnconnectedArea} issue, leaving the graph empty.
  */
 class IsolatedAreaRemovedTest {
 

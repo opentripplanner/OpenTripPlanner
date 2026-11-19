@@ -40,7 +40,7 @@ public class CarpoolStreetRouter implements CarpoolRouter {
    * Creates a new carpool street router.
    *
    * @param streetLimitationParametersService provides street routing parameters (speed limits,
-   *                                          etc.)
+   *     etc.)
    */
   public CarpoolStreetRouter(
     StreetLimitationParametersService streetLimitationParametersService,
@@ -76,9 +76,9 @@ public class CarpoolStreetRouter implements CarpoolRouter {
    * </ul>
    *
    * @param fromVertex the origin vertex
-   * @param toVertex   the destination vertex
+   * @param toVertex the destination vertex
    * @return the first (best) path found, or null if no path reaches the destination within the
-   *         maximum trip duration
+   *     maximum trip duration
    */
   private StreetPath carpoolRouting(Vertex fromVertex, Vertex toVertex) {
     var request = StreetSearchRequest.of().withMode(StreetMode.CAR).build();

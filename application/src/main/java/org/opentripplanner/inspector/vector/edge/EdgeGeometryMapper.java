@@ -26,6 +26,7 @@ class EdgeGeometryMapper {
     final Vertex toVertex = e.getToVertex();
     var toCoord = toVertex.getCoordinate();
     var fromV = e.getFromVertex();
+
     if (fromV.getCoordinate().equals(toCoord)) {
       Coordinate newTo = toCoord.copy();
       newTo.setX(toCoord.getX() + 0.000001);

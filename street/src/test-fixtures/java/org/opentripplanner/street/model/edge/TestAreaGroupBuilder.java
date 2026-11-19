@@ -17,6 +17,7 @@ public class TestAreaGroupBuilder {
     if (boundaryVertices.length < 3) {
       throw new IllegalArgumentException("An area must have at least three boundary vertices.");
     }
+
     this.boundaryVertices = List.of(boundaryVertices);
   }
 
@@ -27,9 +28,11 @@ public class TestAreaGroupBuilder {
 
   public AreaGroup build() {
     var coordinates = new Coordinate[boundaryVertices.size() + 1];
+
     for (int i = 0; i < boundaryVertices.size(); i++) {
       coordinates[i] = boundaryVertices.get(i).getCoordinate();
     }
+
     coordinates[boundaryVertices.size()] = coordinates[0];
 
     var polygon = GeometryUtils.getGeometryFactory().createPolygon(coordinates);
@@ -53,6 +56,7 @@ public class TestAreaGroupBuilder {
       connectAreaEdge(from, to, areaGroup, false);
       connectAreaEdge(to, from, areaGroup, true);
     }
+
     return areaGroup;
   }
 

@@ -23,16 +23,20 @@ public enum ResourceBundleSingleton {
     if (key == null) {
       return null;
     }
+
     if (locale == null) {
       locale = Locale.ROOT;
     }
+
     try {
       ResourceBundle resourceBundle;
+
       if (INTERNAL_KEYS.contains(key)) {
         resourceBundle = getBundleWithoutFallback("internals", locale);
       } else {
         resourceBundle = getBundleWithoutFallback("WayProperties", locale);
       }
+
       return resourceBundle.getString(key);
     } catch (MissingResourceException e) {
       return key;
@@ -40,8 +44,8 @@ public enum ResourceBundleSingleton {
   }
 
   /**
-   * Load a bundle for the given locale without falling back to the JVM default locale. If no
-   * bundle matches the requested language, the root bundle is returned.
+   * Load a bundle for the given locale without falling back to the JVM default locale. If no bundle
+   * matches the requested language, the root bundle is returned.
    * <p>
    * The {@link ResourceBundle.Control} based {@code getBundle} overloads throw
    * {@link UnsupportedOperationException} when called from a named module, so the no-fallback
@@ -49,12 +53,14 @@ public enum ResourceBundleSingleton {
    */
   private static ResourceBundle getBundleWithoutFallback(String baseName, Locale locale) {
     var bundle = ResourceBundle.getBundle(baseName, locale);
+
     // The JDK silently picks the default locale's bundle if the requested one does not exist.
     // Accept the bundle only if it is in the JDK's own candidate list for the requested locale
     // (e.g. nb -> [nb, no, ROOT]).
     if (CONTROL.getCandidateLocales(baseName, locale).contains(bundle.getLocale())) {
       return bundle;
     }
+
     return ResourceBundle.getBundle(baseName, Locale.ROOT);
   }
 }

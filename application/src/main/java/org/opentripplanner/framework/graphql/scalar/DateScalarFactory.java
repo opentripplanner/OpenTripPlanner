@@ -33,7 +33,7 @@ public class DateScalarFactory {
 
   /**
    * @param description Nullable description that allows caller to pass in null which leads to the
-   *                    description from schema.graphqls to be used.
+   *     description from schema.graphqls to be used.
    */
   private static GraphQLScalarType createDateScalar(
     String scalarName,
@@ -62,6 +62,7 @@ public class DateScalarFactory {
                 "Expected type '%s' to be a string, but was '%s'.".formatted(scalarName, input)
               );
             }
+
             try {
               return LocalDate.from(FORMATTER.parse(text));
             } catch (DateTimeParseException e) {

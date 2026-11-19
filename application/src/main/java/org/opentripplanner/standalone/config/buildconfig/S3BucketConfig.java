@@ -59,7 +59,9 @@ public class S3BucketConfig {
       /* No configuration was specified, nothing should be downloaded from S3. */
       return null;
     }
+
     S3BucketConfig bucketConfig = new S3BucketConfig();
+
     try {
       bucketConfig.accessKey = config
         .of("accessKey")
@@ -102,6 +104,7 @@ public class S3BucketConfig {
       );
       throw ex;
     }
+
     return bucketConfig;
   }
 

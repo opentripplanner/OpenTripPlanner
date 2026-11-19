@@ -75,12 +75,15 @@ class EmissionAggregator {
       addEmissionStopStartSeqNrIssue(row);
       return false;
     }
+
     var stop = stops.get(row.boardStopPosInPattern());
+
     // Ignore feed id when comparing stopId
     if (!stop.getId().getId().equals(row.fromStopId())) {
       addEmissionStopIdMismatchIssue(row);
       return false;
     }
+
     return true;
   }
 
@@ -88,11 +91,13 @@ class EmissionAggregator {
     if (hasErrors()) {
       return Optional.empty();
     }
+
     // Currently semantic rules only add warnings, not errors. Hence, no need to abort after the
     // semantic verification.
     new SemanticValidation().verify();
 
     var agerageEmissions = new Emission[emissions.length];
+
     for (int i = 0; i < emissions.length; ++i) {
       agerageEmissions[i] = emissions[i].dividedBy(counts[i]);
     }
@@ -158,14 +163,17 @@ class EmissionAggregator {
 
     private void warnOnMissingHopEmissions() {
       var missingHops = WordList.of();
+
       for (int i = 0; i < emissions.length; ++i) {
         if (emissions[i].isZero()) {
           missingHops.add(Integer.toString(i + 1));
         }
       }
+
       if (missingHops.isEmpty()) {
         return;
       }
+
       addEmissionMissingHopIssue(missingHops);
     }
 

@@ -759,6 +759,7 @@ public class RouteRequestConfig {
           )
           .asDuration(dft.maxJourneyDuration())
       );
+
     if (OTPFeature.DataOverlay.isOn()) {
       builder.withDataOverlay(
         DataOverlayParametersMapper.map(

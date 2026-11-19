@@ -22,11 +22,11 @@ public abstract sealed class McStopArrival<T extends RaptorTripSchedule>
   /**
    * Transit or transfer.
    *
-   * @param previous    the previous arrival visited for the current trip
-   * @param round       the RangeRaptor round
-   * @param stop        stop index for this arrival
+   * @param previous the previous arrival visited for the current trip
+   * @param round the RangeRaptor round
+   * @param stop stop index for this arrival
    * @param arrivalTime the arrival time for this stop index
-   * @param c1          the accumulated criteria-one(cost) at this stop arrival
+   * @param c1 the accumulated criteria-one(cost) at this stop arrival
    */
   protected McStopArrival(McStopArrival<T> previous, int round, int stop, int arrivalTime, int c1) {
     this.previous = previous;

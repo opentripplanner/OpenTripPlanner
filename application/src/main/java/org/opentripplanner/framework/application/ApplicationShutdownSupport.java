@@ -17,13 +17,14 @@ public final class ApplicationShutdownSupport {
    * Attempt to add a shutdown hook. If the application is already shutting down, the shutdown hook
    * will be executed immediately.
    *
-   * @param hookName     the name of the thread
+   * @param hookName the name of the thread
    * @param shutdownHook the payload to be executed in the thread
    * @return an Optional possibly containing the created thread, needed to un-schedule the shutdown
-   *         hook
+   *     hook
    */
   public static Optional<Thread> addShutdownHook(String hookName, Runnable shutdownHook) {
     final Thread shutdownThread = new Thread(shutdownHook, hookName);
+
     try {
       LOG.info("Adding shutdown hook '{}'.", hookName);
       Runtime.getRuntime().addShutdownHook(shutdownThread);
@@ -32,6 +33,7 @@ public final class ApplicationShutdownSupport {
       LOG.info("OTP is already shutting down, running shutdown hook '{}' immediately.", hookName);
       shutdownThread.start();
     }
+
     return Optional.empty();
   }
 

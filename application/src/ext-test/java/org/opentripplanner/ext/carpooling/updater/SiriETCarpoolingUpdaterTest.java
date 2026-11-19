@@ -434,6 +434,7 @@ class SiriETCarpoolingUpdaterTest {
 
   private static void writeThreePagesWithMoreData(Path feed) throws IOException {
     var page = PAGE_WITH_MORE_DATA.formatted(Instant.now());
+
     for (int i = 1; i <= 3; i++) {
       Files.writeString(feed.resolve("page-" + i + ".xml"), page);
     }

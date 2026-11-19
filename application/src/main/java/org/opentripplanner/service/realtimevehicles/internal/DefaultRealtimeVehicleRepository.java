@@ -45,6 +45,7 @@ public class DefaultRealtimeVehicleRepository implements RealtimeVehicleReposito
       if (pattern.getOriginalTripPattern() != null) {
         pattern = pattern.getOriginalTripPattern();
       }
+
       vehicles.put(pattern, vehicle);
     });
   }

@@ -30,6 +30,7 @@ record TestCase(
         default -> points.size() + " pass-through-points ";
       }
     );
+
     if (description != null) {
       buf.append(description);
     } else {
@@ -37,13 +38,16 @@ record TestCase(
         buf.append("at ");
         appendPoint(buf, 0);
       }
+
       if (points.size() > 1) {
         buf.append("at (");
         appendPoint(buf, 0);
+
         for (int i = 1; i < points.size(); ++i) {
           buf.append(") and (");
           appendPoint(buf, i);
         }
+
         buf.append(")");
       }
     }
@@ -55,6 +59,7 @@ record TestCase(
         .append(fromAToB ? " to " : " and ")
         .append(stopIndexToName(stopIndexB));
     }
+
     buf.append(". ").append(
       points
         .stream()

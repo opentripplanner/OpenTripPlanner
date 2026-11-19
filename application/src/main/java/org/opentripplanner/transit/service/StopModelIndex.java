@@ -46,11 +46,13 @@ class SiteRepositoryIndex {
     stopsByIndex = new StopLocation[indexSize];
 
     var allStops = new CollectionsView<StopLocation>(stops, flexStops, groupStops);
+
     for (StopLocation it : allStops) {
       if (it instanceof RegularStop regularStop) {
         var envelope = new Envelope(it.getCoordinate().asJtsCoordinate());
         regularStopSpatialIndex.insert(envelope, regularStop);
       }
+
       stopsByIndex[it.getIndex()] = it;
     }
 
@@ -59,6 +61,7 @@ class SiteRepositoryIndex {
         multiModalStationForStations.put(childStation, it);
       }
     }
+
     for (AreaStop it : flexStops) {
       locationIndex.insert(it.getGeometry().getEnvelopeInternal(), it);
     }
@@ -107,6 +110,7 @@ class SiteRepositoryIndex {
    */
   private void logHolesInIndex() {
     int c = (int) Arrays.stream(stopsByIndex).filter(Objects::isNull).count();
+
     if (c > 0) {
       double p = (100.0 * c) / stopsByIndex.length;
       // Log this as warning if more than 5% of the space is null

@@ -23,7 +23,7 @@ public abstract class CachingOAuthService implements OAuthService {
    * Obtains and caches an OAuth API access token.
    *
    * @return A token holder with the token value (including null token values if the call was
-   *         unsuccessful).
+   *     unsuccessful).
    */
   @Override
   public String getToken() throws IOException {

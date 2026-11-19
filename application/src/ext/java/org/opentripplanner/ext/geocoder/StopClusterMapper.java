@@ -116,7 +116,8 @@ class StopClusterMapper {
       // remove stop locations without a parent station
       .filter(sl -> sl.getParentStation() == null)
       .filter(sl -> !stopConsolidationService.isPartOfConsolidatedStop(sl))
-      // stops without a name (for example flex areas) are useless for searching, so we remove them, too
+      // stops without a name (for example flex areas) are useless for searching, so we remove them,
+      // too
       .filter(sl -> sl.getName() != null)
       .toList();
 
@@ -197,6 +198,7 @@ class StopClusterMapper {
 
   StopCluster.Location toLocation(FeedScopedId id) {
     var loc = transitService.getStopLocation(id);
+
     if (loc != null) {
       var feedPublisher = toFeedPublisher(transitService.getFeedInfo(id.getFeedId()));
       var modes = transitService.findTransitModes(loc).stream().map(Enum::name).toList();

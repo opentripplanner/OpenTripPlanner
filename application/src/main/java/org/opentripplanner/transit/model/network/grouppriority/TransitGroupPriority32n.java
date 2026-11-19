@@ -50,6 +50,7 @@ class TransitGroupPriority32n {
         "Transit group priority can not be a negative number: " + priorityGroupIndex
       );
     }
+
     if (priorityGroupIndex > MAX_SEQ_NO) {
       throw new IllegalArgumentException(
         "Transit group priority exceeds max number of groups: " +

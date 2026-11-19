@@ -31,10 +31,10 @@ public class MappingSupport {
   /**
    * Create a new instance of the given type T with the ref set to the given id.
    *
-   * @param id    the ref is set to point to this id.
+   * @param id the ref is set to point to this id.
    * @param clazz the class used to create a new instance. The class must have a default
-   *              constructor.
-   * @param <T>   the type of the created ref structure
+   *     constructor.
+   * @param <T> the type of the created ref structure
    */
   @SuppressWarnings("unchecked")
   public static <T extends VersionOfObjectRefStructure> T createRef(String id, Class<T> clazz) {
@@ -49,7 +49,7 @@ public class MappingSupport {
    * Wrap an object in a JAXBElement instance.
    *
    * @param value the value wrapped
-   * @param <T>   the value type
+   * @param <T> the value type
    * @return the value wrapped in a JAXBElement
    */
   @SuppressWarnings("unchecked")

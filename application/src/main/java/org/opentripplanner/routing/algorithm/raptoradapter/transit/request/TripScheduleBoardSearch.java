@@ -87,11 +87,11 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule> impleme
    * Find the first trip leaving from the given stop AFTER the the 'earliestTime', but before the
    * given trip ({@code tripIndexUpperBound}).
    *
-   * @param earliestTime          The time of arrival at the given stop for the previous trip.
+   * @param earliestTime The time of arrival at the given stop for the previous trip.
    * @param stopPositionInPattern The stop to board
-   * @param tripIndexUpperBound   Upper bound for trip index to search for. Exclusive - search start
-   *                              at {@code tripIndexUpperBound - 1}. Use {@code -1} (negative
-   *                              value) for an unbounded search.
+   * @param tripIndexUpperBound Upper bound for trip index to search for. Exclusive - search start
+   *     at {@code tripIndexUpperBound - 1}. Use {@code -1} (negative value) for an unbounded
+   *     search.
    */
   @Override
   public RaptorBoardOrAlightEvent<T> search(
@@ -112,6 +112,7 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule> impleme
         return findBoardingBySteppingBackwardsInTime(nTrips);
       }
     }
+
     // We have already found a candidate in a previous search;
     // Hence searching reverse from the upper bound is the fastest way to proceed.
     return findBoardingBySteppingBackwardsInTime(tripIndexUpperBound);
@@ -172,9 +173,11 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule> impleme
         break;
       }
     }
+
     if (candidateTripIndex != RaptorConstants.NOT_FOUND) {
       candidateTrip = timetable.getTripSchedule(candidateTripIndex);
     }
+
     return this;
   }
 
@@ -194,14 +197,15 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule> impleme
         return this;
       }
     }
+
     return this;
   }
 
   /**
    * Do a binary search to find the approximate upper bound index for where to start the search.
    * <p>
-   * This is just a guess and we return when the trip with a best valid departure is in the range
-   * of the next {@link #binarySearchThreshold}.
+   * This is just a guess and we return when the trip with a best valid departure is in the range of
+   * the next {@link #binarySearchThreshold}.
    *
    * @return a better upper bound index (exclusive)
    */
@@ -219,6 +223,7 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule> impleme
         lower = m;
       }
     }
+
     return upper == nTrips ? nTrips : upper + 1;
   }
 }

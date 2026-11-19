@@ -23,8 +23,8 @@ import org.opentripplanner.utils.time.TimeUtils;
  * This class is used for matching TripDescriptors without trip_ids to scheduled GTFS data and to
  * feed back that information into a new TripDescriptor with proper trip_id.
  * <p>
- * The class should only be used if we know that the feed producer is unable to produce trip_ids
- * in the GTFS-RT feed.
+ * The class should only be used if we know that the feed producer is unable to produce trip_ids in
+ * the GTFS-RT feed.
  */
 public class GtfsRealtimeFuzzyTripMatcher {
 
@@ -62,15 +62,19 @@ public class GtfsRealtimeFuzzyTripMatcher {
     FeedScopedId routeId = new FeedScopedId(feedId, trip.getRouteId());
     int time = TimeUtils.time(trip.getStartTime());
     LocalDate date;
+
     try {
       date = ServiceDateUtils.parseString(trip.getStartDate());
     } catch (ParseException e) {
       return trip;
     }
+
     Route route = timetableRepository.getRoute(routeId);
+
     if (route == null) {
       return trip;
     }
+
     Direction direction = directionMapper.map(trip.getDirectionId());
 
     Trip matchedTrip = getTrip(route, direction, time, date);
@@ -110,7 +114,7 @@ public class GtfsRealtimeFuzzyTripMatcher {
    * @param patterns the trip patterns of the route
    * @param servicesRunningForDate the service codes running on the service date of the trip
    * @param startTime the departure time from the first stop, in seconds since the start of the
-   *                  service day
+   *     service day
    * @return the matching trip, or {@code null} if there is none
    */
   @Nullable
@@ -124,6 +128,7 @@ public class GtfsRealtimeFuzzyTripMatcher {
       if (pattern.getDirection() != direction) {
         continue;
       }
+
       for (TripTimes<?> times : pattern.getScheduledTimetable().getTripTimes()) {
         if (
           times.getScheduledDepartureTime(0) == startTime &&
@@ -133,6 +138,7 @@ public class GtfsRealtimeFuzzyTripMatcher {
         }
       }
     }
+
     return null;
   }
 }

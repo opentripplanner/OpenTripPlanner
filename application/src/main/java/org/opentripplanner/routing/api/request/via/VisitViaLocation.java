@@ -58,6 +58,7 @@ public class VisitViaLocation extends AbstractViaLocation {
     if (coordinate == null) {
       return null;
     }
+
     return GenericLocation.fromCoordinate(coordinate.latitude(), coordinate.longitude(), label());
   }
 
@@ -96,12 +97,15 @@ public class VisitViaLocation extends AbstractViaLocation {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     if (!super.equals(o)) {
       return false;
     }
+
     VisitViaLocation that = (VisitViaLocation) o;
     return (
       Objects.equals(minimumWaitTime, that.minimumWaitTime) &&

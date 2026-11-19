@@ -70,6 +70,7 @@ public final class FareTransferRule implements Serializable {
     if (unlimitedTransfers()) {
       return true;
     }
+
     return this.transferCount >= transferCount;
   }
 
@@ -100,9 +101,11 @@ public final class FareTransferRule implements Serializable {
     if (obj == this) {
       return true;
     }
+
     if (obj == null || obj.getClass() != this.getClass()) {
       return false;
     }
+
     var that = (FareTransferRule) obj;
     return (
       Objects.equals(this.id, that.id) &&

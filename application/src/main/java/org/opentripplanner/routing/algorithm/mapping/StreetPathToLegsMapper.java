@@ -103,8 +103,7 @@ public class StreetPathToLegsMapper {
    * are returned in the order they are traversed in the path.
    *
    * @param startTime The legs are time shifted to so that the first leg starts at this time and the
-   *                  next legs have the same delay as the first leg. If this is null, no time
-   *                  shifting happens.
+   *     next legs have the same delay as the first leg. If this is null, no time shifting happens.
    */
   public List<Leg> map(StreetPath path, RouteRequest request, @Nullable ZonedDateTime startTime) {
     return map(path, request.listViaLocations(), startTime);
@@ -118,11 +117,14 @@ public class StreetPathToLegsMapper {
     List<Leg> legs = new ArrayList<>();
     WalkStep previousStep = null;
     var subPaths = slicePath(path);
+
     if (subPaths.isEmpty()) {
       return List.of();
     }
+
     var delay =
       startTime != null ? Duration.between(subPaths.getFirst().startTime(), startTime) : null;
+
     for (var subPath : subPaths) {
       if (
         OTPFeature.FlexRouting.isOn() && subPath.states().get(1).backEdge instanceof FlexTripEdge
@@ -131,16 +133,19 @@ public class StreetPathToLegsMapper {
         previousStep = null;
         continue;
       }
+
       StreetLeg leg = generateLeg(subPath, previousStep, viaLocations, delay);
       legs.add(leg);
 
       List<WalkStep> walkSteps = leg.listWalkSteps();
+
       if (!walkSteps.isEmpty()) {
         previousStep = walkSteps.getLast();
       } else {
         previousStep = null;
       }
     }
+
     return legs;
   }
 
@@ -152,6 +157,7 @@ public class StreetPathToLegsMapper {
    */
   private static List<StreetPath> slicePath(StreetPath streetPath) {
     var states = streetPath.states();
+
     // Trivial case
     if (states.stream().allMatch(state -> state.getBackMode() == null)) {
       return List.of();
@@ -245,7 +251,8 @@ public class StreetPathToLegsMapper {
 
     //This gets nicer names instead of osm:node:id when changing mode of transport
     //Names are generated from all the streets in a corner, same as names in origin and destination
-    //We use name in TemporaryStreetLocation since this name generation already happened when temporary location was generated
+    //We use name in TemporaryStreetLocation since this name generation already happened when
+    //temporary location was generated
     if (vertex instanceof StreetVertex && !(vertex instanceof TemporaryStreetLocation)) {
       name = ((StreetVertex) vertex).getIntersectionName();
     }
@@ -291,9 +298,9 @@ public class StreetPathToLegsMapper {
   /**
    * Generate one leg of an itinerary from a list of {@link State}.
    *
-   * @param subPath      The street path to base the leg on
+   * @param subPath The street path to base the leg on
    * @param previousStep the previous walk step, so that the first relative turn direction is
-   *                     calculated correctly
+   *     calculated correctly
    * @return The generated leg
    */
   private StreetLeg generateLeg(
@@ -345,6 +352,7 @@ public class StreetPathToLegsMapper {
 
     if (firstState.isRentingVehicle()) {
       String vehicleRentalNetwork = firstState.getVehicleRentalNetwork();
+
       if (vehicleRentalNetwork != null) {
         leg.withVehicleRentalNetwork(vehicleRentalNetwork);
       }
@@ -357,6 +365,7 @@ public class StreetPathToLegsMapper {
     if (delay != null) {
       return state.getTime().atZone(timeZone).plus(delay);
     }
+
     return state.getTime().atZone(timeZone);
   }
 }

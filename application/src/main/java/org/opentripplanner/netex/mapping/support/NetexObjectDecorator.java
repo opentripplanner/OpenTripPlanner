@@ -42,7 +42,7 @@ public class NetexObjectDecorator {
    * Consider implementing the mapper.
    *
    * @param log the logger to use, passing the logger in as an argument make sure the log event get
-   *            the right scope - this class is just a utility class, or the messenger.
+   *     the right scope - this class is just a utility class, or the messenger.
    * @param ref the unexpected reference to an unmapped object.
    */
   public static void logUnmappedEntityRef(Logger log, VersionOfObjectRefStructure ref) {

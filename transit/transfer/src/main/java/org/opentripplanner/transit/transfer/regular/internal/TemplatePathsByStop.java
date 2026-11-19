@@ -14,7 +14,9 @@ import java.util.function.BiConsumer;
  * <p>
  * This class is not thread-safe while it is written to.
  *
- * @param <P> the street path type
+ * @param
+ *     <p>
+ *     the street path type
  */
 final class TemplatePathsByStop<P> implements Serializable {
 
@@ -28,6 +30,7 @@ final class TemplatePathsByStop<P> implements Serializable {
     if (pathsByToStop.isEmpty()) {
       return;
     }
+
     // Never modify a stored toStop map, it may already have been handed out - replace it.
     var byToStop = new HashMap<>(paths.getOrDefault(fromStop, Map.of()));
     byToStop.putAll(pathsByToStop);

@@ -14,6 +14,7 @@ public class PassThroughViaLocation extends AbstractViaLocation {
   @SuppressWarnings("DataFlowIssue")
   public PassThroughViaLocation(@Nullable String label, Collection<FeedScopedId> stopLocationIds) {
     super(label, stopLocationIds);
+
     if (stopLocationIds.isEmpty()) {
       throw new IllegalArgumentException(
         "A pass-through via-location must have at least one stop location." +

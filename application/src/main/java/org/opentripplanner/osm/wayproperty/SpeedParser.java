@@ -25,11 +25,13 @@ class SpeedParser {
   @Nullable
   static Float getMetersSecondFromSpeed(String speed) {
     Matcher m = MAX_SPEED_PATTERN.matcher(speed.trim());
+
     if (!m.matches()) {
       return null;
     }
 
     float originalUnits;
+
     try {
       originalUnits = (float) Double.parseDouble(m.group(1));
     } catch (NumberFormatException e) {
@@ -38,6 +40,7 @@ class SpeedParser {
     }
 
     String units = m.group(2);
+
     if (units == null || units.isEmpty()) {
       units = "kmh";
     }

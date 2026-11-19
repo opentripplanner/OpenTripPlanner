@@ -19,11 +19,10 @@ public class OneOfInputValidator {
   /**
    * Validate that the {@code parent} {@code map} only has one entry.
    *
-   * @param map           The input to validate.
+   * @param map The input to validate.
    * @param inputTypeName The name of the type annotated with @oneOf. The name is used in the error
-   *                      message only, in case the validation fails.
+   *     message only, in case the validation fails.
    * @param definedFields The name of the fields the @oneOf directive apply to.
-   *
    * @return the field with a value set.
    */
   public static String validateOneOf(
@@ -44,6 +43,7 @@ public class OneOfInputValidator {
         )
       );
     }
+
     if (fieldsInInput.size() > 1) {
       throw new InvalidInputException(
         "Only one entry in '%s @oneOf' is allowed. Set: '%s'".formatted(
@@ -56,6 +56,7 @@ public class OneOfInputValidator {
     // This is not done in the "standard" validator, so if this is replaced by another validator
     // we should consider adding this validation.
     var field = fieldsInInput.getFirst();
+
     if (map.get(field) instanceof Collection<?> c) {
       if (c.isEmpty()) {
         throw new InvalidInputException(
@@ -63,6 +64,7 @@ public class OneOfInputValidator {
         );
       }
     }
+
     return field;
   }
 }

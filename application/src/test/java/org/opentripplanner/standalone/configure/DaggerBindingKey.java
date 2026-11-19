@@ -11,10 +11,10 @@ import java.util.Arrays;
  * Identifies a Dagger binding as seen from a factory accessor: its generic return type, plus the
  * qualifier annotation (if any) distinguishing it from other bindings of the same type — e.g. the
  * {@code @GtfsSchema}- and {@code @TransmodelSchema}-qualified {@code GraphQLSchema} bindings, or
- * two unqualified accessors returning different parameterizations of the same generic type, such
- * as {@code RepositoryHandle<A, B>} vs. {@code RepositoryHandle<C, D>} — Dagger itself keys
- * generic bindings by their full parameterized type, so the erased raw type alone would wrongly
- * collapse those two into a single binding.
+ * two unqualified accessors returning different parameterizations of the same generic type, such as
+ * {@code RepositoryHandle<A, B>} vs. {@code RepositoryHandle<C, D>} — Dagger itself keys generic
+ * bindings by their full parameterized type, so the erased raw type alone would wrongly collapse
+ * those two into a single binding.
  */
 record DaggerBindingKey(Type type, Class<? extends Annotation> qualifier) {
   static DaggerBindingKey of(Class<?> type) {
@@ -59,8 +59,8 @@ record DaggerBindingKey(Type type, Class<? extends Annotation> qualifier) {
   }
 
   /**
-   * Captures a fully parameterized generic type at the call site by subclassing anonymously with
-   * a concrete type argument — reflection recovers it from the anonymous subclass's superclass.
+   * Captures a fully parameterized generic type at the call site by subclassing anonymously with a
+   * concrete type argument — reflection recovers it from the anonymous subclass's superclass.
    */
   abstract static class GenericType<T> {
 

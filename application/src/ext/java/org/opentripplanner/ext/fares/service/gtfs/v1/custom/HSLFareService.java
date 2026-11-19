@@ -64,12 +64,14 @@ public class HSLFareService extends DefaultFareService {
       .stream()
       .map(leg -> leg.agency().getId().getFeedId())
       .collect(Collectors.toSet());
+
     if (!Sets.difference(legFeedIds, fareRuleFeedIds).isEmpty()) {
       return Optional.empty();
     }
 
     for (Leg leg : legs) {
       lastRideStartTime = leg.startTime();
+
       if (agency == null) {
         agency = leg.agency().getId().getId().toString();
       } else if (agency != leg.agency().getId().getId().toString()) {
@@ -81,12 +83,14 @@ public class HSLFareService extends DefaultFareService {
       Money bestSpecialFare = MAX_PRICE;
 
       Set<String> ruleZones = null;
+
       for (FareRuleSet ruleSet : fareRules) {
         if (
           ruleSet.hasAgencyDefined() && leg.agency().getId().getId() != ruleSet.getAgency().getId()
         ) {
           continue;
         }
+
         RouteOriginDestination routeOriginDestination = new RouteOriginDestination(
           leg.route().getId().toString(),
           leg.from().stop.getFirstZoneAsString(),
@@ -103,6 +107,7 @@ public class HSLFareService extends DefaultFareService {
         ) {
           isSpecialRoute = true;
         }
+
         if (
           isSpecialRoute ||
           (ruleSet.getRoutes().contains(leg.route().getId()) &&
@@ -111,15 +116,18 @@ public class HSLFareService extends DefaultFareService {
         ) {
           // check validity of this special rule and that it is the cheapest applicable one
           FareAttribute attribute = ruleSet.getFareAttribute();
+
           if (
             !attribute.isTransferDurationSet() ||
             Duration.between(lastRideStartTime, startTime).getSeconds() <
               attribute.getTransferDuration()
           ) {
             Money newFare = attribute.getPrice();
+
             if (newFare.lessThan(bestSpecialFare)) {
               bestSpecialFare = newFare;
               ruleZones = ruleSet.getContains();
+
               if (isSpecialRoute) {
                 specialRouteFare = bestSpecialFare;
                 specialFareAttribute = attribute;
@@ -165,6 +173,7 @@ public class HSLFareService extends DefaultFareService {
         ) {
           continue;
         }
+
         // another HSL specific change: We do not set rules for every possible zone combination,
         // but for the largest zone set allowed for a certain ticket type.
         // This way we need only a few rules instead of hundreds of rules. Good for speed!
@@ -172,6 +181,7 @@ public class HSLFareService extends DefaultFareService {
         // contains, not equals !!
         if (ruleSet.getContains().containsAll(zones)) {
           FareAttribute attribute = ruleSet.getFareAttribute();
+
           // transfers are evaluated at boarding time
           if (attribute.isTransferDurationSet()) {
             if (tripTime > attribute.getTransferDuration()) {
@@ -191,7 +201,9 @@ public class HSLFareService extends DefaultFareService {
               );
             }
           }
+
           Money newFare = attribute.getPrice();
+
           if (
             newFare.lessThan(bestFare) ||
             (newFare.equals(bestFare) && ruleSet.getContains().equals(zones))
@@ -205,6 +217,7 @@ public class HSLFareService extends DefaultFareService {
       bestFare = specialRouteFare;
       bestAttribute = specialFareAttribute;
     }
+
     LOG.debug("HSL {} best for {}", bestAttribute, legs);
     final Money finalBestFare = bestFare;
     return Optional.ofNullable(bestAttribute).map(attribute ->

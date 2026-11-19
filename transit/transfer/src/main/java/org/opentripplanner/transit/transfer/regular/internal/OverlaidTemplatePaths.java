@@ -10,8 +10,8 @@ import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUser
  * The runtime path templates: the paths generated at graph build (the base), with the transfers
  * from some stops replaced at runtime (the overlay).
  * <p>
- * The unit of change is a <em>leaf</em>, all paths from one {@code fromStop} under one profile.
- * A replaced leaf hides the base leaf completely; an empty replaced leaf means the stop has no
+ * The unit of change is a <em>leaf</em>, all paths from one {@code fromStop} under one profile. A
+ * replaced leaf hides the base leaf completely; an empty replaced leaf means the stop has no
  * transfers. Resetting a leaf removes it from the overlay, so the base leaf is used again.
  * <p>
  * <b>Copy-on-write.</b> The base is shared by all instances and never modified. The leaves in the
@@ -21,7 +21,9 @@ import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUser
  * <p>
  * This class is not thread-safe. An instance published in a snapshot is never written to.
  *
- * @param <P> the street path type
+ * @param
+ *     <p>
+ *     the street path type
  */
 final class OverlaidTemplatePaths<P> {
 
@@ -70,13 +72,17 @@ final class OverlaidTemplatePaths<P> {
   boolean reset(AbstractUserPreferences<?> profile, int fromStop) {
     assertProfileExists(profile);
     var byFromStop = overlay.get(profile);
+
     if (byFromStop == null || !byFromStop.containsKey(fromStop)) {
       return false;
     }
+
     byFromStop.remove(fromStop);
+
     if (byFromStop.isEmpty()) {
       overlay.remove(profile);
     }
+
     return true;
   }
 
@@ -96,9 +102,11 @@ final class OverlaidTemplatePaths<P> {
    */
   Map<Integer, P> pathsFrom(AbstractUserPreferences<?> profile, int fromStop) {
     var replaced = overlay.getOrDefault(profile, Map.of()).get(fromStop);
+
     if (replaced != null) {
       return replaced;
     }
+
     return base.pathsFrom(profile, fromStop);
   }
 

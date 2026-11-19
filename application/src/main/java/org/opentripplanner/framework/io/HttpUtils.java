@@ -30,6 +30,7 @@ public final class HttpUtils {
    */
   public static String getBaseAddress(UriInfo uri, HttpHeaders headers) {
     String protocol;
+
     if (headers.getRequestHeader(HEADER_X_FORWARDED_PROTO) != null) {
       protocol = headers.getRequestHeader(HEADER_X_FORWARDED_PROTO).getFirst();
     } else {
@@ -37,6 +38,7 @@ public final class HttpUtils {
     }
 
     String host;
+
     if (headers.getRequestHeader(HEADER_X_FORWARDED_HOST) != null) {
       host = extractHost(headers.getRequestHeader(HEADER_X_FORWARDED_HOST).getFirst());
     } else if (headers.getRequestHeader(HEADER_HOST) != null) {
@@ -58,6 +60,7 @@ public final class HttpUtils {
     if (ABSOLUTE_URL.matcher(basePathOrUrl).matches()) {
       return basePathOrUrl.replaceAll("/+$", "");
     }
+
     return "%s/%s".formatted(requestBaseAddress, basePathOrUrl.replaceAll("^/+|/+$", ""));
   }
 

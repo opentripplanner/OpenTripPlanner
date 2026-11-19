@@ -10,7 +10,6 @@ package org.opentripplanner.street.model.elevation;
  *
  *     W = 6 m/s * Exp(-3.5 * Abs(dh/dx + 0.05))
  * </pre>
- *
  * <p>
  * The {@code 6 m/s} is the Maximum speed achieved. This happens at angle 2.86 degrees or -5%
  * downhill. In OTP we want to apply this as a multiplier to the horizontal walking distance. This
@@ -81,9 +80,8 @@ public class ToblersHikingFunction {
 
   /**
    * @param walkDistMultiplierMaxLimit this property is used to set a maximum limit for the
-   *                                   horizontal walking distance multiplier. Must be less than
-   *                                   1.0. See the table in the class documentation for finding
-   *                                   reasonable values for this constant.
+   *     horizontal walking distance multiplier. Must be less than 1.0. See the table in the class
+   *     documentation for finding reasonable values for this constant.
    */
   public ToblersHikingFunction(double walkDistMultiplierMaxLimit) {
     if (walkDistMultiplierMaxLimit < 1.0) {
@@ -93,6 +91,7 @@ public class ToblersHikingFunction {
           ", but must be greater then 1."
       );
     }
+
     this.walkDistMultiplierMaxLimit = walkDistMultiplierMaxLimit;
   }
 

@@ -290,11 +290,13 @@ class OsmAreaGroupTest {
 
   private static Multimap<OsmNode, OsmWay> generateBarrierMap(OsmWay... barriers) {
     Multimap<OsmNode, OsmWay> result = HashMultimap.create();
+
     for (var barrier : barriers) {
       for (var nid : barrier.getNodeRefs().toArray()) {
         result.put(NODES.get(nid), barrier);
       }
     }
+
     return result;
   }
 }

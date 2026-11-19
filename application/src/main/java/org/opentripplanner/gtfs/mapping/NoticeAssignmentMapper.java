@@ -55,9 +55,11 @@ class NoticeAssignmentMapper {
       .stream()
       .collect(Collectors.toMap(Trip::getId, Function.identity()));
     var routes = routeMapper.mappedRoutes();
+
     for (var assignment : assignments) {
       map(assignment, notices, trips, routes).forEach(e -> result.put(e.getKey(), e.getValue()));
     }
+
     return result;
   }
 
@@ -70,6 +72,7 @@ class NoticeAssignmentMapper {
     var notice = notices.get(
       idFactory.createId(assignment.getNoticeId(), "notice_id in notice assignment")
     );
+
     if (notice == null) {
       issueStore.add(
         "NoticeAssignmentWithoutNotice",

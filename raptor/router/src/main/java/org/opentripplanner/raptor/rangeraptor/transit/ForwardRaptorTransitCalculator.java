@@ -94,6 +94,7 @@ public final class ForwardRaptorTransitCalculator<T extends RaptorTripSchedule>
   public boolean isInIteration(int subjectTime, int iterationDepartureTime) {
     // A <= x
     boolean iterationDepartureBeforeOrEqSubject = !isAfter(iterationDepartureTime, subjectTime);
+
     if (oneIterationOnly()) {
       return iterationDepartureBeforeOrEqSubject;
     }

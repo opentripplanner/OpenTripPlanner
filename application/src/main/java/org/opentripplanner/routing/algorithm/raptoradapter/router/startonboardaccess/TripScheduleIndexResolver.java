@@ -34,14 +34,14 @@ public class TripScheduleIndexResolver {
    * {@link InvalidRoutingInputException} is thrown.
    *
    * @param tripAndServiceDate the trip and service date to look up
-   * @param location           the resolved boarding location, containing the stop index and stop
-   *                           position
+   * @param location the resolved boarding location, containing the stop index and stop position
    */
   public RaptorTripScheduleReference resolve(
     TripAndServiceDate tripAndServiceDate,
     LocationInTripPatternReference location
   ) {
     var raptorTimetable = getRaptorTimetableForTripAtStop(location.stopIndex(), tripAndServiceDate);
+
     if (!raptorTimetable.boardingPossibleAt(location.stopPositionInPattern())) {
       throw new InvalidRoutingInputException(
         "Boarding is not allowed at stop position %d for trip %s".formatted(
@@ -50,6 +50,7 @@ public class TripScheduleIndexResolver {
         )
       );
     }
+
     var tripSchedule = findTripScheduleInTimetable(raptorTimetable, tripAndServiceDate);
     return raptorRequestTransitData.tripScheduleReference(tripSchedule);
   }
@@ -87,13 +88,16 @@ public class TripScheduleIndexResolver {
     LocalDate serviceDate
   ) {
     var dayIndexIterator = tripPatternForDates.tripPatternForDatesIndexIterator(true);
+
     while (dayIndexIterator.hasNext()) {
       var dayIndex = dayIndexIterator.next();
       var tripPattern = tripPatternForDates.tripPatternForDate(dayIndex);
+
       if (tripPattern.getServiceDate().equals(serviceDate)) {
         return Optional.of(tripPattern);
       }
     }
+
     return Optional.empty();
   }
 
@@ -102,12 +106,15 @@ public class TripScheduleIndexResolver {
     TripAndServiceDate tripAndServiceDate
   ) {
     var scheduleIndexIterator = IntIterators.intIncIterator(0, timetable.numberOfTripSchedules());
+
     while (scheduleIndexIterator.hasNext()) {
       int tripScheduleIndex = scheduleIndexIterator.next();
       var tripSchedule = timetable.getTripSchedule(tripScheduleIndex);
+
       if (!tripSchedule.getServiceDate().equals(tripAndServiceDate.serviceDate())) {
         continue;
       }
+
       if (
         tripSchedule
           .getOriginalTripTimes()

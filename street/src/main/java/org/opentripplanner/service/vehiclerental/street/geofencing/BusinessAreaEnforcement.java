@@ -31,9 +31,11 @@ final class BusinessAreaEnforcement implements GeofencingBoundaryEnforcement {
     if (!state.isRentingVehicle()) {
       return null;
     }
+
     if (state.isRentingVehicleFromStation()) {
       return State.empty();
     }
+
     return forwardExit(state, edge);
   }
 
@@ -52,6 +54,7 @@ final class BusinessAreaEnforcement implements GeofencingBoundaryEnforcement {
     if (!state.isRentingVehicle()) {
       return null;
     }
+
     return State.empty();
   }
 
@@ -69,10 +72,13 @@ final class BusinessAreaEnforcement implements GeofencingBoundaryEnforcement {
     if (state.getVehicleRentalState() != VehicleRentalState.HAVE_RENTED) {
       return null;
     }
+
     var walking = edge.traverse(state, TraverseMode.WALK);
+
     if (walking != null) {
       return walking.makeStateArray();
     }
+
     return State.empty();
   }
 
@@ -84,13 +90,17 @@ final class BusinessAreaEnforcement implements GeofencingBoundaryEnforcement {
     if (state.isDropOffBannedByCurrentZones()) {
       return State.empty();
     }
+
     var editor = edge.traverse(state, state.currentMode());
+
     if (editor == null) {
       return State.empty();
     }
+
     if (editor.isDropOffBannedByCurrentZones()) {
       return State.empty();
     }
+
     editor.dropFloatingVehicle(
       state.vehicleRentalFormFactor(),
       state.rentalVehiclePropulsionType(),

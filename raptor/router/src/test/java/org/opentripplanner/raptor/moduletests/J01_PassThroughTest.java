@@ -31,8 +31,8 @@ import org.opentripplanner.raptor.configure.RaptorTestFactory;
  * Raptor should include this stop point either as an alight or board point for a trip or as an
  * intermediate point in the trip.
  * <p>
- * It should be possible to specify more than one pass-through point. The result should include
- * stop points in the order in which they were specified in the request. Only alternatives that pass
+ * It should be possible to specify more than one pass-through point. The result should include stop
+ * points in the order in which they were specified in the request. Only alternatives that pass
  * through all stop points should be included in the result.
  * <p>
  * In order to support stop areas raptor should also support multiple stop points in the same
@@ -212,7 +212,8 @@ class J01_PassThroughTest {
   @DisplayName("Pass-through order")
   void passThroughOrder() {
     // Create two routes.
-    // Both include all the desired pass-through stop points but only one of them have correct order.
+    // Both include all the desired pass-through stop points but only one of them have correct
+    // order.
     data.withTimetables(
       """
       R1

@@ -26,10 +26,13 @@ public class HttpHeaders {
     if (map.isEmpty()) {
       return empty();
     }
+
     var builder = of();
+
     for (Map.Entry<String, String> e : map.entrySet()) {
       builder.add(e.getKey(), e.getValue());
     }
+
     return builder.build();
   }
 
@@ -51,9 +54,11 @@ public class HttpHeaders {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     HttpHeaders that = (HttpHeaders) o;
     return Objects.equals(headers, that.headers);
   }

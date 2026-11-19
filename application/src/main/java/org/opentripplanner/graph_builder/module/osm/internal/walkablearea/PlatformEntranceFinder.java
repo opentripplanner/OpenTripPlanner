@@ -69,6 +69,7 @@ class PlatformEntranceFinder {
   private static boolean isPlatformEntranceCandidate(OsmVertex osmVertex) {
     boolean isCandidate = false;
     Vertex start = null;
+
     for (Edge e : osmVertex.getIncoming()) {
       if (e instanceof StreetEdge se && !(e instanceof AreaEdge)) {
         if (se.getPermission().allowsOnlyNonMotorizedModes()) {
@@ -81,6 +82,7 @@ class PlatformEntranceFinder {
 
     if (isCandidate && start != null) {
       boolean isLinkingPoint = true;
+
       for (Edge e : osmVertex.getOutgoing()) {
         if (
           !e.getToVertex().getCoordinate().equals(start.getCoordinate()) && !(e instanceof AreaEdge)
@@ -88,8 +90,10 @@ class PlatformEntranceFinder {
           isLinkingPoint = false;
         }
       }
+
       return isLinkingPoint;
     }
+
     return false;
   }
 }

@@ -41,7 +41,7 @@ import uk.org.siri.siri21.VehicleJourneyRef;
 
 /**
  * Maps a {@link AffectsScopeStructure} to a list of {@link EntitySelector}s
- *
+ * <p>
  * Concretely: this takes the parts of the SIRI SX (Alerts) message describing which transit
  * entities are concerned by the alert, and maps them to EntitySelectors, which can match multiple
  * OTP internal model entities that should be associated with the message.
@@ -87,10 +87,14 @@ public class AffectsMapper {
     }
 
     List<EntitySelector> selectors = new ArrayList<>();
-    for (AffectedVehicleJourneyStructure affectedVehicleJourney : vjs.getAffectedVehicleJourneies()) {
+
+    for (
+      AffectedVehicleJourneyStructure affectedVehicleJourney : vjs.getAffectedVehicleJourneies()
+    ) {
       List<AffectedStopPointStructure> affectedStops = new ArrayList<>();
 
       List<AffectedRouteStructure> routes = affectedVehicleJourney.getRoutes();
+
       // Resolve AffectedStop-ids
       if (routes != null) {
         for (AffectedRouteStructure route : routes) {
@@ -98,6 +102,7 @@ public class AffectsMapper {
             List<Serializable> stopPointsList = route
               .getStopPoints()
               .getAffectedStopPointsAndLinkProjectionToNextStopPoints();
+
             for (Serializable serializable : stopPointsList) {
               if (serializable instanceof AffectedStopPointStructure stopPointStructure) {
                 affectedStops.add(stopPointStructure);
@@ -121,7 +126,8 @@ public class AffectsMapper {
             // Match found - add tripId to selector
             tripIds.add(trip.getId());
           } else if (siriFuzzyTripMatcher != null) {
-            // "Temporary", custom legacy solution - supports alerts tagged on NeTEx-"privateCode" + serviceDate
+            // "Temporary", custom legacy solution - supports alerts tagged on NeTEx-"privateCode" +
+            // serviceDate
             tripIds.addAll(
               siriFuzzyTripMatcher.getTripIdForInternalPlanningCodeServiceDate(
                 vehicleJourneyRef.getValue(),
@@ -149,6 +155,7 @@ public class AffectsMapper {
 
       final FramedVehicleJourneyRefStructure framedVehicleJourneyRef =
         affectedVehicleJourney.getFramedVehicleJourneyRef();
+
       if (framedVehicleJourneyRef != null) {
         selectors.addAll(
           mapTripSelectors(
@@ -161,12 +168,14 @@ public class AffectsMapper {
 
       final List<DatedVehicleJourneyRef> datedVehicleJourneyReves =
         affectedVehicleJourney.getDatedVehicleJourneyReves();
+
       if (isNotEmpty(datedVehicleJourneyReves)) {
         for (DatedVehicleJourneyRef datedVehicleJourneyRef : datedVehicleJourneyReves) {
           // Lookup provided reference as if it is a DSJ
           TripOnServiceDate tripOnServiceDate = entityResolver.resolveTripOnServiceDate(
             datedVehicleJourneyRef.getValue()
           );
+
           if (tripOnServiceDate != null) {
             // Match found - add TripOnServiceDate-selector
             selectors.addAll(
@@ -189,6 +198,7 @@ public class AffectsMapper {
         }
       }
     }
+
     return selectors;
   }
 
@@ -207,9 +217,11 @@ public class AffectsMapper {
             feedId,
             transitRepository
           );
+
           if (stop == null) {
             stop = new FeedScopedId(feedId, affectedStop.getStopPointRef().getValue());
           }
+
           EntitySelector.StopAndTrip entitySelector = new EntitySelector.StopAndTrip(
             stop,
             tripId,
@@ -222,6 +234,7 @@ public class AffectsMapper {
         selectors.add(new EntitySelector.Trip(tripId, serviceDate));
       }
     }
+
     return selectors;
   }
 
@@ -232,8 +245,12 @@ public class AffectsMapper {
 
     List<EntitySelector> selectors = new ArrayList<>();
 
-    for (AffectsScopeStructure.Networks.AffectedNetwork affectedNetwork : networks.getAffectedNetworks()) {
+    for (
+      AffectsScopeStructure.Networks.AffectedNetwork affectedNetwork
+      : networks.getAffectedNetworks()
+    ) {
       List<AffectedLineStructure> affectedLines = affectedNetwork.getAffectedLines();
+
       if (isNotEmpty(affectedLines)) {
         for (AffectedLineStructure line : affectedLines) {
           LineRef lineRef = line.getLineRef();
@@ -253,6 +270,7 @@ public class AffectsMapper {
                 List<Serializable> stopPointsList = route
                   .getStopPoints()
                   .getAffectedStopPointsAndLinkProjectionToNextStopPoints();
+
                 for (Serializable serializable : stopPointsList) {
                   if (serializable instanceof AffectedStopPointStructure stopPointStructure) {
                     affectedStops.add(stopPointStructure);
@@ -261,6 +279,7 @@ public class AffectsMapper {
               }
             }
           }
+
           FeedScopedId affectedRoute = new FeedScopedId(feedId, lineRef.getValue());
 
           var affectedDirections = mapDirections(line.getDirections());
@@ -272,9 +291,11 @@ public class AffectsMapper {
                 feedId,
                 transitRepository
               );
+
               if (stop == null) {
                 stop = new FeedScopedId(feedId, affectedStop.getStopPointRef().getValue());
               }
+
               EntitySelector.StopAndRoute entitySelector = new EntitySelector.StopAndRoute(
                 stop,
                 affectedRoute,
@@ -295,14 +316,17 @@ public class AffectsMapper {
         }
       } else {
         NetworkRefStructure networkRef = affectedNetwork.getNetworkRef();
+
         if (networkRef == null || networkRef.getValue() == null) {
           continue;
         }
+
         String networkId = networkRef.getValue();
         // TODO: What to do here - We need to store network on route and add new EntitySelector
         selectors.add(new EntitySelector.Unknown("Alert affects network %s".formatted(networkId)));
       }
     }
+
     return selectors;
   }
 
@@ -334,6 +358,7 @@ public class AffectsMapper {
 
     for (AffectedStopPointStructure stopPoint : stopPoints.getAffectedStopPoints()) {
       StopPointRefStructure stopPointRef = stopPoint.getStopPointRef();
+
       if (stopPointRef == null || stopPointRef.getValue() == null) {
         continue;
       }
@@ -359,10 +384,12 @@ public class AffectsMapper {
     if (stopPlaces == null || isEmpty(stopPlaces.getAffectedStopPlaces())) {
       return List.of();
     }
+
     List<EntitySelector> selectors = new ArrayList<>();
 
     for (AffectedStopPlaceStructure stopPlace : stopPlaces.getAffectedStopPlaces()) {
       StopPlaceRef stopPlaceRef = stopPlace.getStopPlaceRef();
+
       if (stopPlaceRef == null || stopPlaceRef.getValue() == null) {
         continue;
       }
@@ -388,6 +415,7 @@ public class AffectsMapper {
 
     for (AffectedOperatorStructure affectedOperator : operators.getAffectedOperators()) {
       OperatorRefStructure operatorRef = affectedOperator.getOperatorRef();
+
       if (operatorRef == null || operatorRef.getValue() == null) {
         continue;
       }
@@ -413,6 +441,7 @@ public class AffectsMapper {
     if (originAimedDepartureTime == null) {
       return null;
     }
+
     // This grabs the local-date from timestamp passed into OTP ignoring the time and zone
     // information. An alternative is to use the transit model zone:
     // 'originAimedDepartureTime.withZoneSameInstant(transitService.getTimeZone())'
@@ -435,6 +464,7 @@ public class AffectsMapper {
     TransitRepository transitRepository
   ) {
     FeedScopedId id = new FeedScopedId(feedId, siriStopId);
+
     if (transitRepository.getSiteRepository().getRegularStop(id) != null) {
       return id;
     } else if (transitRepository.getSiteRepository().getStationById(id) != null) {
@@ -448,6 +478,7 @@ public class AffectsMapper {
     List<RoutePointTypeEnumeration> stopConditions
   ) {
     Set<StopCondition> alertStopConditions = new HashSet<>();
+
     if (stopConditions != null) {
       for (RoutePointTypeEnumeration stopCondition : stopConditions) {
         switch (stopCondition) {
@@ -459,11 +490,13 @@ public class AffectsMapper {
         }
       }
     }
+
     if (alertStopConditions.isEmpty()) {
       //No StopConditions are set - set default
       alertStopConditions.add(StopCondition.START_POINT);
       alertStopConditions.add(StopCondition.DESTINATION);
     }
+
     return alertStopConditions;
   }
 
@@ -476,7 +509,7 @@ public class AffectsMapper {
 
   /**
    * @return True if list have at least one element. {@code false} is returned if the given list is
-   *         empty or {@code null}.
+   *     empty or {@code null}.
    */
   private static boolean isNotEmpty(List<?> list) {
     return list != null && !list.isEmpty();

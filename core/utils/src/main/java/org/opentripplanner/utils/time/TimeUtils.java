@@ -68,11 +68,14 @@ public class TimeUtils {
     }
 
     Matcher m = DAYS_SUFFIX.matcher(hhmmss);
+
     if (m.find()) {
       days = Integer.parseInt(m.group(2));
+
       if ("-".equals(m.group(1))) {
         days = -days;
       }
+
       tokens = hhmmss.substring(0, m.start()).split(":");
     } else {
       tokens = hhmmss.split(":");
@@ -83,11 +86,14 @@ public class TimeUtils {
         "Parse error, not a valid time (HH|HH:MM|HH:MM:SS): '" + hhmmss + "'"
       );
     }
+
     int hh = Integer.parseInt(tokens[0]);
+
     if (hh > 23) {
       days += hh / 24;
       hh = hh % 24;
     }
+
     int mm = tokens.length > 1 ? Integer.parseInt(tokens[1]) : 0;
     int ss = tokens.length == 3 ? Integer.parseInt(tokens[2]) : 0;
     int seconds = LocalTime.of(hh, mm, ss).toSecondOfDay() + days * ONE_DAY_SECONDS;
@@ -102,6 +108,7 @@ public class TimeUtils {
     if (hhmmss == null || hhmmss.isBlank()) {
       return defaultValue;
     }
+
     return time(hhmmss.trim());
   }
 
@@ -168,12 +175,11 @@ public class TimeUtils {
   /**
    * This method take a date, a time in seconds and a zoneId and create a {@link ZonedDateTime}.
    * <p>
-   * This method follow the GTFS specification for time: "The time is measured from 'noon minus
-   * 12h' of the service day (effectively midnight except for days on which daylight savings time
-   * changes occur." See https://developers.google.com/transit/gtfs/reference#field_types
-   * <p>
+   * This method follow the GTFS specification for time: "The time is measured from 'noon minus 12h'
+   * of the service day (effectively midnight except for days on which daylight savings time changes
+   * occur." See https://developers.google.com/transit/gtfs/reference#field_types
    *
-   * @param date    the "service" date
+   * @param date the "service" date
    * @param seconds number of seconds since noon minus 12 hours (midnight).
    */
   public static ZonedDateTime zonedDateTime(LocalDate date, int seconds, ZoneId zoneId) {
@@ -201,17 +207,22 @@ public class TimeUtils {
   public static String msToString(long milliseconds) {
     long seconds = milliseconds / 1000L;
     int decimals = Math.abs((int) (milliseconds % 1000));
+
     if (decimals == 0) {
       return seconds + "s";
     }
+
     if (decimals % 10 == 0) {
       decimals = decimals / 10;
+
       if (decimals % 10 == 0) {
         decimals = decimals / 10;
         return seconds + "." + decimals + "s";
       }
+
       return seconds + "." + String.format("%02d", decimals) + "s";
     }
+
     return seconds + "." + String.format("%03d", decimals) + "s";
   }
 
@@ -231,9 +242,11 @@ public class TimeUtils {
   @SuppressWarnings("unused")
   public static long busyWaitOnce(int waitMs) {
     long time = System.currentTimeMillis();
+
     if (time < BUSY_WAIT_GRACE_PERIOD_TIMEOUT.get()) {
       return 0;
     }
+
     BUSY_WAIT_GRACE_PERIOD_TIMEOUT.set(time + 5L * waitMs);
 
     return busyWait(waitMs);
@@ -262,6 +275,7 @@ public class TimeUtils {
     while (System.currentTimeMillis() < waitUntil) {
       value |= rnd.nextLong();
     }
+
     return value;
   }
 
@@ -276,7 +290,6 @@ public class TimeUtils {
   }
 
   /**
-   *
    * Truncates the time to the nearest second. If the given {@code dateTime} is {@code null}, then
    * {@code null} is returned
    */

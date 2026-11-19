@@ -88,7 +88,7 @@ public final class BicycleSlopeSpeedFunction {
    * Evaluate the spline at the given slope and altitude. The slope is clamped to
    * {@code [MIN_SLOPE, MAX_SLOPE]} before evaluation to keep the spline inside its valid domain.
    *
-   * @param slope    {@code rise / run} along the edge (no unit, e.g. {@code 0.05} for 5%)
+   * @param slope {@code rise / run} along the edge (no unit, e.g. {@code 0.05} for 5%)
    * @param altitude metres above sea level at the start of the segment
    * @return speed coefficient: {@code > 1.0} on downhills (faster), {@code < 1.0} on uphills
    */
@@ -124,14 +124,18 @@ public final class BicycleSlopeSpeedFunction {
     }
 
     h[0] = 1.0;
+
     for (j = 1; j < kx + 1; j++) {
       for (i = 0; i < j; i++) {
         hh[i] = h[i];
       }
+
       h[0] = 0.0;
+
       for (i = 0; i < j; i++) {
         li = l + i;
         lj = li - j;
+
         if (TX[li] != TX[lj]) {
           f = hh[i] / (TX[li] - TX[lj]);
           h[i] = h[i] + f * (TX[li] - altitude);
@@ -143,6 +147,7 @@ public final class BicycleSlopeSpeedFunction {
     }
 
     lx = l - kx1;
+
     for (j = 0; j < kx1; j++) {
       w_x[j] = h[j];
     }
@@ -158,14 +163,18 @@ public final class BicycleSlopeSpeedFunction {
     }
 
     h[0] = 1.0;
+
     for (j = 1; j < ky + 1; j++) {
       for (i = 0; i < j; i++) {
         hh[i] = h[i];
       }
+
       h[0] = 0.0;
+
       for (i = 0; i < j; i++) {
         li = l + i;
         lj = li - j;
+
         if (TY[li] != TY[lj]) {
           f = hh[i] / (TY[li] - TY[lj]);
           h[i] = h[i] + f * (TY[li] - slope);
@@ -177,23 +186,28 @@ public final class BicycleSlopeSpeedFunction {
     }
 
     ly = l - ky1;
+
     for (j = 0; j < ky1; j++) {
       w_y[j] = h[j];
     }
 
     l = lx * nky1;
+
     for (i1 = 0; i1 < kx1; i1++) {
       h[i1] = w_x[i1];
     }
 
     l1 = l + ly;
     temp = 0.0;
+
     for (i1 = 0; i1 < kx1; i1++) {
       l2 = l1;
+
       for (j1 = 0; j1 < ky1; j1++) {
         l2 = l2 + 1;
         temp = temp + COEFF[l2 - 1] * h[i1] * w_y[j1];
       }
+
       l1 = l1 + nky1;
     }
 

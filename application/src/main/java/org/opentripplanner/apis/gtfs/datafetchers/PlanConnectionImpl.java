@@ -49,22 +49,28 @@ public class PlanConnectionImpl implements GraphQLDataFetchers.GraphQLPlanConnec
           ? getSource(environment).getPreviousPageCursor().encode()
           : null;
       ConnectionCursor startConnectionCursor = null;
+
       if (startCursor != null) {
         startConnectionCursor = new DefaultConnectionCursor(startCursor);
       }
+
       var endCursor =
         getSource(environment).getPreviousPageCursor() != null
           ? getSource(environment).getNextPageCursor().encode()
           : null;
       ConnectionCursor endConnectionCursor = null;
+
       if (endCursor != null) {
         endConnectionCursor = new DefaultConnectionCursor(endCursor);
       }
+
       Duration searchWindowUsed = null;
       var metadata = getSource(environment).getMetadata();
+
       if (metadata != null) {
         searchWindowUsed = metadata.raptorSearchWindowUsed();
       }
+
       return new PlanPageInfo(
         startConnectionCursor,
         endConnectionCursor,

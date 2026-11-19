@@ -22,10 +22,13 @@ public class DirectTransitRequestMapper {
       // The direct transit search is not compatible with via points
       return Optional.empty();
     }
+
     var directTransitRequestOpt = request.preferences().transit().directTransit();
+
     if (directTransitRequestOpt.isEmpty()) {
       return Optional.empty();
     }
+
     var rel = directTransitRequestOpt.orElseThrow();
     Collection<? extends RaptorAccessEgress> access = searchParamsUsed.accessPaths();
     Collection<? extends RaptorAccessEgress> egress = searchParamsUsed.egressPaths();
@@ -38,14 +41,17 @@ public class DirectTransitRequestMapper {
       access = filterAccessEgressByDuration(access, maxDuration);
       egress = filterAccessEgressByDuration(egress, maxDuration);
     }
+
     if (rel.isExtraReluctanceAddedToAccessAndEgress()) {
       double f = rel.extraAccessEgressReluctance();
       access = decorateAccessEgressWithExtraCost(access, f);
       egress = decorateAccessEgressWithExtraCost(egress, f);
     }
+
     if (access.isEmpty() || egress.isEmpty()) {
       return Optional.empty();
     }
+
     var directRequest = RaptorDirectTransitRequest.of()
       .addAccessPaths(access)
       .addEgressPaths(egress)

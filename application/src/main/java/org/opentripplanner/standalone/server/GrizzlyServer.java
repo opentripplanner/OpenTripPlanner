@@ -72,7 +72,8 @@ public class GrizzlyServer {
     // Set up a pool of threads to handle incoming HTTP requests.
     // According to the Grizzly docs, setting the core and max pool size equal with no queue limit
     // will use a more efficient fixed-size thread pool implementation.
-    // TODO we should probably use Grizzly async processing rather than tying up the HTTP handler threads.
+    // TODO we should probably use Grizzly async processing rather than tying up the HTTP handler
+    // threads.
     int nHandlerThreads = getMaxThreads();
     ThreadPoolConfig threadPoolConfig = ThreadPoolConfig.defaultConfig()
       .setPoolName("grizzly")
@@ -113,6 +114,7 @@ public class GrizzlyServer {
     /* 2. A static content handler to serve the client JS apps etc. from the classpath. */
     if (OTPFeature.DebugUi.isOn()) {
       var classLoader = GrizzlyServer.class.getClassLoader();
+
       if (!hasDebugClient(classLoader)) {
         LOG.warn(
           "The debug client is not on the classpath, so there is no debug UI at '/'. Maven builds " +
@@ -121,11 +123,14 @@ public class GrizzlyServer {
             "to silence this warning."
         );
       }
+
       CLStaticHttpHandler staticHandler = new CLStaticHttpHandler(classLoader, "/client/");
+
       if (params.disableFileCache) {
         LOG.info("Disabling HTTP server static file cache.");
         staticHandler.setFileCacheEnabled(false);
       }
+
       httpServer.getServerConfiguration().addHttpHandler(staticHandler, "/");
     }
 
@@ -144,8 +149,10 @@ public class GrizzlyServer {
     // Graph graph = gs.getGraph();
     // httpServer.getServerConfiguration().addHttpHandler(new OTPHttpHandler(graph), "/test/*");
 
-    // Add shutdown hook to gracefully shut down Grizzly. If no thread is returned then shutdown is already in progress.
+    // Add shutdown hook to gracefully shut down Grizzly. If no thread is returned then shutdown is
+    // already in progress.
     Optional<Thread> shutdownThread = addShutdownHook("grizzly-shutdown", httpServer::shutdown);
+
     if (!shutdownThread.isPresent()) {
       return;
     }
@@ -176,6 +183,7 @@ public class GrizzlyServer {
     LOG.info("Java reports that this machine has {} available processors.", maxThreads);
     // Testing shows increased throughput up to 1.25x as many threads as cores
     maxThreads *= 1.25;
+
     if (params.maxThreads != null && params.maxThreads > 0) {
       maxThreads = params.maxThreads;
       LOG.info("Based on configuration, forced max thread pool size to {} threads.", maxThreads);
@@ -183,6 +191,7 @@ public class GrizzlyServer {
       // Some machines apparently report 1 processor even when they have 8.
       maxThreads = MIN_THREADS;
     }
+
     LOG.info("Maximum HTTP handler thread pool size will be {} threads.", maxThreads);
     return maxThreads;
   }

@@ -47,6 +47,7 @@ class NoticeParser {
         );
         error = true;
       }
+
       if (noticeAssignment.getNoticeRef() == null && noticeAssignment.getNotice() == null) {
         LOG.warn(
           "Notice assignment have no 'notice' or 'noticeRef'. Id: {}",
@@ -54,6 +55,7 @@ class NoticeParser {
         );
         error = true;
       }
+
       if (!error) {
         this.noticeAssignments.add(noticeAssignment);
       }

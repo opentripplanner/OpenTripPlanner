@@ -59,39 +59,48 @@ public class DirectionUtilsTest {
     double[] approxAzimuths = new double[to.size()];
 
     long start = System.currentTimeMillis();
+
     for (int i = 0; i < from.size(); i++) {
       geodeticCalculator.setStartingGeographicPoint(from.get(i).x, from.get(i).y);
       geodeticCalculator.setDestinationGeographicPoint(to.get(i).x, to.get(i).y);
       exactAzimuths[i] = geodeticCalculator.getAzimuth();
     }
+
     long exactTimeMs = System.currentTimeMillis() - start;
     System.out.println(
       "GeodeticCalculator exact azimuth: " + exactTimeMs + "ms for " + N_RUN + " computations."
     );
 
     start = System.currentTimeMillis();
+
     for (int i = 0; i < from.size(); i++) {
       approxAzimuths[i] = DirectionUtils.getAzimuth(from.get(i), to.get(i));
     }
+
     long approxTimeMs = System.currentTimeMillis() - start;
     System.out.println(
       "UtilsDistance approx azimuth: " + approxTimeMs + "ms for " + N_RUN + " computations."
     );
 
     double maxError = 0.0;
+
     for (int i = 0; i < exactAzimuths.length; i++) {
       // Degrees
       double error = exactAzimuths[i] - approxAzimuths[i];
+
       if (error > 360) {
         error -= 360;
       }
+
       if (error < -360) {
         error += 360;
       }
+
       if (error > maxError) {
         maxError = error;
       }
     }
+
     System.out.println("Max error in azimuth: " + maxError + " degrees.");
     assertTrue(maxError < 0.15);
   }

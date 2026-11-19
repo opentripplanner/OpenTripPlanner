@@ -35,6 +35,7 @@ final class DebugHandlerStopArrivalAdapter extends AbstractDebugHandlerAdapter<A
       stops.add(it.stop());
       it = it.previous();
     }
+
     Collections.reverse(stops);
     return stops;
   }

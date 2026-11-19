@@ -181,6 +181,7 @@ public class EstimatedCallType {
                   "Trip has been deleted. this should not be exposed to the API and is probably a bug"
                 );
               }
+
               return TransmodelRealTimeTripStateModel.of(realtimeState);
             })
         )
@@ -370,9 +371,12 @@ public class EstimatedCallType {
         //                .field(GraphQLFieldDefinition.newFieldDefinition()
         //                        .name("flexible")
         //                        .type(Scalars.GraphQLBoolean)
-        //                        .description("Whether this call is part of a flexible trip. This means that arrival or departure " +
-        //                                "times are not scheduled but estimated within specified operating hours.")
-        //                        .dataFetcher(env -> ((TripTimeShort) env.getSource()).isFlexible())
+        //                        .description("Whether this call is part of a flexible trip. This
+        //                        means that arrival or departure " +
+        //                                "times are not scheduled but estimated within specified
+        //                                operating hours.")
+        //                        .dataFetcher(env -> ((TripTimeShort)
+        //                        env.getSource()).isFlexible())
         //                        .build())
         .build()
     );
@@ -387,8 +391,8 @@ public class EstimatedCallType {
       : RealtimeStateMapper.map(tripTimeOnDate.getTripTimes());
   }
 
-  /// Same as [#calcTime(TripTimeOnDate, ToIntFunction)]. If the offset is `-1`, this method
-  /// returns `null`.
+  /// Same as [#calcTime(TripTimeOnDate, ToIntFunction)]. If the offset is `-1`, this method returns
+  /// `null`.
   @Nullable
   private static Long calcTimeOptional(
     DataFetchingEnvironment env,
@@ -446,6 +450,7 @@ public class EstimatedCallType {
     allAlerts.addAll(
       alertPatchService.getStopAndRouteAlerts(stopId, routeId, stopConditions, direction)
     );
+
     // StopPlace
     if (stop.getParentStation() != null) {
       FeedScopedId parentStopId = stop.getParentStation().getId();
@@ -457,6 +462,7 @@ public class EstimatedCallType {
         alertPatchService.getStopAndRouteAlerts(parentStopId, routeId, stopConditions, direction)
       );
     }
+
     // Trip
     allAlerts.addAll(alertPatchService.getTripAlerts(tripId, serviceDate));
     // Route

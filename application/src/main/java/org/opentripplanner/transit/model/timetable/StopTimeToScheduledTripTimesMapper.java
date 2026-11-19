@@ -44,6 +44,7 @@ class StopTimeToScheduledTripTimesMapper {
     final List<BookingInfo> dropOffBookingInfos = new ArrayList<>();
     final List<BookingInfo> pickupBookingInfos = new ArrayList<>();
     int s = 0;
+
     for (final StopTime st : stopTimes) {
       departures[s] = st.getDepartureTime();
       arrivals[s] = st.getArrivalTime();
@@ -54,6 +55,7 @@ class StopTimeToScheduledTripTimesMapper {
       pickupBookingInfos.add(st.getPickupBookingInfo());
       s++;
     }
+
     builder
       .withDepartureTimes(departures)
       .withArrivalTimes(arrivals)
@@ -69,11 +71,12 @@ class StopTimeToScheduledTripTimesMapper {
 
   /**
    * @return either an array of headsigns (one for each stop on this trip) or null if the headsign
-   *         is the same at all stops (including null) and can be found in the Trip object.
+   *     is the same at all stops (including null) and can be found in the Trip object.
    */
   private I18NString[] makeHeadsignsArray(final Collection<StopTime> stopTimes) {
     final I18NString tripHeadsign = trip.getHeadsign();
     boolean useStopHeadsigns = false;
+
     if (tripHeadsign == null) {
       useStopHeadsigns = true;
     } else {
@@ -84,20 +87,25 @@ class StopTimeToScheduledTripTimesMapper {
         }
       }
     }
+
     if (!useStopHeadsigns) {
       // defer to trip_headsign
       return null;
     }
+
     boolean allNull = true;
     int i = 0;
     final I18NString[] hs = new I18NString[stopTimes.size()];
+
     for (final StopTime st : stopTimes) {
       final I18NString headsign = st.getStopHeadsign();
       hs[i++] = headsign;
+
       if (headsign != null) {
         allNull = false;
       }
     }
+
     if (allNull) {
       return null;
     } else {
@@ -110,8 +118,7 @@ class StopTimeToScheduledTripTimesMapper {
    * stop sequence.
    *
    * @return May be null if no stop in the entire sequence of stops has any via strings. Any
-   *         subarray may also be null or empty if no Via strings are displayed at that particular
-   *         stop.
+   *     subarray may also be null or empty if no Via strings are displayed at that particular stop.
    * @see org.opentripplanner.transit.model.timetable.TripTimes#getHeadsignVias(int)
    */
   private String @Nullable [][] makeHeadsignViasArray(final Collection<StopTime> stopTimes) {
@@ -126,6 +133,7 @@ class StopTimeToScheduledTripTimesMapper {
     String[][] vias = new String[stopTimes.size()][];
 
     int i = 0;
+
     for (final StopTime st : stopTimes) {
       if (st.getHeadsignVias() == null) {
         vias[i] = EMPTY_STRING_ARRAY;

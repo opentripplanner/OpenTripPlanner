@@ -17,8 +17,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 /**
  * Vehicle parking locations, which may allow bicycle and/or car parking.
  * <p>
- * All fields are immutable except for the availability, capacity which may be updated by
- * updaters. If any other properties change a new VehicleParking instance should be created.
+ * All fields are immutable except for the availability, capacity which may be updated by updaters.
+ * If any other properties change a new VehicleParking instance should be created.
  */
 public class VehicleParking implements Serializable {
 
@@ -290,9 +290,11 @@ public class VehicleParking implements Serializable {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     final VehicleParking that = (VehicleParking) o;
     return (
       Objects.equals(coordinate, that.coordinate) &&
@@ -447,6 +449,7 @@ public class VehicleParking implements Serializable {
 
     public VehicleParking build() {
       VehicleParkingState state$value = this.state$value;
+
       if (!this.state$set) {
         state$value = VehicleParkingState.OPERATIONAL;
       }

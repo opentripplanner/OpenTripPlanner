@@ -43,12 +43,15 @@ public record ViaRoutingResponse(
       connectionLists.add(connectionList);
       List<Itinerary> itineraries = viaJourneys.get(i);
       List<Itinerary> nextItineraries = viaJourneys.get(i + 1);
+
       for (int j = 0; j < itineraries.size(); j++) {
         Itinerary itinerary = itineraries.get(j);
         var connections = plan.get(itinerary);
+
         if (connections != null) {
           for (var connection : connections) {
             var index = nextItineraries.indexOf(connection);
+
             if (index != -1) {
               connectionList.add(new ViaRoutingResponseConnection(j, index));
             }
@@ -56,6 +59,7 @@ public record ViaRoutingResponse(
         }
       }
     }
+
     return connectionLists;
   }
 }

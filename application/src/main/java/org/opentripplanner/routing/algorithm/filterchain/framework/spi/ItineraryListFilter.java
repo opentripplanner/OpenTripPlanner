@@ -8,9 +8,9 @@ import org.opentripplanner.model.plan.Itinerary;
  * List. It should treat the list as immutable. Do not change the list passed into the filter,
  * instead make a copy, change it and return the copy. It is allowed to return the list unchanged.
  * <p>
- * A filter should do only one thing! For example, do not change the itineraries and delete
- * elements in the same filter. Instead, create two filters and insert them after each other in the
- * filter chain.
+ * A filter should do only one thing! For example, do not change the itineraries and delete elements
+ * in the same filter. Instead, create two filters and insert them after each other in the filter
+ * chain.
  * <p>
  * This allows decoration of each filter and makes it easier to reuse logic. Like the
  * {@link org.opentripplanner.routing.algorithm.filterchain.framework.filter.MaxLimit} is reused in

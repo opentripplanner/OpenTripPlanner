@@ -34,6 +34,7 @@ public abstract class AbstractBuilder<
     if (original == null) {
       return b;
     }
+
     // Make sure we only make a new object if it is changed.
     // Another approach is also to use the Deduplicator, but that is a hassle without DI in place.
     return original.sameAs(b) ? original : b;

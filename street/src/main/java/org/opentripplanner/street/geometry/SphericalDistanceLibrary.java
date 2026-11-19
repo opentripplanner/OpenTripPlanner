@@ -52,7 +52,7 @@ public abstract class SphericalDistanceLibrary {
    * Compute an (approximated) distance between a point and a linestring expressed in standard
    * geographical coordinates (lon, lat in degrees).
    *
-   * @param point      The coordinates of the point (longitude, latitude degrees).
+   * @param point The coordinates of the point (longitude, latitude degrees).
    * @param lineString The set of points representing the polyline, in the same coordinate system.
    * @return The (approximated) distance, in meters, between the point and the linestring.
    */
@@ -71,13 +71,14 @@ public abstract class SphericalDistanceLibrary {
    * Compute the (approximated) distance from a point to a line segment using Cartesian projection
    * for the perpendicular distance calculation.
    * <p>
-   * This method projects the point onto the line segment (treating lat/lon as Cartesian
-   * coordinates for the projection), then calculates the spherical distance to the closest point on
-   * the segment.
+   * This method projects the point onto the line segment (treating lat/lon as Cartesian coordinates
+   * for the projection), then calculates the spherical distance to the closest point on the
+   * segment.
    * <p>
    * The algorithm:
    * <ol>
-   *   <li>Projects the point onto the infinite line passing through segmentStart and segmentEnd</li>
+   *   <li>Projects the point onto the infinite line passing through segmentStart and
+   *       segmentEnd</li>
    *   <li>Clamps the projection to stay within the segment [segmentStart, segmentEnd]</li>
    *   <li>Calculates the spherical distance from the point to the closest point on the segment</li>
    * </ol>
@@ -86,11 +87,11 @@ public abstract class SphericalDistanceLibrary {
    * distances (under 50 km) where the Earth's curvature effect is minimal. For longer distances or
    * higher accuracy requirements, consider using spherical trigonometry approaches.
    *
-   * @param point        The point to measure from (longitude, latitude degrees)
+   * @param point The point to measure from (longitude, latitude degrees)
    * @param segmentStart Start of the line segment (longitude, latitude degrees)
-   * @param segmentEnd   End of the line segment (longitude, latitude degrees)
+   * @param segmentEnd End of the line segment (longitude, latitude degrees)
    * @return The (approximated) distance, in meters, from the point to the closest point on the line
-   *         segment
+   *     segment
    */
   public static double fastDistance(
     Coordinate point,
@@ -198,6 +199,7 @@ public abstract class SphericalDistanceLibrary {
     if (abs(lat1 - lat2) > MAX_LAT_DELTA_DEG || abs(lon1 - lon2) > MAX_LON_DELTA_DEG) {
       return distance(lat1, lon1, lat2, lon2, radius);
     }
+
     double dLat = toRadians(lat2 - lat1);
     double dLon = toRadians(lon2 - lon1) * cos(toRadians((lat1 + lat2) / 2));
     return radius * sqrt(dLat * dLat + dLon * dLon) * MAX_ERR_INV;
@@ -206,8 +208,8 @@ public abstract class SphericalDistanceLibrary {
   /**
    * @param distanceMeters Distance in meters.
    * @return The number of degree for the given distance. For degrees latitude, this is nearly
-   *         correct. For degrees longitude, this is an overestimate because meridians converge
-   *         toward the poles.
+   *     correct. For degrees longitude, this is an overestimate because meridians converge toward
+   *     the poles.
    */
   public static double metersToDegrees(double distanceMeters) {
     return (360 * distanceMeters) / (2 * Math.PI * RADIUS_OF_EARTH_IN_M);
@@ -215,8 +217,8 @@ public abstract class SphericalDistanceLibrary {
 
   /**
    * @return the approximate number of meters for the given number of degrees latitude. If degrees
-   *         longitude are supplied, this is an overestimate anywhere off the equator because
-   *         meridians converge toward the poles.
+   *     longitude are supplied, this is an overestimate anywhere off the equator because meridians
+   *     converge toward the poles.
    */
   public static double degreesLatitudeToMeters(double degreesLatitude) {
     return (2 * Math.PI * RADIUS_OF_EARTH_IN_M * degreesLatitude) / 360;
@@ -224,9 +226,9 @@ public abstract class SphericalDistanceLibrary {
 
   /**
    * @param distanceMeters Distance in meters.
-   * @param latDeg         Latitude of center point, in degree.
+   * @param latDeg Latitude of center point, in degree.
    * @return The number of longitude degree for the given distance. This is a slight overestimate as
-   *         the number of degree of longitude for a given distance depends on the exact latitude.
+   *     the number of degree of longitude for a given distance depends on the exact latitude.
    */
   public static double metersToLonDegrees(double distanceMeters, double latDeg) {
     double dLatDeg = (360 * distanceMeters) / (2 * Math.PI * RADIUS_OF_EARTH_IN_M);
@@ -235,11 +237,13 @@ public abstract class SphericalDistanceLibrary {
      * the range [lat-dLat, lat+dLat].
      */
     double minCosLat;
+
     if (latDeg > 0) {
       minCosLat = cos(toRadians(latDeg + dLatDeg));
     } else {
       minCosLat = cos(toRadians(latDeg - dLatDeg));
     }
+
     return dLatDeg / minCosLat;
   }
 
@@ -287,10 +291,12 @@ public abstract class SphericalDistanceLibrary {
     CoordinateSequence seq = lineString.getCoordinateSequence();
     int n = seq.size();
     double[] projected = new double[n * 2];
+
     for (int i = 0; i < n; i++) {
       projected[i * 2] = toRadians(seq.getX(i)) * cosLat;
       projected[i * 2 + 1] = toRadians(seq.getY(i));
     }
+
     CoordinateSequence projSeq = new PackedCoordinateSequence.Double(projected, 2, 0);
     return GeometryUtils.getGeometryFactory().createLineString(projSeq);
   }

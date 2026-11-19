@@ -94,6 +94,7 @@ public class UberService extends CachingRideHailingService {
     var uri = UriBuilder.fromUri(timeEstimateUri).build();
 
     var finalUri = uri;
+
     if (uri.getScheme().equalsIgnoreCase("https")) {
       finalUri = UriBuilder.fromUri(uri)
         .queryParam("start_latitude", coord.latitude())
@@ -135,6 +136,7 @@ public class UberService extends CachingRideHailingService {
     var uri = UriBuilder.fromUri(priceEstimateUri).build();
 
     var finalUri = uri;
+
     if (uri.getScheme().equalsIgnoreCase("https")) {
       finalUri = UriBuilder.fromUri(uri)
         .queryParam("start_latitude", request.startPosition().latitude())

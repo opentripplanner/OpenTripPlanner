@@ -44,6 +44,7 @@ public abstract class GbfsFeedLoaderImpl<
     // Create updater for each file
     for (var feed : feeds) {
       var feedName = feed.getName();
+
       if (feedUpdaters.containsKey(feedName)) {
         throw new GbfsConstructionException(
           "Feed contains duplicate url for feed " +
@@ -74,9 +75,11 @@ public abstract class GbfsFeedLoaderImpl<
     for (GBFSFeedUpdater<?> updater : feedUpdaters.values()) {
       if (updater.shouldUpdate()) {
         boolean success = updater.fetchData();
+
         if (!success) {
           return false;
         }
+
         didUpdate = true;
       }
     }
@@ -89,9 +92,11 @@ public abstract class GbfsFeedLoaderImpl<
    */
   public <T> T getFeed(Class<T> feed) {
     GBFSFeedUpdater<?> updater = feedUpdaters.get(nameForClass(feed));
+
     if (updater == null) {
       return null;
     }
+
     return feed.cast(updater.getData());
   }
 
@@ -111,6 +116,7 @@ public abstract class GbfsFeedLoaderImpl<
   ) {
     // Build headers with If-None-Match if ETag is available
     var headersBuilder = HttpHeaders.of().add(httpHeaders);
+
     if (etag != null && !etag.isEmpty()) {
       headersBuilder.add(HEADER_IF_NONE_MATCH, etag);
     }
@@ -170,6 +176,7 @@ public abstract class GbfsFeedLoaderImpl<
 
         data = response.body;
         etag = response.etag;
+
         if (etag != null) {
           LOG.debug("Stored ETag {} for GBFS feed {}", etag, url);
         }
@@ -189,8 +196,10 @@ public abstract class GbfsFeedLoaderImpl<
 
     private void updateNextFetchTime(T feedData) {
       try {
-        // Fetch lastUpdated and ttl from the resulting class. Due to type erasure we don't know the actual
-        // class, and have to use introspection to get the method references, as they do not share a supertype.
+        // Fetch lastUpdated and ttl from the resulting class. Due to type erasure we don't know the
+        // actual
+        // class, and have to use introspection to get the method references, as they do not share a
+        // supertype.
         Object lastUpdatedValue = implementingClass.getMethod("getLastUpdated").invoke(feedData);
         Integer lastUpdated =
           lastUpdatedValue == null
@@ -199,6 +208,7 @@ public abstract class GbfsFeedLoaderImpl<
               ? (int) ((Date) lastUpdatedValue).getTime()
               : (Integer) lastUpdatedValue;
         Integer ttl = (Integer) implementingClass.getMethod("getTtl").invoke(feedData);
+
         if (lastUpdated == null || ttl == null) {
           nextUpdate = getCurrentTimeSeconds();
         } else {

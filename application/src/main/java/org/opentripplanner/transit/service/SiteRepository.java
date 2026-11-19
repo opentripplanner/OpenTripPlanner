@@ -266,6 +266,7 @@ public class SiteRepository implements Serializable {
    */
   public Collection<StopLocation> findStopOrChildStops(FeedScopedId id) {
     StopLocationsGroup stops = getStopLocationsGroup(id);
+
     if (stops != null) {
       return stops.getChildStops();
     }
@@ -308,12 +309,15 @@ public class SiteRepository implements Serializable {
     if (id == null) {
       return null;
     }
+
     for (Map<FeedScopedId, ? extends V> map : maps) {
       V v = map.get(id);
+
       if (v != null) {
         return v;
       }
     }
+
     return null;
   }
 
@@ -332,6 +336,7 @@ public class SiteRepository implements Serializable {
           "duplicates/gaps in the stopIndex."
       );
     }
+
     return main.stopIndexCounter;
   }
 }

@@ -46,6 +46,7 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
   ) {
     this.cacheDir = cacheDir;
     this.tileSource = tileSource;
+
     try {
       this.datumUrl = datumUrl.toURL();
     } catch (MalformedURLException e) {
@@ -64,6 +65,7 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
     // If the tile data hasn’t been loaded into memory yet, do that now.
     if (regionCoverages.size() == 0) {
       loadVerticalDatum();
+
       // Make one grid coverage for each NED tile, adding them to a list of coverage instances that
       // can then be wrapped with thread-specific interpolators.
       for (DataSource tile : tileSource.getNEDTiles()) {
@@ -89,16 +91,20 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
         "Can’t read/write NED cache at ‘" + cacheDir.path() + "’. Check permissions."
       );
     }
+
     boolean missingDatum = false;
+
     for (String filename : DATUM_FILENAMES) {
       if (!cacheDir.entry(filename).exists()) {
         missingDatum = true;
       }
     }
+
     if (missingDatum) {
       LOG.warn(
         "OTP needs additional files (a vertical datum) to convert between NED elevations and OSM’s WGS84 elevations."
       );
+
       try {
         fetchDatum();
       } catch (Exception ex) {
@@ -159,6 +165,7 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
   private void loadVerticalDatum() {
     if (datums == null) {
       datums = new ArrayList<>();
+
       try {
         for (String filename : DATUM_FILENAMES) {
           VerticalDatum datum = VerticalDatum.fromGTX(cacheDir.entry(filename).asInputStream());
@@ -178,16 +185,20 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
   private void fetchDatum() throws Exception {
     LOG.info("Attempting to fetch datum files from OTP project web server...");
     ZipInputStream zis = new ZipInputStream(datumUrl.openStream());
+
     for (ZipEntry entry = zis.getNextEntry(); entry != null; entry = zis.getNextEntry()) {
       String filename = entry.getName();
+
       if (entry.isDirectory() || filename.contains("/") || filename.contains("\\")) {
         throw new RuntimeException("ZIP files containing directories are not supported");
       }
+
       LOG.info("decompressing {}", filename);
       OutputStream os = cacheDir.entry(filename).asOutputStream();
       zis.transferTo(os);
       os.close();
     }
+
     zis.close();
     LOG.info("Done.");
   }

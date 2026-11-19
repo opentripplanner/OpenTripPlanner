@@ -25,6 +25,7 @@ public final class CostLinearFunction extends AbstractLinearFunction<Cost> {
     if (constant.isZero() && coefficient == 0.0) {
       return ZERO;
     }
+
     return new CostLinearFunction(constant, coefficient);
   }
 

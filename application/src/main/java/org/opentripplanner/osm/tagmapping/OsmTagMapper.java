@@ -36,8 +36,8 @@ import org.opentripplanner.osm.wayproperty.specifier.LogicalOrSpecifier;
  * starting point for others to use, but they are to some extent tailored to the situation in
  * Portland and people shouldn't hesitate to adjust them to for their own instance.
  * <p>
- * The rules for assigning WayProperties to OSM ways are explained in. The final tie breaker if
- * two Pickers both match is the sequence that the properties are added in this file: if all else is
+ * The rules for assigning WayProperties to OSM ways are explained in. The final tie breaker if two
+ * Pickers both match is the sequence that the properties are added in this file: if all else is
  * equal the 'props.setProperties' statement that is closer to the top of the page will prevail over
  * those lower down the page.
  * <p>
@@ -46,7 +46,6 @@ import org.opentripplanner.osm.wayproperty.specifier.LogicalOrSpecifier;
  * normally does not permit walking based on its tag matches (the prevailing 'props.setProperties'
  * statement) has a 'foot=yes' tag the permissions are overridden and walking is allowed on that
  * way.
- * <p>
  *
  * @author bdferris, novalis
  */
@@ -246,7 +245,8 @@ public class OsmTagMapper {
       ofBicycleSafety(0.8)
     );
 
-    // We assume highway/cycleway of a cycle network to be safer (for bicycle network relations, their network is copied to way in postLoad)
+    // We assume highway/cycleway of a cycle network to be safer (for bicycle network relations,
+    // their network is copied to way in postLoad)
     // this uses a OR since you don't want to apply the safety multiplier more than once.
     // Signed bicycle_roads and cyclestreets exist in traffic codes of some european countries.
     // Tagging in OSM and on-the-ground use is varied, so just assume they are "somehow safer", too.
@@ -517,6 +517,7 @@ public class OsmTagMapper {
 
   public boolean isVehicleThroughTrafficExplicitlyDisallowed(OsmEntity way) {
     String vehicle = way.getTag("vehicle");
+
     if (vehicle != null) {
       return doesTagValueDisallowThroughTraffic(vehicle);
     } else {
@@ -529,6 +530,7 @@ public class OsmTagMapper {
    */
   public boolean isMotorVehicleThroughTrafficExplicitlyDisallowed(OsmEntity way) {
     String motorVehicle = way.getTag("motor_vehicle");
+
     if (motorVehicle != null) {
       return doesTagValueDisallowThroughTraffic(motorVehicle);
     } else {
@@ -541,6 +543,7 @@ public class OsmTagMapper {
    */
   public boolean isBicycleThroughTrafficExplicitlyDisallowed(OsmEntity way) {
     String bicycle = way.getTag("bicycle");
+
     if (bicycle != null) {
       return doesTagValueDisallowThroughTraffic(bicycle);
     } else {
@@ -553,6 +556,7 @@ public class OsmTagMapper {
    */
   public boolean isWalkThroughTrafficExplicitlyDisallowed(OsmEntity way) {
     String foot = way.getTag("foot");
+
     if (foot != null) {
       return doesTagValueDisallowThroughTraffic(foot);
     } else {

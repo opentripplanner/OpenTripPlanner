@@ -41,9 +41,11 @@ public class ListUtils {
    */
   public static int countIterable(Iterable<?> iterable) {
     int count = 0;
+
     for (var _ : iterable) {
       count++;
     }
+
     return count;
   }
 
@@ -68,16 +70,19 @@ public class ListUtils {
    *
    * @param maxSize the maximum number of elements in each sublist, must be at least 1
    * @throws IllegalArgumentException if {@code maxSize} is less than 1
-   * @throws NullPointerException     if {@code list} is {@code null}
+   * @throws NullPointerException if {@code list} is {@code null}
    */
   public static <T> List<List<T>> partition(List<T> list, int maxSize) {
     if (maxSize < 1) {
       throw new IllegalArgumentException("maxSize must be at least 1, but was: " + maxSize);
     }
+
     List<List<T>> partitions = new ArrayList<>();
+
     for (int i = 0; i < list.size(); i += maxSize) {
       partitions.add(list.subList(i, Math.min(i + maxSize, list.size())));
     }
+
     return partitions;
   }
 
@@ -96,6 +101,7 @@ public class ListUtils {
 
     original.forEach(elem -> {
       var key = keyExtractor.apply(elem);
+
       if (!seen.contains(key)) {
         seen.add(key);
         ret.add(elem);
@@ -136,6 +142,7 @@ public class ListUtils {
     if (list.size() < minLimit) {
       throw new IllegalArgumentException("The list must have at least " + minLimit + " elements.");
     }
+
     return list;
   }
 
@@ -147,15 +154,19 @@ public class ListUtils {
     if (input.size() < 2) {
       return List.of();
     }
+
     if (input.size() == 2) {
       return List.of(new Pair<>(input.getFirst(), input.getLast()));
     }
+
     var output = new ArrayList<Pair<T>>(input.size() - 1);
+
     for (int i = 0; i < input.size() - 1; i++) {
       T first = input.get(i);
       T second = input.get(i + 1);
       output.add(new Pair<>(first, second));
     }
+
     return output;
   }
 
@@ -173,10 +184,12 @@ public class ListUtils {
   public static <T> List<Split<T>> partitionIntoSplits(List<T> input) {
     requireAtLeastNElements(input, 2);
     var ret = new ArrayList<Split<T>>();
+
     for (int i = 0; i < input.size() - 1; i++) {
       var sublist = input.subList(i, input.size());
       ret.add(partitionIntoSplit(sublist));
     }
+
     return ret;
   }
 

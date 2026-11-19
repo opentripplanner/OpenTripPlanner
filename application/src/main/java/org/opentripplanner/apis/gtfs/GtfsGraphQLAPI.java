@@ -98,6 +98,7 @@ public class GtfsGraphQLAPI {
     } else {
       variables = new HashMap<>();
     }
+
     return GtfsGraphQLIndex.getGraphQLResponse(
       query,
       variables,

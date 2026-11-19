@@ -31,11 +31,10 @@ import org.opentripplanner.netex.issues.DayTypeScheduleIsEmpty;
  * <p>
  * <b>DESIGN</b>
  * <p>
- * To simplify the logic in this class and avoid passing input parameters down the call chain
- * this class perform the mapping by first creating an instance with READ-ONLY input members. The
- * result is added to {@link #dates} and {@link #datesToRemove} during the mapping process. As a
- * final step, the two collections are merged (dates-datesToRemove) and then mapped to
- * {@link LocalDate}s.
+ * To simplify the logic in this class and avoid passing input parameters down the call chain this
+ * class perform the mapping by first creating an instance with READ-ONLY input members. The result
+ * is added to {@link #dates} and {@link #datesToRemove} during the mapping process. As a final
+ * step, the two collections are merged (dates-datesToRemove) and then mapped to {@link LocalDate}s.
  * <p>
  * This class is THREAD-SAFE. A static mapping method is the single point of entry and a private
  * constructor ensure the instance is used in one thread only.
@@ -87,6 +86,7 @@ public class DayTypeAssignmentMapper {
       for (DayTypeAssignment it : assignments.lookup(dayType.getId())) {
         mapper.map(it);
       }
+
       Set<LocalDate> dates = mapper.mergeAndMapDates();
 
       if (dates.isEmpty()) {
@@ -95,6 +95,7 @@ public class DayTypeAssignmentMapper {
 
       result.put(dayType.getId(), dates);
     }
+
     return result;
   }
 
@@ -104,6 +105,7 @@ public class DayTypeAssignmentMapper {
     if (dta.isIsAvailable() == null) {
       return true;
     }
+
     return dta.isIsAvailable();
   }
 
@@ -114,12 +116,12 @@ public class DayTypeAssignmentMapper {
    * The NeTEx profile makes both {@code properties} and {@code DaysOfWeek} optional. A day type
    * which does not state any days of the week therefore constrains nothing and is valid for
    * <em>every</em> day in the period.
-   * <p>
    */
   private static Set<DayOfWeek> daysOfWeekForDayType(DayType dayType) {
     if (dayType.getProperties() == null) {
       return EVERY_DAY_OF_WEEK;
     }
+
     List<PropertyOfDay> propertyOfDays = dayType.getProperties().getPropertyOfDay();
 
     if (propertyOfDays.stream().allMatch(p -> p.getDaysOfWeek().isEmpty())) {
@@ -127,9 +129,11 @@ public class DayTypeAssignmentMapper {
     }
 
     Set<DayOfWeek> result = EnumSet.noneOf(DayOfWeek.class);
+
     for (PropertyOfDay p : propertyOfDays) {
       result.addAll(DayOfWeekMapper.mapDayOfWeeks(p.getDaysOfWeek()));
     }
+
     return result;
   }
 
@@ -151,9 +155,8 @@ public class DayTypeAssignmentMapper {
    * When mapping two lists of dates are created internally in this class, these are merged as a
    * final step in the mapping process.
    * <p>
-   * Do not call this method before you want to retrieve the result. Calling this method more
-   * than once, may have unexpected effects.
-   * <p>
+   * Do not call this method before you want to retrieve the result. Calling this method more than
+   * once, may have unexpected effects.
    *
    * @return the set of service dates for all dayTypes mapped.
    */
@@ -191,9 +194,11 @@ public class DayTypeAssignmentMapper {
     if (operatingPeriod.getFromDate() != null) {
       return operatingPeriod.getFromDate().toLocalDate();
     }
+
     if (operatingPeriod.getFromOperatingDayRef() != null) {
       return lookupOperatingDay(operatingPeriod.getFromOperatingDayRef());
     }
+
     throw new IllegalArgumentException(
       "Missing start date for operating period " + operatingPeriod.getId()
     );
@@ -203,9 +208,11 @@ public class DayTypeAssignmentMapper {
     if (operatingPeriod.getToDate() != null) {
       return operatingPeriod.getToDate().toLocalDate();
     }
+
     if (operatingPeriod.getToOperatingDayRef() != null) {
       return lookupOperatingDay(operatingPeriod.getToOperatingDayRef());
     }
+
     throw new IllegalArgumentException(
       "Missing end date for operating period " + operatingPeriod.getId()
     );

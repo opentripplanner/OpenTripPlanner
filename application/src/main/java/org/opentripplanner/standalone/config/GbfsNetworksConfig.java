@@ -91,9 +91,11 @@ public class GbfsNetworksConfig {
       );
 
     var byNetwork = new LinkedHashMap<String, GbfsNetworkParameters>();
+
     for (var it : networks) {
       byNetwork.put(it.network(), it.parameters());
     }
+
     return byNetwork;
   }
 

@@ -43,6 +43,7 @@ public class GbfsVehicleRentalDataSource implements VehicleRentalDataSource {
     if (loaderAndMapper == null) {
       return false;
     }
+
     return loaderAndMapper.update();
   }
 

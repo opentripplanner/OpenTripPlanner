@@ -43,6 +43,7 @@ public class SiriAzureSXUpdater implements SiriAzureMessageHandler {
   @Nullable
   public Future<?> handleMessage(ServiceDelivery serviceDelivery, String messageId) {
     var sxDeliveries = serviceDelivery.getSituationExchangeDeliveries();
+
     if (sxDeliveries == null || sxDeliveries.isEmpty()) {
       LOG.info("Empty Siri SX message {}", messageId);
       return null;

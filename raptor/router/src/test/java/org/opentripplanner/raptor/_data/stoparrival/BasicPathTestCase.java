@@ -39,8 +39,7 @@ import org.opentripplanner.raptor.spi.RaptorTransfer;
 /**
  * This class is used to create a journeys with stop arrivals.
  * <p>
- * It creates different data structures representing the same 'basic' trip to be used in
- * unit-tests:
+ * It creates different data structures representing the same 'basic' trip to be used in unit-tests:
  * <pre>
  *   ~
  *   Origin 10:00:15
@@ -56,8 +55,8 @@ import org.opentripplanner.raptor.spi.RaptorTransfer;
  *   Transfers: 2
  *   Generalized-cost: $8154
  * </pre>
- * The Trip has 2 transfers, 1 connected by walking and without. The trip start at 10:00 and
- * ends at 12:00, total 2 hours.
+ * The Trip has 2 transfers, 1 connected by walking and without. The trip start at 10:00 and ends at
+ * 12:00, total 2 hours.
  */
 public class BasicPathTestCase implements RaptorTestConstants {
 

@@ -146,6 +146,7 @@ class EmissionItineraryDecoratorTest implements PlanTestConstants {
     for (int i = rLeg.boardStopPosInPattern(); i < rLeg.alightStopPosInPattern(); ++i) {
       expectedRailEmission = expectedRailEmission.plus(hopEmissions.get(i));
     }
+
     tripEmissions.put(rLeg.trip().getId(), new TripPatternEmission(hopEmissions));
     tripEmissions.put(
       combinedWithFlex.legs().get(1).trip().getId(),

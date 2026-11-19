@@ -33,11 +33,13 @@ public class LocalDateRangeUtil {
     if (ranges == null) {
       return null;
     }
+
     if (ranges.isEmpty()) {
       throw new InvalidInputException(
         "Service date range filter must be either null or have at least one entry."
       );
     }
+
     return ranges
       .stream()
       .map(range -> LocalDateRange.ofExclusiveEnd(range.getGraphQLStart(), range.getGraphQLEnd()))

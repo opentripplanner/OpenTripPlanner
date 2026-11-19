@@ -39,6 +39,7 @@ class NodeInfoBuilder {
         "Use type specific build methods for this type like 'withArray'. Type : " + type
       );
     }
+
     this.type = type;
     return this;
   }
@@ -69,9 +70,11 @@ class NodeInfoBuilder {
     if (!experimentalFeature) {
       return description;
     }
+
     if (description == null) {
       return EXPERIMENTAL_FEATURE;
     }
+
     return description + "\n\n" + EXPERIMENTAL_FEATURE;
   }
 

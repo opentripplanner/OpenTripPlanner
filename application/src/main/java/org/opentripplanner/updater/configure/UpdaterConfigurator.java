@@ -239,6 +239,7 @@ public class UpdaterConfigurator {
 
   public static void shutdownGraph(TransitRepository transitRepository) {
     GraphUpdaterManager updaterManager = transitRepository.getUpdaterManager();
+
     if (updaterManager != null) {
       updaterManager.stop();
     }
@@ -255,6 +256,7 @@ public class UpdaterConfigurator {
     if (parameters == null) {
       return List.of();
     }
+
     return VehicleRentalServiceDirectoryFetcher.createUpdatersFromEndpoint(
       parameters,
       gbfsNetworkOverrides,
@@ -275,6 +277,7 @@ public class UpdaterConfigurator {
     if (!updatersParameters.getVehicleRentalParameters().isEmpty()) {
       int maxHttpConnections = updatersParameters.getVehicleRentalParameters().size();
       var otpHttpClientFactory = new OtpHttpClientFactory(maxHttpConnections);
+
       for (var configItem : updatersParameters.getVehicleRentalParameters()) {
         var source = VehicleRentalDataSourceFactory.create(
           configItem.sourceParameters(),
@@ -283,15 +286,19 @@ public class UpdaterConfigurator {
         updaters.add(new VehicleRentalUpdater(configItem, source, linker, vehicleRentalRepository));
       }
     }
+
     for (var configItem : updatersParameters.getGtfsRealtimeAlertsUpdaterParameters()) {
       updaters.add(new GtfsRealtimeAlertsUpdater(configItem));
     }
+
     for (var configItem : updatersParameters.getPollingStoptimeUpdaterParameters()) {
       updaters.add(new PollingTripUpdater(configItem, provideGtfsAdapter()));
     }
+
     for (var configItem : updatersParameters.getVehiclePositionsUpdaterParameters()) {
       updaters.add(new PollingVehiclePositionUpdater(configItem));
     }
+
     for (var configItem : updatersParameters.getSiriETUpdaterParameters()) {
       updaters.add(
         SiriUpdaterModule.createSiriETUpdater(
@@ -300,6 +307,7 @@ public class UpdaterConfigurator {
         )
       );
     }
+
     if (OTPFeature.CarPooling.isOn()) {
       for (var configItem : updatersParameters.getSiriETCarpoolingUpdaterParameters()) {
         updaters.add(
@@ -312,6 +320,7 @@ public class UpdaterConfigurator {
         );
       }
     }
+
     for (var configItem : updatersParameters.getSiriETLiteUpdaterParameters()) {
       updaters.add(
         SiriUpdaterModule.createSiriETUpdater(
@@ -320,6 +329,7 @@ public class UpdaterConfigurator {
         )
       );
     }
+
     for (var configItem : updatersParameters.getSiriETGooglePubsubUpdaterParameters()) {
       updaters.add(
         new SiriETGooglePubsubUpdater(
@@ -328,15 +338,19 @@ public class UpdaterConfigurator {
         )
       );
     }
+
     for (var configItem : updatersParameters.getSiriSXUpdaterParameters()) {
       updaters.add(SiriUpdaterModule.createSiriSXUpdater(configItem, siriFuzzyTripMatcherCache()));
     }
+
     for (var configItem : updatersParameters.getSiriSXLiteUpdaterParameters()) {
       updaters.add(SiriUpdaterModule.createSiriSXUpdater(configItem, siriFuzzyTripMatcherCache()));
     }
+
     for (var configItem : updatersParameters.getMqttGtfsRealtimeUpdaterParameters()) {
       updaters.add(new MqttGtfsRealtimeUpdater(configItem, provideGtfsAdapter()));
     }
+
     for (var configItem : updatersParameters.getVehicleParkingUpdaterParameters()) {
       switch (configItem.updateType()) {
         case FULL -> {
@@ -354,6 +368,7 @@ public class UpdaterConfigurator {
         }
       }
     }
+
     for (var configItem : updatersParameters.getSiriAzureETUpdaterParameters()) {
       updaters.add(
         SiriAzureUpdater.createETUpdater(
@@ -362,9 +377,11 @@ public class UpdaterConfigurator {
         )
       );
     }
+
     for (var configItem : updatersParameters.getSiriAzureSXUpdaterParameters()) {
       updaters.add(SiriAzureUpdater.createSXUpdater(configItem, siriFuzzyTripMatcherCache()));
     }
+
     for (var configItem : updatersParameters.getMqttSiriETUpdaterParameters()) {
       updaters.add(
         new SiriETMqttUpdater(configItem, provideSiriAdapter(configItem.fuzzyTripMatching()))
@@ -383,6 +400,7 @@ public class UpdaterConfigurator {
     if (siriFuzzyTripMatcherCache == null) {
       siriFuzzyTripMatcherCache = SiriFuzzyTripMatcherCache.create(staticTransitService);
     }
+
     return siriFuzzyTripMatcherCache;
   }
 

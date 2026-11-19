@@ -12,8 +12,8 @@ import org.opentripplanner.transit.transfer.regular.spi.TransferSearch;
 /**
  * Derives the Raptor transfers from the path templates: each path stored under a profile is
  * re-costed under the request-time user preferences. Paths that can not be traversed under the
- * preferences are left out. The max duration of the profile type is not applied, it only bounds
- * the search that discovers the paths.
+ * preferences are left out. The max duration of the profile type is not applied, it only bounds the
+ * search that discovers the paths.
  * <p>
  * The transfers are either created from scratch, re-costing every path of the profile, or patched:
  * only the paths from the stops whose transfers changed are re-costed, and the rows of all other
@@ -23,7 +23,9 @@ import org.opentripplanner.transit.transfer.regular.spi.TransferSearch;
  * <p>
  * This class is stateless and thread-safe.
  *
- * @param <P> the street path type
+ * @param
+ *     <p>
+ *     the street path type
  * @param <R> the request type
  */
 final class RaptorTransfersFactory<P, R> {
@@ -38,8 +40,8 @@ final class RaptorTransfersFactory<P, R> {
 
   /**
    * @param profileRequests the configured routing request of each profile, by the user preferences
-   *                        of the profile. The request-time preferences are applied on top of the
-   *                        request of the profile the paths are stored under.
+   *     of the profile. The request-time preferences are applied on top of the request of the
+   *     profile the paths are stored under.
    */
   RaptorTransfersFactory(
     int nStops,
@@ -59,6 +61,7 @@ final class RaptorTransfersFactory<P, R> {
     AbstractUserPreferences<?> profile
   ) {
     var base = profileRequests.get(profile);
+
     if (base == null) {
       throw new IllegalStateException(
         "The transfers are stored under preferences without a configured profile: " +
@@ -66,6 +69,7 @@ final class RaptorTransfersFactory<P, R> {
           ". Was the graph built with another transfer configuration?"
       );
     }
+
     return pathProvider.searchFor(mapper.toRequest(userPreferences, base));
   }
 
@@ -76,6 +80,7 @@ final class RaptorTransfersFactory<P, R> {
     @Nullable AbstractUserPreferences<?> profile
   ) {
     var builder = RaptorTransferStore.of(nStops);
+
     if (profile != null) {
       var search = searchFor(userPreferences, profile);
       paths.forEachPath(profile, (fromStop, toStop, path) ->
@@ -86,6 +91,7 @@ final class RaptorTransfersFactory<P, R> {
           )
       );
     }
+
     return builder.build();
   }
 
@@ -104,8 +110,10 @@ final class RaptorTransfersFactory<P, R> {
     if (profile == null || changedFromStops.size() > MAX_PATCHED_STOPS_SHARE * nStops) {
       return create(paths, userPreferences, profile);
     }
+
     var search = searchFor(userPreferences, profile);
     var patch = previous.patch();
+
     for (int fromStop : changedFromStops) {
       patch.replaceTransfersFrom(fromStop);
       paths
@@ -118,6 +126,7 @@ final class RaptorTransfersFactory<P, R> {
             )
         );
     }
+
     return patch.build();
   }
 }

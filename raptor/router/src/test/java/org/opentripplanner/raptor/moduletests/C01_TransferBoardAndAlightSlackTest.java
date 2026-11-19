@@ -28,7 +28,6 @@ import org.opentripplanner.raptor.spi.TestSlackProvider;
  * alight-slack.
  * <p>
  * The expected result is an itinerary with 3 transit legs:
- * <p>
  * <pre>
  *    Walk 1m ~ R1 ~ C ~ R2 ~ Walk ~ R3 ~ Walk 1m
  * </pre>

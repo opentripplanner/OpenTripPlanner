@@ -91,6 +91,7 @@ class DlugoszVarLenIntPackerTest {
         Integer.MIN_VALUE,
       },
     };
+
     for (int[] values : cases) {
       byte[] packed = DlugoszVarLenIntPacker.pack(values);
       assertEquals(
@@ -136,6 +137,7 @@ class DlugoszVarLenIntPackerTest {
       { Integer.MAX_VALUE, 5 },
       { Integer.MIN_VALUE, 5 },
     };
+
     for (int[] c : cases) {
       int value = c[0];
       int expectedWidth = c[1];
@@ -174,9 +176,11 @@ class DlugoszVarLenIntPackerTest {
     byte[] packed = DlugoszVarLenIntPacker.pack(values);
     var decoder = new DlugoszVarLenIntPacker.Decoder(packed);
     int idx = 0;
+
     while (decoder.hasNext()) {
       assertEquals(values[idx++], decoder.next(), "value at index " + (idx - 1));
     }
+
     assertEquals(values.length, idx);
   }
 
@@ -194,12 +198,15 @@ class DlugoszVarLenIntPackerTest {
   private String unsignedCharString(byte[] data) {
     StringBuilder sb = new StringBuilder();
     sb.append("[");
+
     for (int i = 0; i < data.length; i++) {
       sb.append(String.format("%02X", data[i] & 0xFF));
+
       if (i < data.length - 1) {
         sb.append(",");
       }
     }
+
     sb.append("]");
     return sb.toString();
   }

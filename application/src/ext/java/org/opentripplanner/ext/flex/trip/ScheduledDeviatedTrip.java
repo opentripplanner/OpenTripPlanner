@@ -36,6 +36,7 @@ public class ScheduledDeviatedTrip
   ScheduledDeviatedTrip(ScheduledDeviatedTripBuilder builder) {
     super(builder);
     List<StopTime> stopTimes = builder.stopTimes();
+
     if (!isScheduledDeviatedFlexTrip(stopTimes)) {
       throw new IllegalArgumentException("Incompatible stopTimes for scheduled flex trip");
     }
@@ -79,9 +80,11 @@ public class ScheduledDeviatedTrip
     int flexTripDurationSeconds
   ) {
     int stopTime = MISSING_VALUE;
+
     for (int i = boardStopPosition; stopTime == MISSING_VALUE && i >= 0; i--) {
       stopTime = stopTimes[i].departureTime;
     }
+
     return stopTime >= departureTime ? stopTime : MISSING_VALUE;
   }
 
@@ -98,9 +101,11 @@ public class ScheduledDeviatedTrip
     int flexTripDurationSeconds
   ) {
     int stopTime = MISSING_VALUE;
+
     for (int i = alightStopPosition; stopTime == MISSING_VALUE && i < stopTimes.length; i++) {
       stopTime = stopTimes[i].arrivalTime;
     }
+
     return stopTime <= arrivalTime ? stopTime : MISSING_VALUE;
   }
 
@@ -182,7 +187,9 @@ public class ScheduledDeviatedTrip
       if (getBoardRule(i).isNotRoutable()) {
         continue;
       }
+
       StopLocation stop = stopTimes[i].stop;
+
       if (stop instanceof GroupStop groupStop) {
         if (
           groupStop
@@ -198,6 +205,7 @@ public class ScheduledDeviatedTrip
         }
       }
     }
+
     return STOP_INDEX_NOT_FOUND;
   }
 
@@ -207,7 +215,9 @@ public class ScheduledDeviatedTrip
       if (getAlightRule(i).isNotRoutable()) {
         continue;
       }
+
       StopLocation stop = stopTimes[i].stop;
+
       if (stop instanceof GroupStop groupStop) {
         if (
           groupStop
@@ -223,6 +233,7 @@ public class ScheduledDeviatedTrip
         }
       }
     }
+
     return STOP_INDEX_NOT_FOUND;
   }
 

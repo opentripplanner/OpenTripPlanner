@@ -28,15 +28,18 @@ class CorsFilter implements ContainerRequestFilter, ContainerResponseFilter {
   public void filter(ContainerRequestContext requestContext) throws IOException {
     if (HttpMethod.OPTIONS.equals(requestContext.getMethod())) {
       Response.ResponseBuilder preflightResponse = Response.status(Response.Status.OK);
+
       if (requestContext.getHeaderString("Access-Control-Request-Headers") != null) {
         preflightResponse.header(
           "Access-Control-Allow-Headers",
           requestContext.getHeaderString("Access-Control-Request-Headers")
         );
       }
+
       if (requestContext.getHeaderString("Access-Control-Request-Method") != null) {
         preflightResponse.header("Access-Control-Allow-Method", "GET,POST");
       }
+
       // Allow caching of pre-flight options for up to an hour
       preflightResponse.header("Access-Control-Max-Age", "3600");
       requestContext.abortWith(preflightResponse.build());

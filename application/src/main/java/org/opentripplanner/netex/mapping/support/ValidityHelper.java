@@ -14,6 +14,7 @@ class ValidityHelper {
   // No validity information treated as valid now
   static boolean isValidNow(ValidBetween validBetween) {
     LocalDateTime now = LocalDateTime.now();
+
     if (validBetween != null) {
       if (validBetween.getFromDate() == null && validBetween.getToDate() == null) {
         return true;
@@ -29,11 +30,13 @@ class ValidityHelper {
 
       return true;
     }
+
     return true;
   }
 
   static boolean isValidPast(ValidBetween validBetween) {
     LocalDateTime now = LocalDateTime.now();
+
     if (validBetween != null) {
       if (validBetween.getToDate() == null) {
         return false;
@@ -45,11 +48,13 @@ class ValidityHelper {
 
       return true;
     }
+
     return false;
   }
 
   static boolean isValidFuture(ValidBetween validBetween) {
     LocalDateTime now = LocalDateTime.now();
+
     if (validBetween != null) {
       if (validBetween.getFromDate() == null) {
         return false;
@@ -61,6 +66,7 @@ class ValidityHelper {
 
       return true;
     }
+
     return false;
   }
 }

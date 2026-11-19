@@ -35,10 +35,10 @@ public class CharacterEscapeFormatter {
   private final char substitutionChar;
 
   /**
-   * @param escapeChar       the character used as an escape character.
-   * @param specialChar      the character to be removed/replaced in the encoded text.
+   * @param escapeChar the character used as an escape character.
+   * @param specialChar the character to be removed/replaced in the encoded text.
    * @param substitutionChar the character used together with the escape character to put in the
-   *                         encoded text as a placeholder for the special character.
+   *     encoded text as a placeholder for the special character.
    */
   public CharacterEscapeFormatter(char escapeChar, char specialChar, char substitutionChar) {
     this.escapeChar = escapeChar;
@@ -55,8 +55,10 @@ public class CharacterEscapeFormatter {
    */
   public String encode(String text) {
     final var buf = new StringBuilder();
+
     for (int i = 0; i < text.length(); ++i) {
       char ch = text.charAt(i);
+
       if (ch == escapeChar) {
         buf.append(escapeChar).append(escapeChar);
       } else if (ch == specialChar) {
@@ -65,6 +67,7 @@ public class CharacterEscapeFormatter {
         buf.append(ch);
       }
     }
+
     return buf.toString();
   }
 
@@ -77,10 +80,13 @@ public class CharacterEscapeFormatter {
     if (encodedText.length() < 2) {
       return encodedText;
     }
+
     final var buf = new StringBuilder();
     boolean prevEsc = false;
+
     for (int i = 0; i < encodedText.length(); ++i) {
       char ch = encodedText.charAt(i);
+
       if (prevEsc) {
         if (ch == escapeChar) {
           buf.append(escapeChar);
@@ -96,6 +102,7 @@ public class CharacterEscapeFormatter {
             )
           );
         }
+
         prevEsc = false;
       } else if (ch == escapeChar) {
         prevEsc = true;
@@ -103,6 +110,7 @@ public class CharacterEscapeFormatter {
         buf.append(ch);
       }
     }
+
     return buf.toString();
   }
 }

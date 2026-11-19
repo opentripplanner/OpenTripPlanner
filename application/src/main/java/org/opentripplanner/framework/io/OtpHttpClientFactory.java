@@ -30,10 +30,12 @@ import org.slf4j.Logger;
  *   <li>Socket timeout: the maximum waiting time between two packets received from the server.
  * </ul>
  * The default timeout is set to 5 seconds.
+ *
  * <h3>Connection time-to-live</h3>
  * Maximum time an HTTP connection can stay in the connection pool before being closed. Note that
  * HTTP 1.1 and HTTP/2 rely on persistent connections and the HTTP server is allowed to close idle
  * connections at any time. The default connection time-to-live is set to 1 minute.
+ *
  * <h3>Connection Pooling</h3>
  * The connection pool holds by default a maximum of 25 connections, with maximum 5 connections per
  * host.

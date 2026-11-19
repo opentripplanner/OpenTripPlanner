@@ -67,12 +67,14 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
     TraverserContext<GraphQLSchemaElement> context
   ) {
     var defaultValue = getDefaultValueForSchemaObject(context, argument.getName());
+
     if (defaultValue != null) {
       return changeNode(
         context,
         argument.transform(builder -> builder.defaultValueLiteral(defaultValue).build())
       );
     }
+
     return TraversalControl.CONTINUE;
   }
 
@@ -82,12 +84,14 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
     TraverserContext<GraphQLSchemaElement> context
   ) {
     var defaultValue = getDefaultValueForSchemaObject(context, field.getName());
+
     if (defaultValue != null) {
       return changeNode(
         context,
         field.transform(builder -> builder.defaultValueLiteral(defaultValue).build())
       );
     }
+
     return TraversalControl.CONTINUE;
   }
 
@@ -383,6 +387,7 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
     var objectBuilder = ObjectValue.newObjectValue().objectField(
       ObjectField.newObjectField().name("mode").value(EnumValue.of(mode.name())).build()
     );
+
     if (reluctance != null) {
       objectBuilder.objectField(
         ObjectField.newObjectField()
@@ -400,6 +405,7 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
           .build()
       );
     }
+
     return objectBuilder.build();
   }
 
@@ -444,6 +450,7 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
 
   private static ArrayValue mapVehicleParkingFilter(VehicleParkingFilter filter) {
     var arrayBuilder = ArrayValue.newArrayValue();
+
     if (!filter.not().isEmpty() || !filter.select().isEmpty()) {
       arrayBuilder.value(
         ObjectValue.newObjectValue()
@@ -452,6 +459,7 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
           .build()
       );
     }
+
     return arrayBuilder.build();
   }
 
@@ -512,6 +520,7 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
       if (value != null) {
         defaultValueForKey.put(key, StringValue.of(value.toString()));
       }
+
       return this;
     }
 
@@ -574,6 +583,7 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
             .build()
         );
       }
+
       return this;
     }
 

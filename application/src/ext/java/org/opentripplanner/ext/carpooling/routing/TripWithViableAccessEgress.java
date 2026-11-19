@@ -8,7 +8,7 @@ import java.util.List;
  * walk budget. Each viable access/egress represents a transit stop that can potentially be served
  * by this carpool trip.
  *
- * @param routableTrip       the carpool trip
+ * @param routableTrip the carpool trip
  * @param viableAccessEgress the access/egress candidates for this trip
  */
 public record TripWithViableAccessEgress(

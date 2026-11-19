@@ -89,12 +89,15 @@ public class CalendarServiceDataFactoryImpl {
     if (c != null) {
       addDatesFromCalendar(c, activeDates);
     }
+
     List<ServiceCalendarDate> dates = calendarDatesByServiceId.get(serviceId);
+
     if (dates != null) {
       for (ServiceCalendarDate cd : dates) {
         addAndRemoveDatesFromCalendarDate(cd, activeDates);
       }
     }
+
     return activeDates;
   }
 
@@ -104,9 +107,11 @@ public class CalendarServiceDataFactoryImpl {
     if (calendars == null || calendars.isEmpty()) {
       return null;
     }
+
     if (calendars.size() == 1) {
       return calendars.get(0);
     }
+
     throw new MultipleCalendarsForServiceIdException(serviceId);
   }
 

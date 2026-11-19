@@ -158,7 +158,8 @@ public class GraphBuilder implements Runnable {
       }
     }
 
-    // This module is outside the hasGTFS conditional block because it also links things like parking
+    // This module is outside the hasGTFS conditional block because it also links things like
+    // parking
     // which need to be handled even when there's no transit.
     graphBuilder.addModule(factory.streetLinkerModule());
 
@@ -167,21 +168,25 @@ public class GraphBuilder implements Runnable {
       graphBuilder.addModule(factory.turnRestrictionModule());
     }
 
-    // Prune graph connectivity islands after transit stop linking, so that pruning can take into account
-    // existence of stops in islands. If an island has a stop, it actually may be a real island and should
+    // Prune graph connectivity islands after transit stop linking, so that pruning can take into
+    // account
+    // existence of stops in islands. If an island has a stop, it actually may be a real island and
+    // should
     // not be removed quite as easily
     if ((dataSources.hasOsm() && !saveStreetGraph) || loadStreetGraph) {
       graphBuilder.addModule(factory.pruneIslands());
     }
 
     // Load elevation data and apply it to the streets.
-    // We want to do run this module after loading the OSM street network but before finding transfers.
+    // We want to do run this module after loading the OSM street network but before finding
+    // transfers.
     for (GraphBuilderModule it : factory.elevationModules()) {
       graphBuilder.addModule(it);
     }
 
     if (graphBuilder.hasTransitData) {
-      // Add links to flex areas after the streets has been split, so that also the split edges are connected
+      // Add links to flex areas after the streets has been split, so that also the split edges are
+      // connected
       graphBuilder.addModuleOptional(factory.areaStopsToVerticesMapper(), OTPFeature.FlexRouting);
 
       // Generates the transfers between the regular stops and the flex stops. Uses the streets if

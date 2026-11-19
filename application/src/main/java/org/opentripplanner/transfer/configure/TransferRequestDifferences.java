@@ -14,21 +14,20 @@ import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfi
  * Finds the street parameters of the transfers that are different from the {@code routingDefaults}
  * of the router configuration.
  * <p>
- * The stored transfers are searched with the street parameters set in the block of the profile
- * type in {@code build-config.json}, see {@code TransferRequestConfig}. The router configuration is
+ * The stored transfers are searched with the street parameters set in the block of the profile type
+ * in {@code build-config.json}, see {@code TransferRequestConfig}. The router configuration is
  * not available when the graph is built, so the {@code routingDefaults} of {@code
  * router-config.json} is not used for them. If the two are different, the transfers are found with
  * other values than a routing request uses for the street search, and nothing else tells.
  * <p>
- * Only the parameters that can be set for the type are compared. The user preferences, for
- * example the speed, are not, they are set by each request.
+ * Only the parameters that can be set for the type are compared. The user preferences, for example
+ * the speed, are not, they are set by each request.
  */
 final class TransferRequestDifferences {
 
   /**
    * @param isComparable whether the parameter is compared for the two requests, for example the
-   *                     costs of a stop are only compared if both requests use stops with unknown
-   *                     accessibility
+   *     costs of a stop are only compared if both requests use stops with unknown accessibility
    */
   private record Parameter(
     String name,
@@ -79,14 +78,15 @@ final class TransferRequestDifferences {
   private TransferRequestDifferences() {}
 
   /**
-   * A warning for each profile type that has parameters different from {@code routingDefaults}.
-   * All the profiles of a type share the same request, so the first profile of the type is used.
+   * A warning for each profile type that has parameters different from {@code routingDefaults}. All
+   * the profiles of a type share the same request, so the first profile of the type is used.
    */
   static List<String> warnings(
     TransferParameters<RouteRequest> parameters,
     RouteRequest routingDefaults
   ) {
     var warnings = new ArrayList<String>();
+
     for (var type : TransferProfileType.values()) {
       parameters
         .profiles()
@@ -95,6 +95,7 @@ final class TransferRequestDifferences {
         .findFirst()
         .ifPresent(profile -> {
           var differences = of(type, profile.routingRequest(), routingDefaults);
+
           if (!differences.isEmpty()) {
             warnings.add(
               "The street parameters of the '%s' transfers are different from routingDefaults in router-config.json. The transfers are found with the values of transfers in build-config.json. Differences: %s".formatted(
@@ -105,6 +106,7 @@ final class TransferRequestDifferences {
           }
         });
     }
+
     return warnings;
   }
 
@@ -115,12 +117,15 @@ final class TransferRequestDifferences {
     RouteRequest routingDefaults
   ) {
     var result = new ArrayList<String>();
+
     for (var parameter : parametersOf(type)) {
       if (!parameter.isComparable().test(transfers, routingDefaults)) {
         continue;
       }
+
       var transferValue = parameter.value().apply(transfers);
       var defaultValue = parameter.value().apply(routingDefaults);
+
       if (!Objects.equals(transferValue, defaultValue)) {
         result.add(
           "%s: %s (transfers), %s (routingDefaults)".formatted(
@@ -131,6 +136,7 @@ final class TransferRequestDifferences {
         );
       }
     }
+
     return result;
   }
 

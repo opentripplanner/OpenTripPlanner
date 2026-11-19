@@ -37,7 +37,8 @@ public class TicketTypeImpl implements GraphQLDataFetchers.GraphQLTicketType {
   @Override
   public DataFetcher<Double> price() {
     return environment -> {
-      // This is needed to overcome float prices becoming inexact in output, e.g. 2.8 becoming 2.7999...
+      // This is needed to overcome float prices becoming inexact in output, e.g. 2.8 becoming
+      // 2.7999...
       DecimalFormat format = new DecimalFormat("#.00");
       DecimalFormatSymbols symbols = format.getDecimalFormatSymbols();
       symbols.setDecimalSeparator('.');

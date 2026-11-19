@@ -13,9 +13,8 @@ import org.opentripplanner.model.GenericLocation;
  * single string, and avoid doing so in newer API queries, but this is how the old queries work and
  * we're keeping this parsing logic so we can keep providing that legacy API.
  * <p>
- * These from/to strings are in the following format: An optional place name followed by two
- * colons, then either a latitude and longitude or a feed-scoped ID for a stop or stop collection
- * (station).
+ * These from/to strings are in the following format: An optional place name followed by two colons,
+ * then either a latitude and longitude or a feed-scoped ID for a stop or stop collection (station).
  * <p>
  * See LocationStringParserTest for examples of valid strings.
  */
@@ -41,11 +40,13 @@ public class LocationStringParser {
   public static Optional<GenericLocation> fromOldStyleString(String input) {
     String name = null;
     String place = input;
+
     if (input.contains("::")) {
       String[] parts = input.split("::", 2);
       name = parts[0];
       place = parts[1];
     }
+
     return getGenericLocation(name, place);
   }
 
@@ -60,6 +61,7 @@ public class LocationStringParser {
     }
 
     Matcher matcher = LAT_LON_PATTERN.matcher(place);
+
     if (matcher.find()) {
       var lat = Double.parseDouble(matcher.group(1));
       var lon = Double.parseDouble(matcher.group(4));

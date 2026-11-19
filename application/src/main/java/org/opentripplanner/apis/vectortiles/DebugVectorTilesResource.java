@@ -223,12 +223,14 @@ public class DebugVectorTilesResource {
     LayerBuilderContext context
   ) {
     return switch (layerParameters.type()) {
-      case RegularStop -> new StopLayerBuilder<>(layerParameters, locale, e ->
-        context.transitService().findRegularStopsByBoundingBox(e)
-      );
-      case AreaStop -> new StopLayerBuilder<>(layerParameters, locale, e ->
-        context.transitService().findAreaStops(e)
-      );
+      case RegularStop
+        -> new StopLayerBuilder<>(layerParameters, locale, e ->
+          context.transitService().findRegularStopsByBoundingBox(e)
+        );
+      case AreaStop
+        -> new StopLayerBuilder<>(layerParameters, locale, e ->
+          context.transitService().findAreaStops(e)
+        );
       case GroupStop -> new GroupStopLayerBuilder(
         layerParameters,
         locale,
@@ -237,22 +239,18 @@ public class DebugVectorTilesResource {
           .transitService()
           .listGroupStops()
       );
-      case GeofencingZones -> new GeofencingZonesLayerBuilder(
-        context.vehicleRentalService(),
-        layerParameters
-      );
-      case Edge -> new EdgeLayerBuilder(
-        context.graph(),
-        layerParameters,
-        context.streetDetailsService()
-      );
+      case GeofencingZones
+        -> new GeofencingZonesLayerBuilder(context.vehicleRentalService(), layerParameters);
+      case Edge
+        -> new EdgeLayerBuilder(context.graph(), layerParameters, context.streetDetailsService());
       case Vertex -> new VertexLayerBuilder(context.graph(), layerParameters);
       case Rental -> new RentalLayerBuilder(context.vehicleRentalService(), layerParameters);
-      case Transfers -> new TransfersLayerBuilder(
-        context.transitService(),
-        context.transferService(),
-        layerParameters
-      );
+      case Transfers
+        -> new TransfersLayerBuilder(
+          context.transitService(),
+          context.transferService(),
+          layerParameters
+        );
     };
   }
 

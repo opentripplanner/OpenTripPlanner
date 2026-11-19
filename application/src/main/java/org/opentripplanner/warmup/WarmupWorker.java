@@ -20,8 +20,8 @@ import org.slf4j.LoggerFactory;
  * routing data structures, and other lazily initialized components. It alternates between depart-at
  * / arrive-by and cycles through access/egress modes (walk, bike, car-to-park).
  * <p>
- * It starts after Raptor transit data is created and stops when the health probe reports "UP"
- * (all updaters primed).
+ * It starts after Raptor transit data is created and stops when the health probe reports "UP" (all
+ * updaters primed).
  */
 class WarmupWorker implements Runnable {
 
@@ -40,17 +40,19 @@ class WarmupWorker implements Runnable {
     this.parameters = parameters;
     this.updaterStatusProvider = updaterStatusProvider;
     this.queryStrategy = switch (parameters.api()) {
-      case TRANSMODEL -> new TransmodelWarmupQueryExecutor(
-        requestScopedFactory.transmodelGraphQLSchema(),
-        requestScopedFactory.transmodelRequestContext(),
-        parameters.accessModes(),
-        parameters.egressModes()
-      );
-      case GTFS -> new GtfsWarmupQueryExecutor(
-        requestScopedFactory.gtfsRequestContext(),
-        parameters.accessModes(),
-        parameters.egressModes()
-      );
+      case TRANSMODEL
+        -> new TransmodelWarmupQueryExecutor(
+          requestScopedFactory.transmodelGraphQLSchema(),
+          requestScopedFactory.transmodelRequestContext(),
+          parameters.accessModes(),
+          parameters.egressModes()
+        );
+      case GTFS
+        -> new GtfsWarmupQueryExecutor(
+          requestScopedFactory.gtfsRequestContext(),
+          parameters.accessModes(),
+          parameters.egressModes()
+        );
     };
   }
 
@@ -81,6 +83,7 @@ class WarmupWorker implements Runnable {
 
         queryCount++;
         boolean arriveBy = queryCount % 2 == 0;
+
         if (!executeQuery(queryCount, arriveBy)) {
           failureCount++;
         }
@@ -101,6 +104,7 @@ class WarmupWorker implements Runnable {
   /** @return true if the query succeeded without errors, false otherwise. */
   private boolean executeQuery(int queryCount, boolean arriveBy) {
     var queryStart = Instant.now();
+
     try {
       boolean success = queryStrategy.execute(
         parameters.from(),

@@ -21,8 +21,8 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
  * OSM way properties for Finnish roads. {@link FinlandMapper} is derived from {@link NorwayMapper}
  * by seime
  * <p>
- * The main difference compared to the default property set is that most of the highway=trunk
- * roads also allows walking and biking, where as some does not.
+ * The main difference compared to the default property set is that most of the highway=trunk roads
+ * also allows walking and biking, where as some does not.
  * http://wiki.openstreetmap.org/wiki/Tag:highway%3Dtrunk
  * http://wiki.openstreetmap.org/wiki/Highway:International_equivalence
  *
@@ -83,7 +83,8 @@ class FinlandMapper extends OsmTagMapper {
     props.setProperties("highway=secondary_link", withModes(ALL).bicycleSafety(1.5));
     props.setProperties("highway=primary", withModes(ALL).bicycleSafety(2.06));
     props.setProperties("highway=primary_link", withModes(ALL).bicycleSafety(2.06));
-    // Replace existing matching properties as the logic is that the first statement registered takes precedence over later statements
+    // Replace existing matching properties as the logic is that the first statement registered
+    // takes precedence over later statements
     props.setProperties("highway=trunk_link", withModes(ALL).bicycleSafety(2.06));
     props.setProperties("highway=trunk", withModes(ALL).bicycleSafety(7.47));
 
@@ -253,6 +254,7 @@ class FinlandMapper extends OsmTagMapper {
     if (super.isMotorVehicleThroughTrafficExplicitlyDisallowed(way)) {
       return true;
     }
+
     return way.isOneOfTags("service", NOTHROUGH_DRIVING_TAGS);
   }
 }

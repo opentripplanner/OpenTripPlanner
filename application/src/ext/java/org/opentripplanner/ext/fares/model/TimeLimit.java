@@ -34,6 +34,7 @@ public class TimeLimit implements Serializable {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     TimeLimit timeLimit = (TimeLimit) o;
     return type == timeLimit.type && Objects.equals(duration, timeLimit.duration);
   }

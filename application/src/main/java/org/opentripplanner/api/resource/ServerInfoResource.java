@@ -35,16 +35,19 @@ public class ServerInfoResource {
   public static ApiServerInfo createServerInfo() {
     String cpuName = "unknown";
     int nCores = 0;
+
     try {
       InputStream fis = new FileInputStream("/proc/cpuinfo");
       BufferedReader br = new BufferedReader(new InputStreamReader(fis, StandardCharsets.UTF_8));
       String line;
+
       while ((line = br.readLine()) != null) {
         if (line.startsWith("model name")) {
           cpuName = line.split(": ")[1];
           nCores += 1;
         }
       }
+
       fis.close();
     } catch (Exception ignore) {}
 
@@ -69,11 +72,13 @@ public class ServerInfoResource {
         .entity("The 'color' parameter contains unexpected characters...")
         .build();
     }
+
     if (!isValidLabel(label)) {
       return Response.status(Response.Status.BAD_REQUEST)
         .entity("The 'label' parameter contains unexpected characters...")
         .build();
     }
+
     var version = "%s (%s)".formatted(
       SERVER_INFO.version.getVersion(),
       SERVER_INFO.otpSerializationVersionId

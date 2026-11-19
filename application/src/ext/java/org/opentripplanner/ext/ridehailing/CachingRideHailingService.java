@@ -16,7 +16,8 @@ import org.opentripplanner.street.geometry.WgsCoordinate;
  */
 public abstract class CachingRideHailingService implements RideHailingService {
 
-  // This value should be no longer than 30 minutes (according to Uber API docs) TODO check Lyft time limit
+  // This value should be no longer than 30 minutes (according to Uber API docs) TODO check Lyft
+  // time limit
   private static final Duration CACHE_DURATION = Duration.ofMinutes(2);
 
   private final Cache<WgsCoordinate, List<ArrivalTime>> arrivalTimeCache = CacheBuilder.newBuilder()

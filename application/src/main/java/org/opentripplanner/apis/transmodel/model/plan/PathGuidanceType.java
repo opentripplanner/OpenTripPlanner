@@ -139,7 +139,8 @@ public class PathGuidanceType {
         //                                .type(localeEnum)
         //                                .defaultValue("no")
         //                                .build())
-        //                        .dataFetcher(environment -> ((WalkStep) environment.getSource()).getLegStepText(environment))
+        //                        .dataFetcher(environment -> ((WalkStep)
+        //                        environment.getSource()).getLegStepText(environment))
         //                        .build())
         .build()
     );

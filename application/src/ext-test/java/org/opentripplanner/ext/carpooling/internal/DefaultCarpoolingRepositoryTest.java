@@ -79,7 +79,8 @@ class DefaultCarpoolingRepositoryTest {
     repository.upsertCarpoolTrip(ended);
     repository.upsertCarpoolTrip(ongoing);
 
-    // Cut-off is NOON.plusHours(3) - 2h = NOON.plusHours(1), so only the trip ending at noon expires.
+    // Cut-off is NOON.plusHours(3) - 2h = NOON.plusHours(1), so only the trip ending at noon
+    // expires.
     int removed = repository.removeExpiredTrips(NOON.plusHours(3).toInstant(), Duration.ofHours(2));
 
     assertThat(removed).isEqualTo(1);

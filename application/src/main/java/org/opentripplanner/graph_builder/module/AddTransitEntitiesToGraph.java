@@ -60,7 +60,7 @@ public class AddTransitEntitiesToGraph {
 
   /**
    * @param subwayAccessTime a positive integer for the extra time to access a subway platform, if
-   *                         negative the default value of zero is used.
+   *     negative the default value of zero is used.
    */
   private AddTransitEntitiesToGraph(
     TransitDataImport dataImport,
@@ -107,6 +107,7 @@ public class AddTransitEntitiesToGraph {
 
     for (TripPattern pattern : dataImport.getTripPatterns()) {
       TransitMode mode = pattern.getMode();
+
       for (var stop : pattern.getStops()) {
         stopModeMap.put(stop, mode);
       }
@@ -162,6 +163,7 @@ public class AddTransitEntitiesToGraph {
         boardingArea
       );
       stationElementNodes.put(boardingArea, boardingAreaVertex);
+
       if (boardingArea.getParentStop() != null) {
         var platformVertex = stationElementNodes.get(boardingArea.getParentStop());
         boolean wheelchair = boardingArea.getWheelchairAccessibility() == Accessibility.POSSIBLE;
@@ -200,6 +202,7 @@ public class AddTransitEntitiesToGraph {
             pathway.getSlope(),
             pathway.isPathwayModeWheelchairAccessible()
           );
+
           if (pathway.isBidirectional()) {
             PathwayEdge.createPathwayEdge(
               toVertex,
@@ -217,6 +220,7 @@ public class AddTransitEntitiesToGraph {
         if (fromVertex == null) {
           LOG.warn("The 'fromVertex' is missing for pathway from stop {}", pathway.getFromStop());
         }
+
         if (toVertex == null) {
           LOG.warn("The 'toVertex' is missing for pathway to stop {}", pathway.getToStop());
         }
@@ -240,6 +244,7 @@ public class AddTransitEntitiesToGraph {
     StopLevel fromLevel = findStopLevel(fromVertex);
     StopLevel toLevel = findStopLevel(toVertex);
     double levels = 1;
+
     if (fromLevel != null && toLevel != null && fromLevel.index() != toLevel.index()) {
       levels = Math.abs(fromLevel.index() - toLevel.index());
     }
@@ -264,6 +269,7 @@ public class AddTransitEntitiesToGraph {
       levels,
       traversalTime
     );
+
     if (pathway.isBidirectional()) {
       createOneWayElevatorEdges(
         toVertex,
@@ -305,6 +311,7 @@ public class AddTransitEntitiesToGraph {
         new Level(fromLevel.index(), fromLevel.name())
       );
     }
+
     if (toLevel != null) {
       streetDetailsRepository.addHorizontalEdgeLevelInfo(
         elevatorAlightEdge,
@@ -335,6 +342,7 @@ public class AddTransitEntitiesToGraph {
   @Nullable
   public StopLevel findStopLevel(StationElementVertex vertex) {
     var stop = dataImport.siteRepository().getRegularStop(vertex.getId());
+
     if (stop == null || stop.level() == null) {
       return null;
     } else {

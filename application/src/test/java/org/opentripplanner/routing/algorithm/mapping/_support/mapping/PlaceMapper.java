@@ -83,11 +83,14 @@ class PlaceMapper {
     api.stopIndex = stopIndex;
     api.stopSequence = gtfsStopSequence;
     api.vertexType = VertexTypeMapper.mapVertexType(domain.vertexType);
+
     if (domain.vehicleRentalPlace != null) {
       api.bikeShareId = domain.vehicleRentalPlace.stationId();
-      // for backwards-compatibility with the IBI frontend this always returns a list of a single item
+      // for backwards-compatibility with the IBI frontend this always returns a list of a single
+      // item
       api.networks = List.of(domain.vehicleRentalPlace.network());
     }
+
     if (domain.vehicleParkingWithEntrance != null) {
       api.vehicleParking = mapVehicleParking(domain.vehicleParkingWithEntrance);
     }

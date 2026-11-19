@@ -44,10 +44,12 @@ class LocationMapper {
 
   private AreaStop doMap(Location gtfsLocation) {
     var name = NonLocalizedString.ofNullable(gtfsLocation.getName());
+
     try {
       var id = idFactory.createId(gtfsLocation.getId(), "location");
       Geometry geometry = GeometryUtils.convertGeoJsonToJtsGeometry(gtfsLocation.getGeometry());
       var isValidOp = new IsValidOp(geometry);
+
       if (!isValidOp.isValid()) {
         var error = isValidOp.getValidationError();
         issueStore.add(
@@ -61,6 +63,7 @@ class LocationMapper {
           )
         );
       }
+
       return siteRepositoryBuilder
         .areaStop(id)
         .withName(name)

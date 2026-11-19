@@ -196,9 +196,9 @@ class StreetEdgeWheelchairCostTest {
   }
 
   /**
-   * A {@link BarrierVertex} with {@link Accessibility#NOT_POSSIBLE} wheelchair accessibility
-   * (e.g. created for a {@code barrier=kerb} node with a raised/rolled kerb) adds a fixed cost
-   * to the edge ending at it, independent of the edge length.
+   * A {@link BarrierVertex} with {@link Accessibility#NOT_POSSIBLE} wheelchair accessibility (e.g.
+   * created for a {@code barrier=kerb} node with a raised/rolled kerb) adds a fixed cost to the
+   * edge ending at it, independent of the edge length.
    */
   @ParameterizedTest(
     name = "a barrier vertex endpoint with accessibility {0} should lead to traversal costs of {1}"

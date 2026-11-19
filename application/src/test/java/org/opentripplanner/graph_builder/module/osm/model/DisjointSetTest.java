@@ -40,36 +40,44 @@ public class DisjointSetTest {
   public void testRandom() {
     DisjointSet<Integer> set = new DisjointSet<>();
     Random random = new Random(1);
+
     for (int i = 0; i < 150; ++i) {
       set.union(Math.abs(random.nextInt() % 700), Math.abs(random.nextInt() % 700));
     }
 
     HashMap<Integer, Integer> seen = new HashMap<>();
     int sizeSum = 0;
+
     for (int i = 0; i < 700; ++i) {
       int key = set.find(i);
       int size = set.size(key);
 
       Integer lastSize = seen.get(key);
       assertTrue(lastSize == null || size == lastSize);
+
       if (lastSize == null) {
         seen.put(key, size);
         sizeSum += size;
       }
+
       assertTrue(size >= 1 && size <= 150);
     }
+
     assertEquals(700, sizeSum);
   }
 
   @Test
   public void setsAreOrderedByFirstInsertedElement() {
     var expected = List.of(Set.of(0, 1), Set.of(2, 3), Set.of(4, 5), Set.of(6, 7), Set.of(8, 9));
+
     // Repeat with new instances: HPPC hash containers iterate in a per-instance order.
     for (int round = 0; round < 20; ++round) {
       DisjointSet<Integer> set = new DisjointSet<>();
+
       for (int i = 0; i < 10; i += 2) {
         set.union(i, i + 1);
       }
+
       assertEquals(expected, set.sets());
     }
   }

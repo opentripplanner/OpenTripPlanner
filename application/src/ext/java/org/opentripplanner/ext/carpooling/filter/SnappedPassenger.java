@@ -11,7 +11,7 @@ import org.opentripplanner.ext.carpooling.util.StreetPathUtils;
  * passenger was snapped to, with the walks to and from them. A direct request has both; an access
  * request only the pickup at the origin, an egress request only the dropoff at the destination.
  *
- * @param pickup  where the car picks the passenger up, or {@code null} for egress
+ * @param pickup where the car picks the passenger up, or {@code null} for egress
  * @param dropoff where the car drops the passenger off, or {@code null} for access
  */
 public record SnappedPassenger(

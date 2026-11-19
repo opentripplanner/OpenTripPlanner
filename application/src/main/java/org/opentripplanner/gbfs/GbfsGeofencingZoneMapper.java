@@ -25,9 +25,9 @@ import org.slf4j.LoggerFactory;
  * Abstract mapper for GBFS geofencing zones. Subclasses implement version-specific access to GBFS
  * feature properties and rules.
  * <p>
- * Per the GBFS spec, a zone can contain multiple rules. Rules within the same zone are resolved
- * by vehicle type scope: rules with the same {@code vehicle_type_ids} are grouped, and only the
- * first (highest-precedence) rule per group is kept. Each distinct vehicle type scope produces one
+ * Per the GBFS spec, a zone can contain multiple rules. Rules within the same zone are resolved by
+ * vehicle type scope: rules with the same {@code vehicle_type_ids} are grouped, and only the first
+ * (highest-precedence) rule per group is kept. Each distinct vehicle type scope produces one
  * {@link GeofencingZone}.
  *
  * @param <F> The GBFS feature type (zone)
@@ -64,15 +64,17 @@ public abstract class GbfsGeofencingZoneMapper<F, R> {
    * {@code vehicle_type_ids} scope — the first rule per scope wins (GBFS precedence semantic). Each
    * distinct scope produces one {@link GeofencingZone}.
    *
-   * @param feature   The GBFS feature (zone)
+   * @param feature The GBFS feature (zone)
    * @param zoneIndex Position in GBFS feature array (used as inter-zone priority)
    * @return List of GeofencingZone objects, one per distinct vehicle type scope
    */
   protected List<GeofencingZone> toInternalModel(F feature, int zoneIndex) {
     Geometry geometry;
+
     try {
       geometry = GeometryUtils.convertGeoJsonToJtsGeometry(featureGeometry(feature));
       TopologyValidationError validation = new IsValidOp(geometry).getValidationError();
+
       if (validation != null) {
         LOG.warn(
           "Invalid JTS geometry name={}, zoneIndex={} validation={}",
@@ -87,6 +89,7 @@ public abstract class GbfsGeofencingZoneMapper<F, R> {
     }
 
     var rules = featureRules(feature);
+
     if (rules == null || rules.isEmpty()) {
       return Collections.emptyList();
     }
@@ -94,6 +97,7 @@ public abstract class GbfsGeofencingZoneMapper<F, R> {
     // Group by vehicle type scope, keeping only the first rule per scope (GBFS first-wins).
     // LinkedHashMap preserves insertion order so the output is deterministic.
     var firstRuleByScope = new LinkedHashMap<VehicleTypeScope, R>();
+
     for (R rule : rules) {
       var ids = ruleVehicleTypeIds(rule);
       var scope = new VehicleTypeScope(ids == null ? null : new LinkedHashSet<>(ids));

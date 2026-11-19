@@ -31,9 +31,8 @@ public final class DefaultCostCalculator<T extends DefaultTripSchedule> implemen
    * (in Raptor the unit for cost is centi-seconds).
    *
    * @param stopBoardAlightTransferCosts Unit centi-seconds. This parameter is used "as-is" and not
-   *                                     transformed into the Raptor cast unit to avoid the
-   *                                     transformation for each request. Use {@code null} to ignore
-   *                                     stop cost.
+   *     transformed into the Raptor cast unit to avoid the transformation for each request. Use
+   *     {@code null} to ignore stop cost.
    */
   public DefaultCostCalculator(
     int boardCost,
@@ -149,6 +148,7 @@ public final class DefaultCostCalculator<T extends DefaultTripSchedule> implemen
     if (egressHasRides) {
       return transferCostOnly;
     }
+
     if (stopBoardAlightTransferCosts != null) {
       // Remove cost that was added during alighting.
       // We do not want to add this cost on last alighting since it should only be applied on
@@ -179,10 +179,12 @@ public final class DefaultCostCalculator<T extends DefaultTripSchedule> implemen
       cost += boardCostOnly;
     } else {
       cost += boardAndTransferCost;
+
       if (stopBoardAlightTransferCosts != null) {
         cost += stopBoardAlightTransferCosts[boardStop];
       }
     }
+
     return cost;
   }
 

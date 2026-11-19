@@ -151,6 +151,7 @@ public class NetexMapper {
     // Add the empty service id, as it can be used for routes expected to be added from realtime
     // updates or DSJs which are replaced, and where we want to keep the original DSJ
     ServiceCalendar emptyCalendar = calendarServiceBuilder.createEmptyCalendar();
+
     if (
       transitBuilder
         .getTripsById()
@@ -176,7 +177,8 @@ public class NetexMapper {
     this.currentNetexIndex = netexIndex;
     this.currentMapperIndexes = new NetexMapperIndexes(netexIndex, currentMapperIndexes);
 
-    // Be careful, the order matter. For example a Route has a reference to Agency; Hence Agency must be mapped
+    // Be careful, the order matter. For example a Route has a reference to Agency; Hence Agency
+    // must be mapped
     // before Route - if both entities are defined in the same file.
 
     mapAuthorities();
@@ -214,6 +216,7 @@ public class NetexMapper {
     if (level != LEVEL_GROUP) {
       return;
     }
+
     this.groupMapper = new GroupNetexMapper(idFactory, issueStore, transitBuilder);
   }
 
@@ -226,6 +229,7 @@ public class NetexMapper {
     if (level != LEVEL_GROUP) {
       return;
     }
+
     this.groupMapper.mapGroupEntries();
     // Throw away group data and make it available for garbage collection
     this.groupMapper = null;
@@ -236,6 +240,7 @@ public class NetexMapper {
       idFactory,
       currentNetexIndex.getTimeZone()
     );
+
     for (Authority authority : currentNetexIndex.getAuthoritiesById().localValues()) {
       Agency agency = agencyMapper.mapAuthorityToAgency(authority);
       transitBuilder.getAgenciesById().add(agency);
@@ -244,6 +249,7 @@ public class NetexMapper {
 
   private void mapBrandings() {
     BrandingMapper mapper = new BrandingMapper(idFactory);
+
     for (Branding branding : currentNetexIndex.getBrandingById().localValues()) {
       transitBuilder.getBrandingsById().add(mapper.mapBranding(branding));
     }
@@ -284,6 +290,7 @@ public class NetexMapper {
 
   private void mapOperators() {
     OperatorToAgencyMapper mapper = new OperatorToAgencyMapper(issueStore, idFactory);
+
     for (Operator operator : currentNetexIndex.getOperatorsById().localValues()) {
       transitBuilder.getOperatorsById().add(mapper.mapOperator(operator));
     }
@@ -313,12 +320,14 @@ public class NetexMapper {
       noTransfersOnIsolatedStops,
       routeToCentroidStopPlaceIds
     );
+
     for (String stopPlaceId : currentNetexIndex.getStopPlaceById().localKeys()) {
       Collection<StopPlace> stopPlaceAllVersions = currentNetexIndex
         .getStopPlaceById()
         .lookup(stopPlaceId);
       stopMapper.mapParentAndChildStops(stopPlaceAllVersions);
     }
+
     transitBuilder.siteRepository().withRegularStops(stopMapper.resultStops);
     transitBuilder.siteRepository().withStations(stopMapper.resultStations);
     currentMapperIndexes.addStationByMultiModalStationRfs(
@@ -336,6 +345,7 @@ public class NetexMapper {
         .getStationsByMultiModalStationRfs()
         .get(multiModalStopPlace.getId());
       var multiModalStation = mapper.map(multiModalStopPlace, stations);
+
       if (multiModalStation != null) {
         transitBuilder.siteRepository().withMultiModalStation(multiModalStation);
       }
@@ -349,6 +359,7 @@ public class NetexMapper {
       transitBuilder.getMultiModalStationsById(),
       transitBuilder.getStations()
     );
+
     for (GroupOfStopPlaces groupOfStopPlaces : currentNetexIndex
       .getGroupOfStopPlacesById()
       .localValues()) {
@@ -377,10 +388,12 @@ public class NetexMapper {
 
     for (FlexibleStopPlace flexibleStopPlace : flexibleStopPlaces) {
       StopLocation stopLocation = flexStopsMapper.map(flexibleStopPlace);
+
       if (stopLocation instanceof AreaStop areaStop) {
         transitBuilder.siteRepository().withAreaStop(areaStop);
       } else if (stopLocation instanceof GroupStop groupStop) {
         transitBuilder.siteRepository().withGroupStop(groupStop);
+
         for (var child : groupStop.getChildLocations()) {
           if (child instanceof AreaStop areaStop) {
             transitBuilder.siteRepository().withAreaStop(areaStop);
@@ -425,14 +438,18 @@ public class NetexMapper {
       currentNetexIndex.getTimeZone(),
       ferryIdsNotAllowedForBicycle
     );
+
     for (Line line : currentNetexIndex.getLineById().localValues()) {
       Route route = routeMapper.mapRoute(line);
+
       if (route != null) {
         transitBuilder.getRoutes().add(route);
       }
     }
+
     for (FlexibleLine line : currentNetexIndex.getFlexibleLineById().localValues()) {
       Route route = routeMapper.mapRoute(line);
+
       if (route != null) {
         transitBuilder.getRoutes().add(route);
       }
@@ -483,6 +500,7 @@ public class NetexMapper {
       .get(stopPattern)
       .stream()
       .anyMatch(tripPattern -> result.tripPattern().getId().equals(tripPattern.getId()));
+
     if (journeyPatternExists) {
       issueStore.add(
         "DuplicateJourneyPattern",
@@ -512,6 +530,7 @@ public class NetexMapper {
       transitBuilder.getTripsById(),
       currentMapperIndexes.getStopTimesByNetexId()
     );
+
     for (NoticeAssignment noticeAssignment : currentNetexIndex
       .getNoticeAssignmentById()
       .localValues()) {
@@ -536,6 +555,7 @@ public class NetexMapper {
       .forEach(id -> {
         var sspid = idFactory.createId(id);
         var quayId = idFactory.createId(currentNetexIndex.getQuayIdByStopPointRef().lookup(id));
+
         if (transitBuilder.getStops().containsKey(quayId)) {
           var stop = transitBuilder.getStops().get(quayId);
           transitBuilder.addStopByScheduledStopPoint(sspid, stop);
@@ -559,6 +579,7 @@ public class NetexMapper {
       .localKeys()
       .forEach(id -> {
         var parking = mapper.map(currentNetexIndex.getParkingsById().lookup(id));
+
         if (parking != null) {
           transitBuilder.vehicleParkings().add(parking);
         }
@@ -572,6 +593,7 @@ public class NetexMapper {
    */
   private LocalDateTime getStartOfPeriod() {
     String timeZone = currentNetexIndex.getTimeZone();
+
     if (timeZone == null) {
       LocalDateTime time = LocalDateTime.now(ZoneId.of("UTC"));
       issueStore.add(
@@ -584,6 +606,7 @@ public class NetexMapper {
       );
       return time;
     }
+
     return LocalDateTime.now(ZoneId.of(timeZone));
   }
 }

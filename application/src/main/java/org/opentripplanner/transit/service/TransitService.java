@@ -93,7 +93,6 @@ public interface TransitService {
 
   /**
    * Return all scheduled trip patterns, not including real-time created trip patterns.
-   * <p>
    * <pre>
    * TODO: verify this is the intended behavior and possibly change the method name to
    *       getAllScheduledTripPatterns
@@ -113,7 +112,6 @@ public interface TransitService {
 
   /**
    * Return a route for a given id, including routes created by real-time updates.
-   *
    */
   Route getRoute(FeedScopedId id);
 
@@ -249,12 +247,12 @@ public interface TransitService {
    * <p>
    * TODO: Add frequency based trips
    *
-   * @param stop                         Stop object to perform the search for
-   * @param startTime                    Start time for the search.
-   * @param timeRange                    Searches forward for timeRange from startTime
+   * @param stop Stop object to perform the search for
+   * @param startTime Start time for the search.
+   * @param timeRange Searches forward for timeRange from startTime
    * @param numberOfDeparturesPerPattern Number of departures to fetch per pattern
-   * @param arrivalDeparture             Filter by arrivals, departures, or both
-   * @param includeCancelledTrips        If true, cancelled trips will also be included in result.
+   * @param arrivalDeparture Filter by arrivals, departures, or both
+   * @param includeCancelledTrips If true, cancelled trips will also be included in result.
    */
   List<StopTimesInPattern> findStopTimesInPattern(
     StopLocation stop,
@@ -269,7 +267,7 @@ public interface TransitService {
    * Get a list of all trips that pass through a stop during a single ServiceDate. Useful when
    * creating complete stop timetables for a single day.
    *
-   * @param stop        Stop object to perform the search for
+   * @param stop Stop object to perform the search for
    * @param serviceDate Return all departures for the specified date
    */
   List<StopTimesInPattern> findStopTimesInPattern(
@@ -287,16 +285,15 @@ public interface TransitService {
    * <p>
    * TODO: Add frequency based trips
    *
-   * @param stop                         Stop object to perform the search for
-   * @param pattern                      Pattern object to perform the search for
-   * @param startTime                    Start time for the search.
-   * @param timeRange                    Searches forward for timeRange from startTime
+   * @param stop Stop object to perform the search for
+   * @param pattern Pattern object to perform the search for
+   * @param startTime Start time for the search.
+   * @param timeRange Searches forward for timeRange from startTime
    * @param numberOfDeparturesPerPattern Number of departures to fetch per pattern
-   * @param arrivalDeparture             Filter by arrivals, departures, or both
-   * @param includeCancellations         If the result should include those trip times where either
-   *                                     the entire trip or the stop at the given stop location has
-   *                                     been cancelled. Deleted trips are never returned no matter
-   *                                     the value of this parameter.
+   * @param arrivalDeparture Filter by arrivals, departures, or both
+   * @param includeCancellations If the result should include those trip times where either the
+   *     entire trip or the stop at the given stop location has been cancelled. Deleted trips are
+   *     never returned no matter the value of this parameter.
    */
   List<TripTimeOnDate> findTripTimesOnDate(
     StopLocation stop,
@@ -383,8 +380,8 @@ public interface TransitService {
   /**
    * For a {@link StopLocationsGroup} get all child stops and get their modes.
    * <p>
-   * The mode is either taken from {@link StopLocation#getVehicleType()} (if non-null) or from
-   * the list of patterns that use the stop location.
+   * The mode is either taken from {@link StopLocation#getVehicleType()} (if non-null) or from the
+   * list of patterns that use the stop location.
    * <p>
    * The returning stream is ordered by the number of occurrences of the mode in the child stops.
    * So, if more patterns of mode BUS than RAIL visit the group, the result will be [BUS,RAIL].
@@ -394,11 +391,11 @@ public interface TransitService {
   /**
    * For a {@link StopLocation} return its modes.
    * <p>
-   * The mode is either taken from {@link StopLocation#getVehicleType()} (if non-null) or from
-   * the list of patterns that use the stop location.
+   * The mode is either taken from {@link StopLocation#getVehicleType()} (if non-null) or from the
+   * list of patterns that use the stop location.
    * <p>
-   * If {@link StopLocation#getVehicleType()} is null the returning stream is ordered by the
-   * number of occurrences of the mode in the stop.
+   * If {@link StopLocation#getVehicleType()} is null the returning stream is ordered by the number
+   * of occurrences of the mode in the stop.
    * <p>
    * So, if more patterns of mode BUS than RAIL visit the stop, the result will be [BUS,RAIL].
    */
@@ -415,7 +412,6 @@ public interface TransitService {
 
   /**
    * Returns a list of {@link Trip}s that match the filtering defined in the request.
-   *
    */
   List<Trip> getTrips(TripRequest request);
 
@@ -464,7 +460,7 @@ public interface TransitService {
 
   /**
    * @return the current (real-time if available, otherwise scheduled) trip times for the given trip
-   *         on the given service date, or empty if the trip does not run on that date.
+   *     on the given service date, or empty if the trip does not run on that date.
    */
   Optional<TripTimes<?>> findTripTimes(Trip trip, LocalDate serviceDate);
 

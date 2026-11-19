@@ -37,9 +37,9 @@ public class GtfsRealTimeTripUpdateAdapter {
   }
 
   /**
-   * Create an update-scoped task for applying GTFS-RT trip updates. Entity lookups within the
-   * task go directly against the given mutable buffer (which falls back to scheduled data), so
-   * they see in-progress real-time additions not yet committed to a published snapshot.
+   * Create an update-scoped task for applying GTFS-RT trip updates. Entity lookups within the task
+   * go directly against the given mutable buffer (which falls back to scheduled data), so they see
+   * in-progress real-time additions not yet committed to a published snapshot.
    */
   public GtfsRealTimeUpdateHandler forUpdate(TimetableRepository buffer) {
     return new GtfsRealTimeUpdateHandler(

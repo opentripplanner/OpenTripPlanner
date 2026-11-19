@@ -40,7 +40,7 @@ public class DefaultEntityById<E extends TransitEntity> implements EntityById<E>
   /**
    * @param id the id whose associated value is to be returned
    * @return the value to which the specified key is mapped, or {@code null} if this map contains no
-   *         mapping for the key
+   *     mapping for the key
    */
   @Override
   public E get(FeedScopedId id) {
@@ -90,14 +90,17 @@ public class DefaultEntityById<E extends TransitEntity> implements EntityById<E>
     Collection<E> newSet = oldSet.stream().filter(Predicate.not(test)).collect(Collectors.toList());
 
     int size = map.size();
+
     if (newSet.size() == size) {
       return 0;
     }
+
     if (callback != null) {
       var removed = new HashSet<>(oldSet);
       removed.removeAll(Set.copyOf(newSet));
       removed.forEach(callback);
     }
+
     map.clear();
     addAll(newSet);
     return size - map.size();

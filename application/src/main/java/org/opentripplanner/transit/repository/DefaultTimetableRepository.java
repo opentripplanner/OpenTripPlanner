@@ -61,12 +61,12 @@ import org.slf4j.LoggerFactory;
  * realtime updates, falling back on the scheduled Timetable if no updates have been applied for a
  * given TripPattern.
  * <p>
- * This is a central part of managing concurrency when many routing searches may be happening,
- * but realtime updates are also streaming in which change the vehicle arrival and departure times.
- * Any given request will only see one unchanging snapshot over the course of its search.
+ * This is a central part of managing concurrency when many routing searches may be happening, but
+ * realtime updates are also streaming in which change the vehicle arrival and departure times. Any
+ * given request will only see one unchanging snapshot over the course of its search.
  * <p>
- * A mutable instance first serves as a buffer to accumulate a batch of incoming updates on top
- * of any already known updates to the base schedules. From time to time such a batch of updates is
+ * A mutable instance first serves as a buffer to accumulate a batch of incoming updates on top of
+ * any already known updates to the base schedules. From time to time such a batch of updates is
  * committed (like a database transaction). At this point an immutable copy is created and becomes
  * available for use by new incoming routing requests.
  * <p>
@@ -75,13 +75,13 @@ import org.slf4j.LoggerFactory;
  * provide a consistent view not only of trips that have been boarded, but of relative arrival and
  * departure times of other trips that have not necessarily been boarded.
  * <p>
- * An instance may only be modified by a single thread. This makes it easier to reason about how
- * the snapshot is built up and used. Write operations are applied one by one, in order, with no
+ * An instance may only be modified by a single thread. This makes it easier to reason about how the
+ * snapshot is built up and used. Write operations are applied one by one, in order, with no
  * concurrent access. Read operations are then allowed concurrently by many threads after writing is
  * forbidden.
  * <p>
- * The fact that TripPattern instances carry a reference only to their scheduled Timetable and
- * not to their realtime timetable is largely due to historical path-dependence in OTP development.
+ * The fact that TripPattern instances carry a reference only to their scheduled Timetable and not
+ * to their realtime timetable is largely due to historical path-dependence in OTP development.
  * Streaming realtime support was added around 2013 as a sort of sandbox feature that was switched
  * off by default. Looking up realtime timetables during routing was a fringe feature that needed to
  * impose near-zero cost and avoid introducing complexity into the primary codebase. Now over ten
@@ -91,9 +91,9 @@ import org.slf4j.LoggerFactory;
  * network. It would also be possible to make the realtime version of Timetables or TripTimes the
  * primary view, and include references back to their scheduled versions.
  * <p>
- * Implementation note: when a snapshot is committed, the mutable state of this class is stored
- * in final fields and completely initialized in the constructor. This provides an additional
- * guarantee of safe-publication without synchronization. (see
+ * Implementation note: when a snapshot is committed, the mutable state of this class is stored in
+ * final fields and completely initialized in the constructor. This provides an additional guarantee
+ * of safe-publication without synchronization. (see
  * <a href="https://docs.oracle.com/javase/specs/jls/se7/html/jls-17.html#jls-17.5">final Field
  * Semantics</a>)
  */
@@ -117,13 +117,13 @@ public class DefaultTimetableRepository implements TimetableRepository {
    * include ones from the scheduled GTFS, as well as ones added by realtime messages and tracked by
    * the TripPatternCache.
    * <p>
-   * Note that the keys do not include all scheduled TripPatterns, only those for which we have
-   * at least one update, and those for which we had updates before but just recently cleared.
+   * Note that the keys do not include all scheduled TripPatterns, only those for which we have at
+   * least one update, and those for which we had updates before but just recently cleared.
    * <p>
-   * The members of the SortedSet (the Timetable for a particular day) are treated as
-   * copy-on-write when we're updating them. If an update will modify the timetable for a particular
-   * day, that timetable is replicated before any modifications are applied to avoid affecting any
-   * previous snapshots still in circulation which reference that same Timetable instance.
+   * The members of the SortedSet (the Timetable for a particular day) are treated as copy-on-write
+   * when we're updating them. If an update will modify the timetable for a particular day, that
+   * timetable is replicated before any modifications are applied to avoid affecting any previous
+   * snapshots still in circulation which reference that same Timetable instance.
    * <p>
    * Alternative implementations: A. This could be an array indexed using the integer pattern
    * indexes. B. It could be made into a flat hashtable with compound keys (TripPattern, LocalDate).
@@ -155,8 +155,8 @@ public class DefaultTimetableRepository implements TimetableRepository {
 
   /**
    * The realTimeAdded* maps are indexes on the trips created at runtime (extra-journey), and the
-   * Route, TripPattern, TripOnServiceDate they refer to.
-   * They are meant to override the corresponding indexes in ScheduledTimetableData.
+   * Route, TripPattern, TripOnServiceDate they refer to. They are meant to override the
+   * corresponding indexes in ScheduledTimetableData.
    */
   private final Map<FeedScopedId, Route> realtimeAddedRoutes;
   private final Map<FeedScopedId, Trip> realTimeAddedTrips;
@@ -238,8 +238,8 @@ public class DefaultTimetableRepository implements TimetableRepository {
 
   /**
    * @param scheduledTimetableData the scheduled (non-realtime) timetable data. Its trip calendars
-   *                               are the initial calendars of this repository; real-time changes
-   *                               replace the repository's own calendars, never these.
+   *     are the initial calendars of this repository; real-time changes replace the repository's
+   *     own calendars, never these.
    */
   public DefaultTimetableRepository(
     RaptorTransitData raptorTransitData,
@@ -350,9 +350,11 @@ public class DefaultTimetableRepository implements TimetableRepository {
   @Nullable
   public Route getRoute(FeedScopedId id) {
     Route realtimeAddedRoute = getRealtimeAddedRoute(id);
+
     if (realtimeAddedRoute != null) {
       return realtimeAddedRoute;
     }
+
     return scheduledTimetableData.getRouteForId(id);
   }
 
@@ -371,9 +373,11 @@ public class DefaultTimetableRepository implements TimetableRepository {
   @Nullable
   public Trip getTrip(FeedScopedId id) {
     Trip trip = getRealTimeAddedTrip(id);
+
     if (trip != null) {
       return trip;
     }
+
     return scheduledTimetableData.getTripForId(id);
   }
 
@@ -402,6 +406,7 @@ public class DefaultTimetableRepository implements TimetableRepository {
     if (getRealTimeAddedTrip(id) != null) {
       return true;
     }
+
     return scheduledTimetableData.containsTrip(id);
   }
 
@@ -412,9 +417,11 @@ public class DefaultTimetableRepository implements TimetableRepository {
   @Override
   public TripPattern findPattern(Trip trip) {
     TripPattern realtimeAddedTripPattern = getRealTimeAddedPatternForTrip(trip);
+
     if (realtimeAddedTripPattern != null) {
       return realtimeAddedTripPattern;
     }
+
     return scheduledTimetableData.getPatternForTrip(trip);
   }
 
@@ -425,9 +432,11 @@ public class DefaultTimetableRepository implements TimetableRepository {
   @Override
   public TripPattern findPattern(Trip trip, @Nullable LocalDate serviceDate) {
     TripPattern realtimePattern = getNewTripPatternForModifiedTrip(trip.getId(), serviceDate);
+
     if (realtimePattern != null) {
       return realtimePattern;
     }
+
     return findPattern(trip);
   }
 
@@ -451,9 +460,11 @@ public class DefaultTimetableRepository implements TimetableRepository {
   @Nullable
   public TripOnServiceDate getTripOnServiceDate(FeedScopedId id) {
     TripOnServiceDate tripOnServiceDate = getRealTimeAddedTripOnServiceDateById(id);
+
     if (tripOnServiceDate != null) {
       return tripOnServiceDate;
     }
+
     return scheduledTimetableData.getTripOnServiceDateById(id);
   }
 
@@ -466,9 +477,11 @@ public class DefaultTimetableRepository implements TimetableRepository {
     TripOnServiceDate tripOnServiceDate = getRealTimeAddedTripOnServiceDateForTripAndDay(
       tripIdAndServiceDate
     );
+
     if (tripOnServiceDate != null) {
       return tripOnServiceDate;
     }
+
     return scheduledTimetableData.getTripOnServiceDateForTripAndDay(tripIdAndServiceDate);
   }
 
@@ -514,9 +527,11 @@ public class DefaultTimetableRepository implements TimetableRepository {
   @Override
   public Collection<TripPattern> findPatterns(StopLocation stop, boolean includeRealtimeUpdates) {
     Set<TripPattern> tripPatterns = new HashSet<>(findPatterns(stop));
+
     if (includeRealtimeUpdates) {
       tripPatterns.addAll(patternsForStop.get(stop));
     }
+
     return tripPatterns;
   }
 
@@ -524,9 +539,11 @@ public class DefaultTimetableRepository implements TimetableRepository {
   public Set<Route> findRoutes(StopLocation stop) {
     Collection<Route> flexRoutes = List.of();
     var flexIndex = scheduledTimetableData.getFlexIndex();
+
     if (flexIndex != null) {
       flexRoutes = flexIndex.findRoutes(stop);
     }
+
     return SetUtils.combine(flexRoutes, scheduledTimetableData.getRoutesForStop(stop));
   }
 
@@ -641,6 +658,7 @@ public class DefaultTimetableRepository implements TimetableRepository {
     swapTimetable(pattern, tt, updated);
 
     Trip trip = updatedTripTimes.getTrip();
+
     if (pattern.isStopPatternModifiedInRealTime()) {
       // Remember this pattern for the added trip id and service date
       FeedScopedId tripId = trip.getId();
@@ -656,6 +674,7 @@ public class DefaultTimetableRepository implements TimetableRepository {
     if (realTimeTripUpdate.routeCreation()) {
       realtimeAddedRoutes.put(route.getId(), route);
     }
+
     if (realTimeTripUpdate.tripCreation()) {
       FeedScopedId tripId = trip.getId();
       realTimeAddedTrips.put(tripId, trip);
@@ -665,12 +684,14 @@ public class DefaultTimetableRepository implements TimetableRepository {
 
       if (tripOnServiceDate != null) {
         realTimeAddedTripOnServiceDateById.put(tripOnServiceDate.getId(), tripOnServiceDate);
+
         for (var replacementFor : tripOnServiceDate.getReplacementFor()) {
           realTimeAddedReplacedByTripOnServiceDateById.put(
             replacementFor.getId(),
             tripOnServiceDate
           );
         }
+
         realTimeAddedTripOnServiceDateForTripAndDay.put(
           new TripIdAndServiceDate(tripId, serviceDate),
           tripOnServiceDate
@@ -754,6 +775,7 @@ public class DefaultTimetableRepository implements TimetableRepository {
     );
     boolean addedTripPatternsWereCleared = clearEntriesForRealtimeAddedTrips(feedId);
     boolean patternsForStopWereCleared = clearPatternsForStop(feedId);
+
     // If this snapshot was modified, it will be dirty after the clear actions.
     if (
       timetablesWereCleared ||
@@ -769,13 +791,13 @@ public class DefaultTimetableRepository implements TimetableRepository {
    * If a previous realtime update has changed which trip pattern is associated with the given trip
    * on the given service date, this method will dissociate the trip from that pattern and remove
    * the trip's timetables from that pattern on that particular service date.
-   *
+   * <p>
    * For this service date, the trip will revert to its original trip pattern from the scheduled
    * data, remaining on that pattern unless it's changed again by a future realtime update.
    *
    * @return true if the trip was found to be shifted to a different trip pattern by a realtime
-   *         message and an attempt was made to re-associate it with its originally scheduled trip
-   *         pattern.
+   *     message and an attempt was made to re-associate it with its originally scheduled trip
+   *     pattern.
    */
   public boolean revertTripToScheduledTripPattern(FeedScopedId tripId, LocalDate serviceDate) {
     validateNotReadOnly();
@@ -783,6 +805,7 @@ public class DefaultTimetableRepository implements TimetableRepository {
     boolean success = false;
 
     final TripPattern pattern = getNewTripPatternForModifiedTrip(tripId, serviceDate);
+
     if (pattern != null) {
       // Dissociate the given trip from any realtime-added pattern.
       // The trip will then fall back to its original scheduled pattern.
@@ -790,11 +813,14 @@ public class DefaultTimetableRepository implements TimetableRepository {
       // Remove times for the trip from any timetables
       // under that now-obsolete realtime-added pattern.
       SortedSet<Timetable> sortedTimetables = this.timetables.get(pattern.getId());
+
       if (sortedTimetables != null) {
         TripTimes<?> tripTimesToRemove = null;
+
         for (Timetable timetable : sortedTimetables) {
           if (timetable.isValidFor(serviceDate)) {
             final var tripTimes = timetable.getTripTimes(tripId);
+
             if (tripTimes == null) {
               LOG.debug("No triptimes to remove for trip {}", tripId);
             } else if (tripTimesToRemove != null) {
@@ -817,6 +843,7 @@ public class DefaultTimetableRepository implements TimetableRepository {
           }
         }
       }
+
       success = true;
     }
 
@@ -832,10 +859,12 @@ public class DefaultTimetableRepository implements TimetableRepository {
     validateNotReadOnly();
 
     boolean modified = false;
+
     for (Iterator<FeedScopedId> it = timetables.keySet().iterator(); it.hasNext(); ) {
       FeedScopedId patternId = it.next();
       SortedSet<Timetable> sortedTimetables = timetables.get(patternId);
       SortedSet<Timetable> toKeepTimetables = new TreeSet<>(new SortedTimetableComparator());
+
       for (Timetable timetable : sortedTimetables) {
         if (serviceDate.isBefore(timetable.getServiceDate())) {
           toKeepTimetables.add(timetable);
@@ -859,6 +888,7 @@ public class DefaultTimetableRepository implements TimetableRepository {
 
     ) {
       TripIdAndServiceDate tripIdAndServiceDate = iterator.next().getKey();
+
       if (!serviceDate.isBefore(tripIdAndServiceDate.serviceDate())) {
         iterator.remove();
         modified = true;
@@ -872,6 +902,7 @@ public class DefaultTimetableRepository implements TimetableRepository {
     if (readOnly) {
       return false;
     }
+
     return dirty;
   }
 
@@ -935,9 +966,11 @@ public class DefaultTimetableRepository implements TimetableRepository {
       .stream()
       .filter(entry -> feedId.equals(entry.getKey().getFeedId()))
       .collect(Collectors.toSet());
+
     for (var entry : entriesToBeRemoved) {
       SortedSet<Timetable> timetablesOfPattern = entry.getValue();
       FeedScopedId patternId = entry.getKey();
+
       for (var timetable : timetablesOfPattern) {
         var serviceDate = timetable.getServiceDate();
         var patternAndServiceDate = new TripPatternAndServiceDate(patternId, serviceDate);
@@ -948,6 +981,7 @@ public class DefaultTimetableRepository implements TimetableRepository {
         dirtyTimetables.put(patternAndServiceDate, scheduledTimetable);
       }
     }
+
     return timetables.entrySet().removeAll(entriesToBeRemoved);
   }
 
@@ -1016,14 +1050,14 @@ public class DefaultTimetableRepository implements TimetableRepository {
   /**
    * Replace the original Timetable by the updated one in the timetable index. The SortedSet that
    * holds the collection of Timetables for that pattern (sorted by service date) is shared between
-   * multiple snapshots and must be copied as well.<br/>
-   * Note on performance: if multiple Timetables are modified in a SortedSet, the SortedSet will be
-   * copied multiple times. The impact on memory/garbage collection is assumed to be minimal since
-   * the collection is small. The SortedSet is made immutable to prevent change after snapshot
-   * publication.
+   * multiple snapshots and must be copied as well.<br/> Note on performance: if multiple Timetables
+   * are modified in a SortedSet, the SortedSet will be copied multiple times. The impact on
+   * memory/garbage collection is assumed to be minimal since the collection is small. The SortedSet
+   * is made immutable to prevent change after snapshot publication.
    */
   private void swapTimetable(TripPattern pattern, Timetable original, Timetable updated) {
     SortedSet<Timetable> sortedTimetables = timetables.get(pattern.getId());
+
     if (sortedTimetables == null) {
       sortedTimetables = new TreeSet<>(new SortedTimetableComparator());
     } else {
@@ -1031,12 +1065,14 @@ public class DefaultTimetableRepository implements TimetableRepository {
       temp.addAll(sortedTimetables);
       sortedTimetables = temp;
     }
+
     // This is a minor optimization:
     // Since sortedTimetables contains only timetables created in real-time, no need to try to
     // remove the original if it was not created by real-time.
     if (original.isCreatedByRealTimeUpdater()) {
       sortedTimetables.remove(original);
     }
+
     sortedTimetables.add(updated);
     timetables.put(pattern.getId(), ImmutableSortedSet.copyOfSorted(sortedTimetables));
 

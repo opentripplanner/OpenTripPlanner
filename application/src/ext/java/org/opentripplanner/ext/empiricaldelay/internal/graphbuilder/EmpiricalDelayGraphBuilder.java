@@ -57,6 +57,7 @@ public class EmpiricalDelayGraphBuilder implements GraphBuilderModule {
     if (parameters == null) {
       return;
     }
+
     var mapper = new TripDelaysMapper(
       createStopIdsByTripIdMap(timetableDataImport.getAllTripPatterns()),
       issueStore,
@@ -75,6 +76,7 @@ public class EmpiricalDelayGraphBuilder implements GraphBuilderModule {
         mapper.map(trip).ifPresent(it -> repository.addTripDelays(it));
       }
     }
+
     LOG.info(repository.summary());
   }
 
@@ -83,6 +85,7 @@ public class EmpiricalDelayGraphBuilder implements GraphBuilderModule {
     Collection<TripPattern> tripPatterns
   ) {
     var map = new HashMap<FeedScopedId, List<FeedScopedId>>();
+
     for (var pattern : tripPatterns) {
       pattern
         .scheduledTripsAsStream()
@@ -90,6 +93,7 @@ public class EmpiricalDelayGraphBuilder implements GraphBuilderModule {
           map.put(it.getId(), pattern.getStops().stream().map(StopLocation::getId).toList())
         );
     }
+
     return map;
   }
 }

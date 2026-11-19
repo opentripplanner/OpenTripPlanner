@@ -40,6 +40,7 @@ public class LogModel implements Serializable {
   public void setActiveLoggers(Collection<String> loggers) {
     this.activeLoggers.clear();
     this.activeLoggers.addAll(loggers);
+
     for (var logger : activeLoggers) {
       DebugLoggingSupport.configureDebugLogging(logger, true);
     }
@@ -67,6 +68,7 @@ public class LogModel implements Serializable {
 
   private void initFromConfig() {
     var debugLoggers = DebugLoggers.listLoggers();
+
     for (var logger : DebugLoggingSupport.listConfiguredDebugLoggers()) {
       if (debugLoggers.contains(logger)) {
         activeLoggers.add(logger);

@@ -34,7 +34,7 @@ public class HierarchicalMapById<V extends EntityStructure>
    * Use the {@link #add(EntityStructure)} method!
    *
    * @throws IllegalArgumentException This method throws an exception to prevent adding elements
-   *                                  with a key different than the element id.
+   *     with a key different than the element id.
    */
   @Override
   public void add(String key, V value) {
@@ -45,7 +45,7 @@ public class HierarchicalMapById<V extends EntityStructure>
    * Use the {@link #addAll(Collection)} method!
    *
    * @throws IllegalArgumentException This method throws an exception to prevent adding elements
-   *                                  with a key different than the element id.
+   *     with a key different than the element id.
    */
   @Override
   public void addAll(Map<String, V> other) {

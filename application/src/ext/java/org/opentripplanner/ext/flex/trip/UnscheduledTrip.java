@@ -48,6 +48,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
   public UnscheduledTrip(UnscheduledTripBuilder builder) {
     super(builder);
     List<StopTime> stopTimes = builder.stopTimes();
+
     if (!isUnscheduledTrip(stopTimes)) {
       throw new IllegalArgumentException("Incompatible stopTimes for unscheduled trip");
     }
@@ -62,6 +63,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
       this.dropOffBookingInfos[i] = stopTimes.get(i).getDropOffBookingInfo();
       this.pickupBookingInfos[i] = stopTimes.get(i).getPickupBookingInfo();
     }
+
     this.timePenalty = Objects.requireNonNull(builder.timePenalty());
 
     var latestArrivalTime = Arrays.stream(this.stopTimes)
@@ -72,6 +74,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
 
     DurationUtils.requireNonNegative(timePenalty.constant());
     DoubleUtils.requireNonNegative(timePenalty.coefficient());
+
     if (timePenalty.isZero()) {
       throw new IllegalArgumentException(
         "Time penalty coefficient and constant cannot both be zero."
@@ -121,10 +124,13 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
     if (optionalDepartureTimeWindow.isEmpty()) {
       return MISSING_VALUE;
     }
+
     var win = optionalDepartureTimeWindow.get();
+
     if (win.endInclusive() < requestedDepartureTime) {
       return MISSING_VALUE;
     }
+
     return Math.max(requestedDepartureTime, win.startInclusive());
   }
 
@@ -149,10 +155,13 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
     if (optionalArrivalTimeWindow.isEmpty()) {
       return MISSING_VALUE;
     }
+
     var win = optionalArrivalTimeWindow.get();
+
     if (win.startInclusive() > requestedArrivalTime) {
       return MISSING_VALUE;
     }
+
     return Math.min(requestedArrivalTime, win.endInclusive());
   }
 
@@ -232,7 +241,9 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
       if (getBoardRule(i).isNotRoutable()) {
         continue;
       }
+
       StopLocation stop = stopTimes[i].stop();
+
       if (stop instanceof GroupStop groupStop) {
         if (
           groupStop
@@ -248,6 +259,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
         }
       }
     }
+
     return FlexTrip.STOP_INDEX_NOT_FOUND;
   }
 
@@ -257,7 +269,9 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
       if (getAlightRule(i).isNotRoutable()) {
         continue;
       }
+
       StopLocation stop = stopTimes[i].stop();
+
       if (stop instanceof GroupStop groupStop) {
         if (
           groupStop
@@ -273,6 +287,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
         }
       }
     }
+
     return FlexTrip.STOP_INDEX_NOT_FOUND;
   }
 

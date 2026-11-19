@@ -29,6 +29,7 @@ public final class RaptorTripScheduleReference {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     var that = (RaptorTripScheduleReference) o;
     return routeIndex == that.routeIndex && tripScheduleIndex == that.tripScheduleIndex;
   }

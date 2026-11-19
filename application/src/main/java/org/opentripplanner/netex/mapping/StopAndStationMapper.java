@@ -44,8 +44,8 @@ import org.opentripplanner.transit.service.SiteRepositoryBuilder;
  * present in the OTP model we have to choose which version should be mapped based on both of these
  * parameters.
  * <p>
- * To ensure compatibility with older data sets, we also have to keep quays that are only present
- * in older versions of the StopPlace.
+ * To ensure compatibility with older data sets, we also have to keep quays that are only present in
+ * older versions of the StopPlace.
  */
 class StopAndStationMapper {
 
@@ -100,10 +100,12 @@ class StopAndStationMapper {
     StopPlace selectedStopPlace = first(stopPlaceAllVersions);
 
     Station station = mapStopPlaceAllVersionsToStation(selectedStopPlace);
+
     if (station == null) {
       // The StationMapper has reported the issue, skip the StopPlace and its quays
       return;
     }
+
     Collection<FareZone> fareZones = mapTariffZones(selectedStopPlace);
     var transitMode = stopPlaceTypeMapper.map(selectedStopPlace);
 
@@ -123,12 +125,15 @@ class StopAndStationMapper {
   @Nullable
   private Station mapStopPlaceAllVersionsToStation(StopPlace stopPlace) {
     Station station = stationMapper.map(stopPlace);
+
     if (station == null) {
       return null;
     }
+
     if (stopPlace.getParentSiteRef() != null) {
       resultStationByMultiModalStationRfs.put(stopPlace.getParentSiteRef().getRef(), station);
     }
+
     resultStations.add(station);
     return station;
   }
@@ -151,6 +156,7 @@ class StopAndStationMapper {
     if (ref == null) {
       return null;
     }
+
     var result = tariffZoneMapper.findAndMapTariffZone(ref);
 
     if (result == null) {
@@ -163,6 +169,7 @@ class StopAndStationMapper {
         )
       );
     }
+
     return result;
   }
 
@@ -190,6 +197,7 @@ class StopAndStationMapper {
     if (!quayIndex.isNewerOrSameVersionComparedWithExistingValues(quay)) {
       return;
     }
+
     if (quaysAlreadyProcessed.contains(quay.getId())) {
       return;
     }
@@ -197,6 +205,7 @@ class StopAndStationMapper {
     var wheelchair = wheelchairAccessibilityFromQuay(quay, stopPlace);
 
     RegularStop stop = quayMapper.mapQuayToStop(quay, station, fareZones, transitMode, wheelchair);
+
     if (stop == null) {
       return;
     }
@@ -208,8 +217,7 @@ class StopAndStationMapper {
   /**
    * Return the list of quays for the given {@code stopPlace} or an empty list if no quays exist.
    * <p>
-   * We do not support quay references, all quays must be included as part of the given
-   * stopPlace.
+   * We do not support quay references, all quays must be included as part of the given stopPlace.
    */
   private List<Quay> listOfQuays(StopPlace stopPlace) {
     Quays_RelStructure quays = stopPlace.getQuays();
@@ -235,13 +243,14 @@ class StopAndStationMapper {
         );
       }
     }
+
     return result;
   }
 
   /**
    * Get WheelChairBoarding from Quay and parent Station.
    *
-   * @param quay      NeTEx quay could contain information about accessibility
+   * @param quay NeTEx quay could contain information about accessibility
    * @param stopPlace Parent StopPlace for given Quay
    * @return not null value with default NO_INFORMATION if nothing defined in quay or parentStation.
    */

@@ -154,9 +154,11 @@ class CompactShapeTest {
     p1.setSequence(sequence);
     p1.setLat(lat);
     p1.setLon(lon);
+
     if (distTraveled != null) {
       p1.setDistTraveled(distTraveled);
     }
+
     return p1;
   }
 }

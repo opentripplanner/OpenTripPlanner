@@ -19,8 +19,7 @@ import java.time.Duration;
  *     LAT = EDT + DW + minTransitTime
  *     EDT = LAT - (DW + minTransitTime)
  * </pre>
- * The {@code round_N(...)} method is will round the input to the closest multiplication of
- * N.
+ * The {@code round_N(...)} method is will round the input to the closest multiplication of N.
  * <p>
  * The 3 coefficients above are:
  * <ol>

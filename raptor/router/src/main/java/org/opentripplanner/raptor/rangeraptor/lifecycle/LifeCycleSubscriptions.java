@@ -59,6 +59,7 @@ public final class LifeCycleSubscriptions implements WorkerLifeCycle {
 
   private <T> void subscribe(List<T> subscriptions, T subscriber) {
     assertIsOpen();
+
     if (subscriber != null) {
       subscriptions.add(subscriber);
     }

@@ -29,6 +29,7 @@ public final class TimePenalty extends AbstractLinearFunction<Duration> {
     if (StringUtils.hasNoValue(text)) {
       return ZERO;
     }
+
     return LinearFunctionSerialization.parse(text, TimePenalty::new).orElse(ZERO);
   }
 

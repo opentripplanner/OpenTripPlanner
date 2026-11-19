@@ -25,10 +25,10 @@ import org.slf4j.LoggerFactory;
  * Manages persistent caches for expensive graph-build computations, backed by a
  * {@link CompositeDataSource} so it works with both local filesystems and cloud storage (e.g. GCP).
  * <p>
- * Each {@link CacheTask} has its own entry named
- * {@code <task>-cache-<serializationVersionId>.obj} inside the composite data source. The per-task
- * version ID is embedded in the entry name so that stale entries from a previous format version are
- * ignored automatically without needing to read their contents.
+ * Each {@link CacheTask} has its own entry named {@code <task>-cache-<serializationVersionId>.obj}
+ * inside the composite data source. The per-task version ID is embedded in the entry name so that
+ * stale entries from a previous format version are ignored automatically without needing to read
+ * their contents.
  * <p>
  * Only the cache for the task currently being executed is held in memory, reducing peak memory
  * usage during large graph builds.
@@ -94,7 +94,9 @@ public class GraphBuildCacheManager implements Closeable {
     if (!isEnabled(task)) {
       return null;
     }
+
     DataSource entry = cacheFiles.get(task);
+
     if (entry == null || !entry.exists()) {
       LOG.info(
         "No {} cache file found in {}.",
@@ -103,9 +105,12 @@ public class GraphBuildCacheManager implements Closeable {
       );
       return null;
     }
+
     LOG.info("Loading {} cache from '{}'.", task, entry.path());
+
     try (Input input = new Input(entry.asInputStream())) {
       var wrapper = (CacheSerializationObject<T>) kryo.readClassAndObject(input);
+
       if (wrapper.serializationVersionId != task.serializationVersionId) {
         LOG.warn(
           "Ignoring {} cache at '{}': version mismatch (file={}, code={}).",
@@ -116,6 +121,7 @@ public class GraphBuildCacheManager implements Closeable {
         );
         return null;
       }
+
       return wrapper.data;
     } catch (Exception e) {
       LOG.warn(
@@ -129,7 +135,6 @@ public class GraphBuildCacheManager implements Closeable {
   }
 
   /**
-   * <p>
    * Return {@code null} if the cache is disabled by configuration.
    */
   @Nullable
@@ -142,8 +147,8 @@ public class GraphBuildCacheManager implements Closeable {
   /**
    * Schedule an asynchronous write of {@code data} to the cache file for {@code task}.
    * <p>
-   * The write is performed on a dedicated background thread so the calling (graph-build) thread
-   * can continue immediately. A fresh {@link Kryo} instance is created for each write to avoid
+   * The write is performed on a dedicated background thread so the calling (graph-build) thread can
+   * continue immediately. A fresh {@link Kryo} instance is created for each write to avoid
    * thread-safety issues with the instance used by {@link #load}.
    * <p>
    * Call {@link #close()} at the end of the build to wait for the write to finish.
@@ -178,6 +183,7 @@ public class GraphBuildCacheManager implements Closeable {
   @Override
   public void close() {
     writeExecutor.shutdown();
+
     try {
       if (!writeExecutor.awaitTermination(WRITE_TIMEOUT.toSeconds(), TimeUnit.SECONDS)) {
         LOG.warn(
@@ -195,9 +201,11 @@ public class GraphBuildCacheManager implements Closeable {
 
   private Map<CacheTask, DataSource> mapFilesToTask(Iterable<DataSource> cacheFiles) {
     var result = new HashMap<CacheTask, DataSource>();
+
     for (DataSource dataSource : cacheFiles) {
       result.put(CacheTask.matchName(dataSource.name()), dataSource);
     }
+
     return result;
   }
 }

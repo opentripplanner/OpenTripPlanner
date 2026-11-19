@@ -9,8 +9,8 @@ import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfi
 class CarPreferencesTest {
 
   /**
-   * The preferences are used as a cache key, so preferences built separately from equal values
-   * must be equal - one is created for each request.
+   * The preferences are used as a cache key, so preferences built separately from equal values must
+   * be equal - one is created for each request.
    */
   @Test
   void preferencesWithEqualValuesAreEqual() {

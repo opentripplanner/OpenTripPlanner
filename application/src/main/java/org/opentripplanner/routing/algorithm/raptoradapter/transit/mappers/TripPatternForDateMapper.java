@@ -42,7 +42,7 @@ public class TripPatternForDateMapper {
   /**
    * This method is THREAD SAFE.
    *
-   * @param timetable   The timetable to be mapped to TripPatternForDate - READ ONLY
+   * @param timetable The timetable to be mapped to TripPatternForDate - READ ONLY
    * @param serviceDate The date to map the TripPatternForDate for - READ ONLY
    * @return TripPatternForDate for this timetable and serviceDate
    */
@@ -91,6 +91,7 @@ public class TripPatternForDateMapper {
           serviceDate
         );
       }
+
       return null;
     }
 
@@ -113,9 +114,11 @@ public class TripPatternForDateMapper {
   public TripPatternForDate mapAndValidate(Timetable timetable, LocalDate serviceDate)
     throws IllegalArgumentException {
     var result = map(timetable, serviceDate);
+
     if (result != null) {
       result.assertValidRunningPeriod();
     }
+
     return result;
   }
 }

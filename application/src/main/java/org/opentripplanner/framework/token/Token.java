@@ -56,16 +56,17 @@ public class Token {
    * in the deployed server, then a new version of OTP can be rolled out which now can use the new
    * value.
    * <p>
-   * To ensure backwards compatibility, enum values should be **deprecated**, not removed. The
-   * enum value can only be deleted, when all tokens with the value has expired (depends on
-   * use-case).
+   * To ensure backwards compatibility, enum values should be **deprecated**, not removed. The enum
+   * value can only be deleted, when all tokens with the value has expired (depends on use-case).
    */
   public <T extends Enum<T>> Optional<T> getEnum(String fieldName, Class<T> enumClass) {
     try {
       String value = (String) get(fieldName, TokenType.ENUM);
+
       if (value == null) {
         return Optional.empty();
       }
+
       return Optional.of(Enum.valueOf(enumClass, value));
     } catch (IllegalArgumentException ignore) {
       return Optional.empty();

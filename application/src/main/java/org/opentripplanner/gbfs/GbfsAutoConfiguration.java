@@ -45,6 +45,7 @@ public class GbfsAutoConfiguration {
     OtpHttpClient otpHttpClient
   ) {
     URI uri = toUri(url);
+
     try {
       return new GbfsAutoConfiguration(
         url,
@@ -52,12 +53,14 @@ public class GbfsAutoConfiguration {
       );
     } catch (OtpHttpClientException e) {
       LOG.warn("Error fetching GBFS feed from {}. Details: {}.", url, e.getMessage(), e);
+
       if (!url.endsWith("gbfs.json")) {
         LOG.warn(
           "GBFS autoconfiguration url {} does not end with gbfs.json. Make sure it follows the specification, if you get any errors using it.",
           url
         );
       }
+
       throw new GbfsConstructionException(
         "Could not fetch the feed auto-configuration file from " + url
       );
@@ -81,10 +84,13 @@ public class GbfsAutoConfiguration {
    */
   public Set<String> feedNames() {
     var data = json.get("data");
+
     if (data == null) {
       return Set.of();
     }
+
     var names = new HashSet<String>();
+
     if (data.has("feeds")) {
       addFeedNames(data.get("feeds"), names);
     } else {
@@ -92,6 +98,7 @@ public class GbfsAutoConfiguration {
         addFeedNames(language.get("feeds"), names);
       }
     }
+
     return Set.copyOf(names);
   }
 
@@ -122,8 +129,10 @@ public class GbfsAutoConfiguration {
     if (feeds == null || !feeds.isArray()) {
       return;
     }
+
     for (var feed : feeds) {
       var name = feed.get("name");
+
       if (name != null && name.isTextual()) {
         names.add(name.asText());
       }

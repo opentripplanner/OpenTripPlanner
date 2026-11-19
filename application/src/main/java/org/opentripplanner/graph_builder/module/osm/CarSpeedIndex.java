@@ -88,6 +88,7 @@ class CarSpeedIndex {
     if (speed == NO_VALUE) {
       throw new IllegalArgumentException("No speed for way %s".formatted(wayId));
     }
+
     return speed;
   }
 }

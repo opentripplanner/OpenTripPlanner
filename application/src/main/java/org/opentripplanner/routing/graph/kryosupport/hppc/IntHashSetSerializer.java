@@ -19,6 +19,7 @@ class IntHashSetSerializer extends Serializer<IntHashSet> {
     int[] values = set.toArray();
     Arrays.sort(values);
     output.writeVarInt(values.length, true);
+
     for (int value : values) {
       output.writeVarInt(value, false);
     }
@@ -28,9 +29,11 @@ class IntHashSetSerializer extends Serializer<IntHashSet> {
   public IntHashSet read(Kryo kryo, Input input, Class<? extends IntHashSet> type) {
     int size = input.readVarInt(true);
     var set = new IntHashSet(size);
+
     for (int i = 0; i < size; i++) {
       set.add(input.readVarInt(false));
     }
+
     return set;
   }
 }

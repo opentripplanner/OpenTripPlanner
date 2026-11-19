@@ -156,6 +156,7 @@ public class InjectCustomDocumentation
     if (!(context.getParentNode() instanceof GraphQLNamedSchemaElement parent)) {
       throw new IllegalArgumentException("The field does not have a named parent: " + field);
     }
+
     var fieldName = field.getName();
     var typeName = parent.getName();
 

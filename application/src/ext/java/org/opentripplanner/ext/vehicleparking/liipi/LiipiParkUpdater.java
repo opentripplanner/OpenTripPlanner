@@ -86,10 +86,13 @@ public class LiipiParkUpdater implements DataSource<VehicleParking> {
   public boolean update() {
     List<VehicleParking> parks = null;
     Map<FeedScopedId, VehicleParkingGroup> hubForPark;
+
     if (fetchFacilitiesAndHubsNow()) {
       hubForPark = hubsDownloader.downloadHubs();
+
       if (hubForPark != null) {
         parks = facilitiesDownloader.downloadFacilities(hubForPark);
+
         if (parks != null) {
           lastFacilitiesFetchTime = System.currentTimeMillis();
         }
@@ -98,14 +101,17 @@ public class LiipiParkUpdater implements DataSource<VehicleParking> {
       parks = this.parks;
       hubForPark = this.hubForPark;
     }
+
     if (parks != null) {
       List<LiipiParkPatch> utilizations = utilizationsDownloader.download();
+
       if (utilizations != null) {
         Map<FeedScopedId, List<LiipiParkPatch>> patches = utilizations
           .stream()
           .collect(Collectors.groupingBy(utilization -> utilization.getId()));
         parks.forEach(park -> {
           List<LiipiParkPatch> patchesForPark = patches.get(park.getId());
+
           if (patchesForPark != null) {
             park.updateAvailability(createVehicleAvailability(patchesForPark));
           }
@@ -113,13 +119,16 @@ public class LiipiParkUpdater implements DataSource<VehicleParking> {
       } else if (this.parks != null) {
         return false;
       }
+
       synchronized (this) {
         // Update atomically
         this.parks = parks;
         this.hubForPark = hubForPark;
       }
+
       return true;
     }
+
     return false;
   }
 
@@ -160,16 +169,18 @@ public class LiipiParkUpdater implements DataSource<VehicleParking> {
 
   /**
    * @return true if facilities and hubs have not been successfully downloaded before, or
-   *         facilitiesFrequencySec > 0 and over facilitiesFrequencySec has passed since last
-   *         successful fetch
+   *     facilitiesFrequencySec > 0 and over facilitiesFrequencySec has passed since last successful
+   *     fetch
    */
   private boolean fetchFacilitiesAndHubsNow() {
     if (parks == null) {
       return true;
     }
+
     if (facilitiesFrequencySec <= 0) {
       return false;
     }
+
     return System.currentTimeMillis() > lastFacilitiesFetchTime + facilitiesFrequencySec * 1000;
   }
 }

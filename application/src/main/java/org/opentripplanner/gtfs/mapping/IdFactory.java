@@ -8,7 +8,7 @@ import org.opentripplanner.utils.lang.StringUtils;
 
 /**
  * Responsible for creating feed-scoped from OBA's {@code AgencyAndId} or strings.
- **/
+ */
 class IdFactory {
 
   private final String feedId;
@@ -21,7 +21,7 @@ class IdFactory {
    * Maps from OBA AgencyAndId to feed-scoped ids. Values must not be null.
    *
    * @param entityName The name of the entity being mapped. Improves the error message being thrown
-   *                   in case of invalid values.
+   *     in case of invalid values.
    */
   FeedScopedId createId(AgencyAndId id, String entityName) {
     Objects.requireNonNull(id, () -> idErrorMessage(entityName));
@@ -32,12 +32,13 @@ class IdFactory {
    * Maps from OBA strings to feed-scoped ids. Parameter must not be null.
    *
    * @param entityName The name of the entity being mapped. Improves the error message being thrown
-   *                   in case of invalid values.
+   *     in case of invalid values.
    */
   FeedScopedId createId(String id, String entityName) {
     if (StringUtils.hasNoValue(id)) {
       throw new IllegalArgumentException(idErrorMessage(entityName));
     }
+
     return new FeedScopedId(feedId, id);
   }
 

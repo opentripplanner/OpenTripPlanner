@@ -231,6 +231,7 @@ public class PagingFilterTest implements PlanTestConstants {
         }
       }
     }
+
     return itineraries;
   }
 
@@ -256,6 +257,7 @@ public class PagingFilterTest implements PlanTestConstants {
     } else {
       builder.drive(departureTime, arrivalTime, B);
     }
+
     var it = builder.build(cost);
     return it;
   }

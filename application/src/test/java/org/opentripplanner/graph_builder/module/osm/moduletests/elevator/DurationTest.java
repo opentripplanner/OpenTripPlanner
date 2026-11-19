@@ -27,6 +27,7 @@ class DurationTest {
 
     var edges = ListUtils.ofIterable(graph.findEdges(ElevatorHopEdge.class));
     assertThat(edges).hasSize(2);
+
     for (var edge : edges) {
       assertThat(edge.getTravelTime()).hasValue(Duration.ofSeconds(62));
     }
@@ -51,6 +52,7 @@ class DurationTest {
 
     var edges = ListUtils.ofIterable(graph.findEdges(ElevatorHopEdge.class));
     assertThat(edges).hasSize(2);
+
     for (var edge : edges) {
       assertThat(edge.getTravelTime()).hasValue(Duration.ofSeconds(62));
     }

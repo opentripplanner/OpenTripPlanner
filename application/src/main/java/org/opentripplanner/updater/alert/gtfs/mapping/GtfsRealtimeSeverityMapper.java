@@ -16,6 +16,7 @@ public class GtfsRealtimeSeverityMapper {
     if (severity == null) {
       return AlertSeverity.UNKNOWN_SEVERITY;
     }
+
     switch (severity) {
       case INFO:
         return AlertSeverity.INFO;

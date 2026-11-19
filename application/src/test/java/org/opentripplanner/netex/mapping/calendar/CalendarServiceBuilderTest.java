@@ -104,6 +104,7 @@ public class CalendarServiceBuilderTest {
         return;
       }
     }
+
     fail(
       "Unable fo find service date. " +
         "ServiceId=" +

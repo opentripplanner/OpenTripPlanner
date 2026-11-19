@@ -37,10 +37,12 @@ public class TripDelays implements Serializable {
   /** Retrieve delay for a specific service and stop position. */
   public Optional<EmpiricalDelay> get(String serviceId, int stopPosInPattern) {
     IntObjectMap<EmpiricalDelay> delayPerStop = delaysByServiceId.get(serviceId);
+
     // Check if empirical data for the serviceId (serviceDay) exist
     if (delayPerStop == null) {
       return Optional.empty();
     }
+
     return Optional.ofNullable(delayPerStop.get(stopPosInPattern));
   }
 
@@ -70,9 +72,11 @@ public class TripDelays implements Serializable {
     /** Utility method for inserting delays for ALL stops in a pattern */
     public Builder with(String serviceId, List<EmpiricalDelay> delaysForEachStop) {
       var map = new IntObjectHashMap<EmpiricalDelay>();
+
       for (int i = 0; i < delaysForEachStop.size(); i++) {
         map.put(i, delaysForEachStop.get(i));
       }
+
       with(serviceId, map);
       return this;
     }

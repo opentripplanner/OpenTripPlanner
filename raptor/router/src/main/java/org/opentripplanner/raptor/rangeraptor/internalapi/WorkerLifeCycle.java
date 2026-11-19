@@ -42,7 +42,7 @@ public interface WorkerLifeCycle {
    * the listener(the input parameter) is notified/invoked with the current round as a argument.
    *
    * @param prepareForNextRound if {@code null} nothing is added to the publisher. The round
-   *                            number(0..n) is passed to the subscriber.
+   *     number(0..n) is passed to the subscriber.
    */
   void onPrepareForNextRound(IntConsumer prepareForNextRound);
 

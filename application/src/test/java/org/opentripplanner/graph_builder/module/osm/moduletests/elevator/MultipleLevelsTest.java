@@ -49,6 +49,7 @@ class MultipleLevelsTest {
 
     var edges = ListUtils.ofIterable(graph.findEdges(ElevatorHopEdge.class));
     assertThat(edges).hasSize(2);
+
     for (var edge : edges) {
       assertEquals(edge.getLevels(), 0.0);
     }
@@ -178,6 +179,7 @@ class MultipleLevelsTest {
     ListUtils.ofIterable(graph.findEdges(ElevatorHopEdge.class))
       .stream()
       .forEach(edge -> elevatorHopEdgeLevels.put(edge, edge.getLevels()));
+
     for (var edge : ListUtils.ofIterable(graph.findEdges(ElevatorHopEdge.class))) {
       assertEquals(edge.getLevels(), elevatorHopEdgeLevels.get(edge));
     }

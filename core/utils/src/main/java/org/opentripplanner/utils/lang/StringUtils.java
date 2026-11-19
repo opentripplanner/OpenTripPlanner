@@ -10,8 +10,8 @@ public class StringUtils {
   /**
    * Regex to find unprintable characters like newlines and 'ZERO WIDTH SPACE' (U+200B).
    * <p>
-   * \p{C} was chosen over \p{Cntrl} because it also recognises invisible control characters in
-   * the middle of a word.
+   * \p{C} was chosen over \p{Cntrl} because it also recognises invisible control characters in the
+   * middle of a word.
    */
   private static final String INVISIBLE_CHARS_REGEX = "\\p{C}";
   /**
@@ -64,6 +64,7 @@ public class StringUtils {
           (value == null ? "null]" : "'" + value + "']")
       );
     }
+
     return value;
   }
 
@@ -71,8 +72,8 @@ public class StringUtils {
    * Add the given number of characters to the buffer.
    *
    * @param buffer the buffer to append to.
-   * @param ch     the character to add to the buffer.
-   * @param count  the number of characters to add. If 0 or negative nothing is added.
+   * @param ch the character to add to the buffer.
+   * @param count the number of characters to add. If 0 or negative nothing is added.
    * @return the given buffer input for convenient chaining
    */
   public static StringBuilder append(StringBuilder buffer, char ch, int count) {
@@ -80,6 +81,7 @@ public class StringUtils {
       buffer.append(ch);
       --count;
     }
+
     return buffer;
   }
 
@@ -87,9 +89,11 @@ public class StringUtils {
     if (value == null) {
       return String.valueOf(ch).repeat(width);
     }
+
     if (value.length() >= width) {
       return value;
     }
+
     return StringUtils.append(new StringBuilder(), ch, width - value.length())
       .append(value)
       .toString();
@@ -99,9 +103,11 @@ public class StringUtils {
     if (value == null) {
       return String.valueOf(ch).repeat(width);
     }
+
     if (value.length() >= width) {
       return value;
     }
+
     var buf = new StringBuilder();
     StringUtils.append(buf, ch, (width + 1 - value.length()) / 2);
     buf.append(value);
@@ -113,9 +119,11 @@ public class StringUtils {
     if (value == null) {
       return String.valueOf(ch).repeat(width);
     }
+
     if (value.length() >= width) {
       return value;
     }
+
     return StringUtils.append(new StringBuilder(value), ch, width - value.length()).toString();
   }
 

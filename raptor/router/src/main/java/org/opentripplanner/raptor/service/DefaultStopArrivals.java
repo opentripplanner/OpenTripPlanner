@@ -43,6 +43,7 @@ public class DefaultStopArrivals implements StopArrivals {
     if (bestOverallArrivalTime == null) {
       this.bestOverallArrivalTime = results.extractBestOverallArrivals();
     }
+
     return bestOverallArrivalTime;
   }
 
@@ -50,6 +51,7 @@ public class DefaultStopArrivals implements StopArrivals {
     if (bestTransitArrivalTime == null) {
       this.bestTransitArrivalTime = results.extractBestTransitArrivals();
     }
+
     return bestTransitArrivalTime;
   }
 
@@ -57,6 +59,7 @@ public class DefaultStopArrivals implements StopArrivals {
     if (bestNumberOfTransfers == null) {
       this.bestNumberOfTransfers = results.extractBestNumberOfTransfers();
     }
+
     return bestNumberOfTransfers;
   }
 }

@@ -35,14 +35,17 @@ class FareTransferRuleMapper {
       .withFromLegGroup(idFactory.createNullableId(rhs.getFromLegGroupId()))
       .withToLegGroup(idFactory.createNullableId(rhs.getToLegGroupId()))
       .withFareProducts(products);
+
     if (rhs.isTransferCountSet()) {
       builder.withTransferCount(rhs.getTransferCount());
     }
+
     if (rhs.isDurationLimitSet()) {
       var duration = Duration.ofSeconds(rhs.getDurationLimit());
       var type = mapLimitType(rhs.getDurationLimitType());
       builder.withTimeLimit(type, duration);
     }
+
     return builder.build();
   }
 
@@ -54,12 +57,15 @@ class FareTransferRuleMapper {
     if (fareProductId == null) {
       return List.of();
     }
+
     var products = fareProductMapper.findFareProducts(fareProductId);
+
     if (products.isEmpty()) {
       throw new IllegalArgumentException(
         "Cannot find fare product '%s' for transfer rule '%s'".formatted(fareProductId, ruleId)
       );
     }
+
     return products;
   }
 

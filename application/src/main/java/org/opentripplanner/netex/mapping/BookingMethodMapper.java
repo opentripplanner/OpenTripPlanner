@@ -14,7 +14,7 @@ public class BookingMethodMapper {
 
   /**
    * @param sourceRef The entity with the booking-method, used to include a reference to the entity
-   *                  in the log, in case of a problem with the mapping.
+   *     in the log, in case of a problem with the mapping.
    */
   public static BookingMethod map(
     String sourceRef,

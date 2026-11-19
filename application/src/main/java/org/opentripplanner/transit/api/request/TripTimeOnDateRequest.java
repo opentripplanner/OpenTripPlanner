@@ -79,6 +79,7 @@ public class TripTimeOnDateRequest {
 
     boolean usesTimeWindow = time != null;
     boolean usesServiceDateRanges = !this.serviceDateRanges.isEmpty();
+
     if (usesTimeWindow == usesServiceDateRanges) {
       throw new IllegalArgumentException(
         "Either 'time' or 'serviceDateRanges' must be set as the time limitation, but not both."

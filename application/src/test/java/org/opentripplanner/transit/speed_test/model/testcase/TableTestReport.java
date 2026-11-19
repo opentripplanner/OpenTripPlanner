@@ -28,6 +28,7 @@ public class TableTestReport {
     for (DiffEntry<Result> it : results) {
       addTo(table, it);
     }
+
     return table.toString();
   }
 

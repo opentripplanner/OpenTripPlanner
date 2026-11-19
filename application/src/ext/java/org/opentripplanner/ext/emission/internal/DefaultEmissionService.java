@@ -42,6 +42,7 @@ public class DefaultEmissionService implements EmissionService {
     double distance_m
   ) {
     var routeEmission = calculateTransitPassengerEmissionForRoute(trip.getRoute(), distance_m);
+
     if (routeEmission.isPresent()) {
       return routeEmission;
     }
@@ -49,9 +50,11 @@ public class DefaultEmissionService implements EmissionService {
     // Calculate emissions based the emissions for each section of a trip, if not found
     // zero is returned.
     var emission = emissionRepository.tripPatternEmissions(trip.getId());
+
     if (emission != null) {
       return Optional.of(emission.section(boardStopPosInPattern, alightStopPosInPattern));
     }
+
     return Optional.empty();
   }
 }

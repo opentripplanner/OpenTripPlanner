@@ -18,10 +18,10 @@ public class TripPatternTest {
 
   /**
    * The originalTripPattern is to consider a planned trip with 2 stops and one coordinate between.
-   *
+   * <p>
    * The tripPattern is an updated trip with just two stops, belonging to the same stations as for
    * originalTripPattern but first stop is an alternative stop.
-   *
+   * <p>
    * The scope is to create hop geometries from original trip pattern since the stops belong to the
    * same stations. The end result should be that the new tripPattern contains the altered stop but
    * all the rest of the coordinates are as from originalTripPattern
@@ -84,7 +84,7 @@ public class TripPatternTest {
   /**
    * Create TripPattern between to stops
    *
-   * @param origin      Start stop
+   * @param origin Start stop
    * @param destination End stop
    * @return TripPattern with stopPattern
    */
@@ -97,6 +97,7 @@ public class TripPatternTest {
     var builder = StopPattern.create(2);
     builder.stops.with(0, origin);
     builder.stops.with(1, destination);
+
     for (int i = 0; i < 2; i++) {
       builder.pickups.with(i, PickDrop.SCHEDULED);
       builder.dropoffs.with(i, PickDrop.SCHEDULED);
@@ -116,9 +117,9 @@ public class TripPatternTest {
   /**
    * Create LineString of coordinates and stops.
    *
-   * @param origin      First stop will become the first coordinate
+   * @param origin First stop will become the first coordinate
    * @param destination Last stop will become the last coordinate
-   * @param coordinate  Coordinate to inject between stops
+   * @param coordinate Coordinate to inject between stops
    * @return LineString with all coordinates
    */
   private List<LineString> getLineStrings(

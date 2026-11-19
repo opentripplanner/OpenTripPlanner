@@ -22,27 +22,32 @@ public class OTPExceptionMapper implements ExceptionMapper<Exception> {
   public Response toResponse(Exception ex) {
     if (ex instanceof WebApplicationException) {
       String header = "";
+
       if (ex instanceof BadRequestException) {
         header = "FOUR HUNDRED\n\n";
       } else if (ex instanceof NotFoundException) {
         header = "FOUR ZERO FOUR\n\n";
       }
+
       return Response.fromResponse(((WebApplicationException) ex).getResponse())
         .entity(header + ex.getMessage())
         .build();
     }
+
     if (ex instanceof OtpAppException) {
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
         .entity("OTP Application error: " + ex.getMessage())
         .type("text/plain")
         .build();
     }
+
     if (ex instanceof OTPRequestTimeoutException) {
       return Response.status(OtpHttpStatus.STATUS_UNPROCESSABLE_ENTITY)
         .entity("OTP API Processing Timeout")
         .type("text/plain")
         .build();
     }
+
     if (ex instanceof StreamReadException || ex instanceof MismatchedInputException) {
       return Response.status(Response.Status.BAD_REQUEST)
         .entity(ex.getMessage())

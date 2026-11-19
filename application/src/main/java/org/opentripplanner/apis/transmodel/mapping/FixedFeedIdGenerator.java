@@ -32,6 +32,7 @@ public class FixedFeedIdGenerator {
           "most agencies will be picked."
       );
     }
+
     LOG.info(
       "Starting Transmodel GraphQL Schema with fixed FeedId: '" +
         fixedFeedId +

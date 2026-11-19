@@ -191,6 +191,7 @@ public class DatedServiceJourneyType {
             } else if (last != null && last < stops.size()) {
               return stops.subList(stops.size() - last, stops.size());
             }
+
             return stops;
           })
           .build()
@@ -228,6 +229,7 @@ public class DatedServiceJourneyType {
                     "Trip has been deleted. this should not be exposed to the API and is probably a bug"
                   );
                 }
+
                 return TransmodelRealTimeTripStateModel.of(tripTimes.realtimeTripState());
               })
               .orElse(null);

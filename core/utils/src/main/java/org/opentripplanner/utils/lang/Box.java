@@ -52,9 +52,11 @@ public class Box<T> {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     Box<?> box = (Box<?>) o;
     return Objects.equals(value, box.value);
   }

@@ -166,6 +166,7 @@ public class ScheduledTransitLeg implements TransitLeg {
     if (transferFromPrevLeg == null) {
       return false;
     }
+
     return transferFromPrevLeg.getTransferConstraint().isStaySeated();
   }
 
@@ -298,6 +299,7 @@ public class ScheduledTransitLeg implements TransitLeg {
       final StopArrival visit = mapper.map(i, stop, isRealTimeUpdated());
       visits.add(visit);
     }
+
     return visits;
   }
 
@@ -326,6 +328,7 @@ public class ScheduledTransitLeg implements TransitLeg {
     if (transferFromPrevLeg != null && transferFromPrevLeg.getTransferConstraint().isStaySeated()) {
       return null;
     }
+
     return tripPattern.getBoardType(boardStopPosInPattern);
   }
 
@@ -335,6 +338,7 @@ public class ScheduledTransitLeg implements TransitLeg {
     if (transferToNextLeg != null && transferToNextLeg.getTransferConstraint().isStaySeated()) {
       return null;
     }
+
     return tripPattern.getAlightType(alightStopPosInPattern);
   }
 
@@ -427,8 +431,8 @@ public class ScheduledTransitLeg implements TransitLeg {
   /**
    * Should be used for debug logging only
    * <p>
-   * The {@code legGeometry} and {@code transitAlerts} are skipped to avoid spamming logs.
-   * Explicit access should be used if needed.
+   * The {@code legGeometry} and {@code transitAlerts} are skipped to avoid spamming logs. Explicit
+   * access should be used if needed.
    */
   @Override
   public String toString() {

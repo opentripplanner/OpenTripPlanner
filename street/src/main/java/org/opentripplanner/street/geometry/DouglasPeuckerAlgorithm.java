@@ -10,7 +10,6 @@ import org.locationtech.jts.geom.LineString;
  * Simplifies a {@link LineString} with the Douglas-Peucker algorithm (also known as
  * Ramer-Douglas-Peucker, or RDP), operating on geographic (WGS84 longitude/latitude, in degrees)
  * coordinates.
- *
  * <p>
  * Away from the equator, a degree of longitude covers fewer real-world meters than a degree of
  * latitude, so the distance calculation scales longitude by {@code cos(latitude)} to correct for
@@ -22,11 +21,10 @@ import org.locationtech.jts.geom.LineString;
  * the coordinates themselves. That means every retained point, endpoints included, is the exact
  * original {@link Coordinate} instance: there is no scale/unscale round-trip, and so no rounding
  * error that could move a point off its original location.
- *
  * <p>
- * JTS ships its own Douglas-Peucker simplifier, but it treats coordinates as planar (Cartesian)
- * and does not apply the longitude correction above, so it distorts distances when applied directly
- * to WGS84 coordinates. This implementation exists to support those coordinates correctly.
+ * JTS ships its own Douglas-Peucker simplifier, but it treats coordinates as planar (Cartesian) and
+ * does not apply the longitude correction above, so it distorts distances when applied directly to
+ * WGS84 coordinates. This implementation exists to support those coordinates correctly.
  */
 public class DouglasPeuckerAlgorithm {
 
@@ -54,9 +52,11 @@ public class DouglasPeuckerAlgorithm {
     if (toleranceMeters < 0.0) {
       throw new IllegalArgumentException("toleranceMeters must not be negative");
     }
+
     if (toleranceMeters == 0.0 || lineString.getNumPoints() < 3) {
       return lineString;
     }
+
     var simplified = new DouglasPeuckerAlgorithm(
       lineString.getCoordinates(),
       toleranceMeters
@@ -73,17 +73,21 @@ public class DouglasPeuckerAlgorithm {
     douglasPeucker(0, coordinates.length - 1);
 
     int kept = keep.cardinality();
+
     if (kept == coordinates.length) {
       return coordinates;
     }
+
     Coordinate[] result = new Coordinate[kept];
     int j = 0;
+
     for (int i = 0; i < coordinates.length; i++) {
       if (keep.get(i)) {
         result[j] = coordinates[i];
         ++j;
       }
     }
+
     return result;
   }
 
@@ -91,11 +95,10 @@ public class DouglasPeuckerAlgorithm {
    * Keeps the point in each {@code [start, end]} range furthest from the chord between its
    * endpoints if it exceeds {@code toleranceDegrees}, then splits into two halves and keeps going.
    * The result is stored in the {@link #keep} BitSet.
-   *
    * <p>
-   * This is iterative, with the pending ranges on an explicit heap-allocated {@code stack},
-   * rather than recursive: a naive recursive version can recurse as deep as the input is long (e.g.
-   * a shape whose furthest point from the chord always lands near one end), which risks a
+   * This is iterative, with the pending ranges on an explicit heap-allocated {@code stack}, rather
+   * than recursive: a naive recursive version can recurse as deep as the input is long (e.g. a
+   * shape whose furthest point from the chord always lands near one end), which risks a
    * {@link StackOverflowError} on the JVM call stack for long, detailed shapes.
    */
   private void douglasPeucker(int start, int end) {
@@ -119,11 +122,13 @@ public class DouglasPeuckerAlgorithm {
           coordinates[i],
           lonScale
         );
+
         if (distance > maxDistance) {
           maxDistance = distance;
           maxIndex = i;
         }
       }
+
       if (maxDistance > toleranceDegrees) {
         keep.set(maxIndex);
         stack.push(new Range(r.start(), maxIndex));

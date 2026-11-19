@@ -209,18 +209,23 @@ class TripViaLocationMapperTest {
     WgsCoordinate coordinate
   ) {
     var map = new HashMap<String, Object>();
+
     if (label != null) {
       map.put(FIELD_LABEL, label);
     }
+
     if (minWaitTime != null) {
       map.put(FIELD_MINIMUM_WAIT_TIME, minWaitTime);
     }
+
     if (ids != null) {
       map.put(FIELD_STOP_LOCATION_IDS, ids);
     }
+
     if (coordinate != null) {
       map.put(FIELD_COORDINATE, CoordinateInputType.mapForTest(coordinate));
     }
+
     return map;
   }
 

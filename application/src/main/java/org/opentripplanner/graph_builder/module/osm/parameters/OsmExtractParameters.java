@@ -9,7 +9,6 @@ import org.opentripplanner.osm.tagmapping.OsmTagMapperSource;
 /**
  * Configure an OpenStreetMap extract. Example:
  * {@code "osm" : [ {source: "file:///path/to/otp/norway.pbf"} ] }
- *
  */
 public record OsmExtractParameters(
   URI source,
@@ -40,7 +39,6 @@ public record OsmExtractParameters(
   }
 
   /**
-   *
    * @return the timezone to use to resolve opening hours in this extract or the default.
    */
   @Nullable

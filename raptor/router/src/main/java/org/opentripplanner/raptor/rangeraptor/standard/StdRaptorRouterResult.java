@@ -38,6 +38,7 @@ public class StdRaptorRouterResult<T extends RaptorTripSchedule> implements Rapt
     if (paths == null) {
       paths = pathSupplier.get();
     }
+
     return paths;
   }
 

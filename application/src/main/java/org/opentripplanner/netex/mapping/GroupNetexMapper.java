@@ -53,8 +53,10 @@ class GroupNetexMapper {
       scheduledStopPointsIndex,
       transitBuilder.getTripsById()
     );
+
     for (ServiceJourneyInterchange it : interchanges) {
       ConstrainedTransfer result = mapper.mapToTransfer(it);
+
       if (result != null) {
         transitBuilder.getTransfers().add(result);
       }

@@ -55,9 +55,11 @@ public class JourneyRequestBuilder implements Serializable {
    */
   public JourneyRequestBuilder withTransfer(StreetMode mode) {
     this.transfer = new StreetRequest(mode);
+
     if (mode != StreetMode.WALK) {
       this.wheelchair = false;
     }
+
     return this;
   }
 

@@ -22,7 +22,8 @@ public class DigitransitVehicleRentalPropertyMapper extends PropertyMapper<Vehic
       new KeyValue("id", place.stationId()),
       // to the response somehow.
       new KeyValue("name", i18NStringMapper.mapToApi(place.name())),
-      // this is plural since once upon a time OSM-added rental stations could have multiple stations
+      // this is plural since once upon a time OSM-added rental stations could have multiple
+      // stations
       new KeyValue("networks", place.network())
     );
   }

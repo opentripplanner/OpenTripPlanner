@@ -18,6 +18,7 @@ record VehicleJourneyIdAndServiceDate(
     if (ref == null) {
       return null;
     }
+
     return new VehicleJourneyIdAndServiceDate(
       ref.getDatedVehicleJourneyRef(),
       parseServiceDate(ref.getDataFrameRef())
@@ -33,6 +34,7 @@ record VehicleJourneyIdAndServiceDate(
     if (dataFrameRef == null || dataFrameRef.getValue() == null) {
       return null;
     }
+
     return ServiceDateUtils.parseStringToOptional(dataFrameRef.getValue()).orElse(null);
   }
 }

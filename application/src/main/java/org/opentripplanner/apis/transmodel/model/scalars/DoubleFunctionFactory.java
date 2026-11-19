@@ -69,6 +69,7 @@ public class DoubleFunctionFactory {
             if (input instanceof StringValue stringValue) {
               return parseValue(stringValue.getValue(), graphQLContext, locale);
             }
+
             return null;
           }
         }

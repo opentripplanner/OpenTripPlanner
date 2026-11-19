@@ -11,6 +11,7 @@ class RequiredFilterValues<E> extends FilterValues<E> {
 
   RequiredFilterValues(String name, @Nullable Collection<E> values) {
     super(name, values);
+
     if (values == null || values.isEmpty()) {
       throw new IllegalArgumentException("Filter %s values must not be empty.".formatted(name));
     }

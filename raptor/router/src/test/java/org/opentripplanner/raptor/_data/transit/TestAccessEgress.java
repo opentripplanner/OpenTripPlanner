@@ -54,10 +54,12 @@ public class TestAccessEgress implements RaptorAccessEgress {
     } else {
       assertTrue(durationInSeconds > 0);
     }
+
     if (closed) {
       assertTimeNotSet(openFrom, "'openFrom'");
       assertTimeNotSet(openUntil, "'openUntil'");
     }
+
     assertTrue(numberOfRides >= 0);
   }
 
@@ -141,9 +143,9 @@ public class TestAccessEgress implements RaptorAccessEgress {
   /**
    * Add opening and closing hours and return a new object.
    * <p>
-   * Opening and closing is specified as seconds since the start of "RAPTOR time" to limit the
-   * time periods that the access is traversable, which is repeatead every 24 hours. This allows
-   * access to only be traversable between given times like 08:00 and 16:00 every day.
+   * Opening and closing is specified as seconds since the start of "RAPTOR time" to limit the time
+   * periods that the access is traversable, which is repeatead every 24 hours. This allows access
+   * to only be traversable between given times like 08:00 and 16:00 every day.
    */
   public TestAccessEgress openingHours(int opening, int closing) {
     return copyOf().withOpeningHours(opening, closing).build();
@@ -200,6 +202,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
     if (!hasOpeningHours()) {
       return requestedDepartureTime;
     }
+
     if (closed) {
       return RaptorConstants.TIME_NOT_SET;
     }
@@ -214,6 +217,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
       // return the opening time for the next day
       return specificOpenFrom + SECONDS_IN_A_DAY;
     }
+
     return requestedDepartureTime;
   }
 
@@ -222,6 +226,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
     if (!hasOpeningHours()) {
       return requestedArrivalTime;
     }
+
     if (closed) {
       return RaptorConstants.TIME_NOT_SET;
     }
@@ -239,6 +244,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
     } else if (requestedArrivalTime > closeAtArrival) {
       return closeAtArrival;
     }
+
     return requestedArrivalTime;
   }
 
@@ -267,6 +273,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     TestAccessEgress that = (TestAccessEgress) o;
     return (
       stop == that.stop &&
@@ -354,14 +361,12 @@ public class TestAccessEgress implements RaptorAccessEgress {
           case RIDES -> withNRides(field.value());
           case TIME_PENALTY -> withTimePenalty(field.value());
           case VIAS -> withViaLocationsVisited(field.value());
-          case
-            C2,
-            TRANSFERS,
-            TRANSFER_PRIORITY,
-            WAIT_TIME_COST -> throw new IllegalArgumentException(field.toString());
+          case C2, TRANSFERS, TRANSFER_PRIORITY, WAIT_TIME_COST
+            -> throw new IllegalArgumentException(field.toString());
           default -> throw new IllegalArgumentException(field.type().toString());
         }
       }
+
       if (!RaptorConstants.isSet(c1)) {
         this.c1 = walkCost(durationInSeconds);
       }
@@ -408,6 +413,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
             "."
         );
       }
+
       this.closed = false;
       this.openFrom = openFrom;
       this.openUntil = openUntil;

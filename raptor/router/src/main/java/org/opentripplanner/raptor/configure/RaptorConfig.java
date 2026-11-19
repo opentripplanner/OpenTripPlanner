@@ -28,8 +28,8 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 /**
  * This class is responsible for creating a new search and holding application-scoped Raptor state.
  * <p>
- * This class should have APPLICATION scope. It keeps a reference to the environment and the
- * tuning parameters. The environment has a thread-pool, which should be APPLICATION scope.
+ * This class should have APPLICATION scope. It keeps a reference to the environment and the tuning
+ * parameters. The environment has a thread-pool, which should be APPLICATION scope.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
@@ -72,6 +72,7 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
     if (extraMcSearch == null) {
       return mainSearch;
     }
+
     var alternativeSearch = createRangeRaptorWithMcWorker(
       extraMcSearch.createTransitDataAlternativeSearch(data),
       request,
@@ -110,6 +111,7 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
       var c = new McRangeRaptorConfig<>(segment).withHeuristics(heuristics);
       nextWorker = createWorker(segment, c.state(), c.strategy());
     }
+
     return createRangeRaptor(context, nextWorker);
   }
 

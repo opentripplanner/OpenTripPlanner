@@ -38,6 +38,7 @@ public class Package implements ArchComponent {
     for (ArchComponent it : allowedDependencies) {
       this.allowedPackages.addAll(it.packages());
     }
+
     return this;
   }
 
@@ -72,14 +73,17 @@ public class Package implements ArchComponent {
     for (Package p : allowedPackages) {
       all.add(p.packageIdentifier());
     }
+
     // Allow all packages to depend on Java
     for (Package p : JAVA_PACKAGES.packages()) {
       all.add(p.packageIdentifier());
     }
+
     // Allow all packages to depend on the log framework
     for (Package p : LOG_FRAMEWORK.packages()) {
       all.add(p.packageIdentifier());
     }
+
     // Allow all packages to depend on itself
     all.add(packageIdentifier);
 

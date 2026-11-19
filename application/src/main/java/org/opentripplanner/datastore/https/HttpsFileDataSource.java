@@ -135,9 +135,11 @@ final class HttpsFileDataSource implements DataSource {
     if (obj == this) {
       return true;
     }
+
     if (obj == null || obj.getClass() != this.getClass()) {
       return false;
     }
+
     var that = (HttpsFileDataSource) obj;
     return (
       Objects.equals(this.uri, that.uri) &&

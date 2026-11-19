@@ -15,9 +15,9 @@ import uk.org.siri.siri21.Siri;
  * <pre>
  * update.xml  ➞  update.xml.inProgress  ➞  ( update.xml.ok | update.xml.failed )
  * </pre>
- * The renaming of the file guarantees that the file is not processed twice. A {@code .ok}
- * file indicate that the file is processed and the content parsed ok. The status of the update
- * might be different - see logs for update errors.
+ * The renaming of the file guarantees that the file is not processed twice. A {@code .ok} file
+ * indicate that the file is processed and the content parsed ok. The status of the update might be
+ * different - see logs for update errors.
  * <p>
  * The file updater will pick up any file matching {@code *.xml} in the configured directory.
  */
@@ -64,6 +64,7 @@ public class SiriFileLoader implements SiriLoader {
   @SuppressWarnings("ResultOfMethodCallIgnored")
   private Optional<Siri> fetchFeed() {
     File[] files = directory.listFiles();
+
     if (files == null) {
       return Optional.empty();
     }
@@ -72,8 +73,10 @@ public class SiriFileLoader implements SiriLoader {
       if (!matchFilename(file)) {
         continue;
       }
+
       LOG.info("Process real-time input file: " + file.getAbsolutePath());
       var inProgressFile = newFile(file, SUFFIX_IN_PROGRESS);
+
       try {
         file.renameTo(inProgressFile);
         Siri siri = null;
@@ -88,6 +91,7 @@ public class SiriFileLoader implements SiriLoader {
         throw new RuntimeException(ex.getMessage(), ex);
       }
     }
+
     return Optional.empty();
   }
 

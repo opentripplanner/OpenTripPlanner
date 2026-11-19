@@ -36,7 +36,7 @@ import org.opentripplanner.transfer.constrained.model.TransferConstraint;
 
 /**
  * @deprecated This was earlier part of Raptor and should not be used outside the Raptor module. Use
- *             the OTP model entities instead.
+ *     the OTP model entities instead.
  */
 @Deprecated
 @SuppressWarnings("UnusedReturnValue")
@@ -82,12 +82,15 @@ public class TestTransitData
   @Override
   public IntIterator routeIndexIterator(IntIterator stops) {
     BitSet routes = new BitSet();
+
     while (stops.hasNext()) {
       int stop = stops.next();
+
       for (int i : routeIndexesByStopIndex.get(stop)) {
         routes.set(i);
       }
     }
+
     return IntIterators.of(routes);
   }
 
@@ -147,9 +150,11 @@ public class TestTransitData
         if (list.isEmpty()) {
           return null;
         }
+
         if (list.size() == 1) {
           return list.getFirst();
         }
+
         throw new IllegalStateException("More than on transfers found: " + list);
       }
     };
@@ -213,11 +218,13 @@ public class TestTransitData
     int routeIndex = this.routes.indexOf(route);
     ((TestTripPattern) route.pattern()).withPatternIndex(routeIndex);
     var pattern = route.pattern();
+
     for (int i = 0; i < pattern.numberOfStopsInPattern(); ++i) {
       int stopIndex = pattern.stopIndex(i);
       expandNumOfStops(stopIndex);
       routeIndexesByStopIndex.get(stopIndex).add(routeIndex);
     }
+
     return this;
   }
 
@@ -225,6 +232,7 @@ public class TestTransitData
     for (TestRoute route : routes) {
       withRoute(route);
     }
+
     return this;
   }
 
@@ -246,6 +254,7 @@ public class TestTransitData
 
   public void clearConstrainedTransfers() {
     constrainedTransfers.clear();
+
     for (TestRoute route : routes) {
       route.clearTransferConstraints();
     }
@@ -255,10 +264,10 @@ public class TestTransitData
    * Create constraint for a given transfer. If trip passes through the stop more than once
    * constraint will be placed on stop position for the first visit.
    *
-   * @param fromTrip   initial trip
-   * @param fromStop   initial stop index
-   * @param toTrip     destination trip
-   * @param toStop     destination trip index
+   * @param fromTrip initial trip
+   * @param fromStop initial stop index
+   * @param toTrip destination trip
+   * @param toStop destination trip index
    * @param constraint constraint to set
    */
   public TestTransitData withConstrainedTransfer(
@@ -274,6 +283,7 @@ public class TestTransitData
     for (TestRoute route : routes) {
       route.addTransferConstraint(fromTrip, fromStopPos, toTrip, toStopPos, constraint);
     }
+
     constrainedTransfers.add(
       new ConstrainedTransfer(
         null,
@@ -301,6 +311,7 @@ public class TestTransitData
         return tx;
       }
     }
+
     return null;
   }
 

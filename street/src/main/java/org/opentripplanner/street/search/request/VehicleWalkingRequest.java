@@ -27,7 +27,8 @@ public class VehicleWalkingRequest {
     this.reluctance = 5.0;
     this.mountDismountTime = Duration.ZERO;
     this.mountDismountCost = Cost.ZERO;
-    // multiplicative factor to carry the bike up/down a flight of stairs on top of the walk reluctance
+    // multiplicative factor to carry the bike up/down a flight of stairs on top of the walk
+    // reluctance
     this.stairsReluctance = 2;
   }
 
@@ -90,9 +91,11 @@ public class VehicleWalkingRequest {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     VehicleWalkingRequest that = (VehicleWalkingRequest) o;
     return (
       speed == that.speed &&

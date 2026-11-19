@@ -24,8 +24,7 @@ public class CountdownTimer {
    * This constructor allows us to unit test the timer without using
    * {@code System::currentTimeMillis}.
    * <p>
-   * The timer is started, no need to explicit call {@link #restart()} right after the
-   * construction.
+   * The timer is started, no need to explicit call {@link #restart()} right after the construction.
    */
   CountdownTimer(Duration countDownDuration, LongSupplier clock) {
     this.clock = clock;
@@ -52,10 +51,12 @@ public class CountdownTimer {
    */
   public boolean nextLap() {
     long time = now();
+
     if (timeIsUp(time)) {
       restart(time);
       return true;
     }
+
     return false;
   }
 

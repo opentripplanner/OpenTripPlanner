@@ -36,10 +36,13 @@ public class GeocoderResource {
         .entity(Map.of("error", "Query parameter 'query' must be provided."))
         .build();
     }
+
     WgsCoordinate focusPoint = null;
+
     if (focusLat != null && focusLon != null) {
       focusPoint = new WgsCoordinate(focusLat, focusLon);
     }
+
     var clusters = luceneIndex.queryStopClusters(query, focusPoint).toList();
 
     return Response.status(Response.Status.OK).entity(clusters).build();

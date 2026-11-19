@@ -117,13 +117,17 @@ public class TransitDataImportBuilderTest {
     return (l, r) -> {
       int c;
       c = l.trip().getId().toString().compareTo(r.trip().getId().toString());
+
       if (c != 0) {
         return c;
       }
+
       c = l.startTime() - r.startTime();
+
       if (c != 0) {
         return c;
       }
+
       return l.endTime() - r.endTime();
     };
   }

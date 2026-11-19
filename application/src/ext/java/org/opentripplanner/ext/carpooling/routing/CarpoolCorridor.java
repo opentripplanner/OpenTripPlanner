@@ -15,12 +15,12 @@ import org.opentripplanner.street.model.vertex.Vertex;
  * trip and the static street graph alone, so the corridor holds them.
  *
  * @param legDurations routed driving time of each leg
- * @param legLimits    the most each leg may take once a passenger is inserted: its duration plus
- *                     its deviation budget
- * @param stops        the stops a driver can serve, with per-leg driving times
- * @param waypoints    the permanent street vertices the trip's route points resolve to, one per
- *                     route point, in route order
- * @param maxCarSpeed  the fastest car speed in the street graph, in metres per second
+ * @param legLimits the most each leg may take once a passenger is inserted: its duration plus its
+ *     deviation budget
+ * @param stops the stops a driver can serve, with per-leg driving times
+ * @param waypoints the permanent street vertices the trip's route points resolve to, one per route
+ *     point, in route order
+ * @param maxCarSpeed the fastest car speed in the street graph, in metres per second
  */
 public record CarpoolCorridor(
   List<Duration> legDurations,
@@ -34,9 +34,11 @@ public record CarpoolCorridor(
     legLimits = List.copyOf(legLimits);
     stops = List.copyOf(stops);
     waypoints = List.copyOf(waypoints);
+
     if (legLimits.size() != legDurations.size()) {
       throw new IllegalArgumentException("One limit per leg is required");
     }
+
     if (waypoints.size() != legDurations.size() + 1) {
       throw new IllegalArgumentException(
         "Corridor has %d legs but %d waypoints".formatted(legDurations.size(), waypoints.size())
@@ -97,6 +99,7 @@ public record CarpoolCorridor(
         return true;
       }
     }
+
     return false;
   }
 }

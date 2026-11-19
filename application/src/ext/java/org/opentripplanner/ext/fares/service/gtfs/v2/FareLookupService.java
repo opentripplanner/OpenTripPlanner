@@ -39,8 +39,8 @@ class FareLookupService implements Serializable {
   private final FreeTransferEligibility freeTransferEligibility;
 
   /// @param freeTransferEligibility A bi-predicate that determines if a free transfer applies to a
-  ///                                given transfer match and fare product. This needs to be
-  ///                                configurable because of custom fare services.
+  ///     given transfer match and fare product. This needs to be configurable because of custom
+  ///     fare services.
   FareLookupService(
     List<FareLegRule> legRules,
     List<FareTransferRule> fareTransferRules,
@@ -82,6 +82,7 @@ class FareLookupService implements Serializable {
       .filter(r -> legMatchesRule(leg, r))
       .collect(Collectors.toUnmodifiableSet());
     var containsPriorities = rules.stream().anyMatch(r -> r.priority().isPresent());
+
     if (containsPriorities) {
       return findHighestPriority(rules);
     } else {
@@ -99,6 +100,7 @@ class FareLookupService implements Serializable {
     if (legs.size() < 2) {
       return Set.of();
     }
+
     return this.transferRules
       .stream()
       .filter(transferPredicate)
@@ -134,6 +136,7 @@ class FareLookupService implements Serializable {
       .flatMap(r -> {
         var fromRules = findFareLegRule(r.fromLegGroup());
         var toRules = findFareLegRule(r.toLegGroup());
+
         if (fromRules.isEmpty() || toRules.isEmpty()) {
           return Stream.of();
         } else {
@@ -276,7 +279,7 @@ class FareLookupService implements Serializable {
 
   /**
    * If a GTFS feed contains rule_priority values, then the highest priority rule is returned.
-   *
+   * <p>
    * @link <a href="https://gtfs.org/documentation/schedule/reference/#fare_leg_rulestxt">spec</a>
    */
   private static Set<FareLegRule> findHighestPriority(Collection<FareLegRule> rules) {

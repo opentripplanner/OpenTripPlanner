@@ -59,6 +59,7 @@ public class EmpiricalDelayType {
     if (parent == null || service == null) {
       return null;
     }
+
     return service
       .findEmpiricalDelay(
         parent.getTrip().getId(),

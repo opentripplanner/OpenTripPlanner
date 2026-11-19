@@ -196,7 +196,6 @@ class StreetEdgeGeofencingTest {
      * The no-traversal pre-traversal should fork (drop + continue riding), not force drop. The
      * boundary vertex V2 has outgoing edges that don't enter the zone (V2→V4). The rider should be
      * able to continue riding from V2 toward V4 without dropping.
-     *
      */
     @Test
     public void noTraversalBoundaryShouldForkNotForceDrop() {
@@ -737,7 +736,7 @@ class StreetEdgeGeofencingTest {
      * Adjacent no-drop-off zones (same network): walker exits zone A and enters zone B at the same
      * boundary. The deferred fork should NOT create renting branches because the walker is still
      * inside a no-drop-off zone (B) for the same network.
-     *
+     * <p>
      * This is the scenario that caused the Tøyen bug: the deferred fork's post-traversal veto
      * failed because the traversed edge exited zone B, removing it from the editor's zone state.
      * The pre-traversal veto on s0's zones catches this.
@@ -851,9 +850,11 @@ class StreetEdgeGeofencingTest {
       null,
       false
     );
+
     for (var network : committedNetworks) {
       editor.addCommittedNetwork(network);
     }
+
     return editor.makeState();
   }
 }

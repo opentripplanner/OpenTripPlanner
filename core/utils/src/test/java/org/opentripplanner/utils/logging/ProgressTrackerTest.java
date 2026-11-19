@@ -59,6 +59,7 @@ public class ProgressTrackerTest {
     subject.step(m -> breakOut = true);
 
     long time = System.currentTimeMillis() - start;
+
     // If test was able to run within the quiet period
     if (time < QUIET_PERIOD) {
       assertFalse(breakOut, "No steps should log anything within the quiet period. Time: " + time);

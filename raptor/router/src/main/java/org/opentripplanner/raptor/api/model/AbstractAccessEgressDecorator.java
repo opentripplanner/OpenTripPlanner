@@ -46,6 +46,7 @@ public class AbstractAccessEgressDecorator implements RaptorAccessEgress {
         throw new IllegalStateException("Unexpected type: " + type + ". Type not found in:" + it);
       }
     }
+
     return Optional.of((T) it);
   }
 
@@ -144,9 +145,11 @@ public class AbstractAccessEgressDecorator implements RaptorAccessEgress {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     AbstractAccessEgressDecorator that = (AbstractAccessEgressDecorator) o;
     return Objects.equals(delegate, that.delegate);
   }

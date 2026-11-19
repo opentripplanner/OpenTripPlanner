@@ -56,6 +56,7 @@ public class AlertMetrics implements MeterBinder {
     try {
       // during construction of the app the service can be null so we must check for this case.
       var transitAlertService = serviceSupplier.get();
+
       if (transitAlertService != null && statuses != null) {
         var rows = summarizeAlerts(transitAlertService);
         statuses.register(rows, true);
@@ -111,18 +112,23 @@ public class AlertMetrics implements MeterBinder {
     Tags toTags() {
       var tags = new ArrayList<Tag>(5);
       tags.add(Tag.of("feedId", feedId));
+
       if (siriCodespace != null) {
         tags.add(Tag.of("siriCodespace", siriCodespace));
       }
+
       if (severity != null) {
         tags.add(Tag.of("severity", severity.name()));
       }
+
       if (effect != null) {
         tags.add(Tag.of("effect", effect.name()));
       }
+
       if (cause != null) {
         tags.add(Tag.of("cause", cause.name()));
       }
+
       return Tags.of(tags);
     }
   }

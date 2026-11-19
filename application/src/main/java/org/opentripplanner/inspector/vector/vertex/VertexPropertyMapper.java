@@ -30,16 +30,18 @@ public class VertexPropertyMapper extends PropertyMapper<Vertex> {
       kv("label", input.getLabel().toString())
     );
     List<KeyValue> properties = switch (input) {
-      case BarrierVertex v -> List.of(
-        kv("permission", v.getBarrierPermissions()),
-        kv("wheelchair", v.wheelchairAccessibility())
-      );
+      case BarrierVertex v
+        -> List.of(
+          kv("permission", v.getBarrierPermissions()),
+          kv("wheelchair", v.wheelchairAccessibility())
+        );
       case VehicleRentalPlaceVertex v -> List.of(kv("rentalId", v.getStation()));
-      case VehicleParkingEntranceVertex v -> List.of(
-        kv("parkingId", v.getVehicleParking().getId()),
-        kColl("spacesFor", spacesFor(v.getVehicleParking())),
-        kColl("traversalPermission", traversalPermissions(v.getParkingEntrance()))
-      );
+      case VehicleParkingEntranceVertex v
+        -> List.of(
+          kv("parkingId", v.getVehicleParking().getId()),
+          kColl("spacesFor", spacesFor(v.getVehicleParking())),
+          kColl("traversalPermission", traversalPermissions(v.getParkingEntrance()))
+        );
       default -> List.of();
     };
 
@@ -56,23 +58,29 @@ public class VertexPropertyMapper extends PropertyMapper<Vertex> {
 
   private Set<TraverseMode> spacesFor(VehicleParking vehicleParking) {
     var ret = new HashSet<TraverseMode>();
+
     if (vehicleParking.hasAnyCarPlaces()) {
       ret.add(TraverseMode.CAR);
     }
+
     if (vehicleParking.hasBicyclePlaces()) {
       ret.add(TraverseMode.BICYCLE);
     }
+
     return ret;
   }
 
   private Set<TraverseMode> traversalPermissions(VehicleParkingEntrance entrance) {
     var ret = new HashSet<TraverseMode>();
+
     if (entrance.isCarAccessible()) {
       ret.add(TraverseMode.CAR);
     }
+
     if (entrance.isWalkAccessible()) {
       ret.add(TraverseMode.WALK);
     }
+
     return ret;
   }
 

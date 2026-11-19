@@ -58,6 +58,7 @@ public class LegacyTimetableRepositoryIntegrationTest {
     feedId = transitRepository.getFeedIds().iterator().next();
 
     patternIndex = new HashMap<>();
+
     for (TripPattern tripPattern : timetableDataImport.getAllTripPatterns()) {
       tripPattern
         .scheduledTripsAsStream()

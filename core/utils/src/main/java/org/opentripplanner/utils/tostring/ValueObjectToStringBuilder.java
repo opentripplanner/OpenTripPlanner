@@ -117,6 +117,7 @@ public class ValueObjectToStringBuilder {
     if (skipNull && lat == null && lon == null) {
       return this;
     }
+
     return addIt(
       "(" + numFormat.formatCoordinate(lat) + ", " + numFormat.formatCoordinate(lon) + ")"
     );
@@ -196,11 +197,13 @@ public class ValueObjectToStringBuilder {
     if (skipNull && value == null) {
       return this;
     }
+
     if (skipSep) {
       skipSep = false;
     } else {
       sb.append(FIELD_SEPARATOR);
     }
+
     sb.append(value == null ? "null" : mapToString.apply(value));
     return this;
   }

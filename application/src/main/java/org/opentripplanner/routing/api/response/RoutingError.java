@@ -26,9 +26,11 @@ public class RoutingError {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     RoutingError that = (RoutingError) o;
     return code == that.code && inputField == that.inputField;
   }

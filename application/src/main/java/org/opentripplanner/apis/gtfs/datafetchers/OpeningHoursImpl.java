@@ -18,6 +18,7 @@ public class OpeningHoursImpl implements GraphQLDataFetchers.GraphQLOpeningHours
   public DataFetcher<String> osm() {
     return environment -> {
       var cal = getSource(environment);
+
       if (cal == null) {
         return null;
       } else {

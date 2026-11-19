@@ -26,12 +26,12 @@ import org.slf4j.LoggerFactory;
  * <ul>
  *   <li><strong>EDT</strong> — earliest departure time = {@code requestedDateTime} (when
  *       {@code arriveBy = false}).</li>
- *   <li><strong>LDT</strong> — latest departure time = {@code requestedDateTime + searchWindow} (when
- *       {@code arriveBy = false}).</li>
+ *   <li><strong>LDT</strong> — latest departure time = {@code requestedDateTime + searchWindow}
+ *       (when {@code arriveBy = false}).</li>
  *   <li><strong>LAT</strong> — latest arrival time = {@code requestedDateTime} (when
  *       {@code arriveBy = true}).</li>
- *   <li><strong>EAT</strong> — earliest arrival time = {@code requestedDateTime − searchWindow} (when
- *       {@code arriveBy = true}).</li>
+ *   <li><strong>EAT</strong> — earliest arrival time = {@code requestedDateTime − searchWindow}
+ *       (when {@code arriveBy = true}).</li>
  * </ul>
  *
  * <h2>Rules</h2>
@@ -62,6 +62,7 @@ public class TimeItineraryFilter implements CarpoolItineraryFilter {
   @Override
   public boolean isValidItinerary(Itinerary itinerary, CarpoolingRequest request) {
     var requestedDateTime = request.getRequestedDateTime();
+
     if (requestedDateTime == null) {
       return true;
     }
@@ -77,13 +78,17 @@ public class TimeItineraryFilter implements CarpoolItineraryFilter {
    */
   private static boolean acceptsArriveBy(Itinerary itinerary, Instant lat, Duration searchWindow) {
     var endTime = itinerary.endTimeAsInstant();
+
     if (endTime.isAfter(lat)) {
       return reject(itinerary, "endTime", endTime, "is after LAT", lat);
     }
+
     var eat = lat.minus(searchWindow);
+
     if (endTime.isBefore(eat)) {
       return reject(itinerary, "endTime", endTime, "is before EAT", eat);
     }
+
     return true;
   }
 
@@ -97,13 +102,17 @@ public class TimeItineraryFilter implements CarpoolItineraryFilter {
     Duration searchWindow
   ) {
     var startTime = itinerary.startTimeAsInstant();
+
     if (startTime.isBefore(edt)) {
       return reject(itinerary, "startTime", startTime, "is before EDT", edt);
     }
+
     var ldt = edt.plus(searchWindow);
+
     if (startTime.isAfter(ldt)) {
       return reject(itinerary, "startTime", startTime, "is after LDT", ldt);
     }
+
     return true;
   }
 

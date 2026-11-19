@@ -34,10 +34,12 @@ public final class MinMap<K, V> {
    */
   public boolean putMin(K key, V value) {
     V oldValue = map.get(key);
+
     if (oldValue == null || comparator.compare(value, oldValue) < 0) {
       map.put(key, value);
       return true;
     }
+
     return false;
   }
 

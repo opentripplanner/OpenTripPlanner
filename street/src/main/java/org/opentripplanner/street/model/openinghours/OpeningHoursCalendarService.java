@@ -47,9 +47,11 @@ public class OpeningHoursCalendarService implements Serializable {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     final OpeningHoursCalendarService that = (OpeningHoursCalendarService) o;
     return (
       deduplicator.equals(that.deduplicator) &&

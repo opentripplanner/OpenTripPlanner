@@ -53,11 +53,14 @@ class SegmentedIdentityMapTest {
     // Small initial capacity to force resize
     var map = new SegmentedIdentityMap<Object, Integer>(2);
     Object[] keys = new Object[100];
+
     for (int i = 0; i < keys.length; i++) {
       keys[i] = new Object();
       map.put(keys[i], i);
     }
+
     assertEquals(100, map.size());
+
     for (int i = 0; i < keys.length; i++) {
       assertEquals(i, map.get(keys[i]));
     }
@@ -68,11 +71,14 @@ class SegmentedIdentityMapTest {
     int count = 100_000;
     var map = new SegmentedIdentityMap<Object, Integer>(count);
     Object[] keys = new Object[count];
+
     for (int i = 0; i < count; i++) {
       keys[i] = new Object();
       map.put(keys[i], i);
     }
+
     assertEquals(count, map.size());
+
     for (int i = 0; i < count; i++) {
       assertEquals(i, map.get(keys[i]));
     }
@@ -111,11 +117,14 @@ class SegmentedIdentityMapTest {
     int count = 25_000;
     var map = new SegmentedIdentityMap<Object, Integer>(count);
     Object[] keys = new Object[count];
+
     for (int i = 0; i < count; i++) {
       keys[i] = new Object();
       map.put(keys[i], i);
     }
+
     assertEquals(count, map.size());
+
     for (int i = 0; i < count; i++) {
       assertEquals(i, map.get(keys[i]));
     }

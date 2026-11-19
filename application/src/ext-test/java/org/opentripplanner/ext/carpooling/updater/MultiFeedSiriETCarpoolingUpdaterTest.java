@@ -30,12 +30,11 @@ import org.opentripplanner.updater.trip.siri.updater.DefaultSiriETUpdaterParamet
  * same {@code EstimatedVehicleJourneyCode}. The two updaters represent two independent SIRI-ET
  * feeds; their feedIds are the only thing that should keep their trips apart in the shared
  * repository.
- *
  * <p>
- * The {@code processEstimatedTimetableDeliveries} pipeline is called once per updater per
- * polling cycle and receives only the deliveries fetched from that updater's source URL — there is
- * no per-call feed multiplexing inside a single delivery list, so the tests below invoke each
- * updater explicitly.
+ * The {@code processEstimatedTimetableDeliveries} pipeline is called once per updater per polling
+ * cycle and receives only the deliveries fetched from that updater's source URL — there is no
+ * per-call feed multiplexing inside a single delivery list, so the tests below invoke each updater
+ * explicitly.
  */
 class MultiFeedSiriETCarpoolingUpdaterTest {
 
@@ -138,6 +137,7 @@ class MultiFeedSiriETCarpoolingUpdaterTest {
     for (var routableTrip : repository.getCarpoolTrips()) {
       var trip = routableTrip.trip();
       var expectedFeed = trip.getId().getFeedId();
+
       for (var stop : trip.stops()) {
         assertEquals(
           expectedFeed,

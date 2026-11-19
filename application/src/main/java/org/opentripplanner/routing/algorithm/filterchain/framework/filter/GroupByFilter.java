@@ -46,21 +46,27 @@ public class GroupByFilter<T extends GroupId<T>> implements ItineraryListFilter 
           }
         }
       }
+
       if (matchFound == null) {
         groups.add(new Entry<>(groupId, it));
       }
     }
+
     // Remove leftover of group mergeAndClear operations
     groups.removeIf(g -> g.itineraries.isEmpty());
 
     List<Itinerary> result = new ArrayList<>();
+
     for (Entry<T> e : groups) {
       List<Itinerary> groupResult = e.itineraries;
+
       for (ItineraryListFilter filter : nestedFilters) {
         groupResult = filter.filter(groupResult);
       }
+
       result.addAll(groupResult);
     }
+
     return result;
   }
 

@@ -57,6 +57,7 @@ public class TranslationHelperTest {
       t.setFieldValue(TRANSLATIONS[x][6]);
       ALL_TRANSLATIONS.add(t);
     }
+
     HELPER.importTranslations(ALL_TRANSLATIONS, FEED_INFOS);
   }
 
@@ -107,6 +108,7 @@ public class TranslationHelperTest {
       );
 
       String id = stop.getId().getId();
+
       switch (id) {
         case "1":
           assertEquals("Stop 1", nameTranslation.toString());

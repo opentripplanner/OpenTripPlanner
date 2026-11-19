@@ -6,7 +6,6 @@ package org.opentripplanner.street.linking;
  */
 public enum VisibilityMode {
   /**
-   *
    * "Visibility lines" are computed and the path crosses "through" the area in the shortest way
    * possible while also taking obstacles into account. This is slower to compute.
    */

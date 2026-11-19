@@ -81,6 +81,7 @@ public class LinkingContextRequest {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     var other = (LinkingContextRequest) o;
     return (
       Objects.equals(from, other.from) &&

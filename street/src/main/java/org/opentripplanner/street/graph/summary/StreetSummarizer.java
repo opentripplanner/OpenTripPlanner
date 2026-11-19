@@ -29,51 +29,57 @@ class StreetSummarizer {
 
   static String summarizeEdge(Edge e) {
     return switch (e) {
-      case StreetEdge tpe -> String.format(
-        "%s → %s %s ♿%s%s",
-        summarizeVertex(e.getFromVertex()),
-        summarizeVertex(e.getToVertex()),
-        tpe.getPermission(),
-        summarizeBoolean(tpe.isWheelchairAccessible()),
-        summarizeNoThru(tpe)
-      );
-      case TemporaryFreeEdge _ -> String.format(
-        "%s → %s ALL",
-        summarizeVertex(e.getFromVertex()),
-        summarizeVertex(e.getToVertex())
-      );
-      case StreetTransitEntityLink link -> String.format(
-        "%s linked to %s",
-        summarizeVertex(link.getFromVertex()),
-        summarizeVertex(link.getToVertex())
-      );
-      case VehicleParkingEdge p -> String.format(
-        "Parking %s → %s",
-        summarizeVertex(p.getFromVertex()),
-        summarizeVertex(p.getToVertex())
-      );
+      case StreetEdge tpe
+        -> String.format(
+          "%s → %s %s ♿%s%s",
+          summarizeVertex(e.getFromVertex()),
+          summarizeVertex(e.getToVertex()),
+          tpe.getPermission(),
+          summarizeBoolean(tpe.isWheelchairAccessible()),
+          summarizeNoThru(tpe)
+        );
+      case TemporaryFreeEdge _
+        -> String.format(
+          "%s → %s ALL",
+          summarizeVertex(e.getFromVertex()),
+          summarizeVertex(e.getToVertex())
+        );
+      case StreetTransitEntityLink link
+        -> String.format(
+          "%s linked to %s",
+          summarizeVertex(link.getFromVertex()),
+          summarizeVertex(link.getToVertex())
+        );
+      case VehicleParkingEdge p
+        -> String.format(
+          "Parking %s → %s",
+          summarizeVertex(p.getFromVertex()),
+          summarizeVertex(p.getToVertex())
+        );
       // Elevator vertices all share the elevator node's coordinate, so their labels (which encode
       // the connected entity and level) identify them rather than the coordinate.
-      case ElevatorBoardEdge board -> String.format(
-        "%s → %s ELEVATOR board",
-        board.getFromVertex().getLabelString(),
-        board.getToVertex().getLabelString()
-      );
-      case ElevatorAlightEdge alight -> String.format(
-        "%s → %s ELEVATOR alight",
-        alight.getFromVertex().getLabelString(),
-        alight.getToVertex().getLabelString()
-      );
-      case ElevatorHopEdge hop -> String.format(
-        "%s → %s ELEVATOR hop levels=%s ♿%s",
-        hop.getFromVertex().getLabelString(),
-        hop.getToVertex().getLabelString(),
-        DECIMAL_FORMAT.format(hop.getLevels()),
-        summarizeBoolean(hop.isWheelchairAccessible())
-      );
-      default -> throw new NotImplementedException(
-        "No summary for edge " + e.getClass().getSimpleName()
-      );
+      case ElevatorBoardEdge board
+        -> String.format(
+          "%s → %s ELEVATOR board",
+          board.getFromVertex().getLabelString(),
+          board.getToVertex().getLabelString()
+        );
+      case ElevatorAlightEdge alight
+        -> String.format(
+          "%s → %s ELEVATOR alight",
+          alight.getFromVertex().getLabelString(),
+          alight.getToVertex().getLabelString()
+        );
+      case ElevatorHopEdge hop
+        -> String.format(
+          "%s → %s ELEVATOR hop levels=%s ♿%s",
+          hop.getFromVertex().getLabelString(),
+          hop.getToVertex().getLabelString(),
+          DECIMAL_FORMAT.format(hop.getLevels()),
+          summarizeBoolean(hop.isWheelchairAccessible())
+        );
+      default
+        -> throw new NotImplementedException("No summary for edge " + e.getClass().getSimpleName());
     };
   }
 
@@ -82,9 +88,11 @@ class StreetSummarizer {
 
     var coord = String.format("(%s,%s)".formatted(format(v.getLat()), format(v.getLon())));
     buf.append(coord);
+
     if (v instanceof TransitStopVertex tsv) {
       buf.append("[%s]".formatted(tsv.getId()));
     }
+
     if (v instanceof VehicleParkingEntranceVertex pev) {
       buf.append("[%s]".formatted(pev.getLabel()));
     }
@@ -107,19 +115,23 @@ class StreetSummarizer {
     return "-0".equals(s) ? "0" : s;
   }
 
-  /// Lists the traverse modes for which the edge is marked as no-thru-traffic, e.g. `"
-  /// noThru=WALK,CAR"`. Returns an empty string if the edge is not restricted for any mode.
+  /// Lists the traverse modes for which the edge is marked as no-thru-traffic, e.g.
+  /// `" noThru=WALK,CAR"`. Returns an empty string if the edge is not restricted for any mode.
   private static String summarizeNoThru(StreetEdge e) {
     var modes = new ArrayList<String>();
+
     if (e.isWalkNoThruTraffic()) {
       modes.add("WALK");
     }
+
     if (e.isBicycleNoThruTraffic()) {
       modes.add("BICYCLE");
     }
+
     if (e.isMotorVehicleNoThruTraffic()) {
       modes.add("CAR");
     }
+
     return modes.isEmpty() ? "" : " noThru=" + String.join(",", modes);
   }
 

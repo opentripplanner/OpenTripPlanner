@@ -11,11 +11,13 @@ public class CapacityTripFilter implements CarpoolTripFilter {
   @Override
   public boolean isCandidateTrip(RoutableCarpoolTrip trip, SnappedPassenger passenger) {
     var carpoolTrip = trip.trip();
+
     for (int leg = 0; leg < carpoolTrip.stops().size() - 1; leg++) {
       if (carpoolTrip.hasFreeSeat(leg)) {
         return true;
       }
     }
+
     return false;
   }
 }

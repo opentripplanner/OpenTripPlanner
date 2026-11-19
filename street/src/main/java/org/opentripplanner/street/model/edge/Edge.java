@@ -43,6 +43,7 @@ public abstract class Edge implements AStarEdge<State, Edge, Vertex>, Serializab
       );
       throw new IllegalStateException(err);
     }
+
     this.fromv = v1;
     this.tov = v2;
   }
@@ -81,12 +82,14 @@ public abstract class Edge implements AStarEdge<State, Edge, Vertex>, Serializab
    */
   public boolean isReachableFromGraph() {
     boolean edgeReachableFromGraph = tov.getIncoming().contains(this);
+
     if (!edgeReachableFromGraph) {
       LOG.warn(
         "Edge {} returned from spatial index is no longer reachable from graph. That is not expected.",
         this
       );
     }
+
     return edgeReachableFromGraph;
   }
 
@@ -104,8 +107,8 @@ public abstract class Edge implements AStarEdge<State, Edge, Vertex>, Serializab
    * makes edge lookups in sets and maps efficient and avoids ambiguity during graph construction,
    * where structurally similar edges may coexist.
    * <p>
-   * <strong>Do not use this method to test whether two edges represent the same street segment
-   * or share the same content.</strong>
+   * <strong>Do not use this method to test whether two edges represent the same street segment or
+   * share the same content.</strong>
    */
   @Override
   public boolean equals(Object o) {
@@ -128,9 +131,11 @@ public abstract class Edge implements AStarEdge<State, Edge, Vertex>, Serializab
   protected String buildToString(@Nullable String name, Consumer<StringBuilder> body) {
     var buf = new StringBuilder();
     buf.append(getClass().getSimpleName()).append("(");
+
     if (name != null) {
       buf.append(name).append(", ");
     }
+
     buf.append(fromv).append(" -> ").append(tov);
     body.accept(buf);
     return buf.append(')').toString();
@@ -167,8 +172,8 @@ public abstract class Edge implements AStarEdge<State, Edge, Vertex>, Serializab
    * Returns true if this edge has a generated name that is derived from its properties, like
    * "path", "stairs" or "tunnel".
    * <p>
-   * Returns false if the field reflects the real world name, like "Fifth Avenue", "Hauptstraße"
-   * or "Øvre Holmegate".
+   * Returns false if the field reflects the real world name, like "Fifth Avenue", "Hauptstraße" or
+   * "Øvre Holmegate".
    */
   public boolean nameIsDerived() {
     return false;

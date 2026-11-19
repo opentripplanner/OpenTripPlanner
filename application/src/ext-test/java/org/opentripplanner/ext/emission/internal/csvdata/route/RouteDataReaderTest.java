@@ -43,9 +43,11 @@ class RouteDataReaderTest implements EmissionTestData {
       "Value for 'avg_co2_per_vehicle_per_km' is missing: '1007,,1' (@line:8)",
       "Value for 'route_id' is missing: ',1,1' (@line:9)"
     );
+
     for (int i = 0; i < expected.size(); i++) {
       assertEquals(expected.get(i), issues.get(i).getMessage());
     }
+
     assertEquals(expected.size(), issues.size());
   }
 

@@ -50,6 +50,7 @@ public class TripUpdateBuilder {
     String tripShortName
   ) {
     this(tripId, startDate, scheduleRelationship, zoneId);
+
     if (tripHeadsign != null) {
       tripUpdateBuilder.getTripPropertiesBuilder().setTripHeadsign(tripHeadsign);
     }
@@ -460,6 +461,7 @@ public class TripUpdateBuilder {
         stopTimePropsBuilder.setDropOffType(gtfsPickDrop);
         stopTimePropsBuilder.setPickupType(gtfsPickDrop);
       }
+
       if (pickDrop != null) {
         var b = MfdzRealtimeExtensions.StopTimePropertiesExtension.newBuilder();
         b.setDropoffType(pickDrop);
@@ -498,6 +500,7 @@ public class TripUpdateBuilder {
     if (arrivalDelay != NO_DELAY) {
       stopTimeUpdateBuilder.getArrivalBuilder().setDelay(arrivalDelay);
     }
+
     if (departureDelay != NO_DELAY) {
       stopTimeUpdateBuilder.getDepartureBuilder().setDelay(departureDelay);
     }

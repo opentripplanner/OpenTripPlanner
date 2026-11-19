@@ -52,6 +52,7 @@ class GbfsStationInformationMapper {
       );
       return null;
     }
+
     var builder = VehicleRentalStation.of()
       .withId(new FeedScopedId(system.systemId(), station.getStationId()))
       .withSystem(system)
@@ -114,6 +115,7 @@ class GbfsStationInformationMapper {
     }
 
     GBFSRentalUris rentalUris = station.getRentalUris();
+
     if (rentalUris != null) {
       String androidUri = rentalUris.getAndroid();
       String iosUri = rentalUris.getIos();

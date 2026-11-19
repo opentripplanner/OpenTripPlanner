@@ -25,7 +25,9 @@ import org.slf4j.LoggerFactory;
  * effectively immutable and safe to read from any number of request threads. The cache of the
  * Raptor transfers derived from them is the only mutable state, and it is thread-safe.
  *
- * @param <P> the street path type
+ * @param
+ *     <p>
+ *     the street path type
  * @param <R> the request type
  */
 class DefaultRegularTransferRepositorySnapshot<
@@ -110,9 +112,11 @@ class DefaultRegularTransferRepositorySnapshot<
     AbstractUserPreferences<?> userPreferences
   ) {
     var entry = entryByPreferences.get(userPreferences);
+
     if (entry != null && entry.source() == UserPreferenceSource.PROFILE) {
       return new RegularTransferCacheStatistics.KeyInfo(entry.source(), entry.id(), entry.id());
     }
+
     var closestProfile = closestProfileOrNull(userPreferences);
     var closest = closestProfile == null ? null : entryByPreferences.get(closestProfile);
     return new RegularTransferCacheStatistics.KeyInfo(

@@ -24,8 +24,8 @@ public interface TransitTuningParameters {
   /**
    * The maximum number of distinct user preferences for which the Raptor transfers are cached, in
    * addition to the ones of the transfer profiles and warmup entries, which are always cached. If
-   * too small, the average request may be slower due to the required re-calculating. If too
-   * large, more memory may be used than needed.
+   * too small, the average request may be slower due to the required re-calculating. If too large,
+   * more memory may be used than needed.
    */
   int transferCacheMaxSize();
 
@@ -52,14 +52,13 @@ public interface TransitTuningParameters {
    * duration is added to the existing search-window and inserted into the next and previous page
    * cursor.
    * <p>
-   * This parameter controls how the search-window is increased. OTP also reduces the
-   * search-window when more than the requested itineraries are fetched. This is done automatically
-   * and acn not be configured. Do not be afraid of scaling up fast, it will be reduced to the
-   * appropriate level in the next search.
+   * This parameter controls how the search-window is increased. OTP also reduces the search-window
+   * when more than the requested itineraries are fetched. This is done automatically and acn not be
+   * configured. Do not be afraid of scaling up fast, it will be reduced to the appropriate level in
+   * the next search.
    * <p>
    * The extra time is added to the search-window for the next request if the current result have
    * few itineraries.
-   * <p>
    * <p>
    * The default values are: {@link #PAGING_SEARCH_WINDOW_ADJUSTMENTS}
    */

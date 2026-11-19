@@ -57,11 +57,13 @@ public class PlanPlaceType {
             .type(new GraphQLNonNull(Scalars.GraphQLFloat))
             .dataFetcher(environment -> {
               var coordinate = ((Place) environment.getSource()).coordinate;
+
               if (coordinate == null) {
                 // TODO: Technically this is wrong, we should not return the place the user sends to
                 //  us, as that is the only place the value can be null
                 return 0;
               }
+
               return coordinate.latitude();
             })
             .build()
@@ -73,11 +75,13 @@ public class PlanPlaceType {
             .type(new GraphQLNonNull(Scalars.GraphQLFloat))
             .dataFetcher(environment -> {
               var coordinate = ((Place) environment.getSource()).coordinate;
+
               if (coordinate == null) {
                 // TODO: Technically this is wrong, we should not return the place the user sends to
                 //  us, as that is the only place the value can be null
                 return 0;
               }
+
               return coordinate.longitude();
             })
             .build()
@@ -147,11 +151,13 @@ public class PlanPlaceType {
         //                        .name("bikePark")
         //                        .type(bikeParkType)
         //                        .description("The bike parking related to the place")
-        //                        .dataFetcher(environment -> ((Place) environment.getSource()).vertexType.equals(VertexType.BIKEPARK) ?
+        //                        .dataFetcher(environment -> ((Place)
+        //                        environment.getSource()).vertexType.equals(VertexType.BIKEPARK) ?
         //                                index.graph.getService(VehicleRentalStationService.class)
         //                                        .getBikeParks()
         //                                        .stream()
-        //                                        .filter(bikePark -> bikePark.id.equals(((Place) environment.getSource()).bikeParkId))
+        //                                        .filter(bikePark -> bikePark.id.equals(((Place)
+        //                                        environment.getSource()).bikeParkId))
         //                                        .findFirst()
         //                                        .orElse(null)
         //                                : null)
@@ -160,11 +166,14 @@ public class PlanPlaceType {
         //                        .name("carPark")
         //                        .type(carParkType)
         //                        .description("The car parking related to the place")
-        //                        .dataFetcher(environment -> ((Place) environment.getSource()).vertexType.equals(VertexType.PARKANDRIDE) ?
+        //                        .dataFetcher(environment -> ((Place)
+        //                        environment.getSource()).vertexType.equals(VertexType.PARKANDRIDE)
+        //                        ?
         //                                index.graph.getService(CarParkService.class)
         //                                        .getCarParks()
         //                                        .stream()
-        //                                        .filter(carPark -> carPark.id.equals(((Place) environment.getSource()).carParkId))
+        //                                        .filter(carPark -> carPark.id.equals(((Place)
+        //                                        environment.getSource()).carParkId))
         //                                        .findFirst()
         //                                        .orElse(null)
         //                                : null)

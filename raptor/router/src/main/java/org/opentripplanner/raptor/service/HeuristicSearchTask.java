@@ -21,8 +21,8 @@ import org.slf4j.LoggerFactory;
  * features. This is mostly to extract some "glue" out of the {@link RangeRaptorDynamicSearch} to
  * make that simpler and let it focus on the main business logic.
  * <p>
- * This class is not meant for reuse, create one task for each potential heuristic search. The
- * task must be {@link #enable()}d before it is {@link #run()}.
+ * This class is not meant for reuse, create one task for each potential heuristic search. The task
+ * must be {@link #enable()}d before it is {@link #run()}.
  */
 public class HeuristicSearchTask<T extends RaptorTripSchedule> {
 
@@ -81,6 +81,7 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
     if (result == null) {
       return null;
     }
+
     return config.createHeuristic(data, heuristicRequest, result);
   }
 
@@ -98,6 +99,7 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
     if (!isEnabled() || !other.isEnabled()) {
       return;
     }
+
     DebugHeuristics.debug(name(), result(), other.name(), other.result(), originalRequest);
   }
 
@@ -120,6 +122,7 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
     if (!result.isDestinationReached()) {
       throw new DestinationNotReachedException();
     }
+
     if (LOG.isDebugEnabled()) {
       String time = DurationUtils.msToSecondsStr(System.currentTimeMillis() - start);
       LOG.debug("RangeRaptor - {} heuristic search performed in {}.", name, time);

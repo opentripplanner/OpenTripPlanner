@@ -24,10 +24,12 @@ public class StopCallImpl implements GraphQLDataFetchers.GraphQLStopCall {
     return environment -> {
       var tripTime = getSource(environment);
       var canceled = tripTime.isCancelledStop();
+
       // A canceled call is reported even if the trip times are not marked as updated
       if (!tripTime.isRealtime() && !canceled) {
         return null;
       }
+
       var scheduledArrival = getZonedDateTime(environment, tripTime.getScheduledArrival());
       var estimatedArrival =
         scheduledArrival == null
@@ -56,9 +58,11 @@ public class StopCallImpl implements GraphQLDataFetchers.GraphQLStopCall {
       } else {
         var transitService = getTransitService(environment);
         var flexTrip = transitService.getFlexIndex().getTripById(tripTime.getTrip().getId());
+
         if (flexTrip == null) {
           return null;
         }
+
         var startSecs = flexTrip.earliestDepartureTime(tripTime.getStopPosition());
         var endSecs = flexTrip.latestArrivalTime(tripTime.getStopPosition());
 
@@ -92,9 +96,11 @@ public class StopCallImpl implements GraphQLDataFetchers.GraphQLStopCall {
 
   private ZonedDateTime getZonedDateTime(DataFetchingEnvironment environment, int time) {
     var fixedTime = stopTimeToInt(time);
+
     if (fixedTime == null) {
       return null;
     }
+
     var serviceDate = getSource(environment).getServiceDay();
     TransitService transitService = getTransitService(environment);
     return ServiceDateUtils.toZonedDateTime(serviceDate, transitService.getTimeZone(), fixedTime);

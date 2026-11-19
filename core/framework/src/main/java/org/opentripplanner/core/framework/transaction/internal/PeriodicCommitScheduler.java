@@ -43,6 +43,7 @@ class PeriodicCommitScheduler {
   private void runCommit() {
     long startTime = System.currentTimeMillis();
     var f = performCommit.get();
+
     try {
       f.get();
     } catch (InterruptedException e) {
@@ -50,7 +51,9 @@ class PeriodicCommitScheduler {
     } catch (ExecutionException e) {
       LOG.error("Error during periodic commit", e);
     }
+
     long elapsedTime = System.currentTimeMillis() - startTime;
+
     if (elapsedTime > warningLimit_ms) {
       if (warningLimit_ms == interval_ms) {
         // We increase the limit after the first log event to:

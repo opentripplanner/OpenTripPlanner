@@ -13,7 +13,7 @@ import org.opentripplanner.updater.trip.gtfs.GtfsRtTestHelper;
 
 /**
  * Tests that stops can be SKIPPED for a trip which repeats times for consecutive stops.
- *
+ * <p>
  * @link <a href="https://github.com/opentripplanner/OpenTripPlanner/issues/6848">issue</a>
  */
 class SkippedWithRepeatedTimesTest implements RealtimeTestConstants {

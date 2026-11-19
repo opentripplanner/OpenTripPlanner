@@ -40,6 +40,7 @@ public class AddTransitEntitiesToTimetable {
     for (var tripOnServiceDate : dataImport.getTripOnServiceDates()) {
       timetableDataImport.addTripOnServiceDate(tripOnServiceDate);
     }
+
     transitRepository.addOperators(dataImport.getAllOperators());
     transitRepository.addNoticeAssignments(dataImport.getNoticeAssignments());
     transitRepository.addScheduledStopPointMapping(dataImport.stopsByScheduledStopPoint());
@@ -86,7 +87,8 @@ public class AddTransitEntitiesToTimetable {
       // TODO this could be more elegant
       tripPattern.getScheduledTimetable().setServiceCodes(timetableDataImport.getServiceCodes());
 
-      // Store the tripPattern in the scheduled timetable data so it will be serialized and usable in routing.
+      // Store the tripPattern in the scheduled timetable data so it will be serialized and usable
+      // in routing.
       timetableDataImport.addTripPattern(tripPattern.getId(), tripPattern);
     }
   }

@@ -75,6 +75,7 @@ class GraphPathFinder {
       geofencingZoneService.hasIndexedZones()
     ) {
       var destinationZones = computeZonesAtVertices(to);
+
       if (!destinationZones.isEmpty()) {
         requestBuilder.withArriveByDestinationZones(destinationZones);
       }
@@ -99,9 +100,11 @@ class GraphPathFinder {
 
   private Set<GeofencingZone> computeZonesAtVertices(Set<Vertex> vertices) {
     var zones = new HashSet<GeofencingZone>();
+
     for (var vertex : vertices) {
       zones.addAll(geofencingZoneService.findZonesContaining(vertex.getCoordinate()));
     }
+
     return zones;
   }
 }

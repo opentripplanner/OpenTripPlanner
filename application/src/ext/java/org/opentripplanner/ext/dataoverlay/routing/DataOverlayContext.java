@@ -42,6 +42,7 @@ public class DataOverlayContext implements ExtensionRequestContext {
     if (OTPFeature.DataOverlay.isOn() && dataOverlayParameterBindings != null) {
       return List.of(new DataOverlayContext(dataOverlayParameterBindings, dataOverlayRequest));
     }
+
     return List.of();
   }
 

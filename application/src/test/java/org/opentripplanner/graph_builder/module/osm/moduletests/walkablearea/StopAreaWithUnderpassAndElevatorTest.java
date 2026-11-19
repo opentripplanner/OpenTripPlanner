@@ -16,7 +16,6 @@ import org.opentripplanner.street.graph.summary.GraphSummarizer;
 /**
  * Extends the stop-area platform scene with an underpass running beneath the platform and an
  * elevator connecting the two levels.
- *
  * <p>
  * The platform (level 0) and the elevator node are both members of a
  * {@code public_transport=stop_area} relation. The platform is reached by a stair at its
@@ -25,7 +24,6 @@ import org.opentripplanner.street.graph.summary.GraphSummarizer;
  * platform edge; the underpass ({@code tunnel=yes}, level -1) shares the same elevator node from
  * below. OTP therefore builds elevator board/alight/hop edges linking the platform (level 0) to the
  * underpass (level -1).
- *
  * <p>
  * Platform entry linking is disabled, but area visibility is enabled. Because the elevator node
  * sits inside the walkable area and is shared with the footway, the visibility builder attaches it
@@ -126,7 +124,8 @@ class StopAreaWithUnderpassAndElevatorTest {
         // underpass (tunnel, level -1) surfacing outside the platform
         "(2.5,7) → (2.5,2.5) PEDESTRIAN ♿✅",
         "(2.5,2.5) → (2.5,7) PEDESTRIAN ♿✅",
-        // elevator level 0: the node is attached both by the platform area (WAY:100) and the footway
+        // elevator level 0: the node is attached both by the platform area (WAY:100) and the
+        // footway
         // (WAY:2), joined by a zero-level hop
         "osm:node:5:WAY:100 → elevator/osm:node:5:WAY:100 ELEVATOR board",
         "elevator/osm:node:5:WAY:100 → osm:node:5:WAY:100 ELEVATOR alight",

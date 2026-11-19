@@ -14,13 +14,11 @@ import org.opentripplanner.street.search.state.VehicleRentalState;
 /**
  * Creates the deferred RENTING_FLOATING fork one edge after a zone boundary, so the renting state's
  * backEdge is safely outside the zone in the forward itinerary.
- *
  * <p>
- * Forking at the boundary itself would attach the drop event to an edge pointing into the zone
- * (the renting state's backEdge would be the boundary edge), so the rendered itinerary would show
- * the drop on the wrong side. Instead, the strategy returns only the walking branch at the
- * boundary; this handler creates the renting branches on the next edge, where the backEdge is
- * safely outside.
+ * Forking at the boundary itself would attach the drop event to an edge pointing into the zone (the
+ * renting state's backEdge would be the boundary edge), so the rendered itinerary would show the
+ * drop on the wrong side. Instead, the strategy returns only the walking branch at the boundary;
+ * this handler creates the renting branches on the next edge, where the backEdge is safely outside.
  */
 class DeferredForkHandler {
 
@@ -31,6 +29,7 @@ class DeferredForkHandler {
     if (!isDeferredRentingForkTrigger(s0)) {
       return null;
     }
+
     return performDeferredRentingFork(s0, edge);
   }
 
@@ -43,10 +42,13 @@ class DeferredForkHandler {
     if (s0.getVehicleRentalState() != VehicleRentalState.HAVE_RENTED) {
       return false;
     }
+
     var backState = s0.getBackState();
+
     if (backState == null) {
       return false;
     }
+
     // Zone loss: backState had restricted/BA zones that s0 doesn't
     for (var zone : backState.getCurrentGeofencingZones()) {
       if (
@@ -56,12 +58,14 @@ class DeferredForkHandler {
         return true;
       }
     }
+
     // Zone gain: s0 has BA zones that backState didn't (walker entered BA in arrive-by)
     for (var zone : s0.getCurrentGeofencingZones()) {
       if (zone.isBusinessArea() && !backState.getCurrentGeofencingZones().contains(zone)) {
         return true;
       }
     }
+
     return false;
   }
 
@@ -74,8 +78,10 @@ class DeferredForkHandler {
     var states = new ArrayList<State>();
 
     var walking = edge.traverse(s0, TraverseMode.WALK);
+
     if (walking != null) {
       var walkState = walking.makeState();
+
       if (walkState != null) {
         states.add(walkState);
       }
@@ -87,10 +93,12 @@ class DeferredForkHandler {
     var rentalMode = StreetModeToRentalTraverseModeMapper.map(request.mode());
 
     boolean hasNetworkStates = false;
+
     for (String network : forkNetworks) {
       if (!isNetworkAllowedByRequest(network, request)) {
         continue;
       }
+
       // Pre-traversal veto: if the walker is currently inside a no-drop-off zone for
       // this network (e.g., adjacent zones), don't create a renting branch here.
       if (
@@ -102,13 +110,16 @@ class DeferredForkHandler {
       ) {
         continue;
       }
+
       var edit = edge.traverse(s0, rentalMode);
+
       if (edit != null) {
         // Post-traversal veto: if the traversal entered a no-drop-off zone during this edge,
         // discard this network's branch
         if (edit.isDropOffBannedForNetwork(network)) {
           continue;
         }
+
         edit.dropFloatingVehicle(
           s0.vehicleRentalFormFactor(),
           s0.rentalVehiclePropulsionType(),
@@ -116,6 +127,7 @@ class DeferredForkHandler {
           true
         );
         var state = edit.makeState();
+
         if (state != null) {
           states.add(state);
           hasNetworkStates = true;
@@ -125,6 +137,7 @@ class DeferredForkHandler {
 
     if (hasNetworkStates) {
       var edit = edge.traverse(s0, rentalMode);
+
       if (edit != null) {
         edit.dropFloatingVehicle(
           s0.vehicleRentalFormFactor(),
@@ -133,6 +146,7 @@ class DeferredForkHandler {
           true
         );
         var state = edit.makeState();
+
         if (state != null) {
           states.add(state);
         }
@@ -144,6 +158,7 @@ class DeferredForkHandler {
 
   private static Set<String> collectExitedNetworks(State s0) {
     var forkNetworks = new HashSet<String>();
+
     // Zone loss: restricted/BA zones backState had that s0 doesn't
     for (var zone : s0.getBackState().getCurrentGeofencingZones()) {
       if (
@@ -153,12 +168,14 @@ class DeferredForkHandler {
         forkNetworks.add(zone.id().getFeedId());
       }
     }
+
     // Zone gain: BA zones s0 has that backState didn't (walker entered BA in arrive-by)
     for (var zone : s0.getCurrentGeofencingZones()) {
       if (zone.isBusinessArea() && !s0.getBackState().getCurrentGeofencingZones().contains(zone)) {
         forkNetworks.add(zone.id().getFeedId());
       }
     }
+
     return forkNetworks;
   }
 

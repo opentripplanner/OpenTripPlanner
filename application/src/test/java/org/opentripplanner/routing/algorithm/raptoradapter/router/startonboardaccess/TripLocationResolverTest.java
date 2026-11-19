@@ -77,7 +77,8 @@ class TripLocationResolverTest {
       rt.applyTripUpdate(rt.tripUpdateScheduled("T1").addDelayedStopTime(1, 90).build())
     );
 
-    // The aimed departure time matches the scheduled time, while boarding happens at the delayed time
+    // The aimed departure time matches the scheduled time, while boarding happens at the delayed
+    // time
     var tripAndServiceDate = new TripAndServiceDate(env.tripData("T1").trip(), SERVICE_DATE);
     var result = new TripLocationResolver(env.transitService()).resolve(
       tripAndServiceDate,

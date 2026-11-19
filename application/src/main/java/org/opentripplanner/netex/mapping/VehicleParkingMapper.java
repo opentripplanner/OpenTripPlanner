@@ -46,10 +46,13 @@ class VehicleParkingMapper {
       );
       return null;
     }
+
     WgsCoordinate coordinate = mapCoordinate(parking);
+
     if (coordinate == null) {
       return null;
     }
+
     return VehicleParking.of()
       .id(idFactory.createId(parking.getId()))
       .name(mapName(parking))
@@ -66,9 +69,11 @@ class VehicleParkingMapper {
    */
   private I18NString mapName(Parking parking) {
     String name = MultilingualStringMapper.nullableValueOf(parking.getName());
+
     if (name != null) {
       return new NonLocalizedString(name);
     }
+
     issueStore.add(
       "MissingParkingName",
       "NeTEx Parking '%s' does not contain a name",
@@ -78,14 +83,14 @@ class VehicleParkingMapper {
   }
 
   /**
-   * Map the centroid to a coordinate. A parking lot without a valid coordinate cannot be linked
-   * to the street network, so a missing or invalid centroid is reported and {@code null} is
-   * returned.
+   * Map the centroid to a coordinate. A parking lot without a valid coordinate cannot be linked to
+   * the street network, so a missing or invalid centroid is reported and {@code null} is returned.
    */
   @Nullable
   private WgsCoordinate mapCoordinate(Parking parking) {
     try {
       WgsCoordinate coordinate = WgsCoordinateMapper.mapToDomain(parking.getCentroid());
+
       if (coordinate == null) {
         issueStore.add(
           "MissingParkingCoordinates",
@@ -93,6 +98,7 @@ class VehicleParkingMapper {
           parkingDebugId(parking)
         );
       }
+
       return coordinate;
     } catch (InvalidCoordinateException e) {
       issueStore.add(

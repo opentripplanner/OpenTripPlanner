@@ -53,9 +53,11 @@ public class TestCaseDefinitionCsvFile extends AbstractCsvFile<TestCaseDefinitio
 
   private GenericLocation genericLocation(String label, String id, double lat, double lon) {
     var feedScopedId = FeedScopedId.ofNullable(feedId, id);
+
     if (feedScopedId == null) {
       return GenericLocation.fromCoordinate(lat, lon, label);
     }
+
     return GenericLocation.fromStopIdWithFallback(feedScopedId, lat, lon, label);
   }
 

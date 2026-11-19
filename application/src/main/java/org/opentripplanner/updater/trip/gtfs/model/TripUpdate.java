@@ -79,6 +79,7 @@ public final class TripUpdate {
     if (startDate != null) {
       return startDate;
     }
+
     // TODO: figure out the correct service date. For the special case that a trip
     // starts for example at 40:00, yesterday would probably be a better guess.
     startDate = tripDescriptor.startDate().orElse(localDateNow.get());
@@ -113,17 +114,22 @@ public final class TripUpdate {
     tripDescriptor.startDate();
 
     var lastStopSequence = -1;
+
     for (StopTimeUpdate update : stopTimeUpdates()) {
       // validate stop sequence
       OptionalInt stopSequence = update.stopSequence();
+
       if (stopSequence.isPresent()) {
         var seq = stopSequence.getAsInt();
+
         if (seq < 0) {
           throw UpdateException.of(tripId(), INVALID_STOP_SEQUENCE);
         }
+
         if (seq <= lastStopSequence) {
           throw UpdateException.of(tripId(), INVALID_STOP_SEQUENCE);
         }
+
         lastStopSequence = seq;
       }
     }

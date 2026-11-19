@@ -68,6 +68,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
   private PathBuilderLeg(MyLeg leg) {
     this.leg = leg;
+
     if (leg.isTransit()) {
       @SuppressWarnings("unchecked")
       var transit = (MyTransitLeg<T>) leg;
@@ -195,9 +196,11 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     if (isAccess()) {
       timeShiftAccessTime(slackProvider, iterationDepartureTime);
     }
+
     if (next != null) {
       if (next.isTransfer()) {
         next.setTransferTimeBasedOnPreviousLeg(slackProvider);
+
         if (next.next().isEgress()) {
           next.timeShiftThisAndNextLeg(slackProvider, iterationDepartureTime);
         }
@@ -216,18 +219,23 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     if (costCalculator == null) {
       return RaptorCostCalculator.ZERO_COST;
     }
+
     if (isAccess()) {
       return asAccessLeg().streetPath.c1();
     }
+
     if (isTransfer()) {
       return asTransferLeg().transfer.c1();
     }
+
     if (isTransit()) {
       return transitCost(costCalculator, slackProvider);
     }
+
     if (isEgress()) {
       return egressCost(costCalculator, slackProvider);
     }
+
     throw new IllegalStateException("Unknown leg type: " + this);
   }
 
@@ -316,15 +324,19 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
   @Nullable
   PathBuilderLeg<T> prevTransitLeg() {
     var it = prev();
+
     if (it == null) {
       return null;
     }
+
     if (it.isTransfer()) {
       it = it.prev();
     }
+
     if (it == null) {
       return null;
     }
+
     // Check transfer, it can be a FLEX access
     return it.isTransit() ? it : null;
   }
@@ -332,9 +344,11 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
   @Nullable
   PathBuilderLeg<T> next(Predicate<PathBuilderLeg<T>> test) {
     var it = next();
+
     while (it != null && !test.test(it)) {
       it = it.next();
     }
+
     return it;
   }
 
@@ -397,15 +411,19 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     if (isAccess()) {
       return createAccessPathLeg(costCalculator, slackProvider);
     }
+
     if (isTransit()) {
       return createTransitPathLeg(costCalculator, slackProvider);
     }
+
     if (isTransfer()) {
       return createTransferPathLeg(costCalculator, slackProvider);
     }
+
     if (isEgress()) {
       return createEgressPathLeg(costCalculator, slackProvider);
     }
+
     throw new IllegalStateException("Unknown leg type: " + this);
   }
 
@@ -456,6 +474,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     if (!isTransit()) {
       return toTime;
     }
+
     return toTime + slackProvider.alightSlack(asTransitLeg().trip.pattern().slackIndex());
   }
 
@@ -511,9 +530,11 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     // For transit, we time-shift the access as late as possible to fit with the transit.
     else {
       int toTime = nextTransitLeg.transitStopArrivalTimeBefore(slackProvider, hasRides());
+
       if (next.isTransfer()) {
         toTime -= next.asTransferLeg().transfer.durationInSeconds();
       }
+
       toTime = accessPath.latestArrivalTime(toTime);
       assertTimeExist(
         toTime,
@@ -526,6 +547,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
   private void setTransferTimeBasedOnPreviousLeg(RaptorSlackProvider slackProvider) {
     int newFromTime;
+
     if (prev.isTransit()) {
       newFromTime =
         prev.toTime() + slackProvider.alightSlack(prev.asTransitLeg().trip.pattern().slackIndex());
@@ -534,6 +556,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     } else {
       throw new IllegalStateException("Unexpected leg type before TransferLeg: " + this);
     }
+
     setTime(newFromTime, newFromTime + asTransferLeg().transfer.durationInSeconds());
   }
 
@@ -636,6 +659,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
         )
       );
     }
+
     return time;
   }
 
@@ -695,9 +719,11 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
       if (path instanceof AccessWithPenalty awp) {
         return awp.removeDecorator();
       }
+
       if (path instanceof EgressWithPenalty awp) {
         return awp.removeDecorator();
       }
+
       return path;
     }
   }

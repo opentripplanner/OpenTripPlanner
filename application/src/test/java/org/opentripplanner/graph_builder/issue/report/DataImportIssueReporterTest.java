@@ -56,6 +56,7 @@ class DataImportIssueReporterTest {
   @Test
   void keepOnlyTheIssuesWithTheHighestPriority() {
     List<DataImportIssue> issues = new ArrayList<>();
+
     for (int priority : new int[] { 3, 7, 1, 9, 5, 8 }) {
       issues.add(new PrioritizedIssue(priority));
     }
@@ -75,9 +76,11 @@ class DataImportIssueReporterTest {
   @Test
   void truncateBeforeSplittingIntoFiles() {
     List<DataImportIssue> issues = new ArrayList<>();
+
     for (int i = 0; i < 1000; i++) {
       issues.add(Issue.issue("TypeA", "a_" + i));
     }
+
     for (int i = 0; i < 5; i++) {
       issues.add(Issue.issue("TypeB", "b_" + i));
     }
@@ -93,6 +96,7 @@ class DataImportIssueReporterTest {
       .filter(b -> b.key().issueType().equals("TypeA"))
       .toList();
     assertThat(typeA).hasSize(5);
+
     for (var bucket : typeA) {
       assertThat(bucket.issues()).hasSize(10);
       assertEquals(50, bucket.reportedIssuesOfType());

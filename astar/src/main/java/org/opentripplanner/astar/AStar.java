@@ -67,17 +67,16 @@ public class AStar<
 
   /// Create an AStar search
   ///
-  /// @param initialStates      The initial states to start the search from.
-  /// @param arriveBy           If set to true we will do a backwards search by traversing the
-  ///                           incoming edges from each vertex.
-  /// @param dominanceFunction  A dominance function that determines which states we should keep
-  ///                           during the search.
-  /// @param goalVertices       The search stops once the first goal vertex is reached.
-  /// @param heuristic          An astar heuristic that estimates a lower bound of the weight to the
-  ///                           destination. If set to null the search will be a basic Dijkstra
-  ///                           search.
-  /// @param timeout            A timeout that exits the search.
-  /// @param preSearchHook      A runnable that is run before the search starts.
+  /// @param initialStates The initial states to start the search from.
+  /// @param arriveBy If set to true we will do a backwards search by traversing the incoming edges
+  ///     from each vertex.
+  /// @param dominanceFunction A dominance function that determines which states we should keep
+  ///     during the search.
+  /// @param goalVertices The search stops once the first goal vertex is reached.
+  /// @param heuristic An astar heuristic that estimates a lower bound of the weight to the
+  ///     destination. If set to null the search will be a basic Dijkstra search.
+  /// @param timeout A timeout that exits the search.
+  /// @param preSearchHook A runnable that is run before the search starts.
   /// @param statisticsCallback A pluggable callback for logging metrics.
   AStar(
     Collection<State> initialStates,
@@ -160,6 +159,7 @@ public class AStar<
     Vertex u_vertex = u.getVertex();
 
     Collection<Edge> edges = arriveBy ? u_vertex.getIncoming() : u_vertex.getOutgoing();
+
     for (Edge edge : edges) {
       if (skipEdgeStrategy != null && skipEdgeStrategy.shouldSkipEdge(u, edge)) {
         continue;
@@ -168,6 +168,7 @@ public class AStar<
       // Iterate over traversal results. When an edge leads nowhere (as indicated by
       // returning an empty array), the iteration is over.
       var states = edge.traverse(u);
+
       for (var v : states) {
         // Could be: for (State v : traverseEdge...)
 
@@ -180,6 +181,7 @@ public class AStar<
         if (remaining_w < 0 || Double.isInfinite(remaining_w)) {
           continue;
         }
+
         double estimate = v.getWeight() + remaining_w;
 
         // spt.add returns true if the state is hopeful; enqueue state if it's hopeful
@@ -188,6 +190,7 @@ public class AStar<
           if (traverseVisitor != null) {
             traverseVisitor.visitEnqueue();
           }
+
           pq.insert(v, estimate);
         }
       }
@@ -232,6 +235,7 @@ public class AStar<
           break;
         }
       }
+
       if (goalVertices != null && goalVertices.contains(u.getVertex()) && u.isFinal()) {
         targetAcceptedStates.add(u);
 

@@ -80,11 +80,10 @@ class StopTimesMapper {
   private List<String> currentHeadSignVias;
 
   /**
-   * @param stopPlaceIdByStopPointRef Generally speaking, scheduled stop points can only refer to quays.
-   *                                  However, some profiles - like EPIP - allow you also use stop places.
-   *                                  If you activate this feature (stopPlaceAsPassengerStopAssignment)
-   *                                  then this collection is non-empty. In such a case a child stop
-   *                                  is used as a fallback.
+   * @param stopPlaceIdByStopPointRef Generally speaking, scheduled stop points can only refer to
+   *     quays. However, some profiles - like EPIP - allow you also use stop places. If you activate
+   *     this feature (stopPlaceAsPassengerStopAssignment) then this collection is non-empty. In
+   *     such a case a child stop is used as a fallback.
    */
   StopTimesMapper(
     DataImportIssueStore issueStore,
@@ -117,9 +116,11 @@ class StopTimesMapper {
 
   static int calculateOtpTime(LocalTime time, BigInteger dayOffset) {
     int otpTime = time.toSecondOfDay();
+
     if (dayOffset != null) {
       otpTime += DAY_IN_SECONDS * dayOffset.intValue();
     }
+
     return otpTime;
   }
 
@@ -156,6 +157,7 @@ class StopTimesMapper {
         ) {
           continue;
         }
+
         issueStore.add(
           "JourneyPatternStopNotFound",
           "Stop with id %s not found for StopPoint %s in JourneyPattern %s. " +
@@ -173,6 +175,7 @@ class StopTimesMapper {
       scheduledStopPointIds.add(stopPoint.getScheduledStopPointRef().getValue().getRef());
 
       StopTime stopTime = mapToStopTime(trip, stopPoint, stop, currentPassingTime, i);
+
       if (stopTime == null) {
         return null;
       }
@@ -187,6 +190,7 @@ class StopTimesMapper {
 
       result.addStopTime(currentPassingTime.getId(), stopTime);
     }
+
     result.setScheduledStopPointIds(scheduledStopPointIds);
 
     return result;
@@ -240,6 +244,7 @@ class StopTimesMapper {
         }
       }
     }
+
     return null;
   }
 
@@ -269,6 +274,7 @@ class StopTimesMapper {
     stopTime.setTrip(trip);
     stopTime.setStopSequence(stopSequence);
     stopTime.setStop(stop);
+
     if (passingTime.getArrivalTime() != null || passingTime.getDepartureTime() != null) {
       stopTime.setArrivalTime(
         calculateOtpTime(
@@ -335,6 +341,7 @@ class StopTimesMapper {
         if (destinationDisplay != null) {
           currentHeadSign = headsignMapper.map(destinationDisplay);
           Vias_RelStructure viaValues = destinationDisplay.getVias();
+
           if (viaValues != null && viaValues.getVia() != null) {
             currentHeadSignVias = viaValues
               .getVia()
@@ -373,9 +380,11 @@ class StopTimesMapper {
     if (currentHeadSign != null) {
       stopTime.setStopHeadsign(currentHeadSign);
     }
+
     if (currentHeadSignVias != null) {
       stopTime.setHeadsignVias(currentHeadSignVias);
     }
+
     return stopTime;
   }
 
@@ -391,6 +400,7 @@ class StopTimesMapper {
     var stopPlaceId = stopPlaceIdByStopPointRef.lookup(stopPointRef);
     var flexibleStopPlaceId = flexibleStopPlaceIdByStopPointRef.lookup(stopPointRef);
     StopLocation stopLocation = null;
+
     if (quayId != null) {
       stopLocation = stopsById.get(idFactory.createId(quayId));
     } else if (stopPlaceId != null) {
@@ -429,6 +439,7 @@ class StopTimesMapper {
     if (station == null) {
       return null;
     }
+
     return station.getChildStops().stream().min(TransitEntity.idComparator()).orElse(null);
   }
 
@@ -439,6 +450,7 @@ class StopTimesMapper {
     if (serviceJourney == null) {
       return null;
     }
+
     String lineRef = null;
     // Check for direct connection to Line
     JAXBElement<? extends LineRefStructure> lineRefStruct = serviceJourney.getLineRef();
@@ -450,6 +462,7 @@ class StopTimesMapper {
       // Connect to Line referenced through JourneyPattern->Route
       lineRef = JourneyPatternHelper.getLineFromRoute(routeByid, journeyPattern);
     }
+
     return flexibleLinesById.lookup(lineRef);
   }
 }

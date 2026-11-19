@@ -54,6 +54,7 @@ public class CalendarServiceBuilder {
     if (dates.isEmpty()) {
       return emptyServiceId;
     }
+
     // The injected lambda is run inside the synchronized block
     return serviceCalendar.computeIfAbsent(dates, ignore -> createServiceId());
   }
@@ -71,6 +72,7 @@ public class CalendarServiceBuilder {
         dates.add(ServiceCalendarDate.create(it.getValue(), serviceDate));
       }
     }
+
     return dates;
   }
 

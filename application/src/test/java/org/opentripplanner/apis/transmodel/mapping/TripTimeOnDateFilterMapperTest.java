@@ -249,9 +249,11 @@ class TripTimeOnDateFilterMapperTest {
    */
   private static Map<String, Object> withNulls(Map<String, ?> input, String... nullFields) {
     var result = new HashMap<String, Object>(input);
+
     for (var field : nullFields) {
       result.put(field, null);
     }
+
     return result;
   }
 }

@@ -6,15 +6,17 @@ import org.opentripplanner.transit.transfer.regular.api.report.RegularTransferCa
 import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
 
 /**
- * A read-only snapshot of the {@link RegularTransferRepository}, and the read access to the
- * regular transfers. A new snapshot is published each time a transaction that touched the
- * repository commits. A request resolves one snapshot at its start and uses it for both routing
- * and recovering the path of a transfer used in an itinerary, so the two are always consistent.
+ * A read-only snapshot of the {@link RegularTransferRepository}, and the read access to the regular
+ * transfers. A new snapshot is published each time a transaction that touched the repository
+ * commits. A request resolves one snapshot at its start and uses it for both routing and recovering
+ * the path of a transfer used in an itinerary, so the two are always consistent.
  * <p>
  * The paths are immutable. The only mutable state is a cache of the Raptor transfers derived from
  * them, see {@link RegularTransfersService#raptorTransfers}.
  *
- * @param <P> the street path type
+ * @param
+ *     <p>
+ *     the street path type
  * @param <R> the request type, see {@link TransferRequestMapper}
  */
 public interface RegularTransferRepositorySnapshot<P, R> {
@@ -35,8 +37,8 @@ public interface RegularTransferRepositorySnapshot<P, R> {
   void warmUp();
 
   /**
-   * A report of the keys of the cache of the Raptor transfers, and how many requests used each.
-   * The report is empty if the statistics are not enabled.
+   * A report of the keys of the cache of the Raptor transfers, and how many requests used each. The
+   * report is empty if the statistics are not enabled.
    */
   RegularTransferCacheReport cacheReport();
 

@@ -21,8 +21,8 @@ public class EdgeTraverser {
 
   /// Create a path from a set of edges and a street search request.
   ///
-  /// @return Empty if the list of edges is empty or if the edges can't be traversed using the
-  ///         given request
+  /// @return Empty if the list of edges is empty or if the edges can't be traversed using the given
+  ///     request
   public static Optional<StreetPath> createPath(List<Edge> edges, StreetSearchRequest request) {
     if (edges.isEmpty()) {
       return Optional.empty();
@@ -30,11 +30,13 @@ public class EdgeTraverser {
 
     var states = new ArrayList<State>(edges.size() + 1);
     var it = new StateIterator(createStartState(edges.getFirst().getFromVertex(), request), edges);
+
     try {
       it.forEachRemaining(states::add);
     } catch (CouldNotTraverseException _) {
       return Optional.empty();
     }
+
     return Optional.of(new StreetPath(states, edges));
   }
 
@@ -43,6 +45,7 @@ public class EdgeTraverser {
   public static Optional<State> traverseEdges(State s, List<Edge> edges) {
     var it = new StateIterator(s, edges);
     var state = s;
+
     while (it.hasNext()) {
       try {
         state = it.next();
@@ -50,6 +53,7 @@ public class EdgeTraverser {
         return Optional.empty();
       }
     }
+
     return Optional.of(state);
   }
 
@@ -83,6 +87,7 @@ public class EdgeTraverser {
 
       var edge = edgeIterator.next();
       var nextState = edge.traverse(state);
+
       if (nextState.length > 1) {
         throw new IllegalStateException(
           "Expected only a single state returned from edge %s but received %s".formatted(

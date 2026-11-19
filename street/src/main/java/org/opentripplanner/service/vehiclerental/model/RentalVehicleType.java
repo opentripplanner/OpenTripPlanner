@@ -11,14 +11,14 @@ import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * @see <a href=
- *      "https://github.com/NABSA/gbfs/blob/master/gbfs.md#vehicle_typesjson-added-in-v21">GBFS
- *      Specification</a>
- *      <p>
+ * @see
+ *     <a href= "https://github.com/NABSA/gbfs/blob/master/gbfs.md#vehicle_typesjson-added-in-v21">GBFS
+ *     Specification</a>
  */
 public final class RentalVehicleType implements Serializable, Comparable<RentalVehicleType> {
 
-  // This is a ConcurrentHashMap in order to be thread safe, as it is used from different updater threads.
+  // This is a ConcurrentHashMap in order to be thread safe, as it is used from different updater
+  // threads.
   static final Map<String, RentalVehicleType> DEFAULT_VEHICLE_FOR_SYSTEM =
     new ConcurrentHashMap<>();
 

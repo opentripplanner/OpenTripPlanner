@@ -12,8 +12,8 @@ import java.util.stream.Stream;
  * Collection of test-cases with a builder that can filter down the number of cases according to the
  * config parameters.
  * <p>
- * A {@link TestCase} does only contain ONE result, so a new set of test-cases should be created
- * for every sample run (run each test-case once).
+ * A {@link TestCase} does only contain ONE result, so a new set of test-cases should be created for
+ * every sample run (run each test-case once).
  */
 public class TestCases {
 
@@ -40,8 +40,8 @@ public class TestCases {
   /**
    * Select test-cases to use for JIT warm-up.
    * <p>
-   * If there are three or fewer cases, all cases are returned. Otherwise, a small set of cases
-   * is selected. When there are multiple mode combinations, the first test-case for each mode
+   * If there are three or fewer cases, all cases are returned. Otherwise, a small set of cases is
+   * selected. When there are multiple mode combinations, the first test-case for each mode
    * combination is selected first. Additional cases are then sampled from across the list until at
    * least three cases have been selected.
    */
@@ -49,6 +49,7 @@ public class TestCases {
     if (numberOfTestCases() <= 3) {
       return List.copyOf(cases);
     }
+
     var samples = new HashSet<TestCase>();
 
     var groupByModes = cases.stream().collect(Collectors.groupingBy(tc -> tc.definition().modes()));
@@ -60,6 +61,7 @@ public class TestCases {
         samples.add(it.getFirst());
       }
     }
+
     // There are at least 4 cases, so we split the set in 4 groups and pick the first element in
     // the 3 last groups.
     int step = numberOfTestCases() / 4;
@@ -69,6 +71,7 @@ public class TestCases {
       samples.add(cases.get(index));
       index += step;
     }
+
     return samples.stream().sorted(Comparator.comparing(TestCase::id)).toList();
   }
 

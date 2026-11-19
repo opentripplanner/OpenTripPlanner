@@ -38,6 +38,7 @@ public class DirectFlexRouter {
     if (!StreetMode.FLEXIBLE.equals(request.journey().direct().mode())) {
       return Collections.emptyList();
     }
+
     OTPRequestTimeoutException.checkForTimeout();
     // Prepare access/egress transfers
     var dataOverlayContext = DataOverlayContext.listExtensionRequestContexts(

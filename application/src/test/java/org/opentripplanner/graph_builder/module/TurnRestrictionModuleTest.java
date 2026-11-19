@@ -182,6 +182,7 @@ public class TurnRestrictionModuleTest {
     // Test all orders in which the turn restrictions can be applied.
     //module.buildGraph();
     List<TurnRestriction> useTurnRestrictions = new ArrayList<>();
+
     switch (order) {
       case 0:
         useTurnRestrictions.add(turnRestrictions.get(0));
@@ -298,11 +299,13 @@ public class TurnRestrictionModuleTest {
       .get();
     var B1 = Bs.get(0);
     var B2 = Bs.get(1);
+
     if (B1.getIncoming().stream().map(Edge::getFromVertex).toList().contains(D)) {
       var swap = B1;
       B1 = B2;
       B2 = swap;
     }
+
     assertThat(graph.getVertices()).containsExactly(A, B, C, D, E, F, G, B1, B2, newE);
     assertThat(B1.getIncoming().stream().map(Edge::getFromVertex)).containsExactly(A);
     assertThat(B2.getIncoming().stream().map(Edge::getFromVertex)).containsExactly(D);

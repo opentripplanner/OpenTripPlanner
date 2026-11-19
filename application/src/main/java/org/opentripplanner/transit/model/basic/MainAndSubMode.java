@@ -42,6 +42,7 @@ public record MainAndSubMode(TransitMode mainMode, @Nullable SubMode subMode) {
     if (subMode == null) {
       return mainMode.name();
     }
+
     return mainMode.name() + "::" + subMode;
   }
 
@@ -50,6 +51,7 @@ public record MainAndSubMode(TransitMode mainMode, @Nullable SubMode subMode) {
     if (modes == null) {
       return null;
     }
+
     return modes.stream().map(MainAndSubMode::new).toList();
   }
 

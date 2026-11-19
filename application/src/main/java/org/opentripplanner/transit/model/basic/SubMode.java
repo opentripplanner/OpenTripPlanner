@@ -19,8 +19,8 @@ import org.slf4j.LoggerFactory;
  * Naming; This class is named SubMode, not NetexSubMode because we want to migrate gtfsRouteType
  * into the same concept.
  * <p>
- * This class is thread-safe, and the performance overhead should affect the graph built time,
- * but not routing.
+ * This class is thread-safe, and the performance overhead should affect the graph built time, but
+ * not routing.
  */
 public record SubMode(String name, int index) implements Serializable {
   private static final int NON_EXISTING_SUB_MODE_INDEX = 1_000_000;
@@ -46,6 +46,7 @@ public record SubMode(String name, int index) implements Serializable {
     if (name == null) {
       return UNKNOWN;
     }
+
     var subMode = ALL.get(name);
     return subMode != null ? subMode : new SubMode(name, NON_EXISTING_SUB_MODE_INDEX);
   }
@@ -61,9 +62,11 @@ public record SubMode(String name, int index) implements Serializable {
     if (name == null) {
       return UNKNOWN;
     }
+
     if (ALL.size() == 1000) {
       LOG.error("There are 1000 subModes in use, there might be a memory leak.");
     }
+
     return ALL.computeIfAbsent(name, it -> new SubMode(it, COUNTER.getAndIncrement()));
   }
 
@@ -72,11 +75,13 @@ public record SubMode(String name, int index) implements Serializable {
    */
   public static Set<SubMode> getByIndex(BitSet subModes) {
     var set = new HashSet<SubMode>();
+
     for (SubMode value : ALL.values()) {
       if (subModes.get(value.index())) {
         set.add(value);
       }
     }
+
     return set;
   }
 
@@ -86,10 +91,12 @@ public record SubMode(String name, int index) implements Serializable {
 
   public static void deserializeSubModeCache(Collection<SubMode> subModes) {
     int maxIndex = 0;
+
     for (SubMode it : subModes) {
       ALL.put(it.name(), it);
       maxIndex = Math.max(maxIndex, it.index);
     }
+
     COUNTER.set(maxIndex + 1);
   }
 
@@ -102,9 +109,11 @@ public record SubMode(String name, int index) implements Serializable {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     var other = (SubMode) o;
     return name.equals(other.name);
   }

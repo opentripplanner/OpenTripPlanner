@@ -20,6 +20,7 @@ public class GeofencingInterceptor {
     EdgeTraversal edge
   ) {
     var result = TraversalBanHandler.apply(s0);
+
     if (result != null) {
       return result;
     }
@@ -40,17 +41,21 @@ public class GeofencingInterceptor {
     if (!s0.isRentingVehicle()) {
       return null;
     }
+
     String network = s0.getVehicleRentalNetwork();
 
     for (var boundary : toBoundaries) {
       var zone = boundary.zone();
+
       if (network != null && !zone.id().getFeedId().equals(network)) {
         continue;
       }
+
       var enforcement = GeofencingBoundaryEnforcement.forZone(zone);
       var result = boundary.entering()
         ? enforcement.forwardApproachingEntry(zone, s0, edge)
         : enforcement.forwardApproachingExit(zone, s0, edge);
+
       if (result != null) {
         return result;
       }
@@ -62,12 +67,16 @@ public class GeofencingInterceptor {
       if (boundary.entering()) {
         continue;
       }
+
       var zone = boundary.zone();
+
       if (network != null && !zone.id().getFeedId().equals(network)) {
         continue;
       }
+
       var enforcement = GeofencingBoundaryEnforcement.forZone(zone);
       var result = enforcement.forwardCrossingExit(zone, s0, edge);
+
       if (result != null) {
         return result;
       }
@@ -83,6 +92,7 @@ public class GeofencingInterceptor {
     EdgeTraversal edge
   ) {
     var deferredResult = DeferredForkHandler.applyDeferredFork(s0, edge);
+
     if (deferredResult != null) {
       return deferredResult;
     }
@@ -96,14 +106,18 @@ public class GeofencingInterceptor {
     if (s0.isRentingVehicle() && network != null) {
       for (var boundary : fromBoundaries) {
         var zone = boundary.zone();
+
         if (!zone.id().getFeedId().equals(network)) {
           continue;
         }
+
         if (boundary.entering()) {
           continue;
         }
+
         var enforcement = GeofencingBoundaryEnforcement.forZone(zone);
         var result = enforcement.arriveByCrossingExit(zone, s0, edge);
+
         if (result != null) {
           return result;
         }
@@ -111,6 +125,7 @@ public class GeofencingInterceptor {
     }
 
     var walkerResult = WalkerBoundaryHandler.apply(s0, fromBoundaries, toBoundaries, edge);
+
     if (walkerResult != null) {
       return walkerResult;
     }

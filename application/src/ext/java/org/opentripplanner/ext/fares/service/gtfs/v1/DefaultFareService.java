@@ -113,14 +113,17 @@ public class DefaultFareService implements FareService {
     if (fareLegs.isEmpty()) {
       return null;
     }
+
     var fareLegsByFeed = fareLegsByFeed(fareLegs);
 
     ItineraryFare fare = ItineraryFare.empty();
+
     for (FareType fareType : fareRulesPerType.keySet()) {
       for (String feedId : fareLegsByFeed.keySet()) {
         var fareRules = fareRulesForFeed(fareType, feedId);
 
-        // Get the currency from the first fareAttribute, assuming that all tickets use the same currency.
+        // Get the currency from the first fareAttribute, assuming that all tickets use the same
+        // currency.
         if (fareRules != null && !fareRules.isEmpty()) {
           Currency currency = fareRules.iterator().next().getFareAttribute().getPrice().currency();
           ItineraryFare computedFaresForType = calculateFaresForType(
@@ -134,6 +137,7 @@ public class DefaultFareService implements FareService {
         }
       }
     }
+
     return fare;
   }
 
@@ -159,9 +163,9 @@ public class DefaultFareService implements FareService {
   /**
    * Builds the Fare object for the given currency, fareType and fareRules.
    * <p>
-   * Besides calculating the lowest fare, we also break down the fare and which routes correspond
-   * to which components. Note that even if we cannot get a lowest fare (if some rides don't have
-   * fare rules), there will still be a breakdown for those parts which have fares.
+   * Besides calculating the lowest fare, we also break down the fare and which routes correspond to
+   * which components. Note that even if we cannot get a lowest fare (if some rides don't have fare
+   * rules), there will still be a breakdown for those parts which have fares.
    * <p>
    * As an example, given the rides A-B and B-C. Where A-B and B-C have fares of 10 each, 2 fare
    * detail objects are added, one with fare 10 for A-B and one with fare 10 for B-C.
@@ -183,12 +187,14 @@ public class DefaultFareService implements FareService {
     Multimap<Leg, FareOffer> fareProductUses = LinkedHashMultimap.create();
     int start = 0;
     int end = legs.size() - 1;
+
     while (start <= end) {
       // skip parts where no fare is present, we want to return something
       // even if not all legs have fares
       while (start <= end && r.endOfComponent[start] < 0) {
         ++start;
       }
+
       if (start > end) {
         break;
       }
@@ -203,8 +209,10 @@ public class DefaultFareService implements FareService {
       ).build();
 
       List<Leg> applicableLegs = new ArrayList<>();
+
       for (int i = start; i <= via; ++i) {
         final var leg = legs.get(i);
+
         // if we have a leg that is combined for the purpose of fare calculation we need to
         // retrieve the original legs so that the fare products are assigned back to the original
         // legs that the combined one originally consisted of.
@@ -256,19 +264,23 @@ public class DefaultFareService implements FareService {
     String feedId = firstRide.agency().getId().getFeedId();
     ZonedDateTime lastRideStartTime = null;
     ZonedDateTime lastRideEndTime = null;
+
     for (var leg : legs) {
       if (!leg.agency().getId().getFeedId().equals(feedId)) {
         LOG.debug("skipped multi-feed ride sequence {}", legs);
         return Optional.empty();
       }
+
       lastRideStartTime = leg.startTime();
       lastRideEndTime = leg.endTime();
       endZone = leg.to().stop.getFirstZoneAsString();
       routes.add(leg.route().getId());
       trips.add(leg.trip().getId());
+
       for (FareZone z : leg.fareZones()) {
         zones.add(z.getId().getId());
       }
+
       transfersUsed += 1;
     }
 
@@ -282,6 +294,7 @@ public class DefaultFareService implements FareService {
     // find the best fare that matches this set of rides
     for (FareRuleSet ruleSet : fareRules) {
       FareAttribute attribute = ruleSet.getFareAttribute();
+
       // fares also don't really have an agency id, they will have the per-feed default id
       // check only if the fare is not mapped to an agency
       if (!attribute.getId().getFeedId().equals(feedId)) {
@@ -301,12 +314,14 @@ public class DefaultFareService implements FareService {
         )
       ) {
         Money newFare = attribute.getPrice();
+
         if (bestFare == null || newFare.lessThan(bestFare)) {
           bestAttribute = attribute;
           bestFare = newFare;
         }
       }
     }
+
     LOG.debug("{} best for {}", bestAttribute, legs);
     Money finalBestFare = bestFare;
     return Optional.ofNullable(bestAttribute).map(attribute ->
@@ -321,8 +336,9 @@ public class DefaultFareService implements FareService {
    * By default it's disabled since this is unspecified in the GTFS fares spec.
    *
    * @see DefaultFareService#combineInterlinedLegs(List)
-   * @see HighestFareInFreeTransferWindowFareService#shouldCombineInterlinedLegs(ScheduledTransitLeg,
-   *      ScheduledTransitLeg)
+   * @see
+   *     HighestFareInFreeTransferWindowFareService#shouldCombineInterlinedLegs(ScheduledTransitLeg,
+   *     ScheduledTransitLeg)
    * @see HSLFareService#shouldCombineInterlinedLegs(ScheduledTransitLeg, ScheduledTransitLeg)
    */
   protected boolean shouldCombineInterlinedLegs(
@@ -340,6 +356,7 @@ public class DefaultFareService implements FareService {
    */
   private List<Leg> combineInterlinedLegs(List<Leg> fareLegs) {
     var result = new ArrayList<Leg>();
+
     for (var leg : fareLegs) {
       if (
         leg.isInterlinedWithPreviousLeg() &&
@@ -354,6 +371,7 @@ public class DefaultFareService implements FareService {
         result.add(leg);
       }
     }
+
     return result;
   }
 
@@ -379,18 +397,23 @@ public class DefaultFareService implements FareService {
         float cost = best
           .map(b -> b.fare().fractionalAmount().floatValue())
           .orElse(Float.POSITIVE_INFINITY);
+
         if (cost < 0) {
           LOG.error("negative cost for a ride sequence");
           cost = Float.POSITIVE_INFINITY;
         }
+
         if (cost < Float.POSITIVE_INFINITY) {
           r.endOfComponent[j] = j + i;
           r.next[j][j + i] = j + i;
         }
+
         r.resultTable[j][j + i] = cost;
         r.fareIds[j][j + i] = best.map(FareAndId::fareId).orElse(null);
+
         for (int k = 0; k < i; k++) {
           float via = r.resultTable[j][j + k] + r.resultTable[j + k + 1][j + i];
+
           if (r.resultTable[j][j + i] > via) {
             r.resultTable[j][j + i] = via;
             r.endOfComponent[j] = j + i;
@@ -399,6 +422,7 @@ public class DefaultFareService implements FareService {
         }
       }
     }
+
     return r;
   }
 }

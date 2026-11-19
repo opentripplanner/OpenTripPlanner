@@ -70,8 +70,8 @@ public class SearchParams {
    * The earliest a journey can depart from the origin. The unit is seconds since midnight.
    * Inclusive.
    * <p>
-   * In the case of a 'depart after' search this is a required. In the case of a 'arrive by'
-   * search this is optional, but it will improve performance if it is set.
+   * In the case of a 'depart after' search this is a required. In the case of a 'arrive by' search
+   * this is optional, but it will improve performance if it is set.
    */
   public int earliestDepartureTime() {
     return earliestDepartureTime;
@@ -85,8 +85,8 @@ public class SearchParams {
    * The latest a journey may arrive at the destination. The unit is seconds since midnight.
    * Exclusive.
    * <p>
-   * In the case of a 'arrive by' search this is a required. In the case of a 'depart after'
-   * search this is optional, but it will improve performance if it is set.
+   * In the case of a 'arrive by' search this is a required. In the case of a 'depart after' search
+   * this is optional, but it will improve performance if it is set.
    */
   public int latestArrivalTime() {
     return latestArrivalTime;
@@ -124,7 +124,6 @@ public class SearchParams {
   /**
    * Keep the latest departures arriving before the given latest-arrival-time(LAT). LAT is required
    * if this parameter is set. This parameter is not allowed if the {@link #timetable} is enabled.
-   * <p>
    * <pre>
    * TODO - Reactor, we should use an Enum value instead of this and 'timetable':
    *      - timePreference : enum TimePreference{ TIMETABLE, DEPART_AFTER, ARRIVE_BY }
@@ -243,9 +242,11 @@ public class SearchParams {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     SearchParams that = (SearchParams) o;
     return (
       earliestDepartureTime == that.earliestDepartureTime &&
@@ -323,6 +324,7 @@ public class SearchParams {
     for (var access : accessPaths) {
       access.validateAccessEgressVisitVia("Access", numberOfVias);
     }
+
     for (var egress : egressPaths) {
       egress.validateAccessEgressVisitVia("Egress", numberOfVias);
     }

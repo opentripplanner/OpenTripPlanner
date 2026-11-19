@@ -14,8 +14,8 @@ import org.opentripplanner.utils.time.DurationUtils;
  * <pre>
  *   v' := v * ratio + slack
  * </pre>
- * The {@code ratio} is rounded of to the closest 1/16. This is done for performance reasons
- * since we then can use shift-right 4 bit to divide by 16.
+ * The {@code ratio} is rounded of to the closest 1/16. This is done for performance reasons since
+ * we then can use shift-right 4 bit to divide by 16.
  * <p>
  * "Increasing" means that {@code v} is better than {@code u}, if {@code v < u}.
  */
@@ -55,6 +55,7 @@ public final class GeneralizedCostRelaxFunction implements RelaxFunction {
     if (isNormal(normalizedRatio, slack)) {
       return NORMAL;
     }
+
     return new GeneralizedCostRelaxFunction(normalizedRatio, slack);
   }
 
@@ -81,9 +82,11 @@ public final class GeneralizedCostRelaxFunction implements RelaxFunction {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     GeneralizedCostRelaxFunction that = (GeneralizedCostRelaxFunction) o;
     return normalizedRatio == that.normalizedRatio && slack == that.slack;
   }

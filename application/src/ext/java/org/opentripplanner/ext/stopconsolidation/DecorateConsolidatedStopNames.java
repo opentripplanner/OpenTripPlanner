@@ -13,8 +13,6 @@ import org.opentripplanner.routing.algorithm.filterchain.framework.spi.Itinerary
  * A decorating filter that checks if a transit leg contains any consolidated stops and if it does,
  * then replaces it with the appropriate, agency-specific stop name. This is so that the physical
  * signage and in-vehicle display matches what OTP returns as a board/alight stop name.
- *
- * <p>
  * <pre>
  * TODO: Split removing short legs out of this clas, even if it is a Sandbox feature the filter
  *       contract is broken.
@@ -43,9 +41,9 @@ public class DecorateConsolidatedStopNames implements ItineraryDecorator {
    * its name with the primary name of the agency that is operating the route, so that the name in
    * the result matches the physical signage on the stop.
    * <p>
-   * If the leg has a "to" stop that is a primary stop, then we don't want to show the stop
-   * that's on the signage but what is shown _inside_ the vehicle. That's why we use the
-   * agency-specific (aka secondary) stop.
+   * If the leg has a "to" stop that is a primary stop, then we don't want to show the stop that's
+   * on the signage but what is shown _inside_ the vehicle. That's why we use the agency-specific
+   * (aka secondary) stop.
    * <p>
    * This follows the somewhat idiosyncratic logic of the consolidated stops feature.
    */
@@ -71,13 +69,17 @@ public class DecorateConsolidatedStopNames implements ItineraryDecorator {
   private void removeShortWalkLegs(ItineraryBuilder builder) {
     var legs = new ArrayList<>(builder.legs());
     var first = legs.getFirst();
+
     if (service.isPartOfConsolidatedStop(first.to().stop) && isShortWalkLeg(first)) {
       legs.removeFirst();
     }
+
     var last = legs.getLast();
+
     if (service.isPartOfConsolidatedStop(last.from().stop) && isShortWalkLeg(last)) {
       legs.removeLast();
     }
+
     var filteredLegs = legs
       .stream()
       .filter(l -> !isTransferWithinConsolidatedStop(l))

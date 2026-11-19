@@ -46,6 +46,7 @@ public final class ItineraryReferenceMapper {
         "Itinerary has no supported transit leg references"
       );
     }
+
     if (legReferences.size() > ItineraryReference.MAX_LEG_REFERENCES) {
       throw new UnsupportedItineraryReferenceException(
         "Itinerary has more than " + ItineraryReference.MAX_LEG_REFERENCES + " transit legs"
@@ -78,8 +79,8 @@ public final class ItineraryReferenceMapper {
 
   /**
    * Builds the request for a refetch: the values stored in {@code ref} on top of
-   * {@code defaultRouteRequest}. Values that are not stored, like
-   * {@code maxAccessEgressDuration}, come from {@code defaultRouteRequest}.
+   * {@code defaultRouteRequest}. Values that are not stored, like {@code maxAccessEgressDuration},
+   * come from {@code defaultRouteRequest}.
    *
    * @throws RefetchItineraryException if the request cannot be built
    */
@@ -143,14 +144,15 @@ public final class ItineraryReferenceMapper {
     if (legReference instanceof ScheduledTransitLegReference scheduledTransitLegReference) {
       return scheduledTransitLegReference;
     }
+
     throw new UnsupportedItineraryReferenceException(
       "Unsupported leg reference type: " + legReference.getClass().getSimpleName()
     );
   }
 
   /**
-   * A transit leg without a reference (for example flex) cannot be stored. Skipping it would give an
-   * id for a different trip, so the whole itinerary is unsupported.
+   * A transit leg without a reference (for example flex) cannot be stored. Skipping it would give
+   * an id for a different trip, so the whole itinerary is unsupported.
    */
   private static LegReference requireLegReference(Leg leg) {
     if (leg instanceof FrequencyTransitLeg) {
@@ -158,12 +160,15 @@ public final class ItineraryReferenceMapper {
         "Frequency-based transit legs cannot be refetched: " + leg.getClass().getSimpleName()
       );
     }
+
     var legReference = leg.legReference();
+
     if (legReference == null) {
       throw new UnsupportedItineraryReferenceException(
         "Leg without a LegReference is not supported: " + leg.getClass().getSimpleName()
       );
     }
+
     return legReference;
   }
 
@@ -171,6 +176,7 @@ public final class ItineraryReferenceMapper {
     if (legReference instanceof ScheduledTransitLegReference) {
       return legReference;
     }
+
     throw new UnsupportedItineraryReferenceException(
       "Unsupported leg reference type: " + legReference.getClass().getSimpleName()
     );

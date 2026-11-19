@@ -52,6 +52,7 @@ public class StreetVehicleParkingLink extends Edge {
     }
 
     var entrance = vehicleParkingEntranceVertex.getParkingEntrance();
+
     if (s0.currentMode() == TraverseMode.CAR) {
       if (!entrance.isCarAccessible()) {
         return State.empty();
@@ -62,6 +63,7 @@ public class StreetVehicleParkingLink extends Edge {
 
     var vehicleParking = vehicleParkingEntranceVertex.getVehicleParking();
     var parkingPreferences = s0.getRequest().parking(s0.currentMode());
+
     if (traversalBanned(parkingPreferences, vehicleParking)) {
       return State.empty();
     }

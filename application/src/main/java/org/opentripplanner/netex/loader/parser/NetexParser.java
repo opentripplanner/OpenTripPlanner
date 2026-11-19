@@ -43,16 +43,18 @@ abstract class NetexParser<T> {
    * element should be relevant to OTP. OTP does not support NeTEx 100%, but elements in the Nordic
    * profile, see https://enturas.atlassian.net/wiki/spaces/PUBLIC/overview should be supported.
    * <p>
-   * If you see this warning and think the element should be mapped, please feel free to report
-   * an issue on GitHub.
+   * If you see this warning and think the element should be mapped, please feel free to report an
+   * issue on GitHub.
    */
   static void warnOnMissingMapping(Logger log, Object rel) {
     if (rel == null) {
       return;
     }
+
     if (rel instanceof Collection) {
       throw new IllegalArgumentException("Do not pass in collections to this method.");
     }
+
     log.warn("Netex import - Element mapping is missing for {}.", resolveXmlTypeName(rel));
   }
 
@@ -65,9 +67,11 @@ abstract class NetexParser<T> {
     if (rel == null) {
       return;
     }
+
     if (rel instanceof Collection) {
       throw new IllegalArgumentException("Do not pass in collections to this method.");
     }
+
     log.info("Netex import - Element skipped: {}", resolveXmlTypeName(rel));
   }
 

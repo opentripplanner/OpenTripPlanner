@@ -100,9 +100,11 @@ public final class AccessibilityRequest {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     AccessibilityRequest that = (AccessibilityRequest) o;
     return (
       onlyConsiderAccessible == that.onlyConsiderAccessible &&

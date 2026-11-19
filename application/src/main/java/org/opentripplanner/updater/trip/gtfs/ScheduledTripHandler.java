@@ -62,6 +62,7 @@ class ScheduledTripHandler {
 
     var serviceId = buffer.getTrip(tripUpdate.tripId()).getServiceId();
     var serviceDates = buffer.getTripCalendars().listServiceDates(serviceId);
+
     if (!serviceDates.contains(tripUpdate.startDate())) {
       throw UpdateException.of(tripUpdate.tripId(), NO_SERVICE_ON_DATE);
     }
@@ -79,16 +80,19 @@ class ScheduledTripHandler {
     var updatedTripTimes = tripTimesPatch.tripTimes();
 
     Map<Integer, StopLocation> newStops = new HashMap<>();
+
     for (var entry : replacedStopIndices.entrySet()) {
       var stop = transitRepository
         .getSiteRepository()
         .getRegularStop(new FeedScopedId(tripUpdate.tripId().getFeedId(), entry.getValue()));
+
       if (stop != null) {
         newStops.put(entry.getKey(), stop);
       }
     }
 
-    // If there are stops with different pickup / drop off, or replaced stops, we need to change the pattern from the scheduled one
+    // If there are stops with different pickup / drop off, or replaced stops, we need to change the
+    // pattern from the scheduled one
     if (!updatedPickup.isEmpty() || !updatedDropoff.isEmpty() || !newStops.isEmpty()) {
       StopPattern newStopPattern = pattern
         .copyPlannedStopPattern()

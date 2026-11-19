@@ -43,6 +43,7 @@ public record GraphIsland(
   @Override
   public String getHTMLMessage() {
     VertexLabel label = island.getRepresentativeVertex().getLabel();
+
     if (label instanceof VertexLabel.OsmNodeLabel osmLabel) {
       return String.format(
         HTMLFMT,

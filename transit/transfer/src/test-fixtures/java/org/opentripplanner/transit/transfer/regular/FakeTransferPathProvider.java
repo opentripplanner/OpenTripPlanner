@@ -15,9 +15,9 @@ import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
 import org.opentripplanner.transit.transfer.regular.spi.TransferSearch;
 
 /**
- * Test double: candidate paths are pre-registered per {@code fromStop}; cost scales linearly
- * with the preferences' {@code reluctance()}. The discovery search only returns the paths within
- * the max duration it is given, re-costing a path never drops it - like the real provider.
+ * Test double: candidate paths are pre-registered per {@code fromStop}; cost scales linearly with
+ * the preferences' {@code reluctance()}. The discovery search only returns the paths within the max
+ * duration it is given, re-costing a path never drops it - like the real provider.
  */
 public class FakeTransferPathProvider
   implements TransferPathProvider<FakeTransferPathProvider.FakePath, WalkPreferences>

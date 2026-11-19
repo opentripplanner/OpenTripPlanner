@@ -171,6 +171,7 @@ public class ItineraryFiltersInputType {
     if (!GqlUtil.hasArgument(environment, "itineraryFilters")) {
       return;
     }
+
     setField(callWith, GROUP_SIMILARITY_KEEP_ONE, (Double v) ->
       builder.withGroupSimilarityKeepOne(validateGroupSimilarity(GROUP_SIMILARITY_KEEP_ONE, v))
     );

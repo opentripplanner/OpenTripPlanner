@@ -21,9 +21,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * The responsibility of this class is to listen for egress stop arrivals and forward these as
  * Destination arrivals to the {@link DestinationArrivalPaths}.
  * <p>
- * Because adding new destination arrivals to the set is expensive, this class optimize this by
- * only adding new destination arrivals at the end of each round.
- * <p>
+ * Because adding new destination arrivals to the set is expensive, this class optimize this by only
+ * adding new destination arrivals at the end of each round.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */

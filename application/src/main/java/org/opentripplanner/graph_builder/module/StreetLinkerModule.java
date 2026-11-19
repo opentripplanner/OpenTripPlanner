@@ -100,6 +100,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
     LOG.info(progress.startMessage());
 
     Set<StopLocation> stopLocationsUsedForFlexTrips = Set.of();
+
     if (OTPFeature.FlexRouting.isOn()) {
       stopLocationsUsedForFlexTrips = getStopLocationsUsedForFlexTrips();
     }
@@ -111,10 +112,13 @@ public class StreetLinkerModule implements GraphBuilderModule {
       var stop = Objects.requireNonNull(
         transitRepository.getSiteRepository().getRegularStop(stopVertex.getId())
       );
-      // Stops with pathways do not need to be connected to the street network, since there are explicit entrances defined for that
+
+      // Stops with pathways do not need to be connected to the street network, since there are
+      // explicit entrances defined for that
       if (stopVertex.hasPathways()) {
         continue;
       }
+
       // check if stop is already linked, to allow multiple idempotent linking cycles
       if (isAlreadyLinked(stopVertex, stop, stopLocationsUsedForFlexTrips)) {
         continue;
@@ -135,6 +139,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
       //noinspection Convert2MethodRef
       progress.step(m -> LOG.info(m));
     }
+
     LOG.info(progress.completeMessage());
   }
 
@@ -144,7 +149,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
    * the {@link OsmBoardingLocationsModule}, which runs before this one, often links stops to
    * walkable edges only.
    *
-   * @param stopVertex                    The transit stop vertex to be checked.
+   * @param stopVertex The transit stop vertex to be checked.
    * @param stopLocationsUsedForFlexTrips A set of stop locations that are used for flexible trips.
    */
   private static boolean isAlreadyLinked(
@@ -188,7 +193,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
    * routable street edges.
    * <p>
    * This does not apply to zones as street vertices store which zones they are part of.
-   *
+   * <p>
    * @link https://github.com/opentripplanner/OpenTripPlanner/issues/5498
    */
   private void linkToDriveableEdge(TransitStopVertex tStop) {
@@ -253,6 +258,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
 
   private void linkTransitEntrances(Graph graph) {
     LOG.info("Linking transit entrances to graph...");
+
     for (TransitEntranceVertex tEntrance : graph.findVertices(TransitEntranceVertex.class)) {
       vertexLinker.linkVertexPermanently(
         tEntrance,
@@ -302,6 +308,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
   private void linkVehicleParks(Graph graph, DataImportIssueStore issueStore) {
     LOG.info("Linking vehicle parks to graph...");
     List<VehicleParking> vehicleParkingToRemove = new ArrayList<>();
+
     for (VehicleParkingEntranceVertex vehicleParkingEntranceVertex : graph.findVertices(
       VehicleParkingEntranceVertex.class
     )) {
@@ -326,10 +333,12 @@ public class StreetLinkerModule implements GraphBuilderModule {
         vehicleParkingEntranceVertex,
         graph
       );
+
       if (vehicleParking != null) {
         vehicleParkingToRemove.add(vehicleParking);
       }
     }
+
     if (!vehicleParkingToRemove.isEmpty()) {
       parkingRepository.updateVehicleParking(List.of(), vehicleParkingToRemove);
     }

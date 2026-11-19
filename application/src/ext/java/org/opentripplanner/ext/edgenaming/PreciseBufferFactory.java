@@ -25,6 +25,7 @@ final class PreciseBufferFactory {
   PreciseBufferFactory(Coordinate coordinate, double distanceInMeters) {
     this.distanceInMeters = distanceInMeters;
     String code = "AUTO:42001,%s,%s".formatted(coordinate.x, coordinate.y);
+
     try {
       CoordinateReferenceSystem auto = CRS.decode(code);
       this.toTransform = CRS.findMathTransform(DefaultGeographicCRS.WGS84, auto);

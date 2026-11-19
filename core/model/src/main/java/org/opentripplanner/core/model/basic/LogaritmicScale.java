@@ -9,6 +9,7 @@ final class LogaritmicScale {
     if (min >= max) {
       throw new IllegalArgumentException("min must be less than max");
     }
+
     this.offset = 1.0 - min;
     this.lnMax = Math.log(max + offset);
   }

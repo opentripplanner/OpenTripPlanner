@@ -11,11 +11,11 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseModeSet;
 
 /**
- * Collects the street edges within the search radius of a vertex from the spatial-index
- * candidates. Only street edges traversable by at least one of the given modes, within the search
- * radius and still present in the graph are kept. The index may report the same edge once per grid
- * cell it spans, so survivors are deduplicated with the same {@code equals}/{@code hashCode}
- * semantics the set-based index query used to apply to every candidate.
+ * Collects the street edges within the search radius of a vertex from the spatial-index candidates.
+ * Only street edges traversable by at least one of the given modes, within the search radius and
+ * still present in the graph are kept. The index may report the same edge once per grid cell it
+ * spans, so survivors are deduplicated with the same {@code equals}/{@code hashCode} semantics the
+ * set-based index query used to apply to every candidate.
  */
 final class NearbyStreetEdgeCollector implements Consumer<Edge> {
 
@@ -23,8 +23,8 @@ final class NearbyStreetEdgeCollector implements Consumer<Edge> {
   private final double lat;
   private final double xscale;
   /**
-   * Squared search radius, compared with
-   * {@link StreetEdge#squaredEquirectangularDistanceToPoint} values.
+   * Squared search radius, compared with {@link StreetEdge#squaredEquirectangularDistanceToPoint}
+   * values.
    */
   private final double radiusDegSq;
   private final TraverseModeSet traverseModes;
@@ -53,10 +53,13 @@ final class NearbyStreetEdgeCollector implements Consumer<Edge> {
     if (!(edge instanceof StreetEdge streetEdge) || !streetEdge.canTraverse(traverseModes)) {
       return;
     }
+
     double squaredDistance = streetEdge.squaredEquirectangularDistanceToPoint(lon, lat, xscale);
+
     if (squaredDistance >= radiusDegSq || !seen.add(streetEdge)) {
       return;
     }
+
     if (streetEdge.isReachableFromGraph()) {
       nearbyEdges.add(new CandidateEdge(streetEdge, squaredDistance));
     }

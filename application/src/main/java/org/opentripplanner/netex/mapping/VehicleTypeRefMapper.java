@@ -22,6 +22,7 @@ class VehicleTypeRefMapper {
     if (vehicleTypeRef == null || vehicleTypeRef.getValue() == null) {
       return null;
     }
+
     return vehicleTypeRef.getValue().getRef();
   }
 }

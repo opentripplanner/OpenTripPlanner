@@ -134,7 +134,8 @@ public class PathTest implements RaptorTestConstants {
 
   @Test
   public void testCompareTo() {
-    // TestRaptorPath(iterDeptTime, startTimeInclusivePenalty, endTimeInclusivePenalty, numberOfTransfers, c1, c2)
+    // TestRaptorPath(iterDeptTime, startTimeInclusivePenalty, endTimeInclusivePenalty,
+    // numberOfTransfers, c1, c2)
     var p0 = new TestRaptorPath(0, 10, 20, 3, 40, 50);
     var p1 = new TestRaptorPath(0, 11, 20, 3, 40, 50);
     var p2 = new TestRaptorPath(0, 10, 19, 3, 40, 50);

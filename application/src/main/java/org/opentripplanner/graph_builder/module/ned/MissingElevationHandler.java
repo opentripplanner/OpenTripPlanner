@@ -23,18 +23,18 @@ import org.slf4j.LoggerFactory;
  * Elevation may be missing from a {@link StreetEdge} for two reasons: 1. the source DEM files
  * contained no data for the whole geometry 2. {@link StreetEdge#isSlopeOverride()} is set
  * <p>
- * The elevation for missing edges is set through its vertices, with the elevation for the
- * from/to vertices being used to set the elevation profile.
+ * The elevation for missing edges is set through its vertices, with the elevation for the from/to
+ * vertices being used to set the elevation profile.
  * <ol>
  *   <li>The source elevations are determined for vertices using edges with an existing elevation
  *       profile, along with values from the {@code ele} tag</li>
- *   <li>All vertices within {@code maxElevationPropagationMeters} of vertices with elevation without
- *       elevation are visited</li>
- *   <li>Foreach vertex without elevation the first two paths from a vertex with elevation are used to
- *       interpolate elevations</li>
+ *   <li>All vertices within {@code maxElevationPropagationMeters} of vertices with elevation
+ *       without elevation are visited</li>
+ *   <li>Foreach vertex without elevation the first two paths from a vertex with elevation are used
+ *       to interpolate elevations</li>
  *   <li>If a vertex only had a single path, then the last known elevation is used</li>
- *   <li>Once elevations for vertices are interpolated they are used to set the elevation profile for
- *       the incoming / outgoing StreetEdges</li>
+ *   <li>Once elevations for vertices are interpolated they are used to set the elevation profile
+ *       for the incoming / outgoing StreetEdges</li>
  * </ol>
  */
 class MissingElevationHandler {
@@ -122,17 +122,20 @@ class MissingElevationHandler {
     BinHeap<ElevationRepairState> pq,
     Map<Vertex, Double> elevations
   ) {
-    // Stores vertices without elevation which were visited by a single path from a vertices with elevation
+    // Stores vertices without elevation which were visited by a single path from a vertices with
+    // elevation
     var pending = new HashMap<Vertex, ElevationRepairState>();
 
     while (!pq.empty()) {
       ElevationRepairState currentState = pq.extract_min();
+
       if (elevations.containsKey(currentState.currentVertex)) {
         continue;
       }
 
       if (pending.containsKey(currentState.currentVertex)) {
         var otherState = pending.get(currentState.currentVertex);
+
         if (otherState.initialVertex != currentState.currentVertex) {
           interpolateElevationsAlongBackPath(otherState, currentState, elevations, pending);
           interpolateElevationsAlongBackPath(currentState, otherState, elevations, pending);
@@ -146,6 +149,7 @@ class MissingElevationHandler {
       for (Edge e : currentState.currentVertex.getIncoming()) {
         var nsVertex = e.getFromVertex();
         var nsDistance = currentState.distance + e.getDistanceMeters();
+
         if (elevations.containsKey(nsVertex) || nsDistance > maxElevationPropagationMeters) {
           continue;
         }
@@ -156,6 +160,7 @@ class MissingElevationHandler {
       for (Edge e : currentState.currentVertex.getOutgoing()) {
         var nsVertex = e.getToVertex();
         var nsDistance = currentState.distance + e.getDistanceMeters();
+
         if (elevations.containsKey(nsVertex) || nsDistance > maxElevationPropagationMeters) {
           continue;
         }
@@ -164,7 +169,8 @@ class MissingElevationHandler {
       }
     }
 
-    // Copy elevation to all pending vertices (where only one path with an initial elevation was found)
+    // Copy elevation to all pending vertices (where only one path with an initial elevation was
+    // found)
     pending.forEach((vertex, elevationRepairState) -> {
       if (!elevations.containsKey(vertex)) {
         elevations.put(vertex, lastKnowElevationForState(elevationRepairState, elevations));
@@ -177,10 +183,12 @@ class MissingElevationHandler {
     Map<Vertex, Double> elevations
   ) {
     var backState = elevationRepairState.previousState;
+
     while (backState != null) {
       if (elevations.containsKey(backState.currentVertex)) {
         return elevations.get(backState.currentVertex);
       }
+
       backState = backState.previousState;
     }
 
@@ -197,6 +205,7 @@ class MissingElevationHandler {
     var totalDistance = stateToBackTrack.distance + alternateState.distance;
 
     var currentState = stateToBackTrack;
+
     while (currentState != null) {
       if (!elevations.containsKey(currentState.currentVertex)) {
         var elevation =
@@ -223,6 +232,7 @@ class MissingElevationHandler {
       if (!edge.isElevationFlattened() && !edge.isSlopeOverride()) {
         issueStore.add(new ElevationProfileFailure(edge, "Failed to propagate elevation data"));
       }
+
       return;
     }
 

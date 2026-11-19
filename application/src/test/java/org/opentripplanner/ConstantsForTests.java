@@ -103,6 +103,7 @@ public class ConstantsForTests {
     if (instance == null) {
       instance = new ConstantsForTests();
     }
+
     return instance;
   }
 
@@ -188,6 +189,7 @@ public class ConstantsForTests {
       addPortlandVehicleRentals(graph);
 
       var transferRepository = TransferServiceTestFactory.defaultTransferRepository();
+
       // Like the graph builder, only generate the flex transfers if flex routing is on
       if (OTPFeature.FlexRouting.isOn()) {
         new FlexTransferGenerator(
@@ -240,11 +242,13 @@ public class ConstantsForTests {
       );
       turnRestrictionModule.buildGraph();
       TransferRepository transferRepository;
+
       if (OTPFeature.FlexRouting.isOn()) {
         transferRepository = TransferServiceTestFactory.withFlex();
       } else {
         transferRepository = TransferServiceTestFactory.defaultTransferRepository();
       }
+
       return new TestOtpModel(graph, transitRepository, timetableDataImport, transferRepository);
     } catch (Exception e) {
       throw new RuntimeException(e);
@@ -395,6 +399,7 @@ public class ConstantsForTests {
     if (portlandGraph == null) {
       portlandGraph = buildNewPortlandGraph(false);
     }
+
     return portlandGraph;
   }
 
@@ -405,6 +410,7 @@ public class ConstantsForTests {
     if (portlandGraphWithElevation == null) {
       portlandGraphWithElevation = buildNewPortlandGraph(true);
     }
+
     return portlandGraphWithElevation;
   }
 
@@ -413,6 +419,7 @@ public class ConstantsForTests {
       VertexLinker linker = VertexLinkerTestFactory.of(graph);
       CsvReader reader = new CsvReader(PORTLAND_BIKE_SHARE_CSV, ',', StandardCharsets.UTF_8);
       reader.readHeaders();
+
       while (reader.readRecord()) {
         RentalVehicleType vehicleType = RentalVehicleType.getDefaultType(reader.get("network"));
         Map<RentalVehicleType, Integer> availability = Map.of(vehicleType, 2);

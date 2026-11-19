@@ -103,9 +103,11 @@ public final class CarRequest {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     CarRequest that = (CarRequest) o;
     return (
       DoubleUtils.doubleEquals(that.reluctance, reluctance) &&

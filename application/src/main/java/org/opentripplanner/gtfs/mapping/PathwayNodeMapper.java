@@ -76,6 +76,7 @@ class PathwayNodeMapper {
     if (gtfsStop.getParentStation() != null) {
       builder.withParentStation(stationLookUp.apply(base.getParentStationId()));
     }
+
     return builder.build();
   }
 }

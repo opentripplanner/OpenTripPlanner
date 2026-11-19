@@ -29,7 +29,8 @@ public abstract class PollingGraphUpdater<C> implements GraphUpdater<C> {
   /** How long to wait after polling to poll again. */
   private final Duration pollingPeriod;
 
-  // TODO OTP2 eliminate this field for reasons in "primed" javadoc; also "initialized" is not a clear term.
+  // TODO OTP2 eliminate this field for reasons in "primed" javadoc; also "initialized" is not a
+  // clear term.
   protected boolean blockReadinessUntilInitialized;
 
   /**
@@ -71,6 +72,7 @@ public abstract class PollingGraphUpdater<C> implements GraphUpdater<C> {
 
       // Run concrete polling graph updater's implementation method.
       runPolling();
+
       if (runOnlyOnce()) {
         LOG.info(
           "As requested in configuration, updater {} has run only once and will now stop.",
@@ -104,7 +106,6 @@ public abstract class PollingGraphUpdater<C> implements GraphUpdater<C> {
    * Allow clients to wait for all realtime data to be loaded before submitting any travel plan
    * requests. This does not block use of the OTP server. The client must voluntarily hit an
    * endpoint and wait for readiness.
-   * <p>
    * <pre>
    * TODO OTP2 This is really a bit backward. We should just run() the updaters once before scheduling them to poll,
    *           and not bring the router online until they have finished.

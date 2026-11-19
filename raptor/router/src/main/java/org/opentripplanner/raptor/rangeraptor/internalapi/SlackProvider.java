@@ -42,12 +42,12 @@ public interface SlackProvider {
    * {@link #boardSlack(int)} above. But there are exceptions, like adding slack to constrained
    * transfers, access and egress.
    * <p>
-   * Regular transfer slack should be added to all access and egress paths with one or more rides
-   * - like a flex-access. Alight-slack and board-slack is only added to {@link RaptorTripPattern}s,
+   * Regular transfer slack should be added to all access and egress paths with one or more rides -
+   * like a flex-access. Alight-slack and board-slack is only added to {@link RaptorTripPattern}s,
    * not access or egress paths, even if they consist one or more rides.
    * <p>
-   * Some constrained transfers should include transfer-slack, but not board- or alight- slack.
-   * This is true for constrained transfers with for example {@code minTransferTime}.
+   * Some constrained transfers should include transfer-slack, but not board- or alight- slack. This
+   * is true for constrained transfers with for example {@code minTransferTime}.
    * <p>
    * Unit: seconds.
    */

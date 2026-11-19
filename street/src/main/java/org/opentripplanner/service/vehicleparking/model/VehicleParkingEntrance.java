@@ -86,9 +86,11 @@ public class VehicleParkingEntrance implements Serializable {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     final VehicleParkingEntrance that = (VehicleParkingEntrance) o;
     return (
       Objects.equals(coordinate, that.coordinate) &&

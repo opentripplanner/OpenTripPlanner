@@ -28,7 +28,6 @@ import org.opentripplanner.routing.algorithm.transferoptimization.model.TripToTr
  * generated are pruned during construction.
  * <p>
  * <b>Performance</b>
- * <p>
  * <pre>
  * N : number of transfers in path
  * M : number of possible transfer location for a given pair of trips
@@ -225,9 +224,11 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
 
     for (OptimizedPathTail<T> path : tails) {
       path.head().changeBoardingPosition(boardPos);
+
       if (nextTransferLeg != null) {
         path.transfer(nextTransferLeg.transfer(), nextTransferLeg.toStop());
       }
+
       path.access(accessLeg.access());
     }
   }
@@ -236,10 +237,10 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
    * Create a new {@link OptimizedPathTail} for the originalLeg with the given transfer,
    * earliest-departure-time and following leg (tail).
    * <p>
-   * Since the previous leg is not yet known, the earliest-departure-time is used instead. For
-   * the first transit leg in a path the {@code earliestDepartureTime} must be set to the correct
-   * values (the access-leg-arrival-time), for all other cases it only need to be before the first
-   * possible boarding.
+   * Since the previous leg is not yet known, the earliest-departure-time is used instead. For the
+   * first transit leg in a path the {@code earliestDepartureTime} must be set to the correct values
+   * (the access-leg-arrival-time), for all other cases it only need to be before the first possible
+   * boarding.
    */
   private OptimizedPathTail<T> createNewTransitLegTail(
     TransitPathLeg<T> originalLeg,

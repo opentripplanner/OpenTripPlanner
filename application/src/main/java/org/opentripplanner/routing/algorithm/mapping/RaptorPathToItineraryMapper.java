@@ -85,12 +85,11 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
   /**
    * Constructs an itinerary mapper for a request and a set of results
    *
-   * @param raptorTransitData     the currently active transit layer (may have real-time data
-   *                              applied)
-   * @param regularTransfers      the request's regular transfers, used to recover the street
-   *                              path of a regular transfer
+   * @param raptorTransitData the currently active transit layer (may have real-time data applied)
+   * @param regularTransfers the request's regular transfers, used to recover the street path of a
+   *     regular transfer
    * @param transitSearchTimeZero the point in time all times in seconds are counted from
-   * @param request               the current routing request
+   * @param request the current routing request
    */
   public RaptorPathToItineraryMapper(
     Graph graph,
@@ -135,6 +134,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     Leg transitLeg = null;
 
     PathLeg<T> previousLeg = null;
+
     while (!pathLeg.isEgressLeg()) {
       // Map transit leg
       if (pathLeg.isTransitLeg()) {
@@ -144,6 +144,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
         ) {
           legs.add(createTransferLegAtSameStop(previousLeg, pathLeg));
         }
+
         transitLeg = mapTransitLeg(transitLeg, pathLeg.asTransitLeg());
         legs.add(transitLeg);
       }
@@ -223,6 +224,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
     int fromTime = accessPathLeg.fromTime();
     var legs = mapAccessEgressToLegs(accessPathLeg.access(), createZonedDateTime(fromTime));
+
     if (taxiService != null && request.journey().access().mode() == StreetMode.TAXI) {
       return taxiService.decorateAccessEgressLegs(
         legs,
@@ -230,6 +232,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
         raptorTransitData.getStopByIndex(accessPathLeg.access().stop()).getCoordinate()
       );
     }
+
     return legs;
   }
 
@@ -242,6 +245,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     // leg given that it is the last leg.
     int lastLegCost = 0;
     PathLeg<T> nextLeg = pathLeg.nextLeg();
+
     if (nextLeg.isEgressLeg() && isFree(nextLeg.asEgressLeg())) {
       lastLegCost = pathLeg.nextLeg().c1();
     }
@@ -317,6 +321,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     if (tripSchedule.getOriginalTripTimes() == null) {
       return null;
     }
+
     TripIdAndServiceDate tripIdAndServiceDate = new TripIdAndServiceDate(
       tripSchedule.getOriginalTripTimes().getTrip().getId(),
       tripSchedule.getServiceDate()
@@ -360,11 +365,14 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     if (raptorTransfer instanceof ViaCoordinateTransfer viaTx) {
       return mapViaCoordinateTransferLeg(pathLeg, viaTx);
     }
+
     // A regular transfer. Recover its street path for the leg's geometry and walk steps.
     var regularTransferPath = findRegularTransferPath(pathLeg.fromStop(), pathLeg.toStop());
+
     if (regularTransferPath != null) {
       return mapTransferLeg(pathLeg, regularTransferPath, transferMode, from, to);
     }
+
     throw new IllegalArgumentException("Unknown transfer type: " + raptorTransfer.getClass());
   }
 
@@ -390,6 +398,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
     var startTime = createZonedDateTime(egressPathLeg.fromTime());
     var legs = mapAccessEgressToLegs(egressPathLeg.egress(), startTime);
+
     if (taxiService != null && request.journey().egress().mode() == StreetMode.TAXI) {
       return taxiService.decorateAccessEgressLegs(
         legs,
@@ -397,6 +406,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
         request.to().wgsCoordinate()
       );
     }
+
     return legs;
   }
 
@@ -412,6 +422,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     Place to
   ) {
     List<Edge> edges = transfer.edges();
+
     if (edges == null || edges.isEmpty()) {
       return List.of(
         StreetLeg.of()
@@ -443,6 +454,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
         "There need to be at least one edge to get from a stop to the via coordinate and back"
       );
     }
+
     // We need to timeshift the toLegs
     long toDuration = toLegs
       .stream()
@@ -464,8 +476,10 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     State s = se.makeState();
     ArrayList<State> transferStates = new ArrayList<>();
     transferStates.add(s);
+
     for (Edge e : edges) {
       var states = e.traverse(s);
+
       if (State.isEmpty(states)) {
         s = null;
       } else {
@@ -473,6 +487,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
         s = states[0];
       }
     }
+
     State[] states = transferStates.toArray(State[]::new);
     var graphPath = new StreetPath(states[states.length - 1]);
     return streetPathToLegsMapper.map(graphPath, request);
@@ -504,7 +519,6 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
    * Include transfer leg in itinerary if the path is a "physical" path-leg between two stops, like
    * walk or bicycle. Do NOT include it if it represents a stay-seated transfer. See more details in
    * https://github.com/opentripplanner/OpenTripPlanner/issues/5086.
-   * <p>
    * <pre>
    * TODO: the logic should be revisited when adding support for transfer between on-board flex
    *       access and transit.
@@ -533,6 +547,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     if (accessEgress instanceof RaptorStartOnBoardAccess) {
       return TimeAndCost.ZERO;
     }
+
     return accessEgress
       .findOriginal(RoutingAccessEgress.class)
       .map(RoutingAccessEgress::penalty)

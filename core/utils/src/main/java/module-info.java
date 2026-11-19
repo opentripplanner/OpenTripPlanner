@@ -1,6 +1,5 @@
 /**
- * Low-level utilities shared by all OTP modules. This module has no dependencies on other OTP
- * code.
+ * Low-level utilities shared by all OTP modules. This module has no dependencies on other OTP code.
  */
 module org.opentripplanner.utils {
   requires static org.jspecify;

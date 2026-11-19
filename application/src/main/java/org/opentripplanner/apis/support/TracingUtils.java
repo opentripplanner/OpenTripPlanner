@@ -14,7 +14,7 @@ public final class TracingUtils {
    * tag, the value is set to "__UNKNOWN__".
    *
    * @param tracingHeaderTags a collection of tag names to match against headers
-   * @param headers           headers from a request
+   * @param headers headers from a request
    * @return a list of tracing tags with computed values
    */
   public static Iterable<Tag> findTagsInHeaders(
@@ -35,8 +35,8 @@ public final class TracingUtils {
    * The value from headers is favored if a value is present in both. If no value is found for a
    * tag, the value is set to "__UNKNOWN__".
    *
-   * @param tracingTags     a collection of tag names to match against headers or query parameters
-   * @param headers         headers from a request
+   * @param tracingTags a collection of tag names to match against headers or query parameters
+   * @param headers headers from a request
    * @param queryParameters query parameters from a request
    * @return a list of tracing tags with computed values
    */
@@ -50,6 +50,7 @@ public final class TracingUtils {
       .map(header -> {
         String headerValue = headers.getHeaderString(header);
         String queryParameterValue = queryParameters.getFirst(header);
+
         if (headerValue != null) {
           return Tag.of(header, headerValue);
         } else if (queryParameterValue != null) {

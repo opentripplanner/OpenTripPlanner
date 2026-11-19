@@ -39,6 +39,7 @@ class BufferedEdgeProcessor {
     final AtomicInteger namesApplied = new AtomicInteger(0);
     unnamedEdges.parallelStream().forEach(edgeOnLevel -> {
       var buffer = preciseBufferFactory.preciseBuffer(edgeOnLevel.edge().getGeometry());
+
       if (assigner.assignNameToEdge(edgeOnLevel, buffer)) {
         namesApplied.incrementAndGet();
       }

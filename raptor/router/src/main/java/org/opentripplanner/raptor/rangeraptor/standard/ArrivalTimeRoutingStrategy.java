@@ -18,8 +18,8 @@ import org.slf4j.LoggerFactory;
  * The purpose of this class is to implement a routing strategy for finding the best arrival-time.
  * This class optimize the raptor search on a single criteria.
  * <p>
- * Note! Raptor give us number-of-transfer as a second pareto criteria - which is outside the
- * scope of this class.
+ * Note! Raptor give us number-of-transfer as a second pareto criteria - which is outside the scope
+ * of this class.
  * <p>
  * Note! This strategy can be used with RangeRaptor - iterating over a time-window to get pareto
  * optimal solution for departure time. Which is outside the scope of this class.
@@ -98,6 +98,7 @@ public final class ArrivalTimeRoutingStrategy<T extends RaptorTripSchedule> impl
       boardSlack,
       onTripIndex
     );
+
     if (!boarding.empty()) {
       board(boarding);
     }
@@ -116,6 +117,7 @@ public final class ArrivalTimeRoutingStrategy<T extends RaptorTripSchedule> impl
       boardSlack,
       txSearch
     );
+
     if (boarding.empty()) {
       boardWithRegularTransfer(stopIndex, stopPos, boardSlack);
     } else if (!boarding.transferConstraint().isNotAllowed()) {

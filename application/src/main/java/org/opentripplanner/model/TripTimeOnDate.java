@@ -76,22 +76,26 @@ public class TripTimeOnDate {
   @Nullable
   public static List<TripTimeOnDate> fromTripTimes(Timetable table, Trip trip) {
     var times = table.getTripTimes(trip);
+
     if (times == null) {
       return null;
     }
+
     List<TripTimeOnDate> out = new ArrayList<>();
+
     for (int i = 0; i < times.getNumStops(); ++i) {
       out.add(new TripTimeOnDate(times, i, table.getPattern()));
     }
+
     return out;
   }
 
   /**
    * Must pass in both Timetable and Trip, because TripTimes do not have a reference to
-   * StopPatterns. <br>
-   * If the timetable does not contain the trip, scheduledTimetable is used instead.
+   * StopPatterns. <br> If the timetable does not contain the trip, scheduledTimetable is used
+   * instead.
    *
-   * @param table       the timetable for the service day
+   * @param table the timetable for the service day
    * @param serviceDate service day to set
    */
   public static List<TripTimeOnDate> fromTripTimesWithScheduleFallback(
@@ -101,23 +105,27 @@ public class TripTimeOnDate {
     Instant midnight
   ) {
     var times = table.getTripTimes(trip);
+
     if (times == null) {
       Timetable scheduledTimetable = table.getPattern().getScheduledTimetable();
       return fromTripTimes(scheduledTimetable, trip);
     }
+
     List<TripTimeOnDate> out = new ArrayList<>();
+
     for (int i = 0; i < times.getNumStops(); ++i) {
       out.add(new TripTimeOnDate(times, i, table.getPattern(), serviceDate, midnight));
     }
+
     return out;
   }
 
   /**
    * Must pass in both Timetable and Trip, because TripTimes do not have a reference to
-   * StopPatterns. <br>
-   * The timetable given must correspond to the service day so that it must contain the trip.
+   * StopPatterns. <br> The timetable given must correspond to the service day so that it must
+   * contain the trip.
    *
-   * @param table       the timetable for the service day
+   * @param table the timetable for the service day
    * @param serviceDate service day to set
    */
   public static List<TripTimeOnDate> fromTripTimes(
@@ -130,9 +138,11 @@ public class TripTimeOnDate {
     // if the trip doesn't run on the date, the scheduled timetable should be given.
     var times = Objects.requireNonNull(table.getTripTimes(trip));
     List<TripTimeOnDate> out = new ArrayList<>();
+
     for (int i = 0; i < times.getNumStops(); ++i) {
       out.add(new TripTimeOnDate(times, i, table.getPattern(), serviceDate, midnight));
     }
+
     return out;
   }
 
@@ -195,20 +205,25 @@ public class TripTimeOnDate {
     if (tripPattern.numberOfStops() == scheduledTripPattern.numberOfStops()) {
       return scheduledTripPattern.getStop(stopPosition);
     }
+
     // The number of stops is different. There must be extra stops in the tripPattern compared to
     // the scheduledTripPattern.
     if (isExtraCall()) {
       // For extra calls we don't have a scheduled stop. Return the same stop as for realtime.
       return getStop();
     }
-    // The number of stops is different. There must be extra stops in tripPattern compared to scheduledTripPattern
+
+    // The number of stops is different. There must be extra stops in tripPattern compared to
+    // scheduledTripPattern
     var extraCallsBefore = (int) IntStream.range(0, stopPosition)
       .filter(tripTimes::isExtraCall)
       .count();
     var scheduledPos = stopPosition - extraCallsBefore;
+
     if (scheduledPos >= scheduledTripPattern.numberOfStops()) {
       throw new IllegalStateException("Number of stops is inconsistent in scheduled trip pattern");
     }
+
     return scheduledTripPattern.getStop(scheduledPos);
   }
 
@@ -428,6 +443,7 @@ public class TripTimeOnDate {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     TripTimeOnDate that = (TripTimeOnDate) o;
     return (
       stopPosition == that.stopPosition &&

@@ -381,8 +381,8 @@ public class Itinerary implements ItinerarySortKey {
    * `generalized-cost` include, not only a penalty for unknown and inaccessible boardings, but also
    * a penalty for undesired uphill and downhill street traversal.
    * <p>
-   * The intended audience for this score are frontend developers wanting to show a simple UI
-   * rather than having to iterate over all the stops and trips.
+   * The intended audience for this score are frontend developers wanting to show a simple UI rather
+   * than having to iterate over all the stops and trips.
    * <p>
    * Note: the information to calculate this score are all available to the frontend, however
    * calculating them on the backend makes life a little easier and changes are automatically
@@ -451,7 +451,8 @@ public class Itinerary implements ItinerarySortKey {
    * on-street legs don't have an unfair advantage over those combining access/egress with transit
    * and using a penalty when being processed by the itinerary filter chain.
    *
-   * @see org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressPenaltyDecorator
+   * @see
+   *     org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressPenaltyDecorator
    */
   @Override
   public NormalizedCost generalizedCostIncludingPenalty() {
@@ -610,9 +611,9 @@ public class Itinerary implements ItinerarySortKey {
    * Used to convert a list of itineraries to a SHORT human-readable string.
    *
    * @see #toStr()
-   *      <p>
-   *      It is great for comparing lists of itineraries in a test: {@code
-   * assertEquals(toStr(List.of(it1)), toStr(result))}.
+   *     <p>
+   *     It is great for comparing lists of itineraries in a test:
+   *     {@code assertEquals(toStr(List.of(it1)), toStr(result))}.
    */
   public static String toStr(List<Itinerary> list) {
     return list.stream().map(Itinerary::toStr).collect(Collectors.joining(", "));
@@ -649,6 +650,7 @@ public class Itinerary implements ItinerarySortKey {
       } else if (leg instanceof StreetLeg streetLeg) {
         buf.street(streetLeg.getMode().name(), leg.startTime(), leg.endTime());
       }
+
       buf.stop(leg.to().name.toString());
     }
 

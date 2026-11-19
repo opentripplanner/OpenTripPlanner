@@ -29,19 +29,24 @@ final class RestrictedZoneEnforcement implements GeofencingBoundaryEnforcement {
     if (!state.isRentingVehicle()) {
       return null;
     }
+
     // Station rentals can't legally drop mid-street, so the floating-style fork doesn't apply.
     if (state.isRentingVehicleFromStation()) {
       if (Boolean.TRUE.equals(zone.traversalBanned())) {
         return State.empty();
       }
+
       return null;
     }
+
     if (Boolean.TRUE.equals(zone.traversalBanned())) {
       return forwardEnteringNoTraversal(state, edge);
     }
+
     if (Boolean.TRUE.equals(zone.dropOffBanned())) {
       return forwardEnteringNoDropOff(state, edge);
     }
+
     return null;
   }
 
@@ -49,7 +54,6 @@ final class RestrictedZoneEnforcement implements GeofencingBoundaryEnforcement {
    * ArriveBy search: a committed renting state was inside the zone (current edge crosses outward in
    * forward time). For a no-traversal zone that's illegal — a rented vehicle couldn't legally have
    * been there. Block.
-   *
    * <p>
    * Only committed (network-bound) states are checked here. HAVE_RENTED walkers are handled by
    * {@link #arriveByAtBoundary}; generic (null-network) renting states by
@@ -68,6 +72,7 @@ final class RestrictedZoneEnforcement implements GeofencingBoundaryEnforcement {
     ) {
       return State.empty();
     }
+
     return null;
   }
 
@@ -86,10 +91,13 @@ final class RestrictedZoneEnforcement implements GeofencingBoundaryEnforcement {
     if (state.getVehicleRentalState() != VehicleRentalState.HAVE_RENTED) {
       return null;
     }
+
     var walking = edge.traverse(state, TraverseMode.WALK);
+
     if (walking != null) {
       return walking.makeStateArray();
     }
+
     return State.empty();
   }
 
@@ -106,6 +114,7 @@ final class RestrictedZoneEnforcement implements GeofencingBoundaryEnforcement {
 
     var dropEditor = edge.traverse(state, state.currentMode());
     State dropState = null;
+
     if (dropEditor != null && !dropEditor.isDropOffBannedByCurrentZones()) {
       dropEditor.dropFloatingVehicle(
         state.vehicleRentalFormFactor(),
@@ -134,6 +143,7 @@ final class RestrictedZoneEnforcement implements GeofencingBoundaryEnforcement {
 
     var dropEditor = edge.traverse(state, state.currentMode());
     State dropState = null;
+
     if (dropEditor != null) {
       if (!dropEditor.isDropOffBannedByCurrentZones()) {
         dropEditor.dropFloatingVehicle(

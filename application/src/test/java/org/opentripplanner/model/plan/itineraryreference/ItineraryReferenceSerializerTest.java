@@ -198,8 +198,8 @@ class ItineraryReferenceSerializerTest {
    * A trailing delimiter in the joined leg-references field must not be silently dropped by
    * {@code split}, which would otherwise let a corrupted value decode as if the trailing empty
    * segment didn't exist. Crafts a token with the exact same field shape production uses, with
-   * valid values for every other field, so this isolates the delimiter defense rather than
-   * failing for an unrelated "missing field" reason.
+   * valid values for every other field, so this isolates the delimiter defense rather than failing
+   * for an unrelated "missing field" reason.
    */
   @Test
   void malformedNestedLegReferenceDecodesToNull() {
@@ -253,8 +253,8 @@ class ItineraryReferenceSerializerTest {
 
   /**
    * A board/alight slack above what the GTFS API would ever let a client set
-   * ({@code requireNonNegativeMax2hours} in {@code TransitPreferencesMapper}) is only possible in
-   * a hand-crafted token, and must not reach {@code RouteRequest.buildRequest()} unvalidated - see
+   * ({@code requireNonNegativeMax2hours} in {@code TransitPreferencesMapper}) is only possible in a
+   * hand-crafted token, and must not reach {@code RouteRequest.buildRequest()} unvalidated - see
    * {@link ItineraryReference}'s class doc.
    */
   @Test
@@ -318,8 +318,8 @@ class ItineraryReferenceSerializerTest {
   }
 
   /**
-   * A single {@code itinerary(id:)} call does a lookup, and possibly a transfer street search,
-   * per leg reference - an id with an unbounded number of them lets a client make one call do an
+   * A single {@code itinerary(id:)} call does a lookup, and possibly a transfer street search, per
+   * leg reference - an id with an unbounded number of them lets a client make one call do an
    * unbounded amount of work - see {@link ItineraryReference#MAX_LEG_REFERENCES}.
    */
   @Test
@@ -348,8 +348,8 @@ class ItineraryReferenceSerializerTest {
 
   /**
    * Builds a token with otherwise-valid values for every field production uses, and no
-   * {@code toStopId}/{@code toLat}/{@code toLon} location - so a test only needs to pass in the
-   * one or two fields it wants to make malformed. Field names/order must match
+   * {@code toStopId}/{@code toLat}/{@code toLon} location - so a test only needs to pass in the one
+   * or two fields it wants to make malformed. Field names/order must match
    * {@code ItineraryReferenceSerializer}'s schema exactly. {@code fromLat}/{@code fromLon}/
    * {@code walkSpeed} are parameters (not later overrides) because {@link TokenBuilder} rejects
    * setting the same field twice.

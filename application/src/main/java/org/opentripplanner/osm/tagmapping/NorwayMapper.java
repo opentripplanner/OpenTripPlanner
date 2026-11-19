@@ -155,6 +155,7 @@ class NorwayMapper extends OsmTagMapper {
           return speedLimit >= 13.8f ? cycleSafetyMediumLowTraffic : cycleSafetyLowTraffic;
         }
       }
+
       // 30 km/h or lower, or lower road class than unclassified
       if (this.isMotorVehicleThroughTrafficExplicitlyDisallowed(way)) {
         return cycleSafetyVeryLowTraffic;
@@ -383,7 +384,8 @@ class NorwayMapper extends OsmTagMapper {
       ),
       twoLaneOrOnewayCyclewayWithSidewalk
     );
-    // "motor_vehicle=destination" indicates unwanted car traffic, signposted "Kjøring til eiendommene tillatt"
+    // "motor_vehicle=destination" indicates unwanted car traffic, signposted "Kjøring til
+    // eiendommene tillatt"
     props.setProperties(
       "highway=cycleway;foot=designated;segregated=*;motor_vehicle=destination",
       withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(cycleSafetyVeryLowTraffic)

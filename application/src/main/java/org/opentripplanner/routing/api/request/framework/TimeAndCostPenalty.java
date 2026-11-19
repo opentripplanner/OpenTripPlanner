@@ -62,6 +62,7 @@ public record TimeAndCostPenalty(TimePenalty timePenalty, double costFactor) {
     if (costFactor != 0.0) {
       buf.append(", costFactor: ").append(Units.factorToString(costFactor));
     }
+
     return buf.append(")").toString();
   }
 }

@@ -11,6 +11,7 @@ class FeedScopedIdMapper {
     if (arg == null) {
       return null;
     }
+
     return arg.getFeedId() + SEPARATOR + arg.getId();
   }
 }

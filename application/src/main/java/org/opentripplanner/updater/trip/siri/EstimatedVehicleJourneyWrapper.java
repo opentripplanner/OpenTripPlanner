@@ -60,9 +60,9 @@ final class EstimatedVehicleJourneyWrapper {
   /**
    * Whether this journey must be rejected because it is not monitored.
    * <p>
-   * A journey reported as not monitored is normally rejected, but the not-monitored flag is
-   * ignored when the journey is a cancellation: a cancelled journey is no longer monitored, yet
-   * must still be processed so that the cancellation is applied.
+   * A journey reported as not monitored is normally rejected, but the not-monitored flag is ignored
+   * when the journey is a cancellation: a cancelled journey is no longer monitored, yet must still
+   * be processed so that the cancellation is applied.
    */
   private boolean mustBeRejectedAsUnmonitored() {
     return !isMonitored() && !isCancellation();
@@ -212,6 +212,7 @@ final class EstimatedVehicleJourneyWrapper {
     if (journey.getJourneyRelations() == null) {
       return List.of();
     }
+
     return journey
       .getJourneyRelations()
       .getJourneyRelations()

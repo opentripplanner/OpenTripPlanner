@@ -27,6 +27,7 @@ class UpdateManagerMetricsTest {
       TransactionFactory.createRepositoryRegistry(),
       threadFactory
     );
+
     try {
       var registry = new SimpleMeterRegistry();
       new ExecutorServiceMetrics(

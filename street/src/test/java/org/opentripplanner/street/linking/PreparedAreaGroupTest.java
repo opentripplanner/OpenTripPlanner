@@ -111,9 +111,12 @@ class PreparedAreaGroupTest {
 
   @Test
   void edgeTouchingNeighbourOnlyAtEndpointExcludesIt() {
-    // Tile A x in [0,10] and tile B x in [10,20] share only the boundary line x=10 (the squares abut,
-    // they do not overlap). The edge (5,5)->(10,5) lies inside A and merely touches B at its endpoint
-    // (10,5). An un-shrunk intersects would wrongly count B; the shrink must drop that endpoint touch
+    // Tile A x in [0,10] and tile B x in [10,20] share only the boundary line x=10 (the squares
+    // abut,
+    // they do not overlap). The edge (5,5)->(10,5) lies inside A and merely touches B at its
+    // endpoint
+    // (10,5). An un-shrunk intersects would wrongly count B; the shrink must drop that endpoint
+    // touch
     // so only A is returned.
     var a = area(square(0, 10));
     var b = area(square(10, 20));
@@ -126,9 +129,11 @@ class PreparedAreaGroupTest {
 
   private static AreaGroup group(Area... areas) {
     var builder = AreaGroup.of(square(0, 16));
+
     for (Area a : areas) {
       builder.addArea(a);
     }
+
     return builder.build();
   }
 

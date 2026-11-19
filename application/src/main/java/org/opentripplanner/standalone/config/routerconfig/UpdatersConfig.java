@@ -111,6 +111,7 @@ public class UpdatersConfig implements UpdatersParameters {
    */
   private TimetableSnapshotParameters timetableUpdates(NodeAdapter c) {
     var dflt = TimetableSnapshotParameters.DEFAULT;
+
     if (c.isEmpty()) {
       return dflt;
     }

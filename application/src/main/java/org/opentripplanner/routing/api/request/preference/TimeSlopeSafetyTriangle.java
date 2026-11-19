@@ -97,6 +97,7 @@ public record TimeSlopeSafetyTriangle(double time, double slope, double safety) 
       if (zeroVector(time, slope, safety)) {
         return defaultValue;
       }
+
       return new TimeSlopeSafetyTriangle(time, slope, safety);
     }
   }

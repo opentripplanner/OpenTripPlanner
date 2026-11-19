@@ -30,6 +30,7 @@ final class JourneyRelationWrapper {
     if (relation.getRelatedJourneies() == null) {
       return List.of();
     }
+
     return relation
       .getRelatedJourneies()
       .stream()
@@ -42,22 +43,29 @@ final class JourneyRelationWrapper {
 
   List<JourneyPartData> journeyParts() {
     var parts = relation.getJourneyParts();
+
     if (parts == null || parts.getJourneyPartInfos() == null) {
       return List.of();
     }
+
     var result = new ArrayList<JourneyPartData>();
+
     for (var part : parts.getJourneyPartInfos()) {
       var fromPos = resolvePosInPattern(part.getFromStopPointRef(), part.getStartTime());
       var toPos = resolvePosInPattern(part.getToStopPointRef(), part.getEndTime());
+
       if (fromPos.isEmpty() || toPos.isEmpty()) {
         continue;
       }
+
       if (fromPos.get() >= toPos.get()) {
         // Ignore invalid parts that start after they end.
         continue;
       }
+
       result.add(new JourneyPartData(fromPos.get(), toPos.get()));
     }
+
     return result;
   }
 
@@ -68,19 +76,25 @@ final class JourneyRelationWrapper {
     if (stopPointRef == null) {
       return Optional.empty();
     }
+
     for (int i = 0; i < calls.size(); i++) {
       var call = calls.get(i);
+
       if (stopPointRef.getValue().equals(call.getStopPointRef())) {
         if (time == null) {
           return Optional.of(i);
         }
+
         if (time.equals(call.getAimedArrivalTime()) || time.equals(call.getAimedDepartureTime())) {
-          // The spec is vague in how JourneyPartInfoStructure.startTime and endTime should be interpreted.
-          // If it is provided we require the call to match the aimed arrival time or aimed departure time.
+          // The spec is vague in how JourneyPartInfoStructure.startTime and endTime should be
+          // interpreted.
+          // If it is provided we require the call to match the aimed arrival time or aimed
+          // departure time.
           return Optional.of(i);
         }
       }
     }
+
     return Optional.empty();
   }
 }

@@ -47,7 +47,8 @@ public class UnifiedGridCoverage extends AbstractCoverage {
     regions = new ArrayList<>();
     datumRegionIndex = new STRtree();
 
-    // Iterate through region coverages, creating Interpolators for each region and then adding them and the
+    // Iterate through region coverages, creating Interpolators for each region and then adding them
+    // and the
     // intersected datum to the spatial index.
     for (GridCoverage2D regionCoverage : regionCoverages) {
       // TODO might bicubic interpolation give better results?
@@ -56,7 +57,8 @@ public class UnifiedGridCoverage extends AbstractCoverage {
         Interpolation.getInstance(Interpolation.INTERP_BILINEAR)
       );
 
-      // Iterate over datums to find intersection envelope with each region and add to spatial index.
+      // Iterate over datums to find intersection envelope with each region and add to spatial
+      // index.
       for (VerticalDatum datum : datums) {
         Envelope datumEnvelope = new Envelope(
           datum.lowerLeftLongitude,
@@ -70,6 +72,7 @@ public class UnifiedGridCoverage extends AbstractCoverage {
         Envelope intersection = regionEnvelope.intersection(datumEnvelope);
         datumRegionIndex.insert(intersection, new DatumRegion(datum, regionCoverageInterpolator));
       }
+
       regions.add(regionCoverageInterpolator);
     }
   }
@@ -99,6 +102,7 @@ public class UnifiedGridCoverage extends AbstractCoverage {
     Coordinate pointCoordinate = new Coordinate(x, y);
     Envelope envelope = new Envelope(pointCoordinate);
     List<DatumRegion> coverageCandidates = datumRegionIndex.query(envelope);
+
     if (coverageCandidates.size() > 0) {
       // Found a match for coverage/datum.
       DatumRegion datumRegion = coverageCandidates.get(0);
@@ -106,6 +110,7 @@ public class UnifiedGridCoverage extends AbstractCoverage {
       result[0] += datumRegion.datum.interpolatedHeight(x, y);
       return result;
     }
+
     throw new PointOutsideCoverageException("Point not found: " + point);
   }
 

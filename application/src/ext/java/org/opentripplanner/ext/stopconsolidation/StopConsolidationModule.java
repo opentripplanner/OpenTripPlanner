@@ -81,6 +81,7 @@ public class StopConsolidationModule implements GraphBuilderModule {
     DataSource ds
   ) {
     LOG.info("Reading stop consolidation information from '{}'", ds);
+
     try (var inputStream = ds.asInputStream()) {
       var groups = StopConsolidationParser.parseGroups(inputStream);
       return new StopConsolidationModule(transitRepository, timetableDataImport, repo, groups);

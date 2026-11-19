@@ -85,6 +85,7 @@ public class GraphStats {
 
   public static void main(String[] args) {
     GraphStats graphStats = new GraphStats(args);
+
     try {
       graphStats.run();
     } catch (OtpAppException ignore) {
@@ -110,14 +111,17 @@ public class GraphStats {
     } else {
       writer = new CsvWriter(System.out, ',', StandardCharsets.UTF_8);
     }
+
     LOG.info("done loading graph.");
 
     String command = jc.getParsedCommand();
+
     if (command.equals("endpoints")) {
       commandEndpoints.run();
     } else if (command.equals("patternstats")) {
       commandPatternStats.run();
     }
+
     writer.close();
   }
 
@@ -158,22 +162,29 @@ public class GraphStats {
       List<Vertex> vertices = new ArrayList<>();
       GeodeticCalculator gc = new GeodeticCalculator();
       Class<?> klasse = useStops ? TransitStopVertex.class : StreetVertex.class;
+
       for (Vertex v : graph.getVertices()) {
         if (klasse.isInstance(v)) {
           vertices.add(v);
         }
       }
+
       Random random = new Random();
+
       if (seed != null) {
         random.setSeed(seed);
       }
+
       Collections.shuffle(vertices, random);
       vertices = vertices.subList(0, n);
+
       try {
         writer.writeRecord(new String[] { "n", "name", "lon", "lat" });
         int i = 0;
+
         for (Vertex v : vertices) {
           Coordinate c;
+
           if (v instanceof StreetVertex) {
             LineString ls = ((StreetVertex) v).getOutgoing().iterator().next().getGeometry();
             int numPoints = ls.getNumPoints();
@@ -185,6 +196,7 @@ public class GraphStats {
           } else {
             c = v.getCoordinate();
           }
+
           // perturb
           double distance = random.nextDouble() * radius;
           double azimuth = random.nextDouble() * 360 - 180;
@@ -206,6 +218,7 @@ public class GraphStats {
       } catch (IOException ioe) {
         LOG.error("Excpetion while writing CSV: {}", ioe.getMessage());
       }
+
       LOG.info("done.");
     }
   }
@@ -215,6 +228,7 @@ public class GraphStats {
 
     public void run() {
       LOG.info("counting number of trips per pattern...");
+
       try {
         writer.writeRecord(new String[] {
           "nTripsInPattern",
@@ -229,15 +243,18 @@ public class GraphStats {
         int nPatterns = patterns.size();
         LOG.info("total number of patterns is: {}", nPatterns);
         int nTrips = 0;
+
         for (TripPattern ttp : patterns) {
           int patternNumTrips = (int) ttp.scheduledTripsAsStream().count();
           counts.add(patternNumTrips);
           nTrips += patternNumTrips;
         }
+
         LOG.info("total number of trips is: {}", nTrips);
         LOG.info("average number of trips per pattern is: {}", nTrips / nPatterns);
         int cPatterns = 0;
         int cTrips = 0;
+
         for (Multiset.Entry<Integer> count : counts.entrySet()) {
           cPatterns += count.getCount();
           cTrips += count.getCount() * count.getElement();
@@ -254,6 +271,7 @@ public class GraphStats {
         LOG.error("Exception writing CSV: {}", e.getMessage());
         return;
       }
+
       LOG.info("done.");
     }
   }

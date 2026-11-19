@@ -186,17 +186,21 @@ class AddedTripBuilder {
     }
 
     FeedScopedId calServiceId = buffer.getOrCreateServiceIdForDate(serviceDate);
+
     if (calServiceId == null) {
       throw UpdateException.of(tripId, NO_START_DATE);
     }
 
     boolean isAddedRoute = false;
     Route route = entityResolver.resolveRoute(lineRef);
+
     if (route == null) {
       Agency agency = resolveAgency();
+
       if (agency == null) {
         throw UpdateException.of(tripId, CANNOT_RESOLVE_AGENCY);
       }
+
       route = createRoute(agency);
       isAddedRoute = true;
       LOG.info("Adding route {} to transitRepository.", route);
@@ -208,6 +212,7 @@ class AddedTripBuilder {
 
     // Create the "scheduled version" of the trip
     var aimedStopTimes = new ArrayList<StopTime>();
+
     for (int stopSequence = 0; stopSequence < calls.size(); stopSequence++) {
       StopTime stopTime = stopTimesMapper.createAimedStopTime(
         trip,
@@ -218,7 +223,8 @@ class AddedTripBuilder {
         stopSequence == calls.size() - 1
       );
 
-      // Drop this update if the call refers to an unknown stop (not present in the site repository).
+      // Drop this update if the call refers to an unknown stop (not present in the site
+      // repository).
       if (stopTime == null) {
         throw UpdateException.of(tripId, UNKNOWN_STOP);
       }
@@ -263,9 +269,11 @@ class AddedTripBuilder {
     }
 
     builder.withVehicleId(FeedScopedId.ofNullable(tripId.getFeedId(), vehicleRef));
+
     if (cancellation || stopPattern.isAllStopsNonRoutable()) {
       builder.withCanceled();
     }
+
     builder.withAdded();
 
     /* Validate */
@@ -349,7 +357,7 @@ class AddedTripBuilder {
   /**
    * Resolves submode based on added trip's mode and replacedRoute's mode
    *
-   * @param transitMode   Mode of the added trip
+   * @param transitMode Mode of the added trip
    * @param replacedRoute Route that is being replaced
    * @return String-representation of submode
    */
@@ -357,6 +365,7 @@ class AddedTripBuilder {
     if (replacedRoute == null) {
       return null;
     }
+
     TransitMode replacedRouteMode = replacedRoute.getMode();
 
     if (replacedRouteMode != TransitMode.RAIL) {

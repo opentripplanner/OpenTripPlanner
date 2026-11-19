@@ -12,8 +12,8 @@ import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUser
 
 /**
  * The {@code P} path templates generated at graph build, keyed by
- * {@code (userPreferences, fromStop, toStop)}. Each user preferences key is a transfer profile,
- * its paths are held by a {@link TemplatePathsByStop}.
+ * {@code (userPreferences, fromStop, toStop)}. Each user preferences key is a transfer profile, its
+ * paths are held by a {@link TemplatePathsByStop}.
  * <p>
  * Written only at graph build, by the build repository. Once the build repository is sealed, this
  * map is never modified again: it is the immutable base the runtime repository and all its
@@ -22,7 +22,9 @@ import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUser
  * <p>
  * This class is not thread-safe while it is written to.
  *
- * @param <P> the street path type
+ * @param
+ *     <p>
+ *     the street path type
  */
 final class TemplatePathsByUserProfile<P> implements Serializable {
 
@@ -41,6 +43,7 @@ final class TemplatePathsByUserProfile<P> implements Serializable {
     if (pathsByToStop.isEmpty()) {
       return;
     }
+
     pathsByUserPreferences
       .computeIfAbsent(userPreferences, p -> new TemplatePathsByStop<>())
       .setPaths(fromStop, pathsByToStop);
@@ -69,6 +72,7 @@ final class TemplatePathsByUserProfile<P> implements Serializable {
     BiConsumer<Integer, Map<Integer, P>> consumer
   ) {
     var paths = pathsByUserPreferences.get(profile);
+
     if (paths != null) {
       paths.forEachFromStop(consumer);
     }
@@ -81,8 +85,8 @@ final class TemplatePathsByUserProfile<P> implements Serializable {
   }
 
   /**
-   * Distances within this limit are equal. The distance is a sum of floating point numbers, so
-   * two distances that are the same by the numbers can differ in the last digits.
+   * Distances within this limit are equal. The distance is a sum of floating point numbers, so two
+   * distances that are the same by the numbers can differ in the last digits.
    */
   static final double DISTANCE_EPSILON = 1e-9;
 
@@ -97,7 +101,7 @@ final class TemplatePathsByUserProfile<P> implements Serializable {
    * ordered by their values, so the result is always the same.
    *
    * @throws IllegalArgumentException if paths are stored, but not for the type of the preferences.
-   *                                  A request can only use the transfers of a configured type.
+   *     A request can only use the transfers of a configured type.
    */
   @Nullable
   AbstractUserPreferences<?> closestProfile(
@@ -107,15 +111,18 @@ final class TemplatePathsByUserProfile<P> implements Serializable {
     if (pathsByUserPreferences.containsKey(userPreferences)) {
       return userPreferences;
     }
+
     if (pathsByUserPreferences.isEmpty()) {
       return null;
     }
+
     var candidates = pathsByUserPreferences
       .keySet()
       .stream()
       .filter(profile -> profile.type() == userPreferences.type())
       .sorted(declarationOrder.thenComparing(AbstractUserPreferences::toString))
       .toList();
+
     if (candidates.isEmpty()) {
       throw new IllegalArgumentException(
         "There is no transfer profile of the type " +
@@ -123,16 +130,20 @@ final class TemplatePathsByUserProfile<P> implements Serializable {
           ", the transfers of that type are not configured."
       );
     }
+
     AbstractUserPreferences<?> best = null;
     double bestDistance = Double.MAX_VALUE;
+
     for (var candidate : candidates) {
       double distance = userPreferences.normalizedDistance(candidate);
+
       // A candidate that is declared first wins a tie
       if (best == null || distance < bestDistance - DISTANCE_EPSILON) {
         best = candidate;
         bestDistance = distance;
       }
     }
+
     return best;
   }
 

@@ -17,8 +17,8 @@ public class CollectionUtils {
    * All elements are also converted to a sting using the {@code toString()} method or if
    * {@code null} to the given {@code nullText}.
    * <p>
-   * If the collection is a set, but not a SortedSet then the elements are sorted. This is done
-   * to return the elements in a deterministic manner, which is important if this is used in for
+   * If the collection is a set, but not a SortedSet then the elements are sorted. This is done to
+   * return the elements in a deterministic manner, which is important if this is used in for
    * example a unit-test.
    * <p>
    * The final result string examples: {@code "[]", "[a]", "[a, b, c]"}
@@ -27,10 +27,13 @@ public class CollectionUtils {
     if (c == null) {
       return nullText;
     }
+
     var stream = c.stream().map(it -> it == null ? nullText : it.toString());
+
     if (c instanceof Set && !(c instanceof SortedSet<T>)) {
       stream = stream.sorted();
     }
+
     return stream.collect(Collectors.joining(", ", "[", "]"));
   }
 
@@ -76,13 +79,13 @@ public class CollectionUtils {
    * Look up the given key in a Map, return null if the key is null. This prevents a
    * NullPointerException if the underlying implementation of the map does not accept querying with
    * null keys (e.g. ImmutableMap).
-   *
-   **/
+   */
   @Nullable
   public static <K, V> V getByNullableKey(K key, Map<K, ? extends V> map) {
     if (key == null) {
       return null;
     }
+
     return map.get(key);
   }
 

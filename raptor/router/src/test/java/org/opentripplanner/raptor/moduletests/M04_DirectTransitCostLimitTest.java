@@ -47,8 +47,8 @@ public class M04_DirectTransitCostLimitTest implements RaptorTestConstants {
     );
   }
 
-  /// Trips with a cost above the limit should be rejected when they are not optimal on arrival
-  /// or departure
+  /// Trips with a cost above the limit should be rejected when they are not optimal on arrival or
+  /// departure
   @Test
   void testRejectExpensive() {
     var data = new TestTransitData();

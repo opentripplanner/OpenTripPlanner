@@ -55,11 +55,13 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
     if (heuristics == null || paths.isEmpty()) {
       return false;
     }
+
     boolean rejected = !qualify(arrival.stop(), arrival.arrivalTime(), arrival.c1(), arrival.c2());
 
     if (rejected) {
       debugRejectByOptimization(arrival);
     }
+
     return rejected;
   }
 
@@ -85,8 +87,8 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
    * This is used to make an optimistic guess for the best possible arrival at the destination,
    * using the given arrival and a pre-calculated heuristics.
    * <p>
-   * The C2 value is passed through since we don't have any clue on what it's used for. There is
-   * no heuristic calculation for the C2 value. Destination pruning can only be used if this is ok.
+   * The C2 value is passed through since we don't have any clue on what it's used for. There is no
+   * heuristic calculation for the C2 value. Destination pruning can only be used if this is ok.
    */
   private boolean qualify(int stop, int arrivalTime, int cost, int c2) {
     HeuristicAtStop h = get(stop);
@@ -94,6 +96,7 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
     if (h == HeuristicAtStop.UNREACHED) {
       return false;
     }
+
     int minArrivalTime = arrivalTime + h.minTravelDuration();
     int minNumberOfTransfers = round - 1 + h.minNumTransfers();
     int minCost = cost + h.minCost();
@@ -110,6 +113,7 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
     if (stops[stop] == null) {
       stops[stop] = heuristics.createHeuristicAtStop(stop);
     }
+
     return stops[stop];
   }
 }

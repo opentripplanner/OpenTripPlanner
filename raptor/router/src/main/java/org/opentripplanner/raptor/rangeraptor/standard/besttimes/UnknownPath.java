@@ -34,6 +34,7 @@ public class UnknownPath<T extends RaptorTripSchedule> implements RaptorPath<T> 
       this.departureTime = targetTime;
       this.arrivalTime = sourceTime;
     }
+
     this.numberOfTransfers = numberOfTransfers;
   }
 
@@ -135,11 +136,13 @@ public class UnknownPath<T extends RaptorTripSchedule> implements RaptorPath<T> 
   @Override
   public String toString() {
     PathStringBuilder pathBuilder = new PathStringBuilder(null);
+
     if (departureTime == 0 && arrivalTime == 0) {
       pathBuilder.summary(c1(), c2());
     } else {
       pathBuilder.summary(startTime(), endTime(), numberOfTransfers, c1(), c2());
     }
+
     return pathBuilder.toString();
   }
 }

@@ -28,8 +28,7 @@ import org.opentripplanner.transit.model.timetable.booking.BookingTime;
  * Maps booking info from NeTEx BookingArrangements, FlexibleServiceProperties, and FlexibleLine
  * into OTP BookingInfo.
  * <p>
- * The precedence is as follows: 1. BookingArrangements 2. FlexibleServiceProperties 3.
- * FlexibleLine
+ * The precedence is as follows: 1. BookingArrangements 2. FlexibleServiceProperties 3. FlexibleLine
  */
 public class BookingInfoMapper {
 
@@ -78,6 +77,7 @@ public class BookingInfoMapper {
           flexibleLine.getBookingNote()
         );
       }
+
       return this;
     }
 
@@ -96,11 +96,13 @@ public class BookingInfoMapper {
           flexibleServiceProperties.getBookingNote()
         );
       }
+
       return this;
     }
 
     private NetexBookingInfoBuilder withStopPoint(StopPointInJourneyPattern stopPoint) {
       BookingArrangementsStructure bookingArrangements = stopPoint.getBookingArrangements();
+
       if (bookingArrangements != null) {
         this.hasBookingInfo = true;
         this.stopPointRef = ref("StopPoint", stopPoint);
@@ -113,6 +115,7 @@ public class BookingInfoMapper {
           bookingArrangements.getBookingNote()
         );
       }
+
       return this;
     }
 
@@ -120,6 +123,7 @@ public class BookingInfoMapper {
       if (!hasBookingInfo) {
         return null;
       }
+
       String entityRefs = flexibleLineRef + '/' + serviceJourneyRef + '/' + stopPointRef;
       return build(
         bookingContact,
@@ -138,10 +142,8 @@ public class BookingInfoMapper {
     ) {
       return switch (purchaseWhen) {
         case UNTIL_PREVIOUS_DAY -> new BookingTime(latestBookingTime, 1);
-        case DAY_OF_TRAVEL_ONLY, ADVANCE_ONLY, ADVANCE_AND_DAY_OF_TRAVEL -> new BookingTime(
-          latestBookingTime,
-          0
-        );
+        case DAY_OF_TRAVEL_ONLY, ADVANCE_ONLY, ADVANCE_AND_DAY_OF_TRAVEL
+          -> new BookingTime(latestBookingTime, 0);
         case TIME_OF_TRAVEL_ONLY -> null;
         default -> throw new IllegalArgumentException("Value not supported: " + purchaseWhen);
       };
@@ -149,11 +151,8 @@ public class BookingInfoMapper {
 
     private static BookingTime mapEarliestBookingTime(PurchaseWhenEnumeration purchaseWhen) {
       return switch (purchaseWhen) {
-        case
-          UNTIL_PREVIOUS_DAY,
-          ADVANCE_ONLY,
-          ADVANCE_AND_DAY_OF_TRAVEL,
-          TIME_OF_TRAVEL_ONLY -> null;
+        case UNTIL_PREVIOUS_DAY, ADVANCE_ONLY, ADVANCE_AND_DAY_OF_TRAVEL, TIME_OF_TRAVEL_ONLY
+          -> null;
         case DAY_OF_TRAVEL_ONLY -> new BookingTime(LocalTime.MIDNIGHT, 0);
         default -> throw new IllegalArgumentException("Value not supported: " + purchaseWhen);
       };
@@ -244,6 +243,7 @@ public class BookingInfoMapper {
       if (bookingMethods != null && !bookingMethods.isEmpty()) {
         this.bookingMethods = bookingMethods;
       }
+
       this.bookingContact = getOrDefault(bookingContact, this.bookingContact);
       this.minimumBookingPeriod = getOrDefault(minimumBookingPeriod, this.minimumBookingPeriod);
       this.latestBookingTime = getOrDefault(latestBookingTime, this.latestBookingTime);

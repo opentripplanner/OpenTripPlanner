@@ -89,9 +89,9 @@ public final class TransitPreferences implements Serializable {
    * alighting a transit leg. Can be significant for airplanes or ferries. It is recommended to use
    * the `alightTimes` in the `router-config.json` to set this for each mode.
    * <p>
-   * Alight-slack can be configured per mode. The default value is used if not set for a given
-   * mode. This enables configuring the alight-slack for train alighting to be 4 minutes and a bus
-   * alight slack to be 0 minutes.
+   * Alight-slack can be configured per mode. The default value is used if not set for a given mode.
+   * This enables configuring the alight-slack for train alighting to be 4 minutes and a bus alight
+   * slack to be 0 minutes.
    * <p>
    * Unit is seconds. Default value is 0.
    */
@@ -106,11 +106,11 @@ public final class TransitPreferences implements Serializable {
    * <p>
    * If set, it overrides the default value {@code 1.0}.
    * <p>
-   * This is a scalar multiplied with the time in second on-board the transit vehicle. Default
-   * value is not-set(empty map).
+   * This is a scalar multiplied with the time in second on-board the transit vehicle. Default value
+   * is not-set(empty map).
    * <p>
-   * The returned map is READ-ONLY and IMMUTABLE. The map is not an EnumMap(mutable), so convert
-   * the type into something more performant if needed.
+   * The returned map is READ-ONLY and IMMUTABLE. The map is not an EnumMap(mutable), so convert the
+   * type into something more performant if needed.
    */
   public Map<TransitMode, Double> reluctanceForMode() {
     return reluctanceForMode;
@@ -183,9 +183,11 @@ public final class TransitPreferences implements Serializable {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     TransitPreferences that = (TransitPreferences) o;
     return (
       boardSlack.equals(that.boardSlack) &&

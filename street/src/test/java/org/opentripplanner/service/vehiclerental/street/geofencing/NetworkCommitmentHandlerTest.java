@@ -66,9 +66,11 @@ class NetworkCommitmentHandlerTest {
     var s0 = new State(v1, req);
     var editor = s0.edit(setupEdge);
     editor.beginFloatingVehicleRenting(RentalFormFactor.SCOOTER_STANDING, null, null, false);
+
     if (zones.length > 0) {
       editor.initializeGeofencingZones(Set.of(zones));
     }
+
     return editor.makeState();
   }
 
@@ -80,12 +82,15 @@ class NetworkCommitmentHandlerTest {
     var s0 = new State(v1, req);
     var editor = s0.edit(setupEdge);
     editor.beginFloatingVehicleRenting(RentalFormFactor.SCOOTER_STANDING, null, null, false);
+
     for (String n : committed) {
       editor.addCommittedNetwork(n);
     }
+
     if (zones.length > 0) {
       editor.initializeGeofencingZones(Set.of(zones));
     }
+
     return editor.makeState();
   }
 
@@ -194,14 +199,17 @@ class NetworkCommitmentHandlerTest {
 
       boolean hasCommitted = false;
       boolean hasGeneric = false;
+
       for (var s : result) {
         if (NETWORK_A.equals(s.getVehicleRentalNetwork())) {
           hasCommitted = true;
         }
+
         if (s.getVehicleRentalNetwork() == null) {
           hasGeneric = true;
         }
       }
+
       assertTrue(hasCommitted, "should have a committed branch for " + NETWORK_A);
       assertTrue(hasGeneric, "should have a generic continuation");
     }
@@ -221,6 +229,7 @@ class NetworkCommitmentHandlerTest {
       );
 
       assertNotNull(result);
+
       for (var s : result) {
         if (s.getVehicleRentalNetwork() == null) {
           assertTrue(
@@ -289,13 +298,16 @@ class NetworkCommitmentHandlerTest {
           "BA zone should NOT produce committed branch — only commit-only"
         );
       }
+
       // Generic continuation should have BA network in committedNetworks
       boolean hasCommitOnly = false;
+
       for (var s : result) {
         if (s.getVehicleRentalNetwork() == null && s.getCommittedNetworks().contains(NETWORK_A)) {
           hasCommitOnly = true;
         }
       }
+
       assertTrue(hasCommitOnly, "generic branch should have BA network in committedNetworks");
     }
 
@@ -314,6 +326,7 @@ class NetworkCommitmentHandlerTest {
       );
 
       assertNotNull(result);
+
       // Should only have generic branch (banned network filtered from committed branches)
       for (var s : result) {
         assertNull(

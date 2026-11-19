@@ -19,6 +19,7 @@ public class ItinerariesHelper {
     if (!wheelchairEnabled) {
       return itineraries;
     }
+
     var result = new ArrayList<Itinerary>();
     boolean dirty = false;
 
@@ -26,6 +27,7 @@ public class ItinerariesHelper {
       // Communicate the fact that the only way we were able to get a response
       // was by removing a slope limit.
       OptionalDouble maxSlope = getMaxSlope(it);
+
       if (maxSlope.isPresent()) {
         dirty = true;
         itineraries.add(
@@ -35,6 +37,7 @@ public class ItinerariesHelper {
         result.add(it);
       }
     }
+
     return dirty ? result : itineraries;
   }
 

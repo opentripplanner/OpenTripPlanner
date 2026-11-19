@@ -71,6 +71,7 @@ public class RequestModes {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
@@ -80,9 +81,11 @@ public class RequestModes {
     if (accessMode != that.accessMode) {
       return false;
     }
+
     if (egressMode != that.egressMode) {
       return false;
     }
+
     if (directMode != that.directMode) {
       return false;
     }

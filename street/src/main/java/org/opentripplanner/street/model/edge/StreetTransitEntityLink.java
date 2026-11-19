@@ -46,10 +46,14 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
 
   @Override
   public State[] traverse(State s0) {
-    // Forbid taking shortcuts composed of two street-transit links associated with the same stop in a row. Also
-    // avoids spurious leg transitions. As noted in https://github.com/opentripplanner/OpenTripPlanner/issues/2815,
-    // it is possible that two stops can have the same GPS coordinate thus creating a possibility for a
-    // legitimate StreetTransitLink > StreetTransitLink sequence, so only forbid two StreetTransitLinks to be taken
+    // Forbid taking shortcuts composed of two street-transit links associated with the same stop in
+    // a row. Also
+    // avoids spurious leg transitions. As noted in
+    // https://github.com/opentripplanner/OpenTripPlanner/issues/2815,
+    // it is possible that two stops can have the same GPS coordinate thus creating a possibility
+    // for a
+    // legitimate StreetTransitLink > StreetTransitLink sequence, so only forbid two
+    // StreetTransitLinks to be taken
     // if they are for the same stop.
     if (
       s0.backEdge instanceof StreetTransitEntityLink<?> link &&
@@ -67,6 +71,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
 
     if (s0.getRequest().wheelchairEnabled()) {
       var accessibility = request.wheelchair();
+
       if (
         accessibility.stop().onlyConsiderAccessible() &&
         wheelchairAccessibility != Accessibility.POSSIBLE
@@ -99,6 +104,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
         ) {
           yield State.empty();
         }
+
         yield buildState(s0, s1);
       }
       // Allow taking an owned bike in the station
@@ -107,6 +113,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
         if (s0.getRequest().mode().includesParking() && !s0.isVehicleParked()) {
           yield State.empty();
         }
+
         // For Kiss & Ride allow dropping of the passenger before entering the station
         if (s0.getCarPickupState() != null) {
           if (canDropOffAfterDriving(s0) && isLeavingStreetNetwork(s0.getRequest().arriveBy())) {
@@ -115,9 +122,11 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
             yield State.empty();
           }
         }
+
         if (s0.isRentingVehicleFromStation()) {
           yield State.empty();
         }
+
         yield buildState(s0, s1);
       }
       // If Kiss & Ride (Taxi) mode is not enabled allow car traversal so that the Stop
@@ -130,6 +139,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
   private State[] buildState(State s0, StateEditor s1) {
     if (s0.isRentingVehicleFromStation() && s0.mayKeepRentedVehicleAtDestination()) {
       var rentalPreferences = s0.getRequest().rental(s0.getRequest().mode());
+
       if (rentalPreferences.allowArrivingInRentedVehicleAtDestination()) {
         s1.incrementWeight(
           rentalPreferences.arrivingInRentalVehicleAtDestinationCost().toSeconds()

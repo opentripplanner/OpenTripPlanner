@@ -63,6 +63,7 @@ public final class CompactLineString implements Serializable {
     if (packed == null) {
       return null;
     }
+
     return packed.length == 0 ? STRAIGHT_LINE : new CompactLineString(packed);
   }
 
@@ -75,6 +76,7 @@ public final class CompactLineString implements Serializable {
     if (lineString == null) {
       return null;
     }
+
     LineString padded = GeometryUtils.addStartEndCoordinatesToLineString(
       new Coordinate(0.0, 0.0),
       lineString,
@@ -91,9 +93,11 @@ public final class CompactLineString implements Serializable {
    */
   LineString toLineString(boolean reverse) {
     int n = coordinateCount();
+
     if (n == 0) {
       return GeometryUtils.emptyLineString();
     }
+
     double[] c = new double[n * 2];
     decodeInto(packed, c, 0, 0, 0, false);
     LineString out = GeometryUtils.makeLineString(c);
@@ -124,16 +128,14 @@ public final class CompactLineString implements Serializable {
    * {@link #toLineString(boolean)} and the endpoint-context
    * {@link EndpointContextLineString#uncompact} call it.
    *
-   * @param packed         the compact line string, or {@code null} / empty for a no-op
-   * @param out            target array to write decoded coordinates into (flat: [x0, y0, x1, y1,
-   *                       …])
-   * @param offset         starting index in {@code out} to write to
-   * @param oix            initial x in fixed-point (start of delta chain)
-   * @param oiy            initial y in fixed-point (start of delta chain)
+   * @param packed the compact line string, or {@code null} / empty for a no-op
+   * @param out target array to write decoded coordinates into (flat: [x0, y0, x1, y1, …])
+   * @param offset starting index in {@code out} to write to
+   * @param oix initial x in fixed-point (start of delta chain)
+   * @param oiy initial y in fixed-point (start of delta chain)
    * @param skipFirstCoord skip writing the first decoded coordinate. Deltas still accumulate so the
-   *                       remaining coordinates land at their correct absolute positions. Used to
-   *                       drop the shared seam coord at hop seams in transit-pattern leg-geometry
-   *                       concatenation.
+   *     remaining coordinates land at their correct absolute positions. Used to drop the shared
+   *     seam coord at hop seams in transit-pattern leg-geometry concatenation.
    * @return the offset of the first unwritten slot in {@code out}
    */
   static int decodeInto(
@@ -147,19 +149,24 @@ public final class CompactLineString implements Serializable {
     if (packed == null || packed.length == 0) {
       return offset;
     }
+
     int writeIdx = offset;
     boolean skip = skipFirstCoord;
     var decoder = new DlugoszVarLenIntPacker.Decoder(packed);
+
     while (decoder.hasNext()) {
       oix += decoder.next();
       oiy += decoder.next();
+
       if (skip) {
         skip = false;
         continue;
       }
+
       out[writeIdx++] = toFloatingPoint(oix);
       out[writeIdx++] = toFloatingPoint(oiy);
     }
+
     return writeIdx;
   }
 
@@ -168,8 +175,8 @@ public final class CompactLineString implements Serializable {
    * deltas accumulated from {@code (oix, oiy)} and produce the Dlugosz-packed bytes. The first and
    * last coordinates of the input are <b>not</b> stored.
    * <p>
-   * Single home of the encode logic; both the self-contained {@link #of(LineString)} (which
-   * passes a padded line string starting and ending at {@code (0,0)}) and the endpoint-context
+   * Single home of the encode logic; both the self-contained {@link #of(LineString)} (which passes
+   * a padded line string starting and ending at {@code (0,0)}) and the endpoint-context
    * {@link EndpointContextLineString#compact} (which passes the vertex coordinates as origin)
    * delegate here.
    */
@@ -177,6 +184,7 @@ public final class CompactLineString implements Serializable {
     CoordinateSequence seq = lineString.getCoordinateSequence();
     int n = seq.size();
     int[] coords = new int[(n - 2) * 2];
+
     for (int i = 1; i < n - 1; i++) {
       // Round to fixed point before taking the delta to prevent rounding errors from accumulating.
       int ix = toFixedPoint(seq.getX(i));
@@ -186,6 +194,7 @@ public final class CompactLineString implements Serializable {
       oix = ix;
       oiy = iy;
     }
+
     return DlugoszVarLenIntPacker.pack(coords);
   }
 

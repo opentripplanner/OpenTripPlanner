@@ -44,8 +44,8 @@ public class SiriRealTimeTripUpdateAdapter {
 
   /**
    * Create an update-scoped task for applying SIRI-ET estimated timetables. Entity lookups within
-   * the task go directly against the given mutable buffer (which falls back to scheduled data),
-   * so they see in-progress real-time additions not yet committed to a published snapshot.
+   * the task go directly against the given mutable buffer (which falls back to scheduled data), so
+   * they see in-progress real-time additions not yet committed to a published snapshot.
    */
   public SiriRealTimeUpdateHandler forUpdate(TimetableRepository buffer) {
     var fuzzyTripMatcher =

@@ -25,6 +25,7 @@ public class RoutingValidationException extends RuntimeException {
     if (e.getCause() instanceof RuntimeException cause) {
       throw cause;
     }
+
     throw e;
   }
 
@@ -32,6 +33,7 @@ public class RoutingValidationException extends RuntimeException {
     if (e.getCause() instanceof RuntimeException cause) {
       throw cause;
     }
+
     throw new RuntimeException(e);
   }
 

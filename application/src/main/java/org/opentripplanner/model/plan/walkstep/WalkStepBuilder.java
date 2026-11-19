@@ -131,6 +131,7 @@ public class WalkStepBuilder {
     } else {
       elevationProfile = elevationProfile.add(other);
     }
+
     return this;
   }
 
@@ -150,14 +151,18 @@ public class WalkStepBuilder {
   @Nullable
   public String directionTextNoParens() {
     var str = directionText.toString();
+
     if (str == null) {
       // Avoid null reference exceptions with pathways which don't have names
       return null;
     }
+
     int idx = str.indexOf('(');
+
     if (idx > 0) {
       return str.substring(0, idx - 1);
     }
+
     return str;
   }
 

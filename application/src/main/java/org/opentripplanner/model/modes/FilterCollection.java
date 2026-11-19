@@ -35,6 +35,7 @@ public class FilterCollection implements AllowTransitModeFilter {
         return true;
       }
     }
+
     return false;
   }
 

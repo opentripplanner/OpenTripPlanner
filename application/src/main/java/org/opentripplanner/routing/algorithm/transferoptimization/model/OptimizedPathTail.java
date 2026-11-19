@@ -81,16 +81,20 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
   public OptimizedPathTail<T> addTransitTail(TransitPathLeg<T> leg) {
     var next = leg.nextLeg();
     RaptorTransfer transfer = null;
+
     // this can also be a transfer leg to a flex trip
     if (next.isTransferLeg()) {
       transfer = next.asTransferLeg().transfer();
       next = next.nextLeg();
     }
+
     if (next.isEgressLeg()) {
       egress(next.asEgressLeg().egress());
+
       if (transfer != null) {
         transfer(transfer, transfer.stop());
       }
+
       var times = new BoardAndAlightTime(
         leg.trip(),
         leg.getFromStopPosition(),
@@ -100,6 +104,7 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
     } else {
       throw new IllegalStateException("We expect an egress leg at the end of the RAPTOR path.");
     }
+
     return this;
   }
 
@@ -151,15 +156,19 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
     if (generalizedCost != RaptorCostCalculator.ZERO_COST) {
       builder.addObj(RaptorValueType.C1.format(generalizedCost()));
     }
+
     if (c2() != RaptorConstants.NOT_SET) {
       builder.addObj(RaptorValueType.C2.format(c2()));
     }
+
     if (transferPriorityCost != TransferConstraint.ZERO_COST) {
       builder.addObj(RaptorValueType.TRANSFER_PRIORITY.format(transferPriorityCost));
     }
+
     if (waitTimeOptimizedCost != TransferWaitTimeCostCalculator.ZERO_COST) {
       builder.addObj(RaptorValueType.WAIT_TIME_COST.format(generalizedCostWaitTimeOptimized()));
     }
+
     return builder.addText("]").toString();
   }
 
@@ -216,6 +225,7 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
     if (skipCostCalc()) {
       return;
     }
+
     this.generalizedCost = legsAsStream()
       .mapToInt(it -> it.c1(costCalculator(), slackProvider()))
       .sum();
@@ -254,6 +264,7 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
     }
 
     int waitTime = pathLeg.waitTimeBeforeNextTransitIncludingSlack();
+
     if (waitTime < 0) {
       return;
     }
@@ -262,6 +273,7 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
 
     if (tx != null) {
       var c = (TransferConstraint) tx.getTransferConstraint();
+
       // If the transfer is stay-seated or guaranteed, then no wait-time cost is added
       if (c != null && c.isFacilitated()) {
         if (c.isStaySeated()) {
@@ -269,6 +281,7 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
         } else if (c.isGuaranteed()) {
           this.waitTimeOptimizedCost += waitTimeCostCalculator.calculateGuaranteedTransferCost();
         }
+
         return;
       }
     }
@@ -282,6 +295,7 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
     }
 
     int extraCost = RaptorCostCalculator.ZERO_COST;
+
     // Ideally we would like to add the board- & alight-stop-cost when a new transit-leg
     // is added to the path. But, the board stop is unknown until the leg before it is
     // added. So, instead of adding the board-stop-cost when it is added, we wait and add it
@@ -289,9 +303,11 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
     if (leg.next() != null && leg.next().isTransit()) {
       extraCost += stopPriorityCostCalculator.extraStopPriorityCost(leg.toStop());
     }
+
     if (leg.isTransit()) {
       extraCost += stopPriorityCostCalculator.extraStopPriorityCost(leg.toStop());
     }
+
     return extraCost;
   }
 }

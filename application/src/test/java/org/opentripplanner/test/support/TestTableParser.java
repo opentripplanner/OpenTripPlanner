@@ -27,8 +27,8 @@ public class TestTableParser {
    * <ul>
    *   <li>Supported types are boolean, int, double and strings</li>
    *   <li>Use '#' to add comments/header line.</li>
-   *   <li>A double pipe({@code '||'}) is optional and is usually used to separate input from expected
-   *       result.</li>
+   *   <li>A double pipe({@code '||'}) is optional and is usually used to separate input from
+   *       expected result.</li>
    * </ul>
    */
   public static Stream<Arguments> of(String text) {
@@ -47,6 +47,7 @@ public class TestTableParser {
     for (int i = 0; i < args.length; i++) {
       result[i] = toValue(args[i]);
     }
+
     return result;
   }
 
@@ -59,16 +60,21 @@ public class TestTableParser {
     if (arg.matches("-?\\d+")) {
       return Integer.valueOf(arg);
     }
+
     if (arg.matches("-?\\d*\\.\\d+")) {
       return Double.valueOf(arg);
     }
+
     String lcArg = arg.toLowerCase(Locale.ROOT);
+
     if (lcArg.matches("t(rue)?|y(es)?|x")) {
       return Boolean.TRUE;
     }
+
     if (lcArg.matches("f(alse)?|n(o)?|-")) {
       return Boolean.FALSE;
     }
+
     return arg;
   }
 

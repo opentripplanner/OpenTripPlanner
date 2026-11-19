@@ -36,6 +36,7 @@ public class HttpsDataSourceRepository implements DataSourceRepository {
     if (skipUri(uri)) {
       return null;
     }
+
     return createSource(uri, type);
   }
 
@@ -44,6 +45,7 @@ public class HttpsDataSourceRepository implements DataSourceRepository {
     if (skipUri(uri)) {
       return null;
     }
+
     return createCompositeSource(uri, type);
   }
 

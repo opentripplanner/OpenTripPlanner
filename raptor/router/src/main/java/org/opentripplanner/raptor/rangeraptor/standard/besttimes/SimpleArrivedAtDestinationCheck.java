@@ -40,11 +40,13 @@ public class SimpleArrivedAtDestinationCheck implements ArrivedAtDestinationChec
         return true;
       }
     }
+
     for (final int egressStop : rideToDestinationEgressStops) {
       if (stopVisited.isStopReachedInCurrentRound(egressStop)) {
         return true;
       }
     }
+
     return false;
   }
 }

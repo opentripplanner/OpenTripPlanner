@@ -30,22 +30,28 @@ public class Ring {
   public Ring(List<OsmNode> osmNodes) {
     ArrayList<Coordinate> vertices = new ArrayList<>();
     nodes = osmNodes;
+
     for (OsmNode node : osmNodes) {
       Coordinate point = new Coordinate(node.lon, node.lat);
       vertices.add(point);
     }
-    // Make sure rings are always clockwise, in order to be able to calculate if it is concave/convex
+
+    // Make sure rings are always clockwise, in order to be able to calculate if it is
+    // concave/convex
     if (Orientation.isCCW(new CoordinateArrayListSequence(vertices))) {
       nodes = new ArrayList<>(nodes);
       Collections.reverse(nodes);
       Collections.reverse(vertices);
     }
+
     GeometryFactory factory = GeometryUtils.getGeometryFactory();
+
     try {
       shell = factory.createLinearRing(vertices.toArray(new Coordinate[0]));
     } catch (IllegalArgumentException e) {
       throw new RingConstructionException();
     }
+
     jtsPolygon = calculateJtsPolygon();
   }
 
@@ -89,15 +95,19 @@ public class Ring {
     // to detect this other than this crazy DE-9IM stuff
 
     List<Polygon> polygonHoles = new ArrayList<>();
+
     for (Ring ring : holes) {
       Polygon polygon = factory.createPolygon(ring.shell, new LinearRing[0]);
+
       for (Iterator<Polygon> it = polygonHoles.iterator(); it.hasNext(); ) {
         Polygon otherHole = it.next();
+
         if (otherHole.relate(polygon, "F***1****")) {
           polygon = (Polygon) polygon.union(otherHole);
           it.remove();
         }
       }
+
       polygonHoles.add(polygon);
     }
 
@@ -105,6 +115,7 @@ public class Ring {
 
     for (Polygon hole : polygonHoles) {
       Geometry boundary = hole.getBoundary();
+
       if (boundary instanceof LinearRing) {
         lrholelist.add((LinearRing) boundary);
       } else {
@@ -115,6 +126,7 @@ public class Ring {
         lrholelist.add(ring);
       }
     }
+
     LinearRing[] lrholes = lrholelist.toArray(new LinearRing[0]);
     return factory.createPolygon(shell, lrholes);
   }

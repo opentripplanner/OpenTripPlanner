@@ -82,6 +82,7 @@ public interface PathLeg<T extends RaptorTripSchedule> {
     if (c1() < 0) {
       return c1();
     }
+
     return stream().mapToInt(PathLeg::c1).sum();
   }
 
@@ -155,8 +156,8 @@ public interface PathLeg<T extends RaptorTripSchedule> {
    *   <li>A transit leg can be followed by a new transit leg, an transfer leg or an egress leg.
    *   <li>A transfer leg can only be followed by a transit leg.
    *   <li>An egress leg is always the last leg and this method will throw a
-   *       {@link UnsupportedOperationException}. Use the {@link #isEgressLeg()} to check if the last leg
-   *       is reached.
+   *       {@link UnsupportedOperationException}. Use the {@link #isEgressLeg()} to check if the
+   *       last leg is reached.
    * </ul>
    *
    * @return Next leg in path.
@@ -185,12 +186,15 @@ public interface PathLeg<T extends RaptorTripSchedule> {
   @Nullable
   default TransitPathLeg<T> nextTransitLeg() {
     PathLeg<T> leg = nextLeg();
+
     while (!leg.isEgressLeg()) {
       if (leg.isTransitLeg()) {
         return leg.asTransitLeg();
       }
+
       leg = leg.nextLeg();
     }
+
     return null;
   }
 

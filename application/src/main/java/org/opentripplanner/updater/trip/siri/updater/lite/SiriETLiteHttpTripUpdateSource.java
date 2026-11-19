@@ -39,15 +39,18 @@ public class SiriETLiteHttpTripUpdateSource implements EstimatedTimetableSource 
   public Optional<Siri> getUpdates() {
     try {
       var siri = siriLoader.fetchETFeed(DUMMY_REQUESTOR_REF);
+
       if (siri.map(Siri::getServiceDelivery).isEmpty()) {
         return Optional.empty();
       }
+
       return siri;
     } catch (OtpHttpClientException e) {
       LOG.warn("Could not get SIRI-ET data from {}", parameters.uri(), e);
     } catch (Exception e) {
       LOG.warn("Failed to parse SIRI-ET feed from {}", parameters.uri(), e);
     }
+
     return Optional.empty();
   }
 

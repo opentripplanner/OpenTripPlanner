@@ -40,8 +40,8 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.transfer.regular.FixedRegularTransfers;
 
 /**
- * Focused test for {@link QueryTypeImpl#itinerary}, the GTFS API's single-id refetch query
- * (#7878). Delegates entirely to the shared
+ * Focused test for {@link QueryTypeImpl#itinerary}, the GTFS API's single-id refetch query (#7878).
+ * Delegates entirely to the shared
  * {@link org.opentripplanner.routing.refetch.ItineraryReferenceMapper}/
  * {@link RefetchItineraryService} core - see {@link ItineraryImplTest} for id exposure.
  */
@@ -128,9 +128,9 @@ class QueryTypeImplItineraryTest {
   }
 
   /**
-   * The id holds no locale. Names in the refetched itinerary must be in the language of the
-   * refetch request ({@code Accept-Language}), not the server default: {@code GraphQLUtils} reads
-   * the {@code locale} put into the local context before it falls back to {@code Accept-Language}.
+   * The id holds no locale. Names in the refetched itinerary must be in the language of the refetch
+   * request ({@code Accept-Language}), not the server default: {@code GraphQLUtils} reads the
+   * {@code locale} put into the local context before it falls back to {@code Accept-Language}.
    */
   @Test
   @SuppressWarnings("unchecked")

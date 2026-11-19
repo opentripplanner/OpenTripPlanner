@@ -123,6 +123,7 @@ public class ParetoSetWithMarkerTest {
     if (set.isEmpty()) {
       return "{}";
     }
+
     Iterator<Vector> afterMarker = set.elementsAfterMarker().iterator();
     Vector firstVectorAfterMarker = afterMarker.hasNext() ? afterMarker.next() : null;
 
@@ -136,9 +137,11 @@ public class ParetoSetWithMarkerTest {
         if (it == firstVectorAfterMarker) {
           buf.add("<M>");
         }
+
         buf.add(it.toString());
       });
     }
+
     return buf.toString();
   }
 

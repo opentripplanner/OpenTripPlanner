@@ -26,9 +26,9 @@ import org.opentripplanner.street.search.strategy.DominanceFunctions;
  * Resolves a car-reachable vertex near a target that sits on a pedestrian-only edge, or on a car
  * edge no car can actually reach.
  * <p>
- * The input is returned unchanged when already car-reachable; otherwise a bounded WALK A* finds
- * the cheapest car-reachable vertex within {@code maxWalk} and returns the walk path bridging the
- * gap, or {@code null} if none is reachable.
+ * The input is returned unchanged when already car-reachable; otherwise a bounded WALK A* finds the
+ * cheapest car-reachable vertex within {@code maxWalk} and returns the walk path bridging the gap,
+ * or {@code null} if none is reachable.
  * <p>
  * "Car-reachable" means a car can both reach the vertex and leave it, since a carpool pickup or
  * dropoff is a mid-route insertion the driver has to arrive at and continue from. Each direction is
@@ -110,13 +110,13 @@ public final class CarReachableVertexSnapper {
   }
 
   /**
-   * @param baseRequest   walk preferences for the walk A*; mode is forced to
-   *                      {@link StreetMode#WALK} and {@code arriveBy} overridden. The reachability
-   *                      probe ignores it (always plain {@link StreetMode#CAR}).
-   * @param vertexToSnap  the vertex to snap; returned unchanged when it can already be snapped to.
-   * @param maxWalk       walk budget for reaching a car-reachable vertex.
-   * @param arriveBy      {@code false} to walk forward from {@code vertexToSnap}, {@code true} to
-   *                      walk backward to it.
+   * @param baseRequest walk preferences for the walk A*; mode is forced to {@link StreetMode#WALK}
+   *     and {@code arriveBy} overridden. The reachability probe ignores it (always plain
+   *     {@link StreetMode#CAR}).
+   * @param vertexToSnap the vertex to snap; returned unchanged when it can already be snapped to.
+   * @param maxWalk walk budget for reaching a car-reachable vertex.
+   * @param arriveBy {@code false} to walk forward from {@code vertexToSnap}, {@code true} to walk
+   *     backward to it.
    * @param permanentOnly reject temporary vertices.
    * @return the snap result, or {@code null} if none is reachable within {@code maxWalk}.
    */
@@ -152,6 +152,7 @@ public final class CarReachableVertexSnapper {
         foundRef[0] = state;
         return true;
       }
+
       return false;
     };
 
@@ -168,24 +169,29 @@ public final class CarReachableVertexSnapper {
       )
       .withDominanceFunction(new DominanceFunctions.MinimumWeight())
       .withTerminationStrategy(terminator);
+
     // Reverse search starts from toVertices, forward from fromVertices.
     if (arriveBy) {
       builder = builder.withTo(vertexToSnap);
     } else {
       builder = builder.withFrom(vertexToSnap);
     }
+
     builder.run();
 
     State best = foundRef[0];
+
     if (best == null) {
       return null;
     }
 
     var path = new StreetPath(best);
+
     // A zero-duration path means the snap landed on a zero-cost temporary hop — no real walk.
     if (path.duration().isZero()) {
       return new SnapResult(best.getVertex(), null);
     }
+
     return new SnapResult(best.getVertex(), path);
   }
 
@@ -193,14 +199,15 @@ public final class CarReachableVertexSnapper {
    * Whether {@code vertex} may be returned as the snap result: car-reachable, and permanent when
    * the caller asked for {@code permanentOnly}.
    * <p>
-   * A permanent vertex's verdict rests on the static graph alone, so it is cached and shared
-   * across requests. A temporary vertex's rests on {@code scope}, which is specific to one linking,
-   * so it is computed fresh and never stored.
+   * A permanent vertex's verdict rests on the static graph alone, so it is cached and shared across
+   * requests. A temporary vertex's rests on {@code scope}, which is specific to one linking, so it
+   * is computed fresh and never stored.
    */
   private boolean canSnapTo(Vertex vertex, boolean permanentOnly, TraversalScope scope) {
     if (TraversalScope.isPermanent(vertex)) {
       return isCarReachable(vertex);
     }
+
     return !permanentOnly && computeCarReachable(vertex, scope);
   }
 
@@ -210,9 +217,11 @@ public final class CarReachableVertexSnapper {
    */
   public boolean isCarReachable(Vertex vertex) {
     Boolean cached = carReachableCache.get(vertex);
+
     if (cached != null) {
       return cached;
     }
+
     boolean verdict = computeCarReachable(vertex, TraversalScope.STATIC_GRAPH);
     carReachableCache.putIfAbsent(vertex, verdict);
     return verdict;
@@ -255,6 +264,7 @@ public final class CarReachableVertexSnapper {
         escaped[0] = true;
         return true;
       }
+
       return false;
     };
 
@@ -269,11 +279,13 @@ public final class CarReachableVertexSnapper {
       .withSkipEdgeStrategy(skipEdges)
       .withDominanceFunction(new DominanceFunctions.MinimumWeight())
       .withTerminationStrategy(terminator);
+
     if (arriveBy) {
       builder = builder.withTo(origin);
     } else {
       builder = builder.withFrom(origin);
     }
+
     builder.run();
 
     return escaped[0];
@@ -285,6 +297,7 @@ public final class CarReachableVertexSnapper {
         return true;
       }
     }
+
     return false;
   }
 }

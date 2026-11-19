@@ -86,12 +86,15 @@ public class VehicleParkingAvailabilityUpdater
       } else {
         var parking = parkingById.get(update.vehicleParkingId());
         var builder = VehicleParkingSpaces.of();
+
         if (parking.hasCarPlaces()) {
           builder.carSpaces(update.spacesAvailable());
         }
+
         if (parking.hasBicyclePlaces()) {
           builder.bicycleSpaces(update.spacesAvailable());
         }
+
         parking.updateAvailability(builder.build());
       }
     }

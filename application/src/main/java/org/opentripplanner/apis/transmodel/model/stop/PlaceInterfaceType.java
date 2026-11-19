@@ -46,18 +46,23 @@ public class PlaceInterfaceType {
         if (o instanceof RegularStop) {
           return schema.getObjectType("Quay");
         }
+
         if (o instanceof MonoOrMultiModalStation) {
           return schema.getObjectType("StopPlace");
         }
+
         if (o instanceof VehicleRentalStation) {
           return schema.getObjectType("BikeRentalStation");
         }
+
         if (o instanceof VehicleRentalVehicle) {
           return schema.getObjectType("RentalVehicle");
         }
+
         if (o instanceof VehicleParking) {
           return schema.getObjectType(BikeParkType.NAME);
         }
+
         //if (o instanceof CarPark) {
         //    return (GraphQLObjectType) carParkType;
         //}

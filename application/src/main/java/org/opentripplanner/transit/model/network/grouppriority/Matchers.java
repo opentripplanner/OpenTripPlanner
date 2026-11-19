@@ -39,20 +39,25 @@ final class Matchers {
     if (select.isEmpty()) {
       return NOOP;
     }
+
     List<Matcher> list = new ArrayList<>();
 
     if (!select.modes().isEmpty()) {
       list.add(new ModeMatcher(select.modes()));
     }
+
     if (!select.subModeRegexp().isEmpty()) {
       list.add(new RegExpMatcher("SubMode", select.subModeRegexp(), EntityAdapter::subMode));
     }
+
     if (!select.agencyIds().isEmpty()) {
       list.add(new IdMatcher("Agency", select.agencyIds(), EntityAdapter::agencyId));
     }
+
     if (!select.routeIds().isEmpty()) {
       list.add(new IdMatcher("Route", select.routeIds(), EntityAdapter::routeId));
     }
+
     return andOf(list);
   }
 
@@ -83,9 +88,11 @@ final class Matchers {
     if (list.isEmpty()) {
       return NOOP;
     }
+
     if (list.size() == 1) {
       return list.get(0);
     }
+
     return new AndMatcher(list);
   }
 
@@ -152,11 +159,13 @@ final class Matchers {
     @Override
     public boolean match(EntityAdapter entity) {
       var value = toValue.apply(entity);
+
       for (java.util.regex.Matcher m : matchers) {
         if (m.reset(value).matches()) {
           return true;
         }
       }
+
       return false;
     }
 
@@ -212,6 +221,7 @@ final class Matchers {
           return false;
         }
       }
+
       return true;
     }
 

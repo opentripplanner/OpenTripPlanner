@@ -63,14 +63,17 @@ public class DirectTransitSearch<T extends RaptorTripSchedule> {
       var paths = routeSearch(route);
       results.addAll(paths);
     }
+
     return results;
   }
 
   private IntIterator findAllAccessStopIndexes() {
     BitSet accessStopBitSet = new BitSet();
+
     for (RaptorAccessEgress it : accesses) {
       accessStopBitSet.set(it.stop());
     }
+
     return IntIterators.of(accessStopBitSet);
   }
 
@@ -102,12 +105,14 @@ public class DirectTransitSearch<T extends RaptorTripSchedule> {
 
         if (pathOp.isPresent()) {
           var candidate = pathOp.get();
+
           if (bestPath == null || candidate.path.c1() < bestPath.path.c1()) {
             bestPath = candidate;
           }
         }
       }
     }
+
     this.currentRouteBoardSlack = RaptorConstants.NOT_SET;
     // Expand the best-path into all paths within the search-window
     return bestPath == null ? List.of() : findAllPathsInSearchWindow(route, bestPath);
@@ -130,6 +135,7 @@ public class DirectTransitSearch<T extends RaptorTripSchedule> {
     if (boardEvent.empty()) {
       return Optional.empty();
     }
+
     var path = mapToPath(boardEvent.trip(), access, egress, boardPos, alightPos);
 
     if (path.startTime() < earliestDepartureTime) {
@@ -142,6 +148,7 @@ public class DirectTransitSearch<T extends RaptorTripSchedule> {
     if (path.startTime() < latestDepartureTime) {
       return Optional.of(new PathAndTripIndex<T>(path, boardEvent.tripScheduleIndex()));
     }
+
     return Optional.empty();
   }
 
@@ -171,8 +178,10 @@ public class DirectTransitSearch<T extends RaptorTripSchedule> {
       if (path.startTime() > latestDepartureTime) {
         return results;
       }
+
       results.add(path);
     }
+
     return results;
   }
 

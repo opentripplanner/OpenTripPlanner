@@ -32,9 +32,9 @@ import org.slf4j.LoggerFactory;
  * <p>
  * If possible the forward and reverse heuristics will be run in parallel.
  * <p>
- * Depending on which optimization is enabled and which search parameters are set a forward
- * and/or a reverse "single-iteration" raptor search is performed and heuristics are collected. This
- * is used to configure the "main" multi-iteration RangeRaptor search.
+ * Depending on which optimization is enabled and which search parameters are set a forward and/or a
+ * reverse "single-iteration" raptor search is performed and heuristics are collected. This is used
+ * to configure the "main" multi-iteration RangeRaptor search.
  */
 public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
 
@@ -101,6 +101,7 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
     if (!originalRequest.useDestinationPruning()) {
       return null;
     }
+
     LOG.debug("RangeRaptor - Destination pruning enabled.");
     return revHeuristics.result();
   }
@@ -130,6 +131,7 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
     } else {
       runHeuristicsSequentially();
     }
+
     fwdHeuristics.debugCompareResult(revHeuristics);
   }
 
@@ -181,6 +183,7 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
     fwdHeuristics.withRequest(originalRequest);
     revHeuristics.withRequest(originalRequest);
     Future<?> asyncResult = null;
+
     try {
       asyncResult = config.threadPool().submit(fwdHeuristics::run);
       revHeuristics.run();
@@ -197,6 +200,7 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
       if (e.getCause() instanceof DestinationNotReachedException dnr) {
         throw dnr;
       }
+
       LOG.error(e.getMessage() + ". Request: " + originalRequest, e);
       throw new IllegalStateException(
         "Failed to run FORWARD/REVERSE heuristic search in parallel. Details: " + e.getMessage()
@@ -259,6 +263,7 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
     if (originalRequest.searchParams().isEarliestDepartureTimeSet()) {
       return originalRequest;
     }
+
     return originalRequest
       .mutate()
       .searchParams()
@@ -270,6 +275,7 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
     if (originalRequest.searchParams().isLatestArrivalTimeSet()) {
       return originalRequest;
     }
+
     return originalRequest
       .mutate()
       .searchParams()
@@ -286,9 +292,11 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
     if (!request.searchParams().isEarliestDepartureTimeSet()) {
       builder.earliestDepartureTime(dynamicSearchWindowCalculator.getEarliestDepartureTime());
     }
+
     if (!request.searchParams().isSearchWindowSet()) {
       builder.searchWindowInSeconds(dynamicSearchWindowCalculator.getSearchWindowSeconds());
     }
+
     // We do not set the latest-arrival-time, because we do not want to limit the forward
     // multi-criteria search, it does not have much effect on the performance - we only risk
     // loosing optimal results.

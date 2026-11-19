@@ -138,20 +138,25 @@ public class ApiTransitService {
     var tripOnServiceDate = transitService.getTripOnServiceDate(
       new TripIdAndServiceDate(tripId, serviceDate)
     );
+
     if (tripOnServiceDate != null) {
       return Optional.of(tripOnServiceDate);
     }
 
     Trip trip = transitService.getTrip(tripId);
+
     if (trip == null) {
       return Optional.empty();
     }
+
     boolean runsOnDate = transitService
       .getTripCalendars()
       .isActiveOn(trip.getServiceId(), serviceDate);
+
     if (!runsOnDate) {
       return Optional.empty();
     }
+
     return Optional.of(
       TripOnServiceDate.of(tripId).withTrip(trip).withServiceDate(serviceDate).build()
     );
@@ -167,9 +172,11 @@ public class ApiTransitService {
     var tripOnServiceDate = transitService.getTripOnServiceDate(
       new TripIdAndServiceDate(trip.getId(), serviceDate)
     );
+
     if (tripOnServiceDate != null) {
       return tripOnServiceDate;
     }
+
     return TripOnServiceDate.of(trip.getId()).withTrip(trip).withServiceDate(serviceDate).build();
   }
 

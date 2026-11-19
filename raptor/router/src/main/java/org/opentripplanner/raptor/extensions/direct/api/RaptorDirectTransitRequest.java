@@ -119,6 +119,7 @@ public final class RaptorDirectTransitRequest {
     if (this == o) {
       return true;
     }
+
     if (o instanceof RaptorDirectTransitRequest that) {
       return (
         earliestDepartureTime == that.earliestDepartureTime &&
@@ -128,6 +129,7 @@ public final class RaptorDirectTransitRequest {
         egressPaths.equals(that.egressPaths)
       );
     }
+
     return false;
   }
 

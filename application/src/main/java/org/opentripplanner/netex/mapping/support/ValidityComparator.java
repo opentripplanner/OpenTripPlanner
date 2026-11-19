@@ -38,6 +38,7 @@ class ValidityComparator implements Comparator<Collection<ValidBetween>> {
         if (validNow1 && validNow2) {
           return 0;
         }
+
         return validNow1 ? -1 : 1;
       }
     }
@@ -52,6 +53,7 @@ class ValidityComparator implements Comparator<Collection<ValidBetween>> {
           //noinspection ConstantConditions
           return v1.getFromDate().compareTo(v2.getFromDate());
         }
+
         return validFuture1 ? -1 : 1;
       }
     }
@@ -66,6 +68,7 @@ class ValidityComparator implements Comparator<Collection<ValidBetween>> {
           //noinspection ConstantConditions
           return v2.getToDate().compareTo(v1.getToDate());
         }
+
         return validPast1 ? -1 : 1;
       }
     }

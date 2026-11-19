@@ -25,6 +25,7 @@ public class StepFeatureTypeResolver implements TypeResolver {
     } else if (o instanceof StairsUse) {
       return schema.getObjectType("StairsUse");
     }
+
     return null;
   }
 }

@@ -24,6 +24,7 @@ public class GsDataSourceModule {
     if (OTPFeature.GoogleCloudStorage.isOff()) {
       return null;
     }
+
     LOG.info("Google Cloud Store Repository enabled - GS resources detected.");
     return new GsDataSourceRepository(config.gsParameters());
   }

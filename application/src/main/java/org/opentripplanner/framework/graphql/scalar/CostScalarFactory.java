@@ -63,6 +63,7 @@ public class CostScalarFactory {
         if (input instanceof Integer intValue) {
           return Cost.costOfSeconds(intValue);
         }
+
         return parseCost((String) input);
       }
 
@@ -72,9 +73,11 @@ public class CostScalarFactory {
         if (input instanceof StringValue stringValue) {
           return parseCost(stringValue.getValue());
         }
+
         if (input instanceof IntValue intValue) {
           return Cost.costOfSeconds(intValue.getValue().intValue());
         }
+
         return null;
       }
 

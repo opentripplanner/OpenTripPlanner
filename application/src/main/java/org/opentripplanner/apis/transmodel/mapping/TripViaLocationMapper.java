@@ -69,6 +69,7 @@ class TripViaLocationMapper {
     var minimumWaitTime = (Duration) inputMap.get(ViaLocationInputType.FIELD_MINIMUM_WAIT_TIME);
     var stopLocationIds = mapStopLocationIds(inputMap);
     var coordinate = mapCoordinate(inputMap);
+
     try {
       return new VisitViaLocation(label, minimumWaitTime, stopLocationIds, coordinate);
     } catch (IllegalArgumentException e) {
@@ -79,6 +80,7 @@ class TripViaLocationMapper {
   private PassThroughViaLocation mapPassThroughViaLocation(Map<String, Object> inputMap) {
     var label = (String) inputMap.get(ViaLocationInputType.FIELD_LABEL);
     var stopLocationIds = mapStopLocationIds(inputMap);
+
     try {
       return new PassThroughViaLocation(label, stopLocationIds);
     } catch (IllegalArgumentException e) {
@@ -107,9 +109,11 @@ class TripViaLocationMapper {
   private ViaLocation mapLegacyPassThroughViaLocation(Map<String, Object> inputMap) {
     final String name = (String) inputMap.get("name");
     List<String> placeIds = (List<String>) inputMap.get("placeIds");
+
     if (placeIds == null || placeIds.isEmpty()) {
       return null;
     }
+
     final List<FeedScopedId> stopLocationIds = idMapper.parseList(placeIds);
     return new PassThroughViaLocation(name, stopLocationIds);
   }

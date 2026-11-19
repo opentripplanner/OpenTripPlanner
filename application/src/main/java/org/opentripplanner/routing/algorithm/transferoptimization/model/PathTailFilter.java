@@ -25,7 +25,6 @@ public interface PathTailFilter<T extends RaptorTripSchedule> {
   /**
    * Filter the paths one last time. The {@code head} is not guaranteed to be the access-leg. This
    * can be used to insert values into the path or checking if all requirements are meet.
-   *
    */
   Set<OptimizedPathTail<T>> filterFinalResult(Set<OptimizedPathTail<T>> elements);
 }

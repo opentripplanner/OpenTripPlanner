@@ -73,9 +73,8 @@ public class SiriRealTimeUpdateHandler {
    * Method to apply estimated timetables to the most recent version of the timetable snapshot.
    *
    * @param incrementality the incrementality of the update, for example if updates represent all
-   *                       updates that are active right now, i.e. all previous updates should be
-   *                       disregarded
-   * @param updates        SIRI EstimatedTimetable deliveries that should be applied atomically.
+   *     updates that are active right now, i.e. all previous updates should be disregarded
+   * @param updates SIRI EstimatedTimetable deliveries that should be applied atomically.
    */
   public UpdateResult applyEstimatedTimetable(
     EntityResolver entityResolver,
@@ -100,6 +99,7 @@ public class SiriRealTimeUpdateHandler {
       for (var estimatedJourneyVersion : etDelivery.getEstimatedJourneyVersionFrames()) {
         var journeys = estimatedJourneyVersion.getEstimatedVehicleJourneies();
         LOG.debug("Handling {} EstimatedVehicleJourneys.", journeys.size());
+
         for (EstimatedVehicleJourney journey : journeys) {
           try {
             successes.add(apply(journey, entityResolver));
@@ -123,17 +123,19 @@ public class SiriRealTimeUpdateHandler {
     throws UpdateException {
     var journeyWrapper = EstimatedVehicleJourneyWrapper.of(journey);
     SiriUpdateType siriUpdateType = null;
+
     try {
       siriUpdateType = updateType(journeyWrapper, entityResolver);
       TripUpdate result = switch (siriUpdateType) {
-        case REPLACEMENT_DEPARTURE -> new AddedTripBuilder(
-          journeyWrapper,
-          transitRepository,
-          buffer,
-          deduplicator,
-          entityResolver,
-          tripPatternIdGenerator::generateUniqueTripPatternId
-        ).build();
+        case REPLACEMENT_DEPARTURE
+          -> new AddedTripBuilder(
+            journeyWrapper,
+            transitRepository,
+            buffer,
+            deduplicator,
+            entityResolver,
+            tripPatternIdGenerator::generateUniqueTripPatternId
+          ).build();
         case EXTRA_CALL -> handleExtraCall(fuzzyTripMatcher, entityResolver, journeyWrapper);
         case TRIP_UPDATE -> handleModifiedTrip(fuzzyTripMatcher, entityResolver, journeyWrapper);
       };
@@ -172,7 +174,6 @@ public class SiriRealTimeUpdateHandler {
    * {@code ExtraJourney} element). That second message is routed here as {@code TRIP_UPDATE}
    * (because {@code isExtraJourney()} is {@code null}/false), and {@code ModifiedTripBuilder}
    * handles the cancellation.
-   *
    * <p>
    * This is why the {@link RealTimeTripTimesBuilder} never needs to hold both {@code added=true}
    * and {@code canceled=true} at the same time for a SIRI source.
@@ -186,7 +187,8 @@ public class SiriRealTimeUpdateHandler {
       return SiriUpdateType.EXTRA_CALL;
     }
 
-    // Replacement departure if the trip is marked as extra journey, and it has not been added before
+    // Replacement departure if the trip is marked as extra journey, and it has not been added
+    // before
     if (journey.isExtraJourney() && entityResolver.resolveTrip(journey) == null) {
       return SiriUpdateType.REPLACEMENT_DEPARTURE;
     }
@@ -198,8 +200,7 @@ public class SiriRealTimeUpdateHandler {
   /**
    * Get the latest timetable for TripPattern for a given service date.
    * <p>
-   * Snapshot timetable is used as source if initialised, trip patterns scheduled timetable if
-   * not.
+   * Snapshot timetable is used as source if initialised, trip patterns scheduled timetable if not.
    */
   private Timetable getCurrentTimetable(TripPattern tripPattern, LocalDate serviceDate) {
     return buffer.resolve(tripPattern, serviceDate);
@@ -239,10 +240,12 @@ public class SiriRealTimeUpdateHandler {
 
     Timetable currentTimetable = getCurrentTimetable(pattern, serviceDate);
     var existingTripTimes = currentTimetable.getTripTimes(trip);
+
     if (existingTripTimes == null) {
       LOG.debug("tripId {} not found in pattern.", trip.getId());
       throw UpdateException.of(trip.getId(), TRIP_NOT_FOUND_IN_PATTERN);
     }
+
     var tripUpdate = new ModifiedTripBuilder(
       existingTripTimes,
       pattern,
@@ -294,10 +297,12 @@ public class SiriRealTimeUpdateHandler {
 
     Timetable currentTimetable = getCurrentTimetable(pattern, serviceDate);
     var existingTripTimes = currentTimetable.getTripTimes(trip);
+
     if (existingTripTimes == null) {
       LOG.debug("tripId {} not found in pattern.", trip.getId());
       throw UpdateException.of(trip.getId(), TRIP_NOT_FOUND_IN_PATTERN);
     }
+
     var tripUpdate = new ExtraCallTripBuilder(
       journey,
       transitRepository,
@@ -323,6 +328,7 @@ public class SiriRealTimeUpdateHandler {
     LocalDate serviceDate = tripUpdate.serviceDate();
 
     final TripPattern pattern;
+
     if (tripUpdate.tripPatternCreation()) {
       pattern = tripUpdate.addedTripPattern();
     } else {

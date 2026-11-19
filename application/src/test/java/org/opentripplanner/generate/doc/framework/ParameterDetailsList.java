@@ -42,17 +42,21 @@ public class ParameterDetailsList {
       if (skipNodes.skipDetails(it)) {
         continue;
       }
+
       printNode(node, it);
 
       if (skipNodes.skipDetailsForNestedElements(it)) {
         continue;
       }
+
       if (!it.type().isComplex()) {
         continue;
       }
+
       if (it.type() == ENUM_SET) {
         continue;
       }
+
       //noinspection ConstantConditions
       if (it.type() == ENUM_MAP && it.elementType().isSimple()) {
         continue;
@@ -77,6 +81,7 @@ public class ParameterDetailsList {
     if (!info.printDetails()) {
       return;
     }
+
     var paramName = info.name();
     doc.header(headerLevel, paramName, anchor(node, paramName));
     addMetaInfo(info, node.contextPath());
@@ -114,6 +119,7 @@ public class ParameterDetailsList {
     } else if (info.type() == ConfigType.ENUM_MAP) {
       doc.lineBreak().label("Enum keys:").addEnums(info.enumTypeValues());
     }
+
     doc.endParagraph();
   }
 }

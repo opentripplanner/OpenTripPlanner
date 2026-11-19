@@ -242,6 +242,7 @@ class StopAndStationMapperTest {
     Collection<Station> stations = stopMapper.resultStations;
 
     assertEquals(1, stations.size());
+
     if (isolated) {
       assertTrue(stations.stream().findFirst().get().isTransfersNotAllowed());
     } else {
@@ -313,8 +314,8 @@ class StopAndStationMapperTest {
   }
 
   /**
-   * A quay with a coordinate outside the WGS84 range is skipped, the other quays of the stop
-   * place are mapped.
+   * A quay with a coordinate outside the WGS84 range is skipped, the other quays of the stop place
+   * are mapped.
    */
   @Test
   void testQuayWithInvalidCoordinatesIsSkipped() {
@@ -394,9 +395,9 @@ class StopAndStationMapperTest {
   /**
    * Utility function to assert WheelChairBoarding from Stop.
    *
-   * @param quayId   ID to find corresponding Stop
+   * @param quayId ID to find corresponding Stop
    * @param expected Expected WheelChairBoarding value in assertion
-   * @param stops    Find correct stop from list
+   * @param stops Find correct stop from list
    */
   private void assertWheelchairAccessibility(
     String quayId,

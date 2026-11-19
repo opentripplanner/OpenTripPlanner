@@ -38,14 +38,17 @@ class DuplicatedTripHandler {
     if (updateIncrementality == UpdateIncrementality.DIFFERENTIAL) {
       throw UpdateException.of(tripUpdate.tripId(), NOT_IMPLEMENTED_DIFFERENTIAL_DUPLICATED);
     }
+
     tripUpdate.validateDuplicated();
 
     var originalTrip = buffer.getTrip(tripUpdate.tripId());
+
     if (originalTrip == null) {
       throw UpdateException.of(tripUpdate.tripId(), TRIP_NOT_FOUND);
     }
 
     var serviceId = buffer.getOrCreateServiceIdForDate(tripUpdate.startDate());
+
     if (serviceId == null) {
       throw UpdateException.of(tripUpdate.tripId(), OUTSIDE_SERVICE_PERIOD);
     }
@@ -99,8 +102,8 @@ class DuplicatedTripHandler {
   }
 
   /// The spec is silent about how these ids should be constructed, so we create a new ID ourselves.
-  /// It is therefore not possible to send a spec-compliant vehicle position update for this trip. If
-  /// this is a requirement, then we need to update the spec.
+  /// It is therefore not possible to send a spec-compliant vehicle position update for this trip.
+  /// If this is a requirement, then we need to update the spec.
   private static FeedScopedId duplicatedTripId(TripUpdate tripUpdate) {
     var localDateTime = tripUpdate.startDate().atTime(tripUpdate.startTime().orElseThrow());
     return new FeedScopedId(

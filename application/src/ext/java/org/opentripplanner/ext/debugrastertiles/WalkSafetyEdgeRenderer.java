@@ -33,6 +33,7 @@ public class WalkSafetyEdgeRenderer implements EdgeVertexRenderer {
         return EdgeVisualAttributes.optional(Color.LIGHT_GRAY, "no walking");
       }
     }
+
     return Optional.empty();
   }
 
@@ -41,6 +42,7 @@ public class WalkSafetyEdgeRenderer implements EdgeVertexRenderer {
     if (v instanceof IntersectionVertex) {
       return VertexVisualAttributes.optional(Color.DARK_GRAY, null);
     }
+
     return Optional.empty();
   }
 }

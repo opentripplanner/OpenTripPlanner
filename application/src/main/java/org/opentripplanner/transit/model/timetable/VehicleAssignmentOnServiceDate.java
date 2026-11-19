@@ -43,9 +43,11 @@ public class VehicleAssignmentOnServiceDate {
     var scheduledVehicleId = scheduled == null ? null : scheduled.vehicleId();
     var scheduledVehicleTypeId = scheduled == null ? null : scheduled.vehicleTypeId();
     var realtimeVehicleId = reportedVehicleId != null ? reportedVehicleId : scheduledVehicleId;
+
     if (scheduledVehicleId == null && scheduledVehicleTypeId == null && realtimeVehicleId == null) {
       return null;
     }
+
     return new VehicleAssignmentOnServiceDate(
       scheduledVehicleId,
       scheduledVehicleTypeId,
@@ -79,9 +81,11 @@ public class VehicleAssignmentOnServiceDate {
     if (this == o) {
       return true;
     }
+
     if (!(o instanceof VehicleAssignmentOnServiceDate other)) {
       return false;
     }
+
     return (
       Objects.equals(scheduledVehicleId, other.scheduledVehicleId) &&
       Objects.equals(scheduledVehicleTypeId, other.scheduledVehicleTypeId) &&

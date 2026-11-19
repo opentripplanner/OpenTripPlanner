@@ -42,14 +42,10 @@ public class SiriUpdaterModule {
 
   private static EstimatedTimetableSource createSource(SiriETUpdaterParameters params) {
     return switch (params) {
-      case DefaultSiriETUpdaterParameters p -> new SiriETHttpTripUpdateSource(
-        p,
-        createLoader(params)
-      );
-      case SiriETLiteUpdaterParameters p -> new SiriETLiteHttpTripUpdateSource(
-        p,
-        createLoader(params)
-      );
+      case DefaultSiriETUpdaterParameters p
+        -> new SiriETHttpTripUpdateSource(p, createLoader(params));
+      case SiriETLiteUpdaterParameters p
+        -> new SiriETLiteHttpTripUpdateSource(p, createLoader(params));
       default -> throw new IllegalArgumentException("Unexpected value: " + params);
     };
   }
@@ -59,18 +55,13 @@ public class SiriUpdaterModule {
     if (SiriFileLoader.matchesUrl(params.url())) {
       return new SiriFileLoader(params.url());
     }
+
     // Fallback to default loader
     return switch (params) {
-      case SiriSXUpdaterParameters p -> new SiriHttpLoader(
-        p.url(),
-        p.timeout(),
-        p.requestHeaders()
-      );
-      case SiriSXLiteUpdaterParameters p -> new SiriLiteHttpLoader(
-        p.uri(),
-        p.timeout(),
-        p.requestHeaders()
-      );
+      case SiriSXUpdaterParameters p
+        -> new SiriHttpLoader(p.url(), p.timeout(), p.requestHeaders());
+      case SiriSXLiteUpdaterParameters p
+        -> new SiriLiteHttpLoader(p.uri(), p.timeout(), p.requestHeaders());
       default -> throw new IllegalArgumentException("Unexpected value: " + params);
     };
   }
@@ -83,17 +74,10 @@ public class SiriUpdaterModule {
     // Fallback to default loader
     else {
       return switch (params) {
-        case DefaultSiriETUpdaterParameters p -> new SiriHttpLoader(
-          p.url(),
-          p.timeout(),
-          p.httpRequestHeaders(),
-          p.previewInterval()
-        );
-        case SiriETLiteUpdaterParameters p -> new SiriLiteHttpLoader(
-          p.uri(),
-          p.timeout(),
-          p.httpRequestHeaders()
-        );
+        case DefaultSiriETUpdaterParameters p
+          -> new SiriHttpLoader(p.url(), p.timeout(), p.httpRequestHeaders(), p.previewInterval());
+        case SiriETLiteUpdaterParameters p
+          -> new SiriLiteHttpLoader(p.uri(), p.timeout(), p.httpRequestHeaders());
         default -> throw new IllegalArgumentException("Unexpected value: " + params);
       };
     }

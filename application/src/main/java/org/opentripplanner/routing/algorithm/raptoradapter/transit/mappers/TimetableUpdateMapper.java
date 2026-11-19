@@ -26,7 +26,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Maps real-time timetable updates into a new {@link RaptorTransitData} instance.
- *
  * <p>
  * This class is <em>stateful</em> and must be instantiated exactly once and reused across all
  * update cycles. The caches ({@code tripPatternsStartingOnDateMapCache},
@@ -35,10 +34,9 @@ import org.slf4j.LoggerFactory;
  * move between {@link TripPatternForDate}s over time. Creating a new instance on each update would
  * discard this history and break the bookkeeping that determines which old patterns need to be
  * removed.
- *
  * <p>
- * <b>Future improvement:</b> The per-date caches maintained here duplicate information that
- * would ideally come from a single authoritative datasource. However,
+ * <b>Future improvement:</b> The per-date caches maintained here duplicate information that would
+ * ideally come from a single authoritative datasource. However,
  * {@link org.opentripplanner.transit.repository.TimetableRepository} only stores real-time
  * timetables, while these caches also cover scheduled trip patterns sourced from
  * {@link RaptorTransitData}. Once scheduled and real-time data live in the same structure, the
@@ -74,8 +72,8 @@ public class TimetableUpdateMapper {
   /// Updates the real-time [RaptorTransitData] to use the modified timetables.
   ///
   /// This method bridges the different update approaches:
-  /// 1. `updatedTimetables` and `timetables` only contains [Timetable]s with real-time updates. This
-  ///    means that removed items are not present.
+  /// 1. `updatedTimetables` and `timetables` only contains [Timetable]s with real-time updates.
+  ///    This means that removed items are not present.
   /// 2. [RaptorTransitData] requires applying the changes to a previous snapshot: adding, updating
   ///    and removing timetables.
   ///
@@ -91,8 +89,8 @@ public class TimetableUpdateMapper {
   ///    1. an update was received
   ///    2. no update was received, and so the previous updated should be removed. If the update was
   ///       for a scheduled trip, then the schedule should be restored.
-  /// 3. Remove the `oldTripPatternsForDate` and add the `newTripPatternsForDate` to
-  ///    the [RaptorTransitData].
+  /// 3. Remove the `oldTripPatternsForDate` and add the `newTripPatternsForDate` to the
+  ///    [RaptorTransitData].
   public RaptorTransitData map(
     RaptorTransitData oldRaptorTransitData,
     Collection<Timetable> updatedTimetables,
@@ -106,10 +104,13 @@ public class TimetableUpdateMapper {
     SetMultimap<TripPattern, TripPatternForDate> oldTripPatternsForDate = HashMultimap.create();
 
     TransferIndexGenerator transferIndexGenerator = null;
+
     if (OTPFeature.TransferConstraints.isOn()) {
       transferIndexGenerator = realtimeRaptorTransitData.getTransferIndexGenerator();
     }
+
     Set<TripPatternForDate> previouslyUsedPatterns = new HashSet<>();
+
     // Map new TriPatternForDate and index for old and new TripPatternsForDate on service date
     for (Timetable timetable : updatedTimetables) {
       LocalDate date = timetable.getServiceDate();
@@ -149,6 +150,7 @@ public class TimetableUpdateMapper {
         tripPatternsStartingOnDateMapCache.get(date).put(tripPattern, newTripPatternForDate);
         newTripPatternsForDate.put(tripPattern, newTripPatternForDate);
         datesToBeUpdated.addAll(newTripPatternForDate.getRunningPeriodDates());
+
         if (transferIndexGenerator != null && tripPattern.isStopPatternModifiedInRealTime()) {
           transferIndexGenerator.addRealtimeTrip(
             tripPattern,
@@ -163,6 +165,7 @@ public class TimetableUpdateMapper {
           );
           TripPatternForDate previousTripPatternForDate =
             tripPatternsForTripIdAndServiceDateCache.put(id, newTripPatternForDate);
+
           if (previousTripPatternForDate != null) {
             previouslyUsedPatterns.add(previousTripPatternForDate);
           } else {
@@ -202,10 +205,13 @@ public class TimetableUpdateMapper {
       for (TripPatternForDate tripPatternForDate : previouslyUsedPatterns) {
         if (tripPatternForDate.getServiceDate().equals(date)) {
           TripPattern pattern = tripPatternForDate.getTripPattern().getPattern();
+
           if (!pattern.isStopPatternModifiedInRealTime()) {
             continue;
           }
+
           var oldTimeTable = timetableProvider.apply(pattern.getId());
+
           if (oldTimeTable != null) {
             var toRemove = oldTimeTable
               .stream()
@@ -218,7 +224,8 @@ public class TimetableUpdateMapper {
               patternsForDate.remove(tripPatternForDate);
             }
           } else {
-            // a previous FULL_DATASET update had real-time data for a trip, but the latest one doesn't
+            // a previous FULL_DATASET update had real-time data for a trip, but the latest one
+            // doesn't
             // therefore we remove it from the RAPTOR data
             patternsForDate.remove(tripPatternForDate);
           }
@@ -229,7 +236,8 @@ public class TimetableUpdateMapper {
         .asMap()
         .entrySet()) {
         for (TripPatternForDate newTripPatternForDate : entry.getValue()) {
-          // Add new TripPatternForDate for this date if it mapped correctly and is valid on this date
+          // Add new TripPatternForDate for this date if it mapped correctly and is valid on this
+          // date
           if (newTripPatternForDate != null) {
             if (newTripPatternForDate.getRunningPeriodDates().contains(date)) {
               patternsForDate.add(newTripPatternForDate);

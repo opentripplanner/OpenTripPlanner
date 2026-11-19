@@ -17,8 +17,8 @@ public class GraphQLUtils {
    * prioritized list:
    * <ol>
    *   <li>{@code language} parameter of a queried field.</li>
-   *   <li>Locale from the DataFetchingEnvironment's local context (for journey planning queries this
-   *       is {@code locale} parameter).</li>
+   *   <li>Locale from the DataFetchingEnvironment's local context (for journey planning queries
+   *       this is {@code locale} parameter).</li>
    *   <li>DataFetchingEnvironment's locale which comes from the accept-language header.</li>
    *   <li>Default locale.</li>
    * </ol>
@@ -31,6 +31,7 @@ public class GraphQLUtils {
     if (input == null) {
       return null;
     }
+
     return input.toString(getLocale(environment));
   }
 
@@ -38,14 +39,15 @@ public class GraphQLUtils {
    * Returns locale from this prioritized list:
    * <ol>
    *   <li>{@code language} parameter of a queried field.</li>
-   *   <li>Locale from the DataFetchingEnvironment's local context (for journey planning queries this
-   *       is {@code locale} parameter).</li>
+   *   <li>Locale from the DataFetchingEnvironment's local context (for journey planning queries
+   *       this is {@code locale} parameter).</li>
    *   <li>DataFetchingEnvironment's locale which comes from the accept-language header.</li>
    *   <li>Default locale.</li>
    * </ol>
    */
   public static Locale getLocale(DataFetchingEnvironment environment) {
     var localeString = environment.getArgument("language");
+
     if (localeString != null) {
       return Locale.forLanguageTag((String) localeString);
     }
@@ -57,8 +59,8 @@ public class GraphQLUtils {
    * Returns locale from this prioritized list:
    * <ol>
    *   <li>{@code localeString}.</li>
-   *   <li>Locale from the DataFetchingEnvironment's local context (for journey planning queries this
-   *       is {@code locale} parameter).</li>
+   *   <li>Locale from the DataFetchingEnvironment's local context (for journey planning queries
+   *       this is {@code locale} parameter).</li>
    *   <li>DataFetchingEnvironment's locale which comes from the accept-language header.</li>
    *   <li>Default locale.</li>
    * </ol>
@@ -78,8 +80,8 @@ public class GraphQLUtils {
    * Returns locale from this prioritized list:
    * <ol>
    *   <li>{@code locale}.</li>
-   *   <li>Locale from the DataFetchingEnvironment's local context (for journey planning queries this
-   *       is {@code locale} parameter).</li>
+   *   <li>Locale from the DataFetchingEnvironment's local context (for journey planning queries
+   *       this is {@code locale} parameter).</li>
    *   <li>DataFetchingEnvironment's locale which comes from the accept-language header.</li>
    *   <li>Default locale.</li>
    * </ol>
@@ -95,8 +97,8 @@ public class GraphQLUtils {
   /**
    * Returns locale from this prioritized list:
    * <ol>
-   *   <li>Locale from the DataFetchingEnvironment's local context (for journey planning queries this
-   *       is {@code locale} parameter).</li>
+   *   <li>Locale from the DataFetchingEnvironment's local context (for journey planning queries
+   *       this is {@code locale} parameter).</li>
    *   <li>DataFetchingEnvironment's locale which comes from the accept-language header.</li>
    *   <li>Default locale.</li>
    * </ol>
@@ -115,9 +117,11 @@ public class GraphQLUtils {
    */
   private static Optional<Locale> getLocalContextLocale(DataFetchingEnvironment environment) {
     Map<String, ?> localContext = environment.getLocalContext();
+
     if (localContext == null) {
       return Optional.empty();
     }
+
     return Optional.ofNullable((Locale) localContext.get("locale"));
   }
 }

@@ -51,26 +51,26 @@ public final class RegularTransferPreferencesMapper implements TransferRequestMa
     var appCar = request.preferences().car();
 
     return switch (type) {
-      case WALK -> WalkPreferences.of()
-        .withSpeed(speed)
-        .withReluctance(reluctance)
-        .withSafetyFactor(safetyFactor)
-        .build();
-      case WHEELCHAIR -> WheelchairPreferences.of()
-        .withSpeed(speed)
-        .withReluctance(reluctance)
-        .build();
-      case BICYCLE -> BicyclePreferences.of()
-        .withSpeed(Speed.ofMetersPerSecond(appBike.speed()))
-        .withReluctance(Reluctance.of(appBike.reluctance()))
-        .withOptimize(optimize(appBike))
-        .withWalk(
-          BicycleWalk.of(
-            Speed.ofMetersPerSecond(appBike.walking().speed()),
-            Reluctance.of(appBike.walking().reluctance())
+      case WALK
+        -> WalkPreferences.of()
+          .withSpeed(speed)
+          .withReluctance(reluctance)
+          .withSafetyFactor(safetyFactor)
+          .build();
+      case WHEELCHAIR
+        -> WheelchairPreferences.of().withSpeed(speed).withReluctance(reluctance).build();
+      case BICYCLE
+        -> BicyclePreferences.of()
+          .withSpeed(Speed.ofMetersPerSecond(appBike.speed()))
+          .withReluctance(Reluctance.of(appBike.reluctance()))
+          .withOptimize(optimize(appBike))
+          .withWalk(
+            BicycleWalk.of(
+              Speed.ofMetersPerSecond(appBike.walking().speed()),
+              Reluctance.of(appBike.walking().reluctance())
+            )
           )
-        )
-        .build();
+          .build();
       case CAR -> CarPreferences.of().withReluctance(Reluctance.of(appCar.reluctance())).build();
     };
   }
@@ -93,14 +93,16 @@ public final class RegularTransferPreferencesMapper implements TransferRequestMa
   private static TransferProfileType profileType(RouteRequest request) {
     var mode = request.journey().transfer().mode();
     return switch (mode) {
-      case WALK -> request.journey().wheelchair()
-        ? TransferProfileType.WHEELCHAIR
-        : TransferProfileType.WALK;
+      case WALK
+        -> request.journey().wheelchair()
+          ? TransferProfileType.WHEELCHAIR
+          : TransferProfileType.WALK;
       case BIKE -> TransferProfileType.BICYCLE;
       case CAR -> TransferProfileType.CAR;
-      default -> throw new IllegalArgumentException(
-        "The transfer street mode " + mode + " is not supported by the regular transfers."
-      );
+      default
+        -> throw new IllegalArgumentException(
+          "The transfer street mode " + mode + " is not supported by the regular transfers."
+        );
     };
   }
 

@@ -18,7 +18,6 @@ import org.opentripplanner.utils.collection.SetUtils;
 
 /**
  * Implements the {@link VehicleRentalPlace} class which contains Javadoc.
- * <p>
  */
 public final class VehicleRentalStation implements VehicleRentalPlace {
 
@@ -305,7 +304,7 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
 
   /**
    * @return Counts of available vehicle spaces by type as well as the total number of available
-   *         vehicle spaces.
+   *     vehicle spaces.
    */
   public RentalVehicleEntityCounts vehicleSpaceCounts() {
     return new RentalVehicleEntityCounts(
@@ -335,9 +334,11 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     VehicleRentalStation that = (VehicleRentalStation) o;
     return (
       Double.compare(that.longitude, longitude) == 0 &&

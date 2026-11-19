@@ -81,12 +81,15 @@ public class TripPatternForDates
 
     int numberOfTripSchedules = 0;
     boolean hasFrequencies = false;
+
     for (TripPatternForDate tripPatternForDate : this.tripPatternForDates) {
       numberOfTripSchedules += tripPatternForDate.numberOfTripSchedules();
+
       if (tripPatternForDate.hasFrequencies()) {
         hasFrequencies = true;
       }
     }
+
     this.numberOfTripSchedules = numberOfTripSchedules;
     this.isFrequencyBased = hasFrequencies;
 
@@ -104,6 +107,7 @@ public class TripPatternForDates
       var tt = tripPatternForDates[day].tripTimes().get(tripIndex.tripIndexForDay(i));
 
       wheelchairBoardings[i] = tt.getWheelchairAccessibility();
+
       for (int s = 0; s < nStops; s++) {
         this.arrivalTimes[s * numberOfTripSchedules + i] = tt.getArrivalTime(s) + offset;
         this.departureTimes[s * numberOfTripSchedules + i] = tt.getDepartureTime(s) + offset;
@@ -129,7 +133,7 @@ public class TripPatternForDates
 
   /**
    * @deprecated This is exposed because it is needed in the TripFrequencyNnnSearch classes, but is
-   *             an implementation detail that should not leak outside the class.
+   *     an implementation detail that should not leak outside the class.
    */
   @Deprecated
   public int tripPatternForDateOffsets(int dayIndex) {
@@ -196,6 +200,7 @@ public class TripPatternForDates
     if (useCustomizedTripSearch()) {
       return createCustomizedTripSearch(direction);
     }
+
     return TripScheduleSearchFactory.create(direction, this);
   }
 
@@ -232,9 +237,8 @@ public class TripPatternForDates
    * be able to override this - for example for frequency based trips.
    *
    * @return {@code true} If you do not want to use the built-in trip search and instead will
-   *         provide your own. Make sure to implement the
-   *         {@link #createCustomizedTripSearch(SearchDirection)} for both forward and reverse
-   *         searches.
+   *     provide your own. Make sure to implement the
+   *     {@link #createCustomizedTripSearch(SearchDirection)} for both forward and reverse searches.
    */
   public boolean useCustomizedTripSearch() {
     return isFrequencyBased;
@@ -268,7 +272,7 @@ public class TripPatternForDates
 
   /**
    * Return a list with all departure times for the first stop for each trip per day.
-   *
+   * <p>
    * There are no unit-tests on this method, so the surface to {@link TripPatternForDate} should be
    * kept as thin as possible.
    */
@@ -277,13 +281,17 @@ public class TripPatternForDates
     int[] offsets
   ) {
     var departureTimes = new ArrayList<int[]>(tripPatternForDates.length);
+
     for (var tripPatternForDate : tripPatternForDates) {
       var times = new int[tripPatternForDate.numberOfTripSchedules()];
+
       for (int i = 0; i < times.length; i++) {
         times[i] = tripPatternForDate.getTripTimes(i).getDepartureTime(FIRST_STOP_POS_IN_PATTERN);
       }
+
       departureTimes.add(times);
     }
+
     return TripTimesForDaysIndex.ofTripTimesForDay(departureTimes, offsets);
   }
 }

@@ -60,9 +60,11 @@ public class Reluctance
     if (this == o) {
       return true;
     }
+
     if (o == null) {
       return false;
     }
+
     return o instanceof Reluctance s ? value == s.value : false;
   }
 

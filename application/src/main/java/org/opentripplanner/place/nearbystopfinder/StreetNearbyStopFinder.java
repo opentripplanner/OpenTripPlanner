@@ -139,11 +139,11 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
    * Return all stops within a certain radius of the given vertex, using network distance along
    * streets. If the origin vertex is a StopVertex, the result will include it.
    *
-   * @param originVertices   the origin point of the street search.
+   * @param originVertices the origin point of the street search.
    * @param reverseDirection if true the paths returned instead originate at the nearby stops and
-   *                         have the originVertex as the destination.
-   * @param maxStopCount     The maximum stops to return. 0 means no limit. Regardless of the
-   *                         maxStopCount we will always return all the directly connected stops.
+   *     have the originVertex as the destination.
+   * @param maxStopCount The maximum stops to return. 0 means no limit. Regardless of the
+   *     maxStopCount we will always return all the directly connected stops.
    */
   public Collection<NearbyStop> findNearbyStops(
     Set<Vertex> originVertices,
@@ -168,6 +168,7 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
     ) {
       return stopsFound;
     }
+
     stopsFound = new ArrayList<>(stopsFound);
 
     var visitor = new NearbyStopFinderVisitor(originVertices, ignoreStops, reverseDirection);
@@ -224,13 +225,13 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
    * vehicle can dominate those that can thereby leading to zero found stops when this predicate is
    * used with the {@link MaxCountTerminationStrategy}.
    * <p>
-   * An example of this would be an egress/reverse search with a very high walk reluctance where
-   * the states that speculatively rent a vehicle move the walk states down the A* priority queue
-   * until the required number of stops are reached to abort the search, leading to zero egress
-   * results.
+   * An example of this would be an egress/reverse search with a very high walk reluctance where the
+   * states that speculatively rent a vehicle move the walk states down the A* priority queue until
+   * the required number of stops are reached to abort the search, leading to zero egress results.
    */
   private boolean hasReachedStop(State state) {
     var vertex = state.getVertex();
+
     if (vertex instanceof TransitStopVertex tsv && state.isFinal()) {
       return !ignoreStops.contains(tsv.getId());
     } else {
@@ -260,7 +261,6 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
     /**
      * The search can adjusted using extensions. Each extention may provide its own request context.
      * Set the context here.
-     * <p>
      *
      * @see org.opentripplanner.street.model.edge.StreetEdgeCostExtension
      */

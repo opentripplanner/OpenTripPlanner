@@ -32,7 +32,6 @@ public class FaresConfiguration {
    * specified.
    * <p>
    * Accept different formats. Examples:
-   *
    * <pre>
    * { fares : "seattle" }
    * --------------------------
@@ -46,6 +45,7 @@ public class FaresConfiguration {
    */
   public static FareServiceFactory fromConfig(JsonNode config) {
     String type = null;
+
     if (config == null) {
       /* Empty block, fallback to default */
       type = null;
@@ -70,9 +70,8 @@ public class FaresConfiguration {
     return switch (type) {
       case "off" -> new NoopFareServiceFactory();
       case "gtfs" -> new GtfsFareServiceFactory();
-      case
-        "highest-fare-in-free-transfer-window",
-        "highestFareInFreeTransferWindow" -> new HighestFareInFreeTransferWindowFareServiceFactory();
+      case "highest-fare-in-free-transfer-window", "highestFareInFreeTransferWindow"
+        -> new HighestFareInFreeTransferWindowFareServiceFactory();
       case "hsl" -> new HSLFareServiceFactory();
       case "atlanta" -> new AtlantaFareServiceFactory();
       case "orca" -> new OrcaFareFactory();

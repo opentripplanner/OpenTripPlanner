@@ -95,6 +95,7 @@ public class PlaceAtDistanceType {
           .collect(Collectors.toList());
       }
     }
+
     places.sort(Comparator.comparing(PlaceAtDistance::distance));
 
     Set<Object> uniquePlaces = new HashSet<>();
@@ -134,6 +135,7 @@ public class PlaceAtDistanceType {
     if ("parent".equals(multiModalMode) || "all".equals(multiModalMode)) {
       res.add(new PlaceAtDistance(new MonoOrMultiModalStation(multiModalStation), p.distance()));
     }
+
     return res.stream();
   }
 

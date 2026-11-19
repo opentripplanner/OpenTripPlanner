@@ -98,6 +98,7 @@ public class IntIteratorsTest {
       empty = false;
       buf.append(", ").append(it.next());
     }
+
     return empty ? "[]" : "[" + buf.substring(2) + "]";
   }
 }

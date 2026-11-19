@@ -42,6 +42,7 @@ public class ViaRequestMapper {
       .toList();
 
     List<JourneyRequest> requests;
+
     if (environment.containsArgument("segments")) {
       List<Map<String, Object>> segments = environment.getArgument("segments");
       requests = segments

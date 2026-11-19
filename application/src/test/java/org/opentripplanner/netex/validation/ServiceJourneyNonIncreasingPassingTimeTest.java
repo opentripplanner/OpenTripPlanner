@@ -273,7 +273,8 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
     ServiceJourney serviceJourney = sample.getServiceJourney();
     JourneyPattern journeyPattern = sample.getJourneyPattern();
 
-    // remove arrival time and departure time and add flex window with decreasing time on second stop
+    // remove arrival time and departure time and add flex window with decreasing time on second
+    // stop
     TimetabledPassingTime firstPassingTime = getFirstPassingTime(serviceJourney);
     TimetabledPassingTime secondPassingTime = getSecondPassingTime(serviceJourney);
     secondPassingTime

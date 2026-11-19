@@ -39,12 +39,15 @@ public abstract class GenericJsonDataSource<T> implements DataSource<T> {
   @Override
   public boolean update() {
     List<T> updates = jsonDataListDownloader.download();
+
     if (updates != null) {
       synchronized (this) {
         this.updates = updates;
       }
+
       return true;
     }
+
     LOG.info("Can't update entities from: {}, keeping current list.", url);
     return false;
   }

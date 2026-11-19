@@ -31,7 +31,7 @@ public class RouteDataReader {
    *
    * @return a map of emissions for each route id in the data set
    * @throws HeadersDoNotMatch - if the headers does not match, this can be used to try another
-   *                           reader, mainly to support multiple versions of the data.
+   *     reader, mainly to support multiple versions of the data.
    */
   public Map<FeedScopedId, Emission> read(
     String resolvedFeedId,

@@ -60,9 +60,11 @@ public class TableBuilder {
    */
   List<Integer> calculateWidths() {
     var widths = new ArrayList<Integer>(numberOfColumns());
+
     for (int i = 0; i < numberOfColumns(); i++) {
       widths.add(findMaxWidth(i));
     }
+
     return widths;
   }
 
@@ -109,6 +111,7 @@ public class TableBuilder {
    */
   private int findMaxWidth(int column) {
     int width0 = headers.get(column).length();
+
     if (minWidths != null) {
       if (minWidths.size() != numberOfColumns()) {
         throw new IllegalStateException(
@@ -118,6 +121,7 @@ public class TableBuilder {
             numberOfColumns()
         );
       }
+
       width0 = Math.max(width0, minWidths.get(column));
     }
 

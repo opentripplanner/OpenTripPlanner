@@ -25,7 +25,7 @@ public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger
   /**
    * Constructs the RemoveTransitIfStreetOnlyIsBetter filter.
    *
-   * @param costLimitFunction       the cost limit function to use with the filter
+   * @param costLimitFunction the cost limit function to use with the filter
    * @param generalizedCostMaxLimit this limit is not null when paging is used
    */
   public RemoveTransitIfStreetOnlyIsBetter(

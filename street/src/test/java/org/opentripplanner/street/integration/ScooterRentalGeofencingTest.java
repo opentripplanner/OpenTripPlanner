@@ -611,12 +611,14 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
 
   private void assertNoRentingOutsideBA(List<String> descriptor, String label) {
     var allStates = String.join("\n  ", descriptor);
+
     for (var d : descriptor) {
       assertFalse(
         (d.contains("DE street") || d.contains("E ")) && d.contains("RENTING_FLOATING"),
         label + ": rider should not be renting outside BA (DE/E→dest edges).\nPath:\n  " + allStates
       );
     }
+
     assertTrue(
       descriptor.stream().anyMatch(d -> d.contains("RENTING_FLOATING")),
       label + " should use a scooter.\nPath:\n  " + allStates
@@ -625,6 +627,7 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
 
   private void assertNoRentingInsideZone(List<String> descriptor, String label) {
     var allStates = String.join("\n  ", descriptor);
+
     for (var d : descriptor) {
       assertFalse(
         (d.contains("CD street") || d.contains("DE street")) && d.contains("RENTING_FLOATING"),
@@ -661,6 +664,7 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
       .getShortestPathTree();
 
     var state = tree.getState(arriveBy ? from : to);
+
     if (state == null) {
       return null;
     }

@@ -8,10 +8,12 @@ public class HppcMapSetUtils {
 
   public static <U> void addToMapSet(LongObjectMap<Set<U>> mapSet, long key, U value) {
     Set<U> set = mapSet.get(key);
+
     if (set == null) {
       set = new HashSet<>();
       mapSet.put(key, set);
     }
+
     set.add(value);
   }
 }

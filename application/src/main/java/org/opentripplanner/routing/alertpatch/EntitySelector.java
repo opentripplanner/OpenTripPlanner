@@ -45,6 +45,7 @@ public sealed interface EntitySelector {
       if (!(other instanceof EntitySelector.Stop s)) {
         return false;
       }
+
       return (
         stopId.equals(s.stopId) &&
         StopConditionsHelper.matchesStopCondition(stopConditions, s.stopConditions)
@@ -74,6 +75,7 @@ public sealed interface EntitySelector {
       if (!(other instanceof EntitySelector.Trip t)) {
         return false;
       }
+
       return (
         tripId.equals(t.tripId) &&
         (serviceDate == null || t.serviceDate == null || serviceDate.equals(t.serviceDate))
@@ -85,7 +87,7 @@ public sealed interface EntitySelector {
   /// stopConditions and the line can be restricted to certain directions.
   ///
   /// @param directions If set the selector will only match trips with one of the specified
-  ///                   directions. An empty list will match nothing.
+  ///     directions. An empty list will match nothing.
   record StopAndRoute(
     FeedScopedId stopId,
     FeedScopedId routeId,
@@ -151,6 +153,7 @@ public sealed interface EntitySelector {
       if (!(other instanceof EntitySelector.StopAndTrip s)) {
         return false;
       }
+
       return (
         stopId.equals(s.stopId) &&
         tripId.equals(s.tripId) &&

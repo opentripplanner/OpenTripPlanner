@@ -44,6 +44,7 @@ public class DebugRaptorBuilder implements Serializable {
     if (stops == null) {
       return this;
     }
+
     this.stops = split(stops);
     return this;
   }
@@ -92,6 +93,7 @@ public class DebugRaptorBuilder implements Serializable {
     if (stops == null) {
       return List.of();
     }
+
     return Arrays.stream(stops.split(DELIMITERS)).filter(StringUtils::hasValue).toList();
   }
 

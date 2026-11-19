@@ -170,9 +170,11 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     TripPatternForDate that = (TripPatternForDate) o;
 
     return tripPattern.equals(that.tripPattern) && serviceDate.equals(that.serviceDate);
@@ -188,6 +190,7 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
   @Nullable
   public TripPatternForDate newWithFilteredTripTimes(Predicate<TripTimes<?>> filter) {
     ArrayList<TripTimes<?>> filteredTripTimes = new ArrayList<>(tripTimes.length);
+
     for (TripTimes<?> tripTimes : tripTimes) {
       if (filter.test(tripTimes)) {
         filteredTripTimes.add(tripTimes);
@@ -195,6 +198,7 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
     }
 
     List<FrequencyEntry> filteredFrequencies = new ArrayList<>(frequencies.length);
+
     for (FrequencyEntry frequencyEntry : frequencies) {
       if (filter.test(frequencyEntry.tripTimes())) {
         filteredFrequencies.add(frequencyEntry);

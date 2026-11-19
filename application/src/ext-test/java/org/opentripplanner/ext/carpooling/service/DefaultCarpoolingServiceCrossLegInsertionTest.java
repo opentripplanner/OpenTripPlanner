@@ -57,17 +57,17 @@ import org.opentripplanner.transit.service.TransitServiceResolver;
  * <p>
  * Access request: passenger at P, dropped at the only stop S.
  * <p>
- * The only insertion that fits the budget is cross-leg: pick up P on leg A → M and drop S on leg
- * M → D, giving A → P → M → S → D. Dropping S on the first leg instead (A → P → S → M) would reach
- * M at ~90 min against a 70-min schedule, blowing the 10-min budget.
+ * The only insertion that fits the budget is cross-leg: pick up P on leg A → M and drop S on leg M
+ * → D, giving A → P → M → S → D. Dropping S on the first leg instead (A → P → S → M) would reach M
+ * at ~90 min against a 70-min schedule, blowing the 10-min budget.
  * <p>
  * That makes the P → M ride a 70-min drive, answered only by the passenger's outward tree. Its
  * limit comes from the first leg: 70 + 10 (budget) = 80 min, less the beeline drive from A to P.
  * <p>
- * X is what makes a too-small tree actually fail here: {@code DurationSkipEdgeStrategy} prunes
- * an edge by the elapsed time at its start, so a single 42-km A → M edge would be crossed in one
- * step from ~0 elapsed and defeat any limit. Splitting it at X (61.7 min) lets a 60-min tree reach
- * X but prune X → M, while the 80-min tree spans the whole leg.
+ * X is what makes a too-small tree actually fail here: {@code DurationSkipEdgeStrategy} prunes an
+ * edge by the elapsed time at its start, so a single 42-km A → M edge would be crossed in one step
+ * from ~0 elapsed and defeat any limit. Splitting it at X (61.7 min) lets a 60-min tree reach X but
+ * prune X → M, while the 80-min tree spans the whole leg.
  */
 class DefaultCarpoolingServiceCrossLegInsertionTest extends GraphRoutingTest {
 

@@ -144,6 +144,7 @@ public class NetexTestDataSample {
           createDestinationDisplayRef(destinationBergen.getId()).getValue()
         );
       }
+
       if (i == 2) {
         stopPoint.setDestinationDisplayRef(
           createDestinationDisplayRef(destinationStavanger.getId()).getValue()

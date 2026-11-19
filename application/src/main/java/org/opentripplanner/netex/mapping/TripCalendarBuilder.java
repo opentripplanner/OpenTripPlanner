@@ -115,6 +115,7 @@ public class TripCalendarBuilder {
       // Add service id to result
       serviceIdsBySJId.put(sj.getId(), serviceId);
     }
+
     return serviceIdsBySJId;
   }
 
@@ -130,12 +131,14 @@ public class TripCalendarBuilder {
     for (JAXBElement<? extends DayTypeRefStructure> dt : dayTypes.getDayTypeRef()) {
       String dayTypeRef = dt.getValue().getRef();
       Set<LocalDate> dates = dayTypeCalendars.lookup(dayTypeRef);
+
       if (dates != null) {
         result.addAll(dates);
       } else {
         reportSJDayTypeNotFound(sj, dayTypeRef);
       }
     }
+
     return result;
   }
 

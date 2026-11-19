@@ -72,10 +72,13 @@ public class SplitEdgeTurnRestrictionsTest {
       RESOURCE_LOADER.file("vvs-bus-764-only.gtfs.zip")
     );
     Graph graph = model.graph();
-    // https://www.openstreetmap.org/relation/10264251 has a turn restriction so when leaving Hardtheimer Weg
-    // you must either turn right and take the long way to Steinhaldenweg or go past the intersection with the
+    // https://www.openstreetmap.org/relation/10264251 has a turn restriction so when leaving
+    // Hardtheimer Weg
+    // you must either turn right and take the long way to Steinhaldenweg or go past the
+    // intersection with the
     // turn restriction and turn around.
-    // on top of this, it has a bus stop so this test also makes sure that the turn restrictions work
+    // on top of this, it has a bus stop so this test also makes sure that the turn restrictions
+    // work
     // even when the streets are split.
     var noRightTurnPermitted = computeCarPolyline(graph, HARDTHEIMER_WEG, STEINHALDEN_WEG);
     assertThatPolylinesAreEqual(
@@ -94,7 +97,8 @@ public class SplitEdgeTurnRestrictionsTest {
     var straightAheadBack = computeCarPolyline(graph, K1022, HARDTHEIMER_WEG);
     assertThatPolylinesAreEqual(straightAheadBack, "kobhHwmcu@Ie@Yo@\\yAXyAFWDOd@}Bp@Zf@T");
 
-    // make sure that turning left onto the minor road works even when the opposite direction has a straight-only
+    // make sure that turning left onto the minor road works even when the opposite direction has a
+    // straight-only
     // restriction
     var leftTurnAllowed = computeCarPolyline(graph, K1022, STEINHALDEN_WEG);
     assertThatPolylinesAreEqual(leftTurnAllowed, "kobhHwmcu@Ie@Yo@\\yAXyACGAIB]j@_DPaA@e@MDCB");
@@ -120,12 +124,14 @@ public class SplitEdgeTurnRestrictionsTest {
       "kochHsl~u@HQL]N_@v@mBDKN]KKM\\{@~BKXWj@KRKPCFYj@DP^lAJX"
     );
 
-    // right hand turn out of the the residential road onto the main road, only right turn allowed plus there
+    // right hand turn out of the the residential road onto the main road, only right turn allowed
+    // plus there
     // is a bus station along the way, splitting the edge
     var noLeftTurnPermitted = computeCarPolyline(graph, PAUL_GERHARDT_WEG_EAST, PARK_STRASSE);
     assertThatPolylinesAreEqual(noLeftTurnPermitted, "sochHof~u@KY_@mAl@oADK");
 
-    // right hand turn out of the residential road onto the main road, only right turn allowed plus there
+    // right hand turn out of the residential road onto the main road, only right turn allowed plus
+    // there
     // is a bus station along the way, splitting the edge
     var longWay = computeCarPolyline(graph, PAUL_GERHARDT_WEG_EAST, HERRENBERGER_STRASSE);
     assertThatPolylinesAreEqual(
@@ -139,14 +145,16 @@ public class SplitEdgeTurnRestrictionsTest {
       "axchHwq~u@G_@Qc@@UCMAK@Q@WTUh@eA@Cb@gANg@Nu@Lq@Fe@Da@Bo@Bq@BUD[Je@Li@DWFBHJt@bAFFTZLN@@d@j@|@lA`@r@\\r@z@tBLZ]TYX]`@e@z@Yp@GJM\\{@~BKXWj@KRKPCFYj@DP^lAJX"
     );
 
-    // test that you can correctly turn right here https://www.openstreetmap.org/relation/415123 when approaching
+    // test that you can correctly turn right here https://www.openstreetmap.org/relation/415123
+    // when approaching
     // from south
     var fromSouth = computeCarPolyline(graph, STEINBEISS_WEG, PAUL_GERHARDT_WEG_WEST);
     assertThatPolylinesAreEqual(fromSouth, "wcchHk~}u@Fd@Hj@o@\\{@b@KFyBlAWmA");
     var toSouth = computeCarPolyline(graph, PAUL_GERHARDT_WEG_WEST, STEINBEISS_WEG);
     assertThatPolylinesAreEqual(toSouth, "okchHoy}u@VlAxBmAJGz@c@n@]Ik@Ge@");
 
-    // test that you cannot turn left here https://www.openstreetmap.org/relation/415123 when approaching
+    // test that you cannot turn left here https://www.openstreetmap.org/relation/415123 when
+    // approaching
     // from north
     var fromNorth = computeCarPolyline(graph, PAUL_GERHARDT_WEG_WEST, HERRENBERGER_STRASSE);
     assertThatPolylinesAreEqual(

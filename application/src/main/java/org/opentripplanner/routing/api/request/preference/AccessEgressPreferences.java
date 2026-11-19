@@ -67,9 +67,11 @@ public final class AccessEgressPreferences implements Serializable {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     AccessEgressPreferences that = (AccessEgressPreferences) o;
     return (
       penalty.equals(that.penalty) &&
@@ -166,11 +168,15 @@ public final class AccessEgressPreferences implements Serializable {
     penaltyBuilder.with(StreetMode.FLEXIBLE, flexDefaultPenalty);
 
     var carPenalty = TimeAndCostPenalty.of(TimePenalty.of(ofMinutes(20), 2f), 1.5);
+
     for (var it : StreetMode.values()) {
-      // Apply car-penalty to all car modes used in access/egress. Car modes(CAR) used in direct street
-      // routing and car modes used when you bring the car with you onto transit should be excluded. The
+      // Apply car-penalty to all car modes used in access/egress. Car modes(CAR) used in direct
+      // street
+      // routing and car modes used when you bring the car with you onto transit should be excluded.
+      // The
       // penalty should also be applied to modes used in access, egress AND direct (CAR_TO_PARK and
-      // CAR_RENTAL). This is not ideal, since we get an unfair comparison in the itinerary filters. We will
+      // CAR_RENTAL). This is not ideal, since we get an unfair comparison in the itinerary filters.
+      // We will
       // live with this for now, but might revisit it later.
       if (
         it.includesDriving() && (it.accessAllowed() || it.egressAllowed()) && it != StreetMode.CAR

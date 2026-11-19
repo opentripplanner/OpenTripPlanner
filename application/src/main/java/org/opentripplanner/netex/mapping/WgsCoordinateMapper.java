@@ -13,10 +13,9 @@ class WgsCoordinateMapper {
    *
    * @return {@code null} if the point or its location is missing.
    * @throws InvalidCoordinateException if the location is present but cannot be mapped to a valid
-   *                                    WGS84 coordinate, e.g. one of latitude/longitude is missing
-   *                                    or a value is out of range. The caller is expected to
-   *                                    report a data import issue and skip the entity - invalid
-   *                                    input data must not abort the graph build.
+   *     WGS84 coordinate, e.g. one of latitude/longitude is missing or a value is out of range. The
+   *     caller is expected to report a data import issue and skip the entity - invalid input data
+   *     must not abort the graph build.
    */
   @Nullable
   static WgsCoordinate mapToDomain(SimplePoint_VersionStructure point)
@@ -24,9 +23,11 @@ class WgsCoordinateMapper {
     if (point == null || point.getLocation() == null) {
       return null;
     }
+
     LocationStructure loc = point.getLocation();
 
     final DirectPositionType pos = loc.getPos();
+
     try {
       if (loc.getLongitude() != null && loc.getLatitude() != null) {
         return new WgsCoordinate(loc.getLatitude().doubleValue(), loc.getLongitude().doubleValue());
@@ -39,12 +40,13 @@ class WgsCoordinateMapper {
       // Thrown by WgsCoordinate when latitude/longitude is out of range
       throw new InvalidCoordinateException(e.getMessage());
     }
+
     throw new InvalidCoordinateException("Coordinate is not valid: " + loc);
   }
 
   /**
-   * Signals that a NeTEx location is present, but does not represent a valid WGS84 coordinate.
-   * This is a checked exception to force every mapper to handle invalid input data explicitly.
+   * Signals that a NeTEx location is present, but does not represent a valid WGS84 coordinate. This
+   * is a checked exception to force every mapper to handle invalid input data explicitly.
    */
   static class InvalidCoordinateException extends Exception {
 

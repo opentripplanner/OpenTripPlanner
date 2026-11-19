@@ -210,6 +210,7 @@ public class TransitDataImportBuilderLimitPeriodTest {
         builder.addTripTimes(TripTimesFactory.tripTimes(trip, STOP_TIMES, DEDUPLICATOR))
       );
     }
+
     return tpb.build();
   }
 

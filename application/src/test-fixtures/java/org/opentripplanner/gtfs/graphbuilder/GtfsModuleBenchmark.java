@@ -116,8 +116,10 @@ public class GtfsModuleBenchmark {
 
     System.out.println("Downloading " + url + " to " + target + " ...");
     Path tmp = dataDir.resolve(fileName + ".part");
+
     try (var clientFactory = new OtpHttpClientFactory()) {
       var client = clientFactory.create(LOG);
+
       try (
         InputStream in = client.getAsInputStream(
           URI.create(url),
@@ -128,6 +130,7 @@ public class GtfsModuleBenchmark {
         Files.copy(in, tmp, StandardCopyOption.REPLACE_EXISTING);
       }
     }
+
     Files.move(tmp, target, StandardCopyOption.REPLACE_EXISTING);
     System.out.printf("Download complete: %,d MB%n", Files.size(target) / 1_000_000);
     return target.toFile();

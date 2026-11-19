@@ -55,9 +55,9 @@ import org.opentripplanner.utils.time.TimeUtils;
  * keep maintenance easy, create the minimum amount of data to focus your test - this also help
  * demonstrate which data is needed by the "code-under-test".
  * <p>
- * <b>Service Time in seconds</b> Time in seconds past "midnight"(noon - 12h). The time is
- * measured from "noon minus 12h" of the service day (effectively midnight except for days on which
- * daylight savings time changes occur).
+ * <b>Service Time in seconds</b> Time in seconds past "midnight"(noon - 12h). The time is measured
+ * from "noon minus 12h" of the service day (effectively midnight except for days on which daylight
+ * savings time changes occur).
  */
 public class TestItineraryBuilder implements PlanTestConstants {
 
@@ -115,6 +115,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
     if (lastEndTime == NOT_SET) {
       throw new IllegalStateException("Start time unknown!");
     }
+
     int legCost = cost(WALK_RELUCTANCE_FACTOR, duration);
     streetLeg(WALK, lastEndTime, lastEndTime + duration, to, legCost, steps);
     return this;
@@ -202,6 +203,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
     if (lastPlace == null) {
       throw new IllegalStateException("Trip from place is unknown!");
     }
+
     int legCost = 0;
     StopTime fromStopTime = new StopTime();
     fromStopTime.setStop(lastPlace.stop);
@@ -344,6 +346,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
     @Nullable FeedScopedId networkId
   ) {
     Route route = RAIL_ROUTE;
+
     if (networkId != null) {
       var builder = RAIL_ROUTE.copy();
       var group = GroupOfRoutes.of(networkId).build();
@@ -514,8 +517,10 @@ public class TestItineraryBuilder implements PlanTestConstants {
     if (lastPlace == null) {
       throw new IllegalStateException("Trip from place is unknown!");
     }
+
     int waitTime = start - lastEndTime(start);
     int legCost = 0;
+
     if (cost != null) {
       legCost = cost;
     } else {

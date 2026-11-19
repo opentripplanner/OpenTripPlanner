@@ -59,7 +59,8 @@ public class OsmOpeningHoursParserTest {
         List.of("2022-10-24T15:30:00Z", "2022-10-24T23:30:00Z", "2022-10-25T15:30:00Z"),
         List.of("2022-10-25T05:30:00Z")
       ),
-      // The second rule overrides the first rule for Wednesdays, i.e. on Wednesdays it should only be
+      // The second rule overrides the first rule for Wednesdays, i.e. on Wednesdays it should only
+      // be
       // open from 10:00 to 13:00
       Arguments.of(
         "Mo-Fr 16:00-02:00; We 10:00-13:00",
@@ -72,11 +73,14 @@ public class OsmOpeningHoursParserTest {
         List.of("2022-10-24T15:30:00Z"),
         List.of("2022-10-24T05:30:00Z", "2022-10-25T10:30:00Z")
       ),
-      // Even though the following rules are not additive, they should be handled as such because they
+      // Even though the following rules are not additive, they should be handled as such because
+      // they
       // have the off modifier (https://github.com/opening-hours/opening_hours.js/issues/53).
-      // Therefore, it should be open according to the first rule outside of the defined off periods,
+      // Therefore, it should be open according to the first rule outside of the defined off
+      // periods,
       // so for example, on Tuesdays it should be open from 07:30 to 12:00 and from 16:00 to 22:00.
-      // These different off cases are needed because they overlap slightly differently with the first
+      // These different off cases are needed because they overlap slightly differently with the
+      // first
       // rule and have slightly different handling in code.
       Arguments.of(
         "Mo-Sa 07:30-22:00; Mo 05:00-23:00 off; Tu 12:00-16:00 off; We 06:00-16:00 off; Th 07:30-16:00 off, Fr 16:00-22:00 off, Sa 16:00-23:00 off",
@@ -150,7 +154,8 @@ public class OsmOpeningHoursParserTest {
       ),
       // TODO implement support for comment modifiers, this is now interpreted to be always closed
       Arguments.of("\"by appointment\"", List.of(), List.of("2022-10-25T07:30:00Z")),
-      // TODO implement support for fallbacks if feasible, now the last rule is ignored and the first
+      // TODO implement support for fallbacks if feasible, now the last rule is ignored and the
+      // first
       // rule is respected
       Arguments.of(
         "Mo-Sa 08:00-13:00,16:00-18:00 || \"by appointment\"",

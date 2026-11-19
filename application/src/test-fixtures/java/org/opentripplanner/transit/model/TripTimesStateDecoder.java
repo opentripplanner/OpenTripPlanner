@@ -13,23 +13,29 @@ public class TripTimesStateDecoder {
   /// * S -> Trip received no updates
   public static String summarizeFromTripTimes(TripTimes tripTimes) {
     StringBuilder stringBuilder = new StringBuilder();
+
     if (tripTimes.isAdded()) {
       stringBuilder.append("A ");
     }
+
     if (tripTimes.isCanceled()) {
       stringBuilder.append("C ");
     }
+
     if (tripTimes.isTripPatternModified()) {
       stringBuilder.append("P ");
     }
+
     if (tripTimes.isDeleted()) {
       stringBuilder.append("D ");
     }
+
     if (tripTimes.hasAnyUpdates()) {
       stringBuilder.append("U ");
     } else {
       stringBuilder.append("S ");
     }
+
     return stringBuilder.toString().trim();
   }
 }

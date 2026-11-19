@@ -112,9 +112,11 @@ public class GeneralizedCostParameters {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     GeneralizedCostParameters that = (GeneralizedCostParameters) o;
     // TODO - Why is not all parameters included here, doc if on purpose or add parameters
     return (

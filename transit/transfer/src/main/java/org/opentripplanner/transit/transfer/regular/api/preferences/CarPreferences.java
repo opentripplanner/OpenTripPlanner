@@ -48,6 +48,7 @@ public final class CarPreferences extends AbstractUserPreferences<CarPreferences
     if (!(obj instanceof CarPreferences)) {
       return false;
     }
+
     return super.equals(obj);
   }
 

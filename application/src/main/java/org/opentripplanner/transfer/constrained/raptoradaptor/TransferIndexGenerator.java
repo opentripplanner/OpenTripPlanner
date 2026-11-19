@@ -64,6 +64,7 @@ public class TransferIndexGenerator {
 
     for (ConstrainedTransfer tx : constrainedTransfers) {
       var c = tx.getTransferConstraint();
+
       // Only add transfers which have an effect on the Raptor routing here.
       // Some transfers only have the priority set, and that is used in optimized-
       // transfers, but not in Raptor.
@@ -118,7 +119,6 @@ public class TransferIndexGenerator {
    * RoutingTripPattern is created (index = N), and routing tries result.toStop(N) on a cached array
    * of size N, it throws IndexOutOfBoundsException. Hence, the additional check against the
    * previous processed number of patterns.
-   *
    */
   private boolean isCacheValid(int nPatterns) {
     return !dirty && nPatterns == prevProcessedNumberOfPatterns && cachedResult != null;
@@ -149,7 +149,7 @@ public class TransferIndexGenerator {
 
   /**
    * @return true if any new entries were added to the lookup maps, false if all entries already
-   *         existed.
+   *     existed.
    */
   private boolean setupPattern(TripPattern tripPattern, List<Trip> trips) {
     boolean added = false;
@@ -165,10 +165,12 @@ public class TransferIndexGenerator {
     for (StopLocation stop : tripPattern.getStops()) {
       added |= patternsByStop.computeIfAbsent(stop, t -> new HashSet<>()).add(pattern);
       Station station = stop.getParentStation();
+
       if (station != null) {
         added |= patternsByStation.computeIfAbsent(station, t -> new HashSet<>()).add(pattern);
       }
     }
+
     return added;
   }
 
@@ -208,12 +210,14 @@ public class TransferIndexGenerator {
 
     for (RoutingTripPattern pattern : patterns) {
       var tripPattern = pattern.getPattern();
+
       for (int pos = 0; pos < tripPattern.numberOfStops(); ++pos) {
         if (point.getStation() == tripPattern.getStop(pos).getParentStation()) {
           result.add(new TPoint(pattern, sourcePoint, null, pos));
         }
       }
     }
+
     return result;
   }
 
@@ -230,12 +234,14 @@ public class TransferIndexGenerator {
 
     for (RoutingTripPattern pattern : patterns) {
       var p = pattern.getPattern();
+
       for (int pos = 0; pos < p.numberOfStops(); ++pos) {
         if (point.getStop() == p.getStop(pos)) {
           result.add(new TPoint(pattern, sourcePoint, null, pos));
         }
       }
     }
+
     return result;
   }
 
@@ -272,6 +278,7 @@ public class TransferIndexGenerator {
 
     for (var pattern : patterns) {
       int stopPosInPattern = resolveStopPosInPattern.applyAsInt(pattern.getPattern());
+
       // stopPosInPattern == -1 means stop is not on pattern
       if (stopPosInPattern >= 0) {
         int stopIndex = pattern.stopIndex(stopPosInPattern);
@@ -282,6 +289,7 @@ public class TransferIndexGenerator {
         points.add(new TPoint(pattern, sourcePoint, null, stopPosInPattern));
       }
     }
+
     return points;
   }
 
@@ -298,6 +306,7 @@ public class TransferIndexGenerator {
 
     // Process first the pattern for which stopPosInPattern was calculated for
     List<RoutingTripPattern> scheduledPatterns = patternsByRealtimeOrScheduled.get(Boolean.FALSE);
+
     if (scheduledPatterns == null || scheduledPatterns.size() != 1) {
       LOG.warn(
         "Trip {} does not have exactly one scheduled trip pattern, found: {}. " +
@@ -316,6 +325,7 @@ public class TransferIndexGenerator {
 
     // Return early if only scheduled pattern exists
     var realtimePatterns = patternsByRealtimeOrScheduled.get(Boolean.TRUE);
+
     if (realtimePatterns == null || realtimePatterns.isEmpty()) {
       return List.of(scheduledPoint);
     }
@@ -325,10 +335,13 @@ public class TransferIndexGenerator {
 
     List<TPoint> res = new ArrayList<>();
     res.add(scheduledPoint);
+
     for (RoutingTripPattern pattern : realtimePatterns) {
-      // Check if the same stop or its sibling is at the same position, if yes, generate a transfer point
+      // Check if the same stop or its sibling is at the same position, if yes, generate a transfer
+      // point
       if (stopPosInPattern < pattern.numberOfStopsInPattern()) {
         StopLocation stop = pattern.getPattern().getStop(stopPosInPattern);
+
         if (stop.equals(scheduledStop) || stop.isPartOfSameStationAs(scheduledStop)) {
           res.add(
             new TPoint(
@@ -344,6 +357,7 @@ public class TransferIndexGenerator {
           continue;
         }
       }
+
       LOG.info(
         "Updated pattern for trip {}, does not match original for stop {} at pos {}. " +
           "Skipping transfer generation.",
@@ -387,9 +401,11 @@ public class TransferIndexGenerator {
       if (this == o) {
         return true;
       }
+
       if (!(o instanceof TPoint tPoint)) {
         return false;
       }
+
       return (
         stopPosition == tPoint.stopPosition &&
         Objects.equals(pattern, tPoint.pattern) &&
@@ -423,14 +439,17 @@ public class TransferIndexGenerator {
       if (forwardTransfers[to.pattern.patternIndex()] == null) {
         forwardTransfers[to.pattern.patternIndex()] = new TransferForPatternByStopPos();
       }
+
       forwardTransfers[to.pattern.patternIndex()].add(
         to.stopPosition,
         new TransferForPattern(sourcePoint, to.trip, rank, c)
       );
+
       // Reverse search
       if (reverseTransfers[pattern.patternIndex()] == null) {
         reverseTransfers[pattern.patternIndex()] = new TransferForPatternByStopPos();
       }
+
       reverseTransfers[pattern.patternIndex()].add(
         stopPosition,
         new TransferForPattern(to.sourcePoint, trip, rank, c)

@@ -51,20 +51,18 @@ class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> {
   private final double radiusMeters;
 
   /**
-   * @param transitService             A TransitService used in finding information about the
-   *                                   various places.
-   * @param filterByModes              A list of TransitModes for which to find Stops and
-   *                                   PatternAtStops. Use null to disable the filtering.
-   * @param filterByPlaceTypes         A list of PlaceTypes to search for. Use null to disable the
-   *                                   filtering, and search for all types.
-   * @param filterByStops              A list of Stop ids for which to find Stops and
-   *                                   PatternAtStops. Use null to disable the filtering.
-   * @param filterByRoutes             A list of Route ids used for filtering Stops. Only the stops
-   *                                   which are served by the route are returned. Use null to
-   *                                   disable the filtering.
+   * @param transitService A TransitService used in finding information about the various places.
+   * @param filterByModes A list of TransitModes for which to find Stops and PatternAtStops. Use
+   *     null to disable the filtering.
+   * @param filterByPlaceTypes A list of PlaceTypes to search for. Use null to disable the
+   *     filtering, and search for all types.
+   * @param filterByStops A list of Stop ids for which to find Stops and PatternAtStops. Use null to
+   *     disable the filtering.
+   * @param filterByRoutes A list of Route ids used for filtering Stops. Only the stops which are
+   *     served by the route are returned. Use null to disable the filtering.
    * @param filterByBikeRentalStations A list of VehicleRentalStation ids to use in filtering. Use
-   *                                   null to disable the filtering.
-   * @param maxResults                 Maximum number of results to return.
+   *     null to disable the filtering.
+   * @param maxResults Maximum number of results to return.
    */
   PlaceFinderTraverseVisitor(
     TransitService transitService,
@@ -81,6 +79,7 @@ class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> {
     if (filterByPlaceTypes == null || filterByPlaceTypes.isEmpty()) {
       throw new IllegalArgumentException("No place type filter was included in request");
     }
+
     this.transitService = transitService;
 
     this.filterByModes = toSet(filterByModes);
@@ -108,6 +107,7 @@ class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> {
   public void visitVertex(State state) {
     Vertex vertex = state.getVertex();
     double distance = state.getTraversalDistanceMeters();
+
     if (vertex instanceof TransitStopVertex transitVertex) {
       var stop = Objects.requireNonNull(transitService.getRegularStop(transitVertex.getId()));
       handleStop(stop, distance);
@@ -124,10 +124,10 @@ class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> {
 
   /**
    * @return A SkipEdgeStrategy to be used with this TraverseVisitor. It skips edges when either the
-   *         maximum number of places or the furthest distance has been reached. However, when the
-   *         maximum number of places has been reached, it continues searching along other paths
-   *         until the distance of the place that is furthest away. This is to account for the fact
-   *         that the a star does not traverse edges ordered by distance.
+   *     maximum number of places or the furthest distance has been reached. However, when the
+   *     maximum number of places has been reached, it continues searching along other paths until
+   *     the distance of the place that is furthest away. This is to account for the fact that the a
+   *     star does not traverse edges ordered by distance.
    */
   SkipEdgeStrategy<State, Edge> getSkipEdgeStrategy() {
     return (current, edge) -> {
@@ -138,6 +138,7 @@ class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> {
         PlaceFinderTraverseVisitor.this.maxResults
       ) {
         furthestDistance = 0;
+
         for (PlaceAtDistance pad : PlaceFinderTraverseVisitor.this.placesFound) {
           if (pad.distance() > furthestDistance) {
             furthestDistance = pad.distance();
@@ -153,6 +154,7 @@ class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> {
     if (list == null) {
       return Set.of();
     }
+
     return Set.copyOf(list);
   }
 
@@ -162,6 +164,7 @@ class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> {
         placesFound.add(new PlaceAtDistance(parking, distance));
         seenParkingLots.add(parking.getId());
       }
+
       // make sure that we don't add the same place twice if it has bike and car parking spaces
       if (
         includeCarParking && parking.hasAnyCarPlaces() && !seenParkingLots.contains(parking.getId())
@@ -247,6 +250,7 @@ class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> {
 
       for (TripPattern pattern : patterns) {
         String seenKey = pattern.getRoute().getId().toString() + ":" + pattern.getId().toString();
+
         if (!seenPatternAtStops.contains(seenKey)) {
           PatternAtStop row = new PatternAtStop(stop, pattern);
           PlaceAtDistance place = new PlaceAtDistance(row, distance);
@@ -261,15 +265,19 @@ class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> {
     if (!includeVehicleRentals) {
       return;
     }
+
     if (!filterByVehicleRental.isEmpty() && !filterByVehicleRental.contains(station.stationId())) {
       return;
     }
+
     if (seenVehicleRentalPlaces.contains(station.id())) {
       return;
     }
+
     if (!filterByNetwork.isEmpty() && !filterByNetwork.contains(station.network())) {
       return;
     }
+
     seenVehicleRentalPlaces.add(station.id());
     placesFound.add(new PlaceAtDistance(station, distance));
   }

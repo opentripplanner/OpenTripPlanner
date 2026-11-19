@@ -73,6 +73,7 @@ class ServiceCalendarFrameParser extends NetexParser<ServiceCalendarFrame_Versio
     if (element == null) {
       return;
     }
+
     for (JAXBElement<?> dt : element.getDayType()) {
       parseDayType(dt);
     }
@@ -82,6 +83,7 @@ class ServiceCalendarFrameParser extends NetexParser<ServiceCalendarFrame_Versio
     if (dayTypes == null) {
       return;
     }
+
     for (JAXBElement<?> dt : dayTypes.getDayTypeRefOrDayType()) {
       parseDayType(dt);
     }
@@ -98,7 +100,9 @@ class ServiceCalendarFrameParser extends NetexParser<ServiceCalendarFrame_Versio
       return;
     }
 
-    for (OperatingPeriod_VersionStructure p : operatingPeriods.getOperatingPeriodOrUicOperatingPeriod()) {
+    for (
+      OperatingPeriod_VersionStructure p : operatingPeriods.getOperatingPeriodOrUicOperatingPeriod()
+    ) {
       parseOperatingPeriod(p);
     }
   }
@@ -107,6 +111,7 @@ class ServiceCalendarFrameParser extends NetexParser<ServiceCalendarFrame_Versio
     if (operatingPeriods == null) {
       return;
     }
+
     JAXBUtils.forEachJAXBElementValue(
       Object.class,
       operatingPeriods.getOperatingPeriodRefOrOperatingPeriodOrUicOperatingPeriod(),
@@ -126,6 +131,7 @@ class ServiceCalendarFrameParser extends NetexParser<ServiceCalendarFrame_Versio
     if (element == null) {
       return;
     }
+
     operatingDays.addAll(element.getOperatingDay());
   }
 
@@ -133,6 +139,7 @@ class ServiceCalendarFrameParser extends NetexParser<ServiceCalendarFrame_Versio
     if (element == null) {
       return;
     }
+
     parseDayTypeAssignments(element.getDayTypeAssignment());
   }
 
@@ -140,6 +147,7 @@ class ServiceCalendarFrameParser extends NetexParser<ServiceCalendarFrame_Versio
     if (element == null) {
       return;
     }
+
     parseDayTypeAssignments(element.getDayTypeAssignment());
   }
 

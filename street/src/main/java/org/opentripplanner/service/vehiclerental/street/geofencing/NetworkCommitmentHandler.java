@@ -13,7 +13,6 @@ import org.opentripplanner.street.search.state.State;
  * Handles network commitment for generic (null-network) RENTING_FLOATING states in arrive-by
  * searches. When a generic state crosses a zone boundary, this handler forks committed branches for
  * each new network and continues the generic with updated committedNetworks.
- *
  * <p>
  * Also handles no-traversal zone network recording: when a generic state enters a no-traversal
  * zone, the zone's network is added to committedNetworks (since a committed branch for that network
@@ -30,14 +29,18 @@ class NetworkCommitmentHandler {
     EdgeTraversal edge
   ) {
     var noTraversalNetworks = collectNoTraversalNetworks(s0, fromBoundaries);
+
     if (!noTraversalNetworks.isEmpty()) {
       var editor = edge.traverse(s0, s0.currentMode());
+
       if (editor != null) {
         for (var n : noTraversalNetworks) {
           editor.addCommittedNetwork(n);
         }
+
         return State.ofNullable(editor.makeState());
       }
+
       return State.empty();
     }
 
@@ -54,32 +57,40 @@ class NetworkCommitmentHandler {
     List<GeofencingBoundaryExtension> fromBoundaries
   ) {
     Set<String> networks = null;
+
     for (var boundary : fromBoundaries) {
       if (Boolean.TRUE.equals(boundary.zone().traversalBanned()) && !boundary.entering()) {
         String n = boundary.zone().id().getFeedId();
+
         if (!s0.getCommittedNetworks().contains(n)) {
           if (networks == null) {
             networks = new HashSet<>();
           }
+
           networks.add(n);
         }
       }
     }
+
     return networks != null ? networks : Set.of();
   }
 
   private static State @Nullable [] commitNetworks(State s0, EdgeTraversal edge) {
     var editor = edge.traverse(s0, s0.currentMode());
     var traversedState = editor != null ? editor.makeState() : null;
+
     if (traversedState == null) {
       return null;
     }
+
     var forkNetworks = new HashSet<String>();
     var commitOnlyNetworks = new HashSet<String>();
     classifyNewZoneNetworks(s0, traversedState, forkNetworks, commitOnlyNetworks);
+
     if (forkNetworks.isEmpty() && commitOnlyNetworks.isEmpty()) {
       return null;
     }
+
     return forkCommittedBranches(s0, forkNetworks, commitOnlyNetworks, edge);
   }
 
@@ -100,12 +111,14 @@ class NetworkCommitmentHandler {
     for (var zone : after.getCurrentGeofencingZones()) {
       if (!before.getCurrentGeofencingZones().contains(zone)) {
         String network = zone.id().getFeedId();
+
         if (
           before.getCommittedNetworks().contains(network) ||
           Boolean.TRUE.equals(zone.traversalBanned())
         ) {
           continue;
         }
+
         if (zone.isBusinessArea()) {
           commitOnlyNetworks.add(network);
         } else {
@@ -113,6 +126,7 @@ class NetworkCommitmentHandler {
         }
       }
     }
+
     // If a network has both BA and non-BA zones at this boundary, fork it
     commitOnlyNetworks.removeAll(forkNetworks);
   }
@@ -130,10 +144,13 @@ class NetworkCommitmentHandler {
       if (!isNetworkAllowedByRequest(network, request)) {
         continue;
       }
+
       var networkBranch = edge.traverse(s0, s0.currentMode());
+
       if (networkBranch != null) {
         networkBranch.bindToNetwork(network);
         var commitState = networkBranch.makeState();
+
         if (commitState != null) {
           states.add(commitState);
         }
@@ -141,11 +158,14 @@ class NetworkCommitmentHandler {
     }
 
     var generic = edge.traverse(s0, s0.currentMode());
+
     if (generic != null) {
       for (String network : commitOnlyNetworks) {
         generic.addCommittedNetwork(network);
       }
+
       var genericContinue = generic.makeState();
+
       if (genericContinue != null) {
         states.add(genericContinue);
       }
@@ -157,14 +177,18 @@ class NetworkCommitmentHandler {
   static boolean isNetworkAllowedByRequest(String network, StreetSearchRequest request) {
     var rentalMode = StreetModeToRentalTraverseModeMapper.map(request.mode());
     var rentalRequest = request.rental(rentalMode);
+
     if (rentalRequest == null) {
       return true;
     }
+
     var allowedNetworks = rentalRequest.allowedNetworks();
     var bannedNetworks = rentalRequest.bannedNetworks();
+
     if (!allowedNetworks.isEmpty()) {
       return allowedNetworks.contains(network);
     }
+
     return !bannedNetworks.contains(network);
   }
 }

@@ -67,6 +67,7 @@ class SidewalkNamer implements EdgeNamer {
   @Override
   public void recordEdges(OsmWay way, StreetEdgePair pair, OsmDatabase osmdb) {
     Set<OsmLevel> levelSet = osmdb.getLevelSetForEntity(way);
+
     // This way is a sidewalk and hasn't been named yet (and is not explicitly unnamed)
     if (
       way instanceof OsmWay osmWay &&
@@ -187,14 +188,11 @@ class SidewalkNamer implements EdgeNamer {
     private double length(Geometry intersection) {
       return switch (intersection) {
         case LineString ls -> GeometryUtils.sumDistances(ls);
-        case MultiLineString mls -> GeometryUtils.getLineStrings(mls)
-          .stream()
-          .mapToDouble(this::intersectionLength)
-          .sum();
+        case MultiLineString mls
+          -> GeometryUtils.getLineStrings(mls).stream().mapToDouble(this::intersectionLength).sum();
         case Point _ -> 0;
-        case Geometry g -> throw new IllegalStateException(
-          "Didn't expect geometry %s".formatted(g.getClass())
-        );
+        case Geometry g
+          -> throw new IllegalStateException("Didn't expect geometry %s".formatted(g.getClass()));
       };
     }
   }

@@ -13,6 +13,7 @@ public class GraphReportBuilder {
 
     var constrainedTransferCounts = countValues(constrainedTransfers, transfer -> {
       var transferConstraint = transfer.getTransferConstraint();
+
       if (transferConstraint.isMinTransferTimeSet()) {
         return "minTransferTime";
       } else if (transferConstraint.isStaySeated()) {
@@ -54,12 +55,14 @@ public class GraphReportBuilder {
   private static <T> TypeStats countValues(Iterable<T> input, Function<T, String> classify) {
     Map<String, Integer> result = new HashMap<>();
     int total = 0;
+
     for (T item : input) {
       var classification = classify.apply(item);
       var count = result.getOrDefault(classification, 0);
       result.put(classification, ++count);
       ++total;
     }
+
     return new TypeStats(total, result);
   }
 

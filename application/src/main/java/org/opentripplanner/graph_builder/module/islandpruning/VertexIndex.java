@@ -32,6 +32,7 @@ class VertexIndex {
     this.vertices = new ArrayList<>(graphVertices.size());
     this.streetVertex = new BitSet(graphVertices.size());
     this.stopVertex = new BitSet(graphVertices.size());
+
     for (Vertex v : graphVertices) {
       addVertex(v);
     }
@@ -39,9 +40,11 @@ class VertexIndex {
 
   int idOf(Vertex v) {
     int id = ids.getOrDefault(v, NO_ID);
+
     if (id == NO_ID) {
       throw new IllegalArgumentException("Vertex %s is not in the index".formatted(v));
     }
+
     return id;
   }
 

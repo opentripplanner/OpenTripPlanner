@@ -48,6 +48,7 @@ public class SpeedTestTimer {
 
   public List<Result> getResults() {
     var results = new ArrayList<Result>();
+
     for (Meter meter : registry.getMeters()) {
       if (meter instanceof Timer timer && ((Timer) meter).count() > 0) {
         results.add(
@@ -62,6 +63,7 @@ public class SpeedTestTimer {
         );
       }
     }
+
     // We ignore individual test-case results in the SpeedTest output; hence we need to aggregate
     // all results for each test-case-category here
     Map<String, List<Result>> groupByName = results.stream().collect(groupingBy(Result::name));
@@ -210,6 +212,7 @@ public class SpeedTestTimer {
       if (results.isEmpty()) {
         throw new IllegalArgumentException("At least on result is needed to merge.");
       }
+
       Result any = null;
       int min = Integer.MAX_VALUE;
       int max = Integer.MIN_VALUE;
@@ -223,6 +226,7 @@ public class SpeedTestTimer {
         totTime += it.totTime;
         count += it.count;
       }
+
       return new Result(any.name, min, max, totTime / count, totTime, count);
     }
   }

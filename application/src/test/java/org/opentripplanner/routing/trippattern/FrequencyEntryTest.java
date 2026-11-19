@@ -28,6 +28,7 @@ public class FrequencyEntryTest {
     List<StopTime> stopTimes = new ArrayList<>();
 
     int time = 0;
+
     for (int i = 0; i < STOP_NUM; ++i) {
       FeedScopedId id = FeedScopedIdForTestFactory.id(i + "");
 
@@ -36,9 +37,11 @@ public class FrequencyEntryTest {
       StopTime stopTime = new StopTime();
       stopTime.setStop(stop);
       stopTime.setArrivalTime(time);
+
       if (i != 0 && i != STOP_NUM - 1) {
         time += 10;
       }
+
       stopTime.setDepartureTime(time);
       time += 90;
       stopTime.setStopSequence(i);

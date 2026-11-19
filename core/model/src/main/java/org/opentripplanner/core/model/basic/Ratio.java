@@ -44,6 +44,7 @@ public sealed class Ratio implements Serializable permits NormalizedRatio {
     if (ratio == null) {
       return Optional.empty();
     }
+
     return of(ratio, validationErrorHandler);
   }
 
@@ -56,6 +57,7 @@ public sealed class Ratio implements Serializable permits NormalizedRatio {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     var other = (Ratio) o;
     return Double.compare(ratio, other.ratio) == 0;
   }

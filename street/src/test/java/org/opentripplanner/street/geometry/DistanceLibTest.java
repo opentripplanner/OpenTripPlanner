@@ -108,9 +108,11 @@ public class DistanceLibTest {
   private LineString makeLineString(double... latlon) {
     assertEquals(0, latlon.length % 2);
     Coordinate[] coords = new Coordinate[latlon.length / 2];
+
     for (int i = 0; i < coords.length; i++) {
       coords[i] = new Coordinate(latlon[i * 2 + 1], latlon[i * 2]);
     }
+
     return new GeometryFactory().createLineString(coords);
   }
 }

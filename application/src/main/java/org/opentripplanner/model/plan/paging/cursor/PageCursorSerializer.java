@@ -64,12 +64,14 @@ final class PageCursorSerializer {
         .withInt(CUT_N_TRANSFERS_FIELD, cut.numberOfTransfers())
         .withInt(CUT_COST_FIELD, cut.generalizedCostIncludingPenalty().toSeconds());
     }
+
     if (cursor.containsGeneralizedCostMaxLimit()) {
       tokenBuilder.withInt(
         GENERALIZED_COST_MAX_LIMIT,
         cursor.generalizedCostMaxLimit().toSeconds()
       );
     }
+
     return tokenBuilder.build();
   }
 
@@ -78,6 +80,7 @@ final class PageCursorSerializer {
     if (StringUtils.hasNoValue(cursor)) {
       return null;
     }
+
     try {
       ItinerarySortKey itineraryPageCut = null;
       var token = SCHEMA_TOKEN.decode(cursor);
@@ -106,8 +109,10 @@ final class PageCursorSerializer {
 
       // VERSION TWO
       Cost generalizedCostMaxLimit = null;
+
       if (token.version() >= VERSION_TWO) {
         var cost = token.getInt(GENERALIZED_COST_MAX_LIMIT);
+
         if (cost.isPresent()) {
           generalizedCostMaxLimit = Cost.costOfSeconds(cost.getAsInt());
         }
@@ -125,9 +130,11 @@ final class PageCursorSerializer {
     } catch (Exception e) {
       String details = e.getMessage();
       String message = "Unable to decode page cursor: '" + cursor + "'.";
+
       if (StringUtils.hasValue(details)) {
         message += " Details: " + details;
       }
+
       throw new IllegalArgumentException(message, e);
     }
   }

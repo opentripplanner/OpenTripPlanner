@@ -162,6 +162,7 @@ public class TestTransferBuilder<T extends RaptorTripSchedule> {
     if (constraint == null) {
       return null;
     }
+
     int fromStopPos = fromTrip.pattern().findAlightStopPositionAfter(0, fromStopIndex);
     int toStopPos = toTrip.pattern().findBoardStopPositionAfter(0, toStopIndex);
 
@@ -186,9 +187,11 @@ public class TestTransferBuilder<T extends RaptorTripSchedule> {
   private void validateFromTo() {
     Objects.requireNonNull(fromTrip);
     Objects.requireNonNull(toTrip);
+
     if (fromStopIndex < 0) {
       throw new IllegalStateException();
     }
+
     if (toStopIndex < 0) {
       throw new IllegalStateException();
     }
@@ -204,6 +207,7 @@ public class TestTransferBuilder<T extends RaptorTripSchedule> {
     if (constraint == null) {
       constraint = TransferConstraint.of();
     }
+
     return constraint;
   }
 }

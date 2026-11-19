@@ -93,6 +93,7 @@ class GbfsFeedLoaderTest {
         List<Exception> cvsExceptions = new ArrayList<>();
         CsvReader reader = new CsvReader(response.body(), StandardCharsets.UTF_8);
         reader.readHeaders();
+
         while (reader.readRecord()) {
           try {
             String url = reader.get("Auto-Discovery URL");

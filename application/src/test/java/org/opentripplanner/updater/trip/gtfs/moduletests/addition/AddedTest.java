@@ -158,7 +158,8 @@ class AddedTest implements RealtimeTestConstants {
     var pattern = assertAddedTrip(ADDED_TRIP_ID, env);
     var firstRoute = pattern.getRoute();
 
-    // apply the update a second time to check that no new route instance is created but the old one is reused
+    // apply the update a second time to check that no new route instance is created but the old one
+    // is reused
     gtfsRt.applyTripUpdate(tripUpdate);
     var secondPattern = assertAddedTrip(ADDED_TRIP_ID, env);
     var secondRoute = secondPattern.getRoute();

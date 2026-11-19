@@ -43,7 +43,7 @@ public class HierarchicalVersionMapById<V extends EntityInVersionStructure>
    * Use the {@link #add(EntityInVersionStructure)} method!
    *
    * @throws IllegalArgumentException This method throws an exception to prevent adding elements
-   *                                  with a key different than the element id.
+   *     with a key different than the element id.
    */
   @Override
   public void add(String key, V value) {
@@ -98,6 +98,7 @@ public class HierarchicalVersionMapById<V extends EntityInVersionStructure>
         }
       }
     }
+
     // Fallback to the latest version of the element.
     return firstValidBestVersion(list, timestamp);
   }

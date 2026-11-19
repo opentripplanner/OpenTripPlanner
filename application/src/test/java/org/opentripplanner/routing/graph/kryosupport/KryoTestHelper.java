@@ -14,9 +14,11 @@ public final class KryoTestHelper {
 
   public static byte[] write(Object object) {
     var bytes = new ByteArrayOutputStream();
+
     try (var out = new Output(bytes)) {
       KRYO.writeClassAndObject(out, object);
     }
+
     return bytes.toByteArray();
   }
 

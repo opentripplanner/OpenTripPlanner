@@ -37,6 +37,7 @@ public class GbfsFeedLoader
       languageCode == null
         ? data.getFeedsData().values().iterator().next()
         : data.getFeedsData().get(languageCode);
+
     if (feeds == null) {
       throw new GbfsConstructionException(
         "Language " + languageCode + " does not exist in feed " + autoConfiguration.url()

@@ -51,6 +51,7 @@ public class StreetLocation extends StreetVertex {
         DoubleUtils.doubleEquals(other.getLon(), this.getLon())
       );
     }
+
     return false;
   }
 }

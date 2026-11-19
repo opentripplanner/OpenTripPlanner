@@ -39,6 +39,7 @@ class FilePatternArgumentsProvider
     var pathMatcher = FileSystems.getDefault().getPathMatcher("glob:../" + pattern);
 
     var pathsFound = new ArrayList<Path>();
+
     try {
       Files.walkFileTree(
         Paths.get(".."),
@@ -48,6 +49,7 @@ class FilePatternArgumentsProvider
             if (pathMatcher.matches(path)) {
               pathsFound.add(path);
             }
+
             return FileVisitResult.CONTINUE;
           }
 
@@ -60,6 +62,7 @@ class FilePatternArgumentsProvider
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
+
     return pathsFound.stream();
   }
 

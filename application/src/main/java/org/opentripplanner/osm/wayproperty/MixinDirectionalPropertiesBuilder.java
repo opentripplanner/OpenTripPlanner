@@ -24,8 +24,8 @@ public class MixinDirectionalPropertiesBuilder {
   /**
    * Sets the same safety value for normal and back edge.
    * <p>
-   * Note that the safeties here will be adjusted such that the safest street has a safety value
-   * of 1, with all others scaled proportionately.
+   * Note that the safeties here will be adjusted such that the safest street has a safety value of
+   * 1, with all others scaled proportionately.
    */
   public MixinDirectionalPropertiesBuilder withBicycleSafety(double value) {
     this.bicycleSafety = value;
@@ -35,8 +35,8 @@ public class MixinDirectionalPropertiesBuilder {
   /**
    * Sets the same safety value for normal and back edge.
    * <p>
-   * Note that the safeties here will be adjusted such that the safest street has a safety value
-   * of 1, with all others scaled proportionately.
+   * Note that the safeties here will be adjusted such that the safest street has a safety value of
+   * 1, with all others scaled proportionately.
    */
   public MixinDirectionalPropertiesBuilder withWalkSafety(double walkSafety) {
     this.walkSafety = walkSafety;

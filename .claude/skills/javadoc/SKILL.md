@@ -51,11 +51,10 @@ style document wins.
    imported.
 6. **Use `<p>` between paragraphs** and `<ul>` for lists. Keep the doc short; two or three
    paragraphs is a ceiling for most elements.
-7. **Wrap at 100 characters**, matching the code. Fill each line up to the limit; do not break a
-   line early when the next word still fits. Prettier does not reflow JavaDoc. Run `mvn
-   spotless:apply -DjavadocFormattingSkip=false` to wrap JavaDoc at 100 characters (check the scope
-   first, it formats the whole reactor). The formatter only wraps long lines; it does not join lines
-   that were broken too early, so fix those by hand.
+7. **Wrap at 100 characters**, matching the code. The Java code formatter wraps and fills JavaDoc
+   (and `///` comments) to 100 characters, and puts each `<p>` on its own line. Run `mvn
+   jcf:format` after writing JavaDoc (check the scope first, it formats the whole reactor). Do not
+   fight it by hand. To keep line breaks (tables, samples), use `<pre>` or a code block.
 8. **Plain, present-tense, active voice.** No filler ("This method is used to"), no marketing words,
    no emojis.
 9. **Define each concept once, at the highest level it belongs to (DRY).** The code has a natural

@@ -63,6 +63,7 @@ public class TestTransitLeg implements TransitLeg {
     var stops = new ArrayList<StopArrival>(intermediateStops.size());
     var totalDuration = Duration.between(startTime, endTime);
     var n = intermediateStops.size() + 1;
+
     for (int i = 0; i < intermediateStops.size(); i++) {
       var fraction = Duration.ofMillis((totalDuration.toMillis() * (i + 1)) / n);
       var time = LegCallTime.ofStatic(startTime.plus(fraction));
@@ -70,6 +71,7 @@ public class TestTransitLeg implements TransitLeg {
         new StopArrival(Place.forStop(intermediateStops.get(i)), time, time, null, null, null)
       );
     }
+
     return stops;
   }
 

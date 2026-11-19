@@ -30,6 +30,7 @@ public class HSLFareServiceFactory extends GtfsFareServiceFactory {
     for (FareAttribute fare : fareAttributes) {
       FeedScopedId id = fare.getId();
       FareRuleSet fareRule = fareRuleSet.get(id);
+
       if (fareRule == null) {
         fareRule = new FareRuleSet(fare);
         fareRuleSet.put(id, fareRule);
@@ -43,6 +44,7 @@ public class HSLFareServiceFactory extends GtfsFareServiceFactory {
       FareAttribute fare = rule.getFare();
       FeedScopedId id = fare.getId();
       FareRuleSet fareRule = fareRuleSet.get(id);
+
       if (fare.getAgency() != null) {
         fareRule.setAgency(fare.getAgency());
       }
@@ -52,7 +54,9 @@ public class HSLFareServiceFactory extends GtfsFareServiceFactory {
         LOG.error("Inexistant fare ID in fare rule: " + id);
         continue;
       }
+
       String contains = rule.getContainsId();
+
       if (contains != null) {
         fareRule.addContains(contains);
       }
@@ -63,6 +67,7 @@ public class HSLFareServiceFactory extends GtfsFareServiceFactory {
 
       if (route != null) {
         FeedScopedId routeId = route.getId();
+
         if (origin != null && destination != null) {
           fareRule.addRouteOriginDestination(routeId.toString(), origin, destination);
         } else {
@@ -79,6 +84,7 @@ public class HSLFareServiceFactory extends GtfsFareServiceFactory {
   public FareService makeFareService() {
     HSLFareService fareService = new HSLFareService();
     fareService.addFareRules(FareType.regular, regularFareRules.values());
+
     if (LOG.isDebugEnabled()) {
       for (FareRuleSet ruleSet : regularFareRules.values()) {
         LOG.debug("farerule {}", ruleSet);
@@ -87,6 +93,7 @@ public class HSLFareServiceFactory extends GtfsFareServiceFactory {
         LOG.debug("agency {}", ruleSet.getAgency());
       }
     }
+
     return fareService;
   }
 }

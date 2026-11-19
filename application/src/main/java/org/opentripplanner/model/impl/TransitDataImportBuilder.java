@@ -266,7 +266,8 @@ public class TransitDataImportBuilder {
   }
 
   /**
-   * @see org.opentripplanner.transit.service.TransitRepository#findStopByScheduledStopPoint(FeedScopedId)
+   * @see
+   *     org.opentripplanner.transit.service.TransitRepository#findStopByScheduledStopPoint(FeedScopedId)
    */
   public Map<FeedScopedId, RegularStop> stopsByScheduledStopPoints() {
     return stopsByScheduledStopPoints;
@@ -294,6 +295,7 @@ public class TransitDataImportBuilder {
     logRemove("ServiceCalendarDate", orgSize, calendarDates.size(), "Outside time period.");
 
     List<ServiceCalendar> keepCal = new ArrayList<>();
+
     for (ServiceCalendar calendar : calendars) {
       if (calendar.getPeriod().overlap(periodLimit)) {
         calendar.setPeriod(calendar.getPeriod().intersection(periodLimit));
@@ -302,11 +304,13 @@ public class TransitDataImportBuilder {
     }
 
     orgSize = calendars.size();
+
     if (orgSize != keepCal.size()) {
       calendars.clear();
       calendars.addAll(keepCal);
       logRemove("ServiceCalendar", orgSize, calendars.size(), "Outside time period.");
     }
+
     removeEntitiesWithInvalidReferences();
     LOG.info("Limiting transit service days to time period complete.");
   }
@@ -323,12 +327,15 @@ public class TransitDataImportBuilder {
    */
   Set<FeedScopedId> findAllServiceIds() {
     Set<FeedScopedId> serviceIds = new HashSet<>();
+
     for (ServiceCalendar calendar : getCalendars()) {
       serviceIds.add(calendar.getServiceId());
     }
+
     for (ServiceCalendarDate date : getCalendarDates()) {
       serviceIds.add(date.getServiceId());
     }
+
     return serviceIds;
   }
 
@@ -336,6 +343,7 @@ public class TransitDataImportBuilder {
     if (orgSize == newSize) {
       return;
     }
+
     LOG.info("{} of {} {}(s) removed. Reason: {}", orgSize - newSize, orgSize, type, reason);
   }
 
@@ -389,6 +397,7 @@ public class TransitDataImportBuilder {
         .stream()
         .filter(tripTimes -> !tripsById.containsKey(tripTimes.getTrip().getId()))
         .collect(Collectors.toUnmodifiableSet());
+
       if (!tripTimesToBeRemoved.isEmpty()) {
         removePatterns.add(e);
         Timetable updatedTimetable = ptn
@@ -397,6 +406,7 @@ public class TransitDataImportBuilder {
           .removeAllTripTimes(tripTimesToBeRemoved)
           .build();
         TripPattern updatedPattern = ptn.copy().withScheduledTimeTable(updatedTimetable).build();
+
         if (!updatedTimetable.getTripTimes().isEmpty()) {
           updatedPatterns.add(updatedPattern);
         } else {
@@ -408,12 +418,15 @@ public class TransitDataImportBuilder {
         }
       }
     }
+
     for (Map.Entry<StopPattern, TripPattern> it : removePatterns) {
       tripPatterns.remove(it.getKey(), it.getValue());
     }
+
     for (TripPattern tripPattern : updatedPatterns) {
       tripPatterns.put(tripPattern.getStopPattern(), tripPattern);
     }
+
     logRemove("TripPattern", orgSize, tripPatterns.size(), "No trips for pattern exist.");
   }
 
@@ -429,6 +442,7 @@ public class TransitDataImportBuilder {
    */
   private void removeTripOnServiceDateForNonExistingTrip() {
     int orgSize = tripOnServiceDates.size();
+
     for (TripOnServiceDate tripOnServiceDate : tripOnServiceDates.values()) {
       if (!tripsById.containsKey(tripOnServiceDate.getTrip().getId())) {
         logRemove(
@@ -456,6 +470,7 @@ public class TransitDataImportBuilder {
     if (!point.isTripTransferPoint()) {
       return false;
     }
+
     var trip = point.asTripTransferPoint().getTrip();
     return !tripsById.containsKey(trip.getId());
   }

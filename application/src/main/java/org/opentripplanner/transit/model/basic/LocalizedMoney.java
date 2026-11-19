@@ -9,6 +9,7 @@ public record LocalizedMoney(Money money) implements I18NString {
     if (locale == null) {
       return money.localize(Locale.ROOT);
     }
+
     return money.localize(locale);
   }
 }

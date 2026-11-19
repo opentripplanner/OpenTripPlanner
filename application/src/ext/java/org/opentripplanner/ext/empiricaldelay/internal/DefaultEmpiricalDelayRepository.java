@@ -27,14 +27,17 @@ public class DefaultEmpiricalDelayRepository implements EmpiricalDelayRepository
     int stopPosInPattern
   ) {
     var serviceId = findServiceId(tripId.getFeedId(), serviceDate);
+
     if (serviceId.isEmpty()) {
       return Optional.empty();
     }
 
     var delays = empiricalDelays.get(tripId);
+
     if (delays == null) {
       return Optional.empty();
     }
+
     return delays.get(serviceId.get(), stopPosInPattern);
   }
 
@@ -45,6 +48,7 @@ public class DefaultEmpiricalDelayRepository implements EmpiricalDelayRepository
         "Only one EmpiricalDelayServiceCalendar is supported per feed."
       );
     }
+
     serviceCalendars.put(feedId, calendar);
   }
 
@@ -64,9 +68,11 @@ public class DefaultEmpiricalDelayRepository implements EmpiricalDelayRepository
   @Nullable
   private Optional<String> findServiceId(String feedId, LocalDate serviceDate) {
     var calendar = serviceCalendars.get(feedId);
+
     if (calendar == null) {
       return Optional.empty();
     }
+
     return calendar.findServiceId(serviceDate);
   }
 }

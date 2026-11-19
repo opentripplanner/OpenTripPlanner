@@ -38,12 +38,15 @@ public class StreetPath {
     var state = finalState.getRequest().arriveBy() ? finalState.reverse() : finalState;
 
     List<State> states = new ArrayList<>();
+
     for (State s : state.listBackStates()) {
       states.add(s);
     }
+
     Collections.reverse(states);
 
     List<Edge> edges = new ArrayList<>(states.size() - 1);
+
     for (int i = 1; i < states.size(); i++) {
       edges.add(states.get(i).getBackEdge());
     }
@@ -57,6 +60,7 @@ public class StreetPath {
     if (states.isEmpty()) {
       throw new IllegalArgumentException("A path needs at least one state");
     }
+
     if (edges.size() != states.size() - 1) {
       throw new IllegalArgumentException("A path needs an edge between each state");
     }
@@ -111,6 +115,7 @@ public class StreetPath {
     double heightOffset = geoidElevation ? ellipsoidToGeoidDifference : 0;
 
     double distanceOffset = 0;
+
     for (final Edge edge : edges) {
       if (edge.getDistanceMeters() > 0) {
         builder.add(encodeElevationProfileWithNaN(edge, distanceOffset, heightOffset));
@@ -127,15 +132,18 @@ public class StreetPath {
   public ElevationChange calculateElevations() {
     double elevationGained_m = 0.0;
     double elevationLost_m = 0.0;
+
     for (Edge edge : edges) {
       if (!(edge instanceof StreetEdge edgeWithElevation)) {
         continue;
       }
+
       PackedCoordinateSequence coordinates = edgeWithElevation.getElevationProfile();
 
       if (coordinates == null) {
         continue;
       }
+
       // TODO Check the test below, AFAIU current elevation profile has 3 dimensions.
       if (coordinates.getDimension() != 2) {
         continue;
@@ -143,6 +151,7 @@ public class StreetPath {
 
       for (int i = 0; i < coordinates.size() - 1; i++) {
         double change_m = coordinates.getOrdinate(i + 1, 1) - coordinates.getOrdinate(i, 1);
+
         if (change_m > 0.0) {
           elevationGained_m += change_m;
         } else {
@@ -150,13 +159,14 @@ public class StreetPath {
         }
       }
     }
+
     return new ElevationChange(elevationGained_m, elevationLost_m);
   }
 
   /// Get a specific section of this path as a new path.
   ///
   /// @param startIdx the first state index (inclusive)
-  /// @param endIdx   the end state index (exclusive)
+  /// @param endIdx the end state index (exclusive)
   public StreetPath subPath(int startIdx, int endIdx) {
     var subStates = states.subList(startIdx, endIdx);
     var subEdges = edges.subList(startIdx, endIdx - 1);

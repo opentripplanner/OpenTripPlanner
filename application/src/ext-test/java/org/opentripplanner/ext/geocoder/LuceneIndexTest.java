@@ -152,6 +152,7 @@ class LuceneIndexTest {
         if (id.equals(BVG.getId())) {
           return BVG;
         }
+
         return null;
       }
 

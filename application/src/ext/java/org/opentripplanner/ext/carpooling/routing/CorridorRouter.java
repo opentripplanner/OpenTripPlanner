@@ -13,11 +13,11 @@ import org.opentripplanner.utils.collection.Pair;
 /**
  * The {@link CarpoolRouter} of a request once the trips carry corridors.
  * <p>
- * Segments with the passenger at one end come from the passenger's own trees, shared by every
- * trip. Everything else, the baseline legs and the segments between a waypoint and a stop, was
- * routed when the trip arrived: {@link #beginTrip} and {@link #registerStop} register those from
- * the {@link CarpoolCorridor} as plain durations before a trip is evaluated. Nothing is searched
- * per trip at request time.
+ * Segments with the passenger at one end come from the passenger's own trees, shared by every trip.
+ * Everything else, the baseline legs and the segments between a waypoint and a stop, was routed
+ * when the trip arrived: {@link #beginTrip} and {@link #registerStop} register those from the
+ * {@link CarpoolCorridor} as plain durations before a trip is evaluated. Nothing is searched per
+ * trip at request time.
  * <p>
  * Not thread-safe; one instance per request.
  */
@@ -30,11 +30,11 @@ public class CorridorRouter implements CarpoolRouter {
   private List<Vertex> waypoints = List.of();
 
   /**
-   * @param passengerRouter   the tree router with the passenger's vertices registered in both
-   *                          directions
+   * @param passengerRouter the tree router with the passenger's vertices registered in both
+   *     directions
    * @param passengerVertices the passenger's snapped vertices: the pickup and the dropoff of a
-   *                          direct request, the one vertex of an access/egress request
-   * @param pathRouter        finds a corridor segment's path
+   *     direct request, the one vertex of an access/egress request
+   * @param pathRouter finds a corridor segment's path
    */
   public CorridorRouter(
     CarpoolTreeStreetRouter passengerRouter,
@@ -51,6 +51,7 @@ public class CorridorRouter implements CarpoolRouter {
     tripSegments.clear();
     waypoints = trip.vertices();
     var legDurations = trip.corridor().legDurations();
+
     for (int leg = 0; leg < legDurations.size(); leg++) {
       register(waypoints.get(leg), waypoints.get(leg + 1), (int) legDurations.get(leg).toSeconds());
     }
@@ -84,12 +85,15 @@ public class CorridorRouter implements CarpoolRouter {
   @Nullable
   public RoutedSegment route(Vertex from, Vertex to) {
     var tripSegment = tripSegments.get(new Pair<>(from, to));
+
     if (tripSegment != null) {
       return tripSegment;
     }
+
     if (passengerVertices.contains(from) || passengerVertices.contains(to)) {
       return passengerRouter.route(from, to);
     }
+
     return null;
   }
 
@@ -125,13 +129,16 @@ public class CorridorRouter implements CarpoolRouter {
     public StreetPath path() {
       if (path == null) {
         var segment = pathRouter.route(from, to);
+
         if (segment == null) {
           throw new IllegalStateException(
             "The corridor holds a duration for " + from + " -> " + to + " but it cannot be routed"
           );
         }
+
         path = segment.path();
       }
+
       return path;
     }
 

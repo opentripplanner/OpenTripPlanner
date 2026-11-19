@@ -78,6 +78,7 @@ public class DefaultTransitDataProviderFilter implements TransitDataProviderFilt
         return tripTimes -> tripTimesPredicate(tripTimes, applyTripTimesFilters);
       }
     }
+
     return null;
   }
 
@@ -124,6 +125,7 @@ public class DefaultTransitDataProviderFilter implements TransitDataProviderFilt
           return true;
         }
       }
+
       return false;
     }
 
@@ -155,11 +157,13 @@ public class DefaultTransitDataProviderFilter implements TransitDataProviderFilt
 
     if (requireWheelchairAccessibleStops) {
       result = (BitSet) result.clone();
-      // Use the and bitwise operator to add false flag to all stops that are not accessible by wheelchair
+      // Use the and bitwise operator to add false flag to all stops that are not accessible by
+      // wheelchair
       result.and(tripPattern.getWheelchairAccessible());
 
       return result;
     }
+
     return result;
   }
 }

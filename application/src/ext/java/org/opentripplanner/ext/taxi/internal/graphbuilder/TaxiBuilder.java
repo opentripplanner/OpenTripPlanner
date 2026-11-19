@@ -33,6 +33,7 @@ public class TaxiBuilder {
   public List<TaxiRoute> buildRoutes(Collection<FlexTrip<?, ?>> flexTrips) {
     List<TaxiRoute> result = new ArrayList<>();
     Set<FeedScopedId> uniqueRouteIds = new HashSet<>();
+
     for (FlexTrip<?, ?> flexTrip : flexTrips) {
       if (isValidTaxiTrip(flexTrip, uniqueRouteIds)) {
         var areaStop = (AreaStop) flexTrip.getStop(0);
@@ -46,6 +47,7 @@ public class TaxiBuilder {
         );
       }
     }
+
     return result;
   }
 
@@ -70,6 +72,7 @@ public class TaxiBuilder {
     if (flexTrip instanceof UnscheduledTrip) {
       return true;
     }
+
     issueStore.add(
       new TaxiTripSkipped(
         flexTrip.getId(),
@@ -81,9 +84,11 @@ public class TaxiBuilder {
 
   private boolean hasTaxiRouteType(FlexTrip<?, ?> flexTrip) {
     TransitMode mode = flexTrip.getTrip().getMode();
+
     if (mode == TransitMode.TAXI) {
       return true;
     }
+
     issueStore.add(
       new TaxiTripSkipped(
         flexTrip.getId(),
@@ -95,9 +100,11 @@ public class TaxiBuilder {
 
   private boolean hasUniqueRoute(FlexTrip<?, ?> flexTrip, Set<FeedScopedId> uniqueRouteIds) {
     FeedScopedId routeId = flexTrip.getTrip().getRoute().getId();
+
     if (uniqueRouteIds.add(routeId)) {
       return true;
     }
+
     issueStore.add(
       new TaxiTripSkipped(
         flexTrip.getId(),
@@ -113,6 +120,7 @@ public class TaxiBuilder {
       int end = flexTrip.latestArrivalTime(i);
       boolean hasWindow = start != StopTime.MISSING_VALUE;
       boolean isFullDay = start == 0 && end == SECONDS_IN_DAY;
+
       if (hasWindow && !isFullDay) {
         issueStore.add(
           new TaxiTripSkipped(
@@ -127,6 +135,7 @@ public class TaxiBuilder {
         return false;
       }
     }
+
     return true;
   }
 
@@ -134,6 +143,7 @@ public class TaxiBuilder {
     if (flexTrip.numberOfStops() == 2) {
       return true;
     }
+
     issueStore.add(
       new TaxiTripSkipped(
         flexTrip.getId(),
@@ -154,6 +164,7 @@ public class TaxiBuilder {
     ) {
       return true;
     }
+
     issueStore.add(
       new TaxiTripSkipped(
         flexTrip.getId(),
@@ -166,6 +177,7 @@ public class TaxiBuilder {
   private boolean hasValidPickupDropoffTypes(FlexTrip<?, ?> flexTrip) {
     PickDrop boardRule = flexTrip.getBoardRule(0);
     PickDrop alightRule = flexTrip.getAlightRule(1);
+
     if (boardRule != PickDrop.CALL_AGENCY) {
       issueStore.add(
         new TaxiTripSkipped(
@@ -178,6 +190,7 @@ public class TaxiBuilder {
       );
       return false;
     }
+
     if (alightRule != PickDrop.CALL_AGENCY) {
       issueStore.add(
         new TaxiTripSkipped(
@@ -190,6 +203,7 @@ public class TaxiBuilder {
       );
       return false;
     }
+
     return true;
   }
 }

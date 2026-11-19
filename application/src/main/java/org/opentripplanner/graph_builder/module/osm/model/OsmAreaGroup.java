@@ -56,12 +56,15 @@ public class OsmAreaGroup {
 
     // However, JTS will lose the coord<->osmnode mapping, and we will have to reconstruct it.
     HashMap<Coordinate, OsmNode> nodeMap = new HashMap<>();
+
     for (OsmArea area : areas) {
       for (Ring ring : area.outermostRings) {
         allRings.add(ring.jtsPolygon);
+
         for (OsmNode node : ring.nodes) {
           nodeMap.put(new Coordinate(node.lon, node.lat), node);
         }
+
         for (Ring inner : ring.getHoles()) {
           for (OsmNode node : inner.nodes) {
             nodeMap.put(new Coordinate(node.lon, node.lat), node);
@@ -69,14 +72,17 @@ public class OsmAreaGroup {
         }
       }
     }
+
     GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
     Geometry allPolygons = geometryFactory.createMultiPolygon(allRings.toArray(new Polygon[0]));
     this.union = allPolygons.union();
 
     if (this.union instanceof GeometryCollection coll) {
       GeometryCollection mp = coll;
+
       for (int i = 0; i < mp.getNumGeometries(); ++i) {
         Geometry geom = mp.getGeometryN(i);
+
         if (geom instanceof Polygon polygon) {
           outermostRings.add(toRing(polygon, nodeMap));
         } else {
@@ -104,14 +110,17 @@ public class OsmAreaGroup {
         // only return barriers where first and second are consecutive nodes
         barrier -> {
           var nodeRefs = Objects.requireNonNull(barrier).getNodeRefs();
+
           for (var i = 0; i < nodeRefs.size() - 1; ++i) {
             if (nodeRefs.get(i) == first.getId() && nodeRefs.get(i + 1) == second.getId()) {
               return true;
             }
+
             if (nodeRefs.get(i) == second.getId() && nodeRefs.get(i + 1) == first.getId()) {
               return true;
             }
           }
+
           return false;
         }
       )
@@ -125,11 +134,13 @@ public class OsmAreaGroup {
     DisjointSet<OsmArea> groups = new DisjointSet<>();
     Multimap<OsmNodePair, OsmArea> areasForNodePair = HashMultimap.create();
     Map<OsmArea, Map<OsmWay, Set<OsmNodePair>>> barriersForArea = new HashMap<>();
+
     for (OsmArea area : areasLevels.keySet()) {
       for (Ring ring : area.outermostRings) {
         for (Ring inner : ring.getHoles()) {
           processRing(area, inner, barriers, areasForNodePair, barriersForArea);
         }
+
         processRing(area, ring, barriers, areasForNodePair, barriersForArea);
       }
     }
@@ -139,6 +150,7 @@ public class OsmAreaGroup {
     for (var nodePair : areasForNodePair.keySet()) {
       for (OsmArea area1 : areasForNodePair.get(nodePair)) {
         Set<OsmLevel> levelSet1 = areasLevels.get(area1);
+
         for (OsmArea area2 : areasForNodePair.get(nodePair)) {
           Set<OsmLevel> levelSet2 = areasLevels.get(area2);
           boolean onSameLevels =
@@ -165,6 +177,7 @@ public class OsmAreaGroup {
             })
             .toList();
           boolean shareBarrier = area1 != area2 && !sharedBarriers.isEmpty();
+
           if (onSameLevels && !shareBarrier) {
             groups.union(area1, area2);
           }
@@ -173,6 +186,7 @@ public class OsmAreaGroup {
     }
 
     List<OsmAreaGroup> out = new ArrayList<>();
+
     for (Set<OsmArea> areaSet : groups.sets()) {
       try {
         out.add(new OsmAreaGroup(areaSet));
@@ -187,6 +201,7 @@ public class OsmAreaGroup {
         }
       }
     }
+
     return out;
   }
 
@@ -198,6 +213,7 @@ public class OsmAreaGroup {
     Map<OsmArea, Map<OsmWay, Set<OsmNodePair>>> barriersForArea
   ) {
     var nodes = ring.nodes;
+
     // the end node of a ring must be the same of the start node
     for (var i = 0; i < nodes.size() - 1; i++) {
       OsmNode node = nodes.get(i);
@@ -206,14 +222,18 @@ public class OsmAreaGroup {
       areasForNodePair.put(pair, area);
 
       var sharedBarriers = getBarriers(barriers, node, nextNode);
+
       for (var barrier : sharedBarriers) {
         if (!barriersForArea.containsKey(area)) {
           barriersForArea.put(area, new HashMap<>());
         }
+
         var barrierMap = barriersForArea.get(area);
+
         if (!barrierMap.containsKey(barrier)) {
           barrierMap.put(barrier, new HashSet<>());
         }
+
         var nodesOnBarrier = barrierMap.get(barrier);
         nodesOnBarrier.add(pair);
       }
@@ -236,25 +256,34 @@ public class OsmAreaGroup {
 
   private Ring toRing(Polygon polygon, HashMap<Coordinate, OsmNode> nodeMap) {
     List<OsmNode> shell = new ArrayList<>();
+
     for (Coordinate coord : polygon.getExteriorRing().getCoordinates()) {
       OsmNode node = nodeMap.get(coord);
+
       if (node == null) {
         throw new RingConstructionException();
       }
+
       shell.add(node);
     }
+
     Ring ring = new Ring(shell);
+
     // now the holes
     for (int i = 0; i < polygon.getNumInteriorRing(); ++i) {
       LineString interior = polygon.getInteriorRingN(i);
       List<OsmNode> hole = new ArrayList<>();
+
       for (Coordinate coord : interior.getCoordinates()) {
         OsmNode node = nodeMap.get(coord);
+
         if (node == null) {
           throw new RingConstructionException();
         }
+
         hole.add(node);
       }
+
       ring.addHole(new Ring(hole));
     }
 
@@ -275,15 +304,18 @@ public class OsmAreaGroup {
       .mapToLong(OsmEntity::getId)
       .sorted()
       .toArray();
+
     for (long id : entityIds) {
       hash = 31L * hash + id;
     }
+
     for (Ring ring : this.outermostRings) {
       for (Coordinate c : ring.jtsPolygon.getCoordinates()) {
         hash = 31L * hash + Double.doubleToLongBits(c.x);
         hash = 31L * hash + Double.doubleToLongBits(c.y);
       }
     }
+
     return hash;
   }
 }

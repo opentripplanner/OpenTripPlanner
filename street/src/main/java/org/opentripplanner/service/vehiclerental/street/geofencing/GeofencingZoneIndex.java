@@ -27,10 +27,12 @@ public class GeofencingZoneIndex {
   public GeofencingZoneIndex(Collection<GeofencingZone> zones) {
     this.index = new STRtree();
     this.preparedGeometries = new HashMap<>(zones.size());
+
     for (GeofencingZone zone : zones) {
       index.insert(zone.geometry().getEnvelopeInternal(), zone);
       preparedGeometries.put(zone, PreparedGeometryFactory.prepare(zone.geometry()));
     }
+
     index.build();
   }
 

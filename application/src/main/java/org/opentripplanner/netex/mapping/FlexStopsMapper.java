@@ -46,10 +46,12 @@ class FlexStopsMapper {
   ) {
     this.idFactory = idFactory;
     this.stopsSpatialIndex = new HashGridSpatialIndex<>();
+
     for (RegularStop stop : stops) {
       Envelope env = new Envelope(stop.getCoordinate().asJtsCoordinate());
       this.stopsSpatialIndex.insert(env, stop);
     }
+
     this.siteRepositoryBuilder = siteRepositoryBuilder;
     this.issueStore = issueStore;
   }
@@ -63,6 +65,7 @@ class FlexStopsMapper {
     TransitMode flexibleStopTransitMode = mapTransitMode(flexibleStopPlace);
     var areas = flexibleStopPlace.getAreas().getFlexibleAreaOrFlexibleAreaRefOrHailAndRideArea();
     List<Geometry> areaGeometries = new ArrayList<>();
+
     for (var area : areas) {
       if (!(area instanceof FlexibleArea flexibleArea)) {
         issueStore.add(
@@ -77,10 +80,12 @@ class FlexStopsMapper {
       }
 
       Geometry flexibleAreaGeometry = mapGeometry(flexibleArea);
+
       if (flexibleAreaGeometry == null) {
         // ignore invalid geometries, issue already created
         continue;
       }
+
       areaGeometries.add(flexibleAreaGeometry);
 
       if (shouldAddStopsFromArea(flexibleArea, flexibleStopPlace)) {
@@ -93,6 +98,7 @@ class FlexStopsMapper {
           flexibleAreaGeometry,
           MultilingualStringMapper.getStringValue(flexibleStopPlace.getName())
         );
+
         if (areaStop != null) {
           stops.add(areaStop);
         }
@@ -150,6 +156,7 @@ class FlexStopsMapper {
     if (geometry == null || flexibleStopTransitMode == null) {
       return List.of();
     }
+
     List<RegularStop> stops = stopsSpatialIndex
       .query(geometry.getEnvelopeInternal())
       .stream()
@@ -211,6 +218,7 @@ class FlexStopsMapper {
 
   private static String getFlexibleStopAreaType(KeyListStructure keyListStructure) {
     String flexibleStopAreaType = null;
+
     if (keyListStructure != null) {
       for (KeyValueStructure k : keyListStructure.getKeyValue()) {
         if (k.getKey().equals(FLEXIBLE_STOP_AREA_TYPE_KEY)) {
@@ -219,6 +227,7 @@ class FlexStopsMapper {
         }
       }
     }
+
     return flexibleStopAreaType;
   }
 }

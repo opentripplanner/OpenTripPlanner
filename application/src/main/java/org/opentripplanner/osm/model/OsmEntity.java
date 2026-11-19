@@ -291,7 +291,7 @@ public abstract class OsmEntity {
    *
    * @param mode The OSM tag of the access mode, such as "motorcar" or "foot"
    * @return an optional value if the mode is allowed or denied access through tagging for the mode
-   *         or a parent mode, empty if it is not specified.
+   *     or a parent mode, empty if it is not specified.
    */
   protected Optional<Permission> checkModePermission(String mode) {
     return checkModePermission(mode, DIRECTIONLESS);
@@ -303,29 +303,33 @@ public abstract class OsmEntity {
    *
    * @param mode The OSM tag of the access mode, such as "motorcar" or "foot"
    * @return an optional value if the mode is allowed or denied access through tagging for the mode
-   *         or a parent mode, either with a directional suffix or not, empty if it is not
-   *         specified.
+   *     or a parent mode, either with a directional suffix or not, empty if it is not specified.
    */
   protected Optional<Permission> checkModePermission(String mode, TraverseDirection direction) {
     if (isTagless()) {
       return Optional.empty();
     }
+
     // check if the exact directional tag allows or denies access
     if (direction != DIRECTIONLESS) {
       if (isExplicitlyAllowed(mode + direction.tagSuffix())) {
         return Optional.of(ALLOW);
       }
+
       if (isExplicitlyDenied(mode + direction.tagSuffix())) {
         return Optional.of(DENY);
       }
     }
+
     // check if the exact tag allows or denies access
     if (isExplicitlyAllowed(mode)) {
       return Optional.of(ALLOW);
     }
+
     if (isExplicitlyDenied(mode)) {
       return Optional.of(DENY);
     }
+
     // check the parent mode
     var parentMode = MODE_HIERARACHY.get(mode);
     return parentMode == null ? Optional.empty() : checkModePermission(parentMode, direction);
@@ -335,6 +339,7 @@ public abstract class OsmEntity {
     if (isTagTrue(key)) {
       return true;
     }
+
     String value = getTag(key);
     return (
       "designated".equals(value) ||
@@ -346,20 +351,21 @@ public abstract class OsmEntity {
 
   /**
    * @return Converts a tag to lower case and returns the associated value. Returns null if tag is
-   *         not present.
+   *     not present.
    */
   @Nullable
   public final String getTag(String tag) {
     if (this.isTagless()) {
       return null;
     }
+
     tag = tag.toLowerCase();
     return tags.get(tag);
   }
 
   /**
    * @return Converts a tag to lower case and returns the associated value. An empty Optional if tag
-   *         is not present.
+   *     is not present.
    */
   public Optional<String> getTagOpt(String network) {
     return Optional.ofNullable(getTag(network));
@@ -371,6 +377,7 @@ public abstract class OsmEntity {
    */
   public OptionalInt getTagAsInt(String tag, Consumer<String> errorHandler) {
     String value = getTag(tag);
+
     if (value != null) {
       try {
         return OptionalInt.of(Integer.parseInt(value));
@@ -378,6 +385,7 @@ public abstract class OsmEntity {
         errorHandler.accept(value);
       }
     }
+
     return OptionalInt.empty();
   }
 
@@ -409,10 +417,12 @@ public abstract class OsmEntity {
       .chars()
       .filter(ch -> ch == ':')
       .count();
+
     if (colonCount <= 2) {
       try {
         int i, j;
         long hours, minutes, seconds;
+
         // The first :-separated element can be any width, and has no maximum. It still has
         // to be non-negative. The following elements must be 2 characters wide, non-negative,
         // and less than 60.
@@ -420,18 +430,22 @@ public abstract class OsmEntity {
           // case "m"
           case 0:
             minutes = Long.parseLong(duration);
+
             if (minutes >= 0) {
               return Duration.ofMinutes(minutes);
             }
+
             break;
           // case "h:mm"
           case 1:
             i = duration.indexOf(':');
             hours = Long.parseLong(duration.substring(0, i));
             minutes = Long.parseLong(duration.substring(i + 1));
+
             if (duration.length() - i == 3 && hours >= 0 && minutes >= 0 && minutes < 60) {
               return Duration.ofHours(hours).plusMinutes(minutes);
             }
+
             break;
           // case "h:mm:ss"
           default:
@@ -440,6 +454,7 @@ public abstract class OsmEntity {
             hours = Long.parseLong(duration.substring(0, i));
             minutes = Long.parseLong(duration.substring(i + 1, j));
             seconds = Long.parseLong(duration.substring(j + 1));
+
             if (
               j - i == 3 &&
               duration.length() - j == 3 &&
@@ -451,12 +466,14 @@ public abstract class OsmEntity {
             ) {
               return Duration.ofHours(hours).plusMinutes(minutes).plusSeconds(seconds);
             }
+
             break;
         }
       } catch (NumberFormatException e) {
         // fallthrough
       }
     }
+
     throw new DateTimeParseException("Bad OSM duration", duration, 0);
   }
 
@@ -470,6 +487,7 @@ public abstract class OsmEntity {
    */
   public Optional<Duration> getTagValueAsDuration(String key, Consumer<String> errorHandler) {
     String value = getTag(key);
+
     if (value != null) {
       try {
         return Optional.of(parseOsmDuration(value));
@@ -477,6 +495,7 @@ public abstract class OsmEntity {
         errorHandler.accept(value);
       }
     }
+
     return Optional.empty();
   }
 
@@ -495,6 +514,7 @@ public abstract class OsmEntity {
    */
   public OptionalInt parseIntOrBoolean(String tag, Consumer<String> errorHandler) {
     var maybeInt = getTagAsInt(tag, NO_OP);
+
     if (maybeInt.isPresent()) {
       return maybeInt;
     } else {
@@ -523,6 +543,7 @@ public abstract class OsmEntity {
    */
   public boolean isOneOfTags(String key, Set<String> oneOfTags) {
     var value = getTag(key);
+
     if (value == null) {
       return false;
     } else {
@@ -542,18 +563,23 @@ public abstract class OsmEntity {
         false
       );
     }
+
     // because it is expensive to compute the creative way, we do it only once.
     if (!creativeNameComputed) {
       this.creativeName = getOsmProvider().getWayPropertySet().getCreativeName(this);
       this.creativeNameComputed = true;
     }
+
     if (creativeName != null) {
       return this.creativeName;
     }
+
     var ref = getTag("ref");
+
     if (ref != null) {
       return new NonLocalizedString(ref);
     }
+
     return null;
   }
 
@@ -561,10 +587,10 @@ public abstract class OsmEntity {
    * Replace various pattern by the OSM tag values, with I18n support.
    *
    * @param pattern Pattern containing options tags to replace, such as "text" or "note: {note}".
-   *                Tag names between {} are replaced by the OSM tag value, if it is present (or the
-   *                empty string if not).
+   *     Tag names between {} are replaced by the OSM tag value, if it is present (or the empty
+   *     string if not).
    * @return A map language code → text, with at least one entry for the default language, and any
-   *         other language found in OSM tag.
+   *     other language found in OSM tag.
    */
   public Map<String, String> generateI18NForPattern(String pattern) {
     Map<String, StringBuffer> i18n = new HashMap<>();
@@ -572,49 +598,62 @@ public abstract class OsmEntity {
     Matcher matcher = I18N_PATTERN.matcher(pattern);
 
     int lastEnd = 0;
+
     while (matcher.find()) {
       // add the stuff before the match
       for (StringBuffer sb : i18n.values()) {
         sb.append(pattern, lastEnd, matcher.start());
       }
+
       lastEnd = matcher.end();
       // and then the value for the match
       String defKey = matcher.group(1);
       // scan all translated tags
       Map<String, String> i18nTags = getTagsByPrefix(defKey);
+
       for (Map.Entry<String, String> kv : i18nTags.entrySet()) {
         if (!kv.getKey().equals(defKey)) {
           String lang = kv.getKey().substring(defKey.length() + 1);
+
           if (!i18n.containsKey(lang)) {
             i18n.put(lang, new StringBuffer(i18n.get(null)));
           }
         }
       }
+
       // get the simple value (eg: description=...)
       String defTag = getTag(defKey);
+
       if (defTag == null && !i18nTags.isEmpty()) {
         defTag = i18nTags.values().iterator().next();
       }
+
       // get the translated value, if exists
       for (String lang : i18n.keySet()) {
         String i18nTag = getTag(defKey + ":" + lang);
         i18n.get(lang).append(i18nTag != null ? i18nTag : defTag != null ? defTag : "");
       }
     }
+
     for (StringBuffer sb : i18n.values()) {
       sb.append(pattern, lastEnd, pattern.length());
     }
+
     Map<String, String> out = HashMap.newHashMap(i18n.size());
+
     for (Map.Entry<String, StringBuffer> kv : i18n.entrySet()) {
       out.put(kv.getKey(), kv.getValue().toString());
     }
+
     return out;
   }
 
   private Map<String, String> getTagsByPrefix(String prefix) {
     Map<String, String> out = new HashMap<>();
+
     for (Map.Entry<String, String> entry : tags.entrySet()) {
       String k = entry.getKey();
+
       if (k.equals(prefix) || k.startsWith(prefix + ":")) {
         out.put(k, entry.getValue());
       }
@@ -636,7 +675,7 @@ public abstract class OsmEntity {
    * Returns true if access is generally denied to this element (potentially with exceptions).
    *
    * @return true if access is denied in general, regardless if permission is explicitly given when
-   *         traversing in a specific (forward or backward) direction.
+   *     traversing in a specific (forward or backward) direction.
    */
   public boolean isGeneralAccessDenied() {
     return isGeneralAccessDenied(DIRECTIONLESS);
@@ -657,6 +696,7 @@ public abstract class OsmEntity {
    */
   public Optional<TraverseDirection> isOneWay(@Nullable String mode) {
     var explicitResult = isExplicitlyOneWay(mode);
+
     if (explicitResult.isPresent()) {
       return explicitResult.get();
     }
@@ -676,14 +716,18 @@ public abstract class OsmEntity {
     }
 
     var parentModeResult = isOneWay(MODE_HIERARACHY.get(mode));
-    // check if any presence is explicitly overridden, for example, oneway=yes and bicycle:backward=yes
+
+    // check if any presence is explicitly overridden, for example, oneway=yes and
+    // bicycle:backward=yes
     if (parentModeResult.isPresent()) {
       var direction = parentModeResult.get();
+
       if (isExplicitlyAllowed(mode + direction.reverse().tagSuffix())) {
         // the way is effectively two-way as the reverse direction is specifically allowed
         return Optional.empty();
       }
     }
+
     return parentModeResult;
   }
 
@@ -691,16 +735,19 @@ public abstract class OsmEntity {
    * Check if the way is explicitly set as one-way for the specified traversal mode
    *
    * @return empty if it is not explicitly set, value containing empty if it is explicitly set as
-   *         two-way.
+   *     two-way.
    */
   private Optional<Optional<TraverseDirection>> isExplicitlyOneWay(@Nullable String mode) {
     String key = mode == null ? "oneway" : "oneway:" + mode;
+
     if (isTagFalse(key)) {
       return Optional.of(Optional.empty());
     }
+
     if (isTagTrue(key)) {
       return Optional.of(Optional.of(TraverseDirection.FORWARD));
     }
+
     return isTag(key, "-1")
       ? Optional.of(Optional.of(TraverseDirection.BACKWARD))
       : Optional.empty();
@@ -744,8 +791,8 @@ public abstract class OsmEntity {
    * Is this a public transport boarding location where passengers wait for transit and that can be
    * linked to a transit stop vertex later on.
    * <p>
-   * This intentionally excludes railway=stop and public_transport=stop because these are
-   * supposed to be placed on the tracks not on the platform.
+   * This intentionally excludes railway=stop and public_transport=stop because these are supposed
+   * to be placed on the tracks not on the platform.
    *
    * @return whether the node is a place used to board a public transport vehicle
    */
@@ -754,6 +801,7 @@ public abstract class OsmEntity {
     if (isTagless()) {
       return false;
     }
+
     return (
       isOneOfTags("highway", HIGHWAY_BOARDING_LOCATION_VALUES) ||
       isOneOfTags("railway", RAILWAY_BOARDING_LOCATION_VALUES) ||
@@ -768,7 +816,7 @@ public abstract class OsmEntity {
    * However, they are filtered out if they are tagged usage=tourism. This prevents miniature
    * tourist railways like the one in Portland's Zoo (https://www.openstreetmap.org/way/119108622)
    * from being linked to transit stops that are underneath it.
-   **/
+   */
   public boolean isPlatform() {
     var isPlatform =
       isTag("public_transport", "platform") || isOneOfTags("railway", RAILWAY_PLATFORM_VALUES);
@@ -820,18 +868,23 @@ public abstract class OsmEntity {
   public Set<String> getMultiTagValues(Set<String> refTags) {
     // we try to keep the allocations low, so only allocate a small hash set by default
     Set<String> result = HashSet.newHashSet(2);
+
     for (var tag : refTags) {
       var value = getTag(tag);
+
       if (value == null) {
         continue;
       }
+
       for (var part : value.split(";")) {
         var stripped = part.strip();
+
         if (!stripped.isBlank()) {
           result.add(stripped);
         }
       }
     }
+
     return result;
   }
 
@@ -877,8 +930,10 @@ public abstract class OsmEntity {
             }
           }
         }
+
         return false;
       }
+
       return true;
     }
 
@@ -903,23 +958,28 @@ public abstract class OsmEntity {
 
   /**
    * @return true if there is no explicit tag that makes this unsuitable for wheelchair use. In
-   *         other words: we assume that something is wheelchair-accessible in the absence of other
-   *         information.
+   *     other words: we assume that something is wheelchair-accessible in the absence of other
+   *     information.
    */
   public boolean isWheelchairAccessible() {
     if (this.isTagless()) {
       return true;
     }
+
     var wheelchairValue = getTag("wheelchair");
+
     if (isTrue(wheelchairValue)) {
       return true;
     }
+
     if (isFalse(wheelchairValue)) {
       return false;
     }
+
     if (isOneOfTags("barrier", WHEELCHAIR_INACCESSIBLE_BARRIERS)) {
       return false;
     }
+
     if (isTag("barrier", "kerb")) {
       // kerb can have semicolon-separated values, e.g. kerb=lowered;raised. The node is
       // accessible if any of them indicates an accessible kerb.
@@ -927,6 +987,7 @@ public abstract class OsmEntity {
         .stream()
         .anyMatch(WHEELCHAIR_ACCESSIBLE_KERBS::contains);
     }
+
     return true;
   }
 
@@ -944,8 +1005,8 @@ public abstract class OsmEntity {
   /**
    * Is this entity unnamed?
    * <p>
-   * Perhaps this entity has a name that isn't in the source data, but it's also possible that
-   * it's explicitly tagged as not having one.
+   * Perhaps this entity has a name that isn't in the source data, but it's also possible that it's
+   * explicitly tagged as not having one.
    *
    * @see OsmEntity#isExplicitlyUnnamed()
    */
@@ -957,8 +1018,7 @@ public abstract class OsmEntity {
    * Whether this entity explicitly doesn't have a name. This is different to no name being set on
    * the entity in OSM.
    *
-   * @see OsmEntity#isNamed()
-   * @link https://wiki.openstreetmap.org/wiki/Tag:noname%3Dyes
+   * @see OsmEntity#isNamed() @link https://wiki.openstreetmap.org/wiki/Tag:noname%3Dyes
    */
   public boolean isExplicitlyUnnamed() {
     return isTagTrue("noname");
@@ -981,9 +1041,11 @@ public abstract class OsmEntity {
 
   private StreetTraversalPermission getBarrierPermission() {
     String barrier = getTag("barrier");
+
     if (barrier == null) {
       return ALL;
     }
+
     return Objects.requireNonNullElse(BARRIER_PERMISSIONS.get(barrier), ALL);
   }
 
@@ -1014,12 +1076,14 @@ public abstract class OsmEntity {
     // handle explicit permissions
     for (var entry : OSM_TAGS_FOR_TRAVERSAL_PERMISSION.entrySet()) {
       var modePermission = checkModePermission(entry.getValue(), direction);
+
       if (modePermission.isPresent()) {
         permission = switch (modePermission.get()) {
           case ALLOW -> permission.add(entry.getKey());
           case DENY -> permission.remove(entry.getKey());
         };
       }
+
       if (
         isOneWay(entry.getValue())
           .map(wayDirection -> wayDirection != direction)
@@ -1048,9 +1112,11 @@ public abstract class OsmEntity {
     if (this == o) {
       return true;
     }
+
     if (!(o instanceof OsmEntity other)) {
       return false;
     }
+
     return getClass() == other.getClass() && id == other.id;
   }
 

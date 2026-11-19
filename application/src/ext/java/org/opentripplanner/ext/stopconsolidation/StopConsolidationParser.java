@@ -25,6 +25,7 @@ public class StopConsolidationParser {
       reader.readHeaders();
 
       var entries = new ArrayList<StopGroupEntry>();
+
       while (reader.readRecord()) {
         var id = reader.get("stop_group_id");
         var feedId = reader.get("feed_id");

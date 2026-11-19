@@ -49,6 +49,7 @@ class GroupOfStationsMapper {
     // TODO Map PurposeOfGrouping from NeTEx
 
     WgsCoordinate coordinate = mapCoordinate(groupOfStopPlaces, groupOfStations.getId());
+
     if (coordinate != null) {
       groupOfStations.withCoordinate(coordinate);
     }
@@ -65,9 +66,11 @@ class GroupOfStationsMapper {
    */
   private I18NString mapName(GroupOfStopPlaces groupOfStopPlaces) {
     String name = MultilingualStringMapper.nullableValueOf(groupOfStopPlaces.getName());
+
     if (name != null) {
       return new NonLocalizedString(name);
     }
+
     issueStore.add(
       "GroupOfStopPlacesWithoutName",
       "GroupOfStopPlaces %s does not contain a name.",
@@ -90,6 +93,7 @@ class GroupOfStationsMapper {
   private WgsCoordinate mapCoordinate(GroupOfStopPlaces groupOfStopPlaces, FeedScopedId id) {
     try {
       WgsCoordinate coordinate = WgsCoordinateMapper.mapToDomain(groupOfStopPlaces.getCentroid());
+
       if (coordinate == null) {
         issueStore.add(
           "GroupOfStationWithoutCoordinates",
@@ -97,6 +101,7 @@ class GroupOfStationsMapper {
           id
         );
       }
+
       return coordinate;
     } catch (InvalidCoordinateException e) {
       issueStore.add(
@@ -115,6 +120,7 @@ class GroupOfStationsMapper {
   ) {
     for (FeedScopedId stationId : memberIds(groupOfStopPlaces)) {
       StopLocationsGroup station = lookupStation(stationId);
+
       if (station != null) {
         groupOfStations.addChildStation(station);
       } else {
@@ -130,9 +136,11 @@ class GroupOfStationsMapper {
 
   private List<FeedScopedId> memberIds(GroupOfStopPlaces groupOfStopPlaces) {
     StopPlaceRefs_RelStructure members = groupOfStopPlaces.getMembers();
+
     if (members == null) {
       return List.of();
     }
+
     return members
       .getStopPlaceRef()
       .stream()
@@ -147,6 +155,7 @@ class GroupOfStationsMapper {
     } else if (multiModalStations.containsKey(stationId)) {
       return multiModalStations.get(stationId);
     }
+
     return null;
   }
 }

@@ -38,9 +38,11 @@ public final class TransferPath<P> {
     if (obj == this) {
       return true;
     }
+
     if (obj == null || obj.getClass() != this.getClass()) {
       return false;
     }
+
     var that = (TransferPath) obj;
     return (
       Objects.equals(this.toStop, that.toStop) &&

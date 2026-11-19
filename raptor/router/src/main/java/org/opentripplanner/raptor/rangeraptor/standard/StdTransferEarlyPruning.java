@@ -12,24 +12,24 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 /**
  * Early Pruning optimization for Standard Range Raptor transfer relaxation.
  * <p>
- * This optimization breaks the transfer loop early when the current arrival time exceeds the
- * best known destination arrival time. It requires transfers to be sorted by increasing duration,
- * so that once a transfer exceeds the bound, all subsequent transfers will too. Transfers with
- * equal duration are acceptable — they produce the same arrival time and are all pruned together.
+ * This optimization breaks the transfer loop early when the current arrival time exceeds the best
+ * known destination arrival time. It requires transfers to be sorted by increasing duration, so
+ * that once a transfer exceeds the bound, all subsequent transfers will too. Transfers with equal
+ * duration are acceptable — they produce the same arrival time and are all pruned together.
  * <p>
- * The optimization is only applied to Standard RAPTOR (not Multi-Criteria). In MC-Raptor,
- * multiple Pareto-optimal arrivals at each stop must be explored; pruning based on a single best
- * destination time would discard arrivals that are suboptimal in time but optimal in cost.
+ * The optimization is only applied to Standard RAPTOR (not Multi-Criteria). In MC-Raptor, multiple
+ * Pareto-optimal arrivals at each stop must be explored; pruning based on a single best destination
+ * time would discard arrivals that are suboptimal in time but optimal in cost.
  * <p>
  * Two bounds are maintained for correctness with Range Raptor:
  * <ol>
  *   <li>A per-round bound ({@code bestDestArrivalByRound}) tracking the best destination arrival
- *       across all Range Raptor iterations for the current round. This ensures that a fast path from an
- *       earlier iteration (later departure) does not incorrectly prune a path in the current iteration,
- *       since the Pareto set includes both departure time and arrival time.</li>
+ *       across all Range Raptor iterations for the current round. This ensures that a fast path
+ *       from an earlier iteration (later departure) does not incorrectly prune a path in the
+ *       current iteration, since the Pareto set includes both departure time and arrival time.</li>
  *   <li>A within-iteration bound ({@code bestDestCurrentIteration}) tracking the best destination
- *       arrival seen in earlier rounds of the current iteration. Within a fixed departure-time iteration,
- *       rounds are processed sequentially, so this bound is safe to apply.</li>
+ *       arrival seen in earlier rounds of the current iteration. Within a fixed departure-time
+ *       iteration, rounds are processed sequentially, so this bound is safe to apply.</li>
  * </ol>
  * See: Rohovyi, Abuaisha, Walsh — "Early Pruning for Public Transport Routing", WCTR 2026
  * (<a href="https://arxiv.org/abs/2603.12592">arxiv.org/abs/2603.12592</a>).
@@ -44,8 +44,8 @@ public class StdTransferEarlyPruning<T extends RaptorTripSchedule> {
   /**
    * Minimum egress duration per egress stop. The map is sparse — it holds only egress stops, so its
    * memory scales with the number of egress paths rather than the number of stops in the graph,
-   * which matters for large transit networks (100 000+ stops). The {@code getOrDefault} lookup is O(1),
-   * keeping {@link #updateArrival(int, int)} cheap; that method is called on every best-time
+   * which matters for large transit networks (100 000+ stops). The {@code getOrDefault} lookup is
+   * O(1), keeping {@link #updateArrival(int, int)} cheap; that method is called on every best-time
    * improvement during both the transit and transfer phases.
    */
   private final IntIntMap egressMinDurationByStop;
@@ -61,14 +61,17 @@ public class StdTransferEarlyPruning<T extends RaptorTripSchedule> {
     WorkerLifeCycle lifeCycle
   ) {
     this.egressMinDurationByStop = new IntIntHashMap(egressPaths.size(), 0.5);
+
     for (var egress : egressPaths) {
       int stop = egress.stop();
       int duration = egress.durationInSeconds();
       int current = egressMinDurationByStop.getOrDefault(stop, NOT_EGRESS);
+
       if (current == NOT_EGRESS || duration < current) {
         egressMinDurationByStop.put(stop, duration);
       }
     }
+
     this.calculator = calculator;
     this.bestDestArrivalByRound = new int[nRounds + 1];
     Arrays.fill(this.bestDestArrivalByRound, calculator.unreachedTime());
@@ -86,13 +89,17 @@ public class StdTransferEarlyPruning<T extends RaptorTripSchedule> {
    */
   void updateArrival(int stop, int alightTime) {
     int egressMinDuration = egressMinDurationByStop.getOrDefault(stop, NOT_EGRESS);
+
     if (egressMinDuration == NOT_EGRESS) {
       return;
     }
+
     int destArrival = calculator.plusDuration(alightTime, egressMinDuration);
+
     if (calculator.isBefore(destArrival, bestDestArrivalByRound[currentRound])) {
       bestDestArrivalByRound[currentRound] = destArrival;
     }
+
     if (calculator.isBefore(destArrival, bestDestCurrentIteration)) {
       bestDestCurrentIteration = destArrival;
     }
@@ -104,9 +111,11 @@ public class StdTransferEarlyPruning<T extends RaptorTripSchedule> {
    */
   boolean exceedsBound(int arrivalTime) {
     int bound = bestDestCurrentIteration;
+
     if (calculator.isBefore(bestDestArrivalByRound[currentRound], bound)) {
       bound = bestDestArrivalByRound[currentRound];
     }
+
     return !calculator.isBefore(arrivalTime, bound);
   }
 }

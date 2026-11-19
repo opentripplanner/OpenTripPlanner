@@ -44,15 +44,19 @@ public class TripTimeOnDateSelectRequest {
   @Override
   public String toString() {
     var builder = ToStringBuilder.ofEmbeddedType();
+
     if (!agencies.includeEverything()) {
       builder.addCol("agencies", agencies.get());
     }
+
     if (!routes.includeEverything()) {
       builder.addCol("routes", routes.get());
     }
+
     if (!transportModes.includeEverything()) {
       builder.addCol("transportModes", transportModes.get());
     }
+
     return builder.toString();
   }
 

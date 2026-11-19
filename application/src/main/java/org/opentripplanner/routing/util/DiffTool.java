@@ -7,7 +7,6 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * This class provide a method for comparing to lists and create a diff between them.
- * <p>
  */
 public final class DiffTool {
 
@@ -32,6 +31,7 @@ public final class DiffTool {
 
     while (l != null && r != null) {
       int c = comparator.compare(l, r);
+
       if (c < 0) {
         result.add(DiffEntry.ofLeft(l));
         l = next(leftIterator);
@@ -51,6 +51,7 @@ public final class DiffTool {
       result.add(DiffEntry.ofLeft(l));
       l = next(leftIterator);
     }
+
     while (r != null) {
       result.add(DiffEntry.ofRight(r));
       r = next(rightIterator);

@@ -57,9 +57,11 @@ public class UnknownPathFactory<T extends RaptorTripSchedule> {
 
   public Collection<RaptorPath<T>> extractPaths() {
     ParetoSet<RaptorPath<T>> paths = ParetoSet.of(comparator);
+
     for (RaptorAccessEgress egress : egressPaths) {
       createNewPath(egress).ifPresent(paths::add);
     }
+
     return paths.stream().toList();
   }
 
@@ -68,6 +70,7 @@ public class UnknownPathFactory<T extends RaptorTripSchedule> {
    */
   private Optional<RaptorPath<T>> createNewPath(RaptorAccessEgress egress) {
     int arrivalTime = calculateStopArrivalTime(egress);
+
     if (arrivalTime == RaptorConstants.NOT_FOUND) {
       return Optional.empty();
     }
@@ -102,6 +105,7 @@ public class UnknownPathFactory<T extends RaptorTripSchedule> {
 
   private int calculateStopArrivalTime(RaptorAccessEgress egress) {
     int stop = egress.stop();
+
     if (egress.arrivedOnStreet()) {
       if (bestTimes.isStopReachedByTransit(stop)) {
         return bestTimes.transitArrivalTime(stop);
@@ -111,6 +115,7 @@ public class UnknownPathFactory<T extends RaptorTripSchedule> {
         return bestTimes.time(stop);
       }
     }
+
     return RaptorConstants.NOT_FOUND;
   }
 }

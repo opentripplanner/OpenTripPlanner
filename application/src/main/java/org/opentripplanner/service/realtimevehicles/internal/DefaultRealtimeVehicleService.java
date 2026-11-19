@@ -16,9 +16,9 @@ import org.opentripplanner.transit.service.TransitService;
 /**
  * A request-scoped view over a {@link RealtimeVehicleRepositorySnapshot}.
  * <p>
- * A new instance should be created for each request, with the request's {@link TransitService}
- * and a vehicle snapshot resolved from the same transaction scope, so that the whole request sees
- * one consistent view of the realtime data.
+ * A new instance should be created for each request, with the request's {@link TransitService} and
+ * a vehicle snapshot resolved from the same transaction scope, so that the whole request sees one
+ * consistent view of the realtime data.
  */
 public class DefaultRealtimeVehicleService implements RealtimeVehicleService {
 
@@ -43,15 +43,18 @@ public class DefaultRealtimeVehicleService implements RealtimeVehicleService {
     if (pattern.getOriginalTripPattern() != null) {
       pattern = pattern.getOriginalTripPattern();
     }
+
     return snapshot.getRealtimeVehicles(pattern);
   }
 
   @Override
   public OccupancyStatus getVehicleOccupancyStatus(Trip trip) {
     TripPattern pattern = transitService.findPattern(trip);
+
     if (pattern == null) {
       return NO_DATA_AVAILABLE;
     }
+
     return getRealtimeVehicles(pattern)
       .stream()
       .filter(vehicle -> trip.getId().equals(vehicle.trip().getId()))

@@ -74,6 +74,7 @@ public class StreetSearchRequestMapper {
       .withTimeout(street.routingTimeout());
 
     var rentalDuration = request.journey().direct().rentalDuration();
+
     if (rentalDuration != null) {
       var rentalPeriod = request.arriveBy()
         ? RentalPeriod.createFromLatestArrivalTime(time, rentalDuration)
@@ -89,7 +90,6 @@ public class StreetSearchRequestMapper {
   ///
   /// - they are always depart-at
   /// - their start time is always the epoch (0)
-  ///
   public static StreetSearchRequestBuilder mapToTransferRequest(RouteRequest request) {
     return map(request)
       .withFromEnvelope(null)
@@ -115,9 +115,11 @@ public class StreetSearchRequestMapper {
     var b = AccessibilityRequest.of()
       .withInaccessibleCost(stop.inaccessibleCost())
       .withUnknownCost(stop.unknownCost());
+
     if (stop.onlyConsiderAccessible()) {
       b.withAccessibleOnly();
     }
+
     return b.build();
   }
 
@@ -234,7 +236,9 @@ public class StreetSearchRequestMapper {
     if (location == null) {
       return null;
     }
+
     var coordinate = location.getCoordinate();
+
     if (coordinate == null) {
       return null;
     }

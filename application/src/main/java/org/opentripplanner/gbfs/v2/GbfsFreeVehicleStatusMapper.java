@@ -88,11 +88,13 @@ class GbfsFreeVehicleStatusMapper {
         .withFuel(RentalVehicleFuel.of().withPercent(fuelRatio).withRange(rangeMeters).build());
 
       String availableUntil = vehicle.getAvailableUntil();
+
       if (StringUtils.hasValue(availableUntil)) {
         builder.withAvailableUntil(Instant.parse(availableUntil));
       }
 
       GBFSRentalUris rentalUris = vehicle.getRentalUris();
+
       if (rentalUris != null) {
         String androidUri = rentalUris.getAndroid();
         String iosUri = rentalUris.getIos();
@@ -114,12 +116,15 @@ class GbfsFreeVehicleStatusMapper {
 
   private I18NString getName(GBFSBike vehicle) {
     var typeId = vehicle.getVehicleTypeId();
+
     if (typeId != null) {
       var type = vehicleTypes.get(typeId);
+
       if (type != null && type.name() != null) {
         return type.name();
       }
     }
+
     return RentalVehicleType.getDefaultType(system.systemId()).name();
   }
 }

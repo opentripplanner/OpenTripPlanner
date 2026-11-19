@@ -95,9 +95,11 @@ class TraversalBanHandlerTest {
     var s0 = new State(v1, req);
     var editor = s0.edit(setupEdge);
     editor.beginFloatingVehicleRenting(RentalFormFactor.SCOOTER_STANDING, null, NETWORK, false);
+
     if (zones.length > 0) {
       editor.initializeGeofencingZones(Set.of(zones));
     }
+
     return editor.makeState();
   }
 
@@ -109,9 +111,11 @@ class TraversalBanHandlerTest {
     var renting = rentEditor.makeState();
     var dropEditor = renting.edit(testEdge);
     dropEditor.dropFloatingVehicle(RentalFormFactor.SCOOTER_STANDING, null, NETWORK, false);
+
     if (zones.length > 0) {
       dropEditor.initializeGeofencingZones(Set.of(zones));
     }
+
     return dropEditor.makeState();
   }
 }

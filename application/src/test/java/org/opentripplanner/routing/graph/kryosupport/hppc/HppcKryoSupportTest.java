@@ -15,8 +15,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 /**
- * Tests the HPPC types without a serializer. The supported types are tested by their own
- * serializer test, like {@link IntHashSetSerializerTest}.
+ * Tests the HPPC types without a serializer. The supported types are tested by their own serializer
+ * test, like {@link IntHashSetSerializerTest}.
  */
 class HppcKryoSupportTest {
 
@@ -46,6 +46,7 @@ class HppcKryoSupportTest {
     while (t.getCause() != null) {
       t = t.getCause();
     }
+
     return t;
   }
 }

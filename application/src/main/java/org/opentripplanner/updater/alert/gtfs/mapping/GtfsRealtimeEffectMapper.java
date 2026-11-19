@@ -16,6 +16,7 @@ public class GtfsRealtimeEffectMapper {
     if (effect == null) {
       return AlertEffect.UNKNOWN_EFFECT;
     }
+
     switch (effect) {
       case NO_SERVICE:
         return AlertEffect.NO_SERVICE;

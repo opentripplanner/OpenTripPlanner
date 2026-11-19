@@ -31,7 +31,8 @@ public class PtModeMapper {
         URBAN_RAILWAY_SERVICE,
         URBAN_RAIL,
         SUBURBAN_RAILWAY_SERVICE,
-        SUBURBAN_RAIL -> TransitMode.RAIL;
+        SUBURBAN_RAIL
+          -> TransitMode.RAIL;
       case COACH, COACH_SERVICE -> TransitMode.COACH;
       case METRO, UNDERGROUND_SERVICE, UNDERGROUND, METRO_SERVICE -> TransitMode.SUBWAY;
       case BUS, BUS_SERVICE -> TransitMode.BUS;

@@ -52,6 +52,7 @@ public class JsonDataListDownloader<T> {
       LOG.warn("Cannot download updates, because url is null!");
       return null;
     }
+
     try {
       return otpHttpClient.getAndMap(URI.create(url), headers, response -> {
         try {
@@ -63,6 +64,7 @@ public class JsonDataListDownloader<T> {
         } catch (IOException e) {
           LOG.warn("Error reading feed from {}", url, e);
         }
+
         return null;
       });
     } catch (OtpHttpClientException e) {
@@ -88,6 +90,7 @@ public class JsonDataListDownloader<T> {
     if (!jsonParsePath.isEmpty()) {
       String delimiter = "/";
       String[] parseElement = jsonParsePath.split(delimiter);
+
       for (String s : parseElement) {
         rootNode = rootNode.path(s);
       }
@@ -101,8 +104,10 @@ public class JsonDataListDownloader<T> {
       if (node == null) {
         continue;
       }
+
       try {
         T parsedElement = elementParser.apply(node);
+
         if (parsedElement != null) {
           out.add(parsedElement);
         }
@@ -110,6 +115,7 @@ public class JsonDataListDownloader<T> {
         LOG.error("Could not process element in JSON list downloaded from {}", url, e);
       }
     }
+
     return out;
   }
 }

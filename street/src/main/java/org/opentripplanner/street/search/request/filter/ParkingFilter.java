@@ -48,15 +48,18 @@ public class ParkingFilter {
         return false;
       }
     }
+
     // not doesn't match and no selects means it matches
     if (select.length == 0) {
       return true;
     }
+
     for (var s : select) {
       if (s.matches(p)) {
         return true;
       }
     }
+
     return false;
   }
 
@@ -73,9 +76,11 @@ public class ParkingFilter {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     ParkingFilter that = (ParkingFilter) o;
     return Arrays.equals(not, that.not) && Arrays.equals(select, that.select);
   }

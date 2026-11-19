@@ -9,8 +9,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * This is the contract between booking info and the router. The router will enforce this
  * information if the request sets the earliest-booking-time request parameter.
  * <p>
- * Either {@code latestBookingTime} and {@code minimumBookingNotice} must be set to an actual
- * value, both can not be set to {@NOT_SET} simultaneously.
+ * Either {@code latestBookingTime} and {@code minimumBookingNotice} must be set to an actual value,
+ * both can not be set to {@NOT_SET} simultaneously.
  * <p>
  * This class is not used by Raptor directly, but used by the BookingTimeAccessEgress which
  * implements the RaptorAccessEgress interface.
@@ -39,11 +39,13 @@ public final class RoutingBookingInfo {
     if (notSet(requestedBookingTime)) {
       throw new IllegalArgumentException("The requestedBookingTime must be set.");
     }
+
     if (notSet(latestBookingTime) && notSet(minimumBookingNotice)) {
       throw new IllegalArgumentException(
         "At least latestBookingTime or minimumBookingNotice must be set."
       );
     }
+
     this.requestedBookingTime = requestedBookingTime;
     this.latestBookingTime = latestBookingTime;
     this.minimumBookingNotice = minimumBookingNotice;
@@ -94,9 +96,11 @@ public final class RoutingBookingInfo {
     if (this == o) {
       return true;
     }
+
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     var other = (RoutingBookingInfo) o;
     return (
       Objects.equals(latestBookingTime, other.latestBookingTime) &&
@@ -149,6 +153,7 @@ public final class RoutingBookingInfo {
         setUnrestricted();
         return this;
       }
+
       withLatestBookingTime(bookingInfo.getLatestBookingTime());
       withMinimumBookingNotice(bookingInfo.getMinimumBookingNotice().orElse(null));
       return this;
@@ -170,9 +175,11 @@ public final class RoutingBookingInfo {
       if (notSet(requestedBookingTime)) {
         return unrestricted();
       }
+
       if (notSet(latestBookingTime) && notSet(minimumBookingNotice)) {
         return RoutingBookingInfo.unrestricted();
       }
+
       return new RoutingBookingInfo(requestedBookingTime, latestBookingTime, minimumBookingNotice);
     }
 

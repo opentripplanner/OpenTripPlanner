@@ -41,9 +41,11 @@ public final class FlexTripForDate {
     if (obj == this) {
       return true;
     }
+
     if (obj == null || obj.getClass() != this.getClass()) {
       return false;
     }
+
     var that = (FlexTripForDate) obj;
     return (
       Objects.equals(this.serviceDate, that.serviceDate) &&

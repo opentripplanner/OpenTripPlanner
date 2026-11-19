@@ -83,9 +83,11 @@ public class RelaxCostType {
     if (input.containsKey(RATIO)) {
       ratio = (Double) input.get(RATIO);
     }
+
     if (input.containsKey(CONSTANT)) {
       constant = (Cost) input.get(CONSTANT);
     }
+
     return CostLinearFunction.of(constant, ratio);
   }
 }

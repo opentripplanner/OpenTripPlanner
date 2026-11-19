@@ -42,12 +42,16 @@ class Deserializer {
       if (matchNewVersionPlusOne && field.deprecated()) {
         continue;
       }
+
       var v = read(field, index);
+
       if (!field.deprecated()) {
         result.add(v);
       }
+
       ++index;
     }
+
     return result;
   }
 
@@ -55,6 +59,7 @@ class Deserializer {
     int matchVersion = (matchVersionPlusOne ? 1 : 0) + definition.version();
 
     int version = readVersion();
+
     if (version != matchVersion) {
       throw new IllegalStateException(
         "Version does not match. Token version: " +

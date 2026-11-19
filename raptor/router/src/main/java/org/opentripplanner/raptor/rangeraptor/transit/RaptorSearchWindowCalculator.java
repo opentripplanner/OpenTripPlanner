@@ -7,8 +7,8 @@ import org.opentripplanner.raptor.api.request.SearchParams;
 /**
  * This is a calculator to dynamically calculate the EDT, LAT, and Raptor-search-window parameters.
  * <p>
- * NOTE ! This calculator is state-full and NOT thread-safe. Create a new one every time you need
- * to calculate theses values.
+ * NOTE ! This calculator is state-full and NOT thread-safe. Create a new one every time you need to
+ * calculate theses values.
  *
  * @see DynamicSearchWindowCoefficients for the rules of operation.
  */
@@ -87,6 +87,7 @@ public class RaptorSearchWindowCalculator {
     if (!params.isEarliestDepartureTimeSet()) {
       earliestDepartureTime = latestArrivalTime - travelWindow;
     }
+
     return this;
   }
 
@@ -96,6 +97,7 @@ public class RaptorSearchWindowCalculator {
         "This operation is not defined for negative numbers: " + minTravelTimeInSeconds
       );
     }
+
     // We want: 0 -> 0, 59 -> 0, 60 -> 60 ...
     return (minTravelTimeInSeconds / 60) * 60;
   }

@@ -35,6 +35,7 @@ class DebugStopArrivalsStatistics {
         arrayLen += stop.internalArrayLength();
       }
     }
+
     double avg = (double) total / numOfStops;
     double arrayLenAvg = (double) arrayLen / numOfStops;
 
@@ -66,9 +67,11 @@ class DebugStopArrivalsStatistics {
     if (number > 1_000_000) {
       return toStr(number / 1_000_000.0) + "\"";
     }
+
     if (number > 1_000) {
       return toStr(number / 1_000.0) + "'";
     }
+
     return Long.toString(number);
   }
 
@@ -76,6 +79,7 @@ class DebugStopArrivalsStatistics {
     if (number > 10) {
       return String.format(ROOT, "%.0f", number);
     }
+
     return String.format(ROOT, "%.1f", number);
   }
 }
