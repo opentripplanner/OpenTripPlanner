@@ -174,9 +174,7 @@ public class StreetLegMapper {
       .withExit(step.highwayExit())
       .withEntrance(mapEntrance(step.entrance()))
       .withVerticalTransportationUse(
-        step.verticalTransportation() == null
-          ? null
-          : verticalTransportationUseFactory.create(step.verticalTransportation())
+        verticalTransportationUseFactory.create(step.verticalTransportation())
       )
       .addElevation(step.elevationProfile())
       .withNameIsDerived(step.nameIsDerived())

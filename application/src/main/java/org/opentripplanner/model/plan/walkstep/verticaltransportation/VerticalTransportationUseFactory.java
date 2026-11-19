@@ -1,6 +1,7 @@
 package org.opentripplanner.model.plan.walkstep.verticaltransportation;
 
 import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.streetdetails.model.InclinedEdgeLevelInfo;
 import org.opentripplanner.service.streetdetails.model.Level;
@@ -22,7 +23,11 @@ public class VerticalTransportationUseFactory {
     this.streetDetailsService = streetDetailsService;
   }
 
-  public VerticalTransportationUse create(VerticalTransportation verticalTransportation) {
+  @Nullable
+  public VerticalTransportationUse create(@Nullable VerticalTransportation verticalTransportation) {
+    if (verticalTransportation == null) {
+      return null;
+    }
     return switch (verticalTransportation) {
       case VerticalTransportation.Elevator e -> createElevatorUse(e.boardEdge(), e.alightEdge());
       case VerticalTransportation.Escalator e -> createEscalatorUse(e.edge());
