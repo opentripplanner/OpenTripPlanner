@@ -8,7 +8,3 @@ This package contains:
   tests in this package are testing the Raptor module as a black box using the _transit model
   mock-up_ found in the `_shared` package.
 - Other _packages_ matching raptor sub-modules contains unit-tests.
-
-
-
-

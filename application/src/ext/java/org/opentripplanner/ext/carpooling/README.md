@@ -1,14 +1,19 @@
 # Carpooling Extension for OpenTripPlanner
 
-The carpooling extension enables OpenTripPlanner to find carpool trip options by matching passenger requests with active driver journeys. Passengers can be dynamically inserted into existing driver routes at optimal pickup and dropoff points while respecting capacity constraints, timing windows, and driver deviation budgets.
+The carpooling extension enables OpenTripPlanner to find carpool trip options by matching passenger
+requests with active driver journeys. Passengers can be dynamically inserted into existing driver
+routes at optimal pickup and dropoff points while respecting capacity constraints, timing windows,
+and driver deviation budgets.
 
 ## Quick Overview
 
 **What it does**: Matches passengers with drivers offering their vehicle journey for ride-sharing.
 
-**Why it exists**: Provides flexible, demand-responsive carpooling as a complement to fixed-route transit.
+**Why it exists**: Provides flexible, demand-responsive carpooling as a complement to fixed-route
+transit.
 
-**How it works**: Pre-filters the driver trips and evaluates the best insertion of the passenger into each from street driving times.
+**How it works**: Pre-filters the driver trips and evaluates the best insertion of the passenger
+into each from street driving times.
 
 ## Key Features
 
@@ -108,24 +113,32 @@ org.opentripplanner.ext.carpooling/
 
 ### Phase 1: Filtering (Fast Pre-screening)
 
-Once the passenger is snapped to the street network, filters eliminate obviously incompatible trips **without any further street routing**. They are necessary conditions only: they never reject a trip that could serve the passenger inside the passenger's window.
+Once the passenger is snapped to the street network, filters eliminate obviously incompatible trips
+**without any further street routing**. They are necessary conditions only: they never reject a trip
+that could serve the passenger inside the passenger's window.
 
-1. **TimeTripFilter**: Can the trip be at the passenger's pickup or dropoff inside the passenger's window (depart-after or arrive-by)? The trip's span is taken as the insertion evaluation times it: from its start to its routed arrival at the destination plus the destination's deviation budget.
-2. **CapacityTripFilter**: Does the car have a free seat on some leg? A car that is full all the way cannot take the passenger.
-3. **CorridorTripFilter** (`CarpoolCorridor.mayServe`): Can the trip's corridor reach the snapped passenger at all? A leg can only serve a point whose beeline detour, driven at the graph's maximum car speed, fits the leg's limit; direct requests check both the pickup and the dropoff.
+1. **TimeTripFilter**: Can the trip be at the passenger's pickup or dropoff inside the passenger's
+   window (depart-after or arrive-by)? The trip's span is taken as the insertion evaluation times
+   it: from its start to its routed arrival at the destination plus the destination's deviation
+   budget.
+2. **CapacityTripFilter**: Does the car have a free seat on some leg? A car that is full all the way
+   cannot take the passenger.
+3. **CorridorTripFilter** (`CarpoolCorridor.mayServe`): Can the trip's corridor reach the snapped
+   passenger at all? A leg can only serve a point whose beeline detour, driven at the graph's
+   maximum car speed, fits the leg's limit; direct requests check both the pickup and the dropoff.
 
 **Performance**: O(n) where n = number of active trips.
 
 ### Phase 2: Insertion Optimization (Finding Best Position)
 
-For every candidate trip the `InsertionEvaluator` picks the pair of legs (one for the pickup,
-one for the dropoff, possibly the same) that adds the least driving time while every later stop
-stays within its deviation budget and the car has a free seat on every leg the passenger rides.
+For every candidate trip the `InsertionEvaluator` picks the pair of legs (one for the pickup, one
+for the dropoff, possibly the same) that adds the least driving time while every later stop stays
+within its deviation budget and the car has a free seat on every leg the passenger rides.
 
 Where the driving times come from:
 
-- **Direct**: the street trees of the passenger's pickup and dropoff (`CarpoolTreeStreetRouter`)
-  and the candidate trips' corridors, as for access/egress below but without the stops.
+- **Direct**: the street trees of the passenger's pickup and dropoff (`CarpoolTreeStreetRouter`) and
+  the candidate trips' corridors, as for access/egress below but without the stops.
 - **Access/egress**: when a trip arrives, `CorridorBuilder` computes its `CarpoolCorridor`: the
   routed baseline legs and, per leg, every transit stop inside the leg's feasibility ellipse with
   the driving times to serve it. A request then builds only the passenger's two street trees
@@ -233,7 +246,8 @@ Represents a driver's journey offering carpool seats:
 - **startTime**: When the driver departs
 - **endTime**: When the driver arrives
 - **totalCapacity**: Number of seats in the car, including the driver seat
-- **stops**: Ordered list of waypoints; the first stop is the origin, the last is the destination, and booked passenger stops are inserted in between
+- **stops**: Ordered list of waypoints; the first stop is the origin, the last is the destination,
+  and booked passenger stops are inserted in between
 - **provider**: Source system identifier
 
 ### CarpoolStop
@@ -242,11 +256,14 @@ Waypoint along a carpool route:
 
 - **coordinate**: Geographic location
 - **aimedArrivalTime**: Planned arrival time (null for the origin stop)
-- **expectedArrivalTime**: Currently expected arrival time, updated via real-time (null for the origin stop)
-- **latestExpectedArrivalTime**: Latest arrival time the driver commits to (null if not provided); used to derive `deviationBudget`
+- **expectedArrivalTime**: Currently expected arrival time, updated via real-time (null for the
+  origin stop)
+- **latestExpectedArrivalTime**: Latest arrival time the driver commits to (null if not provided);
+  used to derive `deviationBudget`
 - **aimedDepartureTime**: Planned departure time (null for the destination stop)
 - **expectedDepartureTime**: Currently expected departure time (null for the destination stop)
-- **deviationBudget**: Extra time the driver is willing to spend on deviations before reaching this stop
+- **deviationBudget**: Extra time the driver is willing to spend on deviations before reaching this
+  stop
 - **onboardCount**: Number of passengers onboard (including the driver) when departing this stop
 
 ### InsertionCandidate
@@ -257,15 +274,18 @@ Result of finding optimal passenger insertion:
 - **pickupPosition**: 0-based index of the passenger's pickup in the modified route
 - **dropoffPosition**: 0-based index of the passenger's dropoff in the modified route
 - **routeSegments**: The `RoutedSegment`s forming the complete modified route
-- **stopDuration**: Dwell time added at each intermediate stop (from the car routing preferences' `pickupTime`)
+- **stopDuration**: Dwell time added at each intermediate stop (from the car routing preferences'
+  `pickupTime`)
 - **transitStop**: Passenger's access/egress stop, if any
-- **totalTripDuration**: Total trip duration including driving and stop delays, computed from `routeSegments` and `stopDuration`
+- **totalTripDuration**: Total trip duration including driving and stop delays, computed from
+  `routeSegments` and `stopDuration`
 
 ## Performance Characteristics
 
 ### Performance Bottlenecks
 
 If performance degrades:
+
 1. **Too many candidate trips near the passenger**: at most 30 are evaluated per request, but the
    passenger's trees have to reach all of their waypoints
 2. **Large route deviation budgets**: widen the feasibility ellipses, so corridors hold more stops
@@ -368,4 +388,4 @@ void testCarpoolingRouting() {
 2. **Car routing enabled**: Verify street mode CAR is allowed
 3. **Check routing logs**: Look for "Routing failed" warnings
 4. **Verify coordinates**: Ensure pickup/dropoff are valid coordinates
-5. 
+5.

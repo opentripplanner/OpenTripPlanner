@@ -2,7 +2,9 @@
 
 ## Overview
 
-The carpooling extension enables passengers to join existing driver journeys by being picked up and dropped off along the driver's route. The system finds optimal insertion points for new passengers while respecting capacity constraints, time windows, and route deviation budgets.
+The carpooling extension enables passengers to join existing driver journeys by being picked up and
+dropped off along the driver's route. The system finds optimal insertion points for new passengers
+while respecting capacity constraints, time windows, and route deviation budgets.
 
 ## Package Structure
 
@@ -44,32 +46,40 @@ org.opentripplanner.ext.carpooling/
 
 ## Trip Matching Algorithm
 
-The carpooling service uses a multi-phase algorithm to match passengers with compatible carpool trips:
+The carpooling service uses a multi-phase algorithm to match passengers with compatible carpool
+trips:
 
 ### 1. Pre-Filter Phase
+
 Fast pre-screening, once the passenger is snapped to the street network, to eliminate incompatible
 trips using necessary conditions only (loose bounds); tight enforcement is deferred to the
 post-filter once actual times are known:
+
 - **TimeTripFilter**: the trip's time span overlaps the passenger's time window
 - **CapacityTripFilter**: the car has a free seat on some leg
 - **CorridorTripFilter**: the trip's corridor can reach the snapped passenger
   (`CarpoolCorridor.mayServe`)
 
 ### 2. Routing Phase
+
 Optimal insertion point calculation:
+
 - Uses beeline estimates to bound the passenger's trees
 - Every pair of pickup and dropoff legs is evaluated in constant time from the driving times
 - Selects the pair with minimum additional travel time that keeps a free seat on every leg the
   passenger rides and fits the deviation budget of every stop it delays
 
 ### 3. Post-Filter Phase
+
 Applied to fully-routed itineraries with actual computed times:
+
 - **TimeItineraryFilter**: Tight enforcement of the passenger's depart-after / arrive-by window
   against the itinerary's real start/end times
 
 ## Multi-Stop Support
 
 The system handles trips with multiple existing passengers:
+
 - Each stop tracks passenger count changes (pickups and dropoffs)
 - Capacity validation ensures vehicle is never over capacity
 - Route optimization considers all existing stops when inserting new passengers
@@ -78,22 +88,32 @@ The system handles trips with multiple existing passengers:
 ## Integration Points
 
 ### GraphQL API
-Carpooling results are integrated into the standard OTP GraphQL API. Carpool legs appear as a distinct leg mode (`CARPOOL`) in multi-modal itineraries, similar to how transit, walking, and biking legs are represented.
+
+Carpooling results are integrated into the standard OTP GraphQL API. Carpool legs appear as a
+distinct leg mode (`CARPOOL`) in multi-modal itineraries, similar to how transit, walking, and
+biking legs are represented.
 
 ### SIRI-ET Updater
-The `SiriETCarpoolingUpdater` receives real-time updates about carpool trips via SIRI-ET (Estimated Timetable) messages. The `CarpoolSiriMapper` maps SIRI-ET data to the internal domain model:
+
+The `SiriETCarpoolingUpdater` receives real-time updates about carpool trips via SIRI-ET (Estimated
+Timetable) messages. The `CarpoolSiriMapper` maps SIRI-ET data to the internal domain model:
+
 - `EstimatedVehicleJourneyCode` → Trip ID
 - `EstimatedCalls` → Stops on the carpooling trip
 
 ## Design Decisions
 
 ### Static Deviation Budget
-Currently assumes a 15 minute budget for carpooling. Future versions will support configurable or dynamically negotiated deviation budgets.
+
+Currently assumes a 15 minute budget for carpooling. Future versions will support configurable or
+dynamically negotiated deviation budgets.
 
 ### Static Capacity
+
 Available seats are static trip properties. There is no reservation system yet.
 
 ### Time Windows
-Both depart-after and arrive-by requests are supported. The pre-filter uses loose bounds
-(necessary conditions) to limit routing cost; the post-filter enforces the passenger's window
-tightly against the routed itinerary times.
+
+Both depart-after and arrive-by requests are supported. The pre-filter uses loose bounds (necessary
+conditions) to limit routing cost; the post-filter enforces the passenger's window tightly against
+the routed itinerary times.

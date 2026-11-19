@@ -3,8 +3,8 @@
 This package contains a router, which produces access and egress legs for the RAPTOR algorithm, as
 well as flex-only itineraries
 
-The data format is based on
-the [GTFS-Flex v2.1 draft](https://github.com/MobilityData/gtfs-flex/blob/master/spec/reference.md).
+The data format is based on the
+[GTFS-Flex v2.1 draft](https://github.com/MobilityData/gtfs-flex/blob/master/spec/reference.md).
 
 ## Algorithm
 
@@ -32,13 +32,13 @@ FlexTrip class, with the required methods.
 This type of trip consists any number of service areas, with a set operating window. The trip is
 possible at any time within the set window, and the class can represent multiple potential trips.
 
-You can travel from a stop time to any other stop time that comes later in the order of stop times 
+You can travel from a stop time to any other stop time that comes later in the order of stop times
 but not the other way around (even when the time windows would otherwise allow this). If you want
 this to happen then you need to create a trip going the opposite direction.
 
-Note, that in a case of three or more flex zones the GTFS Flex spec doesn't exactly specify what
-the driving duration is to go from the first to the third zone or if indeed the second zone needs to 
-be passed through.
+Note, that in a case of three or more flex zones the GTFS Flex spec doesn't exactly specify what the
+driving duration is to go from the first to the third zone or if indeed the second zone needs to be
+passed through.
 
 This topic is discussed in https://github.com/MobilityData/gtfs-flex/issues/76
 
