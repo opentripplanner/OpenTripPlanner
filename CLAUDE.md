@@ -21,7 +21,7 @@ mvn test
 # Run tests with code coverage
 mvn jacoco:prepare-agent test
 
-# Skip the code formatting (Java formatter and Spotless) during local builds
+# Skip the code formatting (Java, JSON and Markdown formatter and Spotless) during local builds
 mvn test -Djcf         # equivalently: mvn test -PjcfSkip
 
 # Regenerate API/itinerary snapshot tests
@@ -33,13 +33,13 @@ mvn clean -Pclean-test-snapshots
 Quality gates run in the Maven `validate` / `process-sources` phases and fail the build on
 violations:
 
-- **Java code formatter** (`java-formatter-maven-plugin`) formats Java code and Javadoc (100-char
-  width, 2-space indent, all comment rules on; the options are in `.jcf/config.properties`). It
-  needs Maven on JDK 25+. CI enforces it with `-PjcfCheck`; check with `mvn jcf:check`, format with
-  `mvn jcf:format`. Skip locally with `-Djcf`.
+- **Java code formatter** (`java-formatter-maven-plugin`) formats Java code, Javadoc, JSON and
+  Markdown (100-char width, 2-space indent, all comment rules on; the options are in
+  `.jcf/config.properties`). It needs Maven on JDK 25+. CI enforces it with `-PjcfCheck`; check with
+  `mvn jcf:check`, format with `mvn jcf:format`. Skip locally with `-Djcf`.
 - **Spotless** removes unused imports from Java (Javadoc-only references are kept) and formats
-  Markdown, JSON and GraphQL with **Prettier**. Requires `node`/`npm` on the `PATH`; check with
-  `mvn spotless:check`, format with `mvn spotless:apply`.
+  GraphQL with **Prettier**. Requires `node`/`npm` on the `PATH`; check with `mvn spotless:check`,
+  format with `mvn spotless:apply`.
 - **Checkstyle** runs against `checkstyle.xml` in the `process-sources` phase (after Spotless). Skip
   with `-Dcs` (or `-PcheckstyleSkip`).
 

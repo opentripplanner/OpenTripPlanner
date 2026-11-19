@@ -96,10 +96,10 @@
         <plugin.spotless.goal>apply</plugin.spotless.goal>
         <plugin.spotless.skip>false</plugin.spotless.skip>
         <!-- The Java code formatter, see .jcf/config.properties for the format options -->
-        <plugin.jcf.version>1.0.0</plugin.jcf.version>
+        <plugin.jcf.version>1.1.0</plugin.jcf.version>
         <plugin.jcf.goal>format</plugin.jcf.goal>
         <plugin.jcf.skip>false</plugin.jcf.skip>
-        <!-- The npm package used by the Spotless 'prettier' steps (Markdown, JSON and GraphQL) -->
+        <!-- The npm package used by the Spotless 'prettier' steps (GraphQL) -->
         <prettier.version>3.9.6</prettier.version>
         <plugin.rewrite.skip>true</plugin.rewrite.skip>
         <skip-source-and-javadoc>true</skip-source-and-javadoc>
@@ -132,11 +132,13 @@
                 </plugin>
                 <plugin>
                     <!--
-                      Formats the Java source code, or checks that it is formatted. How the code is
-                      formatted is configured in '.jcf/config.properties', not here. The source roots
-                      are listed explicitly because the sandbox roots ('src/ext/java' and
-                      'src/ext-test/java') are added by the build-helper plugin after this plugin
-                      has run.
+                      Formats the Java source code, JSON and Markdown, or checks that they are
+                      formatted. How the files are formatted is configured in
+                      '.jcf/config.properties', not here. The source roots are listed explicitly
+                      because some roots (the sandbox 'src/ext/java' in the application module) are
+                      added by the build-helper plugin after this plugin has run. Only the roots
+                      common to all modules are listed here, the application module adds the
+                      sandbox roots.
                     -->
                     <groupId>org.opentripplanner.java.code.formatter</groupId>
                     <artifactId>java-formatter-maven-plugin</artifactId>
@@ -145,10 +147,11 @@
                         <skip>${plugin.jcf.skip}</skip>
                         <sourceRoots>
                             <sourceRoot>src/main/java</sourceRoot>
+                            <sourceRoot>src/main/resources</sourceRoot>
                             <sourceRoot>src/test/java</sourceRoot>
+                            <sourceRoot>src/test/resources</sourceRoot>
                             <sourceRoot>src/test-fixtures/java</sourceRoot>
-                            <sourceRoot>src/ext/java</sourceRoot>
-                            <sourceRoot>src/ext-test/java</sourceRoot>
+                            <sourceRoot>src/test-fixtures/resources</sourceRoot>
                         </sourceRoots>
                     </configuration>
                     <executions>
@@ -164,13 +167,9 @@
                 <plugin>
                     <!--
                       Spotless removes unused imports from the Java code and runs Prettier to
-                      format Markdown, JSON and GraphQL files. The Java code is formatted by the
+                      format GraphQL files. The Java code, JSON and Markdown are formatted by the
                       java-formatter-maven-plugin, see above.
                       Note! Spotless requires node/npm to be available on the PATH.
-
-                      The Prettier options are configured inline below. Spotless resolves the
-                      options up-front, without a file path, so a Prettier config file with
-                      'overrides' per file type would not work.
                     -->
                     <groupId>com.diffplug.spotless</groupId>
                     <artifactId>spotless-maven-plugin</artifactId>
@@ -203,30 +202,10 @@
                         <formats>
                             <format>
                                 <includes>
-                                    <include>src/main/java/**/*.md</include>
-                                </includes>
-                                <excludes>
-                                    <exclude>**/node_modules/**</exclude>
-                                </excludes>
-                                <prettier>
-                                    <devDependencies>
-                                        <prettier>${prettier.version}</prettier>
-                                    </devDependencies>
-                                    <config>
-                                        <parser>markdown</parser>
-                                        <proseWrap>always</proseWrap>
-                                        <printWidth>100</printWidth>
-                                    </config>
-                                </prettier>
-                            </format>
-                            <format>
-                                <includes>
-                                    <include>src/**/*.json</include>
                                     <include>src/test/resources/org/opentripplanner/apis/**/*.graphql</include>
                                 </includes>
                                 <excludes>
                                     <exclude>**/node_modules/**</exclude>
-                                    <exclude>src/test/resources/org/opentripplanner/apis/vectortiles/style.json</exclude>
                                 </excludes>
                                 <prettier>
                                     <devDependencies>
@@ -252,40 +231,37 @@
             <plugin>
                 <groupId>org.opentripplanner.java.code.formatter</groupId>
                 <artifactId>java-formatter-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <!-- The root module only formats the documentation. The modules format
+                             their own files. -->
+                        <id>java-format-root</id>
+                        <phase>validate</phase>
+                        <inherited>false</inherited>
+                        <goals>
+                            <goal>${plugin.jcf.goal}</goal>
+                        </goals>
+                        <configuration>
+                            <sourceRoots combine.self="override">
+                                <sourceRoot>doc</sourceRoot>
+                            </sourceRoots>
+                            <excludes>
+                                <!-- Skip doc/user/**/*.md files. Many of these files are
+                                     generated by JUnit tests and the CI pipeline. To avoid
+                                     conflicts we skip these for now. -->
+                                <exclude>user/**</exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>com.diffplug.spotless</groupId>
                 <artifactId>spotless-maven-plugin</artifactId>
                 <inherited>false</inherited>
                 <configuration>
-                    <!-- The root module only formats the Markdown documentation -->
-                    <java combine.self="override"/>
-                    <formats combine.self="override">
-                        <format>
-                            <includes>
-                                <include>*.md</include>
-                                <include>doc/**/*.md</include>
-                            </includes>
-                            <excludes>
-                                <exclude>**/node_modules/**</exclude>
-                                <!-- Skip doc/user/**/*.md files. Many of these files are generated
-                                     by JUnit tests and the CI pipeline. To avoid conflicts we skip
-                                     these for now.
-                                -->
-                                <exclude>doc/user/**/*.md</exclude>
-                            </excludes>
-                            <prettier>
-                                <devDependencies>
-                                    <prettier>${prettier.version}</prettier>
-                                </devDependencies>
-                                <config>
-                                    <parser>markdown</parser>
-                                    <proseWrap>always</proseWrap>
-                                    <printWidth>100</printWidth>
-                                </config>
-                            </prettier>
-                        </format>
-                    </formats>
+                    <!-- Nothing to do in the root module, the formatter handles the Markdown -->
+                    <skip>true</skip>
                 </configuration>
             </plugin>
             <plugin>

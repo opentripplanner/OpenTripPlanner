@@ -544,6 +544,22 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.opentripplanner.java.code.formatter</groupId>
+                <artifactId>java-formatter-maven-plugin</artifactId>
+                <configuration>
+                    <sourceRoots combine.children="append">
+                        <sourceRoot>src/ext/java</sourceRoot>
+                        <sourceRoot>src/ext/resources</sourceRoot>
+                        <sourceRoot>src/ext-test/java</sourceRoot>
+                        <sourceRoot>src/ext-test/resources</sourceRoot>
+                    </sourceRoots>
+                    <excludes>
+                        <!-- Keep the style file as it is, it is not formatted like other JSON -->
+                        <exclude>**/apis/vectortiles/style.json</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>com.diffplug.spotless</groupId>
                 <artifactId>spotless-maven-plugin</artifactId>
             </plugin>
