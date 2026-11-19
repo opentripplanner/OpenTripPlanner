@@ -10,7 +10,7 @@ import org.opentripplanner.street.search.state.State;
 
 /**
  * The start or end of a {@link StreetLeg}. This is a temporary type that exposes some internal
- * street model entites. It will be refactored in the future.
+ * street model entities. It will be refactored in the future.
  *
  * @param vertex                 The vertex where the leg starts or ends
  * @param name                   A display name for the place. For intersections this is derived
