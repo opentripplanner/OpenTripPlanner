@@ -63,7 +63,7 @@ class StreetPathToLegsMapperTest {
     assertThat(external.startTime()).isEqualTo(walk.getTime());
     assertThat(external.endTime()).isEqualTo(walk.getTime().plusSeconds(600));
     assertThat(external.generalizedCost()).isEqualTo(700);
-    assertThat(external.distanceMeters()).isEqualTo(5000);
+    assertThat(external.distance_m()).isEqualTo(5000);
     assertThat(external.geometry()).isEqualTo(edge.getGeometry());
     assertThat(external.rentedVehicle()).isFalse();
     assertThat(external.vehicleRentalNetwork()).isNull();

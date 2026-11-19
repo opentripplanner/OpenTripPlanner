@@ -28,7 +28,7 @@ public record ExternalEdgeLeg(
   Instant endTime,
   StreetLegPlace from,
   StreetLegPlace to,
-  double distanceMeters,
+  double distance_m,
   int generalizedCost,
   LineString geometry,
   boolean rentedVehicle,
@@ -43,5 +43,10 @@ public record ExternalEdgeLeg(
   @Override
   public List<StreetStep> steps() {
     return List.of();
+  }
+
+  @Override
+  public double distanceMeters() {
+    return distance_m;
   }
 }
