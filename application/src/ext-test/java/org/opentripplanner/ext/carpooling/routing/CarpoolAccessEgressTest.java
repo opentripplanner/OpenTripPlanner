@@ -24,6 +24,7 @@ class CarpoolAccessEgressTest {
   private static final int STOP = 0;
   private static final Duration STOP_DURATION = Duration.ofMinutes(2);
   private static final int DWELL_SECONDS = (int) STOP_DURATION.getSeconds();
+  private static final int BOARD_COST = 0;
   private static final int PICKUP_POSITION = 1;
   private static final int DROPOFF_POSITION = 2;
   private static final Duration PICKUP_SEGMENT_DURATION = Duration.ofMinutes(1);
@@ -152,6 +153,29 @@ class CarpoolAccessEgressTest {
     assertFalse(access.isRentingVehicleFromStation());
   }
 
+  @Test
+  void c1IncludesBoardCostOnce() {
+    var withoutBoardCost = newAccessEgress(0, null, Duration.ofSeconds(60), null, 1.0, 0);
+    var withBoardCost = newAccessEgress(0, null, Duration.ofSeconds(60), null, 1.0, 2400);
+
+    assertEquals(
+      RaptorCostConverter.toRaptorCost(2400),
+      withBoardCost.c1() - withoutBoardCost.c1()
+    );
+  }
+
+  @Test
+  void withPenaltyKeepsBoardCost() {
+    var original = newAccessEgress(0, null, Duration.ofSeconds(60), null, 1.0, 2400);
+
+    var withPenalty = (CarpoolAccessEgress) original.withPenalty(
+      new TimeAndCost(Duration.ofSeconds(30), Cost.costOfSeconds(45))
+    );
+
+    int rideSeconds = 60 + DWELL_SECONDS;
+    assertEquals(rideSeconds * 1.0 + 2400, withPenalty.getPassengerRideWeight());
+  }
+
   /**
    * Builds a CarpoolAccessEgress with the passenger picked up mid-trip (pickupPos = 1, dropoffPos =
    * 2). The route segments list is therefore [pickupSegment, sharedSegment]: the driver runs the
@@ -172,8 +196,7 @@ class CarpoolAccessEgressTest {
       sharedSegmentDuration,
       walkFromDropoff,
       carpoolReluctance,
-      EndpointLabel.EMPTY,
-      EndpointLabel.EMPTY
+      BOARD_COST
     );
   }
 
@@ -183,8 +206,7 @@ class CarpoolAccessEgressTest {
     Duration sharedSegmentDuration,
     @Nullable StreetPath walkFromDropoff,
     double carpoolReluctance,
-    EndpointLabel startLabel,
-    EndpointLabel endLabel
+    int boardCost
   ) {
     var candidate = new InsertionCandidate(
       createSimpleTrip(OSLO_CENTER, OSLO_NORTH),
@@ -202,8 +224,9 @@ class CarpoolAccessEgressTest {
       candidate,
       TimeAndCost.ZERO,
       carpoolReluctance,
-      startLabel,
-      endLabel
+      boardCost,
+      EndpointLabel.EMPTY,
+      EndpointLabel.EMPTY
     );
   }
 }

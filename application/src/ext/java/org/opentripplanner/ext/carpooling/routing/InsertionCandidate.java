@@ -150,10 +150,11 @@ public record InsertionCandidate(
 
   /**
    * Generalized cost of the passenger's ride in raw weight units (seconds-equivalent), equal to
-   * {@link #getPassengerRideDuration()} multiplied by {@code carpoolReluctance}.
+   * {@link #getPassengerRideDuration()} multiplied by {@code carpoolReluctance}, plus a fixed
+   * {@code boardCost} for getting into the car.
    */
-  public double getPassengerRideWeight(double carpoolReluctance) {
-    return getPassengerRideDuration().getSeconds() * carpoolReluctance;
+  public double getPassengerRideWeight(double carpoolReluctance, int boardCost) {
+    return getPassengerRideDuration().getSeconds() * carpoolReluctance + boardCost;
   }
 
   private static Duration totalSegmentDuration(
