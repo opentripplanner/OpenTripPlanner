@@ -1,7 +1,6 @@
 {
   "configVersion": "Performance Test Switzerland",
-  "server": {
-  },
+  "server": {},
   "routingDefaults": {
     "bicycle": {
       // Should not be used - a high cost indicate an error
@@ -53,8 +52,6 @@
       "PREFERRED": 0
     }
   },
-  "flex": {
-  },
-  "updaters": [
-  ]
+  "flex": {},
+  "updaters": []
 }

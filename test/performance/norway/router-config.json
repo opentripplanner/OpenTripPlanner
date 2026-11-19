@@ -83,19 +83,13 @@
     "transitGroupPriority": {
       "global": [
         {
-          "modes": [
-            "AIRPLANE"
-          ]
+          "modes": ["AIRPLANE"]
         },
         {
-          "subModes": [
-            "localCarFerry"
-          ]
+          "subModes": ["localCarFerry"]
         },
         {
-          "agencies": [
-            "RB:FLT:Authority:FLT"
-          ]
+          "agencies": ["RB:FLT:Authority:FLT"]
         },
         {
           "subModes": [
@@ -122,25 +116,16 @@
           ]
         },
         {
-          "agencies": [
-            "RB:VYB:Authority:1",
-            "RB:VYX:Authority:1"
-          ]
+          "agencies": ["RB:VYB:Authority:1", "RB:VYX:Authority:1"]
         },
         {
-          "agencies": [
-            "RB:FLI:Authority:FlixMobility"
-          ]
+          "agencies": ["RB:FLI:Authority:FlixMobility"]
         },
         {
-          "agencies": [
-            "RB:NBU:Authority:002"
-          ]
+          "agencies": ["RB:NBU:Authority:002"]
         },
         {
-          "agencies": [
-            "RB:NWY:Authority:d1ea7af1-3c2a-4825-893f-21408ef08480"
-          ]
+          "agencies": ["RB:NWY:Authority:d1ea7af1-3c2a-4825-893f-21408ef08480"]
         }
       ]
     }
@@ -167,10 +152,10 @@
   },
   "updaters": [
     {
-      "type" : "vehicle-rental",
-      "sourceType" : "gbfs",
-      "frequency" : "1h",
-      "url" : "https://otp-performance.leonard.io/data/norway/tieroslo/gbfs.json",
+      "type": "vehicle-rental",
+      "sourceType": "gbfs",
+      "frequency": "1h",
+      "url": "https://otp-performance.leonard.io/data/norway/tieroslo/gbfs.json",
       "geofencing": {
         "enabled": true
       }

@@ -1,5 +1,5 @@
 {
-  "transitServiceStart" : "2022-05-01",
+  "transitServiceStart": "2022-05-01",
   "transitServiceEnd": "2022-12-30",
   "transitModelTimeZone": "Europe/Oslo",
   "areaVisibility": true,
@@ -18,10 +18,10 @@
     "osmTagMapping": "norway",
     "timeZone": "Europe/Oslo"
   },
-  "netexDefaults" : {
-    "sharedFilePattern" : "ST_stops.xml",
-    "sharedGroupFilePattern" : "(\\w{2})_shared_data.xml",
-    "groupFilePattern" : "(\\w{2})_line.*\\.xml",
+  "netexDefaults": {
+    "sharedFilePattern": "ST_stops.xml",
+    "sharedGroupFilePattern": "(\\w{2})_shared_data.xml",
+    "groupFilePattern": "(\\w{2})_line.*\\.xml",
     "feedId": "ST",
     "noTransfersOnIsolatedStops": true
   },
