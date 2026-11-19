@@ -49,4 +49,9 @@ public record ExternalEdgeLeg(
   public double distanceMeters() {
     return distance_m;
   }
+
+  @Override
+  public TraverseMode computeMode() {
+    return mode;
+  }
 }

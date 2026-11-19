@@ -24,7 +24,7 @@ class StreetPathToLegsMapperTest {
 
     assertThat(legs).hasSize(1);
     var leg = legs.getFirst();
-    assertThat(leg.mode()).isEqualTo(TraverseMode.WALK);
+    assertThat(leg.computeMode()).isEqualTo(TraverseMode.WALK);
     assertThat(leg.steps()).hasSize(2);
     assertThat(leg.distanceMeters()).isEqualTo(200);
     assertThat(leg.rentedVehicle()).isFalse();
@@ -39,8 +39,8 @@ class StreetPathToLegsMapperTest {
     assertThat(legs).hasSize(2);
     var walk = legs.get(0);
     var car = legs.get(1);
-    assertThat(walk.mode()).isEqualTo(TraverseMode.WALK);
-    assertThat(car.mode()).isEqualTo(TraverseMode.CAR);
+    assertThat(walk.computeMode()).isEqualTo(TraverseMode.WALK);
+    assertThat(car.computeMode()).isEqualTo(TraverseMode.CAR);
     assertThat(car.rentedVehicle()).isTrue();
     assertThat(walk.endTime()).isEqualTo(car.startTime());
   }
@@ -57,7 +57,7 @@ class StreetPathToLegsMapperTest {
     assertThat(legs.get(0)).isInstanceOf(DefaultStreetLeg.class);
     var external = (ExternalEdgeLeg) legs.get(1);
     assertThat(external.edge()).isSameInstanceAs(edge);
-    assertThat(external.mode()).isEqualTo(TraverseMode.FLEX);
+    assertThat(external.computeMode()).isEqualTo(TraverseMode.FLEX);
     assertThat(external.from().vertex()).isEqualTo(walk.getVertex());
     assertThat(external.to().vertex()).isEqualTo(StreetModelFactory.V3);
     assertThat(external.startTime()).isEqualTo(walk.getTime());

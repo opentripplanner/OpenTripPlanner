@@ -56,7 +56,7 @@ final class DefaultStreetLeg implements StreetLeg {
   }
 
   @Override
-  public TraverseMode mode() {
+  public TraverseMode computeMode() {
     return (
       path
         .states()

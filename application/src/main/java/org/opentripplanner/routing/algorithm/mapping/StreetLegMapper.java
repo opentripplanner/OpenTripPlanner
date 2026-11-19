@@ -112,7 +112,7 @@ public class StreetLegMapper {
     @Nullable Duration delay
   ) {
     var builder = org.opentripplanner.model.plan.leg.StreetLeg.of()
-      .withMode(leg.mode())
+      .withMode(leg.computeMode())
       .withStartTime(timeWithDelay(leg.startTime(), delay))
       .withEndTime(timeWithDelay(leg.endTime(), delay))
       .withFrom(mapPlace(leg.from(), viaLocations))

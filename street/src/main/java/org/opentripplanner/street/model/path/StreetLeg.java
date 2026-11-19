@@ -20,7 +20,7 @@ public interface StreetLeg {
   /**
    * The mode of the leg. If a vehicle is rented, this is the mode of the rented vehicle.
    */
-  TraverseMode mode();
+  TraverseMode computeMode();
 
   StreetLegPlace from();
 
