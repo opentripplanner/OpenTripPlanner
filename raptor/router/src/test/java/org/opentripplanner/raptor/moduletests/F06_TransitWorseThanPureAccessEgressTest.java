@@ -14,7 +14,6 @@ import org.opentripplanner.raptor.configure.RaptorTestFactory;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.minDuration;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
 
@@ -56,7 +55,7 @@ public class F06_TransitWorseThanPureAccessEgressTest implements RaptorTestConst
     static List<RaptorModuleTestCase> testCases() {
         var path = "";
         return RaptorModuleTestCase.of()
-                .add(minDuration(), "")
+                .addMinDuration("13m", -1, T00_00, T00_30)
                 .add(standard(), PathUtils.withoutCost(path))
                 .add(multiCriteria(), path)
                 .build();
