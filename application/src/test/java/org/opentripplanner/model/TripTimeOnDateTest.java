@@ -266,6 +266,35 @@ class TripTimeOnDateTest {
     assertEquals(stopC, third.getScheduledStop(shorterScheduledPattern));
   }
 
+  @Test
+  void testScheduledStopWhenRealTimePatternIsExtendedWithoutExtraCallFlags() {
+    // The real-time update extends the trip beyond its scheduled terminus, but the added stops are
+    // not flagged as extra calls. This must not throw, the real-time stop is used instead.
+    var route = TransitRepositoryForTest.route("R1").build();
+    var stopA = TEST_MODEL.stop("A").build();
+    var stopB = TEST_MODEL.stop("B").build();
+    var stopC = TEST_MODEL.stop("C").build();
+    var stopD = TEST_MODEL.stop("D").build();
+
+    var scheduledPattern = TransitRepositoryForTest.tripPattern("P1", route)
+      .withStopPattern(TransitRepositoryForTest.stopPattern(stopA, stopB))
+      .build();
+    var realTimePattern = TransitRepositoryForTest.tripPattern("P1", route)
+      .withStopPattern(TransitRepositoryForTest.stopPattern(stopA, stopB, stopC, stopD))
+      .build();
+    var tripTimes = tripTimesFor(4).createRealTimeFromScheduledTimes().build();
+
+    var calls = List.of(0, 1, 2, 3)
+      .stream()
+      .map(pos -> new TripTimeOnDate(tripTimes, pos, realTimePattern))
+      .toList();
+
+    assertEquals(stopA, calls.get(0).getScheduledStop(scheduledPattern));
+    assertEquals(stopB, calls.get(1).getScheduledStop(scheduledPattern));
+    assertEquals(stopC, calls.get(2).getScheduledStop(scheduledPattern));
+    assertEquals(stopD, calls.get(3).getScheduledStop(scheduledPattern));
+  }
+
   private static TripTimes<?> tripTimesFor(int stops) {
     var trip = TransitRepositoryForTest.trip("123").build();
     var stopTimes = TEST_MODEL.stopTimesEvery5Minutes(stops, trip, "11:00");
