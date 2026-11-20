@@ -34,12 +34,12 @@ class VehiclePositionUpdaterRunnable implements GraphWriterRunnable<TransitRealT
       feedId,
       timetableRepository::getTrip,
       timetableRepository::findPattern,
-      timetableRepository::findPattern,
       timetableRepository.getTripCalendars()::listServiceDates,
       context.realtimeVehicleRepository(),
       context.transitRepository().getTimeZone(),
       fuzzyTripMatching ? context.gtfsRealtimeFuzzyTripMatcher() : null,
-      vehiclePositionFeatures
+      vehiclePositionFeatures,
+      timetableRepository::resolve
     );
     // Apply new vehicle positions
     matcher.applyRealtimeVehicleUpdates(updates);

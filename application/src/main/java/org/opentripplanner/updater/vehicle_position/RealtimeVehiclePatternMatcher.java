@@ -68,8 +68,9 @@ class RealtimeVehiclePatternMatcher {
   private final ZoneId timeZoneId;
 
   private final Function<FeedScopedId, Trip> getTripForId;
-  private final Function<Trip, TripPattern> getStaticPattern;
   private final BiFunction<Trip, LocalDate, TripPattern> getRealtimePattern;
+  /** Timetable for a pattern on a service date, including realtime extra journeys. */
+  private final BiFunction<TripPattern, LocalDate, Timetable> getTimetable;
   private final GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
   private final Set<VehiclePositionsUpdaterConfig.VehiclePositionFeature> vehiclePositionFeatures;
   private final Function<FeedScopedId, Set<LocalDate>> getServiceDatesForServiceId;
@@ -77,18 +78,18 @@ class RealtimeVehiclePatternMatcher {
   public RealtimeVehiclePatternMatcher(
     String feedId,
     Function<FeedScopedId, Trip> getTripForId,
-    Function<Trip, TripPattern> getStaticPattern,
     BiFunction<Trip, LocalDate, TripPattern> getRealtimePattern,
     Function<FeedScopedId, Set<LocalDate>> getServiceDatesForServiceId,
     RealtimeVehicleRepository repository,
     ZoneId timeZoneId,
     GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher,
-    Set<VehiclePositionsUpdaterConfig.VehiclePositionFeature> vehiclePositionFeatures
+    Set<VehiclePositionsUpdaterConfig.VehiclePositionFeature> vehiclePositionFeatures,
+    BiFunction<TripPattern, LocalDate, Timetable> getTimetable
   ) {
     this.feedId = feedId;
     this.getTripForId = getTripForId;
-    this.getStaticPattern = getStaticPattern;
     this.getRealtimePattern = getRealtimePattern;
+    this.getTimetable = getTimetable;
     this.repository = repository;
     this.timeZoneId = timeZoneId;
     this.fuzzyTripMatcher = fuzzyTripMatcher;
@@ -384,22 +385,20 @@ class RealtimeVehiclePatternMatcher {
       throw UpdateException.of(scopedTripId, NO_SERVICE_ON_DATE);
     }
 
-    var scheduledTimetable = getStaticPattern.apply(trip).getScheduledTimetable();
-    // the trip times are only used for mapping the GTFS-RT stop_sequence back to a stop.
-    // because new trips without trip times are created for realtime-updated ones, we explicitly
-    // look at the static trips for the stop_sequence->stop mapping
-    var staticTripTimes = scheduledTimetable.getTripTimes(trip);
+    // resolve() is the realtime overlay (scheduled underneath if there is no update), so extra
+    // journeys and REPLACEMENT stop_sequence maps are found on the same timetable.
+    var timetable = getTimetable.apply(pattern, serviceDate);
+    var tripTimes = timetable.getTripTimes(trip);
 
-    // no fixed trip found, try frequency-based one
     if (
-      staticTripTimes == null &&
-      !scheduledTimetable.getFrequencyEntries().isEmpty() &&
+      tripTimes == null &&
+      !timetable.getFrequencyEntries().isEmpty() &&
       vehiclePosition.getTrip().hasStartDate()
     ) {
-      staticTripTimes = matchFrequencyTripTimes(vehiclePosition, scheduledTimetable);
+      tripTimes = matchFrequencyTripTimes(vehiclePosition, timetable);
     }
 
-    if (staticTripTimes == null) {
+    if (tripTimes == null) {
       throw UpdateException.of(scopedTripId, TRIP_NOT_FOUND_IN_PATTERN);
     }
 
@@ -408,7 +407,7 @@ class RealtimeVehiclePatternMatcher {
       vehiclePositionWithTripId,
       pattern.getStops(),
       trip,
-      staticTripTimes::stopPositionForGtfsSequence
+      tripTimes::stopPositionForGtfsSequence
     );
 
     return new PatternAndRealtimeVehicle(pattern, newVehicle);
@@ -417,10 +416,10 @@ class RealtimeVehiclePatternMatcher {
   @Nullable
   private static TripTimes<?> matchFrequencyTripTimes(
     VehiclePosition vehiclePosition,
-    Timetable scheduledTimetable
+    Timetable timetable
   ) {
     var updateStartTime = LocalTime.parse(vehiclePosition.getTrip().getStartTime());
-    var tripTimes = scheduledTimetable
+    var tripTimes = timetable
       .getFrequencyEntries()
       .stream()
       .map(FrequencyEntry::tripTimes)
