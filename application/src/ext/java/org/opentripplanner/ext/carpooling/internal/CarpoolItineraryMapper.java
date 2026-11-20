@@ -104,6 +104,7 @@ public class CarpoolItineraryMapper {
    *                          optional walk paths around the carpool pickup/dropoff
    * @param carpoolReluctance multiplier applied to ride seconds when computing the carpool leg's
    *                          {@code generalizedCost}.
+   * @param boardCost         fixed cost added to the carpool leg's {@code generalizedCost}.
    * @param fromLocation      the request's {@code from} location (passenger origin), used to label
    *                          the first leg's {@code from} place.
    * @param toLocation        the request's {@code to} location (passenger destination), used to
@@ -115,6 +116,7 @@ public class CarpoolItineraryMapper {
   public Itinerary toItinerary(
     InsertionCandidate candidate,
     double carpoolReluctance,
+    int boardCost,
     GenericLocation fromLocation,
     GenericLocation toLocation
   ) {
@@ -130,7 +132,7 @@ public class CarpoolItineraryMapper {
       candidate.walkFromDropoff(),
       carpoolStart,
       carpoolEnd,
-      candidate.getPassengerRideWeight(carpoolReluctance),
+      candidate.getPassengerRideWeight(carpoolReluctance, boardCost),
       EndpointLabel.forLocation(fromLocation),
       EndpointLabel.forLocation(toLocation),
       toBookingInfo(
@@ -188,7 +190,7 @@ public class CarpoolItineraryMapper {
 
   /**
    * Converts a Raptor carpool access/egress leg back into an OTP itinerary for the response. Same
-   * shape as {@link #toItinerary(InsertionCandidate, double, GenericLocation, GenericLocation)} —
+   * shape as {@link #toItinerary(InsertionCandidate, double, int, GenericLocation, GenericLocation)} —
    * an optional WALK leg, the carpool leg, and an optional WALK leg — but driven from the
    * {@link CarpoolAccessEgress} accessors so the displayed times and ride cost agree with the
    * values Raptor used during the search.

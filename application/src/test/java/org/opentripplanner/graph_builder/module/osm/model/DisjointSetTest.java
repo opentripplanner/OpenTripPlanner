@@ -4,7 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 public class DisjointSetTest {
@@ -57,5 +59,18 @@ public class DisjointSetTest {
       assertTrue(size >= 1 && size <= 150);
     }
     assertEquals(700, sizeSum);
+  }
+
+  @Test
+  public void setsAreOrderedByFirstInsertedElement() {
+    var expected = List.of(Set.of(0, 1), Set.of(2, 3), Set.of(4, 5), Set.of(6, 7), Set.of(8, 9));
+    // Repeat with new instances: HPPC hash containers iterate in a per-instance order.
+    for (int round = 0; round < 20; ++round) {
+      DisjointSet<Integer> set = new DisjointSet<>();
+      for (int i = 0; i < 10; i += 2) {
+        set.union(i, i + 1);
+      }
+      assertEquals(expected, set.sets());
+    }
   }
 }

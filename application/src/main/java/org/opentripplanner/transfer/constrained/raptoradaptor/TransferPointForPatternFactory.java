@@ -1,7 +1,7 @@
 package org.opentripplanner.transfer.constrained.raptoradaptor;
 
-import gnu.trove.set.TIntSet;
-import gnu.trove.set.hash.TIntHashSet;
+import com.carrotsearch.hppc.IntHashSet;
+import com.carrotsearch.hppc.IntSet;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.transfer.constrained.model.TransferPoint;
 import org.opentripplanner.transit.model.network.Route;
@@ -42,10 +42,10 @@ final class TransferPointForPatternFactory {
 
   private static class StationSP implements TransferPointMatcher {
 
-    private final TIntSet childStops;
+    private final IntSet childStops;
 
     private StationSP(Station station) {
-      this.childStops = new TIntHashSet(
+      this.childStops = IntHashSet.from(
         station.getChildStops().stream().mapToInt(StopLocation::getIndex).toArray()
       );
     }

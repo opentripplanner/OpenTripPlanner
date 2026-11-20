@@ -425,6 +425,9 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
       Objects.deepEquals(arrivalTimes, that.arrivalTimes) &&
       Objects.deepEquals(departureTimes, that.departureTimes) &&
       Objects.deepEquals(stopRealTimeStates, that.stopRealTimeStates) &&
+      Objects.equals(extraCalls, that.extraCalls) &&
+      Objects.equals(hasArrived, that.hasArrived) &&
+      Objects.equals(hasDeparted, that.hasDeparted) &&
       Objects.equals(tripHeadsign, that.tripHeadsign) &&
       Objects.deepEquals(stopHeadsigns, that.stopHeadsigns) &&
       Objects.deepEquals(occupancyStatus, that.occupancyStatus) &&
@@ -442,6 +445,9 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
       Arrays.hashCode(arrivalTimes),
       Arrays.hashCode(departureTimes),
       Arrays.hashCode(stopRealTimeStates),
+      extraCalls,
+      hasArrived,
+      hasDeparted,
       tripHeadsign,
       Arrays.hashCode(stopHeadsigns),
       Arrays.hashCode(occupancyStatus),

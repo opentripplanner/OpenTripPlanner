@@ -1,5 +1,6 @@
 import { bikeRentalStationQueryAsString } from '../../static/query/bikeRentalStationQuery.tsx';
 import { Maybe } from '../../gql/graphql.ts';
+import { graphiQLLink } from '../../util/graphiQLLink.ts';
 const graphiQLUrl = import.meta.env.VITE_GRAPHIQL_URL;
 
 export function ItineraryGraphiQLBikeRentalStationLink({
@@ -9,16 +10,14 @@ export function ItineraryGraphiQLBikeRentalStationLink({
   stationId: string | undefined;
   legName: Maybe<string> | undefined;
 }) {
+  if (!graphiQLUrl) {
+    return <>{legName}</>;
+  }
+
   const queryID = { id: stationId };
-  const formattedQuery = encodeURIComponent(bikeRentalStationQueryAsString);
-  const formattedQueryID = encodeURIComponent(JSON.stringify(queryID));
 
   return (
-    <a
-      href={graphiQLUrl + '&query=' + formattedQuery + '&variables=' + formattedQueryID}
-      target={'_blank'}
-      rel={'noreferrer'}
-    >
+    <a href={graphiQLLink(graphiQLUrl, bikeRentalStationQueryAsString, queryID)} target={'_blank'} rel={'noreferrer'}>
       {legName}
     </a>
   );

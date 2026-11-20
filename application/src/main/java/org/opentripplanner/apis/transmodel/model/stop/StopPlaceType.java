@@ -362,7 +362,10 @@ public class StopPlaceType {
           .dataFetcher(environment -> {
             ArrivalDeparture arrivalDeparture = environment.getArgument("arrivalDeparture");
             boolean includeCancelledTrips = environment.getArgument("includeCancelledTrips");
-            int numberOfDepartures = environment.getArgument("numberOfDepartures");
+            int numberOfDepartures = getPositiveNonNullIntegerArgument(
+              environment,
+              "numberOfDepartures"
+            );
             Integer departuresPerLineAndDestinationDisplay = environment.getArgument(
               "numberOfDeparturesPerLineAndDestinationDisplay"
             );

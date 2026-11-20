@@ -7,11 +7,14 @@ import graphql.schema.GraphQLInputObjectType;
 import graphql.schema.GraphQLNonNull;
 import java.util.Map;
 import java.util.function.Consumer;
+import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.apis.transmodel.model.scalars.DoubleFunction;
 import org.opentripplanner.apis.transmodel.support.DataFetcherDecorator;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
+import org.opentripplanner.core.model.basic.Ratio;
+import org.opentripplanner.routing.algorithm.filterchain.api.GroupBySimilarity;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
 
@@ -20,6 +23,7 @@ public class ItineraryFiltersInputType {
   private static final String DEBUG = "debug";
   private static final String MIN_SAFE_TRANSFER_TIME_FACTOR = "minSafeTransferTimeFactor";
   private static final String TRANSIT_GENERALIZED_COST_LIMIT = "transitGeneralizedCostLimit";
+  private static final String DIRECT_FLEX_GENERALIZED_COST_LIMIT = "directFlexGeneralizedCostLimit";
   private static final String GROUP_SIMILARITY_KEEP_ONE = "groupSimilarityKeepOne";
   private static final String GROUP_SIMILARITY_KEEP_THREE = "groupSimilarityKeepThree";
   private static final String GROUPED_OTHER_THAN_SAME_LEGS_MAX_COST_MULTIPLIER =
@@ -28,6 +32,22 @@ public class ItineraryFiltersInputType {
     "groupSimilarityKeepNumOfItineraries";
 
   public static GraphQLInputObjectType create(ItineraryFilterPreferences dft) {
+    var generalizedCostFilterParams = GraphQLInputObjectType.newInputObject()
+      .name("TransitGeneralizedCostFilterParams")
+      .field(
+        GraphQLInputObjectField.newInputObjectField()
+          .name("costLimitFunction")
+          .type(new GraphQLNonNull(TransmodelScalars.DOUBLE_FUNCTION_SCALAR))
+          .build()
+      )
+      .field(
+        GraphQLInputObjectField.newInputObjectField()
+          .name("intervalRelaxFactor")
+          .type(new GraphQLNonNull(Scalars.GraphQLFloat))
+          .build()
+      )
+      .build();
+
     return GraphQLInputObjectType.newInputObject()
       .name("ItineraryFilters")
       .description(
@@ -49,30 +69,16 @@ public class ItineraryFiltersInputType {
       .field(
         GraphQLInputObjectField.newInputObjectField()
           .name(TRANSIT_GENERALIZED_COST_LIMIT)
-          .type(
-            GraphQLInputObjectType.newInputObject()
-              .name("TransitGeneralizedCostFilterParams")
-              .field(
-                GraphQLInputObjectField.newInputObjectField()
-                  .name("costLimitFunction")
-                  .type(new GraphQLNonNull(TransmodelScalars.DOUBLE_FUNCTION_SCALAR))
-                  .build()
-              )
-              .field(
-                GraphQLInputObjectField.newInputObjectField()
-                  .name("intervalRelaxFactor")
-                  .type(new GraphQLNonNull(Scalars.GraphQLFloat))
-                  .build()
-              )
-              .build()
-          )
+          .type(generalizedCostFilterParams)
           // There is a bug in the GraphQL lib. The default value is shown as a `boolean`
           // with value `false`, not the actual value. Hence; The default is added to the
           // description instead.
           .description(
-            "Set a relative limit for all transit itineraries. The limit is calculated based on " +
-              "the transit itinerary generalized-cost and the time between itineraries " +
-              "Itineraries without transit legs are excluded from this filter. Example: " +
+            "Set a relative limit for all transit itineraries, except direct flex. The limit is " +
+              "calculated based on " +
+              "the transit itinerary generalized-cost and the time between itineraries. " +
+              "Itineraries without transit legs and direct-flex itineraries are excluded from " +
+              "this filter. Example: " +
               "costLimitFunction(x) = 3600 + 2.0 x and intervalRelaxFactor = 0.5. " +
               "If the lowest cost returned is 10 000, then the limit " +
               "is set to: 3 600 + 2 * 10 000 = 26 600 plus half of the time between either departure" +
@@ -87,13 +93,36 @@ public class ItineraryFiltersInputType {
       )
       .field(
         GraphQLInputObjectField.newInputObjectField()
+          .name(DIRECT_FLEX_GENERALIZED_COST_LIMIT)
+          .type(generalizedCostFilterParams)
+          // The default is added to the description, see transitGeneralizedCostLimit.
+          .description(
+            "Set a relative limit for direct-flex itineraries. The limit is calculated in the " +
+              "same way as for `transitGeneralizedCostLimit`, based on the generalized-cost of " +
+              "the other transit itineraries, including other direct-flex itineraries, and the " +
+              "time between itineraries. Only " +
+              "direct-flex itineraries are removed by this filter. " +
+              "Default: {\"costLimitFunction\": " +
+              dft.directFlexGeneralizedCostLimit().costLimitFunction().serialize() +
+              ", \"intervalRelaxFactor\": " +
+              dft.directFlexGeneralizedCostLimit().intervalRelaxFactor() +
+              "}"
+          )
+          .build()
+      )
+      .field(
+        GraphQLInputObjectField.newInputObjectField()
           .name(GROUP_SIMILARITY_KEEP_ONE)
           .type(Scalars.GraphQLFloat)
           .description(
-            "Pick ONE itinerary from each group after putting itineraries that is 85% " +
-              "similar together."
+            "Group itineraries that are at least this similar, and keep ONE itinerary from " +
+              "each group. Similarity is the share of the travel distance two itineraries have " +
+              "in common. " +
+              "The value must be between 0 and 1. A value below %s turns this filter off.".formatted(
+                GroupBySimilarity.MIN_GROUP_BY_P
+              )
           )
-          .defaultValue(dft.groupSimilarityKeepOne())
+          .defaultValue(dft.groupSimilarityKeepOne().asDouble())
           .build()
       )
       .field(
@@ -101,20 +130,30 @@ public class ItineraryFiltersInputType {
           .type(Scalars.GraphQLFloat)
           .name(GROUP_SIMILARITY_KEEP_THREE)
           .description(
-            "Reduce the number of itineraries in each group to to maximum 3 itineraries. " +
-              "The itineraries are grouped by similar legs (on board same journey). So, if " +
-              " 68% of the distance is traveled by similar legs, then two itineraries are " +
-              "in the same group. Default value is 68%, must be at least 50%."
+            "Group itineraries that are at least this similar, and keep at most three " +
+              "itineraries from each group. Similarity is the share of the travel distance two " +
+              "itineraries have in common. " +
+              "The value must be between 0 and 1. A value below %s turns this filter off.".formatted(
+                GroupBySimilarity.MIN_GROUP_BY_P
+              )
           )
-          .defaultValue(dft.groupSimilarityKeepThree())
+          .defaultValue(dft.groupSimilarityKeepThree().asDouble())
           .build()
       )
       .field(
         GraphQLInputObjectField.newInputObjectField()
           .type(Scalars.GraphQLFloat)
           .name(GROUP_SIMILARITY_KEEP_N_ITINERARIES)
+          .description(
+            "Same as " +
+              GROUP_SIMILARITY_KEEP_THREE +
+              ". " +
+              "The value must be between 0 and 1. A value below %s turns this filter off.".formatted(
+                GroupBySimilarity.MIN_GROUP_BY_P
+              )
+          )
           .deprecate("Use " + GROUP_SIMILARITY_KEEP_THREE + " instead.")
-          .defaultValue(dft.groupSimilarityKeepThree())
+          .defaultValue(dft.groupSimilarityKeepThree().asDouble())
           .build()
       )
       .field(
@@ -154,12 +193,20 @@ public class ItineraryFiltersInputType {
     if (!GqlUtil.hasArgument(environment, "itineraryFilters")) {
       return;
     }
-    setField(callWith, GROUP_SIMILARITY_KEEP_ONE, builder::withGroupSimilarityKeepOne);
+    setField(callWith, GROUP_SIMILARITY_KEEP_ONE, (Double v) ->
+      builder.withGroupSimilarityKeepOne(validateGroupSimilarity(GROUP_SIMILARITY_KEEP_ONE, v))
+    );
 
     // This is deprecated, sets same value as GROUP_SIMILARITY_KEEP_THREE
-    setField(callWith, GROUP_SIMILARITY_KEEP_N_ITINERARIES, builder::withGroupSimilarityKeepThree);
+    setField(callWith, GROUP_SIMILARITY_KEEP_N_ITINERARIES, (Double v) ->
+      builder.withGroupSimilarityKeepThree(
+        validateGroupSimilarity(GROUP_SIMILARITY_KEEP_N_ITINERARIES, v)
+      )
+    );
 
-    setField(callWith, GROUP_SIMILARITY_KEEP_THREE, builder::withGroupSimilarityKeepThree);
+    setField(callWith, GROUP_SIMILARITY_KEEP_THREE, (Double v) ->
+      builder.withGroupSimilarityKeepThree(validateGroupSimilarity(GROUP_SIMILARITY_KEEP_THREE, v))
+    );
     setField(
       callWith,
       GROUPED_OTHER_THAN_SAME_LEGS_MAX_COST_MULTIPLIER,
@@ -173,7 +220,27 @@ public class ItineraryFiltersInputType {
         )
       )
     );
+    setField(callWith, DIRECT_FLEX_GENERALIZED_COST_LIMIT, (Map<String, ?> v) ->
+      builder.withDirectFlexGeneralizedCostLimit(
+        new TransitGeneralizedCostFilterParams(
+          ((DoubleFunction) v.get("costLimitFunction")).asCostLinearFunction(),
+          (double) v.get("intervalRelaxFactor")
+        )
+      )
+    );
     setField(callWith, DEBUG, builder::withDebug);
+  }
+
+  /**
+   * Return the value as a {@link Ratio}, or throw an {@link InvalidInputException} if it is not a
+   * valid ratio.
+   */
+  private static Ratio validateGroupSimilarity(String field, double value) {
+    return Ratio.of(value, message -> {
+      throw new InvalidInputException(
+        "Invalid argument 'itineraryFilters.%s': %s".formatted(field, message)
+      );
+    }).orElseThrow();
   }
 
   private static <T> void setField(

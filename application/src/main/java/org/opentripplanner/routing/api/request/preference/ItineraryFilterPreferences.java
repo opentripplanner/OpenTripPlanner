@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.util.Objects;
 import java.util.function.Consumer;
 import org.opentripplanner.core.model.basic.CostLinearFunction;
+import org.opentripplanner.core.model.basic.Ratio;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.utils.lang.Units;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
@@ -23,13 +24,14 @@ public final class ItineraryFilterPreferences {
   private final ItineraryFilterDebugProfile debug;
   private final boolean filterItinerariesWithSameFirstOrLastTrip;
   private final double groupedOtherThanSameLegsMaxCostMultiplier;
-  private final double groupSimilarityKeepOne;
-  private final double groupSimilarityKeepThree;
+  private final Ratio groupSimilarityKeepOne;
+  private final Ratio groupSimilarityKeepThree;
   private final double minBikeParkingDistance;
   private final CostLinearFunction nonTransitGeneralizedCostLimit;
   private final double parkAndRideDurationRatio;
   private final boolean removeItinerariesWithSameRoutesAndStops;
   private final TransitGeneralizedCostFilterParams transitGeneralizedCostLimit;
+  private final TransitGeneralizedCostFilterParams directFlexGeneralizedCostLimit;
   private final CostLinearFunction removeTransitWithHigherCostThanBestOnStreetOnly;
   private final boolean filterDirectFlexBySearchWindow;
 
@@ -39,13 +41,17 @@ public final class ItineraryFilterPreferences {
     this.debug = ItineraryFilterDebugProfile.OFF;
     this.filterItinerariesWithSameFirstOrLastTrip = false;
     this.groupedOtherThanSameLegsMaxCostMultiplier = 2.0;
-    this.groupSimilarityKeepOne = 0.85;
-    this.groupSimilarityKeepThree = 0.68;
+    this.groupSimilarityKeepOne = Ratio.of(0.85);
+    this.groupSimilarityKeepThree = Ratio.of(0.68);
     this.minBikeParkingDistance = 0;
     this.nonTransitGeneralizedCostLimit = CostLinearFunction.of(Duration.ofHours(1), 2.0);
     this.parkAndRideDurationRatio = 0.0;
     this.removeItinerariesWithSameRoutesAndStops = false;
     this.transitGeneralizedCostLimit = new TransitGeneralizedCostFilterParams(
+      CostLinearFunction.of(Duration.ofMinutes(15), 1.5),
+      0.4
+    );
+    this.directFlexGeneralizedCostLimit = new TransitGeneralizedCostFilterParams(
       CostLinearFunction.of(Duration.ofMinutes(15), 1.5),
       0.4
     );
@@ -65,8 +71,8 @@ public final class ItineraryFilterPreferences {
     this.groupedOtherThanSameLegsMaxCostMultiplier = Units.reluctance(
       builder.groupedOtherThanSameLegsMaxCostMultiplier
     );
-    this.groupSimilarityKeepOne = Units.ratio(builder.groupSimilarityKeepOne);
-    this.groupSimilarityKeepThree = Units.ratio(builder.groupSimilarityKeepThree);
+    this.groupSimilarityKeepOne = Objects.requireNonNull(builder.groupSimilarityKeepOne);
+    this.groupSimilarityKeepThree = Objects.requireNonNull(builder.groupSimilarityKeepThree);
     this.minBikeParkingDistance = builder.minBikeParkingDistance;
     this.nonTransitGeneralizedCostLimit = Objects.requireNonNull(
       builder.nonTransitGeneralizedCostLimit
@@ -74,6 +80,9 @@ public final class ItineraryFilterPreferences {
     this.parkAndRideDurationRatio = Units.ratio(builder.parkAndRideDurationRatio);
     this.removeItinerariesWithSameRoutesAndStops = builder.removeItinerariesWithSameRoutesAndStops;
     this.transitGeneralizedCostLimit = Objects.requireNonNull(builder.transitGeneralizedCostLimit);
+    this.directFlexGeneralizedCostLimit = Objects.requireNonNull(
+      builder.directFlexGeneralizedCostLimit
+    );
     this.removeTransitWithHigherCostThanBestOnStreetOnly = Objects.requireNonNull(
       builder.removeTransitWithHigherCostThanBestOnStreetOnly
     );
@@ -108,11 +117,11 @@ public final class ItineraryFilterPreferences {
     return groupedOtherThanSameLegsMaxCostMultiplier;
   }
 
-  public double groupSimilarityKeepOne() {
+  public Ratio groupSimilarityKeepOne() {
     return groupSimilarityKeepOne;
   }
 
-  public double groupSimilarityKeepThree() {
+  public Ratio groupSimilarityKeepThree() {
     return groupSimilarityKeepThree;
   }
 
@@ -134,6 +143,10 @@ public final class ItineraryFilterPreferences {
 
   public TransitGeneralizedCostFilterParams transitGeneralizedCostLimit() {
     return transitGeneralizedCostLimit;
+  }
+
+  public TransitGeneralizedCostFilterParams directFlexGeneralizedCostLimit() {
+    return directFlexGeneralizedCostLimit;
   }
 
   public CostLinearFunction removeTransitWithHigherCostThanBestOnStreetOnly() {
@@ -159,8 +172,8 @@ public final class ItineraryFilterPreferences {
         groupedOtherThanSameLegsMaxCostMultiplier,
         DEFAULT.groupedOtherThanSameLegsMaxCostMultiplier
       )
-      .addNum("groupSimilarityKeepOne", groupSimilarityKeepOne, DEFAULT.groupSimilarityKeepOne)
-      .addNum(
+      .addObj("groupSimilarityKeepOne", groupSimilarityKeepOne, DEFAULT.groupSimilarityKeepOne)
+      .addObj(
         "groupSimilarityKeepThree",
         groupSimilarityKeepThree,
         DEFAULT.groupSimilarityKeepThree
@@ -180,6 +193,11 @@ public final class ItineraryFilterPreferences {
         "transitGeneralizedCostLimit",
         transitGeneralizedCostLimit,
         DEFAULT.transitGeneralizedCostLimit
+      )
+      .addObj(
+        "directFlexGeneralizedCostLimit",
+        directFlexGeneralizedCostLimit,
+        DEFAULT.directFlexGeneralizedCostLimit
       )
       .addObj(
         "removeTransitWithHigherCostThanBestOnStreetOnly",
@@ -212,8 +230,8 @@ public final class ItineraryFilterPreferences {
         that.groupedOtherThanSameLegsMaxCostMultiplier,
         groupedOtherThanSameLegsMaxCostMultiplier
       ) == 0 &&
-      Double.compare(that.groupSimilarityKeepOne, groupSimilarityKeepOne) == 0 &&
-      Double.compare(that.groupSimilarityKeepThree, groupSimilarityKeepThree) == 0 &&
+      groupSimilarityKeepOne.equals(that.groupSimilarityKeepOne) &&
+      groupSimilarityKeepThree.equals(that.groupSimilarityKeepThree) &&
       Double.compare(that.minBikeParkingDistance, minBikeParkingDistance) == 0 &&
       Double.compare(that.parkAndRideDurationRatio, parkAndRideDurationRatio) == 0 &&
       removeItinerariesWithSameRoutesAndStops == that.removeItinerariesWithSameRoutesAndStops &&
@@ -223,6 +241,7 @@ public final class ItineraryFilterPreferences {
         that.removeTransitWithHigherCostThanBestOnStreetOnly
       ) &&
       Objects.equals(transitGeneralizedCostLimit, that.transitGeneralizedCostLimit) &&
+      Objects.equals(directFlexGeneralizedCostLimit, that.directFlexGeneralizedCostLimit) &&
       filterDirectFlexBySearchWindow == that.filterDirectFlexBySearchWindow
     );
   }
@@ -242,6 +261,7 @@ public final class ItineraryFilterPreferences {
       parkAndRideDurationRatio,
       removeItinerariesWithSameRoutesAndStops,
       transitGeneralizedCostLimit,
+      directFlexGeneralizedCostLimit,
       removeTransitWithHigherCostThanBestOnStreetOnly,
       filterDirectFlexBySearchWindow
     );
@@ -255,13 +275,14 @@ public final class ItineraryFilterPreferences {
     private ItineraryFilterDebugProfile debug;
     private boolean filterItinerariesWithSameFirstOrLastTrip;
     private double groupedOtherThanSameLegsMaxCostMultiplier;
-    private double groupSimilarityKeepOne;
-    private double groupSimilarityKeepThree;
+    private Ratio groupSimilarityKeepOne;
+    private Ratio groupSimilarityKeepThree;
     public double minBikeParkingDistance;
     private CostLinearFunction nonTransitGeneralizedCostLimit;
     private double parkAndRideDurationRatio;
     private boolean removeItinerariesWithSameRoutesAndStops;
     private TransitGeneralizedCostFilterParams transitGeneralizedCostLimit;
+    private TransitGeneralizedCostFilterParams directFlexGeneralizedCostLimit;
     private CostLinearFunction removeTransitWithHigherCostThanBestOnStreetOnly;
     private boolean filterDirectFlexBySearchWindow;
 
@@ -298,12 +319,12 @@ public final class ItineraryFilterPreferences {
       return this;
     }
 
-    public Builder withGroupSimilarityKeepOne(double groupSimilarityKeepOne) {
+    public Builder withGroupSimilarityKeepOne(Ratio groupSimilarityKeepOne) {
       this.groupSimilarityKeepOne = groupSimilarityKeepOne;
       return this;
     }
 
-    public Builder withGroupSimilarityKeepThree(double groupSimilarityKeepThree) {
+    public Builder withGroupSimilarityKeepThree(Ratio groupSimilarityKeepThree) {
       this.groupSimilarityKeepThree = groupSimilarityKeepThree;
       return this;
     }
@@ -339,6 +360,13 @@ public final class ItineraryFilterPreferences {
       return this;
     }
 
+    public Builder withDirectFlexGeneralizedCostLimit(
+      TransitGeneralizedCostFilterParams directFlexGeneralizedCostLimit
+    ) {
+      this.directFlexGeneralizedCostLimit = directFlexGeneralizedCostLimit;
+      return this;
+    }
+
     public Builder withRemoveTransitWithHigherCostThanBestOnStreetOnly(
       CostLinearFunction removeTransitWithHigherCostThanBestOnStreetOnly
     ) {
@@ -364,6 +392,7 @@ public final class ItineraryFilterPreferences {
       this.removeItinerariesWithSameRoutesAndStops =
         original.removeItinerariesWithSameRoutesAndStops;
       this.transitGeneralizedCostLimit = original.transitGeneralizedCostLimit;
+      this.directFlexGeneralizedCostLimit = original.directFlexGeneralizedCostLimit;
       this.removeTransitWithHigherCostThanBestOnStreetOnly =
         original.removeTransitWithHigherCostThanBestOnStreetOnly;
       this.filterDirectFlexBySearchWindow = original.filterDirectFlexBySearchWindow;

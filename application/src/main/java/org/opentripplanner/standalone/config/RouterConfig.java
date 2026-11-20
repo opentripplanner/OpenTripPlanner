@@ -8,6 +8,8 @@ import java.io.Serializable;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.apis.gtfs.GtfsApiParameters;
+import org.opentripplanner.ext.carpooling.CarpoolingParameters;
+import org.opentripplanner.ext.carpooling.config.CarpoolingConfig;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.ojp.config.OjpApiConfig;
 import org.opentripplanner.ext.ojp.config.TriasApiConfig;
@@ -56,6 +58,7 @@ public class RouterConfig implements Serializable {
   private final UpdatersParameters updatersParameters;
   private final RideHailingServicesConfig rideHailingConfig;
   private final FlexConfig flexConfig;
+  private final CarpoolingParameters carpoolingParameters;
   private final TransmodelAPIConfig transmodelApi;
   private final GtfsApiConfig gtfsApi;
   private final VectorTileConfig vectorTileConfig;
@@ -92,6 +95,7 @@ public class RouterConfig implements Serializable {
     this.triasApiParameters = TriasApiConfig.mapParameters("triasApi", root);
     this.ojpApiParameters = OjpApiConfig.mapParameters("ojpApi", root);
     this.flexConfig = new FlexConfig(root, "flex");
+    this.carpoolingParameters = CarpoolingConfig.mapParameters("carpooling", root);
     this.warmupParameters = WarmupConfig.mapWarmupConfig("warmup", root);
 
     if (logUnusedParams && LOG.isWarnEnabled()) {
@@ -148,6 +152,10 @@ public class RouterConfig implements Serializable {
 
   public FlexParameters flexParameters() {
     return flexConfig;
+  }
+
+  public CarpoolingParameters carpoolingParameters() {
+    return carpoolingParameters;
   }
 
   public TriasApiParameters triasApiParameters() {

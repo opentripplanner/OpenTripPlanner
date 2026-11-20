@@ -1,18 +1,11 @@
 package org.opentripplanner.routing.graph.kryosupport;
 
-import com.conveyal.kryo.TIntArrayListSerializer;
-import com.conveyal.kryo.TIntIntHashMapSerializer;
 import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.serializers.ExternalizableSerializer;
 import com.esotericsoftware.kryo.util.DefaultInstantiatorStrategy;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
 import de.javakaffee.kryoserializers.guava.ArrayListMultimapSerializer;
 import de.javakaffee.kryoserializers.guava.HashMultimapSerializer;
-import gnu.trove.impl.hash.TPrimitiveHash;
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.TIntIntHashMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -22,8 +15,10 @@ import org.objenesis.strategy.SerializingInstantiatorStrategy;
 import org.opentripplanner.kryo.BuildConfigSerializer;
 import org.opentripplanner.kryo.RouterConfigSerializer;
 import org.opentripplanner.kryo.UnmodifiableCollectionsSerializer;
+import org.opentripplanner.routing.graph.kryosupport.hppc.HppcKryoSupport;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
+import org.opentripplanner.utils.collection.trie.ImmutableTrieMap;
 
 public final class KryoBuilder {
 
@@ -46,10 +41,7 @@ public final class KryoBuilder {
     // We might actually want to manually register a serializer for every class, to be safe.
     kryo.setRegistrationRequired(false);
     kryo.setReferences(true);
-    kryo.addDefaultSerializer(TPrimitiveHash.class, ExternalizableSerializer.class);
-    kryo.register(TIntArrayList.class, new TIntArrayListSerializer());
-    kryo.register(TIntIntHashMap.class, new TIntIntHashMapSerializer());
-    kryo.register(TIntObjectHashMap.class, new TIntObjectHashMapSerializer());
+    HppcKryoSupport.register(kryo);
 
     // Add support for the package local java.util.ImmutableCollections.
     // Not supported properly in the current com.conveyal:kryo-tools:1.4.0.
@@ -61,6 +53,7 @@ public final class KryoBuilder {
     kryo.register(Map.of().getClass(), new JavaImmutableMapSerializer());
     kryo.register(Map.of(1, 1).getClass(), new JavaImmutableMapSerializer());
     kryo.register(EnumMap.class, new EnumMapSerializer());
+    kryo.register(ImmutableTrieMap.class, new ImmutableTrieMapSerializer());
 
     kryo.register(HashMultimap.class, new HashMultimapSerializer());
     kryo.register(ArrayListMultimap.class, new ArrayListMultimapSerializer());

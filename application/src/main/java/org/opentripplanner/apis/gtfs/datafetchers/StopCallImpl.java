@@ -11,6 +11,7 @@ import org.opentripplanner.apis.gtfs.model.CallRealTime;
 import org.opentripplanner.apis.gtfs.model.CallSchedule;
 import org.opentripplanner.apis.gtfs.model.CallScheduledTime.ArrivalDepartureTime;
 import org.opentripplanner.apis.gtfs.model.CallScheduledTime.TimeWindow;
+import org.opentripplanner.apis.gtfs.model.DestinationDisplay;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.timetable.EstimatedTime;
@@ -20,10 +21,20 @@ import org.opentripplanner.utils.time.ServiceDateUtils;
 public class StopCallImpl implements GraphQLDataFetchers.GraphQLStopCall {
 
   @Override
+  public DataFetcher<DestinationDisplay> destinationDisplay() {
+    return environment -> {
+      var headsign = getSource(environment).getHeadsign();
+      return headsign == null ? null : new DestinationDisplay(headsign);
+    };
+  }
+
+  @Override
   public DataFetcher<CallRealTime> realTime() {
     return environment -> {
       var tripTime = getSource(environment);
-      if (!tripTime.isRealtime()) {
+      var canceled = tripTime.isCancelledStop();
+      // A canceled call is reported even if the trip times are not marked as updated
+      if (!tripTime.isRealtime() && !canceled) {
         return null;
       }
       var scheduledArrival = getZonedDateTime(environment, tripTime.getScheduledArrival());
@@ -36,7 +47,7 @@ public class StopCallImpl implements GraphQLDataFetchers.GraphQLStopCall {
         scheduledDeparture == null
           ? null
           : EstimatedTime.of(scheduledDeparture, tripTime.getDepartureDelay());
-      return new CallRealTime(estimatedArrival, estimatedDeparture);
+      return new CallRealTime(estimatedArrival, estimatedDeparture, canceled);
     };
   }
 

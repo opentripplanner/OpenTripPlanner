@@ -9,7 +9,7 @@
 
 The RouteRequest is the type for the
 [routingDefaults in router-config.json](RouterConfiguration.md#routingDefaults) and in the
-[transferRequests in build-config.json](BuildConfiguration.md#transferRequests).
+[transfers.flex.requests in build-config.json](TransferConfiguration.md#flex-and-via-transfers).
 
 <!-- PARAMETERS-TABLE BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
@@ -123,14 +123,17 @@ The RouteRequest is the type for the
 |    [debug](#rd_if_debug)                                                                                     |         `enum`         | Enable this to attach a system notice to itineraries instead of removing them. This is very convenient when tuning the itinerary-filter-chain.           | *Optional* | `"off"`          |  2.0  |
 |    [filterDirectFlexBySearchWindow](#rd_if_filterDirectFlexBySearchWindow)                                   |        `boolean`       | Filter direct flex results by the search window. The search-window is not used during flex routing, but we use one end to align it with transit results. | *Optional* | `true`           |  2.7  |
 |    [filterItinerariesWithSameFirstOrLastTrip](#rd_if_filterItinerariesWithSameFirstOrLastTrip)               |        `boolean`       | If more than one itinerary begins or ends with same trip, filter out one of those itineraries so that only one remains.                                  | *Optional* | `false`          |  2.2  |
-|    groupSimilarityKeepOne                                                                                    |        `double`        | Pick ONE itinerary from each group after putting itineraries that are 85% similar together.                                                              | *Optional* | `0.85`           |  2.1  |
-|    groupSimilarityKeepThree                                                                                  |        `double`        | Reduce the number of itineraries to three itineraries by reducing each group of itineraries grouped by 68% similarity.                                   | *Optional* | `0.68`           |  2.1  |
+|    [groupSimilarityKeepOne](#rd_if_groupSimilarityKeepOne)                                                   |        `double`        | Group itineraries that are at least this similar, and keep ONE itinerary from each group.                                                                | *Optional* | `0.85`           |  2.1  |
+|    [groupSimilarityKeepThree](#rd_if_groupSimilarityKeepThree)                                               |        `double`        | Group itineraries that are at least this similar, and keep at most three itineraries from each group.                                                    | *Optional* | `0.68`           |  2.1  |
 |    [groupedOtherThanSameLegsMaxCostMultiplier](#rd_if_groupedOtherThanSameLegsMaxCostMultiplier)             |        `double`        | Filter grouped itineraries, where the non-grouped legs are more expensive than in the lowest cost one.                                                   | *Optional* | `2.0`            |  2.1  |
 |    [minBikeParkingDistance](#rd_if_minBikeParkingDistance)                                                   |        `double`        | Filter out bike park+ride results that have fewer meters of cycling than this value.                                                                     | *Optional* | `0.0`            |  2.3  |
 |    [nonTransitGeneralizedCostLimit](#rd_if_nonTransitGeneralizedCostLimit)                                   | `cost-linear-function` | The function define a max-limit for generalized-cost for non-transit itineraries.                                                                        | *Optional* | `"1h + 2.0 t"`   |  2.1  |
 |    [parkAndRideDurationRatio](#rd_if_parkAndRideDurationRatio)                                               |        `double`        | Filter P+R routes that consist of driving and walking by the minimum fraction of the driving using of _time_.                                            | *Optional* | `0.0`            |  2.1  |
 |    [removeItinerariesWithSameRoutesAndStops](#rd_if_removeItinerariesWithSameRoutesAndStops)                 |        `boolean`       | Set to true if you want to list only the first itinerary  which goes through the same stops and routes.                                                  | *Optional* | `false`          |  2.2  |
 |    [removeTransitWithHigherCostThanBestOnStreetOnly](#rd_if_removeTransitWithHigherCostThanBestOnStreetOnly) | `cost-linear-function` | Limit function for generalized-cost computed from street-only itineries applied to transit itineraries.                                                  | *Optional* | `"1m + 1.3 t"`   |  2.4  |
+|    [directFlexGeneralizedCostLimit](#rd_if_directFlexGeneralizedCostLimit)                                   |        `object`        | A relative limit for the generalized-cost for direct-flex itineraries.                                                                                   | *Optional* |                  |  2.11 |
+|       [costLimitFunction](#rd_if_directFlexGeneralizedCostLimit_costLimitFunction)                           | `cost-linear-function` | The base function used by the filter.                                                                                                                    | *Optional* | `"15m + 1.5 t"`  |  2.11 |
+|       [intervalRelaxFactor](#rd_if_directFlexGeneralizedCostLimit_intervalRelaxFactor)                       |        `double`        | How much the filter should be relaxed for itineraries that do not overlap in time.                                                                       | *Optional* | `0.4`            |  2.11 |
 |    [transitGeneralizedCostLimit](#rd_if_transitGeneralizedCostLimit)                                         |        `object`        | A relative limit for the generalized-cost for transit itineraries.                                                                                       | *Optional* |                  |  2.1  |
 |       [costLimitFunction](#rd_if_transitGeneralizedCostLimit_costLimitFunction)                              | `cost-linear-function` | The base function used by the filter.                                                                                                                    | *Optional* | `"15m + 1.5 t"`  |  2.2  |
 |       [intervalRelaxFactor](#rd_if_transitGeneralizedCostLimit_intervalRelaxFactor)                          |        `double`        | How much the filter should be relaxed for itineraries that do not overlap in time.                                                                       | *Optional* | `0.4`            |  2.2  |
@@ -457,6 +460,7 @@ The default values are
 - `taxi` = (timePenalty: 20m + 2.0 t, costFactor: 1.5)
 - `car-rental` = (timePenalty: 20m + 2.0 t, costFactor: 1.5)
 - `car-hailing` = (timePenalty: 20m + 2.0 t, costFactor: 1.5)
+- `carpool` = (timePenalty: 5m + 0.0 t, costFactor: 4.0)
 - `flexible` = (timePenalty: 10m + 1.3 t, costFactor: 1.3)
 
 Example: `"car-to-park" : { "timePenalty": "10m + 1.5t", "costFactor": 2.5 }`
@@ -887,6 +891,30 @@ through the list from top to bottom. If an itinerary matches from any other itin
 removed from list.
 
 
+<h3 id="rd_if_groupSimilarityKeepOne">groupSimilarityKeepOne</h3>
+
+**Since version:** `2.1` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.85`   
+**Path:** /routingDefaults/itineraryFilters 
+
+Group itineraries that are at least this similar, and keep ONE itinerary from each group.
+
+Similarity is the share of the travel distance two itineraries have in common.
+
+The value must be between 0 and 1. A value below 0.5 turns this filter off.
+
+
+<h3 id="rd_if_groupSimilarityKeepThree">groupSimilarityKeepThree</h3>
+
+**Since version:** `2.1` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.68`   
+**Path:** /routingDefaults/itineraryFilters 
+
+Group itineraries that are at least this similar, and keep at most three itineraries from each group.
+
+Similarity is the share of the travel distance two itineraries have in common.
+
+The value must be between 0 and 1. A value below 0.5 turns this filter off.
+
+
 <h3 id="rd_if_groupedOtherThanSameLegsMaxCostMultiplier">groupedOtherThanSameLegsMaxCostMultiplier</h3>
 
 **Since version:** `2.1` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `2.0`   
@@ -963,6 +991,41 @@ set. Walking is handled with a different logic: if a transit itinerary has highe
 a plain walk itinerary, it will be removed even if the cost limit function would keep it.
 
 
+<h3 id="rd_if_directFlexGeneralizedCostLimit">directFlexGeneralizedCostLimit</h3>
+
+**Since version:** `2.11` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
+**Path:** /routingDefaults/itineraryFilters 
+
+A relative limit for the generalized-cost for direct-flex itineraries.
+
+The filter compares each direct-flex itinerary against every other transit itinerary,
+including other direct-flex itineraries, and drops it if its generalized-cost is higher
+than the limit. The limit is calculated in the same way as for
+`transitGeneralizedCostLimit`, using the `costLimitFunction` plus a *relative cost*
+for the distance in time between the itineraries.
+
+
+<h3 id="rd_if_directFlexGeneralizedCostLimit_costLimitFunction">costLimitFunction</h3>
+
+**Since version:** `2.11` ∙ **Type:** `cost-linear-function` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"15m + 1.5 t"`   
+**Path:** /routingDefaults/itineraryFilters/directFlexGeneralizedCostLimit 
+
+The base function used by the filter.
+
+This function calculates the threshold for the filter, when the itineraries have exactly the same arrival and departure times.
+
+<h3 id="rd_if_directFlexGeneralizedCostLimit_intervalRelaxFactor">intervalRelaxFactor</h3>
+
+**Since version:** `2.11` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.4`   
+**Path:** /routingDefaults/itineraryFilters/directFlexGeneralizedCostLimit 
+
+How much the filter should be relaxed for itineraries that do not overlap in time.
+
+This value is used to increase the filter threshold for itineraries further away in
+time, compared to those, that have exactly the same arrival and departure times.
+
+The unit is cost unit per second of time difference.
+
 <h3 id="rd_if_transitGeneralizedCostLimit">transitGeneralizedCostLimit</h3>
 
 **Since version:** `2.1` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
@@ -970,7 +1033,8 @@ a plain walk itinerary, it will be removed even if the cost limit function would
 
 A relative limit for the generalized-cost for transit itineraries.
 
-The filter compares all itineraries against every other itinerary. If the generalized-cost plus a
+The filter compares all transit itineraries, except direct flex, against every other such
+itinerary. If the generalized-cost plus a
 `transitGeneralizedCostLimit` is higher than the other generalized-cost, then the itinerary is
 dropped. The `transitGeneralizedCostLimit` is calculated using the `costLimitFunction` plus a
 *relative cost* for the distance in time between the itineraries. The *relative cost* is the
@@ -1412,6 +1476,10 @@ include stairs as a last result.
     },
     "itineraryFilters" : {
       "transitGeneralizedCostLimit" : {
+        "costLimitFunction" : "15m + 1.5 x",
+        "intervalRelaxFactor" : 0.4
+      },
+      "directFlexGeneralizedCostLimit" : {
         "costLimitFunction" : "15m + 1.5 x",
         "intervalRelaxFactor" : 0.4
       },

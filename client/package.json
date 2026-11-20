@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "npm run codegen && vite",
     "build": "npm run codegen && npm run lint && npm run check-format && tsc && vite build",
+    "build:bundle": "npm run codegen && tsc && vite build --base ./",
     "test": "vitest --root src/ -c ../vite.config.ts",
     "coverage": "vitest run --root src/ -c ../vite.config.ts --coverage",
     "lint": "eslint . --report-unused-disable-directives --max-warnings 0",
@@ -47,7 +48,7 @@
     "eslint-plugin-react-hooks": "7.1.1",
     "eslint-plugin-react-refresh": "0.5.6",
     "globals": "17.12.0",
-    "jsdom": "30.0.1",
+    "jsdom": "31.0.0",
     "prettier": "3.9.6",
     "typescript": "6.0.3",
     "typescript-eslint": "8.70.0",

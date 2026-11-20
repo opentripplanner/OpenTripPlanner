@@ -33,6 +33,7 @@ import org.opentripplanner.routing.algorithm.filterchain.filters.system.SingleCr
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.mcmax.McMaxLimitFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.DecorateTransitAlert;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.KeepItinerariesWithFewestTransfers;
+import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveDirectFlexIfTransitIsBetter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveItinerariesWithShortStreetLeg;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfWalkingIsBetter;
@@ -76,6 +77,7 @@ public class ItineraryListFilterChainBuilder {
   private boolean removeWalkAllTheWayResults;
   private boolean sameFirstOrLastTripFilter;
   private TransitGeneralizedCostFilterParams transitGeneralizedCostFilterParams;
+  private TransitGeneralizedCostFilterParams directFlexGeneralizedCostFilterParams;
   private double bikeRentalDistanceRatio;
   private double parkAndRideDurationRatio;
   private CostLinearFunction nonTransitGeneralizedCostLimit;
@@ -176,6 +178,18 @@ public class ItineraryListFilterChainBuilder {
     TransitGeneralizedCostFilterParams transitGeneralizedCostFilterParams
   ) {
     this.transitGeneralizedCostFilterParams = transitGeneralizedCostFilterParams;
+    return this;
+  }
+
+  /**
+   * The same as {@link #withTransitGeneralizedCostLimit(TransitGeneralizedCostFilterParams)}, but
+   * the limit is applied to direct-flex itineraries. The limit is computed from the other transit
+   * itineraries, including other direct-flex itineraries.
+   */
+  public ItineraryListFilterChainBuilder withDirectFlexGeneralizedCostLimit(
+    TransitGeneralizedCostFilterParams directFlexGeneralizedCostFilterParams
+  ) {
+    this.directFlexGeneralizedCostFilterParams = directFlexGeneralizedCostFilterParams;
     return this;
   }
 
@@ -423,6 +437,17 @@ public class ItineraryListFilterChainBuilder {
       );
     }
 
+    // Filter direct-flex itineraries on generalized-cost
+    if (directFlexGeneralizedCostFilterParams != null) {
+      addRemoveFilter(
+        filters,
+        new RemoveDirectFlexIfTransitIsBetter(
+          directFlexGeneralizedCostFilterParams.costLimitFunction(),
+          directFlexGeneralizedCostFilterParams.intervalRelaxFactor()
+        )
+      );
+    }
+
     // Filter non-transit itineraries on generalized-cost
     if (nonTransitGeneralizedCostLimit != null) {
       addRemoveFilter(
@@ -586,14 +611,14 @@ public class ItineraryListFilterChainBuilder {
 
     List<GroupBySimilarity> groupBy = groupBySimilarity
       .stream()
-      .sorted(Comparator.comparingDouble(o -> o.groupByP))
+      .sorted(Comparator.comparingDouble(o -> o.groupByP.asDouble()))
       .toList();
 
     List<ItineraryListFilter> groupByFilters = new ArrayList<>();
 
     for (GroupBySimilarity group : groupBy) {
       String tag = "similar-legs-filter-%.0fp-%dx".formatted(
-        100d * group.groupByP,
+        100d * group.groupByP.asDouble(),
         group.maxNumOfItinerariesPerGroup
       );
       sysTags.add(tag);

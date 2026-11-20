@@ -897,7 +897,7 @@ type QueryType {
   "Input type for executing a travel search for a trip between two locations. Returns trip patterns describing suggested alternatives for the trip."
   trip(
     "Time and cost penalty on access/egress modes."
-    accessEgressPenalty: [PenaltyForStreetMode!] = [{streetMode : car_park, timePenalty : "20m + 2.0 t", costFactor : 1.5}, {streetMode : car_pickup, timePenalty : "20m + 2.0 t", costFactor : 1.5}, {streetMode : car_rental, timePenalty : "20m + 2.0 t", costFactor : 1.5}, {streetMode : flexible, timePenalty : "10m + 1.3 t", costFactor : 1.3}, {streetMode : taxi, timePenalty : "20m + 2.0 t", costFactor : 1.5}],
+    accessEgressPenalty: [PenaltyForStreetMode!] = [{streetMode : car_park, timePenalty : "20m + 2.0 t", costFactor : 1.5}, {streetMode : car_pickup, timePenalty : "20m + 2.0 t", costFactor : 1.5}, {streetMode : car_rental, timePenalty : "20m + 2.0 t", costFactor : 1.5}, {streetMode : carpool, timePenalty : "5m + 0.0 t", costFactor : 4.0}, {streetMode : flexible, timePenalty : "10m + 1.3 t", costFactor : 1.3}, {streetMode : taxi, timePenalty : "20m + 2.0 t", costFactor : 1.5}],
     "The alightSlack is the minimum extra time after exiting a public transport vehicle. This is the default value used, if not overridden by the 'alightSlackList'."
     alightSlackDefault: Int = 0,
     "List of alightSlack for a given set of modes. Defaults: []"
@@ -2438,16 +2438,19 @@ input ItineraryFilters {
   itineraries are returned with a system notice, and not deleted.
   """
   debug: ItineraryFilterDebugProfile = off
+  "Set a relative limit for direct-flex itineraries. The limit is calculated in the same way as for `transitGeneralizedCostLimit`, based on the generalized-cost of the other transit itineraries, including other direct-flex itineraries, and the time between itineraries. Only direct-flex itineraries are removed by this filter. Default: {\"costLimitFunction\": 15m + 1.5 t, \"intervalRelaxFactor\": 0.4}"
+  directFlexGeneralizedCostLimit: TransitGeneralizedCostFilterParams
+  "Same as groupSimilarityKeepThree. The value must be between 0 and 1. A value below 0.5 turns this filter off."
   groupSimilarityKeepNumOfItineraries: Float = 0.68 @deprecated(reason : "Use groupSimilarityKeepThree instead.")
-  "Pick ONE itinerary from each group after putting itineraries that is 85% similar together."
+  "Group itineraries that are at least this similar, and keep ONE itinerary from each group. Similarity is the share of the travel distance two itineraries have in common. The value must be between 0 and 1. A value below 0.5 turns this filter off."
   groupSimilarityKeepOne: Float = 0.85
-  "Reduce the number of itineraries in each group to to maximum 3 itineraries. The itineraries are grouped by similar legs (on board same journey). So, if  68% of the distance is traveled by similar legs, then two itineraries are in the same group. Default value is 68%, must be at least 50%."
+  "Group itineraries that are at least this similar, and keep at most three itineraries from each group. Similarity is the share of the travel distance two itineraries have in common. The value must be between 0 and 1. A value below 0.5 turns this filter off."
   groupSimilarityKeepThree: Float = 0.68
   "Of the itineraries grouped to maximum of three itineraries, how much worse can the non-grouped legs be compared to the lowest cost. 2.0 means that they can be double the cost, and any itineraries having a higher cost will be filtered. Default value is 2.0, use a value lower than 1.0 to turn off"
   groupedOtherThanSameLegsMaxCostMultiplier: Float = 2.0
   "Add an additional cost for short transfers on long transit itineraries. See javaDoc on `AddMinSafeTransferCostFilter` details."
   minSafeTransferTimeFactor: Float @deprecated(reason : "This filter is removed, it has undesired side-effects")
-  "Set a relative limit for all transit itineraries. The limit is calculated based on the transit itinerary generalized-cost and the time between itineraries Itineraries without transit legs are excluded from this filter. Example: costLimitFunction(x) = 3600 + 2.0 x and intervalRelaxFactor = 0.5. If the lowest cost returned is 10 000, then the limit is set to: 3 600 + 2 * 10 000 = 26 600 plus half of the time between either departure or arrival times of the itinerary. Default: {\"costLimitFunction\": 15m + 1.5 t, \"intervalRelaxFactor\": 0.4}"
+  "Set a relative limit for all transit itineraries, except direct flex. The limit is calculated based on the transit itinerary generalized-cost and the time between itineraries. Itineraries without transit legs and direct-flex itineraries are excluded from this filter. Example: costLimitFunction(x) = 3600 + 2.0 x and intervalRelaxFactor = 0.5. If the lowest cost returned is 10 000, then the limit is set to: 3 600 + 2 * 10 000 = 26 600 plus half of the time between either departure or arrival times of the itinerary. Default: {\"costLimitFunction\": 15m + 1.5 t, \"intervalRelaxFactor\": 0.4}"
   transitGeneralizedCostLimit: TransitGeneralizedCostFilterParams
 }
 

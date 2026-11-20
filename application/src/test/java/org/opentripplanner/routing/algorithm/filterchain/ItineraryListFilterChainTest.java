@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.opentripplanner.core.model.basic.CostLinearFunction;
+import org.opentripplanner.core.model.basic.Ratio;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
@@ -28,6 +29,7 @@ import org.opentripplanner.model.plan.TestItineraryBuilder;
 import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.algorithm.filterchain.api.GroupBySimilarity;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
+import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.services.TransitAlertService;
@@ -145,7 +147,7 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
   @Test
   void groupByTheLongestItineraryAndTwoGroups() {
     ItineraryListFilterChain chain = createBuilder(false, false, 20)
-      .addGroupBySimilarity(GroupBySimilarity.createWithOneItineraryPerGroup(.5))
+      .addGroupBySimilarity(GroupBySimilarity.createWithOneItineraryPerGroup(Ratio.of(0.5)))
       .build();
 
     // Group 1
@@ -261,7 +263,7 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
     ItineraryListFilterChain chain = createBuilder(false, false, 10)
       // we need to add the group-by-distance-and-id filter because it undeletes those with the
       // fewest transfers and we want to make sure that the filter under test comes _after_
-      .addGroupBySimilarity(GroupBySimilarity.createWithOneItineraryPerGroup(.5))
+      .addGroupBySimilarity(GroupBySimilarity.createWithOneItineraryPerGroup(Ratio.of(0.5)))
       .withRemoveTimeshiftedItinerariesWithSameRoutesAndStops(true)
       .build();
     assertEquals(toStr(List.of(i4, i1)), toStr(chain.filter(List.of(i1, i2, i3, i4, i5, i6))));
@@ -291,7 +293,7 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
     var chain = new ItineraryListFilterChainBuilder(STREET_AND_ARRIVAL_TIME)
       .withMaxNumberOfItineraries(3)
       .addGroupBySimilarity(
-        GroupBySimilarity.createWithMoreThanOneItineraryPerGroup(0.68, 3, true, 0.0)
+        GroupBySimilarity.createWithMoreThanOneItineraryPerGroup(Ratio.of(0.68), 3, true, 0.0)
       )
       .build();
 
@@ -430,6 +432,48 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
         )
         .build();
       assertEquals(toStr(List.of(walk)), toStr(chain.filter(List.of(walk, bus))));
+    }
+  }
+
+  /**
+   * Direct flex and the other transit itineraries have separate cost limits. A direct-flex
+   * itinerary is never used as the reference when the transit cost limit is calculated, so a cheap
+   * direct flex does not remove transit.
+   */
+  @Nested
+  class DirectFlexAndTransitCost {
+
+    private final ItineraryListFilterChainBuilder builder = createBuilder(false, false, 10)
+      .withTransitGeneralizedCostLimit(
+        ItineraryFilterPreferences.DEFAULT.transitGeneralizedCostLimit()
+      )
+      .withDirectFlexGeneralizedCostLimit(
+        ItineraryFilterPreferences.DEFAULT.directFlexGeneralizedCostLimit()
+      );
+
+    @Test
+    void keepTransitWithHigherCostThanDirectFlex() {
+      var directFlex = newItinerary(A, T11_15).flex(T11_15, T11_25, E).build(1000);
+
+      // Limit if the direct flex were the reference: 900 + 1.5 * 1000 + 0.4 * 5 * 60 = 2520
+      var bus = newItinerary(A).bus(21, T11_00, T11_30, E).build(3000);
+
+      var chain = builder.build();
+
+      assertEquals(toStr(List.of(directFlex, bus)), toStr(chain.filter(List.of(bus, directFlex))));
+    }
+
+    @Test
+    void removeDirectFlexWithHigherCostThanTransit() {
+      // Limit: 900 + 1.5 * 1000 = 2400
+      var bus = newItinerary(A).bus(21, T11_00, T11_30, E).build(1000);
+
+      var directFlex = newItinerary(A, T11_00).flex(T11_00, T11_30, E).build(3000);
+
+      var chain = builder.withDebugEnabled(ofDebugEnabled(true)).build();
+
+      assertEquals(toStr(List.of(bus, directFlex)), toStr(chain.filter(List.of(bus, directFlex))));
+      assertEquals("[direct-flex-cost-filter]", toStringOfTags(directFlex.systemNotices()));
     }
   }
 
