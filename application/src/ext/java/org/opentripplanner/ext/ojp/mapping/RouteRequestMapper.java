@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.ojp.mapping;
 
 import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 import static java.time.ZoneOffset.UTC;
 import static org.opentripplanner.ext.ojp.mapping.TripResponseMapper.OptionalFeature.INTERMEDIATE_STOPS;
 import static org.opentripplanner.ext.ojp.mapping.TripResponseMapper.OptionalFeature.LEG_PROJECTIONS;
@@ -29,6 +30,14 @@ import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 
 public class RouteRequestMapper {
+
+  /// If any of these parameters is set to true, then we activate wheelchair-accessible routing
+  private static final List<Function<TripParamStructure, Boolean>> WHEELCHAIR_ACCESSIBLE_PARAMS =
+    List.of(
+      TripParamStructure::isNoStairs,
+      TripParamStructure::isLevelEntrance,
+      TripParamStructure::isLevelEntranceOrBoardingAid
+    );
 
   private final FeedScopedIdMapper idMapper;
   private final RouteRequest defaultRequest;
@@ -64,10 +73,24 @@ public class RouteRequestMapper {
       addExcludedModes(tr, builder);
       addIncludedModes(tr, builder);
       addTransitFilters(tr, builder);
+      setWheelchair(tr, builder);
 
       return builder.buildRequest();
     }
     throw new IllegalArgumentException("TripRequest must have one origin and one destination.");
+  }
+
+  /// Enables wheelchair-accessible routing if any of the accessibility parameters is set. If none
+  /// is set, the value of the default request (from the router config) is kept.
+  private static void setWheelchair(OJPTripRequestStructure tr, RouteRequestBuilder builder) {
+    var wheelchairAccessible = Optional.ofNullable(tr.getParams())
+      .stream()
+      .flatMap(p -> WHEELCHAIR_ACCESSIBLE_PARAMS.stream().map(check -> check.apply(p)))
+      .anyMatch(TRUE::equals);
+
+    if (wheelchairAccessible) {
+      builder.withJourney(j -> j.withWheelchair(true));
+    }
   }
 
   private void addTransitFilters(OJPTripRequestStructure tr, RouteRequestBuilder builder) {

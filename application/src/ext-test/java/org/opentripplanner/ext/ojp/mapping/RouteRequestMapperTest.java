@@ -4,6 +4,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.ext.ojp.mapping.TripResponseMapper.OptionalFeature.INTERMEDIATE_STOPS;
 import static org.opentripplanner.ext.ojp.mapping.TripResponseMapper.OptionalFeature.LEG_PROJECTIONS;
@@ -343,6 +344,46 @@ class RouteRequestMapperTest {
     var tripRequest = baseRequest().withParams(params);
 
     assertEquals(expected, RouteRequestMapper.optionalFeatures(tripRequest));
+  }
+
+  private static Stream<Arguments> wheelchairCases() {
+    return Stream.of(
+      Arguments.of(null, false),
+      Arguments.of(new TripParamStructure(), false),
+      Arguments.of(
+        new TripParamStructure()
+          .withNoStairs(false)
+          .withLevelEntrance(false)
+          .withLevelEntranceOrBoardingAid(false),
+        false
+      ),
+      Arguments.of(new TripParamStructure().withNoStairs(true), true),
+      Arguments.of(new TripParamStructure().withLevelEntrance(true), true),
+      Arguments.of(new TripParamStructure().withLevelEntranceOrBoardingAid(true), true),
+      Arguments.of(new TripParamStructure().withNoStairs(false).withLevelEntrance(true), true)
+    );
+  }
+
+  @ParameterizedTest
+  @MethodSource("wheelchairCases")
+  void wheelchair(TripParamStructure params, boolean expected) {
+    var tripRequest = baseRequest().withParams(params);
+
+    var routeRequest = mapper.map(tripRequest);
+
+    assertEquals(expected, routeRequest.journey().wheelchair());
+  }
+
+  @Test
+  void wheelchairKeepsDefaultFromConfig() {
+    var defaultRequest = RouteRequest.of()
+      .withJourney(j -> j.withWheelchair(true))
+      .buildDefault();
+    var mapper = new RouteRequestMapper(new DefaultFeedIdMapper(), defaultRequest);
+
+    var routeRequest = mapper.map(baseRequest().withParams(new TripParamStructure()));
+
+    assertTrue(routeRequest.journey().wheelchair());
   }
 
   private static OJPTripRequestStructure baseRequest() {

@@ -331,7 +331,7 @@
         <dependency>
             <groupId>org.opentripplanner</groupId>
             <artifactId>ojp-java-model</artifactId>
-            <version>2.0.7</version>
+            <version>2.0.9</version>
         </dependency>
         <!-- Jersey uses java.util logging, redirect it to slf4j API (we use the Logback implementation) -->
         <dependency>
