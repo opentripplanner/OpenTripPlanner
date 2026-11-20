@@ -227,13 +227,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
   }
 
   @ParameterizedTest
-  @ValueSource(
-    strings = {
-      "groupSimilarityKeepOne",
-      "groupSimilarityKeepThree",
-      "groupSimilarityKeepNumOfItineraries",
-    }
-  )
+  @ValueSource(strings = { "groupSimilarityKeepOne", "groupSimilarityKeepThree" })
   public void testGroupSimilarityAcceptsOne(String field) {
     Map<String, Object> arguments = arguments("itineraryFilters", Map.of(field, 1.0));
 
@@ -247,30 +241,8 @@ public class TripRequestMapperTest implements PlanTestConstants {
     );
   }
 
-  /**
-   * graphql-java fills in the schema default for every field the client leaves out, so a client
-   * that sends only the deprecated field also gets the default of groupSimilarityKeepThree.
-   */
-  @Test
-  public void testDeprecatedGroupSimilarityKeepNumOfItinerariesWinsOverDefault() {
-    Map<String, Object> arguments = arguments(
-      "itineraryFilters",
-      Map.of("groupSimilarityKeepNumOfItineraries", 0.9, "groupSimilarityKeepThree", 0.68)
-    );
-
-    var filters = MAPPER.createRequest(executionContext(arguments)).preferences().itineraryFilter();
-
-    assertEquals(Ratio.of(0.9), filters.groupSimilarityKeepThree());
-  }
-
   @ParameterizedTest
-  @ValueSource(
-    strings = {
-      "groupSimilarityKeepOne",
-      "groupSimilarityKeepThree",
-      "groupSimilarityKeepNumOfItineraries",
-    }
-  )
+  @ValueSource(strings = { "groupSimilarityKeepOne", "groupSimilarityKeepThree" })
   public void testGroupSimilarityOutsideRangeIsRejected(String field) {
     Map<String, Object> arguments = arguments("itineraryFilters", Map.of(field, 1.01));
 
