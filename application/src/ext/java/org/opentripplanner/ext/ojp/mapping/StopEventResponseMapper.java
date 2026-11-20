@@ -3,15 +3,6 @@ package org.opentripplanner.ext.ojp.mapping;
 import static org.opentripplanner.ext.ojp.mapping.StopEventResponseMapper.OptionalFeature.REALTIME_DATA;
 import static org.opentripplanner.ext.ojp.mapping.TextMapper.internationalText;
 
-import de.vdv.ojp20.CallAtNearStopStructure;
-import de.vdv.ojp20.CallAtStopStructure;
-import de.vdv.ojp20.OJP;
-import de.vdv.ojp20.OJPResponseStructure;
-import de.vdv.ojp20.OJPStopEventDeliveryStructure;
-import de.vdv.ojp20.ServiceArrivalStructure;
-import de.vdv.ojp20.ServiceDepartureStructure;
-import de.vdv.ojp20.StopEventResultStructure;
-import de.vdv.ojp20.StopEventStructure;
 import jakarta.xml.bind.JAXBElement;
 import java.nio.charset.StandardCharsets;
 import java.time.ZoneId;
@@ -26,6 +17,15 @@ import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.ext.ojp.service.CallAtStop;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.TripTimeOnDate;
+import org.opentripplanner.ojp.schema.ojp.CallAtNearStopStructure;
+import org.opentripplanner.ojp.schema.ojp.CallAtStopStructure;
+import org.opentripplanner.ojp.schema.ojp.OJP;
+import org.opentripplanner.ojp.schema.ojp.OJPResponseStructure;
+import org.opentripplanner.ojp.schema.ojp.OJPStopEventDeliveryStructure;
+import org.opentripplanner.ojp.schema.ojp.ServiceArrivalStructure;
+import org.opentripplanner.ojp.schema.ojp.ServiceDepartureStructure;
+import org.opentripplanner.ojp.schema.ojp.StopEventResultStructure;
+import org.opentripplanner.ojp.schema.ojp.StopEventStructure;
 import org.opentripplanner.ojp.time.XmlDateTime;
 
 /**

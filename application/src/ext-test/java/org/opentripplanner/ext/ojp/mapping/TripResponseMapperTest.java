@@ -6,12 +6,6 @@ import static org.opentripplanner.ext.ojp.mapping.TripResponseMapper.OptionalFea
 import static org.opentripplanner.framework.io.FileUtils.assertFileEquals;
 import static org.opentripplanner.framework.io.FileUtils.writeFile;
 
-import de.vdv.ojp20.LegStructure;
-import de.vdv.ojp20.LegTrackStructure;
-import de.vdv.ojp20.OJP;
-import de.vdv.ojp20.OJPTripDeliveryStructure;
-import de.vdv.ojp20.TripResultStructure;
-import de.vdv.ojp20.siri.LocationStructure;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.JAXBException;
@@ -31,6 +25,12 @@ import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.TestItineraryBuilder;
 import org.opentripplanner.model.plan.TripPlan;
 import org.opentripplanner.model.plan.leg.StreetLeg;
+import org.opentripplanner.ojp.schema.ojp.LegStructure;
+import org.opentripplanner.ojp.schema.ojp.LegTrackStructure;
+import org.opentripplanner.ojp.schema.ojp.OJP;
+import org.opentripplanner.ojp.schema.ojp.OJPTripDeliveryStructure;
+import org.opentripplanner.ojp.schema.ojp.TripResultStructure;
+import org.opentripplanner.ojp.schema.siri.LocationStructure;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.test.support.ResourceLoader;

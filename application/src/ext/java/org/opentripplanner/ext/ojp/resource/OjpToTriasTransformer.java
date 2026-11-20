@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.ojp.resource;
 
-import de.vdv.ojp20.OJP;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import java.io.ByteArrayInputStream;
@@ -15,6 +14,7 @@ import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+import org.opentripplanner.ojp.schema.ojp.OJP;
 
 /**
  * Converts from OJP XML to TRIAS XML by using an XSLT stylesheet.

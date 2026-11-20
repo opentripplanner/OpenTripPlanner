@@ -5,12 +5,6 @@ import static org.opentripplanner.ext.ojp.mapping.StopEventResponseMapper.Option
 import static org.opentripplanner.ext.ojp.mapping.StopEventResponseMapper.OptionalFeature.PREVIOUS_CALLS;
 import static org.opentripplanner.ext.ojp.mapping.StopEventResponseMapper.OptionalFeature.REALTIME_DATA;
 
-import de.vdv.ojp20.ModeFilterStructure;
-import de.vdv.ojp20.OJPStopEventRequestStructure;
-import de.vdv.ojp20.PersonalModesEnumeration;
-import de.vdv.ojp20.StopEventParamStructure;
-import de.vdv.ojp20.StopEventTypeEnumeration;
-import de.vdv.ojp20.UseRealtimeDataEnumeration;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -22,6 +16,12 @@ import java.util.stream.Collectors;
 import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.ojp.service.CallAtStopService;
+import org.opentripplanner.ojp.schema.ojp.ModeFilterStructure;
+import org.opentripplanner.ojp.schema.ojp.OJPStopEventRequestStructure;
+import org.opentripplanner.ojp.schema.ojp.PersonalModesEnumeration;
+import org.opentripplanner.ojp.schema.ojp.StopEventParamStructure;
+import org.opentripplanner.ojp.schema.ojp.StopEventTypeEnumeration;
+import org.opentripplanner.ojp.schema.ojp.UseRealtimeDataEnumeration;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.service.ArrivalDeparture;
 

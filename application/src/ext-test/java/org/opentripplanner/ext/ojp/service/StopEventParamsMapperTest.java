@@ -10,18 +10,6 @@ import static org.opentripplanner.ext.ojp.mapping.StopEventResponseMapper.Option
 import static org.opentripplanner.transit.model.basic.TransitMode.BUS;
 import static org.opentripplanner.transit.model.basic.TransitMode.FERRY;
 
-import de.vdv.ojp20.IndividualTransportOptionStructure;
-import de.vdv.ojp20.ItModesStructure;
-import de.vdv.ojp20.LineDirectionFilterStructure;
-import de.vdv.ojp20.ModeFilterStructure;
-import de.vdv.ojp20.OJPStopEventRequestStructure;
-import de.vdv.ojp20.PersonalModesEnumeration;
-import de.vdv.ojp20.PlaceContextStructure;
-import de.vdv.ojp20.StopEventParamStructure;
-import de.vdv.ojp20.UseRealtimeDataEnumeration;
-import de.vdv.ojp20.siri.LineDirectionStructure;
-import de.vdv.ojp20.siri.LineRefStructure;
-import de.vdv.ojp20.siri.VehicleModesOfTransportEnumeration;
 import java.time.ZonedDateTime;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
@@ -29,6 +17,18 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.api.model.transit.DefaultFeedIdMapper;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.ojp.mapping.StopEventParamsMapper;
+import org.opentripplanner.ojp.schema.ojp.IndividualTransportOptionStructure;
+import org.opentripplanner.ojp.schema.ojp.ItModesStructure;
+import org.opentripplanner.ojp.schema.ojp.LineDirectionFilterStructure;
+import org.opentripplanner.ojp.schema.ojp.ModeFilterStructure;
+import org.opentripplanner.ojp.schema.ojp.OJPStopEventRequestStructure;
+import org.opentripplanner.ojp.schema.ojp.PersonalModesEnumeration;
+import org.opentripplanner.ojp.schema.ojp.PlaceContextStructure;
+import org.opentripplanner.ojp.schema.ojp.StopEventParamStructure;
+import org.opentripplanner.ojp.schema.ojp.UseRealtimeDataEnumeration;
+import org.opentripplanner.ojp.schema.siri.LineDirectionStructure;
+import org.opentripplanner.ojp.schema.siri.LineRefStructure;
+import org.opentripplanner.ojp.schema.siri.VehicleModesOfTransportEnumeration;
 import org.opentripplanner.ojp.time.XmlDateTime;
 
 class StopEventParamsMapperTest {

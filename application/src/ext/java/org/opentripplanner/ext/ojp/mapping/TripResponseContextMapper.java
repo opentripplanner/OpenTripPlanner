@@ -2,16 +2,16 @@ package org.opentripplanner.ext.ojp.mapping;
 
 import static org.opentripplanner.ext.ojp.mapping.TextMapper.internationalText;
 
-import de.vdv.ojp20.PlaceStructure;
-import de.vdv.ojp20.PlacesStructure;
-import de.vdv.ojp20.ResponseContextStructure;
-import de.vdv.ojp20.StopPlaceStructure;
-import de.vdv.ojp20.StopPointStructure;
 import java.util.Objects;
 import java.util.stream.Stream;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.TripPlan;
+import org.opentripplanner.ojp.schema.ojp.PlaceStructure;
+import org.opentripplanner.ojp.schema.ojp.PlacesStructure;
+import org.opentripplanner.ojp.schema.ojp.ResponseContextStructure;
+import org.opentripplanner.ojp.schema.ojp.StopPlaceStructure;
+import org.opentripplanner.ojp.schema.ojp.StopPointStructure;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.utils.collection.StreamUtils;
 

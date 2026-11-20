@@ -7,11 +7,6 @@ import static org.opentripplanner.ext.ojp.mapping.TripResponseMapper.OptionalFea
 import static org.opentripplanner.ext.ojp.mapping.TripResponseMapper.OptionalFeature.LEG_PROJECTIONS;
 
 import com.google.common.collect.ImmutableSet;
-import de.vdv.ojp20.ModeAndModeOfOperationFilterStructure;
-import de.vdv.ojp20.OJPTripRequestStructure;
-import de.vdv.ojp20.PlaceContextStructure;
-import de.vdv.ojp20.TripParamStructure;
-import de.vdv.ojp20.UseRealtimeDataEnumeration;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
@@ -22,6 +17,11 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.model.GenericLocation;
+import org.opentripplanner.ojp.schema.ojp.ModeAndModeOfOperationFilterStructure;
+import org.opentripplanner.ojp.schema.ojp.OJPTripRequestStructure;
+import org.opentripplanner.ojp.schema.ojp.PlaceContextStructure;
+import org.opentripplanner.ojp.schema.ojp.TripParamStructure;
+import org.opentripplanner.ojp.schema.ojp.UseRealtimeDataEnumeration;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.RouteRequestBuilder;

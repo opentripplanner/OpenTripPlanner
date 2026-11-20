@@ -1,9 +1,9 @@
 package org.opentripplanner.ext.ojp.mapping;
 
-import de.vdv.ojp20.InternationalTextStructure;
-import de.vdv.ojp20.siri.NaturalLanguageStringStructure;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.ojp.schema.ojp.InternationalTextStructure;
+import org.opentripplanner.ojp.schema.siri.NaturalLanguageStringStructure;
 
 class TextMapper {
 

@@ -1,11 +1,5 @@
 package org.opentripplanner.ext.ojp.service;
 
-import de.vdv.ojp20.OJP;
-import de.vdv.ojp20.OJPStopEventRequestStructure;
-import de.vdv.ojp20.OJPTripRequestStructure;
-import de.vdv.ojp20.PlaceContextStructure;
-import de.vdv.ojp20.PlaceRefStructure;
-import de.vdv.ojp20.siri.StopPointRefStructure;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -16,6 +10,12 @@ import org.opentripplanner.ext.ojp.mapping.RouteRequestMapper;
 import org.opentripplanner.ext.ojp.mapping.StopEventParamsMapper;
 import org.opentripplanner.ext.ojp.mapping.StopEventResponseMapper;
 import org.opentripplanner.ext.ojp.mapping.TripResponseMapper;
+import org.opentripplanner.ojp.schema.ojp.OJP;
+import org.opentripplanner.ojp.schema.ojp.OJPStopEventRequestStructure;
+import org.opentripplanner.ojp.schema.ojp.OJPTripRequestStructure;
+import org.opentripplanner.ojp.schema.ojp.PlaceContextStructure;
+import org.opentripplanner.ojp.schema.ojp.PlaceRefStructure;
+import org.opentripplanner.ojp.schema.siri.StopPointRefStructure;
 import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.street.geometry.WgsCoordinate;

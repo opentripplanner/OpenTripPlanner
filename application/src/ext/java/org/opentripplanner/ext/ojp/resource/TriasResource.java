@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.ojp.resource;
 
-import de.vdv.ojp20.OJP;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -24,6 +23,7 @@ import org.opentripplanner.ext.ojp.RequestHandler;
 import org.opentripplanner.ext.ojp.parameters.TriasApiParameters;
 import org.opentripplanner.ext.ojp.service.CallAtStopService;
 import org.opentripplanner.ext.ojp.service.OjpService;
+import org.opentripplanner.ojp.schema.ojp.OJP;
 import org.opentripplanner.place.NearbyStopFinder;
 import org.opentripplanner.place.nearbystopfinder.StraightLineNearbyStopFinder;
 import org.opentripplanner.place.nearbystopfinder.StreetNearbyStopFinder;
