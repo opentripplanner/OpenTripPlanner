@@ -462,6 +462,7 @@ public class TransferProfilesConfigMapper {
     builder.withReluctance(
       mapReluctance(p, "A multiplier for the cost of traveling in a wheelchair.", base)
     );
+    builder.withSafetyFactor(mapSafetyFactor(p, base));
     return builder.build();
   }
 

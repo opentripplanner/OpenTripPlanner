@@ -62,6 +62,9 @@ final class TransferRequestDifferences {
     WHEELCHAIR.add(
       parameter("wheelchair.stairsReluctance", r -> r.preferences().wheelchair().stairsReluctance())
     );
+    WHEELCHAIR.add(
+      parameter("wheelchair.stairsTimeFactor", r -> r.preferences().wheelchair().stairsTimeFactor())
+    );
   }
 
   private static final List<Parameter> BICYCLE = List.of(
