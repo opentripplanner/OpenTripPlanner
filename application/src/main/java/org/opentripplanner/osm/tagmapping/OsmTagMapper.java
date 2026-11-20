@@ -268,6 +268,7 @@ public class OsmTagMapper {
     // The direction follows Poudel & Singleton (2021), but the size of each factor is a judgment call.
     var roundabout = new Equals("junction", "roundabout");
     var multiLane = new Condition.GreaterThan("lanes", 1);
+    // avoid major roundabouts
     props.setMixinProperties(
       new LogicalOrSpecifier(
         new ExactMatchSpecifier(roundabout, multiLane),
@@ -286,6 +287,7 @@ public class OsmTagMapper {
       ),
       ofBicycleSafety(1.5)
     );
+    // prefer minor roundabouts
     props.setMixinProperties(
       new ExactMatchSpecifier(
         roundabout,
@@ -294,7 +296,7 @@ public class OsmTagMapper {
           "residential",
           "residential_link",
           "living_street",
-          // untagged roads are assumed to be a minor
+          // untagged roads are assumed to be minor
           "unclassified"
         ),
         new Not(multiLane)
