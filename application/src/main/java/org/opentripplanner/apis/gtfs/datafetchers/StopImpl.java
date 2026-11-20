@@ -135,12 +135,6 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
   }
 
   @Override
-  @Deprecated
-  public DataFetcher<Object> cluster() {
-    return environment -> null;
-  }
-
-  @Override
   public DataFetcher<Iterable<StopCallOnTripOnServiceDate>> canceledCalls() {
     return environment -> {
       var args = new GraphQLTypes.GraphQLStopCanceledCallsArgs(environment.getArguments());

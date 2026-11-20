@@ -56,7 +56,6 @@ config:
     CarPark: org.opentripplanner.service.vehicleparking.model.VehicleParking#VehicleParking
     CarsAllowed: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLCarsAllowed#GraphQLCarsAllowed
     ContactInfo: org.opentripplanner.transit.model.organization.ContactInfo
-    Cluster: Object
     Coordinates: org.locationtech.jts.geom.Coordinate#Coordinate
     StopCall: org.opentripplanner.model.TripTimeOnDate#TripTimeOnDate
     StopCallOnTripOnServiceDate: org.opentripplanner.apis.gtfs.model.StopCallOnTripOnServiceDate#StopCallOnTripOnServiceDate
