@@ -64,6 +64,9 @@
           }
         }
         stopCalls {
+          destinationDisplay {
+            headsign
+          }
           geometryToNextCall {
             length
             points

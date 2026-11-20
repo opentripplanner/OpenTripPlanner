@@ -109,10 +109,10 @@ public class DoubleUtils {
   }
 
   /**
-   * Throws an exception if the value is less than zero.
+   * Throws an exception if the value is less than zero or {@code NaN}.
    */
   public static double requireNonNegative(double value) {
-    if (value < 0) {
+    if (Double.isNaN(value) || value < 0) {
       throw new IllegalArgumentException("Value is required to be non-negative, but was: " + value);
     }
     return value;
@@ -122,8 +122,13 @@ public class DoubleUtils {
     return requireInRange(value, min, max, "value");
   }
 
+  /**
+   * Check if the given {@code value} is in range {@code [min .. max]}. Both {@code min} and
+   * {@code max} are inclusive. Throws an {@link IllegalArgumentException} if the value is not in
+   * range or is {@code NaN}.
+   */
   public static double requireInRange(double value, double min, double max, String field) {
-    if (value < min || value > max) {
+    if (Double.isNaN(value) || value < min || value > max) {
       throw new IllegalArgumentException(
         "The %s is not in range[%s, %s]: %s".formatted(
           field,

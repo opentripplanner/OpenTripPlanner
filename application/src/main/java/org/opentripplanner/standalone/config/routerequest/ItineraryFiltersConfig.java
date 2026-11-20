@@ -3,6 +3,7 @@ package org.opentripplanner.standalone.config.routerequest;
 import static org.opentripplanner.standalone.config.framework.json.EnumMapper.docEnumValueList;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_11;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_4;
@@ -14,6 +15,7 @@ import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedC
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
+import org.opentripplanner.standalone.config.framework.json.OtpVersion;
 
 public class ItineraryFiltersConfig {
 
@@ -137,7 +139,8 @@ public class ItineraryFiltersConfig {
             .summary("A relative limit for the generalized-cost for transit itineraries.")
             .description(
               """
-              The filter compares all itineraries against every other itinerary. If the generalized-cost plus a
+              The filter compares all transit itineraries, except direct flex, against every other such
+              itinerary. If the generalized-cost plus a
               `transitGeneralizedCostLimit` is higher than the other generalized-cost, then the itinerary is
               dropped. The `transitGeneralizedCostLimit` is calculated using the `costLimitFunction` plus a
               *relative cost* for the distance in time between the itineraries. The *relative cost* is the
@@ -146,7 +149,28 @@ public class ItineraryFiltersConfig {
               """
             )
             .asObject(),
-          dft.transitGeneralizedCostLimit()
+          dft.transitGeneralizedCostLimit(),
+          V2_2
+        )
+      )
+      .withDirectFlexGeneralizedCostLimit(
+        parseTransitGeneralizedCostLimit(
+          c
+            .of("directFlexGeneralizedCostLimit")
+            .since(V2_11)
+            .summary("A relative limit for the generalized-cost for direct-flex itineraries.")
+            .description(
+              """
+              The filter compares each direct-flex itinerary against every other transit itinerary,
+              including other direct-flex itineraries, and drops it if its generalized-cost is higher
+              than the limit. The limit is calculated in the same way as for
+              `transitGeneralizedCostLimit`, using the `costLimitFunction` plus a *relative cost*
+              for the distance in time between the itineraries.
+              """
+            )
+            .asObject(),
+          dft.directFlexGeneralizedCostLimit(),
+          V2_11
         )
       )
       .withNonTransitGeneralizedCostLimit(
@@ -309,7 +333,8 @@ public class ItineraryFiltersConfig {
 
   private static TransitGeneralizedCostFilterParams parseTransitGeneralizedCostLimit(
     NodeAdapter node,
-    TransitGeneralizedCostFilterParams transitGeneralizedCostLimit
+    TransitGeneralizedCostFilterParams transitGeneralizedCostLimit,
+    OtpVersion since
   ) {
     if (node.isEmpty()) {
       return transitGeneralizedCostLimit;
@@ -318,7 +343,7 @@ public class ItineraryFiltersConfig {
     return new TransitGeneralizedCostFilterParams(
       node
         .of("costLimitFunction")
-        .since(V2_2)
+        .since(since)
         .summary("The base function used by the filter.")
         .description(
           "This function calculates the threshold for the filter, when the itineraries have " +
@@ -327,7 +352,7 @@ public class ItineraryFiltersConfig {
         .asCostLinearFunction(transitGeneralizedCostLimit.costLimitFunction()),
       node
         .of("intervalRelaxFactor")
-        .since(V2_2)
+        .since(since)
         .summary(
           "How much the filter should be relaxed for itineraries that do not overlap in time."
         )

@@ -5,7 +5,6 @@ import static com.google.common.truth.Truth.assertThat;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,6 +27,7 @@ import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.transit.service.TransitServiceResolver;
 
 class AccessEgressRouterTest extends GraphRoutingTest {
 
@@ -273,11 +273,7 @@ class AccessEgressRouterTest extends GraphRoutingTest {
       var linkingContextFactory = new LinkingContextFactory(
         graph,
         vertexCreationService,
-        transitService::findStopOrChildIds,
-        id -> {
-          var group = transitService.getStopLocationsGroup(id);
-          return Optional.ofNullable(group).map(locationsGroup -> locationsGroup.getCoordinate());
-        }
+        new TransitServiceResolver(transitService)
       );
       var linkingRequest = LinkingContextRequestMapper.map(request);
       var linkingContext = linkingContextFactory.create(verticesContainer, linkingRequest);

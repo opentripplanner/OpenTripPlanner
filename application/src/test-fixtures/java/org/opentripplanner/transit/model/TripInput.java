@@ -140,7 +140,15 @@ public class TripInput {
   }
 
   public TripInput addStop(RegularStop stop, String arrivalTime, String departureTime) {
-    return addStopWithHeadsign(stop, arrivalTime, departureTime, null);
+    stops.add(
+      new RegularStopCallInput(
+        stop,
+        TimeUtils.time(arrivalTime),
+        TimeUtils.time(departureTime),
+        null
+      )
+    );
+    return this;
   }
 
   public TripInput addStop(
@@ -172,6 +180,20 @@ public class TripInput {
     String arrivalTime,
     String departureTime,
     String headsign
+  ) {
+    return addStopWithHeadsign(
+      stop,
+      arrivalTime,
+      departureTime,
+      headsign == null ? null : new NonLocalizedString(headsign)
+    );
+  }
+
+  public TripInput addStopWithHeadsign(
+    RegularStop stop,
+    String arrivalTime,
+    String departureTime,
+    @Nullable I18NString headsign
   ) {
     stops.add(
       new RegularStopCallInput(
@@ -248,7 +270,7 @@ public class TripInput {
     RegularStop stop,
     int arrivalTime,
     int departureTime,
-    @Nullable String headsign,
+    @Nullable I18NString headsign,
     @Nullable PickDrop pickupType,
     @Nullable PickDrop dropoffType
   ) implements StopCallInput {
@@ -256,7 +278,7 @@ public class TripInput {
       RegularStop stop,
       int arrivalTime,
       int departureTime,
-      @Nullable String headsign
+      @Nullable I18NString headsign
     ) {
       this(stop, arrivalTime, departureTime, headsign, null, null);
     }
@@ -269,7 +291,7 @@ public class TripInput {
       st.setArrivalTime(arrivalTime);
       st.setDepartureTime(departureTime);
       if (headsign != null) {
-        st.setStopHeadsign(new NonLocalizedString(headsign));
+        st.setStopHeadsign(headsign);
       }
       if (pickupType != null) {
         st.setPickupType(pickupType);

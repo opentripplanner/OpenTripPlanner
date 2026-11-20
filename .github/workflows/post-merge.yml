@@ -9,6 +9,10 @@ on:
 concurrency:
   group: github-push
 
+# GITHUB_TOKEN is only used to check out the (public) base branch; pushes use CHANGELOG_TOKEN
+permissions:
+  contents: read
+
 jobs:
   changelog-entry:
     if: github.event.pull_request.merged && github.repository_owner == 'opentripplanner' && !contains(github.event.pull_request.labels.*.name, '+Skip Changelog')
@@ -20,7 +24,8 @@ jobs:
         with:
           # explicitly check out the base branch: this workflow must never run fork PR code
           ref: ${{ github.event.pull_request.base.ref }}
-          token: ${{ secrets.CHANGELOG_TOKEN }}
+          # do not store a token in .git/config; it is passed to the push step only
+          persist-credentials: false
 
       - name: Configure git user
         run: |
@@ -30,20 +35,27 @@ jobs:
       - name: Generate changelog entry from PR information
         run: |
           # add a line above the one which contains AUTOMATIC_CHANGELOG_PLACEHOLDER
-          ITEM="${TITLE} [#${NUMBER}](${URL})"
+          # The title is untrusted: awk reads it as data through ENVIRON. Never interpolate it
+          # into the awk program text (or any other program text).
+          export ITEM="${TITLE} [#${NUMBER}](${URL})"
           TEMP_FILE=doc/user/Changelog.generated.md
           FILE=doc/user/Changelog.md
-          awk "/CHANGELOG_PLACEHOLDER/{print \"- $ITEM\"}1" $FILE > $TEMP_FILE
-          mv $TEMP_FILE $FILE
-          git add $FILE
+          awk '/CHANGELOG_PLACEHOLDER/{print "- " ENVIRON["ITEM"]}1' "$FILE" > "$TEMP_FILE"
+          mv "$TEMP_FILE" "$FILE"
+          git add "$FILE"
           git commit -m "Add changelog entry for #${NUMBER} [ci skip]"
-          git pull --rebase origin dev-2.x
-          git push ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}.git HEAD:dev-2.x
         env:
           # Use environment variables to prevent injection attack
           TITLE: ${{ github.event.pull_request.title }}
           NUMBER: ${{ github.event.pull_request.number }}
           URL: ${{ github.event.pull_request.html_url }}
+
+      - name: Push changelog entry
+        run: |
+          git pull --rebase origin dev-2.x
+          git push "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:dev-2.x
+        env:
+          TOKEN: ${{ secrets.CHANGELOG_TOKEN }}
 
   serialization-version:
     # if you have a dependent job that is skipped (ie. you want to bump the version but not have a changelog entry) you must add
@@ -69,7 +81,8 @@ jobs:
         with:
           # explicitly check out the base branch: this workflow must never run fork PR code
           ref: ${{ github.event.pull_request.base.ref }}
-          token: ${{ secrets.CHANGELOG_TOKEN }}
+          # do not store a token in .git/config; it is passed to the push step only
+          persist-credentials: false
 
       - name: Bump serialization version
         run: |
@@ -81,7 +94,8 @@ jobs:
           git commit -m "Bump serialization version id for #${NUMBER}"
           # just for safety as the Github repo is eventually consistent, therefore this push competes with the changelog entry one
           git pull --rebase origin dev-2.x
-          git push ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}.git HEAD:dev-2.x
+          git push "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:dev-2.x
         env:
           # Use environment variables to prevent injection attack
           NUMBER: ${{ github.event.pull_request.number }}
+          TOKEN: ${{ secrets.CHANGELOG_TOKEN }}
