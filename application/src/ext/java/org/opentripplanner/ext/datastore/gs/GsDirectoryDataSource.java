@@ -11,6 +11,7 @@ import java.util.function.Consumer;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
+import org.opentripplanner.ext.datastore.gs.read.ParallelReadParameters;
 
 /**
  * This is a an adapter to to simulate a file directory on a GCS. Files created using an instance of
@@ -20,10 +21,17 @@ import org.opentripplanner.datastore.api.FileType;
 public class GsDirectoryDataSource extends AbstractGsDataSource implements CompositeDataSource {
 
   private final Storage storage;
+  private final ParallelReadParameters parallelRead;
 
-  GsDirectoryDataSource(Storage storage, BlobId blobId, FileType type) {
+  GsDirectoryDataSource(
+    Storage storage,
+    BlobId blobId,
+    FileType type,
+    ParallelReadParameters parallelRead
+  ) {
     super(blobId, type);
     this.storage = storage;
+    this.parallelRead = parallelRead;
   }
 
   @Override
@@ -42,7 +50,7 @@ public class GsDirectoryDataSource extends AbstractGsDataSource implements Compo
   @Override
   public Collection<DataSource> content() {
     Collection<DataSource> content = new ArrayList<>();
-    forEachChildBlob(blob -> content.add(new GsFileDataSource(blob, type())));
+    forEachChildBlob(blob -> content.add(new GsFileDataSource(blob, type(), parallelRead)));
     return content;
   }
 
@@ -51,7 +59,7 @@ public class GsDirectoryDataSource extends AbstractGsDataSource implements Compo
     Blob blob = childBlob(name);
     // If file exist
     if (blob != null) {
-      return new GsFileDataSource(blob, type());
+      return new GsFileDataSource(blob, type(), parallelRead);
     }
     // New file
     BlobId childBlobId = BlobId.of(bucketName(), childPath(name));

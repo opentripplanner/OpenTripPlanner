@@ -15,6 +15,7 @@ import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.api.GsParameters;
 import org.opentripplanner.datastore.base.DataSourceRepository;
 import org.opentripplanner.datastore.file.ZipStreamDataSourceDecorator;
+import org.opentripplanner.ext.datastore.gs.read.ParallelReadParameters;
 
 /**
  * This data store uses the local file system to access in-/out- data files.
@@ -23,11 +24,13 @@ public class GsDataSourceRepository implements DataSourceRepository {
 
   private final String credentialsFilename;
   private final String host;
+  private final ParallelReadParameters parallelRead;
   private Storage storage;
 
   public GsDataSourceRepository(GsParameters gsParameters) {
     this.credentialsFilename = gsParameters.credentialFile();
     this.host = gsParameters.host();
+    this.parallelRead = ParallelReadParameters.of(gsParameters);
   }
 
   @Override
@@ -67,7 +70,7 @@ public class GsDataSourceRepository implements DataSourceRepository {
     Blob blob = storage.get(blobId);
 
     if (blob != null) {
-      return new GsFileDataSource(blob, type);
+      return new GsFileDataSource(blob, type, parallelRead);
     } else {
       return new GsOutFileDataSource(storage, blobId, type);
     }
@@ -75,7 +78,7 @@ public class GsDataSourceRepository implements DataSourceRepository {
 
   private CompositeDataSource createCompositeSource(BlobId blobId, FileType type) {
     if (GsHelper.isRoot(blobId)) {
-      return new GsDirectoryDataSource(storage, blobId, type);
+      return new GsDirectoryDataSource(storage, blobId, type, parallelRead);
     }
 
     if (blobId.getName().endsWith(".zip")) {
@@ -86,10 +89,10 @@ public class GsDataSourceRepository implements DataSourceRepository {
           type.text() + " not found: " + GsHelper.toUriString(blobId)
         );
       }
-      DataSource gsSource = new GsFileDataSource(blob, type);
+      DataSource gsSource = new GsFileDataSource(blob, type, parallelRead);
       return new ZipStreamDataSourceDecorator(gsSource);
     }
-    return new GsDirectoryDataSource(storage, blobId, type);
+    return new GsDirectoryDataSource(storage, blobId, type, parallelRead);
   }
 
   private Storage connectToStorage() {
