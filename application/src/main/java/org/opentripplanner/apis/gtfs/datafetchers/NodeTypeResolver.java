@@ -54,7 +54,6 @@ public class NodeTypeResolver implements TypeResolver {
       }
       return schema.getObjectType("VehicleRentalStation");
     }
-    // if (o instanceof Cluster) { return schema.getObjectType("Cluster"); }
     if (o instanceof PatternAtStop) {
       return schema.getObjectType("DepartureRow");
     }
