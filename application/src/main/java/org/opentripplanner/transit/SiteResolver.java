@@ -21,5 +21,12 @@ public interface SiteResolver extends EntranceResolver {
   StopLocation getStopLocation(FeedScopedId id);
   Entrance getEntrance(FeedScopedId id);
   List<FeedScopedId> findStopOrChildIds(FeedScopedId id);
+
+  /**
+   * Finds the coordinate of a {@link GenericLocation}. An explicit coordinate on the location
+   * takes precedence. Otherwise, the coordinate of the stop is used, or the centroid of the
+   * station or group of stations if the location refers to one. Returns empty if the coordinate
+   * cannot be resolved.
+   */
   Optional<WgsCoordinate> findCoordinate(GenericLocation location);
 }

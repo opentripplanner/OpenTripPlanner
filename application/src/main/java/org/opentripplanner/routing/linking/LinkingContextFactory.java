@@ -323,7 +323,8 @@ public class LinkingContextFactory {
 
   /**
    * We need to use coordinates of the stop for cars as an alternative as not all stops are routable
-   * with cars.
+   * with cars. For a station, multi-modal station or group of stations, the coordinate of the group
+   * is used rather than those of its child stops.
    */
   private Optional<Vertex> getCarRoutableStreetVertex(
     TemporaryVerticesContainer container,
