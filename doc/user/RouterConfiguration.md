@@ -1000,6 +1000,9 @@ Ordered list of `StreetMode` values used as egress modes. Each entry is paired w
       "url" : "https://example.com/some/path",
       "feedId" : "feed_id",
       "timeout" : "30s",
+      "fuzzyMatching" : {
+        "timeTolerance" : "59s"
+      },
       "headers" : {
         "Authorization" : "Some-Token"
       }
@@ -1033,6 +1036,9 @@ Ordered list of `StreetMode` values used as egress modes. Each entry is paired w
       "fullyQualifiedNamespace" : "fully_qualified_namespace",
       "servicebus-url" : "service_bus_url",
       "feedId" : "feed_id",
+      "fuzzyMatching" : {
+        "timeTolerance" : "59s"
+      },
       "customMidnight" : 4,
       "history" : {
         "url" : "endpoint_url",
@@ -1049,7 +1055,10 @@ Ordered list of `StreetMode` values used as egress modes. Each entry is paired w
       "subscriptionProjectName" : "google_pubsub_subscription_project_name",
       "topicName" : "estimated_timetables",
       "dataInitializationUrl" : "https://example.com/some/path",
-      "fuzzyTripMatching" : true
+      "fuzzyTripMatching" : true,
+      "fuzzyMatching" : {
+        "timeTolerance" : "59s"
+      }
     },
     {
       "type" : "vehicle-parking",
@@ -1067,7 +1076,10 @@ Ordered list of `StreetMode` values used as egress modes. Each entry is paired w
       "type" : "siri-et-lite",
       "feedId" : "sta",
       "url" : "https://example.com/siri-lite/estimated-timetable/xml",
-      "fuzzyTripMatching" : true
+      "fuzzyTripMatching" : true,
+      "fuzzyMatching" : {
+        "timeTolerance" : "59s"
+      }
     },
     {
       "type" : "siri-sx-lite",
@@ -1084,6 +1096,9 @@ Ordered list of `StreetMode` values used as egress modes. Each entry is paired w
       "topic" : "trip/updates/#",
       "qos" : 1,
       "fuzzyTripMatching" : true,
+      "fuzzyMatching" : {
+        "timeTolerance" : "59s"
+      },
       "numberOfPrimingWorkers" : 4,
       "maxPrimingIdleTime" : "1s"
     }

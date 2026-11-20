@@ -16,20 +16,35 @@ public class SiriTestHelper {
   private final SiriRealTimeTripUpdateAdapter siriAdapter;
   private final SiriRealTimeTripUpdateAdapter siriAdapterWithFuzzyMatching;
 
-  SiriTestHelper(TransitTestEnvironment transitTestEnvironment) {
+  SiriTestHelper(
+    TransitTestEnvironment transitTestEnvironment,
+    SiriFuzzyTripMatchingParameters fuzzyTripMatching
+  ) {
     this.transitTestEnvironment = transitTestEnvironment;
     var repo = transitTestEnvironment.transitRepository();
-    this.siriAdapter = new SiriRealTimeTripUpdateAdapter(repo, DeduplicatorService.NOOP, null);
+    this.siriAdapter = new SiriRealTimeTripUpdateAdapter(repo, DeduplicatorService.NOOP);
     var cache = SiriFuzzyTripMatcherCache.create(transitTestEnvironment.transitService());
     this.siriAdapterWithFuzzyMatching = new SiriRealTimeTripUpdateAdapter(
       repo,
       DeduplicatorService.NOOP,
-      cache
+      cache,
+      fuzzyTripMatching
     );
   }
 
   public static SiriTestHelper of(TransitTestEnvironment transitTestEnvironment) {
-    return new SiriTestHelper(transitTestEnvironment);
+    return new SiriTestHelper(transitTestEnvironment, SiriFuzzyTripMatchingParameters.EXACT);
+  }
+
+  /**
+   * Create a helper where {@link #applyEstimatedTimetableWithFuzzyMatcher(List)} uses the given
+   * fuzzy trip matching configuration.
+   */
+  public static SiriTestHelper of(
+    TransitTestEnvironment transitTestEnvironment,
+    SiriFuzzyTripMatchingParameters fuzzyTripMatching
+  ) {
+    return new SiriTestHelper(transitTestEnvironment, fuzzyTripMatching);
   }
 
   public SiriEtBuilder etBuilder() {

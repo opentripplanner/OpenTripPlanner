@@ -1,5 +1,7 @@
 package org.opentripplanner.updater.trip.siri;
 
+import java.time.Duration;
+import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.transit.repository.TimetableRepository;
@@ -31,14 +33,37 @@ public class SiriRealTimeTripUpdateAdapter {
   @Nullable
   private final SiriFuzzyTripMatcherCache siriFuzzyTripMatcherCache;
 
+  private final Duration fuzzyTripMatchingTimeTolerance;
+
+  /**
+   * Create an adapter without fuzzy trip matching.
+   */
+  public SiriRealTimeTripUpdateAdapter(
+    TransitRepository transitRepository,
+    DeduplicatorService deduplicator
+  ) {
+    this(transitRepository, deduplicator, null, SiriFuzzyTripMatchingParameters.DISABLED);
+  }
+
+  /**
+   * @param siriFuzzyTripMatcherCache The shared fuzzy trip matcher cache. Must be set if fuzzy
+   *                                  trip matching is enabled, it is not used otherwise.
+   * @param fuzzyTripMatching         The fuzzy trip matching configuration of this updater.
+   */
   public SiriRealTimeTripUpdateAdapter(
     TransitRepository transitRepository,
     DeduplicatorService deduplicator,
-    @Nullable SiriFuzzyTripMatcherCache siriFuzzyTripMatcherCache
+    @Nullable SiriFuzzyTripMatcherCache siriFuzzyTripMatcherCache,
+    SiriFuzzyTripMatchingParameters fuzzyTripMatching
   ) {
     this.deduplicator = deduplicator;
     this.transitRepository = transitRepository;
-    this.siriFuzzyTripMatcherCache = siriFuzzyTripMatcherCache;
+    if (fuzzyTripMatching.enabled()) {
+      this.siriFuzzyTripMatcherCache = Objects.requireNonNull(siriFuzzyTripMatcherCache);
+    } else {
+      this.siriFuzzyTripMatcherCache = null;
+    }
+    this.fuzzyTripMatchingTimeTolerance = fuzzyTripMatching.timeTolerance();
     this.tripPatternCache = new TripPatternCache(tripPatternIdGenerator);
   }
 
@@ -50,7 +75,12 @@ public class SiriRealTimeTripUpdateAdapter {
   public SiriRealTimeUpdateHandler forUpdate(TimetableRepository buffer) {
     var fuzzyTripMatcher =
       siriFuzzyTripMatcherCache != null
-        ? new SiriFuzzyTripMatcher(siriFuzzyTripMatcherCache, buffer, transitRepository)
+        ? new SiriFuzzyTripMatcher(
+            siriFuzzyTripMatcherCache,
+            buffer,
+            transitRepository,
+            fuzzyTripMatchingTimeTolerance
+          )
         : null;
     return new SiriRealTimeUpdateHandler(
       transitRepository,

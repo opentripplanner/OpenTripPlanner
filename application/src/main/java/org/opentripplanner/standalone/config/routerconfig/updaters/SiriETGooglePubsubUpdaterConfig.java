@@ -76,11 +76,15 @@ public class SiriETGooglePubsubUpdaterConfig {
           """
         )
         .asDuration(INITIAL_GET_DATA_TIMEOUT),
-      c
-        .of("fuzzyTripMatching")
-        .since(V2_1)
-        .summary("If the trips should be matched fuzzily.")
-        .asBoolean(false),
+      SiriFuzzyTripMatchingConfig.map(
+        c,
+        c
+          .of("fuzzyTripMatching")
+          .since(V2_1)
+          .summary(SiriFuzzyTripMatchingConfig.FUZZY_TRIP_MATCHING_SUMMARY)
+          .description(SiriFuzzyTripMatchingConfig.FUZZY_TRIP_MATCHING_DESCRIPTION)
+          .asBoolean(false)
+      ),
       c
         .of("producerMetrics")
         .since(V2_7)
