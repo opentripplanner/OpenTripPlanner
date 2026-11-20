@@ -164,19 +164,28 @@ public class TripPatternByLegIdsQuery {
       .argument(
         GraphQLArgument.newArgument()
           .name("walkSpeed")
-          .description("The maximum walk speed along streets, in meters per second.")
+          .description(
+            "The maximum walk speed along streets, in meters per second. The default is " +
+              preferences.walk().speed() +
+              ", or " +
+              preferences.wheelchair().speed() +
+              " if wheelchairAccessible is true."
+          )
           .type(Scalars.GraphQLFloat)
-          .defaultValue(preferences.walk().speed())
           .build()
       )
       .argument(
         GraphQLArgument.newArgument()
           .name("walkReluctance")
           .description(
-            "Walk cost is multiplied by this value. This is the main parameter to use for limiting walking."
+            "Walk cost is multiplied by this value. This is the main parameter to use for limiting walking. " +
+              "The default is " +
+              preferences.walk().reluctance() +
+              ", or " +
+              preferences.wheelchair().reluctance() +
+              " if wheelchairAccessible is true."
           )
           .type(Scalars.GraphQLFloat)
-          .defaultValue(preferences.walk().reluctance())
           .build()
       )
       .argument(
