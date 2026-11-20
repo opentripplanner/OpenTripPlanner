@@ -1,17 +1,17 @@
 package org.opentripplanner.netex.mapping.calendar;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.opentripplanner.transit.model._data.TransitRepositoryForTest.FEED_ID;
 
 import java.time.LocalDate;
-import java.util.Collection;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
-import org.opentripplanner.model.calendar.ServiceCalendarDate;
+import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 
 public class CalendarServiceBuilderTest {
 
@@ -41,7 +41,7 @@ public class CalendarServiceBuilderTest {
   }
 
   @Test
-  public void createServiceCalendar() {
+  public void addServiceCalendarsTo() {
     // Given
     var subject = new CalendarServiceBuilder(new FeedScopedIdFactory(FEED_ID));
 
@@ -51,25 +51,42 @@ public class CalendarServiceBuilderTest {
     subject.registerDatesAndGetServiceId(Set.of(D2, D1));
 
     // When
-    Collection<ServiceCalendarDate> list = subject.createServiceCalendar();
+    var calendars = TripCalendars.of();
+    subject.addServiceCalendarsTo(calendars);
+    var tripCalendars = calendars.build();
 
     // Then
-    assertServiceDateExistInList(list, EXP_SID_1, D1);
-    assertServiceDateExistInList(list, EXP_SID_2, D2);
-    assertServiceDateExistInList(list, EXP_SID_3, D1);
-    assertServiceDateExistInList(list, EXP_SID_3, D2);
-
-    assertEquals(4, list.size());
+    assertEquals(Set.of(D1), tripCalendars.listServiceDates(EXP_SID_1));
+    assertEquals(Set.of(D2), tripCalendars.listServiceDates(EXP_SID_2));
+    assertEquals(Set.of(D1, D2), tripCalendars.listServiceDates(EXP_SID_3));
   }
 
   @Test
-  public void createEmptyCalendar() {
+  public void addServiceCalendarsToIsLimitedByPeriod() {
+    // Given
     var subject = new CalendarServiceBuilder(new FeedScopedIdFactory(FEED_ID));
 
-    var calendar = subject.createEmptyCalendar();
+    // A service running on D1 only, and one running on both D1 and D2
+    subject.registerDatesAndGetServiceId(Set.of(D1));
+    subject.registerDatesAndGetServiceId(Set.of(D1, D2));
 
-    assertEquals(EXP_EMPTY_SID, calendar.getServiceId());
-    assertEquals(subject.registerDatesAndGetServiceId(Set.of()), calendar.getServiceId());
+    // When the calendars builder's period limit excludes D1
+    var calendarsBuilder = TripCalendars.of(LocalDateRange.ofInclusiveEnd(D2, D2));
+    subject.addServiceCalendarsTo(calendarsBuilder);
+    var tripCalendars = calendarsBuilder.build();
+
+    // Then the service that only ran on D1 is gone entirely, and the other one is trimmed to D2
+    assertEquals(Set.of(), tripCalendars.listServiceIdsOnServiceDate(D1));
+    assertEquals(Set.of(D2), tripCalendars.listServiceDates(EXP_SID_2));
+    assertThat(tripCalendars.listServiceIds()).containsExactly(EXP_SID_2);
+  }
+
+  @Test
+  public void emptyServiceId() {
+    var subject = new CalendarServiceBuilder(new FeedScopedIdFactory(FEED_ID));
+
+    assertEquals(EXP_EMPTY_SID, subject.emptyServiceId());
+    assertEquals(subject.registerDatesAndGetServiceId(Set.of()), subject.emptyServiceId());
   }
 
   @Test
@@ -92,28 +109,5 @@ public class CalendarServiceBuilderTest {
     CalendarServiceBuilder subject = new CalendarServiceBuilder(new FeedScopedIdFactory(FEED_ID));
     assertEquals(FeedScopedIdForTestFactory.id("S000001"), subject.createServiceId());
     assertEquals(FeedScopedIdForTestFactory.id("S000002"), subject.createServiceId());
-  }
-
-  private void assertServiceDateExistInList(
-    Collection<ServiceCalendarDate> list,
-    FeedScopedId serviceId,
-    LocalDate serviceDate
-  ) {
-    for (ServiceCalendarDate it : list) {
-      if (serviceId.equals(it.getServiceId()) && serviceDate.equals(it.getDate())) {
-        return;
-      }
-    }
-    fail(
-      "Unable fo find service date. " +
-        "ServiceId=" +
-        serviceId +
-        ", " +
-        "date=" +
-        serviceDate +
-        ", " +
-        "list=" +
-        list
-    );
   }
 }

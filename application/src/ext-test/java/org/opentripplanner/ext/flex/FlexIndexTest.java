@@ -14,9 +14,9 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
-import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -40,9 +40,9 @@ class FlexIndexTest {
 
     LocalDate serviceDate = LocalDate.of(2025, 2, 28);
     LocalDate nextDay = serviceDate.plusDays(1);
-    CalendarServiceData calendarData = new CalendarServiceData();
+    var calendarData = TripCalendars.of();
     calendarData.putServiceDatesForServiceId(serviceId, List.of(serviceDate));
-    dataImport.updateCalendarServiceData(calendarData);
+    dataImport.mergeTripCalendars(calendarData.build());
 
     FlexIndex index = new FlexIndex(dataImport.getAllFlexTrips(), dataImport.getTripCalendars());
 
@@ -81,9 +81,9 @@ class FlexIndexTest {
     dataImport.addFlexTrip(flexTrip.getId(), flexTrip);
 
     LocalDate serviceDate = LocalDate.of(2025, 2, 28);
-    CalendarServiceData calendarData = new CalendarServiceData();
+    var calendarData = TripCalendars.of();
     calendarData.putServiceDatesForServiceId(serviceId, List.of(serviceDate));
-    dataImport.updateCalendarServiceData(calendarData);
+    dataImport.mergeTripCalendars(calendarData.build());
 
     FlexIndex index = new FlexIndex(dataImport.getAllFlexTrips(), dataImport.getTripCalendars());
 

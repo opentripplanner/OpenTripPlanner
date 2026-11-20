@@ -10,7 +10,6 @@ import static org.opentripplanner.netex.NetexTestDataSupport.jaxbElement;
 
 import com.google.common.collect.ArrayListMultimap;
 import java.time.LocalDate;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,11 +25,11 @@ import org.entur.netex2.model.ServiceJourney;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMultimap;
 import org.opentripplanner.netex.mapping.calendar.CalendarServiceBuilder;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 
 public class TripCalendarBuilderTest {
 
@@ -91,7 +90,9 @@ public class TripCalendarBuilderTest {
     // pop() operation
     subject.pop();
 
-    var calendar = calendarServiceBuilder.createServiceCalendar();
+    var calendars = TripCalendars.of();
+    calendarServiceBuilder.addServiceCalendarsTo(calendars);
+    var tripCalendars = calendars.build();
 
     assertEquals(3, result.size());
     var serviceId1 = result.get(SJ_1);
@@ -102,22 +103,17 @@ public class TripCalendarBuilderTest {
     assertNotNull(serviceId2);
     assertNotNull(serviceId3);
 
-    assertEquals(4, calendar.size());
-    assertEquals("[2020-11-01]", listDates(calendar, serviceId1));
-    assertEquals("[2020-11-01, 2020-11-02]", listDates(calendar, serviceId2));
-    assertEquals("[2020-11-02]", listDates(calendar, serviceId3));
+    assertEquals("[2020-11-01]", listDates(tripCalendars, serviceId1));
+    assertEquals("[2020-11-01, 2020-11-02]", listDates(tripCalendars, serviceId2));
+    assertEquals("[2020-11-02]", listDates(tripCalendars, serviceId3));
   }
 
   /* private helper methods */
 
-  private static String listDates(
-    Collection<ServiceCalendarDate> calendar,
-    FeedScopedId serviceId
-  ) {
-    return calendar
+  private static String listDates(TripCalendars tripCalendars, FeedScopedId serviceId) {
+    return tripCalendars
+      .listServiceDates(serviceId)
       .stream()
-      .filter(it -> serviceId.equals(it.getServiceId()))
-      .map(ServiceCalendarDate::getDate)
       .sorted()
       .collect(Collectors.toList())
       .toString();

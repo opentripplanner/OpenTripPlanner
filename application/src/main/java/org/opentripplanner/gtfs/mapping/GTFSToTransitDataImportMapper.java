@@ -110,7 +110,7 @@ public class GTFSToTransitDataImportMapper {
     Function<FeedScopedId, RegularStop> stopLookup = id -> builder.getStops().get(id);
 
     this.discardMinTransferTimes = discardMinTransferTimes;
-    serviceCalendarMapper = new ServiceCalendarMapper(idFactory);
+    serviceCalendarMapper = new ServiceCalendarMapper(idFactory, issueStore);
     serviceCalendarDateMapper = new ServiceCalendarDateMapper(idFactory);
     shapePointMapper = new ShapePointMapper(idFactory);
     translationHelper = new TranslationHelper();
@@ -196,8 +196,8 @@ public class GTFSToTransitDataImportMapper {
     translationHelper.importTranslations(data.getAllTranslations(), data.getAllFeedInfos());
 
     builder.getAgenciesById().addAll(agencyMapper.map(data.getAllAgencies()));
-    builder.getCalendarDates().addAll(serviceCalendarDateMapper.map(data.getAllCalendarDates()));
-    builder.getCalendars().addAll(serviceCalendarMapper.map(data.getAllCalendars()));
+    serviceCalendarDateMapper.map(data.getAllCalendarDates(), builder.tripCalendars());
+    serviceCalendarMapper.map(data.getAllCalendars(), builder.tripCalendars());
     builder.getFeedInfos().addAll(feedInfoMapper.map(data.getAllFeedInfos()));
     builder.getFrequencies().addAll(frequencyMapper.map(data.getAllFrequencies()));
     routeNetworkAssignmentMapper.map(data.getAllRouteNetworkAssignments());
@@ -269,7 +269,10 @@ public class GTFSToTransitDataImportMapper {
   }
 
   /**
-   * Note! Trip-pattens must be added BEFORE mapping transfers
+   * The resulting transfers still need their stop position resolved against each trip's final, post-filtering
+   * stop-time sequence - see {@link org.opentripplanner.transfer.constrained.model.DeferredConstrainedTransferPoint}. That
+   * happens in {@link org.opentripplanner.model.impl.TransitDataImportBuilder#build()}, so this can safely be
+   * called any time before {@code build()}.
    */
   public void mapAndAddTransfersToBuilder(GtfsDao data) {
     TransferMapper transferMapper = new TransferMapper(
@@ -277,12 +280,11 @@ public class GTFSToTransitDataImportMapper {
       stationMapper,
       stopMapper,
       tripMapper,
-      builder.getStopTimesSortedByTrip(),
       discardMinTransferTimes,
       issueStore
     );
     var result = transferMapper.map(data.getAllTransfers());
-    builder.getTransfers().addAll(result.constrainedTransfers());
+    builder.getPendingTransfers().addAll(result.pendingConstrainedTransfers());
     builder.getStaySeatedNotAllowed().addAll(result.staySeatedNotAllowed());
   }
 }

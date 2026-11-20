@@ -3,29 +3,23 @@ package org.opentripplanner.gtfs.mapping;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
-import java.util.function.Predicate;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Transfer;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.IgnoredGtfsTransfer;
 import org.opentripplanner.graph_builder.issues.InvalidGtfsTransfer;
-import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.TripStopTimes;
-import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
+import org.opentripplanner.transfer.constrained.model.DeferredConstrainedTransferPoint;
+import org.opentripplanner.transfer.constrained.model.PendingConstrainedTransfer;
 import org.opentripplanner.transfer.constrained.model.RouteStationTransferPoint;
 import org.opentripplanner.transfer.constrained.model.RouteStopTransferPoint;
 import org.opentripplanner.transfer.constrained.model.StationTransferPoint;
 import org.opentripplanner.transfer.constrained.model.StopTransferPoint;
 import org.opentripplanner.transfer.constrained.model.TransferConstraint;
-import org.opentripplanner.transfer.constrained.model.TransferPoint;
 import org.opentripplanner.transfer.constrained.model.TransferPriority;
-import org.opentripplanner.transfer.constrained.model.TripTransferPoint;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
@@ -85,7 +79,6 @@ class TransferMapper {
 
   private final TripMapper tripMapper;
 
-  private final TripStopTimes stopTimesByTrip;
   private final DataImportIssueStore issueStore;
 
   private final Multimap<Route, Trip> tripsByRoute = ArrayListMultimap.create();
@@ -96,7 +89,6 @@ class TransferMapper {
     StationMapper stationMapper,
     StopMapper stopMapper,
     TripMapper tripMapper,
-    TripStopTimes stopTimesByTrip,
     boolean discardMinTransferTimes,
     DataImportIssueStore issueStore
   ) {
@@ -104,7 +96,6 @@ class TransferMapper {
     this.stationMapper = stationMapper;
     this.stopMapper = stopMapper;
     this.tripMapper = tripMapper;
-    this.stopTimesByTrip = stopTimesByTrip;
     this.discardMinTransferTimes = discardMinTransferTimes;
     this.issueStore = issueStore;
   }
@@ -127,19 +118,15 @@ class TransferMapper {
   TransferMappingResult map(Collection<Transfer> allTransfers) {
     setup(!allTransfers.isEmpty());
 
-    List<ConstrainedTransfer> constrainedTransfers = allTransfers
-      .stream()
-      .map(this::map)
-      .filter(Objects::nonNull)
-      .toList();
+    var pendingTransfers = allTransfers.stream().map(this::map).filter(Objects::nonNull).toList();
 
-    List<StaySeatedNotAllowed> staySeatedNotAllowed = allTransfers
+    var staySeatedNotAllowed = allTransfers
       .stream()
       .map(this::toStaySeatedNotAllowed)
       .filter(Objects::nonNull)
       .toList();
 
-    return new TransferMappingResult(constrainedTransfers, staySeatedNotAllowed);
+    return new TransferMappingResult(pendingTransfers, staySeatedNotAllowed);
   }
 
   private StaySeatedNotAllowed toStaySeatedNotAllowed(Transfer t) {
@@ -152,7 +139,7 @@ class TransferMapper {
     }
   }
 
-  ConstrainedTransfer map(Transfer rhs) {
+  PendingConstrainedTransfer map(Transfer rhs) {
     Trip fromTrip = tripMapper.map(rhs.getFromTrip());
     Trip toTrip = tripMapper.map(rhs.getToTrip());
 
@@ -171,20 +158,25 @@ class TransferMapper {
       return null;
     }
 
-    TransferPoint fromPoint = mapTransferPoint(
+    DeferredConstrainedTransferPoint fromPoint = mapTransferPoint(
       rhs.getFromStop(),
       rhs.getFromRoute(),
       fromTrip,
       false
     );
-    TransferPoint toPoint = mapTransferPoint(rhs.getToStop(), rhs.getToRoute(), toTrip, true);
+    DeferredConstrainedTransferPoint toPoint = mapTransferPoint(
+      rhs.getToStop(),
+      rhs.getToRoute(),
+      toTrip,
+      true
+    );
 
     if (fromPoint == null || toPoint == null) {
       issueStore.add(new InvalidGtfsTransfer("fromPoint / toPoint doesn't exist", rhs));
       return null;
     }
 
-    return new ConstrainedTransfer(null, fromPoint, toPoint, constraint);
+    return new PendingConstrainedTransfer(null, fromPoint, toPoint, constraint);
   }
 
   private void setup(boolean run) {
@@ -215,7 +207,12 @@ class TransferMapper {
     return builder.build();
   }
 
-  private TransferPoint mapTransferPoint(
+  /**
+   * A trip-based point can't have its stop position resolved yet - the trip's stop times may
+   * still be pruned/interpolated. See {@link DeferredConstrainedTransferPoint}; it is resolved once those
+   * steps have run, by {@link org.opentripplanner.model.impl.TransitDataImportBuilder#build()}.
+   */
+  private DeferredConstrainedTransferPoint mapTransferPoint(
     Stop rhsStopOrStation,
     org.onebusaway.gtfs.model.Route rhsRoute,
     Trip trip,
@@ -240,67 +237,28 @@ class TransferMapper {
     if (trip != null) {
       // A trip may visit the same stop twice, but we ignore that and only add the first stop
       // we find. Pattern that start and end at the same stop is supported.
-      int stopPositionInPattern;
-      if (boardTrip) {
-        stopPositionInPattern = boardStopPosition(trip, stop, station);
-      } else {
-        stopPositionInPattern = alightStopPosition(trip, stop, station);
-      }
-      return stopPositionInPattern < 0 ? null : new TripTransferPoint(trip, stopPositionInPattern);
+      return new DeferredConstrainedTransferPoint.PendingTripPosition(
+        trip,
+        stop,
+        station,
+        boardTrip
+      );
     } else if (route != null) {
       if (stop != null) {
-        return new RouteStopTransferPoint(route, stop);
+        return new DeferredConstrainedTransferPoint.Resolved(
+          new RouteStopTransferPoint(route, stop)
+        );
       } else if (station != null) {
-        return new RouteStationTransferPoint(route, station);
+        return new DeferredConstrainedTransferPoint.Resolved(
+          new RouteStationTransferPoint(route, station)
+        );
       }
     } else if (stop != null) {
-      return new StopTransferPoint(stop);
+      return new DeferredConstrainedTransferPoint.Resolved(new StopTransferPoint(stop));
     } else if (station != null) {
-      return new StationTransferPoint(station);
+      return new DeferredConstrainedTransferPoint.Resolved(new StationTransferPoint(station));
     }
 
     throw new IllegalStateException("Should not get here!");
-  }
-
-  private int boardStopPosition(Trip trip, RegularStop stop, Station station) {
-    List<StopTime> stopTimes = stopTimesByTrip.get(trip);
-
-    Predicate<StopLocation> stopMatches =
-      station != null
-        ? s -> s instanceof RegularStop regStop && regStop.getParentStation() == station
-        : s -> s == stop;
-
-    for (int i = 0; i < stopTimes.size() - 1; i++) {
-      StopTime stopTime = stopTimes.get(i);
-      if (stopTime.getPickupType().isNotRoutable()) {
-        continue;
-      }
-
-      if (stopMatches.test(stopTime.getStop())) {
-        return i;
-      }
-    }
-    return -1;
-  }
-
-  private int alightStopPosition(Trip trip, RegularStop stop, Station station) {
-    List<StopTime> stopTimes = stopTimesByTrip.get(trip);
-
-    Predicate<StopLocation> stopMatches =
-      station != null
-        ? s -> s instanceof RegularStop regStop && regStop.getParentStation() == station
-        : s -> s == stop;
-
-    for (int i = stopTimes.size() - 1; i > 0; i--) {
-      StopTime stopTime = stopTimes.get(i);
-      if (stopTime.getDropOffType().isNotRoutable()) {
-        continue;
-      }
-
-      if (stopMatches.test(stopTime.getStop())) {
-        return i;
-      }
-    }
-    return -1;
   }
 }

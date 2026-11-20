@@ -1,41 +1,50 @@
 package org.opentripplanner.gtfs.mapping;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import org.opentripplanner.model.calendar.ServiceCalendarDate;
-import org.opentripplanner.utils.collection.MapUtils;
+import org.onebusaway.gtfs.model.ServiceCalendarDate;
+import org.opentripplanner.transit.model.calendar.TripCalendarsBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/** Responsible for mapping GTFS ServiceCalendarDate into the OTP model. */
+/** Responsible for mapping GTFS ServiceCalendarDate rows into the OTP model. */
 class ServiceCalendarDateMapper {
 
-  private final IdFactory idFactory;
+  private static final Logger LOG = LoggerFactory.getLogger(ServiceCalendarDateMapper.class);
 
-  private final Map<
-    org.onebusaway.gtfs.model.ServiceCalendarDate,
-    ServiceCalendarDate
-  > mappedServiceDates = new HashMap<>();
+  /** GTFS calendar_dates.txt exception_type: service has been added for the date. */
+  private static final int EXCEPTION_TYPE_ADD = 1;
+
+  /** GTFS calendar_dates.txt exception_type: service has been removed for the date. */
+  private static final int EXCEPTION_TYPE_REMOVE = 2;
+
+  private final IdFactory idFactory;
 
   ServiceCalendarDateMapper(IdFactory idFactory) {
     this.idFactory = idFactory;
   }
 
-  Collection<ServiceCalendarDate> map(
-    Collection<org.onebusaway.gtfs.model.ServiceCalendarDate> allServiceDates
-  ) {
-    return MapUtils.mapToList(allServiceDates, this::map);
+  void map(Collection<ServiceCalendarDate> allServiceDates, TripCalendarsBuilder calendars) {
+    if (allServiceDates == null) {
+      return;
+    }
+    allServiceDates.forEach(d -> map(d, calendars));
   }
 
   /** Map from GTFS to OTP model, {@code null} safe. */
-  ServiceCalendarDate map(org.onebusaway.gtfs.model.ServiceCalendarDate orginal) {
-    return orginal == null ? null : mappedServiceDates.computeIfAbsent(orginal, this::doMap);
-  }
-
-  private ServiceCalendarDate doMap(org.onebusaway.gtfs.model.ServiceCalendarDate rhs) {
-    return new ServiceCalendarDate(
-      idFactory.createId(rhs.getServiceId(), "calendar date"),
-      ServiceDateMapper.mapLocalDate(rhs.getDate()),
-      rhs.getExceptionType()
-    );
+  void map(ServiceCalendarDate rhs, TripCalendarsBuilder calendars) {
+    if (rhs == null) {
+      return;
+    }
+    var serviceId = idFactory.createId(rhs.getServiceId(), "calendar date");
+    var date = ServiceDateMapper.mapLocalDate(rhs.getDate());
+    switch (rhs.getExceptionType()) {
+      case EXCEPTION_TYPE_ADD -> calendars.addServiceDate(serviceId, date);
+      case EXCEPTION_TYPE_REMOVE -> calendars.removeServiceDate(serviceId, date);
+      default -> LOG.warn(
+        "Unknown CalendarDate exception type: {}, service id: {}",
+        rhs.getExceptionType(),
+        serviceId
+      );
+    }
   }
 }

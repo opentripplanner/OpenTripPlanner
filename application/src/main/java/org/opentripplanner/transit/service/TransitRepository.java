@@ -90,9 +90,6 @@ public class TransitRepository implements Serializable {
 
   private transient GraphUpdaterManager updaterManager = null;
 
-  private boolean hasFrequencyService = false;
-  private boolean hasScheduledService = false;
-
   private final Map<FeedScopedId, RegularStop> stopsByScheduledStopPointRefs = new HashMap<>();
 
   /// Updates are not allowed after the repository is frozen. All realtime updates should be applied
@@ -349,31 +346,6 @@ public class TransitRepository implements Serializable {
     assertModificationsAllowed();
     invalidateIndex();
     this.siteRepository = this.siteRepository.merge(childSiteRepository);
-  }
-
-  /**
-   * True if frequency-based services exist in this Graph (GTFS frequencies with exact_times = 0).
-   */
-  public boolean hasFrequencyService() {
-    return hasFrequencyService;
-  }
-
-  public void setHasFrequencyService(boolean hasFrequencyService) {
-    assertModificationsAllowed();
-    this.hasFrequencyService = hasFrequencyService;
-  }
-
-  /**
-   * True if schedule-based services exist in this Graph (including GTFS frequencies with
-   * exact_times = 1).
-   */
-  public boolean hasScheduledService() {
-    return hasScheduledService;
-  }
-
-  public void setHasScheduledService(boolean hasScheduledService) {
-    assertModificationsAllowed();
-    this.hasScheduledService = hasScheduledService;
   }
 
   /**
