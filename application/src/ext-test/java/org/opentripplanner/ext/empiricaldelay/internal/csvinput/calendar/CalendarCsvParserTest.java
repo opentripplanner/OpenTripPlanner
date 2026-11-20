@@ -4,9 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.csvreader.CsvReader;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.csv.CsvRecordReader;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 
 class CalendarCsvParserTest {
@@ -20,14 +20,14 @@ class CalendarCsvParserTest {
     """;
   private final CalendarCsvParser subject = new CalendarCsvParser(
     DataImportIssueStore.NOOP,
-    CsvReader.parse(DEFAUT_INPUT)
+    CsvRecordReader.parse(DEFAUT_INPUT)
   );
 
   @Test
   void headersMatch() {
     var subject = new CalendarCsvParser(
       DataImportIssueStore.NOOP,
-      CsvReader.parse(
+      CsvRecordReader.parse(
         """
         No, matching, header
         """

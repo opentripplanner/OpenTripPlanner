@@ -3,13 +3,13 @@ package org.opentripplanner.framework.csv.parser;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.csvreader.CsvReader;
 import java.util.ArrayList;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.datastore.api.DataSourceTestFactory;
 import org.opentripplanner.datastore.api.FileType;
+import org.opentripplanner.framework.csv.CsvRecordReader;
 import org.opentripplanner.framework.csv.HeadersDoNotMatch;
 import org.opentripplanner.framework.csv.OtpCsvReader;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -59,7 +59,7 @@ class OtpCsvReaderTest {
 
   static class Parser extends AbstractCsvParser<AType> {
 
-    public Parser(CsvReader reader) {
+    public Parser(CsvRecordReader reader) {
       super(DataImportIssueStore.NOOP, reader, "issueType");
     }
 

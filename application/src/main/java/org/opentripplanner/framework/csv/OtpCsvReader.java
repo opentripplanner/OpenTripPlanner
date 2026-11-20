@@ -1,7 +1,5 @@
 package org.opentripplanner.framework.csv;
 
-import com.csvreader.CsvReader;
-import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -31,7 +29,7 @@ import org.opentripplanner.utils.logging.ProgressTracker;
 public class OtpCsvReader<T> {
 
   private DataSource dataSource;
-  private Function<CsvReader, AbstractCsvParser<T>> parserFactory;
+  private Function<CsvRecordReader, AbstractCsvParser<T>> parserFactory;
   private Consumer<T> rowHandler;
 
   @Nullable
@@ -60,7 +58,7 @@ public class OtpCsvReader<T> {
 
   /** Set the parser factory for converting CSV rows to objects. */
   public OtpCsvReader<T> withParserFactory(
-    Function<CsvReader, AbstractCsvParser<T>> parserFactory
+    Function<CsvRecordReader, AbstractCsvParser<T>> parserFactory
   ) {
     this.parserFactory = parserFactory;
     return this;
@@ -91,25 +89,25 @@ public class OtpCsvReader<T> {
       progress = ProgressTracker.track("Read " + dataSource.name(), 10_000, -1);
       progressLogger.accept(progress.startMessage());
     }
-    var reader = new CsvReader(dataSource.asInputStream(), StandardCharsets.UTF_8);
-    var parser = parserFactory.apply(reader);
+    try (var reader = CsvRecordReader.of(dataSource.asInputStream())) {
+      var parser = parserFactory.apply(reader);
 
-    if (!parser.headersMatch()) {
-      throw new HeadersDoNotMatch(dataSource.path(), reader.getRawRecord(), parser.headers());
-    }
-
-    while (parser.hasNext()) {
-      // Do not convert this to a lambda expression. The logger will not be
-      // able to log the correct source and line number for the caller.
-      if (progress != null) {
-        progress.step(m -> progressLogger.accept(m));
+      if (!parser.headersMatch()) {
+        throw new HeadersDoNotMatch(dataSource.path(), reader.rawRecord(), parser.headers());
       }
-      rowHandler.accept(parser.next());
+
+      while (parser.hasNext()) {
+        // Do not convert this to a lambda expression. The logger will not be
+        // able to log the correct source and line number for the caller.
+        if (progress != null) {
+          progress.step(m -> progressLogger.accept(m));
+        }
+        rowHandler.accept(parser.next());
+      }
     }
 
     if (progress != null) {
       progressLogger.accept(progress.completeMessage());
     }
-    return;
   }
 }

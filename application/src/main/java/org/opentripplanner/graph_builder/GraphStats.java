@@ -3,13 +3,10 @@ package org.opentripplanner.graph_builder;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
-import com.csvreader.CsvWriter;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.TreeMultiset;
 import java.awt.geom.Point2D;
 import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -30,10 +27,19 @@ import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectWriter;
+import tools.jackson.databind.SequenceWriter;
+import tools.jackson.dataformat.csv.CsvMapper;
+import tools.jackson.dataformat.csv.CsvSchema;
 
 public class GraphStats {
 
   private static final Logger LOG = LoggerFactory.getLogger(GraphStats.class);
+
+  private static final ObjectWriter CSV_WRITER = new CsvMapper()
+    .writerFor(String[].class)
+    .with(CsvSchema.emptySchema());
 
   @Parameter(names = { "-v", "--verbose" }, description = "Verbose output")
   private final boolean verbose = false;
@@ -62,7 +68,7 @@ public class GraphStats {
 
   private TimetableDataImport timetableDataImport;
 
-  private CsvWriter writer;
+  private SequenceWriter writer;
 
   private GraphStats(String[] args) {
     jc = new JCommander(this);
@@ -102,13 +108,13 @@ public class GraphStats {
     /* open output stream (same for all commands) */
     if (outPath != null) {
       try {
-        writer = new CsvWriter(outPath, ',', StandardCharsets.UTF_8);
+        writer = CSV_WRITER.writeValues(new File(outPath));
       } catch (Exception e) {
         LOG.error("Exception while opening output file " + outPath);
         return;
       }
     } else {
-      writer = new CsvWriter(System.out, ',', StandardCharsets.UTF_8);
+      writer = CSV_WRITER.writeValues(System.out);
     }
     LOG.info("done loading graph.");
 
@@ -170,7 +176,7 @@ public class GraphStats {
       Collections.shuffle(vertices, random);
       vertices = vertices.subList(0, n);
       try {
-        writer.writeRecord(new String[] { "n", "name", "lon", "lat" });
+        writer.write(new String[] { "n", "name", "lon", "lat" });
         int i = 0;
         for (Vertex v : vertices) {
           Coordinate c;
@@ -200,11 +206,11 @@ public class GraphStats {
             Double.toString(dest.getX()),
             Double.toString(dest.getY()),
           };
-          writer.writeRecord(entries);
+          writer.write(entries);
           i += 1;
         }
-      } catch (IOException ioe) {
-        LOG.error("Excpetion while writing CSV: {}", ioe.getMessage());
+      } catch (JacksonException e) {
+        LOG.error("Exception while writing CSV: {}", e.getMessage());
       }
       LOG.info("done.");
     }
@@ -216,7 +222,7 @@ public class GraphStats {
     public void run() {
       LOG.info("counting number of trips per pattern...");
       try {
-        writer.writeRecord(new String[] {
+        writer.write(new String[] {
           "nTripsInPattern",
           "frequency",
           "cumulativePatterns",
@@ -241,7 +247,7 @@ public class GraphStats {
         for (Multiset.Entry<Integer> count : counts.entrySet()) {
           cPatterns += count.getCount();
           cTrips += count.getCount() * count.getElement();
-          writer.writeRecord(new String[] {
+          writer.write(new String[] {
             count.getElement().toString(),
             Integer.toString(count.getCount()),
             Integer.toString(cPatterns),
@@ -250,7 +256,7 @@ public class GraphStats {
             Double.toString(cTrips / (double) nTrips),
           });
         }
-      } catch (IOException e) {
+      } catch (JacksonException e) {
         LOG.error("Exception writing CSV: {}", e.getMessage());
         return;
       }

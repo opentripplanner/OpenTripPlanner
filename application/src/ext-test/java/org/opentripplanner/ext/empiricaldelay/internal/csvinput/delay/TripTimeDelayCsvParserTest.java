@@ -4,9 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.csvreader.CsvReader;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.framework.csv.CsvRecordReader;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 
 class TripTimeDelayCsvParserTest {
@@ -20,7 +20,7 @@ class TripTimeDelayCsvParserTest {
 
   private final TripTimeDelayCsvParser subject = new TripTimeDelayCsvParser(
     DataImportIssueStore.NOOP,
-    CsvReader.parse(DEFAUT_INPUT),
+    CsvRecordReader.parse(DEFAUT_INPUT),
     FEED_ID
   );
 
@@ -28,7 +28,7 @@ class TripTimeDelayCsvParserTest {
   void headersMatch() {
     var subject = new TripTimeDelayCsvParser(
       DataImportIssueStore.NOOP,
-      CsvReader.parse(
+      CsvRecordReader.parse(
         """
         No, matching, header
         """
