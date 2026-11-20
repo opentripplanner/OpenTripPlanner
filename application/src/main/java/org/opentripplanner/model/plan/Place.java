@@ -12,9 +12,6 @@ import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.street.search.request.StreetSearchRequest;
-import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
@@ -203,18 +200,13 @@ public class Place {
     );
   }
 
-  public static Place forVehicleParkingEntrance(VehicleParkingEntranceVertex vertex, State state) {
-    TraverseMode traverseMode = null;
-    final StreetSearchRequest request = state.getRequest();
-    if (request.mode().includesDriving()) {
-      traverseMode = TraverseMode.CAR;
-    } else if (request.mode().includesBiking()) {
-      traverseMode = TraverseMode.BICYCLE;
-    }
-
-    boolean realTime = vertex
-      .getVehicleParking()
-      .hasRealTimeDataForMode(traverseMode, request.wheelchairEnabled());
+  /**
+   * @param realTime Whether real-time availability data exists for the parking
+   */
+  public static Place forVehicleParkingEntrance(
+    VehicleParkingEntranceVertex vertex,
+    boolean realTime
+  ) {
     return new Place(
       vertex.getName(),
       WgsCoordinate.creatOptionalCoordinate(vertex.getLat(), vertex.getLon()),
