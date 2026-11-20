@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.rangeraptor;
+package org.opentripplanner.raptor.debug;
 
 import static org.opentripplanner.raptor.api.view.PathLegType.ACCESS;
 import static org.opentripplanner.raptor.api.view.PathLegType.TRANSIT;

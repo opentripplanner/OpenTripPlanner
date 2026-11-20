@@ -23,15 +23,18 @@ public class RaptorArchitectureTest {
   private static final Package RAPTOR_UTIL = RAPTOR.subPackage("util");
   private static final Package RAPTOR_UTIL_PARETO_SET = RAPTOR_UTIL.subPackage("paretoset");
   private static final Package RAPTOR_UTIL_COMPOSITE = RAPTOR_UTIL.subPackage("composite");
+  private static final Package RAPTOR_UTIL_COLLECTION = RAPTOR_UTIL.subPackage("collection");
   private static final Module RAPTOR_UTILS = Module.of(
     RAPTOR_UTIL,
     RAPTOR_UTIL_PARETO_SET,
-    RAPTOR_UTIL_COMPOSITE
+    RAPTOR_UTIL_COMPOSITE,
+    RAPTOR_UTIL_COLLECTION
   );
   private static final Package RAPTOR_SPI = RAPTOR.subPackage("spi");
   private static final Package RAPTOR_EXTENSIONS = RAPTOR.subPackage("extensions..");
   private static final Package RAPTOR_PATH = RAPTOR.subPackage("path");
   private static final Package CONFIGURE = RAPTOR.subPackage("configure");
+  private static final Package DEBUG = RAPTOR.subPackage("debug");
   private static final Package SERVICE = RAPTOR.subPackage("service");
   private static final Package RANGE_RAPTOR = RAPTOR.subPackage("rangeraptor");
   private static final Package RR_INTERNAL_API = RANGE_RAPTOR.subPackage("internalapi");
@@ -91,6 +94,7 @@ public class RaptorArchitectureTest {
     RAPTOR_UTIL.dependsOn(OTP_UTILS, RAPTOR_SPI).verify();
     RAPTOR_UTIL_PARETO_SET.dependsOn(RAPTOR_UTIL_COMPOSITE).verify();
     RAPTOR_UTIL_COMPOSITE.verify();
+    RAPTOR_UTIL_COLLECTION.verify();
   }
 
   @Test
@@ -193,6 +197,15 @@ public class RaptorArchitectureTest {
       mcRideC1,
       RR_MULTI_CRITERIA
     ).verify();
+  }
+
+  @Test
+  void enforcePackageDependenciesInDebug() {
+    // A concrete DebugLogger implementation is heavier than the pure api.debug interfaces
+    // (DebugEvent/DebugLogger/DebugTopic) - it needs the rest of the public API plus
+    // rangeraptor.transit's trip-search helpers, so it gets its own package rather than
+    // diluting api.debug's minimal dependency footprint.
+    DEBUG.dependsOn(OTP_UTILS, RAPTOR_API, RAPTOR_SPI, RR_TRANSIT).verify();
   }
 
   @Test
