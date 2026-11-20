@@ -167,6 +167,14 @@ type Alert implements Node {
   ): String
   "Header of the alert in all different available languages"
   alertHeaderTextTranslations: [TranslatedString!]! @deprecated(reason : "Use `alertHeaderText` instead. `accept-language` header can be used for translations or the `language` parameter on the `alertHeaderText` field.")
+  """
+  ID of the alert as set by the producer, prefixed with the feed ID (`FeedId:AlertId`). For
+  SIRI-SX this is the `SituationNumber` and for GTFS-RT the id of the `FeedEntity`.
+  
+  Unlike `id`, this value is not opaque and can be used to link the alert to the system it
+  originates from.
+  """
+  alertId: String!
   "Alert severity level"
   alertSeverityLevel: AlertSeverityLevelType
   "Url with more information"
@@ -194,6 +202,11 @@ type Alert implements Node {
   stop: Stop @deprecated(reason : "Alert can have multiple affected entities now instead of there being duplicate alerts\nfor different entities. This will return only one of the affected stops.\nUse entities instead.")
   "Trip affected by the disruption"
   trip: Trip @deprecated(reason : "Alert can have multiple affected entities now instead of there being duplicate alerts\nfor different entities. This will return only one of the affected trips.\nUse entities instead.")
+  """
+  Version of the alert as set by the producer. Only SIRI-SX provides one (`Version`), so this is
+  `null` for GTFS-RT alerts.
+  """
+  version: Int
 }
 
 """
