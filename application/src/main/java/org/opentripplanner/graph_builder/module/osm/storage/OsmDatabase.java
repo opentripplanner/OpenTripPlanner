@@ -92,10 +92,10 @@ public class OsmDatabase {
   private final LongSet areaWayIds = new LongHashSet();
 
   /* Set of all node IDs of kept ways. Needed to mark which nodes to keep in stage 3. */
-  private final LongSet waysNodeIds = new LongHashSet();
+  private final OsmIdBitSet waysNodeIds = new OsmIdBitSet();
 
   /* Set of all node IDs of kept areas. Needed to mark which nodes to keep in stage 3. */
-  private final LongSet areaNodeIds = new LongHashSet();
+  private final OsmIdBitSet areaNodeIds = new OsmIdBitSet();
 
   /**
    * Track which vertical levels OSM entities belong to. Level information can be set for ways,
@@ -387,7 +387,7 @@ public class OsmDatabase {
     entityLevels.putAll(entity, osmLevelFactory.createOsmLevelsForEntity(entity));
   }
 
-  private void markNodesForKeeping(Collection<OsmWay> osmWays, LongSet nodeSet) {
+  private void markNodesForKeeping(Collection<OsmWay> osmWays, OsmIdBitSet nodeSet) {
     for (OsmWay way : osmWays) {
       // Since the way is kept, update nodes-with-neighbors
       LongArrayList nodes = way.getNodeRefs();
