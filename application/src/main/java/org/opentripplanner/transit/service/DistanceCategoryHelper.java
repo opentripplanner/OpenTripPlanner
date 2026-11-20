@@ -59,26 +59,35 @@ public final class DistanceCategoryHelper {
     gtfsTypes.put(
       TransitMode.RAIL,
       Map.ofEntries(
-        // 101 High Speed Rail, 102 Long Distance Trains, 103 Inter Regional Rail,
-        // 104 Car Transport Rail
+        // High Speed Rail Service
         Map.entry(101, LONG_DISTANCE),
+        // Long Distance Trains
         Map.entry(102, LONG_DISTANCE),
+        // Inter Regional Rail Service
         Map.entry(103, LONG_DISTANCE),
+        // Car Transport Rail Service
         Map.entry(104, LONG_DISTANCE),
-        // 105 Sleeper Rail, 107 Tourist Railway, 108 Rail Shuttle (Within Complex)
+        // Sleeper Rail Service
         Map.entry(105, LONG_DISTANCE),
+        // Tourist Railway Service
         Map.entry(107, LOCAL),
+        // Rail Shuttle (Within Complex)
         Map.entry(108, LOCAL),
-        // 109 Suburban Railway, 112 Lorry Transport Rail, 114 Cross-Country Rail
+        // Suburban Railway
         Map.entry(109, LOCAL),
+        // Lorry Transport Rail Service
         Map.entry(112, LONG_DISTANCE),
+        // Cross-Country Rail Service
         Map.entry(114, LONG_DISTANCE),
-        // 115 Vehicle Transport Rail, 116 Rack and Pinion Railway
+        // Vehicle Transport Rail Service
         Map.entry(115, LONG_DISTANCE),
+        // Rack and Pinion Railway
         Map.entry(116, LOCAL),
-        // 400 and 403 Urban Railway Service, 404 All Urban Railway Services
+        // Urban Railway Service, OTP maps 400, 403 and 404 to RAIL, not SUBWAY
         Map.entry(400, LOCAL),
+        // Urban Railway Service
         Map.entry(403, LOCAL),
+        // All Urban Railway Services
         Map.entry(404, LOCAL)
       )
     );
@@ -108,12 +117,15 @@ public final class DistanceCategoryHelper {
     gtfsTypes.put(
       TransitMode.COACH,
       Map.ofEntries(
-        // 203 Shuttle Coach, 204 Regional Coach, 206 Sightseeing Coach, 207 Tourist Coach
+        // Shuttle Coach Service
         Map.entry(203, LOCAL),
+        // Regional Coach Service
         Map.entry(204, REGIONAL),
+        // Sightseeing Coach Service
         Map.entry(206, REGIONAL),
+        // Tourist Coach Service
         Map.entry(207, REGIONAL),
-        // 208 Commuter Coach
+        // Commuter Coach Service
         Map.entry(208, LOCAL)
       )
     );
@@ -129,8 +141,16 @@ public final class DistanceCategoryHelper {
       )
     );
 
-    // GTFS 700 Bus Service, 701 Regional Bus, 706 Post Bus Service
-    gtfsTypes.put(TransitMode.BUS, Map.of(701, REGIONAL, 706, REGIONAL));
+    // GTFS 700 Bus Service
+    gtfsTypes.put(
+      TransitMode.BUS,
+      Map.ofEntries(
+        // Regional Bus Service
+        Map.entry(701, REGIONAL),
+        // Post Bus Service
+        Map.entry(706, REGIONAL)
+      )
+    );
     netexSubmodes.put(
       TransitMode.BUS,
       Map.ofEntries(
@@ -140,7 +160,8 @@ public final class DistanceCategoryHelper {
       )
     );
 
-    // GTFS 900 Tram Service, 903 Regional Tram
+    // GTFS 900 Tram Service
+    // 903 Regional Tram Service
     gtfsTypes.put(TransitMode.TRAM, Map.of(903, REGIONAL));
     netexSubmodes.put(TransitMode.TRAM, Map.of("regionalTram", REGIONAL));
 

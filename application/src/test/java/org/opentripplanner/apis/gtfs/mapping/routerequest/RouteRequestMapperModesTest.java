@@ -222,7 +222,7 @@ class RouteRequestMapperModesTest {
     var modesArgs = transitModes(
       Map.ofEntries(
         entry("mode", "RAIL"),
-        entry("distanceCategories", List.of("LOCAL", "REGIONAL"))
+        entry("distanceCategories", List.of("REGIONAL", "LOCAL"))
       ),
       Map.ofEntries(entry("mode", "COACH"), entry("distanceCategories", List.of("LONG_DISTANCE"))),
       Map.ofEntries(

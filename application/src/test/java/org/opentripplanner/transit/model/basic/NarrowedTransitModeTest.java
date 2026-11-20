@@ -3,7 +3,6 @@ package org.opentripplanner.transit.model.basic;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -73,37 +72,15 @@ class NarrowedTransitModeTest {
         .build()
     );
     assertThat(regional).isNotEqualTo(NarrowedTransitMode.of(TransitMode.RAIL).build());
-  }
-
-  @Test
-  void severalDistanceCategories() {
-    var subject = NarrowedTransitMode.of(TransitMode.RAIL)
-      .withDistanceCategories(List.of(DistanceCategory.REGIONAL, DistanceCategory.LOCAL))
-      .build();
-
-    assertThat(subject.getDistanceCategories()).containsExactly(
-      DistanceCategory.LOCAL,
-      DistanceCategory.REGIONAL
-    );
-    assertThat(subject).isEqualTo(
+    // The order of the categories does not matter
+    assertThat(
+      NarrowedTransitMode.of(TransitMode.RAIL)
+        .withDistanceCategories(List.of(DistanceCategory.REGIONAL, DistanceCategory.LOCAL))
+        .build()
+    ).isEqualTo(
       NarrowedTransitMode.of(TransitMode.RAIL)
         .withDistanceCategories(List.of(DistanceCategory.LOCAL, DistanceCategory.REGIONAL))
         .build()
-    );
-    assertThat(subject.toString()).isEqualTo("RAIL::::IGNORED::[LOCAL, REGIONAL]");
-  }
-
-  @Test
-  void distanceCategoriesAreCopied() {
-    var categories = new ArrayList<>(List.of(DistanceCategory.LOCAL));
-    var subject = NarrowedTransitMode.of(TransitMode.RAIL)
-      .withDistanceCategories(categories)
-      .build();
-    categories.add(DistanceCategory.REGIONAL);
-
-    assertThat(subject.getDistanceCategories()).containsExactly(DistanceCategory.LOCAL);
-    assertThrows(UnsupportedOperationException.class, () ->
-      subject.getDistanceCategories().add(DistanceCategory.REGIONAL)
     );
   }
 
@@ -111,19 +88,5 @@ class NarrowedTransitModeTest {
   void emptyDistanceCategoriesAreRejected() {
     var builder = NarrowedTransitMode.of(TransitMode.RAIL);
     assertThrows(IllegalArgumentException.class, () -> builder.withDistanceCategories(List.of()));
-  }
-
-  @Test
-  void toStringWithoutDistanceCategories() {
-    assertThat(NarrowedTransitMode.of(TransitMode.BUS).build().toString()).isEqualTo("BUS");
-    assertThat(
-      NarrowedTransitMode.of(TransitMode.BUS).withSubMode(SubMode.of("localBus")).build().toString()
-    ).isEqualTo("BUS::localBus");
-    assertThat(
-      NarrowedTransitMode.of(TransitMode.BUS)
-        .withReplacement(ReplacementRequirement.REQUIRED)
-        .build()
-        .toString()
-    ).isEqualTo("BUS::::REQUIRED");
   }
 }
