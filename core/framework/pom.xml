@@ -13,14 +13,6 @@
     <name>OpenTripPlanner - Core Framework</name>
     <description>Core framework implementation - the api should be in the core model module</description>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>com.diffplug.spotless</groupId>
-                <artifactId>spotless-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
 
     <dependencies>
         <dependency>

@@ -21,7 +21,7 @@ mvn test
 # Run tests with code coverage
 mvn jacoco:prepare-agent test
 
-# Skip the code formatting (Java, JSON and Markdown formatter and Spotless) during local builds
+# Skip the code formatting (Java, JSON and Markdown formatter) during local builds
 mvn test -Djcf         # equivalently: mvn test -PjcfSkip
 
 # Regenerate API/itinerary snapshot tests
@@ -37,11 +37,8 @@ violations:
   Markdown (100-char width, 2-space indent, all comment rules on; the options are in
   `.jcf/config.properties`). It needs Maven on JDK 25+. CI enforces it with `-PjcfCheck`; check with
   `mvn jcf:check`, format with `mvn jcf:format`. Skip locally with `-Djcf`.
-- **Spotless** removes unused imports from Java (Javadoc-only references are kept) and formats
-  GraphQL with **Prettier**. Requires `node`/`npm` on the `PATH`; check with `mvn spotless:check`,
-  format with `mvn spotless:apply`.
-- **Checkstyle** runs against `checkstyle.xml` in the `process-sources` phase (after Spotless). Skip
-  with `-Dcs` (or `-PcheckstyleSkip`).
+- **Checkstyle** runs against `checkstyle.xml` in the `process-sources` phase (after the Java code
+  formatter). Skip with `-Dcs` (or `-PcheckstyleSkip`).
 
 OpenRewrite (recipes in `openrewrite.yml`, e.g. removing unused imports) does **not** run
 automatically — invoke it explicitly with `mvn validate -Prewrite` (or the `-Drw` shortcut).
