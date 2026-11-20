@@ -5,6 +5,8 @@ import java.util.function.Function;
 import org.opentripplanner.core.model.transaction.RepositoryHandle;
 import org.opentripplanner.core.model.transaction.UpdateManager;
 import org.opentripplanner.core.model.transaction.WriteContext;
+import org.opentripplanner.service.elevatorstatus.ElevatorStatusRepository;
+import org.opentripplanner.service.elevatorstatus.ElevatorStatusRepositorySnapshot;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySnapshot;
 import org.opentripplanner.street.graph.Graph;
@@ -43,9 +45,9 @@ public class GraphWriterService<C> implements WriteToGraphCallback<C> {
 
   /**
    * Create the bridge for the transit write domain. Each task checks out the mutable
-   * realtime-timetable repository for the current transaction. The realtime-vehicle repository is
-   * resolved lazily: only tasks that actually apply vehicle updates cause a new vehicle snapshot to
-   * be published at commit.
+   * realtime-timetable repository for the current transaction. The realtime-vehicle and elevator
+   * status repositories are resolved lazily: only tasks that use them cause a new snapshot of
+   * them to be published at commit.
    */
   public static GraphWriterService<TransitRealTimeUpdateContext> forTransitDomain(
     UpdateManager updateManager,
@@ -54,13 +56,19 @@ public class GraphWriterService<C> implements WriteToGraphCallback<C> {
       RealtimeVehicleRepositorySnapshot,
       RealtimeVehicleRepository
     > realtimeVehicleHandle,
+    RepositoryHandle<
+      ElevatorStatusRepositorySnapshot,
+      ElevatorStatusRepository
+    > elevatorStatusHandle,
     TransitRepository transitRepository
   ) {
     return new GraphWriterService<>(updateManager, ctx ->
       new DefaultTransitRealTimeUpdateContext(
         transitRepository,
         ctx.repository(timetableHandle),
-        () -> ctx.repository(realtimeVehicleHandle)
+        () -> ctx.repository(realtimeVehicleHandle),
+        () -> ctx.repository(elevatorStatusHandle),
+        ctx
       )
     );
   }

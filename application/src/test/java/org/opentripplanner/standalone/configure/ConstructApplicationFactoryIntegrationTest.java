@@ -31,6 +31,8 @@ import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
+import org.opentripplanner.service.elevatorstatus.ElevatorStatusRepository;
+import org.opentripplanner.service.elevatorstatus.ElevatorStatusRepositorySnapshot;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySnapshot;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
@@ -44,6 +46,7 @@ import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.standalone.configure.DaggerBindingKey.GenericType;
 import org.opentripplanner.standalone.server.MetricsLogging;
 import org.opentripplanner.street.StreetRepository;
+import org.opentripplanner.street.elevator.ElevatorEdgeIndex;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.transfer.regular.TransferRepository;
@@ -72,6 +75,7 @@ class ConstructApplicationFactoryIntegrationTest {
     of(DeduplicatorService.class),
     of(DelegatingTransitAlertServiceImpl.class),
     of(FareServiceFactory.class),
+    of(ElevatorEdgeIndex.class),
     of(Graph.class),
     of(GraphQLSchema.class, GtfsSchema.class),
     of(GraphQLSchema.class, TransmodelSchema.class),
@@ -83,6 +87,11 @@ class ConstructApplicationFactoryIntegrationTest {
       >() {}
     ),
     of(new GenericType<RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository>>() {}),
+    of(
+      new GenericType<
+        RepositoryHandle<ElevatorStatusRepositorySnapshot, ElevatorStatusRepository>
+      >() {}
+    ),
     of(new GenericType<RegularTransferBuildRepository<NearbyStop>>() {}),
     of(
       new GenericType<

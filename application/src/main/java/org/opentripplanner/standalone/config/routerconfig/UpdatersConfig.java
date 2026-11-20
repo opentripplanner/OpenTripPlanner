@@ -38,6 +38,7 @@ import org.opentripplanner.standalone.config.routerconfig.updaters.SiriETGoogleP
 import org.opentripplanner.standalone.config.routerconfig.updaters.SiriETLiteUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.SiriETMqttUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.SiriETUpdaterConfig;
+import org.opentripplanner.standalone.config.routerconfig.updaters.SiriFmElevatorUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.SiriSXLiteUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.SiriSXUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.VehicleParkingUpdaterConfig;
@@ -50,6 +51,7 @@ import org.opentripplanner.updater.UpdatersParameters;
 import org.opentripplanner.updater.alert.gtfs.GtfsRealtimeAlertsUpdaterParameters;
 import org.opentripplanner.updater.alert.siri.SiriSXUpdaterParameters;
 import org.opentripplanner.updater.alert.siri.lite.SiriSXLiteUpdaterParameters;
+import org.opentripplanner.updater.elevator.siri.SiriFmElevatorUpdaterParameters;
 import org.opentripplanner.updater.trip.gtfs.updater.http.PollingTripUpdaterParameters;
 import org.opentripplanner.updater.trip.gtfs.updater.mqtt.MqttGtfsRealtimeUpdaterParameters;
 import org.opentripplanner.updater.trip.siri.updater.DefaultSiriETUpdaterParameters;
@@ -206,6 +208,11 @@ public class UpdatersConfig implements UpdatersParameters {
   }
 
   @Override
+  public List<SiriFmElevatorUpdaterParameters> getSiriFmElevatorUpdaterParameters() {
+    return getParameters(Type.SIRI_FM_ELEVATOR);
+  }
+
+  @Override
   public List<MqttGtfsRealtimeUpdaterParameters> getMqttGtfsRealtimeUpdaterParameters() {
     return getParameters(MQTT_GTFS_RT_UPDATER);
   }
@@ -251,6 +258,7 @@ public class UpdatersConfig implements UpdatersParameters {
     SIRI_ET_GOOGLE_PUBSUB_UPDATER(SiriETGooglePubsubUpdaterConfig::create),
     SIRI_SX_UPDATER(SiriSXUpdaterConfig::create),
     SIRI_SX_LITE(SiriSXLiteUpdaterConfig::create),
+    SIRI_FM_ELEVATOR(SiriFmElevatorUpdaterConfig::create),
     SIRI_AZURE_ET_UPDATER(SiriAzureETUpdaterConfig::create),
     SIRI_AZURE_SX_UPDATER(SiriAzureSXUpdaterConfig::create),
     SIRI_ET_MQTT(SiriETMqttUpdaterConfig::create);

@@ -239,6 +239,7 @@ public class ConstructApplication {
     // Repositories must be registered before the updaters start writing, not lazily by the first
     // request - registration is not thread-safe.
     factory.regularTransferRepositoryHandle();
+    factory.elevatorStatusRepositoryHandle();
 
     /* Create updater modules from JSON config. */
     UpdaterConfigurator.configure(
@@ -256,6 +257,8 @@ public class ConstructApplication {
       factory.transitUpdateManager(),
       factory.streetUpdateManager(),
       factory.timetableRepositoryHandle(),
+      factory.elevatorStatusRepositoryHandle(),
+      factory::elevatorEdgeIndex,
       factory.transitAlertService(),
       routerConfig().updaterConfig(),
       otpConfig().gbfsNetworks

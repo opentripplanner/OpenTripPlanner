@@ -44,6 +44,7 @@ public final class TransferParameters<R> {
   private final List<TransferProfile<R>> profiles;
   private final Map<TransferProfileType, MaxDurationsPreference> maxDurations;
   private final List<WarmupParameters> warmup;
+  private final boolean pathAlternatives;
 
   /**
    * @param profiles           the profiles of all types, in the order declared in the
@@ -60,14 +61,19 @@ public final class TransferParameters<R> {
    *                           starts, see {@link WarmupParameters}. The ids must be unique among
    *                           the profiles and the warmup entries, and there must be a profile of
    *                           the type of each entry.
+   * @param pathAlternatives whether to generate alternative paths that avoid the closable facility id
+   *                           ids of the paths, see
+   *                           {@link org.opentripplanner.transit.transfer.regular.spi.TransferPath#closableFacilityIds()}
    */
   public TransferParameters(
     List<TransferProfile<R>> profiles,
     Map<TransferProfileType, MaxDurationsPreference> maxDurations,
-    List<WarmupParameters> warmup
+    List<WarmupParameters> warmup,
+    boolean pathAlternatives
   ) {
     this.profiles = List.copyOf(profiles);
     this.warmup = List.copyOf(warmup);
+    this.pathAlternatives = pathAlternatives;
     this.maxDurations = maxDurations.isEmpty() ? Map.of() : Map.copyOf(new EnumMap<>(maxDurations));
     this.maxDurations.forEach(TransferParameters::validateMaxDurationsOfType);
     validateProfiles(this.profiles, this.warmup);
@@ -80,6 +86,15 @@ public final class TransferParameters<R> {
    */
   public TransferParameters(List<TransferProfile<R>> profiles) {
     this(profiles, defaultMaxDurations(profiles));
+  }
+
+  /** The profiles without alternative paths for closable facility ids. */
+  public TransferParameters(
+    List<TransferProfile<R>> profiles,
+    Map<TransferProfileType, MaxDurationsPreference> maxDurations,
+    List<WarmupParameters> warmup
+  ) {
+    this(profiles, maxDurations, warmup, false);
   }
 
   /** The profiles without warmup entries. */
@@ -96,6 +111,14 @@ public final class TransferParameters<R> {
 
   public List<WarmupParameters> warmup() {
     return warmup;
+  }
+
+  /**
+   * Whether alternative paths that avoid the closable facility ids of the best paths are generated
+   * at graph build.
+   */
+  public boolean pathAlternatives() {
+    return pathAlternatives;
   }
 
   /**
@@ -208,13 +231,14 @@ public final class TransferParameters<R> {
     return (
       profiles.equals(that.profiles) &&
       maxDurations.equals(that.maxDurations) &&
-      warmup.equals(that.warmup)
+      warmup.equals(that.warmup) &&
+      pathAlternatives == that.pathAlternatives
     );
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(profiles, maxDurations, warmup);
+    return Objects.hash(profiles, maxDurations, warmup, pathAlternatives);
   }
 
   @Override
@@ -223,6 +247,7 @@ public final class TransferParameters<R> {
       .addCol("profiles", profiles)
       .addObj("maxDurations", maxDurations)
       .addCol("warmup", warmup)
+      .addBool("pathAlternatives", pathAlternatives, false)
       .toString();
   }
 }

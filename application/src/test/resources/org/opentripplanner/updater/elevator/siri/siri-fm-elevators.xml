@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Siri xmlns="http://www.siri.org.uk/siri">
+  <ServiceDelivery>
+    <ResponseTimestamp>2026-11-12T11:16:20.345Z</ResponseTimestamp>
+    <ProducerRef>test</ProducerRef>
+    <FacilityMonitoringDelivery>
+      <ResponseTimestamp>2026-11-12T11:16:20.345Z</ResponseTimestamp>
+      <FacilityCondition>
+        <FacilityRef>Lift Maker:1001</FacilityRef>
+        <Facility>
+          <Description xml:lang="en">Street level - platform</Description>
+          <Features><Feature><AccessFacility>lift</AccessFacility></Feature></Features>
+          <FacilityLocation><StopPlaceRef>test:1</StopPlaceRef></FacilityLocation>
+        </Facility>
+        <FacilityStatus><Status>available</Status></FacilityStatus>
+      </FacilityCondition>
+      <FacilityCondition>
+        <FacilityRef>Lift Maker:1002</FacilityRef>
+        <Facility>
+          <Features><Feature><AccessFacility>lift</AccessFacility></Feature></Features>
+        </Facility>
+        <FacilityStatus>
+          <Status>notAvailable</Status>
+          <Description xml:lang="en">Out of service until further notice</Description>
+        </FacilityStatus>
+      </FacilityCondition>
+      <FacilityCondition>
+        <FacilityRef>Lift Maker:1003</FacilityRef>
+        <Facility>
+          <Features><Feature><AccessFacility>lift</AccessFacility></Feature></Features>
+        </Facility>
+        <FacilityStatus><Status>unknown</Status></FacilityStatus>
+      </FacilityCondition>
+      <FacilityCondition>
+        <FacilityRef>Escalator Maker:2001</FacilityRef>
+        <Facility>
+          <Features><Feature><AccessFacility>escalator</AccessFacility></Feature></Features>
+        </Facility>
+        <FacilityStatus><Status>notAvailable</Status></FacilityStatus>
+      </FacilityCondition>
+    </FacilityMonitoringDelivery>
+  </ServiceDelivery>
+</Siri>

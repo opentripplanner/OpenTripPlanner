@@ -3,6 +3,7 @@ package org.opentripplanner.updater.configure;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.transaction.RepositoryHandle;
@@ -19,10 +20,13 @@ import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.gbfs.network.GbfsNetworkOverrides;
 import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
+import org.opentripplanner.service.elevatorstatus.ElevatorStatusRepository;
+import org.opentripplanner.service.elevatorstatus.ElevatorStatusRepositorySnapshot;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySnapshot;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
+import org.opentripplanner.street.elevator.ElevatorEdgeIndex;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.model.openinghours.OpeningHoursCalendarService;
@@ -33,11 +37,15 @@ import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterService;
+import org.opentripplanner.updater.StreetRealTimeUpdateContext;
 import org.opentripplanner.updater.UpdatersParameters;
 import org.opentripplanner.updater.alert.TransitAlertProvider;
 import org.opentripplanner.updater.alert.gtfs.GtfsRealtimeAlertsUpdater;
+import org.opentripplanner.updater.elevator.ElevatorStatusUpdater;
+import org.opentripplanner.updater.elevator.siri.SiriFmElevatorDataSource;
 import org.opentripplanner.updater.spi.GraphUpdater;
 import org.opentripplanner.updater.spi.WriteDomain;
+import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.opentripplanner.updater.spi.WriteToGraphCallbacks;
 import org.opentripplanner.updater.trip.gtfs.GtfsRealTimeTripUpdateAdapter;
 import org.opentripplanner.updater.trip.gtfs.updater.http.PollingTripUpdater;
@@ -92,6 +100,11 @@ public class UpdaterConfigurator {
   private final UpdateManager transitUpdateManager;
   private final UpdateManager streetUpdateManager;
   private final RepositoryHandle<
+    ElevatorStatusRepositorySnapshot,
+    ElevatorStatusRepository
+  > elevatorStatusRepositoryHandle;
+  private final Supplier<ElevatorEdgeIndex> elevatorEdgeIndex;
+  private final RepositoryHandle<
     TimetableRepositorySnapshot,
     TimetableRepository
   > timetableRepositoryHandle;
@@ -118,6 +131,11 @@ public class UpdaterConfigurator {
     UpdateManager transitUpdateManager,
     UpdateManager streetUpdateManager,
     RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableRepositoryHandle,
+    RepositoryHandle<
+      ElevatorStatusRepositorySnapshot,
+      ElevatorStatusRepository
+    > elevatorStatusRepositoryHandle,
+    Supplier<ElevatorEdgeIndex> elevatorEdgeIndex,
     DelegatingTransitAlertServiceImpl transitAlertService,
     UpdatersParameters updatersParameters,
     GbfsNetworkOverrides gbfsNetworkOverrides
@@ -134,6 +152,8 @@ public class UpdaterConfigurator {
     this.transitUpdateManager = transitUpdateManager;
     this.streetUpdateManager = streetUpdateManager;
     this.timetableRepositoryHandle = timetableRepositoryHandle;
+    this.elevatorStatusRepositoryHandle = elevatorStatusRepositoryHandle;
+    this.elevatorEdgeIndex = elevatorEdgeIndex;
     this.carpoolingRepository = carpoolingRepository;
     this.routableCarpoolTripResolver = routableCarpoolTripResolver;
     this.carpoolingParameters = carpoolingParameters;
@@ -159,6 +179,11 @@ public class UpdaterConfigurator {
     UpdateManager transitUpdateManager,
     UpdateManager streetUpdateManager,
     RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableRepositoryHandle,
+    RepositoryHandle<
+      ElevatorStatusRepositorySnapshot,
+      ElevatorStatusRepository
+    > elevatorStatusRepositoryHandle,
+    Supplier<ElevatorEdgeIndex> elevatorEdgeIndex,
     DelegatingTransitAlertServiceImpl transitAlertService,
     UpdatersParameters updatersParameters,
     GbfsNetworkOverrides gbfsNetworkOverrides
@@ -178,6 +203,8 @@ public class UpdaterConfigurator {
       transitUpdateManager,
       streetUpdateManager,
       timetableRepositoryHandle,
+      elevatorStatusRepositoryHandle,
+      elevatorEdgeIndex,
       transitAlertService,
       updatersParameters,
       gbfsNetworkOverrides
@@ -186,8 +213,9 @@ public class UpdaterConfigurator {
 
   private void configure() {
     List<GraphUpdater<?>> updaters = new ArrayList<>();
+    var streetWriterService = GraphWriterService.forStreetDomain(streetUpdateManager, graph);
 
-    updaters.addAll(createUpdatersFromConfig());
+    updaters.addAll(createUpdatersFromConfig(streetWriterService));
 
     updaters.addAll(
       // Setup updaters using the VehicleRentalServiceDirectoryFetcher(Sandbox)
@@ -208,9 +236,9 @@ public class UpdaterConfigurator {
       transitUpdateManager,
       timetableRepositoryHandle,
       realtimeVehicleRepositoryHandle,
+      elevatorStatusRepositoryHandle,
       transitRepository
     );
-    var streetWriterService = GraphWriterService.forStreetDomain(streetUpdateManager, graph);
     var updaterManager = new GraphUpdaterManager(
       new WriteToGraphCallbacks()
         .with(WriteDomain.TRANSIT, transitWriterService)
@@ -264,9 +292,13 @@ public class UpdaterConfigurator {
   }
 
   /**
+   * @param streetWriter writes to the street domain for the updaters of other domains that also
+   *                     change the street
    * @return a list of GraphUpdaters created from the configuration
    */
-  private List<GraphUpdater<?>> createUpdatersFromConfig() {
+  private List<GraphUpdater<?>> createUpdatersFromConfig(
+    WriteToGraphCallback<StreetRealTimeUpdateContext> streetWriter
+  ) {
     OpeningHoursCalendarService openingHoursCalendarService =
       graph.getOpeningHoursCalendarService();
 
@@ -333,6 +365,16 @@ public class UpdaterConfigurator {
     }
     for (var configItem : updatersParameters.getSiriSXLiteUpdaterParameters()) {
       updaters.add(SiriUpdaterModule.createSiriSXUpdater(configItem, siriFuzzyTripMatcherCache()));
+    }
+    for (var configItem : updatersParameters.getSiriFmElevatorUpdaterParameters()) {
+      updaters.add(
+        new ElevatorStatusUpdater(
+          configItem,
+          new SiriFmElevatorDataSource(configItem),
+          elevatorEdgeIndex.get(),
+          streetWriter
+        )
+      );
     }
     for (var configItem : updatersParameters.getMqttGtfsRealtimeUpdaterParameters()) {
       updaters.add(new MqttGtfsRealtimeUpdater(configItem, provideGtfsAdapter()));

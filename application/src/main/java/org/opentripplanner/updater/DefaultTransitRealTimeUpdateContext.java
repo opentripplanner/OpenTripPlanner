@@ -1,6 +1,9 @@
 package org.opentripplanner.updater;
 
 import java.util.function.Supplier;
+import org.opentripplanner.core.model.event.DomainEvent;
+import org.opentripplanner.core.model.transaction.WriteContext;
+import org.opentripplanner.service.elevatorstatus.ElevatorStatusRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.service.TransitRepository;
@@ -18,14 +21,23 @@ public class DefaultTransitRealTimeUpdateContext implements TransitRealTimeUpdat
    */
   private final Supplier<RealtimeVehicleRepository> realtimeVehicleRepository;
 
+  /** Resolved lazily, like the realtime vehicles. */
+  private final Supplier<ElevatorStatusRepository> elevatorStatusRepository;
+
+  private final WriteContext writeContext;
+
   public DefaultTransitRealTimeUpdateContext(
     TransitRepository transitRepository,
     TimetableRepository timetableRepository,
-    Supplier<RealtimeVehicleRepository> realtimeVehicleRepository
+    Supplier<RealtimeVehicleRepository> realtimeVehicleRepository,
+    Supplier<ElevatorStatusRepository> elevatorStatusRepository,
+    WriteContext writeContext
   ) {
     this.transitRepository = transitRepository;
     this.timetableRepository = timetableRepository;
     this.realtimeVehicleRepository = realtimeVehicleRepository;
+    this.elevatorStatusRepository = elevatorStatusRepository;
+    this.writeContext = writeContext;
   }
 
   @Override
@@ -51,5 +63,15 @@ public class DefaultTransitRealTimeUpdateContext implements TransitRealTimeUpdat
   @Override
   public EntityResolver entityResolver(String feedId) {
     return new EntityResolver(timetableRepository, transitRepository, feedId);
+  }
+
+  @Override
+  public ElevatorStatusRepository elevatorStatusRepository() {
+    return elevatorStatusRepository.get();
+  }
+
+  @Override
+  public void publish(DomainEvent event) {
+    writeContext.publish(event);
   }
 }

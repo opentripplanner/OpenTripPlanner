@@ -1,9 +1,12 @@
 package org.opentripplanner.transit.transfer.regular.internal;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.IdentityHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -15,6 +18,7 @@ import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.raptor.data.stop.RaptorStopIndex;
 import org.opentripplanner.raptor.spi.RaptorConstants;
+import org.opentripplanner.transit.transfer.regular.AlternativePath;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferGenerator;
 import org.opentripplanner.transit.transfer.regular.RegularTransferProfileStatistics;
@@ -40,6 +44,7 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
   private final RaptorStopIndex stopIndex;
   private final TransferProfiles<P, R> profiles;
   private final RegularTransferBuildRepository<P> buildRepository;
+  private final boolean pathAlternatives;
   private final Set<Integer> stopsUsedInTransfers = ConcurrentHashMap.newKeySet();
 
   /** The number of paths of a profile (by id) that are the paths of an earlier profile. */
@@ -48,6 +53,12 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
   /** The stops that are the start or the end of a path of a profile (by id). */
   private final Map<String, Set<Integer>> stopsUsedByProfile = new ConcurrentHashMap<>();
 
+  /** The number of searches that avoid closable facility ids, in addition to the discovery searches. */
+  private final LongAdder alternativeSearches = new LongAdder();
+
+  /** The number of paths stored for the transfers that depend on ids. */
+  private final LongAdder alternativePaths = new LongAdder();
+
   public DefaultRegularTransferGenerator(
     RaptorStopIndex stopIndex,
     TransferParameters<R> parameters,
@@ -55,17 +66,24 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
     TransferRequestMapper<R> mapper,
     RegularTransferBuildRepository<P> buildRepository
   ) {
-    this(stopIndex, TransferProfiles.of(parameters, pathProvider, mapper), buildRepository);
+    this(
+      stopIndex,
+      TransferProfiles.of(parameters, pathProvider, mapper),
+      buildRepository,
+      parameters.pathAlternatives()
+    );
   }
 
   DefaultRegularTransferGenerator(
     RaptorStopIndex stopIndex,
     TransferProfiles<P, R> profiles,
-    RegularTransferBuildRepository<P> buildRepository
+    RegularTransferBuildRepository<P> buildRepository,
+    boolean pathAlternatives
   ) {
     this.stopIndex = stopIndex;
     this.profiles = profiles;
     this.buildRepository = buildRepository;
+    this.pathAlternatives = pathAlternatives;
   }
 
   @Override
@@ -74,13 +92,20 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
     var progress = ProgressTracker.track("Generate regular transfers", 1000, stops.size());
     stops.parallelStream().forEach(stop -> {
       // The paths of this stop of the profiles generated so far, in the order of the profiles
-      var pathsOfEarlierProfiles = new ArrayList<Map<Integer, P>>();
+      var pathsOfEarlierProfiles = new ArrayList<Map<Integer, AlternativePath<P>>>();
       for (var profile : profiles) {
         pathsOfEarlierProfiles.add(generateForStop(profile, stop, pathsOfEarlierProfiles));
       }
       progress.step(m -> LOG.info(m));
     });
     LOG.info(progress.completeMessage());
+    if (pathAlternatives) {
+      LOG.info(
+        "Transfer alternatives: {} extra searches, {} paths stored for the transfers with closable facility ids.",
+        alternativeSearches.sum(),
+        alternativePaths.sum()
+      );
+    }
   }
 
   @Override
@@ -140,41 +165,32 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
    *                               before this profile, by target stop
    * @return the paths of the profile from the stop, by target stop
    */
-  private Map<Integer, P> generateForStop(
+  private Map<Integer, AlternativePath<P>> generateForStop(
     TransferProfileState<P, R> profile,
     FeedScopedId fromStopId,
-    List<Map<Integer, P>> pathsOfEarlierProfiles
+    List<Map<Integer, AlternativePath<P>>> pathsOfEarlierProfiles
   ) {
     int fromStop = requireStopIndex(fromStopId);
-    Map<Integer, TransferPath<P>> bestCandidatePerTargetStop = new HashMap<>();
+    var bestCandidatePerTargetStop = findBestPerTargetStop(
+      profile.search().findNearbyStops(fromStopId, profile.maxDurations())
+    );
 
-    var nearbyStops = profile.search().findNearbyStops(fromStopId, profile.maxDurations());
-    for (var candidate : nearbyStops) {
-      int toStop = stopIndex.toStopIndex(candidate.toStop());
-      if (toStop == RaptorConstants.NOT_FOUND) {
-        // The nearby stops may include flex stops, they can not be a target of a regular transfer
-        continue;
-      }
-      var existing = bestCandidatePerTargetStop.get(toStop);
-      if (existing == null || candidate.criteria().c1() < existing.criteria().c1()) {
-        bestCandidatePerTargetStop.put(toStop, candidate);
-      }
-    }
-
-    Map<Integer, P> pathsByToStop = new HashMap<>();
+    Map<Integer, AlternativePath<P>> pathsByToStop = new HashMap<>();
     bestCandidatePerTargetStop.forEach((toStop, candidate) -> {
+      var ownPath = new AlternativePath<>(candidate.path(), closableFacilityIdsOf(candidate));
       var reusedPath = findEquivalentPath(
         profile,
         fromStopId,
         toStop,
         candidate,
+        ownPath.closableFacilityIds(),
         pathsOfEarlierProfiles
       );
       if (reusedPath != null) {
         pathsByToStop.put(toStop, reusedPath);
         sharedPaths.computeIfAbsent(profile.id(), id -> new LongAdder()).increment();
       } else {
-        pathsByToStop.put(toStop, candidate.path());
+        pathsByToStop.put(toStop, ownPath);
       }
     });
     if (!pathsByToStop.isEmpty()) {
@@ -186,11 +202,119 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
       stopsOfProfile.add(fromStop);
       stopsOfProfile.addAll(pathsByToStop.keySet());
     }
+    var templates = new HashMap<Integer, P>();
+    pathsByToStop.forEach((toStop, alternative) -> templates.put(toStop, alternative.path()));
     // Stops are generated in parallel, the build repository is not thread-safe
     synchronized (this) {
-      buildRepository.setPaths(profile.userPreferences(), fromStop, pathsByToStop);
+      buildRepository.setPaths(profile.userPreferences(), fromStop, templates);
+    }
+    if (pathAlternatives) {
+      generateAlternativePaths(profile, fromStopId, fromStop, pathsByToStop);
     }
     return pathsByToStop;
+  }
+
+  /**
+   * The cheapest candidate per target stop. The target stops that are not in the stop index are
+   * dropped.
+   */
+  private Map<Integer, TransferPath<P>> findBestPerTargetStop(
+    Collection<TransferPath<P>> candidates
+  ) {
+    Map<Integer, TransferPath<P>> bestPerTargetStop = new HashMap<>();
+    for (var candidate : candidates) {
+      int toStop = stopIndex.toStopIndex(candidate.toStop());
+      if (toStop == RaptorConstants.NOT_FOUND) {
+        // The nearby stops may include flex stops, they can not be a target of a regular transfer
+        continue;
+      }
+      var existing = bestPerTargetStop.get(toStop);
+      if (existing == null || candidate.criteria().c1() < existing.criteria().c1()) {
+        bestPerTargetStop.put(toStop, candidate);
+      }
+    }
+    return bestPerTargetStop;
+  }
+
+  /**
+   * The closable facility ids of the path. They are ignored if the feature is off, so the paths are
+   * generated and reused as if they had no closable facility ids.
+   */
+  private Set<String> closableFacilityIdsOf(TransferPath<P> candidate) {
+    return pathAlternatives ? candidate.closableFacilityIds() : Set.of();
+  }
+
+  /**
+   * Find the alternatives of the transfers from the stop that depend on ids and store all
+   * paths of these transfers. For each non-empty subset {@code S} of the closable facility ids {@code E} of
+   * a best path, the best path of the transfer that avoids
+   * {@code S} is an alternative. There is one search for each distinct subset, it is shared by all
+   * the transfers that need it. A transfer without a path that avoids {@code S} has no alternative
+   * for {@code S}. The alternatives of a transfer are stored once even if several subsets give the
+   * same path. The number of searches grows as 2^n for a path with n closable facility ids.
+   * <p>
+   * The best path is stored with the alternatives, so the closable facility ids of the best path are known.
+   * The alternatives are not shared with other profiles, they are found with the search of this
+   * profile.
+   */
+  private void generateAlternativePaths(
+    TransferProfileState<P, R> profile,
+    FeedScopedId fromStopId,
+    int fromStop,
+    Map<Integer, AlternativePath<P>> bestPaths
+  ) {
+    var pathsByToStop = new HashMap<Integer, Set<AlternativePath<P>>>();
+    var toStopsByAvoidedIds = new HashMap<Set<String>, List<Integer>>();
+    bestPaths.forEach((toStop, best) -> {
+      var ids = best.closableFacilityIds();
+      if (ids.isEmpty()) {
+        return;
+      }
+      pathsByToStop.put(toStop, new LinkedHashSet<>(List.of(best)));
+      for (var subset : nonEmptySubsets(ids)) {
+        toStopsByAvoidedIds.computeIfAbsent(subset, k -> new ArrayList<>()).add(toStop);
+      }
+    });
+
+    toStopsByAvoidedIds.forEach((avoidedIds, toStops) -> {
+      alternativeSearches.increment();
+      var found = findBestPerTargetStop(
+        profile.search().findNearbyStops(fromStopId, profile.maxDurations(), avoidedIds)
+      );
+      for (int toStop : toStops) {
+        var alternative = found.get(toStop);
+        if (alternative != null) {
+          pathsByToStop
+            .get(toStop)
+            .add(new AlternativePath<>(alternative.path(), alternative.closableFacilityIds()));
+        }
+      }
+    });
+
+    var stored = new HashMap<Integer, List<AlternativePath<P>>>();
+    pathsByToStop.forEach((toStop, paths) -> {
+      stored.put(toStop, List.copyOf(paths));
+      alternativePaths.add(paths.size());
+    });
+    synchronized (this) {
+      buildRepository.setAlternativePaths(profile.userPreferences(), fromStop, stored);
+    }
+  }
+
+  /** All non-empty subsets of the ids, there are 2^n - 1 of them. */
+  private static List<Set<String>> nonEmptySubsets(Set<String> ids) {
+    var list = List.copyOf(ids);
+    var subsets = new ArrayList<Set<String>>();
+    for (int mask = 1; mask < 1 << list.size(); ++mask) {
+      var subset = new HashSet<String>();
+      for (int i = 0; i < list.size(); ++i) {
+        if ((mask & (1 << i)) != 0) {
+          subset.add(list.get(i));
+        }
+      }
+      subsets.add(Set.copyOf(subset));
+    }
+    return subsets;
   }
 
   /**
@@ -198,25 +322,31 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
    * equivalent to the path the profile found itself, or {@code null} if there is none. A path
    * that several profiles share is only checked once. A path of an earlier profile may not be
    * possible with the preferences of this profile, for example a path of another type, and it may
-   * be longer than the max duration of this profile.
+   * be longer than the max duration of this profile. The path must also have the same closable facility
+   * ids as the path of this profile, it is not equivalent if it depends on something else.
    */
   @Nullable
-  private P findEquivalentPath(
+  private AlternativePath<P> findEquivalentPath(
     TransferProfileState<P, R> profile,
     FeedScopedId fromStopId,
     int toStop,
     TransferPath<P> own,
-    List<Map<Integer, P>> pathsOfEarlierProfiles
+    Set<String> ownClosableFacilityIds,
+    List<Map<Integer, AlternativePath<P>>> pathsOfEarlierProfiles
   ) {
     var checked = Collections.newSetFromMap(new IdentityHashMap<P, Boolean>());
-    P best = null;
+    AlternativePath<P> best = null;
     int bestC1 = Integer.MAX_VALUE;
     for (var paths : pathsOfEarlierProfiles) {
       var path = paths.get(toStop);
-      if (path == null || !checked.add(path)) {
+      if (
+        path == null ||
+        !path.closableFacilityIds().equals(ownClosableFacilityIds) ||
+        !checked.add(path.path())
+      ) {
         continue;
       }
-      var criteria = profile.search().computePathCriteria(path);
+      var criteria = profile.search().computePathCriteria(path.path());
       if (criteria.isPresent()) {
         int c1 = criteria.get().c1();
         if (

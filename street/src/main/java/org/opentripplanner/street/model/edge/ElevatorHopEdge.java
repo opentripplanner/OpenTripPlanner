@@ -28,6 +28,15 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
   private final int travelTime;
   private final String id;
 
+  /**
+   * Whether the elevator is out of service. It is set at runtime from the elevator status, in place
+   * on the edge, so a search running while it changes may see the old value on one hop and the new
+   * on the next. It is volatile so a change is visible to the searches on other threads, and
+   * transient so it is not part of the serialized graph: every elevator is in service when the
+   * graph is loaded.
+   */
+  private transient volatile boolean outOfService = false;
+
   private ElevatorHopEdge(
     Vertex from,
     Vertex to,
@@ -125,6 +134,23 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
   }
 
   /**
+   * Whether the elevator is out of service. An elevator that is out of service can not be
+   * traversed, by any mode.
+   */
+  public boolean isOutOfService() {
+    return outOfService;
+  }
+
+  /**
+   * Set the elevator out of service ({@code true}) or in service ({@code false}). The change is
+   * visible to the searches started afterward, on any thread. Only the street writer thread may
+   * call this.
+   */
+  public void setOutOfService(boolean outOfService) {
+    this.outOfService = outOfService;
+  }
+
+  /**
    * The number of levels that the ElevatorHopEdge travels.
    */
   public double getLevels() {
@@ -141,6 +167,9 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
 
   @Override
   public State[] traverse(State s0) {
+    if (outOfService) {
+      return State.empty();
+    }
     var request = s0.getRequest();
 
     StateEditor s1 = createEditorForDrivingOrWalking(s0, this);

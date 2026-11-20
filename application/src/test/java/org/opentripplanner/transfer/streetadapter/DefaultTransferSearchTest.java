@@ -9,12 +9,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner._support.geometry.Coordinates;
+import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.place.NearbyStopFinder;
 import org.opentripplanner.place.api.NearbyStop;
@@ -25,6 +27,9 @@ import org.opentripplanner.routing.linking.TransitStopVertexBuilderFactory;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.StreetModelForTest;
+import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.ElevatorHopEdge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.transfer.regular.api.maxduration.AllowedMode;
 import org.opentripplanner.transit.transfer.regular.api.maxduration.BicycleMaxDurations;
@@ -164,6 +169,47 @@ class DefaultTransferSearchTest {
 
     assertThat(subject.accepts(FROM, PLAIN, new PathCriteria(1000, 600), maxDurations)).isTrue();
     assertThat(subject.accepts(FROM, PLAIN, new PathCriteria(1000, 601), maxDurations)).isFalse();
+  }
+
+  @Test
+  void theClosableFacilityIdsOfAPathAreTheIdsOfItsElevators() {
+    var v0 = intersectionVertex(Coordinates.BERLIN);
+    var v1 = intersectionVertex(Coordinates.BERLIN_BRANDENBURG_GATE);
+    var v2 = intersectionVertex(Coordinates.BERLIN);
+    var v3 = intersectionVertex(Coordinates.BERLIN_BRANDENBURG_GATE);
+    var v4 = intersectionVertex(Coordinates.BERLIN);
+    var edges = List.<Edge>of(
+      elevator(v0, v1, "e1"),
+      elevator(v1, v2, "e1"),
+      elevator(v2, v3, "e2"),
+      elevator(v3, v4, null)
+    );
+    finder.add(new NearbyStop(PLAIN, 1, edges, null));
+    var subject = subject(StreetMode.WALK, MODES, FROM);
+
+    var result = subject.findNearbyStops(FROM, MaxDurationsPreference.of(Duration.ofMinutes(30)));
+
+    assertThat(result.iterator().next().closableFacilityIds()).containsExactly("e1", "e2");
+  }
+
+  @Test
+  void aPathWithoutElevatorsHasNoClosableFacilityIds() {
+    finder.add(PLAIN, minutes(10));
+    var subject = subject(StreetMode.WALK, MODES, FROM);
+
+    var result = subject.findNearbyStops(FROM, MaxDurationsPreference.of(Duration.ofMinutes(30)));
+
+    assertThat(result.iterator().next().closableFacilityIds()).isEmpty();
+  }
+
+  @Test
+  void theClosedFacilityIdsToAvoidAreGivenToTheNearbyStopFinder() {
+    finder.add(PLAIN, minutes(10));
+    var subject = subject(StreetMode.WALK, MODES, FROM);
+
+    subject.findNearbyStops(FROM, MaxDurationsPreference.of(Duration.ofMinutes(30)), Set.of("e1"));
+
+    assertThat(finder.avoidedElevatorIds).containsExactly("e1");
   }
 
   /** The cost of a path is capped at the max cost Raptor accepts. */
@@ -307,6 +353,26 @@ class DefaultTransferSearchTest {
     return new DefaultTransferSearch(graph, finder, isSource, isTarget, lookup, request);
   }
 
+  private static ElevatorHopEdge elevator(Vertex from, Vertex to, String id) {
+    ElevatorHopEdge.bidirectional(
+      from,
+      to,
+      StreetTraversalPermission.ALL,
+      Accessibility.POSSIBLE,
+      1,
+      -1,
+      id
+    );
+    return from
+      .getOutgoing()
+      .stream()
+      .filter(ElevatorHopEdge.class::isInstance)
+      .map(ElevatorHopEdge.class::cast)
+      .filter(e -> e.getToVertex() == to && e.id().equals(Optional.ofNullable(id)))
+      .findFirst()
+      .orElseThrow();
+  }
+
   private static List<FeedScopedId> stopIds(Collection<TransferPath<NearbyStop>> paths) {
     return paths.stream().map(TransferPath::toStop).toList();
   }
@@ -324,6 +390,12 @@ class DefaultTransferSearchTest {
     private final List<NearbyStop> stops = new ArrayList<>();
     private int calls = 0;
     private Duration durationLimit;
+    private Set<String> avoidedElevatorIds = Set.of();
+
+    FakeNearbyStopFinder add(NearbyStop stop) {
+      stops.add(stop);
+      return this;
+    }
 
     FakeNearbyStopFinder add(FeedScopedId stopId, int durationSeconds) {
       stops.add(new NearbyStop(stopId, durationSeconds, List.of(), null));
@@ -342,6 +414,27 @@ class DefaultTransferSearchTest {
       calls++;
       this.durationLimit = durationLimit;
       return stops;
+    }
+
+    @Override
+    public Collection<NearbyStop> findNearbyStops(
+      Vertex vertex,
+      RouteRequest routingRequest,
+      StreetMode streetMode,
+      boolean reverseDirection,
+      Duration durationLimit,
+      int maxStopCount,
+      Set<String> avoidElevatorIds
+    ) {
+      this.avoidedElevatorIds = avoidElevatorIds;
+      return findNearbyStops(
+        vertex,
+        routingRequest,
+        streetMode,
+        reverseDirection,
+        durationLimit,
+        maxStopCount
+      );
     }
 
     @Override
