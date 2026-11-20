@@ -490,6 +490,12 @@
                                 <source>src/main/java</source>
                                 <source>src/ext/java</source>
                                 <source>${project.build.directory}/generated-sources/annotations</source>
+                                <!--
+                                  Output of the graphql-codegen plugin. The plugin registers this
+                                  root itself at build time, but declaring it here lets IDEs like
+                                  IntelliJ pick it up on Maven import without running the plugin.
+                                -->
+                                <source>${project.build.directory}/generated-sources/graphql</source>
                             </sources>
                         </configuration>
                     </execution>
