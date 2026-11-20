@@ -2773,6 +2773,17 @@ type StopCall {
   has a headsign.
   """
   destinationDisplay: DestinationDisplay
+  """
+  The geometry of the hop from this call to the next call of the trip. Null for the last call, and
+  for all calls of flexible trips, where the path of the vehicle is not known.
+    
+  The geometry is also returned if this call or the next call is canceled, even though the vehicle
+  may not travel along it.
+    
+  If a real-time update has changed the stops of the trip, this is the geometry of the updated
+  trip.
+  """
+  geometryToNextCall: Geometry
   "Notices of this call which are known ahead of time."
   notices: [Notice!]! @deprecated(reason : "Experimental API that can be changed without notice.")
   "Real-time information and state for this stop location."

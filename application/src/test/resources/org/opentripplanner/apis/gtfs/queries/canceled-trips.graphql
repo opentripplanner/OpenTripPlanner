@@ -67,6 +67,10 @@
           destinationDisplay {
             headsign
           }
+          geometryToNextCall {
+            length
+            points
+          }
           schedule {
             time {
               ... on ArrivalDepartureTime {

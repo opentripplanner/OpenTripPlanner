@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.Nullable;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
 import org.opentripplanner.model.StopTime;
@@ -197,11 +199,12 @@ public class TransitRepositoryTestBuilder {
 
     var stopTimes = tripInput.stopTimes(trip);
     var stopPattern = stopPattern(stopTimes);
-    var tripPattern = getOrCreateTripPattern(stopPattern, route);
+    var patternKey = new TripPatternKey(stopPattern, route, tripInput.hopGeometries());
+    var tripPattern = getOrCreateTripPattern(patternKey);
 
     var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, null);
 
-    addTripTimesToPattern(tripPattern, tripTimes);
+    addTripTimesToPattern(patternKey, tripPattern, tripTimes);
 
     if (tripInput.tripOnServiceDateId() != null) {
       if (serviceDates.size() != 1) {
@@ -231,23 +234,30 @@ public class TransitRepositoryTestBuilder {
     return this;
   }
 
-  private void addTripTimesToPattern(TripPattern tripPattern, TripTimes tripTimes) {
+  private void addTripTimesToPattern(
+    TripPatternKey key,
+    TripPattern tripPattern,
+    TripTimes tripTimes
+  ) {
     var newPattern = tripPattern
       .copy()
       .withScheduledTimeTableBuilder(b -> b.addTripTimes(tripTimes))
       .build();
-    tripPatterns.put(TripPatternKey.of(newPattern), newPattern);
+    tripPatterns.put(key, newPattern);
   }
 
-  private TripPattern getOrCreateTripPattern(StopPattern stopPattern, Route route) {
-    var key = new TripPatternKey(stopPattern, route);
+  private TripPattern getOrCreateTripPattern(TripPatternKey key) {
     var pattern = tripPatterns.get(key);
     if (pattern != null) {
       return pattern;
     }
 
     var id = "Pattern" + (tripPatterns.size() + 1);
-    var newPattern = TripPattern.of(id(id)).withRoute(route).withStopPattern(stopPattern).build();
+    var builder = TripPattern.of(id(id)).withRoute(key.route()).withStopPattern(key.stopPattern());
+    if (key.hopGeometries() != null) {
+      builder.withHopGeometries(key.hopGeometries());
+    }
+    var newPattern = builder.build();
     tripPatterns.put(key, newPattern);
     return newPattern;
   }
@@ -287,13 +297,13 @@ public class TransitRepositoryTestBuilder {
     return builder.build();
   }
 
-  // We use route and stopPattern as key for tripPattern. This isn't enough in general so we
-  // can extend it to more attributes from the trip pattern as needed.
-  private record TripPatternKey(StopPattern stopPattern, Route route) {
-    public static TripPatternKey of(TripPattern tripPattern) {
-      return new TripPatternKey(tripPattern.getStopPattern(), tripPattern.getRoute());
-    }
-  }
+  // We use route, stopPattern and hop geometries as key for tripPattern. This isn't enough in
+  // general so we can extend it to more attributes from the trip pattern as needed.
+  private record TripPatternKey(
+    StopPattern stopPattern,
+    Route route,
+    @Nullable List<LineString> hopGeometries
+  ) {}
 
   private record ServiceCode(List<LocalDate> serviceDates, FeedScopedId id) {}
 }

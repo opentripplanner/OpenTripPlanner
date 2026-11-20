@@ -5,6 +5,7 @@ import static org.opentripplanner.apis.gtfs.GraphQLUtils.stopTimeToInt;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import java.time.ZonedDateTime;
+import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.apis.gtfs.GtfsGraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.model.CallRealTime;
@@ -25,6 +26,24 @@ public class StopCallImpl implements GraphQLDataFetchers.GraphQLStopCall {
     return environment -> {
       var headsign = getSource(environment).getHeadsign();
       return headsign == null ? null : new DestinationDisplay(headsign);
+    };
+  }
+
+  @Override
+  public DataFetcher<Geometry> geometryToNextCall() {
+    return environment -> {
+      var tripTime = getSource(environment);
+      var pattern = tripTime.pattern();
+      var stopPosition = tripTime.getStopPosition();
+      if (stopPosition >= pattern.numberOfStops() - 1) {
+        return null;
+      }
+      // The path of a flexible trip is not known
+      var flexIndex = getTransitService(environment).getFlexIndex();
+      if (flexIndex != null && flexIndex.getTripById(tripTime.getTrip().getId()) != null) {
+        return null;
+      }
+      return pattern.getHopGeometry(stopPosition);
     };
   }
 
