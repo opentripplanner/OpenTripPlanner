@@ -72,6 +72,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Build the debug client into the jar instead of publishing it to a CDN [#8151](https://github.com/opentripplanner/OpenTripPlanner/pull/8151)
 - Add destinationDisplay with headsign to StopCall in the GTFS GraphQL API [#8174](https://github.com/opentripplanner/OpenTripPlanner/pull/8174)
 - Fix direct flex transit cost filter [#8192](https://github.com/opentripplanner/OpenTripPlanner/pull/8192)
+- Fix `TAXI` routing not being able to use stops as origin or destination [#8138](https://github.com/opentripplanner/OpenTripPlanner/pull/8138)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.10.0 (2026-09-09)
