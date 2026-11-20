@@ -115,7 +115,7 @@ public class WheelchairPreferences implements Serializable {
     this.speed = Units.speed(speed);
     this.reluctance = Units.reluctance(reluctance);
     this.stairsTimeFactor = Units.reluctance(stairsTimeFactor);
-    this.safetyFactor = Units.reluctance(safetyFactor);
+    this.safetyFactor = Units.ratio(safetyFactor);
   }
 
   private WheelchairPreferences(Builder builder) {
@@ -129,7 +129,7 @@ public class WheelchairPreferences implements Serializable {
     this.speed = Units.speed(builder.speed);
     this.reluctance = Units.reluctance(builder.reluctance);
     this.stairsTimeFactor = Units.reluctance(builder.stairsTimeFactor);
-    this.safetyFactor = Units.reluctance(builder.safetyFactor);
+    this.safetyFactor = Units.ratio(builder.safetyFactor);
   }
 
   public static Builder of() {
