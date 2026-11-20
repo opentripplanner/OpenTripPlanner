@@ -128,7 +128,8 @@ class TransitFilterOldWayMapper {
           for (TransmodelTransportSubmode submode : transportSubModes) {
             tModes.add(new MainAndSubMode(mainMode, SubMode.of(submode.getValue())));
           }
-        } else {
+        }
+        else {
           tModes.add(new MainAndSubMode(mainMode));
         }
       }

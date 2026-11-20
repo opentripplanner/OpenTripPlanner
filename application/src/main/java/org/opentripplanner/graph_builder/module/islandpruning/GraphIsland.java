@@ -56,7 +56,8 @@ public record GraphIsland(
         this.restricted,
         this.removed
       );
-    } else {
+    }
+    else {
       return this.getMessage();
     }
   }

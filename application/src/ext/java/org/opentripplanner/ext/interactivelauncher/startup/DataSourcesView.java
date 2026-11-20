@@ -84,12 +84,14 @@ class DataSourcesView {
     // number of configurations found.
     if (size <= 10) {
       addListPanel(valuesSorted, selectedValue, selectDataSourceRadioGroup);
-    } else if (size <= 20) {
+    }
+    else if (size <= 20) {
       int half = size / 2;
       addListPanel(valuesSorted.subList(0, half), selectedValue, selectDataSourceRadioGroup);
       addHorizontalGlue(listPanel);
       addListPanel(valuesSorted.subList(half, size), selectedValue, selectDataSourceRadioGroup);
-    } else {
+    }
+    else {
       int third = size / 3;
       addListPanel(valuesSorted.subList(0, third), selectedValue, selectDataSourceRadioGroup);
       addHorizontalGlue(listPanel);

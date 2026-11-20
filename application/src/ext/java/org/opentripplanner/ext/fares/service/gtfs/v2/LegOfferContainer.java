@@ -81,7 +81,8 @@ class LegOfferContainer {
         unlimitedTransferOffers.remove(leg, existing);
         unlimitedTransferOffers.put(leg, legOffer);
       }
-    } else {
+    }
+    else {
       unlimitedTransferOffers.put(leg, legOffer);
     }
   }

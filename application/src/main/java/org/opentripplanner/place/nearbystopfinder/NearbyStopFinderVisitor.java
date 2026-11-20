@@ -68,7 +68,8 @@ class NearbyStopFinderVisitor implements TraverseVisitor<State, Edge> {
       if (!ignoreStops.contains(stopId)) {
         transitStopsFound.add(NearbyStop.nearbyStopForState(state, stopId));
       }
-    } else if (
+    }
+    else if (
       OTPFeature.FlexRouting.isOn() &&
       vertex instanceof StreetVertex streetVertex &&
       !streetVertex.areaStops().isEmpty()

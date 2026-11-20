@@ -96,7 +96,8 @@ class WarmupWorker implements Runnable {
         failureCount,
         DurationUtils.durationToStr(Duration.between(startTime, Instant.now()))
       );
-    } catch (Throwable e) {
+    }
+    catch (Throwable e) {
       LOG.error("Application warmup terminated by error after {} queries.", queryCount, e);
     }
   }
@@ -119,7 +120,8 @@ class WarmupWorker implements Runnable {
         DurationUtils.durationToStr(elapsed)
       );
       return success;
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       var elapsed = Duration.between(queryStart, Instant.now());
       LOG.info(
         "Warmup query #{} failed in {}: {}",

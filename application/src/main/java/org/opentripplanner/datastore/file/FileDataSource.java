@@ -27,10 +27,12 @@ public class FileDataSource extends AbstractFileDataSource {
       // We support both gzip and unzipped files when reading.
       if (file.getName().endsWith(".gz")) {
         return new GZIPInputStream(new FileInputStream(file));
-      } else {
+      }
+      else {
         return new FileInputStream(file);
       }
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       throw new RuntimeException("Failed to load " + path() + ": " + e.getLocalizedMessage(), e);
     }
   }
@@ -39,7 +41,8 @@ public class FileDataSource extends AbstractFileDataSource {
   public OutputStream asOutputStream() {
     try {
       return new FileOutputStream(file);
-    } catch (FileNotFoundException e) {
+    }
+    catch (FileNotFoundException e) {
       throw new RuntimeException("File not found " + path() + ": " + e.getLocalizedMessage(), e);
     }
   }

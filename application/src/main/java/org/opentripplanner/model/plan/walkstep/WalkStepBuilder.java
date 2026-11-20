@@ -128,7 +128,8 @@ public class WalkStepBuilder {
   public WalkStepBuilder addElevation(ElevationProfile other) {
     if (elevationProfile == null) {
       elevationProfile = other;
-    } else {
+    }
+    else {
       elevationProfile = elevationProfile.add(other);
     }
 

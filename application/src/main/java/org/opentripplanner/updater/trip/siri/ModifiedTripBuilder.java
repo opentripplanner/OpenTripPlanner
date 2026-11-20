@@ -134,7 +134,8 @@ class ModifiedTripBuilder {
 
     try {
       stopPattern = createStopPattern(pattern, calls, entityResolver);
-    } catch (UpdateException e) {
+    }
+    catch (UpdateException e) {
       throw e.withTripId(existingTripTimes.getTrip().getId());
     }
 
@@ -176,7 +177,8 @@ class ModifiedTripBuilder {
     try {
       var newTimes = builder.build();
       return new TripUpdate(stopPattern, newTimes, serviceDate, dataSource);
-    } catch (DataValidationException e) {
+    }
+    catch (DataValidationException e) {
       throw DataValidationExceptionMapper.map(e);
     }
   }

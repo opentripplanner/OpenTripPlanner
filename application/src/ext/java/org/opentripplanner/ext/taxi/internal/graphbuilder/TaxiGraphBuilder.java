@@ -37,7 +37,8 @@ public class TaxiGraphBuilder implements GraphBuilderModule {
 
       try {
         dataReader.read(bundle);
-      } catch (IOException e) {
+      }
+      catch (IOException e) {
         LOG.error("Failed to load taxi provider feed {}: {}", bundle.feedInfo(), e.getMessage());
       }
     }

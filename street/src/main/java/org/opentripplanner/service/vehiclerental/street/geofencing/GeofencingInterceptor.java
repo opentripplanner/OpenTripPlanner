@@ -27,7 +27,8 @@ public class GeofencingInterceptor {
 
     if (s0.getRequest().arriveBy()) {
       return evaluateArriveBy(s0, fromBoundaries, toBoundaries, edge);
-    } else {
+    }
+    else {
       return evaluateForward(s0, fromBoundaries, toBoundaries, edge);
     }
   }

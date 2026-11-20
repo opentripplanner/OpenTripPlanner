@@ -35,7 +35,8 @@ public final class DecorateTransitAlert implements ItineraryDecorator {
         var l = alertToLegMapper.decorateWithAlerts(leg, isFirstTransitLeg);
         isFirstTransitLeg = false;
         return l;
-      } else {
+      }
+      else {
         return leg;
       }
     }

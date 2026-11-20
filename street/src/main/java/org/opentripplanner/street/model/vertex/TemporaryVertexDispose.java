@@ -80,7 +80,8 @@ class TemporaryVertexDispose {
   private void disposeVertex(Vertex v, Edge connectedEdge, boolean incoming) {
     if (v instanceof TemporaryVertex) {
       addVertexToProcessTodoList(v);
-    } else {
+    }
+    else {
       removeEdgeFromMainGraphVertex(v, connectedEdge, incoming);
     }
   }
@@ -96,7 +97,8 @@ class TemporaryVertexDispose {
   private void removeEdgeFromMainGraphVertex(Vertex v, Edge connectedEdge, boolean incoming) {
     if (incoming) {
       v.removeIncoming(connectedEdge);
-    } else {
+    }
+    else {
       v.removeOutgoing(connectedEdge);
     }
   }

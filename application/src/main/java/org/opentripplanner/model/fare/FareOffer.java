@@ -21,7 +21,8 @@ public sealed interface FareOffer permits FareOffer.DefaultFareOffer, FareOffer.
   ) {
     if (dependencies.isEmpty()) {
       return FareOffer.of(startTime, product);
-    } else {
+    }
+    else {
       return new DependentFareOffer(
         startTime,
         product,

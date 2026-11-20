@@ -88,7 +88,8 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
 
     if (arriveBy) {
       useWalkSpeed = s.getVehicleRentalState() == VehicleRentalState.BEFORE_RENTING;
-    } else {
+    }
+    else {
       useWalkSpeed =
         s.isVehicleParked() || s.getVehicleRentalState() == VehicleRentalState.HAVE_RENTED;
     }

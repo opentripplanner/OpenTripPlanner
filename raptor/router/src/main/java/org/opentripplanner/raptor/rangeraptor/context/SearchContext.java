@@ -292,7 +292,8 @@ public class SearchContext<T extends RaptorTripSchedule> {
 
     if (forward) {
       return new ForwardRaptorTransitCalculator<>(s, t);
-    } else {
+    }
+    else {
       return new ReverseRaptorTransitCalculator<>(s, t);
     }
   }

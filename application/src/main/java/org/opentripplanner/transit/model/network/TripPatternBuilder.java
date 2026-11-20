@@ -226,9 +226,11 @@ public final class TripPatternBuilder
 
     if (this.hopGeometries != null) {
       geometries = this.hopGeometries;
-    } else if (this.originalTripPattern != null) {
+    }
+    else if (this.originalTripPattern != null) {
       geometries = generateHopGeometriesFromOriginalTripPattern();
-    } else {
+    }
+    else {
       geometries = null;
     }
 
@@ -278,7 +280,8 @@ public final class TripPatternBuilder
           cumulativeDouble[i] + GeometryUtils.sumDistances(hop.getCoordinateSequence());
         hops.add(hop);
       }
-    } else {
+    }
+    else {
       for (int i = 0; i < numberOfStops - 1; i++) {
         StopLocation from = stopPattern.getStop(i);
         StopLocation to = stopPattern.getStop(i + 1);
@@ -319,7 +322,8 @@ public final class TripPatternBuilder
       if (hopGeometry != null && stopPattern.sameStops(originalTripPattern.getStopPattern(), i)) {
         // Copy hop geometry from previous pattern
         hopGeometries.add(originalTripPattern.getHopGeometry(i));
-      } else if (
+      }
+      else if (
         hopGeometry != null && stopPattern.sameStations(originalTripPattern.getStopPattern(), i)
       ) {
         // Use old geometry but patch first and last point with new stops
@@ -334,7 +338,8 @@ public final class TripPatternBuilder
         coordinates[coordinates.length - 1].setCoordinate(newEnd);
 
         hopGeometries.add(GeometryUtils.getGeometryFactory().createLineString(coordinates));
-      } else {
+      }
+      else {
         // Create new straight-line geometry for hop
         hopGeometries.add(
           GeometryUtils.getGeometryFactory().createLineString(new Coordinate[] {

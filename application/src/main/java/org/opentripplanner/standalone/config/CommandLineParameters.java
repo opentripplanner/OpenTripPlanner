@@ -199,9 +199,11 @@ public class CommandLineParameters {
 
     if (doBuildStreet() & doBuildTransit()) {
       mainCommands.add("Build Street & Transit Graph");
-    } else if (doBuildStreet()) {
+    }
+    else if (doBuildStreet()) {
       mainCommands.add("Build Street Graph");
-    } else if (doBuildTransit()) {
+    }
+    else if (doBuildTransit()) {
       mainCommands.add("Build Transit Graph");
     }
 
@@ -223,14 +225,17 @@ public class CommandLineParameters {
 
     try {
       socket = new ServerSocket(port);
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       portUnavailable = true;
       reason = e.getMessage();
-    } finally {
+    }
+    finally {
       if (socket != null) {
         try {
           socket.close();
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
           // will not be thrown
         }
       }

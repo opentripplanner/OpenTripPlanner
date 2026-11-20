@@ -123,7 +123,8 @@ public class GraphBuildCacheManager implements Closeable {
       }
 
       return wrapper.data;
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       LOG.warn(
         "Failed to load {} cache from '{}': {}. Starting with empty cache.",
         task,
@@ -163,7 +164,8 @@ public class GraphBuildCacheManager implements Closeable {
           new CacheSerializationObject<>(task.serializationVersionId, data)
         );
         LOG.info("Saved {} cache to '{}'.", task, entry.path());
-      } catch (KryoException e) {
+      }
+      catch (KryoException e) {
         LOG.warn("Failed to save {} cache to '{}': {}.", task, entry.path(), e.getMessage());
       }
     });
@@ -192,7 +194,8 @@ public class GraphBuildCacheManager implements Closeable {
         );
         writeExecutor.shutdownNow();
       }
-    } catch (InterruptedException e) {
+    }
+    catch (InterruptedException e) {
       LOG.warn("Interrupted while waiting for cache write to finish; aborting.");
       writeExecutor.shutdownNow();
       Thread.currentThread().interrupt();

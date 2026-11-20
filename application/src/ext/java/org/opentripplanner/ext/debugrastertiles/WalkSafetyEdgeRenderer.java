@@ -29,7 +29,8 @@ public class WalkSafetyEdgeRenderer implements EdgeVertexRenderer {
           palette.getColor(walkSafety),
           "%.02f".formatted(walkSafety)
         );
-      } else {
+      }
+      else {
         return EdgeVisualAttributes.optional(Color.LIGHT_GRAY, "no walking");
       }
     }

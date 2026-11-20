@@ -121,7 +121,8 @@ public class RaptorSearchWindowCalculator {
       int travelWindow = params.latestArrivalTime() - params.earliestDepartureTime();
       // There is no upper limit the search window when both EDT and LAT is set.
       return roundStep(travelWindow - heuristicMinTransitTime);
-    } else {
+    }
+    else {
       // Set the search window using the min-travel-time.
       int v = roundStep(
         minSearchWindow.toSeconds() +

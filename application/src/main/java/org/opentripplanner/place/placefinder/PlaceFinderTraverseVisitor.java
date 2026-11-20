@@ -112,9 +112,11 @@ class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> {
       var stop = Objects.requireNonNull(transitService.getRegularStop(transitVertex.getId()));
       handleStop(stop, distance);
       handlePatternsAtStop(stop, distance);
-    } else if (vertex instanceof VehicleRentalPlaceVertex rentalVertex) {
+    }
+    else if (vertex instanceof VehicleRentalPlaceVertex rentalVertex) {
       handleVehicleRental(rentalVertex.getStation(), distance);
-    } else if (vertex instanceof VehicleParkingEntranceVertex parkingVertex) {
+    }
+    else if (vertex instanceof VehicleParkingEntranceVertex parkingVertex) {
       handleParking(parkingVertex.getVehicleParking(), distance);
     }
   }
@@ -230,7 +232,8 @@ class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> {
     if (includeStations && stop.getParentStation() != null) {
       seenStops.add(stop.getParentStation().getId());
       placesFound.add(new PlaceAtDistance(stop.getParentStation(), distance));
-    } else if (includeStops) {
+    }
+    else if (includeStops) {
       seenStops.add(stop.getId());
       placesFound.add(new PlaceAtDistance(stop, distance));
     }

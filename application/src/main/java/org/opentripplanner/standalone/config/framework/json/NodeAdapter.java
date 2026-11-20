@@ -327,7 +327,8 @@ public class NodeAdapter {
   private void addParameterInfo(NodeInfo info) {
     if (parameters.containsKey(info.name())) {
       assertParameterInfoIsEqual(info);
-    } else {
+    }
+    else {
       parameters.put(info.name(), info);
     }
   }

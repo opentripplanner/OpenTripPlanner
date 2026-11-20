@@ -211,7 +211,8 @@ public class ConstantsForTests {
         transferRepository,
         fareFactory
       );
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       throw new RuntimeException(e);
     }
   }
@@ -245,12 +246,14 @@ public class ConstantsForTests {
 
       if (OTPFeature.FlexRouting.isOn()) {
         transferRepository = TransferServiceTestFactory.withFlex();
-      } else {
+      }
+      else {
         transferRepository = TransferServiceTestFactory.defaultTransferRepository();
       }
 
       return new TestOtpModel(graph, transitRepository, timetableDataImport, transferRepository);
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       throw new RuntimeException(e);
     }
   }
@@ -356,7 +359,8 @@ public class ConstantsForTests {
         timetableDataImport,
         TransferServiceTestFactory.defaultTransferRepository()
       );
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       throw new RuntimeException(e);
     }
   }
@@ -456,7 +460,8 @@ public class ConstantsForTests {
             )
         );
       }
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       throw new RuntimeException(e);
     }
   }

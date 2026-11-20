@@ -89,7 +89,8 @@ public class ApiTransitService {
           )
         );
       return calls.subList(leg.boardStopPosInPattern(), leg.alightStopPosInPattern() + 1);
-    } else {
+    }
+    else {
       return List.of();
     }
   }

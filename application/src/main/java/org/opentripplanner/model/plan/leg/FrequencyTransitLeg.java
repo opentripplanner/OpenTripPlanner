@@ -46,7 +46,8 @@ public class FrequencyTransitLeg extends ScheduledTransitLeg {
       var start = tripTimes().getDepartureTime(0);
       var otherStart = frequencyTransitLeg.tripTimes().getDepartureTime(0);
       return same && start == otherStart;
-    } else {
+    }
+    else {
       return same;
     }
   }

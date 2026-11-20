@@ -68,7 +68,8 @@ public class Token {
       }
 
       return Optional.of(Enum.valueOf(enumClass, value));
-    } catch (IllegalArgumentException ignore) {
+    }
+    catch (IllegalArgumentException ignore) {
       return Optional.empty();
     }
   }

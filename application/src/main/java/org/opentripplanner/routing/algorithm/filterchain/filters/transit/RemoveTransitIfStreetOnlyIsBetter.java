@@ -55,7 +55,8 @@ public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger
     if (generalizedCostMaxLimit != null) {
       // The best street only cost is used from the cursor, if it can be found.
       minStreetCost = generalizedCostMaxLimit;
-    } else {
+    }
+    else {
       // Find the best street-all-the-way option.
       OptionalInt minStreetCostOption = itineraries
         .stream()

@@ -27,7 +27,8 @@ public class DataFetcherDecorator {
         T v = m.get(name);
         consumer.accept(v);
       }
-    } else {
+    }
+    else {
       String[] parts = name.split("\\.");
 
       if (hasArgument(m, parts[0])) {
@@ -46,7 +47,8 @@ public class DataFetcherDecorator {
       if (GqlUtil.hasArgument(environment, name)) {
         consumer.accept(environment.getArgument(name));
       }
-    } else {
+    }
+    else {
       String[] parts = name.split("\\.");
 
       if (GqlUtil.hasArgument(environment, parts[0])) {

@@ -83,18 +83,21 @@ class ItineraryResultMapper {
 
       if (leg.isWalkingLeg()) {
         buf.walk((int) leg.duration().toSeconds());
-      } else if (
+      }
+      else if (
         leg instanceof StreetLeg streetLeg && streetLeg.from().vehicleRentalPlace != null
       ) {
         var name = streetLeg.from().vehicleRentalPlace.name().toString();
         buf.pickupRental(name, (int) leg.duration().toSeconds());
-      } else if (leg instanceof TransitLeg transitLeg) {
+      }
+      else if (leg instanceof TransitLeg transitLeg) {
         buf.transit(
           transitLeg.mode().name() + " " + leg.route().getShortName(),
           leg.startTime().get(ChronoField.SECOND_OF_DAY),
           leg.endTime().get(ChronoField.SECOND_OF_DAY)
         );
-      } else if (leg instanceof UnknownPathLeg d) {
+      }
+      else if (leg instanceof UnknownPathLeg d) {
         buf.text(d.description());
       }
     }

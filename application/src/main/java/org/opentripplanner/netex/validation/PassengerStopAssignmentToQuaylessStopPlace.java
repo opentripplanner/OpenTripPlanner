@@ -25,7 +25,8 @@ class PassengerStopAssignmentToQuaylessStopPlace
 
     if (hasAtLeastOneUsableQuay(stopPlace)) {
       return Status.OK;
-    } else {
+    }
+    else {
       return Status.DISCARD;
     }
   }

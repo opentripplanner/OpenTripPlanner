@@ -97,7 +97,8 @@ public class LocalizedString implements I18NString, Serializable {
           .map(i -> i.toString(locale))
           .toArray(Object[]::new)
       );
-    } else {
+    }
+    else {
       return translation;
     }
   }

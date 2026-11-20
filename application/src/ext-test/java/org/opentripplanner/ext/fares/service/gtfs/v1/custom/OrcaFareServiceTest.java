@@ -145,7 +145,8 @@ public class OrcaFareServiceTest {
 
     if (splitFareType.length > 1) {
       return splitFareType[1].toLowerCase();
-    } else {
+    }
+    else {
       return fareType.toString();
     }
   }

@@ -97,7 +97,8 @@ public final class PagingSearchWindowAdjuster {
   static int ceiling(int value, int step) {
     if (value < 0) {
       return (value / step) * step;
-    } else {
+    }
+    else {
       return ((value + step - 1) / step) * step;
     }
   }

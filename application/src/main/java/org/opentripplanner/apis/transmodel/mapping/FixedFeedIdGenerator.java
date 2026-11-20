@@ -22,9 +22,11 @@ public class FixedFeedIdGenerator {
 
     if (feedIds.isEmpty()) {
       LOG.warn("No data, unable to resolve fixedFeedScope to use in the Transmodel GraphQL API.");
-    } else if (feedIds.size() == 1) {
+    }
+    else if (feedIds.size() == 1) {
       fixedFeedId = feedIds.keySet().iterator().next();
-    } else {
+    }
+    else {
       //noinspection OptionalGetWithoutIsPresent
       fixedFeedId = feedIds.entrySet().stream().max(Map.Entry.comparingByValue()).get().getKey();
       LOG.warn(

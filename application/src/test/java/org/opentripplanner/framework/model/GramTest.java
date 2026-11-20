@@ -93,9 +93,11 @@ class GramTest {
   void testToString(String expected, Object input) {
     if (input instanceof Integer iValue) {
       assertEquals(expected, Gram.of(iValue.intValue()).toString());
-    } else if (input instanceof Double dValue) {
+    }
+    else if (input instanceof Double dValue) {
       assertEquals(expected, Gram.of(dValue.doubleValue()).toString());
-    } else {
+    }
+    else {
       fail("Input should be an integer or double: " + input.getClass());
     }
   }

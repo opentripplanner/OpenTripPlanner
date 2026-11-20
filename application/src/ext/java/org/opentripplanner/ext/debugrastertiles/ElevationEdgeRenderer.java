@@ -25,7 +25,8 @@ class ElevationEdgeRenderer implements EdgeVertexRenderer {
         (graph.minElevation + graph.maxElevation) / 2,
         graph.maxElevation
       );
-    } else {
+    }
+    else {
       colorPalette = new DefaultScalarColorPalette(0, 0, 0);
     }
   }
@@ -43,7 +44,8 @@ class ElevationEdgeRenderer implements EdgeVertexRenderer {
       return Optional.of(
         new VertexVisualAttributes(colorPalette.getColor(elevation), elevation.toString())
       );
-    } else {
+    }
+    else {
       return Optional.empty();
     }
   }
@@ -74,10 +76,12 @@ class ElevationEdgeRenderer implements EdgeVertexRenderer {
         }
 
         return list;
-      } else {
+      }
+      else {
         return List.of(new EdgeSegmentColor(1.0d, Color.GRAY));
       }
-    } else {
+    }
+    else {
       return List.of(new EdgeSegmentColor(1.0d, Color.LIGHT_GRAY));
     }
   }

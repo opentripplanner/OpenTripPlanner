@@ -220,7 +220,8 @@ public class DefaultFareService implements FareService {
         // afterwards to associating fare products with it will result in the API not showing any.)
         if (leg instanceof CombinedInterlinedTransitLeg combinedLeg) {
           applicableLegs.addAll(combinedLeg.originalLegs());
-        } else {
+        }
+        else {
           applicableLegs.add(leg);
         }
       }
@@ -367,7 +368,8 @@ public class DefaultFareService implements FareService {
         var combinedLeg = new CombinedInterlinedTransitLeg(previousLeg, currentLeg);
         // overwrite the previous leg with the combined one
         result.set(result.size() - 1, combinedLeg);
-      } else {
+      }
+      else {
         result.add(leg);
       }
     }

@@ -42,7 +42,8 @@ public class FlexIndex {
             flexTripsByStopId.put(stopElement.getId(), flexTrip);
             routeByStopBuilder.put(stopElement, route);
           }
-        } else {
+        }
+        else {
           flexTripsByStopId.put(stop.getId(), flexTrip);
           routeByStopBuilder.put(stop, route);
         }

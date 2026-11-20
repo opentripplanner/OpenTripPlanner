@@ -28,7 +28,8 @@ abstract class AbstractStopArrival implements ArrivalView<TestTripSchedule> {
 
     if (previous == null) {
       this.c1 = extraCost;
-    } else {
+    }
+    else {
       this.c1 = previous.c1() + extraCost;
     }
   }

@@ -244,14 +244,17 @@ class TestPagingModel {
     if (transit) {
       if (nTransfers == 0) {
         builder.bus(10, departureTime, arrivalTime, B);
-      } else if (nTransfers == 1) {
+      }
+      else if (nTransfers == 1) {
         builder
           .bus(20, departureTime, departureTime + 120, B)
           .bus(21, departureTime + 240, arrivalTime, B);
-      } else {
+      }
+      else {
         throw new IllegalArgumentException("nTransfers not supported: " + nTransfers);
       }
-    } else {
+    }
+    else {
       builder.drive(departureTime, arrivalTime, B);
     }
 

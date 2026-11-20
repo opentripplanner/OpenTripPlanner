@@ -72,12 +72,15 @@ public class QualifiedModeSet implements Serializable {
         throw new IllegalStateException(
           "Multiple non-walk modes provided " + filteredModesWithoutWalk
         );
-      } else if (filteredModesWithoutWalk.isEmpty()) {
+      }
+      else if (filteredModesWithoutWalk.isEmpty()) {
         requestMode = filteredModes.get(0);
-      } else {
+      }
+      else {
         requestMode = filteredModesWithoutWalk.get(0);
       }
-    } else if (!filteredModes.isEmpty()) {
+    }
+    else if (!filteredModes.isEmpty()) {
       requestMode = filteredModes.get(0);
     }
 
@@ -88,12 +91,14 @@ public class QualifiedModeSet implements Serializable {
           if (requestMode.qualifiers.contains(Qualifier.RENT)) {
             mBuilder.withAllStreetModes(StreetMode.BIKE_RENTAL);
             mBuilder.withTransferMode(StreetMode.WALK);
-          } else if (requestMode.qualifiers.contains(Qualifier.PARK)) {
+          }
+          else if (requestMode.qualifiers.contains(Qualifier.PARK)) {
             mBuilder.withAccessMode(StreetMode.BIKE_TO_PARK);
             mBuilder.withEgressMode(StreetMode.WALK);
             mBuilder.withDirectMode(StreetMode.BIKE_TO_PARK);
             mBuilder.withTransferMode(StreetMode.WALK);
-          } else {
+          }
+          else {
             mBuilder.withAllStreetModes(StreetMode.BIKE);
           }
         }
@@ -101,7 +106,8 @@ public class QualifiedModeSet implements Serializable {
           if (requestMode.qualifiers.contains(Qualifier.RENT)) {
             mBuilder.withAllStreetModes(StreetMode.SCOOTER_RENTAL);
             mBuilder.withTransferMode(StreetMode.WALK);
-          } else {
+          }
+          else {
             // Only supported as rental mode
             throw new IllegalArgumentException();
           }
@@ -110,27 +116,32 @@ public class QualifiedModeSet implements Serializable {
           if (requestMode.qualifiers.contains(Qualifier.RENT)) {
             mBuilder.withAllStreetModes(StreetMode.CAR_RENTAL);
             mBuilder.withTransferMode(StreetMode.WALK);
-          } else if (requestMode.qualifiers.contains(Qualifier.PARK)) {
+          }
+          else if (requestMode.qualifiers.contains(Qualifier.PARK)) {
             mBuilder.withAccessMode(StreetMode.CAR_TO_PARK);
             mBuilder.withTransferMode(StreetMode.WALK);
             mBuilder.withEgressMode(StreetMode.WALK);
             mBuilder.withDirectMode(StreetMode.CAR_TO_PARK);
-          } else if (requestMode.qualifiers.contains(Qualifier.PICKUP)) {
+          }
+          else if (requestMode.qualifiers.contains(Qualifier.PICKUP)) {
             mBuilder.withAccessMode(StreetMode.WALK);
             mBuilder.withTransferMode(StreetMode.WALK);
             mBuilder.withEgressMode(StreetMode.CAR_PICKUP);
             mBuilder.withDirectMode(StreetMode.CAR_PICKUP);
-          } else if (requestMode.qualifiers.contains(Qualifier.DROPOFF)) {
+          }
+          else if (requestMode.qualifiers.contains(Qualifier.DROPOFF)) {
             mBuilder.withAccessMode(StreetMode.CAR_PICKUP);
             mBuilder.withTransferMode(StreetMode.WALK);
             mBuilder.withEgressMode(StreetMode.WALK);
             mBuilder.withDirectMode(StreetMode.CAR_PICKUP);
-          } else if (requestMode.qualifiers.contains(Qualifier.HAIL)) {
+          }
+          else if (requestMode.qualifiers.contains(Qualifier.HAIL)) {
             mBuilder.withAccessMode(StreetMode.CAR_HAILING);
             mBuilder.withTransferMode(StreetMode.WALK);
             mBuilder.withEgressMode(StreetMode.CAR_HAILING);
             mBuilder.withDirectMode(StreetMode.WALK);
-          } else {
+          }
+          else {
             // This is necessary for transfer calculations.
             mBuilder.withAccessMode(StreetMode.CAR);
             mBuilder.withTransferMode(StreetMode.CAR);
@@ -146,9 +157,11 @@ public class QualifiedModeSet implements Serializable {
       if (qMode.mode.equals(ApiRequestMode.FLEX)) {
         if (qMode.qualifiers.contains(Qualifier.ACCESS)) {
           mBuilder.withAccessMode(StreetMode.FLEXIBLE);
-        } else if (qMode.qualifiers.contains(Qualifier.EGRESS)) {
+        }
+        else if (qMode.qualifiers.contains(Qualifier.EGRESS)) {
           mBuilder.withEgressMode(StreetMode.FLEXIBLE);
-        } else if (qMode.qualifiers.contains(Qualifier.DIRECT)) {
+        }
+        else if (qMode.qualifiers.contains(Qualifier.DIRECT)) {
           mBuilder.withDirectMode(StreetMode.FLEXIBLE);
         }
       }

@@ -11,7 +11,8 @@ public class HttpForTest {
     try {
       URI uri = new URI("https://localhost:8080");
       return new ContainerRequest(uri, uri, method, null, new MapPropertiesDelegate(), null);
-    } catch (URISyntaxException e) {
+    }
+    catch (URISyntaxException e) {
       throw new RuntimeException(e);
     }
   }

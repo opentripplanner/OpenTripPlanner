@@ -44,7 +44,8 @@ class StateDebugger<T extends RaptorTripSchedule> {
       drop(stop, true, newBestOverall);
       body.run();
       accept(stop, true);
-    } else {
+    }
+    else {
       body.run();
     }
   }
@@ -54,7 +55,8 @@ class StateDebugger<T extends RaptorTripSchedule> {
       drop(stop, false, true);
       body.run();
       accept(stop, false);
-    } else {
+    }
+    else {
       body.run();
     }
   }

@@ -277,7 +277,8 @@ public class OtpDataStoreTest {
         if (p.startsWith(baseDirPath)) {
           // Add 1 to strip off path separator
           p = "base:" + p.substring(baseDirPath.length() + 1);
-        } else if (p.startsWith(dataDirPath)) {
+        }
+        else if (p.startsWith(dataDirPath)) {
           p = "data:" + p.substring(dataDirPath.length() + 1);
         }
 

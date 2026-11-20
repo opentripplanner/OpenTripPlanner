@@ -194,7 +194,8 @@ public class TaxiRouter {
     for (Leg leg : legs) {
       if (leg instanceof StreetLeg streetLeg && streetLeg.getMode() == TraverseMode.CAR) {
         newLegs.add(new TaxiLeg(streetLeg, taxiRoute.get()));
-      } else {
+      }
+      else {
         newLegs.add(leg);
       }
     }

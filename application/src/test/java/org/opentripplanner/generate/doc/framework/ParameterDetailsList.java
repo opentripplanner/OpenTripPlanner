@@ -66,11 +66,13 @@ public class ParameterDetailsList {
 
       if (child == null || child.isEmpty()) {
         LOG.error("Not found: {} : {}", node.fullPath(it.name()), it.type().docName());
-      } else if (it.type() == ConfigType.ARRAY) {
+      }
+      else if (it.type() == ConfigType.ARRAY) {
         for (String childName : child.listChildrenByName()) {
           addParametersList(child.child(childName));
         }
-      } else {
+      }
+      else {
         addParametersList(child);
       }
     }
@@ -116,7 +118,8 @@ public class ParameterDetailsList {
     // Document enums
     if (EnumSet.of(ConfigType.ENUM, ConfigType.ENUM_SET).contains(info.type())) {
       doc.lineBreak().label("Enum values:").addEnums(info.enumTypeValues());
-    } else if (info.type() == ConfigType.ENUM_MAP) {
+    }
+    else if (info.type() == ConfigType.ENUM_MAP) {
       doc.lineBreak().label("Enum keys:").addEnums(info.enumTypeValues());
     }
 

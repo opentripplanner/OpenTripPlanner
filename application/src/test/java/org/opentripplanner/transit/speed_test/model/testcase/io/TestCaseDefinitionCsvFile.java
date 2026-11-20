@@ -70,7 +70,8 @@ public class TestCaseDefinitionCsvFile extends AbstractCsvFile<TestCaseDefinitio
         List.of(),
         new WgsCoordinate(parseDouble("viaLat"), parseDouble("viaLon"))
       );
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       return null;
     }
   }

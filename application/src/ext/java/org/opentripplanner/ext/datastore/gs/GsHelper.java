@@ -58,7 +58,8 @@ class GsHelper {
   static URI toUri(String bucket, String objectName) {
     try {
       return new URI(toUriString(bucket, objectName));
-    } catch (URISyntaxException e) {
+    }
+    catch (URISyntaxException e) {
       throw new IllegalArgumentException(e.getLocalizedMessage(), e);
     }
   }

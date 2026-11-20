@@ -70,7 +70,8 @@ public class GsDataSourceRepository implements DataSourceRepository {
 
     if (blob != null) {
       return new GsFileDataSource(blob, type);
-    } else {
+    }
+    else {
       return new GsOutFileDataSource(storage, blobId, type);
     }
   }
@@ -102,7 +103,8 @@ public class GsDataSourceRepository implements DataSourceRepository {
     try {
       if (host != null) {
         builder = StorageOptions.newBuilder().setHost(host);
-      } else {
+      }
+      else {
         builder = StorageOptions.getDefaultInstance().toBuilder();
       }
 
@@ -114,7 +116,8 @@ public class GsDataSourceRepository implements DataSourceRepository {
       }
 
       return builder.build().getService();
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       throw new RuntimeException(e.getLocalizedMessage(), e);
     }
   }

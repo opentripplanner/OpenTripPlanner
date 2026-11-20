@@ -56,7 +56,8 @@ class TripResponseContextMapper {
         .withGeoPosition(LocationMapper.map(stopLocation.getCoordinate()));
 
       return Stream.of(stopPlace, stopPoint);
-    } else {
+    }
+    else {
       return Stream.of(stopPoint);
     }
   }

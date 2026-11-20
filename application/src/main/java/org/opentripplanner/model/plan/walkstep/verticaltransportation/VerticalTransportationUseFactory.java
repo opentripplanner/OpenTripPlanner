@@ -46,14 +46,17 @@ public class VerticalTransportationUseFactory {
 
       if (boardEdgeLevel.level() > alightEdgeLevel.level()) {
         verticalDirection = VerticalDirection.DOWN;
-      } else if (boardEdgeLevel.level() < alightEdgeLevel.level()) {
+      }
+      else if (boardEdgeLevel.level() < alightEdgeLevel.level()) {
         verticalDirection = VerticalDirection.UP;
       }
 
       return new ElevatorUse(boardEdgeLevel, alightEdgeLevel, verticalDirection);
-    } else if (boardEdgeLevelOptional.isPresent()) {
+    }
+    else if (boardEdgeLevelOptional.isPresent()) {
       return new ElevatorUse(boardEdgeLevelOptional.get(), null, VerticalDirection.UNKNOWN);
-    } else if (alightEdgeLevelOptional.isPresent()) {
+    }
+    else if (alightEdgeLevelOptional.isPresent()) {
       return new ElevatorUse(null, alightEdgeLevelOptional.get(), VerticalDirection.UNKNOWN);
     }
 
@@ -81,7 +84,8 @@ public class VerticalTransportationUseFactory {
         inclinedEdgeLevelInfo.upperVertexInfo().level(),
         verticalDirection
       );
-    } else {
+    }
+    else {
       return new EscalatorUse(
         inclinedEdgeLevelInfo.upperVertexInfo().level(),
         inclinedEdgeLevelInfo.lowerVertexInfo().level(),
@@ -111,7 +115,8 @@ public class VerticalTransportationUseFactory {
         inclinedEdgeLevelInfo.upperVertexInfo().level(),
         verticalDirection
       );
-    } else {
+    }
+    else {
       return new StairsUse(
         inclinedEdgeLevelInfo.upperVertexInfo().level(),
         inclinedEdgeLevelInfo.lowerVertexInfo().level(),

@@ -196,7 +196,8 @@ public class OsmOpeningHoursParserTest {
         Instant closedDateTime = Instant.parse(closedTime);
         assertFalse(ohCalendar.isOpen(closedDateTime.getEpochSecond()));
       });
-    } catch (OpeningHoursParseException e) {
+    }
+    catch (OpeningHoursParseException e) {
       fail(e);
     }
   }

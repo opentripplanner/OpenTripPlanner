@@ -50,7 +50,8 @@ public class BikeParkType {
 
             if (availability != null) {
               return availability.getBicycleSpaces();
-            } else {
+            }
+            else {
               return Integer.MAX_VALUE;
             }
           })

@@ -41,7 +41,8 @@ public class OutsideSearchWindowFilter implements RemoveItineraryFlagger {
       if (it.isSearchWindowAware()) {
         var time = it.startTime().toInstant();
         return time.isBefore(earliestDepartureTime) || !time.isBefore(latestDepartureTime);
-      } else {
+      }
+      else {
         return false;
       }
     };

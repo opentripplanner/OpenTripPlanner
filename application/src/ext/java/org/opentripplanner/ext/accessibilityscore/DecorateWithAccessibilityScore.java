@@ -45,9 +45,11 @@ public class DecorateWithAccessibilityScore implements ItineraryDecorator {
     builder.transformLegs(leg -> {
       if (leg instanceof ScheduledTransitLeg transitLeg) {
         return transitLeg.copyOf().withAccessibilityScore(compute(transitLeg)).build();
-      } else if (leg instanceof StreetLeg streetLeg && leg.isWalkingLeg()) {
+      }
+      else if (leg instanceof StreetLeg streetLeg && leg.isWalkingLeg()) {
         return streetLeg.withAccessibilityScore(compute(streetLeg));
-      } else {
+      }
+      else {
         return leg;
       }
     });

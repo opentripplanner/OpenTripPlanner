@@ -155,7 +155,8 @@ class EnglishNgramAnalyzerTest {
       }
 
       return result;
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       throw new RuntimeException(e);
     }
   }

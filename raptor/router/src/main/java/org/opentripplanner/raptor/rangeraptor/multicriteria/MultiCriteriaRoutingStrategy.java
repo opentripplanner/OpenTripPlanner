@@ -171,7 +171,8 @@ public class MultiCriteriaRoutingStrategy<
 
     if (boarding.empty()) {
       boardWithRegularTransfer(prevArrival, stopIndex, stopPos, boardSlack);
-    } else if (!boarding.transferConstraint().isNotAllowed()) {
+    }
+    else if (!boarding.transferConstraint().isNotAllowed()) {
       board(prevArrival, stopIndex, boarding);
     }
   }

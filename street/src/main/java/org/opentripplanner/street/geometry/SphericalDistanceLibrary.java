@@ -240,7 +240,8 @@ public abstract class SphericalDistanceLibrary {
 
     if (latDeg > 0) {
       minCosLat = cos(toRadians(latDeg + dLatDeg));
-    } else {
+    }
+    else {
       minCosLat = cos(toRadians(latDeg - dLatDeg));
     }
 

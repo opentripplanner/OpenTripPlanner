@@ -115,7 +115,8 @@ class ServiceLinkMapper {
 
         if (serviceLink != null) {
           geometries[i] = mapServiceLink(serviceLink, stopPattern, i);
-        } else {
+        }
+        else {
           issueStore.add(
             "MissingServiceLink",
             "ServiceLink %s not found in journey pattern %s",
@@ -244,7 +245,8 @@ class ServiceLinkMapper {
         serviceLink
       );
       return false;
-    } else if (!fromPointStop.equals(stopPattern.getStop(stopIndex))) {
+    }
+    else if (!fromPointStop.equals(stopPattern.getStop(stopIndex))) {
       issueStore.add(
         "ServiceLinkQuayMismatch",
         "Service link %s with quays different from point in journey pattern. Link point: %s, journey pattern point: %s",
@@ -253,7 +255,8 @@ class ServiceLinkMapper {
         stopPattern.getStop(stopIndex).getId().getId()
       );
       return false;
-    } else if (!toPointStop.equals(stopPattern.getStop(stopIndex + 1))) {
+    }
+    else if (!toPointStop.equals(stopPattern.getStop(stopIndex + 1))) {
       issueStore.add(
         "ServiceLinkQuayMismatch",
         "Service link %s with quays different to point in journey pattern. Link point: %s, journey pattern point: %s",
@@ -296,7 +299,8 @@ class ServiceLinkMapper {
         id
       );
       return false;
-    } else if (
+    }
+    else if (
       SphericalDistanceLibrary.fastDistance(endCoordinate, geometryEndCoordinate) >
       maxStopToShapeSnapDistance
     ) {

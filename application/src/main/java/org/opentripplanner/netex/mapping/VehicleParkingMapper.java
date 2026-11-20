@@ -100,7 +100,8 @@ class VehicleParkingMapper {
       }
 
       return coordinate;
-    } catch (InvalidCoordinateException e) {
+    }
+    catch (InvalidCoordinateException e) {
       issueStore.add(
         "InvalidParkingCoordinates",
         "NeTEx Parking '%s' has invalid coordinates. %s",
@@ -118,11 +119,14 @@ class VehicleParkingMapper {
   private static String parkingDebugId(Parking parking) {
     if (parking.getId() != null) {
       return parking.getId();
-    } else if (parking.getName() != null) {
+    }
+    else if (parking.getName() != null) {
       return MultilingualStringMapper.getStringValue(parking.getName());
-    } else if (parking.getCentroid() != null) {
+    }
+    else if (parking.getCentroid() != null) {
       return parking.getCentroid().toString();
-    } else {
+    }
+    else {
       return parking.toString();
     }
   }
@@ -149,7 +153,8 @@ class VehicleParkingMapper {
     // you have to define two parking lots with the same coordinates
     if (hasBikes(parking)) {
       builder.bicycleSpaces(capacity);
-    } else {
+    }
+    else {
       builder.carSpaces(capacity);
     }
 

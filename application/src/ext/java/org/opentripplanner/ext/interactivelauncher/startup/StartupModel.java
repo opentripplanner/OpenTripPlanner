@@ -140,11 +140,14 @@ public class StartupModel {
 
     if (buildAll()) {
       args.add("--build");
-    } else if (buildStreet) {
+    }
+    else if (buildStreet) {
       args.add("--buildStreet");
-    } else if (buildTransit) {
+    }
+    else if (buildTransit) {
       args.add("--loadStreet");
-    } else {
+    }
+    else {
       args.add("--load");
     }
 

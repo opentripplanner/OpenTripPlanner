@@ -61,7 +61,8 @@ public class ViaRoutingWorker {
     // If viaLocation is null then we are at last search
     if (v.viaLocation() != null) {
       this.currentSegmentRequest.withTo(v.viaLocation().point());
-    } else {
+    }
+    else {
       this.currentSegmentRequest.withTo(viaRequest.to());
     }
 

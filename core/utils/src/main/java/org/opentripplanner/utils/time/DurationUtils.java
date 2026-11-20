@@ -127,14 +127,16 @@ public class DurationUtils {
       if (pos > 0) {
         var days = d.substring(0, pos);
         d = pos == d.length() ? "P" + days : "P" + days + "T" + d.substring(pos);
-      } else {
+      }
+      else {
         d = "PT" + d;
       }
     }
 
     try {
       return Duration.parse(d);
-    } catch (DateTimeParseException e) {
+    }
+    catch (DateTimeParseException e) {
       throw new DateTimeParseException(
         e.getMessage() + ": '" + duration + "'",
         duration,
@@ -198,7 +200,8 @@ public class DurationUtils {
 
     if (timeMs < 9950) {
       return msToSecondsStr("%.1f", timeMs);
-    } else {
+    }
+    else {
       return msToSecondsStr("%.0f", timeMs);
     }
   }
@@ -319,7 +322,8 @@ public class DurationUtils {
     if (duration.isNegative()) {
       var positive = duration.abs().toString();
       return "-" + positive;
-    } else {
+    }
+    else {
       return duration.toString();
     }
   }

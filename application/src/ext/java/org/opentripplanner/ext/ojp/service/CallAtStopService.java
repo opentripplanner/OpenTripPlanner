@@ -46,7 +46,8 @@ public class CallAtStopService {
 
     if (stop != null) {
       stops = List.of(stop);
-    } else {
+    }
+    else {
       var station = transitService.getStopLocationsGroup(id);
 
       if (station == null) {

@@ -21,7 +21,8 @@ public class OpeningHoursImpl implements GraphQLDataFetchers.GraphQLOpeningHours
 
       if (cal == null) {
         return null;
-      } else {
+      }
+      else {
         return OsmOpeningHoursSupport.osmFormat(cal);
       }
     };

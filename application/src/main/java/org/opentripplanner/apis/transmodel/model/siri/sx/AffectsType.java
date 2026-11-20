@@ -246,13 +246,17 @@ public class AffectsType {
         // references in this class are deregistered and replaced by other instances.
         if (object instanceof EntitySelector.Stop) {
           return env.getSchema().getObjectType("AffectedStopPlace");
-        } else if (object instanceof EntitySelector.Route) {
+        }
+        else if (object instanceof EntitySelector.Route) {
           return env.getSchema().getObjectType("AffectedLine");
-        } else if (object instanceof EntitySelector.Trip) {
+        }
+        else if (object instanceof EntitySelector.Trip) {
           return env.getSchema().getObjectType("AffectedServiceJourney");
-        } else if (object instanceof EntitySelector.StopAndRoute) {
+        }
+        else if (object instanceof EntitySelector.StopAndRoute) {
           return env.getSchema().getObjectType("AffectedStopPlaceOnLine");
-        } else if (object instanceof EntitySelector.StopAndTrip) {
+        }
+        else if (object instanceof EntitySelector.StopAndTrip) {
           return env.getSchema().getObjectType("AffectedStopPlaceOnServiceJourney");
         }
 

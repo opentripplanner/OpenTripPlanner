@@ -293,7 +293,8 @@ public class AccessAndEgressWithOpeningHoursPathTestCase implements RaptorTestCo
 
       int waitCost = costL1ForwardIncWait(prevArrival.arrivalTime());
       prevArrival = bus(2, STOP_D, L1_STOP_ARR_TIME, waitCost, 0, TRIP_A, prevArrival);
-    } else {
+    }
+    else {
       arrivalTime = accessPath.latestArrivalTime(TX1_START);
       prevArrival = access(accessPath.stop(), arrivalTime, accessPath);
       int timeShift = TX1_START - prevArrival.arrivalTime();
@@ -341,7 +342,8 @@ public class AccessAndEgressWithOpeningHoursPathTestCase implements RaptorTestCo
 
       cost = costL1ReverseIncWait(prevArrival.arrivalTime());
       prevArrival = busReverseSearch(2, STOP_A, L1_STOP_ARR_TIME_REV, cost, 0, TRIP_A, prevArrival);
-    } else {
+    }
+    else {
       arrivalTime = L1_END + ALIGHT_SLACK + TX2_DURATION + TRANSFER_SLACK;
       arrivalTime = egressPath.earliestDepartureTime(arrivalTime);
       prevArrival = access(egressPath.stop(), arrivalTime, egressPath);

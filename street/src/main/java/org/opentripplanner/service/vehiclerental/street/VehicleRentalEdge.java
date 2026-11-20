@@ -109,7 +109,8 @@ public class VehicleRentalEdge extends Edge {
 
             s1.beginFloatingVehicleRenting(formFactor, getPropulsionType(station), network, true);
             pickedUp = true;
-          } else {
+          }
+          else {
             return State.empty();
           }
         }
@@ -146,7 +147,8 @@ public class VehicleRentalEdge extends Edge {
         }
         default -> throw new IllegalStateException();
       }
-    } else {
+    }
+    else {
       switch (s0.getVehicleRentalState()) {
         case BEFORE_RENTING -> {
           if (
@@ -162,7 +164,8 @@ public class VehicleRentalEdge extends Edge {
             }
 
             s1.beginFloatingVehicleRenting(formFactor, getPropulsionType(station), network, false);
-          } else {
+          }
+          else {
             boolean mayKeep =
               request.allowArrivingInRentedVehicleAtDestination() &&
               station.isArrivingInRentalVehicleAtDestinationAllowed();

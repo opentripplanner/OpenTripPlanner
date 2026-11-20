@@ -48,7 +48,8 @@ public final class AddedRoute {
       var routeType = ext.getRouteType();
       var routeName = ext.getRouteLongName();
       return new AddedRoute(url, agencyId, routeType, routeName);
-    } else {
+    }
+    else {
       return new AddedRoute(null, null, null, null);
     }
   }

@@ -115,7 +115,8 @@ class PS3_FewItinerariesOnSearchWindowLimitTest {
         SEARCH_WINDOW,
         NUM_OF_ITINERARIES
       );
-    } else {
+    }
+    else {
       expectedSortOrder = SortOrder.STREET_AND_ARRIVAL_TIME;
       driver = model.departAfterDriver(currTime, SEARCH_WINDOW, NUM_OF_ITINERARIES);
     }
@@ -128,7 +129,8 @@ class PS3_FewItinerariesOnSearchWindowLimitTest {
         if (tc.gotoPage() == NEXT_PAGE) {
           cursor = subject.nextPageCursor();
           currTime += tc.timeShift;
-        } else {
+        }
+        else {
           cursor = subject.previousPageCursor();
           currTime -= tc.timeShift;
         }
@@ -147,7 +149,8 @@ class PS3_FewItinerariesOnSearchWindowLimitTest {
         // assertEquals(expLat, cleanStr(cursor.earliestDepartureTime()), description);
         driver = driver.newPage(cursor);
         subject = driver.pagingService(cursor);
-      } else {
+      }
+      else {
         assertEquals(tc.expItinerary, getResultAsString(driver.kept()), tc.testDescription());
       }
     }

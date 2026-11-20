@@ -232,14 +232,16 @@ public class LegacyRouteRequestMapper {
 
             if (tModes.isEmpty()) {
               transitDisabled = true;
-            } else {
+            }
+            else {
               filterRequestBuilder.addSelect(SelectRequest.of().withTransportModes(tModes).build());
             }
           }
 
           if (transitDisabled) {
             transitBuilder.disable();
-          } else {
+          }
+          else {
             transitBuilder.withFilters(List.of(filterRequestBuilder.build()));
           }
         }
@@ -348,7 +350,8 @@ public class LegacyRouteRequestMapper {
         if (hasArgument(environment, name)) {
           consumer.accept(environment.getArgument(name));
         }
-      } else {
+      }
+      else {
         String[] parts = name.split("\\.");
 
         if (hasArgument(environment, parts[0])) {
@@ -364,7 +367,8 @@ public class LegacyRouteRequestMapper {
           T v = m.get(name);
           consumer.accept(v);
         }
-      } else {
+      }
+      else {
         String[] parts = name.split("\\.");
 
         if (hasArgument(m, parts[0])) {

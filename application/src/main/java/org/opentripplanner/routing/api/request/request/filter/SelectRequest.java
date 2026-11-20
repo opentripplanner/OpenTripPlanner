@@ -27,7 +27,8 @@ public class SelectRequest implements Serializable {
   public SelectRequest(Builder builder) {
     if (builder.transportModes.isEmpty()) {
       this.transportModeFilter = null;
-    } else {
+    }
+    else {
       this.transportModeFilter = AllowTransitModeFilter.of(builder.transportModes);
     }
 

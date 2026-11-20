@@ -232,7 +232,8 @@ class StopAndStationMapper {
     for (JAXBElement<?> it : quays.getQuayRefOrQuay()) {
       if (it.getValue() instanceof Quay quay) {
         result.add(quay);
-      } else {
+      }
+      else {
         issueStore.add(
           Issue.issue(
             "StopPlaceWithoutQuays",

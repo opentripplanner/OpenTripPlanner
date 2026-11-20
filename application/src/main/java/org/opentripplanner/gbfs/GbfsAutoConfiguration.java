@@ -51,7 +51,8 @@ public class GbfsAutoConfiguration {
         url,
         otpHttpClient.getAndMapAsJsonNode(uri, httpHeaders, OBJECT_MAPPER)
       );
-    } catch (OtpHttpClientException e) {
+    }
+    catch (OtpHttpClientException e) {
       LOG.warn("Error fetching GBFS feed from {}. Details: {}.", url, e.getMessage(), e);
 
       if (!url.endsWith("gbfs.json")) {
@@ -93,7 +94,8 @@ public class GbfsAutoConfiguration {
 
     if (data.has("feeds")) {
       addFeedNames(data.get("feeds"), names);
-    } else {
+    }
+    else {
       for (var language : data) {
         addFeedNames(language.get("feeds"), names);
       }
@@ -108,7 +110,8 @@ public class GbfsAutoConfiguration {
   public <T> T mapTo(Class<T> clazz) {
     try {
       return OBJECT_MAPPER.treeToValue(json, clazz);
-    } catch (JacksonException e) {
+    }
+    catch (JacksonException e) {
       LOG.warn(
         "Error parsing GBFS auto-configuration file from {}. Details: {}.",
         url,
@@ -142,7 +145,8 @@ public class GbfsAutoConfiguration {
   private static URI toUri(String url) {
     try {
       return new URI(url);
-    } catch (URISyntaxException e) {
+    }
+    catch (URISyntaxException e) {
       throw new GbfsConstructionException("Invalid url " + url);
     }
   }

@@ -98,7 +98,8 @@ final class ScheduledTimetableIndex {
       for (FlexTrip<?, ?> flexTrip : flexIndex.getAllFlexTrips()) {
         tripForId.put(flexTrip.getId(), flexTrip.getTrip());
       }
-    } else {
+    }
+    else {
       flexIndex = null;
     }
 

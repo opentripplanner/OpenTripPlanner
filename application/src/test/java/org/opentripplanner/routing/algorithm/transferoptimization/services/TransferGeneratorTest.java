@@ -558,7 +558,8 @@ public class TransferGeneratorTest implements RaptorTestConstants {
         "[[TripToTripTransfer{from: [2 10:10 BUS L1], to: [2 10:20 BUS L2]}]]",
         result.toString()
       );
-    } else {
+    }
+    else {
       Assertions.assertThrows(RuntimeException.class, () ->
         subject.findAllPossibleTransfers(transitLegs)
       );

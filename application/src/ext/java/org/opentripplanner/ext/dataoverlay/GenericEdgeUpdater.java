@@ -87,14 +87,17 @@ class GenericEdgeUpdater {
 
     if ((timeFormat == null || timeFormat == TimeUnit.SECONDS) && dataType.equals(Integer.TYPE)) {
       return originInstant.plusSeconds(timeArray.getInt(0));
-    } else if (timeFormat == TimeUnit.MS_EPOCH && dataType.equals(Long.TYPE)) {
+    }
+    else if (timeFormat == TimeUnit.MS_EPOCH && dataType.equals(Long.TYPE)) {
       return Instant.ofEpochMilli(timeArray.getLong(0));
-    } else {
+    }
+    else {
       long addSeconds = 0;
 
       if (dataType.equals(Double.TYPE)) {
         addSeconds = (long) (timeArray.getDouble(0) * 3600);
-      } else if (dataType.equals(Float.TYPE)) {
+      }
+      else if (dataType.equals(Float.TYPE)) {
         addSeconds = (long) (timeArray.getFloat(0) * 3600);
       }
 
@@ -231,9 +234,11 @@ class GenericEdgeUpdater {
 
       if (selectIndex.getRank() == 3) {
         selectIndex.set(timeIndex, latIndex, lonIndex);
-      } else if (selectIndex.getRank() == 4) {
+      }
+      else if (selectIndex.getRank() == 4) {
         selectIndex.set(timeIndex, height, latIndex, lonIndex);
-      } else {
+      }
+      else {
         throw new IllegalArgumentException(
           String.format("Invalid data array shape for %s", propertyName)
         );
@@ -243,13 +248,17 @@ class GenericEdgeUpdater {
 
       if (dataArrayType.equals(Integer.TYPE)) {
         result.add(timeIndex, ((ArrayInt) dataArray).get(selectIndex));
-      } else if (dataArrayType.equals(Double.TYPE)) {
+      }
+      else if (dataArrayType.equals(Double.TYPE)) {
         result.add(timeIndex, ((ArrayDouble) dataArray).get(selectIndex));
-      } else if (dataArrayType.equals(Float.TYPE)) {
+      }
+      else if (dataArrayType.equals(Float.TYPE)) {
         result.add(timeIndex, ((ArrayFloat) dataArray).get(selectIndex));
-      } else if (dataArrayType.equals(Long.TYPE)) {
+      }
+      else if (dataArrayType.equals(Long.TYPE)) {
         result.add(timeIndex, ((ArrayLong) dataArray).get(selectIndex));
-      } else {
+      }
+      else {
         throw new IllegalArgumentException(
           String.format("Unsupported format %s of %s variable", dataArrayType, propertyName)
         );
@@ -275,7 +284,8 @@ class GenericEdgeUpdater {
 
       if (currentDistance < distance) {
         distance = currentDistance;
-      } else {
+      }
+      else {
         return i - 1;
       }
     }

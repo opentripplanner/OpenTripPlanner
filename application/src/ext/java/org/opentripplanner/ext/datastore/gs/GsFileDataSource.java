@@ -62,10 +62,12 @@ class GsFileDataSource extends AbstractGsDataSource implements DataSource {
     if (blob.getName().endsWith(".gz")) {
       try {
         return new GZIPInputStream(in);
-      } catch (IOException e) {
+      }
+      catch (IOException e) {
         throw new IllegalStateException(e.getLocalizedMessage(), e);
       }
-    } else {
+    }
+    else {
       return in;
     }
   }

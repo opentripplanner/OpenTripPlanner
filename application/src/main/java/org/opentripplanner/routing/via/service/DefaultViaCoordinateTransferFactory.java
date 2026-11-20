@@ -77,7 +77,8 @@ public class DefaultViaCoordinateTransferFactory implements ViaCoordinateTransfe
   private NearbyStopFinder createNearbyStopFinder() {
     if (!graph.hasStreets) {
       return new StraightLineNearbyStopFinder(transitService::findRegularStopsByBoundingBox);
-    } else {
+    }
+    else {
       return StreetNearbyStopFinder.of(null).build();
     }
   }

@@ -35,14 +35,16 @@ class ViaLocationMapper {
         passThrough.getGraphQLLabel(),
         mapStopLocationIds(passThrough.getGraphQLStopLocationIds())
       );
-    } else if (visit != null) {
+    }
+    else if (visit != null) {
       return new VisitViaLocation(
         visit.getGraphQLLabel(),
         visit.getGraphQLMinimumWaitTime(),
         mapStopLocationIds(visit.getGraphQLStopLocationIds()),
         mapCoordinate(visit.getGraphQLCoordinate()).orElse(null)
       );
-    } else {
+    }
+    else {
       throw new InvalidInputException("ViaLocation must define either pass-through or visit.");
     }
   }

@@ -46,7 +46,8 @@ class ItinerariesCalculateLegTotals {
         if (!leg.isInterlinedWithPreviousLeg()) {
           ++nTransitLegs;
         }
-      } else if (leg.isStreetLeg()) {
+      }
+      else if (leg.isStreetLeg()) {
         onStreetDuration = onStreetDuration.plus(dt);
         onStreetDistanceMeters += leg.distanceMeters();
 
@@ -54,7 +55,8 @@ class ItinerariesCalculateLegTotals {
           walkDuration = walkDuration.plus(leg.duration());
           walkDistanceMeters = walkDistanceMeters + leg.distanceMeters();
         }
-      } else if (leg instanceof UnknownPathLeg unknownPathLeg) {
+      }
+      else if (leg instanceof UnknownPathLeg unknownPathLeg) {
         nTransitLegs += unknownPathLeg.getNumberOfTransfers() + 1;
       }
 

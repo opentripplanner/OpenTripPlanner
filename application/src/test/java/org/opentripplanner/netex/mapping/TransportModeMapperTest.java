@@ -148,7 +148,8 @@ class TransportModeMapperTest {
     SUPPORTED_MODES.forEach(mode -> {
       try {
         transportModeMapper.map(mode, null);
-      } catch (UnsupportedModeException e) {
+      }
+      catch (UnsupportedModeException e) {
         fail("Mode " + mode + " should be supported", e);
       }
     });

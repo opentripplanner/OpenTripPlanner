@@ -165,19 +165,22 @@ final class DaggerScopeAssertions {
 
         if (singletons.contains(key) && first != second) {
           failures.add(method.getName() + "() should be a singleton but was rebuilt");
-        } else if (knownUnscopedBugs.contains(key) && first == second) {
+        }
+        else if (knownUnscopedBugs.contains(key) && first == second) {
           failures.add(
             method.getName() +
               "() is a known unscoped bug but now returns a stable instance — reclassify " +
               key
           );
-        } else if (prototypeByDesign.contains(key) && first == second) {
+        }
+        else if (prototypeByDesign.contains(key) && first == second) {
           failures.add(method.getName() + "() should build a fresh instance every call");
         }
       }
 
       assertThat(failures).isEmpty();
-    } catch (ReflectiveOperationException e) {
+    }
+    catch (ReflectiveOperationException e) {
       throw new RuntimeException(e);
     }
   }
@@ -242,7 +245,8 @@ final class DaggerScopeAssertions {
           failures.add(
             method.getName() + "() should be stable across requests but differed across requests"
           );
-        } else if (requestScoped.contains(key) && withinRequestFirst == acrossRequests) {
+        }
+        else if (requestScoped.contains(key) && withinRequestFirst == acrossRequests) {
           failures.add(
             method.getName() +
               "() is request-scoped but returned the same instance across two independent " +
@@ -254,7 +258,8 @@ final class DaggerScopeAssertions {
       }
 
       assertThat(failures).isEmpty();
-    } catch (ReflectiveOperationException e) {
+    }
+    catch (ReflectiveOperationException e) {
       throw new RuntimeException(e);
     }
   }

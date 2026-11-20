@@ -166,7 +166,8 @@ public class CarRoutingTest {
       i.legs().forEach(l -> {
         if (l instanceof StreetLeg stLeg) {
           assertEquals(TraverseMode.CAR, stLeg.getMode());
-        } else {
+        }
+        else {
           fail("Expected StreetLeg (CAR): " + l);
         }
       })

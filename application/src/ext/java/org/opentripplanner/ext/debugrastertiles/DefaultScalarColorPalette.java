@@ -25,7 +25,8 @@ public record DefaultScalarColorPalette(
       }
 
       return Color.getHSBColor(0.0f, 1.0f, 0.7f - x * 0.7f);
-    } else {
+    }
+    else {
       // Green (hue=0.3) to red (hue=1.0) gradient
       float x = (float) ((value - min) / (max - min));
 

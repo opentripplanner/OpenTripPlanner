@@ -26,7 +26,8 @@ public final class GtfsFaresService implements FareService {
 
     if (faresV2.isEmpty()) {
       fare = Objects.requireNonNullElse(faresV1.calculateFares(itinerary), ItineraryFare.empty());
-    } else {
+    }
+    else {
       var products = faresV2.calculateFares(itinerary);
       addLegProducts(products.legProducts(), fare);
     }

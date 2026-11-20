@@ -121,7 +121,8 @@ public class LuceneIndex implements Serializable {
 
       DirectoryReader indexReader = DirectoryReader.open(directory);
       searcher = new SuggestIndexSearcher(indexReader);
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       throw new RuntimeException(e);
     }
   }
@@ -209,7 +210,8 @@ public class LuceneIndex implements Serializable {
 
     try {
       writer.addDocument(document);
-    } catch (IOException ex) {
+    }
+    catch (IOException ex) {
       throw new RuntimeException(ex);
     }
   }
@@ -274,18 +276,21 @@ public class LuceneIndex implements Serializable {
           )
         );
         topDocs = searcher.search(query, MAX_RESULTS, sort);
-      } else {
+      }
+      else {
         topDocs = searcher.search(query, MAX_RESULTS);
       }
 
       return Arrays.stream(topDocs.scoreDocs).map(scoreDoc -> {
         try {
           return searcher.storedFields().document(scoreDoc.doc);
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
           throw new RuntimeException(e);
         }
       });
-    } catch (IOException | ParseException ex) {
+    }
+    catch (IOException | ParseException ex) {
       throw new RuntimeException(ex);
     }
   }

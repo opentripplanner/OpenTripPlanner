@@ -118,7 +118,8 @@ public class BicycleRoutingTest {
       i.legs().forEach(l -> {
         if (l instanceof StreetLeg stLeg) {
           assertEquals(TraverseMode.BICYCLE, stLeg.getMode());
-        } else {
+        }
+        else {
           fail("Expected StreetLeg (BICYCLE): " + l);
         }
       })

@@ -178,7 +178,8 @@ public class RefetchItineraryService {
         }
 
         transitLegs.add(transitLeg);
-      } else {
+      }
+      else {
         throw new RefetchItineraryException(
           "RefetchItinerary not implemented for non transit legs yet"
         );

@@ -120,7 +120,8 @@ public class VehicleParkingUpdater extends PollingGraphUpdater<StreetRealTimeUpd
           oldVehicleParkingsById
             .get(updatedVehicleParking.getId())
             .updateAvailability(updatedVehicleParking.getAvailability());
-        } else {
+        }
+        else {
           toAdd.add(updatedVehicleParking);
 
           if (operational) {

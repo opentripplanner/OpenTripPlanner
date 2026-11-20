@@ -102,7 +102,8 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
 
     if (errors.isEmpty()) {
       addDestinationArrivalToPaths(destArrival);
-    } else {
+    }
+    else {
       debugReject(destArrival, String.join(" ", errors));
     }
   }

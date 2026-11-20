@@ -69,7 +69,8 @@ class TimetableHelper {
     if (stopTimeUpdate.hasRealTimeUpdate()) {
       tripTimesBuilder.withArrivalDelay(index, stopTimeUpdate.getArrivalDelay());
       tripTimesBuilder.withDepartureDelay(index, stopTimeUpdate.getDepartureDelay());
-    } else {
+    }
+    else {
       // other flags must follow withNoData so they take precedence
       tripTimesBuilder.withNoData(index);
     }

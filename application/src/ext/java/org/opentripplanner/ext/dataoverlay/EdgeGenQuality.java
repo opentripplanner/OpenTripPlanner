@@ -32,7 +32,8 @@ class EdgeGenQuality<E extends Number> {
 
     if (existing == null) {
       gridDataVariableValues.put(time, List.of(propertyValue));
-    } else {
+    }
+    else {
       List<E> updated = new ArrayList<>(existing.size() + 1);
       updated.addAll(existing);
       updated.add(existing.size(), propertyValue);
@@ -97,7 +98,8 @@ class EdgeGenQuality<E extends Number> {
       }
 
       return (float) total / len;
-    } else if (values.get(0) instanceof Float) {
+    }
+    else if (values.get(0) instanceof Float) {
       float sum = 0f;
 
       for (E value : values) {
@@ -105,7 +107,8 @@ class EdgeGenQuality<E extends Number> {
       }
 
       return sum / len;
-    } else if (values.get(0) instanceof Double) {
+    }
+    else if (values.get(0) instanceof Double) {
       double sum = 0;
 
       for (E value : values) {
@@ -113,7 +116,8 @@ class EdgeGenQuality<E extends Number> {
       }
 
       return (float) sum / len;
-    } else if (values.get(0) instanceof Long) {
+    }
+    else if (values.get(0) instanceof Long) {
       Long total = 0L;
 
       for (E value : values) {
@@ -121,7 +125,8 @@ class EdgeGenQuality<E extends Number> {
       }
 
       return (float) total / len;
-    } else {
+    }
+    else {
       throw new UnsupportedOperationException("Unrecognizable format of " + values.get(0));
     }
   }

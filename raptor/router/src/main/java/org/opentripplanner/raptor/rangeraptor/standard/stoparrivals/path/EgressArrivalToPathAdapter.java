@@ -79,7 +79,8 @@ public class EgressArrivalToPathAdapter<T extends RaptorTripSchedule> implements
       debugRejectCurrentBestArrival();
       bestArrival = new DestinationArrivalEvent(round, stopReachedOnBoard, egressPath);
       bestDestinationTime = arrivalTime;
-    } else {
+    }
+    else {
       debugRejectNew(round, stopReachedOnBoard, egressPath);
     }
   }

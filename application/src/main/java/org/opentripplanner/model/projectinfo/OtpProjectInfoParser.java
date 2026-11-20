@@ -29,7 +29,8 @@ class OtpProjectInfoParser {
       );
       LOG.debug("Parsed Maven artifact version: {}", version);
       return version;
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       LOG.error("Error reading version from properties file: {}", e.getMessage());
       return new OtpProjectInfo();
     }

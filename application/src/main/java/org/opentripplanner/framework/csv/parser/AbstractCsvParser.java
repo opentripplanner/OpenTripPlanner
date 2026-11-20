@@ -64,7 +64,8 @@ public abstract class AbstractCsvParser<T> {
       var rawHeaders = Arrays.stream(reader.getHeaders()).toList();
       // All defined headers must exist, but there might be extra headers - these are ignored
       return rawHeaders.containsAll(headers());
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       throw new RuntimeException(e);
     }
   }
@@ -79,12 +80,15 @@ public abstract class AbstractCsvParser<T> {
           ++lineNumber;
           this.next = createNextRow();
           return true;
-        } else {
+        }
+        else {
           return false;
         }
-      } catch (IOException e) {
+      }
+      catch (IOException e) {
         throw new RuntimeException(e);
-      } catch (HandledCsvParseException ignore) {
+      }
+      catch (HandledCsvParseException ignore) {
         // Issue is already handled. Continue with next row until file is complete
       }
     }
@@ -138,7 +142,8 @@ public abstract class AbstractCsvParser<T> {
       }
 
       return value;
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       throw new RuntimeException(e);
     }
   }
@@ -153,7 +158,8 @@ public abstract class AbstractCsvParser<T> {
           ? GTFS_LOCAL_DATE_FORMATER
           : DateTimeFormatter.ISO_LOCAL_DATE
       );
-    } catch (DateTimeParseException e) {
+    }
+    catch (DateTimeParseException e) {
       issueStore.add(new FormatIssue(columnName, value, TYPE_LOCAL_DATE, line(), issueType));
       throw new HandledCsvParseException();
     }
@@ -185,7 +191,8 @@ public abstract class AbstractCsvParser<T> {
 
     try {
       return mapper.apply(value);
-    } catch (NumberFormatException e) {
+    }
+    catch (NumberFormatException e) {
       issueStore.add(new FormatIssue(columnName, value, type, line(), issueType));
       throw new HandledCsvParseException();
     }

@@ -508,7 +508,8 @@ public class PlatformLinkingTest {
               )
             )
         );
-      } else {
+      }
+      else {
         linker.linkVertexForRealTime(
           tStop,
           new TraverseModeSet(TraverseMode.WALK),

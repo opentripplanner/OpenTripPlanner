@@ -52,7 +52,8 @@ public class TokenSchema {
     for (TokenDefinition definition : definitions) {
       try {
         return new Token(definition, deserializer.deserialize(definition));
-      } catch (Exception ignore) {}
+      }
+      catch (Exception ignore) {}
     }
 
     throw new IllegalArgumentException(

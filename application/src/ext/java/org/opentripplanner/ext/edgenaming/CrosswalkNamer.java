@@ -101,13 +101,17 @@ class CrosswalkNamer implements EdgeNamer {
         crosswalk.overrideDerivedName(
           new LocalizedString("name.crosswalk_over_street", crossStreet.getAssumedName())
         );
-      } else if (crossStreet.isServiceRoad()) {
+      }
+      else if (crossStreet.isServiceRoad()) {
         crosswalk.overrideDerivedName(new LocalizedString("name.crosswalk_over_service_road"));
-      } else if (crossStreet.isMotorwayRamp()) {
+      }
+      else if (crossStreet.isMotorwayRamp()) {
         crosswalk.overrideDerivedName(new LocalizedString("name.crosswalk_over_motorway_ramp"));
-      } else if (crossStreet.isTurnLane()) {
+      }
+      else if (crossStreet.isTurnLane()) {
         crosswalk.overrideDerivedName(new LocalizedString("name.crosswalk_over_turn_lane"));
-      } else {
+      }
+      else {
         // Default on using the OSM way ID, which should not happen.
         crosswalk.overrideDerivedName(I18NString.of(String.format("crosswalk %s", way.getId())));
       }

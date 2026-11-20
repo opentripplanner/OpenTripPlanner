@@ -48,7 +48,8 @@ public class OtpRetry {
       try {
         retryable.run();
         return;
-      } catch (Exception e) {
+      }
+      catch (Exception e) {
         if (!retryableException.test(e)) {
           throw new OtpRetryException("Operation failed with non-retryable exception", e);
         }

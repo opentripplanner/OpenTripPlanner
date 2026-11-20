@@ -82,7 +82,8 @@ public class OsmArea {
           }
         }
       }
-    } catch (TopologyException ex) {
+    }
+    catch (TopologyException ex) {
       throw new AreaConstructionException(ex.getMessage());
     }
 
@@ -112,7 +113,8 @@ public class OsmArea {
       if (start == end) {
         LongArrayList ring = new LongArrayList(refs);
         closedRings.add(ring);
-      } else {
+      }
+      else {
         waysByEndpoint.put(start, way);
         waysByEndpoint.put(end, way);
       }
@@ -160,7 +162,8 @@ public class OsmArea {
 
     if (constructRingsRecursive(waysByEndpoint, partialRing, closedRings, firstEndpoint)) {
       return closedRings;
-    } else {
+    }
+    else {
       return null;
     }
   }
@@ -233,7 +236,8 @@ public class OsmArea {
 
         newRing.addAll(ring);
         newFirstEndpoint = otherEndpoint;
-      } else {
+      }
+      else {
         newRing.add(nodeRefs.toArray(), 0, nodeRefs.size() - 1);
         newRing.addAll(ring);
         newFirstEndpoint = firstEndpoint;
@@ -272,7 +276,8 @@ public class OsmArea {
 
         waysByEndpoint.remove(firstEndpoint, firstWay);
         waysByEndpoint.remove(otherEndpoint, firstWay);
-      } else {
+      }
+      else {
         // continue with this ring
         if (waysByEndpoint.get(newFirstEndpoint) != null) {
           if (constructRingsRecursive(waysByEndpoint, newRing, closedRings, newFirstEndpoint)) {
@@ -283,7 +288,8 @@ public class OsmArea {
 
       if (firstEndpoint == endpoint) {
         waysByEndpoint.put(otherEndpoint, way);
-      } else {
+      }
+      else {
         waysByEndpoint.put(firstEndpoint, way);
       }
     }

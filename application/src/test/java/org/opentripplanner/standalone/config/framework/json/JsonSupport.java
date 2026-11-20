@@ -51,7 +51,8 @@ public class JsonSupport {
       jsonText = jsonText.replace("'", "\"");
 
       return mapper.readTree(jsonText);
-    } catch (JacksonException e) {
+    }
+    catch (JacksonException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
   }
@@ -67,7 +68,8 @@ public class JsonSupport {
       URI uri = ClassLoader.getSystemClassLoader().getResource(path).toURI();
 
       return jsonNodeFromPath(Paths.get(uri));
-    } catch (URISyntaxException e) {
+    }
+    catch (URISyntaxException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
   }
@@ -79,7 +81,8 @@ public class JsonSupport {
   public static String prettyPrint(JsonNode body) {
     try {
       return PRETTY_PRINTER.writeValueAsString(body);
-    } catch (JacksonException e) {
+    }
+    catch (JacksonException e) {
       throw new RuntimeException(e);
     }
   }
@@ -92,7 +95,8 @@ public class JsonSupport {
     try {
       var json = LENIENT_MAPPER.readTree(input);
       return PRETTY_PRINTER.writeValueAsString(json);
-    } catch (JacksonException e) {
+    }
+    catch (JacksonException e) {
       throw new RuntimeException(e);
     }
   }
@@ -105,7 +109,8 @@ public class JsonSupport {
       var json = Files.readString(path);
 
       return LENIENT_MAPPER.readTree(json);
-    } catch (JacksonException | IOException e) {
+    }
+    catch (JacksonException | IOException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
   }
@@ -116,7 +121,8 @@ public class JsonSupport {
   public static JsonNode jsonNodeFromString(String input) {
     try {
       return LENIENT_MAPPER.readTree(input);
-    } catch (JacksonException e) {
+    }
+    catch (JacksonException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
   }

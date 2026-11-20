@@ -92,15 +92,18 @@ public class TransmodelAPI {
 
     if (queryVariables instanceof Map queryVariablesAsMap) {
       variables = queryVariablesAsMap;
-    } else if (
+    }
+    else if (
       queryVariables instanceof String queryVariablesAsString && !queryVariablesAsString.isEmpty()
     ) {
       try {
         variables = deserializer.readValue(queryVariablesAsString, Map.class);
-      } catch (JacksonException e) {
+      }
+      catch (JacksonException e) {
         throw new BadRequestException("Variables must be a valid json object");
       }
-    } else {
+    }
+    else {
       variables = Collections.emptyMap();
     }
 

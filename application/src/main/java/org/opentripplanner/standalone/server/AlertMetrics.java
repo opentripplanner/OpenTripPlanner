@@ -61,7 +61,8 @@ public class AlertMetrics implements MeterBinder {
         var rows = summarizeAlerts(transitAlertService);
         statuses.register(rows, true);
       }
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       LOG.error("Error building alerts metrics", e);
     }
   }

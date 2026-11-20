@@ -209,10 +209,12 @@ public class RoutingWorker {
           var r5 = CompletableFuture.supplyAsync(() -> routeDirectTaxi());
 
           result.merge(r1.join(), r2.join(), r3.join(), r4.join(), r5.join());
-        } catch (CompletionException e) {
+        }
+        catch (CompletionException e) {
           RoutingValidationException.unwrapAndRethrowCompletionException(e);
         }
-      } else {
+      }
+      else {
         result.merge(
           routeDirectStreet(),
           routeDirectFlex(),
@@ -221,7 +223,8 @@ public class RoutingWorker {
           routeDirectTaxi()
         );
       }
-    } catch (RoutingValidationException e) {
+    }
+    catch (RoutingValidationException e) {
       result.merge(RoutingResult.failed(e.getRoutingErrors()));
     }
 
@@ -366,9 +369,11 @@ public class RoutingWorker {
         ),
         emptyDirectModeHandler.removeWalkAllTheWayResults()
       );
-    } catch (RoutingValidationException e) {
+    }
+    catch (RoutingValidationException e) {
       return RoutingResult.failed(e.getRoutingErrors());
-    } finally {
+    }
+    finally {
       debugTimingAggregator.finishedDirectStreetRouter();
     }
   }
@@ -398,9 +403,11 @@ public class RoutingWorker {
           linkingContext()
         )
       );
-    } catch (RoutingValidationException e) {
+    }
+    catch (RoutingValidationException e) {
       return RoutingResult.failed(e.getRoutingErrors());
-    } finally {
+    }
+    finally {
       debugTimingAggregator.finishedDirectFlexRouter();
     }
   }
@@ -418,9 +425,11 @@ public class RoutingWorker {
 
     try {
       return RoutingResult.ok(carpoolingService.routeDirect(request));
-    } catch (RoutingValidationException e) {
+    }
+    catch (RoutingValidationException e) {
       return RoutingResult.failed(e.getRoutingErrors());
-    } finally {
+    }
+    finally {
       debugTimingAggregator.finishedDirectCarpoolRouter();
     }
   }
@@ -452,9 +461,11 @@ public class RoutingWorker {
     try {
       var itineraries = taxiService.routeDirect(transitService, request, linkingContext());
       return RoutingResult.ok(itineraries);
-    } catch (RoutingValidationException e) {
+    }
+    catch (RoutingValidationException e) {
       return RoutingResult.failed(e.getRoutingErrors());
-    } finally {
+    }
+    finally {
       debugTimingAggregator.finishedDirectTaxiRouter();
     }
   }
@@ -497,9 +508,11 @@ public class RoutingWorker {
       var itineraries = transitResults.getItineraries();
       checkIfTransitConnectionExistsInSearchWindow(itineraries);
       return RoutingResult.ok(itineraries);
-    } catch (RoutingValidationException e) {
+    }
+    catch (RoutingValidationException e) {
       return RoutingResult.failed(e.getRoutingErrors());
-    } finally {
+    }
+    finally {
       debugTimingAggregator.finishedTransitRouter();
     }
   }

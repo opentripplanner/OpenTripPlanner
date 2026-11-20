@@ -34,7 +34,8 @@ public class RemoveFilter implements ItineraryListFilter {
         .stream()
         .filter(Predicate.not(Itinerary::isFlaggedForDeletion))
         .collect(Collectors.toList());
-    } else {
+    }
+    else {
       filterInput = itineraries;
     }
 

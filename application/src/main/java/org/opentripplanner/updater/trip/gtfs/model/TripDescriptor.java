@@ -38,7 +38,8 @@ public class TripDescriptor {
       return tripDescriptor.hasStartDate()
         ? Optional.of(ServiceDateUtils.parseString(tripDescriptor.getStartDate()))
         : Optional.empty();
-    } catch (ParseException e) {
+    }
+    catch (ParseException e) {
       throw UpdateException.of(UpdateErrorType.INVALID_INPUT_STRUCTURE);
     }
   }
@@ -52,7 +53,8 @@ public class TripDescriptor {
       }
 
       return Optional.empty();
-    } catch (DateTimeParseException _) {
+    }
+    catch (DateTimeParseException _) {
       throw UpdateException.of(UpdateErrorType.INVALID_INPUT_STRUCTURE);
     }
   }

@@ -59,7 +59,8 @@ public class DirectoryDataSource extends AbstractFileDataSource implements Compo
       try (var files = Files.walk(file.toPath())) {
         // Need to reverse stream to delete nested files before parent directory
         files.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
-      } catch (IOException e) {
+      }
+      catch (IOException e) {
         throw new RuntimeException(
           "Failed to delete " + path() + ": " + e.getLocalizedMessage(),
           e

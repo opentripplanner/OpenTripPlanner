@@ -275,7 +275,8 @@ public class FlexIntegrationTest {
             .withAccessMode(StreetMode.WALK)
             .withEgressMode(StreetMode.WALK);
           journeyBuilder.withTransit(b -> b.disable());
-        } else {
+        }
+        else {
           modes.withEgressMode(FLEXIBLE);
         }
 

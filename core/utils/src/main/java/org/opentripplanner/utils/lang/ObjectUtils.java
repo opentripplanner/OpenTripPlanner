@@ -43,7 +43,8 @@ public class ObjectUtils {
   public static <T> T safeGetOrNull(Supplier<T> body) {
     try {
       return body.get();
-    } catch (Exception ignore) {
+    }
+    catch (Exception ignore) {
       return null;
     }
   }

@@ -164,7 +164,8 @@ public class Deduplicator implements DeduplicatorService, Serializable {
     if (canonicalObjArrays.containsKey(type)) {
       //noinspection unchecked
       map = (Map<ObjArray<T>, ObjArray<T>>) canonicalObjArrays.get(type);
-    } else {
+    }
+    else {
       map = new HashMap<>();
       canonicalObjArrays.put(type, map);
     }

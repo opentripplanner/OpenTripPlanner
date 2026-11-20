@@ -12,7 +12,8 @@ class OsmNodePair {
     if (first.getId() > second.getId()) {
       this.second = first;
       this.first = second;
-    } else {
+    }
+    else {
       this.first = first;
       this.second = second;
     }

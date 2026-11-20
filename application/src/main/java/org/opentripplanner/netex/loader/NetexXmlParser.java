@@ -33,7 +33,8 @@ public class NetexXmlParser {
   private static Unmarshaller createUnmarshaller() {
     try {
       return JAXBContext.newInstance(PublicationDeliveryStructure.class).createUnmarshaller();
-    } catch (JAXBException e) {
+    }
+    catch (JAXBException e) {
       // This is a programming error - not expected!
       // We abort early and also allow for this to happen in the constructor;
       // Which in other cases would be considered bad practice.

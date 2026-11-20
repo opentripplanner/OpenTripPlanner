@@ -129,9 +129,11 @@ public class AtlantaFareService extends DefaultFareService {
         // Consider the conditions under which this transfer will no longer be valid.
         if (transferClassification.type.equals(TransferType.END_TRANSFER)) {
           return false;
-        } else if (transferUseTime.isAfter(transferStartTime.plus(transferWindow))) {
+        }
+        else if (transferUseTime.isAfter(transferStartTime.plus(transferWindow))) {
           return false;
-        } else if (legs.size() > maxRides) {
+        }
+        else if (legs.size() > maxRides) {
           return false;
         }
       }
@@ -151,7 +153,8 @@ public class AtlantaFareService extends DefaultFareService {
         fares.put(fareType, Money.ofFractionalAmount(currency, 0));
         lastFareWithTransfer = defaultFare;
         return true;
-      } else if (transferClassification.type.equals(TransferType.TRANSFER_PAY_DIFFERENCE)) {
+      }
+      else if (transferClassification.type.equals(TransferType.TRANSFER_PAY_DIFFERENCE)) {
         Money newCost = Money.ZERO_USD;
 
         if (defaultFare.greaterThan(lastFareWithTransfer)) {
@@ -161,7 +164,8 @@ public class AtlantaFareService extends DefaultFareService {
         fares.put(fareType, newCost);
         lastFareWithTransfer = defaultFare;
         return true;
-      } else if (transferClassification.type.equals(TransferType.TRANSFER_WITH_UPCHARGE)) {
+      }
+      else if (transferClassification.type.equals(TransferType.TRANSFER_WITH_UPCHARGE)) {
         fares.put(fareType, transferClassification.upcharge);
         lastFareWithTransfer = defaultFare;
         return true;
@@ -219,7 +223,8 @@ public class AtlantaFareService extends DefaultFareService {
       case COBB_AGENCY_ID -> {
         if (RideType.COBB_EXPRESS.routeNamesContains(shortName)) {
           return RideType.COBB_EXPRESS;
-        } else if (COBB_FREE_RIDE_SHORT_NAMES.contains(shortName)) {
+        }
+        else if (COBB_FREE_RIDE_SHORT_NAMES.contains(shortName)) {
           return RideType.FREE_RIDE;
         }
 
@@ -231,14 +236,16 @@ public class AtlantaFareService extends DefaultFareService {
 
         if (hours >= 12) {
           return RideType.XPRESS_AFTERNOON;
-        } else {
+        }
+        else {
           return RideType.XPRESS_MORNING;
         }
       }
       case GCT_AGENCY_ID -> {
         if (RideType.GCT_EXPRESS_Z1.routeNamesContains(shortName)) {
           return RideType.GCT_EXPRESS_Z1;
-        } else if (RideType.GCT_EXPRESS_Z2.routeNamesContains(shortName)) {
+        }
+        else if (RideType.GCT_EXPRESS_Z2.routeNamesContains(shortName)) {
           return RideType.GCT_EXPRESS_Z2;
         }
 

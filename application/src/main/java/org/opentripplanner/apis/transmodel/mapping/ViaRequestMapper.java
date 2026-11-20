@@ -49,7 +49,8 @@ public class ViaRequestMapper {
         .stream()
         .map(viaRequest -> viaSegmentMapper.mapViaSegment(request, viaRequest))
         .toList();
-    } else {
+    }
+    else {
       requests = Collections.nCopies(vias.size() + 1, request.journey());
     }
 

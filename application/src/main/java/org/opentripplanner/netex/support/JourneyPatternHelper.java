@@ -26,7 +26,8 @@ public class JourneyPatternHelper {
     if (journeyPattern.getRouteRef() != null) {
       String routeRef = journeyPattern.getRouteRef().getRef();
       lineRef = routeById.lookup(routeRef).getLineRef().getValue().getRef();
-    } else if (journeyPattern.getRouteView() != null) {
+    }
+    else if (journeyPattern.getRouteView() != null) {
       lineRef = journeyPattern.getRouteView().getLineRef().getValue().getRef();
     }
 

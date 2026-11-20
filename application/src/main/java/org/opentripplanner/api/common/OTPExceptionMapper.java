@@ -25,7 +25,8 @@ public class OTPExceptionMapper implements ExceptionMapper<Exception> {
 
       if (ex instanceof BadRequestException) {
         header = "FOUR HUNDRED\n\n";
-      } else if (ex instanceof NotFoundException) {
+      }
+      else if (ex instanceof NotFoundException) {
         header = "FOUR ZERO FOUR\n\n";
       }
 

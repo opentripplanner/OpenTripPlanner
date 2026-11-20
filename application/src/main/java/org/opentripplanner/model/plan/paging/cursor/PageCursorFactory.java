@@ -141,7 +141,8 @@ public class PageCursorFactory {
     if (pageType == null && resolvePageTypeForTheFirstSearch(sortOrder) == PREVIOUS_PAGE) {
       if (firstItineraryResultDeparture != null) {
         return firstItineraryResultDeparture;
-      } else {
+      }
+      else {
         return edt;
       }
     }
@@ -167,7 +168,8 @@ public class PageCursorFactory {
       if (currentPageType == NEXT_PAGE) {
         prevEdt = edtBeforeNewSw();
         nextEdt = pageCursorInput.earliestRemovedDeparture();
-      } else {
+      }
+      else {
         prevEdt = pageCursorInput
           .latestRemovedDeparture()
           .minus(newSearchWindow)

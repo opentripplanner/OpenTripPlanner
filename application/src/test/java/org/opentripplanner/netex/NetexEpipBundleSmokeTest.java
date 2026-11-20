@@ -54,7 +54,8 @@ class NetexEpipBundleSmokeTest {
 
       // When
       transitBuilder = netexBundle.loadBundle(new Deduplicator(), DataImportIssueStore.NOOP);
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       throw new RuntimeException(e);
     }
 

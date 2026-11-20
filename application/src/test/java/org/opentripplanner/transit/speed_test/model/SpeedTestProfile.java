@@ -109,7 +109,8 @@ public enum SpeedTestProfile {
   private static SpeedTestProfile parseOne(String value) {
     try {
       return valueOf(value);
-    } catch (IllegalArgumentException ignore) {
+    }
+    catch (IllegalArgumentException ignore) {
       for (SpeedTestProfile it : values()) {
         if (it.shortName.equalsIgnoreCase(value)) {
           return it;
@@ -133,7 +134,8 @@ public enum SpeedTestProfile {
 
     if (name().equals(shortName)) {
       text = new StringBuilder(String.format("%s : %s", name(), description));
-    } else {
+    }
+    else {
       text = new StringBuilder(String.format("%s, %s : %s", shortName, name(), description));
     }
 

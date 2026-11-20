@@ -85,7 +85,8 @@ class TripMapper {
   private Optional<TimePenalty> mapSafeTimePenalty(org.onebusaway.gtfs.model.Trip rhs) {
     if (rhs.getSafeDurationFactor() == null && rhs.getSafeDurationOffset() == null) {
       return Optional.empty();
-    } else {
+    }
+    else {
       var offset =
         rhs.getSafeDurationOffset() == null
           ? Duration.ZERO

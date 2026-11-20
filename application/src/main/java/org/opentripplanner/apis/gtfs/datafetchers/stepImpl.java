@@ -58,7 +58,8 @@ public class stepImpl implements GraphQLDataFetchers.GraphQLStep {
 
       if (walkStep.entrance().isPresent()) {
         return walkStep.entrance().get();
-      } else if (walkStep.verticalTransportationUse().isPresent()) {
+      }
+      else if (walkStep.verticalTransportationUse().isPresent()) {
         return walkStep.verticalTransportationUse().get();
       }
 

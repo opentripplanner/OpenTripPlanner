@@ -38,7 +38,8 @@ public class DatedServiceJourneyMapper {
 
       if (opDay != null) {
         result.add(OperatingDayMapper.map(opDay));
-      } else {
+      }
+      else {
         // There is a validation on this, so we should never get here
         throw new NullPointerException(
           "DatedServiceJourney operating-day not found. DSJ Id: " + dsj.getId()

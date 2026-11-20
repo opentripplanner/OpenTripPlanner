@@ -41,10 +41,12 @@ public class NetexVersionHelper {
   public static long versionOf(EntityInVersionStructure e) {
     if (ANY.equals(e.getVersion())) {
       return UNKNOWN_VERSION;
-    } else {
+    }
+    else {
       try {
         return Long.parseLong(e.getVersion());
-      } catch (NumberFormatException _) {
+      }
+      catch (NumberFormatException _) {
         return UNKNOWN_VERSION;
       }
     }

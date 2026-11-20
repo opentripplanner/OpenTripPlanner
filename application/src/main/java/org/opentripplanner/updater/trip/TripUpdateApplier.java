@@ -42,7 +42,8 @@ public class TripUpdateApplier {
         buffer.update(
           RealTimeTripUpdate.of(scheduledPattern, builder.build(), serviceDate).build()
         );
-      } else if (LOG.isDebugEnabled()) {
+      }
+      else if (LOG.isDebugEnabled()) {
         LOG.debug(
           "Trip {} not found in scheduled pattern {}, skipping deletion.",
           trip.getId(),

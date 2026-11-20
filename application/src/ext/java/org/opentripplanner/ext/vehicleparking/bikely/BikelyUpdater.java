@@ -70,7 +70,8 @@ public class BikelyUpdater implements DataSource<VehicleParking> {
             .forEach(node -> lots.add(parseElement(node)));
 
           return lots.stream().filter(Objects::nonNull).toList();
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
           LOG.error("Could not get Bikely updates", e);
         }
 
@@ -134,7 +135,8 @@ public class BikelyUpdater implements DataSource<VehicleParking> {
         .entrance(entrance)
         .note(note)
         .build();
-    } else {
+    }
+    else {
       return null;
     }
   }
@@ -148,7 +150,8 @@ public class BikelyUpdater implements DataSource<VehicleParking> {
 
     if (startPriceAmount == 0 && mainPriceAmount == 0) {
       return new LocalizedString("price.free");
-    } else {
+    }
+    else {
       return new LocalizedString(
         "price.startMain",
         NonLocalizedString.ofNumber(startPriceDurationHours),
@@ -162,7 +165,8 @@ public class BikelyUpdater implements DataSource<VehicleParking> {
   private static VehicleParkingState toState(boolean isUnderMaintenance) {
     if (isUnderMaintenance) {
       return VehicleParkingState.TEMPORARILY_CLOSED;
-    } else {
+    }
+    else {
       return OPERATIONAL;
     }
   }

@@ -240,7 +240,8 @@ class ElevatorProcessor {
         );
         // Do not create unnecessary ElevatorBoardEdges, ElevatorAlightEdges, or ElevatorHopEdges.
         continue;
-      } else if (nodes.size() > 2) {
+      }
+      else if (nodes.size() > 2) {
         issueStore.add(
           new MoreThanTwoIntersectionNodesInElevatorWay(
             way,

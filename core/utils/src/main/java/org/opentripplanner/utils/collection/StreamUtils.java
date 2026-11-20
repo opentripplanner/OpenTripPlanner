@@ -13,7 +13,8 @@ public class StreamUtils {
   public static <T> Stream<T> ofNullableCollection(@Nullable Collection<T> value) {
     if (value == null) {
       return Stream.empty();
-    } else {
+    }
+    else {
       return value.stream();
     }
   }

@@ -148,7 +148,8 @@ class TransferMapper {
 
     if (t.getTransferType() == STAY_SEATED_NOT_ALLOWED) {
       return new StaySeatedNotAllowed(fromTrip, toTrip);
-    } else {
+    }
+    else {
       return null;
     }
   }
@@ -235,7 +236,8 @@ class TransferMapper {
 
     if (rhsStopOrStation.getLocationType() == 0) {
       stop = stopMapper.map(rhsStopOrStation);
-    } else {
+    }
+    else {
       station = stationMapper.map(rhsStopOrStation);
     }
 
@@ -246,20 +248,25 @@ class TransferMapper {
 
       if (boardTrip) {
         stopPositionInPattern = boardStopPosition(trip, stop, station);
-      } else {
+      }
+      else {
         stopPositionInPattern = alightStopPosition(trip, stop, station);
       }
 
       return stopPositionInPattern < 0 ? null : new TripTransferPoint(trip, stopPositionInPattern);
-    } else if (route != null) {
+    }
+    else if (route != null) {
       if (stop != null) {
         return new RouteStopTransferPoint(route, stop);
-      } else if (station != null) {
+      }
+      else if (station != null) {
         return new RouteStationTransferPoint(route, station);
       }
-    } else if (stop != null) {
+    }
+    else if (stop != null) {
       return new StopTransferPoint(stop);
-    } else if (station != null) {
+    }
+    else if (station != null) {
       return new StationTransferPoint(station);
     }
 

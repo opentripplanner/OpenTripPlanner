@@ -211,7 +211,8 @@ class RequestScopedFactoryIntegrationTest {
 
       assertThat(findPath(after)).isSameInstanceAs(PATH);
       assertThat(findPath(before)).isNull();
-    } finally {
+    }
+    finally {
       updateManager.shutdown();
     }
   }

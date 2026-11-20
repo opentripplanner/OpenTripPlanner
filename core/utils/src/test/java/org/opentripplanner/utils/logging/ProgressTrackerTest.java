@@ -69,7 +69,8 @@ public class ProgressTrackerTest {
   void sleep10ms() {
     try {
       Thread.sleep(10);
-    } catch (InterruptedException e) {
+    }
+    catch (InterruptedException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
   }

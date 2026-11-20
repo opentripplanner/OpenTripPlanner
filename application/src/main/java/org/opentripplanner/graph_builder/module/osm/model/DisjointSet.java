@@ -37,7 +37,8 @@ public class DisjointSet<T> {
       sets.set(p2, p1);
       sets.set(p1, -totalSize);
       return p2;
-    } else {
+    }
+    else {
       sets.set(p1, p2);
       sets.set(p2, -totalSize);
       return p1;
@@ -48,7 +49,8 @@ public class DisjointSet<T> {
     if (setMapping.containsKey(element)) {
       int i = setMapping.get(element);
       return compact(i);
-    } else {
+    }
+    else {
       setMapping.put(element, sets.size());
       sets.add(-1);
       return sets.size() - 1;

@@ -38,7 +38,8 @@ public class OsmLevelFactory {
         OsmLevelSource.LEVEL_TAG,
         entity
       );
-    } else if (entity.hasTag("layer")) {
+    }
+    else if (entity.hasTag("layer")) {
       return createLevelListFromTag(entity.getTag("layer"), null, OsmLevelSource.LAYER_TAG, entity);
     }
 
@@ -63,19 +64,22 @@ public class OsmLevelFactory {
       // Otherwise the nameTag data won't be used because the names can't be reliably mapped.
       if (levelArray.length == nameArray.length) {
         levels = createLevelListFromSubstringArrays(levelArray, nameArray, source);
-      } else {
+      }
+      else {
         levels = createLevelListFromSubstringArrays(levelArray, source);
         issueStore.add(
           new LevelAndLevelRefDifferentSizes(levelArray.length, nameArray.length, entity)
         );
       }
-    } else {
+    }
+    else {
       levels = createLevelListFromSubstringArrays(levelArray, source);
     }
 
     if (levelListIsValid(levels)) {
       return levels;
-    } else {
+    }
+    else {
       issueStore.add(new FloorNumberUnknownAssumedGroundLevel(levelTag, entity));
       return List.of();
     }
@@ -134,10 +138,12 @@ public class OsmLevelFactory {
 
       if (nameString != null) {
         return new OsmLevel(level, nameString, source);
-      } else {
+      }
+      else {
         return new OsmLevel(level, levelString, source);
       }
-    } catch (NumberFormatException e) {
+    }
+    catch (NumberFormatException e) {
       return null;
     }
   }

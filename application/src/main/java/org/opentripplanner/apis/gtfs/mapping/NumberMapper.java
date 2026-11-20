@@ -11,7 +11,8 @@ public class NumberMapper {
   public static Double toDouble(@Nullable Number input) {
     if (input != null) {
       return input.doubleValue();
-    } else {
+    }
+    else {
       return null;
     }
   }

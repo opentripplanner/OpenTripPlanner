@@ -54,7 +54,8 @@ public class BarrierVertex extends OsmVertex {
     if (edgeCount == 1) {
       // only one edge connects the vertex, must be end point
       needsFix = true;
-    } else if (edgeCount == 2) {
+    }
+    else if (edgeCount == 2) {
       var out = this.getOutgoing();
       var in = this.getIncoming();
 

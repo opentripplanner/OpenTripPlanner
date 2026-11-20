@@ -271,7 +271,8 @@ public class TripPatternByLegIdsQuery {
       var itinerary = refetcher.refetchItinerary(from, to, legs, routeRequest);
       TripPatternResult apiResponse = new TripPatternResult(itinerary);
       return DataFetcherResult.<TripPatternResult>newResult().data(apiResponse).build();
-    } catch (RefetchItineraryException e) {
+    }
+    catch (RefetchItineraryException e) {
       throw new InvalidInputException(e.getMessage());
     }
   }

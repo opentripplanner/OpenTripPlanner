@@ -41,7 +41,8 @@ public class RaptorDebugModel implements LauncherRequestDecorator {
         this.eventTypes.add(eventType);
         save();
       }
-    } else {
+    }
+    else {
       if (isEventTypeSet(eventType)) {
         this.eventTypes.remove(eventType);
         save();

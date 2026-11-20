@@ -38,7 +38,8 @@ public class EgressPaths {
 
     if (MULTI_CRITERIA.is(profile)) {
       paths = removeNonOptimalPathsForMcRaptor(paths);
-    } else {
+    }
+    else {
       paths = removeNonOptimalPathsForStandardRaptor(paths);
     }
 

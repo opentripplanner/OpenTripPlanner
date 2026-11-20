@@ -201,7 +201,8 @@ public class TimetabledPassingTimeType {
   private static Integer missingValueToNull(int value) {
     if (value == StopTime.MISSING_VALUE) {
       return null;
-    } else {
+    }
+    else {
       return value;
     }
   }

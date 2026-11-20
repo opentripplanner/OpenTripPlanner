@@ -200,7 +200,8 @@ public class ValueObjectToStringBuilder {
 
     if (skipSep) {
       skipSep = false;
-    } else {
+    }
+    else {
       sb.append(FIELD_SEPARATOR);
     }
 

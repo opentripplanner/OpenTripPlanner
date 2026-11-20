@@ -250,9 +250,11 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
   ) {
     if (returnPolicy.equals(ANY_TYPE) && includeRealtimeAvailability) {
       return allowDropoffNow();
-    } else if (returnPolicy.equals(ANY_TYPE)) {
+    }
+    else if (returnPolicy.equals(ANY_TYPE)) {
       return true;
-    } else {
+    }
+    else {
       return availableDropoffFormFactors(includeRealtimeAvailability).contains(formFactor);
     }
   }

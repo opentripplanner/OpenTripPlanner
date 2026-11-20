@@ -91,7 +91,8 @@ abstract class NetexParser<T> {
   private static String resolveXmlTypeName(Object rel) {
     if (rel instanceof JAXBElement<?> jaxb) {
       return jaxb.getDeclaredType().getName();
-    } else {
+    }
+    else {
       return rel.getClass().getName();
     }
   }

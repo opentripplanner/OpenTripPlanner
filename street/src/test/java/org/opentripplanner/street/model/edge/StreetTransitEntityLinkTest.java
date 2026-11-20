@@ -75,7 +75,8 @@ class StreetTransitEntityLinkTest {
 
       if (onlyAccessible) {
         feature = AccessibilityRequest.ofOnlyAccessible();
-      } else {
+      }
+      else {
         feature = AccessibilityRequest.ofCost(100, 100);
       }
 

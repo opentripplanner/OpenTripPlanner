@@ -101,7 +101,8 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
         leg.getToStopPosition()
       );
       transit(leg.trip(), times);
-    } else {
+    }
+    else {
       throw new IllegalStateException("We expect an egress leg at the end of the RAPTOR path.");
     }
 
@@ -278,7 +279,8 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
       if (c != null && c.isFacilitated()) {
         if (c.isStaySeated()) {
           this.waitTimeOptimizedCost += waitTimeCostCalculator.calculateStaySeatedTransferCost();
-        } else if (c.isGuaranteed()) {
+        }
+        else if (c.isGuaranteed()) {
           this.waitTimeOptimizedCost += waitTimeCostCalculator.calculateGuaranteedTransferCost();
         }
 

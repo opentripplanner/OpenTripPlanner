@@ -130,7 +130,8 @@ public class StateData implements Cloneable {
                 d.vehicleRentalState == RENTING_FLOATING
             )
             .toList();
-        } else {
+        }
+        else {
           yield stateDatas;
         }
       }
@@ -198,7 +199,8 @@ public class StateData implements Cloneable {
         stationReturnedStateData.vehicleRentalState = HAVE_RENTED;
         stationReturnedStateData.currentMode = TraverseMode.WALK;
         res.add(stationReturnedStateData);
-      } else {
+      }
+      else {
         var beforeRentalStateData = proto.clone();
         beforeRentalStateData.vehicleRentalState = BEFORE_RENTING;
         res.add(beforeRentalStateData);
@@ -216,7 +218,8 @@ public class StateData implements Cloneable {
           ? TraverseMode.BICYCLE
           : TraverseMode.CAR;
       res.add(parkAndRideStateData);
-    } else {
+    }
+    else {
       res.add(proto.clone());
     }
 
@@ -258,7 +261,8 @@ public class StateData implements Cloneable {
   protected StateData clone() {
     try {
       return (StateData) super.clone();
-    } catch (CloneNotSupportedException e1) {
+    }
+    catch (CloneNotSupportedException e1) {
       throw new IllegalStateException("This is not happening");
     }
   }

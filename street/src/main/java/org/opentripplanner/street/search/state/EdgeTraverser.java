@@ -33,7 +33,8 @@ public class EdgeTraverser {
 
     try {
       it.forEachRemaining(states::add);
-    } catch (CouldNotTraverseException _) {
+    }
+    catch (CouldNotTraverseException _) {
       return Optional.empty();
     }
 
@@ -49,7 +50,8 @@ public class EdgeTraverser {
     while (it.hasNext()) {
       try {
         state = it.next();
-      } catch (CouldNotTraverseException _) {
+      }
+      catch (CouldNotTraverseException _) {
         return Optional.empty();
       }
     }
@@ -95,7 +97,8 @@ public class EdgeTraverser {
             nextState.length
           )
         );
-      } else if (State.isEmpty(nextState)) {
+      }
+      else if (State.isEmpty(nextState)) {
         throw new CouldNotTraverseException();
       }
 

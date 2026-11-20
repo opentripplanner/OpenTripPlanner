@@ -70,9 +70,11 @@ abstract class AbstractTable {
 
       if (child == null || child.isEmpty()) {
         LOG.error("Not found: {} : {}", node.fullPath(it.name()), it.type().docName());
-      } else if (it.type() == ConfigType.ARRAY) {
+      }
+      else if (it.type() == ConfigType.ARRAY) {
         addArrayChildrenToTable(it, child, table);
-      } else {
+      }
+      else {
         addParametersToTable(child, table);
       }
     }
@@ -103,7 +105,8 @@ abstract class AbstractTable {
 
     if (link.isPresent()) {
       parameter = MarkdownFormatter.linkToDoc(info.name(), link.get());
-    } else if (info.printDetails()) {
+    }
+    else if (info.printDetails()) {
       parameter = MarkdownFormatter.linkToAnchor(parameter, anchor(node, parameter));
     }
 

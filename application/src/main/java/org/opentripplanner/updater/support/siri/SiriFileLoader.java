@@ -36,7 +36,8 @@ public class SiriFileLoader implements SiriLoader {
       if (!directory.exists() || !directory.isDirectory()) {
         throw new IllegalArgumentException("Could not find directory: " + url);
       }
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       throw new RuntimeException(e.getMessage(), e);
     }
   }
@@ -86,7 +87,8 @@ public class SiriFileLoader implements SiriLoader {
           inProgressFile.renameTo(newFile(file, SUFFIX_OK));
           return Optional.of(siri);
         }
-      } catch (Exception ex) {
+      }
+      catch (Exception ex) {
         inProgressFile.renameTo(newFile(file, SUFFIX_FAILED));
         throw new RuntimeException(ex.getMessage(), ex);
       }

@@ -41,7 +41,8 @@ class TransactionalRepository<S, M> {
       S snapshot = lifecycle.freeze(this.repository);
       repositorySnapshotCache.put(nextTransaction, snapshot);
       reset();
-    } else {
+    }
+    else {
       // No changes to this repository; carry the last snapshot forward to the next transaction.
       S snapshot = repositorySnapshotCache.get(lastTransaction);
       repositorySnapshotCache.put(nextTransaction, snapshot);

@@ -44,15 +44,19 @@ public class GenericLocationMapper {
 
     if (stopId != null && lat != null && lon != null) {
       return Optional.of(GenericLocation.fromStopIdWithFallback(stopId, lat, lon, name));
-    } else if (stopId != null) {
+    }
+    else if (stopId != null) {
       return Optional.of(GenericLocation.fromStopId(stopId, name));
-    } else if (lat != null && lon != null) {
+    }
+    else if (lat != null && lon != null) {
       return Optional.of(GenericLocation.fromCoordinate(lat, lon, name));
-    } else if (serviceJourneyLocation != null) {
+    }
+    else if (serviceJourneyLocation != null) {
       return Optional.of(
         GenericLocation.fromTripLocation(mapTripLocation(serviceJourneyLocation), name)
       );
-    } else {
+    }
+    else {
       return Optional.empty();
     }
   }

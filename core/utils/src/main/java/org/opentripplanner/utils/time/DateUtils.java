@@ -74,7 +74,8 @@ public class DateUtils {
         //assume t = now
         retVal = LocalDateTime.of(localDate, retVal.toLocalTime()).atZone(tz);
       }
-    } else if (time != null) {
+    }
+    else if (time != null) {
       LocalTime localTime = parseTime(time);
 
       if (localTime != null) {
@@ -107,7 +108,8 @@ public class DateUtils {
             newString.substring(4, 6) +
             '.' +
             newString.substring(6, 8);
-        } else if (!newString.matches(".*20\\d\\d.*")) {
+        }
+        else if (!newString.matches(".*20\\d\\d.*")) {
           // if it looks like we have a small date format, ala 11.4.09, then use
           // another set of compares
           dateTimeFormatterList = SMALL_DF_LIST;
@@ -125,9 +127,11 @@ public class DateUtils {
               break;
             }
           }
-        } catch (DateTimeParseException ex) {}
+        }
+        catch (DateTimeParseException ex) {}
       }
-    } catch (Exception ex) {
+    }
+    catch (Exception ex) {
       throw new RuntimeException("Could not parse " + input);
     }
 
@@ -137,7 +141,8 @@ public class DateUtils {
   public static int getIntegerFromString(String input) {
     try {
       return Integer.parseInt(input);
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       return 0;
     }
   }
@@ -149,7 +154,8 @@ public class DateUtils {
       retVal = str.trim();
       retVal = retVal.replaceAll("%20;", "");
       retVal = retVal.replaceAll("%20", "");
-    } catch (Exception ex) {}
+    }
+    catch (Exception ex) {}
 
     return retVal;
   }
@@ -157,7 +163,8 @@ public class DateUtils {
   public static long absoluteTimeout(Duration timeout) {
     if (timeout == null) {
       return Long.MAX_VALUE;
-    } else {
+    }
+    else {
       return System.currentTimeMillis() + timeout.toMillis();
     }
   }
@@ -224,7 +231,8 @@ public class DateUtils {
       }
 
       return LocalTime.of(hour, min, sec);
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       throw new RuntimeException("Could not parse time: " + time, e);
     }
   }

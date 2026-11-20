@@ -310,7 +310,8 @@ public class GraphBuilderModules {
       gridCoverageFactories.add(
         createNedElevationFactory(dataSources.getNedCacheDirectory(), config)
       );
-    } else if (dataSources.hasDem()) {
+    }
+    else if (dataSources.hasDem()) {
       gridCoverageFactories.addAll(
         createDemGeotiffGridCoverageFactories(dataSources.getDemConfiguredDataSource())
       );

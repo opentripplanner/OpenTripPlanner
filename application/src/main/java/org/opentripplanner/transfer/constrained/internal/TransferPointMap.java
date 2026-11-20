@@ -29,17 +29,22 @@ class TransferPointMap<E> {
     if (point.isTripTransferPoint()) {
       var tp = point.asTripTransferPoint();
       tripMap.put(new TripKey(tp.getTrip(), tp.getStopPositionInPattern()), e);
-    } else if (point.isRouteStopTransferPoint()) {
+    }
+    else if (point.isRouteStopTransferPoint()) {
       var rp = point.asRouteStopTransferPoint();
       routeStopMap.put(new RouteStopKey(rp.getRoute(), rp.getStop()), e);
-    } else if (point.isRouteStationTransferPoint()) {
+    }
+    else if (point.isRouteStationTransferPoint()) {
       var rp = point.asRouteStationTransferPoint();
       routeStationMap.put(new RouteStationKey(rp.getRoute(), rp.getStation()), e);
-    } else if (point.isStopTransferPoint()) {
+    }
+    else if (point.isStopTransferPoint()) {
       stopMap.put(point.asStopTransferPoint().getStop(), e);
-    } else if (point.isStationTransferPoint()) {
+    }
+    else if (point.isStationTransferPoint()) {
       stationMap.put(point.asStationTransferPoint().getStation(), e);
-    } else {
+    }
+    else {
       throw new IllegalArgumentException("Unknown TransferPoint type: " + point);
     }
   }
@@ -50,21 +55,25 @@ class TransferPointMap<E> {
       return tripMap.computeIfAbsent(new TripKey(tp.getTrip(), tp.getStopPositionInPattern()), k ->
         creator.get()
       );
-    } else if (point.isRouteStopTransferPoint()) {
+    }
+    else if (point.isRouteStopTransferPoint()) {
       var rp = point.asRouteStopTransferPoint();
       return routeStopMap.computeIfAbsent(new RouteStopKey(rp.getRoute(), rp.getStop()), k ->
         creator.get()
       );
-    } else if (point.isRouteStationTransferPoint()) {
+    }
+    else if (point.isRouteStationTransferPoint()) {
       var rp = point.asRouteStationTransferPoint();
       return routeStationMap.computeIfAbsent(
         new RouteStationKey(rp.getRoute(), rp.getStation()),
         k -> creator.get()
       );
-    } else if (point.isStopTransferPoint()) {
+    }
+    else if (point.isStopTransferPoint()) {
       var sp = point.asStopTransferPoint();
       return stopMap.computeIfAbsent(sp.getStop(), k -> creator.get());
-    } else if (point.isStationTransferPoint()) {
+    }
+    else if (point.isStationTransferPoint()) {
       var sp = point.asStationTransferPoint();
       return stationMap.computeIfAbsent(sp.getStation(), k -> creator.get());
     }

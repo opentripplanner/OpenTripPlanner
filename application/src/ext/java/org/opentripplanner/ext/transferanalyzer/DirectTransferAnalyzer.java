@@ -107,7 +107,8 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
           .forEach(nearbyStop ->
             stopsStreets.putIfAbsent(getRegularStop(nearbyStop.stopId()), nearbyStop)
           );
-      } catch (Exception ignored) {}
+      }
+      catch (Exception ignored) {}
 
       RegularStop originStop = Objects.requireNonNull(
         transitRepository.getSiteRepository().getRegularStop(originStopVertex.getId())

@@ -22,7 +22,8 @@ public class FileSizeToTextConverter {
 
     if (n == 1) {
       return String.format(Locale.ROOT, "%d byte", n);
-    } else {
+    }
+    else {
       return String.format(Locale.ROOT, "%d bytes", n);
     }
   }

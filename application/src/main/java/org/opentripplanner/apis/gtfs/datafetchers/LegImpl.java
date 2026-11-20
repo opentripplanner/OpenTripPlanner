@@ -288,7 +288,8 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
 
       if (leg instanceof RideHailingLeg rhl) {
         return rhl.rideEstimate();
-      } else {
+      }
+      else {
         return null;
       }
     };
@@ -424,7 +425,8 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
           .map(Leg.class::cast)
           .toList();
         return res;
-      } else {
+      }
+      else {
         return null;
       }
     };

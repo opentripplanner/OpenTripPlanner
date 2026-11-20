@@ -48,7 +48,8 @@ public class RaptorService<T extends RaptorTripSchedule> {
 
     if (request.isDynamicSearch()) {
       response = new RangeRaptorDynamicSearch<>(config, data, extraMcSearch, request).route();
-    } else {
+    }
+    else {
       response = routeUsingStdWorker(data, request);
     }
 

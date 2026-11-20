@@ -18,7 +18,8 @@ class ElevationMapper {
 
       if (step.isYUnknown()) {
         str.append("NaN");
-      } else {
+      }
+      else {
         str.append(Math.round(step.y() * 10.0) / 10.0);
       }
 

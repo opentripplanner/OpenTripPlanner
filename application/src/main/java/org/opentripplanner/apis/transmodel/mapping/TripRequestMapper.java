@@ -94,7 +94,8 @@ public class TripRequestMapper {
           transitBuilder.withFilters(
             transitFilterNewWayMapper.mapFilter(environment.getArgument("filters"))
           );
-        } else {
+        }
+        else {
           transitFilterOldWayMapper.mapFilter(environment, callWith, transitBuilder);
         }
       });

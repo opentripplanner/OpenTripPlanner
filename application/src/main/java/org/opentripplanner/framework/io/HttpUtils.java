@@ -33,7 +33,8 @@ public final class HttpUtils {
 
     if (headers.getRequestHeader(HEADER_X_FORWARDED_PROTO) != null) {
       protocol = headers.getRequestHeader(HEADER_X_FORWARDED_PROTO).getFirst();
-    } else {
+    }
+    else {
       protocol = uri.getRequestUri().getScheme();
     }
 
@@ -41,9 +42,11 @@ public final class HttpUtils {
 
     if (headers.getRequestHeader(HEADER_X_FORWARDED_HOST) != null) {
       host = extractHost(headers.getRequestHeader(HEADER_X_FORWARDED_HOST).getFirst());
-    } else if (headers.getRequestHeader(HEADER_HOST) != null) {
+    }
+    else if (headers.getRequestHeader(HEADER_HOST) != null) {
       host = headers.getRequestHeader(HEADER_HOST).getFirst();
-    } else {
+    }
+    else {
       host = uri.getBaseUri().getHost() + ":" + uri.getBaseUri().getPort();
     }
 

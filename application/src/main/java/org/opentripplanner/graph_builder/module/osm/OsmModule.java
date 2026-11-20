@@ -276,7 +276,8 @@ public class OsmModule implements GraphBuilderModule {
       LOG.info(
         "Skipping visibility graph construction for walkable areas and using just area rings for edges."
       );
-    } else {
+    }
+    else {
       LOG.info("Building visibility graphs for walkable areas.");
     }
 
@@ -310,7 +311,8 @@ public class OsmModule implements GraphBuilderModule {
       for (OsmAreaGroup group : areaGroups) {
         walkableAreaBuilder.buildWithoutVisibility(group);
       }
-    } else {
+    }
+    else {
       ProgressTracker progress = ProgressTracker.track(
         "Build visibility graph for areas",
         50,
@@ -333,7 +335,8 @@ public class OsmModule implements GraphBuilderModule {
 
     if (skipVisibility) {
       LOG.info("Done building rings for walkable areas.");
-    } else {
+    }
+    else {
       LOG.info("Done building visibility graphs for walkable areas.");
     }
   }
@@ -391,7 +394,8 @@ public class OsmModule implements GraphBuilderModule {
           if (level != null) {
             levelsDiffer = true;
           }
-        } else {
+        }
+        else {
           if (!lastLevel.equals(level)) {
             levelsDiffer = true;
           }
@@ -477,7 +481,8 @@ public class OsmModule implements GraphBuilderModule {
 
           lineString = GeometryUtils.makeLineString(segmentCoordinates.toArray());
           segmentCoordinates.clear();
-        } else {
+        }
+        else {
           segmentCoordinates.add(osmEndNode.lon);
           segmentCoordinates.add(osmEndNode.lat);
           continue;
@@ -494,7 +499,8 @@ public class OsmModule implements GraphBuilderModule {
           if (ele.isPresent()) {
             elevationData.put(fromVertex, ele.getAsDouble());
           }
-        } else {
+        }
+        else {
           // subsequent iterations
           fromVertex = toVertex;
         }
@@ -510,7 +516,8 @@ public class OsmModule implements GraphBuilderModule {
           // Elevator way processing is done after the basic graph has been built.
           // However, intersection vertices are created in this loop.
           continue;
-        } else if (way.isEscalator()) {
+        }
+        else if (way.isEscalator()) {
           var length = GeometryUtils.sumDistances(lineString);
           EscalatorEdgePair escalatorEdgePair = escalatorProcessor.buildEscalatorEdge(
             way,
@@ -527,7 +534,8 @@ public class OsmModule implements GraphBuilderModule {
               way
             );
           }
-        } else {
+        }
+        else {
           StreetEdgePair streets = getEdgesForStreet(
             fromVertex,
             toVertex,
@@ -658,7 +666,8 @@ public class OsmModule implements GraphBuilderModule {
       for (TurnRestrictionTag tag : restrictionTags) {
         if (tag.via == startNode) {
           tag.possibleFrom.add(backStreet);
-        } else if (tag.via == endNode) {
+        }
+        else if (tag.via == endNode) {
           tag.possibleFrom.add(street);
         }
       }
@@ -670,7 +679,8 @@ public class OsmModule implements GraphBuilderModule {
       for (TurnRestrictionTag tag : restrictionTags) {
         if (tag.via == startNode) {
           tag.possibleTo.add(street);
-        } else if (tag.via == endNode) {
+        }
+        else if (tag.via == endNode) {
           tag.possibleTo.add(backStreet);
         }
       }

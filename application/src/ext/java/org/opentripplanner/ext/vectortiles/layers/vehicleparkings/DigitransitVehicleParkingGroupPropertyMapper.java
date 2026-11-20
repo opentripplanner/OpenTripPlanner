@@ -47,7 +47,8 @@ public class DigitransitVehicleParkingGroupPropertyMapper
         new KeyValue("name", i18NStringMapper.mapToApi(group.name())),
         new KeyValue("vehicleParking", string)
       );
-    } catch (JacksonException e) {
+    }
+    catch (JacksonException e) {
       throw new RuntimeException(e);
     }
   }

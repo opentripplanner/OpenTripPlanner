@@ -27,7 +27,8 @@ class OjpCodec {
         marshaller.marshal(ojpOutput, os);
         var writer = new OutputStreamWriter(os);
         writer.flush();
-      } catch (JAXBException e) {
+      }
+      catch (JAXBException e) {
         throw new RuntimeException(e);
       }
     };
@@ -36,7 +37,8 @@ class OjpCodec {
   private static JAXBContext jaxbContext() {
     try {
       return JAXBContext.newInstance(OJP.class);
-    } catch (JAXBException e) {
+    }
+    catch (JAXBException e) {
       throw new RuntimeException(e);
     }
   }

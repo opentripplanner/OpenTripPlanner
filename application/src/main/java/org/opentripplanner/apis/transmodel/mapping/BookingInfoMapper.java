@@ -20,19 +20,24 @@ public class BookingInfoMapper {
     if (earliestBookingTime == null) {
       if (latestBookingTime == null) {
         return "timeOfTravelOnly";
-      } else if (latestBookingTime.getDaysPrior() == 1) {
+      }
+      else if (latestBookingTime.getDaysPrior() == 1) {
         return "untilPreviousDay";
-      } else if (latestBookingTime.getDaysPrior() == 0) {
+      }
+      else if (latestBookingTime.getDaysPrior() == 0) {
         return "advanceAndDayOfTravel";
-      } else {
+      }
+      else {
         return "other";
       }
-    } else if (
+    }
+    else if (
       earliestBookingTime.getDaysPrior() == 0 &&
       (latestBookingTime == null || latestBookingTime.getDaysPrior() == 0)
     ) {
       return "dayOfTravelOnly";
-    } else {
+    }
+    else {
       return "other";
     }
   }

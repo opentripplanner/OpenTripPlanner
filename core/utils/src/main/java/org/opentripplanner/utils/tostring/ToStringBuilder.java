@@ -410,7 +410,8 @@ public class ToStringBuilder {
   private void addLabel(String name) {
     if (first) {
       first = false;
-    } else {
+    }
+    else {
       sb.append(FIELD_SEPARATOR);
     }
 

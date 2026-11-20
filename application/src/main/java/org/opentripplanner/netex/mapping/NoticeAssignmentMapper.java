@@ -95,16 +95,20 @@ class NoticeAssignmentMapper {
       for (TimetabledPassingTime time : times) {
         addStopTimeNotice(noticiesByEntity, time.getId(), otpNotice);
       }
-    } else if (stopTimesByNetexId.containsKey(noticedObjectId)) {
+    }
+    else if (stopTimesByNetexId.containsKey(noticedObjectId)) {
       addStopTimeNotice(noticiesByEntity, noticedObjectId, otpNotice);
-    } else {
+    }
+    else {
       FeedScopedId otpId = idFactory.createId(noticedObjectId);
 
       if (routesById.containsKey(otpId)) {
         noticiesByEntity.put(routesById.get(otpId), otpNotice);
-      } else if (tripsById.containsKey(otpId)) {
+      }
+      else if (tripsById.containsKey(otpId)) {
         noticiesByEntity.put(tripsById.get(otpId), otpNotice);
-      } else {
+      }
+      else {
         issueStore.add(
           "NoticeAssignmentWithUnknownEntity",
           "Could not map notice assignment %s for element with id %s",

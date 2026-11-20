@@ -121,7 +121,8 @@ public class TestVehicleRentalStationBuilder {
     if (vehicleTypesAvailable.isEmpty() || vehicleSpacesAvailable.isEmpty()) {
       typesAvailable = Map.of(RentalVehicleType.getDefaultType(NETWORK_1), vehicles);
       spacesAvailableMap = Map.of(RentalVehicleType.getDefaultType(NETWORK_1), spaces);
-    } else {
+    }
+    else {
       typesAvailable = vehicleTypesAvailable;
       spacesAvailableMap = vehicleSpacesAvailable;
     }

@@ -73,7 +73,8 @@ class ElevationProfileSlicerTest {
 
     if (expectedCoordinates == null) {
       assertNull(partialElevationProfile);
-    } else {
+    }
+    else {
       var expectedElevationProfile = new PackedCoordinateSequence.Double(
         expectedCoordinates,
         2,

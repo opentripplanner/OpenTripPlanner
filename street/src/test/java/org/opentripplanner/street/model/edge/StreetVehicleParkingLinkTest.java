@@ -73,7 +73,8 @@ class StreetVehicleParkingLinkTest {
 
     if (shouldTraverse) {
       assertFalse(State.isEmpty(result));
-    } else {
+    }
+    else {
       assertTrue(State.isEmpty(result));
     }
   }

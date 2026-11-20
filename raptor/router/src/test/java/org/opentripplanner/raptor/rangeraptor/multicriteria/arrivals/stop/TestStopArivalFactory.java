@@ -46,7 +46,8 @@ public class TestStopArivalFactory {
     if (nRounds == 0) {
       nLegs = 1;
       this.trasitLegCoeficient = -1.0f;
-    } else {
+    }
+    else {
       nLegs = 1 + nRounds + (arriveOnBoard ? 0 : 1);
       this.trasitLegCoeficient = 1.0f / nRounds;
     }

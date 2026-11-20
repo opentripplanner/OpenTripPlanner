@@ -234,7 +234,8 @@ public class VertexLinker {
           }
         }
       }
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       if (tempEdges != null) {
         tempEdges.disposeEdges();
       }
@@ -465,10 +466,12 @@ public class VertexLinker {
           if (distSquared(vertex, split) <= DUPLICATE_NODE_EPSILON_DEGREES_SQUARED) {
             // vertex is so close to the edge that we can use the split point directly
             start = split;
-          } else {
+          }
+          else {
             if (vertex instanceof IntersectionVertex iv) {
               start = iv;
-            } else {
+            }
+            else {
               start = createSplitVertex(aEdge, scope, vertex.getLon(), vertex.getLat());
             }
 
@@ -483,7 +486,8 @@ public class VertexLinker {
         // note that by definition, connection to closest edge cannot be blocked and edge can be
         // forced
         addVisibilityEdges(start, split, area, scope, tempEdges, true);
-      } else {
+      }
+      else {
         // vertex is outside an area. Use split point for area connections
         start = split;
       }
@@ -492,7 +496,8 @@ public class VertexLinker {
       if (!ag.visibilityVertices().contains(start)) {
         addAreaVertex(start, area, scope, tempEdges, false);
       }
-    } else {
+    }
+    else {
       start = split;
     }
 
@@ -618,7 +623,8 @@ public class VertexLinker {
         originalEdge
       );
       v = tsv;
-    } else {
+    }
+    else {
       v = splitterVertex(originalEdge, x, y, uniqueSplitLabel);
     }
 
@@ -742,7 +748,8 @@ public class VertexLinker {
       }
 
       return false;
-    } else if (scope == Scope.PERMANENT) {
+    }
+    else if (scope == Scope.PERMANENT) {
       // marking the new vertex as visibilityVertex enables direct connections to it
       areaGroup.addVisibilityVertex(newVertex);
     }

@@ -45,7 +45,8 @@ public class CostScalarFactory {
   private static Cost parseCost(String input) throws CoercingParseValueException {
     try {
       return Cost.fromDuration(DurationUtils.parseSecondsOrDuration(input).orElseThrow());
-    } catch (IllegalArgumentException | NoSuchElementException e) {
+    }
+    catch (IllegalArgumentException | NoSuchElementException e) {
       throw new CoercingParseValueException(e.getMessage(), e);
     }
   }

@@ -62,7 +62,8 @@ final class SecureXml {
       // a SAXParserFactory is not documented as thread-safe, so it is not shared between requests
       var reader = saxParserFactory().newSAXParser().getXMLReader();
       return new SAXSource(reader, new InputSource(xml));
-    } catch (ParserConfigurationException | SAXException e) {
+    }
+    catch (ParserConfigurationException | SAXException e) {
       throw new IllegalStateException("Could not create a hardened XML reader.", e);
     }
   }
@@ -95,7 +96,8 @@ final class SecureXml {
     throws ParserConfigurationException {
     try {
       factory.setFeature(name, value);
-    } catch (SAXNotRecognizedException | SAXNotSupportedException e) {
+    }
+    catch (SAXNotRecognizedException | SAXNotSupportedException e) {
       throw new ParserConfigurationException(
         "The XML parser does not support the security feature '%s'.".formatted(name)
       );
@@ -105,7 +107,8 @@ final class SecureXml {
   private static void enableSecureProcessing(TransformerFactory factory) {
     try {
       factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-    } catch (TransformerConfigurationException e) {
+    }
+    catch (TransformerConfigurationException e) {
       throw new IllegalStateException(
         "The XSLT implementation does not support secure processing.",
         e

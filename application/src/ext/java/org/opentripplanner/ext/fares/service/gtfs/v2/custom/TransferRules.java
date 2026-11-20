@@ -12,7 +12,8 @@ class TransferRules {
     return (transferMatch, product) -> {
       if (transferMatch.transferRule().fareProducts().isEmpty()) {
         return true;
-      } else {
+      }
+      else {
         return transferMatch
           .transferRule()
           .fareProducts()
@@ -24,7 +25,8 @@ class TransferRules {
               transferProduct.isFree()
             ) {
               return true;
-            } else {
+            }
+            else {
               return (
                 mediaMatches(transferProduct.medium(), product.medium()) &&
                 categoryMatches(transferProduct.category(), product.category())
@@ -38,7 +40,8 @@ class TransferRules {
   private static boolean categoryMatches(RiderCategory cat1, RiderCategory cat2) {
     if (cat1 == null && cat2 == null) {
       return true;
-    } else if (cat1 == null || cat2 == null) {
+    }
+    else if (cat1 == null || cat2 == null) {
       return false;
     }
 
@@ -48,7 +51,8 @@ class TransferRules {
   private static boolean mediaMatches(FareMedium medium, FareMedium medium1) {
     if (medium == null && medium1 == null) {
       return true;
-    } else if (medium == null || medium1 == null) {
+    }
+    else if (medium == null || medium1 == null) {
       return false;
     }
 

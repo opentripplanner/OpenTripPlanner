@@ -34,10 +34,12 @@ public class BikeSafetyEdgeRenderer implements EdgeVertexRenderer {
           palette.getColor(bikeSafety),
           String.format("%.02f", bikeSafety)
         );
-      } else {
+      }
+      else {
         return EdgeVisualAttributes.optional(Color.LIGHT_GRAY, "no bikes");
       }
-    } else if (e instanceof StreetVehicleRentalLink) {
+    }
+    else if (e instanceof StreetVehicleRentalLink) {
       return EdgeVisualAttributes.optional(palette.getColor(1.0f), "link");
     }
 
@@ -48,7 +50,8 @@ public class BikeSafetyEdgeRenderer implements EdgeVertexRenderer {
   public Optional<VertexVisualAttributes> renderVertex(Vertex v) {
     if (v instanceof VehicleRentalPlaceVertex) {
       return VertexVisualAttributes.optional(VEHICLE_RENTAL_COLOR_VERTEX, v.getDefaultName());
-    } else if (v instanceof IntersectionVertex) {
+    }
+    else if (v instanceof IntersectionVertex) {
       return VertexVisualAttributes.optional(Color.DARK_GRAY, null);
     }
 

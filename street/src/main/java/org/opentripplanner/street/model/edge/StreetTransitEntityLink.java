@@ -77,9 +77,11 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
         wheelchairAccessibility != Accessibility.POSSIBLE
       ) {
         return State.empty();
-      } else if (wheelchairAccessibility == Accessibility.NO_INFORMATION) {
+      }
+      else if (wheelchairAccessibility == Accessibility.NO_INFORMATION) {
         s1.incrementWeight(accessibility.stop().unknownCost());
-      } else if (wheelchairAccessibility == Accessibility.NOT_POSSIBLE) {
+      }
+      else if (wheelchairAccessibility == Accessibility.NOT_POSSIBLE) {
         s1.incrementWeight(accessibility.stop().inaccessibleCost());
       }
     }
@@ -118,7 +120,8 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
         if (s0.getCarPickupState() != null) {
           if (canDropOffAfterDriving(s0) && isLeavingStreetNetwork(s0.getRequest().arriveBy())) {
             dropOffAfterDriving(s0, s1);
-          } else {
+          }
+          else {
             yield State.empty();
           }
         }

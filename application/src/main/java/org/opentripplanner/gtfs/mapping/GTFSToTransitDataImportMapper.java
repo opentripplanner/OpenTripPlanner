@@ -253,9 +253,11 @@ public class GTFSToTransitDataImportMapper {
     for (Stop it : stops) {
       if (it.getLocationType() == LOCATION_TYPE_STOP) {
         builder.siteRepository().withRegularStop(stopMapper.map(it));
-      } else if (it.getLocationType() == LOCATION_TYPE_ENTRANCE_EXIT) {
+      }
+      else if (it.getLocationType() == LOCATION_TYPE_ENTRANCE_EXIT) {
         builder.siteRepository().withEntrance(entranceMapper.map(it));
-      } else if (it.getLocationType() == LOCATION_TYPE_NODE) {
+      }
+      else if (it.getLocationType() == LOCATION_TYPE_NODE) {
         builder.getPathwayNodes().add(pathwayNodeMapper.map(it));
       }
     }

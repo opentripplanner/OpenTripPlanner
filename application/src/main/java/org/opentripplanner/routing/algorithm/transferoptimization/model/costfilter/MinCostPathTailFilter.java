@@ -58,7 +58,8 @@ class MinCostPathTailFilter<T extends RaptorTripSchedule> implements PathTailFil
 
       if (cost == minCost) {
         result.add(it);
-      } else if (cost < minCost) {
+      }
+      else if (cost < minCost) {
         minCost = cost;
         result.clear();
         result.add(it);

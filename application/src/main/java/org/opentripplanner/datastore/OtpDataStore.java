@@ -233,7 +233,8 @@ public class OtpDataStore {
   ) {
     if (uri != null) {
       return findSourceUsingAllRepos(it -> it.findCompositeSource(uri, type));
-    } else {
+    }
+    else {
       return localRepository.findCompositeSource(filename, type);
     }
   }

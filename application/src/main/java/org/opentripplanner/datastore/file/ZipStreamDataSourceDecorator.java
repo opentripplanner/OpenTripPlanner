@@ -186,12 +186,14 @@ public class ZipStreamDataSourceDecorator implements CompositeDataSource {
 
         uncompressEntry(zis, entry);
       }
-    } catch (ZipException ex) {
+    }
+    catch (ZipException ex) {
       throw new RuntimeException(
         "Can not read zip file " + path() + ": " + ex.getLocalizedMessage(),
         ex
       );
-    } catch (IOException ie) {
+    }
+    catch (IOException ie) {
       throw new RuntimeException("Failed to load " + path() + ": " + ie.getLocalizedMessage(), ie);
     }
   }
@@ -212,7 +214,8 @@ public class ZipStreamDataSourceDecorator implements CompositeDataSource {
           false
         ).withBytes(byteArray)
       );
-    } else {
+    }
+    else {
       LOG.info(
         "The entry {} in the zip datasource {} is larger than 2GB. It will be stored on disk",
         entry.getName(),

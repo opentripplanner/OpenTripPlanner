@@ -108,7 +108,8 @@ class GbfsStationStatusMapper {
             .map(t -> new VehicleTypeCount(vehicleTypes.get(t), available.getCount()))
         )
         .collect(TYPE_MAP_COLLECTOR);
-    } else {
+    }
+    else {
       return Map.of();
     }
   }
@@ -116,7 +117,8 @@ class GbfsStationStatusMapper {
   private static ReturnPolicy returnPolicy(GBFSStation station) {
     if (station.getVehicleDocksAvailable() == null) {
       return ReturnPolicy.ANY_TYPE;
-    } else {
+    }
+    else {
       return ReturnPolicy.SPECIFIC_TYPES;
     }
   }

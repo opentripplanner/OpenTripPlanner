@@ -40,7 +40,8 @@ public class JourneyWhiteListed {
     if (whiteList == null) {
       this.authorityIds = Set.of();
       this.lineIds = Set.of();
-    } else {
+    }
+    else {
       this.authorityIds = Set.copyOf(idMapper.parseListNullSafe(whiteList.get("authorities")));
       this.lineIds = Set.copyOf(idMapper.parseListNullSafe(whiteList.get("lines")));
     }

@@ -127,7 +127,8 @@ public class TransportModeSlack {
         var modes = TransportModeInputMapper.mapTransitModes((List<?>) map.get("modes"));
         modes.forEach(m -> builder.with(m, Duration.ofSeconds(slack)));
       }
-    } else {
+    }
+    else {
       throw new IllegalArgumentException(
         "Expected List, but got: " + value + " (" + value.getClass() + ")"
       );

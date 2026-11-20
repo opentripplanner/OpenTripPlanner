@@ -54,7 +54,8 @@ public enum Message {
   public String get(Locale l) {
     try {
       return config.get(name(), l);
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       LOG.warn("No entry in Message.properties file could be found for string {}", name());
       return "";
     }

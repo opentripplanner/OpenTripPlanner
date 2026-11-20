@@ -33,7 +33,8 @@ public class EscalatorEdge extends Edge {
 
       if (duration == null) {
         time = getDistanceMeters() / s0.getRequest().walk().escalator().speed();
-      } else {
+      }
+      else {
         time = duration.toSeconds();
       }
 
@@ -41,7 +42,8 @@ public class EscalatorEdge extends Edge {
       s1.incrementTimeInSeconds((long) time);
       s1.incrementTraversalDistanceMeters(getDistanceMeters());
       return s1.makeStateArray();
-    } else {
+    }
+    else {
       return State.empty();
     }
   }

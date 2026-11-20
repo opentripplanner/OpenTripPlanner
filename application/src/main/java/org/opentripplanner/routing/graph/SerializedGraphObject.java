@@ -171,7 +171,8 @@ public class SerializedGraphObject implements Serializable {
   public static SerializedGraphObject load(File file) {
     try {
       return load(new FileInputStream(file), file.getAbsolutePath());
-    } catch (FileNotFoundException e) {
+    }
+    catch (FileNotFoundException e) {
       LOG.error("Graph file not found: " + file, e);
       throw new OtpAppException(e.getMessage());
     }
@@ -201,7 +202,8 @@ public class SerializedGraphObject implements Serializable {
   public void save(@Nullable DataSource target) {
     if (target != null) {
       save(target.asOutputStream(), target.name(), target.size());
-    } else {
+    }
+    else {
       LOG.info("Not saving graph to disk, as requested.");
     }
   }
@@ -232,10 +234,12 @@ public class SerializedGraphObject implements Serializable {
       serObj.transitRepository.index();
       serObj.logSerializationCompleteStatus();
       return serObj;
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       LOG.error("IO exception while loading graph: {}", e.getLocalizedMessage(), e);
       return null;
-    } catch (KryoException ke) {
+    }
+    catch (KryoException ke) {
       if (ke.getCause() instanceof IOException) {
         LOG.error("IO exception while loading graph: {}", ke.getLocalizedMessage(), ke);
         return null;

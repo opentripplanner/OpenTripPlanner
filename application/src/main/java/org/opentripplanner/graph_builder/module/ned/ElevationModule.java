@@ -72,7 +72,8 @@ public class ElevationModule implements GraphBuilderModule {
   static {
     try {
       WGS84_XY = CRS.getAuthorityFactory(true).createCoordinateReferenceSystem("EPSG:4326");
-    } catch (Exception ex) {
+    }
+    catch (Exception ex) {
       LOG.error("Unable to create longitude-first WGS84 CRS", ex);
       throw new RuntimeException(
         "Could not create longitude-first WGS84 coordinate reference system."
@@ -208,7 +209,8 @@ public class ElevationModule implements GraphBuilderModule {
       streetsWithElevationEdges
         .parallelStream()
         .forEach(ee -> processEdgeWithProgress(ee, progress));
-    } else {
+    }
+    else {
       // If using just a single thread, process each edge inline
       for (StreetEdge ee : streetsWithElevationEdges) {
         processEdgeWithProgress(ee, progress);
@@ -347,7 +349,8 @@ public class ElevationModule implements GraphBuilderModule {
             vertex,
             elevation - getApproximateEllipsoidToGeoidDifference(vertex.getY(), vertex.getX())
           );
-        } catch (TransformException e) {
+        }
+        catch (TransformException e) {
           LOG.error(
             "Error processing elevation for known elevation at vertex: {} due to error: {}",
             vertex,
@@ -491,12 +494,14 @@ public class ElevationModule implements GraphBuilderModule {
       );
 
       setEdgeElevationProfile(ee, elevPCS);
-    } catch (PointOutsideCoverageException _) {
+    }
+    catch (PointOutsideCoverageException _) {
       // Do not create an issue for each edge that falls out of coverage
       // (there can be many of them).
       // The total number of ignored edges is reported in a single issue
       // ElevationProfilePointsOutsideDEM.
-    } catch (ArrayIndexOutOfBoundsException | TransformException e) {
+    }
+    catch (ArrayIndexOutOfBoundsException | TransformException e) {
       issueStore.add(new ElevationProfileFailure(ee, e.getMessage()));
     }
   }
@@ -531,7 +536,8 @@ public class ElevationModule implements GraphBuilderModule {
           // point on the edge to initialize these other items.
           try {
             getElevation(coverage, examplarCoordinate);
-          } catch (
+          }
+          catch (
             PointOutsideCoverageException
             | ArrayIndexOutOfBoundsException
             | TransformException e
@@ -548,7 +554,8 @@ public class ElevationModule implements GraphBuilderModule {
       }
 
       return coverage;
-    } else {
+    }
+    else {
       if (singleThreadedCoverageInterpolator == null) {
         singleThreadedCoverageInterpolator = gridCoverageFactory.getGridCoverage();
       }
@@ -568,7 +575,8 @@ public class ElevationModule implements GraphBuilderModule {
       if (ee.isElevationFlattened()) {
         issueStore.add(new ElevationFlattened(ee));
       }
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       issueStore.add(new ElevationProfileFailure(ee, e.getMessage()));
     }
   }
@@ -615,7 +623,8 @@ public class ElevationModule implements GraphBuilderModule {
       // unprojected DEM
       // rasters to also use (long, lat).
       coverage.evaluate(new Position2D(WGS84_XY, x, y), values);
-    } catch (PointOutsideCoverageException e) {
+    }
+    catch (PointOutsideCoverageException e) {
       nPointsOutsideDEM.incrementAndGet();
       throw e;
     }

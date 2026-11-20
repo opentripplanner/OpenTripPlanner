@@ -187,7 +187,8 @@ class DefaultTransitDataImport implements TransitDataImport {
 
     if (c instanceof List) {
       list = (List<T>) c;
-    } else {
+    }
+    else {
       list = new ArrayList<>(c);
     }
 

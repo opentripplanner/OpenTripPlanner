@@ -38,7 +38,8 @@ public class ModePreferencesMapper {
 
     if (Boolean.TRUE.equals(modesInput.getGraphQLTransitOnly())) {
       journey.withDirect(new StreetRequest(StreetMode.NOT_SET));
-    } else if (direct != null) {
+    }
+    else if (direct != null) {
       if (direct.isEmpty()) {
         throw new InvalidInputException("Direct modes must not be empty.");
       }
@@ -52,11 +53,13 @@ public class ModePreferencesMapper {
 
     if (Boolean.TRUE.equals(modesInput.getGraphQLDirectOnly())) {
       journey.withTransit(TransitRequestBuilder::disable);
-    } else if (transit == null) {
+    }
+    else if (transit == null) {
       // even if there are no transit modes set, we need to set the filter to get the route/agency
       // filters for flex
       setTransitFilters(journey, NarrowedTransitMode.all(), args);
-    } else {
+    }
+    else {
       var access = transit.getGraphQLAccess();
 
       if (access != null) {
@@ -100,7 +103,8 @@ public class ModePreferencesMapper {
         // route/agency
         // includes/excludes
         setTransitFilters(journey, NarrowedTransitMode.all(), args);
-      } else {
+      }
+      else {
         if (planTransitModes.isEmpty()) {
           throw new InvalidInputException("Transit modes must not be empty.");
         }
@@ -132,7 +136,8 @@ public class ModePreferencesMapper {
         null,
         map(input.getGraphQLReplacement())
       );
-    } else {
+    }
+    else {
       return null;
     }
   }

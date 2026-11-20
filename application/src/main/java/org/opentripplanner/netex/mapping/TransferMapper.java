@@ -125,7 +125,8 @@ public class TransferMapper {
     if (it.getMaximumWaitTime() != null) {
       if (it.isGuaranteed()) {
         cBuilder.maxWaitTime((int) it.getMaximumWaitTime().toSeconds());
-      } else {
+      }
+      else {
         // Add a warning here and keep the interchange
         issueStore.add(new InterchangeMaxWaitTimeNotGuaranteed(it));
       }
@@ -171,7 +172,8 @@ public class TransferMapper {
       }
 
       errorMessage = "Scheduled-stop-point-ref not found";
-    } else {
+    }
+    else {
       errorMessage = "Service-journey not found";
     }
 

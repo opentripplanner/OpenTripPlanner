@@ -43,9 +43,11 @@ public class StopConditionsHelper {
   ) {
     if (entitySelector instanceof EntitySelector.Stop stop) {
       return matchesStopCondition(stop.stopConditions(), requestConditions);
-    } else if (entitySelector instanceof EntitySelector.StopAndRoute stopAndRoute) {
+    }
+    else if (entitySelector instanceof EntitySelector.StopAndRoute stopAndRoute) {
       return matchesStopCondition(stopAndRoute.stopConditions(), requestConditions);
-    } else if (entitySelector instanceof EntitySelector.StopAndTrip stopAndTrip) {
+    }
+    else if (entitySelector instanceof EntitySelector.StopAndTrip stopAndTrip) {
       return matchesStopCondition(stopAndTrip.stopConditions(), requestConditions);
     }
 

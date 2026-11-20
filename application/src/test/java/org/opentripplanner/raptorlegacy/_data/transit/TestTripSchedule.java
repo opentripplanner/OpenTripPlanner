@@ -232,7 +232,8 @@ public class TestTripSchedule implements TripSchedule {
     public TestTripSchedule build() {
       if (arrivalTimes == null) {
         arrivalTimes = copyWithOffset(departureTimes, -arrivalDepartureOffset);
-      } else if (departureTimes == null) {
+      }
+      else if (departureTimes == null) {
         departureTimes = copyWithOffset(arrivalTimes, arrivalDepartureOffset);
       }
 

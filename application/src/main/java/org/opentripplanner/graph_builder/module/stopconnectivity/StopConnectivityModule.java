@@ -60,7 +60,8 @@ public class StopConnectivityModule implements GraphBuilderModule {
       .map(stop -> {
         if (stop.isFerryStop()) {
           return checkFerryStop(stop, progress);
-        } else {
+        }
+        else {
           return checkWalkingConnection(stop, progress);
         }
       })
@@ -77,7 +78,8 @@ public class StopConnectivityModule implements GraphBuilderModule {
 
     if (stop.isConnectedToGraph()) {
       return null;
-    } else {
+    }
+    else {
       return new IsolatedStop(stop, Duration.ZERO);
     }
   }
@@ -114,7 +116,8 @@ public class StopConnectivityModule implements GraphBuilderModule {
 
     if (allowsTenMinuteWalking) {
       return null;
-    } else {
+    }
+    else {
       return new IsolatedStop(stop, Duration.ofSeconds(maxWalk_s));
     }
   }

@@ -67,7 +67,8 @@ public class StopConsolidationParser {
         })
         .distinct()
         .toList();
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       throw new RuntimeException(e);
     }
   }

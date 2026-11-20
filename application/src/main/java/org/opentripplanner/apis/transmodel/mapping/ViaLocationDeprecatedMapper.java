@@ -31,7 +31,8 @@ class ViaLocationDeprecatedMapper {
         (Duration) viaLocation.get("minSlack"),
         (Duration) viaLocation.get("maxSlack")
       );
-    } catch (IllegalArgumentException e) {
+    }
+    catch (IllegalArgumentException e) {
       throw new RoutingValidationException(
         List.of(new RoutingError(RoutingErrorCode.LOCATION_NOT_FOUND, INTERMEDIATE_PLACE))
       );

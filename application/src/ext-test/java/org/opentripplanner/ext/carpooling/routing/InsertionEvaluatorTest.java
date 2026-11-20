@@ -210,7 +210,8 @@ class InsertionEvaluatorTest {
         getCoordinate(from).equals(OSLO_CENTER) && getCoordinate(to).equals(OSLO_MIDPOINT_NORTH)
       ) {
         return null;
-      } else {
+      }
+      else {
         return RoutedSegment.of(mockPath);
       }
     };

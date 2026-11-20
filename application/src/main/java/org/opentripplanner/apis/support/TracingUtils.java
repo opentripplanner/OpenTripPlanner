@@ -53,9 +53,11 @@ public final class TracingUtils {
 
         if (headerValue != null) {
           return Tag.of(header, headerValue);
-        } else if (queryParameterValue != null) {
+        }
+        else if (queryParameterValue != null) {
           return Tag.of(header, queryParameterValue);
-        } else {
+        }
+        else {
           return Tag.of(header, UNKNOWN_VALUE);
         }
       })

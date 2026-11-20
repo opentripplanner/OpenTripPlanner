@@ -48,7 +48,8 @@ public final class MemEfficientArrayBuilder<T> {
       }
 
       array = Arrays.copyOf(original, original.length);
-    } else if (value == array[index]) {
+    }
+    else if (value == array[index]) {
       return this;
     }
 

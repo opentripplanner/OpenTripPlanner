@@ -34,7 +34,8 @@ class SpeedParser {
 
     try {
       originalUnits = (float) Double.parseDouble(m.group(1));
-    } catch (NumberFormatException e) {
+    }
+    catch (NumberFormatException e) {
       LOG.warn("Could not parse max speed {}", m.group(1));
       return null;
     }

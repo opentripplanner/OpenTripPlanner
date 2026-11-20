@@ -29,7 +29,8 @@ public final class BookingUrlTemplate {
     try {
       new URI(expand(urlTemplate, PROBE, PROBE));
       return true;
-    } catch (URISyntaxException e) {
+    }
+    catch (URISyntaxException e) {
       return false;
     }
   }

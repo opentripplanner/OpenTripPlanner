@@ -64,7 +64,8 @@ public class AdditionalSearchDays {
       var sw = getSearchWindowOrElseMax();
       var earliestStart = searchDateTime.minus(maxJourneyDuration.plus(sw));
       return daysInBetween(searchDateTime, earliestStart);
-    } else {
+    }
+    else {
       return 0;
     }
   }
@@ -75,7 +76,8 @@ public class AdditionalSearchDays {
   public int additionalSearchDaysInFuture() {
     if (arriveBy) {
       return 0;
-    } else {
+    }
+    else {
       var sw = getSearchWindowOrElseMax();
       var requestTime = searchDateTime;
       var lastArrival = requestTime.plus(maxJourneyDuration.plus(sw));

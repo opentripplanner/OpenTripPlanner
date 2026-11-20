@@ -21,10 +21,12 @@ class MIMEImageFormat {
     if (parts.length == 2 && parts[0].equals("image")) {
       if (ACCEPTED_TYPES.contains(parts[1])) {
         type = parts[1];
-      } else {
+      }
+      else {
         throw new BadRequestException("unsupported image format: " + parts[1]);
       }
-    } else {
+    }
+    else {
       throw new BadRequestException("malformed image format mime type: " + s);
     }
   }

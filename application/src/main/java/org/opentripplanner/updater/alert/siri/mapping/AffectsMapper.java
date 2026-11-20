@@ -125,7 +125,8 @@ public class AffectsMapper {
           if (trip != null) {
             // Match found - add tripId to selector
             tripIds.add(trip.getId());
-          } else if (siriFuzzyTripMatcher != null) {
+          }
+          else if (siriFuzzyTripMatcher != null) {
             // "Temporary", custom legacy solution - supports alerts tagged on NeTEx-"privateCode" +
             // serviceDate
             tripIds.addAll(
@@ -185,7 +186,8 @@ public class AffectsMapper {
                 tripOnServiceDate.getServiceDate()
               )
             );
-          } else {
+          }
+          else {
             // Not found - add generic Trip-selector - with legacy ServiceDate if provided
             selectors.addAll(
               mapTripSelectors(
@@ -230,7 +232,8 @@ public class AffectsMapper {
           );
           selectors.add(entitySelector);
         }
-      } else {
+      }
+      else {
         selectors.add(new EntitySelector.Trip(tripId, serviceDate));
       }
     }
@@ -304,17 +307,20 @@ public class AffectsMapper {
               );
               selectors.add(entitySelector);
             }
-          } else {
+          }
+          else {
             if (affectedDirections != null) {
               for (var dir : affectedDirections) {
                 selectors.add(new EntitySelector.DirectionAndRoute(affectedRoute, dir));
               }
-            } else {
+            }
+            else {
               selectors.add(new EntitySelector.Route(affectedRoute));
             }
           }
         }
-      } else {
+      }
+      else {
         NetworkRefStructure networkRef = affectedNetwork.getNetworkRef();
 
         if (networkRef == null || networkRef.getValue() == null) {
@@ -467,7 +473,8 @@ public class AffectsMapper {
 
     if (transitRepository.getSiteRepository().getRegularStop(id) != null) {
       return id;
-    } else if (transitRepository.getSiteRepository().getStationById(id) != null) {
+    }
+    else if (transitRepository.getSiteRepository().getStationById(id) != null) {
       return id;
     }
 

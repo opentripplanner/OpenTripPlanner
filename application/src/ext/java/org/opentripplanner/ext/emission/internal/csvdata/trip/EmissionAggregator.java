@@ -41,7 +41,8 @@ class EmissionAggregator {
       this.counts = null;
       this.fromStopSequenceRange = null;
       warnOnMissingStopPatternForTrip();
-    } else {
+    }
+    else {
       int size = stops.size() - 1;
       this.fromStopSequenceRange = IntRange.ofInclusive(1, size);
       this.emissions = new Emission[size];

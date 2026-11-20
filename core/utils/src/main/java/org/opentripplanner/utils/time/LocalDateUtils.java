@@ -26,7 +26,8 @@ public class LocalDateUtils {
     throws DateTimeParseException {
     if (text.startsWith("-") || text.startsWith("P")) {
       return timeZero.plus(Period.parse(text));
-    } else {
+    }
+    else {
       return LocalDate.parse(text);
     }
   }

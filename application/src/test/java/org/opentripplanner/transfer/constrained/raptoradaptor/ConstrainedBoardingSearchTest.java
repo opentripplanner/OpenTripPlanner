@@ -442,7 +442,8 @@ public class ConstrainedBoardingSearchTest {
       assertEquals(stopIndex, boarding.boardStopIndex());
       assertEquals(targetStopPos, boarding.stopPositionInPattern());
       assertEquals(expectedTripIndex, boarding.tripScheduleIndex());
-    } else {
+    }
+    else {
       assertTrue(boarding.empty());
     }
   }

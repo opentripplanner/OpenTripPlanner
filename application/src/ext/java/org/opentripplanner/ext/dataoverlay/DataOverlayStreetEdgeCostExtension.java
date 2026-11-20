@@ -108,7 +108,8 @@ class DataOverlayStreetEdgeCostExtension implements StreetEdgeCostExtension, Ser
           if (penaltyForParameters >= 0) {
             totalPenalty += penaltyForParameters;
           }
-        } else {
+        }
+        else {
           LOG.warn("No available data overlay for the given time");
         }
       }
@@ -144,7 +145,8 @@ class DataOverlayStreetEdgeCostExtension implements StreetEdgeCostExtension, Ser
         .build()
         .setVariables(variables);
       return expression.evaluate();
-    } catch (UnknownFunctionOrVariableException ex) {
+    }
+    catch (UnknownFunctionOrVariableException ex) {
       throw new IllegalArgumentException(
         String.format("Formula %s did not receive all the required parameters", formula)
       );

@@ -67,7 +67,8 @@ public class EmissionDataReader {
       var routeReader = new RouteDataReader(emissionDataSource, issueStore);
       this.emissionRepository.addRouteEmissions(routeReader.read(resolvedFeedId, m -> LOG.info(m)));
       return;
-    } catch (HeadersDoNotMatch ignore) {}
+    }
+    catch (HeadersDoNotMatch ignore) {}
 
     try {
       // Assume input CO₂ emission data is per trip hop
@@ -77,7 +78,8 @@ public class EmissionDataReader {
         tripHopMapper.map(tripReader.read(m -> LOG.info(m)))
       );
       return;
-    } catch (HeadersDoNotMatch ignore) {}
+    }
+    catch (HeadersDoNotMatch ignore) {}
 
     LOG.error(
       "No emission data read from: " +

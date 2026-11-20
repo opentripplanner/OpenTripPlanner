@@ -26,7 +26,8 @@ class Deserializer {
     try {
       // Assume deprecated fields are included in the token
       return readFields(definition, false);
-    } catch (Exception ignore) {
+    }
+    catch (Exception ignore) {
       // If the token is the next version, then deprecated field are removed. Try
       // skipping the deprecated tokens
       return readFields(definition, true);

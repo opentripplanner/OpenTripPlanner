@@ -85,13 +85,16 @@ public class OsmAreaGroup {
 
         if (geom instanceof Polygon polygon) {
           outermostRings.add(toRing(polygon, nodeMap));
-        } else {
+        }
+        else {
           LOG.warn("Unexpected non-polygon when merging areas: {}", geom);
         }
       }
-    } else if (this.union instanceof Polygon polygon) {
+    }
+    else if (this.union instanceof Polygon polygon) {
       outermostRings.add(toRing(polygon, nodeMap));
-    } else {
+    }
+    else {
       LOG.warn("Unexpected non-polygon when merging areas: {}", this.union);
     }
   }
@@ -190,7 +193,8 @@ public class OsmAreaGroup {
     for (Set<OsmArea> areaSet : groups.sets()) {
       try {
         out.add(new OsmAreaGroup(areaSet));
-      } catch (RingConstructionException e) {
+      }
+      catch (RingConstructionException e) {
         for (OsmArea area : areaSet) {
           LOG.debug(
             "Failed to create merged area for " +

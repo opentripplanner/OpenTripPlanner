@@ -126,7 +126,8 @@ public class NetexModule implements GraphBuilderModule {
         issueStore,
         transitRepository.getTimeZone()
       );
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       throw new RuntimeException(e);
     }
   }

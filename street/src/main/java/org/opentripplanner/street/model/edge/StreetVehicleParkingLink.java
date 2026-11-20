@@ -57,7 +57,8 @@ public class StreetVehicleParkingLink extends Edge {
       if (!entrance.isCarAccessible()) {
         return State.empty();
       }
-    } else if (!entrance.isWalkAccessible()) {
+    }
+    else if (!entrance.isWalkAccessible()) {
       return State.empty();
     }
 

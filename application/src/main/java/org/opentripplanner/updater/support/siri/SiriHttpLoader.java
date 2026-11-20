@@ -76,7 +76,8 @@ public class SiriHttpLoader implements SiriLoader {
         requestTimer.responseUnmarshalled();
         return Optional.of(siri);
       });
-    } finally {
+    }
+    finally {
       LOG.info(
         "Updating SIRI-{} [{}]: Create req: {} ms, Fetching data: {} ms, Unmarshalling: {} ms",
         requestTimer.feedType,

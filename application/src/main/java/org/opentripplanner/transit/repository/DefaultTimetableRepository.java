@@ -823,9 +823,11 @@ public class DefaultTimetableRepository implements TimetableRepository {
 
             if (tripTimes == null) {
               LOG.debug("No triptimes to remove for trip {}", tripId);
-            } else if (tripTimesToRemove != null) {
+            }
+            else if (tripTimesToRemove != null) {
               LOG.debug("Found two triptimes to remove for trip {}", tripId);
-            } else {
+            }
+            else {
               tripTimesToRemove = tripTimes;
             }
           }
@@ -868,14 +870,16 @@ public class DefaultTimetableRepository implements TimetableRepository {
       for (Timetable timetable : sortedTimetables) {
         if (serviceDate.isBefore(timetable.getServiceDate())) {
           toKeepTimetables.add(timetable);
-        } else {
+        }
+        else {
           modified = true;
         }
       }
 
       if (toKeepTimetables.isEmpty()) {
         it.remove();
-      } else {
+      }
+      else {
         timetables.put(patternId, ImmutableSortedSet.copyOfSorted(toKeepTimetables));
       }
     }
@@ -1060,7 +1064,8 @@ public class DefaultTimetableRepository implements TimetableRepository {
 
     if (sortedTimetables == null) {
       sortedTimetables = new TreeSet<>(new SortedTimetableComparator());
-    } else {
+    }
+    else {
       SortedSet<Timetable> temp = new TreeSet<>(new SortedTimetableComparator());
       temp.addAll(sortedTimetables);
       sortedTimetables = temp;

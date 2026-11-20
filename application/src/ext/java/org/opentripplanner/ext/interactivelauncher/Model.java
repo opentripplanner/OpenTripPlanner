@@ -43,7 +43,8 @@ public class Model implements Serializable {
     try {
       var mapper = new JsonMapper();
       return mapper.readValue(MODEL_FILE, Model.class).initSubModels();
-    } catch (JacksonException e) {
+    }
+    catch (JacksonException e) {
       System.err.println(
         "Unable to read the InteractiveOtpMain state cache. If the model changed this " +
           "is expected, and it will work next time. Cause: " +
@@ -59,7 +60,8 @@ public class Model implements Serializable {
         .configure(SerializationFeature.INDENT_OUTPUT, true)
         .build()
         .writeValue(MODEL_FILE, this);
-    } catch (JacksonException e) {
+    }
+    catch (JacksonException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
   }

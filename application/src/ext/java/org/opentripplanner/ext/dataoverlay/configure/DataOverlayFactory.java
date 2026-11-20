@@ -27,7 +27,8 @@ public class DataOverlayFactory {
         new GenericDataFile(dataFile, config),
         config.getTimeFormat()
       );
-    } else {
+    }
+    else {
       LOG.error("No data input {} found!", dataFile);
       return null;
     }

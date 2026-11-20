@@ -283,10 +283,12 @@ public class SpeedTest {
       if (speedTest.transitRepository.getUpdaterManager() != null) {
         speedTest.transitRepository.getUpdaterManager().stop();
       }
-    } catch (OtpAppException ae) {
+    }
+    catch (OtpAppException ae) {
       System.err.println(ae.getMessage());
       System.exit(1);
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       System.err.println(e.getMessage());
       e.printStackTrace(System.err);
       System.exit(1);
@@ -364,9 +366,11 @@ public class SpeedTest {
       testCase.assertResult(profile, itineraries, transitTime, totalTime);
       // Report success
       ResultPrinter.printResultOk(testCase, opts.verbose());
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       ResultPrinter.printResultFailed(testCase, e);
-    } finally {
+    }
+    finally {
       status = status.highestSeverity(testCase.status());
     }
   }

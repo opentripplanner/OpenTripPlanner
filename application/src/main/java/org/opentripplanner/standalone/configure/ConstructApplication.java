@@ -280,7 +280,8 @@ public class ConstructApplication {
       var c = factory.worldEnvelopeService().envelope().orElseThrow().center();
       double value = EllipsoidUtils.computeEllipsoidToGeoidDifference(c.latitude(), c.longitude());
       graph().initEllipsoidToGeoidDifference(value, c.latitude(), c.longitude());
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       LOG.error("Error computing ellipsoid/geoid difference");
     }
   }

@@ -266,7 +266,8 @@ public class GeometryProcessor {
           if (minSegmentIndexForThisStop == -1) {
             minSegmentIndexForThisStop = index;
           }
-        } else if (distance < bestDistance) {
+        }
+        else if (distance < bestDistance) {
           bestDistance = distance;
           bestSegment = segment;
 
@@ -281,7 +282,8 @@ public class GeometryProcessor {
         //fall back to nearest segment
         stopSegments.add(bestSegment);
         minSegmentIndex = bestSegment.index;
-      } else {
+      }
+      else {
         minSegmentIndex = minSegmentIndexForThisStop;
       }
 
@@ -393,9 +395,11 @@ public class GeometryProcessor {
 
           if (continuousSegments.isEmpty()) {
             shouldStartNewSegment = true;
-          } else if (stopPositionInPattern + 1 == stopTimes.size()) {
+          }
+          else if (stopPositionInPattern + 1 == stopTimes.size()) {
             shouldStartNewSegment = false;
-          } else {
+          }
+          else {
             var lastSegment = continuousSegments.getLast().getLast();
             var segmentsForNextStop = possibleSegmentsForStop.get(stopPositionInPattern + 1);
             var s = segment;
@@ -461,7 +465,8 @@ public class GeometryProcessor {
     if (distances == null) {
       issueStore.add(new BogusShapeGeometry(shapeId));
       return null;
-    } else {
+    }
+    else {
       LinearLocation startIndex = getSegmentFraction(distances, startDistance);
       LinearLocation endIndex = getSegmentFraction(distances, endDistance);
 
@@ -530,7 +535,8 @@ public class GeometryProcessor {
       maxStopToShapeSnapDistance
     ) {
       return false;
-    } else if (
+    }
+    else if (
       SphericalDistanceLibrary.fastDistance(endCoord, geometryEndCoord) > maxStopToShapeSnapDistance
     ) {
       return false;
@@ -601,7 +607,8 @@ public class GeometryProcessor {
       if (last == null || last.sequence() != sp.sequence()) {
         if (last != null && last.sameCoordinates(sp)) {
           LOG.trace("pair of identical shape points (skipping): {} {}", last, sp);
-        } else {
+        }
+        else {
           filtered.add(sp);
         }
       }

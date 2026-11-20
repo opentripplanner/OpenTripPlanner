@@ -92,7 +92,8 @@ public class SiriAzureUpdater implements GraphUpdater<TransitRealTimeUpdateConte
 
     try {
       this.dataInitializationUrl = config.buildDataInitializationUrl().orElse(null);
-    } catch (URISyntaxException e) {
+    }
+    catch (URISyntaxException e) {
       throw new IllegalArgumentException("Invalid history url", e);
     }
 
@@ -113,13 +114,15 @@ public class SiriAzureUpdater implements GraphUpdater<TransitRealTimeUpdateConte
         "fullyQualifiedNamespace must not be null when using FederatedIdentity authentication"
       );
       this.serviceBusUrl = null;
-    } else if (authenticationType == AuthenticationType.SharedAccessKey) {
+    }
+    else if (authenticationType == AuthenticationType.SharedAccessKey) {
       this.serviceBusUrl = Objects.requireNonNull(
         config.getServiceBusUrl(),
         "serviceBusUrl must not be null when using SharedAccessKey authentication"
       );
       this.fullyQualifiedNamespace = null;
-    } else {
+    }
+    else {
       throw new IllegalArgumentException("Unsupported authentication type: " + authenticationType);
     }
   }
@@ -194,7 +197,8 @@ public class SiriAzureUpdater implements GraphUpdater<TransitRealTimeUpdateConte
 
         if (initialData.isEmpty()) {
           LOG.info("Got empty response from history endpoint");
-        } else {
+        }
+        else {
           processInitialSiriData(initialData.get());
         }
       }, updaterType + ":HistoricalSiriData");
@@ -208,7 +212,8 @@ public class SiriAzureUpdater implements GraphUpdater<TransitRealTimeUpdateConte
 
       // Register shutdown hook only once, and only after subscriptionName is set
       registerShutdownHook();
-    } catch (InterruptedException e) {
+    }
+    catch (InterruptedException e) {
       LOG.info("Startup interrupted, aborting updater initialization");
       // Preserve interrupt status
       Thread.currentThread().interrupt();
@@ -228,7 +233,8 @@ public class SiriAzureUpdater implements GraphUpdater<TransitRealTimeUpdateConte
       otpRetry.execute(task);
       LOG.info("{} completed successfully", stepDescription);
       return true;
-    } catch (OtpRetryException e) {
+    }
+    catch (OtpRetryException e) {
       String message = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
       LOG.warn(
         "REALTIME_STARTUP_FAILED_ALERT component={} status=FAILED error={}",
@@ -257,7 +263,8 @@ public class SiriAzureUpdater implements GraphUpdater<TransitRealTimeUpdateConte
       try {
         eventProcessor.close();
         LOG.debug("Event processor closed successfully");
-      } catch (Exception e) {
+      }
+      catch (Exception e) {
         LOG.warn("Error closing event processor: {}", e.getMessage());
       }
     }
@@ -267,7 +274,8 @@ public class SiriAzureUpdater implements GraphUpdater<TransitRealTimeUpdateConte
       try {
         serviceBusAdmin.deleteSubscription(topicName, subscriptionName);
         LOG.info("Subscription '{}' deleted on topic '{}'", subscriptionName, topicName);
-      } catch (Exception e) {
+      }
+      catch (Exception e) {
         LOG.warn("Error deleting subscription '{}': {}", subscriptionName, e.getMessage());
       }
     }
@@ -292,7 +300,8 @@ public class SiriAzureUpdater implements GraphUpdater<TransitRealTimeUpdateConte
             .build()
         )
         .buildClient();
-    } else if (authenticationType == AuthenticationType.SharedAccessKey) {
+    }
+    else if (authenticationType == AuthenticationType.SharedAccessKey) {
       serviceBusAdmin = new ServiceBusAdministrationClientBuilder()
         .connectionString(serviceBusUrl)
         .buildClient();
@@ -332,13 +341,15 @@ public class SiriAzureUpdater implements GraphUpdater<TransitRealTimeUpdateConte
       clientBuilder
         .fullyQualifiedNamespace(fullyQualifiedNamespace)
         .credential(new DefaultAzureCredentialBuilder().build());
-    } else if (authenticationType == AuthenticationType.SharedAccessKey) {
+    }
+    else if (authenticationType == AuthenticationType.SharedAccessKey) {
       Objects.requireNonNull(
         serviceBusUrl,
         "serviceBusUrl must be set for SharedAccessKey authentication"
       );
       clientBuilder.connectionString(serviceBusUrl);
-    } else {
+    }
+    else {
       throw new IllegalArgumentException("Unsupported authentication type: " + authenticationType);
     }
 
@@ -379,13 +390,16 @@ public class SiriAzureUpdater implements GraphUpdater<TransitRealTimeUpdateConte
       if (serviceDelivery == null) {
         if (siri.getHeartbeatNotification() != null) {
           LOG.debug("Updater {} received SIRI heartbeat message", updaterType);
-        } else {
+        }
+        else {
           LOG.debug("Updater {} received SIRI message without ServiceDelivery", updaterType);
         }
-      } else {
+      }
+      else {
         messageHandler.handleMessage(serviceDelivery, message.getMessageId());
       }
-    } catch (JAXBException | XMLStreamException e) {
+    }
+    catch (JAXBException | XMLStreamException e) {
       LOG.error(e.getLocalizedMessage(), e);
     }
   }
@@ -450,10 +464,12 @@ public class SiriAzureUpdater implements GraphUpdater<TransitRealTimeUpdateConte
       }
 
       LOG.info("{} updater initialized in {} ms.", updaterType, System.currentTimeMillis() - t1);
-    } catch (InterruptedException e) {
+    }
+    catch (InterruptedException e) {
       Thread.currentThread().interrupt();
       throw new SiriAzureInitializationException("Interrupted while applying history", e);
-    } catch (ExecutionException e) {
+    }
+    catch (ExecutionException e) {
       throw new SiriAzureInitializationException("Error applying history", e);
     }
   }
@@ -489,9 +505,11 @@ public class SiriAzureUpdater implements GraphUpdater<TransitRealTimeUpdateConte
         reason,
         e.getMessage()
       );
-    } else if (reason == ServiceBusFailureReason.MESSAGE_LOCK_LOST) {
+    }
+    else if (reason == ServiceBusFailureReason.MESSAGE_LOCK_LOST) {
       LOG.error("Message lock lost for message", e);
-    } else if (
+    }
+    else if (
       reason == ServiceBusFailureReason.SERVICE_BUSY ||
       reason == ServiceBusFailureReason.UNAUTHORIZED
     ) {
@@ -500,11 +518,13 @@ public class SiriAzureUpdater implements GraphUpdater<TransitRealTimeUpdateConte
       try {
         // Wait before retrying when Service Bus is busy or unauthorized
         TimeUnit.SECONDS.sleep(ERROR_RETRY_WAIT_SECONDS);
-      } catch (InterruptedException ie) {
+      }
+      catch (InterruptedException ie) {
         Thread.currentThread().interrupt();
         LOG.info("OTP is shutting down, stopping processing of ServiceBus error messages");
       }
-    } else {
+    }
+    else {
       LOG.error(e.getLocalizedMessage(), e);
     }
   }

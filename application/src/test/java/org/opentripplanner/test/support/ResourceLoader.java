@@ -68,7 +68,8 @@ public class ResourceLoader {
 
     try {
       file = new File(new URI(resource.toString()));
-    } catch (URISyntaxException e) {
+    }
+    catch (URISyntaxException e) {
       throw new RuntimeException(e);
     }
 
@@ -82,7 +83,8 @@ public class ResourceLoader {
   public String fileToString(String p) {
     try {
       return Files.readString(file(p).toPath());
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       throw new RuntimeException(e);
     }
   }
@@ -128,7 +130,8 @@ public class ResourceLoader {
   public URI uri(String s) {
     try {
       return url(s).toURI();
-    } catch (URISyntaxException e) {
+    }
+    catch (URISyntaxException e) {
       throw new IllegalArgumentException(e);
     }
   }
@@ -141,7 +144,8 @@ public class ResourceLoader {
 
     try {
       return Files.readAllLines(path, StandardCharsets.UTF_8).stream().limit(lines).toList();
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       throw new RuntimeException(e);
     }
   }
@@ -152,7 +156,8 @@ public class ResourceLoader {
   public InputStream inputStream(String path) {
     try {
       return url(path).openStream();
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       throw new RuntimeException(e);
     }
   }

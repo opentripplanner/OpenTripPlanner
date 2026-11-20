@@ -98,7 +98,8 @@ public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule
 
     if (boarding.empty()) {
       boardSameTrip(boarding.earliestBoardTime(), stopPos);
-    } else {
+    }
+    else {
       board(boarding);
     }
   }
@@ -131,7 +132,8 @@ public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule
       //       this check can be removed.
       if (calculator.isBefore(stopArrivalTime, onTripBoardTime)) {
         logInvalidAlightTime(stopPos, stopArrivalTime);
-      } else {
+      }
+      else {
         state.transitToStop(stopIndex, stopArrivalTime, onTripBoardStopPosition, onTrip);
       }
     }

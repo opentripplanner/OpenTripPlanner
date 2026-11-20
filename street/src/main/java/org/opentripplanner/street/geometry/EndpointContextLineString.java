@@ -235,7 +235,8 @@ public final class EndpointContextLineString {
 
     if (t < 0.0) {
       t = 0.0;
-    } else if (t > 1.0) {
+    }
+    else if (t > 1.0) {
       t = 1.0;
     }
 

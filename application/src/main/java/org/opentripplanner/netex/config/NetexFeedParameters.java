@@ -302,7 +302,8 @@ public class NetexFeedParameters implements DataSourceConfig {
     private Builder applyIgnore(boolean ignore, IgnorableFeature feature) {
       if (ignore) {
         ignoredFeatures.add(feature);
-      } else {
+      }
+      else {
         ignoredFeatures.remove(feature);
       }
 

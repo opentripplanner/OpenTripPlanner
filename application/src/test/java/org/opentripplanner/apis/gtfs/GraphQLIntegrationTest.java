@@ -610,7 +610,8 @@ class GraphQLIntegrationTest {
   private static Integer sortOrder(TransitMode m) {
     if (m.ordinal() == 0) {
       return null;
-    } else {
+    }
+    else {
       return m.ordinal();
     }
   }
@@ -750,7 +751,8 @@ class GraphQLIntegrationTest {
           var baos = new ByteArrayOutputStream();
           streaming.write(baos);
           return baos.toString(StandardCharsets.UTF_8);
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
           fail("Failed to read streaming response: " + e.getMessage());
         }
       }

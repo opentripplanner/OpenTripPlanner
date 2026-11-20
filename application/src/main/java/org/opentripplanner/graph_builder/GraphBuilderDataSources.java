@@ -220,7 +220,8 @@ public class GraphBuilderDataSources implements Closeable {
         if (dataSource instanceof Closeable closeable) {
           closeable.close();
         }
-      } catch (IOException e) {
+      }
+      catch (IOException e) {
         LOG.error(
           "Failed to close datasource {}, details: {}",
           dataSource.path(),
@@ -368,18 +369,21 @@ public class GraphBuilderDataSources implements Closeable {
       if (!hasOsm() && !hasTransitOrTaxiData()) {
         throw new OtpAppException("Unable to build graph, no transit nor OSM data available.");
       }
-    } else if (cli.buildStreet) {
+    }
+    else if (cli.buildStreet) {
       if (!hasOsm()) {
         throw new OtpAppException("Unable to build street graph, no OSM data available.");
       }
-    } else if (cli.load) {
+    }
+    else if (cli.load) {
       if (!store.getGraph().exists()) {
         throw new OtpAppException(
           "Unable to load graph, no graph file found: %s",
           store.getGraph().path()
         );
       }
-    } else if (cli.loadStreet) {
+    }
+    else if (cli.loadStreet) {
       if (!store.getStreetGraph().exists()) {
         throw new OtpAppException(
           "Unable to load street graph, no street graph file found: %s",
@@ -396,7 +400,8 @@ public class GraphBuilderDataSources implements Closeable {
   private DataSource getOutputGraph(CommandLineParameters cli) {
     if (cli.doSaveGraph()) {
       return store.getGraph();
-    } else if (cli.doSaveStreetGraph()) {
+    }
+    else if (cli.doSaveStreetGraph()) {
       return store.getStreetGraph();
     }
 
@@ -407,7 +412,8 @@ public class GraphBuilderDataSources implements Closeable {
     // Add or remove type - we do not care if the element already exist or not
     if (include) {
       includeTypes.add(type);
-    } else {
+    }
+    else {
       includeTypes.remove(type);
     }
   }
@@ -416,7 +422,8 @@ public class GraphBuilderDataSources implements Closeable {
     for (FileType type : FileType.values()) {
       if (includeTypes.contains(type)) {
         inputData.putAll(type, store.listExistingSourcesFor(type));
-      } else {
+      }
+      else {
         skipData.putAll(type, store.listExistingSourcesFor(type));
       }
     }

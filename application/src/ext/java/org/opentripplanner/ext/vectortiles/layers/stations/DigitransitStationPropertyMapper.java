@@ -80,7 +80,8 @@ public class DigitransitStationPropertyMapper extends PropertyMapper<Station> {
           )
         )
       );
-    } catch (JacksonException e) {
+    }
+    catch (JacksonException e) {
       throw new RuntimeException(e);
     }
   }

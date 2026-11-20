@@ -75,7 +75,8 @@ class TimeframeMatcher {
     if (end.isBefore(start)) {
       // Timeframe crosses midnight, e.g., 22:00 to 02:00
       return !localTime.isBefore(start) || !localTime.isAfter(end);
-    } else {
+    }
+    else {
       // Normal case: start <= time <= end
       return !localTime.isBefore(start) && !localTime.isAfter(end);
     }

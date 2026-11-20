@@ -126,7 +126,8 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
 
     try {
       expectRequestResponseToMatchSnapshot(request);
-    } catch (CompletionException e) {
+    }
+    catch (CompletionException e) {
       RoutingValidationException.unwrapAndRethrowCompletionException(e);
     }
   }

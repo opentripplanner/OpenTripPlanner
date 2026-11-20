@@ -47,18 +47,22 @@ public class RequestHandler {
         var ojpResponse = ojpService.handleStopEventRequest(ser);
         StreamingOutput stream = responseMapper.apply(ojpResponse);
         return Response.ok(stream).build();
-      } else if (request instanceof OJPTripRequestStructure tr) {
+      }
+      else if (request instanceof OJPTripRequestStructure tr) {
         var ojpResponse = ojpService.handleTripRequest(tr, defaultRequest);
         StreamingOutput stream = responseMapper.apply(ojpResponse);
         return Response.ok(stream).build();
-      } else {
+      }
+      else {
         return error(
           "Request type '%s' is not supported".formatted(request.getClass().getSimpleName())
         );
       }
-    } catch (EntityNotFoundException | RoutingValidationException e) {
+    }
+    catch (EntityNotFoundException | RoutingValidationException e) {
       return error(e.getMessage());
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       LOG.error("Error processing %s request".formatted(apiName), e);
       return error(e.getMessage());
     }

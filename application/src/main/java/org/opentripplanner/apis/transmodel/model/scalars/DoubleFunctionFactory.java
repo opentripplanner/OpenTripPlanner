@@ -54,7 +54,8 @@ public class DoubleFunctionFactory {
             try {
               String text = (String) input;
               return LinearFunctionSerialization.parse(text, DoubleFunction::new).orElseThrow();
-            } catch (IllegalArgumentException | NoSuchElementException e) {
+            }
+            catch (IllegalArgumentException | NoSuchElementException e) {
               throw new CoercingParseValueException(e.getMessage(), e);
             }
           }

@@ -31,7 +31,8 @@ class FilterFactory {
 
     if (mode.getSubMode() == null) {
       return new AllowMainModeFilter(mode.getMode());
-    } else {
+    }
+    else {
       return new AllowMainAndSubModeFilter(new MainAndSubMode(mode.getMode(), mode.getSubMode()));
     }
   }
@@ -69,9 +70,11 @@ class FilterFactory {
 
     if (mainModeFilters.size() == TransitMode.values().length) {
       return ALLOWED_ALL_TRANSIT_MODES;
-    } else if (mainModeFilters.size() == 1) {
+    }
+    else if (mainModeFilters.size() == 1) {
       result.addAll(mainModeFilters);
-    } else if (mainModeFilters.size() > 1) {
+    }
+    else if (mainModeFilters.size() > 1) {
       result.add(new AllowMainModesFilter(mainModeFilters));
     }
 
@@ -95,7 +98,8 @@ class FilterFactory {
 
       if (subModeFilters.size() == 1) {
         result.addAll(subModeFilters);
-      } else if (subModeFilters.size() > 1) {
+      }
+      else if (subModeFilters.size() > 1) {
         result.add(new AllowMainAndSubModesFilter(subModeFilters));
       }
       // esle ignore empty
@@ -114,7 +118,8 @@ class FilterFactory {
 
       if (narrowedModeFilters.size() == 1) {
         result.addAll(narrowedModeFilters);
-      } else if (narrowedModeFilters.size() > 1) {
+      }
+      else if (narrowedModeFilters.size() > 1) {
         result.add(new AllowNarrowedTransitModesFilter(narrowedModeFilters));
       }
     }

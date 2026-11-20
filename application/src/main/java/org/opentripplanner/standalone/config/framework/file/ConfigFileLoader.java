@@ -104,10 +104,12 @@ public class ConfigFileLoader {
       LOG.info("Load JSON configuration file '{}'", file.getPath());
       LOG.info("Summarizing '{}': {}", file.getName(), ConfigFileRedactor.toRedactedString(node));
       return node;
-    } catch (FileNotFoundException ex) {
+    }
+    catch (FileNotFoundException ex) {
       LOG.info("File '{}' is not present. Using default configuration.", file);
       return MissingNode.getInstance();
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       LOG.error("Error while parsing JSON config file '{}': {}", file, e.getMessage());
       throw new RuntimeException(e.getLocalizedMessage(), e);
     }
@@ -130,7 +132,8 @@ public class ConfigFileLoader {
       jsonAsString = insertEnvironmentVariables(jsonAsString, source);
 
       return mapper.readTree(jsonAsString);
-    } catch (JacksonException ie) {
+    }
+    catch (JacksonException ie) {
       LOG.error("Error while parsing config '{}'.", source, ie);
       throw new OtpAppException("Failed to load config: " + source);
     }

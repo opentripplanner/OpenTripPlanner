@@ -31,7 +31,8 @@ public sealed class Ratio implements Serializable permits NormalizedRatio {
   public static Optional<Ratio> of(double ratio, Consumer<String> validationErrorHandler) {
     if (ratio >= 0d && ratio <= 1d) {
       return Optional.of(new Ratio(ratio));
-    } else {
+    }
+    else {
       validationErrorHandler.accept("Ratio must be in range [0.0, 1.0], but was: " + ratio);
       return Optional.empty();
     }

@@ -44,7 +44,8 @@ public class TripPlanMapper {
     if (itineraries.isEmpty()) {
       from = Place.forGenericLocation(fromLocation, new LocalizedString("origin"));
       to = Place.forGenericLocation(toLocation, new LocalizedString("destination"));
-    } else {
+    }
+    else {
       List<Leg> legs = itineraries.getFirst().legs();
       from = legs.getFirst().from();
       to = legs.getLast().to();

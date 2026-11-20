@@ -164,7 +164,8 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
 
     try {
       return osmOpeningHoursParser.parseOpeningHours(jsonNode.asString(), id.toString(), null);
-    } catch (OpeningHoursParseException e) {
+    }
+    catch (OpeningHoursParseException e) {
       LOG.info("Parsing of opening hours failed for park {}, it is now always open:\n{}", id, e);
       return null;
     }
@@ -183,7 +184,8 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
 
     if (jsonNode.has("id")) {
       id = jsonNode.path("id").asString();
-    } else {
+    }
+    else {
       id = String.format(
         "%s/%f/%f",
         jsonNode.get("name"),

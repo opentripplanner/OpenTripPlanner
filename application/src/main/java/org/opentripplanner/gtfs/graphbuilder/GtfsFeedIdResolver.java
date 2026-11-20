@@ -69,7 +69,8 @@ public class GtfsFeedIdResolver {
       }
 
       return generateId();
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       throw new RuntimeException(e);
     }
   }

@@ -61,7 +61,8 @@ class ShapeSegmentKey {
       if (other.shapeId != null) {
         return false;
       }
-    } else if (!shapeId.equals(other.shapeId)) {
+    }
+    else if (!shapeId.equals(other.shapeId)) {
       return false;
     }
 

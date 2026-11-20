@@ -56,7 +56,8 @@ public class CompoundRefTagGroup {
 
     if (values.stream().anyMatch(Objects::isNull)) {
       return Optional.empty();
-    } else {
+    }
+    else {
       return Optional.of(values.stream().map(String::strip).collect(Collectors.joining(DELIMITER)));
     }
   }

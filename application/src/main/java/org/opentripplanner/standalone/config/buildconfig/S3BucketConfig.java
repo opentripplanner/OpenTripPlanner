@@ -96,7 +96,8 @@ public class S3BucketConfig {
           """
         )
         .asUri();
-    } catch (OtpAppException ex) {
+    }
+    catch (OtpAppException ex) {
       LOG.error(
         "You must specify an accessKey, a secretKey, and a bucketName when " +
           "configuring S3 download. " +

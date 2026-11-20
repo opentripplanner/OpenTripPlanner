@@ -228,7 +228,8 @@ public class IslandPruningModule implements GraphBuilderModule {
             }
           }
         }
-      } else {
+      }
+      else {
         //for islands without stops
         int pruningThresholdWithoutStops = parameters.pruningThresholdIslandWithoutStops();
 
@@ -250,7 +251,8 @@ public class IslandPruningModule implements GraphBuilderModule {
 
     if (markIsolated) {
       LOG.info("Detected {} isolated edges", stats.isolated());
-    } else {
+    }
+    else {
       LOG.info("Number of islands with stops: {}", stats.islandsWithStops());
       LOG.info("Modified connectivity of {} islands with stops", stats.islandsWithStopsChanged());
       LOG.info("Removed {} edges", stats.removed());
@@ -311,7 +313,8 @@ public class IslandPruningModule implements GraphBuilderModule {
           var edges = se.isNoThruTraffic(traverseMode) ? noThruEdges : thruEdges;
           edges.add(from);
           edges.add(vertexIndex.idOf(se.getToVertex()));
-        } else {
+        }
+        else {
           // Fall back to a real traversal for edge types (eg. escalators, pathways, vehicle
           // rental/parking edges) that don't behave like a plain permission-gated street edge.
           if (s0 == null) {
@@ -368,7 +371,8 @@ public class IslandPruningModule implements GraphBuilderModule {
           if (markIsolated) {
             isolated.put(e, true);
             stats.incrementIsolated();
-          } else {
+          }
+          else {
             StreetEdge pse = (StreetEdge) e;
 
             if (!isolated.containsKey(e)) {
@@ -381,12 +385,14 @@ public class IslandPruningModule implements GraphBuilderModule {
                   pse.setMotorVehicleNoThruTraffic(true);
                   changed = true;
                 }
-              } else if (traverseMode == TraverseMode.BICYCLE) {
+              }
+              else if (traverseMode == TraverseMode.BICYCLE) {
                 if (!pse.isBicycleNoThruTraffic()) {
                   pse.setBicycleNoThruTraffic(true);
                   changed = true;
                 }
-              } else if (traverseMode == TraverseMode.WALK) {
+              }
+              else if (traverseMode == TraverseMode.WALK) {
                 if (!pse.isWalkNoThruTraffic()) {
                   pse.setWalkNoThruTraffic(true);
                   changed = true;
@@ -397,7 +403,8 @@ public class IslandPruningModule implements GraphBuilderModule {
                 stats.incrementNoThru();
                 nothru++;
               }
-            } else {
+            }
+            else {
               StreetTraversalPermission permission = pse.getPermission();
               boolean changed = false;
 
@@ -406,12 +413,14 @@ public class IslandPruningModule implements GraphBuilderModule {
                   permission = permission.remove(StreetTraversalPermission.CAR);
                   changed = true;
                 }
-              } else if (traverseMode == TraverseMode.BICYCLE) {
+              }
+              else if (traverseMode == TraverseMode.BICYCLE) {
                 if (permission.allows(StreetTraversalPermission.BICYCLE)) {
                   permission = permission.remove(StreetTraversalPermission.BICYCLE);
                   changed = true;
                 }
-              } else if (traverseMode == TraverseMode.WALK) {
+              }
+              else if (traverseMode == TraverseMode.WALK) {
                 if (permission.allows(StreetTraversalPermission.PEDESTRIAN)) {
                   permission = permission.remove(StreetTraversalPermission.PEDESTRIAN);
                   changed = true;
@@ -423,7 +432,8 @@ public class IslandPruningModule implements GraphBuilderModule {
                   graph.removeEdge(pse);
                   stats.incrementRemoved();
                   removed++;
-                } else {
+                }
+                else {
                   pse.setPermission(permission);
                   stats.incrementRestricted();
                   restricted++;

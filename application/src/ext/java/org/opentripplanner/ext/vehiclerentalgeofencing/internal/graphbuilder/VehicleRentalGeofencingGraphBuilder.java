@@ -92,7 +92,8 @@ public class VehicleRentalGeofencingGraphBuilder implements GraphBuilderModule {
       for (var network : networks) {
         try {
           applyNetwork(network, httpClientFactory);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
           // One operator's feed is third-party data referenced by the manifest, not something the
           // build config named. Record it and leave the rest of the graph buildable.
           LOG.error("Failed to load geofencing zones for network {}", network.network(), e);
@@ -147,7 +148,8 @@ public class VehicleRentalGeofencingGraphBuilder implements GraphBuilderModule {
           headers,
           clientFactory.create(LOG)
         );
-      } catch (Exception e) {
+      }
+      catch (Exception e) {
         LOG.error("Failed to fetch the GBFS auto-configuration file for network {}", network, e);
         issueStore.add(new GeofencingFeedUnavailable(network, url.get(), e.toString()));
         continue;

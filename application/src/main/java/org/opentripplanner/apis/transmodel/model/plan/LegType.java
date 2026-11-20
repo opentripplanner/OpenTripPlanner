@@ -320,7 +320,8 @@ public class LegType {
 
             if (stops == null || stops.isEmpty()) {
               return List.of();
-            } else {
+            }
+            else {
               return stops
                 .stream()
                 .map(stop -> stop.place.stop)

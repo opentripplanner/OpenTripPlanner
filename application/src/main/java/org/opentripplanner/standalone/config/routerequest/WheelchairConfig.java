@@ -154,7 +154,8 @@ public class WheelchairConfig {
 
     if (onlyConsiderAccessible) {
       builder.withAccessibleOnly();
-    } else {
+    }
+    else {
       builder.withUnknownCost(unknownCost).withInaccessibleCost(inaccessibleCost);
     }
   }

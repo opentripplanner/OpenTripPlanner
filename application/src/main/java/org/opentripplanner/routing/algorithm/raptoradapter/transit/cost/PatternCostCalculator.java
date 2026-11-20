@@ -64,7 +64,8 @@ class PatternCostCalculator<T extends DefaultTripSchedule> implements RaptorCost
     if (includeUnpreferredCost) {
       int unpreferredCostValue = unpreferredCost.calculateRaptorCost(transitDuration);
       return defaultCost + unpreferredCostValue;
-    } else {
+    }
+    else {
       return defaultCost;
     }
   }

@@ -242,7 +242,8 @@ public class InsertionEvaluator {
             if (detour > legBudget[pickupLeg]) {
               continue;
             }
-          } else {
+          }
+          else {
             RoutedSegment fromPickup = pickupTimes.toLegEnd(pickupLeg);
 
             if (fromPickup == null) {
@@ -330,13 +331,16 @@ public class InsertionEvaluator {
           segments.add(Objects.requireNonNull(pickupTimes.fromLegStart(leg)));
           segments.add(Objects.requireNonNull(pickupToDropoff));
           segments.add(Objects.requireNonNull(dropoffTimes.toLegEnd(leg)));
-        } else if (leg == pickupLeg) {
+        }
+        else if (leg == pickupLeg) {
           segments.add(Objects.requireNonNull(pickupTimes.fromLegStart(leg)));
           segments.add(Objects.requireNonNull(pickupTimes.toLegEnd(leg)));
-        } else if (leg == dropoffLeg) {
+        }
+        else if (leg == dropoffLeg) {
           segments.add(Objects.requireNonNull(dropoffTimes.fromLegStart(leg)));
           segments.add(Objects.requireNonNull(dropoffTimes.toLegEnd(leg)));
-        } else {
+        }
+        else {
           segments.add(baseline[leg]);
         }
       }

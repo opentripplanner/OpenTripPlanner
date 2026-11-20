@@ -59,7 +59,8 @@ public class StreetElevationExtension implements Serializable {
     if (computed) {
       this.compactedElevationProfile = null;
       this.packedElevationProfile = packedElevationProfile;
-    } else {
+    }
+    else {
       this.compactedElevationProfile =
         CompactElevationProfile.compactElevationProfileWithRegularSamples(packedElevationProfile);
       this.packedElevationProfile = null;
@@ -72,7 +73,8 @@ public class StreetElevationExtension implements Serializable {
         compactedElevationProfile,
         distanceMeters
       );
-    } else {
+    }
+    else {
       return packedElevationProfile;
     }
   }

@@ -60,7 +60,8 @@ class LineStringMapper {
 
         list.add(values.getLast());
         list.add(values.getFirst());
-      } else {
+      }
+      else {
         issueStore.add(
           "BadLineStringElementType",
           "Unhandled and unknown lineString element type: %s",
@@ -96,7 +97,8 @@ class LineStringMapper {
         id
       );
       return false;
-    } else if (coordinates.length % 2 != 0) {
+    }
+    else if (coordinates.length % 2 != 0) {
       issueStore.add(
         "ServiceLinkGeometryError",
         "Ignore linkSequenceProjection with invalid linestring, " +

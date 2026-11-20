@@ -30,7 +30,8 @@ public class TemporaryFileDataSource extends FileDataSource {
   public void deleteFile() {
     try {
       Files.delete(file.toPath());
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       LOG.warn(
         "Could not delete temporary file {} for temporary file datasource {}",
         file.getName(),

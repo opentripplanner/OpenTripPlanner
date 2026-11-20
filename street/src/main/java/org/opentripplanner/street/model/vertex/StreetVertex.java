@@ -52,9 +52,11 @@ public abstract class StreetVertex extends Vertex {
 
     if (uniqueNames.size() > 1) {
       return new LocalizedString("corner", uniqueNames.get(0), uniqueNames.get(1));
-    } else if (uniqueNames.size() == 1) {
+    }
+    else if (uniqueNames.size() == 1) {
       return uniqueNames.get(0);
-    } else {
+    }
+    else {
       return new LocalizedString("unnamedStreet");
     }
   }
@@ -102,7 +104,8 @@ public abstract class StreetVertex extends Vertex {
     synchronized (this) {
       if (areaStops == EMPTY_SET) {
         areaStops = Set.copyOf(toBeAdded);
-      } else {
+      }
+      else {
         areaStops = Stream.concat(areaStops.stream(), toBeAdded.stream()).collect(
           Collectors.toUnmodifiableSet()
         );

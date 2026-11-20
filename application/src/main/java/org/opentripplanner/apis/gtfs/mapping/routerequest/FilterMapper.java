@@ -39,7 +39,8 @@ class FilterMapper {
       if (CollectionUtils.isEmpty(includes)) {
         var modeSelect = SelectRequest.of().withNarrowedTransportModes(modes).build();
         filterRequestBuilder.addSelect(modeSelect);
-      } else {
+      }
+      else {
         // for every inclusion we also need to add the modes, otherwise the filter will not work
         for (var selectInput : ListUtils.nullSafeImmutableList(includes)) {
           var builder = SelectRequestMapper.mapSelectRequest(selectInput, "include");

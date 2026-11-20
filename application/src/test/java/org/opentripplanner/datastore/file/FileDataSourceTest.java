@@ -86,7 +86,8 @@ public class FileDataSourceTest {
       subject.asInputStream();
       // Then
       fail("The creation of the new file did not fail as expected!");
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       assertTrue(e.getMessage().contains(FILENAME));
     }
   }
@@ -105,7 +106,8 @@ public class FileDataSourceTest {
       subject.asOutputStream();
       // Then
       fail("Did not expect to be able to open a directory for reading!");
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       assertTrue(e.getMessage().contains("a_child"));
     }
   }

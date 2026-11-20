@@ -41,7 +41,8 @@ public class ZipFileDataSource
         content.clear();
         zipFile = null;
       }
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       LOG.error(path() + " close failed. Details: " + e.getLocalizedMessage(), e);
     }
   }
@@ -71,7 +72,8 @@ public class ZipFileDataSource
   public InputStream entryStream(ZipEntry entry) {
     try {
       return zipFile.getInputStream(entry);
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       throw new RuntimeException("Failed to read " + path() + ": " + e.getLocalizedMessage(), e);
     }
   }
@@ -103,7 +105,8 @@ public class ZipFileDataSource
       // The get name on ZipFile returns the full path, we want just the name.
       this.zipFile = new ZipFile(file, ZipFile.OPEN_READ);
       content.addAll(ZipFileDataSource.listZipEntries(this, zipFile));
-    } catch (ZipException ze) {
+    }
+    catch (ZipException ze) {
       // Java needs help for standard ZIP files with names encoded in cp437
       // this allows decoding of utf-8 and cp437 at the same time!
       // As Cp437 is not guaranteed to be available try it but don't depend on it.
@@ -128,10 +131,12 @@ public class ZipFileDataSource
         Charset charset = Charset.forName("Cp437");
         this.zipFile = new ZipFile(file, ZipFile.OPEN_READ, charset);
         content.addAll(ZipFileDataSource.listZipEntries(this, zipFile));
-      } catch (IOException e) {
+      }
+      catch (IOException e) {
         throw new RuntimeException("Failed to load " + path() + ": " + e.getLocalizedMessage(), e);
       }
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       throw new RuntimeException("Failed to load " + path() + ": " + e.getLocalizedMessage(), e);
     }
   }

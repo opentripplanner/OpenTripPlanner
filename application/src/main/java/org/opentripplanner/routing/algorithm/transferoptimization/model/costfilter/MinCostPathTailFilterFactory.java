@@ -26,7 +26,8 @@ public class MinCostPathTailFilterFactory<T extends RaptorTripSchedule> {
 
     if (optimizeWaitTime) {
       filters.add(OptimizedPathTail::generalizedCostWaitTimeOptimized);
-    } else {
+    }
+    else {
       filters.add(OptimizedPathTail::generalizedCost);
     }
 

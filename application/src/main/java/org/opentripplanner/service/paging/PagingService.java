@@ -95,7 +95,8 @@ public class PagingService {
         raptorSearchWindowUsed,
         lastKeptDepartureTime()
       );
-    } else {
+    }
+    else {
       return TripSearchMetadata.createForArriveBy(
         edt,
         ldt,

@@ -92,7 +92,8 @@ class FlexStopsMapper {
         stops.addAll(
           findStopsInFlexArea(flexibleArea, flexibleAreaGeometry, flexibleStopTransitMode)
         );
-      } else {
+      }
+      else {
         AreaStop areaStop = mapFlexArea(
           flexibleArea,
           flexibleAreaGeometry,
@@ -107,7 +108,8 @@ class FlexStopsMapper {
 
     if (stops.isEmpty()) {
       return null;
-    } else {
+    }
+    else {
       // We create a new GroupStop, even if the stop place consists of a single area, in order to
       // get the ids for the area and stop place correct
       var builder = siteRepositoryBuilder
@@ -182,7 +184,8 @@ class FlexStopsMapper {
   private Geometry mapGeometry(FlexibleArea area) {
     try {
       return OpenGisMapper.mapGeometry(area.getPolygon());
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       issueStore.add(
         Issue.issue(
           "InvalidFlexAreaGeometry",
@@ -198,7 +201,8 @@ class FlexStopsMapper {
   private TransitMode mapTransitMode(FlexibleStopPlace flexibleStopPlace) {
     try {
       return transportModeMapper.mapAllPublicTransportModes(flexibleStopPlace.getTransportMode());
-    } catch (TransportModeMapper.UnsupportedModeException e) {
+    }
+    catch (TransportModeMapper.UnsupportedModeException e) {
       return null;
     }
   }
@@ -209,7 +213,8 @@ class FlexStopsMapper {
 
     if (UNRESTRICTED_PUBLIC_TRANSPORT_AREAS_VALUE.equals(flexibleAreaType)) {
       return true;
-    } else {
+    }
+    else {
       return (
         UNRESTRICTED_PUBLIC_TRANSPORT_AREAS_VALUE.equals(parentStopType) && flexibleAreaType == null
       );

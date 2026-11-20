@@ -98,7 +98,8 @@ class GbfsFeedLoaderTest {
           try {
             String url = reader.get("Auto-Discovery URL");
             createLoader(url, null).update();
-          } catch (Exception e) {
+          }
+          catch (Exception e) {
             cvsExceptions.add(e);
           }
         }

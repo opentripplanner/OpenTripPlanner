@@ -159,7 +159,8 @@ public class StreetLinkerModule implements GraphBuilderModule {
   ) {
     if (stopLocationsUsedForFlexTrips.contains(stop)) {
       return stopVertex.isLinkedToDrivableEdge() && stopVertex.isLinkedToWalkableEdge();
-    } else {
+    }
+    else {
       return stopVertex.isConnectedToGraph();
     }
   }
@@ -379,7 +380,8 @@ public class StreetLinkerModule implements GraphBuilderModule {
 
     if (removeVehicleParking) {
       return vehicleParking;
-    } else {
+    }
+    else {
       vehicleParking.getEntrances().remove(entrance);
       return null;
     }

@@ -77,7 +77,8 @@ public class OsmWay extends OsmEntity {
   public boolean isWheelchairAccessible() {
     if (isSteps()) {
       return isTagTrue("wheelchair");
-    } else {
+    }
+    else {
       return super.isWheelchairAccessible();
     }
   }

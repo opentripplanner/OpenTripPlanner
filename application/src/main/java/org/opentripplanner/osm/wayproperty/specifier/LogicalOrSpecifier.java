@@ -44,7 +44,8 @@ public class LogicalOrSpecifier implements OsmSpecifier {
 
     if (oneMatchesExactly) {
       return 1;
-    } else {
+    }
+    else {
       return 0;
     }
   }

@@ -127,7 +127,8 @@ public abstract class GtfsTest {
         filterRequestBuilder.addSelect(
           SelectRequest.of().addTransportMode(new MainAndSubMode(preferredMode, null)).build()
         );
-      } else {
+      }
+      else {
         filterRequestBuilder.addSelect(
           SelectRequest.of().withTransportModes(MainAndSubMode.all()).build()
         );
@@ -185,7 +186,8 @@ public abstract class GtfsTest {
     if (fromStopId != null) {
       assertEquals(FEED_ID, leg.from().stop.getId().getFeedId());
       assertEquals(fromStopId, leg.from().stop.getId().getId());
-    } else {
+    }
+    else {
       assertNull(leg.from().stop.getId());
     }
   }
@@ -278,8 +280,10 @@ public abstract class GtfsTest {
         })
         .get();
       alertsUpdateHandler.update(feedMessage, null);
-    } catch (FileNotFoundException _) {
-    } catch (Exception e) {
+    }
+    catch (FileNotFoundException _) {
+    }
+    catch (Exception e) {
       throw new RuntimeException(e);
     }
 

@@ -80,9 +80,11 @@ public class TransitGroupPriorityService {
   ) {
     if (relaxTransitGroupPriority.isNormal()) {
       return TransitGroupPriorityService.empty();
-    } else if (Stream.of(groupByAgency, groupGlobal).allMatch(Collection::isEmpty)) {
+    }
+    else if (Stream.of(groupByAgency, groupGlobal).allMatch(Collection::isEmpty)) {
       return TransitGroupPriorityService.empty();
-    } else {
+    }
+    else {
       return new TransitGroupPriorityService(groupByAgency, groupGlobal);
     }
   }

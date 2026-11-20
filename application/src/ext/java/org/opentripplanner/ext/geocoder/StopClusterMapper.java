@@ -216,7 +216,8 @@ class StopClusterMapper {
         agencies,
         feedPublisher
       );
-    } else {
+    }
+    else {
       var group = transitService.getStopLocationsGroup(id);
       var feedPublisher = toFeedPublisher(transitService.getFeedInfo(id.getFeedId()));
       var modes = transitService.findTransitModes(group).stream().map(Enum::name).toList();
@@ -241,7 +242,8 @@ class StopClusterMapper {
   private static String extractCode(StopLocationsGroup group) {
     if (group instanceof Station station) {
       return station.getCode();
-    } else {
+    }
+    else {
       return null;
     }
   }
@@ -257,7 +259,8 @@ class StopClusterMapper {
   private static StopCluster.FeedPublisher toFeedPublisher(FeedInfo fi) {
     if (fi == null) {
       return null;
-    } else {
+    }
+    else {
       return new StopCluster.FeedPublisher(fi.getPublisherName());
     }
   }

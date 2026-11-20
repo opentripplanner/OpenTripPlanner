@@ -131,7 +131,8 @@ public final class TripPattern
       }
 
       this.scheduledTimetable = builder.getScheduledTimetable();
-    } else {
+    }
+    else {
       this.scheduledTimetable = builder
         .getScheduledTimetableBuilder()
         .withTripPattern(this)
@@ -485,7 +486,8 @@ public final class TripPattern
   public TripPattern clone() {
     try {
       return (TripPattern) super.clone();
-    } catch (CloneNotSupportedException e) {
+    }
+    catch (CloneNotSupportedException e) {
       /* cannot happen */
       throw new RuntimeException(e);
     }

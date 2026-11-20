@@ -142,7 +142,8 @@ class LuceneIndexTest {
       public List<TransitMode> findTransitModes(StopLocation stop) {
         if (stop.getVehicleType() != null) {
           return List.of(stop.getVehicleType());
-        } else {
+        }
+        else {
           return List.copyOf(modes.get(stop));
         }
       }

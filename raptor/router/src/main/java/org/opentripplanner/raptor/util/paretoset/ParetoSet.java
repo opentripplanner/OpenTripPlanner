@@ -256,7 +256,8 @@ public sealed class ParetoSet<T> extends AbstractCollection<T> permits ParetoSet
       if (!leftVectorDominatesRightVector(newValue, elements[j])) {
         elements[i] = elements[j];
         ++i;
-      } else {
+      }
+      else {
         notifyElementDropped(elements[j], newValue);
       }
 

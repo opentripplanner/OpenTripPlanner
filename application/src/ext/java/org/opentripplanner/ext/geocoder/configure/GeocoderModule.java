@@ -25,7 +25,8 @@ public class GeocoderModule {
   ) {
     if (OTPFeature.SandboxAPIGeocoder.isOn()) {
       return new LuceneIndex(transitService, stopConsolidationService);
-    } else {
+    }
+    else {
       return null;
     }
   }

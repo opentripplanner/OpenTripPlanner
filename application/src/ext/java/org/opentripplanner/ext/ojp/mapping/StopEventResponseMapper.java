@@ -138,7 +138,8 @@ public class StopEventResponseMapper {
 
     if (agencyLang != null) {
       return agencyLang;
-    } else {
+    }
+    else {
       return resolveFeedLanguage.apply(tripTimeOnDate.getTrip().getId().getFeedId()).orElse(null);
     }
   }

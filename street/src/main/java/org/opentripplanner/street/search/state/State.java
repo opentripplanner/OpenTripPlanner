@@ -135,7 +135,8 @@ public final class State implements AStarState<State, Edge, Vertex> {
   public static State[] ofNullable(@Nullable State u) {
     if (u == null) {
       return EMPTY_STATES;
-    } else {
+    }
+    else {
       return new State[] { u };
     }
   }
@@ -150,11 +151,14 @@ public final class State implements AStarState<State, Edge, Vertex> {
   public static State[] ofNullable(@Nullable State s1, @Nullable State s2) {
     if (s1 == null && s2 == null) {
       return EMPTY_STATES;
-    } else if (s1 == null) {
+    }
+    else if (s1 == null) {
       return new State[] { s2 };
-    } else if (s2 == null) {
+    }
+    else if (s2 == null) {
       return new State[] { s1 };
-    } else {
+    }
+    else {
       return new State[] { s1, s2 };
     }
   }
@@ -197,7 +201,8 @@ public final class State implements AStarState<State, Edge, Vertex> {
   private long millisecondsToSeconds(long milliseconds) {
     if (request.arriveBy()) {
       return milliseconds / 1000L;
-    } else {
+    }
+    else {
       return (milliseconds + 999L) / 1000L;
     }
   }
@@ -280,7 +285,8 @@ public final class State implements AStarState<State, Edge, Vertex> {
     if (request.arriveBy()) {
       vehicleRentingOk = !request.mode().includesRenting() || !isRentingVehicle();
       vehicleParkAndRideOk = !parkAndRide || !isVehicleParked();
-    } else {
+    }
+    else {
       vehicleRentingOk =
         !request.mode().includesRenting() || vehicleRentalNotStarted() || vehicleRentalIsFinished();
       vehicleParkAndRideOk = !parkAndRide || isVehicleParked();
@@ -406,7 +412,8 @@ public final class State implements AStarState<State, Edge, Vertex> {
             stationVertex.getStation().network(),
             false
           );
-        } else {
+        }
+        else {
           editor.dropFloatingVehicle(
             orig.stateData.rentalVehicleFormFactor,
             orig.rentalVehiclePropulsionType(),
@@ -414,7 +421,8 @@ public final class State implements AStarState<State, Edge, Vertex> {
             false
           );
         }
-      } else if (!orig.isRentingVehicle() && orig.getBackState().isRentingVehicle()) {
+      }
+      else if (!orig.isRentingVehicle() && orig.getBackState().isRentingVehicle()) {
         var stationVertex = (VehicleRentalPlaceVertex) orig.vertex;
 
         if (orig.getBackState().isRentingVehicleFromStation()) {
@@ -425,7 +433,8 @@ public final class State implements AStarState<State, Edge, Vertex> {
             orig.backState.mayKeepRentedVehicleAtDestination(),
             false
           );
-        } else if (orig.getBackState().isRentingFloatingVehicle()) {
+        }
+        else if (orig.getBackState().isRentingFloatingVehicle()) {
           editor.beginFloatingVehicleRenting(
             ((VehicleRentalEdge) edge).formFactor,
             orig.getBackState().rentalVehiclePropulsionType(),
@@ -512,7 +521,8 @@ public final class State implements AStarState<State, Edge, Vertex> {
     while (state != null) {
       if (state.currentMode().isDrivingIsh()) {
         return true;
-      } else {
+      }
+      else {
         state = state.getBackState();
       }
     }
@@ -574,7 +584,8 @@ public final class State implements AStarState<State, Edge, Vertex> {
   private double getTraversalDistanceDeltaMeters() {
     if (backState != null) {
       return Math.abs(this.traversalDistance_m - backState.traversalDistance_m);
-    } else {
+    }
+    else {
       return 0.0;
     }
   }

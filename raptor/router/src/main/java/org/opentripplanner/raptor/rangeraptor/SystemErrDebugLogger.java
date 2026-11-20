@@ -136,7 +136,8 @@ public class SystemErrDebugLogger implements DebugLogger {
       // We log to info - since debugging is controlled by the application
       if (message.contains("\n")) {
         System.err.printf("%s\n%s", topic, message);
-      } else {
+      }
+      else {
         System.err.printf("%-16s | %s%n", topic, message);
       }
     }

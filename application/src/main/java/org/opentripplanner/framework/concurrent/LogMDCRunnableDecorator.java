@@ -21,7 +21,8 @@ class LogMDCRunnableDecorator implements Runnable {
     try {
       LogMDCSupport.setLocal(parentLogContext);
       delegate.run();
-    } finally {
+    }
+    finally {
       LogMDCSupport.clearLocal();
     }
   }

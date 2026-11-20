@@ -86,16 +86,19 @@ public class GtfsGraphQLAPI {
 
     if (queryVariables instanceof Map) {
       variables = (Map) queryVariables;
-    } else if (queryVariables instanceof String && !((String) queryVariables).isEmpty()) {
+    }
+    else if (queryVariables instanceof String && !((String) queryVariables).isEmpty()) {
       try {
         variables = deserializer.readValue((String) queryVariables, Map.class);
-      } catch (JacksonException e) {
+      }
+      catch (JacksonException e) {
         return Response.status(Response.Status.BAD_REQUEST)
           .type(MediaType.TEXT_PLAIN_TYPE)
           .entity("Variables must be a valid json object")
           .build();
       }
-    } else {
+    }
+    else {
       variables = new HashMap<>();
     }
 

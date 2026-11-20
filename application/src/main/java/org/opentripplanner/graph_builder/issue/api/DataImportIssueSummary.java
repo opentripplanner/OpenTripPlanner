@@ -46,7 +46,8 @@ public class DataImportIssueSummary implements Serializable {
       if (combined.containsKey(type)) {
         var countSoFar = combined.get(type);
         combined.put(type, count + countSoFar);
-      } else {
+      }
+      else {
         combined.put(type, count);
       }
     });

@@ -175,7 +175,8 @@ public class PtSituationElementType {
               .map(headerText -> {
                 if (headerText instanceof TranslatedString translatedString) {
                   return translatedString.getTranslations();
-                } else {
+                }
+                else {
                   return List.of(new AbstractMap.SimpleEntry<>(null, headerText.toString()));
                 }
               })
@@ -195,7 +196,8 @@ public class PtSituationElementType {
               .map(descriptionText -> {
                 if (descriptionText instanceof TranslatedString translatedString) {
                   return translatedString.getTranslations();
-                } else {
+                }
+                else {
                   return List.of(new AbstractMap.SimpleEntry<>(null, descriptionText.toString()));
                 }
               })
@@ -213,9 +215,11 @@ public class PtSituationElementType {
 
             if (adviceText instanceof TranslatedString translatedString) {
               return translatedString.getTranslations();
-            } else if (adviceText != null) {
+            }
+            else if (adviceText != null) {
               return List.of(new AbstractMap.SimpleEntry<>(null, adviceText.toString()));
-            } else {
+            }
+            else {
               return emptyList();
             }
           })

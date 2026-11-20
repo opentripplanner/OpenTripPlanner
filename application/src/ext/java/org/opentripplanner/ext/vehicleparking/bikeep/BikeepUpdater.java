@@ -65,7 +65,8 @@ public class BikeepUpdater extends GenericJsonDataSource<VehicleParking> {
         .capacity(capacity)
         .entrance(entrance)
         .build();
-    } catch (JacksonException e) {
+    }
+    catch (JacksonException e) {
       throw new RuntimeException(e);
     }
   }

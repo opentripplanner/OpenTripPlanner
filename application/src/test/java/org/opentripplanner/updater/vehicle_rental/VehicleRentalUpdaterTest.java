@@ -93,7 +93,8 @@ class VehicleRentalUpdaterTest {
     private boolean hasFailed() {
       try {
         return hasFailed.get(5, TimeUnit.SECONDS);
-      } catch (Exception e) {
+      }
+      catch (Exception e) {
         throw new RuntimeException(e);
       }
     }
@@ -122,7 +123,8 @@ class VehicleRentalUpdaterTest {
     private boolean hasFailed() {
       try {
         return hasFailed.get(5, TimeUnit.SECONDS);
-      } catch (Exception e) {
+      }
+      catch (Exception e) {
         throw new RuntimeException(e);
       }
     }

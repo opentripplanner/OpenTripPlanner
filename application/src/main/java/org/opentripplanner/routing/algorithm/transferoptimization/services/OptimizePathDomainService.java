@@ -216,7 +216,8 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
     if (nextLeg.isTransferLeg()) {
       nextTransferLeg = nextLeg.asTransferLeg();
       nextTransitLeg = nextTransferLeg.nextLeg().asTransitLeg();
-    } else {
+    }
+    else {
       nextTransitLeg = accessLeg.nextLeg().asTransitLeg();
     }
 

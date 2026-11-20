@@ -47,7 +47,8 @@ public record PrunedStopIsland(
         this.restricted,
         this.removed
       );
-    } else {
+    }
+    else {
       return this.getMessage();
     }
   }

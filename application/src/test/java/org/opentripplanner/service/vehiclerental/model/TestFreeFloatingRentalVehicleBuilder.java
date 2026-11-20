@@ -55,7 +55,8 @@ public class TestFreeFloatingRentalVehicleBuilder {
   ) {
     if (currentFuelPercent == null) {
       this.currentFuelPercent = null;
-    } else {
+    }
+    else {
       this.currentFuelPercent = Ratio.ofBoxed(currentFuelPercent, ignore -> {}).orElse(null);
     }
 

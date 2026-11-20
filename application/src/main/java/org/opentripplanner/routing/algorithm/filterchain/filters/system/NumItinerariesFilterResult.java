@@ -45,7 +45,8 @@ public class NumItinerariesFilterResult {
 
     if (cropSection == ListSection.HEAD) {
       pageCut = ListUtils.first(keptItineraries);
-    } else {
+    }
+    else {
       pageCut = ListUtils.last(keptItineraries);
     }
   }

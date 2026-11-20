@@ -381,7 +381,8 @@ public class LinkingContextFactory {
 
       if (stopVertex != null) {
         coordinate = stopVertex.getCoordinate();
-      } else {
+      }
+      else {
         // For car routing, we use station's coordinate instead of child stops' if stop location is
         // a station.
         coordinate = findStopLocationsGroupCentroid

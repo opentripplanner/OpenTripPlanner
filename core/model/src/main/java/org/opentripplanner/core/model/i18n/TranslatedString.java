@@ -32,7 +32,8 @@ public class TranslatedString implements I18NString, Serializable {
     for (Map.Entry<String, String> i : translations.entrySet()) {
       if (i.getKey() == null) {
         this.translations.put(null, i.getValue());
-      } else {
+      }
+      else {
         this.translations.put(i.getKey().toLowerCase(), i.getValue());
       }
     }
@@ -120,7 +121,8 @@ public class TranslatedString implements I18NString, Serializable {
 
     if (t != null) {
       return t;
-    } else {
+    }
+    else {
       I18NString ret;
       // Check if we only have one name, even under multiple languages
       boolean allValuesEqual = new HashSet<>(translations.values()).size() == 1;
@@ -130,9 +132,11 @@ public class TranslatedString implements I18NString, Serializable {
 
       if (forceTranslatedString && !onlySingleUntranslatedLanguage) {
         ret = new TranslatedString(translations);
-      } else if (allValuesEqual) {
+      }
+      else if (allValuesEqual) {
         ret = new NonLocalizedString(translations.values().iterator().next());
-      } else {
+      }
+      else {
         ret = new TranslatedString(translations);
       }
 

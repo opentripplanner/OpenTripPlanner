@@ -234,7 +234,8 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
 
     if (vertex instanceof TransitStopVertex tsv && state.isFinal()) {
       return !ignoreStops.contains(tsv.getId());
-    } else {
+    }
+    else {
       return false;
     }
   }

@@ -72,7 +72,8 @@ class TripViaLocationMapper {
 
     try {
       return new VisitViaLocation(label, minimumWaitTime, stopLocationIds, coordinate);
-    } catch (IllegalArgumentException e) {
+    }
+    catch (IllegalArgumentException e) {
       throw new InvalidInputException(e.getMessage());
     }
   }
@@ -83,7 +84,8 @@ class TripViaLocationMapper {
 
     try {
       return new PassThroughViaLocation(label, stopLocationIds);
-    } catch (IllegalArgumentException e) {
+    }
+    catch (IllegalArgumentException e) {
       throw new InvalidInputException(e.getMessage());
     }
   }

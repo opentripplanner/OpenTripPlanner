@@ -419,7 +419,8 @@ public class ParameterBuilder {
 
     if (node.isString()) {
       return asDuration(defaultValue);
-    } else {
+    }
+    else {
       return Duration.ofSeconds((long) asDouble(defaultValue.toSeconds()));
     }
   }
@@ -663,7 +664,8 @@ public class ParameterBuilder {
   private <T> T convert(JsonNode node, Function<JsonNode, T> body) {
     try {
       return body.apply(node);
-    } catch (JsonNodeException e) {
+    }
+    catch (JsonNodeException e) {
       throw error("The parameter value '%s' has the wrong type.".formatted(node), e);
     }
   }
@@ -671,7 +673,8 @@ public class ParameterBuilder {
   private <T> T parseConfigType(ConfigType elementType, JsonNode child) {
     try {
       return elementType.valueOf(child);
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       throw error(
         "The parameter value '%s' is not of type %s.".formatted(
           child.asString(),
@@ -712,7 +715,8 @@ public class ParameterBuilder {
   private LocalDate parseRelativeLocalDate(String value, ZoneId zoneId) {
     try {
       return LocalDateUtils.asRelativeLocalDate(value, LocalDate.now(zoneId));
-    } catch (DateTimeParseException e) {
+    }
+    catch (DateTimeParseException e) {
       throw error("The parameter value '%s' is not a Period or LocalDate.".formatted(value), e);
     }
   }
@@ -720,7 +724,8 @@ public class ParameterBuilder {
   private Duration parseDuration(String value) {
     try {
       return DurationUtils.duration(value);
-    } catch (DateTimeParseException e) {
+    }
+    catch (DateTimeParseException e) {
       throw error("The parameter value '%s' is not a duration.".formatted(value), e);
     }
   }
@@ -752,7 +757,8 @@ public class ParameterBuilder {
       }
 
       return new URI(text);
-    } catch (URISyntaxException e) {
+    }
+    catch (URISyntaxException e) {
       throw error(
         "Unable to parse URI parameter value '%s'. Not parsable by java.net.URI class.".formatted(
           text
@@ -765,7 +771,8 @@ public class ParameterBuilder {
   private ZoneId parseZoneId(String text) {
     try {
       return ZoneId.of(text);
-    } catch (DateTimeException e) {
+    }
+    catch (DateTimeException e) {
       throw error(
         "Unable to parse parameter value: '" +
           text +

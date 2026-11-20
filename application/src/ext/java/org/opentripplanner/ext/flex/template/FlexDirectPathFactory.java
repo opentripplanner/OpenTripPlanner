@@ -156,7 +156,8 @@ public class FlexDirectPathFactory {
 
       // Shift from departing at departureTime to arriving at departureTime
       timeShift = flexDurations.mapToRouterArrivalTime(latestArrivalTime) - flexDurations.total();
-    } else {
+    }
+    else {
       int firstStopDepartureTime = flexDurations.mapToFlexTripDepartureTime(requestTime);
 
       // Time-shift departure so the minimum-booking-notice restriction is honored.
@@ -186,7 +187,8 @@ public class FlexDirectPathFactory {
   protected boolean isRouteable(FlexAccessTemplate accessTemplate, Vertex flexVertex) {
     if (accessTemplate.accessEgress.state().getVertex() == flexVertex) {
       return false;
-    } else {
+    }
+    else {
       return (
         accessTemplate.calculator.calculateFlexPath(
           accessTemplate.accessEgress.state().getVertex(),

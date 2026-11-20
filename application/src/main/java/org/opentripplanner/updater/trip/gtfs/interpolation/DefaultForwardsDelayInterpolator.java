@@ -60,16 +60,19 @@ class DefaultForwardsDelayInterpolator implements ForwardsDelayInterpolator {
           // than that.
           if (time != null && builder.getScheduledArrivalTime(i) < time) {
             builder.withArrivalTime(i, time);
-          } else {
+          }
+          else {
             builder.withArrivalDelay(i, 0);
           }
-        } else if (delay != null) {
+        }
+        else if (delay != null) {
           // the arrival delay cannot exceed the given departure time
           var departureTime = builder.getDepartureTime(i);
 
           if (departureTime != null && builder.getScheduledArrivalTime(i) + delay > departureTime) {
             builder.withArrivalTime(i, departureTime);
-          } else {
+          }
+          else {
             builder.withArrivalDelay(i, delay);
           }
         }
@@ -87,10 +90,12 @@ class DefaultForwardsDelayInterpolator implements ForwardsDelayInterpolator {
           // than that.
           if (time != null && builder.getScheduledDepartureTime(i) < time) {
             builder.withDepartureTime(i, time);
-          } else {
+          }
+          else {
             builder.withDepartureDelay(i, 0);
           }
-        } else if (delay != null) {
+        }
+        else if (delay != null) {
           builder.withDepartureDelay(i, delay);
         }
 
@@ -143,7 +148,8 @@ class DefaultForwardsDelayInterpolator implements ForwardsDelayInterpolator {
       // GTFS does not support INACCURATE_PREDICTIONS, but I think it should be propagated as well
       if (state == StopRealTimeState.NO_DATA || state == StopRealTimeState.INACCURATE_PREDICTIONS) {
         propagatedState = state;
-      } else {
+      }
+      else {
         propagatedState = StopRealTimeState.DEFAULT;
       }
     }

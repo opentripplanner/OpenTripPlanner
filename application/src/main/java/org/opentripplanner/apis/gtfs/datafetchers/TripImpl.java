@@ -127,7 +127,8 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
           }
         });
         return alerts.stream().distinct().collect(Collectors.toList());
-      } else {
+      }
+      else {
         return alertService.getTripAlerts(getSource(environment).getId());
       }
     };
@@ -169,7 +170,8 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
           serviceDate,
           midnight
         );
-      } catch (ParseException e) {
+      }
+      catch (ParseException e) {
         // invalid date format
         return null;
       }
@@ -221,7 +223,8 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
         }
 
         return new TripTimeOnDate(tripTimes, 0, tripPattern, serviceDate, midnight);
-      } catch (ParseException e) {
+      }
+      catch (ParseException e) {
         // invalid date format
         return null;
       }
@@ -392,7 +395,8 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
           serviceDate,
           midnight
         );
-      } catch (ParseException e) {
+      }
+      catch (ParseException e) {
         // invalid date format
         return null;
       }

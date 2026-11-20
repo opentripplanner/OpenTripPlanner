@@ -161,7 +161,8 @@ public class ItineraryReferenceSerializer {
         walkSafetyFactor,
         wheelchair
       );
-    } catch (RuntimeException e) {
+    }
+    catch (RuntimeException e) {
       return null;
     }
   }

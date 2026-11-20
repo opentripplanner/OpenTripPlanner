@@ -36,18 +36,22 @@ public class EmissionItineraryDecorator implements ItineraryDecorator {
 
       if (l instanceof TransitLeg tl) {
         value = calculateCo2EmissionsForTransit(tl).orElse(null);
-      } else if (l instanceof StreetLeg sl && sl.getMode() == TraverseMode.CAR) {
+      }
+      else if (l instanceof StreetLeg sl && sl.getMode() == TraverseMode.CAR) {
         value = calculateCo2EmissionsForCar(sl);
-      } else if (l instanceof TaxiLeg taxiLeg) {
+      }
+      else if (l instanceof TaxiLeg taxiLeg) {
         value = calculateCo2EmissionsForTaxi(taxiLeg).orElse(null);
-      } else {
+      }
+      else {
         newLegs.add(l);
         continue;
       }
 
       if (value == null) {
         partialResults = true;
-      } else {
+      }
+      else {
         l = l.withEmissionPerPerson(value);
         sum = sum.plus(value);
       }

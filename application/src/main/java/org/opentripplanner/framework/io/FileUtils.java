@@ -17,7 +17,8 @@ public class FileUtils {
   public static String readFile(File file) {
     try (var is = new FileInputStream(file)) {
       return new String(is.readAllBytes(), UTF_8);
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
   }
@@ -31,7 +32,8 @@ public class FileUtils {
       // writes '\n' as a single LF byte
       writer.write(doc);
       writer.flush();
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
   }

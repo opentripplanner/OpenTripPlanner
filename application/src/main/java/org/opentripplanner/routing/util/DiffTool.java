@@ -35,7 +35,8 @@ public final class DiffTool {
       if (c < 0) {
         result.add(DiffEntry.ofLeft(l));
         l = next(leftIterator);
-      } else if (c > 0) {
+      }
+      else if (c > 0) {
         result.add(DiffEntry.ofRight(r));
         r = next(rightIterator);
       }

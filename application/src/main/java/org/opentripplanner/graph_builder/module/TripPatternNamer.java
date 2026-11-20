@@ -186,7 +186,8 @@ public class TripPatternNamer implements GraphBuilderModule {
           // The current one must be a subset of the other, because it has no unique via.
           // Therefore we call it the express.
           sb.append(" express");
-        } else {
+        }
+        else {
           // The final fallback: reference a specific trip ID.
           Optional.ofNullable(pattern.getScheduledTimetable().getRepresentativeTripTimes())
             .map(TripTimes::getTrip)

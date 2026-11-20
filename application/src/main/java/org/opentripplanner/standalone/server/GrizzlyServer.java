@@ -162,11 +162,14 @@ public class GrizzlyServer {
       httpServer.start();
       LOG.info("Grizzly server running.");
       Thread.currentThread().join();
-    } catch (BindException be) {
+    }
+    catch (BindException be) {
       LOG.error("Cannot bind to port {}. Is it already in use?", params.port);
-    } catch (IOException ioe) {
+    }
+    catch (IOException ioe) {
       LOG.error("IO exception while starting server.");
-    } catch (InterruptedException ie) {
+    }
+    catch (InterruptedException ie) {
       LOG.info("Interrupted, shutting down.");
     }
 
@@ -187,7 +190,8 @@ public class GrizzlyServer {
     if (params.maxThreads != null && params.maxThreads > 0) {
       maxThreads = params.maxThreads;
       LOG.info("Based on configuration, forced max thread pool size to {} threads.", maxThreads);
-    } else if (maxThreads < MIN_THREADS) {
+    }
+    else if (maxThreads < MIN_THREADS) {
       // Some machines apparently report 1 processor even when they have 8.
       maxThreads = MIN_THREADS;
     }

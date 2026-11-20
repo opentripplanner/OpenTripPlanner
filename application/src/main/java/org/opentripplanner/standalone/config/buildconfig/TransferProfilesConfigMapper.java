@@ -135,7 +135,8 @@ public class TransferProfilesConfigMapper {
       var parameters = new TransferParameters<>(profiles, maxDurations, warmup);
       RegularTransferFactory.validate(parameters, new RegularTransferPreferencesMapper());
       return parameters;
-    } catch (IllegalArgumentException e) {
+    }
+    catch (IllegalArgumentException e) {
       throw new OtpAppException("Invalid transfer configuration: " + e.getMessage());
     }
   }
@@ -198,7 +199,8 @@ public class TransferProfilesConfigMapper {
 
     try {
       return new BicycleMaxDurations(allowAllModes, maxDuration, allowsCar);
-    } catch (IllegalArgumentException e) {
+    }
+    catch (IllegalArgumentException e) {
       throw new OtpAppException(
         "Invalid transfer configuration in " + typeNode.contextPath() + ": " + e.getMessage()
       );
@@ -272,7 +274,8 @@ public class TransferProfilesConfigMapper {
 
     try {
       return builder.asCostLinearFunction(TransferParameters.DEFAULT_REUSE_LIMIT);
-    } catch (IllegalArgumentException e) {
+    }
+    catch (IllegalArgumentException e) {
       throw new OtpAppException(
         "Invalid transfer configuration in " + profile.node().contextPath() + ": " + e.getMessage()
       );
@@ -499,7 +502,8 @@ public class TransferProfilesConfigMapper {
 
     try {
       return Ratio.of(value).normalize();
-    } catch (IllegalArgumentException e) {
+    }
+    catch (IllegalArgumentException e) {
       throw new OtpAppException(
         "Invalid transfer configuration in " + p.contextPath() + ": safetyFactor. " + e.getMessage()
       );
@@ -566,7 +570,8 @@ public class TransferProfilesConfigMapper {
           .summary("The importance of the safety, the safest streets.")
           .asDouble(0.0)
       );
-    } catch (IllegalArgumentException e) {
+    }
+    catch (IllegalArgumentException e) {
       throw new OtpAppException(
         "Invalid transfer configuration in " + optimize.contextPath() + ": " + e.getMessage()
       );

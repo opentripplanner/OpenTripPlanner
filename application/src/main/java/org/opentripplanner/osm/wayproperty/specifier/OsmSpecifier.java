@@ -19,7 +19,8 @@ public interface OsmSpecifier {
 
         if (kv[1].equals("*")) {
           return new Condition.Present(kv[0].toLowerCase());
-        } else {
+        }
+        else {
           return new Condition.Equals(kv[0].toLowerCase(), kv[1].toLowerCase());
         }
       })

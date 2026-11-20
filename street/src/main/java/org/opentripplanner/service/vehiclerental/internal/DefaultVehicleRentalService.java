@@ -81,13 +81,15 @@ public class DefaultVehicleRentalService implements VehicleRentalService {
       .anyMatch(place -> {
         if (place instanceof VehicleRentalVehicle vehicle) {
           return vehicle.vehicleType().formFactor() == RentalFormFactor.BICYCLE;
-        } else if (place instanceof VehicleRentalStation station) {
+        }
+        else if (place instanceof VehicleRentalStation station) {
           return station
             .vehicleTypesAvailable()
             .keySet()
             .stream()
             .anyMatch(t -> t.formFactor() == RentalFormFactor.BICYCLE);
-        } else {
+        }
+        else {
           return false;
         }
       });

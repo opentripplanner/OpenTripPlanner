@@ -33,12 +33,14 @@ public enum ResourceBundleSingleton {
 
       if (INTERNAL_KEYS.contains(key)) {
         resourceBundle = getBundleWithoutFallback("internals", locale);
-      } else {
+      }
+      else {
         resourceBundle = getBundleWithoutFallback("WayProperties", locale);
       }
 
       return resourceBundle.getString(key);
-    } catch (MissingResourceException e) {
+    }
+    catch (MissingResourceException e) {
       return key;
     }
   }

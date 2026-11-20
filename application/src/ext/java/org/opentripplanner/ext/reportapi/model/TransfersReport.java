@@ -161,7 +161,8 @@ public class TransfersReport {
       r.trip = trip.getHeadsign() != null ? trip.getHeadsign().toString() : null;
       var stop = ptn.getStop(tp.getStopPositionInPattern());
       addLocation(r, ptn, stop, trip, boarding);
-    } else if (p instanceof RouteStopTransferPoint rp) {
+    }
+    else if (p instanceof RouteStopTransferPoint rp) {
       var route = rp.getRoute();
       var ptn = transitService.findPatterns(route).stream().findFirst().orElse(null);
       r.operator = getName(route.getOperator());
@@ -169,7 +170,8 @@ public class TransfersReport {
       r.entityId = route.getId().getId();
       r.route = route.getName() + " " + route.getMode() + " " + route.getLongName();
       addLocation(r, ptn, rp.getStop(), null, boarding);
-    } else if (p instanceof RouteStationTransferPoint rp) {
+    }
+    else if (p instanceof RouteStationTransferPoint rp) {
       var route = rp.getRoute();
       r.operator = getName(route.getOperator());
       r.type = "Route";
@@ -177,13 +179,15 @@ public class TransfersReport {
       r.route = route.getName() + " " + route.getMode() + " " + route.getLongName();
       r.loc += rp.getStation().getName();
       r.coordinate = rp.getStation().getCoordinate();
-    } else if (p instanceof StopTransferPoint sp) {
+    }
+    else if (p instanceof StopTransferPoint sp) {
       StopLocation stop = sp.getStop();
       r.type = "Stop";
       r.entityId = stop.getId().getId();
       r.loc = Optional.ofNullable(stop.getName()).map(I18NString::toString).orElse("");
       r.coordinate = stop.getCoordinate();
-    } else if (p instanceof StationTransferPoint sp) {
+    }
+    else if (p instanceof StationTransferPoint sp) {
       Station station = sp.getStation();
       r.type = "Station";
       r.entityId = station.getId().getId();

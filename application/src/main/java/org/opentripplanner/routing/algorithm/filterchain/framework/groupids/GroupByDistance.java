@@ -152,9 +152,11 @@ public class GroupByDistance implements GroupId<GroupByDistance> {
 
     if (leg instanceof TransitLeg trLeg) {
       builder.addEnum("mode", trLeg.mode()).addObj("tripId", leg.trip().getId());
-    } else if (leg instanceof StreetLeg stLeg) {
+    }
+    else if (leg instanceof StreetLeg stLeg) {
       builder.addEnum("mode", stLeg.getMode());
-    } else {
+    }
+    else {
       throw new IllegalStateException("Unhandled type: " + leg.getClass());
     }
 

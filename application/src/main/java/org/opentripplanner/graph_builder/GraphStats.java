@@ -71,7 +71,8 @@ public class GraphStats {
 
     try {
       jc.parse(args);
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       System.out.println(e.getMessage());
       jc.usage();
       System.exit(1);
@@ -88,7 +89,8 @@ public class GraphStats {
 
     try {
       graphStats.run();
-    } catch (OtpAppException ignore) {
+    }
+    catch (OtpAppException ignore) {
       // The error is handled at a lover level
     }
   }
@@ -104,11 +106,13 @@ public class GraphStats {
     if (outPath != null) {
       try {
         writer = new CsvWriter(outPath, ',', StandardCharsets.UTF_8);
-      } catch (Exception e) {
+      }
+      catch (Exception e) {
         LOG.error("Exception while opening output file " + outPath);
         return;
       }
-    } else {
+    }
+    else {
       writer = new CsvWriter(System.out, ',', StandardCharsets.UTF_8);
     }
 
@@ -118,7 +122,8 @@ public class GraphStats {
 
     if (command.equals("endpoints")) {
       commandEndpoints.run();
-    } else if (command.equals("patternstats")) {
+    }
+    else if (command.equals("patternstats")) {
       commandPatternStats.run();
     }
 
@@ -193,7 +198,8 @@ public class GraphStats {
             double frac = random.nextDouble();
             LinearLocation ll = new LinearLocation(seg, frac);
             c = lil.extractPoint(ll);
-          } else {
+          }
+          else {
             c = v.getCoordinate();
           }
 
@@ -215,7 +221,8 @@ public class GraphStats {
           writer.writeRecord(entries);
           i += 1;
         }
-      } catch (IOException ioe) {
+      }
+      catch (IOException ioe) {
         LOG.error("Excpetion while writing CSV: {}", ioe.getMessage());
       }
 
@@ -267,7 +274,8 @@ public class GraphStats {
             Double.toString(cTrips / (double) nTrips),
           });
         }
-      } catch (IOException e) {
+      }
+      catch (IOException e) {
         LOG.error("Exception writing CSV: {}", e.getMessage());
         return;
       }

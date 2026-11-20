@@ -33,7 +33,8 @@ public class LiipiParkUtilizationToPatchMapper {
         "spacesAvailable"
       );
       return new LiipiParkPatch(vehicleParkId, capacityType, spacesAvailable);
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       LOG.warn("Error parsing park utilization {}", vehicleParkId, e);
       return null;
     }

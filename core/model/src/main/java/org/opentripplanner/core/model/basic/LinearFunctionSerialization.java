@@ -139,7 +139,8 @@ public class LinearFunctionSerialization {
       }
 
       return DurationUtils.duration(text);
-    } catch (DateTimeParseException e) {
+    }
+    catch (DateTimeParseException e) {
       throw new IllegalArgumentException("Unable to parse duration: '" + text + "'");
     }
   }

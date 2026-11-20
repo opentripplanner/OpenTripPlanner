@@ -49,7 +49,8 @@ public class TripHopMapper {
 
       if (emission.isPresent()) {
         map.put(it.getKey(), emission.get());
-      } else {
+      }
+      else {
         issueStore.addAll(builder.listIssues());
       }
     }

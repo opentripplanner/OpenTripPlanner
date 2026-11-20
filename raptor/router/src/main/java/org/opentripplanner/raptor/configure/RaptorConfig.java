@@ -105,7 +105,8 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
         nextWorker = RangeRaptorWorkerComposite.of(c.createPathParetoComparator(), w, nextWorker);
         nextWorkerState = s;
       }
-    } else {
+    }
+    else {
       // The first segment is the only segment
       var segment = context.segments().getFirst();
       var c = new McRangeRaptorConfig<>(segment).withHeuristics(heuristics);

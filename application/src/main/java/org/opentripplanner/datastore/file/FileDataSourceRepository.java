@@ -115,7 +115,8 @@ public class FileDataSourceRepository implements LocalDataSourceRepository {
       if (type == resolveFileType(file)) {
         if (isCompositeDataSource(file)) {
           existingFiles.add(createCompositeSource(file, type));
-        } else {
+        }
+        else {
           existingFiles.add(new FileDataSource(file, type));
         }
       }
@@ -134,7 +135,8 @@ public class FileDataSourceRepository implements LocalDataSourceRepository {
   public File openFile(URI uri, FileType type) {
     try {
       return uri.isAbsolute() ? new File(uri) : new File(baseDir, uri.getPath());
-    } catch (IllegalArgumentException e) {
+    }
+    catch (IllegalArgumentException e) {
       throw new OtpAppException(
         "The file URI is invalid for file type " +
           type +

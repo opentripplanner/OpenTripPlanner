@@ -168,7 +168,8 @@ class StopCallImplTest {
       try {
         CallSchedule schedule = impl.schedule().get(env);
         assertEquals(new CallSchedule(new TimeWindow(TEN_AM, TEN_AM.plusMinutes(30))), schedule);
-      } catch (Exception e) {
+      }
+      catch (Exception e) {
         throw new RuntimeException(e);
       }
     });

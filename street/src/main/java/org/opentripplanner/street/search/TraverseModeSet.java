@@ -50,7 +50,8 @@ public class TraverseModeSet implements Cloneable, Serializable {
   public void setBicycle(boolean bicycle) {
     if (bicycle) {
       modes |= MODE_BICYCLE;
-    } else {
+    }
+    else {
       modes &= ~MODE_BICYCLE;
     }
   }
@@ -62,7 +63,8 @@ public class TraverseModeSet implements Cloneable, Serializable {
   public void setWalk(boolean walk) {
     if (walk) {
       modes |= MODE_WALK;
-    } else {
+    }
+    else {
       modes &= ~MODE_WALK;
     }
   }
@@ -74,7 +76,8 @@ public class TraverseModeSet implements Cloneable, Serializable {
   public void setCar(boolean car) {
     if (car) {
       modes |= MODE_CAR;
-    } else {
+    }
+    else {
       modes &= ~MODE_CAR;
     }
   }
@@ -122,7 +125,8 @@ public class TraverseModeSet implements Cloneable, Serializable {
   public TraverseModeSet clone() {
     try {
       return (TraverseModeSet) super.clone();
-    } catch (CloneNotSupportedException e) {
+    }
+    catch (CloneNotSupportedException e) {
       /* this will never happen since our super is the cloneable object */
       throw new RuntimeException(e);
     }

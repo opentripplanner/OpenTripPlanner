@@ -523,7 +523,8 @@ public class RealtimeVehicleMatcherTest {
         testModel.stopTime(trip, 1, fivePast6)
       );
       tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
-    } else {
+    }
+    else {
       serviceDates = serviceDateStrings.stream().map(LocalDate::parse).collect(Collectors.toSet());
     }
 

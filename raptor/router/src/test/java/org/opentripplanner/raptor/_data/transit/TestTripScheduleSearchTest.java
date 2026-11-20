@@ -79,7 +79,8 @@ class TestTripScheduleSearchTest implements RaptorTestConstants {
       assertTrue(result.empty());
       assertTime(searchTime, result.earliestBoardTime());
       assertEquals(NOT_FOUND, result.tripScheduleIndex());
-    } else if (expStatus == Status.OK) {
+    }
+    else if (expStatus == Status.OK) {
       assertFalse(result.empty());
       assertEquals(stopPos, result.stopPositionInPattern());
       assertTime(expTime, result.time());
@@ -140,7 +141,8 @@ class TestTripScheduleSearchTest implements RaptorTestConstants {
       assertTrue(result.empty());
       assertTime(searchTime, result.earliestBoardTime());
       assertEquals(NOT_FOUND, result.tripScheduleIndex());
-    } else {
+    }
+    else {
       assertFalse(result.empty());
       assertEquals(stopPos, result.stopPositionInPattern());
       assertTime(expTime, result.time());
@@ -157,7 +159,8 @@ class TestTripScheduleSearchTest implements RaptorTestConstants {
       if (tripIndex == secondTrip) {
         assertFalse(e.empty());
         assertEquals(firstTrip, result.tripScheduleIndex());
-      } else {
+      }
+      else {
         assertTrue(e.empty());
         assertEquals(NOT_FOUND, result.tripScheduleIndex());
       }

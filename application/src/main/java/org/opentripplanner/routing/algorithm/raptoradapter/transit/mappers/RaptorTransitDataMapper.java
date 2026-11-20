@@ -194,7 +194,8 @@ public class RaptorTransitDataMapper {
 
       if (stop == null) {
         stopBoardAlightTransferCosts[i] = defaultCost;
-      } else {
+      }
+      else {
         var priority = stop.getPriority();
         int domainCost = tuningParams.stopBoardAlightDuringTransferCost(priority);
         stopBoardAlightTransferCosts[i] = RaptorCostConverter.toRaptorCost(domainCost);

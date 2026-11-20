@@ -23,7 +23,8 @@ public enum VisibilityMode {
   public static VisibilityMode ofBoolean(boolean computeVisibility) {
     if (computeVisibility) {
       return COMPUTE_AREA_VISIBILITY_LINES;
-    } else {
+    }
+    else {
       return TRAVERSE_AREA_EDGES;
     }
   }

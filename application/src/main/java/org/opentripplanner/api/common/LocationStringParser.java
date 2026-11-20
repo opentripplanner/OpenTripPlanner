@@ -66,7 +66,8 @@ public class LocationStringParser {
       var lat = Double.parseDouble(matcher.group(1));
       var lon = Double.parseDouble(matcher.group(4));
       return Optional.of(GenericLocation.fromCoordinate(lat, lon, label));
-    } else {
+    }
+    else {
       return FeedScopedId.parseOptional(place).map(id -> GenericLocation.fromStopId(id, label));
     }
   }

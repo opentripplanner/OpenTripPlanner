@@ -391,7 +391,8 @@ public class NetexMapper {
 
       if (stopLocation instanceof AreaStop areaStop) {
         transitBuilder.siteRepository().withAreaStop(areaStop);
-      } else if (stopLocation instanceof GroupStop groupStop) {
+      }
+      else if (stopLocation instanceof GroupStop groupStop) {
         transitBuilder.siteRepository().withGroupStop(groupStop);
 
         for (var child : groupStop.getChildLocations()) {
@@ -559,7 +560,8 @@ public class NetexMapper {
         if (transitBuilder.getStops().containsKey(quayId)) {
           var stop = transitBuilder.getStops().get(quayId);
           transitBuilder.addStopByScheduledStopPoint(sspid, stop);
-        } else {
+        }
+        else {
           // it's debatable if this is actually a problem with the data set. there are legitimate
           // cases where SSPs are not mapped, for example pass-through stops.
           issueStore.add(

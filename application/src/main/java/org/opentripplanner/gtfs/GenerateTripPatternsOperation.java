@@ -84,7 +84,8 @@ public class GenerateTripPatternsOperation {
         buildTripPatternForTrip(trip);
         //noinspection Convert2MethodRef
         progressLogger.step(m -> LOG.info(m));
-      } catch (DataValidationException e) {
+      }
+      catch (DataValidationException e) {
         issueStore.add(e.error());
       }
     }

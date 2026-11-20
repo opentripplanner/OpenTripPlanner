@@ -42,9 +42,11 @@ class StopPositionMapper {
   int stopPositionInPattern(int listIndex, StopTimeUpdate update) throws UpdateException {
     if (update.stopSequence().isPresent()) {
       return handleStopSequence(listIndex, update);
-    } else if (update.stopId().isPresent()) {
+    }
+    else if (update.stopId().isPresent()) {
       return handleStopId(listIndex, update.stopId().get());
-    } else {
+    }
+    else {
       throw UpdateException.of(tripId, INVALID_STOP_REFERENCE, listIndex);
     }
   }
@@ -54,7 +56,8 @@ class StopPositionMapper {
 
     if (pos.isEmpty()) {
       throw UpdateException.of(tripId, INVALID_STOP_SEQUENCE, listIndex);
-    } else {
+    }
+    else {
       return pos.getAsInt();
     }
   }
@@ -64,7 +67,8 @@ class StopPositionMapper {
 
     if (visitsAtStop == 0) {
       throw UpdateException.of(tripId, INVALID_STOP_REFERENCE, listIndex);
-    } else if (visitsAtStop == 1) {
+    }
+    else if (visitsAtStop == 1) {
       return stopIds.indexOf(stopId);
     }
     // special case: circular stop pattern but the updates supplied contain only stop_id
@@ -92,14 +96,16 @@ class StopPositionMapper {
     if (stopIds.get(listIndex).equals(stopId)) {
       // order in the updates also happens to match the order in the stop pattern
       return listIndex;
-    } else {
+    }
+    else {
       // very niche edge case: the update supplies only stop_id and the beginning of
       // the trip is missing in the real-time update
       var lastPosInPattern = stopIds.lastIndexOf(stopId);
 
       if (lastPosInPattern == -1) {
         throw UpdateException.of(tripId, INVALID_STOP_REFERENCE, listIndex);
-      } else {
+      }
+      else {
         return lastPosInPattern;
       }
     }

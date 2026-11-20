@@ -79,7 +79,8 @@ class StopTimeToScheduledTripTimesMapper {
 
     if (tripHeadsign == null) {
       useStopHeadsigns = true;
-    } else {
+    }
+    else {
       for (final StopTime st : stopTimes) {
         if (!tripHeadsign.equals(st.getStopHeadsign())) {
           useStopHeadsigns = true;
@@ -108,7 +109,8 @@ class StopTimeToScheduledTripTimesMapper {
 
     if (allNull) {
       return null;
-    } else {
+    }
+    else {
       return hs;
     }
   }

@@ -298,9 +298,11 @@ public class ElevationProfile {
 
         if (first.y == second.y && second.y == third.y) {
           steps.remove(i + 1);
-        } else if (first.equals(second)) {
+        }
+        else if (first.equals(second)) {
           steps.remove(i + 1);
-        } else if (second.equals(third)) {
+        }
+        else if (second.equals(third)) {
           steps.remove(i + 1);
         }
       }

@@ -80,7 +80,8 @@ class StopTimesMapper {
 
     if (!destinationDisplay.isEmpty()) {
       stopTime.setStopHeadsign(new NonLocalizedString(destinationDisplay));
-    } else if (trip.getHeadsign() != null) {
+    }
+    else if (trip.getHeadsign() != null) {
       stopTime.setStopHeadsign(trip.getHeadsign());
     }
 

@@ -122,7 +122,8 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule> imple
 
     if (arrivedOnBoard || bestTime) {
       stopArrivalsState.setAccessTime(arrivalTime, accessPath, bestTime);
-    } else {
+    }
+    else {
       stopArrivalsState.rejectAccessTime(arrivalTime, accessPath);
     }
   }
@@ -184,7 +185,8 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule> imple
         trip,
         newOverallBestTime
       );
-    } else {
+    }
+    else {
       stopArrivalsState.rejectNewBestTransitTime(stop, arrivalTime, boardStopPosition, trip);
     }
   }
@@ -217,7 +219,8 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule> imple
 
     if (newOverallBestTime(toStop, arrivalTime)) {
       stopArrivalsState.setNewBestTransferTime(fromStop, arrivalTime, transfer);
-    } else {
+    }
+    else {
       stopArrivalsState.rejectNewBestTransferTime(fromStop, arrivalTime, transfer);
     }
 

@@ -58,7 +58,8 @@ public class FlexServiceDate {
 
     if (requestedBookingTimeInstant == null) {
       requestedBookingTime = RoutingBookingInfo.NOT_SET;
-    } else {
+    }
+    else {
       ZonedDateTime startOfService = ServiceDateUtils.asStartOfService(serviceDate, timeZone);
       requestedBookingTime = ServiceDateUtils.secondsSinceStartOfTime(
         startOfService,

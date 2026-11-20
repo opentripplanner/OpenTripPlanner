@@ -176,7 +176,8 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
         stopsCursor(),
         state
       );
-    } else {
+    }
+    else {
       return state;
     }
   }

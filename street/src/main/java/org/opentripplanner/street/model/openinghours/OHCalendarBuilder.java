@@ -191,7 +191,8 @@ public class OHCalendarBuilder {
 
       if (untilMonth == null) {
         months.add(fromMonth);
-      } else {
+      }
+      else {
         int untilMonthAdjusted =
           fromMonth.getValue() > untilMonth.getValue()
             ? untilMonth.getValue() + 12
@@ -207,7 +208,8 @@ public class OHCalendarBuilder {
 
       if (untilDayOfWeek == null) {
         daysOfWeek.add(fromDayOfWeek);
-      } else {
+      }
+      else {
         int untilDayAdjusted =
           fromDayOfWeek.getValue() > untilDayOfWeek.getValue()
             ? untilDayOfWeek.getValue() + 7
@@ -230,7 +232,8 @@ public class OHCalendarBuilder {
 
           dateToProcess = dateToProcess.plusDays(1);
           i += 1;
-        } else {
+        }
+        else {
           int daysToSkip =
             YearMonth.of(dateToProcess.getYear(), dateToProcess.getMonth()).lengthOfMonth() -
             dateToProcess.getDayOfMonth() +
@@ -275,7 +278,8 @@ public class OHCalendarBuilder {
             appendDescription(" except " + offDescription);
           }
         }
-      } else {
+      }
+      else {
         off(daysOff, offDescription);
       }
 

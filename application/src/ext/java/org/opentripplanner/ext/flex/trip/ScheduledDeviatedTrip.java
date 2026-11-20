@@ -199,7 +199,8 @@ public class ScheduledDeviatedTrip
         ) {
           return i;
         }
-      } else {
+      }
+      else {
         if (stop.getId().equals(fromStopId)) {
           return i;
         }
@@ -227,7 +228,8 @@ public class ScheduledDeviatedTrip
         ) {
           return i;
         }
-      } else {
+      }
+      else {
         if (stop.getId().equals(toStopId)) {
           return i;
         }

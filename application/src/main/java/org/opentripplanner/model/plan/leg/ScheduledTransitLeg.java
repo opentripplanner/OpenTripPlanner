@@ -200,7 +200,8 @@ public class ScheduledTransitLeg implements TransitLeg {
   public LegCallTime start() {
     if (isRealTimeUpdated()) {
       return LegCallTime.of(startTime, departureDelay());
-    } else {
+    }
+    else {
       return LegCallTime.ofStatic(startTime);
     }
   }
@@ -209,7 +210,8 @@ public class ScheduledTransitLeg implements TransitLeg {
   public LegCallTime end() {
     if (isRealTimeUpdated()) {
       return LegCallTime.of(endTime, arrivalDelay());
-    } else {
+    }
+    else {
       return LegCallTime.ofStatic(endTime);
     }
   }

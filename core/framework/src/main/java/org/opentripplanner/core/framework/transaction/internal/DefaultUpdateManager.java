@@ -110,7 +110,8 @@ public class DefaultUpdateManager implements UpdateManager {
       try {
         task.accept(new DefaultWriteContext(eventHandlers));
         transactionManager.commit();
-      } catch (RuntimeException e) {
+      }
+      catch (RuntimeException e) {
         rollback();
         throw e;
       }

@@ -40,7 +40,8 @@ public class MappingSupport {
   public static <T extends VersionOfObjectRefStructure> T createRef(String id, Class<T> clazz) {
     try {
       return (T) clazz.newInstance().withRef(id);
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       throw new RuntimeException(e.getLocalizedMessage(), e);
     }
   }

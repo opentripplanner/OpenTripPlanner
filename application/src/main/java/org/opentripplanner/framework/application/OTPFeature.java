@@ -276,7 +276,8 @@ public enum OTPFeature {
       try {
         set(enabled);
         task.run();
-      } finally {
+      }
+      finally {
         set(originalValue);
       }
     }

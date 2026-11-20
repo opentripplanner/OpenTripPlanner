@@ -73,11 +73,13 @@ public class UnmodifiableCollectionsSerializer extends Serializer<Object> {
       // the ordinal could be replaced by s.th. else (e.g. a explicitely managed "id")
       output.writeInt(unmodifiableCollection.ordinal(), true);
       kryo.writeClassAndObject(output, unmodifiableCollection.toKryoSerializedObject(object));
-    } catch (RuntimeException e) {
+    }
+    catch (RuntimeException e) {
       // Don't eat and wrap RuntimeExceptions because the ObjectBuffer.write...
       // handles SerializationException specifically (resizing the buffer)...
       throw e;
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       throw new RuntimeException(e);
     }
   }
@@ -98,10 +100,12 @@ public class UnmodifiableCollectionsSerializer extends Serializer<Object> {
       );
       Object intermediateCopy = kryo.copy(unmodifiableCollection.toKryoSerializedObject(original));
       return unmodifiableCollection.fromKryoSerializedObject(intermediateCopy);
-    } catch (RuntimeException e) {
+    }
+    catch (RuntimeException e) {
       // Don't eat and wrap RuntimeExceptions
       throw e;
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       throw new RuntimeException(e);
     }
   }

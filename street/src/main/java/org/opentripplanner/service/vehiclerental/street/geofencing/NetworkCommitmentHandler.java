@@ -121,7 +121,8 @@ class NetworkCommitmentHandler {
 
         if (zone.isBusinessArea()) {
           commitOnlyNetworks.add(network);
-        } else {
+        }
+        else {
           forkNetworks.add(network);
         }
       }

@@ -452,7 +452,8 @@ class VehicleRentalEdgeTest {
   private static State singleState(State[] resultingStates) {
     if (resultingStates.length == 1) {
       return resultingStates[0];
-    } else {
+    }
+    else {
       fail("Expected a single state from traverse() method but received " + resultingStates.length);
       return null;
     }

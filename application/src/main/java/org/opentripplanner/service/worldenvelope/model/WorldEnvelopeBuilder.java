@@ -75,7 +75,8 @@ public class WorldEnvelopeBuilder {
       if (lon > 180.0) {
         lon -= 180;
       }
-    } else {
+    }
+    else {
       collection.forEach(v -> medianCalculator.add(lonProvider.apply(v)));
       lon = medianCalculator.median();
     }
@@ -103,7 +104,8 @@ public class WorldEnvelopeBuilder {
 
     if (includeLongitude180()) {
       return new WorldEnvelope(minLat, minLonEast, maxLat, minLonWest, transitMedianCenter);
-    } else {
+    }
+    else {
       return new WorldEnvelope(minLat, minLonWest, maxLat, maxLonEast, transitMedianCenter);
     }
   }
@@ -129,7 +131,8 @@ public class WorldEnvelopeBuilder {
     if (longitude < 0) {
       minLonWest = Math.min(minLonWest, longitude);
       maxLonWest = Math.max(maxLonWest, longitude);
-    } else {
+    }
+    else {
       minLonEast = Math.min(minLonEast, longitude);
       maxLonEast = Math.max(maxLonEast, longitude);
     }

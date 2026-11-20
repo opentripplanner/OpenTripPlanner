@@ -520,7 +520,8 @@ public class OsmTagMapper {
 
     if (vehicle != null) {
       return doesTagValueDisallowThroughTraffic(vehicle);
-    } else {
+    }
+    else {
       return isGeneralNoThroughTraffic(way);
     }
   }
@@ -533,7 +534,8 @@ public class OsmTagMapper {
 
     if (motorVehicle != null) {
       return doesTagValueDisallowThroughTraffic(motorVehicle);
-    } else {
+    }
+    else {
       return isVehicleThroughTrafficExplicitlyDisallowed(way);
     }
   }
@@ -546,7 +548,8 @@ public class OsmTagMapper {
 
     if (bicycle != null) {
       return doesTagValueDisallowThroughTraffic(bicycle);
-    } else {
+    }
+    else {
       return isVehicleThroughTrafficExplicitlyDisallowed(way);
     }
   }
@@ -559,7 +562,8 @@ public class OsmTagMapper {
 
     if (foot != null) {
       return doesTagValueDisallowThroughTraffic(foot);
-    } else {
+    }
+    else {
       return isGeneralNoThroughTraffic(way);
     }
   }

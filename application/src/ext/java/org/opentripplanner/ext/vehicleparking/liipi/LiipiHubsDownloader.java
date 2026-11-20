@@ -52,17 +52,21 @@ public class LiipiHubsDownloader {
       return otpHttpClient.getAndMap(URI.create(url), HttpHeaders.empty(), response -> {
         try {
           return parseJSON(response.body());
-        } catch (IllegalArgumentException e) {
+        }
+        catch (IllegalArgumentException e) {
           LOG.warn("Error parsing hubs from {}", url, e);
-        } catch (JacksonException e) {
+        }
+        catch (JacksonException e) {
           LOG.warn("Error parsing hubs from {} (bad JSON of some sort)", url, e);
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
           LOG.warn("Error reading hubs from {}", url, e);
         }
 
         return null;
       });
-    } catch (OtpHttpClientException e) {
+    }
+    catch (OtpHttpClientException e) {
       LOG.warn("Failed to get data from url {}", url);
       return null;
     }

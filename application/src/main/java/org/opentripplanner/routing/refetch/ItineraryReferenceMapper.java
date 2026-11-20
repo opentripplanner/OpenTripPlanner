@@ -115,7 +115,8 @@ public final class ItineraryReferenceMapper {
             )
         )
         .buildRequest();
-    } catch (RoutingValidationException | IllegalArgumentException e) {
+    }
+    catch (RoutingValidationException | IllegalArgumentException e) {
       throw new RefetchItineraryException("Could not rebuild route request: " + e.getMessage());
     }
   }

@@ -85,7 +85,8 @@ public class StopConsolidationModule implements GraphBuilderModule {
     try (var inputStream = ds.asInputStream()) {
       var groups = StopConsolidationParser.parseGroups(inputStream);
       return new StopConsolidationModule(transitRepository, timetableDataImport, repo, groups);
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       throw new RuntimeException(e);
     }
   }

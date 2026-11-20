@@ -173,7 +173,8 @@ public final class CarReachableVertexSnapper {
     // Reverse search starts from toVertices, forward from fromVertices.
     if (arriveBy) {
       builder = builder.withTo(vertexToSnap);
-    } else {
+    }
+    else {
       builder = builder.withFrom(vertexToSnap);
     }
 
@@ -282,7 +283,8 @@ public final class CarReachableVertexSnapper {
 
     if (arriveBy) {
       builder = builder.withTo(origin);
-    } else {
+    }
+    else {
       builder = builder.withFrom(origin);
     }
 

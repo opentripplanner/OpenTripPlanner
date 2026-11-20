@@ -43,7 +43,8 @@ class MedianCalcForDoubles {
 
     if (n % 2 == 1) {
       return array[(n - 1) / 2];
-    } else {
+    }
+    else {
       int i = n / 2 - 1;
       return (array[i] + array[i + 1]) / 2.0;
     }

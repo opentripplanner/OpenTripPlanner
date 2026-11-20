@@ -57,14 +57,16 @@ public class IncludeFileDirective {
   private static String loadFile(File file, String directive, String source) {
     try (var is = new FileInputStream(file)) {
       return new String(is.readAllBytes(), StandardCharsets.UTF_8);
-    } catch (FileNotFoundException ex) {
+    }
+    catch (FileNotFoundException ex) {
       throw new OtpAppException(
         "File '{}' is not present. Can not include " + "directive '{}' in config file '{}'.",
         file.getPath(),
         directive,
         source
       );
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       throw new OtpAppException(
         "Error while parsing file '{}'. Can not include " + "directive '{}' in config file '{}'.",
         file.getPath(),
@@ -104,7 +106,8 @@ public class IncludeFileDirective {
         (json.startsWith("{") && json.endsWith("}")) || (json.startsWith("[") && json.endsWith("]"))
       ) {
         text = text.replace(entry.getKey(), fileText);
-      } else {
+      }
+      else {
         // Add back quotes if matched part of directive pattern
         String startQuote = directive.startsWith(QUOTE) ? QUOTE : "";
         String endQuote = directive.endsWith(QUOTE) ? QUOTE : "";

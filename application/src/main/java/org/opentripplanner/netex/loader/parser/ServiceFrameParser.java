@@ -155,13 +155,15 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
         if (assignment.getQuayRef() != null) {
           String quayRef = assignment.getQuayRef().getValue().getRef();
           quayIdByStopPointRef.put(stopPointRef, quayRef);
-        } else if (
+        }
+        else if (
           allowStopPlaceAsPassengerStopAssignment && assignment.getStopPlaceRef() != null
         ) {
           var stopPlaceRef = assignment.getStopPlaceRef().getValue().getRef();
           stopPlaceByStopPointRef.put(stopPointRef, stopPlaceRef);
         }
-      } else if (stopAssignment.getValue() instanceof FlexibleStopAssignment assignment) {
+      }
+      else if (stopAssignment.getValue() instanceof FlexibleStopAssignment assignment) {
         if (OTPFeature.FlexRouting.isOn()) {
           String flexibleStopPlaceRef = assignment.getFlexibleStopPlaceRef().getRef();
 
@@ -173,11 +175,13 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
           if (flexibleStopPlace != null) {
             String stopPointRef = assignment.getScheduledStopPointRef().getValue().getRef();
             flexibleStopPlaceByStopPointRef.put(stopPointRef, flexibleStopPlace.getId());
-          } else {
+          }
+          else {
             LOG.warn("FlexibleStopPlace {} not found in stop place file.", flexibleStopPlaceRef);
           }
         }
-      } else {
+      }
+      else {
         warnOnMissingMapping(LOG, stopAssignment.getValue());
       }
     }
@@ -242,9 +246,11 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
     for (JAXBElement<?> element : lines.getLine()) {
       if (element.getValue() instanceof Line) {
         this.lines.add((Line) element.getValue());
-      } else if (element.getValue() instanceof FlexibleLine) {
+      }
+      else if (element.getValue() instanceof FlexibleLine) {
         this.flexibleLines.add((FlexibleLine) element.getValue());
-      } else {
+      }
+      else {
         warnOnMissingMapping(LOG, element.getValue());
       }
     }
@@ -258,7 +264,8 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
     for (JAXBElement<?> pattern : journeyPatterns.getJourneyPattern()) {
       if (pattern.getValue() instanceof JourneyPattern_VersionStructure journeyPattern) {
         this.journeyPatterns.add(journeyPattern);
-      } else {
+      }
+      else {
         warnOnMissingMapping(LOG, pattern.getValue());
       }
     }

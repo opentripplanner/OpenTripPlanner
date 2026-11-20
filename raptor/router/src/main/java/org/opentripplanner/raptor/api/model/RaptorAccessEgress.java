@@ -295,11 +295,14 @@ public interface RaptorAccessEgress {
     if (this instanceof RaptorStartOnBoardAccess sob) {
       var boarding = sob.tripBoarding();
       buf.append("StartOnBoard").append(boarding);
-    } else if (isFree()) {
+    }
+    else if (isFree()) {
       buf.append("Free");
-    } else if (hasRides()) {
+    }
+    else if (hasRides()) {
       buf.append(arrivedOnBoard() ? "Flex" : "Flex+Walk");
-    } else {
+    }
+    else {
       // This is not always walking, but inside Raptor we do not care if this is
       // biking, walking or car - any on street is treated the same. So, for
       // short easy reading in Raptor tests we use "Walk" instead of "On-Street"

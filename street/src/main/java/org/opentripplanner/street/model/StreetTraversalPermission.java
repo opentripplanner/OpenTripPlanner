@@ -63,9 +63,11 @@ public enum StreetTraversalPermission {
   public boolean allows(TraverseModeSet modes) {
     if (modes.getWalk() && allows(StreetTraversalPermission.PEDESTRIAN)) {
       return true;
-    } else if (modes.getBicycle() && allows(StreetTraversalPermission.BICYCLE)) {
+    }
+    else if (modes.getBicycle() && allows(StreetTraversalPermission.BICYCLE)) {
       return true;
-    } else {
+    }
+    else {
       return modes.getCar() && allows(StreetTraversalPermission.CAR);
     }
   }
@@ -76,9 +78,11 @@ public enum StreetTraversalPermission {
   public boolean allows(TraverseMode mode) {
     if (mode == TraverseMode.WALK && allows(StreetTraversalPermission.PEDESTRIAN)) {
       return true;
-    } else if (mode.isCyclingIsh() && allows(StreetTraversalPermission.BICYCLE)) {
+    }
+    else if (mode.isCyclingIsh() && allows(StreetTraversalPermission.BICYCLE)) {
       return true;
-    } else {
+    }
+    else {
       return mode == TraverseMode.CAR && allows(StreetTraversalPermission.CAR);
     }
   }

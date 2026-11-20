@@ -98,12 +98,15 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
   public static boolean isUnscheduledTrip(List<StopTime> stopTimes) {
     if (stopTimes.size() < 2) {
       return false;
-    } else if (stopTimes.stream().anyMatch(StopTime::combinesContinuousStoppingWithFlexWindow)) {
+    }
+    else if (stopTimes.stream().anyMatch(StopTime::combinesContinuousStoppingWithFlexWindow)) {
       return false;
       // special case: one fixed stop and a flexible window
-    } else if (stopTimes.size() == 2) {
+    }
+    else if (stopTimes.size() == 2) {
       return stopTimes.stream().anyMatch(StopTime::hasFlexWindow);
-    } else {
+    }
+    else {
       return stopTimes.stream().allMatch(StopTime::hasFlexWindow);
     }
   }
@@ -253,7 +256,8 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
         ) {
           return i;
         }
-      } else {
+      }
+      else {
         if (stop.getId().equals(fromStopId)) {
           return i;
         }
@@ -281,7 +285,8 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
         ) {
           return i;
         }
-      } else {
+      }
+      else {
         if (stop.getId().equals(toStopId)) {
           return i;
         }
@@ -297,7 +302,8 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
     // If the modifier does not change the result, we return the regular calculator.
     if (timePenalty.modifies()) {
       return new TimePenaltyCalculator(defaultCalculator, timePenalty);
-    } else {
+    }
+    else {
       return defaultCalculator;
     }
   }

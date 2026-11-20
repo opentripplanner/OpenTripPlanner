@@ -640,14 +640,16 @@ public class Itinerary implements ItinerarySortKey {
     for (Leg leg : legs) {
       if (leg.isWalkingLeg()) {
         buf.walk((int) leg.duration().toSeconds());
-      } else if (leg instanceof TransitLeg transitLeg) {
+      }
+      else if (leg instanceof TransitLeg transitLeg) {
         buf.transit(
           transitLeg.mode().name(),
           transitLeg.trip().logName(),
           transitLeg.startTime(),
           transitLeg.endTime()
         );
-      } else if (leg instanceof StreetLeg streetLeg) {
+      }
+      else if (leg instanceof StreetLeg streetLeg) {
         buf.street(streetLeg.getMode().name(), leg.startTime(), leg.endTime());
       }
 

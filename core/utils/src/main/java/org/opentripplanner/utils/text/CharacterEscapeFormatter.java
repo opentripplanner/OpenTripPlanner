@@ -61,9 +61,11 @@ public class CharacterEscapeFormatter {
 
       if (ch == escapeChar) {
         buf.append(escapeChar).append(escapeChar);
-      } else if (ch == specialChar) {
+      }
+      else if (ch == specialChar) {
         buf.append(escapeChar).append(substitutionChar);
-      } else {
+      }
+      else {
         buf.append(ch);
       }
     }
@@ -90,9 +92,11 @@ public class CharacterEscapeFormatter {
       if (prevEsc) {
         if (ch == escapeChar) {
           buf.append(escapeChar);
-        } else if (ch == substitutionChar) {
+        }
+        else if (ch == substitutionChar) {
           buf.append(specialChar);
-        } else {
+        }
+        else {
           throw new IllegalStateException(
             "Unexpected combination of escape-char '%c' and '%c' character at position %d. Text: '%s'.".formatted(
               escapeChar,
@@ -104,9 +108,11 @@ public class CharacterEscapeFormatter {
         }
 
         prevEsc = false;
-      } else if (ch == escapeChar) {
+      }
+      else if (ch == escapeChar) {
         prevEsc = true;
-      } else {
+      }
+      else {
         buf.append(ch);
       }
     }

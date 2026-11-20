@@ -57,10 +57,12 @@ public class OTPMain {
       CommandLineParameters params = parseAndValidateCmdLine(args);
       OtpStartupInfo.logInfo(params.logTaskInfo());
       startOTPServer(params);
-    } catch (OtpAppException ae) {
+    }
+    catch (OtpAppException ae) {
       LOG.error(ae.getMessage(), ae);
       System.exit(100);
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       LOG.error("An uncaught error occurred inside OTP: {}", e.getLocalizedMessage(), e);
       System.exit(-1);
     }
@@ -99,7 +101,8 @@ public class OTPMain {
       }
 
       params.inferAndValidate();
-    } catch (ParameterException pex) {
+    }
+    catch (ParameterException pex) {
       LOG.error("Parameter error: {}", pex.getMessage());
       System.exit(1);
     }
@@ -138,7 +141,8 @@ public class OTPMain {
     if (cli.doLoadGraph() || cli.doLoadStreetGraph()) {
       app = loadGraph(loadApp, config, cli.doUseLoadedGraphAsIs());
       graphAvailable = true;
-    } else {
+    }
+    else {
       app = loadApp.appConstruction();
     }
 
@@ -184,7 +188,8 @@ public class OTPMain {
 
     if (cli.doServe()) {
       startOtpWebServer(cli, app);
-    } else {
+    }
+    else {
       LOG.info("Done building graph. Exiting.");
     }
   }
@@ -239,7 +244,8 @@ public class OTPMain {
         try {
           grizzlyServer.run();
           return;
-        } catch (Throwable throwable) {
+        }
+        catch (Throwable throwable) {
           LOG.error(
             "An uncaught error occurred inside OTP. Restarting server. Error was: {}",
             throwable.getMessage(),

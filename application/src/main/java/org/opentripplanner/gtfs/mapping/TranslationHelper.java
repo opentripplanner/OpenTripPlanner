@@ -51,7 +51,8 @@ final class TranslationHelper {
             .stream()
             .collect(Collectors.groupingBy(t -> ""))
         );
-      } else {
+      }
+      else {
         // will create with following structure:
         // {<tableName>_by_record={<recordId@1>=[Translation@1, ..., Translation@Z], ..., <recordId@Z>=[Translation@1, ..., Translation@Z]}}
         // or with record sub id (if exists)
@@ -110,7 +111,8 @@ final class TranslationHelper {
 
     try {
       field = clazz.getDeclaredField(fieldName);
-    } catch (NoSuchFieldException e) {
+    }
+    catch (NoSuchFieldException e) {
       throw new RuntimeException(e);
     }
 
@@ -139,7 +141,8 @@ final class TranslationHelper {
       if (feeds != null) {
         translationList = feeds.get("");
       }
-    } else {
+    }
+    else {
       Map<String, List<Translation>> translationsByKey = translationMap.get(
         tableName + "_by_record"
       );

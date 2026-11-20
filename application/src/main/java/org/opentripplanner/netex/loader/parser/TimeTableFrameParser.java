@@ -80,9 +80,11 @@ class TimeTableFrameParser extends NetexParser<Timetable_VersionFrameStructure> 
     ) {
       if (it instanceof ServiceJourney serviceJourney) {
         serviceJourneys.add(serviceJourney);
-      } else if (it instanceof DatedServiceJourney datedServiceJourney) {
+      }
+      else if (it instanceof DatedServiceJourney datedServiceJourney) {
         datedServiceJourneys.add(datedServiceJourney);
-      } else {
+      }
+      else {
         warnOnMissingMapping(LOG, it);
       }
     }
@@ -98,7 +100,8 @@ class TimeTableFrameParser extends NetexParser<Timetable_VersionFrameStructure> 
     for (Interchange_VersionStructure it : list) {
       if (it instanceof ServiceJourneyInterchange serviceJourneyInterchange) {
         serviceJourneyInterchanges.add(serviceJourneyInterchange);
-      } else {
+      }
+      else {
         warnOnMissingMapping(LOG, it);
       }
     }

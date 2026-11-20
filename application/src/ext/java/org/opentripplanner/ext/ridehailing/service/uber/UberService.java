@@ -184,7 +184,8 @@ public class UberService extends CachingRideHailingService {
   private boolean filterRides(Ride a, boolean wheelchairAccessible) {
     if (wheelchairAccessible) {
       return a.rideType().equals(wheelchairAccessibleProductId);
-    } else {
+    }
+    else {
       return !bannedTypes.contains(a.rideType());
     }
   }

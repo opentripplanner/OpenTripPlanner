@@ -143,9 +143,11 @@ public class GeofencingZoneApplier {
   private Collection<Edge> getBoundaryEdgeCandidates(Geometry boundary) {
     if (boundary instanceof LineString ring) {
       return findEdgesAlongLineStrings.apply(List.of(ring));
-    } else if (boundary instanceof MultiLineString mls) {
+    }
+    else if (boundary instanceof MultiLineString mls) {
       return findEdgesAlongLineStrings.apply(GeometryUtils.getLineStrings(mls));
-    } else {
+    }
+    else {
       return findEdgesForEnvelope.apply(boundary.getEnvelopeInternal());
     }
   }

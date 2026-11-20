@@ -86,7 +86,8 @@ class RaptorValueFormatterTest {
       for (Future<Void> f : futures) {
         f.get();
       }
-    } finally {
+    }
+    finally {
       executor.shutdownNow();
     }
   }

@@ -143,7 +143,8 @@ public final class AccessStopArrivalState<T extends RaptorTripSchedule> implemen
 
     if (access.arrivedOnBoard()) {
       accessArriveOnBoard = access;
-    } else {
+    }
+    else {
       accessArriveOnStreet = access;
     }
   }

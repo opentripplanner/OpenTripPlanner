@@ -133,7 +133,8 @@ class RaptorRoutingRequestTransitDataCreator {
 
         if (offsetCache.containsKey(serviceDate)) {
           offsets[i] = offsetCache.get(serviceDate);
-        } else {
+        }
+        else {
           offsets[i] = secondsSinceStartOfTime(transitSearchTimeZero, serviceDate);
           offsetCache.put(serviceDate, offsets[i]);
         }

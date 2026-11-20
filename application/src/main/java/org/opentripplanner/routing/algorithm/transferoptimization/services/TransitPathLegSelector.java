@@ -60,7 +60,8 @@ class TransitPathLegSelector<T extends RaptorTripSchedule> {
     for (OptimizedPathTail<T> it : remindingLegs) {
       if (fromStopPosition < it.head().toStopPos()) {
         candidates.add(it);
-      } else {
+      }
+      else {
         rest.add(it);
       }
     }

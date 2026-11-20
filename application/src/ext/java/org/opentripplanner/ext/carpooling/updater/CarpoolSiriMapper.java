@@ -316,7 +316,8 @@ public class CarpoolSiriMapper {
       if (firstCapacity == null) {
         firstCapacity = intValue;
         firstCapacityIndex = i;
-      } else if (intValue != firstCapacity) {
+      }
+      else if (intValue != firstCapacity) {
         LOG.info(
           "Trip {}: totalCapacity differs between calls (call {} has {}, call {} has {})",
           tripId,

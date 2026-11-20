@@ -191,7 +191,8 @@ public class SpeedTestTimer {
           char[] chars = name.toCharArray();
           chars[0] = Character.toUpperCase(chars[0]);
           return new String(chars);
-        } else {
+        }
+        else {
           return name;
         }
       }

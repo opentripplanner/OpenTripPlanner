@@ -35,7 +35,8 @@ class TransportModeMapper {
   ) throws UnsupportedModeException {
     if (submode == null) {
       return new NetexMainAndSubMode(mapAllPublicTransportModes(netexMode));
-    } else {
+    }
+    else {
       return getSubmodeAsString(submode);
     }
   }
@@ -85,25 +86,35 @@ class TransportModeMapper {
   private NetexMainAndSubMode getSubmodeAsString(TransportSubmodeStructure submode) {
     if (submode.getAirSubmode() != null) {
       return new NetexMainAndSubMode(TransitMode.AIRPLANE, submode.getAirSubmode().value());
-    } else if (submode.getBusSubmode() != null) {
+    }
+    else if (submode.getBusSubmode() != null) {
       return new NetexMainAndSubMode(TransitMode.BUS, submode.getBusSubmode().value());
-    } else if (submode.getTelecabinSubmode() != null) {
+    }
+    else if (submode.getTelecabinSubmode() != null) {
       return new NetexMainAndSubMode(TransitMode.GONDOLA, submode.getTelecabinSubmode().value());
-    } else if (submode.getCoachSubmode() != null) {
+    }
+    else if (submode.getCoachSubmode() != null) {
       return new NetexMainAndSubMode(TransitMode.COACH, submode.getCoachSubmode().value());
-    } else if (submode.getFunicularSubmode() != null) {
+    }
+    else if (submode.getFunicularSubmode() != null) {
       return new NetexMainAndSubMode(TransitMode.FUNICULAR, submode.getFunicularSubmode().value());
-    } else if (submode.getMetroSubmode() != null) {
+    }
+    else if (submode.getMetroSubmode() != null) {
       return new NetexMainAndSubMode(TransitMode.SUBWAY, submode.getMetroSubmode().value());
-    } else if (submode.getRailSubmode() != null) {
+    }
+    else if (submode.getRailSubmode() != null) {
       return new NetexMainAndSubMode(TransitMode.RAIL, submode.getRailSubmode().value());
-    } else if (submode.getTramSubmode() != null) {
+    }
+    else if (submode.getTramSubmode() != null) {
       return new NetexMainAndSubMode(TransitMode.TRAM, submode.getTramSubmode().value());
-    } else if (submode.getWaterSubmode() != null) {
+    }
+    else if (submode.getWaterSubmode() != null) {
       return new NetexMainAndSubMode(TransitMode.FERRY, submode.getWaterSubmode().value());
-    } else if (submode.getTaxiSubmode() != null) {
+    }
+    else if (submode.getTaxiSubmode() != null) {
       return new NetexMainAndSubMode(TransitMode.TAXI, submode.getTaxiSubmode().value());
-    } else if (submode.getSnowAndIceSubmode() != null) {
+    }
+    else if (submode.getSnowAndIceSubmode() != null) {
       return new NetexMainAndSubMode(
         TransitMode.SNOW_AND_ICE,
         submode.getSnowAndIceSubmode().value()

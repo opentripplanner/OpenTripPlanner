@@ -138,7 +138,8 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
         }
 
         return alerts.stream().distinct().collect(Collectors.toList());
-      } else {
+      }
+      else {
         return alertService.getStopLocationsAlerts(ids);
       }
     };
@@ -314,7 +315,8 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
           getTransitService(env)
         );
         return filter.filterRoutes(routes);
-      } else {
+      }
+      else {
         return routes;
       }
     };
@@ -418,7 +420,8 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
 
       try {
         date = ServiceDateUtils.parseString(args.getGraphQLDate());
-      } catch (ParseException e) {
+      }
+      catch (ParseException e) {
         return null;
       }
 
@@ -609,7 +612,8 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
 
     if (source instanceof StopLocation) {
       return stopTFunction.apply((StopLocation) source);
-    } else if (source instanceof Station) {
+    }
+    else if (source instanceof Station) {
       return stationTFunction.apply((Station) source);
     }
 

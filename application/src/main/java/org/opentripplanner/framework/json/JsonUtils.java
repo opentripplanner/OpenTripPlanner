@@ -15,9 +15,11 @@ public class JsonUtils {
 
     if (valueNode == null) {
       return Optional.empty();
-    } else if (valueNode.isString() && !valueNode.asString().isEmpty()) {
+    }
+    else if (valueNode.isString() && !valueNode.asString().isEmpty()) {
       return valueNode.asStringOpt();
-    } else {
+    }
+    else {
       return Optional.empty();
     }
   }

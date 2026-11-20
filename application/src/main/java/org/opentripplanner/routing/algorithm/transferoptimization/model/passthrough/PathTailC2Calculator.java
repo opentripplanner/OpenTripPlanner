@@ -35,7 +35,8 @@ class PathTailC2Calculator {
     if (curr.isEgress()) {
       ptpIter = PassThroughPointsIterator.tailIterator(viaLocations);
       curr.c2(ptpIter.currC2());
-    } else {
+    }
+    else {
       ptpIter = PassThroughPointsIterator.tailIterator(viaLocations, curr.c2());
     }
 

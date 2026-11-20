@@ -842,7 +842,8 @@ public class TransmodelGraphQLSchemaFactory {
                 )
                 .sorted(Comparator.comparing(s -> s.distance()))
                 .collect(Collectors.toList());
-            } catch (RoutingValidationException e) {
+            }
+            catch (RoutingValidationException e) {
               LOG.warn(
                 "findClosestPlacesByWalking failed with exception, returning empty list of places. ",
                 e
@@ -1016,7 +1017,8 @@ public class TransmodelGraphQLSchemaFactory {
                     return !GqlUtil.getTransitService(environment)
                       .findPatterns(stop, true)
                       .isEmpty();
-                  } else {
+                  }
+                  else {
                     return true;
                   }
                 })

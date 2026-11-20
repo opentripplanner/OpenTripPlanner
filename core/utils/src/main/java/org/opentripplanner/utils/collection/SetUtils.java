@@ -26,9 +26,11 @@ public class SetUtils {
 
     if (list.isEmpty()) {
       return Set.of();
-    } else if (list.size() == 1) {
+    }
+    else if (list.size() == 1) {
       return list.getFirst();
-    } else {
+    }
+    else {
       return list
         .stream()
         .skip(1)

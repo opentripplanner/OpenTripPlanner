@@ -36,13 +36,16 @@ abstract sealed class AbstractStopTimeAdaptor
     if (this instanceof RegularStopTimeAdaptor) {
       if (next instanceof RegularStopTimeAdaptor) {
         return isRegularStopFollowedByRegularStopValid(next);
-      } else {
+      }
+      else {
         return isRegularStopFollowedByAreaStopValid(next);
       }
-    } else {
+    }
+    else {
       if (next instanceof RegularStopTimeAdaptor) {
         return isAreaStopFollowedByRegularStopValid(next);
-      } else {
+      }
+      else {
         return isAreaStopFollowedByAreaStopValid(next);
       }
     }

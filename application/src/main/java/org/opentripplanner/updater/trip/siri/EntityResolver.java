@@ -218,7 +218,8 @@ public class EntityResolver {
 
     if (departureTime < 0) {
       return days - 1;
-    } else {
+    }
+    else {
       return days;
     }
   }

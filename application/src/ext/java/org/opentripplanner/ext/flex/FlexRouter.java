@@ -106,7 +106,8 @@ public class FlexRouter {
         true,
         flexParameters.maxFlexTripDuration()
       );
-    } else {
+    }
+    else {
       // this is only really useful in tests. in real world scenarios you're unlikely to get useful
       // results if you don't have streets
       this.accessFlexPathCalculator = new DirectFlexPathCalculator();

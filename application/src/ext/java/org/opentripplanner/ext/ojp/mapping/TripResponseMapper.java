@@ -198,7 +198,8 @@ public class TripResponseMapper {
 
     if (place.stop != null) {
       return ref.withStopPointRef(stopPointRefMapper.stopPointRef(place.stop));
-    } else {
+    }
+    else {
       return ref.withGeoPosition(LocationMapper.map(place.coordinate));
     }
   }
@@ -207,7 +208,8 @@ public class TripResponseMapper {
   private static XmlDateTime estimatedTime(@Nullable LegCallTime time) {
     if (time.estimated() == null) {
       return null;
-    } else {
+    }
+    else {
       return new XmlDateTime(time.estimated().time());
     }
   }

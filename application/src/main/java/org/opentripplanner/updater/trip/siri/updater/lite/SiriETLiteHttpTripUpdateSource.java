@@ -45,9 +45,11 @@ public class SiriETLiteHttpTripUpdateSource implements EstimatedTimetableSource 
       }
 
       return siri;
-    } catch (OtpHttpClientException e) {
+    }
+    catch (OtpHttpClientException e) {
       LOG.warn("Could not get SIRI-ET data from {}", parameters.uri(), e);
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       LOG.warn("Failed to parse SIRI-ET feed from {}", parameters.uri(), e);
     }
 

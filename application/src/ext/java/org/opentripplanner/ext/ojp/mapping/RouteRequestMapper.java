@@ -117,24 +117,28 @@ public class RouteRequestMapper {
   private GenericLocation toGenericLocation(PlaceContextStructure place, String name) {
     if (place == null || place.getPlaceRef() == null) {
       throw new IllegalArgumentException("PlaceContext of %s is empty".formatted(name));
-    } else if (place.getPlaceRef().getGeoPosition() != null) {
+    }
+    else if (place.getPlaceRef().getGeoPosition() != null) {
       var g = place.getPlaceRef().getGeoPosition();
       return GenericLocation.fromCoordinate(g.getLatitude(), g.getLongitude());
-    } else if (
+    }
+    else if (
       Optional.ofNullable(place.getPlaceRef().getStopPlaceRef())
         .map(r -> r.getValue())
         .isPresent()
     ) {
       var id = idMapper.parseStrict(place.getPlaceRef().getStopPlaceRef().getValue());
       return GenericLocation.fromStopId(id);
-    } else if (
+    }
+    else if (
       Optional.ofNullable(place.getPlaceRef().getStopPointRef())
         .map(r -> r.getValue())
         .isPresent()
     ) {
       var id = idMapper.parseStrict(place.getPlaceRef().getStopPointRef().getValue());
       return GenericLocation.fromStopId(id);
-    } else {
+    }
+    else {
       throw new IllegalArgumentException(
         "PlaceContext of %s contains neither stop reference nor coordinates.".formatted(name)
       );
@@ -151,7 +155,8 @@ public class RouteRequestMapper {
 
     if (includeIntermediateStops) {
       return Set.of(INTERMEDIATE_STOPS);
-    } else {
+    }
+    else {
       return Set.of();
     }
   }
@@ -164,7 +169,8 @@ public class RouteRequestMapper {
     if (origin.getDepArrTime() != null) {
       // time zone doesn't matter but UTC is the fallback when unspecified
       builder.withDateTime(origin.getDepArrTime().atZone(UTC).toInstant()).withArriveBy(false);
-    } else if (destination.getDepArrTime() != null) {
+    }
+    else if (destination.getDepArrTime() != null) {
       builder.withDateTime(destination.getDepArrTime().atZone(UTC).toInstant()).withArriveBy(true);
     }
   }
@@ -178,13 +184,16 @@ public class RouteRequestMapper {
 
     if (filters.isEmpty()) {
       return RequestModes.defaultRequestModes();
-    } else if (filters.stream().anyMatch(f -> !FALSE.equals(f.isExclude()))) {
+    }
+    else if (filters.stream().anyMatch(f -> !FALSE.equals(f.isExclude()))) {
       throw new IllegalArgumentException(
         "Excluding personal modes is not supported (exclusion is default, set exclude=false)."
       );
-    } else if (filters.size() != 1 || filters.getFirst().getPersonalMode().size() != 1) {
+    }
+    else if (filters.size() != 1 || filters.getFirst().getPersonalMode().size() != 1) {
       throw new IllegalArgumentException("Can only select a single personal mode.");
-    } else {
+    }
+    else {
       var mode = filters.getFirst().getPersonalMode().getFirst();
       var streetMode = PersonalModeMapper.toStreetMode(mode);
 

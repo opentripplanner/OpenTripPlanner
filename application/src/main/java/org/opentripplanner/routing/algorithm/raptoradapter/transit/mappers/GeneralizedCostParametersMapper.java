@@ -32,9 +32,11 @@ public class GeneralizedCostParametersMapper {
 
     if (mode == StreetMode.BIKE) {
       builder.boardCost(preferences.bike().boardCost());
-    } else if (mode == StreetMode.CAR) {
+    }
+    else if (mode == StreetMode.CAR) {
       builder.boardCost(preferences.car().boardCost());
-    } else {
+    }
+    else {
       builder.boardCost(preferences.walk().boardCost());
     }
 

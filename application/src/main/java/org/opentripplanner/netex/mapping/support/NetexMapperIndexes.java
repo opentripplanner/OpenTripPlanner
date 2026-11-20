@@ -35,7 +35,8 @@ public class NetexMapperIndexes {
       this.datedServiceJourneysBySjId = indexDSJBySJId(index.getDatedServiceJourneys());
       this.stationsByMultiModalStationRfs = ArrayListMultimap.create();
       this.stopTimesByNetexId = new HierarchicalMap<>();
-    } else {
+    }
+    else {
       // Cached by level(shared files, shared group files and group files). If any entries exist at
       // the current level, then they will hide entries at a higher level.
       this.datedServiceJourneysBySjId = index.getDatedServiceJourneys().localKeys().isEmpty()

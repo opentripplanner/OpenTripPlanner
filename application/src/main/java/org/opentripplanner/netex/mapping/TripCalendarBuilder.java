@@ -134,7 +134,8 @@ public class TripCalendarBuilder {
 
       if (dates != null) {
         result.addAll(dates);
-      } else {
+      }
+      else {
         reportSJDayTypeNotFound(sj, dayTypeRef);
       }
     }

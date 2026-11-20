@@ -206,7 +206,8 @@ public class TripMatcherFactoryTest {
   private Set<LocalDate> dummyServiceDateProvider(FeedScopedId feedScopedId) {
     if (feedScopedId.equals(id("RUT:route:trip:1"))) {
       return Set.of(LocalDate.of(2024, 2, 22), LocalDate.of(2024, 2, 23));
-    } else if (feedScopedId.equals(id("RUT:route:trip:2"))) {
+    }
+    else if (feedScopedId.equals(id("RUT:route:trip:2"))) {
       return Set.of(LocalDate.of(2024, 2, 23));
     }
 

@@ -183,7 +183,8 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
 
     if (direction == Direction.FROM) {
       registerLargest(forwardRegistrations, vertex, searchLimit, targets);
-    } else {
+    }
+    else {
       registerLargest(reverseRegistrations, vertex, searchLimit, targets);
     }
   }

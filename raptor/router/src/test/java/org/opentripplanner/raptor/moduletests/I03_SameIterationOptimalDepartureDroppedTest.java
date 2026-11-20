@@ -132,9 +132,11 @@ public class I03_SameIterationOptimalDepartureDroppedTest implements RaptorTestC
   ) {
     if ("DEPART_AFTER".equals(arriveBy)) {
       searchParams.earliestDepartureTime(T00_02);
-    } else if ("ARRIVE_BY".equals(arriveBy)) {
+    }
+    else if ("ARRIVE_BY".equals(arriveBy)) {
       searchParams.latestArrivalTime(T00_30);
-    } else {
+    }
+    else {
       throw new RuntimeException("Unknown arriveBy: " + arriveBy);
     }
   }

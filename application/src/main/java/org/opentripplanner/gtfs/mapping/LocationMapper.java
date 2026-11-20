@@ -72,7 +72,8 @@ class LocationMapper {
         .withZoneId(gtfsLocation.getZoneId())
         .withGeometry(geometry)
         .build();
-    } catch (UnsupportedGeometryException e) {
+    }
+    catch (UnsupportedGeometryException e) {
       throw new IllegalArgumentException(e);
     }
   }

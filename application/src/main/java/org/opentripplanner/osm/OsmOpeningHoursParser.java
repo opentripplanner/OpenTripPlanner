@@ -134,15 +134,19 @@ public class OsmOpeningHoursParser {
 
       if (is247Rule(rule)) {
         openingHoursBuildersForRule.add(createOHCalendarBuilderForOpen247(calendarBuilder));
-      } else if (rule.getYears() != null) {
+      }
+      else if (rule.getYears() != null) {
         // TODO
         logUnhandled(rule, openingHoursTag, id, link);
-      } else if (rule.getDates() != null) {
+      }
+      else if (rule.getDates() != null) {
         openingHoursBuildersForRule.addAll(createOHCalendarBuildersForDates(calendarBuilder, rule));
-      } else if (rule.getWeeks() != null) {
+      }
+      else if (rule.getWeeks() != null) {
         // TODO
         logUnhandled(rule, openingHoursTag, id, link);
-      } else if (rule.getDays() != null) {
+      }
+      else if (rule.getDays() != null) {
         openingHoursBuildersForRule.addAll(
           createOHCalendarBuildersForDayRanges(calendarBuilder, rule)
         );
@@ -156,7 +160,8 @@ public class OsmOpeningHoursParser {
             splitPreviousBuilders(openingHoursBuilder, openingHoursBuilders)
           )
         );
-      } else if (!rule.isAdditive()) {
+      }
+      else if (!rule.isAdditive()) {
         openingHoursBuildersForRule
           .stream()
           // If a builder is after midnight, there is always another one that can be used to set
@@ -339,7 +344,8 @@ public class OsmOpeningHoursParser {
         startDayOfWeek,
         DAY_OF_WEEK_MAP.getOrDefault(weekDayRange.getEndDay(), null)
       );
-    } else {
+    }
+    else {
       return openingHoursBuilder.on(startDayOfWeek);
     }
   }
@@ -541,7 +547,8 @@ public class OsmOpeningHoursParser {
 
     if (issueStore != null) {
       issueStore.add("UnhandledOHRule", message);
-    } else {
+    }
+    else {
       LOG.info(message);
     }
   }

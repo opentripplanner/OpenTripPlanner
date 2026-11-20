@@ -118,7 +118,8 @@ public class ListUtils {
   public static <T> List<T> ofNullable(@Nullable T input) {
     if (input == null) {
       return List.of();
-    } else {
+    }
+    else {
       return List.of(input);
     }
   }

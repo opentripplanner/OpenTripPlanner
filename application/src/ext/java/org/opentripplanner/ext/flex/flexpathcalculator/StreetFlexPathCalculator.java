@@ -55,7 +55,8 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
 
     if (cache.containsKey(originVertex)) {
       shortestPathTree = cache.get(originVertex);
-    } else {
+    }
+    else {
       shortestPathTree = routeToMany(originVertex);
       cache.put(originVertex, shortestPathTree);
     }

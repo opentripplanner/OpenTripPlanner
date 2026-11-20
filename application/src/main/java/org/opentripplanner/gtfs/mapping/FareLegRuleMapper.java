@@ -56,7 +56,8 @@ class FareLegRuleMapper {
         .withToTimeframes(mapTimeframe(r.getToTimeframeGroupId()));
       r.getRulePriorityOption().ifPresent(builder::withPriority);
       return builder.build();
-    } else {
+    }
+    else {
       issueStore.add(
         "UnknownFareProductId",
         "Fare leg rule %s refers to unknown fare product %s",
@@ -70,7 +71,8 @@ class FareLegRuleMapper {
   private FeedScopedId areaId(@Nullable Area area) {
     if (area == null) {
       return null;
-    } else {
+    }
+    else {
       return idFactory.createId(area.getAreaId(), "area");
     }
   }
@@ -107,7 +109,8 @@ class FareLegRuleMapper {
   private static OptionalInt optionalInt(Double value) {
     if (value == null) {
       return OptionalInt.empty();
-    } else {
+    }
+    else {
       return OptionalInt.of(value.intValue());
     }
   }

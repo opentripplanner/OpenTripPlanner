@@ -188,7 +188,8 @@ public class DatedServiceJourneyType {
 
             if (first != null && first < stops.size()) {
               return stops.subList(0, first);
-            } else if (last != null && last < stops.size()) {
+            }
+            else if (last != null && last < stops.size()) {
               return stops.subList(stops.size() - last, stops.size());
             }
 

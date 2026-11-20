@@ -56,9 +56,11 @@ public class DefaultInclinedEdgeLevelInfoProcessor implements InclinedEdgeLevelI
       // Default to level info in case of contradictory information. Ideally this should be from
       // the tag that is more reliable.
       return Optional.of(levelInfo);
-    } else if (levelInfo != null) {
+    }
+    else if (levelInfo != null) {
       return Optional.of(levelInfo);
-    } else if (inclineInfo != null) {
+    }
+    else if (inclineInfo != null) {
       return Optional.of(inclineInfo);
     }
 
@@ -85,7 +87,8 @@ public class DefaultInclinedEdgeLevelInfoProcessor implements InclinedEdgeLevelI
             lastNodeRef
           )
         );
-      } else if (firstVertexOsmLevel.level() > lastVertexOsmLevel.level()) {
+      }
+      else if (firstVertexOsmLevel.level() > lastVertexOsmLevel.level()) {
         return new InclinedEdgeLevelInfo(
           new VertexLevelInfo(
             new Level(lastVertexOsmLevel.level(), lastVertexOsmLevel.name()),
@@ -108,7 +111,8 @@ public class DefaultInclinedEdgeLevelInfoProcessor implements InclinedEdgeLevelI
         new VertexLevelInfo(null, firstNodeRef),
         new VertexLevelInfo(null, lastNodeRef)
       );
-    } else if (way.isInclineDown()) {
+    }
+    else if (way.isInclineDown()) {
       return new InclinedEdgeLevelInfo(
         new VertexLevelInfo(null, lastNodeRef),
         new VertexLevelInfo(null, firstNodeRef)
@@ -135,7 +139,8 @@ public class DefaultInclinedEdgeLevelInfoProcessor implements InclinedEdgeLevelI
       if (backwardEdge != null) {
         streetDetailsRepository.addInclinedEdgeLevelInfo(backwardEdge, inclinedEdgeLevelInfo);
       }
-    } else {
+    }
+    else {
       var nodeRefs = way.getNodeRefs();
       long firstNodeRef = nodeRefs.get(0);
       long lastNodeRef = nodeRefs.get(nodeRefs.size() - 1);

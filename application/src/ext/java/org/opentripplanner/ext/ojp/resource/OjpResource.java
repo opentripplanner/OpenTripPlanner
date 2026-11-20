@@ -78,7 +78,8 @@ public class OjpResource {
     try {
       var ojp = OjpCodec.deserialize(xmlString);
       return handler.handleRequest(ojp, defaultRouteRequest);
-    } catch (JAXBException | TransformerException e) {
+    }
+    catch (JAXBException | TransformerException e) {
       LOG.error("Error reading OJP request", e);
       return handler.error("Could not read OJP request.");
     }
@@ -94,7 +95,8 @@ public class OjpResource {
   private static FeedScopedIdMapper idMapper(OjpApiParameters ojpParams) {
     if (ojpParams.hideFeedId()) {
       return new HideFeedIdMapper(ojpParams.hardcodedInputFeedId());
-    } else {
+    }
+    else {
       return new DefaultFeedIdMapper();
     }
   }

@@ -99,7 +99,8 @@ public class GraphUpdaterManager implements GraphUpdaterStatus {
       Runnable runUpdater = () -> {
         try {
           updater.run();
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
           LOG.error("Error while running updater {}:", updater.getClass().getName(), e);
         }
       };
@@ -109,7 +110,8 @@ public class GraphUpdaterManager implements GraphUpdaterStatus {
 
         if (pollingGraphUpdater.runOnlyOnce()) {
           pollingUpdaterPool.schedule(runUpdater, 0, TimeUnit.SECONDS);
-        } else {
+        }
+        else {
           pollingUpdaterPool.scheduleWithFixedDelay(
             runUpdater,
             0,
@@ -117,7 +119,8 @@ public class GraphUpdaterManager implements GraphUpdaterStatus {
             TimeUnit.SECONDS
           );
         }
-      } else {
+      }
+      else {
         LOG.info("Starting new thread for updater {}", updater);
         nonPollingUpdaterPool.execute(runUpdater);
       }
@@ -145,7 +148,8 @@ public class GraphUpdaterManager implements GraphUpdaterStatus {
     if (cancelRunningTasks) {
       pollingUpdaterPool.shutdownNow();
       nonPollingUpdaterPool.shutdownNow();
-    } else {
+    }
+    else {
       pollingUpdaterPool.shutdown();
       nonPollingUpdaterPool.shutdown();
     }
@@ -160,7 +164,8 @@ public class GraphUpdaterManager implements GraphUpdaterStatus {
       }
 
       shutdownGraphWriter.run();
-    } catch (InterruptedException e) {
+    }
+    catch (InterruptedException e) {
       LOG.warn("Interrupted while waiting for updaters to finish.");
     }
 
@@ -255,11 +260,13 @@ public class GraphUpdaterManager implements GraphUpdaterStatus {
 
             //noinspection BusyWait
             Thread.sleep(1000);
-          } catch (InterruptedException e) {
+          }
+          catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             otpIsShuttingDown = true;
             LOG.info("OTP is shutting down, cancelling wait for updaters readiness.");
-          } catch (Exception e) {
+          }
+          catch (Exception e) {
             LOG.error(e.getMessage(), e);
           }
         }

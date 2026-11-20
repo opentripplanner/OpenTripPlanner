@@ -102,7 +102,8 @@ public class CompareIntArrays {
     if (stops != null && stops.length > 0) {
       size = stops.length;
       s.compare(a, b, stops);
-    } else {
+    }
+    else {
       size = a.length;
       s.compareAll(a, b);
     }
@@ -141,14 +142,17 @@ public class CompareIntArrays {
   private void countDiff(int a, int b) {
     if (a == unreached) {
       aNotReached++;
-    } else if (b == unreached) {
+    }
+    else if (b == unreached) {
       bNotReached++;
-    } else {
+    }
+    else {
       int c = comparator.compare(a, b);
 
       if (c < 0) {
         aLess++;
-      } else if (c > 0) {
+      }
+      else if (c > 0) {
         bLess++;
       }
     }

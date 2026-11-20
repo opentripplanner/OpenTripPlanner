@@ -524,12 +524,14 @@ public class StopPlaceType {
 
         if (p != null) {
           result.add(new MonoOrMultiModalStation(p));
-        } else {
+        }
+        else {
           result.add(new MonoOrMultiModalStation(it, null));
         }
       });
       return result;
-    } else {
+    }
+    else {
       throw new InvalidInputException("Unexpected multiModalMode: " + multiModalMode);
     }
   }

@@ -63,7 +63,8 @@ public final class TimeShiftedDepartureTime<T extends RaptorTripSchedule> {
     if (firstTransit == null) {
       // Access to egress without transit, the access is moved as early as possible
       departureTime = access.earliestDepartureTime(iterationDepartureTime);
-    } else {
+    }
+    else {
       var transit = firstTransit.transitPath();
       var trip = transit.trip();
       int slack = slackProvider.boardSlack(trip.pattern().slackIndex());

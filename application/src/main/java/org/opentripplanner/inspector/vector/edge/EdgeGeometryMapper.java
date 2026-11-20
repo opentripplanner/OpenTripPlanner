@@ -31,7 +31,8 @@ class EdgeGeometryMapper {
       Coordinate newTo = toCoord.copy();
       newTo.setX(toCoord.getX() + 0.000001);
       return GeometryUtils.makeLineString(fromV.getCoordinate(), newTo);
-    } else {
+    }
+    else {
       return GeometryUtils.makeLineString(fromV.getCoordinate(), toVertex.getCoordinate());
     }
   }

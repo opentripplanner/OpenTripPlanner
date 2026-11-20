@@ -158,11 +158,14 @@ class OsmParser extends BinaryParser {
 
         if (i.getTypes(j) == Osmformat.Relation.MemberType.NODE) {
           relMember.setType(OsmMemberType.NODE);
-        } else if (i.getTypes(j) == Osmformat.Relation.MemberType.WAY) {
+        }
+        else if (i.getTypes(j) == Osmformat.Relation.MemberType.WAY) {
           relMember.setType(OsmMemberType.WAY);
-        } else if (i.getTypes(j) == Osmformat.Relation.MemberType.RELATION) {
+        }
+        else if (i.getTypes(j) == Osmformat.Relation.MemberType.RELATION) {
           relMember.setType(OsmMemberType.RELATION);
-        } else {
+        }
+        else {
           // TODO; Illegal file?
           assert false;
         }

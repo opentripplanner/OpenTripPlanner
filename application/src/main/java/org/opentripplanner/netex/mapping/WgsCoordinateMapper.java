@@ -32,11 +32,13 @@ class WgsCoordinateMapper {
       if (loc.getLongitude() != null && loc.getLatitude() != null) {
         return new WgsCoordinate(loc.getLatitude().doubleValue(), loc.getLongitude().doubleValue());
         // seen in Italian NeTEx data - it's not clear if EPIP-compliant or not
-      } else if (pos != null && (pos.getValue().size() == 2 || pos.getValue().size() == 3)) {
+      }
+      else if (pos != null && (pos.getValue().size() == 2 || pos.getValue().size() == 3)) {
         var coordinates = pos.getValue();
         return new WgsCoordinate(coordinates.getFirst(), coordinates.get(1));
       }
-    } catch (IllegalArgumentException e) {
+    }
+    catch (IllegalArgumentException e) {
       // Thrown by WgsCoordinate when latitude/longitude is out of range
       throw new InvalidCoordinateException(e.getMessage());
     }

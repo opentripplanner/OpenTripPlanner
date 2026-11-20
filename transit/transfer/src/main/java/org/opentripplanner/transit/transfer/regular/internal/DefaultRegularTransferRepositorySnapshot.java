@@ -131,7 +131,8 @@ class DefaultRegularTransferRepositorySnapshot<
   private AbstractUserPreferences<?> closestProfileOrNull(AbstractUserPreferences<?> key) {
     try {
       return matcher.closestProfile(paths, key);
-    } catch (IllegalArgumentException e) {
+    }
+    catch (IllegalArgumentException e) {
       // The paths of the snapshot have no profile of the type of the key
       return null;
     }

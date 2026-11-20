@@ -69,7 +69,8 @@ public class TriasResource {
     try {
       var ojp = OjpToTriasTransformer.triasToOjp(triasInput);
       return handler.handleRequest(ojp, RouteRequest.defaultValue());
-    } catch (JAXBException | TransformerException e) {
+    }
+    catch (JAXBException | TransformerException e) {
       LOG.error("Error reading TRIAS request", e);
       return handler.error("Could not read TRIAS request.");
     }
@@ -102,7 +103,8 @@ public class TriasResource {
   public Response stopEventXml(@PathParam("fileName") String fileName) throws IOException {
     if (ALLOWED_CLASSPATH_RESOURCES.contains(fileName)) {
       return classpathResource(fileName);
-    } else {
+    }
+    else {
       return Response.status(Response.Status.NOT_FOUND).build();
     }
   }
@@ -110,7 +112,8 @@ public class TriasResource {
   private static FeedScopedIdMapper idMapper(TriasApiParameters triasApiConfig) {
     if (triasApiConfig.hideFeedId()) {
       return new HideFeedIdMapper(triasApiConfig.hardcodedInputFeedId());
-    } else {
+    }
+    else {
       return new DefaultFeedIdMapper();
     }
   }

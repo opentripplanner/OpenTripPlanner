@@ -19,7 +19,8 @@ public class JsonAssertions {
   public static void assertEqualJson(String expected, String actual) {
     try {
       assertEqualJson(expected, MAPPER.readTree(actual));
-    } catch (JacksonException e) {
+    }
+    catch (JacksonException e) {
       throw new RuntimeException(e);
     }
   }
@@ -37,7 +38,8 @@ public class JsonAssertions {
           JsonSupport.prettyPrint(actualNode)
         )
       );
-    } catch (JacksonException e) {
+    }
+    catch (JacksonException e) {
       throw new RuntimeException(e);
     }
   }
@@ -50,7 +52,8 @@ public class JsonAssertions {
       var actualNode = MAPPER.readTree(actual.toString());
       var exp = MAPPER.readTree(expected);
       return exp.equals(actualNode);
-    } catch (JacksonException e) {
+    }
+    catch (JacksonException e) {
       throw new RuntimeException(e);
     }
   }

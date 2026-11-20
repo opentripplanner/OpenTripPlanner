@@ -148,7 +148,8 @@ public final class AccessibilityRequest {
         this.onlyConsiderAccessible = true;
         this.unknownCost = defaultCosts.unknownCost;
         this.inaccessibleCost = defaultCosts.inaccessibleCost;
-      } else {
+      }
+      else {
         this.onlyConsiderAccessible = false;
         this.unknownCost = original.unknownCost;
         this.inaccessibleCost = original.inaccessibleCost;

@@ -29,7 +29,8 @@ public class QualifiedMode implements Serializable {
         try {
           Qualifier q = Qualifier.valueOf(element);
           qualifiers.add(q);
-        } catch (IllegalArgumentException e) {
+        }
+        catch (IllegalArgumentException e) {
           mode.append("_");
           mode.append(element);
         }
@@ -37,7 +38,8 @@ public class QualifiedMode implements Serializable {
 
       this.mode = ApiRequestMode.valueOf(mode.toString());
       this.qualifiers = Set.copyOf(qualifiers);
-    } catch (IllegalArgumentException | IndexOutOfBoundsException e) {
+    }
+    catch (IllegalArgumentException | IndexOutOfBoundsException e) {
       throw new BadRequestException(
         "Qualified mode is not valid: '" + qMode + "', details: " + e.getMessage()
       );

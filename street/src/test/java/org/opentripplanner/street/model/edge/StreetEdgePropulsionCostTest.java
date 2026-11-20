@@ -217,7 +217,8 @@ class StreetEdgePropulsionCostTest {
             .withReluctance(1)
         )
         .build();
-    } else {
+    }
+    else {
       req = StreetSearchRequest.of()
         .withMode(streetMode)
         .withBike(bike ->

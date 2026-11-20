@@ -178,7 +178,8 @@ public class ServiceDateUtils {
   public static Optional<LocalDate> parseStringToOptional(String value) {
     try {
       return Optional.of(parseString(value));
-    } catch (ParseException | DateTimeException e) {
+    }
+    catch (ParseException | DateTimeException e) {
       return Optional.empty();
     }
   }

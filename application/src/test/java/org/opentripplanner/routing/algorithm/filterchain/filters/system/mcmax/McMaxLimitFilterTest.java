@@ -178,7 +178,8 @@ class McMaxLimitFilterTest {
 
       if (nTransfers < 0) {
         builder.drive(start, ++start, E);
-      } else {
+      }
+      else {
         builder.bus(1, ++start, ++start, PLACES[1]);
 
         for (int i = 0; i < nTransfers; i++) {

@@ -33,7 +33,8 @@ public class ItinerariesHelper {
         itineraries.add(
           it.copyOf().withMaxSlope(wheelchairPreferences.maxSlope(), maxSlope.getAsDouble()).build()
         );
-      } else {
+      }
+      else {
         result.add(it);
       }
     }

@@ -115,7 +115,8 @@ class ScheduledTripHandler {
           .withHideTripInScheduledPattern(pattern)
           .build()
       );
-    } else {
+    }
+    else {
       return TripUpdateApplier.apply(
         buffer,
         RealTimeTripUpdate.of(pattern, updatedTripTimes, tripUpdate.startDate())

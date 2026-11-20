@@ -32,7 +32,8 @@ public class ZoneIdFallback {
         LOG.warn("Please double-check that transit data was correctly loaded.");
       });
       return FALLBACK;
-    } else {
+    }
+    else {
       return id;
     }
   }

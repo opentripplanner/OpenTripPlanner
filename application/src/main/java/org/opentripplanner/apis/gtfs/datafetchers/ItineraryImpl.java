@@ -89,7 +89,8 @@ public class ItineraryImpl implements GraphQLDataFetchers.GraphQLItinerary {
           routeRequest
         );
         return reference.encode();
-      } catch (UnsupportedItineraryReferenceException e) {
+      }
+      catch (UnsupportedItineraryReferenceException e) {
         return null;
       }
     };

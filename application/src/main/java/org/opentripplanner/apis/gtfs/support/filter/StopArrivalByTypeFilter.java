@@ -32,7 +32,8 @@ public class StopArrivalByTypeFilter {
   public List<StopArrival> filter(@Nullable List<StopArrival> arrivals) {
     if (allowedTypes == null || arrivals == null) {
       return arrivals;
-    } else {
+    }
+    else {
       return arrivals
         .stream()
         .filter(arrival -> allowedTypes.contains(arrival.place.stop.getStopType()))
@@ -43,7 +44,8 @@ public class StopArrivalByTypeFilter {
   private static Set<StopType> map(@Nullable Collection<GraphQLTypes.GraphQLStopType> types) {
     if (types == null) {
       return null;
-    } else {
+    }
+    else {
       var allowed = types
         .stream()
         .map(

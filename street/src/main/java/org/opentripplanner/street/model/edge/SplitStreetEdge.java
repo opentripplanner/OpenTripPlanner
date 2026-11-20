@@ -16,9 +16,11 @@ public record SplitStreetEdge(StreetEdge head, StreetEdge tail) implements Itera
   public Iterator<StreetEdge> iterator() {
     if (head == null && tail == null) {
       return Collections.emptyIterator();
-    } else if (head != null && tail != null) {
+    }
+    else if (head != null && tail != null) {
       return List.of(head, tail).iterator();
-    } else {
+    }
+    else {
       return List.of(Objects.requireNonNullElse(head, tail)).iterator();
     }
   }

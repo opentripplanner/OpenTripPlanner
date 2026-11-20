@@ -133,7 +133,8 @@ public class GbfsFeedMapper implements org.opentripplanner.gbfs.GbfsFeedMapper {
       if (zones != null) {
         var mapper = new GbfsGeofencingZoneMapper(system.systemId());
         this.geofencingZones = mapper.mapGeofencingZone(zones);
-      } else {
+      }
+      else {
         if (logGeofencingZonesDoesNotExistWarning) {
           LOG.warn(
             "GeofencingZones is enabled in OTP, but no zones exist for network: {}",

@@ -36,7 +36,8 @@ class InvalidPointInJourneyPatternRef extends AbstractHMapValidationRule<String,
 
     if (stopPointsInPattern.containsAll(stopPointRefs)) {
       return Status.OK;
-    } else {
+    }
+    else {
       return Status.DISCARD;
     }
   }

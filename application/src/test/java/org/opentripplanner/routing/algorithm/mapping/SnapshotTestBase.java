@@ -80,7 +80,8 @@ public abstract class SnapshotTestBase {
   public static void loadGraphBeforeClass(boolean withElevation) {
     if (withElevation) {
       ConstantsForTests.getInstance().getCachedPortlandGraphWithElevation();
-    } else {
+    }
+    else {
       ConstantsForTests.getInstance().getCachedPortlandGraph();
     }
   }
@@ -194,7 +195,8 @@ public abstract class SnapshotTestBase {
   protected void logDebugInformationOnFailure(RouteRequest request, Runnable task) {
     try {
       task.run();
-    } catch (Throwable e) {
+    }
+    catch (Throwable e) {
       System.err.println(
         "\nTo recreate the snapshots used for verifying the tests run `mvn clean -Pclean-test-snapshots`."
       );
@@ -270,7 +272,8 @@ public abstract class SnapshotTestBase {
         .stream()
         .map(NarrowedTransitMode::toMainAndSubMode)
         .toList();
-    } else if (filter instanceof AllowAllTransitFilter) {
+    }
+    else if (filter instanceof AllowAllTransitFilter) {
       transportModes = MainAndSubMode.all();
     }
 
@@ -306,10 +309,12 @@ public abstract class SnapshotTestBase {
 
     if (location.stopId() != null) {
       formatted = String.format("%s::%s", location.label(), location.stopId());
-    } else if (location.wgsCoordinate() != null) {
+    }
+    else if (location.wgsCoordinate() != null) {
       var coord = location.wgsCoordinate();
       formatted = String.format("%s::%s,%s", location.label(), coord.latitude(), coord.longitude());
-    } else {
+    }
+    else {
       formatted = String.format("%s::null", location.label());
     }
 
@@ -377,7 +382,8 @@ public abstract class SnapshotTestBase {
     public String apply(Object[] objects) {
       try {
         return objectMapper.writer().with(pp).writeValueAsString(objects);
-      } catch (JacksonException e) {
+      }
+      catch (JacksonException e) {
         throw new RuntimeException("Failed to process snapshot JSON", e);
       }
     }

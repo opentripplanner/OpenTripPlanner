@@ -242,9 +242,11 @@ public final class WalkPreferences implements Serializable {
     public Builder withSafetyFactor(double safetyFactor) {
       if (safetyFactor < 0) {
         this.safetyFactor = 0;
-      } else if (safetyFactor > 1) {
+      }
+      else if (safetyFactor > 1) {
         this.safetyFactor = 1;
-      } else {
+      }
+      else {
         this.safetyFactor = safetyFactor;
       }
 

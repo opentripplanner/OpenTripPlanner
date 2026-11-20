@@ -28,7 +28,8 @@ public enum ParetoDominance {
   public static ParetoDominance of(boolean leftDominanceExist, boolean rightDominanceExist) {
     if (leftDominanceExist) {
       return rightDominanceExist ? MUTUAL : LEFT;
-    } else {
+    }
+    else {
       return rightDominanceExist ? RIGHT : NONE;
     }
   }

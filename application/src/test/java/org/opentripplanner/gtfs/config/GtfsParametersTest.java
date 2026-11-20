@@ -48,7 +48,8 @@ class GtfsParametersTest {
   GtfsParametersTest() {
     try {
       SOURCE = new URI("http://a.place.org/feed");
-    } catch (URISyntaxException e) {
+    }
+    catch (URISyntaxException e) {
       throw new RuntimeException(e);
     }
 

@@ -112,7 +112,8 @@ class StationMapper {
   private ZoneId ofZoneId(String stopPlaceId, String zoneId) {
     try {
       return ZoneId.of(zoneId);
-    } catch (DateTimeException e) {
+    }
+    catch (DateTimeException e) {
       issueStore.add(
         "InvalidTimeZone",
         "Invalid ID for ZoneOffset at StopPlace with ID: %s and value %s",
@@ -129,7 +130,8 @@ class StationMapper {
 
     if (stopPlace.getName() == null) {
       name = new NonLocalizedString("N/A");
-    } else if (stopPlace.getAlternativeNames() != null) {
+    }
+    else if (stopPlace.getAlternativeNames() != null) {
       Map<String, String> translations = new HashMap<>();
       translations.put(null, MultilingualStringMapper.getStringValue(stopPlace.getName()));
 
@@ -142,7 +144,8 @@ class StationMapper {
       }
 
       name = TranslatedString.getDeduplicatedI18NString(translations, false);
-    } else {
+    }
+    else {
       name = new NonLocalizedString(MultilingualStringMapper.getStringValue(stopPlace.getName()));
     }
 
@@ -193,7 +196,8 @@ class StationMapper {
       }
 
       return coordinate;
-    } catch (InvalidCoordinateException e) {
+    }
+    catch (InvalidCoordinateException e) {
       issueStore.add(
         "StationInvalidCoordinates",
         "Station %s has invalid coordinates. %s",
@@ -226,7 +230,8 @@ class StationMapper {
         if (coordinate != null) {
           coordinates.add(coordinate);
         }
-      } catch (InvalidCoordinateException ignore) {
+      }
+      catch (InvalidCoordinateException ignore) {
         // Skip the quay, the issue is reported by the QuayMapper
       }
     }

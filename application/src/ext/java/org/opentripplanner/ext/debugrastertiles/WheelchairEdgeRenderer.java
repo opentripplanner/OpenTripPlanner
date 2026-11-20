@@ -34,16 +34,19 @@ public class WheelchairEdgeRenderer implements EdgeVertexRenderer {
     if (e instanceof StreetEdge pse) {
       if (!pse.isWheelchairAccessible()) {
         return EdgeVisualAttributes.optional(NO_WHEELCHAIR_COLOR, "wheelchair=no");
-      } else {
+      }
+      else {
         return EdgeVisualAttributes.optional(
           slopePalette.getColor(pse.getMaxSlope()),
           String.format("%.02f", pse.getMaxSlope())
         );
       }
-    } else if (e instanceof ElevatorHopEdge ehe) {
+    }
+    else if (e instanceof ElevatorHopEdge ehe) {
       if (!ehe.isWheelchairAccessible()) {
         return EdgeVisualAttributes.optional(NO_WHEELCHAIR_COLOR, "wheelchair=no");
-      } else {
+      }
+      else {
         return EdgeVisualAttributes.optional(Color.GREEN, "elevator");
       }
     }

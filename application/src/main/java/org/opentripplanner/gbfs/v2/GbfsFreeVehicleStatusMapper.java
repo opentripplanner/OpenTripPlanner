@@ -109,7 +109,8 @@ class GbfsFreeVehicleStatusMapper {
       }
 
       return builder.build();
-    } else {
+    }
+    else {
       return null;
     }
   }

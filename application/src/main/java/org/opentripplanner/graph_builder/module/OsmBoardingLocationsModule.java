@@ -131,7 +131,8 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
             stop.getCode(),
             ts.getCoordinate()
           );
-        } else {
+        }
+        else {
           successes++;
         }
       }

@@ -220,7 +220,8 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
 
       failedResolutions.remove(tripId);
       repository.upsertCarpoolTrip(routableTrip);
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       LOG.info(
         "Failed to process EstimatedVehicleJourney {}",
         estimatedVehicleJourney.getEstimatedVehicleJourneyCode(),
@@ -297,7 +298,8 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
       resolved = sameRoutePoints
         ? tripResolver.resolve(trip, existing.vertices())
         : tripResolver.resolve(trip);
-    } catch (RuntimeException e) {
+    }
+    catch (RuntimeException e) {
       LOG.warn(
         "Dropping carpool trip {}: resolving its route points or computing its corridor failed",
         trip.getId(),

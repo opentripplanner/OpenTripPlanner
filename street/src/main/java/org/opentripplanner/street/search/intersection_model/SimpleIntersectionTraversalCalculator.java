@@ -35,9 +35,11 @@ public class SimpleIntersectionTraversalCalculator
 
     if (mode.isDrivingIsh()) {
       return computeDrivingTraversalDuration(v, from, to);
-    } else if (mode.isCyclingIsh()) {
+    }
+    else if (mode.isCyclingIsh()) {
       return computeCyclingTraversalDuration(v, from, to, toSpeed);
-    } else {
+    }
+    else {
       return computeWalkingTraversalDuration(v, from, to, toSpeed);
     }
   }
@@ -145,12 +147,15 @@ public class SimpleIntersectionTraversalCalculator
       // Use constants that apply when there are stop lights.
       if (isSafeTurn(turnAngle)) {
         return getExpectedRightAtLightTimeSec();
-      } else if (isTurnAcrossTraffic(turnAngle)) {
+      }
+      else if (isTurnAcrossTraffic(turnAngle)) {
         return getExpectedLeftAtLightTimeSec();
-      } else {
+      }
+      else {
         return getExpectedStraightAtLightTimeSec();
       }
-    } else {
+    }
+    else {
       //assume highway vertex
       if (from.getCarSpeed() > 25 && to.getCarSpeed() > 25) {
         return 0;
@@ -159,9 +164,11 @@ public class SimpleIntersectionTraversalCalculator
       // Use constants that apply when no stop lights.
       if (isSafeTurn(turnAngle)) {
         return getExpectedRightNoLightTimeSec();
-      } else if (isTurnAcrossTraffic(turnAngle)) {
+      }
+      else if (isTurnAcrossTraffic(turnAngle)) {
         return getExpectedLeftNoLightTimeSec();
-      } else {
+      }
+      else {
         return getExpectedStraightNoLightTimeSec();
       }
     }
@@ -178,11 +185,14 @@ public class SimpleIntersectionTraversalCalculator
 
     if (v.hasCyclingTrafficLight()) {
       return baseDuration + getExpectedWalkingAndCyclingTrafficLightTimeSec();
-    } else if (isTurnAcrossTraffic(turnAngle)) {
+    }
+    else if (isTurnAcrossTraffic(turnAngle)) {
       return baseDuration * getAcrossTrafficBicycleTurnMultiplier();
-    } else if (isSafeTurn(turnAngle)) {
+    }
+    else if (isSafeTurn(turnAngle)) {
       return baseDuration * getSafeBicycleTurnModifier();
-    } else {
+    }
+    else {
       return baseDuration;
     }
   }

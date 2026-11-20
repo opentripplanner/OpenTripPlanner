@@ -183,11 +183,13 @@ public abstract class GbfsFeedLoaderImpl<
 
         updateNextFetchTime(response.body);
         return true;
-      } catch (OtpHttpClientException e) {
+      }
+      catch (OtpHttpClientException e) {
         LOG.warn("Could not fetch GBFS data for {}", url, e);
         nextUpdate = getCurrentTimeSeconds();
         return false;
-      } catch (Exception e) {
+      }
+      catch (Exception e) {
         LOG.warn("Exception while processing GBFS data for {}", url, e);
         nextUpdate = getCurrentTimeSeconds();
         return false;
@@ -211,10 +213,12 @@ public abstract class GbfsFeedLoaderImpl<
 
         if (lastUpdated == null || ttl == null) {
           nextUpdate = getCurrentTimeSeconds();
-        } else {
+        }
+        else {
           nextUpdate = lastUpdated + ttl;
         }
-      } catch (
+      }
+      catch (
         NoSuchMethodException
         | InvocationTargetException
         | IllegalAccessException

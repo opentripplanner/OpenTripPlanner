@@ -186,7 +186,8 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
       if (reusedPath != null) {
         pathsByToStop.put(toStop, reusedPath);
         sharedPaths.computeIfAbsent(profile.id(), id -> new LongAdder()).increment();
-      } else {
+      }
+      else {
         pathsByToStop.put(toStop, candidate.path());
       }
     });

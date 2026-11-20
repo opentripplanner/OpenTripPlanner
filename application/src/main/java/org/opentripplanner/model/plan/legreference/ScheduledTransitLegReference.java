@@ -107,7 +107,8 @@ public record ScheduledTransitLegReference(
       }
 
       trip = tripOnServiceDate.getTrip();
-    } else {
+    }
+    else {
       trip = transitService.getTrip(tripId);
     }
 

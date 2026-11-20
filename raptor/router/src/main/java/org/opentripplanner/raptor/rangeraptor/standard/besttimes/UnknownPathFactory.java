@@ -110,7 +110,8 @@ public class UnknownPathFactory<T extends RaptorTripSchedule> {
       if (bestTimes.isStopReachedByTransit(stop)) {
         return bestTimes.transitArrivalTime(stop);
       }
-    } else {
+    }
+    else {
       if (bestTimes.isStopReached(stop)) {
         return bestTimes.time(stop);
       }

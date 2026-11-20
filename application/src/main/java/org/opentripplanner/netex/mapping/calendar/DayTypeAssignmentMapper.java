@@ -145,7 +145,8 @@ public class DayTypeAssignmentMapper {
     // Add or remove periods
     else if (dayTypeAssignment.getOperatingPeriodRef() != null) {
       addOperatingPeriod(dayTypeAssignment);
-    } else if (dayTypeAssignment.getOperatingDayRef() != null) {
+    }
+    else if (dayTypeAssignment.getOperatingDayRef() != null) {
       var opd = operatingDays.lookup(dayTypeAssignment.getOperatingDayRef().getRef());
       addDate(true, opd.getCalendarDate());
     }
@@ -182,7 +183,8 @@ public class DayTypeAssignmentMapper {
       LocalDate date = getOperatingPeriodStartDate(operatingPeriod);
 
       addDates(isAvailable, daysOfWeek, endDate, date);
-    } else if (period instanceof UicOperatingPeriod uicOperatingPeriod) {
+    }
+    else if (period instanceof UicOperatingPeriod uicOperatingPeriod) {
       LocalDate endDate = uicOperatingPeriod.getToDate().toLocalDate().plusDays(1);
       LocalDate date = uicOperatingPeriod.getFromDate().toLocalDate();
 
@@ -244,7 +246,8 @@ public class DayTypeAssignmentMapper {
     for (int i = 0; i < ChronoUnit.DAYS.between(date, endDate); i++) {
       if (i >= validDayBits.length() || validDayBits.charAt(i) == '1') {
         addDate(isAvailable, date.plusDays(i));
-      } else if (validDayBits.charAt(i) != '0') {
+      }
+      else if (validDayBits.charAt(i) != '0') {
         throw new IllegalArgumentException(
           "Invalid character '" + validDayBits.charAt(i) + "' in validDayBits"
         );
@@ -255,7 +258,8 @@ public class DayTypeAssignmentMapper {
   private void addDate(boolean isAvailable, LocalDate date) {
     if (isAvailable) {
       dates.add(date);
-    } else {
+    }
+    else {
       datesToRemove.add(date);
     }
   }

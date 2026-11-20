@@ -236,7 +236,8 @@ class AccessEgressRouterTest extends GraphRoutingTest {
         transitRepository.getSiteRepository().getStopLocation(nearbyStop.stopId()).getName() +
         "]"
       );
-    } else {
+    }
+    else {
       return "street[" + stateDescription(nearbyStop.state()) + "]";
     }
   }

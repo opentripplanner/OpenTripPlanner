@@ -122,7 +122,8 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
 
     try {
       expectRequestResponseToMatchSnapshot(request);
-    } catch (CompletionException e) {
+    }
+    catch (CompletionException e) {
       RoutingValidationException.unwrapAndRethrowCompletionException(e);
     }
   }

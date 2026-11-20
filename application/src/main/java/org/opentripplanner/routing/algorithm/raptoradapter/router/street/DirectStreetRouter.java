@@ -90,7 +90,8 @@ public class DirectStreetRouter {
         request.journey().wheelchair(),
         request.preferences().wheelchair()
       );
-    } catch (PathNotFoundException e) {
+    }
+    catch (PathNotFoundException e) {
       return Collections.emptyList();
     }
   }
@@ -123,13 +124,17 @@ public class DirectStreetRouter {
 
     if (mode.includesDriving()) {
       distanceLimit = durationLimit * maxCarSpeed;
-    } else if (mode.includesBiking()) {
+    }
+    else if (mode.includesBiking()) {
       distanceLimit = durationLimit * preferences.bike().speed();
-    } else if (mode.includesScooter()) {
+    }
+    else if (mode.includesScooter()) {
       distanceLimit = durationLimit * preferences.scooter().speed();
-    } else if (mode.includesWalking()) {
+    }
+    else if (mode.includesWalking()) {
       distanceLimit = durationLimit * preferences.walk().speed();
-    } else {
+    }
+    else {
       throw new IllegalStateException("Could not set max limit for StreetMode");
     }
 

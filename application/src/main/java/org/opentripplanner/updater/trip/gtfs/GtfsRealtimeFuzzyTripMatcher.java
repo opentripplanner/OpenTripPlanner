@@ -65,7 +65,8 @@ public class GtfsRealtimeFuzzyTripMatcher {
 
     try {
       date = ServiceDateUtils.parseString(trip.getStartDate());
-    } catch (ParseException e) {
+    }
+    catch (ParseException e) {
       return trip;
     }
 

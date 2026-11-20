@@ -140,7 +140,8 @@ public final class BicycleSlopeSpeedFunction {
           f = hh[i] / (TX[li] - TX[lj]);
           h[i] = h[i] + f * (TX[li] - altitude);
           h[i + 1] = f * (altitude - TX[lj]);
-        } else {
+        }
+        else {
           h[i + 1 - 1] = 0.0;
         }
       }
@@ -179,7 +180,8 @@ public final class BicycleSlopeSpeedFunction {
           f = hh[i] / (TY[li] - TY[lj]);
           h[i] = h[i] + f * (TY[li] - slope);
           h[i + 1] = f * (slope - TY[lj]);
-        } else {
+        }
+        else {
           h[i + 1 - 1] = 0.0;
         }
       }

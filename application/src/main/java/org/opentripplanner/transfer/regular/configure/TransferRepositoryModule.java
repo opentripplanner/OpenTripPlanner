@@ -19,7 +19,8 @@ public class TransferRepositoryModule {
 
     if (OTPFeature.FlexRouting.isOn()) {
       index = new FlexTransferIndex();
-    } else {
+    }
+    else {
       index = new TransferIndex();
     }
 

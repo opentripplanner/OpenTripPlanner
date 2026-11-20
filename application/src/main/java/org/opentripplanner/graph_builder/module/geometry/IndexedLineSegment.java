@@ -27,10 +27,12 @@ class IndexedLineSegment {
     if (cte < distanceToStart && cte < distanceToEnd) {
       double atd = alongTrackDistance(coord, cte);
       return atd / lineLength;
-    } else {
+    }
+    else {
       if (distanceToStart < distanceToEnd) {
         return 0;
-      } else {
+      }
+      else {
         return 1;
       }
     }
@@ -70,16 +72,19 @@ class IndexedLineSegment {
       if (inverseAtd > lineLength) {
         //we are behind line start
         return distanceToStart;
-      } else {
+      }
+      else {
         //we are within line
         return Math.abs(cte);
       }
-    } else {
+    }
+    else {
       //we might be after line end
       if (atd > lineLength) {
         //we are behind line end, so we that's the nearest point
         return distanceToEnd;
-      } else {
+      }
+      else {
         //we are within line
         return Math.abs(cte);
       }

@@ -97,7 +97,8 @@ public class GenericDataFile {
       for (Map.Entry<IndexVariable, Variable> genVariable : genVariables.entrySet()) {
         netcdfDataForVariable.put(genVariable.getKey().getName(), genVariable.getValue().read());
       }
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       error = e.getMessage();
     }
   }

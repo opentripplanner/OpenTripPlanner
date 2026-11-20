@@ -70,7 +70,8 @@ public class HttpsDataSourceRepository implements DataSourceRepository {
     if (httpsDataSourceMetadata.isZipContentType() || uri.getPath().endsWith(".zip")) {
       DataSource httpsSource = new HttpsFileDataSource(uri, type, httpsDataSourceMetadata);
       return new ZipStreamDataSourceDecorator(httpsSource);
-    } else {
+    }
+    else {
       throw new UnsupportedOperationException(
         "Only ZIP archives are supported as composite sources for the HTTPS data source. URL: %s".formatted(
           uri

@@ -67,7 +67,8 @@ public class VehicleParkingEdge extends Edge {
 
     if (s0.getRequest().arriveBy()) {
       return traverseUnPark(s0);
-    } else {
+    }
+    else {
       return traversePark(s0);
     }
   }
@@ -87,10 +88,12 @@ public class VehicleParkingEdge extends Edge {
     if (streetMode.includesBiking()) {
       var bike = s0.getRequest().bike();
       return traverseUnPark(s0, bike.parking().cost(), bike.parking().time(), TraverseMode.BICYCLE);
-    } else if (streetMode.includesDriving()) {
+    }
+    else if (streetMode.includesDriving()) {
       var car = s0.getRequest().car();
       return traverseUnPark(s0, car.parking().cost(), car.parking().time(), TraverseMode.CAR);
-    } else {
+    }
+    else {
       return State.empty();
     }
   }
@@ -137,13 +140,15 @@ public class VehicleParkingEdge extends Edge {
         preferences.bike().parking().cost(),
         preferences.bike().parking().time()
       );
-    } else if (streetMode.includesDriving()) {
+    }
+    else if (streetMode.includesDriving()) {
       return traversePark(
         s0,
         preferences.car().parking().cost(),
         preferences.car().parking().time()
       );
-    } else {
+    }
+    else {
       return State.empty();
     }
   }

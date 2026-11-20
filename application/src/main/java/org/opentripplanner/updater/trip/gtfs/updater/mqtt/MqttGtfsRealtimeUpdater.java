@@ -197,7 +197,8 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater<TransitRealTimeUpda
           updates.add(feedEntity.getTripUpdate());
         }
       }
-    } catch (InvalidProtocolBufferException e) {
+    }
+    catch (InvalidProtocolBufferException e) {
       LOG.error("Could not decode gtfs-rt message:", e);
     }
 

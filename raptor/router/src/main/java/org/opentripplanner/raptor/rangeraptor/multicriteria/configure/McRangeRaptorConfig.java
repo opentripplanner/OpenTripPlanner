@@ -201,7 +201,8 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
   private HeuristicsProvider<T> createHeuristicsProvider(Heuristics heuristics) {
     if (heuristics == null) {
       return new HeuristicsProvider<>();
-    } else {
+    }
+    else {
       var ctx = contextSegment.parent();
       return new HeuristicsProvider<>(
         heuristics,

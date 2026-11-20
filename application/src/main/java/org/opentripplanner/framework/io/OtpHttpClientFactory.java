@@ -118,7 +118,8 @@ public class OtpHttpClientFactory implements AutoCloseable {
   public void close() {
     try {
       httpClient.close();
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       throw new OtpHttpClientException(e);
     }
   }

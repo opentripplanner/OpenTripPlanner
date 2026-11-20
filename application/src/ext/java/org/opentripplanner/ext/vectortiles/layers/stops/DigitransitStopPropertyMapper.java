@@ -70,7 +70,8 @@ public class DigitransitStopPropertyMapper extends PropertyMapper<RegularStop> {
         })
         .toList();
       return OBJECT_MAPPER.writeValueAsString(objects);
-    } catch (JacksonException e) {
+    }
+    catch (JacksonException e) {
       throw new RuntimeException(e);
     }
   }

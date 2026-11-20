@@ -85,7 +85,8 @@ class FareLookupService implements Serializable {
 
     if (containsPriorities) {
       return findHighestPriority(rules);
-    } else {
+    }
+    else {
       return rules;
     }
   }
@@ -139,7 +140,8 @@ class FareLookupService implements Serializable {
 
         if (fromRules.isEmpty() || toRules.isEmpty()) {
           return Stream.of();
-        } else {
+        }
+        else {
           var possibleTransfers = findPossibleTransfers(head, tail, r, fromRules, toRules);
           return SetUtils.intersection(possibleTransfers).stream();
         }
@@ -230,7 +232,8 @@ class FareLookupService implements Serializable {
     // no need to compute transfers if there is only a single leg or the rules cannot be found
     if (pairs.isEmpty() || fromRules.isEmpty() || toRules.isEmpty()) {
       return List.of();
-    } else {
+    }
+    else {
       return pairs
         .stream()
         .flatMap(pair -> {

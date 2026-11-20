@@ -77,7 +77,8 @@ public class TimeUtils {
       }
 
       tokens = hhmmss.substring(0, m.start()).split(":");
-    } else {
+    }
+    else {
       tokens = hhmmss.split(":");
     }
 

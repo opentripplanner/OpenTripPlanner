@@ -15,7 +15,8 @@ class DistanceMatcher {
       // therefore we add 1
       var numStops = leg.listIntermediateStops().size() + 1;
       return numStops >= min && max >= numStops;
-    } else {
+    }
+    else {
       return true;
     }
   }

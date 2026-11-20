@@ -52,7 +52,8 @@ public class FlexSearchWindowFilter implements RemoveItineraryFlagger {
             yield time.isAfter(latestArrivalTime);
           }
         };
-      } else {
+      }
+      else {
         return false;
       }
     };

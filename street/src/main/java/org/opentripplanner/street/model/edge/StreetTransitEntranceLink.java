@@ -50,7 +50,8 @@ public class StreetTransitEntranceLink extends StreetTransitEntityLink<TransitEn
   public FeedScopedId entrance() {
     if (getToVertex() instanceof TransitEntranceVertex tev) {
       return tev.getId();
-    } else if (getFromVertex() instanceof TransitEntranceVertex tev) {
+    }
+    else if (getFromVertex() instanceof TransitEntranceVertex tev) {
       return tev.getId();
     }
 

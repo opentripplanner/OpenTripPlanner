@@ -103,10 +103,12 @@ public class VehicleRentalUpdater extends PollingGraphUpdater<StreetRealTimeUpda
     try {
       // Do any setup if needed
       retry.execute(source::setup);
-    } catch (InterruptedException e) {
+    }
+    catch (InterruptedException e) {
       Thread.currentThread().interrupt();
       LOG.warn("Updater setup interrupted: {}", nameForLogging, e);
-    } catch (OtpRetryException e) {
+    }
+    catch (OtpRetryException e) {
       LOG.warn("Unable to setup updater: {}", nameForLogging, e);
     }
 
@@ -115,7 +117,8 @@ public class VehicleRentalUpdater extends PollingGraphUpdater<StreetRealTimeUpda
         "Creating vehicle-rental updater running once only (non-polling): {}",
         nameForLogging
       );
-    } else {
+    }
+    else {
       LOG.info(
         "Creating vehicle-rental updater running every {}: {}",
         DurationUtils.durationToStr(pollingPeriod()),
@@ -217,7 +220,8 @@ public class VehicleRentalUpdater extends PollingGraphUpdater<StreetRealTimeUpda
           verticesByStation.put(station.id(), vehicleRentalVertex);
           tempEdgesByStation.put(station.id(), tempEdges);
           newVertices.add(vehicleRentalVertex);
-        } else {
+        }
+        else {
           vehicleRentalVertex.setStation(station);
         }
       }

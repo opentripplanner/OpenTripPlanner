@@ -88,7 +88,8 @@ public class ConfigModel {
     if (this.buildConfig.isDefault()) {
       LOG.info("Using the graph embedded JSON build configuration.");
       this.buildConfig = buildConfig;
-    } else if (graphIsServedAsIs && !buildConfig.isDefault()) {
+    }
+    else if (graphIsServedAsIs && !buildConfig.isDefault()) {
       // TODO: Use the whole embedded build config when serving, not only the transfer profiles.
       //       This is a quick fix, it will be fixed in a follow up PR.
       LOG.info("Using the transfer profiles of the graph embedded JSON build configuration.");

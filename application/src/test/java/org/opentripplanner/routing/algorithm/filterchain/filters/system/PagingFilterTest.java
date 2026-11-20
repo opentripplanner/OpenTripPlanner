@@ -144,7 +144,8 @@ public class PagingFilterTest implements PlanTestConstants {
 
     if (index == 23) {
       assertEquals("", toStr(result));
-    } else {
+    }
+    else {
       assertItineraryEq(allItineraries.get(index + 1), first(result));
     }
   }
@@ -166,7 +167,8 @@ public class PagingFilterTest implements PlanTestConstants {
 
     if (index == 0) {
       assertEquals("", toStr(result));
-    } else {
+    }
+    else {
       assertItineraryEq(allItineraries.get(index - 1), last(result));
     }
   }
@@ -188,7 +190,8 @@ public class PagingFilterTest implements PlanTestConstants {
 
     if (index == 23) {
       assertEquals("", toStr(result));
-    } else {
+    }
+    else {
       assertItineraryEq(allItineraries.get(index + 1), first(result));
     }
   }
@@ -210,7 +213,8 @@ public class PagingFilterTest implements PlanTestConstants {
 
     if (index == 0) {
       assertEquals("", toStr(result));
-    } else {
+    }
+    else {
       assertItineraryEq(allItineraries.get(index - 1), last(result));
     }
   }
@@ -247,14 +251,17 @@ public class PagingFilterTest implements PlanTestConstants {
     if (transit) {
       if (nTransfers == 0) {
         builder.bus(10, departureTime, arrivalTime, B);
-      } else if (nTransfers == 1) {
+      }
+      else if (nTransfers == 1) {
         builder
           .bus(20, departureTime, departureTime + 120, B)
           .bus(21, departureTime + 240, arrivalTime, B);
-      } else {
+      }
+      else {
         throw new IllegalArgumentException("nTransfers not supported: " + nTransfers);
       }
-    } else {
+    }
+    else {
       builder.drive(departureTime, arrivalTime, B);
     }
 

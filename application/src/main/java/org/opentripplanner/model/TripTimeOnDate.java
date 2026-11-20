@@ -535,7 +535,8 @@ public class TripTimeOnDate {
   private Optional<Instant> optionalInstant(int secondsSinceMidnight) {
     if (isCancelledStop() || isRealtime()) {
       return Optional.of(toInstant(secondsSinceMidnight));
-    } else {
+    }
+    else {
       return Optional.empty();
     }
   }

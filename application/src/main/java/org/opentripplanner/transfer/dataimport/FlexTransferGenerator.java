@@ -261,7 +261,8 @@ public class FlexTransferGenerator implements GraphBuilderModule {
         "Creating flex transfer edges between stops using straight line distance (not streets)..."
       );
       finder = new StraightLineNearbyStopFinder(siteRepository::findRegularStops);
-    } else {
+    }
+    else {
       LOG.info("Creating flex transfer edges between stops using the street network from OSM...");
       finder = StreetNearbyStopFinder.of(null).build();
     }
@@ -273,7 +274,8 @@ public class FlexTransferGenerator implements GraphBuilderModule {
         flexIndex.get(),
         finder
       );
-    } else {
+    }
+    else {
       return finder;
     }
   }
@@ -294,7 +296,8 @@ public class FlexTransferGenerator implements GraphBuilderModule {
         transferKey,
         new PathTransfer(from, to, sd.distance(), sd.edges(), EnumSet.of(mode))
       );
-    } else {
+    }
+    else {
       // If the PathTransfer is found, a new PathTransfer with the added mode is created.
       distinctTransfers.put(transferKey, pathTransfer.withAddedMode(mode));
     }

@@ -57,7 +57,8 @@ public class DefaultCarpoolingRepository implements CarpoolingRepository {
 
     if (existing != null) {
       LOG.debug("Updated carpool trip {} with {} stops", trip.getId(), trip.stops().size());
-    } else {
+    }
+    else {
       changeTripCount(trip.getId(), 1);
       LOG.debug("Added new carpool trip {} with {} stops", trip.getId(), trip.stops().size());
     }
@@ -70,7 +71,8 @@ public class DefaultCarpoolingRepository implements CarpoolingRepository {
     if (removed != null) {
       changeTripCount(id, -1);
       LOG.debug("Removed carpool trip {}", id);
-    } else {
+    }
+    else {
       LOG.debug("Tried to remove unknown carpool trip {}", id);
     }
   }

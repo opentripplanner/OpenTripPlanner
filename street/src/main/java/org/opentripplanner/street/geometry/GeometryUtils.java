@@ -186,7 +186,8 @@ public class GeometryUtils {
     if (geometry instanceof LineString ls) {
       total = ls;
       numPoints = ls.getNumPoints();
-    } else {
+    }
+    else {
       Coordinate[] coordinates = geometry.getCoordinates();
       CoordinateSequence sequence = GF.getCoordinateSequenceFactory().create(coordinates);
       total = new LineString(sequence, GF);
@@ -251,7 +252,8 @@ public class GeometryUtils {
           geoJsonPoint.getCoordinates().getAltitude()
         )
       );
-    } else if (geoJsonGeom instanceof org.geojson.Polygon) {
+    }
+    else if (geoJsonGeom instanceof org.geojson.Polygon) {
       org.geojson.Polygon geoJsonPolygon = (org.geojson.Polygon) geoJsonGeom;
       LinearRing shell = GF.createLinearRing(convertPath(geoJsonPolygon.getExteriorRing()));
       LinearRing[] holes = new LinearRing[geoJsonPolygon.getInteriorRings().size()];
@@ -262,7 +264,8 @@ public class GeometryUtils {
       }
 
       return GF.createPolygon(shell, holes);
-    } else if (geoJsonGeom instanceof MultiPolygon) {
+    }
+    else if (geoJsonGeom instanceof MultiPolygon) {
       MultiPolygon geoJsonMultiPolygon = (MultiPolygon) geoJsonGeom;
       Polygon[] jtsPolygons = new Polygon[geoJsonMultiPolygon.getCoordinates().size()];
       int i = 0;
@@ -278,10 +281,12 @@ public class GeometryUtils {
       }
 
       return GF.createMultiPolygon(jtsPolygons);
-    } else if (geoJsonGeom instanceof org.geojson.LineString) {
+    }
+    else if (geoJsonGeom instanceof org.geojson.LineString) {
       org.geojson.LineString geoJsonLineString = (org.geojson.LineString) geoJsonGeom;
       return GF.createLineString(convertPath(geoJsonLineString.getCoordinates()));
-    } else if (geoJsonGeom instanceof org.geojson.MultiLineString) {
+    }
+    else if (geoJsonGeom instanceof org.geojson.MultiLineString) {
       org.geojson.MultiLineString geoJsonMultiLineString =
         (org.geojson.MultiLineString) geoJsonGeom;
       LineString[] jtsLineStrings = new LineString[geoJsonMultiLineString.getCoordinates().size()];
@@ -350,7 +355,8 @@ public class GeometryUtils {
     // from the coordinate sequence than the coordinates (less intermediate objects creation)
     if (geometry instanceof LineString ls) {
       return GeometryUtils.sumDistances(ls.getCoordinateSequence());
-    } else {
+    }
+    else {
       return GeometryUtils.sumDistances(geometry.getCoordinates());
     }
   }

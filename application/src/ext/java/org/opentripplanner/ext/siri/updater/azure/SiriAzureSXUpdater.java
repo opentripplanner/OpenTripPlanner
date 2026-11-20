@@ -47,7 +47,8 @@ public class SiriAzureSXUpdater implements SiriAzureMessageHandler {
     if (sxDeliveries == null || sxDeliveries.isEmpty()) {
       LOG.info("Empty Siri SX message {}", messageId);
       return null;
-    } else {
+    }
+    else {
       return saveResultOnGraph.execute(context -> updateHandler.update(serviceDelivery, context));
     }
   }

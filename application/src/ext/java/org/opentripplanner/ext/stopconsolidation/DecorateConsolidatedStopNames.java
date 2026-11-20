@@ -56,7 +56,8 @@ public class DecorateConsolidatedStopNames implements ItineraryDecorator {
         // to show the name that's on the display inside the vehicle we use the agency-specific name
         var to = service.agencySpecificStop(stl.to().stop, agency);
         return ConsolidatedStopLeg.of(stl).withFrom(from).withTo(to).build();
-      } else {
+      }
+      else {
         return leg;
       }
     });

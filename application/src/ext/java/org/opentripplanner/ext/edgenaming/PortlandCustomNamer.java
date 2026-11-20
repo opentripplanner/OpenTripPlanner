@@ -90,13 +90,16 @@ class PortlandCustomNamer implements EdgeNamer {
       if (isHighwayLink) {
         if (edge.isBack()) {
           nameByDestination.add(edge);
-        } else {
+        }
+        else {
           nameByOrigin.add(edge);
         }
-      } else if (isLowerLink) {
+      }
+      else if (isLowerLink) {
         if (edge.isBack()) {
           nameByOrigin.add(edge);
-        } else {
+        }
+        else {
           nameByDestination.add(edge);
         }
       }
@@ -173,7 +176,8 @@ class PortlandCustomNamer implements EdgeNamer {
 
         e.overrideName(new NonLocalizedString(name));
         return name;
-      } else {
+      }
+      else {
         String name = out.getDefaultName();
         e.overrideName(new NonLocalizedString(name));
         return name;
@@ -198,7 +202,8 @@ class PortlandCustomNamer implements EdgeNamer {
 
         e.overrideName(new NonLocalizedString(name));
         return name;
-      } else {
+      }
+      else {
         String name = in.getDefaultName();
         e.overrideName(new NonLocalizedString(name));
         return name;

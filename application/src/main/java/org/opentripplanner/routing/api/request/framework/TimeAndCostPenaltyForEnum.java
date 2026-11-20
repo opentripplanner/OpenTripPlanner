@@ -128,7 +128,8 @@ public class TimeAndCostPenaltyForEnum<E extends Enum<E>> implements Serializabl
 
       if (value == null || value.isEmpty()) {
         values.remove(key);
-      } else {
+      }
+      else {
         values.put(key, value);
       }
 

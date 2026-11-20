@@ -83,7 +83,8 @@ public class VehicleParkingAvailabilityUpdater
           "Parking with id {} does not exist. Skipping availability update.",
           update.vehicleParkingId()
         );
-      } else {
+      }
+      else {
         var parking = parkingById.get(update.vehicleParkingId());
         var builder = VehicleParkingSpaces.of();
 

@@ -93,7 +93,8 @@ public class TextVariablesSubstitution {
 
         if (value != null) {
           substitutions.put(subKey, value);
-        } else {
+        }
+        else {
           errorHandler.accept(nameOnly);
         }
       }

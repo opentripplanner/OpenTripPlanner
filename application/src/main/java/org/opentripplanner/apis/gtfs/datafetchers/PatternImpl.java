@@ -131,7 +131,8 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
           }
         });
         return alerts.stream().distinct().collect(Collectors.toList());
-      } else {
+      }
+      else {
         return alertService.getDirectionAndRouteAlerts(
           getSource(environment).getDirection(),
           getRoute(environment).getId()
@@ -157,7 +158,8 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
 
       if (geometry == null) {
         return null;
-      } else {
+      }
+      else {
         return Arrays.asList(geometry.getCoordinates());
       }
     };
@@ -228,7 +230,8 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
           .filter(times -> services.contains(times.getServiceCode()))
           .map(TripTimes::getTrip)
           .collect(Collectors.toList());
-      } catch (ParseException e) {
+      }
+      catch (ParseException e) {
         // Invalid date format
         return null;
       }

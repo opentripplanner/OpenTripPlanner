@@ -46,7 +46,8 @@ public class DefaultStopConsolidationService implements StopConsolidationService
             group
           );
           return Stream.empty();
-        } else {
+        }
+        else {
           return group
             .secondaries()
             .stream()
@@ -81,7 +82,8 @@ public class DefaultStopConsolidationService implements StopConsolidationService
   public boolean isPartOfConsolidatedStop(@Nullable StopLocation sl) {
     if (sl == null) {
       return false;
-    } else {
+    }
+    else {
       return isSecondaryStop(sl) || isPrimaryStop(sl);
     }
   }
@@ -95,7 +97,8 @@ public class DefaultStopConsolidationService implements StopConsolidationService
   public StopLocation agencySpecificStop(StopLocation stop, Agency agency) {
     if (agency.getId().getFeedId().equals(stop.getId().getFeedId())) {
       return stop;
-    } else {
+    }
+    else {
       return findAgencySpecificStop(stop, agency).orElse(stop);
     }
   }

@@ -153,7 +153,8 @@ class HTMLWriter {
           IssueColors.rgb(linkIssueType),
           label
         );
-      } else {
+      }
+      else {
         out.printf(
           "<a class='pure-button button-%s' href=\"%s.html\" style='background-color: %s;'>%s</a>%n",
           linkIssueType.toLowerCase(),

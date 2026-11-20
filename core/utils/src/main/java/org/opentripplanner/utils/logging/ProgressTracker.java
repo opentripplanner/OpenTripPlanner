@@ -266,7 +266,8 @@ public class ProgressTracker {
           p
         )
       );
-    } else {
+    }
+    else {
       notification.accept(String.format("%s progress: %s done", actionName, toStr(counter)));
     }
   }

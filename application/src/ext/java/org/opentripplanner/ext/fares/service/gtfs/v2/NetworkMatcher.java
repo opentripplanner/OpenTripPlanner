@@ -38,7 +38,8 @@ class NetworkMatcher {
 
     if (priorityMatcher.feedContainsRulePriority(rule.feedId())) {
       return rule.networkId() == null || routesNetworkIds.contains(rule.networkId());
-    } else {
+    }
+    else {
       return (
         (rule.networkId() == null &&
           networksWithRules.stream().noneMatch(routesNetworkIds::contains)) ||

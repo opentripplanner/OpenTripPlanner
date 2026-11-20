@@ -38,7 +38,8 @@ class ResourceBundleSingletonTest {
     try {
       Locale.setDefault(Locale.GERMAN);
       assertEquals("unnamed", ResourceBundleSingleton.INSTANCE.localize(KEY, Locale.CHINESE));
-    } finally {
+    }
+    finally {
       Locale.setDefault(defaultLocale);
     }
   }

@@ -144,9 +144,11 @@ public class OsmMapperDocTest {
   ) {
     if (value == NONE && forward == NONE && backward == NONE) {
       return "";
-    } else if (value == forward && value == backward) {
+    }
+    else if (value == forward && value == backward) {
       return value.toString();
-    } else {
+    }
+    else {
       StringBuilder result = new StringBuilder();
 
       if (value != NONE) {
@@ -176,9 +178,11 @@ public class OsmMapperDocTest {
   private static String tableValues(double value, double forward, double backward) {
     if (value == 1.0 && forward == 1.0 && backward == 1.0) {
       return "";
-    } else if (value == forward && value == backward) {
+    }
+    else if (value == forward && value == backward) {
       return Double.toString(value);
-    } else {
+    }
+    else {
       return "no direction: %s <br> forward: %s <br> back: %s".formatted(value, forward, backward);
     }
   }

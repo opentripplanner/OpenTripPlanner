@@ -120,7 +120,8 @@ public class FrequencyEntry implements Serializable {
           return dep;
         }
       }
-    } else {
+    }
+    else {
       int dep = time + headway_s;
 
       // TODO it might work better to step forward until in range
@@ -161,7 +162,8 @@ public class FrequencyEntry implements Serializable {
 
       // if t > end, return last valid arrival time
       return arr - headway_s;
-    } else {
+    }
+    else {
       int dep = t - headway_s;
 
       if (dep > end) {

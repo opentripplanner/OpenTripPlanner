@@ -219,7 +219,8 @@ public class CanceledTripsFilterMapper {
   private static OffsetDateTime parseOffsetDateTime(String value, String path) {
     try {
       return OffsetDateTimeParser.parseLeniently(value);
-    } catch (ParseException e) {
+    }
+    catch (ParseException e) {
       throw new InvalidInputException("Expected OffsetDateTime at '" + path + "'.");
     }
   }
@@ -233,7 +234,8 @@ public class CanceledTripsFilterMapper {
 
     try {
       return TransitMode.valueOf(mode);
-    } catch (IllegalArgumentException e) {
+    }
+    catch (IllegalArgumentException e) {
       throw new InvalidInputException("Unknown transit mode: " + mode);
     }
   }

@@ -59,7 +59,8 @@ public class MultilingualStringMapper {
     for (Serializable item : content) {
       if (item instanceof String s) {
         text.append(s);
-      } else if (firstTextElement == null && item instanceof JAXBElement<?> element) {
+      }
+      else if (firstTextElement == null && item instanceof JAXBElement<?> element) {
         firstTextElement = nonBlankTextElementValue(element);
       }
     }

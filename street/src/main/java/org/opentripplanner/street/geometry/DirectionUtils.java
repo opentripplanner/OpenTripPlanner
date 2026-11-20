@@ -61,7 +61,8 @@ public final class DirectionUtils {
 
     if (geometry instanceof MultiLineString) {
       line = (LineString) geometry.getGeometryN(geometry.getNumGeometries() - 1);
-    } else {
+    }
+    else {
       assert geometry instanceof LineString;
       line = (LineString) geometry;
     }
@@ -91,7 +92,8 @@ public final class DirectionUtils {
 
     if (geometry instanceof MultiLineString) {
       line = (LineString) geometry.getGeometryN(0);
-    } else {
+    }
+    else {
       assert geometry instanceof LineString;
       line = (LineString) geometry;
     }

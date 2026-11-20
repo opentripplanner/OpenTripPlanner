@@ -117,7 +117,8 @@ public class StopsCursor<T extends RaptorTripSchedule> {
     if (!stopReachedOnBoard) {
       if (arrival.arrivedByAccessOnStreet()) {
         return newAccessViewByExactArrivalTime(round, arrival.time(), arrival.accessPathOnStreet());
-      } else if (arrival.arrivedByTransfer()) {
+      }
+      else if (arrival.arrivedByTransfer()) {
         return new Transfer<>(round, stop, arrival, this);
       }
     }
@@ -129,7 +130,8 @@ public class StopsCursor<T extends RaptorTripSchedule> {
         arrival.onBoardArrivalTime(),
         arrival.accessPathOnBoard()
       );
-    } else if (arrival.arrivedByTransit()) {
+    }
+    else if (arrival.arrivedByTransit()) {
       return new Transit<>(round, stop, arrival, this);
     }
 
@@ -146,11 +148,14 @@ public class StopsCursor<T extends RaptorTripSchedule> {
 
     if (arrival.arrivedByAccessOnStreet()) {
       return newAccessView(round, arrival.accessPathOnStreet(), nextTransitLeg);
-    } else if (arrival.arrivedByTransfer()) {
+    }
+    else if (arrival.arrivedByTransfer()) {
       return new Transfer<>(round, stop, arrival, this);
-    } else if (arrival.arrivedByAccessOnBoard()) {
+    }
+    else if (arrival.arrivedByAccessOnBoard()) {
       return newAccessView(round, arrival.accessPathOnBoard(), nextTransitLeg);
-    } else if (arrival.arrivedByTransit()) {
+    }
+    else if (arrival.arrivedByTransit()) {
       return new Transit<>(round, stop, arrival, this);
     }
 

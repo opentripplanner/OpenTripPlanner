@@ -156,7 +156,8 @@ public class TestTripSchedule implements RaptorTripSchedule {
     public TestTripSchedule.Builder shiftTimes(int offset) {
       if (arrivalTimes == departureTimes) {
         arrivalTimes = departureTimes = IntUtils.shiftArray(offset, arrivalTimes);
-      } else {
+      }
+      else {
         if (arrivalTimes != null) {
           arrivalTimes = IntUtils.shiftArray(offset, arrivalTimes);
         }
@@ -178,7 +179,8 @@ public class TestTripSchedule implements RaptorTripSchedule {
     public TestTripSchedule build() {
       if (arrivalTimes == null) {
         arrivalTimes = copyWithOffset(departureTimes, -arrivalDepartureOffset);
-      } else if (departureTimes == null) {
+      }
+      else if (departureTimes == null) {
         departureTimes = copyWithOffset(arrivalTimes, arrivalDepartureOffset);
       }
 

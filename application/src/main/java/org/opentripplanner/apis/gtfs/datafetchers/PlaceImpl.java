@@ -128,7 +128,8 @@ public class PlaceImpl implements GraphQLDataFetchers.GraphQLPlace {
 
       if (seq != null) {
         return new PositionAtStop(seq);
-      } else {
+      }
+      else {
         return null;
       }
     };

@@ -52,7 +52,8 @@ public class SameEdgeAdjuster {
           // The vertex is connected with an TemporaryFreeEdge connector to the
           // TemporaryPartialStreetEdge
           fromVertices.add((StreetVertex) toVertex);
-        } else if (outgoing instanceof TemporaryPartialStreetEdge && from instanceof StreetVertex) {
+        }
+        else if (outgoing instanceof TemporaryPartialStreetEdge && from instanceof StreetVertex) {
           fromVertices.add((StreetVertex) from);
         }
       }
@@ -70,7 +71,8 @@ public class SameEdgeAdjuster {
           // The vertex is connected with an TemporaryFreeEdge connector to the
           // TemporaryPartialStreetEdge
           toVertices.add((StreetVertex) fromVertex);
-        } else if (incoming instanceof TemporaryPartialStreetEdge && to instanceof StreetVertex) {
+        }
+        else if (incoming instanceof TemporaryPartialStreetEdge && to instanceof StreetVertex) {
           toVertices.add((StreetVertex) to);
         }
       }
@@ -84,7 +86,8 @@ public class SameEdgeAdjuster {
           }
         }
       }
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       tempEdges.disposeEdges();
       throw e;
     }

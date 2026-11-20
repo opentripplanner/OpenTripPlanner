@@ -409,7 +409,8 @@ public class TransitDataImportBuilder {
 
         if (!updatedTimetable.getTripTimes().isEmpty()) {
           updatedPatterns.add(updatedPattern);
-        } else {
+        }
+        else {
           issueStore.add(
             "RemovedEmptyTripPattern",
             "Removed trip pattern %s as it contains no trips",

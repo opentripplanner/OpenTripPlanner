@@ -60,7 +60,8 @@ abstract class AbstractCsvFile<T> {
           }
 
           rows.add(parseRow());
-        } catch (RuntimeException e) {
+        }
+        catch (RuntimeException e) {
           LOG.error("Parse error! Row: {}", currentReader.getRawRecord());
           throw e;
         }
@@ -68,7 +69,8 @@ abstract class AbstractCsvFile<T> {
 
       currentReader = null;
       return rows;
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       throw new RuntimeException("Can not read: " + file + ". Cause: " + e.getMessage(), e);
     }
   }
@@ -101,7 +103,8 @@ abstract class AbstractCsvFile<T> {
 
       out.flush();
       LOG.info("INFO - New CSV file with is saved to '{}'.", file.getAbsolutePath());
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       LOG.error("Failed to store results: {}", e.getMessage(), e);
     }
   }

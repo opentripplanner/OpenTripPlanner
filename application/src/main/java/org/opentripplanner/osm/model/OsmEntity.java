@@ -236,7 +236,8 @@ public abstract class OsmEntity {
   public Map<String, String> getTags() {
     if (this.isTagless()) {
       return Map.of();
-    } else {
+    }
+    else {
       return Collections.unmodifiableMap(tags);
     }
   }
@@ -268,9 +269,11 @@ public abstract class OsmEntity {
   public Accessibility explicitWheelchairAccessibility() {
     if (isTagTrue("wheelchair")) {
       return Accessibility.POSSIBLE;
-    } else if (isTagFalse("wheelchair")) {
+    }
+    else if (isTagFalse("wheelchair")) {
       return Accessibility.NOT_POSSIBLE;
-    } else {
+    }
+    else {
       return Accessibility.NO_INFORMATION;
     }
   }
@@ -381,7 +384,8 @@ public abstract class OsmEntity {
     if (value != null) {
       try {
         return OptionalInt.of(Integer.parseInt(value));
-      } catch (NumberFormatException e) {
+      }
+      catch (NumberFormatException e) {
         errorHandler.accept(value);
       }
     }
@@ -469,7 +473,8 @@ public abstract class OsmEntity {
 
             break;
         }
-      } catch (NumberFormatException e) {
+      }
+      catch (NumberFormatException e) {
         // fallthrough
       }
     }
@@ -491,7 +496,8 @@ public abstract class OsmEntity {
     if (value != null) {
       try {
         return Optional.of(parseOsmDuration(value));
-      } catch (DateTimeParseException e) {
+      }
+      catch (DateTimeParseException e) {
         errorHandler.accept(value);
       }
     }
@@ -517,15 +523,19 @@ public abstract class OsmEntity {
 
     if (maybeInt.isPresent()) {
       return maybeInt;
-    } else {
+    }
+    else {
       if (isTagTrue(tag)) {
         return OptionalInt.of(1);
-      } else if (isTagFalse(tag)) {
+      }
+      else if (isTagFalse(tag)) {
         return OptionalInt.of(0);
-      } else if (hasTag(tag)) {
+      }
+      else if (hasTag(tag)) {
         errorHandler.accept(getTag(tag));
         return OptionalInt.empty();
-      } else {
+      }
+      else {
         return OptionalInt.empty();
       }
     }
@@ -546,7 +556,8 @@ public abstract class OsmEntity {
 
     if (value == null) {
       return false;
-    } else {
+    }
+    else {
       return oneOfTags.contains(value);
     }
   }
@@ -916,7 +927,8 @@ public abstract class OsmEntity {
   public boolean isRoutable() {
     if (isOneOfTags("highway", NON_ROUTABLE_HIGHWAYS)) {
       return false;
-    } else if (hasTag("highway") || isPlatform() || isIndoorRoutable()) {
+    }
+    else if (hasTag("highway") || isPlatform() || isIndoorRoutable()) {
       if (
         isGeneralAccessDenied(DIRECTIONLESS) &&
         isGeneralAccessDenied(TraverseDirection.FORWARD) &&

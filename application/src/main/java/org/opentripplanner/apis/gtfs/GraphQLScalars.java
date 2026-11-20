@@ -67,9 +67,11 @@ public class GraphQLScalars {
         public String serialize(Object dataFetcherResult) throws CoercingSerializeException {
           if (dataFetcherResult instanceof ZonedDateTime zdt) {
             return zdt.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
-          } else if (dataFetcherResult instanceof OffsetDateTime odt) {
+          }
+          else if (dataFetcherResult instanceof OffsetDateTime odt) {
             return odt.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
-          } else {
+          }
+          else {
             throw new CoercingSerializeException(
               "Cannot serialize object of class %s".formatted(
                 dataFetcherResult.getClass().getSimpleName()
@@ -83,7 +85,8 @@ public class GraphQLScalars {
           if (input instanceof CharSequence cs) {
             try {
               return OffsetDateTimeParser.parseLeniently(cs);
-            } catch (ParseException e) {
+            }
+            catch (ParseException e) {
               int errorOffset = e.getErrorOffset();
               throw new CoercingParseValueException(
                 "Cannot parse %s into an OffsetDateTime. Error at character index %s".formatted(
@@ -104,7 +107,8 @@ public class GraphQLScalars {
           if (input instanceof StringValue sv) {
             try {
               return OffsetDateTimeParser.parseLeniently(sv.getValue());
-            } catch (ParseException e) {
+            }
+            catch (ParseException e) {
               throw new CoercingSerializeException();
             }
           }
@@ -125,9 +129,11 @@ public class GraphQLScalars {
         public Double serialize(Object dataFetcherResult) throws CoercingSerializeException {
           if (dataFetcherResult instanceof Double doubleValue) {
             return doubleValue;
-          } else if (dataFetcherResult instanceof Float floatValue) {
+          }
+          else if (dataFetcherResult instanceof Float floatValue) {
             return floatValue.doubleValue();
-          } else {
+          }
+          else {
             throw new CoercingSerializeException(
               "Cannot serialize object of class %s as a coordinate number".formatted(
                 dataFetcherResult.getClass().getSimpleName()
@@ -197,9 +203,11 @@ public class GraphQLScalars {
         public Integer serialize(Object dataFetcherResult) throws CoercingSerializeException {
           if (dataFetcherResult instanceof Integer intValue) {
             return intValue;
-          } else if (dataFetcherResult instanceof Cost costValue) {
+          }
+          else if (dataFetcherResult instanceof Cost costValue) {
             return costValue.toSeconds();
-          } else {
+          }
+          else {
             throw new CoercingSerializeException(
               "Cannot serialize object of class %s as a cost".formatted(
                 dataFetcherResult.getClass().getSimpleName()
@@ -379,9 +387,11 @@ public class GraphQLScalars {
 
           if (dataFetcherResult instanceof Double doubleValue) {
             return validateRatio(doubleValue).orElseThrow(() -> validationException);
-          } else if (dataFetcherResult instanceof Float floatValue) {
+          }
+          else if (dataFetcherResult instanceof Float floatValue) {
             return validateRatio(floatValue.doubleValue()).orElseThrow(() -> validationException);
-          } else {
+          }
+          else {
             throw new CoercingSerializeException(
               "Cannot serialize object of class %s as a ratio".formatted(
                 dataFetcherResult.getClass().getSimpleName()
@@ -452,9 +462,11 @@ public class GraphQLScalars {
         public Double serialize(Object dataFetcherResult) throws CoercingSerializeException {
           if (dataFetcherResult instanceof Double doubleValue) {
             return doubleValue;
-          } else if (dataFetcherResult instanceof Float floatValue) {
+          }
+          else if (dataFetcherResult instanceof Float floatValue) {
             return floatValue.doubleValue();
-          } else {
+          }
+          else {
             throw new CoercingSerializeException(
               "Cannot serialize object of class %s as a reluctance".formatted(
                 dataFetcherResult.getClass().getSimpleName()

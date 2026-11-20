@@ -20,7 +20,8 @@ public class EllipsoidUtils {
       MT = new DefaultMathTransformFactory().createParameterizedTransform(
         new EarthGravitationalModel.Provider().getParameters().createValue()
       );
-    } catch (FactoryException e) {
+    }
+    catch (FactoryException e) {
       e.printStackTrace();
     }
   }

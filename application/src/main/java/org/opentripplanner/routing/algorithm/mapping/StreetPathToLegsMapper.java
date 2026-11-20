@@ -141,7 +141,8 @@ public class StreetPathToLegsMapper {
 
       if (!walkSteps.isEmpty()) {
         previousStep = walkSteps.getLast();
-      } else {
+      }
+      else {
         previousStep = null;
       }
     }
@@ -225,7 +226,8 @@ public class StreetPathToLegsMapper {
             // Resolve correct mode if renting vehicle
             if (state.isRentingVehicle()) {
               return state.stateData.rentalVehicleFormFactor.traverseMode;
-            } else {
+            }
+            else {
               return mode;
             }
           }
@@ -260,17 +262,21 @@ public class StreetPathToLegsMapper {
     if (vertex instanceof TransitStopVertex tsv) {
       var stop = Objects.requireNonNull(siteResolver.getStop(tsv.getId()));
       return Place.forStop(stop, ViaLocationTypeMapper.map(viaLocations, stop));
-    } else if (vertex instanceof VehicleRentalPlaceVertex) {
+    }
+    else if (vertex instanceof VehicleRentalPlaceVertex) {
       return Place.forVehicleRentalPlace((VehicleRentalPlaceVertex) vertex);
-    } else if (vertex instanceof VehicleParkingEntranceVertex) {
+    }
+    else if (vertex instanceof VehicleParkingEntranceVertex) {
       return Place.forVehicleParkingEntrance((VehicleParkingEntranceVertex) vertex, state);
-    } else if (vertex instanceof TemporaryStreetLocation temporaryStreetLocation) {
+    }
+    else if (vertex instanceof TemporaryStreetLocation temporaryStreetLocation) {
       return Place.normal(
         vertex,
         name,
         ViaLocationTypeMapper.map(viaLocations, temporaryStreetLocation)
       );
-    } else {
+    }
+    else {
       return Place.normal(vertex, name);
     }
   }

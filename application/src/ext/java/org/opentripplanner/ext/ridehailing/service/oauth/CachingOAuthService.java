@@ -50,7 +50,8 @@ public abstract class CachingOAuthService implements OAuthService {
         this.cachedToken = new CachedOAuthToken(token);
 
         LOG.info("Received new access token from URL {}", request.uri());
-      } catch (InterruptedException e) {
+      }
+      catch (InterruptedException e) {
         throw new IOException(e);
       }
     }

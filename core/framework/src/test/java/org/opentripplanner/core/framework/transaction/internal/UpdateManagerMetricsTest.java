@@ -38,7 +38,8 @@ class UpdateManagerMetricsTest {
 
       var queuedTasks = registry.find("executor.queued").tag("name", "graphUpdateScheduler");
       assertThat(queuedTasks.gauge()).isNotNull();
-    } finally {
+    }
+    finally {
       updateManager.shutdown();
     }
   }

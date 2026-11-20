@@ -112,13 +112,15 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
       if (request.arriveBy()) {
         searchParams.latestArrivalTime(time);
         searchParams.earliestDepartureTime(timeLimit);
-      } else {
+      }
+      else {
         searchParams.earliestDepartureTime(time);
         searchParams.latestArrivalTime(timeLimit);
       }
 
       searchParams.searchWindow(request.searchWindow());
-    } else {
+    }
+    else {
       var c = request.pageCursor();
 
       if (c.earliestDepartureTime() != null) {
@@ -155,7 +157,8 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
         if (isMultiThreadedEnbled) {
           builder.enableOptimization(optimization);
         }
-      } else {
+      }
+      else {
         builder.enableOptimization(optimization);
       }
     }
@@ -317,7 +320,8 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
     for (String stop : stops) {
       try {
         result.add(Integer.parseInt(stop));
-      } catch (NumberFormatException ignore) {
+      }
+      catch (NumberFormatException ignore) {
         var a = lookUpStopIndex.lookupStopLocationIndexes(FeedScopedId.parseStrict(stop)).toArray();
 
         if (a.length != 1) {

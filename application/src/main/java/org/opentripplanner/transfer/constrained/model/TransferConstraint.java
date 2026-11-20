@@ -228,7 +228,8 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
         return OTPFeature.MinimumTransferTimeIsDefinitive.isOn()
           ? minTransferBoardTime
           : Math.max(minTransferBoardTime, calcRegularTransferTargetTime.getAsInt());
-      } else {
+      }
+      else {
         int minTransferBoardTime = sourceTransitArrivalTime - minTransferTime;
         return OTPFeature.MinimumTransferTimeIsDefinitive.isOn()
           ? minTransferBoardTime

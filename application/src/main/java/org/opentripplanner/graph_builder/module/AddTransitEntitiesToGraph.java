@@ -184,7 +184,8 @@ public class AddTransitEntitiesToGraph {
         // Elevator
         if (pathway.getPathwayMode() == PathwayMode.ELEVATOR) {
           createElevatorEdgesAndAddThemToGraph(pathway, fromVertex, toVertex);
-        } else {
+        }
+        else {
           // the GTFS spec allows you to define a pathway which has neither traversal time, distance
           // nor steps. This would lead to traversal costs of 0, so we compute the distance from the
           // vertices as fallback.
@@ -216,7 +217,8 @@ public class AddTransitEntitiesToGraph {
             );
           }
         }
-      } else {
+      }
+      else {
         if (fromVertex == null) {
           LOG.warn("The 'fromVertex' is missing for pathway from stop {}", pathway.getFromStop());
         }
@@ -345,7 +347,8 @@ public class AddTransitEntitiesToGraph {
 
     if (stop == null || stop.level() == null) {
       return null;
-    } else {
+    }
+    else {
       var level = stop.level();
       return new StopLevel(
         Objects.requireNonNullElse(level.name(), String.valueOf(level.index())),

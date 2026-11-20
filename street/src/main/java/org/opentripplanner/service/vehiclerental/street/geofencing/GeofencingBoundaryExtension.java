@@ -90,7 +90,8 @@ public record GeofencingBoundaryExtension(GeofencingZone zone, boolean entering)
 
       if (effectiveEntering) {
         newZones.add(boundary.zone());
-      } else {
+      }
+      else {
         newZones.remove(boundary.zone());
       }
     }

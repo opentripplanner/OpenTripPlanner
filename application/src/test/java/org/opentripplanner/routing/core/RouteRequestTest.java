@@ -333,7 +333,8 @@ class RouteRequestTest {
     try {
       body.run();
       fail();
-    } catch (RoutingValidationException rve) {
+    }
+    catch (RoutingValidationException rve) {
       List<RoutingError> errors = rve.getRoutingErrors();
       assertEquals(1, errors.size(), () -> errors.toString());
       assertTrue(errors.stream().anyMatch(e -> e.code == expCode && e.inputField == expField));

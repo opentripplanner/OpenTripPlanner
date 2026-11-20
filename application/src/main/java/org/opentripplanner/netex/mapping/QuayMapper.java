@@ -70,7 +70,8 @@ class QuayMapper {
 
     try {
       coordinate = WgsCoordinateMapper.mapToDomain(quay.getCentroid());
-    } catch (InvalidCoordinateException e) {
+    }
+    catch (InvalidCoordinateException e) {
       issueStore.add(
         "QuayInvalidCoordinates",
         "Quay %s has invalid coordinates and is skipped. %s",

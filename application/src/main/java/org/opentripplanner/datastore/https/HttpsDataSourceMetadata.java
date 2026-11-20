@@ -79,7 +79,8 @@ class HttpsDataSourceMetadata {
   private static long parseLong(String header) {
     try {
       return Long.parseLong(header);
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       return DataSource.UNKNOWN;
     }
   }

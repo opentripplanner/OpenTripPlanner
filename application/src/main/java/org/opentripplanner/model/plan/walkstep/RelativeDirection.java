@@ -51,7 +51,8 @@ public enum RelativeDirection {
       // roundabout: the direction we turn onto it implies the circling direction
       if (cwAngle > ccwAngle) {
         return RelativeDirection.CIRCLE_CLOCKWISE;
-      } else {
+      }
+      else {
         return RelativeDirection.CIRCLE_COUNTERCLOCKWISE;
       }
     }
@@ -59,17 +60,23 @@ public enum RelativeDirection {
     // less than 0.3 rad counts as straight, to simplify walking instructions
     if (cwAngle < 0.3 || ccwAngle < 0.3) {
       return RelativeDirection.CONTINUE;
-    } else if (cwAngle < 0.7) {
+    }
+    else if (cwAngle < 0.7) {
       return RelativeDirection.SLIGHTLY_RIGHT;
-    } else if (ccwAngle < 0.7) {
+    }
+    else if (ccwAngle < 0.7) {
       return RelativeDirection.SLIGHTLY_LEFT;
-    } else if (cwAngle < 2) {
+    }
+    else if (cwAngle < 2) {
       return RelativeDirection.RIGHT;
-    } else if (ccwAngle < 2) {
+    }
+    else if (ccwAngle < 2) {
       return RelativeDirection.LEFT;
-    } else if (cwAngle < Math.PI) {
+    }
+    else if (cwAngle < Math.PI) {
       return RelativeDirection.HARD_RIGHT;
-    } else {
+    }
+    else {
       return RelativeDirection.HARD_LEFT;
     }
   }

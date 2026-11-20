@@ -84,7 +84,8 @@ class GbfsVehicleStatusMapper {
         .withFuel(RentalVehicleFuel.of().withPercent(fuelRatio).withRange(rangeMeters).build());
 
       return builder.build();
-    } else {
+    }
+    else {
       return null;
     }
   }

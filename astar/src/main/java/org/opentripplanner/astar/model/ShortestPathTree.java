@@ -188,7 +188,8 @@ public class ShortestPathTree<
     stateSets.forEachValue(value -> {
       if (value instanceof List) {
         allStates.addAll((List<State>) value);
-      } else {
+      }
+      else {
         allStates.add((State) value);
       }
     });

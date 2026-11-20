@@ -245,7 +245,8 @@ class StopAndStationMapperTest {
 
     if (isolated) {
       assertTrue(stations.stream().findFirst().get().isTransfersNotAllowed());
-    } else {
+    }
+    else {
       assertFalse(stations.stream().findFirst().get().isTransfersNotAllowed());
     }
   }

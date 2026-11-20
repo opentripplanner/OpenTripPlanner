@@ -253,7 +253,8 @@ public class TransactionFrameworkTest {
       try {
         assertState(expScope, expected);
         return;
-      } catch (AssertionError ignored) {
+      }
+      catch (AssertionError ignored) {
         Thread.sleep(AWAIT_STATE_CHECK_INTERVAL_MS);
       }
     }
@@ -264,7 +265,8 @@ public class TransactionFrameworkTest {
   private static void awaitUninterruptibly(CountDownLatch latch) {
     try {
       latch.await();
-    } catch (InterruptedException e) {
+    }
+    catch (InterruptedException e) {
       Thread.currentThread().interrupt();
     }
   }

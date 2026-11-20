@@ -89,7 +89,8 @@ class RouteMapper {
 
     try {
       mode = transportModeMapper.map(line.getTransportMode(), line.getTransportSubmode());
-    } catch (TransportModeMapper.UnsupportedModeException e) {
+    }
+    catch (TransportModeMapper.UnsupportedModeException e) {
       issueStore.add(
         "UnsupportedModeInLine",
         "Unsupported mode in Line. Mode: %s, line: %s",
@@ -132,7 +133,8 @@ class RouteMapper {
     if (line.getTransportMode().equals(AllPublicTransportModesEnumeration.WATER)) {
       if (ferryIdsNotAllowedForBicycle.contains(line.getId())) {
         builder.withBikesAllowed(BikeAccess.NOT_ALLOWED);
-      } else {
+      }
+      else {
         builder.withBikesAllowed(BikeAccess.ALLOWED);
       }
     }
@@ -179,7 +181,8 @@ class RouteMapper {
         String orgRef = network.getTransportOrganisationRef().getValue().getRef();
         agency = agenciesById.get(idFactory.createId(orgRef));
       }
-    } else if (line.getAuthorityRef() != null) {
+    }
+    else if (line.getAuthorityRef() != null) {
       agency = agenciesById.get(idFactory.createId(line.getAuthorityRef().getRef()));
     }
 

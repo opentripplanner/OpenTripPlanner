@@ -67,14 +67,16 @@ public class ConcurrentCompositeRaptorRouter<T extends RaptorTripSchedule> imple
       var mainResult = mainResultFuture.get();
       var alternativeResult = alternativeResultFuture.get();
       return new CompositeResult<>(mainResult, alternativeResult, merger);
-    } catch (InterruptedException e) {
+    }
+    catch (InterruptedException e) {
       Thread.currentThread().interrupt();
       // propagate interruption to the running task.
 
       mainResultFuture.cancel(true);
       alternativeResultFuture.cancel(true);
       throw mapInterruptedException.apply(e);
-    } catch (ExecutionException e) {
+    }
+    catch (ExecutionException e) {
       throw e.getCause() instanceof RuntimeException re ? re : new RuntimeException(e);
     }
   }

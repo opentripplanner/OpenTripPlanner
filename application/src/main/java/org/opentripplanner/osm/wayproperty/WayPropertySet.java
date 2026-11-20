@@ -266,7 +266,8 @@ public class WayPropertySet {
           link,
           speed
         );
-      } else {
+      }
+      else {
         return speed;
       }
     }
@@ -291,7 +292,8 @@ public class WayPropertySet {
 
     if (bestSpeed != null) {
       return bestSpeed;
-    } else {
+    }
+    else {
       return this.defaultCarSpeed;
     }
   }

@@ -66,9 +66,11 @@ public class OsmModuleTest {
     for (Edge e : v2.getOutgoing()) {
       if (e.getToVertex() == v1) {
         e1 = e;
-      } else if (e.getToVertex() == v3) {
+      }
+      else if (e.getToVertex() == v3) {
         e2 = e;
-      } else if (e.getToVertex() == v4) {
+      }
+      else if (e.getToVertex() == v4) {
         e3 = e;
       }
     }

@@ -82,7 +82,8 @@ class IntrospectionTypeWiring {
                 }
 
                 return dataFetcher;
-              } catch (IllegalAccessException | InvocationTargetException error) {
+              }
+              catch (IllegalAccessException | InvocationTargetException error) {
                 throw new RuntimeException(
                   String.format(
                     "Data fetcher %s for type %s threw error",

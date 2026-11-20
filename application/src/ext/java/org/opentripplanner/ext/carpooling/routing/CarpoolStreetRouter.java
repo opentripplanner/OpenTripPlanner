@@ -55,10 +55,12 @@ public class CarpoolStreetRouter implements CarpoolRouter {
     try {
       var path = carpoolRouting(from, to);
       return path == null ? null : RoutedSegment.of(path);
-    } catch (OTPRequestTimeoutException e) {
+    }
+    catch (OTPRequestTimeoutException e) {
       // Rethrown ahead of the catch-all below, which would turn a cancellation into a null return.
       throw e;
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       LOG.warn("Routing failed from {} to {}: {}", from, to, e.getMessage());
       return null;
     }

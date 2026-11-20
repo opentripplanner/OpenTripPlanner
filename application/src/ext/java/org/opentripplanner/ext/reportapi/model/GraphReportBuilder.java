@@ -16,13 +16,17 @@ public class GraphReportBuilder {
 
       if (transferConstraint.isMinTransferTimeSet()) {
         return "minTransferTime";
-      } else if (transferConstraint.isStaySeated()) {
+      }
+      else if (transferConstraint.isStaySeated()) {
         return "staySeated";
-      } else if (transferConstraint.isGuaranteed()) {
+      }
+      else if (transferConstraint.isGuaranteed()) {
         return "guaranteed";
-      } else if (transferConstraint.isNotAllowed()) {
+      }
+      else if (transferConstraint.isNotAllowed()) {
         return "notAllowed";
-      } else {
+      }
+      else {
         return "unknown";
       }
     });

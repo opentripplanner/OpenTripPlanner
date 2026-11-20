@@ -97,13 +97,17 @@ public class NetexDataSourceHierarchy {
 
         if (ignoredFile(name)) {
           LOG.debug("Netex file ignored: {}.", name);
-        } else if (isSharedFile(name)) {
+        }
+        else if (isSharedFile(name)) {
           sharedEntries.add(entry);
-        } else if (isGroupEntry(name, sharedGroupFilePattern)) {
+        }
+        else if (isGroupEntry(name, sharedGroupFilePattern)) {
           groupEntries.get(currentGroup).addSharedEntry(entry);
-        } else if (isGroupEntry(name, groupFilePattern)) {
+        }
+        else if (isGroupEntry(name, groupFilePattern)) {
           groupEntries.get(currentGroup).addIndependentEntries(entry);
-        } else {
+        }
+        else {
           LOG.warn(
             "Netex file ignored: {}. The file do not " + "match any file patterns in the config.",
             name
@@ -129,7 +133,8 @@ public class NetexDataSourceHierarchy {
 
       try {
         currentGroup = m.group(1);
-      } catch (IndexOutOfBoundsException e) {
+      }
+      catch (IndexOutOfBoundsException e) {
         throw new IllegalStateException(
           "Netex file patten '" +
             filePattern +

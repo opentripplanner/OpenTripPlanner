@@ -350,7 +350,8 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
               .map(mode -> {
                 try {
                   return TransitMode.valueOf(mode.name());
-                } catch (IllegalArgumentException ignored) {
+                }
+                catch (IllegalArgumentException ignored) {
                   return null;
                 }
               })
@@ -382,7 +383,8 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
             getTransitService(environment)
           )
         );
-      } catch (RoutingValidationException e) {
+      }
+      catch (RoutingValidationException e) {
         places = Collections.emptyList();
       }
 
@@ -426,7 +428,8 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
             Map.of("locale", locale, ItineraryImpl.ROUTE_REQUEST_CONTEXT_KEY, routeRequest)
           )
           .build();
-      } catch (RefetchItineraryException e) {
+      }
+      catch (RefetchItineraryException e) {
         return null;
       }
     };
@@ -855,7 +858,8 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
           new Coordinate(args.getGraphQLLon(), args.getGraphQLLat()),
           args.getGraphQLRadius()
         );
-      } catch (RoutingValidationException e) {
+      }
+      catch (RoutingValidationException e) {
         stops = Collections.emptyList();
       }
 

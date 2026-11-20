@@ -42,7 +42,8 @@ public class AbstractAccessEgressDecorator implements RaptorAccessEgress {
     while (!type.isAssignableFrom(it.getClass())) {
       if (it instanceof AbstractAccessEgressDecorator d) {
         it = d.delegate();
-      } else {
+      }
+      else {
         throw new IllegalStateException("Unexpected type: " + type + ". Type not found in:" + it);
       }
     }

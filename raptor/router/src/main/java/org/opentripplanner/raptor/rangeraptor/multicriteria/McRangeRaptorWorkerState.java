@@ -290,9 +290,11 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
   void addViaArrival(McStopArrival<T> arrival) {
     if (arrival.arrivedBy(TRANSIT)) {
       transitArrivalsCache.add(arrival);
-    } else if (arrival.arrivedBy(ACCESS)) {
+    }
+    else if (arrival.arrivedBy(ACCESS)) {
       addStopArrival(arrival);
-    } else {
+    }
+    else {
       transferArrivalsCache.add(arrival);
     }
   }

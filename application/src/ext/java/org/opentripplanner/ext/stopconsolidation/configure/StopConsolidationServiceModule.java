@@ -21,7 +21,8 @@ public class StopConsolidationServiceModule {
   ) {
     if (repo == null) {
       return null;
-    } else {
+    }
+    else {
       return new DefaultStopConsolidationService(repo, tm);
     }
   }

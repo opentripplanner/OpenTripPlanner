@@ -107,7 +107,8 @@ public final class FareLegRule implements Serializable {
   public OptionalInt priority() {
     if (priority == null) {
       return OptionalInt.empty();
-    } else {
+    }
+    else {
       return OptionalInt.of(priority);
     }
   }

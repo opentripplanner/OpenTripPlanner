@@ -81,7 +81,8 @@ public class AccessPaths {
 
     if (profile.is(RaptorProfile.MULTI_CRITERIA)) {
       paths = removeNonOptimalPathsForMcRaptor(paths);
-    } else {
+    }
+    else {
       paths = removeNonOptimalPathsForStandardRaptor(paths);
     }
 

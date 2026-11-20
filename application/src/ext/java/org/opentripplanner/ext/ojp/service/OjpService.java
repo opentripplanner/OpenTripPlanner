@@ -53,7 +53,8 @@ public class OjpService {
 
     if (stopId.isPresent()) {
       callsAtStop = callAtStopService.findCallsAtStop(stopId.get(), params);
-    } else if (coordinate.isPresent()) {
+    }
+    else if (coordinate.isPresent()) {
       callsAtStop = callAtStopService.findCallsAtStop(coordinate.get(), params);
     }
 

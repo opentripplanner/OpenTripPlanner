@@ -99,7 +99,8 @@ public class HierarchicalMultimapTest {
       // 1 precident
       else if (value.size() == 1) {
         assertEquals("[E(Reagan, 1)]", value.toString());
-      } else {
+      }
+      else {
         fail("Unexpected: " + value);
       }
     }

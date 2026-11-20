@@ -193,10 +193,12 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
     for (Future<?> f : graphUpdates) {
       try {
         f.get();
-      } catch (InterruptedException e) {
+      }
+      catch (InterruptedException e) {
         Thread.currentThread().interrupt();
         throw new RuntimeException(e);
-      } catch (ExecutionException e) {
+      }
+      catch (ExecutionException e) {
         throw new RuntimeException(e);
       }
     }
@@ -242,7 +244,8 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
 
     if (hasNoValue(parameters.user()) || hasNoValue(parameters.password())) {
       auth = null;
-    } else {
+    }
+    else {
       auth = Mqtt5SimpleAuth.builder()
         .username(parameters.user())
         .password(parameters.password().getBytes(StandardCharsets.UTF_8))
@@ -311,7 +314,8 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
 
     try {
       siri = SiriXml.parseXml(new String(payload, StandardCharsets.UTF_8));
-    } catch (XMLStreamException | JAXBException e) {
+    }
+    catch (XMLStreamException | JAXBException e) {
       LOG.warn("Failed to parse Siri XML", e);
       return Optional.empty();
     }
@@ -326,7 +330,8 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
       offer = primingMessageQueue.offer(message.getPayloadAsBytes());
       primingMessageCounter.incrementAndGet();
       primingMessageSize.addAndGet(message.getPayloadAsBytes().length);
-    } else {
+    }
+    else {
       offer = liveMessageQueue.offer(message.getPayloadAsBytes());
       liveMessageCounter.incrementAndGet();
       liveMessageSize.addAndGet(message.getPayloadAsBytes().length);
@@ -437,9 +442,11 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
           var serviceDelivery = optionalServiceDelivery.get();
           graphUpdates.add(serviceDeliveryConsumer.apply(serviceDelivery));
         }
-      } catch (InterruptedException e) {
+      }
+      catch (InterruptedException e) {
         Thread.currentThread().interrupt();
-      } catch (Exception e) {
+      }
+      catch (Exception e) {
         LOG.error("Error while processing Siri ET update during priming.", e);
       }
     }
@@ -455,9 +462,11 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
           processedLiveMessageCounter.incrementAndGet();
           serviceDelivery(payload).ifPresent(serviceDeliveryConsumer::apply);
         }
-      } catch (InterruptedException e) {
+      }
+      catch (InterruptedException e) {
         Thread.currentThread().interrupt();
-      } catch (Exception e) {
+      }
+      catch (Exception e) {
         LOG.error("Error while processing Siri ET update.", e);
       }
     }

@@ -55,7 +55,8 @@ public class AgencyImpl implements GraphQLDataFetchers.GraphQLAgency {
           }
         });
         return alerts.stream().distinct().collect(Collectors.toList());
-      } else {
+      }
+      else {
         return alertService.getAgencyAlerts(getSource(environment).getId());
       }
     };

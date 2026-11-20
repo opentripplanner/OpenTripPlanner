@@ -57,7 +57,8 @@ public class LogModel implements Serializable {
         DebugLoggingSupport.configureDebugLogging(name, enable);
         save();
       }
-    } else {
+    }
+    else {
       if (activeLoggers.contains(name)) {
         activeLoggers.remove(name);
         DebugLoggingSupport.configureDebugLogging(name, enable);

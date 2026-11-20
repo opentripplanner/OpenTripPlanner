@@ -523,7 +523,8 @@ public class TestItineraryBuilder implements PlanTestConstants {
 
     if (cost != null) {
       legCost = cost;
-    } else {
+    }
+    else {
       legCost += cost(WAIT_RELUCTANCE_FACTOR, waitTime);
       legCost += cost(1.0f, end - start) + BOARD_COST;
     }
@@ -578,7 +579,8 @@ public class TestItineraryBuilder implements PlanTestConstants {
         .withFrequencyHeadwayInSeconds(headwaySecs)
         .withToViaLocationType(to.viaLocationType)
         .build();
-    } else {
+    }
+    else {
       leg = new ScheduledTransitLegBuilder()
         .withTripTimes(tripTimes)
         .withTripPattern(tripPattern)

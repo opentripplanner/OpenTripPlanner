@@ -192,7 +192,8 @@ public class StatesToWalkStepsMapper {
 
     if (edge instanceof FreeEdge) {
       return;
-    } else if (edge instanceof StreetTransitEntranceLink link) {
+    }
+    else if (edge instanceof StreetTransitEntranceLink link) {
       var direction = relativeDirectionForTransitLink(link);
       var entrance = entranceResolver.getEntrance(link.entrance());
       createAndSaveStep(backState, forwardState, link.getName(), direction, edge, entrance);
@@ -219,13 +220,16 @@ public class StatesToWalkStepsMapper {
     if (edge instanceof ElevatorAlightEdge elevatorAlightEdge) {
       createAndSaveElevatorWalkStep(backState, forwardState, elevatorAlightEdge);
       return;
-    } else if (edge instanceof EscalatorEdge) {
+    }
+    else if (edge instanceof EscalatorEdge) {
       createAndSaveEscalatorWalkStep(backState, forwardState, edge, geom);
       return;
-    } else if (edge instanceof StreetEdge streetEdge && streetEdge.isStairs()) {
+    }
+    else if (edge instanceof StreetEdge streetEdge && streetEdge.isStairs()) {
       createAndSaveStairsWalkStep(backState, forwardState, edge, geom);
       return;
-    } else if (edge instanceof PathwayEdge pwe && pwe.signpostedAs().isPresent()) {
+    }
+    else if (edge instanceof PathwayEdge pwe && pwe.signpostedAs().isPresent()) {
       createAndSaveStep(
         backState,
         forwardState,
@@ -245,7 +249,8 @@ public class StatesToWalkStepsMapper {
     if (current == null) {
       createFirstStep(backState, forwardState);
       createdNewStep = true;
-    } else if (
+    }
+    else if (
       modeTransition ||
       !continueOnSameStreet(edge, streetNameNoParens) ||
       // went on to or off of a roundabout
@@ -289,7 +294,8 @@ public class StatesToWalkStepsMapper {
 
       // new step, set distance to length of first edge
       distance = edge.getDistanceMeters();
-    } else {
+    }
+    else {
       // street name has not changed
       double thisAngle = DirectionUtils.getFirstAngle(geom);
       RelativeDirection direction = RelativeDirection.calculate(
@@ -304,7 +310,8 @@ public class StatesToWalkStepsMapper {
           // increment exit count if we passed one.
           roundaboutExit += 1;
         }
-      } else if (direction != RelativeDirection.CONTINUE) {
+      }
+      else if (direction != RelativeDirection.CONTINUE) {
         // we are not on a roundabout, and not continuing straight through.
         // figure out if there were other plausible turn options at the last intersection
         // to see if we should generate a "left to continue" instruction.
@@ -337,7 +344,8 @@ public class StatesToWalkStepsMapper {
           if (isUTurn(twoBack, lastStep)) {
             steps.remove(lastIndex - 1);
             processUTurn(lastStep, twoBack);
-          } else if (canZagBeRemoved(lastStep)) {
+          }
+          else if (canZagBeRemoved(lastStep)) {
             // total hack to remove zags.
             steps.remove(lastIndex);
             steps.remove(lastIndex - 1);
@@ -345,7 +353,8 @@ public class StatesToWalkStepsMapper {
           }
         }
       }
-    } else {
+    }
+    else {
       if (!createdNewStep && current.elevationProfile() != null) {
         updateElevationProfile(backState, edge);
       }
@@ -399,7 +408,8 @@ public class StatesToWalkStepsMapper {
   private static RelativeDirection relativeDirectionForTransitLink(StreetTransitEntranceLink link) {
     if (link.isExit()) {
       return EXIT_STATION;
-    } else {
+    }
+    else {
       return ENTER_STATION;
     }
   }
@@ -438,7 +448,8 @@ public class StatesToWalkStepsMapper {
     if (twoBack.elevationProfile() != null) {
       if (current.elevationProfile() == null) {
         current.addElevation(twoBack.elevationProfile());
-      } else {
+      }
+      else {
         current.addElevation(twoBack.elevationProfile().transformX(current.distance()));
       }
     }
@@ -465,7 +476,8 @@ public class StatesToWalkStepsMapper {
       lastStep.relativeDirection() == RelativeDirection.HARD_LEFT
     ) {
       lastStep.withRelativeDirection(RelativeDirection.UTURN_LEFT);
-    } else {
+    }
+    else {
       lastStep.withRelativeDirection(RelativeDirection.UTURN_RIGHT);
     }
 
@@ -509,7 +521,8 @@ public class StatesToWalkStepsMapper {
           return true;
         }
       }
-    } else {
+    }
+    else {
       double angleDiff = getAbsoluteAngleDiff(lastAngle, thisAngle);
       // FIXME: this code might be wrong with the removal of the edge-based graph
       State twoStatesBack = backState.getBackState();
@@ -619,7 +632,8 @@ public class StatesToWalkStepsMapper {
     if (previous == null) {
       current.withAbsoluteDirection(thisAngle);
       current.withRelativeDirection(RelativeDirection.DEPART);
-    } else {
+    }
+    else {
       current.withDirections(previous.getAngle(), thisAngle, false);
     }
 

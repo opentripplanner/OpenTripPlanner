@@ -196,14 +196,16 @@ public class SiriSXUpdater
 
       lastTimestamp = responseTimestamp;
       return siri;
-    } catch (OtpHttpClientException e) {
+    }
+    catch (OtpHttpClientException e) {
       LOG.info(
         "Retryable exception while reading SIRI feed from {} after {} ms",
         url,
         System.currentTimeMillis() - t1
       );
       throw e;
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       LOG.error(
         "Non-retryable exception while reading SIRI feed from {} after {} ms",
         url,

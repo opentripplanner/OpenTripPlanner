@@ -53,7 +53,8 @@ public class GeoJsonWriter {
       // Make easier to view the file
       geoJSONWriter.setPrettyPrinting(true);
       geoJSONWriter.writeFeatureCollection(featureCollection);
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       LOG.error("Unable to write GeoJSON", e);
       return false;
     }

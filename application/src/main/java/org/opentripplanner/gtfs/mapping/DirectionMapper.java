@@ -19,7 +19,8 @@ public class DirectionMapper {
       }
 
       return map(Integer.parseInt(gtfsCode));
-    } catch (NumberFormatException e) {
+    }
+    catch (NumberFormatException e) {
       issueStore.add(
         "InvalidGTFSDirectionId",
         "Trip %s does not have direction id, defaults to -1",

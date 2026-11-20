@@ -73,10 +73,12 @@ public interface BikeWalkableEdge {
     if (bicycleWalking) {
       if (canSwitchToWalkingBike(s0)) {
         switchToWalkingBike(s0.getRequest(), editor);
-      } else {
+      }
+      else {
         return null;
       }
-    } else if (mode == TraverseMode.BICYCLE) {
+    }
+    else if (mode == TraverseMode.BICYCLE) {
       switchToBiking(s0.getRequest(), editor);
     }
 

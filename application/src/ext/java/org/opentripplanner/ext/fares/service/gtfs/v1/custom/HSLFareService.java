@@ -74,7 +74,8 @@ public class HSLFareService extends DefaultFareService {
 
       if (agency == null) {
         agency = leg.agency().getId().getId().toString();
-      } else if (agency != leg.agency().getId().getId().toString()) {
+      }
+      else if (agency != leg.agency().getId().getId().toString()) {
         singleAgency = false;
       }
 
@@ -149,7 +150,8 @@ public class HSLFareService extends DefaultFareService {
         // don't add temporarily visited zones
         zoneIntersection.retainAll(ruleZones);
         zones.addAll(zoneIntersection);
-      } else {
+      }
+      else {
         zones.addAll(
           leg
             .fareZones()
@@ -192,7 +194,8 @@ public class HSLFareService extends DefaultFareService {
                 attribute.getId()
               );
               continue;
-            } else {
+            }
+            else {
               LOG.debug(
                 "transfer time OK; {} < {} in fare {}",
                 tripTime,
@@ -213,7 +216,8 @@ public class HSLFareService extends DefaultFareService {
           }
         }
       }
-    } else if (!specialRouteFare.equals(MAX_PRICE) && specialFareAttribute != null) {
+    }
+    else if (!specialRouteFare.equals(MAX_PRICE) && specialFareAttribute != null) {
       bestFare = specialRouteFare;
       bestAttribute = specialFareAttribute;
     }

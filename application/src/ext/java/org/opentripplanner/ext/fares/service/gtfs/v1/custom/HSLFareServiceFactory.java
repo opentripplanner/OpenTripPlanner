@@ -70,10 +70,12 @@ public class HSLFareServiceFactory extends GtfsFareServiceFactory {
 
         if (origin != null && destination != null) {
           fareRule.addRouteOriginDestination(routeId.toString(), origin, destination);
-        } else {
+        }
+        else {
           fareRule.addRoute(routeId);
         }
-      } else {
+      }
+      else {
         if (origin != null || destination != null) {
           fareRule.addOriginDestination(origin, destination);
         }

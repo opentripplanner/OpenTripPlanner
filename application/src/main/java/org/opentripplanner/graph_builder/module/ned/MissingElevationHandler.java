@@ -139,10 +139,12 @@ class MissingElevationHandler {
         if (otherState.initialVertex != currentState.currentVertex) {
           interpolateElevationsAlongBackPath(otherState, currentState, elevations, pending);
           interpolateElevationsAlongBackPath(currentState, otherState, elevations, pending);
-        } else {
+        }
+        else {
           continue;
         }
-      } else {
+      }
+      else {
         pending.put(currentState.currentVertex, currentState);
       }
 
@@ -253,7 +255,8 @@ class MissingElevationHandler {
       if (edge.isElevationFlattened()) {
         issueStore.add(new ElevationFlattened(edge));
       }
-    } catch (Exception ex) {
+    }
+    catch (Exception ex) {
       issueStore.add(new ElevationProfileFailure(edge, ex.getMessage()));
     }
   }

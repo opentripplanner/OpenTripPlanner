@@ -41,7 +41,8 @@ public class GroupByFilter<T extends GroupId<T>> implements ItineraryListFilter 
           if (matchFound == null) {
             e.merge(groupId, it);
             matchFound = e;
-          } else {
+          }
+          else {
             matchFound.merge(e);
           }
         }

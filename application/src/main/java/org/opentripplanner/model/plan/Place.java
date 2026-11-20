@@ -160,7 +160,8 @@ public class Place {
     if (stop instanceof AreaStop flexArea && vertex instanceof StreetVertex s) {
       if (flexArea.hasFallbackName()) {
         name = s.getIntersectionName();
-      } else {
+      }
+      else {
         name = new LocalizedString("partOf", s.getIntersectionName(), flexArea.getName());
       }
     }
@@ -214,7 +215,8 @@ public class Place {
 
     if (request.mode().includesDriving()) {
       traverseMode = TraverseMode.CAR;
-    } else if (request.mode().includesBiking()) {
+    }
+    else if (request.mode().includesBiking()) {
       traverseMode = TraverseMode.BICYCLE;
     }
 
@@ -261,7 +263,8 @@ public class Place {
 
     if (stop != null) {
       buf.append(" (").append(stop.getId()).append(")");
-    } else {
+    }
+    else {
       buf.append(" ").append(coordinate.toString());
     }
 

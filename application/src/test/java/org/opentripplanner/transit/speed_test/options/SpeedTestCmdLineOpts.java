@@ -48,7 +48,8 @@ public class SpeedTestCmdLineOpts {
         printHelp(options);
         System.exit(-2);
       }
-    } catch (ParseException e) {
+    }
+    catch (ParseException e) {
       System.err.println(e.getMessage());
       printHelp(options);
       System.exit(-1);

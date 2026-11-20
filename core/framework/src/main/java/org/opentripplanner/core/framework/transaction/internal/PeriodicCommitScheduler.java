@@ -46,9 +46,11 @@ class PeriodicCommitScheduler {
 
     try {
       f.get();
-    } catch (InterruptedException e) {
+    }
+    catch (InterruptedException e) {
       Thread.currentThread().interrupt();
-    } catch (ExecutionException e) {
+    }
+    catch (ExecutionException e) {
       LOG.error("Error during periodic commit", e);
     }
 
@@ -69,7 +71,8 @@ class PeriodicCommitScheduler {
           interval_ms,
           warningLimit_ms
         );
-      } else {
+      }
+      else {
         LOG.warn(
           "Commit is taking a long time to complete (including queued wait), {} ms for {}. " +
             "The warning limit is {} ms. If this continues to happen, consider investigating why or " +

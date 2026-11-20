@@ -113,7 +113,8 @@ class SiteFrameParser extends NetexParser<Site_VersionFrameStructure> {
     for (JAXBElement<? extends Site_VersionStructure> jaxbParking : parkingList) {
       if (jaxbParking.getValue() instanceof Parking parking) {
         parkings.add(parking);
-      } else {
+      }
+      else {
         warnOnMissingMapping(LOG, jaxbParking.getValue());
       }
     }
@@ -123,7 +124,8 @@ class SiteFrameParser extends NetexParser<Site_VersionFrameStructure> {
     for (StopPlace stopPlace : stopPlaceList) {
       if (isMultiModalStopPlace(stopPlace)) {
         multiModalStopPlaces.add(stopPlace);
-      } else {
+      }
+      else {
         stopPlaces.add(stopPlace);
         parseQuays(stopPlace.getQuays());
       }

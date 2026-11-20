@@ -71,7 +71,8 @@ public class ParkAndRideResource {
 
     if (lowerLeft != null) {
       envelope = getEnvelope(lowerLeft, upperRight);
-    } else {
+    }
+    else {
       envelope = new Envelope(-180, 180, -90, 90);
     }
 
@@ -89,7 +90,8 @@ public class ParkAndRideResource {
   private boolean hasTransitStopsNearby(Double maxTransitDistance, VehicleParking lot) {
     if (maxTransitDistance == null) {
       return true;
-    } else {
+    }
+    else {
       var stops = nearbyStopFinder.findNearbyStops(
         lot.getCoordinate().asJtsCoordinate(),
         maxTransitDistance

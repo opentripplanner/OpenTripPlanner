@@ -69,7 +69,8 @@ public class PathTransfer implements Serializable {
   public LineString getGeometry() {
     if (edges == null) {
       return GeometryUtils.getGeometryFactory().createLineString();
-    } else {
+    }
+    else {
       return GeometryUtils.concatenateLineStrings(edges, Edge::getGeometry);
     }
   }

@@ -37,7 +37,8 @@ public class LocalTimeScalarFactory {
           public LocalTime parseValue(Object input) {
             try {
               return LocalTime.from(FORMATTER.parse((CharSequence) input));
-            } catch (DateTimeParseException dtpe) {
+            }
+            catch (DateTimeParseException dtpe) {
               throw new CoercingParseValueException(
                 "Expected type 'LocalTime' but was '" + input + "'."
               );

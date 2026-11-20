@@ -130,7 +130,8 @@ public class QuayType {
                 station,
                 GqlUtil.getTransitService(env).findMultiModalStation(station)
               );
-            } else {
+            }
+            else {
               return null;
             }
           })

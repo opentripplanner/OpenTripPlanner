@@ -55,7 +55,8 @@ class Subgraph {
   void addVertex(int vertexId) {
     if (vertexIndex.isStopVertex(vertexId)) {
       stopIds.add(vertexId);
-    } else {
+    }
+    else {
       streetIds.add(vertexId);
     }
 
@@ -121,7 +122,8 @@ class Subgraph {
 
     if (clostestVertex == null) {
       return searchRadius;
-    } else {
+    }
+    else {
       return SphericalDistanceLibrary.distance(
         clostestVertex.getLat(),
         clostestVertex.getLon(),

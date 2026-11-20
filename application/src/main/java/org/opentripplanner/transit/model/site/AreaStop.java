@@ -46,7 +46,8 @@ public class AreaStop
     if (builder.name() == null) {
       this.name = new NonLocalizedString(builder.getId().toString());
       hasFallbackName = true;
-    } else {
+    }
+    else {
       this.name = builder.name();
       hasFallbackName = builder.hasFallbackName();
     }

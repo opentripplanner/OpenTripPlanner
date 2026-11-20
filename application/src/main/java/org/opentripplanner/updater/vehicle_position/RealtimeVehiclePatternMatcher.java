@@ -108,7 +108,8 @@ class RealtimeVehiclePatternMatcher {
     for (var vehiclePosition : vehiclePositions) {
       try {
         matchResults.add(toRealtimeVehicle(feedId, vehiclePosition));
-      } catch (UpdateException e) {
+      }
+      catch (UpdateException e) {
         errors.add(e.toError());
       }
     }
@@ -170,9 +171,11 @@ class RealtimeVehiclePatternMatcher {
   ) {
     if (tripTimes != null) {
       return inferServiceDate(tripTimes, zoneId, now);
-    } else if (applicableCalendarDates.size() == 1) {
+    }
+    else if (applicableCalendarDates.size() == 1) {
       return applicableCalendarDates.stream().toList().getFirst();
-    } else {
+    }
+    else {
       return null;
     }
   }
@@ -268,7 +271,8 @@ class RealtimeVehiclePatternMatcher {
 
         if (matchedStops.size() == 1) {
           newVehicle.withStop(matchedStops.get(0));
-        } else {
+        }
+        else {
           LOG.warn(
             "Stop ID {} is not in trip {}. Not setting stopRelationship.",
             vehiclePosition.getStopId(),
@@ -334,7 +338,8 @@ class RealtimeVehiclePatternMatcher {
   private static String toString(VehiclePosition vehiclePosition) {
     try {
       return JsonFormat.printer().omittingInsignificantWhitespace().print(vehiclePosition);
-    } catch (InvalidProtocolBufferException ignored) {
+    }
+    catch (InvalidProtocolBufferException ignored) {
       return vehiclePosition.toString();
     }
   }

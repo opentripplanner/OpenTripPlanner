@@ -36,11 +36,13 @@ public class ConfigFileRedactor {
       node.properties().forEach(entry -> {
         if (entry.getValue().isObject() || entry.getValue().isArray()) {
           redactSecretsRecursive(entry.getValue());
-        } else if (REDACT_KEYS.contains(entry.getKey())) {
+        }
+        else if (REDACT_KEYS.contains(entry.getKey())) {
           entry.setValue(new StringNode("********"));
         }
       });
-    } else if (node.isArray()) {
+    }
+    else if (node.isArray()) {
       for (JsonNode element : node) {
         redactSecretsRecursive(element);
       }

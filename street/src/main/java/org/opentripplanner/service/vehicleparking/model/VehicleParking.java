@@ -227,7 +227,8 @@ public class VehicleParking implements Serializable {
       case CAR:
         if (wheelchairAccessible) {
           return wheelchairAccessibleCarPlaces;
-        } else {
+        }
+        else {
           return carPlaces;
         }
       default:

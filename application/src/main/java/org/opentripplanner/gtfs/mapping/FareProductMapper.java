@@ -57,7 +57,8 @@ class FareProductMapper {
   ) {
     if (riderCategory == null) {
       return null;
-    } else {
+    }
+    else {
       return RiderCategory.of(idFactory.createId(riderCategory.getId(), "rider category"))
         .withName(riderCategory.getName())
         .withIsDefault(mapIsDefaultCategory(riderCategory))
@@ -75,7 +76,8 @@ class FareProductMapper {
   private FareMedium toInternalModel(org.onebusaway.gtfs.model.@Nullable FareMedium c) {
     if (c == null) {
       return null;
-    } else {
+    }
+    else {
       return new FareMedium(idFactory.createId(c.getId(), "fare medium"), c.getName());
     }
   }

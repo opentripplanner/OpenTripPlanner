@@ -42,7 +42,8 @@ public class GbfsManifestLoader {
         .getAndMapAsJsonObject(url, headers, OBJECT_MAPPER, GBFSManifest.class);
       LOG.info("Loaded GBFS manifest from {}", url);
       return manifest;
-    } catch (OtpHttpClientException e) {
+    }
+    catch (OtpHttpClientException e) {
       LOG.error("Error loading GBFS manifest from {}", url, e);
       return null;
     }

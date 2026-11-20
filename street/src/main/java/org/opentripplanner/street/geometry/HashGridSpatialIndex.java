@@ -143,7 +143,8 @@ public class HashGridSpatialIndex<T> implements Serializable {
     if (removedCount.get() > 0) {
       nObjects--;
       return true;
-    } else {
+    }
+    else {
       return false;
     }
   }

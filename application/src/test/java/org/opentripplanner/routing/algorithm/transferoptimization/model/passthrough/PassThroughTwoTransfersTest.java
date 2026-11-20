@@ -200,13 +200,15 @@ public class PassThroughTwoTransfersTest implements RaptorTestConstants {
 
       if (tc.stopIndexA() == STOP_C) {
         b.bus(trip1, STOP_C).walk(costCG, STOP_G);
-      } else {
+      }
+      else {
         b.bus(trip1, STOP_E).walk(costEI, STOP_I);
       }
 
       if (tc.stopIndexB() == STOP_H) {
         b.bus(trip2, STOP_H).walk(costHK, STOP_K);
-      } else {
+      }
+      else {
         b.bus(trip2, STOP_J).walk(costJL, STOP_L);
       }
 

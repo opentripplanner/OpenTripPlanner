@@ -108,7 +108,8 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule> impleme
     if (tripIndexUpperBound == UNBOUNDED_TRIP_INDEX) {
       if (nTrips > binarySearchThreshold) {
         return findFirstBoardingOptimizedForLargeSetOfTrips();
-      } else {
+      }
+      else {
         return findBoardingBySteppingBackwardsInTime(nTrips);
       }
     }
@@ -166,7 +167,8 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule> impleme
     for (int i = tripIndexUpperBound - 1; i >= 0; --i) {
       if (timetable.departureTime(stopPositionInPattern, i) >= earliestBoardTime) {
         candidateTripIndex = i;
-      } else {
+      }
+      else {
         // this trip arrives too early. We can break out of the loop since
         // trips are sorted by departure time (trips in given schedule)
         // Trips passing another trip is not accounted for if both are in service.
@@ -219,7 +221,8 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule> impleme
 
       if (timetable.departureTime(stopPositionInPattern, m) >= earliestBoardTime) {
         upper = m;
-      } else {
+      }
+      else {
         lower = m;
       }
     }

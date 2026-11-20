@@ -81,14 +81,16 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
     if (y < 0) {
       northSouth = "s";
       y = -y;
-    } else {
+    }
+    else {
       northSouth = "n";
     }
 
     if (x < 0) {
       eastWest = "w";
       x = -x;
-    } else {
+    }
+    else {
       eastWest = "e";
     }
 
@@ -128,7 +130,8 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
       }
 
       istream.close();
-    } catch (S3ServiceException e) {
+    }
+    catch (S3ServiceException e) {
       // Check if the error code is a NoSuchKey code which indicates that the file was not found in
       // the S3 bucket. If this is the cause, allow execution to continue without this tile.
       //
@@ -141,7 +144,8 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
       }
 
       throw new RuntimeException(e);
-    } catch (ServiceException | IOException e) {
+    }
+    catch (ServiceException | IOException e) {
       throw new RuntimeException(e);
     }
 

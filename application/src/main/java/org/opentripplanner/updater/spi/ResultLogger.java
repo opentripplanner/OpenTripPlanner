@@ -29,7 +29,8 @@ public class ResultLogger {
       );
 
       logUpdateResultErrors(feedId, type, updateResult);
-    } else {
+    }
+    else {
       LOG.info("[feedId={}, type={}] Feed did not contain any updates", feedId, type);
     }
   }

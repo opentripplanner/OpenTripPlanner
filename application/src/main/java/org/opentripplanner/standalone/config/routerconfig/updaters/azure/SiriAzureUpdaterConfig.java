@@ -106,10 +106,12 @@ public abstract class SiriAzureUpdaterConfig {
           ZonedDateTime.now(ZoneId.of("CET")).plus(Period.parse(text)),
           customMidnight
         );
-      } else {
+      }
+      else {
         return LocalDate.parse(text);
       }
-    } catch (DateTimeParseException e) {
+    }
+    catch (DateTimeParseException e) {
       throw new IllegalArgumentException(
         text + "' is not a Period or LocalDate. " + "Details: " + e.getLocalizedMessage()
       );
@@ -128,7 +130,8 @@ public abstract class SiriAzureUpdaterConfig {
   public static LocalDate getDateBasedOnCustomMidnight(ZonedDateTime time, int customMidnight) {
     if (time.isBefore(time.withHour(customMidnight).withMinute(0).withSecond(0).withNano(0))) {
       return time.minusDays(1).toLocalDate();
-    } else {
+    }
+    else {
       return time.toLocalDate();
     }
   }

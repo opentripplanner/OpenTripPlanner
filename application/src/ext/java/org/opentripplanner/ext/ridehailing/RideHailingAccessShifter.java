@@ -51,10 +51,12 @@ public class RideHailingAccessShifter {
 
           if (duration.isSuccess()) {
             return new RideHailingAccessAdapter(access, duration.successValue());
-          } else {
+          }
+          else {
             return null;
           }
-        } else {
+        }
+        else {
           return ae;
         }
       })
@@ -77,7 +79,8 @@ public class RideHailingAccessShifter {
   ) {
     if (shouldShift(req, now)) {
       return shiftTime(req, services, now);
-    } else {
+    }
+    else {
       return Result.success(Duration.ZERO);
     }
   }
@@ -94,14 +97,16 @@ public class RideHailingAccessShifter {
 
       if (shiftingResult.isSuccess()) {
         return Result.success(shiftingResult.successValue());
-      } else {
+      }
+      else {
         LOG.error(
           "Could not fetch arrival time for car hailing service: {}",
           shiftingResult.failureValue()
         );
         return Result.failure(Error.TECHNICAL_ERROR);
       }
-    } else {
+    }
+    else {
       return Result.success(Duration.ZERO);
     }
   }
@@ -135,10 +140,12 @@ public class RideHailingAccessShifter {
         }
 
         return Result.success(duration);
-      } else {
+      }
+      else {
         return Result.failure(Error.NO_ARRIVAL_FOR_LOCATION);
       }
-    } catch (ExecutionException e) {
+    }
+    catch (ExecutionException e) {
       return Result.failure(Error.TECHNICAL_ERROR);
     }
   }

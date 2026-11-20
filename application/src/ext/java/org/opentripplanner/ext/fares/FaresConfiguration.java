@@ -49,10 +49,12 @@ public class FaresConfiguration {
     if (config == null) {
       /* Empty block, fallback to default */
       type = null;
-    } else if (config.isString()) {
+    }
+    else if (config.isString()) {
       /* Simplest form: { fares : "seattle" } */
       type = config.asString();
-    } else if (config.has("type")) {
+    }
+    else if (config.has("type")) {
       /* Fare with a type: { fares : { type : "foobar", param1 : 42 } } */
       type = config.path("type").asString(null);
     }

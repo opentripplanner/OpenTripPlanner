@@ -65,7 +65,8 @@ public final class TimeScalarFactory {
           public Integer parseValue(Object input) {
             try {
               return LocalTime.from(FORMATTER.parse((CharSequence) input)).toSecondOfDay();
-            } catch (DateTimeParseException dtpe) {
+            }
+            catch (DateTimeParseException dtpe) {
               throw new CoercingParseValueException(
                 "Expected type 'Time' but was '" + input + "'."
               );

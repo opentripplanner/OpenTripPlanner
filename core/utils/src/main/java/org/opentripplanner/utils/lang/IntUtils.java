@@ -124,7 +124,8 @@ public final class IntUtils {
   public static Integer requireNullOrNotNegative(Integer value, String field) {
     if (value == null) {
       return null;
-    } else {
+    }
+    else {
       return requireNotNegative(value, field);
     }
   }

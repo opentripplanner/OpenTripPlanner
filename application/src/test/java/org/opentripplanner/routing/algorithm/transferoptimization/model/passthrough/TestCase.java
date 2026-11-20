@@ -33,7 +33,8 @@ record TestCase(
 
     if (description != null) {
       buf.append(description);
-    } else {
+    }
+    else {
       if (points.size() == 1) {
         buf.append("at ");
         appendPoint(buf, 0);

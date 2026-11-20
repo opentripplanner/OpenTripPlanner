@@ -25,9 +25,11 @@ public record UpdateError(
 
     if (id == null) {
       return "no trip id";
-    } else if (stopPosition == null) {
+    }
+    else if (stopPosition == null) {
       return id;
-    } else {
+    }
+    else {
       return "%s{stopPosition=%s}".formatted(id, stopPosition);
     }
   }

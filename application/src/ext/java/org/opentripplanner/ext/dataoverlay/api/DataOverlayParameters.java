@@ -104,7 +104,8 @@ public class DataOverlayParameters implements Serializable {
       var name = ParameterName.valueOf(parameter.substring(0, pos).toUpperCase());
       var type = ParameterType.valueOf(parameter.substring(pos + 1).toUpperCase());
       return new Parameter(name, type);
-    } catch (IllegalArgumentException ignore) {
+    }
+    catch (IllegalArgumentException ignore) {
       return null;
     }
   }
@@ -113,7 +114,8 @@ public class DataOverlayParameters implements Serializable {
   static Double resolveValue(String value) {
     try {
       return Double.parseDouble(value);
-    } catch (NumberFormatException | NullPointerException ignore) {
+    }
+    catch (NumberFormatException | NullPointerException ignore) {
       return null;
     }
   }

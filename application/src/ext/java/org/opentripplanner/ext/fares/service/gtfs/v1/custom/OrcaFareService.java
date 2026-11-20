@@ -128,7 +128,8 @@ public class OrcaFareService extends DefaultFareService {
     public TransferType getTransferType(FareType fareType, ZonedDateTime startTime) {
       if (usesOrca(fareType) && this.permitsFreeTransfers(startTime)) {
         return TransferType.ORCA_INTERAGENCY_TRANSFER;
-      } else if (this == KC_METRO || this == KITSAP_TRANSIT) {
+      }
+      else if (this == KC_METRO || this == KITSAP_TRANSIT) {
         return TransferType.SAME_AGENCY_TRANSFER;
       }
 
@@ -222,7 +223,8 @@ public class OrcaFareService extends DefaultFareService {
           }
 
           yield RideType.COMM_TRANS_LOCAL_SWIFT;
-        } catch (NumberFormatException e) {
+        }
+        catch (NumberFormatException e) {
           yield RideType.COMM_TRANS_LOCAL_SWIFT;
         }
       }
@@ -233,13 +235,15 @@ public class OrcaFareService extends DefaultFareService {
           if (routeId >= 500 && routeId < 600) {
             yield RideType.SOUND_TRANSIT_BUS;
           }
-        } catch (NumberFormatException ignored) {
+        }
+        catch (NumberFormatException ignored) {
           // Lettered routes exist, are not an error.
         }
 
         if ("973".equals(route.getShortName())) {
           yield RideType.KC_WATER_TAXI_WEST_SEATTLE;
-        } else if ("975".equals(route.getShortName())) {
+        }
+        else if ("975".equals(route.getShortName())) {
           yield RideType.KC_WATER_TAXI_VASHON_ISLAND;
         }
 
@@ -259,7 +263,8 @@ public class OrcaFareService extends DefaultFareService {
           }
 
           yield RideType.PIERCE_COUNTY_TRANSIT;
-        } catch (NumberFormatException e) {
+        }
+        catch (NumberFormatException e) {
           yield RideType.PIERCE_COUNTY_TRANSIT;
         }
       }
@@ -623,7 +628,8 @@ public class OrcaFareService extends DefaultFareService {
           // Extend the validity period of the dependencies
           validFareProducts.forEach(vfp -> vfp.extendedStartTime = leg.startTime());
         }
-      } else if (transferType == TransferType.SAME_AGENCY_TRANSFER) {
+      }
+      else if (transferType == TransferType.SAME_AGENCY_TRANSFER) {
         // Generate medium ID for the agency's cash transfer
         var mediumId = "cash";
         var agencyTransferMedium = new FareMedium(new FeedScopedId(FEED_ID, mediumId), mediumId);
@@ -655,10 +661,12 @@ public class OrcaFareService extends DefaultFareService {
           var newFareOffer = FareOffer.of(leg.startTime(), newFareProduct);
           fare.addFareProduct(leg, newFareOffer);
           purchasedFareProducts.add(new ExtendedFareOffer(newFareOffer, leg.startTime()));
-        } else {
+        }
+        else {
           fare.addFareProduct(leg, validAgencyFareProducts.getFirst());
         }
-      } else {
+      }
+      else {
         // Create a generic fare product for this leg
         var riderCategory = getRiderCategory(fareType);
         var genericFareProduct = FareProduct.of(
@@ -731,7 +739,8 @@ public class OrcaFareService extends DefaultFareService {
 
     if (splitFareType.length > 1) {
       name = splitFareType[1].toLowerCase();
-    } else {
+    }
+    else {
       name = fareType.toString();
     }
 

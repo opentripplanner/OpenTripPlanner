@@ -57,7 +57,8 @@ public class TurnRestrictionModule implements GraphBuilderModule {
   Vertex getMainVertex(Vertex vertex) {
     if (mainVertices.containsKey(vertex)) {
       return mainVertices.get(vertex);
-    } else {
+    }
+    else {
       return vertex;
     }
   }
@@ -137,7 +138,8 @@ public class TurnRestrictionModule implements GraphBuilderModule {
         fromEdge.remove();
         addedEdges--;
         vertexHasRemovedInputEdges = true;
-      } else {
+      }
+      else {
         fromEdge.setPermission(oldPermission);
       }
     }
@@ -157,7 +159,8 @@ public class TurnRestrictionModule implements GraphBuilderModule {
                 .buildAndConnect();
               addedEdges++;
             }
-          } else {
+          }
+          else {
             if (isCorrespondingVertex(turnRestriction.to.getToVertex(), toEdge.getToVertex())) {
               toEdge
                 .toBuilder()
@@ -221,12 +224,14 @@ public class TurnRestrictionModule implements GraphBuilderModule {
         for (var subVertex : vertices.toArray(new SubsidiaryVertex[0])) {
           processVertex(subVertex, turnRestriction);
         }
-      } else {
+      }
+      else {
         subsidiaryVertices.put(vertex, new HashSet<>());
       }
 
       processVertex(intersectionVertex, turnRestriction);
-    } else {
+    }
+    else {
       throw new IllegalStateException(
         String.format("Vertex %s is not an IntersectionVertex", vertex)
       );

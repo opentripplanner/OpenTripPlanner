@@ -76,7 +76,8 @@ public final class ArrivalTimeRoutingStrategy<T extends RaptorTripSchedule> impl
       //       this check can be removed.
       if (calculator.isBefore(stopArrivalTime, onTripBoardTime)) {
         logInvalidAlightTime(stopPos, stopArrivalTime);
-      } else {
+      }
+      else {
         state.transitToStop(stopIndex, stopArrivalTime, onTripBoardStopPosition, onTrip);
       }
     }
@@ -120,7 +121,8 @@ public final class ArrivalTimeRoutingStrategy<T extends RaptorTripSchedule> impl
 
     if (boarding.empty()) {
       boardWithRegularTransfer(stopIndex, stopPos, boardSlack);
-    } else if (!boarding.transferConstraint().isNotAllowed()) {
+    }
+    else if (!boarding.transferConstraint().isNotAllowed()) {
       board(boarding);
     }
   }

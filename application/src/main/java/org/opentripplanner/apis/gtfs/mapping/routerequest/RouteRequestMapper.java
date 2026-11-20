@@ -36,10 +36,12 @@ public class RouteRequestMapper {
 
     if (dateTime.getGraphQLEarliestDeparture() != null) {
       request.withDateTime(args.getGraphQLDateTime().getGraphQLEarliestDeparture().toInstant());
-    } else if (dateTime.getGraphQLLatestArrival() != null) {
+    }
+    else if (dateTime.getGraphQLLatestArrival() != null) {
       request.withDateTime(args.getGraphQLDateTime().getGraphQLLatestArrival().toInstant());
       request.withArriveBy(true);
-    } else {
+    }
+    else {
       request.withDateTime(Instant.now());
     }
 
@@ -65,13 +67,15 @@ public class RouteRequestMapper {
       if (args.getGraphQLLast() != null) {
         request.withNumItineraries(args.getGraphQLLast());
       }
-    } else if (args.getGraphQLAfter() != null) {
+    }
+    else if (args.getGraphQLAfter() != null) {
       request.withPageCursorFromEncoded(args.getGraphQLAfter());
 
       if (args.getGraphQLFirst() != null) {
         request.withNumItineraries(args.getGraphQLFirst());
       }
-    } else if (args.getGraphQLFirst() != null) {
+    }
+    else if (args.getGraphQLFirst() != null) {
       request.withNumItineraries(args.getGraphQLFirst());
     }
 

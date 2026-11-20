@@ -223,7 +223,8 @@ class RegularTransferServiceCache<V> {
 
       previous = entry.value.join();
       stale = Set.of();
-    } else {
+    }
+    else {
       previous = entry.previous;
       stale = entry.changedFromStops;
     }
@@ -248,7 +249,8 @@ class RegularTransferServiceCache<V> {
   private void count(Entry<V> entry) {
     if (entry.value.isDone()) {
       counters.hit();
-    } else {
+    }
+    else {
       counters.miss();
     }
   }
@@ -279,7 +281,8 @@ class RegularTransferServiceCache<V> {
           : f.patch(userPreferences, entry.previous, entry.changedFromStops);
       counters.created(System.nanoTime() - start);
       entry.value.complete(value);
-    } catch (RuntimeException | Error e) {
+    }
+    catch (RuntimeException | Error e) {
       counters.creationFailed(System.nanoTime() - start);
       onFailure.run();
       entry.value.completeExceptionally(e);
@@ -290,7 +293,8 @@ class RegularTransferServiceCache<V> {
   private static <V> V await(Entry<V> entry) {
     try {
       return entry.value.join();
-    } catch (CompletionException e) {
+    }
+    catch (CompletionException e) {
       if (e.getCause() instanceof RuntimeException re) {
         throw re;
       }

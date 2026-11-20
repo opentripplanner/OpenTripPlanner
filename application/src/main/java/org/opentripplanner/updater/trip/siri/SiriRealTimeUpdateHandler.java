@@ -103,7 +103,8 @@ public class SiriRealTimeUpdateHandler {
         for (EstimatedVehicleJourney journey : journeys) {
           try {
             successes.add(apply(journey, entityResolver));
-          } catch (UpdateException e) {
+          }
+          catch (UpdateException e) {
             errors.add(
               e
                 .withTripReference(TripReferenceHelper.tripReference(journey))
@@ -142,11 +143,14 @@ public class SiriRealTimeUpdateHandler {
 
       /* commit */
       return addTripToGraphAndBuffer(result);
-    } catch (UpdateException e) {
+    }
+    catch (UpdateException e) {
       throw e;
-    } catch (DataValidationException e) {
+    }
+    catch (DataValidationException e) {
       throw DataValidationExceptionMapper.map(e);
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       LOG.warn("{} EstimatedJourney {} failed.", siriUpdateType, journeyWrapper, e);
       throw UpdateException.noTripId(UNKNOWN);
     }
@@ -224,7 +228,8 @@ public class SiriRealTimeUpdateHandler {
     if (trip != null) {
       // Found exact match
       pattern = buffer.findPattern(trip);
-    } else if (fuzzyTripMatcher != null) {
+    }
+    else if (fuzzyTripMatcher != null) {
       // No exact match found - search for trips based on arrival-times/stop-patterns
       var tripAndPattern = fuzzyTripMatcher.match(
         journey,
@@ -234,7 +239,8 @@ public class SiriRealTimeUpdateHandler {
       );
       trip = tripAndPattern.trip();
       pattern = tripAndPattern.tripPattern();
-    } else {
+    }
+    else {
       throw UpdateException.of(null, TRIP_NOT_FOUND);
     }
 
@@ -280,7 +286,8 @@ public class SiriRealTimeUpdateHandler {
     if (trip != null) {
       // Found exact match
       pattern = buffer.findPattern(trip);
-    } else if (fuzzyTripMatcher != null) {
+    }
+    else if (fuzzyTripMatcher != null) {
       // No exact match found - search for trips based on arrival-times/stop-patterns
       var tripAndPattern = fuzzyTripMatcher.match(
         journey,
@@ -291,7 +298,8 @@ public class SiriRealTimeUpdateHandler {
 
       trip = tripAndPattern.trip();
       pattern = tripAndPattern.tripPattern();
-    } else {
+    }
+    else {
       throw UpdateException.of(null, TRIP_NOT_FOUND);
     }
 
@@ -331,7 +339,8 @@ public class SiriRealTimeUpdateHandler {
 
     if (tripUpdate.tripPatternCreation()) {
       pattern = tripUpdate.addedTripPattern();
-    } else {
+    }
+    else {
       // Get cached trip pattern or create one if it doesn't exist yet
       pattern = tripPatternCache.getOrCreateTripPattern(
         tripUpdate.stopPattern(),

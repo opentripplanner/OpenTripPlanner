@@ -40,7 +40,8 @@ public sealed interface Condition {
 
     if (way.hasTag(leftKey)) {
       return isExtendedKeyMatch(way, leftKey);
-    } else {
+    }
+    else {
       return isExplicitBothMatch(way);
     }
   }
@@ -57,7 +58,8 @@ public sealed interface Condition {
 
     if (way.hasTag(rightKey)) {
       return isExtendedKeyMatch(way, rightKey);
-    } else {
+    }
+    else {
       return isExplicitBothMatch(way);
     }
   }
@@ -71,7 +73,8 @@ public sealed interface Condition {
 
     if (way.hasTag(bothKey)) {
       return isExtendedKeyMatch(way, bothKey);
-    } else {
+    }
+    else {
       return isMatch(way);
     }
   }
@@ -81,7 +84,8 @@ public sealed interface Condition {
 
     if (way.hasTag(forwardKey)) {
       return isExtendedKeyMatch(way, forwardKey);
-    } else {
+    }
+    else {
       /* Assumes right hand traffic */
       return isRightMatch(way);
     }
@@ -96,7 +100,8 @@ public sealed interface Condition {
 
     if (way.hasTag(backwardKey)) {
       return isExtendedKeyMatch(way, backwardKey);
-    } else {
+    }
+    else {
       /* Assumes right hand traffic */
       return isLeftMatch(way);
     }

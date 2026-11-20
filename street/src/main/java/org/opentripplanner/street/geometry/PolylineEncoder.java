@@ -29,13 +29,17 @@ public class PolylineEncoder {
   public static PolylineEncoderResult encodeGeometry(Geometry geometry) {
     if (geometry instanceof LineString string) {
       return encodeCoordinateSequence(string.getCoordinateSequence());
-    } else if (geometry instanceof MultiLineString mls) {
+    }
+    else if (geometry instanceof MultiLineString mls) {
       return encodeCoordinates(mls.getCoordinates());
-    } else if (geometry instanceof Polygon polygon) {
+    }
+    else if (geometry instanceof Polygon polygon) {
       return encodeCoordinates(polygon.getCoordinates());
-    } else if (geometry instanceof Point point) {
+    }
+    else if (geometry instanceof Point point) {
       return encodeCoordinates(point.getCoordinates());
-    } else {
+    }
+    else {
       throw new IllegalArgumentException(geometry.toString());
     }
   }

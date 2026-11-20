@@ -105,7 +105,8 @@ public class ExampleConfigTest {
       if (!buf.isEmpty()) {
         fail(buf.toString());
       }
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       throw new RuntimeException(e);
     }
   }

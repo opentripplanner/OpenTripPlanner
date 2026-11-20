@@ -60,17 +60,21 @@ public class LiipiFacilitiesDownloader {
       return otpHttpClient.getAndMap(URI.create(url), HttpHeaders.empty(), response -> {
         try {
           return parseJSON(response.body(), hubForPark);
-        } catch (IllegalArgumentException e) {
+        }
+        catch (IllegalArgumentException e) {
           LOG.warn("Error parsing facilities from {}", url, e);
-        } catch (JacksonException e) {
+        }
+        catch (JacksonException e) {
           LOG.warn("Error parsing facilities from {} (bad JSON of some sort)", url, e);
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
           LOG.warn("Error reading facilities from {}", url, e);
         }
 
         return null;
       });
-    } catch (OtpHttpClientException e) {
+    }
+    catch (OtpHttpClientException e) {
       LOG.warn("Failed to get data from url {}", url);
       return null;
     }

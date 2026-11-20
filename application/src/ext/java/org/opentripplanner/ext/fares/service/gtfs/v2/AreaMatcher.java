@@ -52,7 +52,8 @@ class AreaMatcher {
 
     if (priorityMatcher.feedContainsRulePriority(stop.getId().getFeedId())) {
       return areaId == null || stopAreas.contains(areaId);
-    } else {
+    }
+    else {
       return (
         (isNull(areaId) && stopAreas.stream().noneMatch(areasWithRules::contains)) ||
         (nonNull(areaId) && stopAreas.contains(areaId))

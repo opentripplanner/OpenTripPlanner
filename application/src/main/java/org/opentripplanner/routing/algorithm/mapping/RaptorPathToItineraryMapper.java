@@ -437,7 +437,8 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
           .withWalkSteps(List.of())
           .build()
       );
-    } else {
+    }
+    else {
       return mapTransferLegWithEdges(pathLeg.fromTime(), edges);
     }
   }
@@ -482,7 +483,8 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
       if (State.isEmpty(states)) {
         s = null;
-      } else {
+      }
+      else {
         transferStates.add(states[0]);
         s = states[0];
       }

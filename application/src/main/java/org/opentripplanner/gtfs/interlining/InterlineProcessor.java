@@ -243,7 +243,8 @@ public class InterlineProcessor {
       // the
       // from trip.
       return false;
-    } else {
+    }
+    else {
       interlines.put(
         new TripPatternPair(fromPattern, toPattern),
         new TripPair(fromTripTimes.getTrip(), toTripTimes.getTrip())

@@ -124,7 +124,8 @@ class TripMapper {
           serviceJourney.getTransportMode(),
           serviceJourney.getTransportSubmode()
         );
-      } catch (TransportModeMapper.UnsupportedModeException e) {
+      }
+      catch (TransportModeMapper.UnsupportedModeException e) {
         issueStore.add(
           "UnsupportedModeInServiceJourney",
           "Unsupported mode in ServiceJourney. Mode: %s, sj: %s",
@@ -139,7 +140,8 @@ class TripMapper {
       builder.withCarsAllowed(
         transportModeMapper.mapCarsAllowed(serviceJourney.getTransportSubmode())
       );
-    } else {
+    }
+    else {
       builder.withCarsAllowed(transportModeMapper.mapCarsAllowed(route.getNetexSubmode()));
     }
 
@@ -162,7 +164,8 @@ class TripMapper {
 
     if (netexRoute != null && netexRoute.getDirectionType() != null) {
       return netexRoute.getDirectionType();
-    } else {
+    }
+    else {
       return null;
     }
   }
@@ -192,7 +195,8 @@ class TripMapper {
     if (lineRefStruct != null) {
       // Connect to Line referenced directly from ServiceJourney
       lineRef = lineRefStruct.getValue().getRef();
-    } else if (serviceJourney.getJourneyPatternRef() != null) {
+    }
+    else if (serviceJourney.getJourneyPatternRef() != null) {
       // Connect to Line referenced through JourneyPattern->Route
       JourneyPattern_VersionStructure journeyPattern = journeyPatternsById.lookup(
         serviceJourney.getJourneyPatternRef().getValue().getRef()

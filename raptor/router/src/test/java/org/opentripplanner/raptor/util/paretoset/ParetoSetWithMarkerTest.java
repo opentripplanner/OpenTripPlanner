@@ -132,7 +132,8 @@ public class ParetoSetWithMarkerTest {
     if (firstVectorAfterMarker == null) {
       set.forEach(it -> buf.add(it.toString()));
       buf.add("<M>");
-    } else {
+    }
+    else {
       set.forEach(it -> {
         if (it == firstVectorAfterMarker) {
           buf.add("<M>");

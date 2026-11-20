@@ -15,7 +15,8 @@ class TextMapper {
   public static InternationalTextStructure internationalText(@Nullable String name) {
     if (name == null) {
       return null;
-    } else {
+    }
+    else {
       return internationalText(name, null);
     }
   }
@@ -23,7 +24,8 @@ class TextMapper {
   static InternationalTextStructure internationalText(I18NString string, @Nullable String lang) {
     if (string == null) {
       return null;
-    } else {
+    }
+    else {
       return internationalText(string.toString(), lang);
     }
   }
@@ -31,7 +33,8 @@ class TextMapper {
   static InternationalTextStructure internationalText(String string, @Nullable String lang) {
     if (string == null) {
       return null;
-    } else {
+    }
+    else {
       var t = new DefaultedTextStructure().withValue(string);
 
       if (lang != null) {

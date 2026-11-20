@@ -59,7 +59,8 @@ class RelativeTime {
     if (negative) {
       // The days and secondsOfDay are both negative numbers
       return new RelativeTime(days - 1, LocalTime.MIDNIGHT.plusSeconds(secondsOfDay));
-    } else {
+    }
+    else {
       return new RelativeTime(days, LocalTime.ofSecondOfDay(secondsOfDay));
     }
   }

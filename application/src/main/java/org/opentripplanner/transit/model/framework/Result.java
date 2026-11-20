@@ -49,7 +49,8 @@ public abstract sealed class Result<T, E> {
   public <N> Result<N, E> mapSuccess(Function<T, N> mapper) {
     if (isSuccess()) {
       return Result.success(mapper.apply(successValue()));
-    } else {
+    }
+    else {
       return Result.failure(failureValue());
     }
   }
@@ -64,7 +65,8 @@ public abstract sealed class Result<T, E> {
   public <N> Result<N, E> flatMap(Function<T, Result<N, E>> mapper) {
     if (isSuccess()) {
       return mapper.apply(successValue());
-    } else {
+    }
+    else {
       return Result.failure(failureValue());
     }
   }
@@ -95,7 +97,8 @@ public abstract sealed class Result<T, E> {
   public E failureValue() {
     if (isFailure()) {
       return (E) value();
-    } else {
+    }
+    else {
       throw new RuntimeException(
         "Value %s is not a failure. Check isFailure() before calling failureValue().".formatted(
           value()
@@ -134,7 +137,8 @@ public abstract sealed class Result<T, E> {
   public T successValue() {
     if (isSuccess()) {
       return (T) value();
-    } else {
+    }
+    else {
       throw new RuntimeException(
         "Value %s is not a success. Check isSuccess() before calling successValue().".formatted(
           value()

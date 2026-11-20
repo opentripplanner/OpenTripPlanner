@@ -104,13 +104,15 @@ public class SiriAlertsUpdateHandler {
           if (expireSituation) {
             alerts.removeIf(transitAlert -> transitAlert.getId().equals(id));
             expiredCounter++;
-          } else {
+          }
+          else {
             TransitAlert alert = null;
 
             try {
               alert = mapSituationToAlert(sxElement, context);
               addedCounter++;
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
               LOG.info(
                 "Caught exception when processing situation with situationNumber {}: {}",
                 situationNumber,
@@ -189,7 +191,8 @@ public class SiriAlertsUpdateHandler {
       }
 
       alert.withCalendar(AlertCalendar.of(periods));
-    } else {
+    }
+    else {
       // Per the GTFS-rt spec, if an alert has no TimeRanges, than it should always be shown.
       alert.withCalendar(AlertCalendar.ofAlwaysActive());
     }
@@ -291,7 +294,8 @@ public class SiriAlertsUpdateHandler {
 
           if (uri != null) {
             alertUrls.add(new AlertUrl(uri, label));
-          } else {
+          }
+          else {
             if (LOG.isDebugEnabled()) {
               LOG.debug(
                 "URI missing in info-link - ignoring info-link in situation: {}",
@@ -339,7 +343,8 @@ public class SiriAlertsUpdateHandler {
 
         translations.put(language, value);
       }
-    } else {
+    }
+    else {
       translations.put("", "");
     }
 

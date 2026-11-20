@@ -13,7 +13,8 @@ public class URIUtils {
   public static URI uri(String uri) {
     try {
       return new URI(uri);
-    } catch (URISyntaxException e) {
+    }
+    catch (URISyntaxException e) {
       throw new RuntimeException(e);
     }
   }

@@ -272,7 +272,8 @@ public class TestTransitData
 
         if (ROUTE_NAME_PATTERN.matcher(firstLine.trim()).matches()) {
           withTimetable(firstLine, timetable.substring(firstLine.length() + 1).trim());
-        } else {
+        }
+        else {
           withTimetable("R" + ++routeIndex, timetable.trim());
         }
       }
@@ -414,7 +415,8 @@ public class TestTransitData
         .withPatternRideDebugListener(logger::patternRideLister)
         .withDestinationArrivalListener(logger::destinationArrivalListener)
         .withLogger(logger);
-    } else {
+    }
+    else {
       if (WARNING_COUNTER.getAndIncrement() % 20 == 0) {
         System.err.println(
           "[INFO] The debug logging for raptor module tests is off by default! " +

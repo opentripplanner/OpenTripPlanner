@@ -220,7 +220,8 @@ public class OsmDatabase {
 
     if (levels.size() == 1) {
       return levels.getFirst();
-    } else {
+    }
+    else {
       return OsmLevelFactory.DEFAULT;
     }
   }
@@ -232,7 +233,8 @@ public class OsmDatabase {
   public List<OsmLevel> getLevelsForEntity(OsmEntity entity) {
     if (entityLevels.containsKey(entity)) {
       return entityLevels.get(entity);
-    } else {
+    }
+    else {
       return List.of(OsmLevelFactory.DEFAULT);
     }
   }
@@ -244,7 +246,8 @@ public class OsmDatabase {
   public Set<OsmLevel> getLevelSetForEntity(OsmEntity entity) {
     if (entityLevels.containsKey(entity)) {
       return Set.copyOf(entityLevels.get(entity));
-    } else {
+    }
+    else {
       return Set.of(OsmLevelFactory.DEFAULT);
     }
   }
@@ -347,7 +350,8 @@ public class OsmDatabase {
       }
 
       createLevelsForEntity(relation);
-    } else if (
+    }
+    else if (
       !relation.isRestriction() &&
       !relation.isRoadRoute() &&
       !(relation.isMultiPolygon() && relation.isRoutable()) &&
@@ -431,12 +435,14 @@ public class OsmDatabase {
         // street graph and from the area processing
         waysById.remove(way.getId());
         waysSortedById = null;
-      } catch (OsmArea.AreaConstructionException | Ring.RingConstructionException e) {
+      }
+      catch (OsmArea.AreaConstructionException | Ring.RingConstructionException e) {
         // this area cannot be constructed, but we already have all the
         // necessary nodes to construct it. So, something must be wrong with
         // the area; we'll mark it as processed so that we don't retry.
         issueStore.add(new InvalidOsmGeometry(way));
-      } catch (IllegalArgumentException iae) {
+      }
+      catch (IllegalArgumentException iae) {
         // This occurs when there are an invalid number of points in a LinearRing
         // Mark the ring as processed so we don't retry it.
         issueStore.add(new InvalidOsmGeometry(way));
@@ -481,7 +487,8 @@ public class OsmDatabase {
         for (LongCursor c : way.getNodeRefs()) {
           if (nodes.contains(c.value)) {
             HppcMapSetUtils.addToMapSet(areasForNode, c.value, way);
-          } else {
+          }
+          else {
             // this area is missing some nodes, perhaps because it is on
             // the edge of the region, so we will simply not route on it.
             continue RELATION;
@@ -490,7 +497,8 @@ public class OsmDatabase {
 
         if (member.hasRoleInner()) {
           innerWays.add(way);
-        } else if (member.hasRoleOuter()) {
+        }
+        else if (member.hasRoleOuter()) {
           outerWays.add(way);
         }
       }
@@ -499,7 +507,8 @@ public class OsmDatabase {
 
       try {
         addArea(new OsmArea(relation, outerWays, innerWays, this::getNode));
-      } catch (OsmArea.AreaConstructionException | Ring.RingConstructionException e) {
+      }
+      catch (OsmArea.AreaConstructionException | Ring.RingConstructionException e) {
         issueStore.add(new InvalidOsmGeometry(relation));
       }
     }
@@ -534,9 +543,11 @@ public class OsmDatabase {
     for (OsmRelation relation : values(relationsById)) {
       if (relation.isRestriction()) {
         processRestriction(relation);
-      } else if (relation.isRoute()) {
+      }
+      else if (relation.isRoute()) {
         processRoute(relation);
-      } else if (relation.isPublicTransport()) {
+      }
+      else if (relation.isPublicTransport()) {
         processPublicTransportStopArea(relation);
       }
     }
@@ -570,9 +581,11 @@ public class OsmDatabase {
 
       if (role.equals("from")) {
         from = member.getRef();
-      } else if (role.equals("to")) {
+      }
+      else if (role.equals("to")) {
         to = member.getRef();
-      } else if (role.equals("via")) {
+      }
+      else if (role.equals("via")) {
         via = member.getRef();
       }
     }
@@ -591,7 +604,8 @@ public class OsmDatabase {
       for (String m : exceptModes.split(";")) {
         if (m.equals("motorcar")) {
           modes.setCar(false);
-        } else if (m.equals("bicycle")) {
+        }
+        else if (m.equals("bicycle")) {
           modes.setBicycle(false);
           issueStore.add(new TurnRestrictionException(via, from));
         }
@@ -607,65 +621,75 @@ public class OsmDatabase {
         Direction.RIGHT,
         relation.getId()
       );
-    } else if (relation.isTag("restriction", "no_left_turn")) {
+    }
+    else if (relation.isTag("restriction", "no_left_turn")) {
       tag = new TurnRestrictionTag(
         via,
         TurnRestrictionType.NO_TURN,
         Direction.LEFT,
         relation.getId()
       );
-    } else if (relation.isTag("restriction", "no_straight_on")) {
+    }
+    else if (relation.isTag("restriction", "no_straight_on")) {
       tag = new TurnRestrictionTag(
         via,
         TurnRestrictionType.NO_TURN,
         Direction.STRAIGHT,
         relation.getId()
       );
-    } else if (relation.isTag("restriction", "no_u_turn")) {
+    }
+    else if (relation.isTag("restriction", "no_u_turn")) {
       tag = new TurnRestrictionTag(via, TurnRestrictionType.NO_TURN, Direction.U, relation.getId());
-    } else if (relation.isTag("restriction", "only_straight_on")) {
+    }
+    else if (relation.isTag("restriction", "only_straight_on")) {
       tag = new TurnRestrictionTag(
         via,
         TurnRestrictionType.ONLY_TURN,
         Direction.STRAIGHT,
         relation.getId()
       );
-    } else if (relation.isTag("restriction", "only_right_turn")) {
+    }
+    else if (relation.isTag("restriction", "only_right_turn")) {
       tag = new TurnRestrictionTag(
         via,
         TurnRestrictionType.ONLY_TURN,
         Direction.RIGHT,
         relation.getId()
       );
-    } else if (relation.isTag("restriction", "only_left_turn")) {
+    }
+    else if (relation.isTag("restriction", "only_left_turn")) {
       tag = new TurnRestrictionTag(
         via,
         TurnRestrictionType.ONLY_TURN,
         Direction.LEFT,
         relation.getId()
       );
-    } else if (relation.isTag("restriction", "no_entry")) {
+    }
+    else if (relation.isTag("restriction", "no_entry")) {
       tag = new TurnRestrictionTag(
         via,
         TurnRestrictionType.NO_TURN,
         Direction.ENTRY,
         relation.getId()
       );
-    } else if (relation.isTag("restriction", "only_u_turn")) {
+    }
+    else if (relation.isTag("restriction", "only_u_turn")) {
       tag = new TurnRestrictionTag(
         via,
         TurnRestrictionType.ONLY_TURN,
         Direction.U,
         relation.getId()
       );
-    } else if (relation.isTag("restriction", "no_exit")) {
+    }
+    else if (relation.isTag("restriction", "no_exit")) {
       tag = new TurnRestrictionTag(
         via,
         TurnRestrictionType.NO_TURN,
         Direction.EXIT,
         relation.getId()
       );
-    } else {
+    }
+    else {
       issueStore.add(new TurnRestrictionUnknown(relation, relation.getTag("restriction")));
       return;
     }

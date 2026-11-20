@@ -83,7 +83,8 @@ class RouteMapper {
         lhs.getId()
       );
       lhs.withMode(TransitMode.BUS);
-    } else {
+    }
+    else {
       lhs.withMode(mode);
     }
 
@@ -105,7 +106,8 @@ class RouteMapper {
   private Collection<FeedScopedId> networkId(org.onebusaway.gtfs.model.Route rhs) {
     if (rhs.getNetworkId() == null) {
       return List.of();
-    } else {
+    }
+    else {
       return List.of(idFactory.createId(rhs.getNetworkId(), "route's network"));
     }
   }

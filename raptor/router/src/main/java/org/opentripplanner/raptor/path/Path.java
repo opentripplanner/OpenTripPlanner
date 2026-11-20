@@ -192,7 +192,8 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
             buf.accessEgress(accessLeg.access());
             addWalkDetails(detailed, buf, leg);
           }
-        } else {
+        }
+        else {
           buf.stop(leg.fromStop());
 
           if (detailed) {
@@ -223,7 +224,8 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
                 .getConstrainedTransferAfterLeg()
                 .getTransferConstraint();
             }
-          } else if (leg.isTransferLeg()) {
+          }
+          else if (leg.isTransferLeg()) {
             buf.walk(leg.duration());
             addWalkDetails(detailed, buf, leg);
           }

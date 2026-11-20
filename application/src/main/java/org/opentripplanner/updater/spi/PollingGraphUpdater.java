@@ -79,18 +79,22 @@ public abstract class PollingGraphUpdater<C> implements GraphUpdater<C> {
           this.getClass().getSimpleName()
         );
       }
-    } catch (InterruptedException e) {
+    }
+    catch (InterruptedException e) {
       Thread.currentThread().interrupt();
       LOG.info(
         "OTP is shutting down, polling updater {} was interrupted and is stopping.",
         this.getClass().getName()
       );
-    } catch (CancellationException e) {
+    }
+    catch (CancellationException e) {
       LOG.info("OTP is shutting down, the polling updater {} was interrupted", this, e);
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       LOG.error("Error while running polling updater {}", this, e);
       // TODO Should we cancel the task? Or after n consecutive failures? cancel();
-    } finally {
+    }
+    finally {
       primed = true;
     }
   }

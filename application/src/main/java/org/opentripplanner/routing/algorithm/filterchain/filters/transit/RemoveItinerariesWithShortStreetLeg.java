@@ -52,7 +52,8 @@ public class RemoveItinerariesWithShortStreetLeg implements RemoveItineraryFlagg
         .sum();
 
       return distance <= minDistance;
-    } else {
+    }
+    else {
       return false;
     }
   }

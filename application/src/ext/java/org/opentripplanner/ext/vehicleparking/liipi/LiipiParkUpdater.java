@@ -97,7 +97,8 @@ public class LiipiParkUpdater implements DataSource<VehicleParking> {
           lastFacilitiesFetchTime = System.currentTimeMillis();
         }
       }
-    } else {
+    }
+    else {
       parks = this.parks;
       hubForPark = this.hubForPark;
     }
@@ -116,7 +117,8 @@ public class LiipiParkUpdater implements DataSource<VehicleParking> {
             park.updateAvailability(createVehicleAvailability(patchesForPark));
           }
         });
-      } else if (this.parks != null) {
+      }
+      else if (this.parks != null) {
         return false;
       }
 

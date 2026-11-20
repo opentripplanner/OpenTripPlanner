@@ -33,7 +33,8 @@ public class GbfsVehicleRentalDataSource implements VehicleRentalDataSource {
   public void setup() {
     try {
       loaderAndMapper = GbfsFeedLoaderAndMapper.create(params, otpHttpClientFactory);
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       throw new UpdaterConstructionException(e);
     }
   }

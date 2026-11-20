@@ -33,7 +33,8 @@ public class TransmodelSchemaModule {
     if (routerConfig.transmodelApi().hideFeedId()) {
       String fixedFeedId = FixedFeedIdGenerator.generate(transitRepository.getAgencies());
       feedIdMapper = new HideFeedIdMapper(fixedFeedId);
-    } else {
+    }
+    else {
       feedIdMapper = new DefaultFeedIdMapper();
     }
 

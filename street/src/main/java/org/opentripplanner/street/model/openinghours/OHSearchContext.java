@@ -12,7 +12,8 @@ public class OHSearchContext {
     if (maxJourneyDuration.isNegative()) {
       this.searchStartTime = searchStartTime.plus(maxJourneyDuration);
       this.searchEndTime = searchStartTime;
-    } else {
+    }
+    else {
       this.searchStartTime = searchStartTime;
       this.searchEndTime = searchStartTime.plus(maxJourneyDuration);
     }

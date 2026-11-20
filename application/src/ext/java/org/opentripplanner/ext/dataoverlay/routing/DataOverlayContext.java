@@ -81,7 +81,8 @@ public class DataOverlayContext implements ExtensionRequestContext {
     if (value == null || value < 0d) {
       LOG.warn("Request parameter required. Parameter: {}", toStringKey(name, type));
       return true;
-    } else {
+    }
+    else {
       return false;
     }
   }

@@ -79,7 +79,8 @@ public final class StdStopArrivals<T extends RaptorTripSchedule> implements Best
 
     if (existingArrival instanceof AccessStopArrivalState) {
       ((AccessStopArrivalState<?>) existingArrival).setAccessTime(time, access, bestTime);
-    } else {
+    }
+    else {
       arrivals[round][stop] = new AccessStopArrivalState<>(
         time,
         access,

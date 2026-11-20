@@ -40,7 +40,8 @@ public class SiriAzureETUpdaterParameters
       try {
         // Don't include the preshared key
         return new ConnectionStringProperties(getServiceBusUrl()).getEndpoint().toString();
-      } catch (IllegalArgumentException ignore) {}
+      }
+      catch (IllegalArgumentException ignore) {}
     }
 
     return "unknown";

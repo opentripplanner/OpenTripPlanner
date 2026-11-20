@@ -169,7 +169,8 @@ public class ItineraryBuilder {
       .map(l -> {
         if (l instanceof TransitLeg tl) {
           return mapper.apply(tl);
-        } else {
+        }
+        else {
           return l;
         }
       })

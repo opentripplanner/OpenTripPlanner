@@ -141,7 +141,8 @@ class State {
     for (SingleCriteriaComparator comparator : comparators) {
       if (comparator.strictOrder()) {
         groups.add(createOrderedGroup(items, comparator));
-      } else {
+      }
+      else {
         groups.addAll(createUnorderedGroups(items, comparator));
       }
     }
@@ -169,7 +170,8 @@ class State {
 
       if (comparator.leftDominanceExist(item.item(), current.item())) {
         group.addNewDominantItem(item);
-      } else if (!comparator.leftDominanceExist(current.item(), item.item())) {
+      }
+      else if (!comparator.leftDominanceExist(current.item(), item.item())) {
         group.add(item);
       }
     }
@@ -201,7 +203,8 @@ class State {
             // Mutual dominance => the item belong in another group
             --groupCount;
           }
-        } else {
+        }
+        else {
           if (comparator.leftDominanceExist(item.item(), groupItem)) {
             group.removeAllItems();
           }

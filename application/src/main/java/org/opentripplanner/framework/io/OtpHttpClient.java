@@ -122,7 +122,8 @@ public class OtpHttpClient {
     return getAndMap(uri, timeout, headers, response -> {
       try {
         return objectMapper.readValue(response.body(), clazz);
-      } catch (Exception e) {
+      }
+      catch (Exception e) {
         throw new OtpHttpClientException(e);
       }
     });
@@ -148,7 +149,8 @@ public class OtpHttpClient {
     return getAndMap(uri, timeout, headers, response -> {
       try {
         return objectMapper.readTree(response.body());
-      } catch (Exception e) {
+      }
+      catch (Exception e) {
         throw new OtpHttpClientException(e);
       }
     });
@@ -304,7 +306,8 @@ public class OtpHttpClient {
 
     try {
       return httpClient.execute(httpRequest, responseHandler);
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       throw new OtpHttpClientException(e);
     }
   }
@@ -326,7 +329,8 @@ public class OtpHttpClient {
           response.getCode()
         );
         return responseMapper.apply(httpResponse);
-      } catch (Exception e) {
+      }
+      catch (Exception e) {
         throw new OtpHttpClientException(e);
       }
     }
@@ -347,7 +351,8 @@ public class OtpHttpClient {
         response.getCode()
       );
       return responseMapper.apply(httpResponse);
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       throw new OtpHttpClientException(e);
     }
   }
@@ -367,7 +372,8 @@ public class OtpHttpClient {
 
     try {
       downloadUrl = uri.toURL();
-    } catch (MalformedURLException e) {
+    }
+    catch (MalformedURLException e) {
       throw new OtpHttpClientException(e);
     }
 
@@ -375,13 +381,15 @@ public class OtpHttpClient {
 
     if (proto.equals("http") || proto.equals("https")) {
       return executeAndMap(request, timeout, headers, responseMapper);
-    } else {
+    }
+    else {
       // Local file probably, try standard java
       try (InputStream is = downloadUrl.openStream()) {
         // Create empty headers and status code OK for local file
         OtpHttpResponse httpResponse = new OtpHttpResponse(is, new Header[0], SC_OK);
         return responseMapper.apply(httpResponse);
-      } catch (Exception e) {
+      }
+      catch (Exception e) {
         throw new OtpHttpClientException(e);
       }
     }
@@ -430,7 +438,8 @@ public class OtpHttpClient {
           .collect(Collectors.joining("\n"));
         log.trace("HTTP request failed with status code {}: \n{}", response.getCode(), content);
       }
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       log.debug(e.getMessage());
     }
   }

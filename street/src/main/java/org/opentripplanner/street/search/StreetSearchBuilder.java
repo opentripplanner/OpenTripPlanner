@@ -144,7 +144,8 @@ public class StreetSearchBuilder {
   private RemainingWeightHeuristic<State> initializedHeuristic(Set<Vertex> goalVertices) {
     if (heuristic instanceof EuclideanRemainingWeightHeuristic euclideanHeuristic) {
       euclideanHeuristic.initialize(goalVertices, request);
-    } else if (heuristic != null) {
+    }
+    else if (heuristic != null) {
       throw new IllegalArgumentException("Unknown heuristic type: " + heuristic);
     }
 

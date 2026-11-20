@@ -110,7 +110,8 @@ class LegMapper {
       api.tripId = FeedScopedIdMapper.mapToApi(trip.getId());
       api.tripShortName = trip.getShortName();
       api.tripBlockId = trip.getGtfsBlockId();
-    } else if (domain instanceof StreetLeg streetLeg) {
+    }
+    else if (domain instanceof StreetLeg streetLeg) {
       api.transitLeg = false;
       api.mode = ModeMapper.mapToApi(streetLeg.getMode());
 

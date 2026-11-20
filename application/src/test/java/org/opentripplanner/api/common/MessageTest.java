@@ -43,7 +43,8 @@ public class MessageTest {
       for (var m : Message.values()) {
         assertEquals(m.get(), m.get(GERMANY));
       }
-    } finally {
+    }
+    finally {
       Locale.setDefault(sysDefaultLocale);
     }
   }

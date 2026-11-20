@@ -121,7 +121,8 @@ public class JourneyPatternType {
 
             if (geometry == null) {
               return null;
-            } else {
+            }
+            else {
               return EncodedPolyline.of(geometry);
             }
           })

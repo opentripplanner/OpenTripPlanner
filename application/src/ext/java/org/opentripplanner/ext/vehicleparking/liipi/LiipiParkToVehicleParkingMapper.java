@@ -134,7 +134,8 @@ public class LiipiParkToVehicleParkingMapper {
         )
         .vehicleParkingGroup(vehicleParkingGroup)
         .build();
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       LOG.warn("Error parsing park {}", vehicleParkId, e);
       return null;
     }

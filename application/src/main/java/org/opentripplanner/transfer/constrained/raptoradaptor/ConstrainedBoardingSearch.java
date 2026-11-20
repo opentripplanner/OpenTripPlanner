@@ -209,11 +209,13 @@ public final class ConstrainedBoardingSearch
 
         if (tx.applyToAllTargetTrips()) {
           return true;
-        } else if (tx.applyToTargetTrip(targetTrip)) {
+        }
+        else if (tx.applyToTargetTrip(targetTrip)) {
           if (onTripTxConstraint.isNotAllowed()) {
             useNextNormalTrip = true;
             continue outer;
-          } else {
+          }
+          else {
             return true;
           }
         }

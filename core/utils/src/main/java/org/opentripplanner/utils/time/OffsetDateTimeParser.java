@@ -36,7 +36,8 @@ public class OffsetDateTimeParser {
   public static OffsetDateTime parseLeniently(CharSequence input) throws ParseException {
     try {
       return OffsetDateTime.parse(input, LENIENT_PARSER);
-    } catch (DateTimeParseException e) {
+    }
+    catch (DateTimeParseException e) {
       throw new ParseException(e.getParsedString(), e.getErrorIndex());
     }
   }

@@ -61,7 +61,8 @@ public class EmpiricalDelayCsvDataReader {
     try {
       readCalendarFile(calendarDataSource);
       readTripDelays(delayDataSource, feedId);
-    } catch (HeadersDoNotMatch e) {
+    }
+    catch (HeadersDoNotMatch e) {
       LOG.error(e.getMessage());
     }
   }

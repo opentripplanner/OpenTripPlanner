@@ -94,7 +94,8 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
         createMinSafeTxTimeService(),
         transferWaitTimeCalculator
       );
-    } else {
+    }
+    else {
       var transfersPermutationService = createOptimizePathService(
         pathTransferGenerator,
         null,

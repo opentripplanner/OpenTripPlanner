@@ -122,7 +122,8 @@ class ServiceCalendarFrameParser extends NetexParser<ServiceCalendarFrame_Versio
   private void parseOperatingPeriod(Object operatingPeriod) {
     if (operatingPeriod instanceof OperatingPeriod_VersionStructure op) {
       operatingPeriods.add(op);
-    } else {
+    }
+    else {
       NetexParser.warnOnMissingMapping(LOG, operatingPeriod);
     }
   }

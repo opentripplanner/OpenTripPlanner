@@ -323,10 +323,12 @@ public class TransitRouter {
           CompletableFuture.runAsync(() -> accessList.addAll(fetchAccess(fetchAccessEgress))),
           CompletableFuture.runAsync(() -> egressList.addAll(fetchEgress(fetchAccessEgress)))
         ).join();
-      } catch (CompletionException e) {
+      }
+      catch (CompletionException e) {
         RoutingValidationException.unwrapAndRethrowCompletionException(e);
       }
-    } else {
+    }
+    else {
       accessList.addAll(fetchAccess(fetchAccessEgress));
       egressList.addAll(fetchEgress(fetchAccessEgress));
     }

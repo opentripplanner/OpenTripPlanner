@@ -71,10 +71,12 @@ public final class DateTimeScalarFactory {
 
                 if (temporalAccessor instanceof LocalDateTime localDateTime) {
                   instant = localDateTime.atZone(timeZone).toInstant();
-                } else {
+                }
+                else {
                   instant = Instant.from(temporalAccessor);
                 }
-              } catch (DateTimeParseException dtpe) {
+              }
+              catch (DateTimeParseException dtpe) {
                 // ignored
               }
             }

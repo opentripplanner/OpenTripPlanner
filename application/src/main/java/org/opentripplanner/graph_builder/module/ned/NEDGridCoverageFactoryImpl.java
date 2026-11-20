@@ -49,7 +49,8 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
 
     try {
       this.datumUrl = datumUrl.toURL();
-    } catch (MalformedURLException e) {
+    }
+    catch (MalformedURLException e) {
       throw new RuntimeException(e);
     }
   }
@@ -107,7 +108,8 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
 
       try {
         fetchDatum();
-      } catch (Exception ex) {
+      }
+      catch (Exception ex) {
         LOG.error("Exception while fetching datum files from the web.");
         throw new RuntimeException(ex);
       }
@@ -171,7 +173,8 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
           VerticalDatum datum = VerticalDatum.fromGTX(cacheDir.entry(filename).asInputStream());
           datums.add(datum);
         }
-      } catch (IOException e) {
+      }
+      catch (IOException e) {
         LOG.error("Datum file has disappeared since preflight inputs check.");
         throw new RuntimeException(e);
       }

@@ -42,7 +42,8 @@ class TableRowFormatter {
     for (int i = 0; i < values.size(); ++i) {
       if (i != 0) {
         buf.append(AIR).append(SEP).append(AIR);
-      } else if (includeBoarder) {
+      }
+      else if (includeBoarder) {
         buf.append(SEP).append(AIR);
       }
 

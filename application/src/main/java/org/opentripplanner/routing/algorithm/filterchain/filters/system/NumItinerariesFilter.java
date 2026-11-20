@@ -43,7 +43,8 @@ public class NumItinerariesFilter implements RemoveItineraryFlagger {
 
       itinerariesToRemove = itineraries.subList(0, limit);
       itinerariesToKeep = itineraries.subList(limit, itineraries.size());
-    } else {
+    }
+    else {
       itinerariesToRemove = itineraries.subList(maxLimit, itineraries.size());
       itinerariesToKeep = itineraries.subList(0, maxLimit);
     }

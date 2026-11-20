@@ -295,7 +295,8 @@ class AddedTripBuilder {
         dataSource,
         null
       );
-    } catch (DataValidationException e) {
+    }
+    catch (DataValidationException e) {
       throw DataValidationExceptionMapper.map(e);
     }
   }

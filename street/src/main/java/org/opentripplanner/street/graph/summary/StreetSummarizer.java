@@ -138,7 +138,8 @@ class StreetSummarizer {
   private static String summarizeBoolean(boolean b) {
     if (b) {
       return "✅";
-    } else {
+    }
+    else {
       return "❌";
     }
   }

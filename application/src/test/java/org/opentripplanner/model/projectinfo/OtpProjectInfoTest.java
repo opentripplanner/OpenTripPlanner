@@ -30,7 +30,8 @@ public class OtpProjectInfoTest {
       assertNotNull(p.versionControl.branch);
       assertNotNull(p.versionControl.buildTime);
       assertNotNull(p.versionControl.commitTime);
-    } else {
+    }
+    else {
       assertEquals("UNKNOWN", p.graphFileHeaderInfo.otpSerializationVersionIdPadded());
       assertEquals("UNKNOWN", p.versionControl.commit);
       assertEquals("UNKNOWN", p.versionControl.branch);

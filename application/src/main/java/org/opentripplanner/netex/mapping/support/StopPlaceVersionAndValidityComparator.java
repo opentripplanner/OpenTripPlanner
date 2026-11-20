@@ -19,7 +19,8 @@ public class StopPlaceVersionAndValidityComparator implements Comparator<StopPla
     // If both are equally valid, sort by version
     if (compareValue == 0) {
       return NetexVersionHelper.comparingVersion().compare(s2, s1);
-    } else {
+    }
+    else {
       return compareValue;
     }
   }

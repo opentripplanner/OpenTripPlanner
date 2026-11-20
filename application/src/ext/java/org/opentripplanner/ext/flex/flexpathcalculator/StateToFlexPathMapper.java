@@ -34,7 +34,8 @@ class StateToFlexPathMapper {
       if (state.getRequest().arriveBy()) {
         var geometries = Iterables.transform(state.listBackEdges(), Edge::getGeometry);
         return GeometryUtils.concatenateLineStrings(geometries);
-      } else {
+      }
+      else {
         var geometries = Iterables.transform(state.listBackEdges(), StateToFlexPathMapper::reverse);
         return GeometryUtils.concatenateLineStrings(geometries).reverse();
       }
@@ -52,7 +53,8 @@ class StateToFlexPathMapper {
 
     if (geom == null) {
       return null;
-    } else {
+    }
+    else {
       return geom.reverse();
     }
   }

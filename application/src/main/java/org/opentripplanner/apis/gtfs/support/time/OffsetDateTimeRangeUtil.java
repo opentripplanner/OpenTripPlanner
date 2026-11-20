@@ -47,7 +47,8 @@ public class OffsetDateTimeRangeUtil {
         start == null ? null : start.toInstant(),
         end == null ? null : end.toInstant()
       );
-    } catch (IllegalArgumentException e) {
+    }
+    catch (IllegalArgumentException e) {
       throw new InvalidInputException(
         "The start of the time range '%s' must not be after its end.".formatted(fieldName)
       );

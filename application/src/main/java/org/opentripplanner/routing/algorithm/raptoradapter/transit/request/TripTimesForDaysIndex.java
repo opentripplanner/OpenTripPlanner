@@ -75,7 +75,8 @@ final class TripTimesForDaysIndex {
 
         if (i < a.length) {
           u = a[i];
-        } else {
+        }
+        else {
           ++day;
 
           if (day == list.size()) {

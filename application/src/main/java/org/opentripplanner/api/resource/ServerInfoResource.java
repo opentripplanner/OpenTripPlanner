@@ -49,7 +49,8 @@ public class ServerInfoResource {
       }
 
       fis.close();
-    } catch (Exception ignore) {}
+    }
+    catch (Exception ignore) {}
 
     return new ApiServerInfo(cpuName, nCores, OtpProjectInfo.projectInfo());
   }

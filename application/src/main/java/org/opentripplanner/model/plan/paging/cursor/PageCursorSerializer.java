@@ -127,7 +127,8 @@ final class PageCursorSerializer {
         itineraryPageCut,
         generalizedCostMaxLimit
       );
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       String details = e.getMessage();
       String message = "Unable to decode page cursor: '" + cursor + "'.";
 

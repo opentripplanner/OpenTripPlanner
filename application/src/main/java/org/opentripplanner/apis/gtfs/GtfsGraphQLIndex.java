@@ -74,7 +74,8 @@ class GtfsGraphQLIndex {
 
     try {
       return graphQL.executeAsync(executionInput).get(timeoutMs, TimeUnit.MILLISECONDS);
-    } catch (InterruptedException | ExecutionException | TimeoutException e) {
+    }
+    catch (InterruptedException | ExecutionException | TimeoutException e) {
       return new AbortExecutionException(e).toExecutionResult();
     }
   }

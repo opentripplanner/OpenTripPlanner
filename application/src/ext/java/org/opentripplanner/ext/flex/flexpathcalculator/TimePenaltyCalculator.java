@@ -30,7 +30,8 @@ public class TimePenaltyCalculator implements FlexPathCalculator {
 
     if (path == null) {
       return null;
-    } else {
+    }
+    else {
       return path.withTimePenalty(penalty);
     }
   }

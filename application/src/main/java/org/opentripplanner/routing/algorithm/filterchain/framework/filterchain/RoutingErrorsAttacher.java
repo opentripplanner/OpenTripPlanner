@@ -69,7 +69,8 @@ public class RoutingErrorsAttacher {
         if (nonTransitIsWalking) {
           routingErrors.add(new RoutingError(WALKING_BETTER_THAN_TRANSIT, null));
         }
-      } else if (
+      }
+      else if (
         filteredItineraries
           .stream()
           .allMatch(isOnStreetAllTheWay.or(OutsideSearchWindowFilter::taggedBy))

@@ -30,7 +30,8 @@ sealed interface LegOffer {
   static LegOffer of(FareOffer offer, TransitLeg startLeg, FareTransferRule transferRule) {
     if (transferRule.timeLimit().isEmpty()) {
       return new DefaultLegOffer(offer);
-    } else {
+    }
+    else {
       return new TimeLimitedOffer(offer, transferRule.timeLimit().get(), startLeg);
     }
   }

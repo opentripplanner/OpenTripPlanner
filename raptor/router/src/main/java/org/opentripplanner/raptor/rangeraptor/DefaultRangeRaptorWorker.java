@@ -234,7 +234,8 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule> implem
       if (calculator.alightingPossibleAt(pattern, stopPos)) {
         if (enableTransferConstraints && txSearch.transferExistSourceStop(stopPos)) {
           transitWorker.alightConstrainedTransferExist(stopIndex, stopPos, alightSlack);
-        } else {
+        }
+        else {
           transitWorker.alightOnlyRegularTransferExist(stopIndex, stopPos, alightSlack);
         }
       }
@@ -260,7 +261,8 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule> implem
           // has constrained transfers
           if (enableTransferConstraints && txSearch.transferExistTargetStop(stopPos)) {
             transitWorker.boardWithConstrainedTransfer(stopIndex, stopPos, boardSlack, txSearch);
-          } else {
+          }
+          else {
             transitWorker.boardWithRegularTransfer(stopIndex, stopPos, boardSlack);
           }
         }

@@ -222,7 +222,8 @@ public class WalkableAreaBuilder {
 
     if (cachedPairs != null) {
       replayVisibilityEdges(cachedPairs, ringSetData, group);
-    } else {
+    }
+    else {
       List<VisibilityPair> visiblePairs = computeVisiblePairs(ringSetData);
       VisibilityEdgesResult visEdges = addVisibilityEdges(visiblePairs, group);
 
@@ -553,9 +554,11 @@ public class WalkableAreaBuilder {
 
     if (firstEdge.getPermission().allows(StreetTraversalPermission.PEDESTRIAN)) {
       mode = StreetMode.WALK;
-    } else if (firstEdge.getPermission().allows(StreetTraversalPermission.BICYCLE)) {
+    }
+    else if (firstEdge.getPermission().allows(StreetTraversalPermission.BICYCLE)) {
       mode = StreetMode.BIKE;
-    } else {
+    }
+    else {
       mode = StreetMode.CAR;
     }
 
@@ -588,7 +591,8 @@ public class WalkableAreaBuilder {
     for (Edge edge : edges) {
       if (!usedEdges.contains(edge) && !edgesToKeep.contains(edge)) {
         graph.removeEdge(edge);
-      } else if (!edgesToKeep.contains(edge)) {
+      }
+      else if (!edgesToKeep.contains(edge)) {
         survivingVisibilityEdges.add(edge);
       }
     }

@@ -131,7 +131,8 @@ public class DefaultTransitService implements TransitService {
       !this.getServiceCodesRunningForDate(serviceDate).contains(times.getServiceCode())
     ) {
       return Optional.empty();
-    } else {
+    }
+    else {
       Instant midnight = ServiceDateUtils.asStartOfService(
         serviceDate,
         this.getTimeZone()
@@ -713,7 +714,8 @@ public class DefaultTransitService implements TransitService {
   private Stream<TransitMode> getPatternModesOfStop(StopLocation stop) {
     if (stop.getVehicleType() != null) {
       return Stream.of(stop.getVehicleType());
-    } else {
+    }
+    else {
       return findPatterns(stop).stream().map(TripPattern::getMode);
     }
   }
@@ -730,7 +732,8 @@ public class DefaultTransitService implements TransitService {
     public int compare(TripOnServiceDate t1, TripOnServiceDate t2) {
       if (t1.getServiceDate().isBefore(t2.getServiceDate())) {
         return -1;
-      } else if (t2.getServiceDate().isBefore(t1.getServiceDate())) {
+      }
+      else if (t2.getServiceDate().isBefore(t1.getServiceDate())) {
         return 1;
       }
 
@@ -739,9 +742,11 @@ public class DefaultTransitService implements TransitService {
 
       if (departure1 < departure2) {
         return -1;
-      } else if (departure1 > departure2) {
+      }
+      else if (departure1 > departure2) {
         return 1;
-      } else {
+      }
+      else {
         // identical departure day and time, so sort by unique feed-scoped id
         return t1.getTrip().getId().compareTo(t2.getTrip().getId());
       }

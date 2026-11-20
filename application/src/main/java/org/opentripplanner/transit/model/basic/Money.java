@@ -58,7 +58,8 @@ public class Money implements Comparable<Money>, Serializable {
 
     if (first.greaterThan(second)) {
       return first;
-    } else {
+    }
+    else {
       return second;
     }
   }
@@ -212,7 +213,8 @@ public class Money implements Comparable<Money>, Serializable {
   public boolean equals(Object obj) {
     if (obj instanceof Money other) {
       return other.amount == this.amount && other.currency == this.currency;
-    } else {
+    }
+    else {
       return false;
     }
   }

@@ -77,13 +77,16 @@ public class DecorateWithRideHailing implements ItineraryListFilter {
         if (estimates.isEmpty()) {
           flagForDeletion(i);
           return leg;
-        } else {
+        }
+        else {
           return new RideHailingLeg(sl, service.provider(), estimates.get(0));
         }
-      } else {
+      }
+      else {
         return leg;
       }
-    } catch (ExecutionException e) {
+    }
+    catch (ExecutionException e) {
       LOG.error("Could not get ride hailing estimate for {}", service.provider(), e);
       flagForDeletion(i);
       return leg;

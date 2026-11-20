@@ -257,7 +257,8 @@ public class VertexGenerator {
 
         if (node.getId() == firstNodeRef) {
           return List.of(levels.getFirst());
-        } else if (node.getId() == lastNodeRef) {
+        }
+        else if (node.getId() == lastNodeRef) {
           return List.of(levels.getLast());
         }
       }
@@ -289,7 +290,8 @@ public class VertexGenerator {
         (LongProcedure) node -> {
           if (possibleIntersectionNodes.contains(node)) {
             intersectionNodes.put(node, null);
-          } else {
+          }
+          else {
             possibleIntersectionNodes.add(node);
           }
         }
@@ -426,7 +428,8 @@ public class VertexGenerator {
 
       if (possibleIntersectionNodes.contains(nodeId)) {
         intersectionNodes.put(nodeId, null);
-      } else {
+      }
+      else {
         possibleIntersectionNodes.add(nodeId);
       }
     }

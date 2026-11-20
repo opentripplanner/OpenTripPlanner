@@ -503,7 +503,8 @@ public interface Leg {
   private static Stream<FareZone> fareZones(Place place) {
     if (place.stop == null) {
       return Stream.empty();
-    } else {
+    }
+    else {
       return place.stop.getFareZones().stream();
     }
   }

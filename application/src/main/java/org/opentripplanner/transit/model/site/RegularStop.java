@@ -98,7 +98,8 @@ public final class RegularStop
   public ZoneId getTimeZone() {
     if (timeZone != null) {
       return timeZone;
-    } else if (isPartOfStation()) {
+    }
+    else if (isPartOfStation()) {
       return getParentStation().getTimezone();
     }
 

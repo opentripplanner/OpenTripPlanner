@@ -30,7 +30,8 @@ final class PreciseBufferFactory {
       CoordinateReferenceSystem auto = CRS.decode(code);
       this.toTransform = CRS.findMathTransform(DefaultGeographicCRS.WGS84, auto);
       this.fromTransform = CRS.findMathTransform(auto, DefaultGeographicCRS.WGS84);
-    } catch (FactoryException e) {
+    }
+    catch (FactoryException e) {
       throw new RuntimeException(e);
     }
   }
@@ -50,7 +51,8 @@ final class PreciseBufferFactory {
       Geometry pGeom = JTS.transform(geometry, toTransform);
       Geometry pBufferedGeom = pGeom.buffer(distanceInMeters, 4, BufferParameters.CAP_FLAT);
       return JTS.transform(pBufferedGeom, fromTransform);
-    } catch (TransformException e) {
+    }
+    catch (TransformException e) {
       throw new RuntimeException(e);
     }
   }

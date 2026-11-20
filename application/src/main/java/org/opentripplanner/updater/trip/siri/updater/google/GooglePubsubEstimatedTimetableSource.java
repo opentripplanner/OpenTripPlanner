@@ -162,13 +162,15 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
           subscriber.startAsync().awaitRunning();
           primed = true;
           subscriber.awaitTerminated();
-        } catch (IllegalStateException e) {
+        }
+        catch (IllegalStateException e) {
           subscriber.stopAsync();
         }
 
         Thread.sleep(reconnectPeriod.toMillis());
       }
-    } catch (InterruptedException ie) {
+    }
+    catch (InterruptedException ie) {
       Thread.currentThread().interrupt();
       LOG.info("OTP is shutting down, stopping the SIRI ET Google PubSub Updater.");
     }
@@ -188,7 +190,8 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
 
     if (hostname == null || hostname.isEmpty()) {
       return SUBSCRIPTION_PREFIX + "otp-" + UUID.randomUUID();
-    } else {
+    }
+    else {
       return SUBSCRIPTION_PREFIX + hostname + '-' + Instant.now().toEpochMilli();
     }
   }
@@ -214,7 +217,8 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
           )
           .build()
       );
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       // Google libraries expects credentials json-file either as
       //   Path is stored in environment variable "GOOGLE_APPLICATION_CREDENTIALS"
       //   (https://cloud.google.com/docs/authentication/getting-started)
@@ -237,9 +241,11 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
         subscriptionName,
         DurationUtils.durationToStr(Duration.between(startTime, Instant.now()))
       );
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       LOG.error("Could not delete subscription {}", subscriptionName);
-    } catch (NotFoundException nfe) {
+    }
+    catch (NotFoundException nfe) {
       LOG.info("Subscription {} not found, ignoring deletion request", subscriptionName);
     }
   }
@@ -252,7 +258,8 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
 
     try {
       siri = SiriXml.parseXml(data.newInput());
-    } catch (XMLStreamException | JAXBException e) {
+    }
+    catch (XMLStreamException | JAXBException e) {
       throw new RuntimeException(e);
     }
 
@@ -273,10 +280,12 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
       serviceDelivery.map(serviceDeliveryConsumer).ifPresent(future -> {
         try {
           future.get();
-        } catch (InterruptedException e) {
+        }
+        catch (InterruptedException e) {
           Thread.currentThread().interrupt();
           throw new RuntimeException(e);
-        } catch (ExecutionException e) {
+        }
+        catch (ExecutionException e) {
           throw new RuntimeException(e);
         }
       });
@@ -355,7 +364,8 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
         .getFirst()
         .getEstimatedVehicleJourneies()
         .size();
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       //ignore
     }
 

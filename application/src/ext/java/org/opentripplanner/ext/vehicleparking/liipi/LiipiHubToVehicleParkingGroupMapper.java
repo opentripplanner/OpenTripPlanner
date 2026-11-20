@@ -74,7 +74,8 @@ public class LiipiHubToVehicleParkingGroupMapper {
       );
 
       return hubForPark;
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       LOG.warn("Error parsing hub {}", hubId, e);
       return null;
     }

@@ -136,7 +136,8 @@ public class RouteImpl implements GraphQLDataFetchers.GraphQLRoute {
           }
         });
         return alerts.stream().distinct().collect(Collectors.toList());
-      } else {
+      }
+      else {
         return getAlertService(environment).getRouteAlerts(getSource(environment).getId());
       }
     };
@@ -207,7 +208,8 @@ public class RouteImpl implements GraphQLDataFetchers.GraphQLRoute {
           transitService
         );
         return filter.filterPatterns(patterns);
-      } else {
+      }
+      else {
         return patterns;
       }
     };

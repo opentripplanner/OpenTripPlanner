@@ -22,7 +22,8 @@ class StopConsolidationParserTest {
         List.of("pierce:1705867009"),
         first.secondaries().stream().map(FeedScopedId::toString).toList()
       );
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       throw new RuntimeException(e);
     }
   }

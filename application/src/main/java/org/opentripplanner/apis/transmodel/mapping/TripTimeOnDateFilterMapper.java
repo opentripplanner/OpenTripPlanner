@@ -107,7 +107,8 @@ public class TripTimeOnDateFilterMapper {
           for (var subMode : transportSubModes) {
             tModes.add(new MainAndSubMode(mainMode, SubMode.of(subMode.getValue())));
           }
-        } else {
+        }
+        else {
           tModes.add(new MainAndSubMode(mainMode));
         }
       }

@@ -127,7 +127,8 @@ public class EdgePropertyMapper extends PropertyMapper<Edge> {
 
     if (se.nameIsDerived()) {
       props.addFirst(kv("name", "%s (generated)".formatted(se.getName().toString())));
-    } else {
+    }
+    else {
       props.addFirst(kv("name", se.getName().toString()));
     }
 

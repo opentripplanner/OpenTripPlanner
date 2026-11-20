@@ -80,7 +80,8 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
       var dynamicRequest = requestWithDynamicSearchParams(originalRequest);
 
       return createAndRunDynamicRRWorker(dynamicRequest);
-    } catch (DestinationNotReachedException e) {
+    }
+    catch (DestinationNotReachedException e) {
       return new RaptorResponse<>(
         Collections.emptyList(),
         null,
@@ -128,7 +129,8 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
   private void runHeuristics() {
     if (isItPossibleToRunHeuristicsInParallel()) {
       runHeuristicsInParallel();
-    } else {
+    }
+    else {
       runHeuristicsSequentially();
     }
 
@@ -147,7 +149,8 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
         getDestinationHeuristics(),
         extraMcSearch
       );
-    } else {
+    }
+    else {
       raptorRouter = config.createRangeRaptorWithStdWorker(data, request);
     }
 
@@ -191,12 +194,14 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
       LOG.debug(
         "Route using RangeRaptor - " + "REVERSE and FORWARD heuristic search performed in parallel."
       );
-    } catch (InterruptedException e) {
+    }
+    catch (InterruptedException e) {
       Thread.currentThread().interrupt();
       // propagate interruption to the running task.
       asyncResult.cancel(true);
       throw config.mapInterruptedException(e);
-    } catch (ExecutionException e) {
+    }
+    catch (ExecutionException e) {
       if (e.getCause() instanceof DestinationNotReachedException dnr) {
         throw dnr;
       }

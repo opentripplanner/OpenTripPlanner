@@ -172,7 +172,8 @@ public class TransitRepository implements Serializable {
       // We use the agency timezone unless the timezone is specifically set.
       if (timeZone == null) {
         timeZone = agency.getTimezone();
-      } else if (!timeZone.equals(agency.getTimezone())) {
+      }
+      else if (!timeZone.equals(agency.getTimezone())) {
         /*
          * OTP doesn't currently support multiple time zones in a single graph, unless explicitly
          * configured. Check that the time zone of the added agencies are the same as the current.

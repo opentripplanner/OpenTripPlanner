@@ -36,7 +36,8 @@ public class LogMDCSupport {
     if (enabled && StringUtils.hasValue(key)) {
       if (StringUtils.hasValue(value)) {
         MDC.put(key, value);
-      } else {
+      }
+      else {
         MDC.remove(key);
       }
     }

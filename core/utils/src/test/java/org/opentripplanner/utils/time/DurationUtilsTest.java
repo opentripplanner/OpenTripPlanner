@@ -246,7 +246,8 @@ public class DurationUtilsTest {
       assertEquals("9.9 seconds", DurationUtils.msToSecondsStr(9_949));
       assertEquals("10 seconds", DurationUtils.msToSecondsStr(9_950));
       assertEquals("-0.456 seconds", DurationUtils.msToSecondsStr(-456));
-    } finally {
+    }
+    finally {
       Locale.setDefault(defaultLocale);
     }
   }

@@ -55,7 +55,8 @@ public final class TestCostCalculator implements RaptorCostCalculator<TestTripSc
   ) {
     if (transferConstraints.isRegularTransfer()) {
       return boardingCostRegularTransfer(firstBoarding, prevArrivalTime, boardStopIndex, boardTime);
-    } else {
+    }
+    else {
       return boardingCostConstrainedTransfer(
         prevArrivalTime,
         boardStopIndex,
@@ -107,7 +108,8 @@ public final class TestCostCalculator implements RaptorCostCalculator<TestTripSc
         (boardCost + transferCost) * minNumTransfers +
         TRANSIT_RELUCTANCE * minTravelDuration
       );
-    } else {
+    }
+    else {
       // Remove cost that was added during alighting similar as we do in the costEgress() method
       return stopBoardAlightTransferCosts == null
         ? TRANSIT_RELUCTANCE * minTravelDuration
@@ -119,14 +121,16 @@ public final class TestCostCalculator implements RaptorCostCalculator<TestTripSc
   public int costEgress(int stopIndex, boolean hasRides) {
     if (hasRides) {
       return transferCost;
-    } else if (stopBoardAlightTransferCosts != null) {
+    }
+    else if (stopBoardAlightTransferCosts != null) {
       // Remove cost that was added during alighting.
       // We do not want to add this cost on last alighting since it should only be applied on
       // transfers
       // It has to be done here because during alighting we do not know yet if it will be
       // a transfer or not.
       return -stopBoardAlightTransferCosts[stopIndex];
-    } else {
+    }
+    else {
       return 0;
     }
   }
@@ -183,7 +187,8 @@ public final class TestCostCalculator implements RaptorCostCalculator<TestTripSc
       // transit reluctance and wait reluctance is also small, so we ignore this.
       //
       return TRANSIT_RELUCTANCE * boardWaitTime;
-    } else if (tx.isGuaranteed()) {
+    }
+    else if (tx.isGuaranteed()) {
       // For a guaranteed transfer we skip board- and transfer-cost
       final int boardWaitTime = boardTime - prevArrivalTime;
 

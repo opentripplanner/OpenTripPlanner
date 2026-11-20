@@ -150,7 +150,8 @@ class OtpHttpClientTest {
       // Read the body
       try {
         return new String(response.body().readAllBytes(), StandardCharsets.UTF_8);
-      } catch (IOException e) {
+      }
+      catch (IOException e) {
         throw new RuntimeException(e);
       }
     });
@@ -238,7 +239,8 @@ class OtpHttpClientTest {
 
       try {
         return new String(response.body().readAllBytes(), StandardCharsets.UTF_8);
-      } catch (IOException e) {
+      }
+      catch (IOException e) {
         throw new RuntimeException(e);
       }
     });
@@ -272,7 +274,8 @@ class OtpHttpClientTest {
 
       try {
         return new String(response.body().readAllBytes(), StandardCharsets.UTF_8);
-      } catch (IOException e) {
+      }
+      catch (IOException e) {
         throw new RuntimeException(e);
       }
     });

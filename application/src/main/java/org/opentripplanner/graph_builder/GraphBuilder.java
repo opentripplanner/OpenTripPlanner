@@ -258,10 +258,12 @@ public class GraphBuilder implements Runnable {
       );
 
       validate();
-    } finally {
+    }
+    finally {
       try {
         cacheManager.close();
-      } finally {
+      }
+      finally {
         closeDataSources();
       }
     }
@@ -313,7 +315,8 @@ public class GraphBuilder implements Runnable {
   private void closeDataSources() {
     try {
       closeDataSourcesHandle.close();
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       throw new RuntimeException(e);
     }
   }

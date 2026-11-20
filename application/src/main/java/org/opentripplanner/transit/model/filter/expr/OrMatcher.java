@@ -36,7 +36,8 @@ public final class OrMatcher<T> implements Matcher<T> {
     for (Matcher<T> it : matchers) {
       if (it instanceof OrMatcher<T> orMatcher) {
         expr.addAll(Arrays.asList(orMatcher.matchers));
-      } else {
+      }
+      else {
         expr.add(it);
       }
     }

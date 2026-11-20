@@ -100,9 +100,11 @@ public class GtfsRealTimeUpdateHandler {
           forwardsDelayPropagationType
         );
         successes.add(result);
-      } catch (DataValidationException e) {
+      }
+      catch (DataValidationException e) {
         errors.add(DataValidationExceptionMapper.map(e).toError());
-      } catch (UpdateException e) {
+      }
+      catch (UpdateException e) {
         errors.add(e.toError());
       }
     }

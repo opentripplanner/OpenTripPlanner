@@ -68,7 +68,8 @@ public class MavenProjectVersion implements Serializable {
       }
 
       numFields = splitInotNumFields(version.substring(0, pos));
-    } else {
+    }
+    else {
       numFields = splitInotNumFields(version);
     }
 
@@ -95,7 +96,8 @@ public class MavenProjectVersion implements Serializable {
   private static int parseNumField(String field) {
     try {
       return Integer.parseInt(field);
-    } catch (NumberFormatException ignore) {
+    }
+    catch (NumberFormatException ignore) {
       return 0;
     }
   }

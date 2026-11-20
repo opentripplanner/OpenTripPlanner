@@ -103,7 +103,8 @@ class GroupOfStationsMapper {
       }
 
       return coordinate;
-    } catch (InvalidCoordinateException e) {
+    }
+    catch (InvalidCoordinateException e) {
       issueStore.add(
         "GroupOfStationInvalidCoordinates",
         "GroupOfStations %s has invalid coordinates, the coordinates are ignored. %s",
@@ -123,7 +124,8 @@ class GroupOfStationsMapper {
 
       if (station != null) {
         groupOfStations.addChildStation(station);
-      } else {
+      }
+      else {
         issueStore.add(
           "GroupOfStationWithoutStations",
           "GroupOfStation %s child not found: %s",
@@ -152,7 +154,8 @@ class GroupOfStationsMapper {
   private StopLocationsGroup lookupStation(FeedScopedId stationId) {
     if (stations.containsKey(stationId)) {
       return stations.get(stationId);
-    } else if (multiModalStations.containsKey(stationId)) {
+    }
+    else if (multiModalStations.containsKey(stationId)) {
       return multiModalStations.get(stationId);
     }
 

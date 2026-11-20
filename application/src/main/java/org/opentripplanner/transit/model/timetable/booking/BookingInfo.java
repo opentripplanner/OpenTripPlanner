@@ -65,12 +65,14 @@ public class BookingInfo implements Serializable {
       this.latestBookingTime = builder.latestBookingTime;
       this.minimumBookingNotice = null;
       this.maximumBookingNotice = null;
-    } else if (builder.minimumBookingNotice != null || builder.maximumBookingNotice != null) {
+    }
+    else if (builder.minimumBookingNotice != null || builder.maximumBookingNotice != null) {
       this.earliestBookingTime = null;
       this.latestBookingTime = null;
       this.minimumBookingNotice = builder.minimumBookingNotice;
       this.maximumBookingNotice = builder.maximumBookingNotice;
-    } else {
+    }
+    else {
       this.earliestBookingTime = null;
       this.latestBookingTime = null;
       this.minimumBookingNotice = null;

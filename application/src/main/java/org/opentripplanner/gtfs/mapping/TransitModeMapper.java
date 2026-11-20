@@ -22,9 +22,11 @@ public class TransitModeMapper {
     if (routeType >= 100 && routeType < 200) {
       // Railway Service
       return TransitMode.RAIL;
-    } else if (routeType >= 200 && routeType < 300) {
+    }
+    else if (routeType >= 200 && routeType < 300) {
       return TransitMode.COACH;
-    } else if (routeType >= 300 && routeType < 500) {
+    }
+    else if (routeType >= 300 && routeType < 500) {
       // Suburban Railway Service and Urban Railway service
       if (routeType >= 401 && routeType <= 402) {
         return TransitMode.SUBWAY;
@@ -35,45 +37,58 @@ public class TransitModeMapper {
       }
 
       return TransitMode.RAIL;
-    } else if (routeType >= 500 && routeType < 700) {
+    }
+    else if (routeType >= 500 && routeType < 700) {
       // Metro Service and Underground Service
       return TransitMode.SUBWAY;
-    } else if (routeType >= 700 && routeType < 800) {
+    }
+    else if (routeType >= 700 && routeType < 800) {
       // Bus Service
       return TransitMode.BUS;
-    } else if (routeType >= 800 && routeType < 900) {
+    }
+    else if (routeType >= 800 && routeType < 900) {
       // Trolleybus Service
       return TransitMode.TROLLEYBUS;
-    } else if (routeType >= 900 && routeType < 1000) {
+    }
+    else if (routeType >= 900 && routeType < 1000) {
       // Tram service
       return TransitMode.TRAM;
-    } else if (routeType >= 1000 && routeType < 1100) {
+    }
+    else if (routeType >= 1000 && routeType < 1100) {
       // Water Transport Service
       return TransitMode.FERRY;
-    } else if (routeType >= 1100 && routeType < 1200) {
+    }
+    else if (routeType >= 1100 && routeType < 1200) {
       // Air Service
       return TransitMode.AIRPLANE;
-    } else if (routeType >= 1200 && routeType < 1300) {
+    }
+    else if (routeType >= 1200 && routeType < 1300) {
       // Ferry Service
       return TransitMode.FERRY;
-    } else if (routeType >= 1300 && routeType < 1400) {
+    }
+    else if (routeType >= 1300 && routeType < 1400) {
       // Telecabin Service
       return TransitMode.GONDOLA;
-    } else if (routeType >= 1400 && routeType < 1500) {
+    }
+    else if (routeType >= 1400 && routeType < 1500) {
       // Funicular Service
       return TransitMode.FUNICULAR;
-    } else if (routeType >= 1551 && routeType < 1561) {
+    }
+    else if (routeType >= 1551 && routeType < 1561) {
       // Carpooling, not defined anywhere, so we've chosen this number space
       // see https://groups.google.com/g/gtfs-changes/c/keT5rTPS7Y0/m/71uMz2l6ke0J for an effort to
       // standardise
       return TransitMode.CARPOOL;
-    } else if (routeType >= 1500 && routeType < 1599) {
+    }
+    else if (routeType >= 1500 && routeType < 1599) {
       // Taxi Service
       return TransitMode.TAXI;
-    } else if (routeType >= 1600 && routeType < 1700) {
+    }
+    else if (routeType >= 1600 && routeType < 1700) {
       // Self drive
       return TransitMode.BUS;
-    } else if (routeType >= 1700 && routeType < 1800) {
+    }
+    else if (routeType >= 1700 && routeType < 1800) {
       // Miscellaneous Service
       return null;
     }

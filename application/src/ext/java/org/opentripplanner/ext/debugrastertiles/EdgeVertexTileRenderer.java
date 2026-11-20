@@ -179,7 +179,8 @@ public class EdgeVertexTileRenderer implements TileRenderer {
 
           previousLocation = currentLocation;
         }
-      } else {
+      }
+      else {
         context.graphics.setColor(evAttrs.color);
         context.graphics.draw(offsetShape);
       }

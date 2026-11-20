@@ -94,7 +94,8 @@ class PatternByServiceDatesFilterTest {
 
     if (expectation == NOT_REMOVED) {
       assertEquals(filterOutput, filterInput);
-    } else {
+    }
+    else {
       assertEquals(List.of(), filterOutput);
     }
   }
@@ -109,7 +110,8 @@ class PatternByServiceDatesFilterTest {
 
     if (expectation == NOT_REMOVED) {
       assertEquals(filterOutput, filterInput);
-    } else {
+    }
+    else {
       assertEquals(List.of(), filterOutput);
     }
   }

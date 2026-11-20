@@ -41,7 +41,8 @@ public class LegReferenceSerializer {
       typeEnum.getSerializer().write(legReference, out);
       out.flush();
       return Base64.getUrlEncoder().encodeToString(buf.toByteArray());
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       LOG.error("Failed to encode leg reference", e);
       return null;
     }
@@ -57,7 +58,8 @@ public class LegReferenceSerializer {
 
     try {
       serializedLegReference = Base64.getUrlDecoder().decode(legReference);
-    } catch (IllegalArgumentException e) {
+    }
+    catch (IllegalArgumentException e) {
       LOG.info("Unable to decode leg reference (invalid base64 encoding): '{}'", legReference, e);
       return null;
     }
@@ -69,7 +71,8 @@ public class LegReferenceSerializer {
 
       var type = readEnum(in, LegReferenceType.class);
       return type.getDeserializer().read(in);
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       LOG.warn(
         "Unable to decode leg reference (incompatible serialization format): '{}'",
         legReference,
@@ -89,7 +92,8 @@ public class LegReferenceSerializer {
       out.writeUTF(s.fromStopId().toString());
       out.writeUTF(s.toStopId().toString());
       out.writeUTF(s.tripOnServiceDateId() == null ? "" : s.tripOnServiceDateId().toString());
-    } else {
+    }
+    else {
       throw new IllegalArgumentException("Invalid LegReference type");
     }
   }

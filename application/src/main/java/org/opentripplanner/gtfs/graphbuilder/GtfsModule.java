@@ -191,7 +191,8 @@ public class GtfsModule implements GraphBuilderModule {
 
         fareServiceFactory.processGtfs(fareRulesData);
       }
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       throw new RuntimeException(e);
     }
 

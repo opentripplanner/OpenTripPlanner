@@ -141,7 +141,8 @@ public class TimetableUpdateMapper {
           timetable,
           timetable.getServiceDate()
         );
-      } catch (IllegalArgumentException exception) {
+      }
+      catch (IllegalArgumentException exception) {
         // There is some issue with finding the correct running period, using old pattern instead
         newTripPatternForDate = oldTripPatternForDate;
       }
@@ -168,7 +169,8 @@ public class TimetableUpdateMapper {
 
           if (previousTripPatternForDate != null) {
             previouslyUsedPatterns.add(previousTripPatternForDate);
-          } else {
+          }
+          else {
             LOG.debug(
               "NEW TripPatternForDate: {} - {}",
               newTripPatternForDate.getServiceDate(),
@@ -223,7 +225,8 @@ public class TimetableUpdateMapper {
             if (toRemove) {
               patternsForDate.remove(tripPatternForDate);
             }
-          } else {
+          }
+          else {
             // a previous FULL_DATASET update had real-time data for a trip, but the latest one
             // doesn't
             // therefore we remove it from the RAPTOR data

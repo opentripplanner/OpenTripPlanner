@@ -65,13 +65,17 @@ class TransmodelGraph {
       result = limitMaxNumberOfErrors(result);
 
       return ExecutionResultMapper.okResponse(result);
-    } catch (OTPRequestTimeoutException te) {
+    }
+    catch (OTPRequestTimeoutException te) {
       return ExecutionResultMapper.timeoutResponse();
-    } catch (ResponseTooLargeException rtle) {
+    }
+    catch (ResponseTooLargeException rtle) {
       return ExecutionResultMapper.tooLargeResponse(rtle.getMessage());
-    } catch (EntityNotFoundException | CoercingParseValueException | UnknownOperationException e) {
+    }
+    catch (EntityNotFoundException | CoercingParseValueException | UnknownOperationException e) {
       return ExecutionResultMapper.badRequestResponse(e.getMessage());
-    } catch (Exception systemError) {
+    }
+    catch (Exception systemError) {
       LOG.error(systemError.getMessage(), systemError);
       return ExecutionResultMapper.systemErrorResponse(systemError.getMessage());
     }

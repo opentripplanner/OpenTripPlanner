@@ -29,7 +29,8 @@ public record StreetEdgePair(@Nullable StreetEdge main, @Nullable StreetEdge bac
   public StreetEdge pickAny() {
     if (main != null) {
       return main;
-    } else if (back != null) {
+    }
+    else if (back != null) {
       return back;
     }
 

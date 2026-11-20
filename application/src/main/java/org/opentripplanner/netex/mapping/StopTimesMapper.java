@@ -297,7 +297,8 @@ class StopTimesMapper {
       if (Boolean.TRUE.equals(stopPoint.isIsWaitPoint()) && passingTime.getWaitingTime() != null) {
         stopTime.setTimepoint(1);
       }
-    } else if (
+    }
+    else if (
       passingTime.getEarliestDepartureTime() != null && passingTime.getLatestArrivalTime() != null
     ) {
       stopTime.setFlexWindowStart(
@@ -312,24 +313,29 @@ class StopTimesMapper {
           passingTime.getLatestArrivalDayOffset()
         )
       );
-    } else {
+    }
+    else {
       return null;
     }
 
     if (stopPoint != null) {
       if (isFalse(stopPoint.isForAlighting())) {
         stopTime.setDropOffType(NONE);
-      } else if (Boolean.TRUE.equals(stopPoint.isRequestStop())) {
+      }
+      else if (Boolean.TRUE.equals(stopPoint.isRequestStop())) {
         stopTime.setDropOffType(COORDINATE_WITH_DRIVER);
-      } else {
+      }
+      else {
         stopTime.setDropOffType(SCHEDULED);
       }
 
       if (isFalse(stopPoint.isForBoarding())) {
         stopTime.setPickupType(NONE);
-      } else if (Boolean.TRUE.equals(stopPoint.isRequestStop())) {
+      }
+      else if (Boolean.TRUE.equals(stopPoint.isRequestStop())) {
         stopTime.setPickupType(COORDINATE_WITH_DRIVER);
-      } else {
+      }
+      else {
         stopTime.setPickupType(SCHEDULED);
       }
 
@@ -361,7 +367,8 @@ class StopTimesMapper {
             if (currentHeadSignVias.isEmpty()) {
               currentHeadSignVias = null;
             }
-          } else {
+          }
+          else {
             currentHeadSignVias = null;
           }
         }
@@ -403,18 +410,21 @@ class StopTimesMapper {
 
     if (quayId != null) {
       stopLocation = stopsById.get(idFactory.createId(quayId));
-    } else if (stopPlaceId != null) {
+    }
+    else if (stopPlaceId != null) {
       // The validation normally drops assignments to missing or quay-less stop places, but corner
       // cases (e.g. a quay attached to two stop places) can still end up here, so we drop the stop.
       var station = stationsById.get(idFactory.createId(stopPlaceId));
       stopLocation = pickAnyChildStop(station);
-    } else if (flexibleStopPlaceId != null) {
+    }
+    else if (flexibleStopPlaceId != null) {
       AreaStop areaStop = flexibleStopLocationsById.get(idFactory.createId(flexibleStopPlaceId));
       GroupStop groupStop = groupStopById.get(idFactory.createId(flexibleStopPlaceId));
 
       if (areaStop != null) {
         stopLocation = areaStop;
-      } else {
+      }
+      else {
         stopLocation = groupStop;
       }
     }
@@ -458,7 +468,8 @@ class StopTimesMapper {
     if (lineRefStruct != null) {
       // Connect to Line referenced directly from ServiceJourney
       lineRef = lineRefStruct.getValue().getRef();
-    } else if (serviceJourney.getJourneyPatternRef() != null) {
+    }
+    else if (serviceJourney.getJourneyPatternRef() != null) {
       // Connect to Line referenced through JourneyPattern->Route
       lineRef = JourneyPatternHelper.getLineFromRoute(routeByid, journeyPattern);
     }

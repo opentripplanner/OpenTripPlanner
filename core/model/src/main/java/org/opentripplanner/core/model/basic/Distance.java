@@ -35,7 +35,8 @@ public class Distance {
   ) {
     if (distanceInMillimeters >= 0) {
       return Optional.of(new Distance(distanceInMillimeters));
-    } else {
+    }
+    else {
       validationErrorHandler.accept(
         "Distance must be greater or equal than 0, but was: " + distanceInMillimeters
       );
@@ -98,7 +99,8 @@ public class Distance {
       return ValueObjectToStringBuilder.of()
         .addNum((double) this.millimeters / (double) MILLIMETERS_PER_KM, "km")
         .toString();
-    } else {
+    }
+    else {
       return ValueObjectToStringBuilder.of()
         .addNum((double) this.millimeters / (double) MILLIMETERS_PER_M, "m")
         .toString();

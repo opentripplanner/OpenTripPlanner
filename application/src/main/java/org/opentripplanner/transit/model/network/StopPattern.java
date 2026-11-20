@@ -118,7 +118,8 @@ public final class StopPattern implements Serializable {
         Arrays.equals(this.pickups, that.pickups) &&
         Arrays.equals(this.dropoffs, that.dropoffs)
       );
-    } else {
+    }
+    else {
       return false;
     }
   }
@@ -129,7 +130,8 @@ public final class StopPattern implements Serializable {
   public boolean stopsEqual(Object other) {
     if (other instanceof StopPattern that) {
       return Arrays.equals(this.stops, that.stops);
-    } else {
+    }
+    else {
       return false;
     }
   }
@@ -268,7 +270,8 @@ public final class StopPattern implements Serializable {
   private static PickDrop computePickDrop(StopLocation stop, PickDrop pickDrop) {
     if (stop instanceof RegularStop) {
       return pickDrop;
-    } else {
+    }
+    else {
       return PickDrop.NONE;
     }
   }

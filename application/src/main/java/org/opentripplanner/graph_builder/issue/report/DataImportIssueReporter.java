@@ -80,18 +80,21 @@ public class DataImportIssueReporter implements GraphBuilderModule {
 
       try {
         HTMLWriter.forIndex(reportDirectory, keys, buckets).writeFile();
-      } catch (Exception e) {
+      }
+      catch (Exception e) {
         LOG.error("Index file couldn't be created:{}", e.getMessage());
       }
 
       LOG.info(progress.completeMessage());
       LOG.info("Data import issue report is in {}", reportDirectory.path());
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       // If the issue report fails due to a remote storage or network problem, then we log
       // the error an CONTINUE with the graph build process. Preventing OTP from saving the
       // Graph might have much bigger consequences than just failing to save the issue report.
       LOG.error("OTP failed to save issue report!", e);
-    } finally {
+    }
+    finally {
       closeReportDirectory();
     }
   }
@@ -110,7 +113,8 @@ public class DataImportIssueReporter implements GraphBuilderModule {
       //Removes all files from report directory
       try {
         reportDirectory.delete();
-      } catch (Exception e) {
+      }
+      catch (Exception e) {
         LOG.error(
           "Failed to clean HTML report directory: " +
             reportDirectory.path() +
@@ -176,7 +180,8 @@ public class DataImportIssueReporter implements GraphBuilderModule {
         for (int i = 0; i < partitions.size(); i++) {
           buckets.add(new Bucket(new BucketKey(key, i + 1), partitions.get(i), reported, total));
         }
-      } else {
+      }
+      else {
         buckets.add(new Bucket(new BucketKey(key, null), sortedIssues, reported, total));
       }
     }
@@ -187,7 +192,8 @@ public class DataImportIssueReporter implements GraphBuilderModule {
   private void closeReportDirectory() {
     try {
       reportDirectory.close();
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       LOG.warn(
         "Failed to close report directory: {}, details: {}. ",
         reportDirectory.path(),

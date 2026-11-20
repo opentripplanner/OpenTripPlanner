@@ -361,7 +361,8 @@ class TripPatternMapper {
         })
         .filter(Objects::nonNull)
         .toList();
-    } else {
+    }
+    else {
       replacementFor = List.of();
     }
 
@@ -387,7 +388,8 @@ class TripPatternMapper {
     if (journeyPattern.getRouteRef() != null) {
       Route route = routeById.lookup(journeyPattern.getRouteRef().getRef());
       lineId = route.getLineRef().getValue().getRef();
-    } else {
+    }
+    else {
       RouteView routeView = journeyPattern.getRouteView();
       lineId = routeView.getLineRef().getValue().getRef();
     }
@@ -410,11 +412,13 @@ class TripPatternMapper {
           "Trip %s does not contain any trip times.",
           trip.getId()
         );
-      } else {
+      }
+      else {
         try {
           var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, deduplicator);
           tripTimesResult.add(tripTimes);
-        } catch (DataValidationException e) {
+        }
+        catch (DataValidationException e) {
           issueStore.add(e.error());
         }
       }

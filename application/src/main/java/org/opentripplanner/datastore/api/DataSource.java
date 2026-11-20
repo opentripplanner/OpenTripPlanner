@@ -117,7 +117,8 @@ public interface DataSource {
   default byte[] asBytes() {
     try (var is = asInputStream()) {
       return is.readAllBytes();
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       throw new RuntimeException("Failed to read " + path() + ": " + e.getLocalizedMessage(), e);
     }
   }

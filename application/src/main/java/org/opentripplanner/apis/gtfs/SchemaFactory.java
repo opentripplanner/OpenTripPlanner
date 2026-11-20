@@ -223,7 +223,8 @@ public class SchemaFactory {
 
       SchemaGenerator schemaGenerator = new SchemaGenerator();
       return schemaGenerator.makeExecutableSchema(typeRegistry, runtimeWiring);
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       LOG.error("Unable to build GTFS GraphQL Schema", e);
       return null;
     }

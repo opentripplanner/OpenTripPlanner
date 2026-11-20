@@ -49,7 +49,8 @@ public class MarkdownFormatter {
   public static String header(int level, String header, @Nullable String anchor) {
     if (anchor != null && !anchor.isBlank()) {
       return "<h%d id=\"%s\">%s</h%d>".formatted(level, normalizeAnchor(anchor), header, level);
-    } else {
+    }
+    else {
       return "#".repeat(level) + " " + header;
     }
   }

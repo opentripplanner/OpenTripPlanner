@@ -102,7 +102,8 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
     if (time_ms == 0) {
       if (distance > 0) {
         time_ms = (long) ((1000.0 * distance) / request.walk().speed());
-      } else if (isStairs()) {
+      }
+      else if (isStairs()) {
         // 1 step corresponds to 20cm, doubling that to compensate for elevation;
         time_ms = (long) ((1000.0 * 0.4 * Math.abs(stairCount)) / request.walk().speed());
       }
@@ -118,7 +119,8 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
           wheelchairAccessible,
           isStairs()
         );
-      } else {
+      }
+      else {
         weight *= StreetEdgeReluctanceCalculator.computeReluctance(
           request,
           TraverseMode.WALK,
@@ -129,7 +131,8 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
 
       s1.incrementTimeInMilliseconds(time_ms);
       s1.incrementWeight(weight);
-    } else {
+    }
+    else {
       // elevators often don't have a traversal time, distance or stairCount, so we need to add
       // _some_ cost. the real cost is added in ElevatorHopEdge.
       // adding a cost of 1 is analogous to FreeEdge
@@ -173,7 +176,8 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
   public double getEffectiveWalkDistance() {
     if (traversalTime > 0) {
       return 0;
-    } else {
+    }
+    else {
       return distance;
     }
   }
@@ -190,7 +194,8 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
   public Optional<Duration> traversalTime() {
     if (traversalTime > 0) {
       return Optional.of(Duration.ofMillis(traversalTime));
-    } else {
+    }
+    else {
       return Optional.empty();
     }
   }

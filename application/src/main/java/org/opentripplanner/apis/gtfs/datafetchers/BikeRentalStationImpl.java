@@ -104,9 +104,11 @@ public class BikeRentalStationImpl implements GraphQLDataFetchers.GraphQLBikeRen
 
       if (rentalPlace.isFloatingVehicle() && rentalPlace.isAllowPickup()) {
         return STATE_ON;
-      } else if (rentalPlace.isAllowDropoff() && rentalPlace.isAllowPickup()) {
+      }
+      else if (rentalPlace.isAllowDropoff() && rentalPlace.isAllowPickup()) {
         return STATE_ON;
-      } else {
+      }
+      else {
         return STATE_OFF;
       }
     };

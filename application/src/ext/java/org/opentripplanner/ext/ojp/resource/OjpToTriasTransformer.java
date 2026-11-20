@@ -47,7 +47,8 @@ class OjpToTriasTransformer {
       var xmlSource = new StreamSource(new ByteArrayInputStream(outputStream.toByteArray()));
 
       ojpToTrias(writer, xmlSource);
-    } catch (IOException | JAXBException | TransformerException e) {
+    }
+    catch (IOException | JAXBException | TransformerException e) {
       throw new RuntimeException(e);
     }
   }
@@ -81,7 +82,8 @@ class OjpToTriasTransformer {
       var xslt = OjpToTriasTransformer.class.getResource(name).openStream();
       var xsltSource = new StreamSource(xslt);
       return SecureXml.transformerFactory().newTemplates(xsltSource);
-    } catch (TransformerConfigurationException | IOException e) {
+    }
+    catch (TransformerConfigurationException | IOException e) {
       throw new RuntimeException(e);
     }
   }
@@ -89,7 +91,8 @@ class OjpToTriasTransformer {
   private static JAXBContext jaxbContext() {
     try {
       return JAXBContext.newInstance(OJP.class);
-    } catch (JAXBException e) {
+    }
+    catch (JAXBException e) {
       throw new RuntimeException(e);
     }
   }

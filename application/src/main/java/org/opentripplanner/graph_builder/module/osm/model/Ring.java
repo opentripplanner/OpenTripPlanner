@@ -48,7 +48,8 @@ public class Ring {
 
     try {
       shell = factory.createLinearRing(vertices.toArray(new Coordinate[0]));
-    } catch (IllegalArgumentException e) {
+    }
+    catch (IllegalArgumentException e) {
       throw new RingConstructionException();
     }
 
@@ -118,7 +119,8 @@ public class Ring {
 
       if (boundary instanceof LinearRing) {
         lrholelist.add((LinearRing) boundary);
-      } else {
+      }
+      else {
         // this is a case of a hole inside a hole. OSM technically
         // allows this, but it would be a giant hassle to get right. So:
         LineString line = hole.getExteriorRing();

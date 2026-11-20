@@ -65,7 +65,8 @@ public class DateScalarFactory {
 
             try {
               return LocalDate.from(FORMATTER.parse(text));
-            } catch (DateTimeParseException e) {
+            }
+            catch (DateTimeParseException e) {
               throw new CoercingParseValueException(
                 "Expected type '%s' but was '%s'.".formatted(scalarName, input)
               );

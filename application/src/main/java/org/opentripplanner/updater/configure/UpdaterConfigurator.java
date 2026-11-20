@@ -218,7 +218,8 @@ public class UpdaterConfigurator {
       () -> {
         try {
           transitWriterService.stop();
-        } finally {
+        }
+        finally {
           streetWriterService.stop();
         }
       },

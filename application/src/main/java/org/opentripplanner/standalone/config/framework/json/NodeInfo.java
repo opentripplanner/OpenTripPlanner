@@ -171,10 +171,12 @@ public record NodeInfo(
 
     if (required) {
       builder.addText(" Required");
-    } else {
+    }
+    else {
       if (defaultValue != null) {
         builder.addText(" = ").addText(type.quote(defaultValue));
-      } else {
+      }
+      else {
         builder.addText(" Optional");
       }
     }

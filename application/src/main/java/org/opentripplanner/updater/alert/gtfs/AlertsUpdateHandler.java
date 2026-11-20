@@ -68,7 +68,8 @@ public class AlertsUpdateHandler {
 
       try {
         alerts.add(mapAlert(id, alert, fuzzyTripMatcher));
-      } catch (Exception e) {
+      }
+      catch (Exception e) {
         LOG.warn("Failed to map GTFS-RT alert with id {}: {}", id, e.getMessage(), e);
       }
     }
@@ -117,7 +118,8 @@ public class AlertsUpdateHandler {
       }
 
       alertBuilder.withCalendar(AlertCalendar.of(periods));
-    } else {
+    }
+    else {
       // Per the GTFS-rt spec, if an alert has no TimeRanges, than it should always be shown.
       alertBuilder.withCalendar(AlertCalendar.ofAlwaysActive());
     }
@@ -172,10 +174,12 @@ public class AlertsUpdateHandler {
               new FeedScopedId(feedId, tripId)
             )
           );
-        } else {
+        }
+        else {
           alertBuilder.addEntity(new EntitySelector.Trip(new FeedScopedId(feedId, tripId)));
         }
-      } else if (routeId != null) {
+      }
+      else if (routeId != null) {
         if (stopId != null) {
           alertBuilder.addEntity(
             new EntitySelector.StopAndRoute(
@@ -183,31 +187,38 @@ public class AlertsUpdateHandler {
               new FeedScopedId(feedId, routeId)
             )
           );
-        } else if (directionId != MISSING_INT_FIELD_VALUE) {
+        }
+        else if (directionId != MISSING_INT_FIELD_VALUE) {
           alertBuilder.addEntity(
             new EntitySelector.DirectionAndRoute(
               new FeedScopedId(feedId, routeId),
               directionMapper.map(directionId)
             )
           );
-        } else {
+        }
+        else {
           alertBuilder.addEntity(new EntitySelector.Route(new FeedScopedId(feedId, routeId)));
         }
-      } else if (stopId != null) {
+      }
+      else if (stopId != null) {
         alertBuilder.addEntity(new EntitySelector.Stop(new FeedScopedId(feedId, stopId)));
-      } else if (agencyId != null) {
+      }
+      else if (agencyId != null) {
         FeedScopedId feedScopedAgencyId = new FeedScopedId(feedId, agencyId);
 
         if (routeType != MISSING_INT_FIELD_VALUE) {
           alertBuilder.addEntity(
             new EntitySelector.RouteTypeAndAgency(feedScopedAgencyId, routeType)
           );
-        } else {
+        }
+        else {
           alertBuilder.addEntity(new EntitySelector.Agency(feedScopedAgencyId));
         }
-      } else if (routeType != MISSING_INT_FIELD_VALUE) {
+      }
+      else if (routeType != MISSING_INT_FIELD_VALUE) {
         alertBuilder.addEntity(new EntitySelector.RouteType(feedId, routeType));
-      } else {
+      }
+      else {
         String description = "Entity selector: " + informed;
         alertBuilder.addEntity(new EntitySelector.Unknown(description));
       }

@@ -94,7 +94,8 @@ class RegularTransferServiceCacheTest {
 
       releaseCreation.countDown();
       slowCreation.get(5, TimeUnit.SECONDS);
-    } finally {
+    }
+    finally {
       releaseCreation.countDown();
       executor.shutdownNow();
     }
@@ -120,7 +121,8 @@ class RegularTransferServiceCacheTest {
       releaseCreation.countDown();
       assertThat(second.get(5, TimeUnit.SECONDS)).isSameInstanceAs(first.get(5, TimeUnit.SECONDS));
       assertThat(factory.created).hasSize(1);
-    } finally {
+    }
+    finally {
       releaseCreation.countDown();
       executor.shutdownNow();
     }
@@ -208,7 +210,8 @@ class RegularTransferServiceCacheTest {
       var factory = new TestFactory();
       next.get(PREFS_1, factory);
       assertThat(factory.created).containsExactly("create " + PREFS_1);
-    } finally {
+    }
+    finally {
       releaseCreation.countDown();
       executor.shutdownNow();
     }
@@ -367,7 +370,8 @@ class RegularTransferServiceCacheTest {
       for (var future : futures) {
         future.get(30, TimeUnit.SECONDS);
       }
-    } finally {
+    }
+    finally {
       executor.shutdownNow();
     }
 
@@ -387,7 +391,8 @@ class RegularTransferServiceCacheTest {
       if (!latch.await(5, TimeUnit.SECONDS)) {
         throw new IllegalStateException("Timed out waiting for the latch");
       }
-    } catch (InterruptedException e) {
+    }
+    catch (InterruptedException e) {
       Thread.currentThread().interrupt();
       throw new IllegalStateException(e);
     }

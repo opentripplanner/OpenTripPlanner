@@ -52,7 +52,8 @@ public class SpeedTestRequest {
 
     if (input.departureTimeSet()) {
       builder.withDateTime(time(input.departureTime())).withArriveBy(false);
-    } else if (input.arrivalTimeSet()) {
+    }
+    else if (input.arrivalTimeSet()) {
       builder.withDateTime(time(input.arrivalTime())).withArriveBy(true);
     }
 
@@ -79,7 +80,8 @@ public class SpeedTestRequest {
 
       if (tModes.isEmpty()) {
         journeyBuilder.withTransit(b -> b.disable());
-      } else {
+      }
+      else {
         var fb = TransitFilterRequest.of().addSelect(
           SelectRequest.of().withTransportModes(tModes).build()
         );

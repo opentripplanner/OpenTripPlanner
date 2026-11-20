@@ -83,7 +83,8 @@ public abstract class GbfsGeofencingZoneMapper<F, R> {
           validation
         );
       }
-    } catch (UnsupportedGeometryException e) {
+    }
+    catch (UnsupportedGeometryException e) {
       LOG.error("Could not convert geofencing zone", e);
       return Collections.emptyList();
     }

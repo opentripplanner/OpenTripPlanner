@@ -42,7 +42,8 @@ class CalculateTransferToDestination<T extends RaptorTripSchedule> implements
       case ACCESS -> {
         if (newElement.arrivedOnBoard()) {
           addOnBoardStopArrivalToDestination(newElement);
-        } else {
+        }
+        else {
           addOnStreetArrivalToDestination(newElement);
         }
       }

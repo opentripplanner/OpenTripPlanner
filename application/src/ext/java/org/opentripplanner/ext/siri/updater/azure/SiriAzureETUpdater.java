@@ -49,7 +49,8 @@ public class SiriAzureETUpdater implements SiriAzureMessageHandler {
     if (etDeliveries == null || etDeliveries.isEmpty()) {
       LOG.info("Empty Siri ET message {}", messageId);
       return null;
-    } else {
+    }
+    else {
       return processMessage(etDeliveries);
     }
   }

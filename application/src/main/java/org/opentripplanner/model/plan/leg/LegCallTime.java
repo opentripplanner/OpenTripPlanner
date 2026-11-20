@@ -45,7 +45,8 @@ public class LegCallTime {
   public ZonedDateTime time() {
     if (estimated == null) {
       return scheduledTime;
-    } else {
+    }
+    else {
       return estimated.time();
     }
   }

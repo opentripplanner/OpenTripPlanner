@@ -67,10 +67,12 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
       // Stop times frequently contain missing, or incorrect entries. Repair them.
       if (!filterStopTimes(stopTimes)) {
         stopTimesByTrip.replace(trip, List.of());
-      } else if (interpolate) {
+      }
+      else if (interpolate) {
         interpolateStopTimes(stopTimes);
         stopTimesByTrip.replace(trip, stopTimes);
-      } else {
+      }
+      else {
         stopTimes.removeIf(st -> !st.isArrivalTimeSet() || !st.isDepartureTimeSet());
         stopTimesByTrip.replace(trip, stopTimes);
       }
@@ -116,7 +118,8 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
       // Set arrival and departure times if one of them is missing.
       if (!st1.isArrivalTimeSet() && st1.isDepartureTimeSet()) {
         st1.setArrivalTime(st1.getDepartureTime());
-      } else if (!st1.isDepartureTimeSet() && st1.isArrivalTimeSet()) {
+      }
+      else if (!st1.isDepartureTimeSet() && st1.isArrivalTimeSet()) {
         st1.setDepartureTime(st1.getArrivalTime());
       }
 
@@ -173,7 +176,8 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
             )
           );
         }
-      } else if (hopSpeed > getMaxSpeedForMode(st0.getTrip().getMode())) {
+      }
+      else if (hopSpeed > getMaxSpeedForMode(st0.getTrip().getMode())) {
         issueStore.add(
           new HopSpeedFast(
             (float) hopSpeed,
@@ -184,7 +188,8 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
             st1.getStop()
           )
         );
-      } else if (hopSpeed < 0.3) {
+      }
+      else if (hopSpeed < 0.3) {
         // 0.3 m/sec ~= 1 km/h
         issueStore.add(
           new HopSpeedSlow(
@@ -276,7 +281,8 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
 
         if (st.isArrivalTimeSet()) {
           arrivalTime = st.getArrivalTime();
-        } else {
+        }
+        else {
           arrivalTime = st.getDepartureTime();
         }
 
@@ -293,7 +299,8 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
 
           if (st.isArrivalTimeSet()) {
             departureTime = st.getArrivalTime();
-          } else {
+          }
+          else {
             st.setArrivalTime(departureTime);
           }
 

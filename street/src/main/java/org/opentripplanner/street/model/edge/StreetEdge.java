@@ -344,14 +344,18 @@ public class StreetEdge
     if (s0.currentMode() == TraverseMode.BICYCLE) {
       if (canTraverse(TraverseMode.BICYCLE)) {
         editor = doTraverse(s0, TraverseMode.BICYCLE, false);
-      } else if (canTraverse(TraverseMode.WALK)) {
+      }
+      else if (canTraverse(TraverseMode.WALK)) {
         editor = doTraverse(s0, TraverseMode.WALK, true);
-      } else {
+      }
+      else {
         return State.empty();
       }
-    } else if (canTraverse(s0.currentMode())) {
+    }
+    else if (canTraverse(s0.currentMode())) {
       editor = doTraverse(s0, s0.currentMode(), false);
-    } else {
+    }
+    else {
       editor = null;
     }
 
@@ -471,7 +475,8 @@ public class StreetEdge
   public StreetEdge clone() {
     try {
       return (StreetEdge) super.clone();
-    } catch (CloneNotSupportedException e) {
+    }
+    catch (CloneNotSupportedException e) {
       throw new RuntimeException(e);
     }
   }
@@ -479,7 +484,8 @@ public class StreetEdge
   public void shareData(StreetEdge reversedEdge) {
     if (Arrays.equals(compactGeometry, reversedEdge.compactGeometry)) {
       compactGeometry = reversedEdge.compactGeometry;
-    } else {
+    }
+    else {
       LOG.warn("Can't share geometry between {} and {}", this, reversedEdge);
     }
   }
@@ -616,7 +622,8 @@ public class StreetEdge
       double frac = (double) l1 / (l1 + l2);
       l1 = (int) (length_mm * frac);
       l2 = length_mm - l1;
-    } else {
+    }
+    else {
       // cast before the divide so that the sum is promoted
       double frac = (double) l2 / (l1 + l2);
       l2 = (int) (length_mm * frac);
@@ -731,7 +738,8 @@ public class StreetEdge
       copyPropertiesToSplitEdge(tpseb, start, start + length);
       TemporaryPartialStreetEdge se = tpseb.buildAndConnect();
       return Optional.of(se);
-    } else {
+    }
+    else {
       return Optional.empty();
     }
   }
@@ -908,7 +916,8 @@ public class StreetEdge
             (float) speed,
             (float) backSpeed
           );
-      } else if (!arriveBy && fromv instanceof IntersectionVertex traversedVertex) {
+      }
+      else if (!arriveBy && fromv instanceof IntersectionVertex traversedVertex) {
         // depart-after search
         turnDuration = s0
           .intersectionTraversalCalculator()
@@ -920,7 +929,8 @@ public class StreetEdge
             (float) backSpeed,
             (float) speed
           );
-      } else {
+      }
+      else {
         // In case this is a temporary edge not connected to an IntersectionVertex
         LOG.debug("Not computing turn duration for edge {}", this);
         turnDuration = 0;
@@ -1105,11 +1115,13 @@ public class StreetEdge
       if (BitSetUtils.get(flags, WHEELCHAIR_INACCESSIBLE_BARRIER_FLAG_INDEX)) {
         weight += WHEELCHAIR_INACCESSIBLE_BARRIER_COST;
       }
-    } else {
+    }
+    else {
       if (walkingBike) {
         // take slopes into account when walking bikes
         time = weight = getEffectiveBikeDistance() / speed;
-      } else {
+      }
+      else {
         // take slopes into account when walking
         time = getEffectiveWalkDistance() / speed;
         weight =
@@ -1161,7 +1173,8 @@ public class StreetEdge
       if (backEdge instanceof StreetEdge sbe && !sbe.isNoThruTraffic(traverseMode)) {
         s1.setEnteredNoThroughTrafficArea();
       }
-    } else if (s0.hasEnteredNoThruTrafficArea()) {
+    }
+    else if (s0.hasEnteredNoThruTrafficArea()) {
       // If we transitioned into a no-through-traffic area at some point, check if we are exiting
       // it.
       return true;
@@ -1196,7 +1209,8 @@ public class StreetEdge
         byte in = convertRadianToByte(DirectionUtils.getFirstAngle(geometry));
         byte out = convertRadianToByte(DirectionUtils.getLastAngle(geometry));
         return new LineStringInOutAngles(in, out);
-      } catch (Exception e) {
+      }
+      catch (Exception e) {
         LOG.info(
           "Exception while determining LineString angles. setting to zero. There is probably something wrong with this segment's geometry."
         );

@@ -47,7 +47,8 @@ public class ArgumentUtils {
         .stream()
         .map(GraphQLTypes.GraphQLPlanTransitModePreferenceInput::new)
         .collect(Collectors.toList());
-    } else {
+    }
+    else {
       return null;
     }
   }

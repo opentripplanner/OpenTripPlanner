@@ -73,9 +73,11 @@ public class DefaultOsmProvider implements OsmProvider {
 
       parsePhase(parser, OsmParserPhase.Nodes);
       osmdb.doneThirdPhaseNodes();
-    } catch (Exception ex) {
+    }
+    catch (Exception ex) {
       throw new IllegalStateException("error loading OSM from path " + source.path(), ex);
-    } finally {
+    }
+    finally {
       executorService.shutdown();
     }
   }
@@ -113,7 +115,8 @@ public class DefaultOsmProvider implements OsmProvider {
       )
     ) {
       in.process();
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       LOG.error(e.getMessage(), e);
     }
   }

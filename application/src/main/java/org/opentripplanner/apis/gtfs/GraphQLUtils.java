@@ -120,7 +120,8 @@ public class GraphQLUtils {
   public static Integer stopTimeToInt(int value) {
     if (value == StopTime.MISSING_VALUE) {
       return null;
-    } else {
+    }
+    else {
       return value;
     }
   }

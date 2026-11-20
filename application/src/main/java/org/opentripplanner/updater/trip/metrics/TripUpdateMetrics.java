@@ -39,7 +39,8 @@ public class TripUpdateMetrics {
   private static Consumer<UpdateResult> getConsumer(Supplier<Consumer<UpdateResult>> maker) {
     if (OTPFeature.ActuatorAPI.isOn()) {
       return maker.get();
-    } else {
+    }
+    else {
       return NOOP;
     }
   }

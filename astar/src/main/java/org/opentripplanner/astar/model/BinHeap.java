@@ -42,7 +42,8 @@ public class BinHeap<T> {
   public double peek_min_key() {
     if (size > 0) {
       return prio[1];
-    } else {
+    }
+    else {
       throw new IllegalStateException("An empty queue does not have a minimum key.");
     }
   }
@@ -50,7 +51,8 @@ public class BinHeap<T> {
   public T peek_min() {
     if (size > 0) {
       return elem[1];
-    } else {
+    }
+    else {
       return null;
     }
   }
@@ -87,11 +89,13 @@ public class BinHeap<T> {
           elem[i] = elem[child];
           prio[i] = prio[child];
           i = child;
-        } else {
+        }
+        else {
           break;
         }
       }
-    } else {
+    }
+    else {
       // sift down (as in insert)
       while (prio[i / 2] > p) {
         elem[i] = elem[i / 2];
@@ -148,7 +152,8 @@ public class BinHeap<T> {
       if (lastPrio > prio[child]) {
         elem[i] = elem[child];
         prio[i] = prio[child];
-      } else {
+      }
+      else {
         break;
       }
     }

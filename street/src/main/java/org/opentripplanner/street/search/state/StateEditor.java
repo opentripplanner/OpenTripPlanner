@@ -70,10 +70,12 @@ public class StateEditor {
       // fromVertex.equals(toVertex) ? parent.getOptions().arriveBy : false;
       traversingBackward = fromVertex.equals(toVertex) && parent.getRequest().arriveBy();
       this.vertex = toVertex;
-    } else if (parentVertex.equals(toVertex)) {
+    }
+    else if (parentVertex.equals(toVertex)) {
       traversingBackward = true;
       this.vertex = fromVertex;
-    } else {
+    }
+    else {
       throw new IllegalStateException(
         "Edge is not connected to parent state: %s, from=%s, to=%s, parent=%s".formatted(
           e,
@@ -307,7 +309,8 @@ public class StateEditor {
       stateData.vehicleRentalNetwork = null;
       stateData.rentalVehicleFormFactor = null;
       stateData.rentalVehiclePropulsionType = null;
-    } else {
+    }
+    else {
       stateData.vehicleRentalState = VehicleRentalState.RENTING_FLOATING;
       stateData.currentMode = formFactor.traverseMode;
       stateData.vehicleRentalNetwork = network;
@@ -333,7 +336,8 @@ public class StateEditor {
       stateData.rentalVehicleFormFactor = null;
       stateData.rentalVehiclePropulsionType = null;
       stateData.backWalkingBike = false;
-    } else {
+    }
+    else {
       stateData.mayKeepRentedVehicleAtDestination = mayKeep;
       stateData.vehicleRentalState = VehicleRentalState.RENTING_FROM_STATION;
       stateData.currentMode = formFactor.traverseMode;
@@ -358,7 +362,8 @@ public class StateEditor {
       stateData.vehicleRentalNetwork = network;
       stateData.rentalVehicleFormFactor = formFactor;
       stateData.rentalVehiclePropulsionType = propulsionType;
-    } else {
+    }
+    else {
       stateData.mayKeepRentedVehicleAtDestination = false;
       stateData.vehicleRentalState = VehicleRentalState.HAVE_RENTED;
       stateData.currentMode = TraverseMode.WALK;
@@ -387,7 +392,8 @@ public class StateEditor {
       stateData.vehicleRentalNetwork = network;
       stateData.rentalVehicleFormFactor = formFactor;
       stateData.rentalVehiclePropulsionType = propulsionType;
-    } else {
+    }
+    else {
       stateData.mayKeepRentedVehicleAtDestination = false;
       stateData.vehicleRentalState = VehicleRentalState.HAVE_RENTED;
       stateData.currentMode = TraverseMode.WALK;

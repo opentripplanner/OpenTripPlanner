@@ -55,7 +55,8 @@ final class RaptorValueFormatter {
   static int parse(String valueString) {
     try {
       return FORMAT_INT.get().parse(valueString).intValue();
-    } catch (ParseException e) {
+    }
+    catch (ParseException e) {
       throw new IllegalArgumentException("Not a valid Raptor value: " + valueString, e);
     }
   }
@@ -63,7 +64,8 @@ final class RaptorValueFormatter {
   static int parseCenti(String valueString) {
     try {
       return (int) Math.round(FORMAT_CENTI.get().parse(valueString).doubleValue() * 100.0);
-    } catch (ParseException e) {
+    }
+    catch (ParseException e) {
       throw new IllegalArgumentException("Not a valid Raptor value: " + valueString, e);
     }
   }

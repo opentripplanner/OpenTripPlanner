@@ -100,14 +100,16 @@ public class OsmNode extends OsmEntity {
 
     if (ele.endsWith("m")) {
       ele = ele.replaceFirst("\\s*m", "");
-    } else if (ele.endsWith("ft")) {
+    }
+    else if (ele.endsWith("ft")) {
       ele = ele.replaceFirst("\\s*ft", "");
       unit = 0.3048;
     }
 
     try {
       return OptionalDouble.of(Double.parseDouble(ele) * unit);
-    } catch (NumberFormatException e) {
+    }
+    catch (NumberFormatException e) {
       return OptionalDouble.empty();
     }
   }

@@ -83,7 +83,8 @@ public class TransferIndexGenerator {
               }
             }
           });
-      } catch (Exception e) {
+      }
+      catch (Exception e) {
         LOG.error("Unable to generate transfers: {}. Affected transfer: {}", e, tx);
       }
     }
@@ -186,13 +187,17 @@ public class TransferIndexGenerator {
   private Collection<TPoint> findTPoints(TransferPoint txPoint, boolean boarding) {
     if (txPoint.isStationTransferPoint()) {
       return findTPoints(txPoint.asStationTransferPoint());
-    } else if (txPoint.isStopTransferPoint()) {
+    }
+    else if (txPoint.isStopTransferPoint()) {
       return findTPoints(txPoint.asStopTransferPoint());
-    } else if (txPoint.isRouteStationTransferPoint()) {
+    }
+    else if (txPoint.isRouteStationTransferPoint()) {
       return findTPoint(txPoint.asRouteStationTransferPoint(), boarding);
-    } else if (txPoint.isRouteStopTransferPoint()) {
+    }
+    else if (txPoint.isRouteStopTransferPoint()) {
       return findTPoint(txPoint.asRouteStopTransferPoint(), boarding);
-    } else {
+    }
+    else {
       return findTPoints(txPoint.asTripTransferPoint());
     }
   }

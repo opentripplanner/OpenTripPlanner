@@ -46,7 +46,8 @@ public class HierarchicalElement<E> {
 
     if (parent == null) {
       return null;
-    } else {
+    }
+    else {
       return parent.get();
     }
   }

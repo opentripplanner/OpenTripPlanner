@@ -29,7 +29,8 @@ public class UnknownPath<T extends RaptorTripSchedule> implements RaptorPath<T> 
     if (sourceTime <= targetTime) {
       this.departureTime = sourceTime;
       this.arrivalTime = targetTime;
-    } else {
+    }
+    else {
       // Flip departure and arrival for reverse search
       this.departureTime = targetTime;
       this.arrivalTime = sourceTime;
@@ -139,7 +140,8 @@ public class UnknownPath<T extends RaptorTripSchedule> implements RaptorPath<T> 
 
     if (departureTime == 0 && arrivalTime == 0) {
       pathBuilder.summary(c1(), c2());
-    } else {
+    }
+    else {
       pathBuilder.summary(startTime(), endTime(), numberOfTransfers, c1(), c2());
     }
 

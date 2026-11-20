@@ -76,7 +76,8 @@ final class HttpsFileDataSource implements DataSource {
 
     try {
       in = otpHttpClient.getAsInputStream(uri, HTTP_GET_REQUEST_TIMEOUT, HttpHeaders.empty());
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       throw new IllegalStateException(e.getLocalizedMessage(), e);
     }
 
@@ -85,10 +86,12 @@ final class HttpsFileDataSource implements DataSource {
     if (httpsDataSourceMetadata().isGzipContentType() || uri.getPath().endsWith(".gz")) {
       try {
         return new GZIPInputStream(in);
-      } catch (IOException e) {
+      }
+      catch (IOException e) {
         throw new IllegalStateException(e.getLocalizedMessage(), e);
       }
-    } else {
+    }
+    else {
       return in;
     }
   }

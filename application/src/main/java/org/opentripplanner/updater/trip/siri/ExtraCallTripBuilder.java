@@ -132,7 +132,8 @@ class ExtraCallTripBuilder {
       // Only changes within the same parent station are allowed.
       if (call.isExtraCall()) {
         extraCallCounter++;
-      } else {
+      }
+      else {
         StopLocation stopInOriginalPattern = originalPattern.getStop(
           stopSequence - extraCallCounter
         );
@@ -208,7 +209,8 @@ class ExtraCallTripBuilder {
         dataSource,
         null
       );
-    } catch (DataValidationException e) {
+    }
+    catch (DataValidationException e) {
       throw DataValidationExceptionMapper.map(e);
     }
   }

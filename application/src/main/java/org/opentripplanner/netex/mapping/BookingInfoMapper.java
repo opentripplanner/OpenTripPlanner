@@ -215,7 +215,8 @@ public class BookingInfoMapper {
             entityRefs
           );
         }
-      } else if (minimumBookingPeriod != null) {
+      }
+      else if (minimumBookingPeriod != null) {
         minimumBookingNotice = minimumBookingPeriod;
       }
 

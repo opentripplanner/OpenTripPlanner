@@ -43,7 +43,8 @@ public class OtpAppException extends RuntimeException {
   public static String format(String message, Object... args) {
     try {
       return String.format(message, args);
-    } catch (IllegalFormatException e) {
+    }
+    catch (IllegalFormatException e) {
       LOG.error(e.getMessage(), e);
       return message + " " + Arrays.toString(args);
     }

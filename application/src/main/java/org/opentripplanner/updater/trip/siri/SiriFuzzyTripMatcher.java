@@ -256,9 +256,11 @@ public class SiriFuzzyTripMatcher {
 
     if (possibleTrips.isEmpty()) {
       throw UpdateException.of(UpdateErrorType.NO_FUZZY_TRIP_MATCH);
-    } else if (possibleTrips.size() > 1) {
+    }
+    else if (possibleTrips.size() > 1) {
       throw UpdateException.of(UpdateErrorType.MULTIPLE_FUZZY_TRIP_MATCHES);
-    } else {
+    }
+    else {
       return possibleTrips.iterator().next();
     }
   }

@@ -40,7 +40,8 @@ class MultiModalStationMapper {
 
     try {
       coordinate = WgsCoordinateMapper.mapToDomain(stopPlace.getCentroid());
-    } catch (InvalidCoordinateException e) {
+    }
+    catch (InvalidCoordinateException e) {
       issueStore.add(
         "MultiModalStationInvalidCoordinates",
         "MultiModal station %s has invalid coordinates and is skipped. %s",
@@ -57,7 +58,8 @@ class MultiModalStationMapper {
         multiModalStation.getId()
       );
       return null;
-    } else {
+    }
+    else {
       multiModalStation.withCoordinate(coordinate);
       return multiModalStation.build();
     }

@@ -181,9 +181,11 @@ public class Timetable implements Serializable {
   ) {
     if (!scheduledTripTimes.isEmpty()) {
       return scheduledTripTimes.iterator().next();
-    } else if (!frequencies.isEmpty()) {
+    }
+    else if (!frequencies.isEmpty()) {
       return frequencies.iterator().next().tripTimes();
-    } else {
+    }
+    else {
       // Pattern is created only for real-time updates
       return null;
     }

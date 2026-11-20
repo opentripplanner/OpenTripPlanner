@@ -155,7 +155,8 @@ class ParkingProcessor {
           link,
           zoneId
         );
-      } catch (OpeningHoursParseException e) {
+      }
+      catch (OpeningHoursParseException e) {
         issueStore.add(
           "OsmOpeningHoursUnparsed",
           "OSM object with id '%s' (%s) has an invalid opening_hours value, it will always be open",
@@ -307,7 +308,8 @@ class ParkingProcessor {
       carCapacity = parseCapacity(entity);
       bicycleCapacity = parseCapacity(entity, "capacity:bike");
       wheelchairAccessibleCarCapacity = parseCapacity(entity, "capacity:disabled");
-    } else {
+    }
+    else {
       bicycleCapacity = parseCapacity(entity);
       carCapacity = OptionalInt.empty();
       wheelchairAccessibleCarCapacity = OptionalInt.empty();

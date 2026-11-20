@@ -219,7 +219,8 @@ public abstract class PathBuilder<T extends RaptorTripSchedule> {
   protected void addTail(PathBuilderLeg<T> newLeg) {
     if (head == null) {
       head = tail = newLeg;
-    } else {
+    }
+    else {
       tail.setNext(newLeg);
       newLeg.setPrev(tail);
       tail = newLeg;
@@ -229,7 +230,8 @@ public abstract class PathBuilder<T extends RaptorTripSchedule> {
   protected void addHead(PathBuilderLeg<T> newLeg) {
     if (head == null) {
       head = tail = newLeg;
-    } else {
+    }
+    else {
       newLeg.setNext(head);
       head.setPrev(newLeg);
       head = newLeg;

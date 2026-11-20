@@ -51,7 +51,8 @@ public class TestAccessEgress implements RaptorAccessEgress {
 
     if (free) {
       assertEquals(0, durationInSeconds);
-    } else {
+    }
+    else {
       assertTrue(durationInSeconds > 0);
     }
 
@@ -213,7 +214,8 @@ public class TestAccessEgress implements RaptorAccessEgress {
 
     if (requestedDepartureTime < specificOpenFrom) {
       return specificOpenFrom;
-    } else if (requestedDepartureTime > specificOpenTo) {
+    }
+    else if (requestedDepartureTime > specificOpenTo) {
       // return the opening time for the next day
       return specificOpenFrom + SECONDS_IN_A_DAY;
     }
@@ -241,7 +243,8 @@ public class TestAccessEgress implements RaptorAccessEgress {
     if (requestedDepartureTime < specificOpenFrom) {
       // return the closing for the previous day, offset with durationInSeconds()
       return closeAtArrival - SECONDS_IN_A_DAY;
-    } else if (requestedArrivalTime > closeAtArrival) {
+    }
+    else if (requestedArrivalTime > closeAtArrival) {
       return closeAtArrival;
     }
 

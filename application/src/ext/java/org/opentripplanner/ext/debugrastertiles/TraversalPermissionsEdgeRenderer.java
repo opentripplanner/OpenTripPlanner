@@ -55,7 +55,8 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
       if (pse.isStairs()) {
         color = STAIRS_COLOR_EDGE;
         label = "stairs";
-      } else {
+      }
+      else {
         color = getColor(pse.getPermission());
         label = getLabel(pse.getPermission());
       }
@@ -71,7 +72,8 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
       if (pse.isWalkNoThruTraffic()) {
         label += " walk NTT";
       }
-    } else if (e instanceof ElevatorHopEdge ehe) {
+    }
+    else if (e instanceof ElevatorHopEdge ehe) {
       color = ELEVATOR_COLOR_EDGE;
       label = "elevator";
 
@@ -86,10 +88,12 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
       if (ehe.getPermission().allows(StreetTraversalPermission.CAR)) {
         label += " car";
       }
-    } else if (e instanceof EscalatorEdge) {
+    }
+    else if (e instanceof EscalatorEdge) {
       color = STAIRS_COLOR_EDGE;
       label = "escalator";
-    } else {
+    }
+    else {
       color = LINK_COLOR_EDGE;
       label = "link";
     }
@@ -104,22 +108,26 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
         OSM_BOARDING_LOCATION_VERTEX_COLOR,
         "OSM refs" + osmV.references
       );
-    } else if (v instanceof IntersectionVertex) {
+    }
+    else if (v instanceof IntersectionVertex) {
       if (v instanceof BarrierVertex) {
         return VertexVisualAttributes.optional(BARRIER_COLOR_VERTEX, null);
       }
 
       return VertexVisualAttributes.optional(STREET_COLOR_VERTEX, null);
-    } else if (
+    }
+    else if (
       v instanceof TransitStopVertex ||
       v instanceof TransitEntranceVertex ||
       v instanceof TransitPathwayNodeVertex ||
       v instanceof TransitBoardingAreaVertex
     ) {
       return VertexVisualAttributes.optional(TRANSIT_STOP_COLOR_VERTEX, v.getDefaultName());
-    } else if (v instanceof VehicleRentalPlaceVertex) {
+    }
+    else if (v instanceof VehicleRentalPlaceVertex) {
       return VertexVisualAttributes.optional(VEHICLE_RENTAL_COLOR_VERTEX, v.getDefaultName());
-    } else if (v instanceof VehicleParkingEntranceVertex) {
+    }
+    else if (v instanceof VehicleParkingEntranceVertex) {
       return VertexVisualAttributes.optional(PARK_AND_RIDE_COLOR_VERTEX, v.getDefaultName());
     }
 
@@ -169,7 +177,8 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
     if (sb.length() > 0) {
       // Remove last comma
       sb.setLength(sb.length() - 1);
-    } else {
+    }
+    else {
       sb.append("none");
     }
 

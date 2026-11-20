@@ -59,11 +59,14 @@ public class BoardAlightRestrictions {
     for (String code : codes) {
       if ("a".equals(code)) {
         list.add(ALIGHTING_ONLY);
-      } else if ("b".equals(code)) {
+      }
+      else if ("b".equals(code)) {
         list.add(BOARDING_ONLY);
-      } else if (code.matches("ab|ba|\\*")) {
+      }
+      else if (code.matches("ab|ba|\\*")) {
         list.add(ALL_ALLOWED);
-      } else if ("-".equals(code)) {
+      }
+      else if ("-".equals(code)) {
         list.add(NONE_ALLOWED);
       }
     }
@@ -86,11 +89,14 @@ public class BoardAlightRestrictions {
     for (int i = 0; i < restrictions.size(); ++i) {
       if (isAlightingPossibleAt(i) && isBoardingPossibleAt(i)) {
         buf.append(" *");
-      } else if (isAlightingPossibleAt(i)) {
+      }
+      else if (isAlightingPossibleAt(i)) {
         buf.append(" A");
-      } else if (isBoardingPossibleAt(i)) {
+      }
+      else if (isBoardingPossibleAt(i)) {
         buf.append(" B");
-      } else {
+      }
+      else {
         buf.append(" Ø");
       }
     }

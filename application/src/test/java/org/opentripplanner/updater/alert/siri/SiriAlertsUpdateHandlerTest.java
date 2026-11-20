@@ -106,7 +106,8 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
         transitRepository,
         DefaultTimetableRepository.scheduledOnly(timetableDataImport.toScheduledTimetableData())
       );
-    } else {
+    }
+    else {
       transitAlertService.getAllAlerts().clear();
     }
 
@@ -1089,9 +1090,11 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
       if (!foundMatch) {
         if (entity instanceof EntitySelector.Stop entitySelector) {
           foundMatch = entitySelector.stopId().equals(feedScopedEntityId);
-        } else if (entity instanceof EntitySelector.Trip entitySelector) {
+        }
+        else if (entity instanceof EntitySelector.Trip entitySelector) {
           foundMatch = entitySelector.tripId().equals(feedScopedEntityId);
-        } else if (entity instanceof EntitySelector.Route entitySelector) {
+        }
+        else if (entity instanceof EntitySelector.Route entitySelector) {
           foundMatch = entitySelector.routeId().equals(feedScopedEntityId);
         }
       }
@@ -1296,7 +1299,8 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
       if (!foundMatch) {
         if (entity.key() instanceof EntityKey.StopAndRoute stopAndRoute) {
           foundMatch = stopAndRoute.equals(new EntityKey.StopAndRoute(stopId, routeOrTripId));
-        } else if (entity instanceof EntitySelector.StopAndTrip stopAndTrip) {
+        }
+        else if (entity instanceof EntitySelector.StopAndTrip stopAndTrip) {
           foundMatch =
             stopAndTrip.key().equals(new EntityKey.StopAndTrip(stopId, routeOrTripId)) &&
             stopAndTrip.serviceDate().equals(serviceDate);

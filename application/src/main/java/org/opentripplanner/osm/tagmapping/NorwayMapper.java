@@ -138,7 +138,8 @@ class NorwayMapper extends OsmTagMapper {
       else if (speedLimit >= 19.4f) {
         if (isTrunkOrPrimary.isMatch(way)) {
           return cycleSafetyHighTraffic;
-        } else {
+        }
+        else {
           return cycleSafetyMediumHighTraffic;
         }
       }
@@ -147,10 +148,12 @@ class NorwayMapper extends OsmTagMapper {
         if (isTrunkOrPrimary.isMatch(way)) {
           // 60 km/h or 50 to 40 km/h
           return speedLimit >= 16.6f ? cycleSafetyMediumHighTraffic : cycleSafetyMediumTraffic;
-        } else if (isSecondaryHighway.isMatch(way)) {
+        }
+        else if (isSecondaryHighway.isMatch(way)) {
           // ~60 km/h or 50 to 40 km/h
           return speedLimit >= 16.6f ? cycleSafetyMediumTraffic : cycleSafetyMediumLowTraffic;
-        } else if (isTertiaryHighway.isMatch(way)) {
+        }
+        else if (isTertiaryHighway.isMatch(way)) {
           // ~60 to 50 km/h or 40 km/h
           return speedLimit >= 13.8f ? cycleSafetyMediumLowTraffic : cycleSafetyLowTraffic;
         }
@@ -159,7 +162,8 @@ class NorwayMapper extends OsmTagMapper {
       // 30 km/h or lower, or lower road class than unclassified
       if (this.isMotorVehicleThroughTrafficExplicitlyDisallowed(way)) {
         return cycleSafetyVeryLowTraffic;
-      } else {
+      }
+      else {
         return cycleSafetyLowTraffic;
       }
     };

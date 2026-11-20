@@ -32,7 +32,8 @@ public class FilterMapper {
     for (TransitFilter filter : filters) {
       if (filter instanceof TransitFilterRequest sr) {
         addFilter(sr);
-      } else if (
+      }
+      else if (
         !(filter instanceof AllowAllTransitFilter) && !(filter instanceof ExcludeAllTransitFilter)
       ) {
         throw new IllegalStateException("Unexpected value: " + filter);

@@ -40,7 +40,8 @@ public class DurationScalarFactory {
     public Duration parseValue(Object input) throws CoercingParseValueException {
       try {
         return DurationUtils.duration(input.toString());
-      } catch (DateTimeParseException dtpe) {
+      }
+      catch (DateTimeParseException dtpe) {
         throw new CoercingParseValueException("Expected type 'Duration' but was '" + input + "'.");
       }
     }
