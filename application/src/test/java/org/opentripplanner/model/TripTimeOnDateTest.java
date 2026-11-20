@@ -17,6 +17,7 @@ import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.TripTimes;
@@ -264,6 +265,67 @@ class TripTimeOnDateTest {
     assertEquals(stopA, first.getScheduledStop(shorterScheduledPattern));
     assertEquals(realTimeStop, second.getScheduledStop(shorterScheduledPattern));
     assertEquals(stopC, third.getScheduledStop(shorterScheduledPattern));
+  }
+
+  @Test
+  void scheduledPickupDropoffIgnoresCancellation() {
+    var route = TransitRepositoryForTest.route("R1").build();
+    var stopPattern = TransitRepositoryForTest.stopPattern(
+      TEST_MODEL.stop("A").build(),
+      TEST_MODEL.stop("B").build(),
+      TEST_MODEL.stop("C").build()
+    );
+    var scheduledPattern = TransitRepositoryForTest.tripPattern("P1", route)
+      .withStopPattern(stopPattern)
+      .build();
+    var tripTimes = tripTimesFor(3).createRealTimeFromScheduledTimes().withCanceled().build();
+
+    var subject = new TripTimeOnDate(tripTimes, 1, scheduledPattern);
+
+    assertEquals(PickDrop.CANCELLED, subject.getPickupType());
+    assertEquals(PickDrop.CANCELLED, subject.getDropoffType());
+    assertEquals(PickDrop.SCHEDULED, subject.getScheduledPickupType(scheduledPattern));
+    assertEquals(PickDrop.SCHEDULED, subject.getScheduledDropoffType(scheduledPattern));
+  }
+
+  @Test
+  void scheduledPickupDropoffWithExtraCall() {
+    var route = TransitRepositoryForTest.route("R1").build();
+    var stopA = TEST_MODEL.stop("A").build();
+    var stopC = TEST_MODEL.stop("C").build();
+
+    var scheduledStopPattern = StopPattern.create(2);
+    scheduledStopPattern.stops.with(0, stopA);
+    scheduledStopPattern.pickups.with(0, PickDrop.SCHEDULED);
+    scheduledStopPattern.dropoffs.with(0, PickDrop.NONE);
+    scheduledStopPattern.stops.with(1, stopC);
+    scheduledStopPattern.pickups.with(1, PickDrop.NONE);
+    scheduledStopPattern.dropoffs.with(1, PickDrop.CALL_AGENCY);
+    var scheduledPattern = TransitRepositoryForTest.tripPattern("P1", route)
+      .withStopPattern(scheduledStopPattern.build())
+      .build();
+    var realTimePattern = TransitRepositoryForTest.tripPattern("P1", route)
+      .withStopPattern(
+        TransitRepositoryForTest.stopPattern(stopA, TEST_MODEL.stop("extra").build(), stopC)
+      )
+      .build();
+    var tripTimes = tripTimesFor(3)
+      .createRealTimeFromScheduledTimes()
+      .withExtraCall(1, true)
+      .build();
+
+    var first = new TripTimeOnDate(tripTimes, 0, realTimePattern);
+    var extra = new TripTimeOnDate(tripTimes, 1, realTimePattern);
+    var last = new TripTimeOnDate(tripTimes, 2, realTimePattern);
+
+    assertEquals(PickDrop.SCHEDULED, first.getScheduledPickupType(scheduledPattern));
+    assertEquals(PickDrop.NONE, first.getScheduledDropoffType(scheduledPattern));
+
+    assertNull(extra.getScheduledPickupType(scheduledPattern));
+    assertNull(extra.getScheduledDropoffType(scheduledPattern));
+
+    assertEquals(PickDrop.NONE, last.getScheduledPickupType(scheduledPattern));
+    assertEquals(PickDrop.CALL_AGENCY, last.getScheduledDropoffType(scheduledPattern));
   }
 
   private static TripTimes<?> tripTimesFor(int stops) {
