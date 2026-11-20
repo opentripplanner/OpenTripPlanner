@@ -221,6 +221,7 @@ class QueryTypeImplItineraryTest {
     return new RefetchItineraryService(
       GRAPH,
       TRANSIT_ENV.transitService(),
+      TRANSIT_ENV.shapeService(),
       new TransitAlertServiceImpl(),
       FixedRegularTransfers.of().snapshot(),
       null,
@@ -260,6 +261,7 @@ class QueryTypeImplItineraryTest {
       .locale(requestLocale)
       .context(
         new TestGtfsGraphQLRequestContext(
+          null,
           null,
           null,
           null,

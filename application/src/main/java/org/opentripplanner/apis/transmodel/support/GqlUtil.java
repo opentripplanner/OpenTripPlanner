@@ -20,6 +20,7 @@ import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.place.NearbyPlaceFinder;
 import org.opentripplanner.place.NearbyStopFinder;
 import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.service.shape.ShapeService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
@@ -36,6 +37,10 @@ public class GqlUtil {
 
   public static TransitService getTransitService(DataFetchingEnvironment environment) {
     return ((TransmodelGraphQLRequestContext) environment.getContext()).transitService();
+  }
+
+  public static ShapeService getShapeService(DataFetchingEnvironment environment) {
+    return ((TransmodelGraphQLRequestContext) environment.getContext()).shapeService();
   }
 
   public static TransitAlertService getTransitAlertService(DataFetchingEnvironment environment) {

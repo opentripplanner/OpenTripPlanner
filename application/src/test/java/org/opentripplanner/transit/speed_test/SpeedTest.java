@@ -33,6 +33,10 @@ import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.routing.service.DefaultRoutingService;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.internal.RealtimeVehicleRepositoryLifecycle;
+import org.opentripplanner.service.shape.dataimport.ShapeDataImport;
+import org.opentripplanner.service.shape.internal.DefaultShapeRepository;
+import org.opentripplanner.service.shape.internal.DefaultShapeService;
+import org.opentripplanner.service.shape.internal.ShapeRepositoryLifecycle;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalRepository;
 import org.opentripplanner.standalone.OtpStartupInfo;
@@ -99,6 +103,7 @@ public class SpeedTest {
     Graph graph,
     TransitRepository transitRepository,
     TimetableDataImport timetableDataImport,
+    ShapeDataImport shapeDataImport,
     TransferRepository transferRepository,
     TransferParameters<RouteRequest> transferProfiles,
     RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository
@@ -149,6 +154,11 @@ public class SpeedTest {
       new DefaultRealtimeVehicleRepository(),
       new RealtimeVehicleRepositoryLifecycle()
     );
+    var shapeRepository = new DefaultShapeRepository(shapeDataImport.toScheduledShapeData());
+    var shapeHandle = registry.registerRepository(
+      shapeRepository,
+      new ShapeRepositoryLifecycle(shapeRepository)
+    );
     // Registered before the updaters start, registration is not thread-safe
     var regularTransferHandle = StreetTransferFactory.registerRepository(
       registry,
@@ -191,6 +201,7 @@ public class SpeedTest {
       transitUpdateManager,
       streetUpdateManager,
       timetableHandle,
+      shapeHandle,
       new DelegatingTransitAlertServiceImpl(),
       routerConfig.updaterConfig(),
       // The speed test does not use GBFS vehicle rental.
@@ -215,6 +226,7 @@ public class SpeedTest {
 
     this.routingService = new DefaultRoutingService(
       this.transitService,
+      new DefaultShapeService(shapeHandle.repositorySnapshot(transactionScope)),
       graph,
       raptorConfig,
       timer.getRegistry(),
@@ -257,6 +269,7 @@ public class SpeedTest {
       var model = SetupHelper.loadGraph(opts.rootDir(), config.graph());
       var transitRepository = model.transitRepository();
       var timetableDataImport = model.timetableDataImport();
+      var shapeDataImport = model.shapeDataImport();
       var transferRepository = model.transferRepository();
       var buildConfig = model.buildConfig();
       var graph = model.graph();
@@ -269,6 +282,7 @@ public class SpeedTest {
         graph,
         transitRepository,
         timetableDataImport,
+        shapeDataImport,
         transferRepository,
         buildConfig.transferProfiles(),
         model.regularTransferBuildRepository()

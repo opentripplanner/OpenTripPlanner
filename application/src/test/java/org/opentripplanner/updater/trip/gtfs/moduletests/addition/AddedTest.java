@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.updater.spi.UpdateErrorType.INVALID_STOP_REFERENCE;
@@ -306,6 +307,47 @@ class AddedTest implements RealtimeTestConstants {
     assertEquals(2, result.successful());
     assertAddedTrip(ADDED_TRIP_ID, env);
     assertAddedTrip("AddedTrip2", env);
+  }
+
+  @Test
+  void fullDatasetUpdateRemovesTheGeometryOfAddedPattern() {
+    var tripUpdate = gtfsRt
+      .tripUpdate(ADDED_TRIP_ID, ADDED)
+      .addStopTime(STOP_A_ID, "00:30")
+      .addStopTime(STOP_B_ID, "00:40")
+      .addStopTime(STOP_C_ID, "00:55")
+      .build();
+    assertSuccess(gtfsRt.applyTripUpdate(tripUpdate));
+    var pattern = assertAddedTrip(ADDED_TRIP_ID, env);
+    assertNotNull(env.shapeService().getTripPatternShape(pattern.getId()));
+
+    gtfsRt.applyTripUpdates(List.of());
+
+    assertThrows(IllegalArgumentException.class, () ->
+      env.shapeService().getTripPatternShape(pattern.getId())
+    );
+
+    // The cached pattern is reused and its geometry is created again
+    assertSuccess(gtfsRt.applyTripUpdate(tripUpdate));
+    var readded = assertAddedTrip(ADDED_TRIP_ID, env);
+    assertSame(pattern, readded);
+    assertNotNull(env.shapeService().getTripPatternShape(pattern.getId()));
+  }
+
+  @Test
+  void differentialUpdateKeepsTheGeometryOfAddedPattern() {
+    var tripUpdate = gtfsRt
+      .tripUpdate(ADDED_TRIP_ID, ADDED)
+      .addStopTime(STOP_A_ID, "00:30")
+      .addStopTime(STOP_B_ID, "00:40")
+      .addStopTime(STOP_C_ID, "00:55")
+      .build();
+    assertSuccess(gtfsRt.applyTripUpdate(tripUpdate));
+    var pattern = assertAddedTrip(ADDED_TRIP_ID, env);
+
+    gtfsRt.applyTripUpdates(List.of(), DIFFERENTIAL);
+
+    assertNotNull(env.shapeService().getTripPatternShape(pattern.getId()));
   }
 
   private TripPattern assertAddedTrip(String tripId, TransitTestEnvironment env) {

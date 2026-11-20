@@ -16,6 +16,7 @@ import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.opentripplanner.updater.trip.TripUpdateApplier;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
 import org.opentripplanner.updater.trip.gtfs.model.TripUpdate;
+import org.opentripplanner.updater.trip.shape.RealTimeTripShapeWriter;
 
 /// Handles GTFS-RT TripUpdates for trips with schedule relationship `DUPLICATED`. Creates a copy of
 /// a scheduled trip shifted to a new start time (and service date).
@@ -23,10 +24,16 @@ class DuplicatedTripHandler {
 
   private final TimetableRepository buffer;
   private final DeduplicatorService deduplicator;
+  private final RealTimeTripShapeWriter shapeWriter;
 
-  DuplicatedTripHandler(TimetableRepository buffer, DeduplicatorService deduplicator) {
+  DuplicatedTripHandler(
+    TimetableRepository buffer,
+    DeduplicatorService deduplicator,
+    RealTimeTripShapeWriter shapeWriter
+  ) {
     this.buffer = buffer;
     this.deduplicator = deduplicator;
+    this.shapeWriter = shapeWriter;
   }
 
   UpdateSuccess handleDuplicated(TripUpdate tripUpdate, UpdateIncrementality updateIncrementality)
@@ -95,7 +102,7 @@ class DuplicatedTripHandler {
       .withTripCreation(true)
       .withAddedTripOnServiceDate(tripOnServiceDate)
       .build();
-    return TripUpdateApplier.apply(buffer, update);
+    return TripUpdateApplier.apply(buffer, shapeWriter, update);
   }
 
   /// The spec is silent about how these ids should be constructed, so we create a new ID ourselves.

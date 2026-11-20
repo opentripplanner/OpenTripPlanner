@@ -12,6 +12,7 @@ import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
+import org.opentripplanner.service.shape.dataimport.ShapeDataImport;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
@@ -68,6 +69,7 @@ public class LoadApplication {
       obj.streetDetailsRepository,
       obj.transitRepository,
       obj.timetableDataImport,
+      obj.shapeDataImport,
       obj.transferRepository,
       obj.regularTransferBuildRepository,
       obj.worldEnvelopeRepository,
@@ -90,6 +92,7 @@ public class LoadApplication {
       factory.emptyStreetDetailsRepository(),
       factory.emptyTransitRepository(),
       factory.emptyTimetableDataImport(),
+      factory.emptyShapeDataImport(),
       factory.emptyTransferRepository(),
       factory.emptyRegularTransferBuildRepository(),
       factory.emptyWorldEnvelopeRepository(),
@@ -121,6 +124,7 @@ public class LoadApplication {
     StreetDetailsRepository streetDetailsRepository,
     TransitRepository transitRepository,
     TimetableDataImport timetableDataImport,
+    ShapeDataImport shapeDataImport,
     TransferRepository transferRepository,
     RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
@@ -140,6 +144,7 @@ public class LoadApplication {
       streetDetailsRepository,
       transitRepository,
       timetableDataImport,
+      shapeDataImport,
       transferRepository,
       regularTransferBuildRepository,
       worldEnvelopeRepository,

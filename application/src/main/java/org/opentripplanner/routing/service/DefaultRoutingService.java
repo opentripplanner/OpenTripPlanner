@@ -32,6 +32,7 @@ import org.opentripplanner.routing.api.response.ViaRoutingResponse;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
+import org.opentripplanner.service.shape.ShapeService;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.street.graph.Graph;
@@ -53,6 +54,7 @@ public class DefaultRoutingService implements RoutingService {
   private static final Logger LOG = LoggerFactory.getLogger(DefaultRoutingService.class);
 
   private final TransitService transitService;
+  private final ShapeService shapeService;
   private final TransitAlertService transitAlertService;
   private final Graph graph;
   private final RaptorConfig<TripSchedule> raptorConfig;
@@ -96,6 +98,7 @@ public class DefaultRoutingService implements RoutingService {
 
   public DefaultRoutingService(
     TransitService transitService,
+    ShapeService shapeService,
     Graph graph,
     RaptorConfig<TripSchedule> raptorConfig,
     MeterRegistry meterRegistry,
@@ -120,6 +123,7 @@ public class DefaultRoutingService implements RoutingService {
     @Nullable RealtimeResolver realtimeResolver
   ) {
     this.transitService = transitService;
+    this.shapeService = shapeService;
     this.transitAlertService = transitAlertService;
     this.graph = graph;
     this.raptorConfig = raptorConfig;
@@ -177,6 +181,7 @@ public class DefaultRoutingService implements RoutingService {
   private RoutingWorker newRoutingWorker(RoutingWorkerRequest workerRequest) {
     return new RoutingWorker(
       transitService,
+      shapeService,
       transitAlertService,
       graph,
       raptorConfig,

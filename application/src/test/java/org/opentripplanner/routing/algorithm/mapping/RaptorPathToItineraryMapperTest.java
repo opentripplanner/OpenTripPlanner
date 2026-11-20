@@ -51,8 +51,10 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.FlexAccessEgr
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.service.shape.ShapeTestFactory;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRepository;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsService;
+import org.opentripplanner.standalone.api.TestServerContext;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.TestStateBuilder;
@@ -99,6 +101,19 @@ public class RaptorPathToItineraryMapperTest {
   private static final RegularStop S1 = TEST_MODEL.stop("STOP1").build();
   private static final RegularStop S2 = TEST_MODEL.stop("STOP2").build();
   private static final RegularStop S3 = TEST_MODEL.stop("STOP3").build();
+  private static final TestTripPattern TWO_STOP_PATTERN = TestTripPattern.pattern(
+    "TestPattern",
+    1,
+    2
+  ).withRoute(ROUTE);
+  private static final TestTripPattern FIVE_STOP_PATTERN = TestTripPattern.pattern(
+    "TestPattern",
+    1,
+    2,
+    3,
+    2,
+    1
+  ).withRoute(ROUTE);
 
   @ParameterizedTest
   @ValueSource(ints = { 0, 3000, -3000 })
@@ -242,7 +257,7 @@ public class RaptorPathToItineraryMapperTest {
 
   private TestTripSchedule transferAtSameStopSchedule() {
     TestTransitData data = new TestTransitData();
-    var pattern = TestTripPattern.pattern("TestPattern", 1, 2, 3, 2, 1).withRoute(ROUTE);
+    var pattern = FIVE_STOP_PATTERN;
     var originalPattern = getOriginalPattern(pattern);
 
     var timetable = new TestTripSchedule.Builder()
@@ -305,7 +320,12 @@ public class RaptorPathToItineraryMapperTest {
       stopTimes.add(stopTime);
     }
 
-    var builder = TripPattern.of(new FeedScopedId(pattern.route().getId().getFeedId(), "TestId"))
+    var builder = TripPattern.of(
+      new FeedScopedId(
+        pattern.route().getId().getFeedId(),
+        "TestId" + pattern.numberOfStopsInPattern()
+      )
+    )
       .withRoute(pattern.route())
       .withStopPattern(new StopPattern(stopTimes));
     return builder.build();
@@ -336,6 +356,11 @@ public class RaptorPathToItineraryMapperTest {
         transitRepository,
         DefaultTimetableRepository.scheduledOnly(timetableDataImport.toScheduledTimetableData())
       ),
+      TestServerContext.createShapeService(
+        ShapeTestFactory.shapeDataImport(
+          List.of(getOriginalPattern(TWO_STOP_PATTERN), getOriginalPattern(FIVE_STOP_PATTERN))
+        )
+      ),
       new DefaultStreetDetailsService(new DefaultStreetDetailsRepository()),
       getRaptorTransitData(),
       regularTransfers,
@@ -362,7 +387,7 @@ public class RaptorPathToItineraryMapperTest {
 
   private TestTripSchedule getTestTripSchedule2() {
     TestTransitData data = new TestTransitData();
-    var pattern = TestTripPattern.pattern("TestPattern", 1, 2, 3, 2, 1).withRoute(ROUTE);
+    var pattern = FIVE_STOP_PATTERN;
     var originalPattern = getOriginalPattern(pattern);
 
     var timetable = new TestTripSchedule.Builder()
@@ -385,7 +410,7 @@ public class RaptorPathToItineraryMapperTest {
 
   private TestTripSchedule getTestTripSchedule() {
     TestTransitData data = new TestTransitData();
-    var pattern = TestTripPattern.pattern("TestPattern", 1, 2).withRoute(ROUTE);
+    var pattern = TWO_STOP_PATTERN;
     var originalPattern = getOriginalPattern(pattern);
 
     var timetable = new TestTripSchedule.Builder()

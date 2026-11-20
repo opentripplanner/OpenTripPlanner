@@ -3,10 +3,13 @@ package org.opentripplanner.updater.trip.gtfs;
 import java.time.LocalDate;
 import java.util.function.Supplier;
 import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
+import org.opentripplanner.service.shape.ShapeRepository;
 import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.trip.patterncache.TripPatternCache;
 import org.opentripplanner.updater.trip.patterncache.TripPatternIdGenerator;
+import org.opentripplanner.updater.trip.shape.RealTimeTripShapeFactory;
+import org.opentripplanner.updater.trip.shape.RealTimeTripShapeWriter;
 
 /**
  * Application-scoped factory for GTFS-RT trip update processing. Holds stable, application-lifetime
@@ -39,16 +42,37 @@ public class GtfsRealTimeTripUpdateAdapter {
   /**
    * Create an update-scoped task for applying GTFS-RT trip updates. Entity lookups within the
    * task go directly against the given mutable buffer (which falls back to scheduled data), so
-   * they see in-progress real-time additions not yet committed to a published snapshot.
+   * they see in-progress real-time additions not yet committed to a published snapshot. The shape
+   * repository is resolved lazily, only if a pattern is created by the update.
    */
-  public GtfsRealTimeUpdateHandler forUpdate(TimetableRepository buffer) {
+  public GtfsRealTimeUpdateHandler forUpdate(
+    TimetableRepository buffer,
+    Supplier<ShapeRepository> shapeRepository
+  ) {
+    var shapeWriter = new RealTimeTripShapeWriter(
+      shapeRepository,
+      new RealTimeTripShapeFactory(deduplicator)
+    );
     return new GtfsRealTimeUpdateHandler(
       buffer,
+      shapeRepository,
       localDateNow,
-      new ScheduledTripHandler(transitRepository, buffer, tripTimesUpdater, tripPatternCache),
-      new NewTripHandler(transitRepository, buffer, tripTimesUpdater, tripPatternCache),
-      new CanceledTripHandler(buffer),
-      new DuplicatedTripHandler(buffer, deduplicator)
+      new ScheduledTripHandler(
+        transitRepository,
+        buffer,
+        tripTimesUpdater,
+        tripPatternCache,
+        shapeWriter
+      ),
+      new NewTripHandler(
+        transitRepository,
+        buffer,
+        tripTimesUpdater,
+        tripPatternCache,
+        shapeWriter
+      ),
+      new CanceledTripHandler(buffer, shapeWriter),
+      new DuplicatedTripHandler(buffer, deduplicator, shapeWriter)
     );
   }
 }
