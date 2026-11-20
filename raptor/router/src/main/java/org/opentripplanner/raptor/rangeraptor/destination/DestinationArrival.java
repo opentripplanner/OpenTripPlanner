@@ -1,5 +1,6 @@
 package org.opentripplanner.raptor.rangeraptor.destination;
 
+import static org.opentripplanner.raptor.api.view.PathLegType.ACCESS;
 import static org.opentripplanner.raptor.api.view.PathLegType.EGRESS;
 
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
@@ -116,6 +117,15 @@ public class DestinationArrival<T extends RaptorTripSchedule> implements Arrival
    */
   public int departureTime() {
     return departureTime;
+  }
+
+  /**
+   * Return {@code true} if the arrival includes transit. Most arrivals do, but some don't, for
+   * example an access that arrives on-street, directly followed by an egress that arrives
+   * on-street.
+   */
+  public boolean includesTransit() {
+    return !(previous.arrivedBy(ACCESS) && !previous.arrivedOnBoard() && egress.arrivedOnStreet());
   }
 
   @Override
