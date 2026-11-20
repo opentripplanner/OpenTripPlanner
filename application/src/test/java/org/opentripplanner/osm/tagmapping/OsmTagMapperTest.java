@@ -165,6 +165,13 @@ class OsmTagMapperTest {
     assertEquals(1.5, roundaboutSafetyFactor("secondary", "lanes", "2"), EPSILON);
   }
 
+  @Test
+  void bicycleSafetyOfCircularJunction() {
+    var street = OsmWay.of().withTag("highway", "residential").build();
+    var circular = street.copy().withTag("junction", "circular").build();
+    assertEquals(0.9, bicycleSafety(circular) / bicycleSafety(street), EPSILON);
+  }
+
   /** Bicycle safety of a roundabout, relative to the same street without the roundabout tag. */
   private static double roundaboutSafetyFactor(String highway, String... extraTags) {
     var builder = OsmWay.of().withTag("highway", highway);

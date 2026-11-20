@@ -266,7 +266,10 @@ public class OsmTagMapper {
     // Crash research points to lanes and speed as what makes roundabouts worse for cyclists, with
     // road class standing in for speed since its more consistently tagged.
     // The direction follows Poudel & Singleton (2021), but the size of each factor is a judgment call.
-    var roundabout = new Equals("junction", "roundabout");
+    var roundabout = new Condition.OneOf(
+      "junction",
+      OsmEntity.ROUNDABOUT_JUNCTION_VALUES.toArray(String[]::new)
+    );
     var multiLane = new Condition.GreaterThan("lanes", 1);
     // avoid major roundabouts
     props.setMixinProperties(
