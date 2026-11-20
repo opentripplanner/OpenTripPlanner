@@ -7,7 +7,6 @@ import static org.opentripplanner.updater.spi.UpdateErrorType.UNKNOWN_STOP;
 
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -60,7 +59,8 @@ public class SiriFuzzyTripMatcher {
   }
 
   /**
-   * Matches EstimatedVehicleJourney to a set of possible Trips based on tripId
+   * Matches a journey to a scheduled trip by the aimed arrival time at its last stop and the aimed
+   * departure time at its first stop.
    */
   public TripAndPattern match(
     EstimatedVehicleJourneyWrapper journeyWrapper,
@@ -77,28 +77,19 @@ public class SiriFuzzyTripMatcher {
       throw UpdateException.of(INVALID_DEPARTURE_TIME);
     }
 
-    Set<Trip> trips = Set.of();
-    if (journeyWrapper.vehicleRef().isPresent() && journeyWrapper.isRail()) {
-      trips = cache.tripsByInternalPlanningCode(journeyWrapper.vehicleRef().get());
+    CallWrapper lastCall = calls.getLast();
+    // accepts a quay id or a scheduled stop point id
+    RegularStop stop = entityResolver.resolveQuay(lastCall.getStopPointRef());
+    if (stop == null) {
+      throw UpdateException.of(UNKNOWN_STOP);
     }
+    ZonedDateTime arrivalTime =
+      lastCall.getAimedArrivalTime() != null
+        ? lastCall.getAimedArrivalTime()
+        : lastCall.getAimedDepartureTime();
 
-    if (trips.isEmpty()) {
-      CallWrapper lastCall = calls.getLast();
-      // resolves a scheduled stop point id to a quay (regular stop) if necessary
-      // quay ids also work
-      RegularStop stop = entityResolver.resolveQuay(lastCall.getStopPointRef());
-      if (stop == null) {
-        throw UpdateException.of(UNKNOWN_STOP);
-      }
-      ZonedDateTime arrivalTime =
-        lastCall.getAimedArrivalTime() != null
-          ? lastCall.getAimedArrivalTime()
-          : lastCall.getAimedDepartureTime();
-
-      if (arrivalTime != null) {
-        trips = getMatchingTripsOnStopOrSiblings(stop, arrivalTime);
-      }
-    }
+    Set<Trip> trips =
+      arrivalTime != null ? getMatchingTripsOnStopOrSiblings(stop, arrivalTime) : Set.of();
     if (trips.isEmpty()) {
       throw UpdateException.of(NO_FUZZY_TRIP_MATCH);
     }
@@ -118,26 +109,6 @@ public class SiriFuzzyTripMatcher {
       getCurrentTimetable,
       getNewTripPatternForModifiedTrip
     );
-  }
-
-  /**
-   * Returns a match of tripIds that match the provided values.
-   */
-  public List<FeedScopedId> getTripIdForInternalPlanningCodeServiceDate(
-    String internalPlanningCode,
-    LocalDate serviceDate
-  ) {
-    List<FeedScopedId> matches = new ArrayList<>();
-    for (Trip trip : cache.tripsByInternalPlanningCode(internalPlanningCode)) {
-      Set<LocalDate> serviceDates = timetableRepository
-        .getTripCalendars()
-        .listServiceDates(trip.getServiceId());
-      if (serviceDates.contains(serviceDate)) {
-        matches.add(trip.getId());
-      }
-    }
-
-    return matches;
   }
 
   private Set<Trip> getMatchingTripsOnStopOrSiblings(

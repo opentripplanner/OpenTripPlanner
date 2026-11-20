@@ -11,14 +11,10 @@ import uk.org.siri.siri21.FramedVehicleJourneyRefStructure;
 public class TripReferenceHelper {
 
   /**
-   * A compact, best-effort identifier of the trip a journey refers to, used for logging when the
-   * trip could not be resolved to an internal id (for example because the failure was raised before
-   * resolution, or before the journey could even be wrapped). It mirrors the reference chain that
-   * {@code EntityResolver} uses to resolve the trip: the framed vehicle journey (service journey id
-   * and service date), the dated vehicle journey, the estimated vehicle journey code (added trips),
-   * and finally the vehicle ref (used as the fuzzy matching key).
-   *
-   * @return the identifier, or {@code null} if the journey carries no usable reference
+   * A best-effort identifier of the trip a journey refers to, for journeys that could not be
+   * resolved to a trip. In order of preference: the framed vehicle journey with its data frame, the
+   * dated vehicle journey, the estimated vehicle journey code and the vehicle ref. {@code null} if
+   * the journey has none of these.
    */
   @Nullable
   public static String tripReference(@Nullable EstimatedVehicleJourney journey) {
