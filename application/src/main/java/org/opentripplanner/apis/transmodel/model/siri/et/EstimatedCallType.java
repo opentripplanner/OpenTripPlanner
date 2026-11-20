@@ -270,7 +270,7 @@ public class EstimatedCallType {
         )
         .field(
           GraphQLFieldDefinition.newFieldDefinition()
-            .name("isNotExpectedArrival")
+            .name("notExpectedArrival")
             .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
             .description(
               "Whether the real-time data reports that the vehicle is not expected to arrive at this quay, for example at an on-demand stop that has not been booked yet. " +
@@ -281,7 +281,7 @@ public class EstimatedCallType {
         )
         .field(
           GraphQLFieldDefinition.newFieldDefinition()
-            .name("isNotExpectedDeparture")
+            .name("notExpectedDeparture")
             .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
             .description(
               "Whether the real-time data reports that the vehicle is not expected to depart from this quay, for example at an on-demand stop that has not been booked yet. " +

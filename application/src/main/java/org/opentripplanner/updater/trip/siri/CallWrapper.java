@@ -314,12 +314,12 @@ public interface CallWrapper {
 
     @Override
     public boolean isNotExpectedArrival() {
-      return call.getArrivalStatus() != null && call.getArrivalStatus().equals(NOT_EXPECTED);
+      return call.getArrivalStatus() == NOT_EXPECTED;
     }
 
     @Override
     public boolean isNotExpectedDeparture() {
-      return call.getDepartureStatus() != null && call.getDepartureStatus().equals(NOT_EXPECTED);
+      return call.getArrivalStatus() == NOT_EXPECTED;
     }
 
     @Override

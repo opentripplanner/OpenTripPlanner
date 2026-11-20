@@ -516,6 +516,11 @@ public class SiriEtBuilder {
       return this;
     }
 
+    public EstimatedCallsBuilder withDepartureStatus(CallStatusEnumeration callStatus) {
+      calls.getLast().setDepartureStatus(callStatus);
+      return this;
+    }
+
     public EstimatedCallsBuilder withAimedArrivalTime(String aimedTime) {
       var call = calls.getLast();
       call.setAimedArrivalTime(localTimeParser.zonedDateTime(aimedTime));

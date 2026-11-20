@@ -189,8 +189,8 @@ public class TestCall implements CallWrapper {
     private int sortOrder = 0;
     private Boolean cancellation = null;
     private boolean extraCall = false;
-    private boolean isNotExpectedArrival;
-    private boolean isNotExpectedDeparture;
+    private boolean isNotExpectedArrival = false;
+    private boolean isNotExpectedDeparture = false;
     private Boolean predictionInaccurate = null;
     private OccupancyEnumeration occupancy = null;
     private List<NaturalLanguageStringStructure> destinationDisplaies = null;
@@ -231,7 +231,7 @@ public class TestCall implements CallWrapper {
       return this;
     }
 
-    public TestCallBuilder isNotExpectedDeparture(boolean isNotExpectedDeparture) {
+    public TestCallBuilder withNotExpectedDeparture(boolean isNotExpectedDeparture) {
       this.isNotExpectedDeparture = isNotExpectedDeparture;
       return this;
     }

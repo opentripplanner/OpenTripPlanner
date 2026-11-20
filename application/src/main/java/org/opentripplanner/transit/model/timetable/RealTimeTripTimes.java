@@ -434,7 +434,9 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
       wheelchairAccessibility == that.wheelchairAccessibility &&
       Objects.equals(state, that.state) &&
       Objects.equals(partialReplacedBys, that.partialReplacedBys) &&
-      Objects.equals(vehicleId, that.vehicleId)
+      Objects.equals(vehicleId, that.vehicleId) &&
+      Objects.equals(isNotExpectedArrival, that.isNotExpectedArrival) &&
+      Objects.equals(isNotExpectedDeparture, that.isNotExpectedDeparture)
     );
   }
 
@@ -454,7 +456,9 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
       wheelchairAccessibility,
       state,
       partialReplacedBys,
-      vehicleId
+      vehicleId,
+      isNotExpectedArrival,
+      isNotExpectedDeparture
     );
   }
 }
