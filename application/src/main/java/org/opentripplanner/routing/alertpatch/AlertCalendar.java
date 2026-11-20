@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.alertpatch;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Comparator;
@@ -14,7 +15,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * if any of the periods are valid. An alert always has at least one period: if the source data does
  * not contain any validity information, the alert is {@link #ofAlwaysActive() always active}.
  */
-public final class AlertCalendar {
+public final class AlertCalendar implements Serializable {
 
   private static final AlertCalendar ALWAYS_ACTIVE = new AlertCalendar(
     List.of(TimePeriod.ofUnbounded())

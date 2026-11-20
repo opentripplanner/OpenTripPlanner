@@ -16,6 +16,11 @@ import org.opentripplanner.kryo.BuildConfigSerializer;
 import org.opentripplanner.kryo.RouterConfigSerializer;
 import org.opentripplanner.kryo.UnmodifiableCollectionsSerializer;
 import org.opentripplanner.routing.graph.kryosupport.hppc.HppcKryoSupport;
+import org.opentripplanner.routing.graph.kryosupport.java.AtomicIntegerSerializer;
+import org.opentripplanner.routing.graph.kryosupport.java.EnumMapSerializer;
+import org.opentripplanner.routing.graph.kryosupport.java.JavaImmutableListSerializer;
+import org.opentripplanner.routing.graph.kryosupport.java.JavaImmutableMapSerializer;
+import org.opentripplanner.routing.graph.kryosupport.java.JavaImmutableSetSerializer;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.utils.collection.trie.ImmutableTrieMap;
@@ -44,8 +49,7 @@ public final class KryoBuilder {
     HppcKryoSupport.register(kryo);
 
     // Add support for the package local java.util.ImmutableCollections.
-    // Not supported properly in the current com.conveyal:kryo-tools:1.4.0.
-    // This provide support for List.of, Set.of, Map.of and Collectors.toUnmodifiable(Set|List|Map)
+    // This provides support for List.of, Set.of, Map.of and Collectors.toUnmodifiable(Set|List|Map)
     kryo.register(List.of().getClass(), new JavaImmutableListSerializer());
     kryo.register(List.of(1).getClass(), new JavaImmutableListSerializer());
     kryo.register(Set.of().getClass(), new JavaImmutableSetSerializer());
