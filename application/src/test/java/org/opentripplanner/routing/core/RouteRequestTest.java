@@ -31,6 +31,7 @@ import org.opentripplanner.routing.api.request.via.VisitViaLocation;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
+import org.opentripplanner.routing.error.InvalidRoutingInputException;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.StreetMode;
@@ -280,7 +281,7 @@ class RouteRequestTest {
 
   @Test
   void testTooLongSearchWindow() {
-    var ex = assertThrows(IllegalArgumentException.class, () ->
+    var ex = assertThrows(InvalidRoutingInputException.class, () ->
       minimal
         .copyOf()
         .withMaxSearchWindow(DURATION_24_HOURS)
@@ -292,7 +293,7 @@ class RouteRequestTest {
 
   @Test
   void testNegativeSearchWindow() {
-    var ex = assertThrows(IllegalArgumentException.class, () ->
+    var ex = assertThrows(InvalidRoutingInputException.class, () ->
       minimal.copyOf().withSearchWindow(Duration.ofSeconds(-1)).buildRequest()
     );
     assertEquals("The search window must be a positive duration", ex.getMessage());

@@ -569,10 +569,12 @@ public class RouteRequest implements Serializable {
   private void validateSearchWindow() {
     if (searchWindow != null) {
       if (hasMaxSearchWindow() && searchWindow.toSeconds() > maxSearchWindow.toSeconds()) {
-        throw new IllegalArgumentException("The search window cannot exceed " + maxSearchWindow);
+        throw new InvalidRoutingInputException(
+          "The search window cannot exceed " + maxSearchWindow
+        );
       }
       if (searchWindow.isNegative()) {
-        throw new IllegalArgumentException("The search window must be a positive duration");
+        throw new InvalidRoutingInputException("The search window must be a positive duration");
       }
     }
   }
