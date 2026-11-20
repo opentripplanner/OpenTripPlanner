@@ -4,7 +4,6 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.UUID;
-import org.jspecify.annotations.Nullable;
 import org.opentripplanner.framework.io.OtpHttpClientException;
 import org.opentripplanner.framework.retry.OtpRetry;
 import org.opentripplanner.framework.retry.OtpRetryBuilder;
@@ -17,7 +16,6 @@ import org.opentripplanner.updater.spi.PollingGraphUpdaterParameters;
 import org.opentripplanner.updater.spi.WriteDomain;
 import org.opentripplanner.updater.support.siri.SiriLoader;
 import org.opentripplanner.updater.trip.UrlUpdaterParameters;
-import org.opentripplanner.updater.trip.siri.SiriFuzzyTripMatcherCache;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,11 +48,7 @@ public class SiriSXUpdater
   private final SiriLoader siriHttpLoader;
   private final OtpRetry retry;
 
-  public SiriSXUpdater(
-    Parameters config,
-    @Nullable SiriFuzzyTripMatcherCache siriFuzzyTripMatcherCache,
-    SiriLoader siriLoader
-  ) {
+  public SiriSXUpdater(Parameters config, SiriLoader siriLoader) {
     super(config);
     this.url = config.url();
     this.requestorRef = config.requestorRef();
@@ -70,8 +64,7 @@ public class SiriSXUpdater
     this.updateHandler = new SiriAlertsUpdateHandler(
       config.feedId(),
       transitAlertService,
-      config.earlyStart(),
-      siriFuzzyTripMatcherCache
+      config.earlyStart()
     );
     siriHttpLoader = siriLoader;
 
