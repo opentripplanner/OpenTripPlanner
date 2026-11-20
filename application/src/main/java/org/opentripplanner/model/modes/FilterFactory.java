@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.NarrowedTransitMode;
-import org.opentripplanner.transit.model.basic.ReplacementRequirement;
 import org.opentripplanner.transit.model.basic.TransitMode;
 
 /**
@@ -25,7 +24,7 @@ class FilterFactory {
   private FilterFactory() {}
 
   static AllowTransitModeFilter of(NarrowedTransitMode mode) {
-    if (mode.getReplacement() != ReplacementRequirement.IGNORED) {
+    if (!mode.isConvertibleToMainAndSubMode()) {
       return new AllowNarrowedTransitModeFilter(mode);
     }
     if (mode.getSubMode() == null) {

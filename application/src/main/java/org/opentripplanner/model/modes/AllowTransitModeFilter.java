@@ -17,7 +17,7 @@ public interface AllowTransitModeFilter extends Serializable {
   }
 
   static AllowTransitModeFilter ofMainAndSubMode(Collection<MainAndSubMode> modes) {
-    return of(modes.stream().map(NarrowedTransitMode::of).toList());
+    return of(modes.stream().map(NarrowedTransitMode::ofMainAndSubMode).toList());
   }
 
   /**

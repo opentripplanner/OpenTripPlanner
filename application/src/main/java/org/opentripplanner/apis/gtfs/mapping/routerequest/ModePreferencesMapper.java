@@ -18,8 +18,10 @@ import org.opentripplanner.routing.api.request.request.TransitRequestBuilder;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
 import org.opentripplanner.street.model.StreetMode;
+import org.opentripplanner.transit.model.basic.DistanceCategory;
 import org.opentripplanner.transit.model.basic.NarrowedTransitMode;
 import org.opentripplanner.transit.model.basic.ReplacementRequirement;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.utils.collection.CollectionUtils;
 import org.opentripplanner.utils.time.DurationUtils;
 
@@ -112,16 +114,36 @@ public class ModePreferencesMapper {
     };
   }
 
+  private static DistanceCategory map(GraphQLTypes.GraphQLDistanceCategory input) {
+    return switch (input) {
+      case LOCAL -> DistanceCategory.LOCAL;
+      case REGIONAL -> DistanceCategory.REGIONAL;
+      case LONG_DISTANCE -> DistanceCategory.LONG_DISTANCE;
+    };
+  }
+
   private static NarrowedTransitMode map(GraphQLTypes.GraphQLPlanTransitModePreferenceInput input) {
-    if (input != null) {
-      return new NarrowedTransitMode(
-        TransitModeMapper.map(input.getGraphQLMode()),
-        null,
-        map(input.getGraphQLReplacement())
-      );
-    } else {
+    var mode = TransitModeMapper.map(input.getGraphQLMode());
+    return NarrowedTransitMode.of(mode)
+      .withReplacement(map(input.getGraphQLReplacement()))
+      .withDistanceCategories(mapDistanceCategories(mode, input.getGraphQLDistanceCategories()))
+      .build();
+  }
+
+  @Nullable
+  private static List<DistanceCategory> mapDistanceCategories(
+    TransitMode mode,
+    @Nullable List<GraphQLTypes.GraphQLDistanceCategory> input
+  ) {
+    if (input == null) {
       return null;
     }
+    if (input.isEmpty()) {
+      throw new InvalidInputException(
+        "The distance categories of transit mode " + mode + " must not be empty."
+      );
+    }
+    return input.stream().map(ModePreferencesMapper::map).toList();
   }
 
   /**
