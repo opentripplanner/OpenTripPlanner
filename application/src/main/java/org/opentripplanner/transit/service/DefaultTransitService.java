@@ -1,8 +1,7 @@
 package org.opentripplanner.transit.service;
 
-import gnu.trove.TCollections;
-import gnu.trove.set.TIntSet;
-import gnu.trove.set.hash.TIntHashSet;
+import com.carrotsearch.hppc.IntHashSet;
+import com.carrotsearch.hppc.IntSet;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -75,9 +74,7 @@ import org.opentripplanner.utils.time.ServiceDateUtils;
  */
 public class DefaultTransitService implements TransitService {
 
-  private static final TIntSet EMPTY_SERVICE_CODES = TCollections.unmodifiableSet(
-    new TIntHashSet()
-  );
+  private static final IntSet EMPTY_SERVICE_CODES = new IntHashSet();
 
   private final TransitRepository transitRepository;
 
@@ -213,7 +210,7 @@ public class DefaultTransitService implements TransitService {
   }
 
   @Override
-  public TIntSet getServiceCodesRunningForDate(LocalDate serviceDate) {
+  public IntSet getServiceCodesRunningForDate(LocalDate serviceDate) {
     return getTripCalendars()
       .getServiceCodesRunningForDate()
       .getOrDefault(serviceDate, EMPTY_SERVICE_CODES);
@@ -665,7 +662,7 @@ public class DefaultTransitService implements TransitService {
   }
 
   @Override
-  public Map<LocalDate, TIntSet> getServiceCodesRunningForDate() {
+  public Map<LocalDate, IntSet> getServiceCodesRunningForDate() {
     return Collections.unmodifiableMap(getTripCalendars().getServiceCodesRunningForDate());
   }
 

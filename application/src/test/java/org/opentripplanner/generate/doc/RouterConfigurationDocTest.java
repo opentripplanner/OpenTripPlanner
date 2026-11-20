@@ -33,11 +33,11 @@ public class RouterConfigurationDocTest {
     .skip("routingDefaults", "RouteRequest.md")
     .skip("updaters", "Realtime-Updaters.md")
     .skip("vectorTiles", "sandbox/MapboxVectorTilesApi.md")
-    .skipNestedElements("transferCacheRequests", "RouteRequest.md")
     .skip("rideHailingServices", "sandbox/RideHailing.md")
     .skip("vehicleRentalServiceDirectory", "sandbox/VehicleRentalServiceDirectory.md")
     .skip("triasApi", "sandbox/TriasApi.md")
     .skip("ojpApi", "sandbox/OjpApi.md")
+    .skip("carpooling", "sandbox/Carpooling.md")
     .build();
 
   /**

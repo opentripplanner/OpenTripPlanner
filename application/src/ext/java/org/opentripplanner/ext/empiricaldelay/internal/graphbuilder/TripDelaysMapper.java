@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.empiricaldelay.internal.graphbuilder;
 
-import gnu.trove.map.hash.TIntObjectHashMap;
+import com.carrotsearch.hppc.IntObjectHashMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -43,12 +43,12 @@ class TripDelaysMapper {
   }
 
   @Nullable
-  private TIntObjectHashMap<EmpiricalDelay> map(
+  private IntObjectHashMap<EmpiricalDelay> map(
     FeedScopedId tripId,
     String serviceId,
     List<DelayAtStopDto> delayDtos
   ) {
-    var map = new TIntObjectHashMap<EmpiricalDelay>();
+    var map = new IntObjectHashMap<EmpiricalDelay>();
     var stopIds = stopIdsByTripId.get(tripId);
 
     if (stopIds == null) {
@@ -80,7 +80,7 @@ class TripDelaysMapper {
       addSkippedStopIssue(tripId, serviceId, skippedStops);
     }
 
-    deduplicator.deduplicateObject(TIntObjectHashMap.class, map);
+    deduplicator.deduplicateObject(IntObjectHashMap.class, map);
     return map;
   }
 

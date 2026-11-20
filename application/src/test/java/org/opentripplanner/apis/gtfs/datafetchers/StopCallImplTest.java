@@ -1,24 +1,32 @@
 package org.opentripplanner.apis.gtfs.datafetchers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.apis.gtfs.model.CallSchedule;
 import org.opentripplanner.apis.gtfs.model.CallScheduledTime.ArrivalDepartureTime;
 import org.opentripplanner.apis.gtfs.model.CallScheduledTime.TimeWindow;
 import org.opentripplanner.apis.support.graphql.DataFetchingSupport;
+import org.opentripplanner.core.model.i18n.TranslatedString;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model.TripInput;
+import org.opentripplanner.transit.model.network.StopPattern;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 class StopCallImplTest {
@@ -31,6 +39,7 @@ class StopCallImplTest {
   ).toInstant();
   private static final String TRIP_ID = "Trip1";
   private static final String FLEX_TRIP_ID = "FlexTrip1";
+  private static final String HEADSIGN_TRIP_ID = "HeadsignTrip1";
 
   private static final OffsetDateTime NOON = OffsetDateTime.parse("2023-06-03T12:00+02:00");
   private static final OffsetDateTime TEN_AM = NOON.minusHours(2);
@@ -44,6 +53,17 @@ class StopCallImplTest {
   private final TripInput TRIP_INPUT = TripInput.of(TRIP_ID)
     .addStop(STOP_A, "12:00:00", "12:00:00")
     .addStop(STOP_B, "12:30:00", "12:30:00")
+    .addStop(STOP_C, "13:00:00", "13:00:00");
+
+  private final TripInput HEADSIGN_TRIP_INPUT = TripInput.of(HEADSIGN_TRIP_ID)
+    .withHeadsign(TranslatedString.getI18NString("Ring", "de", "Ringlinie"))
+    .addStop(STOP_A, "12:00:00", "12:00:00")
+    .addStopWithHeadsign(
+      STOP_B,
+      "12:30:00",
+      "12:30:00",
+      TranslatedString.getI18NString("Ring via C", "de", "Ringlinie über C")
+    )
     .addStop(STOP_C, "13:00:00", "13:00:00");
 
   private final TripInput FLEX_TRIP_INPUT = TripInput.flex(FLEX_TRIP_ID)
@@ -68,6 +88,109 @@ class StopCallImplTest {
 
     var schedule = impl.schedule().get(env);
     assertEquals(new CallSchedule(new ArrivalDepartureTime(NOON, NOON, false)), schedule);
+  }
+
+  @Test
+  void headsign() throws Exception {
+    var transitEnv = envBuilder.addTrip(HEADSIGN_TRIP_INPUT).build();
+
+    assertEquals("Ring", headsign(transitEnv, 0, Map.of()));
+    assertEquals("Ring via C", headsign(transitEnv, 1, Map.of()));
+    assertEquals("Ring", headsign(transitEnv, 2, Map.of()));
+  }
+
+  @Test
+  void noDestinationDisplayWithoutHeadsign() throws Exception {
+    var transitEnv = envBuilder.addTrip(TRIP_INPUT).build();
+    var tripData = transitEnv.tripData(TRIP_ID);
+    var call = new TripTimeOnDate(
+      tripData.tripTimes(),
+      0,
+      tripData.tripPattern(),
+      SERVICE_DATE,
+      MIDNIGHT
+    );
+    var env = DataFetchingSupport.dataFetchingEnvironment(
+      call,
+      Map.of(),
+      transitEnv.transitService()
+    );
+
+    assertNull(new StopCallImpl().destinationDisplay().get(env));
+  }
+
+  @Test
+  void translatedHeadsign() throws Exception {
+    var transitEnv = envBuilder.addTrip(HEADSIGN_TRIP_INPUT).build();
+
+    assertEquals("Ringlinie", headsign(transitEnv, 0, Map.of("language", "de")));
+    assertEquals("Ringlinie über C", headsign(transitEnv, 1, Map.of("language", "de")));
+  }
+
+  @Test
+  void canceledStop() throws Exception {
+    var realtimeEnv = envBuilder.addTrip(TRIP_INPUT).build();
+    var tripData = realtimeEnv.tripData(TRIP_ID);
+    var pattern = tripData.tripPattern();
+    var tripTimes = tripData
+      .tripTimes()
+      .createRealTimeFromScheduledTimes()
+      .withRealTimeUpdated()
+      .withCanceled(2)
+      .build();
+
+    // Only the last stop is canceled
+    var expectedCanceled = List.of(false, false, true);
+    for (int stopPos = 0; stopPos < expectedCanceled.size(); stopPos++) {
+      var call = new TripTimeOnDate(tripTimes, stopPos, pattern, SERVICE_DATE, MIDNIGHT);
+      assertCanceledInRealTime(expectedCanceled.get(stopPos), call, realtimeEnv.transitService());
+    }
+  }
+
+  /** Canceling the trip alone does not cancel its calls. */
+  @Test
+  void canceledTripDoesNotCancelCalls() throws Exception {
+    var realtimeEnv = envBuilder.addTrip(TRIP_INPUT).build();
+    var tripData = realtimeEnv.tripData(TRIP_ID);
+    var pattern = tripData.tripPattern();
+    var tripTimes = tripData.tripTimes().createRealTimeFromScheduledTimes().withCanceled().build();
+
+    for (int stopPos = 0; stopPos < 3; stopPos++) {
+      var call = new TripTimeOnDate(tripTimes, stopPos, pattern, SERVICE_DATE, MIDNIGHT);
+      assertCanceledInRealTime(false, call, realtimeEnv.transitService());
+    }
+  }
+
+  /**
+   * A real-time pattern can cancel a stop by setting its pickup and drop-off to cancelled, without
+   * the trip times marking the stop as canceled. The cancellation is reported in {@code realTime},
+   * even if the trip times are not marked as updated.
+   */
+  @Test
+  void stopCanceledByPattern() throws Exception {
+    var realtimeEnv = envBuilder.addTrip(TRIP_INPUT).build();
+    var tripData = realtimeEnv.tripData(TRIP_ID);
+    var scheduledPattern = tripData.tripPattern();
+    // Only the middle stop is canceled
+    var canceled = List.of(false, true, false);
+    var stops = List.of(STOP_A, STOP_B, STOP_C);
+    var stopPattern = StopPattern.create(stops.size());
+    for (int i = 0; i < stops.size(); i++) {
+      var pickDrop = canceled.get(i) ? PickDrop.CANCELLED : PickDrop.SCHEDULED;
+      stopPattern.stops.with(i, stops.get(i));
+      stopPattern.pickups.with(i, pickDrop);
+      stopPattern.dropoffs.with(i, pickDrop);
+    }
+    var pattern = TripPattern.of(id("PatternWithCanceledStop"))
+      .withRoute(scheduledPattern.getRoute())
+      .withMode(scheduledPattern.getMode())
+      .withStopPattern(stopPattern.build())
+      .build();
+
+    for (int stopPos = 0; stopPos < stops.size(); stopPos++) {
+      var call = new TripTimeOnDate(tripData.tripTimes(), stopPos, pattern, SERVICE_DATE, MIDNIGHT);
+      assertCanceledInRealTime(canceled.get(stopPos), call, realtimeEnv.transitService());
+    }
   }
 
   @Test
@@ -96,5 +219,42 @@ class StopCallImplTest {
         throw new RuntimeException(e);
       }
     });
+  }
+
+  private String headsign(
+    TransitTestEnvironment transitEnv,
+    int stopPosition,
+    Map<String, Object> arguments
+  ) throws Exception {
+    var tripData = transitEnv.tripData(HEADSIGN_TRIP_ID);
+    var call = new TripTimeOnDate(
+      tripData.tripTimes(),
+      stopPosition,
+      tripData.tripPattern(),
+      SERVICE_DATE,
+      MIDNIGHT
+    );
+    var callEnv = DataFetchingSupport.dataFetchingEnvironment(
+      call,
+      Map.of(),
+      transitEnv.transitService()
+    );
+    var destinationDisplay = new StopCallImpl().destinationDisplay().get(callEnv);
+    var env = DataFetchingSupport.dataFetchingEnvironment(destinationDisplay, arguments);
+    return new DestinationDisplayImpl().headsign().get(env);
+  }
+
+  /**
+   * Assert whether a call is canceled by a real-time update. A call without real-time data is not
+   * canceled by a real-time update.
+   */
+  private static void assertCanceledInRealTime(
+    boolean expected,
+    TripTimeOnDate call,
+    TransitService transitService
+  ) throws Exception {
+    var env = DataFetchingSupport.dataFetchingEnvironment(call, Map.of(), transitService);
+    var realTime = new StopCallImpl().realTime().get(env);
+    assertEquals(expected, realTime != null && realTime.canceled());
   }
 }

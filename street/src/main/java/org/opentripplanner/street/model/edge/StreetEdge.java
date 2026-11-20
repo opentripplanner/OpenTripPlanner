@@ -386,15 +386,26 @@ public class StreetEdge
   }
 
   /**
-   * Update the name of the edge after it has been constructed. This method also sets the
+   * Update the name of the edge after it has been constructed and set the
    * nameIsDerived property to false, indicating to the code that maps from edges to steps that this
    * is a real street name.
    *
    * @see Edge#nameIsDerived()
    */
-  public void setName(I18NString name) {
+  public void overrideName(I18NString name) {
     this.name = name;
     this.flags = BitSetUtils.set(flags, NAME_IS_DERIVED_FLAG_INDEX, false);
+  }
+
+  /**
+   * Update the name of the edge after it has been constructed and marking the name as derived,
+   * meaning that its name should be de-prioritized in walk steps.
+   *
+   * @see Edge#nameIsDerived()
+   */
+  public void overrideDerivedName(I18NString name) {
+    this.name = name;
+    this.flags = BitSetUtils.set(flags, NAME_IS_DERIVED_FLAG_INDEX, true);
   }
 
   @Override
@@ -1051,14 +1062,22 @@ public class StreetEdge
     double time, weight;
     if (wheelchair) {
       time = getEffectiveWalkDistance() / speed;
-      weight =
-        (getEffectiveBikeDistance() / speed) *
-        StreetEdgeReluctanceCalculator.computeWheelchairReluctance(
-          request,
-          getMaxSlope(),
-          isWheelchairAccessible(),
-          isStairs()
-        );
+      // Use walk safety and the bike slope model.
+      double slopeAdjustedDistance = getEffectiveBikeDistance();
+      double safetyWeightedDistance = getWalkSafetyFactor() * slopeAdjustedDistance;
+
+      // Blend the safety-weighted and the plain distance by how much the request weighs safety
+      double safetyShare = request.walk().safetyFactor();
+      double blendedDistance =
+        safetyWeightedDistance * safetyShare + slopeAdjustedDistance * (1 - safetyShare);
+
+      double wheelchairReluctance = StreetEdgeReluctanceCalculator.computeWheelchairReluctance(
+        request,
+        getMaxSlope(),
+        isWheelchairAccessible(),
+        isStairs()
+      );
+      weight = (blendedDistance / speed) * wheelchairReluctance;
       if (BitSetUtils.get(flags, WHEELCHAIR_INACCESSIBLE_BARRIER_FLAG_INDEX)) {
         weight += WHEELCHAIR_INACCESSIBLE_BARRIER_COST;
       }

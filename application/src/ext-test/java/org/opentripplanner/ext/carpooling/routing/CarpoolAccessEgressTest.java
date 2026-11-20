@@ -15,17 +15,16 @@ import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.framework.model.TimeAndCost;
-import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.raptor.spi.RaptorCostConverter;
 import org.opentripplanner.street.model.path.StreetPath;
-import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 
 class CarpoolAccessEgressTest {
 
   private static final int STOP = 0;
   private static final Duration STOP_DURATION = Duration.ofMinutes(2);
   private static final int DWELL_SECONDS = (int) STOP_DURATION.getSeconds();
+  private static final int BOARD_COST = 0;
   private static final int PICKUP_POSITION = 1;
   private static final int DROPOFF_POSITION = 2;
   private static final Duration PICKUP_SEGMENT_DURATION = Duration.ofMinutes(1);
@@ -140,74 +139,9 @@ class CarpoolAccessEgressTest {
     assertThrows(IllegalStateException.class, () -> withPenalty.withPenalty(penalty));
   }
 
-  /**
-   * For an access the transit stop sits at the chain end, so the final state is the last state of
-   * the trailing walk from the dropoff to the stop.
-   */
-  @Test
-  void getFinalStateForAccessReturnsStateAtTransitStopChainEnd() {
-    var walkToPickup = createStreetPath(Duration.ofSeconds(80));
-    var walkFromDropoff = createStreetPath(Duration.ofSeconds(40));
-    var stop = TransitRepositoryForTest.of().stop("Central Station", 59.91, 10.74).build();
-
-    var access = newAccessEgress(
-      1_000,
-      walkToPickup,
-      Duration.ofSeconds(60),
-      walkFromDropoff,
-      1.0,
-      EndpointLabel.forLocation(GenericLocation.fromCoordinate(59.92, 10.75, "Home")),
-      EndpointLabel.forStop(stop)
-    );
-
-    assertEquals(walkFromDropoff.lastState(), access.getFinalState());
-  }
-
-  /**
-   * For an egress the transit stop sits at the chain start, so the final state is the first state
-   * of the leading walk from the stop to the pickup.
-   */
-  @Test
-  void getFinalStateForEgressReturnsStateAtTransitStopChainStart() {
-    var walkToPickup = createStreetPath(Duration.ofSeconds(80));
-    var walkFromDropoff = createStreetPath(Duration.ofSeconds(40));
-    var stop = TransitRepositoryForTest.of().stop("Central Station", 59.91, 10.74).build();
-
-    var egress = newAccessEgress(
-      1_000,
-      walkToPickup,
-      Duration.ofSeconds(60),
-      walkFromDropoff,
-      1.0,
-      EndpointLabel.forStop(stop),
-      EndpointLabel.forLocation(GenericLocation.fromCoordinate(59.92, 10.75, "Office"))
-    );
-
-    assertEquals(walkToPickup.states().getFirst(), egress.getFinalState());
-  }
-
-  /**
-   * With no walks bracketing the ride, the final state falls back to the shared ride segment
-   * endpoint at the transit stop — the last shared segment's last state for an access.
-   */
-  @Test
-  void getFinalStateWithoutWalksFallsBackToSharedSegment() {
-    var access = newAccessEgress(
-      0,
-      null,
-      Duration.ofSeconds(300),
-      null,
-      1.0,
-      EndpointLabel.EMPTY,
-      EndpointLabel.forStop(TransitRepositoryForTest.of().stop("Stop", 59.91, 10.74).build())
-    );
-
-    assertEquals(access.pathsWithNewPassenger().getLast().lastState(), access.getFinalState());
-  }
-
   /** A carpool passenger rides in the driver's car, never a station-rented vehicle. */
   @Test
-  void getFinalStateIsNotRentingVehicleFromStation() {
+  void isNotRentingVehicleFromStation() {
     var access = newAccessEgress(
       1_000,
       createStreetPath(Duration.ofSeconds(80)),
@@ -216,7 +150,30 @@ class CarpoolAccessEgressTest {
       1.0
     );
 
-    assertFalse(access.getFinalState().isRentingVehicleFromStation());
+    assertFalse(access.isRentingVehicleFromStation());
+  }
+
+  @Test
+  void c1IncludesBoardCostOnce() {
+    var withoutBoardCost = newAccessEgress(0, null, Duration.ofSeconds(60), null, 1.0, 0);
+    var withBoardCost = newAccessEgress(0, null, Duration.ofSeconds(60), null, 1.0, 2400);
+
+    assertEquals(
+      RaptorCostConverter.toRaptorCost(2400),
+      withBoardCost.c1() - withoutBoardCost.c1()
+    );
+  }
+
+  @Test
+  void withPenaltyKeepsBoardCost() {
+    var original = newAccessEgress(0, null, Duration.ofSeconds(60), null, 1.0, 2400);
+
+    var withPenalty = (CarpoolAccessEgress) original.withPenalty(
+      new TimeAndCost(Duration.ofSeconds(30), Cost.costOfSeconds(45))
+    );
+
+    int rideSeconds = 60 + DWELL_SECONDS;
+    assertEquals(rideSeconds * 1.0 + 2400, withPenalty.getPassengerRideWeight());
   }
 
   /**
@@ -239,8 +196,7 @@ class CarpoolAccessEgressTest {
       sharedSegmentDuration,
       walkFromDropoff,
       carpoolReluctance,
-      EndpointLabel.EMPTY,
-      EndpointLabel.EMPTY
+      BOARD_COST
     );
   }
 
@@ -250,8 +206,7 @@ class CarpoolAccessEgressTest {
     Duration sharedSegmentDuration,
     @Nullable StreetPath walkFromDropoff,
     double carpoolReluctance,
-    EndpointLabel startLabel,
-    EndpointLabel endLabel
+    int boardCost
   ) {
     var candidate = new InsertionCandidate(
       createSimpleTrip(OSLO_CENTER, OSLO_NORTH),
@@ -269,8 +224,9 @@ class CarpoolAccessEgressTest {
       candidate,
       TimeAndCost.ZERO,
       carpoolReluctance,
-      startLabel,
-      endLabel
+      boardCost,
+      EndpointLabel.EMPTY,
+      EndpointLabel.EMPTY
     );
   }
 }

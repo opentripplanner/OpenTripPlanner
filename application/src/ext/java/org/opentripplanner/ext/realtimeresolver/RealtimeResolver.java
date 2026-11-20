@@ -77,7 +77,9 @@ public class RealtimeResolver {
     GenericLocation fromLocation = getStreetLocation(itinerary.legs().getFirst(), true);
     GenericLocation toLocation = getStreetLocation(itinerary.legs().getLast(), false);
 
-    boolean hasItineraryStopsChanged = hasItineraryStopsChanged(itinerary);
+    Itinerary updatedItinerary = itinerary.copyOf().transformLegs(this::mapLeg).build();
+
+    boolean hasItineraryStopsChanged = hasItineraryStopsChanged(updatedItinerary);
 
     // We only call refetchItineraryService if any change has been made of stop places, due to performance reasons since refetch can be heavy.
     if (hasItineraryStopsChanged) {
@@ -88,7 +90,7 @@ public class RealtimeResolver {
         routeRequest
       );
     }
-    return itinerary.copyOf().transformLegs(this::mapLeg).build();
+    return updatedItinerary;
   }
 
   private static boolean hasItineraryStopsChanged(Itinerary itinerary) {

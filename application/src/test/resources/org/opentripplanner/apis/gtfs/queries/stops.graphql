@@ -35,6 +35,9 @@
         }
       }
       stopCall {
+        destinationDisplay {
+          headsign
+        }
         stopLocation {
           ... on Stop {
             gtfsId
@@ -44,6 +47,7 @@
           arrival {
             delay
           }
+          canceled
         }
       }
     }

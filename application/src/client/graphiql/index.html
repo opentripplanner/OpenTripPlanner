@@ -191,6 +191,31 @@ query TransmodelExampleQuery {
             transmodel: '/otp/transmodel/v3'
         }
 
+        // Optional overrides of the API endpoints, for OTP served behind a proxy that exposes the APIs
+        // on other paths. Each flavor has its own parameter, so one endpoint is never used for both.
+        // Only endpoints on the same origin as this page are accepted, so a crafted link cannot send
+        // the queries, and the headers typed in here, elsewhere.
+        const endpointParameters = {
+            gtfs: 'gtfsEndpoint',
+            transmodel: 'transmodelEndpoint'
+        };
+        Object.keys(endpointParameters).forEach((flavor) => {
+            const name = endpointParameters[flavor];
+            if (!parameters[name]) {
+                return;
+            }
+            try {
+                const endpoint = new URL(parameters[name], window.location.origin);
+                if (endpoint.origin === window.location.origin) {
+                    urls[flavor] = endpoint.pathname + endpoint.search;
+                } else {
+                    console.warn(`Ignoring ${name} '${parameters[name]}', it is not on ${window.location.origin}`);
+                }
+            } catch (e) {
+                console.warn(`Ignoring invalid ${name} '${parameters[name]}'`);
+            }
+        });
+
         let defaultQueries = {
             gtfs: gtfsExampleQuery,
             transmodel: transmodelExampleQuery
@@ -199,7 +224,18 @@ query TransmodelExampleQuery {
         let updateFlavor = (e) => {
             apiFlavor = e.target.value;
             console.log(`Setting API flavor to '${apiFlavor}'`);
-            history.pushState(null, null, `?flavor=${apiFlavor}`);
+            // The query and variables belong to the previous flavor, but the endpoints do not.
+            const kept = { flavor: apiFlavor };
+            Object.values(endpointParameters).forEach((name) => {
+                if (parameters[name]) {
+                    kept[name] = parameters[name];
+                }
+            });
+            history.pushState(
+                null,
+                null,
+                '?' + Object.keys(kept).map((key) => encodeURIComponent(key) + '=' + encodeURIComponent(kept[key])).join('&'),
+            );
             window.location.reload();
         };
 
