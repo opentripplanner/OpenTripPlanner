@@ -401,6 +401,13 @@ type CallRealTime {
 
 "What is scheduled for a trip on a service date for a stop location."
 type CallSchedule {
+  """
+  The originally scheduled stop location for this call. This is not affected by real-time updates,
+  so if the stop (e.g. the platform) was changed by a real-time update, this differs from
+  `StopCall.stopLocation`. For calls added by real-time updates, which have no scheduled stop
+  location, this is the same as `StopCall.stopLocation`.
+  """
+  stopLocation: CallStopLocation!
   "Scheduled time for a trip on a service date for a stop location."
   time: CallScheduledTime
 }
