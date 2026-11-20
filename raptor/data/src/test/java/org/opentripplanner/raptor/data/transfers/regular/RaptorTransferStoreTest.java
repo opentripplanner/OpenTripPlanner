@@ -51,6 +51,39 @@ class RaptorTransferStoreTest {
   }
 
   @Test
+  void transfersWithSameDurationKeepInsertionOrder() {
+    RaptorTransferStore subject = RaptorTransferStore.of(4)
+      .addTransfer(STOP_A, STOP_C, TIME_AB, C1_AC)
+      .addTransfer(STOP_A, STOP_B, TIME_AB, C1_AB)
+      .addTransfer(STOP_A, 3, 50, 5)
+      .build();
+
+    assertThat(collect(subject.getTransfersFromStop(STOP_A)))
+      .containsExactly(new TxEntry(3, 50, 5), new TxEntry(STOP_C, TIME_AB, C1_AC), TX_AB)
+      .inOrder();
+  }
+
+  @Test
+  void theIteratorIsAFlyweightAndHasNextDoesNotAdvance() {
+    RaptorTransferStore subject = RaptorTransferStore.of(3)
+      .addTransfer(STOP_A, STOP_B, TIME_AB, C1_AB)
+      .addTransfer(STOP_A, STOP_C, TIME_AC, C1_AC)
+      .build();
+
+    var it = subject.getTransfersFromStop(STOP_A);
+    assertThat(it.hasNext()).isTrue();
+    assertThat(it.hasNext()).isTrue();
+    var first = it.next();
+    var second = it.next();
+
+    // The same object is reused, only the second transfer is visible after the second next()
+    assertThat(first).isSameInstanceAs(second);
+    assertThat(first.stop()).isEqualTo(STOP_C);
+    assertThat(it.hasNext()).isFalse();
+    assertThat(it.hasNext()).isFalse();
+  }
+
+  @Test
   void testIteratorHasNextForEmptySet() {
     RaptorTransferStore subject = RaptorTransferStore.of(3)
       .addTransfer(STOP_A, STOP_B, 100, 10)

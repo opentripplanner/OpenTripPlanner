@@ -27,8 +27,13 @@ class Transfer extends AbstractStopArrival {
   }
 
   @Override
-  public RaptorTransfer transfer() {
-    return transfer;
+  public int transferDuration() {
+    return transfer.durationInSeconds();
+  }
+
+  @Override
+  public int transferC1() {
+    return transfer.c1();
   }
 
   @Override

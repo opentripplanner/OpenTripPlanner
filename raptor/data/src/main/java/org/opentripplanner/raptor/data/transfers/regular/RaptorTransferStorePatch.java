@@ -1,10 +1,8 @@
 package org.opentripplanner.raptor.data.transfers.regular;
 
 import com.carrotsearch.hppc.IntArrayList;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -21,8 +19,6 @@ import java.util.Set;
  * This class is not thread-safe, and can only build one store.
  */
 public final class RaptorTransferStorePatch {
-
-  private static final DefaultRaptorTransfer[] EMPTY_ARRAY = new DefaultRaptorTransfer[0];
 
   private final RaptorTransfers fromStops;
   private final RaptorTransfers toStops;
@@ -80,16 +76,11 @@ public final class RaptorTransferStorePatch {
     );
   }
 
-  private Map<Integer, DefaultRaptorTransfer[]> newFromRows() {
-    var rows = new HashMap<Integer, DefaultRaptorTransfer[]>();
-    newTransfersByFromStop.forEach((fromStop, triples) -> {
-      var row = new DefaultRaptorTransfer[triples.size() / 3];
-      for (int i = 0; i < row.length; ++i) {
-        int j = i * 3;
-        row[i] = new DefaultRaptorTransfer(triples.get(j), triples.get(j + 1), triples.get(j + 2));
-      }
-      rows.put(fromStop, row.length == 0 ? EMPTY_ARRAY : row);
-    });
+  private Map<Integer, int[]> newFromRows() {
+    var rows = new HashMap<Integer, int[]>();
+    newTransfersByFromStop.forEach((fromStop, triples) ->
+      rows.put(fromStop, triples.isEmpty() ? RaptorTransfers.EMPTY_ROW : triples.toArray())
+    );
     return rows;
   }
 
@@ -98,38 +89,44 @@ public final class RaptorTransferStorePatch {
    * after the patch: drop the transfers from the replaced from-stops, and add their new ones.
    * The transfers from other stops are kept, in their original order.
    */
-  private Map<Integer, DefaultRaptorTransfer[]> newToRows() {
+  private Map<Integer, int[]> newToRows() {
     Set<Integer> replaced = newTransfersByFromStop.keySet();
 
     // The new reverse transfers, by toStop
-    var added = new HashMap<Integer, List<DefaultRaptorTransfer>>();
+    var added = new HashMap<Integer, IntArrayList>();
     newTransfersByFromStop.forEach((fromStop, triples) -> {
       for (int j = 0; j < triples.size(); j += 3) {
-        added
-          .computeIfAbsent(triples.get(j), s -> new ArrayList<>())
-          .add(new DefaultRaptorTransfer(fromStop, triples.get(j + 1), triples.get(j + 2)));
+        var row = added.computeIfAbsent(triples.get(j), s -> new IntArrayList(3));
+        row.add(fromStop);
+        row.add(triples.get(j + 1));
+        row.add(triples.get(j + 2));
       }
     });
 
     // Old targets of the replaced from-stops, read from the forward rows before the patch
     var affected = new HashSet<>(added.keySet());
     for (int fromStop : replaced) {
-      for (var transfer : fromStops.row(fromStop)) {
-        affected.add(transfer.stop());
+      int[] row = fromStops.row(fromStop);
+      for (int j = 0; j < row.length; j += RaptorTransfers.STRIDE) {
+        affected.add(row[j]);
       }
     }
 
-    var rows = new HashMap<Integer, DefaultRaptorTransfer[]>();
+    var rows = new HashMap<Integer, int[]>();
     for (int toStop : affected) {
-      var row = new ArrayList<DefaultRaptorTransfer>();
-      for (var transfer : toStops.row(toStop)) {
-        // In a reverse row, stop() is the from-stop of the transfer
-        if (!replaced.contains(transfer.stop())) {
-          row.add(transfer);
+      var row = new IntArrayList();
+      int[] old = toStops.row(toStop);
+      for (int j = 0; j < old.length; j += RaptorTransfers.STRIDE) {
+        // In a reverse row, the first value is the from-stop of the transfer
+        if (!replaced.contains(old[j])) {
+          row.add(old, j, RaptorTransfers.STRIDE);
         }
       }
-      row.addAll(added.getOrDefault(toStop, List.of()));
-      rows.put(toStop, row.isEmpty() ? EMPTY_ARRAY : row.toArray(EMPTY_ARRAY));
+      var newTransfers = added.get(toStop);
+      if (newTransfers != null) {
+        row.addAll(newTransfers);
+      }
+      rows.put(toStop, row.isEmpty() ? RaptorTransfers.EMPTY_ROW : row.toArray());
     }
     return rows;
   }
