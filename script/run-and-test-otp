@@ -63,7 +63,7 @@ SHADED_TARGET=otp-shaded/target
 
 if [ "$1" != "--skipCompile" ] && [ "$1" != "-c" ]; then
   echo "Build project with maven"
-  mvn clean package -Djcf -DskipTests
+  mvn clean package -Dsf -DskipTests
 fi
 
 echo "Start OTP, output: $OTP_LOG"

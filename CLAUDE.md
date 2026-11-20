@@ -22,7 +22,7 @@ mvn test
 mvn jacoco:prepare-agent test
 
 # Skip the code formatting (Java, JSON and Markdown formatter) during local builds
-mvn test -Djcf         # equivalently: mvn test -PjcfSkip
+mvn test -Dsf         # equivalently: mvn test -PformatSkip
 
 # Regenerate API/itinerary snapshot tests
 mvn clean -Pclean-test-snapshots
@@ -35,8 +35,8 @@ violations:
 
 - **Java code formatter** (`java-formatter-maven-plugin`) formats Java code, Javadoc, JSON and
   Markdown (100-char width, 2-space indent, all comment rules on; the options are in
-  `.jcf/config.properties`). It needs Maven on JDK 25+. CI enforces it with `-PjcfCheck`; check with
-  `mvn jcf:check`, format with `mvn jcf:format`. Skip locally with `-Djcf`.
+  `.jcf/config.properties`). It needs Maven on JDK 25+. CI enforces it with `-PformatCheck`; check
+  with `mvn jcf:check`, format with `mvn jcf:format`. Skip locally with `-Dsf`.
 - **Checkstyle** runs against `checkstyle.xml` in the `process-sources` phase (after the Java code
   formatter). Skip with `-Dcs` (or `-PcheckstyleSkip`).
 

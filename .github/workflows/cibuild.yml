@@ -53,8 +53,8 @@ jobs:
         # NAT drops them
         # https://github.com/actions/runner-images/issues/1499
         run: |
-          mvn jacoco:prepare-agent test jacoco:report -P jcfCheck
-          mvn package -Dmaven.test.skip -P jcfSkip,checkstyleSkip
+          mvn jacoco:prepare-agent test jacoco:report -P formatCheck
+          mvn package -Dmaven.test.skip -P formatSkip,checkstyleSkip
 
       - name: Send coverage data to codecov.io
         if: github.repository_owner == 'opentripplanner' && github.event_name != 'merge_group'
@@ -78,7 +78,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         # the debug client was built in the package step above, so don't run the npm build again with
         # the registry credentials around
-        run: mvn deploy --settings maven-settings.xml -DskipTests -Dplugin.frontend.skip=true -DGITHUB_REPOSITORY=$GITHUB_REPOSITORY -P jcfSkip,checkstyleSkip,deployGitHub
+        run: mvn deploy --settings maven-settings.xml -DskipTests -Dplugin.frontend.skip=true -DGITHUB_REPOSITORY=$GITHUB_REPOSITORY -P formatSkip,checkstyleSkip,deployGitHub
 
   build-windows:
     timeout-minutes: 20
@@ -96,7 +96,7 @@ jobs:
       - name: Configure Windows Pagefile
         uses: al-cheb/configure-pagefile-action@v1.5
       - name: Run tests
-        run: mvn test -P jcfSkip,checkstyleSkip
+        run: mvn test -P formatSkip,checkstyleSkip
 
   docs:
     if: github.repository_owner == 'opentripplanner'
@@ -212,7 +212,7 @@ jobs:
           cache-dependency-path: client/package-lock.json
       - name: Build the application, including the debug client
         # no registry credentials in this step, because it runs the npm build
-        run: mvn -P jcfSkip,checkstyleSkip -Dmaven.test.skip=true -Dmaven.source.skip=true package
+        run: mvn -P formatSkip,checkstyleSkip -Dmaven.test.skip=true -Dmaven.source.skip=true package
       - name: Build container image with Jib, push to Dockerhub
         env:
           CONTAINER_REPO: docker.io/opentripplanner/opentripplanner
@@ -235,7 +235,7 @@ jobs:
             echo "Maven version ${version_with_snapshot} contains SNAPSHOT, adding date to container image tag"
           fi
           
-          MAVEN_SKIP_ARGS="-P jcfSkip,checkstyleSkip -Dmaven.test.skip=true -Dmaven.source.skip=true"
+          MAVEN_SKIP_ARGS="-P formatSkip,checkstyleSkip -Dmaven.test.skip=true -Dmaven.source.skip=true"
           
           # the debug client was built in the previous step
           mvn $MAVEN_SKIP_ARGS -Dplugin.frontend.skip=true package -Djib.skip=false -Djib.to.tags=latest,$image_version

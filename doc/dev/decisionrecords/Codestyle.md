@@ -115,17 +115,17 @@ You can manually run _only_ the formatting process with:
 % mvn jcf:format
 ```
 
-To skip the formatting, use the profile `jcfSkip`, or its short alias `-Djcf`:
+To skip the formatting, use the profile `formatSkip`, or its short alias `-Dsf`:
 
 ```shell
-% mvn test -P jcfSkip
-% mvn test -Djcf
+% mvn test -P formatSkip
+% mvn test -Dsf
 ```
 
-To check for formatting errors, use the profile `jcfCheck`:
+To check for formatting errors, use the profile `formatCheck`:
 
 ```shell
-% mvn test -P jcfCheck
+% mvn test -P formatCheck
 ```
 
 The check is run by the CI server and will fail the build if the code is incorrectly formatted.
