@@ -329,10 +329,10 @@ public class UpdaterConfigurator {
       );
     }
     for (var configItem : updatersParameters.getSiriSXUpdaterParameters()) {
-      updaters.add(SiriUpdaterModule.createSiriSXUpdater(configItem, siriFuzzyTripMatcherCache()));
+      updaters.add(SiriUpdaterModule.createSiriSXUpdater(configItem));
     }
     for (var configItem : updatersParameters.getSiriSXLiteUpdaterParameters()) {
-      updaters.add(SiriUpdaterModule.createSiriSXUpdater(configItem, siriFuzzyTripMatcherCache()));
+      updaters.add(SiriUpdaterModule.createSiriSXUpdater(configItem));
     }
     for (var configItem : updatersParameters.getMqttGtfsRealtimeUpdaterParameters()) {
       updaters.add(new MqttGtfsRealtimeUpdater(configItem, provideGtfsAdapter()));
@@ -363,7 +363,7 @@ public class UpdaterConfigurator {
       );
     }
     for (var configItem : updatersParameters.getSiriAzureSXUpdaterParameters()) {
-      updaters.add(SiriAzureUpdater.createSXUpdater(configItem, siriFuzzyTripMatcherCache()));
+      updaters.add(SiriAzureUpdater.createSXUpdater(configItem));
     }
     for (var configItem : updatersParameters.getMqttSiriETUpdaterParameters()) {
       updaters.add(

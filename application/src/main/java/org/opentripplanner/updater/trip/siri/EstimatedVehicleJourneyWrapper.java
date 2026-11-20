@@ -19,7 +19,6 @@ import uk.org.siri.siri21.EstimatedVehicleJourney;
 import uk.org.siri.siri21.LineRef;
 import uk.org.siri.siri21.OperatorRefStructure;
 import uk.org.siri.siri21.VehicleJourneyRef;
-import uk.org.siri.siri21.VehicleModesEnumeration;
 import uk.org.siri.siri21.VehicleRef;
 
 /**
@@ -129,7 +128,7 @@ final class EstimatedVehicleJourneyWrapper {
   }
 
   /**
-   * The reference to the vehicle operating this journey. Also used for fuzzy matching
+   * The reference to the vehicle operating this journey.
    */
   Optional<String> vehicleRef() {
     return Optional.ofNullable(journey.getVehicleRef())
@@ -172,13 +171,6 @@ final class EstimatedVehicleJourneyWrapper {
 
   Optional<String> operatorRef() {
     return Optional.ofNullable(journey.getOperatorRef()).map(OperatorRefStructure::getValue);
-  }
-
-  /**
-   * Whether this journey is operated by rail.
-   */
-  boolean isRail() {
-    return journey.getVehicleModes().contains(VehicleModesEnumeration.RAIL);
   }
 
   /**
