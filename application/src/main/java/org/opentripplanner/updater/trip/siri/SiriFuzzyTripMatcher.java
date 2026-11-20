@@ -42,9 +42,10 @@ import org.slf4j.LoggerFactory;
  * <p>
  * The aimed arrival time at the last stop and the aimed departure time at the first stop must
  * match the scheduled times within the configured time tolerance. A tolerance of zero requires
- * the times to be equal to the second. If exactly one trip matches the aimed times to the second,
- * it is used, even if other trips match within the tolerance. Otherwise, if more than one trip
- * matches, the journey is rejected with {@link UpdateErrorType#MULTIPLE_FUZZY_TRIP_MATCHES}.
+ * the times to be equal to the second. A trip that matches the aimed times to the second is
+ * preferred over trips within the tolerance, even if it arrives at another quay of the same
+ * station as the reported one. If there is no single best match, the journey is rejected with
+ * {@link UpdateErrorType#MULTIPLE_FUZZY_TRIP_MATCHES}.
  * <p>
  * Constructed per update task (cheap — only assigns fields). The expensive scheduled-data index
  * lives in {@link SiriFuzzyTripMatcherCache}, which is built once and shared across all SIRI
@@ -128,9 +129,12 @@ public class SiriFuzzyTripMatcher {
       throw UpdateException.of(NO_FUZZY_TRIP_MATCH);
     }
 
-    // Try the candidate lookups in order of preference. A lookup is only used if one of its
-    // candidates passes all the checks, otherwise the next lookup is tried. With a time tolerance,
-    // a lookup may return unrelated trips, which must not prevent the following lookups.
+    // Try the candidate lookups in order of preference. The first lookup with an exact match is
+    // used, so an exact match on a sibling quay wins over a trip within the tolerance at the
+    // reported quay. Without an exact match, the first lookup with a candidate that passes all the
+    // checks is used. With a time tolerance, a lookup may return unrelated trips, which must not
+    // prevent the following lookups.
+    List<Candidate> firstCandidates = List.of();
     for (var lookup : candidateLookups(stop, arrivalTime)) {
       Set<Trip> trips = filterByRoute(lookup.trips().get(), route);
       if (trips.isEmpty()) {
@@ -144,11 +148,14 @@ public class SiriFuzzyTripMatcher {
         getCurrentTimetable,
         getNewTripPatternForModifiedTrip
       );
-      if (!possibleTrips.isEmpty()) {
+      if (possibleTrips.stream().anyMatch(Candidate::exact)) {
         return singleMatch(possibleTrips);
       }
+      if (firstCandidates.isEmpty()) {
+        firstCandidates = possibleTrips;
+      }
     }
-    throw UpdateException.of(NO_FUZZY_TRIP_MATCH);
+    return singleMatch(firstCandidates);
   }
 
   /**
@@ -208,7 +215,8 @@ public class SiriFuzzyTripMatcher {
    *   <li>trips arriving at any quay of the same station, since SIRI data may report another
    *   platform.</li>
    * </ol>
-   * The lookups are evaluated lazily, so a lookup is only done if the previous ones gave no match.
+   * The lookups are evaluated lazily, so a lookup is only done if the previous ones gave no exact
+   * match.
    */
   private List<Lookup> candidateLookups(RegularStop lastStop, ZonedDateTime arrivalTime) {
     var timeZone = transitRepository.getTimeZone();

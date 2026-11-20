@@ -273,6 +273,34 @@ class SiriFuzzyTripMatcherTest implements RealtimeTestConstants {
   }
 
   /**
+   * A last-minute platform change: SIRI reports another quay of the same station as the
+   * schedule. An exact match on the scheduled quay is preferred over a trip within the tolerance
+   * at the reported quay.
+   */
+  @Test
+  void exactMatchOnSiblingQuayIsPreferredOverTripWithinToleranceAtReportedQuay() {
+    var quay1 = ENV_BUILDER.stopAtStation("B1", "B");
+    var quay2 = ENV_BUILDER.stopAtStation("B2", "B");
+    // 0:10:00 -> 0:20:00, same as the SIRI journey, but scheduled at quay 1
+    var exact = TripInput.of(TRIP_1_ID)
+      .addStop(STOP_A, "0:10:00", "0:10:00")
+      .addStop(quay1, "0:20:00", "0:20:00");
+    // 30 seconds later, at the quay reported by SIRI
+    var nearby = TripInput.of(TRIP_2_ID)
+      .addStop(STOP_A, "0:10:30", "0:10:30")
+      .addStop(quay2, "0:20:30", "0:20:30");
+    var env = ENV_BUILDER.addTrip(exact).addTrip(nearby).build();
+
+    var evj = estimatedVehicleJourney(env, STOP_A, quay2);
+
+    // At 0 s, the reported quay has no candidate, and TRIP_1 is found on the sibling quay
+    assertEquals(TRIP_1_ID, match(evj, env).trip().getId().getId());
+
+    // With a tolerance, TRIP_1 still matches exactly and should still win
+    assertEquals(TRIP_1_ID, match(evj, env, Duration.ofSeconds(59)).trip().getId().getId());
+  }
+
+  /**
    * A match at the reported quay is preferred over matches at sibling quays, so the update is not
    * rejected as ambiguous.
    */
