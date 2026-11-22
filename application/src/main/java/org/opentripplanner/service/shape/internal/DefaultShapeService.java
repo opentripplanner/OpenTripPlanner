@@ -6,11 +6,15 @@ import org.opentripplanner.service.shape.ShapeService;
 import org.opentripplanner.service.shape.model.CompactLineStringSequence;
 
 /**
- * In request scope a new instance should be created for each request with a snapshot resolved from
- * the same transaction scope as the rest of the request, so that the whole request sees one
- * consistent view. The mutable {@code ShapeRepository} also implements the snapshot interface, so a
- * service over it can be used on the writer thread to see in-progress additions. Such an instance
- * must never be given to request threads.
+ * A service over the given {@link ShapeRepositorySnapshot}. What it sees depends on what it is
+ * created over:
+ * <ul>
+ *   <li>In request scope, create one per request over the snapshot of the request's transaction
+ *   scope, so that the whole request sees one consistent view.</li>
+ *   <li>On the writer thread, it can be created over the mutable {@code ShapeRepository}, which also
+ *   implements the snapshot interface, to see the shapes added by the ongoing update. Such an
+ *   instance must never be given to request threads.</li>
+ * </ul>
  */
 public class DefaultShapeService implements ShapeService {
 

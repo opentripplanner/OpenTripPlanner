@@ -57,6 +57,9 @@ public class RealTimeTripShapeWriter {
     TripPattern pattern,
     ShapeRepository repository
   ) {
+    // TripPatternCache is keyed by stop pattern only, so a realtime pattern can be shared by trips
+    // whose original patterns, and shapes, differ. The shape is derived from the original of the
+    // trip that created the pattern. Per-trip shapes will aim to fix this.
     var original = pattern.getOriginalTripPattern();
     if (original == null) {
       return null;

@@ -34,10 +34,14 @@ pattern has a shape and that it has one hop per pair of stops, and fail with
 3. **Real-time:** `RealTimeTripShapeWriter` (`updater/trip/shape`) stores the shape of every new
    real-time pattern when the update is applied. `RealTimeTripShapeFactory` derives it from the
    pattern it replaces.
-4. **Full dataset update:** the update handlers clear the feed's real-time shapes
-   (`ShapeRepository.clear(feedId)`) together with its real-time timetable data. Patterns kept in
-   `TripPatternCache` get their shape created again the next time they are used. If the original of
-   a pattern is a real-time pattern whose shape was cleared, straight lines are used.
+4. **Update incrementality:** how long real-time shapes are kept depends on the feed.
+   - **Full dataset:** the update handlers clear the feed's real-time shapes
+     (`ShapeRepository.clear(feedId)`) together with its real-time timetable data. Patterns kept in
+     `TripPatternCache` get their shape created again the next time they are used. If the original
+     of a pattern is a real-time pattern whose shape was cleared, straight lines are used.
+   - **Differential:** nothing is cleared. A shape is only added when a real-time pattern without
+     one is used, and is kept until the feed sends a full dataset, like the patterns in
+     `TripPatternCache`.
 5. **Requests:** each request gets a `ShapeService` over the snapshot of its transaction scope.
 
 Identical hops are deduplicated, so equal hops share one instance.

@@ -16,6 +16,9 @@ import org.opentripplanner.transit.model.network.TripPattern;
  * Real-time geometries are grouped by feed in a {@link FeedPartitionedMap}, so a feed can be
  * cleared at once with {@link #clear(String)}, and a snapshot only copies the feeds changed since
  * the previous one.
+ * <p>
+ * See {@code package.md} for how the real-time geometries are kept for full dataset and
+ * differential feeds.
  */
 public class DefaultShapeRepository implements ShapeRepository {
 
