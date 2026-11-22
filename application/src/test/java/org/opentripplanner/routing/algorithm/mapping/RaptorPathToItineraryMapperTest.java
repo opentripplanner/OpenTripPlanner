@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.raptorlegacy._data.RaptorTestConstants.BOARD_SLACK;
 
 import java.time.Instant;
@@ -320,12 +321,7 @@ public class RaptorPathToItineraryMapperTest {
       stopTimes.add(stopTime);
     }
 
-    var builder = TripPattern.of(
-      new FeedScopedId(
-        pattern.route().getId().getFeedId(),
-        "TestId" + pattern.numberOfStopsInPattern()
-      )
-    )
+    var builder = TripPattern.of(id("TestId" + pattern.numberOfStopsInPattern()))
       .withRoute(pattern.route())
       .withStopPattern(new StopPattern(stopTimes));
     return builder.build();

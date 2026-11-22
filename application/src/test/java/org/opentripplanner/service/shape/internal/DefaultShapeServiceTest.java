@@ -3,6 +3,7 @@ package org.opentripplanner.service.shape.internal;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -33,7 +34,7 @@ class DefaultShapeServiceTest {
   private static final TripPattern RT_PATTERN = TransitRepositoryForTest.tripPattern("rt", ROUTE)
     .withStopPattern(STOP_PATTERN)
     .build();
-  private static final FeedScopedId UNKNOWN_PATTERN = new FeedScopedId("F", "unknown");
+  private static final FeedScopedId UNKNOWN_PATTERN = id("unknown");
 
   private static final CompactLineStringSequence SCHEDULED_TRIP_PATTERN_GEOMETRY =
     ShapeTestFactory.straightLine(60.0);
