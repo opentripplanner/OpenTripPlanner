@@ -23,8 +23,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
  */
 public class ShapeDataImport implements Serializable {
 
-  private final Map<FeedScopedId, CompactLineStringSequence> geometriesByTripPattern =
-    new HashMap<>();
+  private final Map<FeedScopedId, CompactLineStringSequence> shapesByTripPattern = new HashMap<>();
 
   /**
    * Set when the content is converted to {@link ScheduledShapeData}. Not serialized, so a
@@ -48,12 +47,12 @@ public class ShapeDataImport implements Serializable {
   ) {
     assertModificationsAllowed();
     TripShapeValidator.validate(tripPattern, tripPatternShape);
-    geometriesByTripPattern.put(tripPattern.getId(), tripPatternShape);
+    shapesByTripPattern.put(tripPattern.getId(), tripPatternShape);
   }
 
   @Nullable
   public CompactLineStringSequence getTripPatternShape(FeedScopedId tripPatternId) {
-    return geometriesByTripPattern.get(tripPatternId);
+    return shapesByTripPattern.get(tripPatternId);
   }
 
   /**
@@ -62,7 +61,7 @@ public class ShapeDataImport implements Serializable {
    */
   public ScheduledShapeData toScheduledShapeData() {
     frozen = true;
-    return ScheduledShapeData.of(geometriesByTripPattern);
+    return ScheduledShapeData.of(shapesByTripPattern);
   }
 
   private void assertModificationsAllowed() {

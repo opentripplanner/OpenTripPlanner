@@ -98,7 +98,7 @@ public class AddTransitEntitiesToTimetable {
 
       shapeDataImport.setTripPatternShape(
         tripPattern,
-        dataImport.getGeometriesByTripPattern().get(tripPattern.getId())
+        dataImport.getShapesByTripPattern().get(tripPattern.getId())
       );
     }
   }

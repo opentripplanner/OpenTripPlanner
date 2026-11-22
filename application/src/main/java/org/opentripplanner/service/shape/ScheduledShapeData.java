@@ -15,10 +15,10 @@ public final class ScheduledShapeData {
 
   private static final ScheduledShapeData EMPTY = new ScheduledShapeData(Map.of());
 
-  private final Map<FeedScopedId, CompactLineStringSequence> geometriesByTripPattern;
+  private final Map<FeedScopedId, CompactLineStringSequence> shapesByTripPattern;
 
-  private ScheduledShapeData(Map<FeedScopedId, CompactLineStringSequence> geometriesByTripPattern) {
-    this.geometriesByTripPattern = geometriesByTripPattern;
+  private ScheduledShapeData(Map<FeedScopedId, CompactLineStringSequence> shapesByTripPattern) {
+    this.shapesByTripPattern = shapesByTripPattern;
   }
 
   /**
@@ -26,9 +26,9 @@ public final class ScheduledShapeData {
    * reflected. The shape instances are shared, not copied.
    */
   public static ScheduledShapeData of(
-    Map<FeedScopedId, CompactLineStringSequence> geometriesByTripPattern
+    Map<FeedScopedId, CompactLineStringSequence> shapesByTripPattern
   ) {
-    return new ScheduledShapeData(Map.copyOf(geometriesByTripPattern));
+    return new ScheduledShapeData(Map.copyOf(shapesByTripPattern));
   }
 
   public static ScheduledShapeData empty() {
@@ -37,6 +37,6 @@ public final class ScheduledShapeData {
 
   @Nullable
   public CompactLineStringSequence getTripPatternShape(FeedScopedId tripPatternId) {
-    return geometriesByTripPattern.get(tripPatternId);
+    return shapesByTripPattern.get(tripPatternId);
   }
 }

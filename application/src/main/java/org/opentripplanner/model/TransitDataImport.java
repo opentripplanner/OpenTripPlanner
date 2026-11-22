@@ -60,7 +60,7 @@ public interface TransitDataImport {
 
   Collection<TripPattern> getTripPatterns();
 
-  Map<FeedScopedId, CompactLineStringSequence> getGeometriesByTripPattern();
+  Map<FeedScopedId, CompactLineStringSequence> getShapesByTripPattern();
 
   Collection<Trip> getAllTrips();
 

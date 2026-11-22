@@ -55,8 +55,7 @@ public class GenerateTripPatternsOperation {
   private final Multimap<StopPattern, TripPatternBuilder> tripPatternBuilders =
     MultimapBuilder.linkedHashKeys().linkedHashSetValues().build();
   private final ListMultimap<Trip, Frequency> frequenciesForTrip = ArrayListMultimap.create();
-  private final Map<FeedScopedId, CompactLineStringSequence> geometriesByTripPattern =
-    new HashMap<>();
+  private final Map<FeedScopedId, CompactLineStringSequence> shapesByTripPattern = new HashMap<>();
 
   private int freqCount = 0;
   private int scheduledCount = 0;
@@ -192,7 +191,7 @@ public class GenerateTripPatternsOperation {
       geometryProcessor.createHopGeometries(trip),
       deduplicator
     );
-    geometriesByTripPattern.put(patternId, tripPatternShape);
+    shapesByTripPattern.put(patternId, tripPatternShape);
     tripPatternBuilders.put(stopPattern, tripPatternBuilder);
     return tripPatternBuilder;
   }
@@ -200,8 +199,8 @@ public class GenerateTripPatternsOperation {
   private void registerTripPattern(TripPattern tripPattern) {
     transitServiceBuilder.getTripPatterns().put(tripPattern.getStopPattern(), tripPattern);
     transitServiceBuilder
-      .getGeometriesByTripPattern()
-      .put(tripPattern.getId(), geometriesByTripPattern.get(tripPattern.getId()));
+      .getShapesByTripPattern()
+      .put(tripPattern.getId(), shapesByTripPattern.get(tripPattern.getId()));
   }
 
   /**

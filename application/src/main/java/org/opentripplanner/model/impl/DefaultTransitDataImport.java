@@ -60,7 +60,7 @@ class DefaultTransitDataImport implements TransitDataImport {
 
   private final Collection<TripPattern> tripPatterns;
 
-  private final Map<FeedScopedId, CompactLineStringSequence> geometriesByTripPattern;
+  private final Map<FeedScopedId, CompactLineStringSequence> shapesByTripPattern;
 
   private final Collection<Trip> trips;
 
@@ -84,7 +84,7 @@ class DefaultTransitDataImport implements TransitDataImport {
     this.boardingAreasById = builder.getBoardingAreas().asImmutableMap();
     this.transfers = immutableList(builder.getTransfers());
     this.tripPatterns = immutableList(builder.getTripPatterns().values());
-    this.geometriesByTripPattern = Map.copyOf(builder.getGeometriesByTripPattern());
+    this.shapesByTripPattern = Map.copyOf(builder.getShapesByTripPattern());
     this.trips = immutableList(builder.getTripsById().values());
     this.tripOnServiceDates = immutableList(builder.getTripOnServiceDates().values());
     this.flexTrips = immutableList(builder.getFlexTripsById().values());
@@ -153,8 +153,8 @@ class DefaultTransitDataImport implements TransitDataImport {
   }
 
   @Override
-  public Map<FeedScopedId, CompactLineStringSequence> getGeometriesByTripPattern() {
-    return geometriesByTripPattern;
+  public Map<FeedScopedId, CompactLineStringSequence> getShapesByTripPattern() {
+    return shapesByTripPattern;
   }
 
   @Override

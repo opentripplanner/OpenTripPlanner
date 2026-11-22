@@ -18,8 +18,8 @@ public class ShapeTestFactory {
   private ShapeTestFactory() {}
 
   /**
-   * A short north-south geometry starting at the given latitude. Different latitudes give
-   * different geometries, which makes them easy to tell apart in tests.
+   * A short north-south shape starting at the given latitude. Different latitudes give
+   * different shapes, which makes them easy to tell apart in tests.
    */
   public static CompactLineStringSequence straightLine(double lat) {
     var testModel = TransitRepositoryForTest.of();
@@ -31,7 +31,7 @@ public class ShapeTestFactory {
   }
 
   /**
-   * A shape data import with a straight-line geometry for each of the patterns.
+   * A shape data import with a straight-line shape for each of the patterns.
    */
   public static ShapeDataImport shapeDataImport(Collection<TripPattern> patterns) {
     var shapeDataImport = new ShapeDataImport();

@@ -11,13 +11,13 @@ import org.opentripplanner.transit.model.network.TripPattern;
 
 /**
  * A single long-lived buffer, shared by all transactions and only accessed on the single writer
- * thread. Lookups check the real-time geometries first, then the scheduled ones.
+ * thread. Lookups check the real-time shapes first, then the scheduled ones.
  * <p>
- * Real-time geometries are grouped by feed in a {@link FeedPartitionedMap}, so a feed can be
+ * Real-time shapes are grouped by feed in a {@link FeedPartitionedMap}, so a feed can be
  * cleared at once with {@link #clear(String)}, and a snapshot only copies the feeds changed since
  * the previous one.
  * <p>
- * See {@code package.md} for how the real-time geometries are kept for full dataset and
+ * See {@code package.md} for how the real-time shapes are kept for full dataset and
  * differential feeds.
  */
 public class DefaultShapeRepository implements ShapeRepository {
@@ -27,7 +27,7 @@ public class DefaultShapeRepository implements ShapeRepository {
   private final FeedPartitionedMap<
     FeedScopedId,
     CompactLineStringSequence
-  > realTimeGeometriesByTripPattern;
+  > realTimeShapesByTripPattern;
 
   public DefaultShapeRepository(ScheduledShapeData scheduledShapeData) {
     this(scheduledShapeData, new FeedPartitionedMap<>());
@@ -35,10 +35,10 @@ public class DefaultShapeRepository implements ShapeRepository {
 
   private DefaultShapeRepository(
     ScheduledShapeData scheduledShapeData,
-    FeedPartitionedMap<FeedScopedId, CompactLineStringSequence> realTimeGeometriesByTripPattern
+    FeedPartitionedMap<FeedScopedId, CompactLineStringSequence> realTimeShapesByTripPattern
   ) {
     this.scheduledShapeData = scheduledShapeData;
-    this.realTimeGeometriesByTripPattern = realTimeGeometriesByTripPattern;
+    this.realTimeShapesByTripPattern = realTimeShapesByTripPattern;
   }
 
   /**
@@ -55,21 +55,18 @@ public class DefaultShapeRepository implements ShapeRepository {
   ) {
     TripShapeValidator.validate(tripPattern, tripPatternShape);
     var tripPatternId = tripPattern.getId();
-    realTimeGeometriesByTripPattern.put(tripPatternId.getFeedId(), tripPatternId, tripPatternShape);
+    realTimeShapesByTripPattern.put(tripPatternId.getFeedId(), tripPatternId, tripPatternShape);
   }
 
   @Override
   public void clear(String feedId) {
-    realTimeGeometriesByTripPattern.clear(feedId);
+    realTimeShapesByTripPattern.clear(feedId);
   }
 
   @Override
   @Nullable
   public CompactLineStringSequence getTripPatternShape(FeedScopedId tripPatternId) {
-    var realTimeShape = realTimeGeometriesByTripPattern.get(
-      tripPatternId.getFeedId(),
-      tripPatternId
-    );
+    var realTimeShape = realTimeShapesByTripPattern.get(tripPatternId.getFeedId(), tripPatternId);
     if (realTimeShape != null) {
       return realTimeShape;
     }
@@ -78,6 +75,6 @@ public class DefaultShapeRepository implements ShapeRepository {
 
   @Override
   public ShapeRepositorySnapshot createSnapshot() {
-    return new DefaultShapeRepository(scheduledShapeData, realTimeGeometriesByTripPattern.freeze());
+    return new DefaultShapeRepository(scheduledShapeData, realTimeShapesByTripPattern.freeze());
   }
 }

@@ -107,8 +107,7 @@ public class TransitDataImportBuilder {
 
   private final Multimap<StopPattern, TripPattern> tripPatterns = ArrayListMultimap.create();
 
-  private final Map<FeedScopedId, CompactLineStringSequence> geometriesByTripPattern =
-    new HashMap<>();
+  private final Map<FeedScopedId, CompactLineStringSequence> shapesByTripPattern = new HashMap<>();
 
   private final EntityById<FlexTrip<?, ?>> flexTripsById = new DefaultEntityById<>();
 
@@ -234,8 +233,8 @@ public class TransitDataImportBuilder {
     return tripPatterns;
   }
 
-  public Map<FeedScopedId, CompactLineStringSequence> getGeometriesByTripPattern() {
-    return geometriesByTripPattern;
+  public Map<FeedScopedId, CompactLineStringSequence> getShapesByTripPattern() {
+    return shapesByTripPattern;
   }
 
   public EntityById<FlexTrip<?, ?>> getFlexTripsById() {
