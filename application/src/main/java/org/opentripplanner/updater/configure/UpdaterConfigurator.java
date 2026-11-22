@@ -45,6 +45,7 @@ import org.opentripplanner.updater.trip.gtfs.GtfsRealTimeTripUpdateAdapter;
 import org.opentripplanner.updater.trip.gtfs.updater.http.PollingTripUpdater;
 import org.opentripplanner.updater.trip.gtfs.updater.mqtt.MqttGtfsRealtimeUpdater;
 import org.opentripplanner.updater.trip.siri.SiriFuzzyTripMatcherCache;
+import org.opentripplanner.updater.trip.siri.SiriFuzzyTripMatchingParameters;
 import org.opentripplanner.updater.trip.siri.SiriRealTimeTripUpdateAdapter;
 import org.opentripplanner.updater.trip.siri.updater.google.SiriETGooglePubsubUpdater;
 import org.opentripplanner.updater.vehicle_parking.AvailabilityDataSourceFactory;
@@ -366,7 +367,7 @@ public class UpdaterConfigurator {
       updaters.add(
         SiriAzureUpdater.createETUpdater(
           configItem,
-          provideSiriAdapter(configItem.isFuzzyTripMatching())
+          provideSiriAdapter(configItem.getFuzzyMatching())
         )
       );
     }
@@ -382,9 +383,16 @@ public class UpdaterConfigurator {
     return updaters;
   }
 
-  private SiriRealTimeTripUpdateAdapter provideSiriAdapter(boolean fuzzyTripMatching) {
-    var cache = fuzzyTripMatching ? siriFuzzyTripMatcherCache() : null;
-    return new SiriRealTimeTripUpdateAdapter(transitRepository, deduplicator, cache);
+  private SiriRealTimeTripUpdateAdapter provideSiriAdapter(
+    SiriFuzzyTripMatchingParameters fuzzyTripMatching
+  ) {
+    var cache = fuzzyTripMatching.enabled() ? siriFuzzyTripMatcherCache() : null;
+    return new SiriRealTimeTripUpdateAdapter(
+      transitRepository,
+      deduplicator,
+      cache,
+      fuzzyTripMatching
+    );
   }
 
   private SiriFuzzyTripMatcherCache siriFuzzyTripMatcherCache() {

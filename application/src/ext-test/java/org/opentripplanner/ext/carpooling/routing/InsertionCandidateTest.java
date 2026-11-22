@@ -246,4 +246,22 @@ class InsertionCandidateTest {
       .minus(candidateSmall.getPassengerRideDuration());
     assertEquals(Duration.ofMinutes(8), difference);
   }
+
+  @Test
+  void getPassengerRideWeight_isRideSecondsTimesReluctancePlusBoardCost() {
+    var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
+    var candidate = new InsertionCandidate(
+      trip,
+      1,
+      2,
+      List.of(createSegment(Duration.ofMinutes(5)), createSegment(Duration.ofMinutes(10))),
+      STOP_DURATION,
+      null,
+      null,
+      null
+    );
+
+    // 10 min shared ride + 2 min boarding dwell
+    assertEquals(720 * 4.0 + 2400.0, candidate.getPassengerRideWeight(4.0, 2400));
+  }
 }

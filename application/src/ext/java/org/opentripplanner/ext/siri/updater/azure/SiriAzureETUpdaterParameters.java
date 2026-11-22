@@ -8,6 +8,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import org.apache.hc.core5.net.URIBuilder;
 import org.opentripplanner.updater.trip.UrlUpdaterParameters;
+import org.opentripplanner.updater.trip.siri.SiriFuzzyTripMatchingParameters;
 
 public class SiriAzureETUpdaterParameters
   extends SiriAzureUpdaterParameters
@@ -15,6 +16,7 @@ public class SiriAzureETUpdaterParameters
 {
 
   private LocalDate fromDateTime;
+  private SiriFuzzyTripMatchingParameters fuzzyMatching = SiriFuzzyTripMatchingParameters.DISABLED;
 
   public SiriAzureETUpdaterParameters() {
     super("siri-azure-et-updater");
@@ -26,6 +28,18 @@ public class SiriAzureETUpdaterParameters
 
   public void setFromDateTime(LocalDate fromDateTime) {
     this.fromDateTime = fromDateTime;
+  }
+
+  /**
+   * The fuzzy trip matching configuration, based on both {@code fuzzyMatching} and the deprecated
+   * {@link #isFuzzyTripMatching()}.
+   */
+  public SiriFuzzyTripMatchingParameters getFuzzyMatching() {
+    return fuzzyMatching;
+  }
+
+  public void setFuzzyMatching(SiriFuzzyTripMatchingParameters fuzzyMatching) {
+    this.fuzzyMatching = fuzzyMatching;
   }
 
   @Override

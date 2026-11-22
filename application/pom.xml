@@ -35,6 +35,11 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>debug-client</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>gtfs-realtime-protobuf</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -107,13 +112,6 @@
             <groupId>com.esotericsoftware</groupId>
             <artifactId>kryo</artifactId>
             <version>5.7.1</version>
-        </dependency>
-        <!-- Only used for the ObjectDiffer, which tests that a round trip through serialization reproduces the same network. -->
-        <dependency>
-            <groupId>com.conveyal</groupId>
-            <artifactId>kryo-tools</artifactId>
-            <version>1.6.0</version>
-            <scope>test</scope>
         </dependency>
         <!--
             jersey pulls in older versions of this dependency which are binary-incompatible
@@ -316,7 +314,7 @@
         <dependency>
             <groupId>org.mobilitydata</groupId>
             <artifactId>gbfs-java-model</artifactId>
-            <version>2.0.0</version>
+            <version>2.1.0</version>
         </dependency>
         <!-- OBA GTFS loader -->
         <dependency>
@@ -485,6 +483,12 @@
                                 <source>src/main/java</source>
                                 <source>src/ext/java</source>
                                 <source>${project.build.directory}/generated-sources/annotations</source>
+                                <!--
+                                  Output of the graphql-codegen plugin. The plugin registers this
+                                  root itself at build time, but declaring it here lets IDEs like
+                                  IntelliJ pick it up on Maven import without running the plugin.
+                                -->
+                                <source>${project.build.directory}/generated-sources/graphql</source>
                             </sources>
                         </configuration>
                     </execution>

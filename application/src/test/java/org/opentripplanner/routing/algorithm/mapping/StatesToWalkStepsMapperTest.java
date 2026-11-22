@@ -22,6 +22,9 @@ import org.opentripplanner.transit.model.site.Entrance;
 
 class StatesToWalkStepsMapperTest {
 
+  public static final String SIGN_A = "platform A";
+  public static final String SIGN_B = "platform B";
+
   @Test
   void absoluteDirection() {
     var states = TestStateBuilder.ofWalking().streetEdge().streetEdge();
@@ -152,6 +155,60 @@ class StatesToWalkStepsMapperTest {
       .containsExactly(
         "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: DEPART, directionText: '1.0_1.0_2.0_2.0', distance: 157,225.7}",
         "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: FOLLOW_SIGNS, directionText: 'follow signs to platform 1', distance: 100.0}"
+      )
+      .inOrder();
+  }
+
+  @Test
+  void signpostedBetweenUnsignedPathways() {
+    var builder = TestStateBuilder.ofWalking()
+      .streetEdge(29)
+      .unnamedPathway(10)
+      .pathway(SIGN_A, 10)
+      .unnamedPathway(10);
+    assertThat(toStrings(builder))
+      .containsExactly(
+        // the first 10m pathway is folded into the first step
+        "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: DEPART, directionText: 'street edge', distance: 39.0}",
+        // the next two are collapsed
+        "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: FOLLOW_SIGNS, directionText: 'platform A', distance: 20.0}"
+      )
+      .inOrder();
+  }
+
+  @Test
+  void shortDifferentSigns() {
+    var builder = TestStateBuilder.ofWalking()
+      .streetEdge(29)
+      .pathway(SIGN_A, 10)
+      .pathway(SIGN_B, 10)
+      .unnamedPathway(10);
+
+    assertThat(toStrings(builder))
+      .containsExactly(
+        "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: DEPART, directionText: 'street edge', distance: 29.0}",
+        "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: FOLLOW_SIGNS, directionText: 'platform A', distance: 10.0}",
+        // the last two are collapsed
+        "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: FOLLOW_SIGNS, directionText: 'platform B', distance: 20.0}"
+      )
+      .inOrder();
+  }
+
+  @Test
+  void turnThenSignposted() {
+    var builder = TestStateBuilder.ofWalking(new WgsCoordinate(1, 1))
+      .streetEdge(29, new WgsCoordinate(0, 1))
+      .unnamedPathway(10, new WgsCoordinate(0, 0))
+      .pathway(SIGN_A, 10, new WgsCoordinate(1, 0))
+      .unnamedPathway(10, new WgsCoordinate(2, 0))
+      .unnamedPathway(10, new WgsCoordinate(3, 0));
+
+    assertThat(toStrings(builder))
+      .containsExactly(
+        "WalkStep{absoluteDirection: SOUTH, relativeDirection: DEPART, directionText: 'street edge', distance: 29.0}",
+        "WalkStep{absoluteDirection: WEST, relativeDirection: RIGHT, directionText: 'pathway', distance: 10.0}",
+        // the last three are collapsed
+        "WalkStep{absoluteDirection: NORTH, relativeDirection: FOLLOW_SIGNS, directionText: 'platform A', distance: 30.0}"
       )
       .inOrder();
   }

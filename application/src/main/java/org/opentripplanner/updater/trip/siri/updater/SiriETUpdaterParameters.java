@@ -2,6 +2,7 @@ package org.opentripplanner.updater.trip.siri.updater;
 
 import org.opentripplanner.updater.spi.PollingGraphUpdaterParameters;
 import org.opentripplanner.updater.trip.UrlUpdaterParameters;
+import org.opentripplanner.updater.trip.siri.SiriFuzzyTripMatchingParameters;
 
 public interface SiriETUpdaterParameters
   extends UrlUpdaterParameters, PollingGraphUpdaterParameters
@@ -10,5 +11,6 @@ public interface SiriETUpdaterParameters
 
   boolean blockReadinessUntilInitialized();
 
-  boolean fuzzyTripMatching();
+  /** The fuzzy trip matching configuration of this updater. */
+  SiriFuzzyTripMatchingParameters fuzzyTripMatching();
 }

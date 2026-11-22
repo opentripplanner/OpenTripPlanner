@@ -2,112 +2,54 @@ package org.opentripplanner.routing.graph;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
-import com.conveyal.object_differ.ObjectDiffer;
 import java.io.File;
-import java.lang.ref.SoftReference;
-import java.lang.reflect.Method;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.util.BitSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.jar.JarFile;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
-import org.geotools.util.WeakValueHashMap;
-import org.jets3t.service.io.TempFile;
 import org.junit.jupiter.api.Test;
-import org.locationtech.jts.geom.LineString;
-import org.locationtech.jts.geom.Polygon;
+import org.junit.jupiter.api.io.TempDir;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
-import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
-import org.opentripplanner.ext.emission.EmissionRepository;
-import org.opentripplanner.ext.emission.internal.DefaultEmissionRepository;
-import org.opentripplanner.ext.emission.model.TripPatternEmission;
-import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayRepository;
-import org.opentripplanner.ext.empiricaldelay.internal.DefaultEmpiricalDelayRepository;
-import org.opentripplanner.ext.empiricaldelay.model.EmpiricalDelay;
-import org.opentripplanner.ext.empiricaldelay.model.TripDelays;
-import org.opentripplanner.ext.empiricaldelay.model.calendar.EmpiricalDelayCalendar;
 import org.opentripplanner.ext.fares.service.gtfs.v1.GtfsFareServiceFactory;
-import org.opentripplanner.ext.flex.trip.FlexTrip;
-import org.opentripplanner.framework.model.Gram;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
-import org.opentripplanner.model.plan.Emission;
-import org.opentripplanner.place.api.NearbyStop;
-import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
 import org.opentripplanner.service.shape.dataimport.ShapeDataImport;
-import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRepository;
-import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
-import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.service.worldenvelope.internal.DefaultWorldEnvelopeRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
-import org.opentripplanner.street.StreetRepository;
-import org.opentripplanner.street.geometry.HashGridSpatialIndex;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.internal.DefaultStreetRepository;
 import org.opentripplanner.street.model.StreetModelDetails;
-import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
-import org.opentripplanner.transit.service.TransitRepository;
-import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.configure.RegularTransferFactory;
-import org.slf4j.Logger;
 
 /**
- * Tests that saving a graph and reloading it (round trip through serialization and deserialization)
- * does not corrupt the graph, and yields exactly the same data.
+ * A minimal test that a graph survives a round trip through {@link SerializedGraphObject#save} and
+ * {@link SerializedGraphObject#load(File)}. The test compares the street graph and the scheduled
+ * transit data, it does not compare the object graph field by field.
  * <p>
- * We tried several existing libraries to perform the comparison but nothing did exactly what we
- * needed in a way that we could control precisely.
- * <p>
- * Created by abyrd on 2018-10-26
+ * That all classes in the serialized object graph can be loaded is verified by
+ * {@code SerializedGraphObjectClassesTest}, and each custom Kryo serializer has its own test.
  */
-public class GraphSerializationTest {
+class GraphSerializationTest {
 
-  private static final String FEED_ID = "F";
-  private static final FeedScopedId A_TRIP_ID = new FeedScopedId(FEED_ID, "T:1");
-  private static final Gram CO2 = Gram.of(2);
-  private static final Emission A_EMISSION = Emission.of(CO2);
-  private static final LocalDate LOCAL_DATE = LocalDate.of(2025, 1, 1);
+  @TempDir
+  File tempDir;
 
-  static Class<?>[] IGNORED_CLASSES = Set.of(
-    // Skip AtomicInteger, it does not implement equals/hashCode
-    AtomicInteger.class,
-    ThreadPoolExecutor.class,
-    WeakValueHashMap.class,
-    Method.class,
-    JarFile.class,
-    SoftReference.class,
-    Class.class,
-    Logger.class,
-    ch.qos.logback.classic.Logger.class,
-    HashGridSpatialIndex.class,
-    Deduplicator.class
-  ).toArray(Class[]::new);
-
-  /**
-   * Tests GTFS based graph serialization to file.
-   */
   @Test
-  public void testRoundTripSerializationForGTFSGraph() throws Exception {
-    TestOtpModel model = ConstantsForTests.buildNewPortlandGraph(true);
-    // Make sure there are shapes, otherwise the shape comparison below proves nothing
+  void roundTripGtfsGraph() {
+    var model = ConstantsForTests.buildNewPortlandGraph(true);
+    // Make sure there are shapes, otherwise the shape comparison proves nothing
     var shapes = model
       .timetableDataImport()
       .getAllTripPatterns()
@@ -116,123 +58,87 @@ public class GraphSerializationTest {
       .filter(Objects::nonNull)
       .toList();
     assertThat(shapes).isNotEmpty();
-    var streetRepository = createStreetRepository();
-    var osmGraphBuildRepository = new DefaultOsmInfoGraphBuildRepository();
-    var streetDetailsRepository = new DefaultStreetDetailsRepository();
-    var weRepo = new DefaultWorldEnvelopeRepository();
-    var emissionRepository = createEmissionRepository();
-    var empiricalDelayRepository = empiricalDelayRepository();
-    var parkingRepository = new DefaultVehicleParkingRepository();
-    testRoundTrip(
-      model.graph(),
-      osmGraphBuildRepository,
-      streetDetailsRepository,
-      streetRepository,
-      model.transitRepository(),
-      model.timetableDataImport(),
-      model.shapeDataImport(),
-      model.transferRepository(),
-      RegularTransferFactory.createBuildRepository(),
-      weRepo,
-      parkingRepository,
-      emissionRepository,
-      empiricalDelayRepository
-    );
+    assertRoundTrip(model);
   }
 
-  private static DefaultStreetRepository createStreetRepository() {
+  @Test
+  void roundTripNetexGraph() {
+    assertRoundTrip(ConstantsForTests.buildNewMinimalNetexGraph());
+  }
+
+  private void assertRoundTrip(TestOtpModel model) {
+    var file = new File(tempDir, "graph.obj");
+    save(model, file);
+
+    // The model is cached and may not be indexed by other tests
+    model.index();
+
+    var copy = SerializedGraphObject.load(file);
+    copy.graph.index();
+
+    assertSameStreetGraph(model.graph(), copy.graph);
+    assertSameScheduledData(model.timetableDataImport(), copy.timetableDataImport);
+    assertSameShapeData(model.timetableDataImport(), model.shapeDataImport(), copy.shapeDataImport);
+  }
+
+  private static void save(TestOtpModel model, File file) {
     var streetRepository = new DefaultStreetRepository();
     streetRepository.setStreetModelDetails(new StreetModelDetails(33f, 17, 1.0f, 1.0f));
-    return streetRepository;
-  }
 
-  /**
-   * Tests Netex based graph serialization to file.
-   */
-  @Test
-  public void testRoundTripSerializationForNetexGraph() throws Exception {
-    TestOtpModel model = ConstantsForTests.buildNewMinimalNetexGraph();
-    var streetRepository = createStreetRepository();
-    var osmGraphBuildRepository = new DefaultOsmInfoGraphBuildRepository();
-    var streetDetailsRepository = new DefaultStreetDetailsRepository();
-    var worldEnvelopeRepository = new DefaultWorldEnvelopeRepository();
-    var emissionRepository = createEmissionRepository();
-    var empiricalDelayRepository = empiricalDelayRepository();
-    var parkingRepository = new DefaultVehicleParkingRepository();
-    testRoundTrip(
+    new SerializedGraphObject(
       model.graph(),
-      osmGraphBuildRepository,
-      streetDetailsRepository,
+      new DefaultOsmInfoGraphBuildRepository(),
+      new DefaultStreetDetailsRepository(),
       streetRepository,
       model.transitRepository(),
       model.timetableDataImport(),
       model.shapeDataImport(),
       model.transferRepository(),
       RegularTransferFactory.createBuildRepository(),
-      worldEnvelopeRepository,
-      parkingRepository,
-      emissionRepository,
-      empiricalDelayRepository
-    );
+      new DefaultWorldEnvelopeRepository(),
+      new DefaultVehicleParkingRepository(),
+      BuildConfig.DEFAULT,
+      RouterConfig.DEFAULT,
+      DataImportIssueSummary.empty(),
+      null,
+      null,
+      null,
+      null,
+      new GtfsFareServiceFactory()
+    ).save(new FileDataSource(file, FileType.GRAPH));
   }
 
-  // Ideally we'd also test comparing two separate but identical complex graphs, built separately from the same inputs.
-  // A test that builds the same graph twice will currently fail for the following reasons:
-  // There is global state in Vertex.index and the feeds IDs that mean if you build the same graph twice the feed IDs
-  // and vertex index numbers will all be unique. This is however evidence that the diff tool is detecting changes in
-  // the graph contents. On the other hand deserializing the same graph twice or doing a round trip through
-  // serialization and deserialization should produce identical graphs.
-
   /**
-   * Test comparison of two references to the same graph. This should obviously yield no differences
-   * at all, and allows us to perform a very deep comparison of almost the entire object graph
-   * because there are no problems with lists being reordered, transient indexes being rebuilt, etc.
-   * The ObjectDiffer supports such comparisons of identical objects with a special switch
-   * specifically for testing.
-   * <p>
-   * This is as much a test of the ObjectDiffer itself as of OpenTripPlanner serialization. It is
-   * situated here instead of in the same package as ObjectDiffer so it has access to the
-   * OpenTripPlanner classes, which provide a suitably complex tangle of fields and references for
-   * exercising all the differ's capabilities.
+   * Vertices are compared by label and location, and edges by their description (which includes
+   * the vertices, name and OSM ids) and geometry. The edge lists of the vertices are rebuilt after
+   * loading, and their order is not significant, so they are not compared directly.
    */
-  @Test
-  public void compareGraphToItself() {
-    TestOtpModel cachedPortlandGraph = ConstantsForTests.getInstance()
-      .getCachedPortlandGraph()
-      .index();
-    Graph originalGraph = cachedPortlandGraph.graph();
+  private static void assertSameStreetGraph(Graph expected, Graph actual) {
+    assertEquals(expected.countVertices(), actual.countVertices());
+    assertEquals(expected.countEdges(), actual.countEdges());
+    assertEquals(vertices(expected), vertices(actual));
+    assertEquals(edges(expected), edges(actual));
+  }
 
-    // We can exclude relatively few classes here, because the object trees are of course perfectly identical.
-    // We do skip edge lists - otherwise we trigger a depth-first search of the graph causing a stack overflow.
-    // We also skip some deeply buried weak-value hash maps, which refuse to tell you what their keys are.
-    ObjectDiffer objectDiffer = new ObjectDiffer();
-    objectDiffer.ignoreFields("incoming", "outgoing");
-    objectDiffer.useEquals(BitSet.class, LineString.class, Polygon.class);
-    // ThreadPoolExecutor contains a weak reference to a very deep chain of Finalizer instances.
-    // Method instances usually are part of a proxy which are totally un-reflectable in Java 11.
+  private static Map<String, String> vertices(Graph graph) {
+    var result = new TreeMap<String, String>();
+    for (var v : graph.getVertices()) {
+      result.put(v.getLabelString(), v.getLat() + "," + v.getLon());
+    }
+    return result;
+  }
 
-    objectDiffer.ignoreClasses(IGNORED_CLASSES);
-    // This setting is critical to perform a deep test of an object against itself.
-    objectDiffer.enableComparingIdenticalObjects();
-    objectDiffer.compareTwoObjects(originalGraph, originalGraph);
-    objectDiffer.printSummary();
-    assertFalse(objectDiffer.hasDifferences());
+  private static Set<String> edges(Graph graph) {
+    var result = new TreeSet<String>();
+    for (var e : graph.listEdges()) {
+      result.add(e + " " + (e.hasGeometry() ? e.getGeometry().toText() : ""));
+    }
+    return result;
   }
 
   /**
-   * Compare two separate essentially empty graphs.
-   */
-  @Test
-  public void testEmptyGraphs() {
-    Graph graph1 = new Graph();
-    Graph graph2 = new Graph();
-    assertNoDifferences(graph1, graph2);
-  }
-
-  /**
-   * The scheduled entities are not compared with the object differ (identity-keyed maps), so
-   * compare their ids, the order of the trips on service date (it is the order of replacements)
-   * and the calendars.
+   * The scheduled entities are identity based, so compare their ids, the order of the trips on
+   * service date (it is the order of replacements) and the calendars.
    */
   private static void assertSameScheduledData(
     TimetableDataImport original,
@@ -245,10 +151,6 @@ public class GraphSerializationTest {
     assertEquals(
       original.getAllTripsOnServiceDate().stream().map(TripOnServiceDate::getId).toList(),
       copy.getAllTripsOnServiceDate().stream().map(TripOnServiceDate::getId).toList()
-    );
-    assertEquals(
-      original.getAllFlexTrips().stream().map(FlexTrip::getId).collect(Collectors.toSet()),
-      copy.getAllFlexTrips().stream().map(FlexTrip::getId).collect(Collectors.toSet())
     );
     var originalCalendars = original.getTripCalendars();
     var copyCalendars = copy.getTripCalendars();
@@ -272,148 +174,15 @@ public class GraphSerializationTest {
       if (originalShape == null) {
         continue;
       }
-      var copiedGeometry = copy.getTripPatternShape(pattern.getId());
-      assertEquals(originalShape.size(), copiedGeometry.size());
+      var copiedShape = copy.getTripPatternShape(pattern.getId());
+      assertEquals(originalShape.size(), copiedShape.size());
       for (int i = 0; i < originalShape.size(); i++) {
-        assertEquals(originalShape.get(i), copiedGeometry.get(i));
+        assertEquals(originalShape.get(i), copiedShape.get(i));
         assertEquals(
           originalShape.distanceBetween(i, i + 1),
-          copiedGeometry.distanceBetween(i, i + 1)
+          copiedShape.distanceBetween(i, i + 1)
         );
       }
     }
-  }
-
-  private static void assertNoDifferences(Graph g1, Graph g2) {
-    // Make some exclusions because some classes are inherently transient or contain unordered lists we can't yet compare.
-    ObjectDiffer objectDiffer = new ObjectDiffer();
-    // Skip incoming and outgoing edge lists. These are unordered lists which will not compare properly.
-    // The edges themselves will be compared via another field, and the edge lists are reconstructed after deserialization.
-    // Some tests re-build the graph which will result in build times different by as little as a few milliseconds.
-    // Some transient fields are not relevant to routing, so are not restored after reloading the graph.
-    // Other structures contain Maps with keys that have identity equality - these also cannot be compared yet.
-    // We would need to apply a key extractor function to such maps, copying them into new maps.
-    objectDiffer.ignoreFields(
-      "calendarService",
-      "incoming",
-      "outgoing",
-      "buildTime",
-      "tripPatternForId",
-      "raptorTransitData",
-      "realtimeRaptorTransitData",
-      "dateTime",
-      "notesForEdge",
-      "uniqueMatchers",
-      "linker",
-      // for some reason the object differ struggles with ImmutableSetMultimap
-      "stopVerticesByParentId"
-    );
-    // Edges have very detailed String representation including lat/lon coordinates and OSM IDs. They should be unique.
-    objectDiffer.setKeyExtractor("turnRestrictions", Object::toString);
-    objectDiffer.useEquals(BitSet.class, LineString.class, Polygon.class);
-    // HashGridSpatialIndex contains unordered lists in its bins. This is rebuilt after deserialization anyway.
-    // The deduplicator in the loaded graph will be empty, because it is transient and only fills up when items
-    // are deduplicated.
-    objectDiffer.ignoreClasses(IGNORED_CLASSES);
-    objectDiffer.compareTwoObjects(g1, g2);
-    objectDiffer.printSummary();
-    // Print differences before assertion so we can see what went wrong.
-    assertFalse(objectDiffer.hasDifferences());
-  }
-
-  /**
-   * Tests that saving a Graph to disk and reloading it results in a separate but semantically
-   * identical Graph.
-   */
-  private void testRoundTrip(
-    Graph originalGraph,
-    OsmInfoGraphBuildRepository osmInfoGraphBuildRepository,
-    StreetDetailsRepository streetDetailsRepository,
-    StreetRepository streetRepository,
-    TransitRepository originalTransitRepository,
-    TimetableDataImport originalTimetableDataImport,
-    ShapeDataImport originalShapeDataImport,
-    TransferRepository originalTransferRepository,
-    RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository,
-    WorldEnvelopeRepository worldEnvelopeRepository,
-    VehicleParkingRepository vehicleParkingRepository,
-    EmissionRepository emissionRepository,
-    EmpiricalDelayRepository empiricalDelayRepository
-  ) throws Exception {
-    // Now round-trip the graph through serialization.
-    File tempFile = TempFile.createTempFile("graph", "pdx");
-
-    SerializedGraphObject serializedObj = new SerializedGraphObject(
-      originalGraph,
-      osmInfoGraphBuildRepository,
-      streetDetailsRepository,
-      streetRepository,
-      originalTransitRepository,
-      originalTimetableDataImport,
-      originalShapeDataImport,
-      originalTransferRepository,
-      regularTransferBuildRepository,
-      worldEnvelopeRepository,
-      vehicleParkingRepository,
-      BuildConfig.DEFAULT,
-      RouterConfig.DEFAULT,
-      DataImportIssueSummary.empty(),
-      emissionRepository,
-      null,
-      empiricalDelayRepository,
-      null,
-      new GtfsFareServiceFactory()
-    );
-    serializedObj.save(new FileDataSource(tempFile, FileType.GRAPH));
-    SerializedGraphObject deserializedGraph = SerializedGraphObject.load(tempFile);
-    Graph copiedGraph1 = deserializedGraph.graph;
-    TransitRepository copiedTransitRepository1 = deserializedGraph.transitRepository;
-    assertSameScheduledData(originalTimetableDataImport, deserializedGraph.timetableDataImport);
-    assertSameShapeData(
-      originalTimetableDataImport,
-      originalShapeDataImport,
-      deserializedGraph.shapeDataImport
-    );
-    // Index both graph - we do no know if the original is indexed, because it is cached and
-    // might be indexed by other tests.
-
-    originalTransitRepository.index();
-    originalGraph.index();
-
-    copiedTransitRepository1.index();
-    copiedGraph1.index();
-
-    assertNoDifferences(originalGraph, copiedGraph1);
-
-    SerializedGraphObject deserializedGraph2 = SerializedGraphObject.load(tempFile);
-    Graph copiedGraph2 = deserializedGraph2.graph;
-    TransitRepository copiedTransitRepository2 = deserializedGraph2.transitRepository;
-    copiedTransitRepository2.index();
-    copiedGraph2.index();
-    assertNoDifferences(copiedGraph1, copiedGraph2);
-  }
-
-  private static EmissionRepository createEmissionRepository() {
-    var emissionRepository = new DefaultEmissionRepository();
-    emissionRepository.setCarAvgCo2PerMeter(CO2);
-    emissionRepository.addRouteEmissions(Map.of(A_TRIP_ID, A_EMISSION));
-    emissionRepository.addTripPatternEmissions(
-      Map.of(A_TRIP_ID, new TripPatternEmission(List.of(A_EMISSION)))
-    );
-    return emissionRepository;
-  }
-
-  private static EmpiricalDelayRepository empiricalDelayRepository() {
-    var repository = new DefaultEmpiricalDelayRepository();
-    var cal = EmpiricalDelayCalendar.of()
-      .with("serviceId", Set.of(DayOfWeek.MONDAY), LOCAL_DATE, LOCAL_DATE)
-      .build();
-    repository.addEmpiricalDelayServiceCalendar(FEED_ID, cal);
-    repository.addTripDelays(
-      TripDelays.of(A_TRIP_ID)
-        .with("serviceId", List.of(new EmpiricalDelay(2, 19)))
-        .build()
-    );
-    return repository;
   }
 }

@@ -49,11 +49,15 @@ public class SiriETMqttUpdaterConfig {
       .summary("The qos used for the MQTT subscription")
       .asInt();
 
-    boolean fuzzyTripMatching = siriMqttRoot
-      .of("fuzzyTripMatching")
-      .summary("Whether or not the fuzzy trip matcher should be used")
-      .since(OtpVersion.V2_9)
-      .asBoolean();
+    var fuzzyTripMatching = SiriFuzzyTripMatchingConfig.map(
+      siriMqttRoot,
+      siriMqttRoot
+        .of("fuzzyTripMatching")
+        .since(OtpVersion.V2_9)
+        .summary(SiriFuzzyTripMatchingConfig.FUZZY_TRIP_MATCHING_SUMMARY)
+        .description(SiriFuzzyTripMatchingConfig.FUZZY_TRIP_MATCHING_DESCRIPTION)
+        .asBoolean(false)
+    );
 
     int numberOfPrimingWorkers = siriMqttRoot
       .of("numberOfPrimingWorkers")

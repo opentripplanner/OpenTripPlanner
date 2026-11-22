@@ -28,11 +28,15 @@ public class SiriETLiteUpdaterConfig {
         .since(V2_7)
         .summary("The HTTP timeout to download the updates.")
         .asDuration(Duration.ofSeconds(15)),
-      c
-        .of("fuzzyTripMatching")
-        .since(V2_7)
-        .summary("If the fuzzy trip matcher should be used to match trips.")
-        .asBoolean(false),
+      SiriFuzzyTripMatchingConfig.map(
+        c,
+        c
+          .of("fuzzyTripMatching")
+          .since(V2_7)
+          .summary(SiriFuzzyTripMatchingConfig.FUZZY_TRIP_MATCHING_SUMMARY)
+          .description(SiriFuzzyTripMatchingConfig.FUZZY_TRIP_MATCHING_DESCRIPTION)
+          .asBoolean(false)
+      ),
       HttpHeadersConfig.headers(c, V2_7)
     );
   }

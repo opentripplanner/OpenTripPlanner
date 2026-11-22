@@ -79,6 +79,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
   private final StreetPathToLegsMapper streetPathToLegsMapper;
   private final TransitService transitService;
   private final ShapeService shapeService;
+  private final TransitServiceResolver siteResolver;
   private final CarpoolItineraryMapper carpoolItineraryMapper;
 
   @Nullable
@@ -111,8 +112,9 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     this.transferMode = request.journey().transfer().mode();
     this.request = request;
     this.transferStreetRequest = StreetSearchRequestMapper.mapToTransferRequest(request).build();
+    this.siteResolver = new TransitServiceResolver(transitService);
     this.streetPathToLegsMapper = new StreetPathToLegsMapper(
-      new TransitServiceResolver(transitService),
+      siteResolver,
       transitService.getTimeZone(),
       streetDetailsService,
       graph.ellipsoidToGeoidDifference
@@ -230,7 +232,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     if (taxiService != null && request.journey().access().mode() == StreetMode.TAXI) {
       return taxiService.decorateAccessEgressLegs(
         legs,
-        request.from().wgsCoordinate(),
+        siteResolver.findCoordinate(request.from()).orElseThrow(),
         raptorTransitData.getStopByIndex(accessPathLeg.access().stop()).getCoordinate()
       );
     }
@@ -404,7 +406,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       return taxiService.decorateAccessEgressLegs(
         legs,
         raptorTransitData.getStopByIndex(egressPathLeg.egress().stop()).getCoordinate(),
-        request.to().wgsCoordinate()
+        siteResolver.findCoordinate(request.to()).orElseThrow()
       );
     }
     return legs;
