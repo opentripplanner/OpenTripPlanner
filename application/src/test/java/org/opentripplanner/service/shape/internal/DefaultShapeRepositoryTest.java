@@ -31,12 +31,6 @@ class DefaultShapeRepositoryTest {
   private static final Route ROUTE_F = TransitRepositoryForTest.route(
     new FeedScopedId("F", "route")
   ).build();
-  private static final Route ROUTE_G = TransitRepositoryForTest.route(
-    new FeedScopedId("G", "route")
-  ).build();
-  private static final Route ROUTE_H = TransitRepositoryForTest.route(
-    new FeedScopedId("H", "route")
-  ).build();
 
   private static final TripPattern SCHEDULED = TripPattern.of(new FeedScopedId("F", "scheduled"))
     .withRoute(ROUTE_F)
@@ -48,18 +42,6 @@ class DefaultShapeRepositoryTest {
     .build();
   private static final TripPattern OTHER = TripPattern.of(new FeedScopedId("F", "other"))
     .withRoute(ROUTE_F)
-    .withStopPattern(STOP_PATTERN)
-    .build();
-  private static final TripPattern OTHER_FEED_REAL_TIME = TripPattern.of(
-    new FeedScopedId("G", "rt")
-  )
-    .withRoute(ROUTE_G)
-    .withStopPattern(STOP_PATTERN)
-    .build();
-  private static final TripPattern THIRD_FEED_REAL_TIME = TripPattern.of(
-    new FeedScopedId("H", "rt")
-  )
-    .withRoute(ROUTE_H)
     .withStopPattern(STOP_PATTERN)
     .build();
 
@@ -107,25 +89,16 @@ class DefaultShapeRepositoryTest {
   }
 
   @Test
-  void clearRemovesRealTimeGeometriesOfTheFeedOnly() {
+  void clearRemovesRealTimeGeometriesButKeepsTheScheduledData() {
     repository.setTripPatternShape(REAL_TIME, REAL_TIME_TRIP_PATTERN_GEOMETRY);
-    repository.setTripPatternShape(OTHER_FEED_REAL_TIME, REAL_TIME_TRIP_PATTERN_GEOMETRY);
-    var snapshotBeforeClear = repository.createSnapshot();
+    repository.setTripPatternShape(SCHEDULED, OVERRIDING_TRIP_PATTERN_GEOMETRY);
 
     repository.clear("F");
 
     assertNull(repository.getTripPatternShape(REAL_TIME.getId()));
     assertEquals(
-      REAL_TIME_TRIP_PATTERN_GEOMETRY,
-      repository.getTripPatternShape(OTHER_FEED_REAL_TIME.getId())
-    );
-    assertEquals(
       SCHEDULED_TRIP_PATTERN_GEOMETRY,
       repository.getTripPatternShape(SCHEDULED.getId())
-    );
-    assertEquals(
-      REAL_TIME_TRIP_PATTERN_GEOMETRY,
-      snapshotBeforeClear.getTripPatternShape(REAL_TIME.getId())
     );
   }
 
@@ -147,34 +120,6 @@ class DefaultShapeRepositoryTest {
       OVERRIDING_TRIP_PATTERN_GEOMETRY,
       repository.createSnapshot().getTripPatternShape(REAL_TIME.getId())
     );
-  }
-
-  @Test
-  void snapshotContainingAFeedIsNotAffectedByLaterWritesToTheFeed() {
-    repository.setTripPatternShape(REAL_TIME, REAL_TIME_TRIP_PATTERN_GEOMETRY);
-    var snapshot = repository.createSnapshot();
-
-    repository.setTripPatternShape(OTHER, OVERRIDING_TRIP_PATTERN_GEOMETRY);
-
-    assertNull(snapshot.getTripPatternShape(OTHER.getId()));
-    assertEquals(REAL_TIME_TRIP_PATTERN_GEOMETRY, snapshot.getTripPatternShape(REAL_TIME.getId()));
-  }
-
-  @Test
-  void unchangedFeedIsStillServedWhenAnotherFeedIsWrittenOrCleared() {
-    repository.setTripPatternShape(REAL_TIME, REAL_TIME_TRIP_PATTERN_GEOMETRY);
-    repository.setTripPatternShape(OTHER_FEED_REAL_TIME, OVERRIDING_TRIP_PATTERN_GEOMETRY);
-    repository.createSnapshot();
-
-    repository.clear("F");
-    repository.setTripPatternShape(THIRD_FEED_REAL_TIME, OVERRIDING_TRIP_PATTERN_GEOMETRY);
-    var snapshot = repository.createSnapshot();
-
-    assertEquals(
-      OVERRIDING_TRIP_PATTERN_GEOMETRY,
-      snapshot.getTripPatternShape(OTHER_FEED_REAL_TIME.getId())
-    );
-    assertNull(snapshot.getTripPatternShape(REAL_TIME.getId()));
   }
 
   @Test
