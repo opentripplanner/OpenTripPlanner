@@ -11,24 +11,25 @@ import org.opentripplanner.service.shape.model.CompactLineStringSequence;
 
 class ScheduledShapeDataTest {
 
-  private static final CompactLineStringSequence TRIP_PATTERN_GEOMETRY =
-    ShapeTestFactory.straightLine(60.0);
+  private static final CompactLineStringSequence TRIP_PATTERN_SHAPE = ShapeTestFactory.straightLine(
+    60.0
+  );
 
   @Test
-  void emptyHasNoGeometry() {
+  void emptyHasNoTripPatternShape() {
     var empty = ScheduledShapeData.empty();
 
     assertNull(empty.getTripPatternShape(id("A")));
   }
 
   @Test
-  void ofCopiesTheMapAndSharesTheGeometry() {
-    var shapesByTripPattern = new HashMap<>(Map.of(id("A"), TRIP_PATTERN_GEOMETRY));
+  void ofCopiesTheMapAndSharesTheTripPatternShape() {
+    var shapesByTripPattern = new HashMap<>(Map.of(id("A"), TRIP_PATTERN_SHAPE));
 
     var data = ScheduledShapeData.of(shapesByTripPattern);
-    shapesByTripPattern.put(id("B"), TRIP_PATTERN_GEOMETRY);
+    shapesByTripPattern.put(id("B"), TRIP_PATTERN_SHAPE);
 
-    assertSame(TRIP_PATTERN_GEOMETRY, data.getTripPatternShape(id("A")));
+    assertSame(TRIP_PATTERN_SHAPE, data.getTripPatternShape(id("A")));
     assertNull(data.getTripPatternShape(id("B")));
   }
 }

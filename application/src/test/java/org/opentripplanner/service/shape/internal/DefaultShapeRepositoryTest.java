@@ -45,107 +45,101 @@ class DefaultShapeRepositoryTest {
     .withStopPattern(STOP_PATTERN)
     .build();
 
-  private static final CompactLineStringSequence SCHEDULED_TRIP_PATTERN_GEOMETRY =
+  private static final CompactLineStringSequence SCHEDULED_TRIP_PATTERN_SHAPE =
     ShapeTestFactory.straightLine(60.0);
-  private static final CompactLineStringSequence REAL_TIME_TRIP_PATTERN_GEOMETRY =
+  private static final CompactLineStringSequence REAL_TIME_TRIP_PATTERN_SHAPE =
     ShapeTestFactory.straightLine(61.0);
-  private static final CompactLineStringSequence OVERRIDING_TRIP_PATTERN_GEOMETRY =
+  private static final CompactLineStringSequence OVERRIDING_TRIP_PATTERN_SHAPE =
     ShapeTestFactory.straightLine(62.0);
 
   private final DefaultShapeRepository repository = new DefaultShapeRepository(
-    ScheduledShapeData.of(Map.of(SCHEDULED.getId(), SCHEDULED_TRIP_PATTERN_GEOMETRY))
+    ScheduledShapeData.of(Map.of(SCHEDULED.getId(), SCHEDULED_TRIP_PATTERN_SHAPE))
   );
 
   @Test
   void initialSnapshotContainsTheScheduledData() {
     var snapshot = repository.createSnapshot();
 
-    assertEquals(SCHEDULED_TRIP_PATTERN_GEOMETRY, snapshot.getTripPatternShape(SCHEDULED.getId()));
+    assertEquals(SCHEDULED_TRIP_PATTERN_SHAPE, snapshot.getTripPatternShape(SCHEDULED.getId()));
     assertNull(snapshot.getTripPatternShape(REAL_TIME.getId()));
   }
 
   @Test
-  void snapshotContainsRealTimeGeometry() {
-    repository.setTripPatternShape(REAL_TIME, REAL_TIME_TRIP_PATTERN_GEOMETRY);
+  void snapshotContainsRealTimeTripPatternShape() {
+    repository.setTripPatternShape(REAL_TIME, REAL_TIME_TRIP_PATTERN_SHAPE);
 
     var snapshot = repository.createSnapshot();
 
-    assertEquals(REAL_TIME_TRIP_PATTERN_GEOMETRY, snapshot.getTripPatternShape(REAL_TIME.getId()));
-    assertEquals(SCHEDULED_TRIP_PATTERN_GEOMETRY, snapshot.getTripPatternShape(SCHEDULED.getId()));
+    assertEquals(REAL_TIME_TRIP_PATTERN_SHAPE, snapshot.getTripPatternShape(REAL_TIME.getId()));
+    assertEquals(SCHEDULED_TRIP_PATTERN_SHAPE, snapshot.getTripPatternShape(SCHEDULED.getId()));
   }
 
   @Test
-  void realTimeGeometryOverridesScheduled() {
-    repository.setTripPatternShape(SCHEDULED, OVERRIDING_TRIP_PATTERN_GEOMETRY);
+  void realTimeTripPatternShapeOverridesScheduled() {
+    repository.setTripPatternShape(SCHEDULED, OVERRIDING_TRIP_PATTERN_SHAPE);
 
+    assertEquals(OVERRIDING_TRIP_PATTERN_SHAPE, repository.getTripPatternShape(SCHEDULED.getId()));
     assertEquals(
-      OVERRIDING_TRIP_PATTERN_GEOMETRY,
-      repository.getTripPatternShape(SCHEDULED.getId())
-    );
-    assertEquals(
-      OVERRIDING_TRIP_PATTERN_GEOMETRY,
+      OVERRIDING_TRIP_PATTERN_SHAPE,
       repository.createSnapshot().getTripPatternShape(SCHEDULED.getId())
     );
   }
 
   @Test
-  void clearRemovesRealTimeGeometriesButKeepsTheScheduledData() {
-    repository.setTripPatternShape(REAL_TIME, REAL_TIME_TRIP_PATTERN_GEOMETRY);
-    repository.setTripPatternShape(SCHEDULED, OVERRIDING_TRIP_PATTERN_GEOMETRY);
+  void clearRemovesRealTimeTripPatternShapesButKeepsTheScheduledData() {
+    repository.setTripPatternShape(REAL_TIME, REAL_TIME_TRIP_PATTERN_SHAPE);
+    repository.setTripPatternShape(SCHEDULED, OVERRIDING_TRIP_PATTERN_SHAPE);
 
     repository.clear("F");
 
     assertNull(repository.getTripPatternShape(REAL_TIME.getId()));
-    assertEquals(
-      SCHEDULED_TRIP_PATTERN_GEOMETRY,
-      repository.getTripPatternShape(SCHEDULED.getId())
-    );
+    assertEquals(SCHEDULED_TRIP_PATTERN_SHAPE, repository.getTripPatternShape(SCHEDULED.getId()));
   }
 
   @Test
-  void snapshotAfterClearDoesNotContainTheFeedAndGeometryCanBeAddedAgain() {
-    repository.setTripPatternShape(REAL_TIME, REAL_TIME_TRIP_PATTERN_GEOMETRY);
+  void snapshotAfterClearDoesNotContainTheFeedAndTripPatternShapeCanBeAddedAgain() {
+    repository.setTripPatternShape(REAL_TIME, REAL_TIME_TRIP_PATTERN_SHAPE);
     repository.createSnapshot();
 
     repository.clear("F");
     var snapshotAfterClear = repository.createSnapshot();
-    repository.setTripPatternShape(REAL_TIME, OVERRIDING_TRIP_PATTERN_GEOMETRY);
+    repository.setTripPatternShape(REAL_TIME, OVERRIDING_TRIP_PATTERN_SHAPE);
 
     assertNull(snapshotAfterClear.getTripPatternShape(REAL_TIME.getId()));
     assertEquals(
-      SCHEDULED_TRIP_PATTERN_GEOMETRY,
+      SCHEDULED_TRIP_PATTERN_SHAPE,
       snapshotAfterClear.getTripPatternShape(SCHEDULED.getId())
     );
     assertEquals(
-      OVERRIDING_TRIP_PATTERN_GEOMETRY,
+      OVERRIDING_TRIP_PATTERN_SHAPE,
       repository.createSnapshot().getTripPatternShape(REAL_TIME.getId())
     );
   }
 
   @Test
-  void clearOfAFeedWithoutGeometriesDoesNotChangeTheSnapshot() {
-    repository.setTripPatternShape(REAL_TIME, REAL_TIME_TRIP_PATTERN_GEOMETRY);
+  void clearOfAFeedWithoutTripPatternShapesDoesNotChangeTheSnapshot() {
+    repository.setTripPatternShape(REAL_TIME, REAL_TIME_TRIP_PATTERN_SHAPE);
     repository.createSnapshot();
 
     repository.clear("unknown feed");
     var snapshot = repository.createSnapshot();
 
-    assertEquals(REAL_TIME_TRIP_PATTERN_GEOMETRY, snapshot.getTripPatternShape(REAL_TIME.getId()));
-    assertEquals(SCHEDULED_TRIP_PATTERN_GEOMETRY, snapshot.getTripPatternShape(SCHEDULED.getId()));
+    assertEquals(REAL_TIME_TRIP_PATTERN_SHAPE, snapshot.getTripPatternShape(REAL_TIME.getId()));
+    assertEquals(SCHEDULED_TRIP_PATTERN_SHAPE, snapshot.getTripPatternShape(SCHEDULED.getId()));
   }
 
   @Test
   void snapshotIsNotAffectedByLaterWrites() {
     var snapshot = repository.createSnapshot();
 
-    repository.setTripPatternShape(OTHER, REAL_TIME_TRIP_PATTERN_GEOMETRY);
+    repository.setTripPatternShape(OTHER, REAL_TIME_TRIP_PATTERN_SHAPE);
 
     assertNull(snapshot.getTripPatternShape(OTHER.getId()));
-    assertEquals(REAL_TIME_TRIP_PATTERN_GEOMETRY, repository.getTripPatternShape(OTHER.getId()));
+    assertEquals(REAL_TIME_TRIP_PATTERN_SHAPE, repository.getTripPatternShape(OTHER.getId()));
   }
 
   @Test
-  void rejectAMissingShape() {
+  void rejectAMissingTripPatternShape() {
     var exception = assertThrows(IllegalArgumentException.class, () ->
       repository.setTripPatternShape(OTHER, null)
     );
@@ -154,7 +148,7 @@ class DefaultShapeRepositoryTest {
   }
 
   @Test
-  void rejectAShapeWithTheWrongNumberOfHops() {
+  void rejectATripPatternShapeWithTheWrongNumberOfHops() {
     var threeHops = TripShapeFactory.fromLineStrings(
       List.of(
         GeometryUtils.makeLineString(10.0, 60.0, 10.1, 60.1),

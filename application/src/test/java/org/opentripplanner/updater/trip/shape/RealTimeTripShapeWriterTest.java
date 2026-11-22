@@ -51,8 +51,8 @@ class RealTimeTripShapeWriterTest {
   );
 
   @Test
-  void storeAShapeDerivedFromTheOriginal() {
-    repositoryWithOriginalShape();
+  void storeATripPatternShapeDerivedFromTheOriginal() {
+    repositoryWithOriginalTripPatternShape();
     var pattern = TripPattern.of(id("replacement"))
       .withRoute(ROUTE)
       .withStopPattern(TransitRepositoryForTest.stopPattern(STOP_A, STOP_B, STOP_C))
@@ -63,9 +63,9 @@ class RealTimeTripShapeWriterTest {
     subject.ensureTripPatternShape(pattern);
 
     var original = repository.getTripPatternShape(ORIGINAL.getId());
-    var geometry = repository.getTripPatternShape(pattern.getId());
-    assertEquals(original.get(0), geometry.get(0));
-    assertEquals(original.get(1), geometry.get(1));
+    var shape = repository.getTripPatternShape(pattern.getId());
+    assertEquals(original.get(0), shape.get(0));
+    assertEquals(original.get(1), shape.get(1));
   }
 
   @Test
@@ -78,8 +78,8 @@ class RealTimeTripShapeWriterTest {
 
     subject.ensureTripPatternShape(pattern);
 
-    var geometry = repository.getTripPatternShape(pattern.getId());
-    assertEquals(makeLineString(STOP_A.getCoordinate(), STOP_B.getCoordinate()), geometry.get(0));
+    var shape = repository.getTripPatternShape(pattern.getId());
+    assertEquals(makeLineString(STOP_A.getCoordinate(), STOP_B.getCoordinate()), shape.get(0));
   }
 
   @Test
@@ -113,7 +113,7 @@ class RealTimeTripShapeWriterTest {
 
   @Test
   void writeOnlyToTheRealTimeRepository() {
-    repositoryWithOriginalShape();
+    repositoryWithOriginalTripPatternShape();
     var pattern = TripPattern.of(id("replacement"))
       .withRoute(ROUTE)
       .withStopPattern(TransitRepositoryForTest.stopPattern(STOP_A, STOP_B, STOP_C))
@@ -131,7 +131,7 @@ class RealTimeTripShapeWriterTest {
 
   @Test
   void deriveFromAnOriginalWrittenEarlierInTheSameTransaction() {
-    repositoryWithOriginalShape();
+    repositoryWithOriginalTripPatternShape();
     var firstUpdate = TripPattern.of(id("replacement1"))
       .withRoute(ROUTE)
       .withStopPattern(TransitRepositoryForTest.stopPattern(STOP_A, STOP_B, STOP_C))
@@ -155,8 +155,8 @@ class RealTimeTripShapeWriterTest {
   }
 
   @Test
-  void useStraightLinesWhenARealTimeOriginalHasNoShape() {
-    repositoryWithOriginalShape();
+  void useStraightLinesWhenARealTimeOriginalHasNoTripPatternShape() {
+    repositoryWithOriginalTripPatternShape();
     var firstUpdate = TripPattern.of(id("replacement1"))
       .withRoute(ROUTE)
       .withStopPattern(TransitRepositoryForTest.stopPattern(STOP_A, STOP_B, STOP_C))
@@ -194,7 +194,7 @@ class RealTimeTripShapeWriterTest {
     assertThat(exception).hasMessageThat().contains("original trip pattern");
   }
 
-  private void givenScheduledShape(
+  private void givenScheduledTripPatternShape(
     FeedScopedId patternId,
     CompactLineStringSequence tripPatternShape
   ) {
@@ -202,8 +202,8 @@ class RealTimeTripShapeWriterTest {
     repository = new DefaultShapeRepository(scheduledShapes);
   }
 
-  private void repositoryWithOriginalShape() {
-    givenScheduledShape(
+  private void repositoryWithOriginalTripPatternShape() {
+    givenScheduledTripPatternShape(
       ORIGINAL.getId(),
       TripShapeFactory.fromLineStrings(
         List.of(

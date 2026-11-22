@@ -32,13 +32,14 @@ class RealTimeTripShapeFactoryTest {
     .withStopPattern(TransitRepositoryForTest.stopPattern(STOP_A, STOP_B, STOP_C))
     .build();
 
-  private static final CompactLineStringSequence ORIGINAL_SHAPE = TripShapeFactory.fromLineStrings(
-    List.of(
-      makeLineString(STOP_A.getCoordinate(), STOP_X.getCoordinate(), STOP_B.getCoordinate()),
-      makeLineString(STOP_B.getCoordinate(), STOP_Y.getCoordinate(), STOP_C.getCoordinate())
-    ),
-    DeduplicatorService.NOOP
-  );
+  private static final CompactLineStringSequence ORIGINAL_TRIP_PATTERN_SHAPE =
+    TripShapeFactory.fromLineStrings(
+      List.of(
+        makeLineString(STOP_A.getCoordinate(), STOP_X.getCoordinate(), STOP_B.getCoordinate()),
+        makeLineString(STOP_B.getCoordinate(), STOP_Y.getCoordinate(), STOP_C.getCoordinate())
+      ),
+      DeduplicatorService.NOOP
+    );
 
   private final RealTimeTripShapeFactory subject = new RealTimeTripShapeFactory(
     DeduplicatorService.NOOP
@@ -53,15 +54,15 @@ class RealTimeTripShapeFactoryTest {
       .withOriginalTripPattern(ORIGINAL)
       .build();
 
-    var geometry = subject.createTripPatternShape(pattern, ORIGINAL_SHAPE);
+    var shape = subject.createTripPatternShape(pattern, ORIGINAL_TRIP_PATTERN_SHAPE);
 
-    assertEquals(3, geometry.size());
+    assertEquals(3, shape.size());
     assertEquals(
       makeLineString(STOP_A.getCoordinate(), STOP_X.getCoordinate(), STOP_B.getCoordinate()),
-      geometry.get(0)
+      shape.get(0)
     );
-    assertEquals(makeLineString(STOP_B.getCoordinate(), STOP_X.getCoordinate()), geometry.get(1));
-    assertEquals(makeLineString(STOP_X.getCoordinate(), STOP_Y.getCoordinate()), geometry.get(2));
+    assertEquals(makeLineString(STOP_B.getCoordinate(), STOP_X.getCoordinate()), shape.get(1));
+    assertEquals(makeLineString(STOP_X.getCoordinate(), STOP_Y.getCoordinate()), shape.get(2));
   }
 
   @Test
@@ -73,11 +74,11 @@ class RealTimeTripShapeFactoryTest {
       .withOriginalTripPattern(ORIGINAL)
       .build();
 
-    var geometry = subject.createTripPatternShape(pattern, ORIGINAL_SHAPE);
+    var shape = subject.createTripPatternShape(pattern, ORIGINAL_TRIP_PATTERN_SHAPE);
 
-    assertEquals(ORIGINAL_SHAPE.distanceBetween(0, 2), geometry.distanceBetween(0, 2));
-    assertEquals(ORIGINAL_SHAPE.get(0), geometry.get(0));
-    assertEquals(ORIGINAL_SHAPE.get(1), geometry.get(1));
+    assertEquals(ORIGINAL_TRIP_PATTERN_SHAPE.distanceBetween(0, 2), shape.distanceBetween(0, 2));
+    assertEquals(ORIGINAL_TRIP_PATTERN_SHAPE.get(0), shape.get(0));
+    assertEquals(ORIGINAL_TRIP_PATTERN_SHAPE.get(1), shape.get(1));
   }
 
   /**
@@ -117,11 +118,11 @@ class RealTimeTripShapeFactoryTest {
       .withOriginalTripPattern(original)
       .build();
 
-    var geometry = subject.createTripPatternShape(pattern, originalShape);
+    var shape = subject.createTripPatternShape(pattern, originalShape);
 
     assertEquals(
       makeLineString(stopNewOrigin.getCoordinate(), middle, stopDestination.getCoordinate()),
-      geometry.get(0)
+      shape.get(0)
     );
     assertEquals(
       makeLineString(stopOrigin.getCoordinate(), middle, stopDestination.getCoordinate()),
@@ -137,15 +138,15 @@ class RealTimeTripShapeFactoryTest {
       .withRealTimeAddedTrip()
       .build();
 
-    var geometry = subject.createTripPatternShape(pattern, null);
+    var shape = subject.createTripPatternShape(pattern, null);
 
-    assertEquals(makeLineString(STOP_A.getCoordinate(), STOP_B.getCoordinate()), geometry.get(0));
+    assertEquals(makeLineString(STOP_A.getCoordinate(), STOP_B.getCoordinate()), shape.get(0));
     double expected = distance(STOP_A, STOP_B) + distance(STOP_B, STOP_C);
-    assertEquals((int) Math.round(expected), geometry.distanceBetween(0, 2));
+    assertEquals((int) Math.round(expected), shape.distanceBetween(0, 2));
   }
 
   @Test
-  void useStraightLinesWhenTheOriginalShapeIsNotAvailable() {
+  void useStraightLinesWhenTheOriginalTripPatternShapeIsNotAvailable() {
     var pattern = TripPattern.of(id("replacement"))
       .withRoute(ROUTE)
       .withStopPattern(TransitRepositoryForTest.stopPattern(STOP_A, STOP_B, STOP_C))
@@ -153,11 +154,11 @@ class RealTimeTripShapeFactoryTest {
       .withOriginalTripPattern(ORIGINAL)
       .build();
 
-    var geometry = subject.createTripPatternShape(pattern, null);
+    var shape = subject.createTripPatternShape(pattern, null);
 
-    assertEquals(2, geometry.size());
-    assertEquals(makeLineString(STOP_A.getCoordinate(), STOP_B.getCoordinate()), geometry.get(0));
-    assertEquals(makeLineString(STOP_B.getCoordinate(), STOP_C.getCoordinate()), geometry.get(1));
+    assertEquals(2, shape.size());
+    assertEquals(makeLineString(STOP_A.getCoordinate(), STOP_B.getCoordinate()), shape.get(0));
+    assertEquals(makeLineString(STOP_B.getCoordinate(), STOP_C.getCoordinate()), shape.get(1));
   }
 
   private static double distance(RegularStop from, RegularStop to) {

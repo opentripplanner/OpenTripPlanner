@@ -30,27 +30,28 @@ class ShapeDataImportTest {
       )
     )
     .build();
-  private static final CompactLineStringSequence TRIP_PATTERN_GEOMETRY =
-    ShapeTestFactory.straightLine(60.0);
+  private static final CompactLineStringSequence TRIP_PATTERN_SHAPE = ShapeTestFactory.straightLine(
+    60.0
+  );
 
   @Test
-  void storesGeometry() {
+  void storesTripPatternShape() {
     var subject = new ShapeDataImport();
     assertNull(subject.getTripPatternShape(id("A")));
 
-    subject.setTripPatternShape(PATTERN, TRIP_PATTERN_GEOMETRY);
+    subject.setTripPatternShape(PATTERN, TRIP_PATTERN_SHAPE);
 
-    assertEquals(TRIP_PATTERN_GEOMETRY, subject.getTripPatternShape(id("A")));
+    assertEquals(TRIP_PATTERN_SHAPE, subject.getTripPatternShape(id("A")));
   }
 
   @Test
   void convertsToScheduledData() {
     var subject = new ShapeDataImport();
-    subject.setTripPatternShape(PATTERN, TRIP_PATTERN_GEOMETRY);
+    subject.setTripPatternShape(PATTERN, TRIP_PATTERN_SHAPE);
 
     var scheduled = subject.toScheduledShapeData();
 
-    assertEquals(TRIP_PATTERN_GEOMETRY, scheduled.getTripPatternShape(id("A")));
+    assertEquals(TRIP_PATTERN_SHAPE, scheduled.getTripPatternShape(id("A")));
   }
 
   @Test
@@ -59,13 +60,13 @@ class ShapeDataImportTest {
     subject.toScheduledShapeData();
 
     var exception = assertThrows(IllegalStateException.class, () ->
-      subject.setTripPatternShape(PATTERN, TRIP_PATTERN_GEOMETRY)
+      subject.setTripPatternShape(PATTERN, TRIP_PATTERN_SHAPE)
     );
     assertThat(exception).hasMessageThat().contains("frozen");
   }
 
   @Test
-  void rejectAMissingShape() {
+  void rejectAMissingTripPatternShape() {
     var subject = new ShapeDataImport();
 
     var exception = assertThrows(IllegalArgumentException.class, () ->
@@ -76,7 +77,7 @@ class ShapeDataImportTest {
   }
 
   @Test
-  void rejectAShapeWithTheWrongNumberOfHops() {
+  void rejectATripPatternShapeWithTheWrongNumberOfHops() {
     var subject = new ShapeDataImport();
     var twoHops = TripShapeFactory.fromLineStrings(
       List.of(makeLineString(10.0, 59.0, 10.1, 59.1), makeLineString(10.1, 59.1, 10.2, 59.0)),

@@ -28,9 +28,9 @@ class ShapeRepositoryLifecycleTest {
     .withStopPattern(STOP_PATTERN)
     .build();
 
-  private static final CompactLineStringSequence TRIP_PATTERN_GEOMETRY_1 =
+  private static final CompactLineStringSequence TRIP_PATTERN_SHAPE_1 =
     ShapeTestFactory.straightLine(60.0);
-  private static final CompactLineStringSequence TRIP_PATTERN_GEOMETRY_2 =
+  private static final CompactLineStringSequence TRIP_PATTERN_SHAPE_2 =
     ShapeTestFactory.straightLine(61.0);
 
   private final DefaultShapeRepository buffer = new DefaultShapeRepository(
@@ -40,14 +40,14 @@ class ShapeRepositoryLifecycleTest {
 
   @Test
   void snapshotIsNotAffectedByLaterWritesToTheBuffer() {
-    buffer.setTripPatternShape(PATTERN_1, TRIP_PATTERN_GEOMETRY_1);
+    buffer.setTripPatternShape(PATTERN_1, TRIP_PATTERN_SHAPE_1);
     var snapshot = lifecycle.freeze(buffer);
 
-    lifecycle.copyOnWrite(snapshot).setTripPatternShape(PATTERN_2, TRIP_PATTERN_GEOMETRY_2);
+    lifecycle.copyOnWrite(snapshot).setTripPatternShape(PATTERN_2, TRIP_PATTERN_SHAPE_2);
 
     assertNull(snapshot.getTripPatternShape(PATTERN_2.getId()));
     var next = lifecycle.freeze(buffer);
-    assertEquals(TRIP_PATTERN_GEOMETRY_1, next.getTripPatternShape(PATTERN_1.getId()));
-    assertEquals(TRIP_PATTERN_GEOMETRY_2, next.getTripPatternShape(PATTERN_2.getId()));
+    assertEquals(TRIP_PATTERN_SHAPE_1, next.getTripPatternShape(PATTERN_1.getId()));
+    assertEquals(TRIP_PATTERN_SHAPE_2, next.getTripPatternShape(PATTERN_2.getId()));
   }
 }

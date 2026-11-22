@@ -36,42 +36,42 @@ class DefaultShapeServiceTest {
     .build();
   private static final FeedScopedId UNKNOWN_PATTERN = id("unknown");
 
-  private static final CompactLineStringSequence SCHEDULED_TRIP_PATTERN_GEOMETRY =
+  private static final CompactLineStringSequence SCHEDULED_TRIP_PATTERN_SHAPE =
     ShapeTestFactory.straightLine(60.0);
-  private static final CompactLineStringSequence RT_TRIP_PATTERN_GEOMETRY =
+  private static final CompactLineStringSequence RT_TRIP_PATTERN_SHAPE =
     ShapeTestFactory.straightLine(61.0);
-  private static final CompactLineStringSequence OVERRIDING_TRIP_PATTERN_GEOMETRY =
+  private static final CompactLineStringSequence OVERRIDING_TRIP_PATTERN_SHAPE =
     ShapeTestFactory.straightLine(62.0);
 
   private final DefaultShapeRepository repository = new DefaultShapeRepository(
-    ScheduledShapeData.of(Map.of(SCHEDULED_PATTERN.getId(), SCHEDULED_TRIP_PATTERN_GEOMETRY))
+    ScheduledShapeData.of(Map.of(SCHEDULED_PATTERN.getId(), SCHEDULED_TRIP_PATTERN_SHAPE))
   );
 
   @Test
-  void scheduledGeometryIsServed() {
+  void scheduledTripPatternShapeIsServed() {
     var service = new DefaultShapeService(repository.createSnapshot());
 
     assertSame(
-      SCHEDULED_TRIP_PATTERN_GEOMETRY,
+      SCHEDULED_TRIP_PATTERN_SHAPE,
       service.getTripPatternShape(SCHEDULED_PATTERN.getId())
     );
   }
 
   @Test
-  void realTimeGeometryIsServed() {
-    repository.setTripPatternShape(RT_PATTERN, RT_TRIP_PATTERN_GEOMETRY);
+  void realTimeTripPatternShapeIsServed() {
+    repository.setTripPatternShape(RT_PATTERN, RT_TRIP_PATTERN_SHAPE);
     var service = new DefaultShapeService(repository.createSnapshot());
 
-    assertSame(RT_TRIP_PATTERN_GEOMETRY, service.getTripPatternShape(RT_PATTERN.getId()));
+    assertSame(RT_TRIP_PATTERN_SHAPE, service.getTripPatternShape(RT_PATTERN.getId()));
   }
 
   @Test
-  void realTimeGeometryTakesPrecedenceOverScheduled() {
-    repository.setTripPatternShape(SCHEDULED_PATTERN, OVERRIDING_TRIP_PATTERN_GEOMETRY);
+  void realTimeTripPatternShapeTakesPrecedenceOverScheduled() {
+    repository.setTripPatternShape(SCHEDULED_PATTERN, OVERRIDING_TRIP_PATTERN_SHAPE);
     var service = new DefaultShapeService(repository.createSnapshot());
 
     assertSame(
-      OVERRIDING_TRIP_PATTERN_GEOMETRY,
+      OVERRIDING_TRIP_PATTERN_SHAPE,
       service.getTripPatternShape(SCHEDULED_PATTERN.getId())
     );
   }
@@ -79,16 +79,16 @@ class DefaultShapeServiceTest {
   @Test
   void serviceOverTheMutableRepositorySeesUncommittedWrites() {
     var service = new DefaultShapeService(repository);
-    repository.setTripPatternShape(RT_PATTERN, RT_TRIP_PATTERN_GEOMETRY);
+    repository.setTripPatternShape(RT_PATTERN, RT_TRIP_PATTERN_SHAPE);
 
-    assertSame(RT_TRIP_PATTERN_GEOMETRY, service.getTripPatternShape(RT_PATTERN.getId()));
+    assertSame(RT_TRIP_PATTERN_SHAPE, service.getTripPatternShape(RT_PATTERN.getId()));
   }
 
   @Test
   void serviceOverASnapshotDoesNotSeeLaterWrites() {
     var service = new DefaultShapeService(repository.createSnapshot());
 
-    repository.setTripPatternShape(RT_PATTERN, RT_TRIP_PATTERN_GEOMETRY);
+    repository.setTripPatternShape(RT_PATTERN, RT_TRIP_PATTERN_SHAPE);
 
     var exception = assertThrows(IllegalArgumentException.class, () ->
       service.getTripPatternShape(RT_PATTERN.getId())
