@@ -203,14 +203,6 @@ public class ApiLeg {
   public Boolean rentedBike;
 
   /**
-   * Is this leg walking with a bike?
-   *
-   * @deprecated This is always null or false, the information is now stored per walk step
-   */
-  @Deprecated
-  public Boolean walkingBike;
-
-  /**
    * The leg's duration in seconds
    */
   public double getDuration() {

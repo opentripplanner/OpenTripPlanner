@@ -83,8 +83,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             ],
             "vertexType" : "BIKESHARE"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -153,8 +152,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             ],
             "vertexType" : "BIKESHARE"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -222,8 +220,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyId" : "prt:prt",
@@ -407,8 +404,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "name" : "NW Everett St. & NW 5th Ave. (P3)",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         }
       ],
       "startTime" : "2009-10-21T23:15:04.000Z",
@@ -528,8 +524,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyId" : "prt:prt",
@@ -791,8 +786,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "name" : "NW Everett St. & NW 5th Ave. (P3)",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         }
       ],
       "startTime" : "2009-10-21T23:16:46.000Z",
@@ -873,8 +867,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyId" : "prt:prt",
@@ -1071,8 +1064,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "name" : "NW Everett St. & NW 5th Ave. (P3)",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         }
       ],
       "startTime" : "2009-10-21T23:23:34.000Z",
@@ -1167,8 +1159,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             ],
             "vertexType" : "BIKESHARE"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -1237,8 +1228,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             ],
             "vertexType" : "BIKESHARE"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -1306,8 +1296,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyId" : "prt:prt",
@@ -1491,8 +1480,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "name" : "NW Everett St. & NW 5th Ave. (P3)",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         }
       ],
       "startTime" : "2009-10-21T23:28:04.000Z",
@@ -1587,8 +1575,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             ],
             "vertexType" : "BIKESHARE"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -1657,8 +1644,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             ],
             "vertexType" : "BIKESHARE"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -1726,8 +1712,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyId" : "prt:prt",
@@ -1911,8 +1896,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "name" : "NW Everett St. & NW 5th Ave. (P3)",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         }
       ],
       "startTime" : "2009-10-21T23:37:04.000Z",
@@ -1993,8 +1977,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyId" : "prt:prt",
@@ -2191,8 +2174,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "name" : "NW Everett St. & NW 5th Ave. (P3)",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         }
       ],
       "startTime" : "2009-10-21T23:39:34.000Z",
@@ -2293,8 +2275,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
             ],
             "vertexType" : "BIKESHARE"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -2363,8 +2344,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
             ],
             "vertexType" : "BIKESHARE"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -2441,8 +2421,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
             "name" : "NW Hoyt St. & NW 20th Ave. (P2)",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         }
       ],
       "startTime" : "2009-10-21T23:10:00.000Z",
@@ -2543,8 +2522,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
             ],
             "vertexType" : "BIKESHARE"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -2634,8 +2612,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
             "name" : "NW Hoyt St. & NW 20th Ave. (P2)",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         }
       ],
       "startTime" : "2009-10-21T23:04:33.000Z",
@@ -2736,8 +2713,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
             ],
             "vertexType" : "BIKESHARE"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -2827,8 +2803,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
             "name" : "NW Hoyt St. & NW 20th Ave. (P2)",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         }
       ],
       "startTime" : "2009-10-21T23:10:00.000Z",
@@ -2928,8 +2903,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "vertexType" : "TRANSIT",
             "zoneId" : "0"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyId" : "prt:prt",
@@ -3157,8 +3131,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             ],
             "vertexType" : "BIKESHARE"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -3227,8 +3200,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             ],
             "vertexType" : "BIKESHARE"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -3305,8 +3277,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "name" : "SW Johnson St. & NW 24th Ave. (P1)",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         }
       ],
       "startTime" : "2009-10-21T23:12:38.000Z",
@@ -3400,8 +3371,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "vertexType" : "TRANSIT",
             "zoneId" : "0"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyId" : "prt:prt",
@@ -3663,8 +3633,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "name" : "SW Johnson St. & NW 24th Ave. (P1)",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         }
       ],
       "startTime" : "2009-10-21T23:14:19.000Z",
@@ -3797,8 +3766,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "vertexType" : "TRANSIT",
             "zoneId" : "0"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyId" : "prt:prt",
@@ -4021,8 +3989,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "name" : "SW Johnson St. & NW 24th Ave. (P1)",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         }
       ],
       "startTime" : "2009-10-21T23:18:17.000Z",
@@ -4116,8 +4083,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "vertexType" : "TRANSIT",
             "zoneId" : "0"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyId" : "prt:prt",
@@ -4345,8 +4311,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             ],
             "vertexType" : "BIKESHARE"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -4415,8 +4380,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             ],
             "vertexType" : "BIKESHARE"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -4493,8 +4457,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "name" : "SW Johnson St. & NW 24th Ave. (P1)",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         }
       ],
       "startTime" : "2009-10-21T23:27:38.000Z",
@@ -4588,8 +4551,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "vertexType" : "TRANSIT",
             "zoneId" : "0"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyId" : "prt:prt",
@@ -4851,8 +4813,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "name" : "SW Johnson St. & NW 24th Ave. (P1)",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         }
       ],
       "startTime" : "2009-10-21T23:29:19.000Z",
@@ -4985,8 +4946,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "vertexType" : "TRANSIT",
             "zoneId" : "0"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyId" : "prt:prt",
@@ -5209,8 +5169,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "name" : "SW Johnson St. & NW 24th Ave. (P1)",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         }
       ],
       "startTime" : "2009-10-21T23:37:17.000Z",

@@ -340,8 +340,7 @@ public class StreetPathToLegsMapper {
         subPath.elevation(firstState.getRequest().geoidElevation(), ellipsoidToGeoidDifference)
       )
       .withWalkSteps(walkSteps)
-      .withRentedVehicle(firstState.isRentingVehicle())
-      .withWalkingBike(false);
+      .withRentedVehicle(firstState.isRentingVehicle());
 
     if (firstState.isRentingVehicle()) {
       String vehicleRentalNetwork = firstState.getVehicleRentalNetwork();

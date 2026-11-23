@@ -353,7 +353,7 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
 
   @Override
   public DataFetcher<Boolean> walkingBike() {
-    return environment -> getSource(environment).walkingBike();
+    return environment -> false;
   }
 
   @Override

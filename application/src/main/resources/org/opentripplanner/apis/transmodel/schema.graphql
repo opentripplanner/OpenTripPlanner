@@ -446,7 +446,7 @@ type Leg {
   "The transport sub mode (e.g., localBus or expressBus) used when traversing this leg. Null if leg is not a ride"
   transportSubmode: TransportSubmode
   "Whether this leg is walking with a bike."
-  walkingBike: Boolean
+  walkingBike: Boolean @deprecated(reason : "Walking with a bike is not a separate leg. This field always returns `false`.")
 }
 
 "A group of routes which is generally known to the public by a similar name or number"
