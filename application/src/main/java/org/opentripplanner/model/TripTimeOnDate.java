@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.stream.IntStream;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.i18n.I18NString;
@@ -192,16 +193,28 @@ public class TripTimeOnDate {
    * real time update. Falls back to the real time stop when the patterns differ in size.
    */
   public StopLocation getScheduledStop(TripPattern scheduledTripPattern) {
+    var scheduledPos = scheduledStopPosition(scheduledTripPattern);
+    // For extra calls we don't have a scheduled stop. Return the same stop as for realtime.
+    return scheduledPos.isPresent()
+      ? scheduledTripPattern.getStop(scheduledPos.getAsInt())
+      : getStop();
+  }
+
+  /**
+   * The position of this call in the given scheduled pattern, which differs from
+   * {@link #getStopPosition()} if stops have been added to the trip by a real-time update.
+   *
+   * @return empty if this call is an extra call, which is not part of the scheduled pattern
+   */
+  private OptionalInt scheduledStopPosition(TripPattern scheduledTripPattern) {
     if (tripPattern.numberOfStops() == scheduledTripPattern.numberOfStops()) {
-      return scheduledTripPattern.getStop(stopPosition);
+      return OptionalInt.of(stopPosition);
     }
     // The number of stops is different. There must be extra stops in the tripPattern compared to
     // the scheduledTripPattern.
     if (isExtraCall()) {
-      // For extra calls we don't have a scheduled stop. Return the same stop as for realtime.
-      return getStop();
+      return OptionalInt.empty();
     }
-    // The number of stops is different. There must be extra stops in tripPattern compared to scheduledTripPattern
     var extraCallsBefore = (int) IntStream.range(0, stopPosition)
       .filter(tripTimes::isExtraCall)
       .count();
@@ -209,7 +222,7 @@ public class TripTimeOnDate {
     if (scheduledPos >= scheduledTripPattern.numberOfStops()) {
       throw new IllegalStateException("Number of stops is inconsistent in scheduled trip pattern");
     }
-    return scheduledTripPattern.getStop(scheduledPos);
+    return OptionalInt.of(scheduledPos);
   }
 
   public int getStopPosition() {
@@ -409,6 +422,42 @@ public class TripTimeOnDate {
     return tripTimes.isCanceled() || tripTimes.isCanceledStop(stopPosition)
       ? PickDrop.CANCELLED
       : tripPattern.getAlightType(stopPosition);
+  }
+
+  /**
+   * The pickup type at this call in the given scheduled pattern.
+   * <p>
+   * It is regrettable that you have to pass in the scheduled pattern, but the current transit model
+   * requires this awkward workaround. We hope to refactor this in the future.
+   *
+   * @param scheduledTripPattern the pattern of the trip without real-time updates
+   * @return null if this call is an extra call added by a real-time update, since it has no
+   *         scheduled pickup type
+   */
+  @Nullable
+  public PickDrop getScheduledPickupType(TripPattern scheduledTripPattern) {
+    var scheduledPos = scheduledStopPosition(scheduledTripPattern);
+    return scheduledPos.isPresent()
+      ? scheduledTripPattern.getBoardType(scheduledPos.getAsInt())
+      : null;
+  }
+
+  /**
+   * The drop off type at this call in the given scheduled pattern.
+   * <p>
+   * It is regrettable that you have to pass in the scheduled pattern, but the current transit model
+   * requires this awkward workaround. We hope to refactor this in the future.
+   *
+   * @param scheduledTripPattern the pattern of the trip without real-time updates
+   * @return null if this call is an extra call added by a real-time update, since it has no
+   *         scheduled drop off type
+   */
+  @Nullable
+  public PickDrop getScheduledDropoffType(TripPattern scheduledTripPattern) {
+    var scheduledPos = scheduledStopPosition(scheduledTripPattern);
+    return scheduledPos.isPresent()
+      ? scheduledTripPattern.getAlightType(scheduledPos.getAsInt())
+      : null;
   }
 
   public StopTimeKey getStopTimeKey() {
