@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.graph.kryosupport;
+package org.opentripplanner.routing.graph.kryosupport.java;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.Serializer;
@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.Map;
 
 @SuppressWarnings("rawtypes")
-class JavaImmutableMapSerializer extends Serializer<Map<?, ?>> {
+public class JavaImmutableMapSerializer extends Serializer<Map<?, ?>> {
 
   @Override
   public void write(Kryo kryo, Output output, Map<?, ?> map) {

@@ -37,6 +37,7 @@ import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model.TripInput;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.service.TransitServiceResolver;
 import org.opentripplanner.transit.transfer.regular.FixedRegularTransfers;
 
 /**
@@ -217,7 +218,11 @@ class QueryTypeImplItineraryTest {
         false
       )
     );
-    var linkingContextFactory = new LinkingContextFactory(GRAPH, vertexCreationService);
+    var linkingContextFactory = new LinkingContextFactory(
+      GRAPH,
+      vertexCreationService,
+      new TransitServiceResolver(TRANSIT_ENV.transitService())
+    );
     return new RefetchItineraryService(
       GRAPH,
       TRANSIT_ENV.transitService(),

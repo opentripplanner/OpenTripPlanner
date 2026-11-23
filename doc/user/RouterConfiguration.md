@@ -33,6 +33,7 @@ A full list of them can be found in the [RouteRequest](RouteRequest.md).
 | Config Parameter                                                                          |          Type         | Summary                                                                                                                                                                                                              |  Req./Opt. | Default Value  | Since |
 |-------------------------------------------------------------------------------------------|:---------------------:|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:----------:|----------------|:-----:|
 | [configVersion](#configVersion)                                                           |        `string`       | Deployment version of the *router-config.json*.                                                                                                                                                                      | *Optional* |                |  2.1  |
+| [carpooling](sandbox/Carpooling.md)                                                       |        `object`       | Configuration for the street mode `carpool`.                                                                                                                                                                         | *Optional* |                |  2.11 |
 | [flex](sandbox/Flex.md)                                                                   |        `object`       | Configuration for flex routing.                                                                                                                                                                                      | *Optional* |                |  2.1  |
 | gtfsApi                                                                                   |        `object`       | Configuration for the GTFS GraphQL API.                                                                                                                                                                              | *Optional* |                |  2.8  |
 |    [tracingTags](#gtfsApi_tracingTags)                                                    |       `string[]`      | Used to group requests based on headers or query parameters when monitoring OTP.                                                                                                                                     | *Optional* |                |   na  |
@@ -739,6 +740,10 @@ Ordered list of `StreetMode` values used as egress modes. Each entry is paired w
         "costLimitFunction" : "15m + 1.5 x",
         "intervalRelaxFactor" : 0.4
       },
+      "directFlexGeneralizedCostLimit" : {
+        "costLimitFunction" : "15m + 1.5 x",
+        "intervalRelaxFactor" : 0.4
+      },
       "nonTransitGeneralizedCostLimit" : "400 + 1.5x",
       "removeTransitWithHigherCostThanBestOnStreetOnly" : "60 + 1.3x",
       "bikeRentalDistanceRatio" : 0.3,
@@ -798,6 +803,9 @@ Ordered list of `StreetMode` values used as egress modes. Each entry is paired w
     "maxFlexTripDuration" : "45m",
     "maxAccessWalkDuration" : "15m",
     "maxEgressWalkDuration" : "15m"
+  },
+  "carpooling" : {
+    "boardCost" : 1200
   },
   "transit" : {
     "maxNumberOfTransfers" : 12,
@@ -992,6 +1000,9 @@ Ordered list of `StreetMode` values used as egress modes. Each entry is paired w
       "url" : "https://example.com/some/path",
       "feedId" : "feed_id",
       "timeout" : "30s",
+      "fuzzyMatching" : {
+        "timeTolerance" : "59s"
+      },
       "headers" : {
         "Authorization" : "Some-Token"
       }
@@ -1025,6 +1036,9 @@ Ordered list of `StreetMode` values used as egress modes. Each entry is paired w
       "fullyQualifiedNamespace" : "fully_qualified_namespace",
       "servicebus-url" : "service_bus_url",
       "feedId" : "feed_id",
+      "fuzzyMatching" : {
+        "timeTolerance" : "59s"
+      },
       "customMidnight" : 4,
       "history" : {
         "url" : "endpoint_url",
@@ -1041,7 +1055,10 @@ Ordered list of `StreetMode` values used as egress modes. Each entry is paired w
       "subscriptionProjectName" : "google_pubsub_subscription_project_name",
       "topicName" : "estimated_timetables",
       "dataInitializationUrl" : "https://example.com/some/path",
-      "fuzzyTripMatching" : true
+      "fuzzyTripMatching" : true,
+      "fuzzyMatching" : {
+        "timeTolerance" : "59s"
+      }
     },
     {
       "type" : "vehicle-parking",
@@ -1059,7 +1076,10 @@ Ordered list of `StreetMode` values used as egress modes. Each entry is paired w
       "type" : "siri-et-lite",
       "feedId" : "sta",
       "url" : "https://example.com/siri-lite/estimated-timetable/xml",
-      "fuzzyTripMatching" : true
+      "fuzzyTripMatching" : true,
+      "fuzzyMatching" : {
+        "timeTolerance" : "59s"
+      }
     },
     {
       "type" : "siri-sx-lite",
@@ -1076,6 +1096,9 @@ Ordered list of `StreetMode` values used as egress modes. Each entry is paired w
       "topic" : "trip/updates/#",
       "qos" : 1,
       "fuzzyTripMatching" : true,
+      "fuzzyMatching" : {
+        "timeTolerance" : "59s"
+      },
       "numberOfPrimingWorkers" : 4,
       "maxPrimingIdleTime" : "1s"
     }

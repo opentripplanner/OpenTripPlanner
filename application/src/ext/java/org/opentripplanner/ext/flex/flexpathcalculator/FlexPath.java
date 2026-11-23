@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.flex.flexpathcalculator;
 
+import java.io.Serializable;
 import java.time.Duration;
 import java.util.function.Supplier;
 import org.locationtech.jts.geom.LineString;
@@ -9,7 +10,7 @@ import org.opentripplanner.utils.lang.IntUtils;
 /**
  * This class contains the results from a FlexPathCalculator.
  */
-public class FlexPath {
+public class FlexPath implements Serializable {
 
   private final Supplier<LineString> geometrySupplier;
   public final int distanceMeters;

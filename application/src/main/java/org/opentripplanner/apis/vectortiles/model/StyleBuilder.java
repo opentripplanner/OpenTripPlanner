@@ -259,6 +259,15 @@ public class StyleBuilder {
     return this;
   }
 
+  /**
+   * Draw the line dashed. The values alternate between dash and gap lengths and are multiples of
+   * the line width, so the pattern scales with it.
+   */
+  public StyleBuilder lineDashArray(float... dashesAndGaps) {
+    paint.put("line-dasharray", dashesAndGaps);
+    return this;
+  }
+
   public StyleBuilder lineOffset(ZoomDependentNumber zoomStops) {
     paint.put("line-offset", zoomStops.toJson());
     return this;
@@ -314,6 +323,15 @@ public class StyleBuilder {
   @SafeVarargs
   public final StyleBuilder classFilter(Class<?>... classToFilter) {
     return filterClasses(classToFilter);
+  }
+
+  /**
+   * Only apply the style to entities whose property has exactly the given value.
+   */
+  public StyleBuilder propertyFilter(String propertyName, Object value) {
+    var propertyFilter = List.of("==", List.of("get", propertyName), value);
+    filter = filter.isEmpty() ? propertyFilter : List.of("all", filter, propertyFilter);
+    return this;
   }
 
   public StyleBuilder filterValueInProperty(String propertyName, String... values) {

@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
+import java.time.Duration;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
@@ -12,6 +13,7 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.updater.spi.UpdateErrorType;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
+import org.opentripplanner.updater.trip.siri.SiriFuzzyTripMatchingParameters;
 import org.opentripplanner.updater.trip.siri.SiriTestHelper;
 import uk.org.siri.siri21.VehicleModesEnumeration;
 
@@ -49,6 +51,42 @@ class FuzzyTripMatchingTest implements RealtimeTestConstants {
       "U | A 0:00:15 0:00:15 | B 0:00:25 0:00:25",
       env.tripData(TRIP_1_ID).showTimetable()
     );
+  }
+
+  /**
+   * The schedule contains seconds, but the producer sends aimed times in whole minutes. Without a
+   * time tolerance the trip is not found, with a tolerance of 59 seconds it is.
+   */
+  @Test
+  void testFuzzyMatchingWithTimeTolerance() {
+    var tripInput = TripInput.of(TRIP_1_ID)
+      .addStop(STOP_A, "12:30:12", "12:30:12")
+      .addStop(STOP_B, "12:48:24", "12:48:24");
+    var env = ENV_BUILDER.addTrip(tripInput).build();
+
+    var exactSiri = SiriTestHelper.of(env);
+    var updates = exactSiri
+      .etBuilder()
+      .withEstimatedCalls(builder ->
+        builder
+          .call(STOP_A)
+          .departAimedExpected("12:30:00", "12:32:00")
+          .call(STOP_B)
+          .arriveAimedExpected("12:48:00", "12:50:00")
+      )
+      .buildEstimatedTimetableDeliveries();
+
+    assertFailure(
+      UpdateErrorType.NO_FUZZY_TRIP_MATCH,
+      exactSiri.applyEstimatedTimetableWithFuzzyMatcher(updates)
+    );
+
+    var tolerantSiri = SiriTestHelper.of(
+      env,
+      SiriFuzzyTripMatchingParameters.ofTimeTolerance(Duration.ofSeconds(59))
+    );
+    assertSuccess(tolerantSiri.applyEstimatedTimetableWithFuzzyMatcher(updates));
+    assertEquals("U | A 12:32 12:32 | B 12:50 12:50", env.tripData(TRIP_1_ID).showTimetable());
   }
 
   /**

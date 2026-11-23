@@ -45,6 +45,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.repository.ScheduledTimetableData;
 import org.opentripplanner.transit.service.DefaultTransitService;
+import org.opentripplanner.transit.service.NoopSiteResolver;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 import org.opentripplanner.updater.spi.UpdateResult;
@@ -464,7 +465,8 @@ class RealtimeResolverTest {
 
     LinkingContextFactory linkingContextFactory = new LinkingContextFactory(
       GRAPH,
-      vertexCreationService
+      vertexCreationService,
+      new NoopSiteResolver()
     );
 
     var streetLimitationParametersService = new StreetLimitationParametersService() {

@@ -23,6 +23,28 @@ The carpooling extension is a sandbox feature that must be enabled in `otp-confi
 }
 ```
 
+Routing settings go in the `carpooling` section of `router-config.json`:
+
+<!-- config BEGIN -->
+<!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
+
+```JSON
+// router-config.json
+{
+  "carpooling" : {
+    "boardCost" : 1200
+  }
+}
+```
+
+| Config Parameter |    Type   | Summary                                                                                         |  Req./Opt. | Default Value | Since |
+|------------------|:---------:|-------------------------------------------------------------------------------------------------|:----------:|---------------|:-----:|
+| boardCost        | `integer` | A cost added once to every carpool leg — direct, access and egress alike — for being picked up. | *Optional* | `1200`        |  2.11 |
+
+
+
+<!-- config END -->
+
 To enable receiving carpooling data, add the `SiriETCarpoolingUpdater` to your `router-config.json`:
 
 ```json
@@ -69,18 +91,17 @@ The system supports multi-stop trips where drivers have already accepted multipl
 
 #### Booking URL templates
 
-A trip's `PublicContact/Url` is treated as a URL template. OTP expands two placeholders in it
-before returning the URL on the carpool leg's booking information:
+A trip's `PublicContact/Url` is treated as a URL template. OTP expands two placeholders in it before
+returning the URL on the carpool leg's booking information:
 
 | Placeholder | Expanded with                                                        |
 | ----------- | -------------------------------------------------------------------- |
 | `{from}`    | The carpool **boarding** point — where the passenger gets in the car |
 | `{to}`      | The carpool **alighting** point — where the passenger gets out       |
 
-Each is replaced by `latitude,longitude` at six decimals, for example
-`59.911491,10.750184`. These are the points on the driver's route, which are generally *not* the
-passenger's requested origin and destination (the passenger walks to and from them) and not the
-driver's own origin and destination.
+Each is replaced by `latitude,longitude` at six decimals, for example `59.911491,10.750184`. These
+are the points on the driver's route, which are generally _not_ the passenger's requested origin and
+destination (the passenger walks to and from them) and not the driver's own origin and destination.
 
 So a provider publishing
 
@@ -97,18 +118,18 @@ https://example.com/book/ENT:ServiceJourney:1?pickup=59.911491,10.750184&dropoff
 Notes:
 
 - **The provider owns the URL.** OTP does not choose the parameter names, their order, or where in
-  the URL the coordinates land. Placeholders are expanded wherever they appear — query string,
-  path segment or fragment — and every occurrence is expanded.
+  the URL the coordinates land. Placeholders are expanded wherever they appear — query string, path
+  segment or fragment — and every occurrence is expanded.
 - **Both placeholders are optional.** A URL containing neither is passed through unchanged, so a
   provider that does not want the passenger's coordinates simply publishes a plain URL.
-- **Names are case-sensitive.** `{From}` is not recognised, and since curly braces are not legal
-  URI characters, its leftover braces would make the expanded URL unparseable.
+- **Names are case-sensitive.** `{From}` is not recognised, and since curly braces are not legal URI
+  characters, its leftover braces would make the expanded URL unparseable.
 
 #### Contact validation
 
-The booking URL of an incoming SIRI message is checked when the message is read: it must expand to
-a parseable URI. A URL that fails is logged and left off the trip; the trip itself is kept either
-way, and the booking information on the carpool leg advertises only the channels that survived.
+The booking URL of an incoming SIRI message is checked when the message is read: it must expand to a
+parseable URI. A URL that fails is logged and left off the trip; the trip itself is kept either way,
+and the booking information on the carpool leg advertises only the channels that survived.
 
 ## Features
 

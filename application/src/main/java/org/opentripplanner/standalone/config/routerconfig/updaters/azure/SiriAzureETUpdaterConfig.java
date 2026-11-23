@@ -4,12 +4,24 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 
 import org.opentripplanner.ext.siri.updater.azure.SiriAzureETUpdaterParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
+import org.opentripplanner.standalone.config.routerconfig.updaters.SiriFuzzyTripMatchingConfig;
 
 public class SiriAzureETUpdaterConfig extends SiriAzureUpdaterConfig {
 
   public static SiriAzureETUpdaterParameters create(String configRef, NodeAdapter c) {
     SiriAzureETUpdaterParameters parameters = new SiriAzureETUpdaterParameters();
     populateConfig(parameters, configRef, c);
+    parameters.setFuzzyTripMatching(
+      c
+        .of("fuzzyTripMatching")
+        .since(V2_2)
+        .summary(SiriFuzzyTripMatchingConfig.FUZZY_TRIP_MATCHING_SUMMARY)
+        .description(SiriFuzzyTripMatchingConfig.FUZZY_TRIP_MATCHING_DESCRIPTION)
+        .asBoolean(false)
+    );
+    parameters.setFuzzyMatching(
+      SiriFuzzyTripMatchingConfig.map(c, parameters.isFuzzyTripMatching())
+    );
 
     if (c.exist("history")) {
       NodeAdapter history = c

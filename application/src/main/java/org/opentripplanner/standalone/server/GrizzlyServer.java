@@ -28,6 +28,10 @@ public class GrizzlyServer {
   private static final Logger LOG = LoggerFactory.getLogger(GrizzlyServer.class);
 
   private static final int MIN_THREADS = 4;
+
+  /** Where the debug client is on the classpath, it is put there by the Maven build. */
+  private static final String DEBUG_CLIENT_INDEX = "client/index.html";
+
   /** The command line parameters, including things like port number and content directories. */
   private final CommandLineParameters params;
   private final Application app;
@@ -108,10 +112,16 @@ public class GrizzlyServer {
 
     /* 2. A static content handler to serve the client JS apps etc. from the classpath. */
     if (OTPFeature.DebugUi.isOn()) {
-      CLStaticHttpHandler staticHandler = new CLStaticHttpHandler(
-        GrizzlyServer.class.getClassLoader(),
-        "/client/"
-      );
+      var classLoader = GrizzlyServer.class.getClassLoader();
+      if (!hasDebugClient(classLoader)) {
+        LOG.warn(
+          "The debug client is not on the classpath, so there is no debug UI at '/'. Maven builds " +
+            "it in the package phase, not when the code is compiled. Run " +
+            "'mvn package -DskipTests -pl client -am' to build it, or turn the DebugUi feature off " +
+            "to silence this warning."
+        );
+      }
+      CLStaticHttpHandler staticHandler = new CLStaticHttpHandler(classLoader, "/client/");
       if (params.disableFileCache) {
         LOG.info("Disabling HTTP server static file cache.");
         staticHandler.setFileCacheEnabled(false);
@@ -175,5 +185,13 @@ public class GrizzlyServer {
     }
     LOG.info("Maximum HTTP handler thread pool size will be {} threads.", maxThreads);
     return maxThreads;
+  }
+
+  /**
+   * The debug client is not checked in, it is built by Maven. When OTP is started from an IDE
+   * without a package build it is missing, and requests for it get a 404 without any explanation.
+   */
+  static boolean hasDebugClient(ClassLoader classLoader) {
+    return classLoader.getResource(DEBUG_CLIENT_INDEX) != null;
   }
 }

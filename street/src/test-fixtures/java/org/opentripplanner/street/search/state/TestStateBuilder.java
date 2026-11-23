@@ -7,6 +7,7 @@ import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.service.vehiclerental.model.TestFreeFloatingRentalVehicleBuilder;
@@ -16,6 +17,7 @@ import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.street.StreetVehicleRentalLink;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.StreetModelFactory;
@@ -42,20 +44,29 @@ public class TestStateBuilder {
   private static final Instant DEFAULT_START_TIME = OffsetDateTime.parse(
     "2023-04-18T12:00:00+02:00"
   ).toInstant();
+  private static final WgsCoordinate DEFAULT_START = new WgsCoordinate(1, 1);
+  public static final String DEFAULT_STREET_EDGE_NAME = "street edge";
   private int count = 1;
 
   private State currentState;
 
   private TestStateBuilder(StreetMode mode) {
-    this(StreetSearchRequest.of().withMode(mode).withStartTime(DEFAULT_START_TIME).build());
+    this(mode, DEFAULT_START);
   }
 
-  private TestStateBuilder(StreetSearchRequest request) {
-    currentState = new State(StreetModelFactory.intersectionVertex(count, count), request);
+  private TestStateBuilder(StreetMode mode, WgsCoordinate start) {
+    this(StreetSearchRequest.of().withMode(mode).withStartTime(DEFAULT_START_TIME).build(), start);
+  }
+
+  private TestStateBuilder(StreetSearchRequest request, WgsCoordinate start) {
+    currentState = new State(
+      StreetModelFactory.intersectionVertex(start.latitude(), start.longitude()),
+      request
+    );
   }
 
   public static TestStateBuilder of(StreetSearchRequest request) {
-    return new TestStateBuilder(request);
+    return new TestStateBuilder(request, DEFAULT_START);
   }
 
   /**
@@ -63,6 +74,13 @@ public class TestStateBuilder {
    */
   public static TestStateBuilder ofWalking() {
     return new TestStateBuilder(StreetMode.WALK);
+  }
+
+  /**
+   * Create an initial state that starts walking at the given coordinate.
+   */
+  public static TestStateBuilder ofWalking(WgsCoordinate start) {
+    return new TestStateBuilder(StreetMode.WALK, start);
   }
 
   /**
@@ -124,14 +142,27 @@ public class TestStateBuilder {
     return this;
   }
 
-  public TestStateBuilder streetEdge(String name, int distance) {
+  public TestStateBuilder streetEdge(int distance_m) {
+    return streetEdge(DEFAULT_STREET_EDGE_NAME, distance_m);
+  }
+
+  public TestStateBuilder streetEdge(int distance_m, WgsCoordinate end) {
     count++;
+    return streetEdge(DEFAULT_STREET_EDGE_NAME, distance_m, end);
+  }
+
+  public TestStateBuilder streetEdge(String name, int distance_m) {
+    count++;
+    return streetEdge(name, distance_m, new WgsCoordinate(count, count));
+  }
+
+  private TestStateBuilder streetEdge(String name, int distance_m, WgsCoordinate end) {
     var from = (StreetVertex) currentState.vertex;
-    var to = StreetModelFactory.intersectionVertex(count, count);
+    var to = StreetModelFactory.intersectionVertex(end.latitude(), end.longitude());
     var edge = StreetModelFactory.streetEdgeBuilder(
       from,
       to,
-      distance,
+      distance_m,
       StreetTraversalPermission.PEDESTRIAN
     )
       .withName(name)
@@ -358,6 +389,29 @@ public class TestStateBuilder {
     var states = link.traverse(state);
     currentState = states[0];
     return this;
+  }
+
+  public TestStateBuilder pathway(@Nullable String s, double distance_m, WgsCoordinate to) {
+    var from = (StreetVertex) currentState.vertex;
+    var tov = StreetModelFactory.intersectionVertex(to.latitude(), to.longitude());
+    var name = s == null ? null : I18NString.of(s);
+    var edge = PathwayEdge.createPathwayEdge(from, tov, name, 0, distance_m, 0, 0, true);
+    currentState = requireSingleState(edge.traverse(currentState));
+    return this;
+  }
+
+  public TestStateBuilder pathway(String s, double distance_m) {
+    count++;
+    return pathway(s, distance_m, new WgsCoordinate(count, count));
+  }
+
+  public TestStateBuilder unnamedPathway(int distance_m) {
+    count++;
+    return pathway(null, distance_m, new WgsCoordinate(count, count));
+  }
+
+  public TestStateBuilder unnamedPathway(int distance_m, WgsCoordinate to) {
+    return pathway(null, distance_m, to);
   }
 
   public TestStateBuilder pathway(String s) {

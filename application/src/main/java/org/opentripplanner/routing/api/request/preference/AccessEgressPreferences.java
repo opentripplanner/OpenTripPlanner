@@ -165,6 +165,9 @@ public final class AccessEgressPreferences implements Serializable {
     var flexDefaultPenalty = TimeAndCostPenalty.of(TimePenalty.of(ofMinutes(10), 1.3f), 1.3);
     penaltyBuilder.with(StreetMode.FLEXIBLE, flexDefaultPenalty);
 
+    var carpoolDefaultPenalty = TimeAndCostPenalty.of(TimePenalty.of(ofMinutes(5), 0f), 4.0);
+    penaltyBuilder.with(StreetMode.CARPOOL, carpoolDefaultPenalty);
+
     var carPenalty = TimeAndCostPenalty.of(TimePenalty.of(ofMinutes(20), 2f), 1.5);
     for (var it : StreetMode.values()) {
       // Apply car-penalty to all car modes used in access/egress. Car modes(CAR) used in direct street

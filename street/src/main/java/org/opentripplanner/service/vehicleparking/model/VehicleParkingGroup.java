@@ -1,5 +1,6 @@
 package org.opentripplanner.service.vehicleparking.model;
 
+import java.io.Serializable;
 import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.i18n.I18NString;
@@ -13,7 +14,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * All fields are immutable. If any other properties change a new VehicleParkingGroup instance
  * should be created.
  */
-public class VehicleParkingGroup {
+public class VehicleParkingGroup implements Serializable {
 
   private final FeedScopedId id;
 

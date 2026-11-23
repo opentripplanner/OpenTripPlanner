@@ -52,13 +52,6 @@ public abstract class SiriAzureUpdaterConfig {
         .summary("The number of messages to fetch from the subscription at a time.")
         .asInt(10)
     );
-    parameters.setFuzzyTripMatching(
-      c
-        .of("fuzzyTripMatching")
-        .since(V2_2)
-        .summary("Whether to apply fuzzyTripMatching on the updates")
-        .asBoolean(false)
-    );
     parameters.setFullyQualifiedNamespace(
       c
         .of("fullyQualifiedNamespace")

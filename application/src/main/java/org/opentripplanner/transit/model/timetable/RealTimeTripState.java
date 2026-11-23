@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.model.timetable;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
@@ -21,7 +22,7 @@ import java.util.Objects;
  * Multiple flags may be {@code true} simultaneously. For example, a trip that has a modified
  * stop pattern will always also have {@code timesModified == true}.
  */
-public final class RealTimeTripState {
+public final class RealTimeTripState implements Serializable {
 
   private final boolean timesModified;
   private final boolean canceled;
