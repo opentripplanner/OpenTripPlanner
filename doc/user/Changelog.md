@@ -76,6 +76,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Improve post-merge workflow [#8254](https://github.com/opentripplanner/OpenTripPlanner/pull/8254)
 - Remove kryo-tools [#8238](https://github.com/opentripplanner/OpenTripPlanner/pull/8238)
 - Add configurable time tolerance to SIRI fuzzy trip matching [#8212](https://github.com/opentripplanner/OpenTripPlanner/pull/8212)
+- Pick translations by the full language tag (region and script), not only by language [#8209](https://github.com/opentripplanner/OpenTripPlanner/pull/8209)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.10.0 (2026-09-09)
