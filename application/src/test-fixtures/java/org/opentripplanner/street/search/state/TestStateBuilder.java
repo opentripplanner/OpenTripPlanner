@@ -6,9 +6,7 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
-import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.accessibility.Accessibility;
-import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
 import org.opentripplanner.service.vehiclerental.model.TestFreeFloatingRentalVehicleBuilder;
 import org.opentripplanner.service.vehiclerental.model.TestVehicleRentalStationBuilder;
@@ -26,8 +24,6 @@ import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.ElevatorAlightEdge;
 import org.opentripplanner.street.model.edge.ElevatorBoardEdge;
 import org.opentripplanner.street.model.edge.ElevatorHopEdge;
-import org.opentripplanner.street.model.edge.PathwayEdge;
-import org.opentripplanner.street.model.edge.StreetTransitEntranceLink;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.vertex.ElevatorHopVertex;
 import org.opentripplanner.street.model.vertex.StationEntranceVertex;
@@ -35,7 +31,6 @@ import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
-import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.site.RegularStop;
 
 /**
@@ -44,8 +39,6 @@ import org.opentripplanner.transit.model.site.RegularStop;
 public class TestStateBuilder {
 
   private static final WgsCoordinate DEFAULT_START = new WgsCoordinate(1, 1);
-  public static final String DEFAULT_STREET_EDGE_NAME = "street edge";
-  private final TransitRepositoryForTest testModel = TransitRepositoryForTest.of();
 
   private static final Instant DEFAULT_START_TIME = OffsetDateTime.parse(
     "2023-04-18T12:00:00+02:00"
@@ -74,13 +67,6 @@ public class TestStateBuilder {
    */
   public static TestStateBuilder ofWalking() {
     return new TestStateBuilder(StreetMode.WALK);
-  }
-
-  /**
-   * Create an initial state that starts walking.
-   */
-  public static TestStateBuilder ofWalking(WgsCoordinate start) {
-    return new TestStateBuilder(StreetMode.WALK, AccessEgressType.ACCESS, start);
   }
 
   /**
@@ -131,15 +117,6 @@ public class TestStateBuilder {
     return this;
   }
 
-  public TestStateBuilder streetEdge(int distance_m) {
-    return streetEdge(DEFAULT_STREET_EDGE_NAME, distance_m);
-  }
-
-  public TestStateBuilder streetEdge(int distance_m, WgsCoordinate end) {
-    count++;
-    return streetEdge(DEFAULT_STREET_EDGE_NAME, distance_m, end);
-  }
-
   /**
    * Traverse a named street edge. In an arriveBy search the edge leads to the current vertex, since
    * the search runs backward in time.
@@ -160,24 +137,6 @@ public class TestStateBuilder {
       StreetTraversalPermission.PEDESTRIAN
     )
       .withName(name)
-      .buildAndConnect();
-
-    currentState = requireSingleState(edge.traverse(currentState));
-    return this;
-  }
-
-  public TestStateBuilder unnamedStreetEdge(int distance_m) {
-    count++;
-    var from = (StreetVertex) currentState.vertex;
-    var to = StreetModelForTest.intersectionVertex(count, count);
-    var edge = StreetModelForTest.streetEdgeBuilder(
-      from,
-      to,
-      distance_m,
-      StreetTraversalPermission.PEDESTRIAN
-    )
-      .withName("path")
-      .withNameIsDerived(true)
       .buildAndConnect();
 
     currentState = requireSingleState(edge.traverse(currentState));
@@ -213,15 +172,6 @@ public class TestStateBuilder {
     var edge = StreetModelForTest.escalatorEdge(from, to, 30);
 
     currentState = requireSingleState(edge.traverse(currentState));
-    return this;
-  }
-
-  public TestStateBuilder areaEdge(String name, int distance) {
-    count++;
-    var from = (StreetVertex) currentState.vertex;
-    var to = StreetModelForTest.intersectionVertex(count, count);
-    var area = StreetModelForTest.areaEdge(from, to, name, StreetTraversalPermission.PEDESTRIAN);
-    currentState = requireSingleState(area.traverse(currentState));
     return this;
   }
 
@@ -291,26 +241,8 @@ public class TestStateBuilder {
     return this;
   }
 
-  public TestStateBuilder escalatorEdgeAndStationEntrance() {
-    count++;
-    var from = (StreetVertex) currentState.vertex;
-    var to = new StationEntranceVertex(count, count, 12345, "B", Accessibility.POSSIBLE);
-    var edge = StreetModelForTest.escalatorEdge(from, to, 30);
-
-    currentState = requireSingleState(edge.traverse(currentState));
-    return this;
-  }
-
   public TestStateBuilder stop(RegularStop stop) {
     return arriveAtStop(stop);
-  }
-
-  /**
-   * Add a state that arrives at a transit stop.
-   */
-  public TestStateBuilder stop() {
-    count++;
-    return arriveAtStop(testModel.stop("stop", count, count).build());
   }
 
   /**
@@ -324,71 +256,6 @@ public class TestStateBuilder {
     var link = StreetVehicleRentalLink.createStreetVehicleRentalLink(from, to);
     currentState = requireSingleState(link.traverse(currentState));
     return this;
-  }
-
-  public TestStateBuilder enterStation(String id) {
-    count++;
-    var from = (StreetVertex) currentState.vertex;
-    final var entranceVertex = StreetModelForTest.transitEntranceVertex(id, count, count);
-    var edge = StreetTransitEntranceLink.createStreetTransitEntranceLink(from, entranceVertex);
-    currentState = requireSingleState(edge.traverse(currentState));
-    return this;
-  }
-
-  public TestStateBuilder enterOsmStation(String b) {
-    count++;
-    var from = (StreetVertex) currentState.vertex;
-    var to = StreetModelForTest.stationEntranceVertex(b, count, count);
-    var edge = StreetModelForTest.streetEdge(from, to);
-    var states = edge.traverse(currentState);
-    currentState = requireSingleState(states);
-    return this;
-  }
-
-  public TestStateBuilder exitStation(String id) {
-    count++;
-    var from = (StreetVertex) currentState.vertex;
-    var entranceVertex = StreetModelForTest.transitEntranceVertex(id, count, count);
-    var edge = PathwayEdge.createLowCostPathwayEdge(from, entranceVertex, true);
-    var state = edge.traverse(currentState)[0];
-
-    count++;
-    var to = StreetModelForTest.intersectionVertex(count, count);
-    var link = StreetTransitEntranceLink.createStreetTransitEntranceLink(entranceVertex, to);
-    currentState = requireSingleState(link.traverse(state));
-    return this;
-  }
-
-  public TestStateBuilder pathway(@Nullable String s, double distance_m, WgsCoordinate to) {
-    var from = (StreetVertex) currentState.vertex;
-    var tov = StreetModelForTest.intersectionVertex(to.latitude(), to.longitude());
-    var name = s == null ? null : I18NString.of(s);
-    var edge = PathwayEdge.createPathwayEdge(from, tov, name, 0, distance_m, 0, 0, true);
-    currentState = requireSingleState(edge.traverse(currentState));
-    return this;
-  }
-
-  public TestStateBuilder pathway(String s, double distance_m) {
-    count++;
-    return pathway(s, distance_m, new WgsCoordinate(count, count));
-  }
-
-  public TestStateBuilder pathway(String s) {
-    count++;
-    var from = (StreetVertex) currentState.vertex;
-    var tov = StreetModelForTest.intersectionVertex(count, count);
-    var edge = PathwayEdge.createPathwayEdge(from, tov, I18NString.of(s), 60, 100, 0, 0, true);
-    currentState = requireSingleState(edge.traverse(currentState));
-    return this;
-  }
-
-  public TestStateBuilder unnamedPathway(int distance_m) {
-    count++;
-    return pathway(null, distance_m, new WgsCoordinate(count, count));
-  }
-
-  public TestStateBuilder unnamedPathway(int distance_m, WgsCoordinate to) {
-    return pathway(null, distance_m, to);
   }
 
   private TestStateBuilder arriveAtStop(RegularStop stop) {
