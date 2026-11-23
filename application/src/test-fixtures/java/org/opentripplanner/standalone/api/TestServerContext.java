@@ -13,7 +13,7 @@ import org.opentripplanner.ext.emission.internal.DefaultEmissionService;
 import org.opentripplanner.ext.emission.internal.itinerary.EmissionItineraryDecorator;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.place.api.NearbyStop;
-import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.RaptorServiceFactory;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
@@ -195,13 +195,13 @@ public class TestServerContext {
     RegularTransferRepositorySnapshot<NearbyStop, RouteRequest> regularTransfers
   ) {
     var routerConfig = RouterConfig.DEFAULT;
-    var raptorConfig = createRaptorConfig();
+    var raptorServiceFactory = createRaptorServiceFactory();
     var vertexLinker = createVertexLinker(graph);
 
     return new DefaultRoutingService(
       transitService,
       graph,
-      raptorConfig,
+      raptorServiceFactory,
       Metrics.globalRegistry,
       createStreetLimitationParametersService(),
       createVehicleRentalService(),
@@ -229,9 +229,9 @@ public class TestServerContext {
     return VertexLinkerTestFactory.of(graph);
   }
 
-  public static RaptorConfig<TripSchedule> createRaptorConfig() {
+  public static RaptorServiceFactory<TripSchedule> createRaptorServiceFactory() {
     var routerConfig = RouterConfig.DEFAULT;
-    return new RaptorConfig<>(
+    return new RaptorServiceFactory<>(
       routerConfig.transitTuningConfig(),
       RaptorEnvironmentFactory.create(routerConfig.transitTuningConfig().searchThreadPoolSize())
     );

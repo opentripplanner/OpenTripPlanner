@@ -15,7 +15,7 @@ module org.opentripplanner.raptor {
   exports org.opentripplanner.raptor.api.request;
   exports org.opentripplanner.raptor.api.request.via;
   exports org.opentripplanner.raptor.api.response;
-  exports org.opentripplanner.raptor.configure;
+  exports org.opentripplanner.raptor.api.view;
   exports org.opentripplanner.raptor.debug;
   exports org.opentripplanner.raptor.extensions.direct.api;
   exports org.opentripplanner.raptor.extensions.extrasearch;

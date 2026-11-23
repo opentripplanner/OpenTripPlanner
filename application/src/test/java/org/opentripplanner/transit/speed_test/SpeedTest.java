@@ -19,7 +19,7 @@ import org.opentripplanner.framework.transaction.TimetableSnapshotParameters;
 import org.opentripplanner.gbfs.network.GbfsNetworkOverrides;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.place.api.NearbyStop;
-import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.RaptorServiceFactory;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -200,7 +200,7 @@ public class SpeedTest {
       transitRepository.getUpdaterManager().startUpdaters();
     }
 
-    var raptorConfig = new RaptorConfig<TripSchedule>(
+    var raptorServiceFactory = new RaptorServiceFactory<TripSchedule>(
       routerConfig.transitTuningConfig(),
       RaptorEnvironmentFactory.create(routerConfig.transitTuningConfig().searchThreadPoolSize())
     );
@@ -216,7 +216,7 @@ public class SpeedTest {
     this.routingService = new DefaultRoutingService(
       this.transitService,
       graph,
-      raptorConfig,
+      raptorServiceFactory,
       timer.getRegistry(),
       TestServerContext.createStreetLimitationParametersService(),
       TestServerContext.createVehicleRentalService(),
