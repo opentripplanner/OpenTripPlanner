@@ -27,7 +27,7 @@ final class DefaultStreetLeg implements StreetLeg {
    * starts by leaving a vehicle parking, it is the state before parking. This way the time and
    * cost for parking is included in the leg.
    */
-  private final State startTimeState;
+  private final State previousState;
 
   @Nullable
   private final DefaultStreetLeg previous;
@@ -52,7 +52,7 @@ final class DefaultStreetLeg implements StreetLeg {
     var firstState = path.states().getFirst();
     var previousStateIsVehicleParking =
       firstState.getBackState() != null && firstState.getBackEdge() instanceof VehicleParkingEdge;
-    this.startTimeState = previousStateIsVehicleParking ? firstState.getBackState() : firstState;
+    this.previousState = previousStateIsVehicleParking ? firstState.getBackState() : firstState;
   }
 
   @Override
@@ -79,7 +79,7 @@ final class DefaultStreetLeg implements StreetLeg {
 
   @Override
   public Instant startTime() {
-    return startTimeState.getTime();
+    return previousState.getTime();
   }
 
   @Override
@@ -104,7 +104,7 @@ final class DefaultStreetLeg implements StreetLeg {
 
   @Override
   public int generalizedCost() {
-    var extraWeight = path.states().getFirst().getWeight() - startTimeState.getWeight();
+    var extraWeight = path.states().getFirst().getWeight() - previousState.getWeight();
     return IntUtils.round(path.weight() + extraWeight);
   }
 
