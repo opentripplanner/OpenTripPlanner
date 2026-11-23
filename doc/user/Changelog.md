@@ -79,6 +79,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Pick translations by the full language tag (region and script), not only by language [#8209](https://github.com/opentripplanner/OpenTripPlanner/pull/8209)
 - Add geometryToNextCall to StopCall in GTFS GraphQL API [#8179](https://github.com/opentripplanner/OpenTripPlanner/pull/8179)
 - Handle and expose notExpected on estimatedCalls for departure and arrival [#8211](https://github.com/opentripplanner/OpenTripPlanner/pull/8211)
+- Report added stops of GTFS-RT replacement trips in GTFS API `Stoptime.realtimeState` [#8186](https://github.com/opentripplanner/OpenTripPlanner/pull/8186)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.10.0 (2026-09-09)
