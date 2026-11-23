@@ -138,7 +138,7 @@ class StreetPathToLegsMapper {
       StreetLegPlace.of(toState),
       backEdge.getDistanceMeters(),
       IntUtils.round(toState.getWeight() - fromState.getWeight()),
-      backEdge.getGeometry(),
+      backEdge::getGeometry,
       fromState.isRentingVehicle(),
       fromState.isRentingVehicle() ? fromState.getVehicleRentalNetwork() : null
     );

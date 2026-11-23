@@ -2,6 +2,7 @@ package org.opentripplanner.street.model.path;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.function.Supplier;
 import org.jspecify.annotations.Nullable;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.street.model.edge.ExternalLegEdge;
@@ -30,7 +31,7 @@ public record ExternalEdgeLeg(
   StreetLegPlace to,
   double distance_m,
   int generalizedCost,
-  LineString geometry,
+  Supplier<LineString> geometrySupplier,
   boolean rentedVehicle,
   @Nullable String vehicleRentalNetwork
 ) implements StreetLeg {
@@ -48,6 +49,11 @@ public record ExternalEdgeLeg(
   @Override
   public double distanceMeters() {
     return distance_m;
+  }
+
+  @Override
+  public LineString geometry() {
+    return geometrySupplier.get();
   }
 
   @Override
