@@ -5,12 +5,10 @@ import java.util.List;
 import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.street.model.edge.VehicleParkingEdge;
 import org.opentripplanner.street.model.elevation.ElevationProfile;
 import org.opentripplanner.street.model.path.step.StatesToStreetStepsMapper;
 import org.opentripplanner.street.model.path.step.StreetStep;
 import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.utils.lang.IntUtils;
 
 /**
@@ -23,11 +21,17 @@ final class DefaultStreetLeg implements StreetLeg {
   private final StreetPath path;
 
   /**
-   * The state the leg starts at. This is usually the first state of the path, but if the leg
-   * starts by leaving a vehicle parking, it is the state before parking. This way the time and
-   * cost for parking is included in the leg.
+   * The time the leg starts. This is usually the time of the first state of the path, but if the
+   * leg starts by leaving a vehicle parking, it is the time before parking. This way the time for
+   * parking is included in the leg.
    */
-  private final State previousState;
+  private final Instant startTime;
+
+  /**
+   * Weight not part of the path, but added to the leg's cost. This is the cost for parking if the
+   * leg starts by leaving a vehicle parking, otherwise zero.
+   */
+  private final double extraWeight;
 
   @Nullable
   private final DefaultStreetLeg previous;
@@ -37,22 +41,24 @@ final class DefaultStreetLeg implements StreetLeg {
   private List<StreetStep> steps;
 
   /**
-   * @param previous The street leg immediately preceding this one, if any. It is used to compute
-   *                 the relative direction of the first step correctly.
+   * @param startTime   The time the leg starts. Either the time of the first state of the path or,
+   *                    if the leg starts by leaving a vehicle parking, the time before parking.
+   * @param extraWeight Weight added to the weight of the path, like the cost for parking.
+   * @param previous    The street leg immediately preceding this one, if any. It is used to
+   *                    compute the relative direction of the first step correctly.
    */
   DefaultStreetLeg(
     StreetPath path,
+    Instant startTime,
+    double extraWeight,
     @Nullable DefaultStreetLeg previous,
     double ellipsoidToGeoidDifference
   ) {
     this.path = path;
+    this.startTime = startTime;
+    this.extraWeight = extraWeight;
     this.previous = previous;
     this.ellipsoidToGeoidDifference = ellipsoidToGeoidDifference;
-
-    var firstState = path.states().getFirst();
-    var previousStateIsVehicleParking =
-      firstState.getBackState() != null && firstState.getBackEdge() instanceof VehicleParkingEdge;
-    this.previousState = previousStateIsVehicleParking ? firstState.getBackState() : firstState;
   }
 
   @Override
@@ -79,7 +85,7 @@ final class DefaultStreetLeg implements StreetLeg {
 
   @Override
   public Instant startTime() {
-    return previousState.getTime();
+    return startTime;
   }
 
   @Override
@@ -104,7 +110,6 @@ final class DefaultStreetLeg implements StreetLeg {
 
   @Override
   public int generalizedCost() {
-    var extraWeight = path.states().getFirst().getWeight() - previousState.getWeight();
     return IntUtils.round(path.weight() + extraWeight);
   }
 

@@ -2,6 +2,7 @@ package org.opentripplanner.street.model.path;
 
 import static org.opentripplanner.street.search.state.VehicleRentalState.RENTING_FLOATING;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
@@ -53,12 +54,19 @@ class StreetPathToLegsMapper {
   List<StreetLeg> map(StreetPath path) {
     List<StreetLeg> legs = new ArrayList<>();
     DefaultStreetLeg previousStreetLeg = null;
-    for (var subPath : slicePath(path)) {
+    for (var slice : slicePath(path)) {
+      var subPath = slice.path();
       if (subPath.states().get(1).getBackEdge() instanceof ExternalLegEdge externalEdge) {
         legs.add(mapExternalEdgeLeg(subPath, externalEdge));
         previousStreetLeg = null;
       } else {
-        var leg = new DefaultStreetLeg(subPath, previousStreetLeg, ellipsoidToGeoidDifference);
+        var leg = new DefaultStreetLeg(
+          subPath,
+          slice.startTime(),
+          slice.extraWeight(),
+          previousStreetLeg,
+          ellipsoidToGeoidDifference
+        );
         legs.add(leg);
         previousStreetLeg = leg;
       }
@@ -70,18 +78,20 @@ class StreetPathToLegsMapper {
    * Slice a street path at the leg boundaries.
    *
    * @param streetPath The path to slice of input states
-   * @return A list of subpaths representing the final legs
+   * @return A list of slices representing the final legs
    */
-  private static List<StreetPath> slicePath(StreetPath streetPath) {
+  private static List<Slice> slicePath(StreetPath streetPath) {
     var states = streetPath.states();
     // Trivial case
     if (states.stream().allMatch(state -> state.getBackMode() == null)) {
       return List.of();
     }
 
-    List<StreetPath> subPaths = new ArrayList<>();
+    List<Slice> slices = new ArrayList<>();
 
     int previousBreak = 0;
+    Instant startTime = states.getFirst().getTime();
+    double extraWeight = 0;
 
     for (int i = 1; i < states.size() - 1; i++) {
       var backState = states.get(i);
@@ -101,14 +111,20 @@ class StreetPathToLegsMapper {
         int nextBreak = i;
 
         if (nextBreak > previousBreak) {
-          subPaths.add(streetPath.subPath(previousBreak, nextBreak + 1));
+          var subPath = streetPath.subPath(previousBreak, nextBreak + 1);
+          slices.add(new Slice(subPath, startTime, extraWeight));
+          // The next leg starts at the last state of this one
+          startTime = backState.getTime();
+          extraWeight = 0;
         }
 
         /* Remove the state for actually parking (traversing a VehicleParkingEdge) from the
          * states so that the leg from/to edges correspond to the actual entrances.
-         * The actual time for parking is added to the walking leg in DefaultStreetLeg.
+         * The start time stays the one before parking and the cost for parking is added as
+         * extra weight, so that the time and cost for parking are added to the next leg.
          */
         if (parkingChange) {
+          extraWeight += forwardState.getWeight() - backState.getWeight();
           nextBreak++;
         }
 
@@ -118,10 +134,12 @@ class StreetPathToLegsMapper {
 
     // Final leg
     if (states.size() > previousBreak) {
-      subPaths.add(streetPath.subPath(previousBreak, states.size()));
+      slices.add(
+        new Slice(streetPath.subPath(previousBreak, states.size()), startTime, extraWeight)
+      );
     }
 
-    return subPaths;
+    return slices;
   }
 
   private static ExternalEdgeLeg mapExternalEdgeLeg(StreetPath path, ExternalLegEdge edge) {
@@ -143,4 +161,12 @@ class StreetPathToLegsMapper {
       fromState.isRentingVehicle() ? fromState.getVehicleRentalNetwork() : null
     );
   }
+
+  /**
+   * A sub-path of a street path that becomes a leg. If the leg starts by leaving a vehicle
+   * parking, the parking state is not part of the sub-path. Then the start time is the time
+   * before parking and the extra weight is the cost for parking. Otherwise, the start time is the
+   * time of the first state of the sub-path and the extra weight is zero.
+   */
+  private record Slice(StreetPath path, Instant startTime, double extraWeight) {}
 }
