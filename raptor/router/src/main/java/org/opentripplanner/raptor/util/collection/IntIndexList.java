@@ -16,9 +16,9 @@ import java.util.stream.Stream;
  * round (number of rides). It is a lightweight alternative to a {@code Map<Integer, List<T>>} when
  * the keys are known to be close to {@code 0..n}.
  * <p>
- * Every index in the range {@code [0, size())} has a group; indexes without elements have an empty
- * group. There are never any {@code null} groups. The size is the highest index with an element
- * plus one, so trailing empty groups are never stored.
+ * Every index in the range {@code [0, maxIndex()]} has a group; indexes without elements have an
+ * empty group. There are never any {@code null} groups. The last index is the highest index with an
+ * element, so trailing empty groups are never stored.
  */
 public final class IntIndexList<T> {
 
@@ -60,6 +60,7 @@ public final class IntIndexList<T> {
         while (groups.size() <= index) {
           groups.add(new ArrayList<>());
         }
+        // throws IndexOutOfBoundsException if the index is negative - this is intended.
         groups.get(index).add(it);
       }
     }
@@ -81,14 +82,14 @@ public final class IntIndexList<T> {
 
   /**
    * A lazy, read-only view of all elements of all groups, in index order. Nothing is copied; use
-   * this instead of {@link #stream()} when you only need to iterate.
+   * this instead of {@link #streamElements()} when you only need to iterate.
    */
   public Iterable<T> elements() {
     return () -> new FlatIterator<>(groups.iterator());
   }
 
   /** Stream all elements of all groups, in index order. */
-  public Stream<T> stream() {
+  public Stream<T> streamElements() {
     return groups.stream().flatMap(List::stream);
   }
 

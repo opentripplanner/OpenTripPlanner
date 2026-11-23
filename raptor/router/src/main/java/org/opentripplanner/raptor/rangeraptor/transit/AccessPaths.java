@@ -196,7 +196,7 @@ public class AccessPaths {
 
   private static int maxTimePenalty(IntIndexList<RaptorAccessEgress> col) {
     return col
-      .stream()
+      .streamElements()
       .mapToInt(RaptorAccessEgress::timePenalty)
       .max()
       .orElse(RaptorConstants.TIME_NOT_SET);
@@ -225,7 +225,7 @@ public class AccessPaths {
   }
 
   private static boolean hasTimeDependentAccess(IntIndexList<RaptorAccessEgress> index) {
-    return index.stream().anyMatch(RaptorAccessEgress::hasOpeningHours);
+    return index.streamElements().anyMatch(RaptorAccessEgress::hasOpeningHours);
   }
 
   private static List<RaptorStartOnBoardAccess> mapToStartOnBoardAccess(

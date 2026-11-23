@@ -18,7 +18,7 @@ class IntIndexListTest {
 
     assertEquals(-1, subject.maxIndex());
     assertEquals(List.of(), subject.get(0));
-    assertEquals(List.of(), subject.stream().toList());
+    assertEquals(List.of(), subject.streamElements().toList());
     assertSame(IntIndexList.empty(), subject);
   }
 
@@ -64,7 +64,7 @@ class IntIndexListTest {
   void streamCoversAllGroupsInIndexOrder() {
     var subject = IntIndexList.of(List.of(2, 0, 1, 2), i -> i);
 
-    assertEquals(List.of(0, 1, 2, 2), subject.stream().toList());
+    assertEquals(List.of(0, 1, 2, 2), subject.streamElements().toList());
   }
 
   @Test
