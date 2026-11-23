@@ -40,6 +40,8 @@ public final class RegularStopBuilder
 
   private final List<FareZone> fareZones = new ArrayList<>();
 
+  private final List<FareArea> fareAreas = new ArrayList<>();
+
   RegularStopBuilder(FeedScopedId id, IntSupplier indexCounter) {
     super(id);
     this.indexCounter = Objects.requireNonNull(indexCounter);
@@ -54,6 +56,7 @@ public final class RegularStopBuilder
     this.vehicleType = original.getVehicleType();
     this.netexVehicleSubmode = original.getNetexVehicleSubmode().name();
     this.sometimesUsedRealtime = original.isSometimesUsedRealtime();
+    this.fareAreas.addAll(original.ownFareAreas());
   }
 
   public String platformCode() {
@@ -126,6 +129,20 @@ public final class RegularStopBuilder
    */
   public List<FareZone> fareZones() {
     return fareZones.stream().distinct().sorted(TransitEntity.idComparator()).toList();
+  }
+
+  public RegularStopBuilder withFareAreas(Collection<FareArea> fareAreas) {
+    this.fareAreas.clear();
+    this.fareAreas.addAll(fareAreas);
+    return this;
+  }
+
+  /**
+   * @return a read-only deterministic list of unique fare areas, without the areas of the parent
+   *         station
+   */
+  public List<FareArea> fareAreas() {
+    return FareAreaBuilder.uniqueSortedById(fareAreas);
   }
 
   public RegularStopBuilder addBoardingArea(BoardingArea boardingArea) {

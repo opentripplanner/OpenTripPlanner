@@ -37,6 +37,9 @@ class RegularStopTest {
   private static final TransitMode VEHICLE_TYPE = TransitMode.BUS;
   public static final ZoneId TIME_ZONE = ZoneId.of(TransitRepositoryForTest.TIME_ZONE_ID);
   private static final String PLATFORM_CODE = "platformCode";
+  private static final FareArea AREA_A = FareArea.of(new FeedScopedId("F", "A")).build();
+  private static final FareArea AREA_B = FareArea.of(new FeedScopedId("F", "B")).build();
+  private static final FareArea AREA_C = FareArea.of(new FeedScopedId("F", "C")).build();
 
   private static final RegularStop SUBJECT = SiteRepository.of()
     .regularStop(FeedScopedIdForTestFactory.id(ID))
@@ -51,6 +54,7 @@ class RegularStopTest {
     .withVehicleType(VEHICLE_TYPE)
     .withTimeZone(TIME_ZONE)
     .withPlatformCode(PLATFORM_CODE)
+    .withFareAreas(List.of(AREA_A))
     .build();
 
   @Test
@@ -83,6 +87,7 @@ class RegularStopTest {
     assertEquals(VEHICLE_TYPE, copy.getVehicleType());
     assertEquals(TIME_ZONE, copy.getTimeZone());
     assertEquals(PLATFORM_CODE, copy.getPlatformCode());
+    assertEquals(List.of(AREA_A), copy.getFareAreas());
   }
 
   @Test
@@ -103,6 +108,7 @@ class RegularStopTest {
       )
     );
     assertFalse(SUBJECT.sameAs(SUBJECT.copy().withPlatformCode("X").build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withFareAreas(List.of(AREA_B)).build()));
   }
 
   @Test
@@ -122,5 +128,60 @@ class RegularStopTest {
 
     assertEquals(List.of(zoneA, zoneB, zoneC), List.copyOf(stop.getFareZones()));
     assertEquals("A", stop.getFirstZoneAsString());
+  }
+
+  @Test
+  void fareAreasAreUniqueAndSortedById() {
+    var stop = stopBuilder("sortAreas")
+      .withFareAreas(List.of(AREA_C, AREA_A, AREA_B, AREA_A))
+      .build();
+
+    assertEquals(List.of(AREA_A, AREA_B, AREA_C), stop.getFareAreas());
+  }
+
+  @Test
+  void stopWithoutFareAreasHasEmptyList() {
+    assertEquals(List.of(), stopBuilder("noAreas").build().getFareAreas());
+  }
+
+  @Test
+  void ownFareAreasWinOverParentStation() {
+    var station = TEST_MODEL.station("areaStation").withFareAreas(List.of(AREA_B)).build();
+    var stop = stopBuilder("ownAreas")
+      .withParentStation(station)
+      .withFareAreas(List.of(AREA_A))
+      .build();
+
+    assertEquals(List.of(AREA_A), stop.getFareAreas());
+  }
+
+  @Test
+  void stopWithoutOwnFareAreasInheritsParentStationAreas() {
+    var station = TEST_MODEL.station("areaStation").withFareAreas(List.of(AREA_B)).build();
+    var stop = stopBuilder("inheritAreas").withParentStation(station).build();
+
+    assertEquals(List.of(AREA_B), stop.getFareAreas());
+  }
+
+  @Test
+  void copyDoesNotTurnInheritedFareAreasIntoOwnAreas() {
+    var station = TEST_MODEL.station("areaStation").withFareAreas(List.of(AREA_B)).build();
+    var stop = stopBuilder("inheritAreas").withParentStation(station).build();
+
+    var copy = stop.copy().withName(new NonLocalizedString("v2")).build();
+
+    assertEquals(List.of(AREA_B), copy.getFareAreas());
+    assertEquals(List.of(), copy.copy().fareAreas());
+
+    // Without the parent station, nothing is left of the inherited areas
+    var withoutStation = stop.copy().withParentStation(null).build();
+    assertEquals(List.of(), withoutStation.getFareAreas());
+  }
+
+  private static RegularStopBuilder stopBuilder(String id) {
+    return SiteRepository.of()
+      .regularStop(FeedScopedIdForTestFactory.id(id))
+      .withName(NAME)
+      .withCoordinate(COORDINATE);
   }
 }

@@ -7,9 +7,11 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.ZoneId;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
@@ -27,6 +29,9 @@ class StationTest {
   private static final I18NString URL = new NonLocalizedString("url");
   private static final TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
   private static final Station PARENT_STATION = TEST_MODEL.station("stationId").build();
+  private static final FareArea AREA_A = FareArea.of(new FeedScopedId("F", "A")).build();
+  private static final FareArea AREA_B = FareArea.of(new FeedScopedId("F", "B")).build();
+  private static final FareArea AREA_C = FareArea.of(new FeedScopedId("F", "C")).build();
 
   private static final Station SUBJECT = Station.of(FeedScopedIdForTestFactory.id(ID))
     .withName(NAME)
@@ -36,6 +41,7 @@ class StationTest {
     .withPriority(PRIORITY)
     .withTimezone(TIMEZONE)
     .withUrl(URL)
+    .withFareAreas(List.of(AREA_A))
     .build();
 
   @Test
@@ -62,6 +68,7 @@ class StationTest {
     assertEquals(PRIORITY, copy.getPriority());
     assertEquals(TIMEZONE, copy.getTimezone());
     assertEquals(URL, copy.getUrl());
+    assertEquals(List.of(AREA_A), copy.getFareAreas());
   }
 
   @Test
@@ -83,5 +90,20 @@ class StationTest {
         SUBJECT.copy().withTimezone(ZoneId.of(TransitRepositoryForTest.OTHER_TIME_ZONE_ID)).build()
       )
     );
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withFareAreas(List.of(AREA_B)).build()));
+  }
+
+  @Test
+  void fareAreasAreUniqueAndSortedById() {
+    var station = TEST_MODEL.station("sortAreas")
+      .withFareAreas(List.of(AREA_C, AREA_A, AREA_B, AREA_A))
+      .build();
+
+    assertEquals(List.of(AREA_A, AREA_B, AREA_C), station.getFareAreas());
+  }
+
+  @Test
+  void stationWithoutFareAreasHasEmptyList() {
+    assertEquals(List.of(), TEST_MODEL.station("noAreas").build().getFareAreas());
   }
 }

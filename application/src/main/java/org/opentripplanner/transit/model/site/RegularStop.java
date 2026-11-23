@@ -43,6 +43,8 @@ public final class RegularStop
 
   private final List<FareZone> fareZones;
 
+  private final List<FareArea> fareAreas;
+
   RegularStop(RegularStopBuilder builder) {
     super(builder);
     this.index = builder.createIndex();
@@ -54,6 +56,7 @@ public final class RegularStop
     this.sometimesUsedRealtime = builder.isSometimesUsedRealtime();
     this.boardingAreas = nullSafeImmutableSet(builder.boardingAreas());
     this.fareZones = builder.fareZones();
+    this.fareAreas = builder.fareAreas();
     if (isPartOfStation()) {
       getParentStation().addChildStop(this);
     }
@@ -168,6 +171,25 @@ public final class RegularStop
     return fareZones;
   }
 
+  /**
+   * The areas of this stop, or, if the stop has no areas of its own, the areas of its parent
+   * station. This follows the GTFS rule that the platforms of a station listed in
+   * {@code stop_areas.txt} are part of the station's areas, unless they are assigned to other
+   * areas.
+   */
+  @Override
+  public List<FareArea> getFareAreas() {
+    if (!fareAreas.isEmpty() || !isPartOfStation()) {
+      return fareAreas;
+    }
+    return getParentStation().getFareAreas();
+  }
+
+  /** The areas assigned to this stop itself, without the ones inherited from the parent station. */
+  List<FareArea> ownFareAreas() {
+    return fareAreas;
+  }
+
   public Collection<BoardingArea> getBoardingAreas() {
     return boardingAreas;
   }
@@ -188,7 +210,8 @@ public final class RegularStop
       Objects.equals(netexVehicleSubmode, other.netexVehicleSubmode) &&
       Objects.equals(sometimesUsedRealtime, other.sometimesUsedRealtime) &&
       Objects.equals(boardingAreas, other.boardingAreas) &&
-      Objects.equals(fareZones, other.fareZones)
+      Objects.equals(fareZones, other.fareZones) &&
+      Objects.equals(fareAreas, other.fareAreas)
     );
   }
 
