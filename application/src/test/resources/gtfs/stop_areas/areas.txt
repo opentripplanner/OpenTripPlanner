@@ -1,0 +1,4 @@
+area_id,area_name
+station-area,Station Area
+platform-area,Platform Area
+unnamed-area,

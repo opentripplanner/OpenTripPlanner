@@ -6,14 +6,12 @@ import java.util.Set;
 import org.jspecify.annotations.Nullable;
 import org.onebusaway.csv_entities.CsvInputSource;
 import org.onebusaway.gtfs.impl.GtfsRelationalDaoImpl;
-import org.onebusaway.gtfs.model.Area;
 import org.onebusaway.gtfs.model.FareLegRule;
 import org.onebusaway.gtfs.model.FareMedium;
 import org.onebusaway.gtfs.model.FareProduct;
 import org.onebusaway.gtfs.model.FareTransferRule;
 import org.onebusaway.gtfs.model.RiderCategory;
 import org.onebusaway.gtfs.model.RouteNetworkAssignment;
-import org.onebusaway.gtfs.model.StopAreaElement;
 import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.datastore.api.CompositeDataSource;
@@ -25,14 +23,12 @@ import org.slf4j.LoggerFactory;
 public final class GtfsBundle {
 
   private static final Set<Class<?>> FARES_V2_CLASSES = Set.of(
-    Area.class,
     FareProduct.class,
     FareLegRule.class,
     FareMedium.class,
     FareTransferRule.class,
     RiderCategory.class,
-    RouteNetworkAssignment.class,
-    StopAreaElement.class
+    RouteNetworkAssignment.class
   );
 
   private static final Logger LOG = LoggerFactory.getLogger(GtfsBundle.class);
@@ -136,6 +132,9 @@ public final class GtfsBundle {
    * Since GTFS Fares V2 is a very new, constantly evolving standard there might be a lot of errors
    * in the data. We only want to try to parse them when the feature flag is explicitly enabled as
    * it can easily lead to graph build failures.
+   * <p>
+   * {@code areas.txt} and {@code stop_areas.txt} are not skipped: they are always read, because the
+   * areas of stops and stations are part of the transit model, also without Fares v2.
    */
   private boolean skipEntityClass(Class<?> entityClass) {
     return OTPFeature.FaresV2.isOff() && FARES_V2_CLASSES.contains(entityClass);

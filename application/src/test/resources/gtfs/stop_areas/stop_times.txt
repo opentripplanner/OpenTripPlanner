@@ -1,0 +1,3 @@
+trip_id,arrival_time,departure_time,stop_id,stop_sequence
+trip,08:00:00,08:00:00,platform-own,1
+trip,08:10:00,08:10:00,stop-none,2

@@ -242,7 +242,10 @@ public class GTFSToTransitDataImportMapper {
     fareRulesBuilder
       .fareTransferRules()
       .addAll(fareTransferRuleMapper.map(data.getAllFareTransferRules()));
-    fareRulesBuilder.stopAreas().putAll(stopAreaMapper.map(data.getAllStopAreaElements()));
+    // The stop areas are always read, but the fare service only uses them for Fares v2
+    if (OTPFeature.FaresV2.isOn()) {
+      fareRulesBuilder.stopAreas().putAll(stopAreaMapper.map(data.getAllStopAreaElements()));
+    }
 
     tripSegmentMapper.map(data.getAllTripSegments(), builder.getStopTimesSortedByTrip());
     noticeMapper.map(data.getAllNotices());

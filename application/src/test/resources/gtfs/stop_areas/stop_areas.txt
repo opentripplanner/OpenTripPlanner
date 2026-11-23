@@ -1,0 +1,5 @@
+area_id,stop_id
+station-area,station
+platform-area,platform-own
+unnamed-area,platform-own
+unnamed-area,entrance
