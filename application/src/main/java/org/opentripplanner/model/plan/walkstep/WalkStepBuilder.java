@@ -136,11 +136,6 @@ public class WalkStepBuilder {
     return this;
   }
 
-  public WalkStepBuilder addEdge(Edge edge) {
-    this.edges.add(edge);
-    return this;
-  }
-
   public WalkStep build() {
     return new WalkStep(
       startLocation,
