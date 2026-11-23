@@ -17,7 +17,6 @@ import io.micrometer.core.instrument.binder.system.UptimeMetrics;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ForkJoinPool;
 import org.opentripplanner.core.framework.transaction.configure.StreetDomain;
 import org.opentripplanner.core.framework.transaction.configure.TransitDomain;
@@ -107,17 +106,6 @@ public class MetricsLogging {
       ).bindTo(Metrics.globalRegistry);
     }
 
-    final Map<String, Long> issueCount = issueSummary.asMap();
-
-    var totalIssues = issueCount
-      .values()
-      .stream()
-      .mapToLong(i -> i)
-      .sum();
-    Metrics.globalRegistry.gauge("graph_build_issues_total", totalIssues);
-
-    issueCount.forEach((issueType, number) ->
-      Metrics.globalRegistry.gauge("graph_build_issues", List.of(Tag.of("type", issueType)), number)
-    );
+    new GraphBuildIssueMeterBinder(issueSummary).bindTo(Metrics.globalRegistry);
   }
 }
