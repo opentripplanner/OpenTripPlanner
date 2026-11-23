@@ -81,6 +81,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Handle and expose notExpected on estimatedCalls for departure and arrival [#8211](https://github.com/opentripplanner/OpenTripPlanner/pull/8211)
 - Report added stops of GTFS-RT replacement trips in GTFS API `Stoptime.realtimeState` [#8186](https://github.com/opentripplanner/OpenTripPlanner/pull/8186)
 - Add alertId and version to Alert in the GTFS GraphQL API [#8249](https://github.com/opentripplanner/OpenTripPlanner/pull/8249)
+- Add pick up and drop off types to GTFS API's `StopCall` [#8190](https://github.com/opentripplanner/OpenTripPlanner/pull/8190)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.10.0 (2026-09-09)
