@@ -12,6 +12,7 @@ import java.util.Objects;
 import org.opentripplanner.apis.gtfs.datafetchers.AgencyImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.AlertEntityTypeResolver;
 import org.opentripplanner.apis.gtfs.datafetchers.AlertImpl;
+import org.opentripplanner.apis.gtfs.datafetchers.AreaImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.BikeParkImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.BikeRentalStationImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.BookingInfoImpl;
@@ -153,6 +154,7 @@ public class SchemaFactory {
         .type("StepFeature", type -> type.typeResolver(new StepFeatureTypeResolver()))
         .type(typeWiring.build(AgencyImpl.class))
         .type(typeWiring.build(AlertImpl.class))
+        .type(typeWiring.build(AreaImpl.class))
         .type(typeWiring.build(BikeParkImpl.class))
         .type(typeWiring.build(VehicleParkingImpl.class))
         .type(typeWiring.build(BikeRentalStationImpl.class))

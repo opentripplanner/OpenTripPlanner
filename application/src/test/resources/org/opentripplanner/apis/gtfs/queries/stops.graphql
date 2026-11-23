@@ -21,6 +21,10 @@
       alertHeaderText
       alertDescriptionText
     }
+    areas {
+      gtfsId
+      name
+    }
     canceledCalls(
       serviceDateRanges: [{ start: "2024-08-08", end: "2024-08-10" }]
       timeRanges: [

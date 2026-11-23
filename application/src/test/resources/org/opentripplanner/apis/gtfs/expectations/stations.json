@@ -15,6 +15,12 @@
             "alertDescriptionText": "This station is currently closed"
           }
         ],
+        "areas": [
+          {
+            "gtfsId": "F:area-1",
+            "name": "Area 1"
+          }
+        ],
         "patternAndRouteAlerts": []
       }
     ]
