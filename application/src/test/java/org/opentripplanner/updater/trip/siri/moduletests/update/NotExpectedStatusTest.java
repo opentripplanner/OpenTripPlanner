@@ -56,4 +56,34 @@ class NotExpectedStatusTest implements RealtimeTestConstants {
     assertTrue(tt.isNotExpectedArrival(1));
     assertFalse(tt.isNotExpectedDeparture(1));
   }
+
+  /// Verify handling of Arrival and Departure Status == NOT_EXPECTED
+  @Test
+  void testUpdateJourneyWithArrivalStatusNotExpectedOnRecordedCalls() {
+    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
+    var siri = SiriTestHelper.of(env);
+    var update = siri
+      .etBuilder()
+      .withDatedVehicleJourneyRef(TRIP_1_ID)
+      .withRecordedCalls(builder ->
+        builder
+          .call(STOP_A)
+          .departAimedExpected("00:10", "00:10")
+          .withDepartureStatus(CallStatusEnumeration.NOT_EXPECTED)
+          .call(STOP_B)
+          .departAimedExpected("00:20", "00:20")
+          .withArrivalStatus(CallStatusEnumeration.NOT_EXPECTED)
+          .call(STOP_C)
+      )
+      .buildEstimatedTimetableDeliveries();
+
+    var result = siri.applyEstimatedTimetable(update);
+    assertSuccess(result);
+
+    var tt = env.tripData(TRIP_1_ID).tripTimes();
+    assertTrue(tt.isNotExpectedDeparture(0));
+    assertFalse(tt.isNotExpectedArrival(0));
+    assertTrue(tt.isNotExpectedArrival(1));
+    assertFalse(tt.isNotExpectedDeparture(1));
+  }
 }

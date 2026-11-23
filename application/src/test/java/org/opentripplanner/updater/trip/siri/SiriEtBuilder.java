@@ -367,6 +367,18 @@ public class SiriEtBuilder {
       return this;
     }
 
+    public RecordedCallsBuilder withArrivalStatus(CallStatusEnumeration callStatus) {
+      var call = calls.getLast();
+      call.setArrivalStatus(callStatus);
+      return this;
+    }
+
+    public RecordedCallsBuilder withDepartureStatus(CallStatusEnumeration callStatus) {
+      var call = calls.getLast();
+      call.setDepartureStatus(callStatus);
+      return this;
+    }
+
     public RecordedCallsBuilder withVisitNumber(int visitNumber) {
       var call = calls.getLast();
       call.setVisitNumber(BigInteger.valueOf(visitNumber));
