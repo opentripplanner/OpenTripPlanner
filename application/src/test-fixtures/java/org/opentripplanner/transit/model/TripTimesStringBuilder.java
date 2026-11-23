@@ -20,6 +20,7 @@ public class TripTimesStringBuilder {
    * A: Arrived but not departed
    * PI: Prediction Inaccurate
    * ND: No Data
+   * EC: Extra Call
    * </pre>
    *
    * @throws IllegalStateException if TripTimes does not match the TripPattern

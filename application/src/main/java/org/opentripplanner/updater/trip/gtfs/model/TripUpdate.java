@@ -2,6 +2,8 @@ package org.opentripplanner.updater.trip.gtfs.model;
 
 import static org.opentripplanner.updater.spi.UpdateErrorType.INVALID_INPUT_STRUCTURE;
 import static org.opentripplanner.updater.spi.UpdateErrorType.INVALID_STOP_SEQUENCE;
+import static org.opentripplanner.updater.spi.UpdateErrorType.NOT_IMPLEMENTED_NO_DATA_IN_REPLACEMENT;
+import static org.opentripplanner.updater.spi.UpdateErrorType.TOO_MANY_STOPS;
 import static org.opentripplanner.updater.trip.gtfs.model.GtfsRealtimeMapper.mapWheelchairAccessible;
 
 import com.google.transit.realtime.GtfsRealtime;
@@ -25,6 +27,14 @@ import org.opentripplanner.utils.lang.StringUtils;
  * of this class are validated and ready for further processing.
  */
 public final class TripUpdate {
+
+  /**
+   * The maximum number of stops in a {@code REPLACEMENT} trip update. A replacement is matched
+   * against the scheduled trip it replaces, which takes time and memory proportional to the number
+   * of stops in both trips. Real trips should be far below this limit, so a larger update is
+   * rejected to protect the updater from malformed feeds.
+   */
+  public static final int MAX_REPLACEMENT_STOPS = 500;
 
   private final String feedId;
   private final GtfsRealtime.TripUpdate tripUpdate;
@@ -112,6 +122,13 @@ public final class TripUpdate {
     // exercise the getter, would throw an UpdateException if start date is malformed
     tripDescriptor.startDate();
 
+    if (
+      scheduleRelationship() == ScheduleRelationship.REPLACEMENT &&
+      tripUpdate.getStopTimeUpdateCount() > MAX_REPLACEMENT_STOPS
+    ) {
+      throw UpdateException.of(tripId(), TOO_MANY_STOPS);
+    }
+
     var lastStopSequence = -1;
     for (StopTimeUpdate update : stopTimeUpdates()) {
       // validate stop sequence
@@ -125,6 +142,13 @@ public final class TripUpdate {
           throw UpdateException.of(tripId(), INVALID_STOP_SEQUENCE);
         }
         lastStopSequence = seq;
+      }
+      if (
+        scheduleRelationship() == ScheduleRelationship.REPLACEMENT &&
+        update.scheduleRelationship() ==
+          GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship.NO_DATA
+      ) {
+        throw UpdateException.of(tripId(), NOT_IMPLEMENTED_NO_DATA_IN_REPLACEMENT);
       }
     }
   }

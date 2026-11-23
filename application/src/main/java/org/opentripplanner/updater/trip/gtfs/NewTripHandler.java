@@ -119,6 +119,15 @@ class NewTripHandler {
 
     var stopAndStopTimeUpdates = resolveStops(tripId, stopTimeUpdates);
 
+    if (modified) {
+      stopAndStopTimeUpdates = tripTimesUpdater.flagAddedStops(
+        trip,
+        tripUpdate.startDate(),
+        stopAndStopTimeUpdates,
+        buffer.findPattern(trip)
+      );
+    }
+
     var value = tripTimesUpdater.createNewTripTimesFromGtfsRt(
       trip,
       tripUpdate,
