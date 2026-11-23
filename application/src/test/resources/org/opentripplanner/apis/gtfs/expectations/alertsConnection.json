@@ -10,6 +10,8 @@
         {
           "node": {
             "id": "QWxlcnQ6Rjphbi1hbGVydA",
+            "alertId": "F:an-alert",
+            "version": 3,
             "headerDefault": "A header",
             "headerDe": "A header",
             "descriptionDefault": "A description",
@@ -21,6 +23,8 @@
         {
           "node": {
             "id": "QWxlcnQ6RjphLXN0YXRpb24tYWxlcnQ",
+            "alertId": "F:a-station-alert",
+            "version": null,
             "headerDefault": "Station closed",
             "headerDe": "Station closed",
             "descriptionDefault": "This station is currently closed",
