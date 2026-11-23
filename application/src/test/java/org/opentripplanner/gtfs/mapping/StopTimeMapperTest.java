@@ -72,7 +72,8 @@ public class StopTimeMapperTest {
     ID_FACTORY,
     new TranslationHelper(),
     stationId -> null,
-    siteRepositoryBuilder
+    siteRepositoryBuilder,
+    new FareAreaMapper(ID_FACTORY)
   );
   private final BookingRuleMapper bookingRuleMapper = new BookingRuleMapper();
   private final LocationMapper locationMapper = new LocationMapper(

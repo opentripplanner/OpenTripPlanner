@@ -45,7 +45,8 @@ public class TransferMapperTest {
     ID_FACTORY,
     TRANSLATION_HELPER,
     stationId -> null,
-    SITE_REPOSITORY_BUILDER
+    SITE_REPOSITORY_BUILDER,
+    new FareAreaMapper(ID_FACTORY)
   );
   private static final BookingRuleMapper BOOKING_RULE_MAPPER = new BookingRuleMapper();
 
@@ -105,7 +106,8 @@ public class TransferMapperTest {
     STATION_MAPPER = new StationMapper(
       ID_FACTORY,
       TRANSLATION_HELPER,
-      StopTransferPriority.ALLOWED
+      StopTransferPriority.ALLOWED,
+      new FareAreaMapper(ID_FACTORY)
     );
 
     STOP_TIME_MAPPER = new StopTimeMapper(

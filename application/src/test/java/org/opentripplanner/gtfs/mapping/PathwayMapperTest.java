@@ -36,7 +36,8 @@ public class PathwayMapperTest {
       ID_FACTORY,
       TRANSLATION_HELPER,
       stationId -> null,
-      new SiteRepository().withContext()
+      new SiteRepository().withContext(),
+      new FareAreaMapper(ID_FACTORY)
     ),
     new EntranceMapper(ID_FACTORY, TRANSLATION_HELPER, stationId -> null),
     new PathwayNodeMapper(ID_FACTORY, TRANSLATION_HELPER, stationId -> null),

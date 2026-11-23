@@ -89,6 +89,8 @@ public class GTFSToTransitDataImportMapper {
 
   private final StopAreaMapper stopAreaMapper;
 
+  private final FareAreaMapper fareAreaMapper;
+
   private final NoticeMapper noticeMapper;
   private final NoticeAssignmentMapper noticeAssignmentMapper;
 
@@ -116,12 +118,19 @@ public class GTFSToTransitDataImportMapper {
     translationHelper = new TranslationHelper();
     feedInfoMapper = new FeedInfoMapper(feedId);
     agencyMapper = new AgencyMapper(idFactory);
-    stationMapper = new StationMapper(idFactory, translationHelper, stationTransferPreference);
+    fareAreaMapper = new FareAreaMapper(idFactory);
+    stationMapper = new StationMapper(
+      idFactory,
+      translationHelper,
+      stationTransferPreference,
+      fareAreaMapper
+    );
     stopMapper = new StopMapper(
       idFactory,
       translationHelper,
       stationLookup,
-      builder.siteRepository()
+      builder.siteRepository(),
+      fareAreaMapper
     );
     entranceMapper = new EntranceMapper(idFactory, translationHelper, stationLookup);
     pathwayNodeMapper = new PathwayNodeMapper(idFactory, translationHelper, stationLookup);
@@ -207,6 +216,7 @@ public class GTFSToTransitDataImportMapper {
     // shape points is a large collection, so after mapping it can be cleared
     data.getAllShapePoints().clear();
 
+    fareAreaMapper.map(data.getAllStopAreaElements());
     mapGtfsStopsToOtpTypes(data.getAllStops());
 
     if (OTPFeature.FlexRouting.isOn()) {

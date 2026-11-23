@@ -25,15 +25,18 @@ class StationMapper {
 
   private final TranslationHelper translationHelper;
   private final StopTransferPriority stationTransferPreference;
+  private final FareAreaMapper fareAreaMapper;
 
   StationMapper(
     IdFactory idFactory,
     TranslationHelper translationHelper,
-    StopTransferPriority stationTransferPreference
+    StopTransferPriority stationTransferPreference,
+    FareAreaMapper fareAreaMapper
   ) {
     this.idFactory = idFactory;
     this.translationHelper = translationHelper;
     this.stationTransferPreference = stationTransferPreference;
+    this.fareAreaMapper = fareAreaMapper;
   }
 
   /** Map from GTFS to OTP model, {@code null} safe. */
@@ -53,7 +56,8 @@ class StationMapper {
     }
     StationBuilder builder = Station.of(idFactory.createId(rhs.getId(), "station"))
       .withCoordinate(WgsCoordinateMapper.mapToDomain(rhs))
-      .withCode(rhs.getCode());
+      .withCode(rhs.getCode())
+      .withFareAreas(fareAreaMapper.areasFor(rhs));
 
     builder.withName(
       translationHelper.getTranslation(Stop.class, "name", rhs.getId().getId(), rhs.getName())

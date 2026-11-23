@@ -24,17 +24,20 @@ class StopMapper {
   private final SiteRepositoryBuilder siteRepositoryBuilder;
   private final TranslationHelper translationHelper;
   private final Function<FeedScopedId, Station> stationLookUp;
+  private final FareAreaMapper fareAreaMapper;
 
   StopMapper(
     IdFactory idFactory,
     TranslationHelper translationHelper,
     Function<FeedScopedId, Station> stationLookUp,
-    SiteRepositoryBuilder siteRepositoryBuilder
+    SiteRepositoryBuilder siteRepositoryBuilder,
+    FareAreaMapper fareAreaMapper
   ) {
     this.idFactory = idFactory;
     this.translationHelper = translationHelper;
     this.stationLookUp = stationLookUp;
     this.siteRepositoryBuilder = siteRepositoryBuilder;
+    this.fareAreaMapper = fareAreaMapper;
   }
 
   Collection<RegularStop> map(Collection<Stop> allStops) {
@@ -59,7 +62,8 @@ class StopMapper {
       .withLevel(base.getLevel())
       .withPlatformCode(gtfsStop.getPlatformCode())
       .withVehicleType(mode)
-      .withSometimesUsedRealtime(mapSometimesUsedRealtime(mode, gtfsStop));
+      .withSometimesUsedRealtime(mapSometimesUsedRealtime(mode, gtfsStop))
+      .withFareAreas(fareAreaMapper.areasFor(gtfsStop));
 
     builder.withName(
       translationHelper.getTranslation(Stop.class, "name", base.getId().getId(), base.getName())
