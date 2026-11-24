@@ -11,7 +11,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * Everything needed to refetch an itinerary later with
- * {@link org.opentripplanner.routing.refetch.RefetchItineraryService}. It is sent to clients as an
+ * {@link org.opentripplanner.routing.refetch.ItineraryRefetchService}. It is sent to clients as an
  * opaque, versioned token that does not depend on any particular API.
  * <p>
  * Not every itinerary can be referenced.

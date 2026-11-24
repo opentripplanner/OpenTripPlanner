@@ -31,8 +31,8 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.legreference.LegReferenceSerializer;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
-import org.opentripplanner.routing.refetch.RefetchItineraryException;
-import org.opentripplanner.routing.refetch.RefetchItineraryService;
+import org.opentripplanner.routing.refetch.ItineraryRefetchException;
+import org.opentripplanner.routing.refetch.ItineraryRefetchService;
 
 public class TripPatternByLegIdsQuery {
 
@@ -257,7 +257,7 @@ public class TripPatternByLegIdsQuery {
     var from = mapLocation(environment.getArgument("from"));
     var to = mapLocation(environment.getArgument("to"));
 
-    var refetcher = new RefetchItineraryService(
+    var refetcher = new ItineraryRefetchService(
       ctx.graph(),
       ctx.transitService(),
       ctx.transitAlertService(),
@@ -271,7 +271,7 @@ public class TripPatternByLegIdsQuery {
       var itinerary = refetcher.refetchItinerary(from, to, legs, routeRequest);
       TripPatternResult apiResponse = new TripPatternResult(itinerary);
       return DataFetcherResult.<TripPatternResult>newResult().data(apiResponse).build();
-    } catch (RefetchItineraryException e) {
+    } catch (ItineraryRefetchException e) {
       throw new InvalidInputException(e.getMessage());
     }
   }

@@ -25,7 +25,7 @@ import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.routing.refetch.ItineraryReferenceMapper;
-import org.opentripplanner.routing.refetch.RefetchItineraryService;
+import org.opentripplanner.routing.refetch.ItineraryRefetchService;
 import org.opentripplanner.service.vehiclerental.GeofencingZoneService;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VertexLinker;
@@ -44,7 +44,7 @@ import org.opentripplanner.transit.transfer.regular.FixedRegularTransfers;
  * Focused test for {@link QueryTypeImpl#itinerary}, the GTFS API's single-id refetch query
  * (#7878). Delegates entirely to the shared
  * {@link org.opentripplanner.routing.refetch.ItineraryReferenceMapper}/
- * {@link RefetchItineraryService} core - see {@link ItineraryImplTest} for id exposure.
+ * {@link ItineraryRefetchService} core - see {@link ItineraryImplTest} for id exposure.
  */
 class QueryTypeImplItineraryTest {
 
@@ -75,7 +75,7 @@ class QueryTypeImplItineraryTest {
 
   @Test
   void refetchesItineraryByEncodedId() throws Exception {
-    var refetchService = refetchItineraryService();
+    var refetchService = itineraryRefetchService();
     var routeRequest = routeRequest();
     var legRef = legRef();
 
@@ -98,7 +98,7 @@ class QueryTypeImplItineraryTest {
   @Test
   @SuppressWarnings("unchecked")
   void refetchedItineraryCarriesTheRouteRequestForItsOwnId() throws Exception {
-    var refetchService = refetchItineraryService();
+    var refetchService = itineraryRefetchService();
     var routeRequest = routeRequest();
 
     var reference = ItineraryReferenceMapper.toItineraryReference(
@@ -136,7 +136,7 @@ class QueryTypeImplItineraryTest {
   @Test
   @SuppressWarnings("unchecked")
   void refetchedItineraryUsesTheLocaleOfTheRefetchRequest() throws Exception {
-    var refetchService = refetchItineraryService();
+    var refetchService = itineraryRefetchService();
     var serverDefault = routeRequest()
       .copyOf()
       .withPreferences(p -> p.withLocale(Locale.ENGLISH))
@@ -163,7 +163,7 @@ class QueryTypeImplItineraryTest {
   @Test
   void invalidIdReturnsNull() throws Exception {
     var itinerary = SUBJECT.itinerary().get(
-      environment("this-is-not-a-valid-id", refetchItineraryService(), routeRequest())
+      environment("this-is-not-a-valid-id", itineraryRefetchService(), routeRequest())
     );
 
     assertNull(itinerary);
@@ -188,7 +188,7 @@ class QueryTypeImplItineraryTest {
     var id = ItineraryReferenceSerializer.encode(reference);
 
     var itinerary = SUBJECT.itinerary().get(
-      environment(id, refetchItineraryService(), routeRequest())
+      environment(id, itineraryRefetchService(), routeRequest())
     );
 
     assertNull(itinerary);
@@ -208,7 +208,7 @@ class QueryTypeImplItineraryTest {
     );
   }
 
-  private static RefetchItineraryService refetchItineraryService() {
+  private static ItineraryRefetchService itineraryRefetchService() {
     var vertexCreationService = new VertexCreationService(
       new VertexLinker(
         GRAPH,
@@ -223,7 +223,7 @@ class QueryTypeImplItineraryTest {
       vertexCreationService,
       new TransitServiceResolver(TRANSIT_ENV.transitService())
     );
-    return new RefetchItineraryService(
+    return new ItineraryRefetchService(
       GRAPH,
       TRANSIT_ENV.transitService(),
       new TransitAlertServiceImpl(),
@@ -243,12 +243,12 @@ class QueryTypeImplItineraryTest {
 
   private static DataFetchingEnvironment environment(
     String id,
-    RefetchItineraryService refetchItineraryService,
+    ItineraryRefetchService itineraryRefetchService,
     RouteRequest defaultRouteRequest
   ) {
     return environment(
       id,
-      refetchItineraryService,
+      itineraryRefetchService,
       defaultRouteRequest,
       defaultRouteRequest.preferences().locale()
     );
@@ -256,7 +256,7 @@ class QueryTypeImplItineraryTest {
 
   private static DataFetchingEnvironment environment(
     String id,
-    RefetchItineraryService refetchItineraryService,
+    ItineraryRefetchService itineraryRefetchService,
     RouteRequest defaultRouteRequest,
     Locale requestLocale
   ) {
@@ -278,7 +278,7 @@ class QueryTypeImplItineraryTest {
           null,
           null,
           defaultRouteRequest,
-          refetchItineraryService
+          itineraryRefetchService
         )
       )
       .build();

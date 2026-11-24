@@ -46,7 +46,7 @@ import org.opentripplanner.transit.transfer.regular.FixedRegularTransfers;
  * transfers.
  *
  * <p>Proves the chain:
- * {@code Itinerary -> ItineraryReference -> encode -> decode -> RefetchItineraryService ->
+ * {@code Itinerary -> ItineraryReference -> encode -> decode -> ItineraryRefetchService ->
  * same scheduled transit itinerary}.
  */
 class ItineraryReferenceMapperTest {
@@ -65,7 +65,7 @@ class ItineraryReferenceMapperTest {
   private static final Graph GRAPH = new Graph();
 
   static {
-    // Register stop vertices (no street edges) so RefetchItineraryService.findVertex(...) can
+    // Register stop vertices (no street edges) so ItineraryRefetchService.findVertex(...) can
     // resolve the board/alight stops; access/egress street searches still fail (no edges to
     // reach them), which is what refetchUsesDecodedFromAndToLocations relies on.
     GRAPH.addVertex(
@@ -296,7 +296,7 @@ class ItineraryReferenceMapperTest {
     var refetchService = createRefetchService();
 
     // A coordinate that doesn't match a stop, on the edge-less test GRAPH, forces
-    // RefetchItineraryService to attempt (and fail) a real access search - this only happens if
+    // ItineraryRefetchService to attempt (and fail) a real access search - this only happens if
     // the reference's `from` is actually passed through, rather than always passing null as it
     // used to.
     var reference = new ItineraryReference(
@@ -315,7 +315,7 @@ class ItineraryReferenceMapperTest {
     );
 
     var routeRequest = ItineraryReferenceMapper.toRouteRequest(reference, routeRequest());
-    var e = assertThrows(RefetchItineraryException.class, () ->
+    var e = assertThrows(ItineraryRefetchException.class, () ->
       refetchService.refetchItinerary(
         reference.from(),
         reference.to(),
@@ -370,7 +370,7 @@ class ItineraryReferenceMapperTest {
     );
   }
 
-  private RefetchItineraryService createRefetchService() {
+  private ItineraryRefetchService createRefetchService() {
     var vertexCreationService = new VertexCreationService(
       new VertexLinker(
         GRAPH,
@@ -387,7 +387,7 @@ class ItineraryReferenceMapperTest {
       new TransitServiceResolver(TRANSIT_ENV.transitService())
     );
 
-    return new RefetchItineraryService(
+    return new ItineraryRefetchService(
       GRAPH,
       TRANSIT_ENV.transitService(),
       new TransitAlertServiceImpl(),
@@ -400,7 +400,7 @@ class ItineraryReferenceMapperTest {
 
   /**
    * {@code from}/{@code to} match the trip's board/alight stops exactly, so
-   * {@code RefetchItineraryService.stopMatchesLocation} skips access/egress reconstruction - this
+   * {@code ItineraryRefetchService.stopMatchesLocation} skips access/egress reconstruction - this
    * keeps the UC1 acceptance test independent of the (edge-less) test {@code GRAPH}.
    */
   private RouteRequest routeRequest() {

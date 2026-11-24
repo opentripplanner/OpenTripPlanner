@@ -15,7 +15,7 @@ import org.opentripplanner.street.model.StreetMode;
 
 /**
  * Creates an {@link ItineraryReference} from an {@link Itinerary} and the {@link RouteRequest} that
- * planned it, and turns a reference back into a request for {@link RefetchItineraryService}.
+ * planned it, and turns a reference back into a request for {@link ItineraryRefetchService}.
  * <p>
  * Only the transit legs are stored, as {@link LegReference}s. Street legs are not stored, because
  * the refetch creates them again.
@@ -81,7 +81,7 @@ public final class ItineraryReferenceMapper {
    * {@code defaultRouteRequest}. Values that are not stored, like
    * {@code maxAccessEgressDuration}, come from {@code defaultRouteRequest}.
    *
-   * @throws RefetchItineraryException if the request cannot be built
+   * @throws ItineraryRefetchException if the request cannot be built
    */
   public static RouteRequest toRouteRequest(
     ItineraryReference ref,
@@ -115,7 +115,7 @@ public final class ItineraryReferenceMapper {
         )
         .buildRequest();
     } catch (RoutingValidationException | IllegalArgumentException e) {
-      throw new RefetchItineraryException("Could not rebuild route request: " + e.getMessage());
+      throw new ItineraryRefetchException("Could not rebuild route request: " + e.getMessage());
     }
   }
 

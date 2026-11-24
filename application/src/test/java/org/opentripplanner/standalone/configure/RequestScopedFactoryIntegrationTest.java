@@ -26,7 +26,7 @@ import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
-import org.opentripplanner.routing.refetch.RefetchItineraryService;
+import org.opentripplanner.routing.refetch.ItineraryRefetchService;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
@@ -106,7 +106,7 @@ class RequestScopedFactoryIntegrationTest {
   private static final List<DaggerBindingKey> REQUEST_SCOPED = List.of(
     of(GtfsGraphQLRequestContext.class),
     of(RealtimeVehicleService.class),
-    of(RefetchItineraryService.class),
+    of(ItineraryRefetchService.class),
     of(RegularTransferCacheReport.class),
     of(RoutingService.class),
     of(TransactionScope.class),

@@ -49,9 +49,9 @@ import org.opentripplanner.utils.collection.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class RefetchItineraryService {
+public class ItineraryRefetchService {
 
-  private static final Logger LOG = LoggerFactory.getLogger(RefetchItineraryService.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ItineraryRefetchService.class);
 
   private final TransitService transitService;
   private final TransitAlertService transitAlertService;
@@ -62,7 +62,7 @@ public class RefetchItineraryService {
   private final StreetPathToLegsMapper streetPathToLegsMapper;
   private final StreetLimitationParametersService streetLimitationParametersService;
 
-  public RefetchItineraryService(
+  public ItineraryRefetchService(
     Graph graph,
     TransitService transitService,
     TransitAlertService transitAlertService,
@@ -93,14 +93,14 @@ public class RefetchItineraryService {
   /// @param to            An optional to location. If null the last legReference will be the end of
   ///                      the itinerary.
   /// @param legReferences A list of leg references describing the parts of the itinerary.
-  /// @throws RefetchItineraryException If there is some issue with the input values that should be
+  /// @throws ItineraryRefetchException If there is some issue with the input values that should be
   ///                                   mapped so some kind of InvalidInput message to the user.
   public Itinerary refetchItinerary(
     @Nullable GenericLocation from,
     @Nullable GenericLocation to,
     List<LegReference> legReferences,
     RouteRequest routeRequest
-  ) throws RefetchItineraryException {
+  ) throws ItineraryRefetchException {
     if (legReferences.isEmpty()) {
       throw new IllegalArgumentException("legReferences must not be empty");
     }
@@ -162,12 +162,12 @@ public class RefetchItineraryService {
       if (legReference instanceof ScheduledTransitLegReference scheduledTransitLeg) {
         var transitLeg = scheduledTransitLeg.getLeg(transitService, transitAlertService);
         if (transitLeg == null) {
-          throw new RefetchItineraryException("Could not find leg " + scheduledTransitLeg);
+          throw new ItineraryRefetchException("Could not find leg " + scheduledTransitLeg);
         }
         transitLegs.add(transitLeg);
       } else {
-        throw new RefetchItineraryException(
-          "RefetchItinerary not implemented for non transit legs yet"
+        throw new ItineraryRefetchException(
+          "Itinerary refetch is not implemented for non transit legs yet"
         );
       }
     }
@@ -197,7 +197,7 @@ public class RefetchItineraryService {
         mode,
         time,
         true
-      ).orElseThrow(() -> new RefetchItineraryException("Could not calculate access"));
+      ).orElseThrow(() -> new ItineraryRefetchException("Could not calculate access"));
       legs.addAll(access);
     }
 
@@ -253,7 +253,7 @@ public class RefetchItineraryService {
           transferToStop,
           request
         ).orElseThrow(() ->
-          new RefetchItineraryException(
+          new ItineraryRefetchException(
             "Could not transfer from " + transferFromStop.getId() + " to " + transferToStop.getId()
           )
         );
@@ -284,7 +284,7 @@ public class RefetchItineraryService {
         mode,
         time,
         false
-      ).orElseThrow(() -> new RefetchItineraryException("Could not calculate egress"));
+      ).orElseThrow(() -> new ItineraryRefetchException("Could not calculate egress"));
       legs.addAll(egress);
     }
     return Itinerary.ofScheduledTransit(legs)

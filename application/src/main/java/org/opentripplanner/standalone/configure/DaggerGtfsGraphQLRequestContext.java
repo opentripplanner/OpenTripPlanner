@@ -11,7 +11,7 @@ import org.opentripplanner.place.placefinder.StreetNearbyPlaceFinder;
 import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
-import org.opentripplanner.routing.refetch.RefetchItineraryService;
+import org.opentripplanner.routing.refetch.ItineraryRefetchService;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
@@ -108,7 +108,7 @@ final class DaggerGtfsGraphQLRequestContext implements GtfsGraphQLRequestContext
   }
 
   @Override
-  public RefetchItineraryService refetchItineraryService() {
-    return factory.refetchItineraryService();
+  public ItineraryRefetchService itineraryRefetchService() {
+    return factory.itineraryRefetchService();
   }
 }

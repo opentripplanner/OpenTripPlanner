@@ -65,7 +65,7 @@ import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.refetch.ItineraryReferenceMapper;
-import org.opentripplanner.routing.refetch.RefetchItineraryException;
+import org.opentripplanner.routing.refetch.ItineraryRefetchException;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
@@ -410,7 +410,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
           .withPreferences(preferences -> preferences.withLocale(locale))
           .buildRequest();
         var itinerary = context
-          .refetchItineraryService()
+          .itineraryRefetchService()
           .refetchItinerary(
             reference.from(),
             reference.to(),
@@ -423,7 +423,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
             Map.of("locale", locale, ItineraryImpl.ROUTE_REQUEST_CONTEXT_KEY, routeRequest)
           )
           .build();
-      } catch (RefetchItineraryException e) {
+      } catch (ItineraryRefetchException e) {
         return null;
       }
     };

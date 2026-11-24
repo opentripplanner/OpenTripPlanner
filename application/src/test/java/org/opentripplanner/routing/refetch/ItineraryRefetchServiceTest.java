@@ -51,7 +51,7 @@ import org.opentripplanner.transit.transfer.regular.FixedRegularTransfers;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 import org.opentripplanner.updater.trip.gtfs.GtfsRtTestHelper;
 
-public class RefetchItineraryServiceTest {
+public class ItineraryRefetchServiceTest {
 
   // Setup transit
   private static final LocalDate SERVICE_DATE = LocalDate.of(2020, 3, 3);
@@ -236,7 +236,7 @@ public class RefetchItineraryServiceTest {
       .build();
     var refetch = createRefetchService(newTransitEnv);
 
-    var e = assertThrows(RefetchItineraryException.class, () ->
+    var e = assertThrows(ItineraryRefetchException.class, () ->
       refetch.refetchItinerary(null, null, List.of(leg1), routeRequest())
     );
     assertTrue(e.getMessage().startsWith("Could not find leg"));
@@ -367,7 +367,7 @@ public class RefetchItineraryServiceTest {
     var start = GenericLocation.fromCoordinate(V1.coord().moveNorthMeters(10000));
     var leg1 = legRef("trip1", STOP_A, STOP_B, transitEnv);
 
-    var e = assertThrows(RefetchItineraryException.class, () ->
+    var e = assertThrows(ItineraryRefetchException.class, () ->
       refetch.refetchItinerary(start, null, List.of(leg1), routeRequest())
     );
     assertEquals("Could not calculate access", e.getMessage());
@@ -381,7 +381,7 @@ public class RefetchItineraryServiceTest {
     var leg1 = legRef("trip3", STOP_C, STOP_D, transitEnv);
     var leg2 = legRef("trip1", STOP_A, STOP_B, transitEnv);
 
-    var e = assertThrows(RefetchItineraryException.class, () ->
+    var e = assertThrows(ItineraryRefetchException.class, () ->
       refetch.refetchItinerary(null, null, List.of(leg1, leg2), routeRequest())
     );
     assertEquals("Could not transfer from F:D to F:A", e.getMessage());
@@ -453,7 +453,7 @@ public class RefetchItineraryServiceTest {
     );
   }
 
-  private RefetchItineraryService createRefetchService(TransitTestEnvironment transitEnv) {
+  private ItineraryRefetchService createRefetchService(TransitTestEnvironment transitEnv) {
     StreetDetailsService streetDetailsService = null;
     VertexCreationService vertexCreationService = new VertexCreationService(
       new VertexLinker(
@@ -491,7 +491,7 @@ public class RefetchItineraryServiceTest {
         return 0;
       }
     };
-    return new RefetchItineraryService(
+    return new ItineraryRefetchService(
       GRAPH,
       transitEnv.transitService(),
       new TransitAlertServiceImpl(),
