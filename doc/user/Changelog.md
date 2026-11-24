@@ -84,6 +84,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Add pick up and drop off types to GTFS API's `StopCall` [#8190](https://github.com/opentripplanner/OpenTripPlanner/pull/8190)
 - Ignore empty MQTT payloads in the SIRI-ET MQTT updater [#8219](https://github.com/opentripplanner/OpenTripPlanner/pull/8219)
 - Remove deprecated groupSimilarityKeepNumOfItineraries in Transmodel [#8224](https://github.com/opentripplanner/OpenTripPlanner/pull/8224)
+- Remove refetchTripPattern query in Transmodel API [#8175](https://github.com/opentripplanner/OpenTripPlanner/pull/8175)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.10.0 (2026-09-09)
