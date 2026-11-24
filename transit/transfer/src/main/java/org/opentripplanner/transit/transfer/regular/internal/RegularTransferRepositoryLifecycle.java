@@ -49,8 +49,7 @@ public class RegularTransferRepositoryLifecycle<
   private final RaptorTransfersFactory<P, R> raptorTransfersFactory;
   private final TransferRequestMapper<R> mapper;
   private final ProfileMatcher matcher;
-  private final List<WarmupEntry> warmup;
-  private final RegularTransferCacheStatistics statistics;
+  private final RegularTransferCacheReporter reporter;
   private final int cacheMaxSize;
   private final Set<AbstractUserPreferences<?>> retainedKeys;
   private final RegularTransferCacheCounters cacheCounters = new RegularTransferCacheCounters();
@@ -136,15 +135,17 @@ public class RegularTransferRepositoryLifecycle<
     boolean collectCacheStatistics
   ) {
     this.matcher = new ProfileMatcher(declaredProfiles);
-    this.warmup = warmup;
     this.cacheMaxSize = cacheMaxSize;
     this.retainedKeys = warmup
       .stream()
       .map(WarmupEntry::userPreferences)
       .collect(Collectors.toUnmodifiableSet());
-    this.statistics = collectCacheStatistics
-      ? RegularTransferCacheStatistics.of(cacheMaxSize)
-      : RegularTransferCacheStatistics.NONE;
+    this.reporter = new RegularTransferCacheReporter(
+      warmup,
+      collectCacheStatistics
+        ? RegularTransferCacheStatistics.of(cacheMaxSize)
+        : RegularTransferCacheStatistics.NONE
+    );
     this.mapper = Objects.requireNonNull(mapper);
     this.raptorTransfersFactory = new RaptorTransfersFactory<>(
       numberOfStops,
@@ -217,8 +218,7 @@ public class RegularTransferRepositoryLifecycle<
       raptorTransfersFactory,
       mapper,
       matcher,
-      warmup,
-      statistics
+      reporter
     );
   }
 
