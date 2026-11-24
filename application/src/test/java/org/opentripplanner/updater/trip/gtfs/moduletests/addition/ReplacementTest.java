@@ -30,10 +30,6 @@ import org.opentripplanner.updater.trip.gtfs.model.TripUpdate;
 
 public class ReplacementTest implements RealtimeTestConstants {
 
-  /**
-   * An arbitrary time for the invalid NO_DATA stops: the update is rejected by validation before
-   * the time is used.
-   */
   private static final long SCHEDULED_TIME = 1_000_000;
 
   @Test
@@ -370,10 +366,6 @@ public class ReplacementTest implements RealtimeTestConstants {
     assertScheduledTripUnchanged(env);
   }
 
-  /**
-   * The arrival of a NO_DATA stop must have a scheduled time. A time alone is a prediction, so it is
-   * not used as the schedule.
-   */
   @Test
   void replacementTripWithNoDataStopWithoutScheduledArrivalIsRejected() {
     var env = noDataEnvironment();
@@ -397,9 +389,6 @@ public class ReplacementTest implements RealtimeTestConstants {
     assertScheduledTripUnchanged(env);
   }
 
-  /**
-   * The departure of a NO_DATA stop must have a scheduled time.
-   */
   @Test
   void replacementTripWithNoDataStopWithoutDepartureIsRejected() {
     var env = noDataEnvironment();
@@ -446,9 +435,6 @@ public class ReplacementTest implements RealtimeTestConstants {
     assertFalse(tripTimes.isCanceledOrDeleted());
   }
 
-  /**
-   * A scheduled trip A-B-C departing at 8:30, 8:40 and 8:50, with an extra stop D for replacements.
-   */
   private static TransitTestEnvironment noDataEnvironment() {
     var builder = TransitTestEnvironment.of();
     var STOP_A = builder.stop(STOP_A_ID);
