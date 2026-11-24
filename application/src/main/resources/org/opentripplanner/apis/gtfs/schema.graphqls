@@ -2150,6 +2150,10 @@ type QueryType {
   Refetch a previously planned itinerary using its stable `id` (see `Itinerary.itineraryId`), with current
   realtime data applied. Returns `null` if the id is invalid, if the itinerary cannot be
   refetched, or if a trip or stop it refers to no longer exists in the server's data.
+  A rental access or egress is computed again with current rental data, so it may use another
+  vehicle or station than the planned itinerary. Like in `planConnection`, live rental
+  availability is only used for a trip around now: when the first transit leg departs within 15
+  hours of now.
   The id is meant for refetching an itinerary during or shortly before travel, not for long-term
   storage. If transit entity ids have changed after the itinerary id has been created, refetching
   will fail.

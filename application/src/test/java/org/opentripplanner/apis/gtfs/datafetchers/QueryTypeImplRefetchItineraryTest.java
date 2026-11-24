@@ -2,55 +2,77 @@ package org.opentripplanner.apis.gtfs.datafetchers;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.apis.support.graphql.DataFetchingSupport.executionContext;
+import static org.opentripplanner.routing.refetch.RentalRefetchTestModel.NETWORK;
 
 import graphql.execution.DataFetcherResult;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.DataFetchingEnvironmentImpl;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.apis.gtfs.TestGtfsGraphQLRequestContext;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.itineraryreference.ItineraryReference;
 import org.opentripplanner.model.plan.itineraryreference.ItineraryReferenceSerializer;
+import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.model.plan.legreference.ScheduledTransitLegReference;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferencesBuilder;
+import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.routing.refetch.ItineraryReferenceMapper;
 import org.opentripplanner.routing.refetch.ItineraryRefetchService;
+import org.opentripplanner.routing.refetch.RentalRefetchTestModel;
 import org.opentripplanner.service.vehiclerental.GeofencingZoneService;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.linking.VisibilityMode;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
+import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model.TripInput;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.transit.service.TransitServiceResolver;
 import org.opentripplanner.transit.transfer.regular.FixedRegularTransfers;
+import org.opentripplanner.utils.time.TimeUtils;
 
 /**
  * Focused test for {@link QueryTypeImpl#refetchItinerary}, the GTFS API's single-id refetch query
- * (#7878). Delegates entirely to the shared
- * {@link org.opentripplanner.routing.refetch.ItineraryReferenceMapper}/
- * {@link ItineraryRefetchService} core - see {@link ItineraryImplTest} for id exposure.
+ * (#7878). It maps the id with the shared
+ * {@link org.opentripplanner.routing.refetch.ItineraryReferenceMapper}, decides whether live rental
+ * availability is used, and refetches with {@link ItineraryRefetchService} - see
+ * {@link ItineraryImplTest} for id exposure.
  */
 class QueryTypeImplRefetchItineraryTest {
 
   private static final LocalDate SERVICE_DATE = LocalDate.of(2020, 3, 3);
+  private static final ZoneId TIME_ZONE = ZoneId.of("Europe/Paris");
   private static final TransitTestEnvironmentBuilder ENV_BUILDER = TransitTestEnvironment.of(
-    SERVICE_DATE
+    SERVICE_DATE,
+    TIME_ZONE
   );
   private static final RegularStop STOP_A = ENV_BUILDER.stop("A");
   private static final RegularStop STOP_B = ENV_BUILDER.stop("B");
@@ -96,7 +118,6 @@ class QueryTypeImplRefetchItineraryTest {
    * context, which this query - unlike {@code planConnection} - has to put there itself.
    */
   @Test
-  @SuppressWarnings("unchecked")
   void refetchedItineraryCarriesTheRouteRequestForItsOwnId() throws Exception {
     var refetchService = itineraryRefetchService();
     var routeRequest = routeRequest();
@@ -109,23 +130,116 @@ class QueryTypeImplRefetchItineraryTest {
 
     Object result = SUBJECT.refetchItinerary().get(environment(id, refetchService, routeRequest));
 
-    Map<String, ?> localContext = (Map<String, ?>) (
-      (DataFetcherResult<?>) result
-    ).getLocalContext();
+    var localContext = localContextOf(result);
     assertThat(localContext).containsKey(ItineraryImpl.ROUTE_REQUEST_CONTEXT_KEY);
-
-    var secondId = IMPL_FOR_ID.itineraryId().get(
-      DataFetchingEnvironmentImpl.newDataFetchingEnvironment(executionContext())
-        .source(itineraryOf(result))
-        .localContext(localContext)
-        .build()
-    );
-    assertEquals(id, secondId);
+    assertEquals(id, itineraryId(itineraryOf(result), localContext));
   }
 
-  @SuppressWarnings("unchecked")
-  private static Itinerary itineraryOf(Object dataFetcherResult) {
-    return ((DataFetcherResult<Itinerary>) dataFetcherResult).getData();
+  /**
+   * An itinerary with a rental access and egress, planned with the client's own preferences, is
+   * refetched with the same preferences, not with the server's. The client's preferences still
+   * rent a vehicle, but a different way than the server's would.
+   */
+  @ParameterizedTest
+  @MethodSource("clientRentalPreferences")
+  void refetchesARentalItineraryWithThePreferencesItWasPlannedWith(
+    StreetMode mode,
+    TraverseMode rentedVehicle,
+    Consumer<RoutingPreferencesBuilder> clientPreferences
+  ) throws Exception {
+    var refetchService = RentalRefetchTestModel.createRefetchService();
+    var withServerPreferences = RentalRefetchTestModel.request(mode);
+    var planRequest = withServerPreferences
+      .copyOf()
+      .withPreferences(clientPreferences)
+      .buildRequest();
+    var planned = refetchRentalItinerary(refetchService, planRequest);
+    var id = itineraryId(planned, Map.of(ItineraryImpl.ROUTE_REQUEST_CONTEXT_KEY, planRequest));
+
+    Object result = SUBJECT.refetchItinerary().get(
+      environment(
+        id,
+        refetchService,
+        RentalRefetchTestModel.TRANSIT_ENV.transitService(),
+        RouteRequest.defaultValue(),
+        Locale.ENGLISH
+      )
+    );
+
+    var refetched = itineraryOf(result);
+    assertEquals(planned.toStr(), refetched.toStr());
+    assertTrue(
+      refetched
+        .legs()
+        .stream()
+        .anyMatch(
+          leg -> leg instanceof StreetLeg streetLeg && streetLeg.getMode() == rentedVehicle
+        ),
+      refetched.toStr()
+    );
+    assertEquals(id, itineraryId(refetched, localContextOf(result)));
+    // The client's preferences matter: with the server's, the itinerary would be a different one
+    var withoutClientPreferences = refetchRentalItinerary(refetchService, withServerPreferences);
+    assertNotEquals(planned.toStr(), withoutClientPreferences.toStr());
+  }
+
+  /**
+   * Like planConnection, a refetch uses live rental availability for a trip planned for now. The
+   * server default does not, so the refetch has to override it.
+   */
+  @Test
+  void usesLiveRentalAvailabilityForATripPlannedForNow() throws Exception {
+    var departure = ZonedDateTime.now(TIME_ZONE).plusHours(1);
+    var envBuilder = TransitTestEnvironment.of(departure.toLocalDate(), TIME_ZONE);
+    var stopA = envBuilder.stop("A");
+    var stopB = envBuilder.stop("B");
+    var departureTime = departure.toLocalTime().toSecondOfDay();
+    var transitEnv = envBuilder
+      .addTrip(
+        TripInput.of("tripNow")
+          .addStop(stopA, TimeUtils.timeToStrLong(departureTime))
+          .addStop(stopB, TimeUtils.timeToStrLong(departureTime + 600))
+      )
+      .build();
+    var tripData = transitEnv.tripData("tripNow");
+    var legRef = new ScheduledTransitLegReference(
+      tripData.trip().getId(),
+      departure.toLocalDate(),
+      0,
+      1,
+      stopA.getId(),
+      stopB.getId(),
+      null
+    );
+
+    var routeRequest = rentalRefetchRouteRequest(
+      legRef,
+      itineraryRefetchService(transitEnv),
+      transitEnv.transitService(),
+      false
+    );
+
+    assertTrue(routeRequest.preferences().bike().rental().useAvailabilityInformation());
+    assertTrue(routeRequest.preferences().car().rental().useAvailabilityInformation());
+    assertTrue(routeRequest.preferences().scooter().rental().useAvailabilityInformation());
+  }
+
+  /**
+   * For a trip later on, the vehicles available now say little about the ones available then. The
+   * server default uses them, so the refetch has to override it.
+   */
+  @Test
+  void doesNotUseLiveRentalAvailabilityForATripLaterOn() throws Exception {
+    var routeRequest = rentalRefetchRouteRequest(
+      legRef(),
+      itineraryRefetchService(),
+      TRANSIT_ENV.transitService(),
+      true
+    );
+
+    assertFalse(routeRequest.preferences().bike().rental().useAvailabilityInformation());
+    assertFalse(routeRequest.preferences().car().rental().useAvailabilityInformation());
+    assertFalse(routeRequest.preferences().scooter().rental().useAvailabilityInformation());
   }
 
   /**
@@ -134,7 +248,6 @@ class QueryTypeImplRefetchItineraryTest {
    * the {@code locale} put into the local context before it falls back to {@code Accept-Language}.
    */
   @Test
-  @SuppressWarnings("unchecked")
   void refetchedItineraryUsesTheLocaleOfTheRefetchRequest() throws Exception {
     var refetchService = itineraryRefetchService();
     var serverDefault = routeRequest()
@@ -149,12 +262,10 @@ class QueryTypeImplRefetchItineraryTest {
     var id = ItineraryReferenceSerializer.encode(reference);
 
     Object result = SUBJECT.refetchItinerary().get(
-      environment(id, refetchService, serverDefault, Locale.GERMAN)
+      environment(id, refetchService, TRANSIT_ENV.transitService(), serverDefault, Locale.GERMAN)
     );
 
-    Map<String, ?> localContext = (Map<String, ?>) (
-      (DataFetcherResult<?>) result
-    ).getLocalContext();
+    var localContext = localContextOf(result);
     assertThat(localContext).containsEntry("locale", Locale.GERMAN);
     var routeRequest = (RouteRequest) localContext.get(ItineraryImpl.ROUTE_REQUEST_CONTEXT_KEY);
     assertEquals(Locale.GERMAN, routeRequest.preferences().locale());
@@ -183,7 +294,10 @@ class QueryTypeImplRefetchItineraryTest {
       -1,
       2.0,
       1.0,
-      false
+      false,
+      null,
+      null,
+      null
     );
     var id = ItineraryReferenceSerializer.encode(reference);
 
@@ -192,6 +306,108 @@ class QueryTypeImplRefetchItineraryTest {
     );
 
     assertNull(itinerary);
+  }
+
+  /**
+   * The client's preferences for each rental mode, each one different from the server's in a way
+   * that changes the itinerary, but still rents a vehicle of the mode.
+   */
+  private static Stream<Arguments> clientRentalPreferences() {
+    return Stream.of(
+      Arguments.of(
+        StreetMode.BIKE_RENTAL,
+        TraverseMode.BICYCLE,
+        (Consumer<RoutingPreferencesBuilder>) p -> p.withBike(bike -> bike.withSpeed(10))
+      ),
+      Arguments.of(
+        StreetMode.CAR_RENTAL,
+        TraverseMode.CAR,
+        (Consumer<RoutingPreferencesBuilder>) p ->
+          p.withCar(car -> car.withRental(r -> r.withBannedNetworks(Set.of(NETWORK))))
+      ),
+      Arguments.of(
+        StreetMode.SCOOTER_RENTAL,
+        TraverseMode.SCOOTER,
+        (Consumer<RoutingPreferencesBuilder>) p -> p.withScooter(scooter -> scooter.withSpeed(10))
+      )
+    );
+  }
+
+  private static Itinerary refetchRentalItinerary(
+    ItineraryRefetchService refetchService,
+    RouteRequest request
+  ) {
+    return refetchService.refetchItinerary(
+      RentalRefetchTestModel.ORIGIN,
+      RentalRefetchTestModel.DESTINATION,
+      List.of(RentalRefetchTestModel.legRef()),
+      request
+    );
+  }
+
+  /**
+   * Refetches the itinerary of {@code legRef}, planned with bike rental access and egress, and
+   * returns the route request the refetch used. The server default sets
+   * {@code serverUsesAvailability}, so a test can show that the refetch overrides it.
+   */
+  private static RouteRequest rentalRefetchRouteRequest(
+    ScheduledTransitLegReference legRef,
+    ItineraryRefetchService refetchService,
+    TransitService transitService,
+    boolean serverUsesAvailability
+  ) throws Exception {
+    var planRequest = RouteRequest.of()
+      .withFrom(GenericLocation.fromStopId(legRef.fromStopId()))
+      .withTo(GenericLocation.fromStopId(legRef.toStopId()))
+      .withJourney(journey ->
+        journey
+          .withAccess(new StreetRequest(StreetMode.BIKE_RENTAL))
+          .withEgress(new StreetRequest(StreetMode.BIKE_RENTAL))
+      )
+      .buildRequest();
+    var reference = ItineraryReferenceMapper.toItineraryReference(
+      refetchService.refetchItinerary(null, null, List.of(legRef), planRequest),
+      planRequest
+    );
+    var serverDefault = RouteRequest.defaultValue()
+      .copyOf()
+      .withPreferences(p ->
+        p
+          .withBike(b ->
+            b.withRental(r -> r.withUseAvailabilityInformation(serverUsesAvailability))
+          )
+          .withCar(c -> c.withRental(r -> r.withUseAvailabilityInformation(serverUsesAvailability)))
+          .withScooter(s ->
+            s.withRental(r -> r.withUseAvailabilityInformation(serverUsesAvailability))
+          )
+      )
+      .buildDefault();
+
+    Object result = SUBJECT.refetchItinerary().get(
+      environment(reference.encode(), refetchService, transitService, serverDefault, Locale.ENGLISH)
+    );
+
+    return (RouteRequest) localContextOf(result).get(ItineraryImpl.ROUTE_REQUEST_CONTEXT_KEY);
+  }
+
+  private static String itineraryId(Itinerary itinerary, Map<String, ?> localContext)
+    throws Exception {
+    return IMPL_FOR_ID.itineraryId().get(
+      DataFetchingEnvironmentImpl.newDataFetchingEnvironment(executionContext())
+        .source(itinerary)
+        .localContext(localContext)
+        .build()
+    );
+  }
+
+  @SuppressWarnings("unchecked")
+  private static Itinerary itineraryOf(Object dataFetcherResult) {
+    return ((DataFetcherResult<Itinerary>) dataFetcherResult).getData();
+  }
+
+  @SuppressWarnings("unchecked")
+  private static Map<String, ?> localContextOf(Object dataFetcherResult) {
+    return (Map<String, ?>) ((DataFetcherResult<?>) dataFetcherResult).getLocalContext();
   }
 
   private ScheduledTransitLegReference legRef() {
@@ -209,6 +425,12 @@ class QueryTypeImplRefetchItineraryTest {
   }
 
   private static ItineraryRefetchService itineraryRefetchService() {
+    return itineraryRefetchService(TRANSIT_ENV);
+  }
+
+  private static ItineraryRefetchService itineraryRefetchService(
+    TransitTestEnvironment transitEnv
+  ) {
     var vertexCreationService = new VertexCreationService(
       new VertexLinker(
         GRAPH,
@@ -221,11 +443,11 @@ class QueryTypeImplRefetchItineraryTest {
     var linkingContextFactory = new LinkingContextFactory(
       GRAPH,
       vertexCreationService,
-      new TransitServiceResolver(TRANSIT_ENV.transitService())
+      new TransitServiceResolver(transitEnv.transitService())
     );
     return new ItineraryRefetchService(
       GRAPH,
-      TRANSIT_ENV.transitService(),
+      transitEnv.transitService(),
       new TransitAlertServiceImpl(),
       FixedRegularTransfers.of().snapshot(),
       null,
@@ -250,6 +472,7 @@ class QueryTypeImplRefetchItineraryTest {
     return environment(
       id,
       itineraryRefetchService,
+      TRANSIT_ENV.transitService(),
       defaultRouteRequest,
       defaultRouteRequest.preferences().locale()
     );
@@ -258,6 +481,7 @@ class QueryTypeImplRefetchItineraryTest {
   private static DataFetchingEnvironment environment(
     String id,
     ItineraryRefetchService itineraryRefetchService,
+    TransitService transitService,
     RouteRequest defaultRouteRequest,
     Locale requestLocale
   ) {
@@ -267,8 +491,8 @@ class QueryTypeImplRefetchItineraryTest {
       .context(
         new TestGtfsGraphQLRequestContext(
           null,
-          null,
-          null,
+          transitService,
+          new TransitAlertServiceImpl(),
           null,
           null,
           null,

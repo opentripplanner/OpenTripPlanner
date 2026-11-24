@@ -10,6 +10,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.plan.legreference.ScheduledTransitLegReference;
@@ -62,6 +63,44 @@ class ItineraryReferenceTest {
     assertThat(reference(List.of(LEG), 1.3).toString()).contains("walkSpeed: 1.3");
   }
 
+  /** Without them, a refetch would quietly use the server's preferences for the rental mode. */
+  @Test
+  void rentalModeRequiresItsPreferences() {
+    assertThrows(IllegalArgumentException.class, () ->
+      carRentalEgress(StreetMode.CAR_RENTAL, null)
+    );
+  }
+
+  @Test
+  void rentalPreferencesRequireTheirRentalMode() {
+    var car = new CarRentalPreferences(2.0, new RentalNetworks(Set.of(), Set.of()));
+
+    assertThrows(IllegalArgumentException.class, () -> carRentalEgress(StreetMode.WALK, car));
+  }
+
+  private static ItineraryReference carRentalEgress(
+    StreetMode egressMode,
+    CarRentalPreferences car
+  ) {
+    return new ItineraryReference(
+      List.of(LEG),
+      null,
+      null,
+      StreetMode.WALK,
+      egressMode,
+      StreetMode.WALK,
+      Duration.ZERO,
+      Duration.ZERO,
+      1.3,
+      2.0,
+      1.0,
+      false,
+      null,
+      car,
+      null
+    );
+  }
+
   private static ItineraryReference reference(List<LegReference> legs, double walkSpeed) {
     return new ItineraryReference(
       legs,
@@ -75,7 +114,10 @@ class ItineraryReferenceTest {
       walkSpeed,
       2.0,
       1.0,
-      false
+      false,
+      null,
+      null,
+      null
     );
   }
 }

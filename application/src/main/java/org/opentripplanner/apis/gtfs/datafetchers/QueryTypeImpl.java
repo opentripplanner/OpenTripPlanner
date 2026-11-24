@@ -402,12 +402,16 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
       try {
         // The id holds no locale, so names use the language of this request, like leg(id:).
         var locale = environment.getLocale();
+        var isTripPlannedForNow = isTripPlannedForNow(reference, context);
         var routeRequest = ItineraryReferenceMapper.toRouteRequest(
           reference,
           context.defaultRouteRequest()
         )
           .copyOf()
-          .withPreferences(preferences -> preferences.withLocale(locale))
+          .withPreferences(preferences -> {
+            preferences.withLocale(locale);
+            RouteRequestMapper.setRentalAvailabilityPreferences(preferences, isTripPlannedForNow);
+          })
           .buildRequest();
         var itinerary = context
           .itineraryRefetchService()
@@ -1096,6 +1100,28 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
         )
       )
       .build();
+  }
+
+  /**
+   * Like planConnection, a refetch uses live rental availability only for a trip planned for now.
+   * The id holds no time, and the start of the itinerary is only known once the access is found, so
+   * the current departure time of the first transit leg is used instead. This only matters for a
+   * rental access or egress, so the leg, which the refetch looks up again, is only looked up then.
+   */
+  private static boolean isTripPlannedForNow(
+    ItineraryReference reference,
+    GtfsGraphQLRequestContext context
+  ) {
+    if (!reference.accessMode().includesRenting() && !reference.egressMode().includesRenting()) {
+      return false;
+    }
+    var firstLeg = reference
+      .legReferences()
+      .getFirst()
+      .getLeg(context.transitService(), context.transitAlertService());
+    return (
+      firstLeg != null && RouteRequest.isAPIGtfsTripPlannedForNow(firstLeg.startTime().toInstant())
+    );
   }
 
   /// Parse a string as a feed scoped id and apply a mapping function to the id.

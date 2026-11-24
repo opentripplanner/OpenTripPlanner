@@ -1,0 +1,29 @@
+{
+  planConnection(
+    origin: {
+      location: { coordinate: { latitude: 45.5552, longitude: -122.6534 } }
+    }
+    destination: {
+      location: { coordinate: { latitude: 45.4908, longitude: -122.5519 } }
+    }
+    modes: {
+      transit: {
+        access: [BICYCLE_RENTAL, WALK]
+        transfer: [WALK]
+        egress: [SCOOTER_RENTAL, WALK]
+      }
+    }
+    preferences: {
+      street: {
+        bicycle: { speed: 6.5, rental: { bannedNetworks: ["foo"] } }
+        scooter: { reluctance: 2.5, rental: { allowedNetworks: ["bar"] } }
+      }
+    }
+  ) {
+    edges {
+      node {
+        itineraryId
+      }
+    }
+  }
+}

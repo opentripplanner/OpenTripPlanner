@@ -25,6 +25,9 @@ import org.opentripplanner.utils.time.DurationUtils;
  * <p>
  * Street modes are stored as plain strings, not with {@code addEnum()}. See {@link Token#getEnum}
  * for why.
+ * <p>
+ * Version 2 adds the preferences of the rental modes used for access and egress. A version 1
+ * token holds none, as only walking was supported then.
  */
 public class ItineraryReferenceSerializer {
 
@@ -45,6 +48,9 @@ public class ItineraryReferenceSerializer {
   private static final String WALK_RELUCTANCE_FIELD = "walkReluctance";
   private static final String WALK_SAFETY_FACTOR_FIELD = "walkSafetyFactor";
   private static final String WHEELCHAIR_FIELD = "wheelchair";
+  private static final String BIKE_FIELD = "bike";
+  private static final String CAR_FIELD = "car";
+  private static final String SCOOTER_FIELD = "scooter";
 
   private static final TokenSchema SCHEMA = TokenSchema.ofVersion(1)
     .addString(LEG_REFERENCES_FIELD)
@@ -63,6 +69,10 @@ public class ItineraryReferenceSerializer {
     .addString(WALK_RELUCTANCE_FIELD)
     .addString(WALK_SAFETY_FACTOR_FIELD)
     .addBoolean(WHEELCHAIR_FIELD)
+    .newVersion()
+    .addString(BIKE_FIELD)
+    .addString(CAR_FIELD)
+    .addString(SCOOTER_FIELD)
     .build();
 
   /** private constructor to prevent instantiating this utility class */
@@ -91,7 +101,10 @@ public class ItineraryReferenceSerializer {
       .withString(WALK_SPEED_FIELD, Double.toString(ref.walkSpeed()))
       .withString(WALK_RELUCTANCE_FIELD, Double.toString(ref.walkReluctance()))
       .withString(WALK_SAFETY_FACTOR_FIELD, Double.toString(ref.walkSafetyFactor()))
-      .withBoolean(WHEELCHAIR_FIELD, ref.wheelchair());
+      .withBoolean(WHEELCHAIR_FIELD, ref.wheelchair())
+      .withString(BIKE_FIELD, RentalPreferencesSerializer.encodeBike(ref.bikeRental()))
+      .withString(CAR_FIELD, RentalPreferencesSerializer.encodeCar(ref.carRental()))
+      .withString(SCOOTER_FIELD, RentalPreferencesSerializer.encodeScooter(ref.scooterRental()));
 
     withLocation(builder, FROM_STOP_ID_FIELD, FROM_LAT_FIELD, FROM_LON_FIELD, ref.from());
     withLocation(builder, TO_STOP_ID_FIELD, TO_LAT_FIELD, TO_LON_FIELD, ref.to());
@@ -146,6 +159,24 @@ public class ItineraryReferenceSerializer {
 
       var wheelchair = token.getBoolean(WHEELCHAIR_FIELD).orElseThrow();
 
+      BikeRentalPreferences bikeRental = null;
+      CarRentalPreferences carRental = null;
+      ScooterRentalPreferences scooterRental = null;
+      if (token.version() >= 2) {
+        bikeRental = token
+          .getString(BIKE_FIELD)
+          .map(RentalPreferencesSerializer::decodeBike)
+          .orElse(null);
+        carRental = token
+          .getString(CAR_FIELD)
+          .map(RentalPreferencesSerializer::decodeCar)
+          .orElse(null);
+        scooterRental = token
+          .getString(SCOOTER_FIELD)
+          .map(RentalPreferencesSerializer::decodeScooter)
+          .orElse(null);
+      }
+
       return new ItineraryReference(
         legReferences,
         from,
@@ -158,7 +189,10 @@ public class ItineraryReferenceSerializer {
         walkSpeed,
         walkReluctance,
         walkSafetyFactor,
-        wheelchair
+        wheelchair,
+        bikeRental,
+        carRental,
+        scooterRental
       );
     } catch (RuntimeException e) {
       return null;
@@ -166,7 +200,7 @@ public class ItineraryReferenceSerializer {
   }
 
   /** Like {@link Double#parseDouble}, but rejects {@code NaN} and infinity. */
-  private static double finiteDouble(String value) {
+  static double finiteDouble(String value) {
     double result = Double.parseDouble(value);
     if (!Double.isFinite(result)) {
       throw new IllegalArgumentException("Expected a finite number");
