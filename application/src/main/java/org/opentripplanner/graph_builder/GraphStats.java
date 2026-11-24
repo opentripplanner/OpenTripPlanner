@@ -28,6 +28,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.jackson.core.JacksonException;
+import tools.jackson.core.StreamWriteFeature;
 import tools.jackson.databind.ObjectWriter;
 import tools.jackson.databind.SequenceWriter;
 import tools.jackson.dataformat.csv.CsvMapper;
@@ -106,25 +107,28 @@ public class GraphStats {
     timetableDataImport = serializedGraphObject.timetableDataImport;
 
     /* open output stream (same for all commands) */
-    if (outPath != null) {
-      try {
-        writer = CSV_WRITER.writeValues(new File(outPath));
-      } catch (Exception e) {
-        LOG.error("Exception while opening output file " + outPath);
-        return;
-      }
-    } else {
-      writer = CSV_WRITER.writeValues(System.out);
+    SequenceWriter output;
+    try {
+      output =
+        outPath != null
+          ? CSV_WRITER.writeValues(new File(outPath))
+          : CSV_WRITER.without(StreamWriteFeature.AUTO_CLOSE_TARGET).writeValues(System.out);
+    } catch (JacksonException e) {
+      LOG.error("Exception while opening output file {}", outPath);
+      return;
     }
     LOG.info("done loading graph.");
 
-    String command = jc.getParsedCommand();
-    if (command.equals("endpoints")) {
-      commandEndpoints.run();
-    } else if (command.equals("patternstats")) {
-      commandPatternStats.run();
+    // Closing the writer flushes the buffered output. For System.out the stream itself is left open.
+    try (output) {
+      writer = output;
+      String command = jc.getParsedCommand();
+      if (command.equals("endpoints")) {
+        commandEndpoints.run();
+      } else if (command.equals("patternstats")) {
+        commandPatternStats.run();
+      }
     }
-    writer.close();
   }
 
   @Parameters(

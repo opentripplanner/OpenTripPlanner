@@ -42,12 +42,18 @@ public class CsvRecordReader implements AutoCloseable {
     this.records = records;
   }
 
-  /** Read UTF-8 encoded CSV from the given stream. The stream is closed by {@link #close()}. */
+  /**
+   * Read CSV from the given stream. The encoding (UTF-8, UTF-16 or UTF-32) is detected
+   * automatically. The stream is closed by {@link #close()}.
+   */
   public static CsvRecordReader of(InputStream input) {
     return new CsvRecordReader(READER.readValues(input));
   }
 
-  /** Read UTF-8 encoded CSV from the given file. */
+  /**
+   * Read CSV from the given file. The encoding (UTF-8, UTF-16 or UTF-32) is detected
+   * automatically.
+   */
   public static CsvRecordReader of(File file) {
     return new CsvRecordReader(READER.readValues(file));
   }

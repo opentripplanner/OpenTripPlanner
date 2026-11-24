@@ -9,11 +9,16 @@ import org.jspecify.annotations.Nullable;
 import org.onebusaway.csv_entities.CsvInputSource;
 import org.opentripplanner.framework.csv.CsvRecordReader;
 import org.opentripplanner.utils.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import tools.jackson.core.JacksonException;
 
 /**
  * Represent a feed id in a GTFS feed.
  */
 public class GtfsFeedIdResolver {
+
+  private static final Logger LOG = LoggerFactory.getLogger(GtfsFeedIdResolver.class);
 
   /**
    * A counter that will increase for each created feed id.
@@ -29,8 +34,8 @@ public class GtfsFeedIdResolver {
    * <p>
    * This will try to fetch the experimental feed_id field from the feed_info.txt file.
    * <p>
-   * If the feed does not contain a feed_info.txt or a feed_id field, a default GtfsFeedId will
-   * be created.
+   * If the feed does not contain a feed_info.txt or a feed_id field, or feed_info.txt can't be
+   * parsed, a default GtfsFeedId will be created.
    * <h5>THIS METHOD IS THREAD SAFE!</h5>
    * <p>
    * The generated {@code feedId}s are cached in a synchronized map and only inserted if it does
@@ -63,6 +68,12 @@ public class GtfsFeedIdResolver {
           return normalizeId(reader.get("feed_id"));
         }
       }
+      return generateId();
+    } catch (JacksonException e) {
+      LOG.warn(
+        "Unable to read the feed_id from feed_info.txt, generating a feed id instead: {}",
+        e.getOriginalMessage()
+      );
       return generateId();
     } catch (IOException e) {
       throw new RuntimeException(e);
