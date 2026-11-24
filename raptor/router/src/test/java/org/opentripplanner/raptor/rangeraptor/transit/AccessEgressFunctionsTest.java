@@ -193,19 +193,20 @@ class AccessEgressFunctionsTest implements RaptorTestConstants {
   void groupByRoundTest() {
     // Map one element
     var res = groupByRound(List.of(WALK_8_m), _ -> true);
-    assertThat(res.keys()).contains(0);
+    assertEquals(0, res.maxIndex());
     assertElements(List.of(WALK_8_m), res.get(0));
 
     // Map 4 elements into 3 groups
     res = groupByRound(List.of(WALK_8_m, FLEX_1x_8_m, FLEX_2x_8_m, FLEX_1x_10_m), _ -> true);
-    assertThat(res.keys()).contains(2, 0, 1);
+    assertEquals(2, res.maxIndex());
     assertElements(List.of(WALK_8_m), res.get(0));
     assertElements(List.of(FLEX_1x_8_m, FLEX_1x_10_m), res.get(1));
     assertElements(List.of(FLEX_2x_8_m), res.get(2));
 
     // Apply same test, but remove entries with number of rides == 1
     res = groupByRound(List.of(WALK_8_m, FLEX_1x_8_m), RaptorAccessEgress::hasRides);
-    assertThat(res.keys()).contains(1);
+    assertEquals(1, res.maxIndex());
+    assertElements(List.of(), res.get(0));
     assertElements(List.of(FLEX_1x_8_m), res.get(1));
   }
 

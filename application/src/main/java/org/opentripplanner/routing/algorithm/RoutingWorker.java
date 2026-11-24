@@ -24,9 +24,9 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.grouppriority.TransitGroupPriorityItineraryDecorator;
 import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
 import org.opentripplanner.place.api.NearbyStop;
+import org.opentripplanner.raptor.RaptorServiceFactory;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.api.request.SearchParams;
-import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 import org.opentripplanner.routing.algorithm.mapping.PagingServiceFactory;
@@ -82,7 +82,7 @@ public class RoutingWorker {
   private final TransitService transitService;
   private final TransitAlertService transitAlertService;
   private final Graph graph;
-  private final RaptorConfig<TripSchedule> raptorConfig;
+  private final RaptorServiceFactory<TripSchedule> raptorServiceFactory;
   private final MeterRegistry meterRegistry;
   private final StreetLimitationParametersService streetLimitationParametersService;
   private final VehicleRentalService vehicleRentalService;
@@ -131,7 +131,7 @@ public class RoutingWorker {
     TransitService transitService,
     TransitAlertService transitAlertService,
     Graph graph,
-    RaptorConfig<TripSchedule> raptorConfig,
+    RaptorServiceFactory<TripSchedule> raptorServiceFactory,
     MeterRegistry meterRegistry,
     StreetLimitationParametersService streetLimitationParametersService,
     VehicleRentalService vehicleRentalService,
@@ -159,7 +159,7 @@ public class RoutingWorker {
     this.transitService = transitService;
     this.transitAlertService = transitAlertService;
     this.graph = graph;
-    this.raptorConfig = raptorConfig;
+    this.raptorServiceFactory = raptorServiceFactory;
     this.meterRegistry = meterRegistry;
     this.streetLimitationParametersService = streetLimitationParametersService;
     this.vehicleRentalService = vehicleRentalService;
@@ -458,7 +458,7 @@ public class RoutingWorker {
         request,
         transitService,
         graph,
-        raptorConfig,
+        raptorServiceFactory,
         meterRegistry,
         streetDetailsService,
         transferService,

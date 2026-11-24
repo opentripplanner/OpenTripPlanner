@@ -10,6 +10,7 @@ import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
+import org.opentripplanner.raptor.util.collection.IntIndexList;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 import org.opentripplanner.raptor.util.paretoset.ParetoSet;
 import org.slf4j.Logger;
@@ -98,18 +99,22 @@ public final class AccessEgressFunctions {
    * Filter the given input keeping all elements satisfying the given include predicate and then
    * group them by number-of-rides.
    */
-  static IntObjectMap<List<RaptorAccessEgress>> groupByRound(
+  static IntIndexList<RaptorAccessEgress> groupByRound(
     Collection<RaptorAccessEgress> input,
     Predicate<RaptorAccessEgress> include
   ) {
-    return groupBy(
-      input.stream().filter(include).collect(Collectors.toList()),
-      RaptorAccessEgress::numberOfRides
-    );
+    return IntIndexList.of(input, include, RaptorAccessEgress::numberOfRides);
   }
 
   static IntObjectMap<List<RaptorAccessEgress>> groupByStop(Collection<RaptorAccessEgress> input) {
     return groupBy(input, RaptorAccessEgress::stop);
+  }
+
+  static <T extends RaptorAccessEgress> IntIndexList<T> filterOnSegment(
+    IntIndexList<T> index,
+    int segment
+  ) {
+    return index.filter(onSegment(segment));
   }
 
   static <T extends RaptorAccessEgress> IntObjectMap<List<T>> filterOnSegment(
@@ -117,30 +122,24 @@ public final class AccessEgressFunctions {
     int segment
   ) {
     IntObjectMap<List<T>> result = new IntObjectHashMap<>();
-    for (var cursor : map.keys()) {
-      int nRides = cursor.value;
-      for (var it : map.get(nRides)) {
-        if (it != null && it.numberOfViaLocationsVisited() == segment) {
-          var list = result.get(nRides);
-          if (list == null) {
-            list = new ArrayList<>();
-            result.put(nRides, list);
-          }
-          list.add(it);
-        }
+    for (var cursor : map) {
+      var list = filterOnSegment(cursor.value, segment);
+      if (!list.isEmpty()) {
+        result.put(cursor.key, list);
       }
     }
     return result;
   }
 
   static <T extends RaptorAccessEgress> List<T> filterOnSegment(List<T> list, int segment) {
-    return list
-      .stream()
-      .filter(it -> it.numberOfViaLocationsVisited() == segment)
-      .toList();
+    return list.stream().filter(onSegment(segment)).toList();
   }
 
   /* private methods */
+
+  private static <T extends RaptorAccessEgress> Predicate<T> onSegment(int segment) {
+    return it -> it.numberOfViaLocationsVisited() == segment;
+  }
 
   /**
    * Remove relevant access/egress paths. The given set of paths are grouped by stop and the

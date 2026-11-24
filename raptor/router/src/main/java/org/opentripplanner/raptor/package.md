@@ -271,10 +271,12 @@ is preserved in Raptor between routing calls.
 
 ### Configure
 
-The `RaptorConfig` is responsible for the "manual" dependency injection used to create a valid set
-of Raptor components based on the configuration passed in. The api `RaptorProfile` lists all valid
-combinations of router and state. The api `Optimization` is used to turn on/off optimizations,
-currently only the destination pruning is used.
+The `RaptorConfig` (internal, not exported from the module) is responsible for the "manual"
+dependency injection used to create a valid set of Raptor components based on the configuration
+passed in. The api `RaptorProfile` lists all valid combinations of router and state. The api
+`Optimization` is used to turn on/off optimizations, currently only the destination pruning is used.
+Code outside the Raptor module creates services through the `RaptorServiceFactory`, which hides the
+`RaptorConfig`.
 
 ### Service
 

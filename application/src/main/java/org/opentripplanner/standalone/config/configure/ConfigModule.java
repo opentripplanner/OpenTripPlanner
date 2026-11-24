@@ -3,8 +3,8 @@ package org.opentripplanner.standalone.config.configure;
 import dagger.Module;
 import dagger.Provides;
 import jakarta.inject.Singleton;
+import org.opentripplanner.raptor.RaptorServiceFactory;
 import org.opentripplanner.raptor.api.request.RaptorEnvironment;
-import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.config.BuildConfig;
@@ -49,11 +49,11 @@ public class ConfigModule {
 
   @Provides
   @Singleton
-  static RaptorConfig<TripSchedule> providesRaptorConfig(
+  static RaptorServiceFactory<TripSchedule> providesRaptorServiceFactory(
     RouterConfig routerConfig,
     RaptorEnvironment environment
   ) {
-    return new RaptorConfig<>(routerConfig.transitTuningConfig(), environment);
+    return new RaptorServiceFactory<>(routerConfig.transitTuningConfig(), environment);
   }
 
   @Provides

@@ -19,7 +19,7 @@ import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.place.api.NearbyStop;
-import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.RaptorServiceFactory;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RaptorTransitDataMapper;
@@ -384,8 +384,8 @@ public class ConstructApplication {
     return factory.config().debugUiConfig();
   }
 
-  public RaptorConfig<TripSchedule> raptorConfig() {
-    return factory.raptorConfig();
+  public RaptorServiceFactory<TripSchedule> raptorServiceFactory() {
+    return factory.raptorServiceFactory();
   }
 
   private RequestScopedFactory requestScopedFactory() {

@@ -19,10 +19,9 @@ import org.opentripplanner.ext.taxi.TaxiService;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.place.api.NearbyStop;
-import org.opentripplanner.raptor.RaptorService;
+import org.opentripplanner.raptor.RaptorServiceFactory;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.response.RaptorResponse;
-import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.raptor.extensions.extrasearch.ExtraMcRouterSearch;
 import org.opentripplanner.routing.algorithm.mapping.RaptorPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressPenaltyDecorator;
@@ -60,7 +59,7 @@ public class TransitRouter {
   private final RouteRequest request;
   private final TransitService transitService;
   private final Graph graph;
-  private final RaptorConfig<TripSchedule> raptorConfig;
+  private final RaptorServiceFactory<TripSchedule> raptorServiceFactory;
   private final MeterRegistry meterRegistry;
   private final StreetDetailsService streetDetailsService;
   private final FlexTransferService transferService;
@@ -91,7 +90,7 @@ public class TransitRouter {
     RouteRequest request,
     TransitService transitService,
     Graph graph,
-    RaptorConfig<TripSchedule> raptorConfig,
+    RaptorServiceFactory<TripSchedule> raptorServiceFactory,
     MeterRegistry meterRegistry,
     StreetDetailsService streetDetailsService,
     FlexTransferService transferService,
@@ -112,7 +111,7 @@ public class TransitRouter {
     this.request = request;
     this.transitService = transitService;
     this.graph = graph;
-    this.raptorConfig = raptorConfig;
+    this.raptorServiceFactory = raptorServiceFactory;
     this.meterRegistry = meterRegistry;
     this.streetDetailsService = streetDetailsService;
     this.transferService = transferService;
@@ -135,7 +134,7 @@ public class TransitRouter {
     RouteRequest request,
     TransitService transitService,
     Graph graph,
-    RaptorConfig<TripSchedule> raptorConfig,
+    RaptorServiceFactory<TripSchedule> raptorServiceFactory,
     MeterRegistry meterRegistry,
     StreetDetailsService streetDetailsService,
     FlexTransferService transferService,
@@ -161,7 +160,7 @@ public class TransitRouter {
       request,
       transitService,
       graph,
-      raptorConfig,
+      raptorServiceFactory,
       meterRegistry,
       streetDetailsService,
       transferService,
@@ -230,7 +229,7 @@ public class TransitRouter {
     var mapper = RaptorRequestMapper.<TripSchedule>of(
       request,
       transitSearchTimeZero,
-      raptorConfig.isMultiThreaded(),
+      raptorServiceFactory.isMultiThreaded(),
       accessEgresses.getAccesses(),
       accessEgresses.getEgresses(),
       meterRegistry,
@@ -241,7 +240,7 @@ public class TransitRouter {
     var raptorRequest = mapper.mapRaptorRequest();
 
     // Transit routing using Raptor
-    var raptorService = new RaptorService<>(raptorConfig, extraSearchForSorlandsbanen);
+    var raptorService = raptorServiceFactory.createService(extraSearchForSorlandsbanen);
     var transitResponse = raptorService.route(raptorRequest, requestTransitDataProvider);
 
     checkIfTransitConnectionExists(transitResponse);
