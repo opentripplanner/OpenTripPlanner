@@ -330,7 +330,7 @@ class ItineraryReferenceMapperTest {
    * {@code LegReferenceSerializer} only produces {@link ScheduledTransitLegReference} today, but
    * {@code toRouteRequest}'s board/alight-stop fallback must not assume that holds for every
    * possible {@link org.opentripplanner.model.plan.legreference.LegReference} - a mismatch has to
-   * make the {@code itinerary(id:)} query result {@code null}, not cause a
+   * make the {@code refetchItinerary(id:)} query result {@code null}, not cause a
    * {@link ClassCastException}.
    */
   @Test

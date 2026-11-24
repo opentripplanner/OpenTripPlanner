@@ -318,7 +318,7 @@ class ItineraryReferenceSerializerTest {
   }
 
   /**
-   * A single {@code itinerary(id:)} call does a lookup, and possibly a transfer street search,
+   * A single {@code refetchItinerary(id:)} call does a lookup, and possibly a transfer street search,
    * per leg reference - an id with an unbounded number of them lets a client make one call do an
    * unbounded amount of work - see {@link ItineraryReference#MAX_LEG_REFERENCES}.
    */

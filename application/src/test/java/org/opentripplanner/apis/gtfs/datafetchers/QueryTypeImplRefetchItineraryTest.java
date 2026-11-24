@@ -41,12 +41,12 @@ import org.opentripplanner.transit.service.TransitServiceResolver;
 import org.opentripplanner.transit.transfer.regular.FixedRegularTransfers;
 
 /**
- * Focused test for {@link QueryTypeImpl#itinerary}, the GTFS API's single-id refetch query
+ * Focused test for {@link QueryTypeImpl#refetchItinerary}, the GTFS API's single-id refetch query
  * (#7878). Delegates entirely to the shared
  * {@link org.opentripplanner.routing.refetch.ItineraryReferenceMapper}/
  * {@link ItineraryRefetchService} core - see {@link ItineraryImplTest} for id exposure.
  */
-class QueryTypeImplItineraryTest {
+class QueryTypeImplRefetchItineraryTest {
 
   private static final LocalDate SERVICE_DATE = LocalDate.of(2020, 3, 3);
   private static final TransitTestEnvironmentBuilder ENV_BUILDER = TransitTestEnvironment.of(
@@ -85,7 +85,7 @@ class QueryTypeImplItineraryTest {
     );
     var id = ItineraryReferenceSerializer.encode(reference);
 
-    Object result = SUBJECT.itinerary().get(environment(id, refetchService, routeRequest));
+    Object result = SUBJECT.refetchItinerary().get(environment(id, refetchService, routeRequest));
 
     assertEquals("A ~ BUS tripX 10:00 11:00 ~ B []", itineraryOf(result).toStr());
   }
@@ -107,7 +107,7 @@ class QueryTypeImplItineraryTest {
     );
     var id = ItineraryReferenceSerializer.encode(reference);
 
-    Object result = SUBJECT.itinerary().get(environment(id, refetchService, routeRequest));
+    Object result = SUBJECT.refetchItinerary().get(environment(id, refetchService, routeRequest));
 
     Map<String, ?> localContext = (Map<String, ?>) (
       (DataFetcherResult<?>) result
@@ -148,7 +148,7 @@ class QueryTypeImplItineraryTest {
     );
     var id = ItineraryReferenceSerializer.encode(reference);
 
-    Object result = SUBJECT.itinerary().get(
+    Object result = SUBJECT.refetchItinerary().get(
       environment(id, refetchService, serverDefault, Locale.GERMAN)
     );
 
@@ -162,7 +162,7 @@ class QueryTypeImplItineraryTest {
 
   @Test
   void invalidIdReturnsNull() throws Exception {
-    var itinerary = SUBJECT.itinerary().get(
+    var itinerary = SUBJECT.refetchItinerary().get(
       environment("this-is-not-a-valid-id", itineraryRefetchService(), routeRequest())
     );
 
@@ -187,7 +187,7 @@ class QueryTypeImplItineraryTest {
     );
     var id = ItineraryReferenceSerializer.encode(reference);
 
-    var itinerary = SUBJECT.itinerary().get(
+    var itinerary = SUBJECT.refetchItinerary().get(
       environment(id, itineraryRefetchService(), routeRequest())
     );
 

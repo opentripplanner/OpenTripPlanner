@@ -391,10 +391,10 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
 
   @Override
   @SuppressWarnings("unchecked")
-  public DataFetcher<Itinerary> itinerary() {
+  public DataFetcher<Itinerary> refetchItinerary() {
     DataFetcher<?> fetcher = environment -> {
       GtfsGraphQLRequestContext context = environment.<GtfsGraphQLRequestContext>getContext();
-      var args = new GraphQLTypes.GraphQLQueryTypeItineraryArgs(environment.getArguments());
+      var args = new GraphQLTypes.GraphQLQueryTypeRefetchItineraryArgs(environment.getArguments());
       var reference = ItineraryReference.decode(args.getGraphQLId());
       if (reference == null) {
         return null;
