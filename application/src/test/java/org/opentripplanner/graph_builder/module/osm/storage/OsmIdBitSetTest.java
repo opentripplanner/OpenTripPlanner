@@ -71,4 +71,58 @@ class OsmIdBitSetTest {
     assertTrue(subject.contains(1_000_000_000_000L));
     assertFalse(subject.contains(6));
   }
+
+  /**
+   * JOSM-edited OSM files contain negative ids. They map to word indices of 2^57 and above, so
+   * they must not collide with positive ids.
+   */
+  @Test
+  void negativeIds() {
+    var subject = new OsmIdBitSet();
+    subject.add(-1);
+    subject.add(-64);
+    subject.add(-12_345_678_901L);
+
+    assertTrue(subject.contains(-1));
+    assertTrue(subject.contains(-64));
+    assertTrue(subject.contains(-12_345_678_901L));
+
+    assertFalse(subject.contains(-2));
+    assertFalse(subject.contains(-63));
+    assertFalse(subject.contains(-65));
+    assertFalse(subject.contains(-12_345_678_900L));
+    assertFalse(subject.contains(1));
+    assertFalse(subject.contains(63));
+    assertFalse(subject.contains(64));
+    assertFalse(subject.contains(12_345_678_901L));
+  }
+
+  @Test
+  void adjacentIdsAcrossZero() {
+    var subject = new OsmIdBitSet();
+    subject.add(-1);
+    assertTrue(subject.contains(-1));
+    assertFalse(subject.contains(0));
+
+    subject.add(0);
+    assertTrue(subject.contains(-1));
+    assertTrue(subject.contains(0));
+    assertFalse(subject.contains(1));
+    assertFalse(subject.contains(-2));
+  }
+
+  @Test
+  void extremeIds() {
+    var subject = new OsmIdBitSet();
+    subject.add(Long.MIN_VALUE);
+    subject.add(Long.MAX_VALUE);
+
+    assertTrue(subject.contains(Long.MIN_VALUE));
+    assertTrue(subject.contains(Long.MAX_VALUE));
+
+    assertFalse(subject.contains(Long.MIN_VALUE + 1));
+    assertFalse(subject.contains(Long.MAX_VALUE - 1));
+    assertFalse(subject.contains(0));
+    assertFalse(subject.contains(-1));
+  }
 }
