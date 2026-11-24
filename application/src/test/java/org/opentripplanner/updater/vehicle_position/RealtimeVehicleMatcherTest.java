@@ -160,6 +160,50 @@ public class RealtimeVehicleMatcherTest {
   }
 
   @Test
+  @DisplayName(
+    "current_stop_sequence maps through the realtime timetable when it differs from scheduled"
+  )
+  void matchStopSequenceFromRealtimeTimetable() {
+    var repository = new DefaultRealtimeVehicleRepository();
+    var trip = TransitRepositoryForTest.trip(tripId).build();
+    var scheduledStopTimes = List.of(
+      testModel.stopTime(trip, 1),
+      testModel.stopTime(trip, 2),
+      testModel.stopTime(trip, 3)
+    );
+    var realtimeStopTimes = List.of(
+      testModel.stopTime(trip, 10, scheduledStopTimes.get(0).getStop()),
+      testModel.stopTime(trip, 20, scheduledStopTimes.get(1).getStop()),
+      testModel.stopTime(trip, 30, scheduledStopTimes.get(2).getStop())
+    );
+    var pattern = tripPattern(trip, scheduledStopTimes);
+    var realtimeTimetable = Timetable.of()
+      .withTripPattern(pattern)
+      .addTripTimes(TripTimesFactory.tripTimes(trip, realtimeStopTimes, new Deduplicator()))
+      .build();
+
+    var matcher = matcher(
+      ignored -> trip,
+      ignored -> pattern,
+      repository,
+      (ignoredPattern, ignoredDate) -> realtimeTimetable
+    );
+
+    var pos = VehiclePosition.newBuilder()
+      .setTrip(TripDescriptor.newBuilder().setTripId(tripId).build())
+      .setCurrentStopSequence(20)
+      .build();
+
+    var result = matcher.applyRealtimeVehicleUpdates(List.of(pos));
+
+    assertEquals(1, result.successful());
+    assertEquals(
+      "F:stop-2",
+      vehicles(repository, pattern).get(0).stop().orElseThrow().stop().getId().toString()
+    );
+  }
+
+  @Test
   public void sequenceId() {
     var repository = new DefaultRealtimeVehicleRepository();
 
@@ -544,13 +588,13 @@ public class RealtimeVehicleMatcherTest {
     return new RealtimeVehiclePatternMatcher(
       TransitRepositoryForTest.FEED_ID,
       tripForId,
+      getTimetable,
       (trip, ignored) -> patternForTrip.apply(trip),
       ignored -> Set.of(),
       repository,
       zoneId,
       null,
-      FEATURES,
-      getTimetable
+      FEATURES
     );
   }
 

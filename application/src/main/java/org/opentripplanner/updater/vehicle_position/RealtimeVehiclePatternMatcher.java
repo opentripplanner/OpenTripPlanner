@@ -68,9 +68,9 @@ class RealtimeVehiclePatternMatcher {
   private final ZoneId timeZoneId;
 
   private final Function<FeedScopedId, Trip> getTripForId;
-  private final BiFunction<Trip, LocalDate, TripPattern> getRealtimePattern;
   /** Timetable for a pattern on a service date, including realtime extra journeys. */
   private final BiFunction<TripPattern, LocalDate, Timetable> getTimetable;
+  private final BiFunction<Trip, LocalDate, TripPattern> getRealtimePattern;
   private final GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
   private final Set<VehiclePositionsUpdaterConfig.VehiclePositionFeature> vehiclePositionFeatures;
   private final Function<FeedScopedId, Set<LocalDate>> getServiceDatesForServiceId;
@@ -78,18 +78,18 @@ class RealtimeVehiclePatternMatcher {
   public RealtimeVehiclePatternMatcher(
     String feedId,
     Function<FeedScopedId, Trip> getTripForId,
+    BiFunction<TripPattern, LocalDate, Timetable> getTimetable,
     BiFunction<Trip, LocalDate, TripPattern> getRealtimePattern,
     Function<FeedScopedId, Set<LocalDate>> getServiceDatesForServiceId,
     RealtimeVehicleRepository repository,
     ZoneId timeZoneId,
     GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher,
-    Set<VehiclePositionsUpdaterConfig.VehiclePositionFeature> vehiclePositionFeatures,
-    BiFunction<TripPattern, LocalDate, Timetable> getTimetable
+    Set<VehiclePositionsUpdaterConfig.VehiclePositionFeature> vehiclePositionFeatures
   ) {
     this.feedId = feedId;
     this.getTripForId = getTripForId;
-    this.getRealtimePattern = getRealtimePattern;
     this.getTimetable = getTimetable;
+    this.getRealtimePattern = getRealtimePattern;
     this.repository = repository;
     this.timeZoneId = timeZoneId;
     this.fuzzyTripMatcher = fuzzyTripMatcher;
@@ -385,8 +385,9 @@ class RealtimeVehiclePatternMatcher {
       throw UpdateException.of(scopedTripId, NO_SERVICE_ON_DATE);
     }
 
-    // resolve() is the realtime overlay (scheduled underneath if there is no update), so extra
-    // journeys and REPLACEMENT stop_sequence maps are found on the same timetable.
+    // timetable is required to map GTFS-RT stop_sequence from an update back to a stop.
+    // getTimetable.apply returns either a real-time timetable, if one exists, or a scheduled
+    // timetable. Real-time timetable is required for added or replacement trips.
     var timetable = getTimetable.apply(pattern, serviceDate);
     var tripTimes = timetable.getTripTimes(trip);
 

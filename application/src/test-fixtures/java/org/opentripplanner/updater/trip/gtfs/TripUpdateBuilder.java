@@ -95,24 +95,6 @@ public class TripUpdateBuilder {
     );
   }
 
-  public TripUpdateBuilder addStopTime(String stopId, String time, int stopSequence) {
-    return addStopTime(
-      stopId,
-      time,
-      time,
-      stopSequence,
-      NO_DELAY,
-      NO_DELAY,
-      DEFAULT_SCHEDULE_RELATIONSHIP,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
-    );
-  }
-
   public TripUpdateBuilder addStopTime(String stopId, String time, String headsign) {
     return addStopTime(
       stopId,
