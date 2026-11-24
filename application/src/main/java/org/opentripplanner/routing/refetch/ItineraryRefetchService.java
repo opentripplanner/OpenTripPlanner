@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
 import org.opentripplanner.core.model.basic.Cost;
@@ -20,12 +21,14 @@ import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.plan.legreference.ScheduledTransitLegReference;
 import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.routing.algorithm.mapping.StreetPathToLegsMapper;
+import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.via.ViaLocation;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
+import org.opentripplanner.service.vehiclerental.GeofencingZoneService;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.TemporaryVerticesContainer;
 import org.opentripplanner.street.model.StreetMode;
@@ -34,6 +37,7 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
+import org.opentripplanner.street.search.request.StreetSearchRequestBuilder;
 import org.opentripplanner.street.search.state.EdgeTraverser;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
@@ -61,6 +65,7 @@ public class ItineraryRefetchService {
   private final LinkingContextFactory linkingContextFactory;
   private final StreetPathToLegsMapper streetPathToLegsMapper;
   private final StreetLimitationParametersService streetLimitationParametersService;
+  private final GeofencingZoneService geofencingZoneService;
 
   public ItineraryRefetchService(
     Graph graph,
@@ -69,7 +74,8 @@ public class ItineraryRefetchService {
     RegularTransferRepositorySnapshot<NearbyStop, RouteRequest> regularTransfers,
     StreetDetailsService streetDetailsService,
     LinkingContextFactory linkingContextFactory,
-    StreetLimitationParametersService streetLimitationParametersService
+    StreetLimitationParametersService streetLimitationParametersService,
+    GeofencingZoneService geofencingZoneService
   ) {
     this.constrainedTransferService = transitService.getConstrainedTransferService();
     this.transitService = transitService;
@@ -84,6 +90,7 @@ public class ItineraryRefetchService {
       graph.ellipsoidToGeoidDifference
     );
     this.streetLimitationParametersService = streetLimitationParametersService;
+    this.geofencingZoneService = geofencingZoneService;
   }
 
   /// Refetch an itinerary
@@ -185,7 +192,6 @@ public class ItineraryRefetchService {
 
     var legs = new ArrayList<Leg>();
     if (fromVertices != null) {
-      var mode = routeRequest.journey().access().mode();
       var firstLeg = transitLegs.getFirst();
       var firstStop = findVertex(firstLeg.from());
       var boardSlack = routeRequest.preferences().transit().boardSlack().valueOf(firstLeg.mode());
@@ -194,11 +200,10 @@ public class ItineraryRefetchService {
         fromVertices,
         Set.of(firstStop),
         routeRequest,
-        mode,
-        time,
-        true
+        AccessEgressType.ACCESS,
+        time
       ).orElseThrow(() -> new ItineraryRefetchException("Could not calculate access"));
-      legs.addAll(access);
+      legs.addAll(streetPathToLegs(access));
     }
 
     ConstrainedTransfer prevLegConstrainedTransfer = null;
@@ -271,8 +276,8 @@ public class ItineraryRefetchService {
     }
     legs.add(lastTransitLeg);
 
+    boolean arrivedAtDestinationWithRentedVehicle = false;
     if (toVertices != null) {
-      var mode = routeRequest.journey().egress().mode();
       var lastLeg = transitLegs.getLast();
       var lastStop = findVertex(lastLeg.to());
       var alightSlack = routeRequest.preferences().transit().alightSlack().valueOf(lastLeg.mode());
@@ -281,15 +286,16 @@ public class ItineraryRefetchService {
         Set.of(lastStop),
         toVertices,
         routeRequest,
-        mode,
-        time,
-        false
+        AccessEgressType.EGRESS,
+        time
       ).orElseThrow(() -> new ItineraryRefetchException("Could not calculate egress"));
-      legs.addAll(egress);
+      legs.addAll(streetPathToLegs(egress));
+      arrivedAtDestinationWithRentedVehicle = egress.lastState().isRentingVehicleFromStation();
     }
     return Itinerary.ofScheduledTransit(legs)
       // We don't try to calculate a cost for the refetched itinerary.
       .withGeneralizedCost(Cost.ZERO)
+      .withArrivedAtDestinationWithRentedVehicle(arrivedAtDestinationWithRentedVehicle)
       .build();
   }
 
@@ -301,38 +307,30 @@ public class ItineraryRefetchService {
     );
   }
 
-  private Optional<List<Leg>> accessEgress(
+  /// The access is searched backwards from the first boarding stop, so it arrives in time to board.
+  /// The egress is searched forwards from the last alighting stop.
+  private Optional<StreetPath> accessEgress(
     Set<Vertex> fromVertices,
     Set<Vertex> toVertices,
     RouteRequest routeRequest,
-    StreetMode streetMode,
-    Instant time,
-    boolean arriveBy
+    AccessEgressType type,
+    Instant time
   ) {
-    var search = createStreetSearch(
-      fromVertices,
-      toVertices,
-      routeRequest,
-      streetMode,
-      time,
-      arriveBy
-    );
+    var search = createStreetSearch(fromVertices, toVertices, routeRequest, type, time);
 
-    return search
-      .getPathsToTarget()
-      .stream()
-      .min(Comparator.comparing(StreetPath::weight))
-      .map(this::streetPathToLegs);
+    return search.getPathsToTarget().stream().min(Comparator.comparing(StreetPath::weight));
   }
 
   private StreetSearchBuilder createStreetSearch(
     Set<Vertex> fromVertices,
     Set<Vertex> toVertices,
     RouteRequest routeRequest,
-    StreetMode streetMode,
-    Instant time,
-    boolean arriveBy
+    AccessEgressType type,
+    Instant time
   ) {
+    var streetMode = type.isAccess()
+      ? routeRequest.journey().access().mode()
+      : routeRequest.journey().egress().mode();
     var maxDuration = routeRequest
       .preferences()
       .street()
@@ -343,17 +341,42 @@ public class ItineraryRefetchService {
     var streetSearchRequest = StreetSearchRequestMapper.map(routeRequest)
       .withMode(streetMode)
       .withStartTime(time)
-      .withArriveBy(arriveBy)
-      .build();
+      .withArriveBy(type.isAccess());
+    if (type.isAccess()) {
+      applyAccessRentalRules(streetSearchRequest, streetMode, toVertices);
+    }
 
     return StreetSearchBuilder.of()
       .withPreStartHook(OTPRequestTimeoutException::checkForTimeout)
       .withHeuristic(new EuclideanRemainingWeightHeuristic(streetLimitationParametersService))
       .withSkipEdgeStrategy(new DurationSkipEdgeStrategy<>(maxDuration))
       .withDominanceFunction(new DominanceFunctions.MinimumWeight())
-      .withRequest(streetSearchRequest)
+      .withRequest(streetSearchRequest.build())
       .withFrom(fromVertices)
       .withTo(toVertices);
+  }
+
+  /// A rented vehicle has to be dropped off before boarding: like the router, the access never
+  /// keeps it, whatever the destination policy says. The access search starts at the boarding stop,
+  /// so it also needs the geofencing zones there, or it could drop a free-floating vehicle where
+  /// that is not allowed.
+  private void applyAccessRentalRules(
+    StreetSearchRequestBuilder request,
+    StreetMode streetMode,
+    Set<Vertex> boardingStops
+  ) {
+    request
+      .withBike(b -> b.withRental(r -> r.withAllowArrivingInRentedVehicleAtDestination(false)))
+      .withCar(c -> c.withRental(r -> r.withAllowArrivingInRentedVehicleAtDestination(false)))
+      .withScooter(s -> s.withRental(r -> r.withAllowArrivingInRentedVehicleAtDestination(false)));
+
+    if (streetMode.includesRenting() && geofencingZoneService.hasIndexedZones()) {
+      var zones = boardingStops
+        .stream()
+        .flatMap(stop -> geofencingZoneService.findZonesContaining(stop.getCoordinate()).stream())
+        .collect(Collectors.toSet());
+      request.withArriveByDestinationZones(zones);
+    }
   }
 
   /// The transfer is read from the regular transfers of the request, the same path that the

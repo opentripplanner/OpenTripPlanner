@@ -149,7 +149,8 @@ public class RequestScopedModule {
     RegularTransferRepositorySnapshot<NearbyStop, RouteRequest> regularTransfers,
     StreetDetailsService streetDetailsService,
     LinkingContextFactory linkingContextFactory,
-    StreetLimitationParametersService streetLimitationParametersService
+    StreetLimitationParametersService streetLimitationParametersService,
+    VehicleRentalService vehicleRentalService
   ) {
     return new ItineraryRefetchService(
       graph,
@@ -158,7 +159,8 @@ public class RequestScopedModule {
       regularTransfers,
       streetDetailsService,
       linkingContextFactory,
-      streetLimitationParametersService
+      streetLimitationParametersService,
+      vehicleRentalService
     );
   }
 

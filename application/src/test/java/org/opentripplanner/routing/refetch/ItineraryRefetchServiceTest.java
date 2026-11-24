@@ -25,11 +25,16 @@ import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.vehiclerental.GeofencingZoneService;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
+import org.opentripplanner.service.vehiclerental.street.StreetVehicleRentalLink;
+import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
+import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.linking.VisibilityMode;
+import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
 import org.opentripplanner.street.model.edge.Edge;
@@ -498,7 +503,8 @@ public class ItineraryRefetchServiceTest {
       REGULAR_TRANSFERS,
       streetDetailsService,
       linkingContextFactory,
-      streetLimitationParametersService
+      streetLimitationParametersService,
+      GeofencingZoneService.EMPTY
     );
   }
 
@@ -626,16 +632,27 @@ public class ItineraryRefetchServiceTest {
     }
 
     public VertexRef linkStop(RegularStop stop) {
+      var streetVertex = createVertex();
+      // The stop vertex is placed at its street vertex, not at the coordinate of the stop: the
+      // spatial index fills every cell in the envelope of an edge, and the stop is far away.
       var stopV = TransitStopVertex.of()
         .withId(stop.getId())
-        .withCoordinate(stop.getCoordinate())
+        .withCoordinate(streetVertex.toWgsCoordinate())
         .build();
-      var streetVertex = createVertex();
       BoardingLocationToStopLink.createBoardingLocationToStopLink(stopV, streetVertex);
       BoardingLocationToStopLink.createBoardingLocationToStopLink(streetVertex, stopV);
       var v = new VertexRef(this, streetVertex);
       graph.addVertex(stopV);
       return v;
+    }
+
+    /// Adds a rental station or a free-floating rental vehicle at {@code at}.
+    public void rentalPlace(VertexRef at, VehicleRentalPlace place, RentalFormFactor formFactor) {
+      var placeVertex = new VehicleRentalPlaceVertex(place);
+      VehicleRentalEdge.createVehicleRentalEdge(placeVertex, formFactor);
+      StreetVehicleRentalLink.createStreetVehicleRentalLink(at.vertex, placeVertex);
+      StreetVehicleRentalLink.createStreetVehicleRentalLink(placeVertex, at.vertex);
+      graph.addVertex(placeVertex);
     }
 
     private EdgeRef street(VertexRef from, VertexRef to) {

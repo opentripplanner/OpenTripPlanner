@@ -230,7 +230,8 @@ class QueryTypeImplRefetchItineraryTest {
       FixedRegularTransfers.of().snapshot(),
       null,
       linkingContextFactory,
-      StreetLimitationParametersService.DEFAULT
+      StreetLimitationParametersService.DEFAULT,
+      GeofencingZoneService.EMPTY
     );
   }
 

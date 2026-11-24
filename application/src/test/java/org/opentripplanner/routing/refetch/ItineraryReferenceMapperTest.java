@@ -394,7 +394,8 @@ class ItineraryReferenceMapperTest {
       FixedRegularTransfers.of().snapshot(),
       null,
       linkingContextFactory,
-      StreetLimitationParametersService.DEFAULT
+      StreetLimitationParametersService.DEFAULT,
+      GeofencingZoneService.EMPTY
     );
   }
 

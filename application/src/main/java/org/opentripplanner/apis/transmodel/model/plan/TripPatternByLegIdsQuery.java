@@ -264,7 +264,8 @@ public class TripPatternByLegIdsQuery {
       ctx.regularTransfers(),
       ctx.streetDetailsService(),
       ctx.linkingContextFactory(),
-      ctx.streetLimitationParametersService()
+      ctx.streetLimitationParametersService(),
+      ctx.vehicleRentalService()
     );
 
     try {

@@ -498,7 +498,8 @@ class RealtimeResolverTest {
       REGULAR_TRANSFERS,
       streetDetailsService,
       linkingContextFactory,
-      streetLimitationParametersService
+      streetLimitationParametersService,
+      GeofencingZoneService.EMPTY
     );
   }
 }
