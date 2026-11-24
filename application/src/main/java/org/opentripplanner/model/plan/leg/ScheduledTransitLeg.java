@@ -309,7 +309,7 @@ public class ScheduledTransitLeg implements TransitLeg {
   }
 
   /**
-   * The leg geometry is built lazily by concatenating the trip pattern's hop geometries between the
+   * The leg geometry is built lazily by concatenating the trip pattern's hop shapes between the
    * board and alight stops. It is not cached: each call recomputes it.
    */
   @Override

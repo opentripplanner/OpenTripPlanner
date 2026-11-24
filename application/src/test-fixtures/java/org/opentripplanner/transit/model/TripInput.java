@@ -55,7 +55,7 @@ public class TripInput {
   private String netexInternalPlanningCode;
 
   @Nullable
-  private List<LineString> hopGeometries;
+  private List<LineString> hopShapes;
 
   private final boolean isFlex;
 
@@ -135,8 +135,8 @@ public class TripInput {
    * the stops.
    */
   @Nullable
-  public List<LineString> hopGeometries() {
-    return hopGeometries;
+  public List<LineString> hopShapes() {
+    return hopShapes;
   }
 
   public TripInput addStop(RegularStop stop, String arrivalTime, String departureTime) {
@@ -237,12 +237,12 @@ public class TripInput {
    * Set the geometries of the hops between the stops of the trip, which are used for the trip
    * pattern. There must be one geometry for each hop, so one fewer than the number of stops.
    * <p>
-   * Trips share a pattern only if they have the same stops, route and hop geometries. So if the
+   * Trips share a pattern only if they have the same stops, route and hop shapes. So if the
    * geometries are set for only one of several trips with the same stops, that trip gets its own
    * pattern.
    */
-  public TripInput withHopGeometries(LineString... hopGeometries) {
-    this.hopGeometries = List.of(hopGeometries);
+  public TripInput withHopShapes(LineString... hopShapes) {
+    this.hopShapes = List.of(hopShapes);
     return this;
   }
 

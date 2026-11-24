@@ -6,7 +6,7 @@ import org.opentripplanner.service.shape.model.CompactLineStringSequence;
 /**
  * A read-only, request-scoped view over a {@link ShapeRepositorySnapshot}: the scheduled shapes
  * imported at graph build time, overridden by the shapes of real-time patterns. It serves the
- * trip pattern shape: the geometry of each hop between two consecutive stops and the cumulative
+ * trip pattern shape: the shape of each hop between two consecutive stops and the cumulative
  * distance along the pattern.
  * <p>
  * For patterns built without shape data (GTFS without {@code shapes.txt}, NeTEx without ServiceLink
@@ -18,7 +18,7 @@ import org.opentripplanner.service.shape.model.CompactLineStringSequence;
  */
 public interface ShapeService {
   /**
-   * The shape of the trip pattern: one hop geometry for each pair of consecutive stops and the
+   * The shape of the trip pattern: one hop shape for each pair of consecutive stops and the
    * cumulative distance table. The code that builds scheduled transit legs resolves the shape of
    * the leg's pattern from this service and gives it to the leg.
    *

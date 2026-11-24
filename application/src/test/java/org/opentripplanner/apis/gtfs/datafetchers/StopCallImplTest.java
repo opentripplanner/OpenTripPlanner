@@ -162,7 +162,7 @@ class StopCallImplTest {
           .addStop(stopC1, "12:20:00", "12:20:00")
           .addStop(stopX, "12:30:00", "12:30:00")
           // Bent hops can be told apart from the straight lines of hops without a scheduled shape
-          .withHopGeometries(
+          .withHopShapes(
             bentLine(STOP_A, STOP_B),
             bentLine(STOP_B, stopC1),
             bentLine(stopC1, stopX)

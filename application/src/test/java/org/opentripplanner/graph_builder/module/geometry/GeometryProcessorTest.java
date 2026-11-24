@@ -281,7 +281,7 @@ class GeometryProcessorTest {
     builder.getShapePoints().put(SHAPE_ID, shapePoints);
 
     var processor = new GeometryProcessor(builder, 150, 0.0, NOOP);
-    var linestrings = processor.createHopGeometries(trip);
+    var linestrings = processor.createHopShapes(trip);
 
     assertLineStringWithinTolerance(expected, linestrings);
   }
@@ -314,7 +314,7 @@ class GeometryProcessorTest {
       );
 
     var processor = new GeometryProcessor(builder, 150, 0.0, NOOP);
-    var linestrings = processor.createHopGeometries(trip);
+    var linestrings = processor.createHopShapes(trip);
     var expected = List.of(
       // the bus has to call at the return because of the shape distance traveled
       makeLineString(0, 0, 0, 0.2, 0, 0.1),
@@ -337,7 +337,7 @@ class GeometryProcessorTest {
     builder.getStopTimesSortedByTrip().put(trip, stopTimes);
 
     var processor = new GeometryProcessor(builder, 150, 0.0, NOOP);
-    var linestrings = processor.createHopGeometries(trip);
+    var linestrings = processor.createHopShapes(trip);
 
     assertLineStringWithinTolerance(
       List.of(makeLineString(0, 0, 0, 0.1), makeLineString(0, 0.1, 0, 0.2)),
@@ -360,7 +360,7 @@ class GeometryProcessorTest {
     builder.getStopTimesSortedByTrip().put(trip, stopTimes);
 
     var processor = new GeometryProcessor(builder, 150, 0.0, issueStore);
-    var linestrings = processor.createHopGeometries(trip);
+    var linestrings = processor.createHopShapes(trip);
 
     assertThat(linestrings).hasSize(2);
 

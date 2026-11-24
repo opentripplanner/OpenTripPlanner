@@ -46,7 +46,7 @@ class RealTimeTripShapeFactoryTest {
   );
 
   @Test
-  void hopGeometryForReplacementPattern() {
+  void hopShapeForReplacementPattern() {
     var pattern = TripPattern.of(id("replacement"))
       .withRoute(ROUTE)
       .withStopPattern(TransitRepositoryForTest.stopPattern(STOP_A, STOP_B, STOP_X, STOP_Y))

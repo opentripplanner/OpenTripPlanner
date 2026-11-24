@@ -22,7 +22,7 @@ import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
  * Exercises {@link TripShapeFactory} and the resulting {@link CompactLineStringSequence} (the
- * per-pattern hop geometries + cumulative distance table).
+ * per-pattern hop shapes + cumulative distance table).
  */
 class TripShapeFactoryTest {
 
@@ -51,7 +51,7 @@ class TripShapeFactoryTest {
   }
 
   @Test
-  void distanceBetweenWithHopGeometriesMatchesHaversineWithinOneMeter() {
+  void distanceBetweenWithHopShapesMatchesHaversineWithinOneMeter() {
     var subject = TripShapeFactory.fromLineStrings(HOP_GEOMETRIES, NOOP);
 
     assertEquals(0, subject.distanceBetween(0, 0));
@@ -72,7 +72,7 @@ class TripShapeFactoryTest {
   }
 
   @Test
-  void distanceBetweenFallsBackToStraightLineWhenHopGeometriesAreNull() {
+  void distanceBetweenFallsBackToStraightLineWhenHopShapesAreNull() {
     var subject = TripShapeFactory.straightLines(
       TransitRepositoryForTest.stopPattern(STOP_A, STOP_B, STOP_C),
       NOOP
@@ -123,7 +123,7 @@ class TripShapeFactoryTest {
   }
 
   @Test
-  void hopGeometryReturnsCompressedRoundTrip() {
+  void hopShapeReturnsCompressedRoundTrip() {
     var subject = TripShapeFactory.fromLineStrings(HOP_GEOMETRIES, NOOP);
 
     LineString hop0 = subject.get(0);
@@ -140,7 +140,7 @@ class TripShapeFactoryTest {
   }
 
   @Test
-  void hopGeometrySynthesizesStraightLineWhenHopGeometriesAreNull() {
+  void hopShapeSynthesizesStraightLineWhenHopShapesAreNull() {
     var subject = TripShapeFactory.straightLines(
       TransitRepositoryForTest.stopPattern(STOP_A, STOP_B, STOP_C),
       NOOP
@@ -221,7 +221,7 @@ class TripShapeFactoryTest {
   }
 
   @Test
-  void factoryAcceptsEmptyHopGeometries() {
+  void factoryAcceptsEmptyHopShapes() {
     // A non-null but empty list must be treated the same as the single-stop degenerate case:
     // factory succeeds, distanceBetween(0,0) is zero, concatenate(0, size) returns an empty
     // (non-null) LineString because there are no hops to concatenate.

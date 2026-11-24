@@ -47,7 +47,7 @@ public class RealTimeTripShapeFactory {
       return TripShapeFactory.straightLines(pattern.getStopPattern(), deduplicator);
     }
     return TripShapeFactory.fromLineStrings(
-      generateHopGeometriesFromOriginalTripPatternShape(
+      generateHopShapesFromOriginalTripPatternShape(
         pattern.getStopPattern(),
         original.getStopPattern(),
         originalTripPatternShape
@@ -61,21 +61,21 @@ public class RealTimeTripShapeFactory {
    * then preserved up until the first mismatching stop, and a straight line is used for all
    * segments after that.
    */
-  private static List<LineString> generateHopGeometriesFromOriginalTripPatternShape(
+  private static List<LineString> generateHopShapesFromOriginalTripPatternShape(
     StopPattern stopPattern,
     StopPattern originalStopPattern,
     CompactLineStringSequence originalTripPatternShape
   ) {
-    List<LineString> hopGeometries = new ArrayList<>();
+    List<LineString> hopShapes = new ArrayList<>();
 
     for (int i = 0; i < stopPattern.getSize() - 1; i++) {
-      LineString hopGeometry =
+      LineString hopShape =
         i < originalStopPattern.getSize() - 1 ? originalTripPatternShape.get(i) : null;
 
-      if (hopGeometry != null && stopPattern.sameStops(originalStopPattern, i)) {
-        // Copy hop geometry from previous pattern
-        hopGeometries.add(hopGeometry);
-      } else if (hopGeometry != null && stopPattern.sameStations(originalStopPattern, i)) {
+      if (hopShape != null && stopPattern.sameStops(originalStopPattern, i)) {
+        // Copy hop shape from previous pattern
+        hopShapes.add(hopShape);
+      } else if (hopShape != null && stopPattern.sameStations(originalStopPattern, i)) {
         // Use old geometry but patch first and last point with new stops
         var newStart = stopPattern.getStop(i).getCoordinate().asJtsCoordinate();
         var newEnd = stopPattern
@@ -83,14 +83,14 @@ public class RealTimeTripShapeFactory {
           .getCoordinate()
           .asJtsCoordinate();
 
-        Coordinate[] coordinates = hopGeometry.getCoordinates();
+        Coordinate[] coordinates = hopShape.getCoordinates();
         coordinates[0].setCoordinate(newStart);
         coordinates[coordinates.length - 1].setCoordinate(newEnd);
 
-        hopGeometries.add(GeometryUtils.getGeometryFactory().createLineString(coordinates));
+        hopShapes.add(GeometryUtils.getGeometryFactory().createLineString(coordinates));
       } else {
         // Create new straight-line geometry for hop
-        hopGeometries.add(
+        hopShapes.add(
           GeometryUtils.getGeometryFactory().createLineString(new Coordinate[] {
             stopPattern.getStop(i).getCoordinate().asJtsCoordinate(),
             stopPattern
@@ -101,6 +101,6 @@ public class RealTimeTripShapeFactory {
         );
       }
     }
-    return hopGeometries;
+    return hopShapes;
   }
 }

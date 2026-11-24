@@ -202,7 +202,7 @@ public class TransitRepositoryTestBuilder {
 
     var stopTimes = tripInput.stopTimes(trip);
     var stopPattern = stopPattern(stopTimes);
-    var patternKey = new TripPatternKey(stopPattern, route, tripInput.hopGeometries());
+    var patternKey = new TripPatternKey(stopPattern, route, tripInput.hopShapes());
     var tripPattern = getOrCreateTripPattern(patternKey);
 
     var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, null);
@@ -264,12 +264,12 @@ public class TransitRepositoryTestBuilder {
     return newPattern;
   }
 
-  void setHopGeometryShapes(ShapeDataImport shapeDataImport) {
+  void setHopShapes(ShapeDataImport shapeDataImport) {
     tripPatterns.forEach((key, pattern) -> {
-      if (key.hopGeometries() != null) {
+      if (key.hopShapes() != null) {
         shapeDataImport.setTripPatternShape(
           pattern,
-          TripShapeFactory.fromLineStrings(key.hopGeometries(), DeduplicatorService.NOOP)
+          TripShapeFactory.fromLineStrings(key.hopShapes(), DeduplicatorService.NOOP)
         );
       }
     });
@@ -310,12 +310,12 @@ public class TransitRepositoryTestBuilder {
     return builder.build();
   }
 
-  // We use route, stopPattern and hop geometries as key for tripPattern. This isn't enough in
+  // We use route, stopPattern and hop shapes as key for tripPattern. This isn't enough in
   // general so we can extend it to more attributes from the trip pattern as needed.
   private record TripPatternKey(
     StopPattern stopPattern,
     Route route,
-    @Nullable List<LineString> hopGeometries
+    @Nullable List<LineString> hopShapes
   ) {}
 
   private record ServiceCode(List<LocalDate> serviceDates, FeedScopedId id) {}

@@ -46,7 +46,7 @@ public class TransitTestEnvironmentBuilder {
     var shapeDataImport = ShapeTestFactory.shapeDataImport(
       scheduledTimetableData.getAllTripPatterns()
     );
-    timetable.setHopGeometryShapes(shapeDataImport);
+    timetable.setHopShapes(shapeDataImport);
     return new TransitTestEnvironment(
       transitRepository,
       scheduledTimetableData,

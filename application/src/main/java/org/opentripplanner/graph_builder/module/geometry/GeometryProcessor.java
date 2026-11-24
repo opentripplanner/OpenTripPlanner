@@ -34,7 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This module creates hop geometries from GTFS shapes.
+ * This module creates hop shapes from GTFS shapes.
  *
  * <p>
  * THREAD SAFETY The computation runs in parallel so be careful about thread safety when
@@ -70,7 +70,7 @@ public class GeometryProcessor {
   }
 
   /**
-   * Generate the per-hop geometry for the trip. The returned list is never null and always contains
+   * Generate the hop shapes for the trip. The returned list is never null and always contains
    * one entry per hop ({@code stopTimes.size() - 1}). When the trip has no usable shape data, the
    * hops fall back to straight lines between consecutive stops, mirroring the NeTEx
    * {@link org.opentripplanner.netex.mapping.ServiceLinkMapper} behaviour. Assumes that there are
@@ -80,7 +80,7 @@ public class GeometryProcessor {
    * needed for this are concurrent implementations and therefore threadsafe but the issue store,
    * the graph, the TransitDataImport and others are not.
    */
-  public List<LineString> createHopGeometries(Trip trip) {
+  public List<LineString> createHopShapes(Trip trip) {
     List<StopTime> stopTimes = builder.getStopTimesSortedByTrip().get(trip);
     if (
       trip.getShapeId() == null ||
@@ -88,7 +88,7 @@ public class GeometryProcessor {
       trip.getShapeId().getId().isEmpty()
     ) {
       // a straight line between two stops has no interior points to simplify away
-      return Arrays.asList(createStraightLineHopGeometries(stopTimes));
+      return Arrays.asList(createStraightLineHopShapes(stopTimes));
     }
     LineString[] geometry = createGeometry(trip.getShapeId(), stopTimes);
 
@@ -111,7 +111,7 @@ public class GeometryProcessor {
    * Creates a set of geometries for a single trip, considering the GTFS shapes.txt, The geometry is
    * broken down into one geometry per inter-stop segment ("hop"). We also need a shape for the
    * entire trip and tripPattern, but given the complexity of the existing code for generating hop
-   * geometries, we will create the full-trip geometry by simply concatenating the hop geometries.
+   * geometries, we will create the full-trip geometry by simply concatenating the hop shapes.
    * <p>
    * This geometry will in fact be used for an entire set of trips in a trip pattern. Technically
    * one of the trips with exactly the same sequence of stops could follow a different route on the
@@ -120,7 +120,7 @@ public class GeometryProcessor {
   private LineString[] createGeometry(FeedScopedId shapeId, List<StopTime> stopTimes) {
     if (hasShapeDist(shapeId, stopTimes)) {
       // this trip has shape_dist in stop_times
-      LineString[] geometries = getHopGeometriesViaShapeDistTravelled(stopTimes, shapeId);
+      LineString[] geometries = getHopShapesViaShapeDistTravelled(stopTimes, shapeId);
       if (geometries != null) {
         return geometries;
       }
@@ -137,7 +137,7 @@ public class GeometryProcessor {
         stopTimes.get(0).getTrip().getId(),
         shapeId
       );
-      return createStraightLineHopGeometries(stopTimes);
+      return createStraightLineHopShapes(stopTimes);
     }
 
     List<LinearLocation> locations = getLinearLocations(stopTimes, shapeLineString);
@@ -146,7 +146,7 @@ public class GeometryProcessor {
       // their stop sequence. So we'll fall back to trivial stop-to-stop
       // linking, even though theoretically we could do better.
       issueStore.add(new ShapeGeometryTooFar(stopTimes.get(0).getTrip().getId(), shapeId));
-      return createStraightLineHopGeometries(stopTimes);
+      return createStraightLineHopShapes(stopTimes);
     }
 
     return getGeometriesByShape(stopTimes, shapeId, shapeLineString, locations);
@@ -283,7 +283,7 @@ public class GeometryProcessor {
     return getStopLocations(possibleSegmentsForStop, stopTimes);
   }
 
-  private LineString[] createStraightLineHopGeometries(List<StopTime> stopTimes) {
+  private LineString[] createStraightLineHopShapes(List<StopTime> stopTimes) {
     LineString[] geoms = new LineString[stopTimes.size() - 1];
     StopTime st0;
     for (int i = 0; i < stopTimes.size() - 1; ++i) {
@@ -295,7 +295,7 @@ public class GeometryProcessor {
     return geoms;
   }
 
-  private LineString[] getHopGeometriesViaShapeDistTravelled(
+  private LineString[] getHopShapesViaShapeDistTravelled(
     List<StopTime> stopTimes,
     FeedScopedId shapeId
   ) {
@@ -304,7 +304,7 @@ public class GeometryProcessor {
     for (int i = 0; i < stopTimes.size() - 1; ++i) {
       st0 = stopTimes.get(i);
       StopTime st1 = stopTimes.get(i + 1);
-      geoms[i] = getHopGeometryViaShapeDistTraveled(shapeId, st0, st1);
+      geoms[i] = getHopShapeViaShapeDistTraveled(shapeId, st0, st1);
       if (geoms[i] == null) {
         return null;
       }
@@ -401,7 +401,7 @@ public class GeometryProcessor {
     return locations;
   }
 
-  private LineString getHopGeometryViaShapeDistTraveled(
+  private LineString getHopShapeViaShapeDistTraveled(
     FeedScopedId shapeId,
     StopTime st0,
     StopTime st1

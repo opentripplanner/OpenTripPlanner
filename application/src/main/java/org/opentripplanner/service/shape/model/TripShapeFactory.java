@@ -10,7 +10,7 @@ import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.network.StopPattern;
 
 /**
- * Builds a {@link CompactLineStringSequence}, i.e. the per-hop geometries of a trip pattern and the
+ * Builds a {@link CompactLineStringSequence}, i.e. the hop shapes of a trip pattern and the
  * cumulative arc-length table, from plain geometry input. Identical hops (and identical cumulative
  * tables) are deduplicated through the {@link DeduplicatorService}, so they share one instance.
  * <p>
@@ -23,18 +23,18 @@ public final class TripShapeFactory {
   private TripShapeFactory() {}
 
   /**
-   * Build a sequence from explicit hop geometries (e.g. from GTFS shapes). Each hop's length is
+   * Build a sequence from explicit hop shapes (e.g. from GTFS shapes). Each hop's length is
    * the sum of the distances between its consecutive coordinates, see
    * {@link GeometryUtils#sumDistances}.
    */
   public static CompactLineStringSequence fromLineStrings(
-    List<LineString> hopGeometries,
+    List<LineString> hopShapes,
     DeduplicatorService deduplicator
   ) {
-    double[] cumulativeMetersDouble = new double[hopGeometries.size() + 1];
-    ArrayList<CompactLineString> hops = new ArrayList<CompactLineString>(hopGeometries.size());
-    for (int i = 0; i < hopGeometries.size(); i++) {
-      LineString hop = hopGeometries.get(i);
+    double[] cumulativeMetersDouble = new double[hopShapes.size() + 1];
+    ArrayList<CompactLineString> hops = new ArrayList<CompactLineString>(hopShapes.size());
+    for (int i = 0; i < hopShapes.size(); i++) {
+      LineString hop = hopShapes.get(i);
       cumulativeMetersDouble[i + 1] =
         cumulativeMetersDouble[i] + GeometryUtils.sumDistances(hop.getCoordinateSequence());
       hops.add(deduplicator.deduplicateObject(CompactLineString.class, CompactLineString.of(hop)));

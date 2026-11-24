@@ -188,7 +188,7 @@ public class GenerateTripPatternsOperation {
       .withMode(trip.getMode())
       .withNetexSubmode(trip.getNetexSubMode());
     CompactLineStringSequence tripPatternShape = TripShapeFactory.fromLineStrings(
-      geometryProcessor.createHopGeometries(trip),
+      geometryProcessor.createHopShapes(trip),
       deduplicator
     );
     shapesByTripPattern.put(patternId, tripPatternShape);
