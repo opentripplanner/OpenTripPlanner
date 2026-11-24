@@ -65,7 +65,7 @@ import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.refetch.ItineraryReferenceMapper;
-import org.opentripplanner.routing.refetch.RefetchItineraryException;
+import org.opentripplanner.routing.refetch.ItineraryRefetchException;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
@@ -391,10 +391,10 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
 
   @Override
   @SuppressWarnings("unchecked")
-  public DataFetcher<Itinerary> itinerary() {
+  public DataFetcher<Itinerary> refetchItinerary() {
     DataFetcher<?> fetcher = environment -> {
       GtfsGraphQLRequestContext context = environment.<GtfsGraphQLRequestContext>getContext();
-      var args = new GraphQLTypes.GraphQLQueryTypeItineraryArgs(environment.getArguments());
+      var args = new GraphQLTypes.GraphQLQueryTypeRefetchItineraryArgs(environment.getArguments());
       var reference = ItineraryReference.decode(args.getGraphQLId());
       if (reference == null) {
         return null;
@@ -402,15 +402,19 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
       try {
         // The id holds no locale, so names use the language of this request, like leg(id:).
         var locale = environment.getLocale();
+        var isTripPlannedForNow = isTripPlannedForNow(reference, context);
         var routeRequest = ItineraryReferenceMapper.toRouteRequest(
           reference,
           context.defaultRouteRequest()
         )
           .copyOf()
-          .withPreferences(preferences -> preferences.withLocale(locale))
+          .withPreferences(preferences -> {
+            preferences.withLocale(locale);
+            RouteRequestMapper.setRentalAvailabilityPreferences(preferences, isTripPlannedForNow);
+          })
           .buildRequest();
         var itinerary = context
-          .refetchItineraryService()
+          .itineraryRefetchService()
           .refetchItinerary(
             reference.from(),
             reference.to(),
@@ -423,7 +427,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
             Map.of("locale", locale, ItineraryImpl.ROUTE_REQUEST_CONTEXT_KEY, routeRequest)
           )
           .build();
-      } catch (RefetchItineraryException e) {
+      } catch (ItineraryRefetchException e) {
         return null;
       }
     };
@@ -1096,6 +1100,28 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
         )
       )
       .build();
+  }
+
+  /**
+   * Like planConnection, a refetch uses live rental availability only for a trip planned for now.
+   * The id holds no time, and the start of the itinerary is only known once the access is found, so
+   * the current departure time of the first transit leg is used instead. This only matters for a
+   * rental access or egress, so the leg, which the refetch looks up again, is only looked up then.
+   */
+  private static boolean isTripPlannedForNow(
+    ItineraryReference reference,
+    GtfsGraphQLRequestContext context
+  ) {
+    if (!reference.accessMode().includesRenting() && !reference.egressMode().includesRenting()) {
+      return false;
+    }
+    var firstLeg = reference
+      .legReferences()
+      .getFirst()
+      .getLeg(context.transitService(), context.transitAlertService());
+    return (
+      firstLeg != null && RouteRequest.isAPIGtfsTripPlannedForNow(firstLeg.startTime().toInstant())
+    );
   }
 
   /// Parse a string as a feed scoped id and apply a mapping function to the id.

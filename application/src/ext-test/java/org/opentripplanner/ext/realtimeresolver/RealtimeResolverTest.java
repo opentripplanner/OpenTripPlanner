@@ -4,8 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.routing.refetch.RefetchItineraryServiceTest.createRegularTransfers;
-import static org.opentripplanner.routing.refetch.RefetchItineraryServiceTest.staySeated;
+import static org.opentripplanner.routing.refetch.ItineraryRefetchServiceTest.createRegularTransfers;
+import static org.opentripplanner.routing.refetch.ItineraryRefetchServiceTest.staySeated;
 
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
@@ -27,8 +27,8 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
-import org.opentripplanner.routing.refetch.RefetchItineraryService;
-import org.opentripplanner.routing.refetch.RefetchItineraryServiceTest;
+import org.opentripplanner.routing.refetch.ItineraryRefetchService;
+import org.opentripplanner.routing.refetch.ItineraryRefetchServiceTest;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.vehiclerental.GeofencingZoneService;
@@ -106,15 +106,15 @@ class RealtimeResolverTest {
     );
 
   // Setup street
-  private static final RefetchItineraryServiceTest.GraphBuilder G =
-    RefetchItineraryServiceTest.GraphBuilder.of();
+  private static final ItineraryRefetchServiceTest.GraphBuilder G =
+    ItineraryRefetchServiceTest.GraphBuilder.of();
 
-  private static final RefetchItineraryServiceTest.VertexRef V1 = G.vertex();
-  private static final RefetchItineraryServiceTest.VertexRef VA = G.linkStop(STOP_A);
-  private static final RefetchItineraryServiceTest.VertexRef VB = G.linkStop(STOP_B);
-  private static final RefetchItineraryServiceTest.VertexRef VC = G.linkStop(STOP_C);
-  private static final RefetchItineraryServiceTest.VertexRef VD = G.linkStop(STOP_D);
-  private static final RefetchItineraryServiceTest.VertexRef V2 = G.vertex();
+  private static final ItineraryRefetchServiceTest.VertexRef V1 = G.vertex();
+  private static final ItineraryRefetchServiceTest.VertexRef VA = G.linkStop(STOP_A);
+  private static final ItineraryRefetchServiceTest.VertexRef VB = G.linkStop(STOP_B);
+  private static final ItineraryRefetchServiceTest.VertexRef VC = G.linkStop(STOP_C);
+  private static final ItineraryRefetchServiceTest.VertexRef VD = G.linkStop(STOP_D);
+  private static final ItineraryRefetchServiceTest.VertexRef V2 = G.vertex();
 
   static {
     V1.street(VA).meters(10);
@@ -447,7 +447,7 @@ class RealtimeResolverTest {
       .build();
   }
 
-  private RefetchItineraryService createRefetchService(
+  private ItineraryRefetchService createRefetchService(
     TransitAlertService transitAlertService,
     TransitTestEnvironment transitEnv
   ) {
@@ -491,14 +491,15 @@ class RealtimeResolverTest {
       }
     };
 
-    return new RefetchItineraryService(
+    return new ItineraryRefetchService(
       GRAPH,
       transitEnv.transitService(),
       transitAlertService,
       REGULAR_TRANSFERS,
       streetDetailsService,
       linkingContextFactory,
-      streetLimitationParametersService
+      streetLimitationParametersService,
+      GeofencingZoneService.EMPTY
     );
   }
 }

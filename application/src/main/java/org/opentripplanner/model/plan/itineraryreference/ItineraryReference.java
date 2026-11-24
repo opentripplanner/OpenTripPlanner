@@ -11,13 +11,15 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * Everything needed to refetch an itinerary later with
- * {@link org.opentripplanner.routing.refetch.RefetchItineraryService}. It is sent to clients as an
+ * {@link org.opentripplanner.routing.refetch.ItineraryRefetchService}. It is sent to clients as an
  * opaque, versioned token that does not depend on any particular API.
  * <p>
  * Not every itinerary can be referenced.
  * <p>
  * A refetch updates the same itinerary with current realtime data; it does not plan it again. So
- * the stored values are the ones used when the itinerary was planned.
+ * the stored values are the ones used when the itinerary was planned. Only preferences that a
+ * client can set are stored; the server's own settings are read again on refetch. For a rental
+ * access or egress, the preferences of that rental mode are stored as well.
  * <p>
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */
@@ -47,6 +49,15 @@ public final class ItineraryReference {
   private final double walkSafetyFactor;
   private final boolean wheelchair;
 
+  @Nullable
+  private final BikeRentalPreferences bikeRental;
+
+  @Nullable
+  private final CarRentalPreferences carRental;
+
+  @Nullable
+  private final ScooterRentalPreferences scooterRental;
+
   public ItineraryReference(
     List<LegReference> legReferences,
     @Nullable GenericLocation from,
@@ -59,7 +70,10 @@ public final class ItineraryReference {
     double walkSpeed,
     double walkReluctance,
     double walkSafetyFactor,
-    boolean wheelchair
+    boolean wheelchair,
+    @Nullable BikeRentalPreferences bikeRental,
+    @Nullable CarRentalPreferences carRental,
+    @Nullable ScooterRentalPreferences scooterRental
   ) {
     // List.copyOf() also rejects null elements and guards against a caller mutating the list
     // after construction.
@@ -78,6 +92,9 @@ public final class ItineraryReference {
     this.walkReluctance = walkReluctance;
     this.walkSafetyFactor = walkSafetyFactor;
     this.wheelchair = wheelchair;
+    this.bikeRental = requireForRentalMode(bikeRental, StreetMode.BIKE_RENTAL);
+    this.carRental = requireForRentalMode(carRental, StreetMode.CAR_RENTAL);
+    this.scooterRental = requireForRentalMode(scooterRental, StreetMode.SCOOTER_RENTAL);
   }
 
   /** The transit legs of the itinerary, in travel order. Never empty. */
@@ -142,6 +159,27 @@ public final class ItineraryReference {
     return wheelchair;
   }
 
+  /** The bike rental preferences, if the access or egress is bike rental. Otherwise {@code null}. */
+  @Nullable
+  public BikeRentalPreferences bikeRental() {
+    return bikeRental;
+  }
+
+  /** The car rental preferences, if the access or egress is car rental. Otherwise {@code null}. */
+  @Nullable
+  public CarRentalPreferences carRental() {
+    return carRental;
+  }
+
+  /**
+   * The scooter rental preferences, if the access or egress is scooter rental. Otherwise
+   * {@code null}.
+   */
+  @Nullable
+  public ScooterRentalPreferences scooterRental() {
+    return scooterRental;
+  }
+
   /** Returns this reference as an opaque token. */
   public String encode() {
     return ItineraryReferenceSerializer.encode(this);
@@ -151,6 +189,24 @@ public final class ItineraryReference {
   @Nullable
   public static ItineraryReference decode(@Nullable String itineraryReference) {
     return ItineraryReferenceSerializer.decode(itineraryReference);
+  }
+
+  /**
+   * The preferences of a rental mode are stored exactly when the access or egress uses that mode.
+   * Without them, a refetch would quietly use the server's preferences instead.
+   */
+  @Nullable
+  private <T> T requireForRentalMode(@Nullable T preferences, StreetMode rentalMode) {
+    boolean modeIsUsed = accessMode == rentalMode || egressMode == rentalMode;
+    if (modeIsUsed != (preferences != null)) {
+      throw new IllegalArgumentException(
+        "Preferences for " +
+          rentalMode +
+          " must be given exactly when the access or egress uses it: " +
+          preferences
+      );
+    }
+    return preferences;
   }
 
   @Override
@@ -174,7 +230,10 @@ public final class ItineraryReference {
       egressMode == that.egressMode &&
       transferMode == that.transferMode &&
       boardSlack.equals(that.boardSlack) &&
-      alightSlack.equals(that.alightSlack)
+      alightSlack.equals(that.alightSlack) &&
+      Objects.equals(bikeRental, that.bikeRental) &&
+      Objects.equals(carRental, that.carRental) &&
+      Objects.equals(scooterRental, that.scooterRental)
     );
   }
 
@@ -192,7 +251,10 @@ public final class ItineraryReference {
       walkSpeed,
       walkReluctance,
       walkSafetyFactor,
-      wheelchair
+      wheelchair,
+      bikeRental,
+      carRental,
+      scooterRental
     );
   }
 
@@ -211,6 +273,9 @@ public final class ItineraryReference {
       .addNum("walkReluctance", walkReluctance)
       .addNum("walkSafetyFactor", walkSafetyFactor)
       .addBool("wheelchair", wheelchair)
+      .addObj("bikeRental", bikeRental)
+      .addObj("carRental", carRental)
+      .addObj("scooterRental", scooterRental)
       .toString();
   }
 }

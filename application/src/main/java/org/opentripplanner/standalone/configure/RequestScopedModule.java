@@ -33,7 +33,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
-import org.opentripplanner.routing.refetch.RefetchItineraryService;
+import org.opentripplanner.routing.refetch.ItineraryRefetchService;
 import org.opentripplanner.routing.service.DefaultRoutingService;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
@@ -131,34 +131,36 @@ public class RequestScopedModule {
   @Nullable
   @HttpRequestScoped
   RealtimeResolver realTimeResolver(
-    RefetchItineraryService refetchItineraryService,
+    ItineraryRefetchService itineraryRefetchService,
     TransitService transitService,
     TransitAlertService transitAlertService
   ) {
     return OTPFeature.RealtimeResolver.isOn()
-      ? new RealtimeResolver(refetchItineraryService, transitService, transitAlertService)
+      ? new RealtimeResolver(itineraryRefetchService, transitService, transitAlertService)
       : null;
   }
 
   @Provides
   @HttpRequestScoped
-  static RefetchItineraryService refetchItineraryService(
+  static ItineraryRefetchService itineraryRefetchService(
     Graph graph,
     TransitService transitService,
     TransitAlertService transitAlertService,
     RegularTransferRepositorySnapshot<NearbyStop, RouteRequest> regularTransfers,
     StreetDetailsService streetDetailsService,
     LinkingContextFactory linkingContextFactory,
-    StreetLimitationParametersService streetLimitationParametersService
+    StreetLimitationParametersService streetLimitationParametersService,
+    VehicleRentalService vehicleRentalService
   ) {
-    return new RefetchItineraryService(
+    return new ItineraryRefetchService(
       graph,
       transitService,
       transitAlertService,
       regularTransfers,
       streetDetailsService,
       linkingContextFactory,
-      streetLimitationParametersService
+      streetLimitationParametersService,
+      vehicleRentalService
     );
   }
 

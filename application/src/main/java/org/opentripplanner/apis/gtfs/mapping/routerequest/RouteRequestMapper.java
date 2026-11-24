@@ -155,7 +155,12 @@ public class RouteRequestMapper {
     preferences.withWalk(walk -> setWalkPreferences(walk, args.getGraphQLWalk()));
   }
 
-  private static void setRentalAvailabilityPreferences(
+  /**
+   * Live rental availability is only used for a trip planned for now, see
+   * {@link RouteRequest#isAPIGtfsTripPlannedForNow}. For a trip later on, the vehicles that are
+   * available now say little about the ones available then.
+   */
+  public static void setRentalAvailabilityPreferences(
     RoutingPreferencesBuilder preferences,
     boolean isTripPlannedForNow
   ) {

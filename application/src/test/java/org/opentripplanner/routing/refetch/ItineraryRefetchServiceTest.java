@@ -25,11 +25,16 @@ import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.vehiclerental.GeofencingZoneService;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
+import org.opentripplanner.service.vehiclerental.street.StreetVehicleRentalLink;
+import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
+import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.linking.VisibilityMode;
+import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
 import org.opentripplanner.street.model.edge.Edge;
@@ -51,7 +56,7 @@ import org.opentripplanner.transit.transfer.regular.FixedRegularTransfers;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 import org.opentripplanner.updater.trip.gtfs.GtfsRtTestHelper;
 
-public class RefetchItineraryServiceTest {
+public class ItineraryRefetchServiceTest {
 
   // Setup transit
   private static final LocalDate SERVICE_DATE = LocalDate.of(2020, 3, 3);
@@ -236,7 +241,7 @@ public class RefetchItineraryServiceTest {
       .build();
     var refetch = createRefetchService(newTransitEnv);
 
-    var e = assertThrows(RefetchItineraryException.class, () ->
+    var e = assertThrows(ItineraryRefetchException.class, () ->
       refetch.refetchItinerary(null, null, List.of(leg1), routeRequest())
     );
     assertTrue(e.getMessage().startsWith("Could not find leg"));
@@ -367,7 +372,7 @@ public class RefetchItineraryServiceTest {
     var start = GenericLocation.fromCoordinate(V1.coord().moveNorthMeters(10000));
     var leg1 = legRef("trip1", STOP_A, STOP_B, transitEnv);
 
-    var e = assertThrows(RefetchItineraryException.class, () ->
+    var e = assertThrows(ItineraryRefetchException.class, () ->
       refetch.refetchItinerary(start, null, List.of(leg1), routeRequest())
     );
     assertEquals("Could not calculate access", e.getMessage());
@@ -381,7 +386,7 @@ public class RefetchItineraryServiceTest {
     var leg1 = legRef("trip3", STOP_C, STOP_D, transitEnv);
     var leg2 = legRef("trip1", STOP_A, STOP_B, transitEnv);
 
-    var e = assertThrows(RefetchItineraryException.class, () ->
+    var e = assertThrows(ItineraryRefetchException.class, () ->
       refetch.refetchItinerary(null, null, List.of(leg1, leg2), routeRequest())
     );
     assertEquals("Could not transfer from F:D to F:A", e.getMessage());
@@ -453,7 +458,7 @@ public class RefetchItineraryServiceTest {
     );
   }
 
-  private RefetchItineraryService createRefetchService(TransitTestEnvironment transitEnv) {
+  private ItineraryRefetchService createRefetchService(TransitTestEnvironment transitEnv) {
     StreetDetailsService streetDetailsService = null;
     VertexCreationService vertexCreationService = new VertexCreationService(
       new VertexLinker(
@@ -491,14 +496,15 @@ public class RefetchItineraryServiceTest {
         return 0;
       }
     };
-    return new RefetchItineraryService(
+    return new ItineraryRefetchService(
       GRAPH,
       transitEnv.transitService(),
       new TransitAlertServiceImpl(),
       REGULAR_TRANSFERS,
       streetDetailsService,
       linkingContextFactory,
-      streetLimitationParametersService
+      streetLimitationParametersService,
+      GeofencingZoneService.EMPTY
     );
   }
 
@@ -626,16 +632,27 @@ public class RefetchItineraryServiceTest {
     }
 
     public VertexRef linkStop(RegularStop stop) {
+      var streetVertex = createVertex();
+      // The stop vertex is placed at its street vertex, not at the coordinate of the stop: the
+      // spatial index fills every cell in the envelope of an edge, and the stop is far away.
       var stopV = TransitStopVertex.of()
         .withId(stop.getId())
-        .withCoordinate(stop.getCoordinate())
+        .withCoordinate(streetVertex.toWgsCoordinate())
         .build();
-      var streetVertex = createVertex();
       BoardingLocationToStopLink.createBoardingLocationToStopLink(stopV, streetVertex);
       BoardingLocationToStopLink.createBoardingLocationToStopLink(streetVertex, stopV);
       var v = new VertexRef(this, streetVertex);
       graph.addVertex(stopV);
       return v;
+    }
+
+    /// Adds a rental station or a free-floating rental vehicle at {@code at}.
+    public void rentalPlace(VertexRef at, VehicleRentalPlace place, RentalFormFactor formFactor) {
+      var placeVertex = new VehicleRentalPlaceVertex(place);
+      VehicleRentalEdge.createVehicleRentalEdge(placeVertex, formFactor);
+      StreetVehicleRentalLink.createStreetVehicleRentalLink(at.vertex, placeVertex);
+      StreetVehicleRentalLink.createStreetVehicleRentalLink(placeVertex, at.vertex);
+      graph.addVertex(placeVertex);
     }
 
     private EdgeRef street(VertexRef from, VertexRef to) {

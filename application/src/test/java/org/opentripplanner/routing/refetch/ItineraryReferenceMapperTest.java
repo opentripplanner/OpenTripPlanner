@@ -11,16 +11,30 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Place;
+import org.opentripplanner.model.plan.itineraryreference.BikeRentalPreferences;
+import org.opentripplanner.model.plan.itineraryreference.BikeWalkingPreferences;
+import org.opentripplanner.model.plan.itineraryreference.CarRentalPreferences;
 import org.opentripplanner.model.plan.itineraryreference.ItineraryReference;
 import org.opentripplanner.model.plan.itineraryreference.ItineraryReferenceSerializer;
+import org.opentripplanner.model.plan.itineraryreference.RentalDestinationPolicy;
+import org.opentripplanner.model.plan.itineraryreference.RentalNetworks;
+import org.opentripplanner.model.plan.itineraryreference.RidingPreferences;
+import org.opentripplanner.model.plan.itineraryreference.ScooterRentalPreferences;
 import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.plan.legreference.ScheduledTransitLegReference;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferencesBuilder;
+import org.opentripplanner.routing.api.request.preference.TimeSlopeSafetyTriangle;
+import org.opentripplanner.routing.api.request.preference.VehicleRentalPreferences;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.api.request.via.PassThroughViaLocation;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
@@ -31,6 +45,7 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.linking.VisibilityMode;
 import org.opentripplanner.street.model.StreetMode;
+import org.opentripplanner.street.model.VehicleRoutingOptimizeType;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
@@ -46,7 +61,7 @@ import org.opentripplanner.transit.transfer.regular.FixedRegularTransfers;
  * transfers.
  *
  * <p>Proves the chain:
- * {@code Itinerary -> ItineraryReference -> encode -> decode -> RefetchItineraryService ->
+ * {@code Itinerary -> ItineraryReference -> encode -> decode -> ItineraryRefetchService ->
  * same scheduled transit itinerary}.
  */
 class ItineraryReferenceMapperTest {
@@ -65,7 +80,7 @@ class ItineraryReferenceMapperTest {
   private static final Graph GRAPH = new Graph();
 
   static {
-    // Register stop vertices (no street edges) so RefetchItineraryService.findVertex(...) can
+    // Register stop vertices (no street edges) so ItineraryRefetchService.findVertex(...) can
     // resolve the board/alight stops; access/egress street searches still fail (no edges to
     // reach them), which is what refetchUsesDecodedFromAndToLocations relies on.
     GRAPH.addVertex(
@@ -76,6 +91,34 @@ class ItineraryReferenceMapperTest {
     );
     GRAPH.index();
   }
+
+  /** The values of {@link #withClientRentalPreferences}, as stored in a reference. */
+  private static final BikeRentalPreferences CLIENT_BIKE_RENTAL = new BikeRentalPreferences(
+    new RidingPreferences(
+      7.5,
+      3.5,
+      VehicleRoutingOptimizeType.TRIANGLE,
+      new TimeSlopeSafetyTriangle(0.2, 0.3, 0.5)
+    ),
+    new BikeWalkingPreferences(1.2, 4.0, Duration.ofSeconds(45), Cost.costOfSeconds(90)),
+    new RentalNetworks(Set.of("bike-a", "bike-b"), Set.of("bike-c")),
+    new RentalDestinationPolicy(true, Cost.costOfSeconds(120))
+  );
+  private static final CarRentalPreferences CLIENT_CAR_RENTAL = new CarRentalPreferences(
+    4.5,
+    new RentalNetworks(Set.of("car-a"), Set.of("car-b"))
+  );
+  private static final ScooterRentalPreferences CLIENT_SCOOTER_RENTAL =
+    new ScooterRentalPreferences(
+      new RidingPreferences(
+        6.5,
+        2.5,
+        VehicleRoutingOptimizeType.FLAT_STREETS,
+        new TimeSlopeSafetyTriangle(0.6, 0.1, 0.3)
+      ),
+      new RentalNetworks(Set.of("scooter-a"), Set.of("scooter-b")),
+      new RentalDestinationPolicy(true, Cost.costOfSeconds(60))
+    );
 
   @Test
   void roundTripSingleScheduledTransitLeg() {
@@ -255,7 +298,10 @@ class ItineraryReferenceMapperTest {
       2.5,
       3.0,
       0.5,
-      true
+      true,
+      null,
+      null,
+      null
     );
     var currentDefault = RouteRequest.defaultValue()
       .copyOf()
@@ -296,7 +342,7 @@ class ItineraryReferenceMapperTest {
     var refetchService = createRefetchService();
 
     // A coordinate that doesn't match a stop, on the edge-less test GRAPH, forces
-    // RefetchItineraryService to attempt (and fail) a real access search - this only happens if
+    // ItineraryRefetchService to attempt (and fail) a real access search - this only happens if
     // the reference's `from` is actually passed through, rather than always passing null as it
     // used to.
     var reference = new ItineraryReference(
@@ -311,11 +357,14 @@ class ItineraryReferenceMapperTest {
       1.3,
       2.0,
       1.0,
-      false
+      false,
+      null,
+      null,
+      null
     );
 
     var routeRequest = ItineraryReferenceMapper.toRouteRequest(reference, routeRequest());
-    var e = assertThrows(RefetchItineraryException.class, () ->
+    var e = assertThrows(ItineraryRefetchException.class, () ->
       refetchService.refetchItinerary(
         reference.from(),
         reference.to(),
@@ -330,7 +379,7 @@ class ItineraryReferenceMapperTest {
    * {@code LegReferenceSerializer} only produces {@link ScheduledTransitLegReference} today, but
    * {@code toRouteRequest}'s board/alight-stop fallback must not assume that holds for every
    * possible {@link org.opentripplanner.model.plan.legreference.LegReference} - a mismatch has to
-   * make the {@code itinerary(id:)} query result {@code null}, not cause a
+   * make the {@code refetchItinerary(id:)} query result {@code null}, not cause a
    * {@link ClassCastException}.
    */
   @Test
@@ -347,7 +396,10 @@ class ItineraryReferenceMapperTest {
       1.3,
       2.0,
       1.0,
-      false
+      false,
+      null,
+      null,
+      null
     );
 
     assertThrows(UnsupportedItineraryReferenceException.class, () ->
@@ -370,7 +422,7 @@ class ItineraryReferenceMapperTest {
     );
   }
 
-  private RefetchItineraryService createRefetchService() {
+  private ItineraryRefetchService createRefetchService() {
     var vertexCreationService = new VertexCreationService(
       new VertexLinker(
         GRAPH,
@@ -387,26 +439,39 @@ class ItineraryReferenceMapperTest {
       new TransitServiceResolver(TRANSIT_ENV.transitService())
     );
 
-    return new RefetchItineraryService(
+    return new ItineraryRefetchService(
       GRAPH,
       TRANSIT_ENV.transitService(),
       new TransitAlertServiceImpl(),
       FixedRegularTransfers.of().snapshot(),
       null,
       linkingContextFactory,
-      StreetLimitationParametersService.DEFAULT
+      StreetLimitationParametersService.DEFAULT,
+      GeofencingZoneService.EMPTY
     );
   }
 
   /**
    * {@code from}/{@code to} match the trip's board/alight stops exactly, so
-   * {@code RefetchItineraryService.stopMatchesLocation} skips access/egress reconstruction - this
+   * {@code ItineraryRefetchService.stopMatchesLocation} skips access/egress reconstruction - this
    * keeps the UC1 acceptance test independent of the (edge-less) test {@code GRAPH}.
    */
   private RouteRequest routeRequest() {
     return RouteRequest.of()
       .withFrom(GenericLocation.fromStopId(STOP_A.getId()))
       .withTo(GenericLocation.fromStopId(STOP_B.getId()))
+      .buildRequest();
+  }
+
+  private RouteRequest routeRequest(StreetMode access, StreetMode egress, StreetMode transfer) {
+    return routeRequest()
+      .copyOf()
+      .withJourney(journey ->
+        journey
+          .withAccess(new StreetRequest(access))
+          .withEgress(new StreetRequest(egress))
+          .withTransfer(new StreetRequest(transfer))
+      )
       .buildRequest();
   }
 
@@ -450,7 +515,10 @@ class ItineraryReferenceMapperTest {
       1.3,
       2.0,
       1.0,
-      false
+      false,
+      null,
+      null,
+      null
     );
 
     var routeRequest = ItineraryReferenceMapper.toRouteRequest(
@@ -463,37 +531,299 @@ class ItineraryReferenceMapperTest {
   }
 
   /**
-   * Only walk preferences are encoded, so a refetch with non-walk access, egress or transfer would
-   * silently use the server's default bike/car preferences and could differ from the original
-   * itinerary. Such itineraries get no reference.
+   * Only walk and rental preferences are stored. A refetch with another access or egress mode
+   * would use the server's preferences for it and could differ from the original itinerary, so
+   * such itineraries get no reference.
    */
   @ParameterizedTest
-  @CsvSource({
-    "BIKE, WALK, WALK",
-    "WALK, CAR, WALK",
-    "WALK, WALK, BIKE",
-    "BIKE_RENTAL, WALK, WALK",
-  })
-  void nonWalkStreetModeIsUnsupported(StreetMode access, StreetMode egress, StreetMode transfer) {
+  @EnumSource(
+    value = StreetMode.class,
+    names = { "WALK", "BIKE_RENTAL", "CAR_RENTAL", "SCOOTER_RENTAL" },
+    mode = EnumSource.Mode.EXCLUDE
+  )
+  void accessOrEgressModeOtherThanWalkOrRentalIsUnsupported(StreetMode mode) {
     var itinerary = createRefetchService().refetchItinerary(
       null,
       null,
       List.of(legRef()),
       routeRequest()
     );
-    var request = routeRequest()
-      .copyOf()
-      .withJourney(journey ->
-        journey
-          .withAccess(new StreetRequest(access))
-          .withEgress(new StreetRequest(egress))
-          .withTransfer(new StreetRequest(transfer))
+
+    assertThrows(UnsupportedItineraryReferenceException.class, () ->
+      ItineraryReferenceMapper.toItineraryReference(
+        itinerary,
+        routeRequest(mode, StreetMode.WALK, StreetMode.WALK)
       )
-      .buildRequest();
+    );
+    assertThrows(UnsupportedItineraryReferenceException.class, () ->
+      ItineraryReferenceMapper.toItineraryReference(
+        itinerary,
+        routeRequest(StreetMode.WALK, mode, StreetMode.WALK)
+      )
+    );
+  }
+
+  @ParameterizedTest
+  @EnumSource(value = StreetMode.class, names = { "WALK" }, mode = EnumSource.Mode.EXCLUDE)
+  void transferModeOtherThanWalkIsUnsupported(StreetMode mode) {
+    var itinerary = createRefetchService().refetchItinerary(
+      null,
+      null,
+      List.of(legRef()),
+      routeRequest()
+    );
+    var request = routeRequest(StreetMode.WALK, StreetMode.WALK, mode);
 
     assertThrows(UnsupportedItineraryReferenceException.class, () ->
       ItineraryReferenceMapper.toItineraryReference(itinerary, request)
     );
+  }
+
+  /**
+   * A reference holds the preferences of the rental modes the itinerary was planned with, and no
+   * others, so a walk-only id stays short.
+   */
+  @ParameterizedTest
+  @CsvSource({
+    "WALK, WALK, false, false, false",
+    "BIKE_RENTAL, WALK, true, false, false",
+    "WALK, CAR_RENTAL, false, true, false",
+    "SCOOTER_RENTAL, BIKE_RENTAL, true, false, true",
+  })
+  void storesThePreferencesOfTheRentalModesUsed(
+    StreetMode access,
+    StreetMode egress,
+    boolean hasBike,
+    boolean hasCar,
+    boolean hasScooter
+  ) {
+    var itinerary = createRefetchService().refetchItinerary(
+      null,
+      null,
+      List.of(legRef()),
+      routeRequest()
+    );
+
+    var reference = ItineraryReferenceMapper.toItineraryReference(
+      itinerary,
+      routeRequest(access, egress, StreetMode.WALK)
+    );
+
+    assertEquals(access, reference.accessMode());
+    assertEquals(egress, reference.egressMode());
+    assertEquals(hasBike, reference.bikeRental() != null);
+    assertEquals(hasCar, reference.carRental() != null);
+    assertEquals(hasScooter, reference.scooterRental() != null);
+  }
+
+  /**
+   * A reference keeps the rental preferences a client can set, in effect when the itinerary was
+   * planned. The ones only the server sets, like the pickup time, are not stored.
+   */
+  @Test
+  void storesTheRentalPreferencesAClientCanSet() {
+    var itinerary = createRefetchService().refetchItinerary(
+      null,
+      null,
+      List.of(legRef()),
+      routeRequest()
+    );
+    var bikeAndScooter = withClientAndServerRentalPreferences(
+      routeRequest(StreetMode.BIKE_RENTAL, StreetMode.SCOOTER_RENTAL, StreetMode.WALK)
+    );
+    var car = withClientAndServerRentalPreferences(
+      routeRequest(StreetMode.CAR_RENTAL, StreetMode.WALK, StreetMode.WALK)
+    );
+
+    var bikeAndScooterReference = ItineraryReferenceMapper.toItineraryReference(
+      itinerary,
+      bikeAndScooter
+    );
+    var carReference = ItineraryReferenceMapper.toItineraryReference(itinerary, car);
+
+    assertEquals(CLIENT_BIKE_RENTAL, bikeAndScooterReference.bikeRental());
+    assertEquals(CLIENT_SCOOTER_RENTAL, bikeAndScooterReference.scooterRental());
+    assertEquals(CLIENT_CAR_RENTAL, carReference.carRental());
+  }
+
+  /**
+   * On refetch, the stored rental preferences replace the current server defaults. The ones only
+   * the server sets come from the current default request.
+   */
+  @Test
+  void toRouteRequestOverlaysStoredRentalPreferencesOnTheCurrentDefaultRequest() {
+    var bikeAndScooter = rentalReference(
+      StreetMode.BIKE_RENTAL,
+      StreetMode.SCOOTER_RENTAL,
+      CLIENT_BIKE_RENTAL,
+      null,
+      CLIENT_SCOOTER_RENTAL
+    );
+    var car = rentalReference(
+      StreetMode.WALK,
+      StreetMode.CAR_RENTAL,
+      null,
+      CLIENT_CAR_RENTAL,
+      null
+    );
+    var currentDefault = RouteRequest.defaultValue()
+      .copyOf()
+      .withPreferences(this::withServerRentalPreferences)
+      .buildDefault();
+
+    var bikeAndScooterPreferences = ItineraryReferenceMapper.toRouteRequest(
+      bikeAndScooter,
+      currentDefault
+    ).preferences();
+    var carPreferences = ItineraryReferenceMapper.toRouteRequest(car, currentDefault).preferences();
+
+    var expected = RoutingPreferences.of()
+      .apply(p -> {
+        withServerRentalPreferences(p);
+        withClientRentalPreferences(p);
+      })
+      .build();
+    assertEquals(expected.bike(), bikeAndScooterPreferences.bike());
+    assertEquals(expected.scooter(), bikeAndScooterPreferences.scooter());
+    assertEquals(expected.car(), carPreferences.car());
+  }
+
+  /**
+   * A decoded id may come from another OTP version. A mode this version cannot refetch the same
+   * way makes the refetch return {@code null}.
+   */
+  @ParameterizedTest
+  @CsvSource({ "BIKE, WALK, WALK", "WALK, CAR_TO_PARK, WALK", "WALK, WALK, BIKE_RENTAL" })
+  void toRouteRequestRejectsAModeThatIsNotSupported(
+    StreetMode access,
+    StreetMode egress,
+    StreetMode transfer
+  ) {
+    var reference = new ItineraryReference(
+      List.of(legRef()),
+      null,
+      null,
+      access,
+      egress,
+      transfer,
+      Duration.ZERO,
+      Duration.ZERO,
+      1.3,
+      2.0,
+      1.0,
+      false,
+      null,
+      null,
+      null
+    );
+
+    assertThrows(UnsupportedItineraryReferenceException.class, () ->
+      ItineraryReferenceMapper.toRouteRequest(reference, routeRequest())
+    );
+  }
+
+  private RouteRequest withClientAndServerRentalPreferences(RouteRequest request) {
+    return request
+      .copyOf()
+      .withPreferences(preferences -> {
+        withClientRentalPreferences(preferences);
+        withServerRentalPreferences(preferences);
+      })
+      .buildRequest();
+  }
+
+  private ItineraryReference rentalReference(
+    StreetMode access,
+    StreetMode egress,
+    BikeRentalPreferences bike,
+    CarRentalPreferences car,
+    ScooterRentalPreferences scooter
+  ) {
+    return new ItineraryReference(
+      List.of(legRef()),
+      GenericLocation.fromStopId(STOP_A.getId()),
+      GenericLocation.fromStopId(STOP_B.getId()),
+      access,
+      egress,
+      StreetMode.WALK,
+      Duration.ZERO,
+      Duration.ZERO,
+      1.3,
+      2.0,
+      1.0,
+      false,
+      bike,
+      car,
+      scooter
+    );
+  }
+
+  /** Rental preferences a client can set in the GTFS API, all different from the defaults. */
+  private void withClientRentalPreferences(RoutingPreferencesBuilder preferences) {
+    preferences
+      .withBike(bike ->
+        bike
+          .withSpeed(7.5)
+          .withReluctance(3.5)
+          .withOptimizeType(VehicleRoutingOptimizeType.TRIANGLE)
+          .withOptimizeTriangle(t -> t.withTime(0.2).withSlope(0.3).withSafety(0.5))
+          .withWalking(walking ->
+            walking
+              .withSpeed(1.2)
+              .withReluctance(4.0)
+              .withMountDismountTime(Duration.ofSeconds(45))
+              .withMountDismountCost(90)
+          )
+          .withRental(rental ->
+            rental
+              .withAllowedNetworks(Set.of("bike-a", "bike-b"))
+              .withBannedNetworks(Set.of("bike-c"))
+              .withAllowArrivingInRentedVehicleAtDestination(true)
+              .withArrivingInRentalVehicleAtDestinationCost(120)
+          )
+      )
+      .withCar(car ->
+        car
+          .withReluctance(4.5)
+          .withRental(rental ->
+            rental.withAllowedNetworks(Set.of("car-a")).withBannedNetworks(Set.of("car-b"))
+          )
+      )
+      .withScooter(scooter ->
+        scooter
+          .withSpeed(6.5)
+          .withReluctance(2.5)
+          .withOptimizeType(VehicleRoutingOptimizeType.FLAT_STREETS)
+          .withOptimizeTriangle(t -> t.withTime(0.6).withSlope(0.1).withSafety(0.3))
+          .withRental(rental ->
+            rental
+              .withAllowedNetworks(Set.of("scooter-a"))
+              .withBannedNetworks(Set.of("scooter-b"))
+              .withAllowArrivingInRentedVehicleAtDestination(true)
+              .withArrivingInRentalVehicleAtDestinationCost(60)
+          )
+      );
+  }
+
+  /** Rental preferences only the server sets, all different from the defaults. */
+  private void withServerRentalPreferences(RoutingPreferencesBuilder preferences) {
+    preferences
+      .withBike(bike ->
+        bike
+          .withWalking(walking -> walking.withStairsReluctance(8.0))
+          .withRental(rental -> withServerRental(rental))
+      )
+      .withCar(car -> car.withRental(rental -> withServerRental(rental)))
+      .withScooter(scooter -> scooter.withRental(rental -> withServerRental(rental)));
+  }
+
+  private static void withServerRental(VehicleRentalPreferences.Builder rental) {
+    rental
+      .withPickupTime(Duration.ofMinutes(3))
+      .withPickupCost(240)
+      .withDropOffTime(Duration.ofMinutes(2))
+      .withDropOffCost(180)
+      .withElectricAssistSlopeSensitivity(0.5);
   }
 
   /** Via locations are not stored in the reference, so such an itinerary gets no reference. */

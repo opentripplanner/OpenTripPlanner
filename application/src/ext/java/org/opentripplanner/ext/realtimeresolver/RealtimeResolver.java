@@ -11,7 +11,7 @@ import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
 import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.refetch.RefetchItineraryService;
+import org.opentripplanner.routing.refetch.ItineraryRefetchService;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
@@ -23,16 +23,16 @@ import org.opentripplanner.transit.service.TransitService;
  */
 public class RealtimeResolver {
 
-  private final RefetchItineraryService refetchItineraryService;
+  private final ItineraryRefetchService itineraryRefetchService;
   private final TransitService transitService;
   private final TransitAlertService transitAlertService;
 
   public RealtimeResolver(
-    RefetchItineraryService refetchItineraryService,
+    ItineraryRefetchService itineraryRefetchService,
     TransitService transitService,
     TransitAlertService transitAlertService
   ) {
-    this.refetchItineraryService = refetchItineraryService;
+    this.itineraryRefetchService = itineraryRefetchService;
     this.transitService = transitService;
     this.transitAlertService = transitAlertService;
   }
@@ -43,13 +43,13 @@ public class RealtimeResolver {
    */
   public static List<Itinerary> populateLegsWithRealtime(
     List<Itinerary> itineraries,
-    RefetchItineraryService refetchItineraryService,
+    ItineraryRefetchService itineraryRefetchService,
     TransitService transitService,
     TransitAlertService transitAlertService,
     RouteRequest routeRequest
   ) {
     return new RealtimeResolver(
-      refetchItineraryService,
+      itineraryRefetchService,
       transitService,
       transitAlertService
     ).addRealtimeInfo(itineraries, routeRequest);
@@ -81,9 +81,9 @@ public class RealtimeResolver {
 
     boolean hasItineraryStopsChanged = hasItineraryStopsChanged(updatedItinerary);
 
-    // We only call refetchItineraryService if any change has been made of stop places, due to performance reasons since refetch can be heavy.
+    // We only call itineraryRefetchService if any change has been made of stop places, due to performance reasons since refetch can be heavy.
     if (hasItineraryStopsChanged) {
-      return refetchItineraryService.refetchItinerary(
+      return itineraryRefetchService.refetchItinerary(
         fromLocation,
         toLocation,
         legReferences,

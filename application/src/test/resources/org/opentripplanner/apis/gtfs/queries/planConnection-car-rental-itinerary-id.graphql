@@ -1,0 +1,27 @@
+{
+  planConnection(
+    origin: {
+      location: { coordinate: { latitude: 45.5552, longitude: -122.6534 } }
+    }
+    destination: {
+      location: { coordinate: { latitude: 45.4908, longitude: -122.5519 } }
+    }
+    modes: {
+      transit: { access: [CAR_RENTAL, WALK], transfer: [WALK], egress: [WALK] }
+    }
+    preferences: {
+      street: {
+        car: {
+          reluctance: 4.5
+          rental: { allowedNetworks: ["foo"], bannedNetworks: ["bar"] }
+        }
+      }
+    }
+  ) {
+    edges {
+      node {
+        itineraryId
+      }
+    }
+  }
+}
