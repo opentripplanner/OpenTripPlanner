@@ -42,7 +42,9 @@ public interface RegularTransferBuildRepository<P> extends Serializable {
   /**
    * Store, for the transfers from {@code fromStop} that depend on ids, all the paths of the
    * transfer, keyed by {@code toStop}: the best path first, then the paths that avoid some of its
-   * closable facility ids, see {@link AlternativePath}. The best path is also stored with
+   * closable facility ids, see {@link AlternativePath}. The list is in the cost order of the
+   * profile: while facilities are closed, the transfer uses the first path that depends on none of
+   * them. The best path is also stored with
    * {@link #setPaths}, the paths here are an addition, used to choose another path when a facility
    * is unavailable. Existing entries for other stops are kept. The given map is copied, not
    * retained.

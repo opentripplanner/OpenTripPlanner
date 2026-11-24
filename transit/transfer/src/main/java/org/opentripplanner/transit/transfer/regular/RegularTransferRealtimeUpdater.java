@@ -32,9 +32,10 @@ public interface RegularTransferRealtimeUpdater<P> {
 
   /**
    * Close the given facilities, and open all others. A path that depends on a closed facility,
-   * see {@code TransferPath#closableFacilityIds()}, is not used as a transfer: the cheapest
-   * alternative path without a closed facility is used instead, and there is no transfer between
-   * the two stops if there is none.
+   * see {@code TransferPath#closableFacilityIds()}, is not used as a transfer: the first stored
+   * path of the transfer without a closed facility is used instead, and there is no transfer
+   * between the two stops if there is none. The stored paths are in the cost order of the
+   * profile, and only avoid subsets of the facilities of the best path.
    * <p>
    * The set is the complete state: every facility that is not in it is open, and an empty set
    * opens all facilities. Calling the method again with the same set changes nothing. An id that

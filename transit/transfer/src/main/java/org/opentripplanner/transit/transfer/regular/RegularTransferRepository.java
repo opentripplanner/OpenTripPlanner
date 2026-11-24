@@ -46,9 +46,11 @@ public interface RegularTransferRepository<P> {
 
   /**
    * Close the given facilities, and open all others. A path is not used as a transfer if one of
-   * its {@code TransferPath#closableFacilityIds()} is in the set; the cheapest alternative path
-   * without a closed facility is used instead, and the pair has no transfer if there is none. See
-   * {@code RegularTransferBuildRepository#setAlternativePaths}.
+   * its {@code TransferPath#closableFacilityIds()} is in the set; the first stored path of the
+   * transfer without a closed facility is used instead, and the pair has no transfer if there is
+   * none. The stored paths are in the cost order of the profile, and only avoid subsets of the
+   * facilities of the best path. The request preferences only re-cost that path, they do not
+   * choose another one. See {@code RegularTransferBuildRepository#setAlternativePaths}.
    * <p>
    * The set is the complete state: every facility that is not in the set is open. Calling the
    * method twice with the same set changes nothing (idempotent). The repository compares the set

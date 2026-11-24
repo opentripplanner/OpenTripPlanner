@@ -12,15 +12,17 @@ import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUser
 /**
  * Default {@link RegularTransfersService}, created by
  * {@link DefaultRegularTransferRepositorySnapshot#forRequest}. It holds the user preferences of
- * the request and the profile closest to them, both found once, and reads the paths and the cache
- * of the Raptor transfers of the snapshot it is created from. The paths are immutable and the
- * cache is thread-safe, so the view is thread-safe.
+ * the request and the profile closest to them, both found once, and reads the open paths and the
+ * cache of the Raptor transfers of the snapshot it is created from. The paths are the ones the
+ * Raptor transfers are derived from, see {@link OpenTemplatePaths}: while a facility is closed,
+ * a transfer that depends on it has the path of its alternative, or no path. The paths are
+ * immutable and the cache is thread-safe, so the view is thread-safe.
  *
  * @param <P> the street path type
  */
 final class DefaultRegularTransfersService<P> implements RegularTransfersService<P> {
 
-  private final OverlaidTemplatePaths<P> paths;
+  private final OpenTemplatePaths<P> paths;
   private final RegularTransferServiceCache<RaptorTransferStore> cache;
   private final RegularTransferServiceCache.Factory<RaptorTransferStore> cacheFactory;
   private final AbstractUserPreferences<?> userPreferences;
@@ -34,7 +36,7 @@ final class DefaultRegularTransfersService<P> implements RegularTransfersService
    *                        read from it. {@code null} if there are no stored paths.
    */
   DefaultRegularTransfersService(
-    OverlaidTemplatePaths<P> paths,
+    OpenTemplatePaths<P> paths,
     RegularTransferServiceCache<RaptorTransferStore> cache,
     RegularTransferServiceCache.Factory<RaptorTransferStore> cacheFactory,
     AbstractUserPreferences<?> userPreferences,

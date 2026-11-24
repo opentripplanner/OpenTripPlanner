@@ -22,8 +22,10 @@ import org.slf4j.LoggerFactory;
  * Default {@link RegularTransferRepositorySnapshot}, created by
  * {@link RegularTransferRepositoryLifecycle#freeze}. The snapshot owns its
  * {@link OverlaidTemplatePaths}, which is never written to after creation. Hence, the paths are
- * effectively immutable and safe to read from any number of request threads. The cache of the
- * Raptor transfers derived from them is the only mutable state, and it is thread-safe.
+ * effectively immutable and safe to read from any number of request threads. The Raptor transfers
+ * and the paths of the requests are read from one {@link OpenTemplatePaths} view of the paths with
+ * the closed facilities of the snapshot applied, so they always agree on the path of a transfer.
+ * The cache of the Raptor transfers is the only mutable state, and it is thread-safe.
  *
  * @param <P> the street path type
  * @param <R> the request type
@@ -39,6 +41,7 @@ class DefaultRegularTransferRepositorySnapshot<
 
   private final OverlaidTemplatePaths<P> paths;
   private final Set<String> closedFacilityIds;
+  private final OpenTemplatePaths<P> openPaths;
   private final RegularTransferServiceCache<RaptorTransferStore> cache;
   private final CacheFactory cacheFactory;
   private final TransferRequestMapper<R> mapper;
@@ -59,6 +62,7 @@ class DefaultRegularTransferRepositorySnapshot<
   ) {
     this.paths = paths;
     this.closedFacilityIds = Set.copyOf(closedFacilityIds);
+    this.openPaths = new OpenTemplatePaths<>(paths, this.closedFacilityIds);
     this.cache = cache;
     this.mapper = mapper;
     this.matcher = matcher;
@@ -66,9 +70,7 @@ class DefaultRegularTransferRepositorySnapshot<
     this.entryByPreferences = new HashMap<>();
     warmup.forEach(entry -> entryByPreferences.put(entry.userPreferences(), entry));
     this.statistics = statistics;
-    this.cacheFactory = new CacheFactory(
-      raptorTransfersFactory.withClosedFacilityIds(this.closedFacilityIds)
-    );
+    this.cacheFactory = new CacheFactory(raptorTransfersFactory);
   }
 
   @Override
@@ -89,7 +91,7 @@ class DefaultRegularTransferRepositorySnapshot<
     var profile = matcher.closestProfile(paths, userPreferences);
     statistics.record(userPreferences);
     return new DefaultRegularTransfersService<>(
-      paths,
+      openPaths,
       cache,
       cacheFactory,
       userPreferences,
@@ -143,6 +145,11 @@ class DefaultRegularTransferRepositorySnapshot<
     return paths;
   }
 
+  /** The paths of this snapshot with its closed facilities applied. */
+  OpenTemplatePaths<P> openPaths() {
+    return openPaths;
+  }
+
   /** The ids of the facilities that are closed in this snapshot, for the lifecycle. */
   Set<String> closedFacilityIds() {
     return closedFacilityIds;
@@ -167,7 +174,7 @@ class DefaultRegularTransferRepositorySnapshot<
     @Override
     public RaptorTransferStore create(AbstractUserPreferences<?> userPreferences) {
       return raptorTransfersFactory.create(
-        paths,
+        openPaths,
         userPreferences,
         matcher.closestProfile(paths, userPreferences)
       );
@@ -180,7 +187,7 @@ class DefaultRegularTransferRepositorySnapshot<
       Set<Integer> changedFromStops
     ) {
       return raptorTransfersFactory.patch(
-        paths,
+        openPaths,
         userPreferences,
         matcher.closestProfile(paths, userPreferences),
         previous,

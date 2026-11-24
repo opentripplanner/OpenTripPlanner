@@ -3,10 +3,10 @@ package org.opentripplanner.transit.transfer.regular.internal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -23,6 +23,7 @@ import org.opentripplanner.transit.transfer.regular.RegularTransferBuildReposito
 import org.opentripplanner.transit.transfer.regular.RegularTransferGenerator;
 import org.opentripplanner.transit.transfer.regular.RegularTransferProfileStatistics;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferParameters;
+import org.opentripplanner.transit.transfer.regular.spi.PathCriteria;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPath;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
 import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
@@ -33,7 +34,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Graph-build-time implementation of {@link RegularTransferGenerator} - see that interface's doc.
- * There is no {@code RegularTransferRealtimeUpdater} implementation yet.
  *
  * @param <P> the street path type
  * @param <R> the request type
@@ -41,6 +41,15 @@ import org.slf4j.LoggerFactory;
 public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGenerator {
 
   private static final Logger LOG = LoggerFactory.getLogger(DefaultRegularTransferGenerator.class);
+
+  /**
+   * The order of the alternative paths of a transfer: by the cost of the search of the profile,
+   * then by duration.
+   */
+  private static final Comparator<PathCriteria> PROFILE_COST_ORDER = Comparator.comparingInt(
+    PathCriteria::c1
+  ).thenComparingInt(PathCriteria::durationInSeconds);
+
   private final RaptorStopIndex stopIndex;
   private final TransferProfiles<P, R> profiles;
   private final RegularTransferBuildRepository<P> buildRepository;
@@ -253,9 +262,12 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
    * for {@code S}. The alternatives of a transfer are stored once even if several subsets give the
    * same path. The number of searches grows as 2^n for a path with n closable facility ids.
    * <p>
-   * The best path is stored with the alternatives, so the closable facility ids of the best path are known.
-   * The alternatives are not shared with other profiles, they are found with the search of this
-   * profile.
+   * The paths of a transfer are stored in the cost order of the profile: the best path first, so
+   * its closable facility ids are known, then the alternatives by the cost the search of this
+   * profile found them with, then by duration and by their closable facility ids. Choosing the
+   * first path without a closed facility thus gives the path the profile itself would find if the
+   * facilities were closed. The alternatives are not shared with other profiles, they are found
+   * with the search of this profile.
    */
   private void generateAlternativePaths(
     TransferProfileState<P, R> profile,
@@ -263,14 +275,16 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
     int fromStop,
     Map<Integer, AlternativePath<P>> bestPaths
   ) {
-    var pathsByToStop = new HashMap<Integer, Set<AlternativePath<P>>>();
+    var bestByToStop = new HashMap<Integer, AlternativePath<P>>();
+    var foundByToStop = new HashMap<Integer, Map<AlternativePath<P>, PathCriteria>>();
     var toStopsByAvoidedIds = new HashMap<Set<String>, List<Integer>>();
     bestPaths.forEach((toStop, best) -> {
       var ids = best.closableFacilityIds();
       if (ids.isEmpty()) {
         return;
       }
-      pathsByToStop.put(toStop, new LinkedHashSet<>(List.of(best)));
+      bestByToStop.put(toStop, best);
+      foundByToStop.put(toStop, new HashMap<>());
       for (var subset : nonEmptySubsets(ids)) {
         toStopsByAvoidedIds.computeIfAbsent(subset, k -> new ArrayList<>()).add(toStop);
       }
@@ -284,21 +298,42 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
       for (int toStop : toStops) {
         var alternative = found.get(toStop);
         if (alternative != null) {
-          pathsByToStop
+          foundByToStop
             .get(toStop)
-            .add(new AlternativePath<>(alternative.path(), alternative.closableFacilityIds()));
+            .putIfAbsent(
+              new AlternativePath<>(alternative.path(), alternative.closableFacilityIds()),
+              alternative.criteria()
+            );
         }
       }
     });
 
     var stored = new HashMap<Integer, List<AlternativePath<P>>>();
-    pathsByToStop.forEach((toStop, paths) -> {
+    bestByToStop.forEach((toStop, best) -> {
+      var found = foundByToStop.get(toStop);
+      found.remove(best);
+      var paths = new ArrayList<AlternativePath<P>>();
+      paths.add(best);
+      found
+        .entrySet()
+        .stream()
+        .sorted(
+          Map.Entry.<AlternativePath<P>, PathCriteria>comparingByValue(
+            PROFILE_COST_ORDER
+          ).thenComparing(e -> idsKey(e.getKey()))
+        )
+        .forEach(e -> paths.add(e.getKey()));
       stored.put(toStop, List.copyOf(paths));
       alternativePaths.add(paths.size());
     });
     synchronized (this) {
       buildRepository.setAlternativePaths(profile.userPreferences(), fromStop, stored);
     }
+  }
+
+  /** The sorted closable facility ids, a stable key to order paths that cost the same. */
+  private static String idsKey(AlternativePath<?> path) {
+    return path.closableFacilityIds().stream().sorted().toList().toString();
   }
 
   /** All non-empty subsets of the ids, there are 2^n - 1 of them. */

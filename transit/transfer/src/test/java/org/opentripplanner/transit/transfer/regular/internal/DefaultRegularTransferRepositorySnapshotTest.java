@@ -129,11 +129,67 @@ class DefaultRegularTransferRepositorySnapshotTest {
       tx(C, 400)
     );
 
+    assertSameAsCreatedFromScratch(closed, closed.forRequest(REQUEST).raptorTransfers());
+
     repository.closeFacilities(Set.of());
-    assertThat(from(freeze().forRequest(REQUEST).raptorTransfers(), A)).containsExactly(
+    var reopened = freeze();
+    assertThat(from(reopened.forRequest(REQUEST).raptorTransfers(), A)).containsExactly(
       tx(B, 200),
       tx(C, 400)
     );
+    assertSameAsCreatedFromScratch(reopened, reopened.forRequest(REQUEST).raptorTransfers());
+  }
+
+  @Test
+  void findPathAndFindPathsFromReturnTheAlternativeWhileAFacilityIsClosed() {
+    var best = path(A, B, 100);
+    var detour = path(A, B, 500);
+    var buildRepository = new DefaultRegularTransferBuildRepository<FakePath>();
+    buildRepository.setPaths(PROFILE, A, Map.of(B, best, C, path(A, C, 200)));
+    buildRepository.setAlternativePaths(
+      PROFILE,
+      A,
+      Map.of(
+        B,
+        List.of(new AlternativePath<>(best, Set.of("e1")), new AlternativePath<>(detour, Set.of()))
+      )
+    );
+    repository =
+      (DefaultRegularTransferRepository<FakePath>) buildRepository.createRuntimeRepository();
+    freeze();
+
+    repository.closeFacilities(Set.of("e1"));
+    var closed = freeze().forRequest(REQUEST);
+    assertThat(closed.findPath(A, B)).isSameInstanceAs(detour);
+    assertThat(closed.findPathsFrom(A)).containsExactly(detour, path(A, C, 200));
+
+    repository.closeFacilities(Set.of());
+    var reopened = freeze().forRequest(REQUEST);
+    assertThat(reopened.findPath(A, B)).isSameInstanceAs(best);
+    assertThat(reopened.findPathsFrom(A)).containsExactly(best, path(A, C, 200));
+  }
+
+  @Test
+  void thereIsNoPathWhileEveryPathOfTheTransferDependsOnAClosedFacility() {
+    var buildRepository = new DefaultRegularTransferBuildRepository<FakePath>();
+    buildRepository.setPaths(PROFILE, A, Map.of(B, path(A, B, 100), C, path(A, C, 200)));
+    buildRepository.setAlternativePaths(
+      PROFILE,
+      A,
+      Map.of(B, List.of(new AlternativePath<>(path(A, B, 100), Set.of("e1"))))
+    );
+    repository =
+      (DefaultRegularTransferRepository<FakePath>) buildRepository.createRuntimeRepository();
+    freeze();
+
+    repository.closeFacilities(Set.of("e1"));
+    var closed = freeze();
+    var service = closed.forRequest(REQUEST);
+
+    assertThat(service.findPath(A, B)).isNull();
+    assertThat(service.findPathsFrom(A)).containsExactly(path(A, C, 200));
+    assertThat(from(service.raptorTransfers(), A)).containsExactly(tx(C, 400));
+    assertSameAsCreatedFromScratch(closed, service.raptorTransfers());
   }
 
   @Test
@@ -465,7 +521,7 @@ class DefaultRegularTransferRepositorySnapshotTest {
   ) {
     var paths = (
       (DefaultRegularTransferRepositorySnapshot<FakePath, WalkPreferences>) snapshot
-    ).paths();
+    ).openPaths();
     var expected = new RaptorTransfersFactory<>(
       N_STOPS,
       provider,

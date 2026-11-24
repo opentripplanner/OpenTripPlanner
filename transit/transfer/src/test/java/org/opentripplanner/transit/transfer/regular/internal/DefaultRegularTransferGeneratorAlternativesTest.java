@@ -75,6 +75,44 @@ class DefaultRegularTransferGeneratorAlternativesTest {
   }
 
   @Test
+  void theAlternativesAreStoredInTheCostOrderOfTheProfileWithTheBestPathFirst() {
+    var best = provider.addNearby(A, B, 100, 60, Set.of("e1", "e2"));
+    var avoidsBoth = provider.addNearby(A, B, 150, 60);
+    var avoidsE1 = provider.addNearby(A, B, 300, 60, Set.of("e2"));
+    var avoidsE2 = provider.addNearby(A, B, 200, 60, Set.of("e1"));
+    // Under the profile, avoidsBoth costs most, although it is the cheapest by its base cost
+    provider.withCost(avoidsBoth, 1.0, 400);
+
+    var subject = generate(true);
+
+    assertThat(subject.paths(FIRST, B_INDEX))
+      .containsExactly(
+        alternative(best, "e1", "e2"),
+        alternative(avoidsE2, "e1"),
+        alternative(avoidsE1, "e2"),
+        alternative(avoidsBoth)
+      )
+      .inOrder();
+  }
+
+  @Test
+  void alternativesThatCostTheSameAreStoredTheShortestFirst() {
+    var best = provider.addNearby(A, B, 100, 60, Set.of("e1", "e2"));
+    var avoidsE1 = provider.addNearby(A, B, 200, 80, Set.of("e2"));
+    var avoidsE2 = provider.addNearby(A, B, 200, 70, Set.of("e1"));
+
+    var subject = generate(true);
+
+    assertThat(subject.paths(FIRST, B_INDEX))
+      .containsExactly(
+        alternative(best, "e1", "e2"),
+        alternative(avoidsE2, "e1"),
+        alternative(avoidsE1, "e2")
+      )
+      .inOrder();
+  }
+
+  @Test
   void aPathWithThreeClosableFacilityIdsNeedsOneSearchForEachOfTheSevenSubsets() {
     provider.addNearby(A, B, 100, 60, Set.of("e1", "e2", "e3"));
 
