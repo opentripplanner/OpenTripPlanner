@@ -29,7 +29,8 @@ class QueryTypeImplPatternsByIdsTest {
         DataFetchingSupport.dataFetchingEnvironment(
           null,
           Map.of("ids", List.of(pattern.getId().toString())),
-          transitService
+          transitService,
+          env.shapeService()
         )
       );
 
@@ -46,7 +47,14 @@ class QueryTypeImplPatternsByIdsTest {
 
     var result = subject
       .patternsByIds()
-      .get(DataFetchingSupport.dataFetchingEnvironment(null, Map.of("ids", ids), transitService));
+      .get(
+        DataFetchingSupport.dataFetchingEnvironment(
+          null,
+          Map.of("ids", ids),
+          transitService,
+          env.shapeService()
+        )
+      );
 
     assertThat(result).isEmpty();
   }

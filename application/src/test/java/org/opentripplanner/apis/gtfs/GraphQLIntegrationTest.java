@@ -484,6 +484,7 @@ class GraphQLIntegrationTest {
       .withCause(AlertCause.MAINTENANCE)
       .withEffect(AlertEffect.REDUCED_SERVICE)
       .withSeverity(AlertSeverity.VERY_SEVERE)
+      .withVersion(3)
       .addEntity(entitySelector)
       .withCalendar(AlertCalendar.of(TimePeriod.of(ALERT_START_TIME, ALERT_END_TIME)))
       .build();

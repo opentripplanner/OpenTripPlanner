@@ -35,6 +35,8 @@ public enum UpdateErrorType {
   INVALID_STOP_SEQUENCE,
   NOT_IMPLEMENTED_UNSCHEDULED,
   NOT_IMPLEMENTED_DIFFERENTIAL_DUPLICATED,
+  // a GTFS-RT REPLACEMENT trip update contains a NO_DATA stop
+  NOT_IMPLEMENTED_NO_DATA_IN_REPLACEMENT,
   NOT_MONITORED,
   CANNOT_RESOLVE_AGENCY,
   // there are several trips that would match the reference

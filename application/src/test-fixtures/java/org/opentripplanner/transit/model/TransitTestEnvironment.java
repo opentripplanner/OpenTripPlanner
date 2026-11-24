@@ -7,23 +7,28 @@ import java.time.ZoneId;
 import java.util.concurrent.ExecutionException;
 import org.opentripplanner.LocalTimeParser;
 import org.opentripplanner.core.framework.transaction.configure.TransactionFactory;
+import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.core.model.transaction.RepositoryHandle;
 import org.opentripplanner.core.model.transaction.RepositoryRegistry;
 import org.opentripplanner.core.model.transaction.UpdateManager;
+import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RaptorTransitDataMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.DefaultTransitDataProviderFilterBuilder;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.service.shape.ScheduledShapeData;
 import org.opentripplanner.service.shape.ShapeRepository;
 import org.opentripplanner.service.shape.ShapeRepositorySnapshot;
 import org.opentripplanner.service.shape.ShapeService;
-import org.opentripplanner.service.shape.ShapeTestFactory;
 import org.opentripplanner.service.shape.internal.DefaultShapeRepository;
 import org.opentripplanner.service.shape.internal.DefaultShapeService;
 import org.opentripplanner.service.shape.internal.ShapeRepositoryLifecycle;
+import org.opentripplanner.transit.model.network.StopPattern;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.repository.ScheduledTimetableData;
@@ -34,6 +39,8 @@ import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.transit.transfer.regular.NoRegularTransfers;
+import org.opentripplanner.updater.trip.shape.RealTimeTripShapeFactory;
+import org.opentripplanner.updater.trip.shape.RealTimeTripShapeWriter;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 /**
@@ -67,6 +74,7 @@ public final class TransitTestEnvironment {
   TransitTestEnvironment(
     TransitRepository transitRepository,
     ScheduledTimetableData scheduledTimetableData,
+    ScheduledShapeData scheduledShapeData,
     LocalDate defaultServiceDate
   ) {
     this.transitRepository = transitRepository;
@@ -90,11 +98,7 @@ public final class TransitTestEnvironment {
       timetableSnapshot,
       new TimetableRepositoryLifecycle(timetableSnapshot, false, () -> defaultServiceDate)
     );
-    var shapeRepository = new DefaultShapeRepository(
-      ShapeTestFactory.shapeDataImport(
-        scheduledTimetableData.getAllTripPatterns()
-      ).toScheduledShapeData()
-    );
+    var shapeRepository = new DefaultShapeRepository(scheduledShapeData);
     this.shapeHandle = repositoryRegistry.registerRepository(
       shapeRepository,
       new ShapeRepositoryLifecycle(shapeRepository)
@@ -148,12 +152,43 @@ public final class TransitTestEnvironment {
       var task = updateManager.submit(ctx -> {
         TimetableRepository repository = ctx.repository(timetableHandle);
         repository.update(update);
+        // Like TripUpdateApplier, give a pattern created in real time a shape
+        new RealTimeTripShapeWriter(
+          () -> ctx.repository(shapeHandle),
+          new RealTimeTripShapeFactory(DeduplicatorService.NOOP)
+        ).ensureTripPatternShape(update.pattern());
       });
       // Wait for task to commit - this allows us to proceed with the test
       task.get();
     } catch (InterruptedException | ExecutionException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  /**
+   * Applies a real-time update that makes the trip call at the given stops on the default service
+   * date, instead of the stops of its schedule. The scheduled times are kept, so there must be as
+   * many stops as in the schedule. The real-time pattern refers to the scheduled pattern as its
+   * original, and can be fetched with {@link #tripData(String)} after the update.
+   */
+  public void applyStopPatternUpdate(String tripId, StopLocation... stops) {
+    var tripData = tripData(tripId);
+    var scheduledPattern = tripData.scheduledTripPattern();
+    var stopPattern = StopPattern.create(stops.length);
+    for (int i = 0; i < stops.length; i++) {
+      stopPattern.stops.with(i, stops[i]);
+      stopPattern.pickups.with(i, PickDrop.SCHEDULED);
+      stopPattern.dropoffs.with(i, PickDrop.SCHEDULED);
+    }
+    var realTimePattern = TripPattern.of(id(tripId + "RealTimePattern"))
+      .withRoute(scheduledPattern.getRoute())
+      .withMode(scheduledPattern.getMode())
+      .withStopPattern(stopPattern.build())
+      .withRealTimeStopPatternModified()
+      .withOriginalTripPattern(scheduledPattern)
+      .build();
+    var tripTimes = tripData.scheduledTripTimes().createRealTimeFromScheduledTimes().build();
+    applyUpdate(RealTimeTripUpdate.of(realTimePattern, tripTimes, defaultServiceDate).build());
   }
 
   public String feedId() {

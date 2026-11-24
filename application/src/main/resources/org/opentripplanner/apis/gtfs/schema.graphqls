@@ -167,6 +167,14 @@ type Alert implements Node {
   ): String
   "Header of the alert in all different available languages"
   alertHeaderTextTranslations: [TranslatedString!]! @deprecated(reason : "Use `alertHeaderText` instead. `accept-language` header can be used for translations or the `language` parameter on the `alertHeaderText` field.")
+  """
+  ID of the alert as set by the producer, prefixed with the feed ID (`FeedId:AlertId`). For
+  SIRI-SX this is the `SituationNumber` and for GTFS-RT the id of the `FeedEntity`.
+    
+  Unlike `id`, this value is not opaque and can be used to link the alert to the system it
+  originates from.
+  """
+  alertId: String!
   "Alert severity level"
   alertSeverityLevel: AlertSeverityLevelType
   "Url with more information"
@@ -194,6 +202,11 @@ type Alert implements Node {
   stop: Stop @deprecated(reason : "Alert can have multiple affected entities now instead of there being duplicate alerts\nfor different entities. This will return only one of the affected stops.\nUse entities instead.")
   "Trip affected by the disruption"
   trip: Trip @deprecated(reason : "Alert can have multiple affected entities now instead of there being duplicate alerts\nfor different entities. This will return only one of the affected trips.\nUse entities instead.")
+  """
+  Version of the alert as set by the producer. Only SIRI-SX provides one (`Version`), so this is
+  `null` for GTFS-RT alerts.
+  """
+  version: Int
 }
 
 """
@@ -401,6 +414,10 @@ type CallRealTime {
 
 "What is scheduled for a trip on a service date for a stop location."
 type CallSchedule {
+  "The drop off type at this call."
+  dropOffType: PickupDropoffType
+  "The pick-up type at this call."
+  pickupType: PickupDropoffType
   "Scheduled time for a trip on a service date for a stop location."
   time: CallScheduledTime
 }
@@ -2773,6 +2790,17 @@ type StopCall {
   has a headsign.
   """
   destinationDisplay: DestinationDisplay
+  """
+  The geometry of the hop from this call to the next call of the trip. Null for the last call, and
+  for all calls of flexible trips, where the path of the vehicle is not known.
+    
+  The geometry is also returned if this call or the next call is canceled, even though the vehicle
+  may not travel along it.
+    
+  If a real-time update has changed the stops of the trip, this is the geometry of the updated
+  trip.
+  """
+  geometryToNextCall: Geometry
   "Notices of this call which are known ahead of time."
   notices: [Notice!]! @deprecated(reason : "Experimental API that can be changed without notice.")
   "Real-time information and state for this stop location."
@@ -2868,9 +2896,13 @@ type Stoptime {
   "Real-time prediction of departure time. Format: seconds since midnight of the departure date"
   realtimeDeparture: Int
   """
-  State of real-time data. Currently used to determine, whether a stop has been canceled.
-  Disclaimer: this is, in most cases the trips realtime state, unless the stop is canceled,
-  then the Trips State will be overwritten to be CANCELED.
+  Real-time state of this stop.
+    
+  `CANCELED` if the stop or its trip is canceled. `ADDED` if the stop has been added to a trip
+  whose stop pattern has been modified (e.g. by a GTFS-RT `REPLACEMENT` trip update or a SIRI extra
+  call). Otherwise this is the trip's real-time state. Scheduled stops left out of a modified trip
+  are not listed.
+    
   It is recommended to avoid using this field.
   """
   realtimeState: RealtimeState

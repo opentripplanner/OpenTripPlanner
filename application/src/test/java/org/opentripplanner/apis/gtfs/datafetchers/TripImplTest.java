@@ -34,7 +34,8 @@ class TripImplTest {
     var env = DataFetchingSupport.dataFetchingEnvironment(
       trip,
       Map.of(),
-      realtimeEnv.transitService()
+      realtimeEnv.transitService(),
+      realtimeEnv.shapeService()
     );
 
     var activeDates = impl.activeDates().get(env);
@@ -55,7 +56,8 @@ class TripImplTest {
     var env = DataFetchingSupport.dataFetchingEnvironment(
       trip,
       Map.of(),
-      realtimeEnv.transitService()
+      realtimeEnv.transitService(),
+      realtimeEnv.shapeService()
     );
 
     var activeDates = impl.activeDates().get(env);
@@ -71,7 +73,8 @@ class TripImplTest {
     var env = DataFetchingSupport.dataFetchingEnvironment(
       trip,
       Map.of("date", SERVICE_DATE),
-      realtimeEnv.transitService()
+      realtimeEnv.transitService(),
+      realtimeEnv.shapeService()
     );
 
     TripOnServiceDate result = impl.onServiceDate().get(env);
@@ -92,7 +95,8 @@ class TripImplTest {
     var env = DataFetchingSupport.dataFetchingEnvironment(
       trip,
       Map.of("date", SERVICE_DATE.plusDays(1)),
-      realtimeEnv.transitService()
+      realtimeEnv.transitService(),
+      realtimeEnv.shapeService()
     );
 
     assertNull(impl.onServiceDate().get(env));
@@ -108,7 +112,8 @@ class TripImplTest {
     var env = DataFetchingSupport.dataFetchingEnvironment(
       trip,
       Map.of("date", SERVICE_DATE),
-      realtimeEnv.transitService()
+      realtimeEnv.transitService(),
+      realtimeEnv.shapeService()
     );
 
     TripOnServiceDate result = impl.onServiceDate().get(env);

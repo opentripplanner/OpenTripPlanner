@@ -47,7 +47,7 @@ class TripOnServiceDateImplTest {
     var env = envBuilder.addTrip(TRIP_INPUT).build();
     var transitService = env.transitService();
     var tosd = transitService.getTripOnServiceDate(id(TOSD_ID));
-    var dfEnv = dataFetchingEnvironment(tosd, Map.of(), transitService);
+    var dfEnv = dataFetchingEnvironment(tosd, Map.of(), transitService, env.shapeService());
     var state = SUBJECT.realTimeTripState().get(dfEnv);
     assertEquals(new RealTimeTripStateModel(false, false, false, false, false), state);
   }
@@ -66,7 +66,7 @@ class TripOnServiceDateImplTest {
     );
     var transitService = env.transitService();
     var tosd = transitService.getTripOnServiceDate(id(TOSD_ID));
-    var dfEnv = dataFetchingEnvironment(tosd, Map.of(), transitService);
+    var dfEnv = dataFetchingEnvironment(tosd, Map.of(), transitService, env.shapeService());
     var state = SUBJECT.realTimeTripState().get(dfEnv);
     assertTrue(state.canceled());
     assertTrue(state.updated());
@@ -89,7 +89,7 @@ class TripOnServiceDateImplTest {
     );
     var transitService = env.transitService();
     var tosd = transitService.getTripOnServiceDate(id(TOSD_ID));
-    var dfEnv = dataFetchingEnvironment(tosd, Map.of(), transitService);
+    var dfEnv = dataFetchingEnvironment(tosd, Map.of(), transitService, env.shapeService());
     var state = SUBJECT.realTimeTripState().get(dfEnv);
     assertTrue(state.timesModified());
     assertTrue(state.updated());
@@ -110,7 +110,7 @@ class TripOnServiceDateImplTest {
       .withTrip(unknownTrip)
       .withServiceDate(SERVICE_DATE)
       .build();
-    var dfEnv = dataFetchingEnvironment(tosd, Map.of(), transitService);
+    var dfEnv = dataFetchingEnvironment(tosd, Map.of(), transitService, env.shapeService());
     assertNull(SUBJECT.realTimeTripState().get(dfEnv));
   }
 }

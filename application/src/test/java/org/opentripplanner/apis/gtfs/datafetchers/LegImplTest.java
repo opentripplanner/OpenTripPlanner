@@ -163,13 +163,18 @@ class LegImplTest implements PlanTestConstants {
       .withAlightStopIndexInPattern(1)
       .build();
 
-    var dfEnv = dataFetchingEnvironment(leg, Map.of(), transitService);
+    var dfEnv = dataFetchingEnvironment(leg, Map.of(), transitService, env.shapeService());
     var tripOnServiceDate = IMPL.tripOnServiceDate().get(dfEnv);
     assertThat(tripOnServiceDate).isEqualTo(transitService.getTripOnServiceDate(id("Tosd1")));
 
     // The TripOnServiceDate returned by the leg is the same one TripOnServiceDateImpl resolves
     // realTimeTripState over, so the real-time state is reachable from the leg.
-    var tosdEnv = dataFetchingEnvironment(tripOnServiceDate, Map.of(), transitService);
+    var tosdEnv = dataFetchingEnvironment(
+      tripOnServiceDate,
+      Map.of(),
+      transitService,
+      env.shapeService()
+    );
     assertThat(new TripOnServiceDateImpl().realTimeTripState().get(tosdEnv)).isEqualTo(
       new RealTimeTripStateModel(false, false, false, false, false)
     );

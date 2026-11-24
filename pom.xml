@@ -92,7 +92,7 @@
         <debugUi.apiUrl>/otp/transmodel/v3</debugUi.apiUrl>
         <debugUi.styleUrl>/otp/debug/vectortiles/style.json</debugUi.styleUrl>
         <debugUi.graphiqlUrl>/graphiql?flavor=transmodel</debugUi.graphiqlUrl>
-        <plugin.spotless.version>3.10.4</plugin.spotless.version>
+        <plugin.spotless.version>3.11.0</plugin.spotless.version>
         <plugin.spotless.goal>apply</plugin.spotless.goal>
         <plugin.spotless.skip>false</plugin.spotless.skip>
         <!-- Javadoc formatting (Eclipse formatter + Javadoc regex fixes) is opt-in, see the
@@ -397,7 +397,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>3.6.2</version>
+                <version>3.8.0</version>
                 <executions>
                     <execution>
                         <id>build-helper-generate-test-sources</id>
@@ -494,7 +494,7 @@
                     <dependency>
                         <groupId>com.puppycrawl.tools</groupId>
                         <artifactId>checkstyle</artifactId>
-                        <version>14.3.0</version>
+                        <version>14.4.0</version>
                     </dependency>
                 </dependencies>
                 <executions>

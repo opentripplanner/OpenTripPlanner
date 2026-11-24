@@ -5,6 +5,7 @@ import static org.opentripplanner.apis.gtfs.GraphQLUtils.stopTimeToInt;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import java.time.ZonedDateTime;
+import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.apis.gtfs.GtfsGraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.model.CallRealTime;
@@ -13,6 +14,7 @@ import org.opentripplanner.apis.gtfs.model.CallScheduledTime.ArrivalDepartureTim
 import org.opentripplanner.apis.gtfs.model.CallScheduledTime.TimeWindow;
 import org.opentripplanner.apis.gtfs.model.DestinationDisplay;
 import org.opentripplanner.model.TripTimeOnDate;
+import org.opentripplanner.service.shape.ShapeService;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.timetable.EstimatedTime;
 import org.opentripplanner.transit.service.TransitService;
@@ -25,6 +27,24 @@ public class StopCallImpl implements GraphQLDataFetchers.GraphQLStopCall {
     return environment -> {
       var headsign = getSource(environment).getHeadsign();
       return headsign == null ? null : new DestinationDisplay(headsign);
+    };
+  }
+
+  @Override
+  public DataFetcher<Geometry> geometryToNextCall() {
+    return environment -> {
+      var tripTime = getSource(environment);
+      var pattern = tripTime.pattern();
+      var stopPosition = tripTime.getStopPosition();
+      if (stopPosition >= pattern.numberOfStops() - 1) {
+        return null;
+      }
+      // The path of a flexible trip is not known
+      var flexIndex = getTransitService(environment).getFlexIndex();
+      if (flexIndex != null && flexIndex.getTripById(tripTime.getTrip().getId()) != null) {
+        return null;
+      }
+      return getShapeService(environment).getTripPatternShape(pattern.getId()).get(stopPosition);
     };
   }
 
@@ -59,8 +79,15 @@ public class StopCallImpl implements GraphQLDataFetchers.GraphQLStopCall {
       if (tripTime.hasScheduledTimes()) {
         var scheduledArrival = getZonedDateTime(environment, tripTime.getScheduledArrival());
         var scheduledDeparture = getZonedDateTime(environment, tripTime.getScheduledDeparture());
+        // This is quite awkward: the call only knows its (possibly real-time) pattern, so the
+        // scheduled pattern has to be looked up separately and the stop position translated to it
+        // to get the scheduled pickup/drop off type. This should be refactored when the transit
+        // model is refactored.
+        var scheduledPattern = getTransitService(environment).findPattern(tripTime.getTrip());
         return new CallSchedule(
-          new ArrivalDepartureTime(scheduledArrival, scheduledDeparture, tripTime.isTimepoint())
+          new ArrivalDepartureTime(scheduledArrival, scheduledDeparture, tripTime.isTimepoint()),
+          tripTime.getScheduledPickupType(scheduledPattern),
+          tripTime.getScheduledDropoffType(scheduledPattern)
         );
       } else {
         var transitService = getTransitService(environment);
@@ -68,15 +95,20 @@ public class StopCallImpl implements GraphQLDataFetchers.GraphQLStopCall {
         if (flexTrip == null) {
           return null;
         }
-        var startSecs = flexTrip.earliestDepartureTime(tripTime.getStopPosition());
-        var endSecs = flexTrip.latestArrivalTime(tripTime.getStopPosition());
+        var stopPosition = tripTime.getStopPosition();
+        var startSecs = flexTrip.earliestDepartureTime(stopPosition);
+        var endSecs = flexTrip.latestArrivalTime(stopPosition);
 
         var serviceDay = tripTime.getServiceDay();
         var timeZone = transitService.getTimeZone();
         var start = ServiceDateUtils.toOffsetDateTime(serviceDay, timeZone, startSecs);
         var end = ServiceDateUtils.toOffsetDateTime(serviceDay, timeZone, endSecs);
 
-        return new CallSchedule(new TimeWindow(start, end));
+        return new CallSchedule(
+          new TimeWindow(start, end),
+          flexTrip.getBoardRule(stopPosition),
+          flexTrip.getAlightRule(stopPosition)
+        );
       }
     };
   }
@@ -97,6 +129,10 @@ public class StopCallImpl implements GraphQLDataFetchers.GraphQLStopCall {
 
   private TransitService getTransitService(DataFetchingEnvironment environment) {
     return environment.<GtfsGraphQLRequestContext>getContext().transitService();
+  }
+
+  private ShapeService getShapeService(DataFetchingEnvironment environment) {
+    return environment.<GtfsGraphQLRequestContext>getContext().shapeService();
   }
 
   private ZonedDateTime getZonedDateTime(DataFetchingEnvironment environment, int time) {

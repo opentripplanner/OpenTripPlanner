@@ -51,6 +51,7 @@ Identical hops are deduplicated, so equal hops share one instance.
 | Term                        | Meaning                                                                                |
 | --------------------------- | -------------------------------------------------------------------------------------- |
 | Hop                         | The segment between two consecutive stops of a pattern.                                |
+| Hop geometry                | The `LineString` of a single hop; a trip pattern shape holds one per hop.              |
 | Trip pattern shape          | All hops of a pattern, as a `CompactLineStringSequence`.                               |
 | `ShapeService`              | Read-only, request-scoped lookup of a pattern's shape.                                 |
 | `ShapeRepository`           | Mutable buffer for the writer thread; publishes snapshots.                             |
