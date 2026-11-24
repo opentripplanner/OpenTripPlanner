@@ -41,6 +41,16 @@ final class OpenTemplatePaths<P> {
     this(paths, Set.of());
   }
 
+  /** All stored paths, whatever is closed. */
+  OverlaidTemplatePaths<P> paths() {
+    return paths;
+  }
+
+  /** The ids of the closed facilities. */
+  Set<String> closedFacilityIds() {
+    return closedFacilityIds;
+  }
+
   /**
    * The path the transfer from {@code fromStop} to {@code toStop} uses, given the stored path of
    * the pair. {@code null} if every path of the transfer depends on a closed facility.

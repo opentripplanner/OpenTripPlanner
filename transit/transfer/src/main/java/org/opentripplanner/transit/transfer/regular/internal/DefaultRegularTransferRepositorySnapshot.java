@@ -20,11 +20,10 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Default {@link RegularTransferRepositorySnapshot}, created by
- * {@link RegularTransferRepositoryLifecycle#freeze}. The snapshot owns its
- * {@link OverlaidTemplatePaths}, which is never written to after creation. Hence, the paths are
- * effectively immutable and safe to read from any number of request threads. The Raptor transfers
- * and the paths of the requests are read from one {@link OpenTemplatePaths} view of the paths with
- * the closed facilities of the snapshot applied, so they always agree on the path of a transfer.
+ * {@link RegularTransferRepositoryLifecycle#freeze}. The snapshot owns its paths, which are never
+ * written to after creation. Hence, the paths are effectively immutable and safe to read from any
+ * number of request threads. The Raptor transfers and the paths of the requests are both read from
+ * the {@link OpenTemplatePaths} of the snapshot, so they always agree on the path of a transfer.
  * The cache of the Raptor transfers is the only mutable state, and it is thread-safe.
  *
  * @param <P> the street path type
@@ -39,8 +38,6 @@ class DefaultRegularTransferRepositorySnapshot<
     DefaultRegularTransferRepositorySnapshot.class
   );
 
-  private final OverlaidTemplatePaths<P> paths;
-  private final Set<String> closedFacilityIds;
   private final OpenTemplatePaths<P> openPaths;
   private final RegularTransferServiceCache<RaptorTransferStore> cache;
   private final CacheFactory cacheFactory;
@@ -51,8 +48,7 @@ class DefaultRegularTransferRepositorySnapshot<
   private final RegularTransferCacheStatistics statistics;
 
   DefaultRegularTransferRepositorySnapshot(
-    OverlaidTemplatePaths<P> paths,
-    Set<String> closedFacilityIds,
+    OpenTemplatePaths<P> openPaths,
     RegularTransferServiceCache<RaptorTransferStore> cache,
     RaptorTransfersFactory<P, R> raptorTransfersFactory,
     TransferRequestMapper<R> mapper,
@@ -60,9 +56,7 @@ class DefaultRegularTransferRepositorySnapshot<
     List<WarmupEntry> warmup,
     RegularTransferCacheStatistics statistics
   ) {
-    this.paths = paths;
-    this.closedFacilityIds = Set.copyOf(closedFacilityIds);
-    this.openPaths = new OpenTemplatePaths<>(paths, this.closedFacilityIds);
+    this.openPaths = openPaths;
     this.cache = cache;
     this.mapper = mapper;
     this.matcher = matcher;
@@ -88,7 +82,7 @@ class DefaultRegularTransferRepositorySnapshot<
   @Override
   public RegularTransfersService<P> forRequest(R request) {
     var userPreferences = mapper.toUserPreferences(request);
-    var profile = matcher.closestProfile(paths, userPreferences);
+    var profile = matcher.closestProfile(openPaths.paths(), userPreferences);
     statistics.record(userPreferences);
     return new DefaultRegularTransfersService<>(
       openPaths,
@@ -133,26 +127,16 @@ class DefaultRegularTransferRepositorySnapshot<
   @Nullable
   private AbstractUserPreferences<?> closestProfileOrNull(AbstractUserPreferences<?> key) {
     try {
-      return matcher.closestProfile(paths, key);
+      return matcher.closestProfile(openPaths.paths(), key);
     } catch (IllegalArgumentException e) {
       // The paths of the snapshot have no profile of the type of the key
       return null;
     }
   }
 
-  /** The paths of this snapshot, for the lifecycle. */
-  OverlaidTemplatePaths<P> paths() {
-    return paths;
-  }
-
-  /** The paths of this snapshot with its closed facilities applied. */
+  /** The paths of this snapshot and its closed facilities. */
   OpenTemplatePaths<P> openPaths() {
     return openPaths;
-  }
-
-  /** The ids of the facilities that are closed in this snapshot, for the lifecycle. */
-  Set<String> closedFacilityIds() {
-    return closedFacilityIds;
   }
 
   /** The cache of the Raptor transfers of this snapshot, for the lifecycle. */
@@ -176,7 +160,7 @@ class DefaultRegularTransferRepositorySnapshot<
       return raptorTransfersFactory.create(
         openPaths,
         userPreferences,
-        matcher.closestProfile(paths, userPreferences)
+        matcher.closestProfile(openPaths.paths(), userPreferences)
       );
     }
 
@@ -189,7 +173,7 @@ class DefaultRegularTransferRepositorySnapshot<
       return raptorTransfersFactory.patch(
         openPaths,
         userPreferences,
-        matcher.closestProfile(paths, userPreferences),
+        matcher.closestProfile(openPaths.paths(), userPreferences),
         previous,
         changedFromStops
       );

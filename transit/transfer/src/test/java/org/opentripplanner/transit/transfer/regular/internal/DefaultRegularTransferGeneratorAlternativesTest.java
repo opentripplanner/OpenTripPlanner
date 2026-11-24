@@ -246,7 +246,7 @@ class DefaultRegularTransferGeneratorAlternativesTest {
         String,
         WalkPreferences
       >) TestLifecycles.initialSnapshot(copy);
-      assertEquals(paths, snapshot.paths().alternativePaths(FIRST, A_INDEX, B_INDEX));
+      assertEquals(paths, snapshot.openPaths().paths().alternativePaths(FIRST, A_INDEX, B_INDEX));
     }
   }
 
@@ -272,7 +272,7 @@ class DefaultRegularTransferGeneratorAlternativesTest {
       FakePath,
       WalkPreferences
     >) TestLifecycles.initialSnapshot(buildRepository);
-    return new Generated(snapshot.paths(), provider);
+    return new Generated(snapshot.openPaths().paths(), provider);
   }
 
   private static AlternativePath<FakePath> alternative(FakePath path, String... ids) {

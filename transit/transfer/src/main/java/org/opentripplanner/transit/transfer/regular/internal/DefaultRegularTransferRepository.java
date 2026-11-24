@@ -55,9 +55,9 @@ class DefaultRegularTransferRepository<P> implements RegularTransferRepository<P
     DefaultRegularTransferRepositorySnapshot<P, ?> base
   ) {
     return new DefaultRegularTransferRepository<>(
-      base.paths().copy(),
+      base.openPaths().paths().copy(),
       base,
-      base.closedFacilityIds()
+      base.openPaths().closedFacilityIds()
     );
   }
 

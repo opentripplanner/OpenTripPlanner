@@ -212,8 +212,7 @@ public class RegularTransferRepositoryLifecycle<
             .carryForward(userPreferences -> changedFromStops(frozen, userPreferences));
     cacheCounters.setLatest(cache);
     return new DefaultRegularTransferRepositorySnapshot<>(
-      frozen.paths(),
-      frozen.closedFacilityIds(),
+      new OpenTemplatePaths<>(frozen.paths(), frozen.closedFacilityIds()),
       cache,
       raptorTransfersFactory,
       mapper,
