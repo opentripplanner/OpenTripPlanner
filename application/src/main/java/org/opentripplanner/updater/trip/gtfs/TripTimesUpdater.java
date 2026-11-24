@@ -247,12 +247,16 @@ class TripTimesUpdater {
         builder.withExtraCall(stopIndex, true);
       }
 
-      setArrivalAndDeparture(
-        builder,
-        stopIndex,
-        stopAndStopTimeUpdate.stopTimeUpdate(),
-        midnightSecondsSinceEpoch
-      );
+      if (stopAndStopTimeUpdate.stopTimeUpdate().isNoData()) {
+        builder.withNoData(stopIndex);
+      } else {
+        setArrivalAndDeparture(
+          builder,
+          stopIndex,
+          stopAndStopTimeUpdate.stopTimeUpdate(),
+          midnightSecondsSinceEpoch
+        );
+      }
       if (builder.getArrivalTime(stopIndex) == null) {
         builder.withArrivalDelay(stopIndex, 0);
       }

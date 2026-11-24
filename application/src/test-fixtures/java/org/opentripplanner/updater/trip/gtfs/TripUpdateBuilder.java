@@ -316,6 +316,32 @@ public class TripUpdateBuilder {
   }
 
   /**
+   * Add a NO_DATA stop with a scheduled arrival and departure time, as required for a stop of a NEW
+   * or REPLACEMENT trip.
+   */
+  public TripUpdateBuilder addNoDataStopWithScheduled(
+    String stopId,
+    @Nullable String time,
+    String scheduledTime
+  ) {
+    return addStopTime(
+      stopId,
+      time,
+      time,
+      NO_STOP_SEQUENCE,
+      NO_DELAY,
+      NO_DELAY,
+      StopTimeUpdate.ScheduleRelationship.NO_DATA,
+      null,
+      null,
+      null,
+      scheduledTime,
+      scheduledTime,
+      null
+    );
+  }
+
+  /**
    * Add a skipped stop to the TripUpdate.
    */
   public TripUpdateBuilder addSkippedStop(int stopSequence) {

@@ -172,14 +172,53 @@ class RealtimeStateMapperTest {
   }
 
   @Test
-  void stopStateOfModifiedPatternIgnoresNoData() {
+  void noDataStopOfModifiedPatternIsScheduled() {
     var tripTimes = TripTimesForTest.realTime(b -> {
       b.withModifiedTripPattern();
       b.withNoData(0);
       b.withExtraCall(1, true);
     });
-    assertEquals(MODIFIED, RealtimeStateMapper.map(stopTime(tripTimes, 0)));
+    assertEquals(SCHEDULED, RealtimeStateMapper.map(stopTime(tripTimes, 0)));
     assertEquals(ADDED, RealtimeStateMapper.map(stopTime(tripTimes, 1)));
+  }
+
+  @Test
+  void noDataExtraCallIsAdded() {
+    var tripTimes = TripTimesForTest.realTime(b -> {
+      b.withModifiedTripPattern();
+      b.withNoData(0);
+      b.withExtraCall(0, true);
+    });
+    assertEquals(ADDED, RealtimeStateMapper.map(stopTime(tripTimes, 0)));
+  }
+
+  @Test
+  void noDataStopOfUnmodifiedTripHasTripState() {
+    var tripTimes = TripTimesForTest.realTime(b -> {
+      b.withRealTimeUpdated();
+      b.withNoData(0);
+    });
+    assertEquals(UPDATED, RealtimeStateMapper.map(stopTime(tripTimes, 0)));
+  }
+
+  @Test
+  void noDataStopOfAddedTripIsAdded() {
+    var tripTimes = TripTimesForTest.realTime(b -> {
+      b.withAdded();
+      b.withModifiedTripPattern();
+      b.withNoData(0);
+    });
+    assertEquals(ADDED, RealtimeStateMapper.map(stopTime(tripTimes, 0)));
+  }
+
+  @Test
+  void noDataStopOfCanceledTripIsCanceled() {
+    var tripTimes = TripTimesForTest.realTime(b -> {
+      b.withModifiedTripPattern();
+      b.withNoData(0);
+      b.withCanceled();
+    });
+    assertEquals(CANCELED, RealtimeStateMapper.map(stopTime(tripTimes, 0)));
   }
 
   @Test

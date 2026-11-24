@@ -152,6 +152,21 @@ public final class StopTimeUpdate {
     );
   }
 
+  public boolean isNoData() {
+    return (
+      stopTimeUpdate.getScheduleRelationship() ==
+      GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship.NO_DATA
+    );
+  }
+
+  public boolean hasScheduledArrivalTime() {
+    return stopTimeUpdate.hasArrival() && stopTimeUpdate.getArrival().hasScheduledTime();
+  }
+
+  public boolean hasScheduledDepartureTime() {
+    return stopTimeUpdate.hasDeparture() && stopTimeUpdate.getDeparture().hasScheduledTime();
+  }
+
   public OptionalInt stopSequence() {
     return stopTimeUpdate.hasStopSequence()
       ? OptionalInt.of(stopTimeUpdate.getStopSequence())
