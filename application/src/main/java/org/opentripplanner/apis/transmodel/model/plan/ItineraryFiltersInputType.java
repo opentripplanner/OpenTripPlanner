@@ -28,8 +28,6 @@ public class ItineraryFiltersInputType {
   private static final String GROUP_SIMILARITY_KEEP_THREE = "groupSimilarityKeepThree";
   private static final String GROUPED_OTHER_THAN_SAME_LEGS_MAX_COST_MULTIPLIER =
     "groupedOtherThanSameLegsMaxCostMultiplier";
-  private static final String GROUP_SIMILARITY_KEEP_N_ITINERARIES =
-    "groupSimilarityKeepNumOfItineraries";
 
   public static GraphQLInputObjectType create(ItineraryFilterPreferences dft) {
     var generalizedCostFilterParams = GraphQLInputObjectType.newInputObject()
@@ -143,22 +141,6 @@ public class ItineraryFiltersInputType {
       .field(
         GraphQLInputObjectField.newInputObjectField()
           .type(Scalars.GraphQLFloat)
-          .name(GROUP_SIMILARITY_KEEP_N_ITINERARIES)
-          .description(
-            "Same as " +
-              GROUP_SIMILARITY_KEEP_THREE +
-              ". " +
-              "The value must be between 0 and 1. A value below %s turns this filter off.".formatted(
-                GroupBySimilarity.MIN_GROUP_BY_P
-              )
-          )
-          .deprecate("Use " + GROUP_SIMILARITY_KEEP_THREE + " instead.")
-          .defaultValue(dft.groupSimilarityKeepThree().asDouble())
-          .build()
-      )
-      .field(
-        GraphQLInputObjectField.newInputObjectField()
-          .type(Scalars.GraphQLFloat)
           .name(GROUPED_OTHER_THAN_SAME_LEGS_MAX_COST_MULTIPLIER)
           .description(
             "Of the itineraries grouped to maximum of three itineraries, how much worse can the " +
@@ -196,14 +178,6 @@ public class ItineraryFiltersInputType {
     setField(callWith, GROUP_SIMILARITY_KEEP_ONE, (Double v) ->
       builder.withGroupSimilarityKeepOne(validateGroupSimilarity(GROUP_SIMILARITY_KEEP_ONE, v))
     );
-
-    // This is deprecated, sets same value as GROUP_SIMILARITY_KEEP_THREE
-    setField(callWith, GROUP_SIMILARITY_KEEP_N_ITINERARIES, (Double v) ->
-      builder.withGroupSimilarityKeepThree(
-        validateGroupSimilarity(GROUP_SIMILARITY_KEEP_N_ITINERARIES, v)
-      )
-    );
-
     setField(callWith, GROUP_SIMILARITY_KEEP_THREE, (Double v) ->
       builder.withGroupSimilarityKeepThree(validateGroupSimilarity(GROUP_SIMILARITY_KEEP_THREE, v))
     );
