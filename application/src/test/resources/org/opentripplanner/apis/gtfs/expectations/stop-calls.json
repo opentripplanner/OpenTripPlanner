@@ -1,0 +1,121 @@
+{
+  "data": {
+    "pattern": {
+      "tripsOnServiceDate": [
+        {
+          "trip": {
+            "gtfsId": "F:123"
+          },
+          "stopCalls": [
+            {
+              "stopLocation": {
+                "gtfsId": "F:Stop_0"
+              },
+              "schedule": {
+                "stopLocation": {
+                  "gtfsId": "F:Stop_0"
+                }
+              }
+            },
+            {
+              "stopLocation": {
+                "gtfsId": "F:Stop_1"
+              },
+              "schedule": {
+                "stopLocation": {
+                  "gtfsId": "F:Stop_1"
+                }
+              }
+            },
+            {
+              "stopLocation": {
+                "gtfsId": "F:Stop_2"
+              },
+              "schedule": {
+                "stopLocation": {
+                  "gtfsId": "F:Stop_2"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "trip": {
+            "gtfsId": "F:REPLACEMENT_TRIP"
+          },
+          "stopCalls": [
+            {
+              "stopLocation": {
+                "gtfsId": "F:A"
+              },
+              "schedule": {
+                "stopLocation": null
+              }
+            },
+            {
+              "stopLocation": {
+                "gtfsId": "F:B"
+              },
+              "schedule": {
+                "stopLocation": null
+              }
+            },
+            {
+              "stopLocation": {
+                "gtfsId": "F:C"
+              },
+              "schedule": {
+                "stopLocation": null
+              }
+            },
+            {
+              "stopLocation": {
+                "gtfsId": "F:D"
+              },
+              "schedule": {
+                "stopLocation": null
+              }
+            }
+          ]
+        },
+        {
+          "trip": {
+            "gtfsId": "F:321Canceled"
+          },
+          "stopCalls": [
+            {
+              "stopLocation": {
+                "gtfsId": "F:Stop_0"
+              },
+              "schedule": {
+                "stopLocation": {
+                  "gtfsId": "F:Stop_0"
+                }
+              }
+            },
+            {
+              "stopLocation": {
+                "gtfsId": "F:Stop_1"
+              },
+              "schedule": {
+                "stopLocation": {
+                  "gtfsId": "F:Stop_1"
+                }
+              }
+            },
+            {
+              "stopLocation": {
+                "gtfsId": "F:Stop_2"
+              },
+              "schedule": {
+                "stopLocation": {
+                  "gtfsId": "F:Stop_2"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

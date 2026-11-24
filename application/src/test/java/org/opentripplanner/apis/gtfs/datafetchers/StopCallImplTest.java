@@ -1,6 +1,8 @@
 package org.opentripplanner.apis.gtfs.datafetchers;
 
+import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.ADDED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
@@ -51,6 +53,7 @@ class StopCallImplTest {
   private static final String FLEX_TRIP_ID = "FlexTrip1";
   private static final String MODIFIED_TRIP_ID = "ModifiedTrip1";
   private static final String HEADSIGN_TRIP_ID = "HeadsignTrip1";
+  private static final String ADDED_TRIP_ID = "AddedTrip1";
   private static final double TOLERANCE = 1e-6;
 
   private static final OffsetDateTime NOON = OffsetDateTime.parse("2023-06-03T12:00+02:00");
@@ -145,6 +148,40 @@ class StopCallImplTest {
 
     assertEquals(STOP_B_OTHER_PLATFORM, impl.stopLocation().get(env));
     assertEquals(STOP_B, impl.schedule().get(env).stopLocation());
+  }
+
+  /** A trip added by a real-time update has scheduled times, but no scheduled stop location. */
+  @Test
+  void addedTrip() throws Exception {
+    var realtimeEnv = envBuilder.addTrip(TRIP_INPUT).build();
+    var rt = GtfsRtTestHelper.of(realtimeEnv);
+    var addedTrip = rt
+      .tripUpdate(ADDED_TRIP_ID, ADDED)
+      .addStopTime(STOP_A.getId().getId(), "12:00")
+      .addStopTime(STOP_B.getId().getId(), "12:30")
+      .build();
+    assertSuccess(rt.applyTripUpdate(addedTrip));
+
+    var tripData = realtimeEnv.tripData(ADDED_TRIP_ID);
+    var call = new TripTimeOnDate(
+      tripData.tripTimes(),
+      0,
+      tripData.tripPattern(),
+      SERVICE_DATE,
+      MIDNIGHT
+    );
+
+    var impl = new StopCallImpl();
+    var env = DataFetchingSupport.dataFetchingEnvironment(
+      call,
+      Map.of(),
+      realtimeEnv.transitService()
+    );
+
+    assertEquals(STOP_A, impl.stopLocation().get(env));
+    var schedule = impl.schedule().get(env);
+    assertNotNull(schedule.time());
+    assertNull(schedule.stopLocation());
   }
 
   @Test

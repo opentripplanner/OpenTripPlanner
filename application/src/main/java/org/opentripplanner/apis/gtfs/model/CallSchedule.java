@@ -12,11 +12,11 @@ import org.opentripplanner.transit.model.site.StopLocation;
  * @param dropOffType the scheduled drop off type of the call
  * @param stopLocation the originally scheduled stop location of the call, which may differ from
  *                     the real-time stop location if the stop (e.g. platform) was changed by a
- *                     real-time update
+ *                     real-time update. {@code null} if the call has no scheduled stop location.
  */
 public record CallSchedule(
   CallScheduledTime time,
   @Nullable PickDrop pickupType,
   @Nullable PickDrop dropOffType,
-  StopLocation stopLocation
+  @Nullable StopLocation stopLocation
 ) {}

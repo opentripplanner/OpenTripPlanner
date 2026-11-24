@@ -215,14 +215,37 @@ public class TripTimeOnDate {
     if (isExtraCall()) {
       return OptionalInt.empty();
     }
-    var extraCallsBefore = (int) IntStream.range(0, stopPosition)
-      .filter(tripTimes::isExtraCall)
-      .count();
-    var scheduledPos = stopPosition - extraCallsBefore;
+    var scheduledPos = stopPosition - numberOfExtraCallsBefore(stopPosition);
     if (scheduledPos >= scheduledTripPattern.numberOfStops()) {
       throw new IllegalStateException("Number of stops is inconsistent in scheduled trip pattern");
     }
     return OptionalInt.of(scheduledPos);
+  }
+
+  /**
+   * Find the originally scheduled stop for this call. It differs from {@link #getStop()} if the
+   * stop, for example the platform, was changed by a real-time update.
+   * <p>
+   * Returns {@code null} if the call has no scheduled stop: if the trip or the call was added by a
+   * real-time update, or if the real-time stops of the trip can't be matched to the scheduled
+   * stops. They can be matched if they are the scheduled stops plus any extra calls.
+   */
+  @Nullable
+  public StopLocation findScheduledStop(TripPattern scheduledTripPattern) {
+    if (tripTimes.isAdded() || isExtraCall()) {
+      return null;
+    }
+    int numberOfStops = tripPattern.numberOfStops();
+    int numberOfScheduledStops = numberOfStops - numberOfExtraCallsBefore(numberOfStops);
+    if (numberOfScheduledStops != scheduledTripPattern.numberOfStops()) {
+      return null;
+    }
+    return scheduledTripPattern.getStop(stopPosition - numberOfExtraCallsBefore(stopPosition));
+  }
+
+  /** The number of extra calls in this trip before the given stop position. */
+  private int numberOfExtraCallsBefore(int position) {
+    return (int) IntStream.range(0, position).filter(tripTimes::isExtraCall).count();
   }
 
   public int getStopPosition() {

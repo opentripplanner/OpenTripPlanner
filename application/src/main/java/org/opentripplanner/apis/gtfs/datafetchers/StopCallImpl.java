@@ -80,7 +80,7 @@ public class StopCallImpl implements GraphQLDataFetchers.GraphQLStopCall {
       // to get the scheduled stop and pickup/drop off type. This should be refactored when the
       // transit model is refactored.
       var scheduledPattern = transitService.findPattern(tripTime.getTrip());
-      var scheduledStop = tripTime.getScheduledStop(scheduledPattern);
+      var scheduledStop = tripTime.findScheduledStop(scheduledPattern);
 
       if (tripTime.hasScheduledTimes()) {
         var scheduledArrival = getZonedDateTime(environment, tripTime.getScheduledArrival());
