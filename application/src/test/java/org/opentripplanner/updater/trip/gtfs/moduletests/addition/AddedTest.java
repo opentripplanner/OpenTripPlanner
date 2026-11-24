@@ -18,6 +18,8 @@ import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailu
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL;
 
+import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
 import de.mfdz.MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupType;
 import java.util.List;
 import java.util.Objects;
@@ -207,7 +209,7 @@ class AddedTest implements RealtimeTestConstants {
     var tripUpdate = gtfsRt
       .tripUpdate(ADDED_TRIP_ID, NEW)
       .addStopTime(STOP_A_ID, "00:30")
-      .addNoDataStopWithScheduled(STOP_B_ID, null, "00:40")
+      .addNoDataStopWithScheduled(STOP_B_ID, "00:40")
       .addStopTime(STOP_C_ID, "00:55")
       .build();
 
@@ -226,6 +228,31 @@ class AddedTest implements RealtimeTestConstants {
       .tripUpdate(ADDED_TRIP_ID, NEW)
       .addStopTime(STOP_A_ID, "00:30")
       .addNoDataStop(STOP_B_ID)
+      .addStopTime(STOP_C_ID, "00:55")
+      .build();
+
+    assertFailure(INVALID_ARRIVAL_TIME, gtfsRt.applyTripUpdate(tripUpdate));
+    assertTripNotAdded();
+  }
+
+  @Test
+  void addedTripWithNoDataStopWithPredictedTimeIsRejected() {
+    long time = 1_000_000;
+    var tripUpdate = gtfsRt
+      .tripUpdate(ADDED_TRIP_ID, NEW)
+      .addStopTime(STOP_A_ID, "00:30")
+      .addRawStopTime(
+        StopTimeUpdate.newBuilder()
+          .setStopId(STOP_B_ID)
+          .setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.NO_DATA)
+          .setArrival(
+            StopTimeEvent.newBuilder()
+              .setScheduledTime(time)
+              .setTime(time + 120)
+          )
+          .setDeparture(StopTimeEvent.newBuilder().setScheduledTime(time))
+          .build()
+      )
       .addStopTime(STOP_C_ID, "00:55")
       .build();
 

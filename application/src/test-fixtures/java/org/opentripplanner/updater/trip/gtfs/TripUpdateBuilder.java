@@ -316,18 +316,14 @@ public class TripUpdateBuilder {
   }
 
   /**
-   * Add a NO_DATA stop with a scheduled arrival and departure time, as required for a stop of a NEW
-   * or REPLACEMENT trip.
+   * Add a NO_DATA stop with a scheduled arrival and departure time but no predictions, as required
+   * for a stop of a NEW or REPLACEMENT trip.
    */
-  public TripUpdateBuilder addNoDataStopWithScheduled(
-    String stopId,
-    @Nullable String time,
-    String scheduledTime
-  ) {
+  public TripUpdateBuilder addNoDataStopWithScheduled(String stopId, String scheduledTime) {
     return addStopTime(
       stopId,
-      time,
-      time,
+      null,
+      null,
       NO_STOP_SEQUENCE,
       NO_DELAY,
       NO_DELAY,

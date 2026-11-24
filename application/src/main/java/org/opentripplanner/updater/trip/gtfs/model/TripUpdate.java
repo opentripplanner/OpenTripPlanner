@@ -146,10 +146,10 @@ public final class TripUpdate {
         lastStopSequence = seq;
       }
       if (newTrip && update.isNoData()) {
-        if (!update.hasScheduledArrivalTime()) {
+        if (!update.hasOnlyScheduledArrivalTime()) {
           throw UpdateException.of(tripId(), INVALID_ARRIVAL_TIME);
         }
-        if (!update.hasScheduledDepartureTime()) {
+        if (!update.hasOnlyScheduledDepartureTime()) {
           throw UpdateException.of(tripId(), INVALID_DEPARTURE_TIME);
         }
       }

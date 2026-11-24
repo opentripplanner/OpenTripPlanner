@@ -20,10 +20,15 @@ import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSucce
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
 import java.util.List;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TripInput;
+import org.opentripplanner.updater.spi.UpdateErrorType;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.gtfs.GtfsRtTestHelper;
 import org.opentripplanner.updater.trip.gtfs.model.TripUpdate;
@@ -311,107 +316,6 @@ public class ReplacementTest implements RealtimeTestConstants {
   }
 
   @Test
-  void replacementTripWithNoDataStop() {
-    var env = noDataEnvironment();
-    var rt = GtfsRtTestHelper.of(env);
-
-    var tripUpdate = rt
-      .tripUpdate(TRIP_1_ID, REPLACEMENT)
-      .addStopTimeWithScheduled(STOP_A_ID, "8:32", "8:30")
-      .addNoDataStopWithScheduled(STOP_B_ID, "8:47", "8:41")
-      .addStopTimeWithScheduled(STOP_C_ID, "8:56", "8:50")
-      .build();
-
-    assertSuccess(rt.applyTripUpdate(tripUpdate));
-
-    assertEquals(
-      "P U | A 8:32 8:32 | B [ND] 8:41 8:41 | C 8:56 8:56",
-      env.tripData(TRIP_1_ID).showTimetable()
-    );
-  }
-
-  @Test
-  void replacementTripWithNoDataExtraCall() {
-    var env = noDataEnvironment();
-    var rt = GtfsRtTestHelper.of(env);
-
-    var tripUpdate = rt
-      .tripUpdate(TRIP_1_ID, REPLACEMENT)
-      .addStopTimeWithScheduled(STOP_A_ID, "8:30", "8:30")
-      .addNoDataStopWithScheduled(STOP_D_ID, null, "8:45")
-      .addStopTimeWithScheduled(STOP_C_ID, "8:50", "8:50")
-      .build();
-
-    assertSuccess(rt.applyTripUpdate(tripUpdate));
-
-    assertEquals(
-      "P U | A 8:30 8:30 | D [ND,EC] 8:45 8:45 | C 8:50 8:50",
-      env.tripData(TRIP_1_ID).showTimetable()
-    );
-  }
-
-  @Test
-  void replacementTripWithNoDataStopBeforePreviousDepartureIsRejected() {
-    var env = noDataEnvironment();
-    var rt = GtfsRtTestHelper.of(env);
-
-    var tripUpdate = rt
-      .tripUpdate(TRIP_1_ID, REPLACEMENT)
-      .addStopTimeWithScheduled(STOP_A_ID, "8:45", "8:30")
-      .addNoDataStopWithScheduled(STOP_B_ID, null, "8:40")
-      .addStopTimeWithScheduled(STOP_C_ID, "8:55", "8:50")
-      .build();
-
-    assertFailure(NEGATIVE_HOP_TIME, rt.applyTripUpdate(tripUpdate));
-    assertScheduledTripUnchanged(env);
-  }
-
-  @Test
-  void replacementTripWithNoDataStopWithoutScheduledArrivalIsRejected() {
-    var env = noDataEnvironment();
-    var rt = GtfsRtTestHelper.of(env);
-
-    var tripUpdate = rt
-      .tripUpdate(TRIP_1_ID, REPLACEMENT)
-      .addStopTime(STOP_A_ID, "8:30")
-      .addRawStopTime(
-        StopTimeUpdate.newBuilder()
-          .setStopId(STOP_B_ID)
-          .setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.NO_DATA)
-          .setArrival(StopTimeEvent.newBuilder().setTime(SCHEDULED_TIME))
-          .setDeparture(StopTimeEvent.newBuilder().setScheduledTime(SCHEDULED_TIME))
-          .build()
-      )
-      .addStopTime(STOP_C_ID, "8:50")
-      .build();
-
-    assertFailure(INVALID_ARRIVAL_TIME, rt.applyTripUpdate(tripUpdate));
-    assertScheduledTripUnchanged(env);
-  }
-
-  @Test
-  void replacementTripWithNoDataStopWithoutDepartureIsRejected() {
-    var env = noDataEnvironment();
-    var rt = GtfsRtTestHelper.of(env);
-
-    var tripUpdate = rt
-      .tripUpdate(TRIP_1_ID, REPLACEMENT)
-      .addStopTime(STOP_A_ID, "8:30")
-      .addRawStopTime(
-        StopTimeUpdate.newBuilder()
-          .setStopId(STOP_B_ID)
-          .setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.NO_DATA)
-          .setArrival(StopTimeEvent.newBuilder().setScheduledTime(SCHEDULED_TIME))
-          .build()
-      )
-      .addStopTime(STOP_C_ID, "8:50")
-      .build();
-
-    assertFailure(INVALID_DEPARTURE_TIME, rt.applyTripUpdate(tripUpdate));
-    assertScheduledTripUnchanged(env);
-  }
-
-  @Test
   void replacementTripWithTooManyStopsIsRejected() {
     var builder = TransitTestEnvironment.of();
     var STOP_A = builder.stop(STOP_A_ID);
@@ -433,6 +337,134 @@ public class ReplacementTest implements RealtimeTestConstants {
     assertNotNull(tripTimes);
     assertFalse(tripTimes.isTripPatternModified());
     assertFalse(tripTimes.isCanceledOrDeleted());
+  }
+
+  @Test
+  void replacementTripWithNoDataStop() {
+    var env = noDataEnvironment();
+    var rt = GtfsRtTestHelper.of(env);
+
+    var tripUpdate = rt
+      .tripUpdate(TRIP_1_ID, REPLACEMENT)
+      .addStopTimeWithScheduled(STOP_A_ID, "8:32", "8:30")
+      .addNoDataStopWithScheduled(STOP_B_ID, "8:41")
+      .addStopTimeWithScheduled(STOP_C_ID, "8:56", "8:50")
+      .build();
+
+    assertSuccess(rt.applyTripUpdate(tripUpdate));
+
+    assertEquals(
+      "P U | A 8:32 8:32 | B [ND] 8:41 8:41 | C 8:56 8:56",
+      env.tripData(TRIP_1_ID).showTimetable()
+    );
+  }
+
+  @Test
+  void replacementTripWithNoDataExtraCall() {
+    var env = noDataEnvironment();
+    var rt = GtfsRtTestHelper.of(env);
+
+    var tripUpdate = rt
+      .tripUpdate(TRIP_1_ID, REPLACEMENT)
+      .addStopTimeWithScheduled(STOP_A_ID, "8:30", "8:30")
+      .addNoDataStopWithScheduled(STOP_D_ID, "8:45")
+      .addStopTimeWithScheduled(STOP_C_ID, "8:50", "8:50")
+      .build();
+
+    assertSuccess(rt.applyTripUpdate(tripUpdate));
+
+    assertEquals(
+      "P U | A 8:30 8:30 | D [ND,EC] 8:45 8:45 | C 8:50 8:50",
+      env.tripData(TRIP_1_ID).showTimetable()
+    );
+  }
+
+  @Test
+  void replacementTripWithNoDataStopBeforePreviousDepartureIsRejected() {
+    var env = noDataEnvironment();
+    var rt = GtfsRtTestHelper.of(env);
+
+    var tripUpdate = rt
+      .tripUpdate(TRIP_1_ID, REPLACEMENT)
+      .addStopTimeWithScheduled(STOP_A_ID, "8:45", "8:30")
+      .addNoDataStopWithScheduled(STOP_B_ID, "8:40")
+      .addStopTimeWithScheduled(STOP_C_ID, "8:55", "8:50")
+      .build();
+
+    assertFailure(NEGATIVE_HOP_TIME, rt.applyTripUpdate(tripUpdate));
+    assertScheduledTripUnchanged(env);
+  }
+
+  private static Stream<Arguments> invalidNoDataStopCases() {
+    var scheduled = StopTimeEvent.newBuilder().setScheduledTime(SCHEDULED_TIME).build();
+    return Stream.of(
+      Arguments.of(
+        "arrival without scheduled time",
+        noDataStop()
+          .setArrival(StopTimeEvent.newBuilder().setTime(SCHEDULED_TIME))
+          .setDeparture(scheduled)
+          .build(),
+        INVALID_ARRIVAL_TIME
+      ),
+      Arguments.of(
+        "arrival with time",
+        noDataStop()
+          .setArrival(scheduled.toBuilder().setTime(SCHEDULED_TIME))
+          .setDeparture(scheduled)
+          .build(),
+        INVALID_ARRIVAL_TIME
+      ),
+      Arguments.of(
+        "arrival with delay",
+        noDataStop().setArrival(scheduled.toBuilder().setDelay(60)).setDeparture(scheduled).build(),
+        INVALID_ARRIVAL_TIME
+      ),
+      Arguments.of(
+        "no departure",
+        noDataStop().setArrival(scheduled).build(),
+        INVALID_DEPARTURE_TIME
+      ),
+      Arguments.of(
+        "departure with time",
+        noDataStop()
+          .setArrival(scheduled)
+          .setDeparture(scheduled.toBuilder().setTime(SCHEDULED_TIME))
+          .build(),
+        INVALID_DEPARTURE_TIME
+      ),
+      Arguments.of(
+        "departure with delay",
+        noDataStop().setArrival(scheduled).setDeparture(scheduled.toBuilder().setDelay(60)).build(),
+        INVALID_DEPARTURE_TIME
+      )
+    );
+  }
+
+  private static StopTimeUpdate.Builder noDataStop() {
+    return StopTimeUpdate.newBuilder()
+      .setStopId(STOP_B_ID)
+      .setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.NO_DATA);
+  }
+
+  @ParameterizedTest(name = "{0}")
+  @MethodSource("invalidNoDataStopCases")
+  void replacementTripWithInvalidNoDataStopIsRejected(
+    String description,
+    StopTimeUpdate noDataStop,
+    UpdateErrorType expectedError
+  ) {
+    var env = noDataEnvironment();
+    var rt = GtfsRtTestHelper.of(env);
+
+    var tripUpdate = rt
+      .tripUpdate(TRIP_1_ID, REPLACEMENT)
+      .addStopTime(STOP_A_ID, "8:30")
+      .addRawStopTime(noDataStop)
+      .addStopTime(STOP_C_ID, "8:50")
+      .build();
+
+    assertFailure(expectedError, rt.applyTripUpdate(tripUpdate));
+    assertScheduledTripUnchanged(env);
   }
 
   private static TransitTestEnvironment noDataEnvironment() {

@@ -145,6 +145,14 @@ public final class StopTimeUpdate {
     );
   }
 
+  public boolean hasOnlyScheduledArrivalTime() {
+    return stopTimeUpdate.hasArrival() && isScheduledOnly(stopTimeUpdate.getArrival());
+  }
+
+  public boolean hasOnlyScheduledDepartureTime() {
+    return stopTimeUpdate.hasDeparture() && isScheduledOnly(stopTimeUpdate.getDeparture());
+  }
+
   public boolean isSkipped() {
     return (
       stopTimeUpdate.getScheduleRelationship() ==
@@ -157,14 +165,6 @@ public final class StopTimeUpdate {
       stopTimeUpdate.getScheduleRelationship() ==
       GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship.NO_DATA
     );
-  }
-
-  public boolean hasScheduledArrivalTime() {
-    return stopTimeUpdate.hasArrival() && stopTimeUpdate.getArrival().hasScheduledTime();
-  }
-
-  public boolean hasScheduledDepartureTime() {
-    return stopTimeUpdate.hasDeparture() && stopTimeUpdate.getDeparture().hasScheduledTime();
   }
 
   public OptionalInt stopSequence() {
@@ -227,6 +227,12 @@ public final class StopTimeUpdate {
     return stopTimeEvent.hasTime()
       ? OptionalLong.of(stopTimeEvent.getTime())
       : OptionalLong.empty();
+  }
+
+  private static boolean isScheduledOnly(StopTimeEvent stopTimeEvent) {
+    return (
+      stopTimeEvent.hasScheduledTime() && !stopTimeEvent.hasTime() && !stopTimeEvent.hasDelay()
+    );
   }
 
   /**
