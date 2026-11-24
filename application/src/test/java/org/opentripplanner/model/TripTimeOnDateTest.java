@@ -437,6 +437,35 @@ class TripTimeOnDateTest {
     }
   }
 
+  /**
+   * If the real-time stops can't be matched to the scheduled stops, there is no scheduled pickup
+   * and drop off type, and the scheduled stop falls back to the real-time stop.
+   */
+  @Test
+  void scheduledPickupDropoffAndStopWhenStopsCannotBeMatched() {
+    var route = TransitRepositoryForTest.route("R1").build();
+    var stopA = TEST_MODEL.stop("A").build();
+    var stopB = TEST_MODEL.stop("B").build();
+    var stopC = TEST_MODEL.stop("C").build();
+    var stopD = TEST_MODEL.stop("D").build();
+
+    var scheduledPattern = TransitRepositoryForTest.tripPattern("P1", route)
+      .withStopPattern(TransitRepositoryForTest.stopPattern(stopA, stopB, stopC))
+      .build();
+    // A replacement trip that calls at one more stop than scheduled
+    var realTimePattern = TransitRepositoryForTest.tripPattern("P2", route)
+      .withStopPattern(TransitRepositoryForTest.stopPattern(stopA, stopB, stopC, stopD))
+      .build();
+    var tripTimes = tripTimesFor(4);
+
+    for (int stopPos = 0; stopPos < 4; stopPos++) {
+      var subject = new TripTimeOnDate(tripTimes, stopPos, realTimePattern);
+      assertNull(subject.getScheduledPickupType(scheduledPattern));
+      assertNull(subject.getScheduledDropoffType(scheduledPattern));
+      assertEquals(subject.getStop(), subject.getScheduledStop(scheduledPattern));
+    }
+  }
+
   private static TripTimes<?> tripTimesFor(int stops) {
     var trip = TransitRepositoryForTest.trip("123").build();
     var stopTimes = TEST_MODEL.stopTimesEvery5Minutes(stops, trip, "11:00");
