@@ -67,7 +67,7 @@ class DefaultRegularTransferRepositoryCloseFacilitiesTest {
     );
     repository =
       (DefaultRegularTransferRepository<String>) buildRepository.createRuntimeRepository();
-    lifecycle = TestLifecycles.pathsOnly();
+    lifecycle = TestLifecycles.pathsOnly(WALK);
   }
 
   @Test

@@ -82,7 +82,7 @@ class DefaultRegularTransferRepositorySnapshot<
   @Override
   public RegularTransfersService<P> forRequest(R request) {
     var userPreferences = mapper.toUserPreferences(request);
-    var profile = matcher.closestProfile(openPaths.paths(), userPreferences);
+    var profile = matcher.closestProfile(userPreferences);
     statistics.record(userPreferences);
     return new DefaultRegularTransfersService<>(
       openPaths,
@@ -127,7 +127,7 @@ class DefaultRegularTransferRepositorySnapshot<
   @Nullable
   private AbstractUserPreferences<?> closestProfileOrNull(AbstractUserPreferences<?> key) {
     try {
-      return matcher.closestProfile(openPaths.paths(), key);
+      return matcher.closestProfile(key);
     } catch (IllegalArgumentException e) {
       // The paths of the snapshot have no profile of the type of the key
       return null;
@@ -160,7 +160,7 @@ class DefaultRegularTransferRepositorySnapshot<
       return raptorTransfersFactory.create(
         openPaths,
         userPreferences,
-        matcher.closestProfile(openPaths.paths(), userPreferences)
+        matcher.closestProfile(userPreferences)
       );
     }
 
@@ -173,7 +173,7 @@ class DefaultRegularTransferRepositorySnapshot<
       return raptorTransfersFactory.patch(
         openPaths,
         userPreferences,
-        matcher.closestProfile(openPaths.paths(), userPreferences),
+        matcher.closestProfile(userPreferences),
         previous,
         changedFromStops
       );

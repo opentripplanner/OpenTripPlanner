@@ -37,7 +37,7 @@ class DefaultRegularTransferBuildRepositoryTest {
 
     buildRepository.setPaths(WALK, A, Map.of(B, PATH_AB_NEW));
 
-    var snapshot = TestLifecycles.initialSnapshot(buildRepository);
+    var snapshot = TestLifecycles.initialSnapshot(buildRepository, WALK);
     assertThat(snapshot.forRequest(WALK).findPath(A, B)).isEqualTo(PATH_AB_NEW);
     assertThat(snapshot.forRequest(WALK).findPath(A, C)).isEqualTo(PATH_AC);
     assertThat(snapshot.forRequest(WALK).findPath(B, C)).isEqualTo(PATH_BC);
@@ -45,7 +45,7 @@ class DefaultRegularTransferBuildRepositoryTest {
 
   @Test
   void runtimeRepositoryContainsTheGeneratedPaths() {
-    var snapshot = TestLifecycles.initialSnapshot(createBuildRepository());
+    var snapshot = TestLifecycles.initialSnapshot(createBuildRepository(), WALK);
 
     assertThat(snapshot.forRequest(WALK).findPath(A, B)).isEqualTo(PATH_AB);
     assertThat(snapshot.forRequest(WALK).findPath(A, C)).isEqualTo(PATH_AC);
@@ -70,7 +70,7 @@ class DefaultRegularTransferBuildRepositoryTest {
   void runtimeWritesDoNotChangeTheBuildRepository() {
     var buildRepository = createBuildRepository();
     var runtimeRepository = buildRepository.createRuntimeRepository();
-    var lifecycle = TestLifecycles.<String>pathsOnly();
+    var lifecycle = TestLifecycles.<String>pathsOnly(WALK);
 
     // The paths of the build repository are the base of the runtime repository, a write
     // replaces the paths from stop A in the runtime repository only
@@ -81,7 +81,7 @@ class DefaultRegularTransferBuildRepositoryTest {
     );
     // A new runtime repository starts from the unchanged paths of the build repository
     assertThat(
-      TestLifecycles.initialSnapshot(buildRepository).forRequest(WALK).findPath(A, B)
+      TestLifecycles.initialSnapshot(buildRepository, WALK).forRequest(WALK).findPath(A, B)
     ).isEqualTo(PATH_AB);
   }
 

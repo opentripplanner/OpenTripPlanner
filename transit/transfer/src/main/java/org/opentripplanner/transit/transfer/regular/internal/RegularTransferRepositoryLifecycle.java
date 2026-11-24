@@ -99,7 +99,7 @@ public class RegularTransferRepositoryLifecycle<
       pathProvider,
       mapper,
       requestsByProfile(profiles, mapper),
-      new ProfileMatcher(List.copyOf(ProfileUserPreferences.resolveAll(profiles, mapper).keySet())),
+      List.copyOf(ProfileUserPreferences.resolveAll(profiles, mapper).keySet()),
       warmupEntries(profiles, mapper),
       numberOfStops,
       cacheMaxSize,
@@ -117,7 +117,7 @@ public class RegularTransferRepositoryLifecycle<
       pathProvider,
       mapper,
       profileRequests,
-      new ProfileMatcher(List.of()),
+      List.copyOf(profileRequests.keySet()),
       List.of(),
       numberOfStops,
       RegularTransferServiceCache.DEFAULT_MAX_SIZE,
@@ -129,13 +129,13 @@ public class RegularTransferRepositoryLifecycle<
     TransferPathProvider<P, R> pathProvider,
     TransferRequestMapper<R> mapper,
     Map<AbstractUserPreferences<?>, R> profileRequests,
-    ProfileMatcher matcher,
+    List<AbstractUserPreferences<?>> declaredProfiles,
     List<WarmupEntry> warmup,
     int numberOfStops,
     int cacheMaxSize,
     boolean collectCacheStatistics
   ) {
-    this.matcher = matcher;
+    this.matcher = new ProfileMatcher(declaredProfiles);
     this.warmup = warmup;
     this.cacheMaxSize = cacheMaxSize;
     this.retainedKeys = warmup
@@ -230,7 +230,7 @@ public class RegularTransferRepositoryLifecycle<
     DefaultRegularTransferRepository.Frozen<?> frozen,
     AbstractUserPreferences<?> userPreferences
   ) {
-    var profile = matcher.closestProfile(frozen.paths(), userPreferences);
+    var profile = matcher.closestProfile(userPreferences);
     if (profile == null) {
       return Set.of();
     }
