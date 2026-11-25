@@ -7,7 +7,7 @@ import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.ext.carpooling.street.CarReachableVertexSnapper;
-import org.opentripplanner.ext.carpooling.street.StreetVertexUtils;
+import org.opentripplanner.ext.carpooling.street.TemporaryVertexFactory;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.linking.TemporaryVerticesContainer;
@@ -18,7 +18,7 @@ import org.opentripplanner.street.search.request.StreetSearchRequest;
  * Turns a {@link CarpoolTrip} into a {@link RoutableCarpoolTrip}: each route point is resolved to a
  * permanent, car-reachable street vertex, and the trip's {@link CarpoolCorridor} is computed from
  * the vertices. A point is linked to a temporary vertex via
- * {@link StreetVertexUtils#createDriverWaypointVertex}, then snapped to a permanent one by
+ * {@link TemporaryVertexFactory#createDriverWaypointVertex}, then snapped to a permanent one by
  * {@link CarReachableVertexSnapper#snapToPermanentVertex}.
  */
 public class RoutableCarpoolTripResolver {
@@ -58,12 +58,12 @@ public class RoutableCarpoolTripResolver {
   public RoutableCarpoolTrip resolve(CarpoolTrip trip) {
     var vertices = new ArrayList<Vertex>(trip.routePoints().size());
     try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
-      var streetVertexUtils = new StreetVertexUtils(
+      var vertexFactory = new TemporaryVertexFactory(
         vertexCreationService,
         temporaryVerticesContainer
       );
       for (var routePoint : trip.routePoints()) {
-        var vertex = resolveRoutePoint(routePoint, streetVertexUtils);
+        var vertex = resolveRoutePoint(routePoint, vertexFactory);
         if (vertex == null) {
           return null;
         }
@@ -86,8 +86,8 @@ public class RoutableCarpoolTripResolver {
   }
 
   @Nullable
-  private Vertex resolveRoutePoint(WgsCoordinate point, StreetVertexUtils streetVertexUtils) {
-    var linked = streetVertexUtils.createDriverWaypointVertex(point);
+  private Vertex resolveRoutePoint(WgsCoordinate point, TemporaryVertexFactory vertexFactory) {
+    var linked = vertexFactory.createDriverWaypointVertex(point);
     if (linked == null) {
       return null;
     }

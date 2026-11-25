@@ -16,18 +16,18 @@ public class PassengerSnapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(PassengerSnapper.class);
 
-  private final StreetVertexUtils streetVertexUtils;
+  private final TemporaryVertexFactory vertexFactory;
   private final CarReachableVertexSnapper carReachableVertexSnapper;
   private final StreetSearchRequest streetSearchRequest;
   private final Duration maxWalk;
 
   public PassengerSnapper(
-    StreetVertexUtils streetVertexUtils,
+    TemporaryVertexFactory vertexFactory,
     CarReachableVertexSnapper carReachableVertexSnapper,
     StreetSearchRequest streetSearchRequest,
     Duration maxWalk
   ) {
-    this.streetVertexUtils = streetVertexUtils;
+    this.vertexFactory = vertexFactory;
     this.carReachableVertexSnapper = carReachableVertexSnapper;
     this.streetSearchRequest = streetSearchRequest;
     this.maxWalk = maxWalk;
@@ -47,7 +47,7 @@ public class PassengerSnapper {
 
   @Nullable
   private SnapResult snap(WgsCoordinate coordinate, boolean pickup) {
-    var vertex = streetVertexUtils.createPassengerVertex(coordinate);
+    var vertex = vertexFactory.createPassengerVertex(coordinate);
     if (vertex == null) {
       LOG.info("Could not link passenger coordinates {} to graph", coordinate);
       return null;

@@ -18,12 +18,12 @@ import org.opentripplanner.street.search.TraverseMode;
  * Vertices and edges created here are registered with the given
  * {@link TemporaryVerticesContainer}; closing it removes them from the graph.
  */
-public class StreetVertexUtils {
+public class TemporaryVertexFactory {
 
   private final VertexCreationService vertexCreationService;
   private final TemporaryVerticesContainer temporaryVerticesContainer;
 
-  public StreetVertexUtils(
+  public TemporaryVertexFactory(
     VertexCreationService vertexCreationService,
     TemporaryVerticesContainer temporaryVerticesContainer
   ) {

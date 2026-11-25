@@ -44,7 +44,7 @@ class TraversalScopeTest extends GraphRoutingTest {
     );
 
     try (var container = new TemporaryVerticesContainer()) {
-      var linked = new StreetVertexUtils(
+      var linked = new TemporaryVertexFactory(
         vertexCreationService,
         container
       ).createDriverWaypointVertex(new WgsCoordinate(60.0000, 10.0005));
@@ -95,7 +95,7 @@ class TraversalScopeTest extends GraphRoutingTest {
     );
 
     try (var container = new TemporaryVerticesContainer()) {
-      var linked = new StreetVertexUtils(
+      var linked = new TemporaryVertexFactory(
         vertexCreationService,
         container
       ).createDriverWaypointVertex(new WgsCoordinate(60.0000, 10.0005));

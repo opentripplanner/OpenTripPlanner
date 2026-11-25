@@ -22,13 +22,13 @@ import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 
-class StreetVertexUtilsTest {
+class TemporaryVertexFactoryTest {
 
   private static final double DELTA = 0.001;
 
   private StreetVertex from;
   private StreetVertex to;
-  private StreetVertexUtils streetVertexUtils;
+  private TemporaryVertexFactory vertexFactory;
 
   @BeforeEach
   void setup() {
@@ -52,12 +52,12 @@ class StreetVertexUtilsTest {
     var vertexLinker = VertexLinkerTestFactory.of(graph);
     var vertexCreationService = new VertexCreationService(vertexLinker);
     var temporaryVerticesContainer = new TemporaryVerticesContainer();
-    streetVertexUtils = new StreetVertexUtils(vertexCreationService, temporaryVerticesContainer);
+    vertexFactory = new TemporaryVertexFactory(vertexCreationService, temporaryVerticesContainer);
   }
 
   @Test
   void passenger_createsBidirectionallyLinkedVertex() {
-    var result = streetVertexUtils.createPassengerVertex(OSLO_CENTER);
+    var result = vertexFactory.createPassengerVertex(OSLO_CENTER);
 
     assertNotNull(result);
 
@@ -99,14 +99,14 @@ class StreetVertexUtilsTest {
   void passenger_returnsNullWhenLinkingFails() {
     var farAway = new WgsCoordinate(0.0, 0.0);
 
-    var result = streetVertexUtils.createPassengerVertex(farAway);
+    var result = vertexFactory.createPassengerVertex(farAway);
 
     assertNull(result);
   }
 
   @Test
   void driverWaypoint_createsVertexLinkedToGraph() {
-    var result = streetVertexUtils.createDriverWaypointVertex(OSLO_CENTER);
+    var result = vertexFactory.createDriverWaypointVertex(OSLO_CENTER);
 
     assertNotNull(result);
     assertFalse(result.getOutgoing().isEmpty());
@@ -133,7 +133,7 @@ class StreetVertexUtilsTest {
   void driverWaypoint_returnsNullWhenLinkingFails() {
     var farAway = new WgsCoordinate(0.0, 0.0);
 
-    var result = streetVertexUtils.createDriverWaypointVertex(farAway);
+    var result = vertexFactory.createDriverWaypointVertex(farAway);
 
     assertNull(result);
   }

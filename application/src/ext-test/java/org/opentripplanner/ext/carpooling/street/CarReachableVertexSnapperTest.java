@@ -574,9 +574,10 @@ class CarReachableVertexSnapperTest extends GraphRoutingTest {
     var reachabilitySnapper = new CarReachableVertexSnapper(100);
 
     try (var container = new TemporaryVerticesContainer()) {
-      var passenger = new StreetVertexUtils(vertexCreationService, container).createPassengerVertex(
-        new WgsCoordinate(60.0000, 10.0003)
-      );
+      var passenger = new TemporaryVertexFactory(
+        vertexCreationService,
+        container
+      ).createPassengerVertex(new WgsCoordinate(60.0000, 10.0003));
       assertNotNull(passenger);
 
       var result = reachabilitySnapper.snapPickup(
@@ -619,7 +620,7 @@ class CarReachableVertexSnapperTest extends GraphRoutingTest {
     var reachabilitySnapper = new CarReachableVertexSnapper(50);
 
     try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
-      var linked = new StreetVertexUtils(
+      var linked = new TemporaryVertexFactory(
         vertexCreationService,
         temporaryVerticesContainer
       ).createDriverWaypointVertex(new WgsCoordinate(60.0000, 10.0005));

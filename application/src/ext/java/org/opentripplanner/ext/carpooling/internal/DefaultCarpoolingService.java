@@ -33,7 +33,7 @@ import org.opentripplanner.ext.carpooling.street.CarReachableVertexSnapper.SnapR
 import org.opentripplanner.ext.carpooling.street.CarpoolStreetRouter;
 import org.opentripplanner.ext.carpooling.street.PassengerSnapper;
 import org.opentripplanner.ext.carpooling.street.StreetPathUtils;
-import org.opentripplanner.ext.carpooling.street.StreetVertexUtils;
+import org.opentripplanner.ext.carpooling.street.TemporaryVertexFactory;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
@@ -348,7 +348,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
     Duration maxWalk
   ) {
     return new PassengerSnapper(
-      new StreetVertexUtils(vertexCreationService, temporaryVerticesContainer),
+      new TemporaryVertexFactory(vertexCreationService, temporaryVerticesContainer),
       carReachableVertexSnapper,
       streetSearchRequest,
       maxWalk

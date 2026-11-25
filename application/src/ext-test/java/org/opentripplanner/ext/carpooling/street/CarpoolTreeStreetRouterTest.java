@@ -334,11 +334,11 @@ class CarpoolTreeStreetRouterTest extends GraphRoutingTest {
     var vertexCreationService = new VertexCreationService(
       VertexLinkerTestFactory.of(model.graph())
     );
-    var streetVertexUtils = new StreetVertexUtils(
+    var vertexFactory = new TemporaryVertexFactory(
       vertexCreationService,
       new TemporaryVerticesContainer()
     );
-    var vertex = streetVertexUtils.createDriverWaypointVertex(coord);
+    var vertex = vertexFactory.createDriverWaypointVertex(coord);
     assertNotNull(vertex, "Driver waypoint vertex should link to the graph");
     return vertex;
   }
