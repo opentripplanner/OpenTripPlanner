@@ -110,7 +110,12 @@ public class RealtimeVehicleMatcherTest {
       : List.of();
     var pattern = tripPattern(trip1, stopTimes);
 
-    var matcher = matcher(ignored -> trip2, ignored -> pattern, repository);
+    var matcher = matcher(
+      ignored -> trip2,
+      ignored -> pattern,
+      repository,
+      (tripPattern, ignored) -> tripPattern.getScheduledTimetable()
+    );
 
     var positions = hasStopTimes
       ? List.of(vehiclePosition(secondTripId))
@@ -122,9 +127,6 @@ public class RealtimeVehicleMatcherTest {
   }
 
   @Test
-  @DisplayName(
-    "A vehicle position for a trip that exists only on the realtime timetable is matched"
-  )
   void matchTripTimesFromRealtimeTimetable() {
     var repository = new DefaultRealtimeVehicleRepository();
     var trip = TransitRepositoryForTest.trip(tripId).build();
@@ -160,9 +162,7 @@ public class RealtimeVehicleMatcherTest {
   }
 
   @Test
-  @DisplayName(
-    "current_stop_sequence maps through the realtime timetable when it differs from scheduled"
-  )
+  @DisplayName("REPLACEMENT current_stop_sequence maps through the realtime timetable")
   void matchStopSequenceFromRealtimeTimetable() {
     var repository = new DefaultRealtimeVehicleRepository();
     var trip = TransitRepositoryForTest.trip(tripId).build();
@@ -221,7 +221,9 @@ public class RealtimeVehicleMatcherTest {
     var tripForId = Map.of(scopedTripId, trip1);
     var patternForTrip = Map.of(trip1, pattern1);
 
-    var matcher = matcher(tripForId::get, patternForTrip::get, repository);
+    var matcher = matcher(tripForId::get, patternForTrip::get, repository, (tripPattern, ignored) ->
+      tripPattern.getScheduledTimetable()
+    );
 
     var pos = VehiclePosition.newBuilder()
       .setTrip(TripDescriptor.newBuilder().setTripId(tripId).build())
@@ -284,7 +286,9 @@ public class RealtimeVehicleMatcherTest {
     // an untouched pattern has no vehicle positions
     assertThat(vehicles(repository, pattern)).isEmpty();
 
-    var matcher = matcher(tripForId::get, patternForTrip::get, repository);
+    var matcher = matcher(tripForId::get, patternForTrip::get, repository, (tripPattern, ignored) ->
+      tripPattern.getScheduledTimetable()
+    );
 
     var pos = VehiclePosition.newBuilder()
       .setTrip(
@@ -354,7 +358,9 @@ public class RealtimeVehicleMatcherTest {
     var tripForId = Map.of(scopedTripId, trip);
     var patternForTrip = Map.of(trip, pattern);
 
-    var matcher = matcher(tripForId::get, patternForTrip::get, repository);
+    var matcher = matcher(tripForId::get, patternForTrip::get, repository, (tripPattern, ignored) ->
+      tripPattern.getScheduledTimetable()
+    );
 
     var pos = VehiclePosition.newBuilder()
       .setTrip(
@@ -394,7 +400,9 @@ public class RealtimeVehicleMatcherTest {
     // an untouched pattern has no vehicle positions
     assertThat(vehicles(repository, pattern)).isEmpty();
 
-    var matcher = matcher(tripForId::get, patternForTrip::get, repository);
+    var matcher = matcher(tripForId::get, patternForTrip::get, repository, (tripPattern, ignored) ->
+      tripPattern.getScheduledTimetable()
+    );
 
     var positions = List.of(pos);
 
@@ -432,7 +440,9 @@ public class RealtimeVehicleMatcherTest {
     // an untouched pattern has no vehicle positions
     assertThat(vehicles(repository, pattern)).isEmpty();
 
-    var matcher = matcher(tripForId::get, patternForTrip::get, repository);
+    var matcher = matcher(tripForId::get, patternForTrip::get, repository, (tripPattern, ignored) ->
+      tripPattern.getScheduledTimetable()
+    );
 
     var positions = List.of(pos);
 
@@ -482,7 +492,9 @@ public class RealtimeVehicleMatcherTest {
     // an untouched pattern has no vehicles
     assertThat(vehicles(repository, pattern1)).isEmpty();
 
-    var matcher = matcher(tripForId::get, patternForTrip::get, repository);
+    var matcher = matcher(tripForId::get, patternForTrip::get, repository, (tripPattern, ignored) ->
+      tripPattern.getScheduledTimetable()
+    );
 
     var pos1 = vehiclePosition(tripId1);
 
@@ -567,16 +579,6 @@ public class RealtimeVehicleMatcherTest {
     var inferredDate = RealtimeVehiclePatternMatcher.inferServiceDate(tripTimes, zoneId, time);
 
     assertEquals(LocalDate.parse("2022-04-04"), inferredDate);
-  }
-
-  private RealtimeVehiclePatternMatcher matcher(
-    Function<FeedScopedId, Trip> tripForId,
-    Function<Trip, TripPattern> patternForTrip,
-    RealtimeVehicleRepository repository
-  ) {
-    return matcher(tripForId, patternForTrip, repository, (pattern, ignored) ->
-      pattern.getScheduledTimetable()
-    );
   }
 
   private RealtimeVehiclePatternMatcher matcher(

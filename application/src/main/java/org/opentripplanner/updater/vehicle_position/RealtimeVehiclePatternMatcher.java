@@ -68,7 +68,6 @@ class RealtimeVehiclePatternMatcher {
   private final ZoneId timeZoneId;
 
   private final Function<FeedScopedId, Trip> getTripForId;
-  /** Timetable for a pattern on a service date, including realtime extra journeys. */
   private final BiFunction<TripPattern, LocalDate, Timetable> getTimetable;
   private final BiFunction<Trip, LocalDate, TripPattern> getRealtimePattern;
   private final GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
@@ -385,9 +384,7 @@ class RealtimeVehiclePatternMatcher {
       throw UpdateException.of(scopedTripId, NO_SERVICE_ON_DATE);
     }
 
-    // timetable is required to map GTFS-RT stop_sequence from an update back to a stop.
-    // getTimetable.apply returns either a real-time timetable, if one exists, or a scheduled
-    // timetable. Real-time timetable is required for added or replacement trips.
+    // Realtime timetable if one exists, otherwise scheduled; needed for added/replacement trips.
     var timetable = getTimetable.apply(pattern, serviceDate);
     var tripTimes = timetable.getTripTimes(trip);
 
