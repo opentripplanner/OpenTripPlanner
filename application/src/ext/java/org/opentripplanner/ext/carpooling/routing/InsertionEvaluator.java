@@ -86,7 +86,7 @@ public class InsertionEvaluator {
 
   @Nullable
   private TripInsertionPlan plan(RoutableCarpoolTrip routableTrip) {
-    var waypoints = routableTrip.vertices();
+    var waypoints = routableTrip.waypoints();
     var baseline = new RoutedSegment[routableTrip.corridor().legCount()];
     for (int leg = 0; leg < baseline.length; leg++) {
       baseline[leg] = carpoolRouter.route(waypoints.get(leg), waypoints.get(leg + 1));
@@ -323,7 +323,7 @@ public class InsertionEvaluator {
       RoutedSegment fromLegStart(int leg) {
         if (!fromLegStartRouted[leg]) {
           fromLegStartRouted[leg] = true;
-          fromLegStart[leg] = carpoolRouter.route(routableTrip.vertices().get(leg), point);
+          fromLegStart[leg] = carpoolRouter.route(routableTrip.waypoints().get(leg), point);
         }
         return fromLegStart[leg];
       }
@@ -333,7 +333,7 @@ public class InsertionEvaluator {
       RoutedSegment toLegEnd(int leg) {
         if (!toLegEndRouted[leg]) {
           toLegEndRouted[leg] = true;
-          toLegEnd[leg] = carpoolRouter.route(point, routableTrip.vertices().get(leg + 1));
+          toLegEnd[leg] = carpoolRouter.route(point, routableTrip.waypoints().get(leg + 1));
         }
         return toLegEnd[leg];
       }

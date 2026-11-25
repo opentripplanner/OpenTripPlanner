@@ -184,7 +184,7 @@ class SiriETCarpoolingUpdaterTest {
   @Test
   void processEstimatedVehicleJourney_budgetChanged_recomputesCorridorOnStoredVertices() {
     updater.processEstimatedVehicleJourney(journeyWithLatestExpectedArrivalTime(0, 10));
-    var storedVertices = repository.getCarpoolTrips().iterator().next().vertices();
+    var storedVertices = repository.getCarpoolTrips().iterator().next().waypoints();
     doAnswer(invocation ->
       RoutableCarpoolTripTestData.withVertices(invocation.getArgument(0), invocation.getArgument(1))
     )
@@ -196,7 +196,7 @@ class SiriETCarpoolingUpdaterTest {
 
     verify(resolver, times(1)).resolve(any());
     verify(resolver, times(1)).resolve(any(), eq(storedVertices));
-    assertEquals(storedVertices, repository.getCarpoolTrips().iterator().next().vertices());
+    assertEquals(storedVertices, repository.getCarpoolTrips().iterator().next().waypoints());
   }
 
   @Test
@@ -264,7 +264,7 @@ class SiriETCarpoolingUpdaterTest {
     verify(resolver, never()).resolve(any(), any());
     var reused = repository.getCarpoolTrips().iterator().next();
     assertEquals(mapper.mapSiriToCarpoolTrip(later).endTime(), reused.trip().endTime());
-    assertEquals(stored.vertices(), reused.vertices());
+    assertEquals(stored.waypoints(), reused.waypoints());
     assertSame(stored.corridor(), reused.corridor());
   }
 

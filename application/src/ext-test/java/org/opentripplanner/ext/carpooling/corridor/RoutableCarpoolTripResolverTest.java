@@ -48,8 +48,8 @@ class RoutableCarpoolTripResolverTest extends GraphRoutingTest {
     var resolved = resolverFor(model).resolve(trip);
 
     assertNotNull(resolved);
-    assertEquals(v[0], resolved.vertices().get(0));
-    assertEquals(v[1], resolved.vertices().get(1));
+    assertEquals(v[0], resolved.waypoints().get(0));
+    assertEquals(v[1], resolved.waypoints().get(1));
   }
 
   /**
@@ -124,12 +124,12 @@ class RoutableCarpoolTripResolverTest extends GraphRoutingTest {
     assertNotNull(resolved);
     assertEquals(
       v[1],
-      resolved.vertices().get(0),
+      resolved.waypoints().get(0),
       "The origin O cannot be arrived at, so it must walk out to M"
     );
     assertEquals(
       v[1],
-      resolved.vertices().get(1),
+      resolved.waypoints().get(1),
       "The destination D cannot be departed from, so it must walk back to M"
     );
   }

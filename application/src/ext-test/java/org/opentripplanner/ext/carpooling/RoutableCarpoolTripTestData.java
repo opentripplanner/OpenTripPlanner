@@ -32,7 +32,7 @@ public final class RoutableCarpoolTripTestData {
    * to take no longer than that.
    */
   public static RoutableCarpoolTrip withRoutedLegs(CarpoolTrip trip, Duration... legDurations) {
-    var vertices = withDummyVertices(trip).vertices();
+    var vertices = withDummyVertices(trip).waypoints();
     var durations = List.of(legDurations);
     return new RoutableCarpoolTrip(
       trip,

@@ -21,8 +21,8 @@ public record RoutableCarpoolTrip(CarpoolTrip trip, CarpoolCorridor corridor) {
     }
   }
 
-  /** The corridor's waypoints. */
-  public List<Vertex> vertices() {
+  /** The street vertices of the trip's stops, in visit order. */
+  public List<Vertex> waypoints() {
     return corridor.waypoints();
   }
 }

@@ -118,7 +118,7 @@ public final class PassengerTrees {
   Map<Vertex, Duration> waypointReach(Vertex point, Direction direction, boolean pickup) {
     var reach = new HashMap<Vertex, Duration>();
     for (var trip : trips) {
-      var stops = trip.vertices();
+      var stops = trip.waypoints();
       int stopNeverNeeded = pickup ? stops.size() - 1 : 0;
       for (int leg = 0; leg < trip.corridor().legCount(); leg++) {
         int farStop = direction == Direction.FROM ? leg + 1 : leg;

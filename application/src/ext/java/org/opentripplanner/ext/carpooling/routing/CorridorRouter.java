@@ -55,7 +55,7 @@ public class CorridorRouter implements CarpoolRouter {
   /** Forgets the previous trip's segments and registers the trip's legs from its corridor. */
   public void beginTrip(RoutableCarpoolTrip trip) {
     tripSegments.clear();
-    waypoints = trip.vertices();
+    waypoints = trip.waypoints();
     var legDurations = trip.corridor().legDurations();
     for (int leg = 0; leg < legDurations.size(); leg++) {
       register(waypoints.get(leg), waypoints.get(leg + 1), (int) legDurations.get(leg).toSeconds());

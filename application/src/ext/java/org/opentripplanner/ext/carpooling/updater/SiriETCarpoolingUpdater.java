@@ -274,7 +274,7 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
     RoutableCarpoolTrip resolved;
     try {
       resolved = sameRoutePoints
-        ? tripResolver.resolve(trip, existing.vertices())
+        ? tripResolver.resolve(trip, existing.waypoints())
         : tripResolver.resolve(trip);
     } catch (RuntimeException e) {
       LOG.warn(
