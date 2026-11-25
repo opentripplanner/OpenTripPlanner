@@ -312,7 +312,7 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
   }
 
   private static boolean sameDeviationBudgets(CarpoolTrip a, CarpoolTrip b) {
-    for (int leg = 0; leg < a.stops().size() - 1; leg++) {
+    for (int leg = 0; leg < a.legCount(); leg++) {
       if (!a.legDeviationBudget(leg).equals(b.legDeviationBudget(leg))) {
         return false;
       }

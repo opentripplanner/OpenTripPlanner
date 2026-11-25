@@ -183,6 +183,11 @@ public class CarpoolTrip
     return stops.get(stopIndex).getOnboardCount();
   }
 
+  /** The number of legs: one from each stop to the next. */
+  public int legCount() {
+    return stops.size() - 1;
+  }
+
   /** Whether one more passenger fits on the leg from stop {@code leg} to the next. */
   public boolean hasFreeSeat(int leg) {
     return getPassengerCountAtDepartureOfStop(leg) < totalCapacity;

@@ -87,7 +87,7 @@ public class InsertionEvaluator {
   @Nullable
   private TripInsertionPlan plan(RoutableCarpoolTrip routableTrip) {
     var waypoints = routableTrip.vertices();
-    var baseline = new RoutedSegment[waypoints.size() - 1];
+    var baseline = new RoutedSegment[routableTrip.corridor().legCount()];
     for (int leg = 0; leg < baseline.length; leg++) {
       baseline[leg] = carpoolRouter.route(waypoints.get(leg), waypoints.get(leg + 1));
       if (baseline[leg] == null) {
