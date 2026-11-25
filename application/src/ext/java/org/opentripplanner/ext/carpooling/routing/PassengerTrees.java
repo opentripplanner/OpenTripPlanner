@@ -8,6 +8,7 @@ import org.opentripplanner.ext.carpooling.corridor.DetourBound;
 import org.opentripplanner.ext.carpooling.corridor.RoutableCarpoolTrip;
 import org.opentripplanner.ext.carpooling.street.CarpoolTreeStreetRouter;
 import org.opentripplanner.ext.carpooling.street.CarpoolTreeStreetRouter.Direction;
+import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
 import org.opentripplanner.street.model.vertex.Vertex;
 
 /**
@@ -66,10 +67,11 @@ public final class PassengerTrees {
   public static CarpoolTreeStreetRouter accessEgressRouter(
     Vertex passenger,
     List<RoutableCarpoolTrip> trips,
-    boolean access,
+    AccessEgressType accessOrEgress,
     Duration maxTree,
     Duration maxRide
   ) {
+    boolean access = accessOrEgress.isAccess();
     var trees = new PassengerTrees(trips, maxTree);
     var router = new CarpoolTreeStreetRouter();
 
