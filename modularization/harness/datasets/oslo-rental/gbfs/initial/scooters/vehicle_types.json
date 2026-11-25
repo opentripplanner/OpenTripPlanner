@@ -1,0 +1,16 @@
+{
+  "last_updated": 1700000000,
+  "ttl": 0,
+  "version": "2.3",
+  "data": {
+    "vehicle_types": [
+      {
+        "vehicle_type_id": "scooter",
+        "form_factor": "scooter_standing",
+        "propulsion_type": "electric",
+        "max_range_meters": 30000,
+        "name": "E-scooter"
+      }
+    ]
+  }
+}

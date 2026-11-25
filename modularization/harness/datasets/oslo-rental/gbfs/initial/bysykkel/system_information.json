@@ -1,0 +1,11 @@
+{
+  "last_updated": 1700000000,
+  "ttl": 0,
+  "version": "2.3",
+  "data": {
+    "system_id": "bysykkel",
+    "name": "Oslo city bikes",
+    "timezone": "Europe/Oslo",
+    "language": "en"
+  }
+}

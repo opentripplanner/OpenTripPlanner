@@ -1,0 +1,5 @@
+{
+  "api": "transmodel",
+  "query": "{ bikeRentalStations { id name latitude longitude bikesAvailable spacesAvailable realtimeOccupancyAvailable } }",
+  "sortArraysBy": "id"
+}

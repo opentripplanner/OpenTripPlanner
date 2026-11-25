@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Siri xmlns="http://www.siri.org.uk/siri" version="2.0">
+  <ServiceDelivery>
+    <ResponseTimestamp>2099-01-01T00:00:03+01:00</ResponseTimestamp>
+    <ProducerRef>HARNESS</ProducerRef>
+    <EstimatedTimetableDelivery version="2.0">
+      <ResponseTimestamp>2099-01-01T00:00:03+01:00</ResponseTimestamp>
+      <EstimatedJourneyVersionFrame>
+      <RecordedAtTime>2017-12-27T12:00:00+01:00</RecordedAtTime>
+      <EstimatedVehicleJourney>
+        <RecordedAtTime>2017-12-27T12:00:00+01:00</RecordedAtTime>
+        <LineRef>RUT:Line:4</LineRef>
+        <EstimatedVehicleJourneyCode>HARNESS-EXTRA-1</EstimatedVehicleJourneyCode>
+        <ExtraJourney>true</ExtraJourney>
+        <OperatorRef>RUT:Operator:130c</OperatorRef>
+        <Monitored>true</Monitored>
+        <DataSource>HARNESS</DataSource>
+        <EstimatedCalls>
+          <EstimatedCall>
+            <StopPointRef>NSR:Quay:10682</StopPointRef>
+            <Order>1</Order>
+            <AimedDepartureTime>2017-12-27T16:00:00+01:00</AimedDepartureTime>
+            <ExpectedDepartureTime>2017-12-27T16:00:00+01:00</ExpectedDepartureTime>
+          </EstimatedCall>
+          <EstimatedCall>
+            <StopPointRef>NSR:Quay:7184</StopPointRef>
+            <Order>2</Order>
+            <AimedArrivalTime>2017-12-27T16:20:00+01:00</AimedArrivalTime>
+            <ExpectedArrivalTime>2017-12-27T16:20:00+01:00</ExpectedArrivalTime>
+          </EstimatedCall>
+        </EstimatedCalls>
+      </EstimatedVehicleJourney>
+      </EstimatedJourneyVersionFrame>
+    </EstimatedTimetableDelivery>
+  </ServiceDelivery>
+</Siri>

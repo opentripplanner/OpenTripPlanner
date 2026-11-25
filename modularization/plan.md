@@ -16,6 +16,10 @@ Split OTP into functional domain modules with clear APIs and single responsibili
   several parameter classes) and documents the parameters.
 - Each sandbox extension becomes its own Maven module under a `sandbox` parent. Core code has no
   `OTPFeature` conditionals; core exposes extension points and `application` wires the sandboxes.
+- Fares are a sandbox too. The core model contains fares today, so fares are extracted from the
+  core into a sandbox module, and the core gets extension points for it (itinerary
+  post-processing, result attachment, API contribution, import hooks, request parameters,
+  configuration, graph storage). See the sandbox section of `vocabulary.md`.
 
 ## Problem
 
@@ -101,10 +105,15 @@ Location: `modularization/harness/`, a standalone Maven project outside the OTP 
 It is black-box. It runs the shaded jar built from either tree, so it does not depend on OTP
 packages. It compares:
 
-- graph build output on fixed inputs, then routing results for fixed requests
+- graph build output on fixed inputs, then routing results for fixed requests. Inputs: GTFS, NeTEx,
+  OSM and elevation, in several datasets
 - the GraphQL schemas
-- generated configuration documentation and JSON schema
-- real-time updater results on recorded feeds
+- generated configuration documentation and JSON schema (not built yet)
+- real-time updater results on generated input: SIRI-ET from files, and vehicle rental from GBFS
+  feeds (v2.3 and v3.0, stations and free-floating, with geofencing)
+
+Fares are not covered, by decision. They become a sandbox. When the extraction starts, a fare
+dataset is added so the extraction can be checked.
 
 `approved-discrepancies` lists each accepted difference with a reason and an owner. The harness
 fails on any difference not listed, and on any listed entry that no longer occurs.

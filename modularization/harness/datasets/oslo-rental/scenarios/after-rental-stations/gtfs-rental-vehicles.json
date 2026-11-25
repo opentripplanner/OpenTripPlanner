@@ -1,0 +1,5 @@
+{
+  "api": "gtfs",
+  "query": "{ rentalVehicles { vehicleId name lat lon allowPickupNow operative rentalNetwork { networkId } vehicleType { formFactor propulsionType } fuel { percent range } } }",
+  "sortArraysBy": "vehicleId"
+}

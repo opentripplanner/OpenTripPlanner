@@ -1,0 +1,69 @@
+{
+  "last_updated": "2025-11-05T12:00:00+00:00",
+  "ttl": 0,
+  "version": "3.0",
+  "data": {
+    "geofencing_zones": {
+      "type": "FeatureCollection",
+      "features": [
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "MultiPolygon",
+            "coordinates": [
+              [
+                [
+                  [
+                    10.74826,
+                    59.90996
+                  ],
+                  [
+                    10.75126,
+                    59.90996
+                  ],
+                  [
+                    10.75126,
+                    59.91296
+                  ],
+                  [
+                    10.74826,
+                    59.91296
+                  ],
+                  [
+                    10.74826,
+                    59.90996
+                  ]
+                ]
+              ]
+            ]
+          },
+          "properties": {
+            "name": [
+              {
+                "text": "Drop-off forbidden Torggata",
+                "language": "en"
+              }
+            ],
+            "rules": [
+              {
+                "vehicle_type_ids": [
+                  "float3"
+                ],
+                "ride_start_allowed": true,
+                "ride_end_allowed": false,
+                "ride_through_allowed": true
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "global_rules": [
+      {
+        "ride_start_allowed": true,
+        "ride_end_allowed": true,
+        "ride_through_allowed": true
+      }
+    ]
+  }
+}

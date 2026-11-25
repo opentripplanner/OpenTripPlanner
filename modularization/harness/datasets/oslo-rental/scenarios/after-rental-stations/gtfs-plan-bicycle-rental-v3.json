@@ -1,0 +1,4 @@
+{
+  "api": "gtfs",
+  "query": "{ planConnection(origin:{location:{coordinate:{latitude:59.9216,longitude:10.7125}}}, destination:{location:{coordinate:{latitude:59.9143,longitude:10.7348}}}, dateTime:{earliestDeparture:\"2023-06-14T10:00:00+02:00\"}, first:3, modes:{direct:[WALK, BICYCLE_RENTAL], directOnly:true}) { routingErrors { code inputField } edges { node { start end duration generalizedCost legs { mode rentedBike distance duration from { name vehicleRentalStation { stationId } rentalVehicle { vehicleId } } to { name vehicleRentalStation { stationId } rentalVehicle { vehicleId } } } } } } }"
+}

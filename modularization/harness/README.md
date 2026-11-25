@@ -41,12 +41,33 @@ tested. This way both trees get the same input, also after the test resources ha
 | Dataset | Inputs | What it covers |
 |---|---|---|
 | `portland` | GTFS, OSM, elevation raster (NED) | GTFS import, transit routing in both APIs, elevation on street edges and in steps, OSM park and ride, both GraphQL schemas |
-| `oslo` | NeTEx (Nordic profile), OSM | NeTEx import and its mapping in both APIs: authorities, operators, lines, quays, stop places, service journeys, calendars, departures, trip search with transit |
+| `oslo` | NeTEx (Nordic profile), OSM, generated SIRI-ET | NeTEx import and its mapping in both APIs: authorities, operators, lines, quays, stop places, service journeys, calendars, departures, trip search with transit. Four SIRI-ET update steps: delay and early run, cancelled trip and cancelled stop, extra journey, a later update that replaces an earlier one |
+| `oslo-rental` | OSM, generated GBFS feeds | Vehicle rental from four GBFS networks: v2.3 stations, v2.3 free-floating scooters with geofencing, v3.0 stations, v3.0 free-floating vehicles with geofencing. Two update steps: station counts and flags change; vehicles are moved, disabled, removed and added and geofencing zones change. Rental trips in both APIs |
 | `herrenberg` | OSM (German tag mapping) | OSM street import: walk, bicycle and car routing, street steps, OSM parking |
 | `skoyen` | OSM (Norway) | The same on a second extract |
 
 The street scenarios are generated from the OSM file with `tools/gen_street_scenarios.py`
-(needs `osmium`). The output is deterministic and committed.
+(needs `osmium`). The SIRI-ET files and their scenarios come from `tools/gen_siri_et.py` and
+`tools/gen_oslo_rt_scenarios.py`, the GBFS feeds, dataset and scenarios of `oslo-rental` from
+`tools/gen_gbfs.py`. The output is deterministic and committed. The GBFS feeds are synthetic, in
+the shapes of the GBFS test data of OTP, but located in Oslo so they link to the Oslo OSM extract.
+
+## Real-time updates (steps)
+
+A dataset can list `steps` in `dataset.json`. After the scenarios of the dataset have run, each
+step in turn:
+
+1. copies its files into a directory that an updater reads (`drops`; with `substitute` the text
+   `${workDir}` in the file is replaced by the work directory),
+2. waits until the updater has consumed the files (for SIRI the file loader renames `a.xml` to
+   `a.xml.ok` or `a.xml.failed`; skipped when `awaitDir` is empty), then `settleMillis` more,
+3. records the outcome of the file processing (`updater-files.json`), and
+4. runs the scenarios in `scenarios/after-<step>/`.
+
+The updaters read `file:` URLs, e.g. `"url": "file://${workDir}/siri-et"` in `routerConfig`.
+Steps build on each other. The SIRI-ET updater drops a delivery that is older than the one before
+or older than the start of OTP, so the generated files have increasing response timestamps in
+the future.
 
 ## Scenarios
 
@@ -93,7 +114,9 @@ Found by `selfcheck`. They are worked around in the scenarios, not hidden:
 ## Not covered yet
 
 - Generated configuration documentation and the JSON schema of the configuration.
-- Real-time updaters on recorded feeds.
+- Real-time updaters other than SIRI-ET and GBFS: SIRI-SX, GTFS-RT (trip updates, alerts, vehicle
+  positions), vehicle parking updaters.
+- Fares. By decision: they become a sandbox, see `plan.md`.
 - More input: the EPIP NeTEx profile (the sample in the repository has no stop places, so it
   gives no trips; it needs a real German extract), flex, vehicle rental, fares, GBFS.
 - Elevation outside Portland. Only the Portland raster is in the repository.

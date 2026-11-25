@@ -1,0 +1,4 @@
+{
+  "api": "transmodel",
+  "query": "{ trip(from:{coordinates:{latitude:59.9124,longitude:10.7503}}, to:{coordinates:{latitude:59.9303,longitude:10.7148}}, dateTime:\"2023-06-14T10:00:00+02:00\", numTripPatterns:3, modes:{directMode:bike_rental, transportModes:[]}) { routingErrors { code } tripPatterns { startTime endTime duration legs { mode distance duration fromPlace { name } toPlace { name } } } } }"
+}

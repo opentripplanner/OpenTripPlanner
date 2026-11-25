@@ -34,8 +34,8 @@ owned by the consumer.
 | Layer | Meaning | Domains |
 |---|---|---|
 | L0 | Foundation | `foundation` |
-| L1 | Data domains: own entities and the data they hold | `transit-model`, `street-network`, `vehicle-rental`, `vehicle-parking`, `transfers`, `fares-model` |
-| L2 | Domain services and engines | `raptor`, `street-routing`, `fares`, `flex`, `realtime-trip`, `realtime-alerts`, `realtime-vehicle-position`, `emissions`, `place-search` |
+| L1 | Data domains: own entities and the data they hold | `transit-model`, `street-network`, `vehicle-rental`, `vehicle-parking`, `transfers` |
+| L2 | Domain services and engines | `raptor`, `street-routing`, `flex`, `realtime-trip`, `realtime-alerts`, `realtime-vehicle-position`, `emissions`, `place-search` |
 | L3 | Use cases | `trip-planning`, `itinerary-filtering`, `transfer-optimization`, `trip-plan-model`, `routing-request`, `refetch` |
 | L4 | Data import and graph build | `osm-import`, `gtfs-import`, `netex-import`, `graph-build`, `graph-storage`, `datastore` |
 | L5 | APIs and updaters (adapters) | `api-gtfs`, `api-transmodel`, `api-other`, `updater-framework` and the updater adapters |
@@ -61,7 +61,6 @@ those will be decided case by case.
 | `vehicle-rental` | Rental vehicles and stations, networks, geofencing | rental places, networks, geofencing zones, GBFS feed model | `street/.../vehiclerental`, `gbfs`, `ext/vehiclerentalgeofencing`, `ext/vehiclerentalservicedirectory` |
 | `vehicle-parking` | Parking facilities and their availability | parking lots, entrances, tags, state | `street/.../vehicleparking`, `ext/vehicleparking`, `ext/parkAndRideApi` |
 | `transfers` | Where and how a passenger changes between trips and stops | regular transfers, constrained transfers (GTFS/NeTEx), transfer parameters and generation, nearby stop finding | `transit/transfer`, `transfer/*`, `place/nearbystopfinder`, `ext/transferanalyzer` |
-| `fares-model` | Fare products, rules and the fare data model | fare products, fare media, leg rules, transfer rules | `model/fare`, `routing/core` |
 
 ### L2 Domain services and engines
 
@@ -70,7 +69,6 @@ those will be decided case by case.
 | `raptor` | The generic transit search engine | everything in the `raptor` module | `raptor/*` |
 | `raptor-adapter` | Maps OTP data and requests to the Raptor SPI and back | `RaptorRequestMapper`, `RaptorRoutingRequestTransitData`, transit router, cost calculators, access/egress for transit | `routing/algorithm/raptoradapter` |
 | `street-routing` | Street legs for itineraries: access, egress, direct, transfers on street | street search requests, state-to-leg mapping | `routing/algorithm/mapping`, `routing/api` (street parts), `street/.../search` (use side) |
-| `fares` | Calculating the fare of an itinerary | fare services, calculators, fare engines for Nordic/German/etc. | `routing/fares`, `ext/fares` |
 | `flex` | Flexible and demand-responsive transit | flex trips, areas, access/egress, direct flex routing | `ext/flex` |
 | `realtime-trip` | Applying real-time changes to trips and timetables | trip updates (GTFS-RT, SIRI), timetable snapshot, trip adders and cancellations, delay prediction | `updater/trip`, `ext/siri`, `ext/empiricaldelay`, `ext/realtimeresolver` |
 | `realtime-alerts` | Service alerts and their match to entities | alert model, alert patches, alert service | `updater/alert`, `routing/alertpatch`, `routing/services`, `routing/impl` |
@@ -79,6 +77,37 @@ those will be decided case by case.
 | `place-search` | Finding places: nearby places, text search | stop and place finder, geocoder, suggestion index | `place/*`, `ext/geocoder` |
 | `ride-hailing` | Ride-hailing offers | providers, estimates | `ext/ridehailing`, `ext/taxi` |
 | `carpooling` | Carpooling offers | carpooling model and routing | `ext/carpooling` |
+
+### Sandbox domains
+
+Decided: **fares is a sandbox module**, not a core domain. This domain is not in a layer, because
+it plugs into the core through extension points.
+
+| Domain | Responsibility | Typical content | Currently in |
+|---|---|---|---|
+| `fares` | Fare products, fare rules, fare calculation and the fare data of an itinerary | fare products and media, leg and transfer rules, fare services and calculators (Nordic, German, ...), `FareType`, fare import from GTFS and NeTEx | `model/fare`, `routing/fares`, `routing/core`, `ext/fares`, and the fare parts of the importers, the plan model and the APIs |
+
+The core model contains fares today, so the work is an extraction, and the core needs extension
+points for it. The list below is the starting inventory. It will be completed by the
+classification, which labels every class that mentions fares with `fares` and marks the
+core classes that carry fare data as `split`.
+
+1. **Itinerary post-processing:** a hook in `trip-planning` that lets a sandbox decorate a found
+   itinerary (today: the fare service called after the filter chain).
+2. **Result attachment:** a way to attach typed, sandbox-owned data to an `Itinerary` or `Leg`
+   without the plan model knowing the type (today: fare fields on `Itinerary`).
+3. **API contribution:** a way for a sandbox to add fields and data fetchers to the GTFS and
+   Transmodel GraphQL schemas.
+4. **Import hooks:** `gtfs-import` and `netex-import` pass fare data to the sandbox (today: fare
+   mappers inside the importers and fare data stored in `TimetableRepository`).
+5. **Request parameters:** a way to carry sandbox request parameters, e.g. the fare type, without
+   `routing-request` knowing them.
+6. **Configuration:** the sandbox owns its parameter types. The config adapter maps JSON to them,
+   as for all modules.
+7. **Graph storage:** the sandbox registers its data for serialization.
+
+The same list applies, in general form, to every sandbox. Fares is the first one to be worked
+out, because it is the largest piece of sandbox data in the core.
 
 ### L3 Use cases
 
@@ -131,8 +160,8 @@ These are my open questions. The right answer depends on your judgment of the pr
 1. **`transit-model` is large (about 190 classes plus timetables).** Should it split into static
    entities (`transit-model`) and timetables and patterns (`timetable`)? I suggest one domain
    first, and a split when the dependency report shows a clear seam.
-2. **`fares-model` and `fares`:** one domain or two? The model is used by the API and the plan
-   result. The calculators are not. Two domains keeps the API from depending on the calculators.
+2. **Fares:** decided. One sandbox domain, `fares`. The open point is the form of the extension
+   points listed in the sandbox section, especially result attachment (2) and API contribution (3).
 3. **`trip-plan-model` and `routing-request`:** both are hubs that most domains touch. Should they
    stay as domains with the contracts defined by a small interface set, or be split by feature
    (for example a request part per domain)? The plan says to split them by feature. The
@@ -155,7 +184,7 @@ These are my open questions. The right answer depends on your judgment of the pr
 | Sandbox | Domain |
 |---|---|
 | `carpooling` | `carpooling` |
-| `fares` | `fares` |
+| `fares` | `fares` (sandbox, extracted from the core, see above) |
 | `flex` | `flex` |
 | `ojp` | `api-other` |
 | `vectortiles`, `debugrastertiles`, `reportapi`, `actuator` | `api-other` |

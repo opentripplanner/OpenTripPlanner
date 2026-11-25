@@ -1,0 +1,51 @@
+{
+  "last_updated": 1700000000,
+  "ttl": 0,
+  "version": "2.3",
+  "data": {
+    "stations": [
+      {
+        "station_id": "b1",
+        "name": "Jernbanetorget",
+        "lat": 59.91225,
+        "lon": 10.75014,
+        "capacity": 20
+      },
+      {
+        "station_id": "b2",
+        "name": "Brugata",
+        "lat": 59.91233,
+        "lon": 10.74964,
+        "capacity": 15
+      },
+      {
+        "station_id": "b3",
+        "name": "Majorstuen",
+        "lat": 59.9098,
+        "lon": 10.74806,
+        "capacity": 10
+      },
+      {
+        "station_id": "b4",
+        "name": "Torggata",
+        "lat": 59.91146,
+        "lon": 10.74976,
+        "capacity": 12
+      },
+      {
+        "station_id": "b5",
+        "name": "Vaterland",
+        "lat": 59.9134,
+        "lon": 10.754,
+        "capacity": 18
+      },
+      {
+        "station_id": "b6",
+        "name": "Kjels\u00e5s",
+        "lat": 59.93057,
+        "lon": 10.71432,
+        "capacity": 16
+      }
+    ]
+  }
+}

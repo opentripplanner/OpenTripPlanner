@@ -1,0 +1,27 @@
+{
+  "last_updated": 1700000000,
+  "ttl": 0,
+  "version": "2.3",
+  "data": {
+    "en": {
+      "feeds": [
+        {
+          "name": "system_information",
+          "url": "file://${workDir}/gbfs/scooters/system_information.json"
+        },
+        {
+          "name": "vehicle_types",
+          "url": "file://${workDir}/gbfs/scooters/vehicle_types.json"
+        },
+        {
+          "name": "free_bike_status",
+          "url": "file://${workDir}/gbfs/scooters/free_bike_status.json"
+        },
+        {
+          "name": "geofencing_zones",
+          "url": "file://${workDir}/gbfs/scooters/geofencing_zones.json"
+        }
+      ]
+    }
+  }
+}

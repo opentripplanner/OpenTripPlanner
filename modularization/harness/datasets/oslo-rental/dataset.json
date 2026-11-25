@@ -1,0 +1,174 @@
+{
+  "inputs": [
+    {
+      "from": "application/src/test/resources/org/opentripplanner/oslo-east-filtered.osm.pbf"
+    },
+    {
+      "from": "modularization/harness/datasets/oslo-rental/gbfs/initial/bysykkel/gbfs.json",
+      "as": "gbfs/bysykkel/gbfs.json",
+      "substitute": true
+    },
+    {
+      "from": "modularization/harness/datasets/oslo-rental/gbfs/initial/bysykkel/system_information.json",
+      "as": "gbfs/bysykkel/system_information.json"
+    },
+    {
+      "from": "modularization/harness/datasets/oslo-rental/gbfs/initial/bysykkel/vehicle_types.json",
+      "as": "gbfs/bysykkel/vehicle_types.json"
+    },
+    {
+      "from": "modularization/harness/datasets/oslo-rental/gbfs/initial/bysykkel/station_information.json",
+      "as": "gbfs/bysykkel/station_information.json"
+    },
+    {
+      "from": "modularization/harness/datasets/oslo-rental/gbfs/initial/bysykkel/station_status.json",
+      "as": "gbfs/bysykkel/station_status.json"
+    },
+    {
+      "from": "modularization/harness/datasets/oslo-rental/gbfs/initial/citybikes-v3/gbfs.json",
+      "as": "gbfs/citybikes-v3/gbfs.json",
+      "substitute": true
+    },
+    {
+      "from": "modularization/harness/datasets/oslo-rental/gbfs/initial/citybikes-v3/system_information.json",
+      "as": "gbfs/citybikes-v3/system_information.json"
+    },
+    {
+      "from": "modularization/harness/datasets/oslo-rental/gbfs/initial/citybikes-v3/vehicle_types.json",
+      "as": "gbfs/citybikes-v3/vehicle_types.json"
+    },
+    {
+      "from": "modularization/harness/datasets/oslo-rental/gbfs/initial/citybikes-v3/station_information.json",
+      "as": "gbfs/citybikes-v3/station_information.json"
+    },
+    {
+      "from": "modularization/harness/datasets/oslo-rental/gbfs/initial/citybikes-v3/station_status.json",
+      "as": "gbfs/citybikes-v3/station_status.json"
+    },
+    {
+      "from": "modularization/harness/datasets/oslo-rental/gbfs/initial/scooters/gbfs.json",
+      "as": "gbfs/scooters/gbfs.json",
+      "substitute": true
+    },
+    {
+      "from": "modularization/harness/datasets/oslo-rental/gbfs/initial/scooters/system_information.json",
+      "as": "gbfs/scooters/system_information.json"
+    },
+    {
+      "from": "modularization/harness/datasets/oslo-rental/gbfs/initial/scooters/vehicle_types.json",
+      "as": "gbfs/scooters/vehicle_types.json"
+    },
+    {
+      "from": "modularization/harness/datasets/oslo-rental/gbfs/initial/scooters/free_bike_status.json",
+      "as": "gbfs/scooters/free_bike_status.json"
+    },
+    {
+      "from": "modularization/harness/datasets/oslo-rental/gbfs/initial/scooters/geofencing_zones.json",
+      "as": "gbfs/scooters/geofencing_zones.json"
+    },
+    {
+      "from": "modularization/harness/datasets/oslo-rental/gbfs/initial/floaters-v3/gbfs.json",
+      "as": "gbfs/floaters-v3/gbfs.json",
+      "substitute": true
+    },
+    {
+      "from": "modularization/harness/datasets/oslo-rental/gbfs/initial/floaters-v3/system_information.json",
+      "as": "gbfs/floaters-v3/system_information.json"
+    },
+    {
+      "from": "modularization/harness/datasets/oslo-rental/gbfs/initial/floaters-v3/vehicle_types.json",
+      "as": "gbfs/floaters-v3/vehicle_types.json"
+    },
+    {
+      "from": "modularization/harness/datasets/oslo-rental/gbfs/initial/floaters-v3/vehicle_status.json",
+      "as": "gbfs/floaters-v3/vehicle_status.json"
+    },
+    {
+      "from": "modularization/harness/datasets/oslo-rental/gbfs/initial/floaters-v3/geofencing_zones.json",
+      "as": "gbfs/floaters-v3/geofencing_zones.json"
+    }
+  ],
+  "buildConfig": {
+    "osmDefaults": {
+      "timeZone": "Europe/Oslo"
+    }
+  },
+  "routerConfig": {
+    "updaters": [
+      {
+        "type": "vehicle-rental",
+        "sourceType": "gbfs",
+        "feedId": "bysykkel",
+        "frequency": "PT1S",
+        "url": "file://${workDir}/gbfs/bysykkel/gbfs.json"
+      },
+      {
+        "type": "vehicle-rental",
+        "sourceType": "gbfs",
+        "feedId": "citybikes-v3",
+        "frequency": "PT1S",
+        "url": "file://${workDir}/gbfs/citybikes-v3/gbfs.json"
+      },
+      {
+        "type": "vehicle-rental",
+        "sourceType": "gbfs",
+        "feedId": "scooters",
+        "frequency": "PT1S",
+        "url": "file://${workDir}/gbfs/scooters/gbfs.json",
+        "geofencing": {
+          "enabled": true
+        }
+      },
+      {
+        "type": "vehicle-rental",
+        "sourceType": "gbfs",
+        "feedId": "floaters-v3",
+        "frequency": "PT1S",
+        "url": "file://${workDir}/gbfs/floaters-v3/gbfs.json",
+        "geofencing": {
+          "enabled": true
+        }
+      }
+    ]
+  },
+  "steps": [
+    {
+      "name": "rental-stations",
+      "awaitDir": "",
+      "settleMillis": 4000,
+      "drops": [
+        {
+          "from": "modularization/harness/datasets/oslo-rental/gbfs/step-1/bysykkel/station_status.json",
+          "toDir": "gbfs/bysykkel"
+        },
+        {
+          "from": "modularization/harness/datasets/oslo-rental/gbfs/step-1/citybikes-v3/station_status.json",
+          "toDir": "gbfs/citybikes-v3"
+        }
+      ]
+    },
+    {
+      "name": "rental-vehicles",
+      "awaitDir": "",
+      "settleMillis": 4000,
+      "drops": [
+        {
+          "from": "modularization/harness/datasets/oslo-rental/gbfs/step-2/scooters/free_bike_status.json",
+          "toDir": "gbfs/scooters"
+        },
+        {
+          "from": "modularization/harness/datasets/oslo-rental/gbfs/step-2/scooters/geofencing_zones.json",
+          "toDir": "gbfs/scooters"
+        },
+        {
+          "from": "modularization/harness/datasets/oslo-rental/gbfs/step-2/floaters-v3/vehicle_status.json",
+          "toDir": "gbfs/floaters-v3"
+        },
+        {
+          "from": "modularization/harness/datasets/oslo-rental/gbfs/step-2/floaters-v3/geofencing_zones.json",
+          "toDir": "gbfs/floaters-v3"
+        }
+      ]
+    }
+  ]
+}

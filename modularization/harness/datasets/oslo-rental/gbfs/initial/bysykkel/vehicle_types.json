@@ -1,0 +1,15 @@
+{
+  "last_updated": 1700000000,
+  "ttl": 0,
+  "version": "2.3",
+  "data": {
+    "vehicle_types": [
+      {
+        "vehicle_type_id": "bike",
+        "form_factor": "bicycle",
+        "propulsion_type": "human",
+        "name": "City bike"
+      }
+    ]
+  }
+}

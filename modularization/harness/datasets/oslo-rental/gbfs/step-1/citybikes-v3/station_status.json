@@ -1,0 +1,36 @@
+{
+  "last_updated": "2025-11-05T12:00:00+00:00",
+  "ttl": 0,
+  "version": "3.0",
+  "data": {
+    "stations": [
+      {
+        "station_id": "c1",
+        "num_docks_available": 13,
+        "is_installed": true,
+        "is_renting": true,
+        "is_returning": true,
+        "num_vehicles_available": 1,
+        "last_reported": "2025-11-05T12:00:00+00:00"
+      },
+      {
+        "station_id": "c2",
+        "num_docks_available": 8,
+        "is_installed": true,
+        "is_renting": true,
+        "is_returning": true,
+        "num_vehicles_available": 2,
+        "last_reported": "2025-11-05T12:00:00+00:00"
+      },
+      {
+        "station_id": "c3",
+        "num_docks_available": 2,
+        "is_installed": true,
+        "is_renting": true,
+        "is_returning": true,
+        "num_vehicles_available": 20,
+        "last_reported": "2025-11-05T12:00:00+00:00"
+      }
+    ]
+  }
+}

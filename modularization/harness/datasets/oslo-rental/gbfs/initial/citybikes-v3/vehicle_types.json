@@ -1,0 +1,20 @@
+{
+  "last_updated": "2025-11-05T12:00:00+00:00",
+  "ttl": 0,
+  "version": "3.0",
+  "data": {
+    "vehicle_types": [
+      {
+        "vehicle_type_id": "bike3",
+        "form_factor": "bicycle",
+        "propulsion_type": "human",
+        "name": [
+          {
+            "text": "City bike",
+            "language": "en"
+          }
+        ]
+      }
+    ]
+  }
+}

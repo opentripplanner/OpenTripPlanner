@@ -1,0 +1,21 @@
+{
+  "last_updated": "2025-11-05T12:00:00+00:00",
+  "ttl": 0,
+  "version": "3.0",
+  "data": {
+    "vehicle_types": [
+      {
+        "vehicle_type_id": "float3",
+        "form_factor": "scooter_standing",
+        "propulsion_type": "electric",
+        "max_range_meters": 40000,
+        "name": [
+          {
+            "text": "E-scooter",
+            "language": "en"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "last_updated": 1700000000,
+  "ttl": 0,
+  "version": "2.3",
+  "data": {
+    "en": {
+      "feeds": [
+        {
+          "name": "system_information",
+          "url": "file://${workDir}/gbfs/bysykkel/system_information.json"
+        },
+        {
+          "name": "vehicle_types",
+          "url": "file://${workDir}/gbfs/bysykkel/vehicle_types.json"
+        },
+        {
+          "name": "station_information",
+          "url": "file://${workDir}/gbfs/bysykkel/station_information.json"
+        },
+        {
+          "name": "station_status",
+          "url": "file://${workDir}/gbfs/bysykkel/station_status.json"
+        }
+      ]
+    }
+  }
+}

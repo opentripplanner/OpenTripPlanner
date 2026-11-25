@@ -72,4 +72,44 @@ class DatasetTest {
     Files.createDirectories(tmp.resolve("datasets/not-a-dataset"));
     assertEquals(List.of("d"), Dataset.loadAll(tmp.resolve("datasets")).stream().map(Dataset::name).toList());
   }
+
+  @Test
+  void workDirIsSubstitutedInConfigAndInMarkedFilesAndDropsGoToNestedDirectories(@TempDir Path tmp)
+    throws IOException {
+    Path repo = Files.createDirectories(tmp.resolve("repo"));
+    Files.writeString(repo.resolve("feed.json"), "{\"url\":\"file://${workDir}/gbfs/a/x.json\"}");
+    Files.writeString(repo.resolve("plain.json"), "{\"keep\":\"${workDir}\"}");
+    Files.writeString(repo.resolve("update.json"), "{\"u\":\"${workDir}\"}");
+
+    var dataset = write(
+      tmp,
+      """
+      {"inputs":[
+         {"from":"feed.json","as":"gbfs/a/gbfs.json","substitute":true},
+         {"from":"plain.json","as":"gbfs/a/plain.json"}],
+       "routerConfig":{"updaters":[{"url":"file://${workDir}/siri"}]},
+       "steps":[{"name":"s","awaitDir":"siri","settleMillis":1,
+                 "drops":[{"from":"update.json","toDir":"gbfs/a","substitute":true}]}]}
+      """
+    );
+    Path work = tmp.resolve("work");
+    dataset.materialize(repo, work);
+    String abs = work.toAbsolutePath().toString();
+
+    assertEquals("{\"url\":\"file://" + abs + "/gbfs/a/x.json\"}", Files.readString(work.resolve("gbfs/a/gbfs.json")));
+    assertEquals("{\"keep\":\"${workDir}\"}", Files.readString(work.resolve("gbfs/a/plain.json")));
+    assertTrue(Files.readString(work.resolve("router-config.json")).contains("file://" + abs + "/siri"));
+    assertTrue(Files.isDirectory(work.resolve("siri")), "the watched directory exists at startup");
+
+    dataset.applyDrops(dataset.steps().get(0), repo, work);
+    assertEquals("{\"u\":\"" + abs + "\"}", Files.readString(work.resolve("gbfs/a/update.json")));
+  }
+
+  @Test
+  void stepsAreReadInOrder(@TempDir Path tmp) throws IOException {
+    var dataset = write(tmp, "{\"steps\":[{\"name\":\"one\"},{\"name\":\"two\",\"settleMillis\":5}]}");
+    assertEquals(List.of("one", "two"), dataset.steps().stream().map(Dataset.Step::name).toList());
+    assertEquals(2000, dataset.steps().get(0).settleMillis());
+    assertEquals(5, dataset.steps().get(1).settleMillis());
+  }
 }

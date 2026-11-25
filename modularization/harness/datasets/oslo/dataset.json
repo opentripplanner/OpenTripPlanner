@@ -1,18 +1,80 @@
 {
   "inputs": [
-    { "from": "application/src/test/resources/netex/nordic/netex_minimal", "zipAs": "netex_minimal.zip" },
-    { "from": "application/src/test/resources/org/opentripplanner/oslo-east-filtered.osm.pbf" }
+    {
+      "from": "application/src/test/resources/netex/nordic/netex_minimal",
+      "zipAs": "netex_minimal.zip"
+    },
+    {
+      "from": "application/src/test/resources/org/opentripplanner/oslo-east-filtered.osm.pbf"
+    }
   ],
   "buildConfig": {
     "transitServiceStart": "2017-12-21",
     "transitServiceEnd": "2018-01-31",
     "netexDefaults": {
-      "moduleFilePattern": "netex_.*\\.zip",
       "sharedFilePattern": "_stops.xml",
       "sharedGroupFilePattern": "_(\\w{3})_shared_data.xml",
       "groupFilePattern": "(\\w{3})_.*\\.xml",
       "feedId": "EN"
     }
   },
-  "routerConfig": {}
+  "routerConfig": {
+    "timetableUpdates": {
+      "maxSnapshotFrequency": "PT0S"
+    },
+    "updaters": [
+      {
+        "type": "siri-et-updater",
+        "feedId": "EN",
+        "url": "file://${workDir}/siri-et",
+        "frequency": "PT1S"
+      }
+    ]
+  },
+  "steps": [
+    {
+      "name": "et-delay",
+      "awaitDir": "siri-et",
+      "settleMillis": 2000,
+      "drops": [
+        {
+          "from": "modularization/harness/datasets/oslo/updates/et-1-delay.xml",
+          "toDir": "siri-et"
+        }
+      ]
+    },
+    {
+      "name": "et-cancel",
+      "awaitDir": "siri-et",
+      "settleMillis": 2000,
+      "drops": [
+        {
+          "from": "modularization/harness/datasets/oslo/updates/et-2-cancel.xml",
+          "toDir": "siri-et"
+        }
+      ]
+    },
+    {
+      "name": "et-extra",
+      "awaitDir": "siri-et",
+      "settleMillis": 2000,
+      "drops": [
+        {
+          "from": "modularization/harness/datasets/oslo/updates/et-3-extra.xml",
+          "toDir": "siri-et"
+        }
+      ]
+    },
+    {
+      "name": "et-delay-again",
+      "awaitDir": "siri-et",
+      "settleMillis": 2000,
+      "drops": [
+        {
+          "from": "modularization/harness/datasets/oslo/updates/et-4-delay-again.xml",
+          "toDir": "siri-et"
+        }
+      ]
+    }
+  ]
 }

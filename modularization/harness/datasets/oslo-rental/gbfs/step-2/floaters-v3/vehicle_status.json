@@ -1,0 +1,36 @@
+{
+  "last_updated": "2025-11-05T12:00:00+00:00",
+  "ttl": 0,
+  "version": "3.0",
+  "data": {
+    "vehicles": [
+      {
+        "lat": 59.912,
+        "lon": 10.76,
+        "is_reserved": false,
+        "is_disabled": false,
+        "vehicle_type_id": "float3",
+        "current_range_meters": 17000,
+        "vehicle_id": "f1"
+      },
+      {
+        "lat": 59.93057,
+        "lon": 10.71432,
+        "is_reserved": false,
+        "is_disabled": false,
+        "vehicle_type_id": "float3",
+        "current_range_meters": 22000,
+        "vehicle_id": "f2"
+      },
+      {
+        "lat": 59.91225,
+        "lon": 10.75014,
+        "is_reserved": false,
+        "is_disabled": false,
+        "vehicle_type_id": "float3",
+        "current_range_meters": 40000,
+        "vehicle_id": "f4"
+      }
+    ]
+  }
+}

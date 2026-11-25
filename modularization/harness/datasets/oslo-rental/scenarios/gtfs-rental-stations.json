@@ -1,0 +1,5 @@
+{
+  "api": "gtfs",
+  "query": "{ vehicleRentalStations { stationId name lat lon allowDropoff allowPickup allowDropoffNow allowPickupNow operative capacity availableVehicles { total } availableSpaces { total } rentalNetwork { networkId } } }",
+  "sortArraysBy": "stationId"
+}

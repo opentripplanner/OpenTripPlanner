@@ -1,0 +1,45 @@
+{
+  "last_updated": "2025-11-05T12:00:00+00:00",
+  "ttl": 0,
+  "version": "3.0",
+  "data": {
+    "stations": [
+      {
+        "station_id": "c1",
+        "name": [
+          {
+            "text": "Frogner plass",
+            "language": "en"
+          }
+        ],
+        "lat": 59.9215,
+        "lon": 10.712,
+        "capacity": 14
+      },
+      {
+        "station_id": "c2",
+        "name": [
+          {
+            "text": "Solli",
+            "language": "en"
+          }
+        ],
+        "lat": 59.9145,
+        "lon": 10.726,
+        "capacity": 10
+      },
+      {
+        "station_id": "c3",
+        "name": [
+          {
+            "text": "Nationaltheatret",
+            "language": "en"
+          }
+        ],
+        "lat": 59.9142,
+        "lon": 10.735,
+        "capacity": 22
+      }
+    ]
+  }
+}

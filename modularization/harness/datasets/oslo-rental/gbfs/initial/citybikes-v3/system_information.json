@@ -1,0 +1,15 @@
+{
+  "last_updated": "2025-11-05T12:00:00+00:00",
+  "ttl": 0,
+  "version": "3.0",
+  "data": {
+    "system_id": "citybikes-v3",
+    "name": [
+      {
+        "text": "Oslo city bikes v3",
+        "language": "en"
+      }
+    ],
+    "timezone": "Europe/Oslo"
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "last_updated": 1700000000,
+  "ttl": 0,
+  "version": "2.3",
+  "data": {
+    "geofencing_zones": {
+      "type": "FeatureCollection",
+      "features": [
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "MultiPolygon",
+            "coordinates": [
+              [
+                [
+                  [
+                    10.7132,
+                    59.9285
+                  ],
+                  [
+                    10.7162,
+                    59.9285
+                  ],
+                  [
+                    10.7162,
+                    59.9315
+                  ],
+                  [
+                    10.7132,
+                    59.9315
+                  ],
+                  [
+                    10.7132,
+                    59.9285
+                  ]
+                ]
+              ]
+            ]
+          },
+          "properties": {
+            "name": "No parking Kjels\u00e5s",
+            "rules": [
+              {
+                "vehicle_type_id": [
+                  "scooter"
+                ],
+                "ride_allowed": false,
+                "ride_through_allowed": true
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "global_rules": [
+      {
+        "ride_allowed": true,
+        "ride_through_allowed": true
+      }
+    ]
+  }
+}

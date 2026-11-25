@@ -65,24 +65,85 @@ final class Capture {
     int port,
     String xmx
   ) throws IOException, InterruptedException {
-    List<Scenario> scenarios = Scenario.loadAll(dataset.scenarioDir());
     Files.createDirectories(outDir);
     Path work = outDir.resolve("_work");
     try (var otp = new OtpRunner(jar, work, outDir.resolve("_logs"), port, xmx)) {
       dataset.materialize(repoRoot, work);
       otp.buildGraph();
       otp.startServer();
-      for (Scenario s : scenarios) {
-        JsonNode response = send(otp, s);
-        JsonNode normalized = Json.normalize(response, s.ignore(), s.sortArraysBy(), s.unordered());
-        Files.writeString(
-          outDir.resolve(s.name() + ".json"),
-          Json.MAPPER.writeValueAsString(normalized) + "\n"
+      runScenarios(otp, dataset.name(), dataset.scenarioDir(), outDir);
+      for (Dataset.Step step : dataset.steps()) {
+        System.out.println("-- step " + step.name());
+        dataset.applyDrops(step, repoRoot, work);
+        Path phaseOut = outDir.resolve("after-" + step.name());
+        Files.createDirectories(phaseOut);
+        if (!step.awaitDir().isEmpty()) {
+          awaitConsumed(work.resolve(step.awaitDir()));
+        }
+        Thread.sleep(step.settleMillis());
+        if (!step.awaitDir().isEmpty()) {
+          // The outcome of the file processing is part of the result
+          Files.writeString(
+            phaseOut.resolve("updater-files.json"),
+            Json.MAPPER.writeValueAsString(fileStatuses(work.resolve(step.awaitDir()))) + "\n"
+          );
+        }
+        runScenarios(
+          otp,
+          dataset.name() + "/after-" + step.name(),
+          dataset.scenarioDir().resolve("after-" + step.name()),
+          phaseOut
         );
-        System.out.println("captured " + dataset.name() + "/" + s.name());
       }
     }
     deleteRecursively(work);
+  }
+
+  private static void runScenarios(OtpRunner otp, String label, Path scenarioDir, Path outDir)
+    throws IOException, InterruptedException {
+    if (!Files.isDirectory(scenarioDir)) {
+      return;
+    }
+    for (Scenario s : Scenario.loadAll(scenarioDir)) {
+      JsonNode response = send(otp, s);
+      JsonNode normalized = Json.normalize(response, s.ignore(), s.sortArraysBy(), s.unordered());
+      Files.writeString(
+        outDir.resolve(s.name() + ".json"),
+        Json.MAPPER.writeValueAsString(normalized) + "\n"
+      );
+      System.out.println("captured " + label + "/" + s.name());
+    }
+  }
+
+  /** Wait until no {@code .xml} or {@code .xml.inProgress} file is left in the directory. */
+  private static void awaitConsumed(Path dir) throws IOException, InterruptedException {
+    long deadline = System.nanoTime() + java.time.Duration.ofSeconds(90).toNanos();
+    while (System.nanoTime() < deadline) {
+      try (var files = Files.list(dir)) {
+        boolean pending = files.anyMatch(f -> {
+          String n = f.getFileName().toString();
+          return n.endsWith(".xml") || n.endsWith(".xml.inProgress");
+        });
+        if (!pending) {
+          return;
+        }
+      }
+      Thread.sleep(200);
+    }
+    throw new IllegalStateException("The updater did not consume the files in " + dir);
+  }
+
+  /** The outcome of the file loader: {@code a.xml.ok -> {"a.xml": "ok"}}. */
+  private static JsonNode fileStatuses(Path dir) throws IOException {
+    var result = Json.object();
+    try (var files = Files.list(dir)) {
+      for (Path f : files.sorted().toList()) {
+        String n = f.getFileName().toString();
+        int i = n.indexOf(".xml.");
+        result.put(i < 0 ? n : n.substring(0, i + 4), i < 0 ? "unprocessed" : n.substring(i + 5));
+      }
+    }
+    return result;
   }
 
   private static JsonNode send(OtpRunner otp, Scenario s) throws IOException, InterruptedException {
