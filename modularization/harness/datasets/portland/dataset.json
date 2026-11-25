@@ -1,8 +1,26 @@
 {
   "inputs": [
-    { "from": "application/src/test/resources/portland/portland.gtfs.zip" },
-    { "from": "application/src/test/resources/portland/portland-central-filtered.osm.pbf" },
-    { "from": "application/src/test/resources/portland/portland-ned.tif" }
+    {
+      "from": "application/src/test/resources/portland/portland.gtfs.zip"
+    },
+    {
+      "from": "application/src/test/resources/portland/portland-central-filtered.osm.pbf"
+    },
+    {
+      "from": "application/src/test/resources/portland/portland-ned.tif"
+    },
+    {
+      "from": "modularization/harness/datasets/portland/updates/step-0/trip-updates.pb",
+      "as": "rt-feeds/trip-updates.pb"
+    },
+    {
+      "from": "modularization/harness/datasets/portland/updates/step-0/alerts.pb",
+      "as": "rt-feeds/alerts.pb"
+    },
+    {
+      "from": "modularization/harness/datasets/portland/updates/step-0/vehicle-positions.pb",
+      "as": "rt-feeds/vehicle-positions.pb"
+    }
   ],
   "buildConfig": {
     "transitServiceStart": "2009-09-01",
@@ -10,5 +28,74 @@
     "staticBikeParkAndRide": true,
     "staticParkAndRide": true
   },
-  "routerConfig": {}
+  "routerConfig": {
+    "timetableUpdates": {
+      "maxSnapshotFrequency": "PT0S"
+    },
+    "updaters": [
+      {
+        "type": "stop-time-updater",
+        "feedId": "1",
+        "frequency": "PT1S",
+        "url": "file://${workDir}/rt-feeds/trip-updates.pb"
+      },
+      {
+        "type": "real-time-alerts",
+        "feedId": "1",
+        "frequency": "PT1S",
+        "url": "file://${workDir}/rt-feeds/alerts.pb"
+      },
+      {
+        "type": "vehicle-positions",
+        "feedId": "1",
+        "frequency": "PT1S",
+        "url": "file://${workDir}/rt-feeds/vehicle-positions.pb",
+        "features": [
+          "position",
+          "stop-position",
+          "occupancy"
+        ]
+      }
+    ]
+  },
+  "steps": [
+    {
+      "name": "rt-delays",
+      "awaitDir": "",
+      "settleMillis": 4000,
+      "drops": [
+        {
+          "from": "modularization/harness/datasets/portland/updates/step-1/trip-updates.pb",
+          "toDir": "rt-feeds"
+        },
+        {
+          "from": "modularization/harness/datasets/portland/updates/step-1/alerts.pb",
+          "toDir": "rt-feeds"
+        },
+        {
+          "from": "modularization/harness/datasets/portland/updates/step-1/vehicle-positions.pb",
+          "toDir": "rt-feeds"
+        }
+      ]
+    },
+    {
+      "name": "rt-changes",
+      "awaitDir": "",
+      "settleMillis": 4000,
+      "drops": [
+        {
+          "from": "modularization/harness/datasets/portland/updates/step-2/trip-updates.pb",
+          "toDir": "rt-feeds"
+        },
+        {
+          "from": "modularization/harness/datasets/portland/updates/step-2/alerts.pb",
+          "toDir": "rt-feeds"
+        },
+        {
+          "from": "modularization/harness/datasets/portland/updates/step-2/vehicle-positions.pb",
+          "toDir": "rt-feeds"
+        }
+      ]
+    }
+  ]
 }

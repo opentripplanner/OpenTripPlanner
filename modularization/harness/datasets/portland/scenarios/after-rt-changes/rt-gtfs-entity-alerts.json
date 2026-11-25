@@ -1,0 +1,4 @@
+{
+  "api": "gtfs",
+  "query": "{ r4: route(id:\"1:4\") { alerts { alertHeaderText } } r44: route(id:\"1:44\") { alerts { alertHeaderText } } s7751: stop(id:\"1:7751\") { alerts { alertHeaderText } } t81: trip(id:\"1:81W1180\") { alerts { alertHeaderText } } }"
+}

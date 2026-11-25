@@ -1,0 +1,10 @@
+{
+  "api": "transmodel",
+  "query": "{ situations { situationNumber summary { value language } description { value language } reportType severity validityPeriod { startTime endTime } lines { id } quays { id } serviceJourneys { id } } }",
+  "sortArraysBy": "situationNumber",
+  "unordered": [
+    "data.situations[*].lines",
+    "data.situations[*].quays",
+    "data.situations[*].serviceJourneys"
+  ]
+}

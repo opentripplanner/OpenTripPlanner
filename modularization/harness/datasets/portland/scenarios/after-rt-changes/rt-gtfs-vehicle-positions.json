@@ -1,0 +1,4 @@
+{
+  "api": "gtfs",
+  "query": "{ t0: trip(id:\"1:41W1300\") { pattern { code vehiclePositions { vehicleId label lat lon heading speed lastUpdated stopRelationship { status stop { gtfsId } } trip { gtfsId } } } } t1: trip(id:\"1:171W1260\") { pattern { code vehiclePositions { vehicleId label lat lon heading speed lastUpdated stopRelationship { status stop { gtfsId } } trip { gtfsId } } } } t2: trip(id:\"1:81W1180\") { pattern { code vehiclePositions { vehicleId label lat lon heading speed lastUpdated stopRelationship { status stop { gtfsId } } trip { gtfsId } } } } t3: trip(id:\"1:331W1220\") { pattern { code vehiclePositions { vehicleId label lat lon heading speed lastUpdated stopRelationship { status stop { gtfsId } } trip { gtfsId } } } } t4: trip(id:\"1:441W1140\") { pattern { code vehiclePositions { vehicleId label lat lon heading speed lastUpdated stopRelationship { status stop { gtfsId } } trip { gtfsId } } } } }"
+}

@@ -1,0 +1,4 @@
+{
+  "api": "gtfs",
+  "query": "{ planConnection(origin:{location:{stopLocation:{stopLocationId:\"1:2708\"}}}, destination:{location:{stopLocation:{stopLocationId:\"1:4583\"}}}, dateTime:{earliestDeparture:\"2009-11-17T09:30:00-08:00\"}, first:3, modes:{transitOnly:true}) { routingErrors { code } edges { node { start end duration legs { mode transitLeg realTime realtimeState departureDelay arrivalDelay start { scheduledTime estimated { time delay } } end { scheduledTime estimated { time delay } } from { name stop { gtfsId } } to { name stop { gtfsId } } route { gtfsId } trip { gtfsId } alerts { alertHeaderText } } } } } }"
+}

@@ -109,8 +109,9 @@ packages. It compares:
   OSM and elevation, in several datasets
 - the GraphQL schemas
 - generated configuration documentation and JSON schema (not built yet)
-- real-time updater results on generated input: SIRI-ET from files, and vehicle rental from GBFS
-  feeds (v2.3 and v3.0, stations and free-floating, with geofencing)
+- real-time updater results on generated input: SIRI-ET and GTFS-RT (trip updates, alerts, vehicle
+  positions) from files, and vehicle rental from GBFS feeds (v2.3 and v3.0, stations and
+  free-floating, with geofencing)
 
 Fares are not covered, by decision. They become a sandbox. When the extraction starts, a fare
 dataset is added so the extraction can be checked.

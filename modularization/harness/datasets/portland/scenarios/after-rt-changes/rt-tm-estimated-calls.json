@@ -1,0 +1,7 @@
+{
+  "api": "transmodel",
+  "query": "{ q2253: quay(id:\"1:2253\") { estimatedCalls(numberOfDepartures:6, startTime:\"2009-11-17T09:00:00-08:00\", timeRange:7200) { aimedDepartureTime expectedDepartureTime realtime realtimeState cancellation serviceJourney { id } } } q1342: quay(id:\"1:1342\") { estimatedCalls(numberOfDepartures:6, startTime:\"2009-11-17T09:00:00-08:00\", timeRange:7200) { aimedDepartureTime expectedDepartureTime realtime realtimeState cancellation serviceJourney { id } } } q2708: quay(id:\"1:2708\") { estimatedCalls(numberOfDepartures:6, startTime:\"2009-11-17T09:00:00-08:00\", timeRange:7200) { aimedDepartureTime expectedDepartureTime realtime realtimeState cancellation serviceJourney { id } } } q2828: quay(id:\"1:2828\") { estimatedCalls(numberOfDepartures:6, startTime:\"2009-11-17T09:00:00-08:00\", timeRange:7200) { aimedDepartureTime expectedDepartureTime realtime realtimeState cancellation serviceJourney { id } } } q9041: quay(id:\"1:9041\") { estimatedCalls(numberOfDepartures:6, startTime:\"2009-11-17T09:00:00-08:00\", timeRange:7200) { aimedDepartureTime expectedDepartureTime realtime realtimeState cancellation serviceJourney { id } } } q4431: quay(id:\"1:4431\") { estimatedCalls(numberOfDepartures:6, startTime:\"2009-11-17T09:00:00-08:00\", timeRange:7200) { aimedDepartureTime expectedDepartureTime realtime realtimeState cancellation serviceJourney { id } } } }",
+  "unordered": [
+    "data.*.estimatedCalls"
+  ]
+}
