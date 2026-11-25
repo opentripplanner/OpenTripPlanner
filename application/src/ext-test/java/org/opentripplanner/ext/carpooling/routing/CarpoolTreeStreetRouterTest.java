@@ -89,25 +89,6 @@ class CarpoolTreeStreetRouterTest extends GraphRoutingTest {
   }
 
   @Test
-  void aDetourBoundKeepsTheLegAndDropsTheRest() {
-    var unbounded = CarTreeSearch.carTree(vertexA, false, SEARCH_LIMIT, null);
-    long legSeconds = unbounded.getState(vertexC).getElapsedTimeSeconds();
-    // The bound admits the leg A -> C with 5 s to spare; D lies beyond C and can never lead back to
-    // it within that, while everything on the way to C stays.
-    var bound = new DetourBound(vertexA, vertexC, Duration.ofSeconds(legSeconds + 5), 40.0);
-    var bounded = CarTreeSearch.carTree(
-      vertexA,
-      false,
-      SEARCH_LIMIT,
-      bound.skipEdgeStrategy(false)
-    );
-
-    assertEquals(legSeconds, bounded.getState(vertexC).getElapsedTimeSeconds());
-    assertNotNull(bounded.getState(vertexB));
-    assertNull(bounded.getState(vertexD));
-  }
-
-  @Test
   void aTreeWithTargetsStopsOnceTheyAreReached() {
     var tree = CarTreeSearch.carTree(
       vertexA,

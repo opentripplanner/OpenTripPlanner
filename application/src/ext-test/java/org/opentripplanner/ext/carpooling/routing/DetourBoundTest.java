@@ -2,18 +2,22 @@ package org.opentripplanner.ext.carpooling.routing;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.street.geometry.WgsCoordinate;
+import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.SimpleVertex;
 
 /**
  * A 10 km leg with a limit of 1500 s and a top speed of 10 m/s. Each kilometre takes at least 100 s,
  * so the leg itself takes at least 1000 s and leaves 500 s for a detour.
  */
-class DetourBoundTest {
+class DetourBoundTest extends GraphRoutingTest {
 
   private static final WgsCoordinate START = new WgsCoordinate(59.9139, 10.7522);
   private static final DetourBound BOUND = new DetourBound(
@@ -22,6 +26,11 @@ class DetourBoundTest {
     Duration.ofSeconds(1500),
     10.0
   );
+
+  private IntersectionVertex vertexA;
+  private IntersectionVertex vertexB;
+  private IntersectionVertex vertexC;
+  private IntersectionVertex vertexD;
 
   @Test
   void aPointMayBePassedIfBothBeelinesFitTheLimit() {
@@ -73,6 +82,35 @@ class DetourBoundTest {
     // 400 s from the start, 600 s on to the end.
     assertEquals(1100, BOUND.limitFrom(vertexEast(4_000)).toSeconds(), 2);
     assertEquals(900, BOUND.limitTo(vertexEast(4_000)).toSeconds(), 2);
+  }
+
+  @Test
+  void aDetourBoundKeepsTheLegAndDropsTheRest() {
+    modelOf(
+      new Builder() {
+        @Override
+        public void build() {
+          vertexA = intersection("A", START);
+          vertexB = intersection("B", START.moveEastMeters(500));
+          vertexC = intersection("C", START.moveEastMeters(1000));
+          vertexD = intersection("D", START.moveEastMeters(1500));
+          biStreet(vertexA, vertexB, 500);
+          biStreet(vertexB, vertexC, 500);
+          biStreet(vertexC, vertexD, 500);
+        }
+      }
+    );
+    var searchLimit = Duration.ofMinutes(30);
+    var unbounded = CarTreeSearch.carTree(vertexA, false, searchLimit, null);
+    long legSeconds = unbounded.getState(vertexC).getElapsedTimeSeconds();
+    // The bound admits the leg A -> C with 5 s to spare; D lies beyond C and can never lead back to
+    // it within that, while everything on the way to C stays.
+    var bound = new DetourBound(vertexA, vertexC, Duration.ofSeconds(legSeconds + 5), 40.0);
+    var bounded = CarTreeSearch.carTree(vertexA, false, searchLimit, bound.skipEdgeStrategy(false));
+
+    assertEquals(legSeconds, bounded.getState(vertexC).getElapsedTimeSeconds());
+    assertNotNull(bounded.getState(vertexB));
+    assertNull(bounded.getState(vertexD));
   }
 
   private static SimpleVertex vertexEast(double meters) {
