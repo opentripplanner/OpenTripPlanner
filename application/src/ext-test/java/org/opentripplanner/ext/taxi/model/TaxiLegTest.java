@@ -121,7 +121,6 @@ class TaxiLegTest implements PlanTestConstants {
   @Test
   void rentalFieldsAreNotUsed() {
     var leg = taxiLeg();
-    assertThat(leg.walkingBike()).isFalse();
     assertThat(leg.rentedVehicle()).isFalse();
     assertThat(leg.vehicleRentalNetwork()).isNull();
   }

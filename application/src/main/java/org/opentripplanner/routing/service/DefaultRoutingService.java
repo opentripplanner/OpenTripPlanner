@@ -15,8 +15,8 @@ import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.framework.time.ZoneIdFallback;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.place.api.NearbyStop;
+import org.opentripplanner.raptor.RaptorServiceFactory;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
-import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.RequestPreProcessor;
 import org.opentripplanner.routing.algorithm.RoutingWorker;
 import org.opentripplanner.routing.algorithm.RoutingWorkerRequest;
@@ -55,7 +55,7 @@ public class DefaultRoutingService implements RoutingService {
   private final TransitService transitService;
   private final TransitAlertService transitAlertService;
   private final Graph graph;
-  private final RaptorConfig<TripSchedule> raptorConfig;
+  private final RaptorServiceFactory<TripSchedule> raptorServiceFactory;
   private final MeterRegistry meterRegistry;
   private final StreetLimitationParametersService streetLimitationParametersService;
   private final VehicleRentalService vehicleRentalService;
@@ -97,7 +97,7 @@ public class DefaultRoutingService implements RoutingService {
   public DefaultRoutingService(
     TransitService transitService,
     Graph graph,
-    RaptorConfig<TripSchedule> raptorConfig,
+    RaptorServiceFactory<TripSchedule> raptorServiceFactory,
     MeterRegistry meterRegistry,
     StreetLimitationParametersService streetLimitationParametersService,
     VehicleRentalService vehicleRentalService,
@@ -122,7 +122,7 @@ public class DefaultRoutingService implements RoutingService {
     this.transitService = transitService;
     this.transitAlertService = transitAlertService;
     this.graph = graph;
-    this.raptorConfig = raptorConfig;
+    this.raptorServiceFactory = raptorServiceFactory;
     this.meterRegistry = meterRegistry;
     this.streetLimitationParametersService = streetLimitationParametersService;
     this.vehicleRentalService = vehicleRentalService;
@@ -179,7 +179,7 @@ public class DefaultRoutingService implements RoutingService {
       transitService,
       transitAlertService,
       graph,
-      raptorConfig,
+      raptorServiceFactory,
       meterRegistry,
       streetLimitationParametersService,
       vehicleRentalService,

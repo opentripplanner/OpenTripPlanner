@@ -106,7 +106,6 @@ class StreetLegMapperTest {
     assertEquals(path.geometry(), leg.legGeometry());
     assertEquals(VertexType.NORMAL, leg.from().vertexType);
     assertEquals(VertexType.NORMAL, leg.to().vertexType);
-    assertFalse(leg.walkingBike());
     assertFalse(leg.rentedVehicle());
     assertNull(leg.vehicleRentalNetwork());
     assertThat(leg.listWalkSteps()).hasSize(2);

@@ -36,7 +36,6 @@ public class StreetLeg implements Leg {
   private final List<WalkStep> walkSteps;
   private final ElevationProfile elevationProfile;
 
-  private final Boolean walkingBike;
   private final Boolean rentedVehicle;
   private final String vehicleRentalNetwork;
   private final Float accessibilityScore;
@@ -53,7 +52,6 @@ public class StreetLeg implements Leg {
     this.elevationProfile = builder.getElevationProfile();
     this.legGeometry = builder.getGeometry();
     this.walkSteps = Objects.requireNonNull(builder.getWalkSteps());
-    this.walkingBike = builder.getWalkingBike();
     this.rentedVehicle = builder.getRentedVehicle();
     this.vehicleRentalNetwork = builder.getVehicleRentalNetwork();
     this.accessibilityScore = builder.getAccessibilityScore();
@@ -133,11 +131,6 @@ public class StreetLeg implements Leg {
   @Override
   public Set<TransitAlert> listTransitAlerts() {
     return Set.of();
-  }
-
-  @Override
-  public Boolean walkingBike() {
-    return walkingBike;
   }
 
   @Override
@@ -221,7 +214,6 @@ public class StreetLeg implements Leg {
       .addEnum("mode", mode)
       .addNum("distance", distanceMeters, "m")
       .addNum("cost", generalizedCost)
-      .addBool("walkingBike", walkingBike)
       .addBool("rentedVehicle", rentedVehicle)
       .addStr("bikeRentalNetwork", vehicleRentalNetwork)
       .toString();

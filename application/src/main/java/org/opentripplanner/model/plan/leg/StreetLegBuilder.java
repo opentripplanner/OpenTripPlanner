@@ -22,7 +22,6 @@ public class StreetLegBuilder {
   private LineString geometry;
   private ElevationProfile elevationProfile;
   private List<WalkStep> walkSteps = List.of();
-  private Boolean walkingBike;
   private Boolean rentedVehicle;
   private String vehicleRentalNetwork;
   private Float accessibilityScore;
@@ -41,7 +40,6 @@ public class StreetLegBuilder {
     this.geometry = leg.legGeometry();
     this.elevationProfile = leg.elevationProfile();
     this.walkSteps = Objects.requireNonNull(leg.listWalkSteps());
-    this.walkingBike = leg.walkingBike();
     this.rentedVehicle = leg.rentedVehicle();
     this.vehicleRentalNetwork = leg.vehicleRentalNetwork();
     this.accessibilityScore = leg.accessibilityScore();
@@ -90,10 +88,6 @@ public class StreetLegBuilder {
 
   public List<WalkStep> getWalkSteps() {
     return walkSteps;
-  }
-
-  public Boolean getWalkingBike() {
-    return walkingBike;
   }
 
   public Boolean getRentedVehicle() {
@@ -159,11 +153,6 @@ public class StreetLegBuilder {
 
   public StreetLegBuilder withWalkSteps(List<WalkStep> walkSteps) {
     this.walkSteps = Objects.requireNonNull(walkSteps);
-    return this;
-  }
-
-  public StreetLegBuilder withWalkingBike(Boolean walkingBike) {
-    this.walkingBike = walkingBike;
     return this;
   }
 

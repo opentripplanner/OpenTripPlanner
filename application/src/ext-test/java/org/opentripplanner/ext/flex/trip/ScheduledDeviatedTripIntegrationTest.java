@@ -241,7 +241,7 @@ class ScheduledDeviatedTripIntegrationTest {
         request,
         transitService,
         graph,
-        TestServerContext.createRaptorConfig(),
+        TestServerContext.createRaptorServiceFactory(),
         Metrics.globalRegistry,
         TestServerContext.createStreetDetailsService(),
         TransferServiceTestFactory.transferService(transferRepository),

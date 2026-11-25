@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.raptor.rangeraptor.SystemErrDebugLogger;
+import org.opentripplanner.raptor.debug.SystemErrDebugLogger;
 import org.opentripplanner.raptor.spi.IntIterator;
 import org.opentripplanner.raptor.spi.IntIterators;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;

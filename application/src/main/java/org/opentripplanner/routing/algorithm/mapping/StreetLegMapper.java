@@ -122,8 +122,7 @@ public class StreetLegMapper {
       .withGeometry(leg.geometry())
       .withElevationProfile(leg.elevationProfile())
       .withWalkSteps(leg.steps().stream().map(this::mapStep).toList())
-      .withRentedVehicle(leg.rentedVehicle())
-      .withWalkingBike(false);
+      .withRentedVehicle(leg.rentedVehicle());
 
     if (leg.vehicleRentalNetwork() != null) {
       builder.withVehicleRentalNetwork(leg.vehicleRentalNetwork());

@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 import org.jspecify.annotations.Nullable;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.model.PickDrop;
@@ -52,6 +53,9 @@ public class TripInput {
 
   @Nullable
   private String netexInternalPlanningCode;
+
+  @Nullable
+  private List<LineString> hopGeometries;
 
   private final boolean isFlex;
 
@@ -124,6 +128,15 @@ public class TripInput {
 
   public boolean isFlex() {
     return isFlex;
+  }
+
+  /**
+   * The geometries of the hops of the trip pattern, or null if the hops are straight lines between
+   * the stops.
+   */
+  @Nullable
+  public List<LineString> hopGeometries() {
+    return hopGeometries;
   }
 
   public TripInput addStop(RegularStop stop, String arrivalTime, String departureTime) {
@@ -217,6 +230,19 @@ public class TripInput {
 
   public TripInput withWithTripOnServiceDate(String tripOnServiceDateId) {
     this.tripOnServiceDateId = tripOnServiceDateId;
+    return this;
+  }
+
+  /**
+   * Set the geometries of the hops between the stops of the trip, which are used for the trip
+   * pattern. There must be one geometry for each hop, so one fewer than the number of stops.
+   * <p>
+   * Trips share a pattern only if they have the same stops, route and hop geometries. So if the
+   * geometries are set for only one of several trips with the same stops, that trip gets its own
+   * pattern.
+   */
+  public TripInput withHopGeometries(LineString... hopGeometries) {
+    this.hopGeometries = List.of(hopGeometries);
     return this;
   }
 

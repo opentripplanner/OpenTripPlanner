@@ -295,6 +295,27 @@ public class TripUpdateBuilder {
   }
 
   /**
+   * Add a NO_DATA stop, referenced by its stop id and without any times, to the TripUpdate.
+   */
+  public TripUpdateBuilder addNoDataStop(String stopId) {
+    return addStopTime(
+      stopId,
+      null,
+      null,
+      NO_STOP_SEQUENCE,
+      NO_DELAY,
+      NO_DELAY,
+      StopTimeUpdate.ScheduleRelationship.NO_DATA,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    );
+  }
+
+  /**
    * Add a skipped stop to the TripUpdate.
    */
   public TripUpdateBuilder addSkippedStop(int stopSequence) {

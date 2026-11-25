@@ -281,6 +281,10 @@ type EstimatedCall {
   forAlighting: Boolean!
   "Whether vehicle may be boarded at quay."
   forBoarding: Boolean!
+  "Whether the real-time data reports that the vehicle is not expected to arrive at this quay, for example at an on-demand stop that has not been booked yet. Unlike cancellation, the call is still part of the planned service and may be served if it is booked. Always false when no real-time data says so."
+  notExpectedArrival: Boolean!
+  "Whether the real-time data reports that the vehicle is not expected to depart from this quay, for example at an on-demand stop that has not been booked yet. Unlike cancellation, the call is still part of the planned service and may be served if it is booked. Always false when no real-time data says so."
+  notExpectedDeparture: Boolean!
   notices: [Notice!]!
   occupancyStatus: OccupancyStatus!
   "Whether the updated estimates are expected to be inaccurate."
@@ -446,7 +450,7 @@ type Leg {
   "The transport sub mode (e.g., localBus or expressBus) used when traversing this leg. Null if leg is not a ride"
   transportSubmode: TransportSubmode
   "Whether this leg is walking with a bike."
-  walkingBike: Boolean
+  walkingBike: Boolean @deprecated(reason : "Walking with a bike is not a separate leg. This field always returns `false`.")
 }
 
 "A group of routes which is generally known to the public by a similar name or number"
@@ -817,33 +821,6 @@ type QueryType {
     "Radius via streets (in meters) to search for from the specified location"
     radius: Float!
   ): quayAtDistanceConnection @timingData
-  "Get an updated version of a trip pattern with realtime changes applied."
-  refetchTripPattern(
-    "The alightSlack is the minimum extra time after exiting a public transport vehicle. This is the default value used, if not overridden by the 'alightSlackList'."
-    alightSlackDefault: Int = 0,
-    "List of alightSlack for a given set of modes. Defaults: []"
-    alightSlackList: [TransportModeSlack],
-    "The boardSlack is the minimum extra time to board a public transport vehicle. This is the same as the 'minimumTransferTime', except that this also applies to to the first transit leg in the trip. This is the default value used, if not overridden by the 'boardSlackList'."
-    boardSlackDefault: Int = 0,
-    "List of boardSlack for a given set of modes. Defaults: []"
-    boardSlackList: [TransportModeSlack],
-    "The start location, if null the trip pattern will start with the first provided leg"
-    from: Location,
-    "A list of legIds describing the trip pattern. At least one leg is required."
-    legs: [ID!]!,
-    "Maximum duration for access/egress for street searches per respective mode. Cannot be higher than default value. This is a performance optimisation parameter, avoid using it to limit the search. "
-    maxAccessEgressDurationForMode: [StreetModeDurationInput!] = [],
-    "The set of access/egress modes to be used for this search. The direct and transit modes are ignored"
-    modes: Modes,
-    "The destination location, if null the trip pattern will end with the last provided leg"
-    to: Location,
-    "Walk cost is multiplied by this value. This is the main parameter to use for limiting walking."
-    walkReluctance: Float = 2.0,
-    "The maximum walk speed along streets, in meters per second."
-    walkSpeed: Float = 1.35,
-    "Whether the trip must be wheelchair accessible. Supported for the street part of the search."
-    wheelchairAccessible: Boolean = false
-  ): RefetchTripPatternResult! @deprecated(reason : "Use tripPatternByLegIds instead.") @timingData
   "Get default routing parameters."
   routingParameters: RoutingParameters @timingData
   "Get OTP deployment information. This is only useful for developers of OTP itself not regular API users."
@@ -1143,12 +1120,6 @@ type RealTimeJourneyState {
   timesModified: Boolean!
   "Have there been any real-time updates on this journey?"
   updated: Boolean!
-}
-
-"Refetched data for a trip pattern"
-type RefetchTripPatternResult {
-  "The refetched trip pattern"
-  tripPattern: TripPattern
 }
 
 type RentalVehicle implements PlaceInterface {
@@ -2436,8 +2407,6 @@ input ItineraryFilters {
   debug: ItineraryFilterDebugProfile = off
   "Set a relative limit for direct-flex itineraries. The limit is calculated in the same way as for `transitGeneralizedCostLimit`, based on the generalized-cost of the other transit itineraries, including other direct-flex itineraries, and the time between itineraries. Only direct-flex itineraries are removed by this filter. Default: {\"costLimitFunction\": 15m + 1.5 t, \"intervalRelaxFactor\": 0.4}"
   directFlexGeneralizedCostLimit: TransitGeneralizedCostFilterParams
-  "Same as groupSimilarityKeepThree. The value must be between 0 and 1. A value below 0.5 turns this filter off."
-  groupSimilarityKeepNumOfItineraries: Float = 0.68 @deprecated(reason : "Use groupSimilarityKeepThree instead.")
   "Group itineraries that are at least this similar, and keep ONE itinerary from each group. Similarity is the share of the travel distance two itineraries have in common. The value must be between 0 and 1. A value below 0.5 turns this filter off."
   groupSimilarityKeepOne: Float = 0.85
   "Group itineraries that are at least this similar, and keep at most three itineraries from each group. Similarity is the share of the travel distance two itineraries have in common. The value must be between 0 and 1. A value below 0.5 turns this filter off."

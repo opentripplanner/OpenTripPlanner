@@ -49,6 +49,10 @@
                 "destinationDisplay": {
                   "headsign": "Stop headsign at stop 10"
                 },
+                "geometryToNextCall": {
+                  "length": 2,
+                  "points": "_wemJ_c`|@??"
+                },
                 "schedule": {
                   "time": {
                     "arrival": "2024-08-09T11:30:00+02:00",
@@ -74,6 +78,10 @@
               {
                 "destinationDisplay": {
                   "headsign": "Stop headsign at stop 20"
+                },
+                "geometryToNextCall": {
+                  "length": 2,
+                  "points": "_wemJ_c`|@??"
                 },
                 "schedule": {
                   "time": {
@@ -101,6 +109,7 @@
                 "destinationDisplay": {
                   "headsign": "Stop headsign at stop 30"
                 },
+                "geometryToNextCall": null,
                 "schedule": {
                   "time": {
                     "arrival": "2024-08-09T11:40:00+02:00",
