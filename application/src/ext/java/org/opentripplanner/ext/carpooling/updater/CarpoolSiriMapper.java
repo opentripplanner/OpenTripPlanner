@@ -123,66 +123,9 @@ public class CarpoolSiriMapper {
 
     var endTime = lastStop.getScheduledArrivalTime();
 
-    if (startTime == null) {
-      throw new IllegalArgumentException(
-        "Trip " + tripId + ": first call has neither expected nor aimed departure time."
-      );
-    }
-    if (endTime == null) {
-      throw new IllegalArgumentException(
-        "Trip " + tripId + ": last call has neither expected nor aimed arrival time."
-      );
-    }
-    if (!endTime.isAfter(startTime)) {
-      throw new IllegalArgumentException(
-        String.format(
-          "Trip %s: end time (%s) is not after start time (%s).",
-          tripId,
-          endTime,
-          startTime
-        )
-      );
-    }
-
-    // Reject over-long trips at ingestion. A malformed feed (e.g. a wrong date on one call) could
-    // otherwise create an absurdly long trip whose access/egress routing expands street search
-    // trees across the network and degrades every later request. When the destination has no
-    // latest expected arrival, its scheduled arrival plus the default deviation budget is used —
-    // the same default the destination stop itself receives when the feed omits a latest arrival.
-    var latestArrival =
-      lastStop.getLatestExpectedArrivalTime() != null
-        ? lastStop.getLatestExpectedArrivalTime()
-        : endTime.plus(CarpoolStop.DEFAULT_DEVIATION_BUDGET);
-    var tripDuration = Duration.between(startTime, latestArrival);
-    if (tripDuration.compareTo(maxTripDuration) > 0) {
-      throw new IllegalArgumentException(
-        String.format(
-          "Trip %s: duration (%s) exceeds the maximum of %s (start %s, latest arrival %s).",
-          tripId,
-          tripDuration,
-          maxTripDuration,
-          startTime,
-          latestArrival
-        )
-      );
-    }
-
-    // The timetable above bounds only the claimed schedule, which says nothing about how far apart
-    // the waypoints are. Tree-expansion cost is driven by distance, so reject a trip whose
-    // waypoints cannot be reached in order within the same bound even at the maximum modelled car
-    // speed: such a trip is malformed and would expand street trees far beyond a real carpool trip.
-    var minimumDriveDuration = minimumDriveDuration(stops);
-    if (minimumDriveDuration.compareTo(maxTripDuration) > 0) {
-      throw new IllegalArgumentException(
-        String.format(
-          "Trip %s: straight-line drive time (%s) exceeds the maximum of %s; its waypoints are too" +
-            " far apart to be a real carpool trip whatever the schedule claims.",
-          tripId,
-          minimumDriveDuration,
-          maxTripDuration
-        )
-      );
-    }
+    validateStartAndEnd(tripId, startTime, endTime);
+    validateDuration(tripId, startTime, endTime, lastStop);
+    validateDriveDuration(tripId, stops);
 
     int totalCapacity = extractTotalCapacity(tripId, activeCalls);
 
@@ -234,6 +177,82 @@ public class CarpoolSiriMapper {
       return null;
     }
     return bookingUrl;
+  }
+
+  private static void validateStartAndEnd(
+    String tripId,
+    @Nullable ZonedDateTime startTime,
+    @Nullable ZonedDateTime endTime
+  ) {
+    if (startTime == null) {
+      throw new IllegalArgumentException(
+        "Trip " + tripId + ": first call has neither expected nor aimed departure time."
+      );
+    }
+    if (endTime == null) {
+      throw new IllegalArgumentException(
+        "Trip " + tripId + ": last call has neither expected nor aimed arrival time."
+      );
+    }
+    if (!endTime.isAfter(startTime)) {
+      throw new IllegalArgumentException(
+        String.format(
+          "Trip %s: end time (%s) is not after start time (%s).",
+          tripId,
+          endTime,
+          startTime
+        )
+      );
+    }
+  }
+
+  private void validateDuration(
+    String tripId,
+    ZonedDateTime startTime,
+    ZonedDateTime endTime,
+    CarpoolStop lastStop
+  ) {
+    // Reject over-long trips at ingestion. A malformed feed (e.g. a wrong date on one call) could
+    // otherwise create an absurdly long trip whose access/egress routing expands street search
+    // trees across the network and degrades every later request. When the destination has no
+    // latest expected arrival, its scheduled arrival plus the default deviation budget is used —
+    // the same default the destination stop itself receives when the feed omits a latest arrival.
+    var latestArrival =
+      lastStop.getLatestExpectedArrivalTime() != null
+        ? lastStop.getLatestExpectedArrivalTime()
+        : endTime.plus(CarpoolStop.DEFAULT_DEVIATION_BUDGET);
+    var tripDuration = Duration.between(startTime, latestArrival);
+    if (tripDuration.compareTo(maxTripDuration) > 0) {
+      throw new IllegalArgumentException(
+        String.format(
+          "Trip %s: duration (%s) exceeds the maximum of %s (start %s, latest arrival %s).",
+          tripId,
+          tripDuration,
+          maxTripDuration,
+          startTime,
+          latestArrival
+        )
+      );
+    }
+  }
+
+  private void validateDriveDuration(String tripId, List<CarpoolStop> stops) {
+    // The timetable bounds only the claimed schedule, which says nothing about how far apart the
+    // waypoints are. Tree-expansion cost is driven by distance, so reject a trip whose waypoints
+    // cannot be reached in order within the same bound even at the maximum modelled car speed:
+    // such a trip is malformed and would expand street trees far beyond a real carpool trip.
+    var minimumDriveDuration = minimumDriveDuration(stops);
+    if (minimumDriveDuration.compareTo(maxTripDuration) > 0) {
+      throw new IllegalArgumentException(
+        String.format(
+          "Trip %s: straight-line drive time (%s) exceeds the maximum of %s; its waypoints are too" +
+            " far apart to be a real carpool trip whatever the schedule claims.",
+          tripId,
+          minimumDriveDuration,
+          maxTripDuration
+        )
+      );
+    }
   }
 
   /**
