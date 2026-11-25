@@ -5,12 +5,14 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Command line entry point.
  *
  * <pre>
- * capture --jar OTP.jar --data DIR --out DIR [--scenarios DIR] [--port N] [--xmx 3G]
+ * capture --jar OTP.jar --out DIR [--repo-root DIR] [--datasets DIR] [--only a,b] [--port N] [--xmx 3G]
+ * serve --jar OTP.jar --only DATASET [--repo-root DIR] [--datasets DIR] [--port N] [--xmx 3G]
  * compare --baseline DIR --candidate DIR [--approved FILE] [--report FILE]
  * </pre>
  *
@@ -27,9 +29,18 @@ public final class Main {
     switch (args[0]) {
       case "capture" -> Capture.run(
         Path.of(required(opts, "jar")),
-        Path.of(required(opts, "data")),
-        Path.of(opts.getOrDefault("scenarios", "scenarios")),
+        Path.of(opts.getOrDefault("repo-root", "../..")),
+        Path.of(opts.getOrDefault("datasets", "datasets")),
         Path.of(required(opts, "out")),
+        opts.containsKey("only") ? Set.of(opts.get("only").split(",")) : Set.of(),
+        Integer.parseInt(opts.getOrDefault("port", "8080")),
+        opts.getOrDefault("xmx", "3G")
+      );
+      case "serve" -> Capture.serve(
+        Path.of(required(opts, "jar")),
+        Path.of(opts.getOrDefault("repo-root", "../..")),
+        Path.of(opts.getOrDefault("datasets", "datasets")),
+        required(opts, "only"),
         Integer.parseInt(opts.getOrDefault("port", "8080")),
         opts.getOrDefault("xmx", "3G")
       );
@@ -79,7 +90,7 @@ public final class Main {
       String.join(
         "\n",
         List.of(
-          "capture --jar OTP.jar --data DIR --out DIR [--scenarios DIR] [--port N] [--xmx 3G]",
+          "capture --jar OTP.jar --out DIR [--repo-root DIR] [--datasets DIR] [--only a,b] [--port N] [--xmx 3G]",
           "compare --baseline DIR --candidate DIR [--approved FILE] [--report FILE]"
         )
       )

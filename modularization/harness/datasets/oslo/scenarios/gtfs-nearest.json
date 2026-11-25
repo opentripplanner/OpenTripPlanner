@@ -1,0 +1,4 @@
+{
+  "api": "gtfs",
+  "query": "{ nearest(lat:59.9123, lon:10.7513, maxDistance:800, filterByPlaceTypes:[STOP]) { edges { node { distance place { ... on Stop { gtfsId name } } } } } }"
+}

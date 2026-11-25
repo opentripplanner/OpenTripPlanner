@@ -1,0 +1,5 @@
+{
+  "api": "gtfs",
+  "query": "{ trips { gtfsId tripHeadsign serviceId activeDates wheelchairAccessible bikesAllowed route { gtfsId } pattern { code } stoptimes { stop { gtfsId } scheduledArrival scheduledDeparture pickupType dropoffType } } }",
+  "sortArraysBy": "gtfsId"
+}

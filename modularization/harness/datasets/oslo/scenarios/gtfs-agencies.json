@@ -1,0 +1,5 @@
+{
+  "api": "gtfs",
+  "query": "{ agencies { gtfsId name timezone phone } }",
+  "sortArraysBy": "gtfsId"
+}

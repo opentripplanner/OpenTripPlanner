@@ -1,0 +1,7 @@
+{
+  "api": "transmodel",
+  "query": "{ line(id:\"EN:RUT:Line:4\") { id name publicCode transportMode transportSubmode authority { id } operator { id } journeyPatterns { id name directionType } } }",
+  "unordered": [
+    "data.line.journeyPatterns"
+  ]
+}

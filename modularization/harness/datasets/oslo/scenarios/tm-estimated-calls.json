@@ -1,0 +1,4 @@
+{
+  "api": "transmodel",
+  "query": "{ quay(id:\"EN:NSR:Quay:10682\") { id name estimatedCalls(numberOfDepartures:6, startTime:\"2017-12-27T14:00:00+01:00\") { aimedDepartureTime expectedDepartureTime destinationDisplay { frontText } serviceJourney { id line { id } } } } }"
+}

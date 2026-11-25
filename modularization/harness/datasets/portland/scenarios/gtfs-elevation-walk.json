@@ -1,0 +1,4 @@
+{
+  "api": "gtfs",
+  "query": "{ planConnection(origin:{location:{coordinate:{latitude:45.52,longitude:-122.7}}}, destination:{location:{coordinate:{latitude:45.51,longitude:-122.65}}}, dateTime:{earliestDeparture:\"2009-11-17T10:00:00-08:00\"}, first:2, modes:{direct:[WALK], directOnly:true}) { routingErrors { code } edges { node { start end duration generalizedCost walkDistance elevationGained elevationLost legs { mode distance duration steps { streetName distance elevationProfile { distance elevation } } } } } } }"
+}

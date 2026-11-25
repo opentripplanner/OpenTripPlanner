@@ -1,0 +1,14 @@
+{
+  "inputs": [
+    { "from": "application/src/test/resources/portland/portland.gtfs.zip" },
+    { "from": "application/src/test/resources/portland/portland-central-filtered.osm.pbf" },
+    { "from": "application/src/test/resources/portland/portland-ned.tif" }
+  ],
+  "buildConfig": {
+    "transitServiceStart": "2009-09-01",
+    "transitServiceEnd": "2010-03-01",
+    "staticBikeParkAndRide": true,
+    "staticParkAndRide": true
+  },
+  "routerConfig": {}
+}

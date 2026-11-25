@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /** Finds the differences between two captures, value by value. */
 public final class Differ {
@@ -87,15 +88,22 @@ public final class Differ {
     }
   }
 
+  /**
+   * Scenario names are the relative paths without the extension, e.g. {@code portland/gtfs-stops}.
+   * Files and directories with a name starting with an underscore are skipped.
+   */
   private static TreeSet<String> scenarioNames(Path dir) {
     var names = new TreeSet<String>();
     if (!Files.isDirectory(dir)) {
       return names;
     }
-    try (Stream<Path> files = Files.list(dir)) {
+    try (Stream<Path> files = Files.walk(dir)) {
       files
-        .map(p -> p.getFileName().toString())
-        .filter(n -> n.endsWith(".json") && !n.startsWith("_"))
+        .filter(Files::isRegularFile)
+        .map(dir::relativize)
+        .filter(p -> p.getFileName().toString().endsWith(".json"))
+        .filter(p -> StreamSupport.stream(p.spliterator(), false).noneMatch(s -> s.toString().startsWith("_")))
+        .map(p -> p.toString().replace('\\', '/'))
         .forEach(n -> names.add(n.substring(0, n.length() - ".json".length())));
     } catch (IOException e) {
       throw new UncheckedIOException(e);

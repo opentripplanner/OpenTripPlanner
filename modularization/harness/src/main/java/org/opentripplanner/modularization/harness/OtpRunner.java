@@ -10,7 +10,6 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 /** Builds a graph and runs a server from an OTP shaded jar. The jar is a black box. */
 final class OtpRunner implements AutoCloseable {
@@ -32,18 +31,6 @@ final class OtpRunner implements AutoCloseable {
     this.logDir = logDir.toAbsolutePath();
     this.port = port;
     this.xmx = xmx;
-  }
-
-  /** Copy the input data (without any old graph) into the work dir. */
-  void prepareData(Path dataDir) throws IOException {
-    Files.createDirectories(workDir);
-    try (Stream<Path> files = Files.list(dataDir)) {
-      for (Path f : files.toList()) {
-        if (Files.isRegularFile(f) && !f.getFileName().toString().equals("graph.obj")) {
-          Files.copy(f, workDir.resolve(f.getFileName()), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-        }
-      }
-    }
   }
 
   void buildGraph() throws IOException, InterruptedException {

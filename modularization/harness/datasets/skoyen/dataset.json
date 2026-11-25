@@ -1,0 +1,9 @@
+{
+  "inputs": [
+    { "from": "application/src/test/resources/org/opentripplanner/graph_builder/module/osm/skoyen.osm.pbf" }
+  ],
+  "buildConfig": {
+    "osmDefaults": { "timeZone": "Europe/Oslo" }
+  },
+  "routerConfig": {}
+}

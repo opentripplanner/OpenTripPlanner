@@ -1,0 +1,9 @@
+{
+  "inputs": [
+    { "from": "application/src/test/resources/org/opentripplanner/street/integration/herrenberg-minimal.osm.pbf" }
+  ],
+  "buildConfig": {
+    "osmDefaults": { "osmTagMapping": "germany", "timeZone": "Europe/Berlin" }
+  },
+  "routerConfig": {}
+}

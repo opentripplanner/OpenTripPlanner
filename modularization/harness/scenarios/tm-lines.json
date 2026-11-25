@@ -1,5 +1,0 @@
-{
-  "api": "transmodel",
-  "query": "{ lines { id name publicCode transportMode } }",
-  "sortArraysBy": "id"
-}

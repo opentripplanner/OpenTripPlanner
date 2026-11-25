@@ -1,11 +1,15 @@
 #!/usr/bin/env bash
 # Compliance harness for the OTP modularization. See modularization/plan.md.
 #
-#   harness.sh capture   <otp-shaded.jar> <out-dir> [data-dir]
+#   harness.sh capture   <otp-shaded.jar> <out-dir> [dataset,dataset,...]
+#   harness.sh serve     <otp-shaded.jar> <dataset>
 #   harness.sh compare   <baseline-dir> <candidate-dir>
 #   harness.sh selfcheck <otp-shaded.jar> <work-dir>
 #
-# capture   builds a graph with the jar, starts OTP, sends every scenario and writes the answers.
+# capture   for each dataset (see datasets/): builds a graph with the jar from the dataset inputs,
+#           starts OTP, sends every scenario of the dataset and writes the answers.
+# serve     builds the graph of one dataset and keeps OTP running on port 8080 (Ctrl-C to stop),
+#           for exploring the data and writing scenarios.
 # compare   compares two captures against approved-discrepancies.json (exit 1 on differences).
 # selfcheck captures twice with the same jar and compares. It must report no differences. It tests
 #           that the harness and the scenarios are deterministic.
@@ -13,7 +17,6 @@ set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$HERE/../.." && pwd)"
-DEFAULT_DATA="$REPO_ROOT/application/src/test/resources/portland"
 APPROVED="$HERE/approved-discrepancies.json"
 
 build_harness() {
@@ -32,7 +35,12 @@ abs() { (cd "$(dirname "$1")" && echo "$PWD/$(basename "$1")"); }
 
 case "${1:-}" in
   capture)
-    run capture --jar "$(abs "$2")" --out "$(abs "$3")" --data "${4:-$DEFAULT_DATA}"
+    only=()
+    [ -n "${4:-}" ] && only=(--only "$4")
+    run capture --jar "$(abs "$2")" --out "$(abs "$3")" --repo-root "$REPO_ROOT" ${only[@]+"${only[@]}"}
+    ;;
+  serve)
+    run serve --jar "$(abs "$2")" --repo-root "$REPO_ROOT" --only "$3"
     ;;
   compare)
     run compare --baseline "$(abs "$2")" --candidate "$(abs "$3")" --approved "$APPROVED"
@@ -44,7 +52,7 @@ case "${1:-}" in
     "$0" compare "$3/run-1" "$3/run-2"
     ;;
   *)
-    sed -n '2,13p' "$0"
+    sed -n '2,16p' "$0"
     exit 2
     ;;
 esac

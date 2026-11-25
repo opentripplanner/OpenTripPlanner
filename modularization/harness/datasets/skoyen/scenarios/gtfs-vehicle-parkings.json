@@ -1,0 +1,8 @@
+{
+  "api": "gtfs",
+  "sortArraysBy": "vehicleParkingId",
+  "query": "{ vehicleParkings { vehicleParkingId name lat lon bicyclePlaces carPlaces tags capacity { bicycleSpaces carSpaces wheelchairAccessibleCarSpaces } } }",
+  "unordered": [
+    "data.vehicleParkings[*].tags"
+  ]
+}

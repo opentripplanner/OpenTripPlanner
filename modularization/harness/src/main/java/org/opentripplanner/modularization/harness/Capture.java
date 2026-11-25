@@ -6,28 +6,70 @@ import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Set;
 
 /**
- * Builds a graph from the given jar and data, starts a server, sends every scenario and writes
- * the normalized responses to the output directory, one {@code <scenario>.json} file each.
+ * For each dataset: builds a graph from the given jar and the dataset inputs, starts a server,
+ * sends every scenario and writes the normalized responses to {@code <out>/<dataset>/<scenario>.json}.
  */
 final class Capture {
 
   private Capture() {}
 
+  /**
+   * @param only names of the datasets to run, or empty for all
+   */
   static void run(
     Path jar,
-    Path dataDir,
-    Path scenarioDir,
+    Path repoRoot,
+    Path datasetsDir,
+    Path outDir,
+    Set<String> only,
+    int port,
+    String xmx
+  ) throws IOException, InterruptedException {
+    Files.createDirectories(outDir);
+    for (Dataset dataset : Dataset.loadAll(datasetsDir)) {
+      if (!only.isEmpty() && !only.contains(dataset.name())) {
+        continue;
+      }
+      System.out.println("== dataset " + dataset.name());
+      run(jar, repoRoot, dataset, outDir.resolve(dataset.name()), port, xmx);
+    }
+  }
+
+  /** Build the graph of one dataset and keep the server running until the process is stopped. */
+  static void serve(Path jar, Path repoRoot, Path datasetsDir, String name, int port, String xmx)
+    throws IOException, InterruptedException {
+    Dataset dataset = Dataset
+      .loadAll(datasetsDir)
+      .stream()
+      .filter(d -> d.name().equals(name))
+      .findFirst()
+      .orElseThrow(() -> new IllegalArgumentException("Unknown dataset: " + name));
+    Path base = Files.createTempDirectory("harness-serve-");
+    try (var otp = new OtpRunner(jar, base.resolve("work"), base.resolve("logs"), port, xmx)) {
+      dataset.materialize(repoRoot, base.resolve("work"));
+      otp.buildGraph();
+      otp.startServer();
+      System.out.println("OTP is running on http://localhost:" + port + "/otp/ (logs: " + base.resolve("logs") + ")");
+      Thread.currentThread().join();
+    }
+  }
+
+  private static void run(
+    Path jar,
+    Path repoRoot,
+    Dataset dataset,
     Path outDir,
     int port,
     String xmx
   ) throws IOException, InterruptedException {
-    List<Scenario> scenarios = Scenario.loadAll(scenarioDir);
+    List<Scenario> scenarios = Scenario.loadAll(dataset.scenarioDir());
     Files.createDirectories(outDir);
     Path work = outDir.resolve("_work");
     try (var otp = new OtpRunner(jar, work, outDir.resolve("_logs"), port, xmx)) {
-      otp.prepareData(dataDir);
+      dataset.materialize(repoRoot, work);
       otp.buildGraph();
       otp.startServer();
       for (Scenario s : scenarios) {
@@ -37,7 +79,7 @@ final class Capture {
           outDir.resolve(s.name() + ".json"),
           Json.MAPPER.writeValueAsString(normalized) + "\n"
         );
-        System.out.println("captured " + s.name());
+        System.out.println("captured " + dataset.name() + "/" + s.name());
       }
     }
     deleteRecursively(work);

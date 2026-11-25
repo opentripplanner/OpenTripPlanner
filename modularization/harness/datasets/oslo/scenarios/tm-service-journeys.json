@@ -1,0 +1,5 @@
+{
+  "api": "transmodel",
+  "query": "{ serviceJourneys { id publicCode transportMode line { id } journeyPattern { id } operator { id } passingTimes { quay { id } arrival { time } departure { time } } } }",
+  "sortArraysBy": "id"
+}
