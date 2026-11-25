@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.carpooling.routing;
 
 import java.time.Duration;
+import java.time.ZonedDateTime;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
@@ -146,6 +147,16 @@ public record InsertionCandidate(
    */
   public Duration getPassengerRideDuration() {
     return totalSegmentDuration(getSegmentsWithNewPassenger(), stopDuration).plus(stopDuration);
+  }
+
+  /** When the car arrives at the passenger's pickup. */
+  public ZonedDateTime pickupTime() {
+    return trip.startTime().plus(getDurationUntilPickupArrival());
+  }
+
+  /** When the car arrives at the passenger's dropoff. */
+  public ZonedDateTime dropoffTime() {
+    return pickupTime().plus(getPassengerRideDuration());
   }
 
   /**

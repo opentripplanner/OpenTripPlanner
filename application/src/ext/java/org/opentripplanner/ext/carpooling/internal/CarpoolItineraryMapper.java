@@ -109,10 +109,8 @@ public class CarpoolItineraryMapper {
    *                          the first leg's {@code from} place.
    * @param toLocation        the request's {@code to} location (passenger destination), used to
    *                          label the last leg's {@code to} place.
-   * @return an itinerary for the passenger's journey, or {@code null} if the candidate has no
-   *         shared segments (a safety check that should not trigger for valid candidates)
+   * @return an itinerary for the passenger's journey
    */
-  @Nullable
   public Itinerary toItinerary(
     InsertionCandidate candidate,
     double carpoolReluctance,
@@ -120,28 +118,97 @@ public class CarpoolItineraryMapper {
     GenericLocation fromLocation,
     GenericLocation toLocation
   ) {
-    var pathsWithNewPassenger = candidate.getPathsWithNewPassenger();
-    if (pathsWithNewPassenger.isEmpty()) {
-      return null;
-    }
-    var carpoolStart = candidate.trip().startTime().plus(candidate.getDurationUntilPickupArrival());
-    var carpoolEnd = carpoolStart.plus(candidate.getPassengerRideDuration());
     return buildItinerary(
-      pathsWithNewPassenger,
-      candidate.walkToPickup(),
-      candidate.walkFromDropoff(),
-      carpoolStart,
-      carpoolEnd,
+      candidate,
       candidate.getPassengerRideWeight(carpoolReluctance, boardCost),
       EndpointLabel.forLocation(fromLocation),
-      EndpointLabel.forLocation(toLocation),
-      toBookingInfo(
-        candidate.trip().publicContactInformation(),
-        candidate.trip().startTime(),
-        boardingCoordinate(pathsWithNewPassenger),
-        alightingCoordinate(pathsWithNewPassenger)
+      EndpointLabel.forLocation(toLocation)
+    );
+  }
+
+  /**
+   * Converts a Raptor carpool access/egress leg back into an OTP itinerary for the response. Same
+   * shape as {@link #toItinerary(InsertionCandidate, double, int, GenericLocation, GenericLocation)} —
+   * an optional WALK leg, the carpool leg, and an optional WALK leg — but driven from the
+   * {@link CarpoolAccessEgress} accessors so the displayed times and ride cost agree with the
+   * values Raptor used during the search.
+   */
+  public Itinerary toItinerary(CarpoolAccessEgress accessEgress) {
+    return buildItinerary(
+      accessEgress.insertionCandidate(),
+      accessEgress.getPassengerRideWeight(),
+      accessEgress.startLabel(),
+      accessEgress.endLabel()
+    );
+  }
+
+  /**
+   * Assembles a WALK + CARPOOL + WALK itinerary around the shared ride. Walk legs are omitted when
+   * their corresponding path is {@code null}; the walk legs' outer times are derived from
+   * {@code carpoolStart}/{@code carpoolEnd} plus the walk durations.
+   * <p>
+   * Boundary-place precedence at the chain's outermost endpoints follows the
+   * {@link EndpointLabel} contract: a stop wins over a user location, which wins over the
+   * vertex-derived fallback name via {@link #makePlace(Vertex)}.
+   */
+  private static Itinerary buildItinerary(
+    InsertionCandidate candidate,
+    double rideWeight,
+    EndpointLabel startLabel,
+    EndpointLabel endLabel
+  ) {
+    var pathsWithNewPassenger = candidate.getPathsWithNewPassenger();
+    var walkToPickup = candidate.walkToPickup();
+    var walkFromDropoff = candidate.walkFromDropoff();
+    var carpoolStart = candidate.pickupTime();
+    var carpoolEnd = candidate.dropoffTime();
+
+    Vertex pickupVertex = pathsWithNewPassenger.getFirst().states().getFirst().getVertex();
+    Vertex dropoffVertex = pathsWithNewPassenger.getLast().lastState().getVertex();
+    Place pickupPlace = makePlace(pickupVertex);
+    Place dropoffPlace = makePlace(dropoffVertex);
+
+    Vertex startBoundaryVertex =
+      walkToPickup != null ? walkToPickup.states().getFirst().getVertex() : pickupVertex;
+    Vertex endBoundaryVertex =
+      walkFromDropoff != null ? walkFromDropoff.lastState().getVertex() : dropoffVertex;
+
+    Place itineraryStart = boundaryPlace(startLabel, ORIGIN_DEFAULT_NAME, startBoundaryVertex);
+    Place itineraryEnd = boundaryPlace(endLabel, DESTINATION_DEFAULT_NAME, endBoundaryVertex);
+
+    Place carpoolFromPlace = walkToPickup != null ? pickupPlace : itineraryStart;
+    Place carpoolToPlace = walkFromDropoff != null ? dropoffPlace : itineraryEnd;
+
+    var bookingInfo = toBookingInfo(
+      candidate.trip().publicContactInformation(),
+      candidate.trip().startTime(),
+      pickupVertex.toWgsCoordinate(),
+      dropoffVertex.toWgsCoordinate()
+    );
+
+    List<Leg> legs = new ArrayList<>(3);
+    if (walkToPickup != null) {
+      var walkStart = carpoolStart.minus(walkToPickup.duration());
+      legs.add(buildWalkLeg(walkToPickup, walkStart, carpoolStart, itineraryStart, pickupPlace));
+    }
+    legs.add(
+      buildCarpoolLeg(
+        pathsWithNewPassenger,
+        carpoolStart,
+        carpoolEnd,
+        rideWeight,
+        carpoolFromPlace,
+        carpoolToPlace,
+        bookingInfo
       )
     );
+    if (walkFromDropoff != null) {
+      var walkEnd = carpoolEnd.plus(walkFromDropoff.duration());
+      legs.add(buildWalkLeg(walkFromDropoff, carpoolEnd, walkEnd, dropoffPlace, itineraryEnd));
+    }
+
+    int totalCost = legs.stream().mapToInt(Leg::generalizedCost).sum();
+    return Itinerary.ofDirect(legs).withGeneralizedCost(Cost.costOfSeconds(totalCost)).build();
   }
 
   private static CarpoolLeg buildCarpoolLeg(
@@ -186,101 +253,6 @@ public class CarpoolItineraryMapper {
       .withDistanceMeters(walkPath.distanceMeters())
       .withGeneralizedCost((int) walkPath.weight())
       .build();
-  }
-
-  /**
-   * Converts a Raptor carpool access/egress leg back into an OTP itinerary for the response. Same
-   * shape as {@link #toItinerary(InsertionCandidate, double, int, GenericLocation, GenericLocation)} —
-   * an optional WALK leg, the carpool leg, and an optional WALK leg — but driven from the
-   * {@link CarpoolAccessEgress} accessors so the displayed times and ride cost agree with the
-   * values Raptor used during the search.
-   *
-   * @return the itinerary, or {@code null} if the access/egress has no shared segments (a safety
-   *         check that should not trigger for valid legs)
-   */
-  @Nullable
-  public Itinerary toItinerary(CarpoolAccessEgress accessEgress) {
-    var pathsWithNewPassenger = accessEgress.pathsWithNewPassenger();
-    if (pathsWithNewPassenger.isEmpty()) {
-      return null;
-    }
-    return buildItinerary(
-      pathsWithNewPassenger,
-      accessEgress.walkToPickup(),
-      accessEgress.walkFromDropoff(),
-      accessEgress.getCarpoolStart(),
-      accessEgress.getCarpoolEnd(),
-      accessEgress.getPassengerRideWeight(),
-      accessEgress.startLabel(),
-      accessEgress.endLabel(),
-      toBookingInfo(
-        accessEgress.trip().publicContactInformation(),
-        accessEgress.trip().startTime(),
-        boardingCoordinate(pathsWithNewPassenger),
-        alightingCoordinate(pathsWithNewPassenger)
-      )
-    );
-  }
-
-  /**
-   * Assembles a WALK + CARPOOL + WALK itinerary around the shared ride. Walk legs are omitted when
-   * their corresponding path is {@code null}; the walk legs' outer times are derived from
-   * {@code carpoolStart}/{@code carpoolEnd} plus the walk durations.
-   * <p>
-   * Boundary-place precedence at the chain's outermost endpoints follows the
-   * {@link EndpointLabel} contract: a stop wins over a user location, which wins over the
-   * vertex-derived fallback name via {@link #makePlace(Vertex)}.
-   */
-  private static Itinerary buildItinerary(
-    List<StreetPath> pathsWithNewPassenger,
-    @Nullable StreetPath walkToPickup,
-    @Nullable StreetPath walkFromDropoff,
-    ZonedDateTime carpoolStart,
-    ZonedDateTime carpoolEnd,
-    double rideWeight,
-    EndpointLabel startLabel,
-    EndpointLabel endLabel,
-    @Nullable BookingInfo bookingInfo
-  ) {
-    Vertex pickupVertex = pathsWithNewPassenger.getFirst().states().getFirst().getVertex();
-    Vertex dropoffVertex = pathsWithNewPassenger.getLast().lastState().getVertex();
-    Place pickupPlace = makePlace(pickupVertex);
-    Place dropoffPlace = makePlace(dropoffVertex);
-
-    Vertex startBoundaryVertex =
-      walkToPickup != null ? walkToPickup.states().getFirst().getVertex() : pickupVertex;
-    Vertex endBoundaryVertex =
-      walkFromDropoff != null ? walkFromDropoff.lastState().getVertex() : dropoffVertex;
-
-    Place itineraryStart = boundaryPlace(startLabel, ORIGIN_DEFAULT_NAME, startBoundaryVertex);
-    Place itineraryEnd = boundaryPlace(endLabel, DESTINATION_DEFAULT_NAME, endBoundaryVertex);
-
-    Place carpoolFromPlace = walkToPickup != null ? pickupPlace : itineraryStart;
-    Place carpoolToPlace = walkFromDropoff != null ? dropoffPlace : itineraryEnd;
-
-    List<Leg> legs = new ArrayList<>(3);
-    if (walkToPickup != null) {
-      var walkStart = carpoolStart.minus(walkToPickup.duration());
-      legs.add(buildWalkLeg(walkToPickup, walkStart, carpoolStart, itineraryStart, pickupPlace));
-    }
-    legs.add(
-      buildCarpoolLeg(
-        pathsWithNewPassenger,
-        carpoolStart,
-        carpoolEnd,
-        rideWeight,
-        carpoolFromPlace,
-        carpoolToPlace,
-        bookingInfo
-      )
-    );
-    if (walkFromDropoff != null) {
-      var walkEnd = carpoolEnd.plus(walkFromDropoff.duration());
-      legs.add(buildWalkLeg(walkFromDropoff, carpoolEnd, walkEnd, dropoffPlace, itineraryEnd));
-    }
-
-    int totalCost = legs.stream().mapToInt(Leg::generalizedCost).sum();
-    return Itinerary.ofDirect(legs).withGeneralizedCost(Cost.costOfSeconds(totalCost)).build();
   }
 
   /**
@@ -343,14 +315,6 @@ public class CarpoolItineraryMapper {
       .withBookingMethods(bookingMethods)
       .withLatestBookingTime(new BookingTime(tripStartTime.toLocalTime(), 0))
       .build();
-  }
-
-  private static WgsCoordinate boardingCoordinate(List<StreetPath> pathsWithNewPassenger) {
-    return pathsWithNewPassenger.getFirst().states().getFirst().getVertex().toWgsCoordinate();
-  }
-
-  private static WgsCoordinate alightingCoordinate(List<StreetPath> pathsWithNewPassenger) {
-    return pathsWithNewPassenger.getLast().lastState().getVertex().toWgsCoordinate();
   }
 
   /**

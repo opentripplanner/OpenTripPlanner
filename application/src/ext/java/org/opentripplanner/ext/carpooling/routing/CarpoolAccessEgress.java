@@ -1,15 +1,10 @@
 package org.opentripplanner.ext.carpooling.routing;
 
-import java.time.ZonedDateTime;
-import java.util.List;
-import org.jspecify.annotations.Nullable;
-import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.ext.carpooling.util.StreetPathUtils;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccessEgress;
 import org.opentripplanner.routing.cost.CostLimit;
-import org.opentripplanner.street.model.path.StreetPath;
 
 /**
  * Raptor access/egress adapter wrapping an {@link InsertionCandidate}: the candidate carries the
@@ -211,14 +206,9 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
     );
   }
 
-  /**
-   * The underlying carpool trip — i.e. the driver's committed route, schedule, and public-contact
-   * details. Exposed for the itinerary mapper, which reads trip-level metadata (start time,
-   * {@code publicContactInformation}, ...) to build the carpool leg's {@code pickupBookingInfo}.
-   * Mirrors how the direct path reads the same data straight off the {@link InsertionCandidate}.
-   */
-  public CarpoolTrip trip() {
-    return insertionCandidate.trip();
+  /** The carpool-side data of this leg: the trip, the walks bracketing the ride and the ride. */
+  public InsertionCandidate insertionCandidate() {
+    return insertionCandidate;
   }
 
   /**
@@ -254,52 +244,6 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
   @Override
   public TimeAndCost penalty() {
     return this.penalty;
-  }
-
-  /**
-   * Walk path from the passenger's origin (or transit stop, for egress) to the snapped pickup
-   * vertex. {@code null} when the origin/stop is already on a car-reachable vertex and no walk is
-   * needed.
-   */
-  @Nullable
-  public StreetPath walkToPickup() {
-    return insertionCandidate.walkToPickup();
-  }
-
-  /**
-   * The street paths of the carpool route segments traversed by the passenger between pickup and
-   * dropoff (inclusive of intermediate stops the driver makes along the way for other passengers).
-   * Never empty for a valid leg.
-   */
-  public List<StreetPath> pathsWithNewPassenger() {
-    return insertionCandidate.getPathsWithNewPassenger();
-  }
-
-  /**
-   * Walk path from the snapped dropoff vertex to the passenger's destination (or transit stop, for
-   * access). {@code null} when the destination/stop is already on a car-reachable vertex and no
-   * walk is needed.
-   */
-  @Nullable
-  public StreetPath walkFromDropoff() {
-    return insertionCandidate.walkFromDropoff();
-  }
-
-  /**
-   * Absolute wall-clock time at which the carpool arrives at the pickup vertex — i.e. the start of
-   * the shared ride. Computed from the driver's trip start time plus the duration of all segments
-   * preceding the passenger's pickup; independent of {@code transitSearchTimeZero}.
-   */
-  public ZonedDateTime getCarpoolStart() {
-    return insertionCandidate
-      .trip()
-      .startTime()
-      .plus(insertionCandidate.getDurationUntilPickupArrival());
-  }
-
-  /** Absolute wall-clock time at which the carpool arrives at the dropoff vertex. */
-  public ZonedDateTime getCarpoolEnd() {
-    return getCarpoolStart().plus(insertionCandidate.getPassengerRideDuration());
   }
 
   /**

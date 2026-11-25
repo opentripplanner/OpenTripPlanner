@@ -354,9 +354,12 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
       assertTrue(accessEgress.durationInSeconds() > 0, "Duration should be positive");
       assertTrue(accessEgress.hasOpeningHours(), "Carpool access should have opening hours");
       assertFalse(accessEgress.isWalkOnly(), "Carpool access should not be walk-only");
-      assertNotNull(accessEgress.pathsWithNewPassenger(), "Shared segments should not be null");
+      assertNotNull(
+        accessEgress.insertionCandidate().getPathsWithNewPassenger(),
+        "Shared segments should not be null"
+      );
       assertFalse(
-        accessEgress.pathsWithNewPassenger().isEmpty(),
+        accessEgress.insertionCandidate().getPathsWithNewPassenger().isEmpty(),
         "Shared segments should not be empty"
       );
     }
@@ -404,7 +407,10 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
 
     for (CarpoolAccessEgress accessEgress : results) {
       assertTrue(accessEgress.durationInSeconds() > 0, "Duration should be positive");
-      assertNotNull(accessEgress.pathsWithNewPassenger(), "Shared segments should not be null");
+      assertNotNull(
+        accessEgress.insertionCandidate().getPathsWithNewPassenger(),
+        "Shared segments should not be null"
+      );
     }
 
     int stopT1Index = transitServiceResolver.getStop(stopT1.getId()).getIndex();
@@ -695,7 +701,7 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
     // The carpool drops the passenger at D (the only drivable vertex incident to the side branch)
     // and the passenger must walk D -> iT5 -> stopT5. The result must therefore carry a
     // non-empty walk-from-dropoff segment.
-    var walkFromDropoff = stopT5Result.walkFromDropoff();
+    var walkFromDropoff = stopT5Result.insertionCandidate().walkFromDropoff();
     assertNotNull(
       walkFromDropoff,
       "stopT5 access result must include a walk-from-dropoff segment, since the carpool " +
@@ -739,12 +745,12 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
     assertNotNull(stopT3Result, "Access results should include stopT3");
 
     assertNull(
-      stopT3Result.walkToPickup(),
+      stopT3Result.insertionCandidate().walkToPickup(),
       "Passenger P2 sits on an all-permission street, so the carpool can pick up directly " +
         "at the passenger's location; walkToPickup should be null"
     );
     assertNull(
-      stopT3Result.walkFromDropoff(),
+      stopT3Result.insertionCandidate().walkFromDropoff(),
       "stopT3 is biLinked to a drivable intersection, so the carpool can drop the " +
         "passenger off directly at the stop's link vertex; walkFromDropoff should be null"
     );

@@ -276,7 +276,6 @@ public class DefaultCarpoolingService implements CarpoolingService {
             request.to()
           )
         )
-        .filter(Objects::nonNull)
         .filter(itinerary -> postFilters.isValidItinerary(itinerary, carpoolingRequest))
         .toList();
     }
@@ -549,13 +548,9 @@ public class DefaultCarpoolingService implements CarpoolingService {
     AccessEgressType accessOrEgress,
     GenericLocation passengerLocation
   ) {
-    var carpoolPickupTime = insertionCandidate
-      .trip()
-      .startTime()
-      .plus(insertionCandidate.getDurationUntilPickupArrival());
-    var passengerStartTime = carpoolPickupTime.minus(
-      StreetPathUtils.durationOrZero(insertionCandidate.walkToPickup())
-    );
+    var passengerStartTime = insertionCandidate
+      .pickupTime()
+      .minus(StreetPathUtils.durationOrZero(insertionCandidate.walkToPickup()));
 
     var passengerDepartureTime = TimeUtils.toTransitTimeSeconds(
       transitSearchTimeZero,
