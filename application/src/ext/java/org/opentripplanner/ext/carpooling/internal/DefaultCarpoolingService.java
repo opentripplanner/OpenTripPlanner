@@ -20,7 +20,6 @@ import org.opentripplanner.ext.carpooling.filter.SnappedPassenger;
 import org.opentripplanner.ext.carpooling.filter.TripPreFilters;
 import org.opentripplanner.ext.carpooling.mapping.CarpoolAccessEgress;
 import org.opentripplanner.ext.carpooling.mapping.CarpoolItineraryMapper;
-import org.opentripplanner.ext.carpooling.mapping.EndpointLabel;
 import org.opentripplanner.ext.carpooling.routing.CarpoolingRequest;
 import org.opentripplanner.ext.carpooling.routing.CorridorRouter;
 import org.opentripplanner.ext.carpooling.routing.InsertionCandidate;
@@ -35,7 +34,6 @@ import org.opentripplanner.ext.carpooling.street.CarpoolStreetRouter;
 import org.opentripplanner.ext.carpooling.street.PassengerSnapper;
 import org.opentripplanner.ext.carpooling.street.StreetPathUtils;
 import org.opentripplanner.ext.carpooling.street.StreetVertexUtils;
-import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
@@ -52,9 +50,7 @@ import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.streetadapter.StreetSearchRequestMapper;
-import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitServiceResolver;
-import org.opentripplanner.utils.time.TimeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -325,17 +321,17 @@ public class DefaultCarpoolingService implements CarpoolingService {
         }
         var rides = rides(tripStops.stops(), accessOrEgress, passengerSnap, transitServiceResolver);
         for (var candidate : insertionEvaluator.findBestInsertions(trip, rides)) {
-          var accessEgress = createCarpoolAccessEgress(
+          var accessEgress = CarpoolAccessEgress.of(
             candidate,
+            accessOrEgress,
+            passengerLocation,
             transitSearchTimeZero,
             carpoolReluctance,
-            accessOrEgress,
-            passengerLocation
+            parameters.boardCost()
           );
-          if (accessEgress.durationInSeconds() > maxLegSeconds) {
-            continue;
+          if (accessEgress.durationInSeconds() <= maxLegSeconds) {
+            accessEgresses.add(accessEgress);
           }
-          accessEgresses.add(accessEgress);
         }
       }
       LOG.debug(
@@ -430,40 +426,5 @@ public class DefaultCarpoolingService implements CarpoolingService {
         List.of(new RoutingError(RoutingErrorCode.LOCATION_NOT_FOUND, InputField.TO_PLACE))
       );
     }
-  }
-
-  private CarpoolAccessEgress createCarpoolAccessEgress(
-    InsertionCandidate insertionCandidate,
-    ZonedDateTime transitSearchTimeZero,
-    double carpoolReluctance,
-    AccessEgressType accessOrEgress,
-    GenericLocation passengerLocation
-  ) {
-    var passengerStartTime = insertionCandidate
-      .pickupTime()
-      .minus(StreetPathUtils.durationOrZero(insertionCandidate.walkToPickup()));
-
-    var passengerDepartureTime = TimeUtils.toTransitTimeSeconds(
-      transitSearchTimeZero,
-      passengerStartTime.toInstant()
-    );
-
-    StopLocation transitStopLocation = insertionCandidate.transitStop();
-    EndpointLabel stopLabel = EndpointLabel.forStop(transitStopLocation);
-    EndpointLabel passengerLabel = EndpointLabel.forLocation(passengerLocation);
-
-    EndpointLabel startLabel = accessOrEgress.isAccess() ? passengerLabel : stopLabel;
-    EndpointLabel endLabel = accessOrEgress.isAccess() ? stopLabel : passengerLabel;
-
-    return new CarpoolAccessEgress(
-      transitStopLocation.getIndex(),
-      passengerDepartureTime,
-      insertionCandidate,
-      TimeAndCost.ZERO,
-      carpoolReluctance,
-      parameters.boardCost(),
-      startLabel,
-      endLabel
-    );
   }
 }

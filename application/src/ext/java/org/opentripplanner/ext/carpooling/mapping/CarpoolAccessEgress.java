@@ -1,11 +1,16 @@
 package org.opentripplanner.ext.carpooling.mapping;
 
+import java.time.ZonedDateTime;
 import org.opentripplanner.ext.carpooling.routing.InsertionCandidate;
 import org.opentripplanner.ext.carpooling.street.StreetPathUtils;
 import org.opentripplanner.framework.model.TimeAndCost;
+import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.raptor.spi.RaptorConstants;
+import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccessEgress;
 import org.opentripplanner.routing.cost.CostLimit;
+import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.utils.time.TimeUtils;
 
 /**
  * Raptor access/egress adapter wrapping an {@link InsertionCandidate}: the candidate carries the
@@ -94,6 +99,45 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
     double totalWeight =
       walkWeight + insertionCandidate.getPassengerRideWeight(carpoolReluctance, boardCost);
     this.c1 = CostLimit.toRaptorCost(totalWeight) + penalty.cost().toCentiSeconds();
+  }
+
+  /**
+   * The access or egress leg of an insertion whose ride runs between the passenger and a transit
+   * stop.
+   *
+   * @param passengerLocation     the request's origin for access, its destination for egress
+   * @param transitSearchTimeZero the time the leg's Raptor times are relative to
+   */
+  public static CarpoolAccessEgress of(
+    InsertionCandidate insertionCandidate,
+    AccessEgressType accessOrEgress,
+    GenericLocation passengerLocation,
+    ZonedDateTime transitSearchTimeZero,
+    double carpoolReluctance,
+    int boardCost
+  ) {
+    var passengerStartTime = insertionCandidate
+      .pickupTime()
+      .minus(StreetPathUtils.durationOrZero(insertionCandidate.walkToPickup()));
+    var passengerDepartureTime = TimeUtils.toTransitTimeSeconds(
+      transitSearchTimeZero,
+      passengerStartTime.toInstant()
+    );
+
+    StopLocation transitStop = insertionCandidate.transitStop();
+    EndpointLabel stopLabel = EndpointLabel.forStop(transitStop);
+    EndpointLabel passengerLabel = EndpointLabel.forLocation(passengerLocation);
+
+    return new CarpoolAccessEgress(
+      transitStop.getIndex(),
+      passengerDepartureTime,
+      insertionCandidate,
+      TimeAndCost.ZERO,
+      carpoolReluctance,
+      boardCost,
+      accessOrEgress.isAccess() ? passengerLabel : stopLabel,
+      accessOrEgress.isAccess() ? stopLabel : passengerLabel
+    );
   }
 
   @Override
