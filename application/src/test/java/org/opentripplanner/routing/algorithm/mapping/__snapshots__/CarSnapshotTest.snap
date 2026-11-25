@@ -106,8 +106,7 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPark=[
             },
             "vertexType" : "BIKEPARK"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -194,8 +193,7 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPark=[
             "name" : "NW Marshall St. & NW 24th Ave. (P2)",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         }
       ],
       "startTime" : "2009-10-21T23:10:00.000Z",
@@ -266,8 +264,7 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPickupWit
             "name" : "corner of Northwest Pettygrove Street and path",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -328,8 +325,7 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPickupWit
             "name" : "corner of Northwest 22nd Avenue and path",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -376,8 +372,7 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPickupWit
             "name" : "Legacy Good Samaritan Medical Center (P4)",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         }
       ],
       "startTime" : "2009-10-21T23:10:00.000Z",
@@ -448,8 +443,7 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPickupWit
             "name" : "corner of Northwest Pettygrove Street and path",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -510,8 +504,7 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPickupWit
             "name" : "corner of Northwest 22nd Avenue and path",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -558,8 +551,7 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPickupWit
             "name" : "Legacy Good Samaritan Medical Center (P4)",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         }
       ],
       "startTime" : "2009-10-21T23:10:51.000Z",
@@ -642,8 +634,7 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPickupWit
             "name" : "NW Marshall St. & NW 24th Ave. (P2)",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         }
       ],
       "startTime" : "2009-10-21T23:10:00.000Z",

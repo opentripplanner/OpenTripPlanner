@@ -419,14 +419,6 @@ public interface Leg {
   }
 
   /**
-   * Is this leg walking with a bike?
-   */
-  @Nullable
-  default Boolean walkingBike() {
-    return null;
-  }
-
-  /**
    * A sandbox feature for calculating a numeric score between 0 and 1 which indicates how
    * accessible the itinerary is as a whole. This is not a very scientific method but just a rough
    * guidance that expresses certainty or uncertainty about the accessibility.

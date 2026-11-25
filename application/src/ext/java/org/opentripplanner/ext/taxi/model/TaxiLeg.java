@@ -157,11 +157,6 @@ public class TaxiLeg implements Leg {
   }
 
   @Override
-  public Boolean walkingBike() {
-    return false;
-  }
-
-  @Override
   public Boolean rentedVehicle() {
     return false;
   }
