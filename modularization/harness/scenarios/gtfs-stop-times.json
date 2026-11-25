@@ -1,0 +1,8 @@
+{
+  "api": "gtfs",
+  "query": "{ stop(id:\"1:7751\") { gtfsId name routes { gtfsId } stoptimesForServiceDate(date:\"2009-11-17\") { pattern { code } stoptimes { scheduledArrival scheduledDeparture realtimeState headsign serviceDay trip { gtfsId } } } } }",
+  "unordered": [
+    "data.stop.stoptimesForServiceDate",
+    "data.stop.routes"
+  ]
+}

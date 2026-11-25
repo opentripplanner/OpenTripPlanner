@@ -1,0 +1,5 @@
+{
+  "api": "transmodel",
+  "query": "{ serviceJourneys { id publicCode line { id } } }",
+  "sortArraysBy": "id"
+}

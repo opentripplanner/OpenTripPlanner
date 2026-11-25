@@ -1,0 +1,5 @@
+{
+  "api": "gtfs",
+  "query": "{ stops { gtfsId name code lat lon zoneId } }",
+  "sortArraysBy": "gtfsId"
+}

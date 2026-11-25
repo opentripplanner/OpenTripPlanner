@@ -1,0 +1,8 @@
+{
+  "api": "info",
+  "ignore": [
+    "versionControl*",
+    "cpuName",
+    "nCores"
+  ]
+}

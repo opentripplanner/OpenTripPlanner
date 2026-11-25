@@ -1,0 +1,4 @@
+{
+  "api": "gtfs",
+  "query": "{ feeds { feedId agencies { gtfsId name url timezone } } }"
+}

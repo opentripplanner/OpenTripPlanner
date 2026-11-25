@@ -1,0 +1,5 @@
+{
+  "api": "gtfs",
+  "query": "{ trips { gtfsId tripHeadsign directionId serviceId route { gtfsId } pattern { code } } }",
+  "sortArraysBy": "gtfsId"
+}

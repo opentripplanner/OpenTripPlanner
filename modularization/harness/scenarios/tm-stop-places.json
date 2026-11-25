@@ -1,0 +1,5 @@
+{
+  "api": "transmodel",
+  "query": "{ stopPlaces { id name latitude longitude quays { id } } }",
+  "sortArraysBy": "id"
+}

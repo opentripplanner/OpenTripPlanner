@@ -1,0 +1,4 @@
+{
+  "api": "transmodel",
+  "query": "{ trip(from:{coordinates:{latitude:45.53,longitude:-122.66}}, to:{coordinates:{latitude:45.51,longitude:-122.685}}, dateTime:\"2009-11-17T19:30:00-08:00\", numTripPatterns:3 ) { tripPatterns { startTime endTime duration generalizedCost legs { mode distance duration aimedStartTime aimedEndTime fromPlace { name latitude longitude quay { id } } toPlace { name latitude longitude quay { id } } line { id publicCode } serviceJourney { id } } } } }"
+}

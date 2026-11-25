@@ -1,0 +1,5 @@
+{
+  "api": "gtfs",
+  "query": "{ patterns { code name directionId route { gtfsId } stops { gtfsId } } }",
+  "sortArraysBy": "code"
+}

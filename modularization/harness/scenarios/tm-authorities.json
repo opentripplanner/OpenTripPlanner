@@ -1,0 +1,4 @@
+{
+  "api": "transmodel",
+  "query": "{ authorities { id name url timezone } }"
+}
