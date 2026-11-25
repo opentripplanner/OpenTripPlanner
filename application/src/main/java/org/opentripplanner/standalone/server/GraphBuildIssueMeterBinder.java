@@ -7,8 +7,8 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 
 /**
  * Exposes the graph build issue counts as one gauge {@code graph_build_issues} per issue type,
- * tagged with {@code type}. The gauges hold their counts strongly, so a registry added later, like
- * the Prometheus registry, still gets them.
+ * tagged with {@code type}. The gauges hold their counts strongly, so a registry added later still
+ * gets them.
  */
 class GraphBuildIssueMeterBinder implements MeterBinder {
 
