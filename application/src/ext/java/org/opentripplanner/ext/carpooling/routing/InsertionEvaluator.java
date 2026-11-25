@@ -9,9 +9,7 @@ import java.util.Objects;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
-import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
 import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.utils.collection.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,24 +44,23 @@ public class InsertionEvaluator {
   }
 
   /**
-   * @return A list containing the best insertion that can be found for every stop in the list
-   *         tripWithViableAccessEgress.viableAccessEgress. If there are no valid insertions for a
-   *         stop, then no candidate for that stop will be returned.
+   * The best insertion of each of the rides into the trip. A ride that no pair of legs can take
+   * within the budgets and the capacity gets none.
    */
   public List<InsertionCandidate> findBestInsertions(
-    TripWithViableAccessEgress tripWithViableAccessEgress
+    RoutableCarpoolTrip routableTrip,
+    List<PassengerRide> rides
   ) {
-    var viableStops = tripWithViableAccessEgress.viableAccessEgress();
-    if (viableStops.isEmpty()) {
+    if (rides.isEmpty()) {
       return List.of();
     }
-    var plan = plan(tripWithViableAccessEgress.routableTrip());
+    var plan = plan(routableTrip);
     if (plan == null) {
       return List.of();
     }
     var candidates = new ArrayList<InsertionCandidate>();
-    for (var viable : viableStops) {
-      var candidate = plan.best(toPassengerSnap(viable), viable.transitStop());
+    for (var ride : rides) {
+      var candidate = plan.best(ride);
       if (candidate != null) {
         candidates.add(candidate);
       }
@@ -72,19 +69,16 @@ public class InsertionEvaluator {
   }
 
   /**
-   * The best insertion of one passenger ride into the trip, or {@code null} if no pair of legs can
-   * take it within the budgets and the capacity.
-   *
-   * @param snap pickup/dropoff vertices (already snapped to car-reachable vertices by the caller)
-   *             and the optional walk paths bracketing the carpool ride
+   * The best insertion of the ride into the trip, or {@code null} if no pair of legs can take it
+   * within the budgets and the capacity.
    */
   @Nullable
   public InsertionCandidate findBestInsertion(
     RoutableCarpoolTrip routableTrip,
-    PassengerSnap snap
+    PassengerRide ride
   ) {
     var plan = plan(routableTrip);
-    return plan == null ? null : plan.best(snap, null);
+    return plan == null ? null : plan.best(ride);
   }
 
   @Nullable
@@ -109,16 +103,6 @@ public class InsertionEvaluator {
         Optional.ofNullable(carpoolRouter.route(pickup, dropoff))
       )
       .orElse(null);
-  }
-
-  private static PassengerSnap toPassengerSnap(ViableAccessEgress viable) {
-    boolean access = viable.accessEgress() == AccessEgressType.ACCESS;
-    return new PassengerSnap(
-      access ? viable.passengerVertex() : viable.transitVertex(),
-      access ? viable.transitVertex() : viable.passengerVertex(),
-      viable.walkToPickup(),
-      viable.walkFromDropoff()
-    );
   }
 
   /**
@@ -174,9 +158,9 @@ public class InsertionEvaluator {
     }
 
     @Nullable
-    InsertionCandidate best(PassengerSnap snap, @Nullable StopLocation transitStop) {
-      Vertex pickup = snap.pickupVertex();
-      Vertex dropoff = snap.dropoffVertex();
+    InsertionCandidate best(PassengerRide ride) {
+      Vertex pickup = ride.pickup().vertex();
+      Vertex dropoff = ride.dropoff().vertex();
       LegTimes pickupTimes = legTimes(pickup);
       LegTimes dropoffTimes = legTimes(dropoff);
       long bestDetour = Long.MAX_VALUE;
@@ -267,9 +251,9 @@ public class InsertionEvaluator {
         bestDropoffLeg + 2,
         routeWith(bestPickupLeg, bestDropoffLeg, pickupTimes, dropoffTimes, pickupToDropoff),
         stopDuration,
-        transitStop,
-        snap.walkToPickup(),
-        snap.walkFromDropoff()
+        ride.transitStop(),
+        ride.pickup().walkPath(),
+        ride.dropoff().walkPath()
       );
     }
 

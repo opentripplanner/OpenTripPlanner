@@ -30,6 +30,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.carpooling.RoutableCarpoolTripTestData;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
+import org.opentripplanner.ext.carpooling.util.CarReachableVertexSnapper.SnapResult;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.model.vertex.SimpleVertex;
@@ -105,9 +106,15 @@ class InsertionEvaluatorTest {
   ) {
     var routableTrip = createRoutableTrip(trip);
     var evaluator = new InsertionEvaluator(carpoolRouter, dwell);
-    return evaluator.findBestInsertion(
-      routableTrip,
-      new PassengerSnap(vertexMap.get(passengerPickup), vertexMap.get(passengerDropoff), null, null)
+    return evaluator.findBestInsertion(routableTrip, ride(passengerPickup, passengerDropoff));
+  }
+
+  /** A ride between the vertices at the two coordinates, with no walk at either end. */
+  private PassengerRide ride(WgsCoordinate pickup, WgsCoordinate dropoff) {
+    return new PassengerRide(
+      new SnapResult(vertexMap.get(pickup), null),
+      new SnapResult(vertexMap.get(dropoff), null),
+      null
     );
   }
 
@@ -316,10 +323,7 @@ class InsertionEvaluatorTest {
       segmentOrNull(pathsMap.get(new Pair<>(getCoordinate(from), getCoordinate(to))));
 
     var evaluator = new InsertionEvaluator(routingFunction, Duration.ZERO);
-    var result = evaluator.findBestInsertion(
-      routableTrip,
-      new PassengerSnap(vertexMap.get(OSLO_EAST), vertexMap.get(OSLO_WEST), null, null)
-    );
+    var result = evaluator.findBestInsertion(routableTrip, ride(OSLO_EAST, OSLO_WEST));
 
     assertNotNull(result);
     assertEquals(2, result.pickupPosition());
@@ -406,12 +410,12 @@ class InsertionEvaluatorTest {
       return RoutedSegment.of(createStreetPath());
     };
     var evaluator = new InsertionEvaluator(router, Duration.ZERO);
-    var snap = new PassengerSnap(vertexMap.get(OSLO_EAST), vertexMap.get(OSLO_WEST), null, null);
+    var ride = ride(OSLO_EAST, OSLO_WEST);
     var tripA = createTripWithDeviationBudget(Duration.ofMinutes(20), OSLO_CENTER, OSLO_NORTH);
     var tripB = createTripWithDeviationBudget(Duration.ofMinutes(20), OSLO_SOUTH, OSLO_NORTHEAST);
 
-    assertNotNull(evaluator.findBestInsertion(createRoutableTrip(tripA), snap));
-    assertNotNull(evaluator.findBestInsertion(createRoutableTrip(tripB), snap));
+    assertNotNull(evaluator.findBestInsertion(createRoutableTrip(tripA), ride));
+    assertNotNull(evaluator.findBestInsertion(createRoutableTrip(tripB), ride));
 
     assertEquals(1, rides[0], "pickup -> dropoff does not depend on the trip");
   }

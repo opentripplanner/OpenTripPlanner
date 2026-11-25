@@ -28,11 +28,9 @@ import org.opentripplanner.ext.carpooling.routing.CorridorRouter;
 import org.opentripplanner.ext.carpooling.routing.EndpointLabel;
 import org.opentripplanner.ext.carpooling.routing.InsertionCandidate;
 import org.opentripplanner.ext.carpooling.routing.InsertionEvaluator;
-import org.opentripplanner.ext.carpooling.routing.PassengerSnap;
+import org.opentripplanner.ext.carpooling.routing.PassengerRide;
 import org.opentripplanner.ext.carpooling.routing.PassengerTrees;
 import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTrip;
-import org.opentripplanner.ext.carpooling.routing.TripWithViableAccessEgress;
-import org.opentripplanner.ext.carpooling.routing.ViableAccessEgress;
 import org.opentripplanner.ext.carpooling.util.CarReachableVertexSnapper;
 import org.opentripplanner.ext.carpooling.util.CarReachableVertexSnapper.SnapResult;
 import org.opentripplanner.ext.carpooling.util.StreetPathUtils;
@@ -295,17 +293,12 @@ public class DefaultCarpoolingService implements CarpoolingService {
         pathRouter
       );
       var insertionEvaluator = new InsertionEvaluator(corridorRouter, stopDuration);
-      var snap = new PassengerSnap(
-        pickupSnap.vertex(),
-        dropoffSnap.vertex(),
-        pickupSnap.walkPath(),
-        dropoffSnap.walkPath()
-      );
+      var ride = new PassengerRide(pickupSnap, dropoffSnap, null);
 
       var insertionCandidates = new ArrayList<InsertionCandidate>();
       for (var trip : candidateTrips) {
         corridorRouter.beginTrip(trip);
-        var candidate = insertionEvaluator.findBestInsertion(trip, snap);
+        var candidate = insertionEvaluator.findBestInsertion(trip, ride);
         if (candidate != null) {
           insertionCandidates.add(candidate);
         }
@@ -515,14 +508,8 @@ public class DefaultCarpoolingService implements CarpoolingService {
         for (var usable : tripStops.stops()) {
           corridorRouter.registerStop(usable.stop(), usable.snap().vertex(), access);
         }
-        var viableStops = viableAccessEgress(
-          tripStops.stops(),
-          accessOrEgress,
-          passengerSnap,
-          transitServiceResolver
-        );
-        var tripWithViableAccessEgress = new TripWithViableAccessEgress(trip, viableStops);
-        for (var candidate : insertionEvaluator.findBestInsertions(tripWithViableAccessEgress)) {
+        var rides = rides(tripStops.stops(), accessOrEgress, passengerSnap, transitServiceResolver);
+        for (var candidate : insertionEvaluator.findBestInsertions(trip, rides)) {
           var accessEgress = createCarpoolAccessEgress(
             candidate,
             transitSearchTimeZero,
@@ -579,37 +566,29 @@ public class DefaultCarpoolingService implements CarpoolingService {
     return usable;
   }
 
-  /** One access/egress candidate per stop, even when several legs serve it. */
-  private List<ViableAccessEgress> viableAccessEgress(
+  /** One ride per stop, even when several legs serve it. */
+  private List<PassengerRide> rides(
     List<UsableStop> stops,
     AccessEgressType accessOrEgress,
     SnapResult passengerSnap,
     TransitServiceResolver transitServiceResolver
   ) {
-    boolean access = accessOrEgress.isAccess();
     var snapByStop = new LinkedHashMap<FeedScopedId, SnapResult>();
     for (var usable : stops) {
       snapByStop.putIfAbsent(usable.stop().stopId(), usable.snap());
     }
 
-    var viable = new ArrayList<ViableAccessEgress>(snapByStop.size());
+    var rides = new ArrayList<PassengerRide>(snapByStop.size());
     for (var entry : snapByStop.entrySet()) {
       var stop = transitServiceResolver.getStopLocation(entry.getKey());
-      var snap = entry.getValue();
-      var pickupSide = access ? passengerSnap : snap;
-      var dropoffSide = access ? snap : passengerSnap;
-      viable.add(
-        new ViableAccessEgress(
-          stop,
-          snap.vertex(),
-          passengerSnap.vertex(),
-          accessOrEgress,
-          pickupSide.walkPath(),
-          dropoffSide.walkPath()
-        )
+      var stopSnap = entry.getValue();
+      rides.add(
+        accessOrEgress.isAccess()
+          ? new PassengerRide(passengerSnap, stopSnap, stop)
+          : new PassengerRide(stopSnap, passengerSnap, stop)
       );
     }
-    return viable;
+    return rides;
   }
 
   /**
