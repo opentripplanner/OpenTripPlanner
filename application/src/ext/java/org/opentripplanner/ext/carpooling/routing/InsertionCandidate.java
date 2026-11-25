@@ -26,7 +26,6 @@ public record InsertionCandidate(
   List<RoutedSegment> routeSegments,
   Duration stopDuration,
   @Nullable StopLocation transitStop,
-  Duration totalTripDuration,
   @Nullable StreetPath walkToPickup,
   @Nullable StreetPath walkFromDropoff
 ) {
@@ -51,33 +50,6 @@ public record InsertionCandidate(
     }
   }
 
-  /**
-   * Convenience constructor that derives {@code totalTripDuration} from the route segments and stop
-   * duration.
-   */
-  public InsertionCandidate(
-    CarpoolTrip trip,
-    int pickupPosition,
-    int dropoffPosition,
-    List<RoutedSegment> routeSegments,
-    Duration stopDuration,
-    @Nullable StopLocation transitStop,
-    @Nullable StreetPath walkToPickup,
-    @Nullable StreetPath walkFromDropoff
-  ) {
-    this(
-      trip,
-      pickupPosition,
-      dropoffPosition,
-      routeSegments,
-      stopDuration,
-      transitStop,
-      totalSegmentDuration(routeSegments, stopDuration),
-      walkToPickup,
-      walkFromDropoff
-    );
-  }
-
   /** The segments the car drives before it reaches the passenger's pickup. */
   public List<RoutedSegment> getSegmentsBeforePickup() {
     return routeSegments.subList(0, pickupPosition);
@@ -94,6 +66,11 @@ public record InsertionCandidate(
    */
   public List<StreetPath> getPathsWithNewPassenger() {
     return getSegmentsWithNewPassenger().stream().map(RoutedSegment::path).toList();
+  }
+
+  /** The duration of the whole route, the dwells at its intermediate stops included. */
+  public Duration totalTripDuration() {
+    return totalSegmentDuration(routeSegments, stopDuration);
   }
 
   /**
@@ -151,7 +128,7 @@ public record InsertionCandidate(
       trip.getId(),
       pickupPosition,
       dropoffPosition,
-      totalTripDuration.getSeconds(),
+      totalTripDuration().getSeconds(),
       routeSegments.size()
     );
   }
