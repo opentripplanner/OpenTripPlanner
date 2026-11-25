@@ -8,6 +8,9 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.List;
+import org.opentripplanner.framework.application.OtpAppException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This is a JCommander-annotated class that holds parameters for OTP stand-alone mode. These
@@ -26,6 +29,7 @@ import java.util.List;
  */
 public class CommandLineParameters {
 
+  private static final Logger LOG = LoggerFactory.getLogger(CommandLineParameters.class);
   private static final String TIP = " Use --help to see available options.";
   private static final int DEFAULT_PORT = 8080;
   private static final String DEFAULT_BIND_ADDRESS = "0.0.0.0";
@@ -118,6 +122,19 @@ public class CommandLineParameters {
   )
   public Integer port = DEFAULT_PORT;
 
+  /**
+   * Not initialized, so we can tell whether it was given on the command line. When not set, the
+   * Actuator API is served on {@link #port}.
+   */
+  @Parameter(
+    names = { "--actuatorPort" },
+    validateWith = PositiveInteger.class,
+    description = "Server port for the Actuator API. If it differs from --port, the Actuator API " +
+      "is served only on this port, with its own small thread pool. Defaults to --port. Only " +
+      "used if the ActuatorAPI feature is enabled."
+  )
+  public Integer actuatorPort = null;
+
   @Parameter(
     names = { "--abortOnUnknownConfig" },
     description = "Abort the startup if configuration files are found to contain unknown parameters."
@@ -194,6 +211,48 @@ public class CommandLineParameters {
     return load || (serve && doBuildTransit());
   }
 
+  /**
+   * Where the Actuator API is served. The Actuator API gets its own port only if
+   * {@code --actuatorPort} differs from {@code --port}.
+   *
+   * @param actuatorApiEnabled the {@code ActuatorAPI} feature is on. The features are read from the
+   *                           config, so this can not be decided by the command line alone.
+   */
+  public ActuatorApiPlacement actuatorApiPlacement(boolean actuatorApiEnabled) {
+    if (!actuatorApiEnabled) {
+      return ActuatorApiPlacement.DISABLED;
+    }
+    return actuatorPort != null && !actuatorPort.equals(port)
+      ? ActuatorApiPlacement.SEPARATE_PORT
+      : ActuatorApiPlacement.MAIN_PORT;
+  }
+
+  /**
+   * Validate the {@code --actuatorPort} when a server is started. This needs the OTP features, so
+   * it can not be done in {@link #inferAndValidate()}.
+   * <p>
+   * If the Actuator API is disabled, a given port is reported like an unknown config parameter: a
+   * warning, or an aborted startup when {@code --abortOnUnknownConfig} is set. If the Actuator API
+   * has its own port, the port must be available.
+   *
+   * @throws OtpAppException if the startup must be aborted
+   */
+  public void validateActuatorPort(boolean actuatorApiEnabled) {
+    if (!doServe()) {
+      return;
+    }
+    switch (actuatorApiPlacement(actuatorApiEnabled)) {
+      case DISABLED -> {
+        if (actuatorPort != null) {
+          reportUnusedActuatorPort();
+        }
+      }
+      case MAIN_PORT -> {
+      }
+      case SEPARATE_PORT -> checkActuatorPortAvailable();
+    }
+  }
+
   public String logTaskInfo() {
     var mainCommands = new ArrayList<String>();
     if (doBuildStreet() & doBuildTransit()) {
@@ -234,6 +293,25 @@ public class CommandLineParameters {
     if (portUnavailable) {
       String msg = String.format(": port %d is not available. %s.", port, reason);
       throw new ParameterException(msg);
+    }
+  }
+
+  private void reportUnusedActuatorPort() {
+    String message =
+      "The --actuatorPort is set, but the ActuatorAPI feature is not enabled. The port is not used.";
+    if (abortOnUnknownConfig) {
+      throw new OtpAppException(
+        message + " Enable the feature or remove --actuatorPort from your OTP CLI parameters."
+      );
+    }
+    LOG.warn(message);
+  }
+
+  private void checkActuatorPortAvailable() {
+    try {
+      checkPortAvailable(actuatorPort);
+    } catch (ParameterException e) {
+      throw new OtpAppException("--actuatorPort" + e.getMessage());
     }
   }
 

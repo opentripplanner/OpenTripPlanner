@@ -9,6 +9,7 @@ import com.beust.jcommander.ParameterException;
 import org.geotools.referencing.factory.DeferredAuthorityFactory;
 import org.geotools.util.WeakCollectionCleaner;
 import org.opentripplanner.framework.application.ApplicationShutdownSupport;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.raptor.RaptorService;
@@ -118,6 +119,7 @@ public class OTPMain {
     var config = loadApp.config();
 
     detectUnusedConfigParams(cli, config);
+    cli.validateActuatorPort(OTPFeature.ActuatorAPI.isOn());
 
     // Validate data sources, command line arguments and config before loading and
     // processing input data to fail early

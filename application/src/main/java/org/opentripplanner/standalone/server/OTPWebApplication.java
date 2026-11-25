@@ -47,8 +47,9 @@ public class OTPWebApplication extends Application {
   }
 
   /**
-   * @param additionalComponents optional APIs served by this application, like the Actuator API.
-   *                             Use {@link JerseyComponents#EMPTY} if there are none.
+   * @param additionalComponents optional APIs served by this application, like the Actuator API
+   *                             when it is served on the main port. Use
+   *                             {@link JerseyComponents#EMPTY} if there are none.
    */
   public OTPWebApplication(
     OTPWebApplicationParameters parameters,

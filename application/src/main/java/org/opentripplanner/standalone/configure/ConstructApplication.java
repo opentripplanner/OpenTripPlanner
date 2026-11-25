@@ -42,7 +42,9 @@ import org.opentripplanner.standalone.config.DebugUiConfig;
 import org.opentripplanner.standalone.config.OtpConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.ActuatorApiComponents;
+import org.opentripplanner.standalone.server.ActuatorWebApplication;
 import org.opentripplanner.standalone.server.GrizzlyServer;
+import org.opentripplanner.standalone.server.GrizzlyServer.ActuatorEndpoint;
 import org.opentripplanner.standalone.server.JerseyComponents;
 import org.opentripplanner.standalone.server.OTPWebApplication;
 import org.opentripplanner.street.StreetRepository;
@@ -182,9 +184,17 @@ public class ConstructApplication {
     LOG.info("Wiring up and configuring server.");
     setupTransitRoutingServer();
 
-    return createServer(
-      OTPFeature.ActuatorAPI.isOn() ? createActuatorApi() : JerseyComponents.EMPTY
-    );
+    return switch (cli.actuatorApiPlacement(OTPFeature.ActuatorAPI.isOn())) {
+      case DISABLED -> createServer(JerseyComponents.EMPTY, null);
+      case MAIN_PORT -> createServer(createActuatorApi(), null);
+      case SEPARATE_PORT -> createServer(
+        JerseyComponents.EMPTY,
+        new ActuatorEndpoint(
+          new ActuatorWebApplication(this::requestScopedFactory, createActuatorApi()),
+          cli.actuatorPort
+        )
+      );
+    };
   }
 
   /**
@@ -231,7 +241,10 @@ public class ConstructApplication {
     return graphBuilderDataSources;
   }
 
-  private GrizzlyServer createServer(JerseyComponents additionalComponents) {
+  private GrizzlyServer createServer(
+    JerseyComponents additionalComponents,
+    @Nullable ActuatorEndpoint actuatorEndpoint
+  ) {
     return new GrizzlyServer(
       cli,
       new OTPWebApplication(
@@ -239,6 +252,7 @@ public class ConstructApplication {
         this::requestScopedFactory,
         additionalComponents
       ),
+      actuatorEndpoint,
       routerConfig().server().apiProcessingTimeout()
     );
   }

@@ -1,5 +1,6 @@
 package org.opentripplanner.standalone.config;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -7,8 +8,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.beust.jcommander.ParameterException;
 import java.io.File;
+import java.io.IOException;
+import java.net.ServerSocket;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.opentripplanner.framework.application.OtpAppException;
 
 public class CommandLineParametersTest {
 
@@ -171,6 +177,69 @@ public class CommandLineParametersTest {
   public void loadStreetRequiresSaveOrServeOrBoth() {
     // --loadStreet requires --save and/or --serve
     validateWith().loadStreet().expectNotValid();
+  }
+
+  @ParameterizedTest
+  @CsvSource(
+    value = {
+      "false, null, DISABLED",
+      "false, 13525, DISABLED",
+      "true, null, MAIN_PORT",
+      "true, 13524, MAIN_PORT",
+      "true, 13525, SEPARATE_PORT",
+    },
+    nullValues = "null"
+  )
+  public void actuatorApiPlacement(
+    boolean actuatorApiEnabled,
+    Integer actuatorPort,
+    ActuatorApiPlacement expected
+  ) {
+    subject.actuatorPort = actuatorPort;
+    assertEquals(expected, subject.actuatorApiPlacement(actuatorApiEnabled));
+  }
+
+  @Test
+  public void actuatorPortWithoutActuatorAPIAbortsWhenAbortOnUnknownConfigIsSet() {
+    subject.load = true;
+    subject.abortOnUnknownConfig = true;
+    subject.actuatorPort = 8081;
+
+    assertThrows(OtpAppException.class, () -> subject.validateActuatorPort(false));
+  }
+
+  @Test
+  public void actuatorPortWithoutActuatorAPIOnlyWarnsAndIsNotBound() throws IOException {
+    subject.load = true;
+    try (var occupied = new ServerSocket(0)) {
+      subject.actuatorPort = occupied.getLocalPort();
+
+      assertDoesNotThrow(() -> subject.validateActuatorPort(false));
+    }
+  }
+
+  @Test
+  public void separateActuatorPortMustBeAvailableWhenActuatorAPIIsEnabled() throws IOException {
+    subject.load = true;
+    try (var occupied = new ServerSocket(0)) {
+      subject.actuatorPort = occupied.getLocalPort();
+
+      var ex = assertThrows(OtpAppException.class, () -> subject.validateActuatorPort(true));
+      assertTrue(ex.getMessage().contains("port " + occupied.getLocalPort()), ex.getMessage());
+    }
+  }
+
+  @Test
+  public void actuatorPortIsNotValidatedWhenNotServing() throws IOException {
+    subject.build = true;
+    subject.save = true;
+    subject.abortOnUnknownConfig = true;
+    try (var occupied = new ServerSocket(0)) {
+      subject.actuatorPort = occupied.getLocalPort();
+
+      assertDoesNotThrow(() -> subject.validateActuatorPort(false));
+      assertDoesNotThrow(() -> subject.validateActuatorPort(true));
+    }
   }
 
   private TestValidation validateWith() {
