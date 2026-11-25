@@ -4,12 +4,9 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
@@ -31,6 +28,8 @@ import org.opentripplanner.ext.carpooling.routing.InsertionEvaluator;
 import org.opentripplanner.ext.carpooling.routing.PassengerRide;
 import org.opentripplanner.ext.carpooling.routing.PassengerTrees;
 import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTrip;
+import org.opentripplanner.ext.carpooling.routing.UsableStops;
+import org.opentripplanner.ext.carpooling.routing.UsableStops.UsableStop;
 import org.opentripplanner.ext.carpooling.util.CarReachableVertexSnapper;
 import org.opentripplanner.ext.carpooling.util.CarReachableVertexSnapper.SnapResult;
 import org.opentripplanner.ext.carpooling.util.StreetPathUtils;
@@ -50,7 +49,6 @@ import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.linking.TemporaryVerticesContainer;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.streetadapter.StreetSearchRequestMapper;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -459,10 +457,15 @@ public class DefaultCarpoolingService implements CarpoolingService {
       // Only a trip with a stop the passenger can walk to (access) or from (egress) can serve the
       // request, and only those trips size the passenger's trees.
       boolean access = accessOrEgress.isAccess();
-      var stopSnaps = new HashMap<FeedScopedId, SnapResult>();
+      var usableStops = new UsableStops(
+        stopIndex,
+        accessOrEgress,
+        streetSearchRequest,
+        maxWalkToCarpool
+      );
       var servingTrips = new ArrayList<TripStops>();
       for (var trip : candidateTrips) {
-        var stops = usableStops(trip, access, stopSnaps, streetSearchRequest, maxWalkToCarpool);
+        var stops = usableStops.of(trip);
         if (!stops.isEmpty()) {
           servingTrips.add(new TripStops(trip, stops));
         }
@@ -536,36 +539,6 @@ public class DefaultCarpoolingService implements CarpoolingService {
   /** A trip with the corridor stops the passenger can use, each with its snap. */
   private record TripStops(RoutableCarpoolTrip trip, List<UsableStop> stops) {}
 
-  private record UsableStop(CarpoolCorridor.CorridorStop stop, SnapResult snap) {}
-
-  /**
-   * The trip's corridor stops the passenger can walk to (access) or from (egress) within the walk
-   * budget, each with its snap.
-   */
-  private List<UsableStop> usableStops(
-    RoutableCarpoolTrip trip,
-    boolean access,
-    Map<FeedScopedId, SnapResult> stopSnaps,
-    StreetSearchRequest streetSearchRequest,
-    Duration maxWalk
-  ) {
-    var usable = new ArrayList<UsableStop>();
-    for (var stop : trip.corridor().stops()) {
-      if (access ? !stop.servesDropoff() : !stop.servesPickup()) {
-        continue;
-      }
-      if (!stopSnaps.containsKey(stop.stopId())) {
-        stopSnaps.put(stop.stopId(), stopSnap(stop.stopId(), access, streetSearchRequest));
-      }
-      var snap = stopSnaps.get(stop.stopId());
-      if (snap == null || StreetPathUtils.durationOrZero(snap.walkPath()).compareTo(maxWalk) > 0) {
-        continue;
-      }
-      usable.add(new UsableStop(stop, snap));
-    }
-    return usable;
-  }
-
   /** One ride per stop, even when several legs serve it. */
   private List<PassengerRide> rides(
     List<UsableStop> stops,
@@ -589,25 +562,6 @@ public class DefaultCarpoolingService implements CarpoolingService {
       );
     }
     return rides;
-  }
-
-  /**
-   * The stop's snap with its walk replayed under the request's street preferences, or {@code null}
-   * when the stop has no snap or the passenger cannot take its walk, for instance by wheelchair.
-   * The snap itself is chosen with the default preferences, so only that walk is checked.
-   */
-  @Nullable
-  private SnapResult stopSnap(
-    FeedScopedId stopId,
-    boolean access,
-    StreetSearchRequest streetSearchRequest
-  ) {
-    var snap = access ? stopIndex.dropoffSnap(stopId) : stopIndex.pickupSnap(stopId);
-    if (snap == null || snap.walkPath() == null) {
-      return snap;
-    }
-    var walk = StreetPathUtils.replay(snap.walkPath(), streetSearchRequest);
-    return walk == null ? null : new SnapResult(snap.vertex(), walk);
   }
 
   private void validateRequest(RouteRequest request) throws RoutingValidationException {
