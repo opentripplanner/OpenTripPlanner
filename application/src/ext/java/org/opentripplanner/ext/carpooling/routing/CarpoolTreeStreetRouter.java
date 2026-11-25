@@ -41,10 +41,8 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
 
   private static final Logger LOG = LoggerFactory.getLogger(CarpoolTreeStreetRouter.class);
 
-  private final Map<Vertex, VertexRegistration> forwardRegistrations = new HashMap<>();
-  private final Map<Vertex, VertexRegistration> reverseRegistrations = new HashMap<>();
-  private final Map<Vertex, ShortestPathTree<State, Edge, Vertex>> forwardTrees = new HashMap<>();
-  private final Map<Vertex, ShortestPathTree<State, Edge, Vertex>> reverseTrees = new HashMap<>();
+  private final Trees forwardTrees = new Trees(false);
+  private final Trees reverseTrees = new Trees(true);
   private final Map<Pair<Vertex>, RoutedSegment> segmentCache = new HashMap<>();
   private boolean routingStarted = false;
 
@@ -57,82 +55,6 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
      * We want to calculate paths to the vertex
      */
     TO,
-  }
-
-  private record VertexRegistration(
-    Vertex vertex,
-    Duration searchLimit,
-    @Nullable Map<Vertex, Duration> targets
-  ) {}
-
-  private ShortestPathTree<State, Edge, Vertex> createTree(
-    Vertex vertex,
-    boolean reverse,
-    VertexRegistration registration
-  ) {
-    var targets = registration.targets();
-    var targetReach = targets == null ? null : new TargetReach(targets);
-    return carTree(vertex, reverse, registration.searchLimit(), targetReach);
-  }
-
-  /**
-   * A car shortest-path tree from {@code root}, or to it when {@code reverse}. Nothing is expanded
-   * past {@code searchLimit}, nor where {@code alsoSkip}, if given, skips.
-   */
-  static ShortestPathTree<State, Edge, Vertex> carTree(
-    Vertex root,
-    boolean reverse,
-    Duration searchLimit,
-    @Nullable SkipEdgeStrategy<State, Edge> alsoSkip
-  ) {
-    var streetSearchRequest = reverse
-      ? StreetSearchRequest.of().withMode(StreetMode.CAR).withArriveBy(true).build()
-      : StreetSearchRequest.of().withMode(StreetMode.CAR).build();
-    SkipEdgeStrategy<State, Edge> skipEdgeStrategy = new DurationSkipEdgeStrategy<>(searchLimit);
-    if (alsoSkip != null) {
-      skipEdgeStrategy = new ComposingSkipEdgeStrategy<>(skipEdgeStrategy, alsoSkip);
-    }
-    var builder = StreetSearchBuilder.of()
-      .withPreStartHook(OTPRequestTimeoutException::checkForTimeout)
-      .withSkipEdgeStrategy(skipEdgeStrategy)
-      .withDominanceFunction(new DominanceFunctions.EarliestArrival())
-      .withRequest(streetSearchRequest);
-
-    if (reverse) {
-      return builder.withTo(root).getShortestPathTree();
-    }
-
-    return builder.withFrom(root).getShortestPathTree();
-  }
-
-  private ShortestPathTree<State, Edge, Vertex> getOrCreateForwardTree(Vertex vertex) {
-    var tree = forwardTrees.get(vertex);
-    if (tree != null) {
-      return tree;
-    }
-    var reg = forwardRegistrations.get(vertex);
-    if (reg == null) {
-      return null;
-    }
-    tree = createTree(vertex, false, reg);
-    forwardTrees.put(vertex, tree);
-    forwardRegistrations.remove(vertex);
-    return tree;
-  }
-
-  private ShortestPathTree<State, Edge, Vertex> getOrCreateReverseTree(Vertex vertex) {
-    var tree = reverseTrees.get(vertex);
-    if (tree != null) {
-      return tree;
-    }
-    var reg = reverseRegistrations.get(vertex);
-    if (reg == null) {
-      return null;
-    }
-    tree = createTree(vertex, true, reg);
-    reverseTrees.put(vertex, tree);
-    reverseRegistrations.remove(vertex);
-    return tree;
   }
 
   /**
@@ -170,28 +92,141 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
           "Register all vertices before calling route()."
       );
     }
-    if (direction == Direction.FROM) {
-      registerLargest(forwardRegistrations, vertex, searchLimit, targets);
-    } else {
-      registerLargest(reverseRegistrations, vertex, searchLimit, targets);
-    }
+    var trees = direction == Direction.FROM ? forwardTrees : reverseTrees;
+    trees.register(vertex, searchLimit, targets);
   }
 
   /**
-   * Registers {@code vertex} keeping the larger of any already-registered limit and
-   * {@code searchLimit}: a vertex registered twice gets one tree, which has to serve both
-   * registrations. A larger tree only widens the search, so taking the maximum is always safe.
+   * Find the shortest path between two vertices using lazily computed trees. Results are cached so
+   * repeated queries for the same vertex pair are free. The tree for a vertex is computed on the
+   * first {@link #route} call that needs it.
+   * <p>
+   * The method first looks for a forward tree rooted at {@code from}; if none exists it falls
+   * back to a reverse tree rooted at {@code to}. At least one of the two endpoints must therefore
+   * have been registered with {@link #addVertex} in the matching direction; a call whose endpoints
+   * were both left unregistered cannot be served and returns {@code null}. A registered endpoint
+   * whose tree does not reach the other endpoint within its search limit returns {@code null} as
+   * well.
    */
-  private static void registerLargest(
-    Map<Vertex, VertexRegistration> registrations,
-    Vertex vertex,
+  @Override
+  public RoutedSegment route(Vertex from, Vertex to) {
+    routingStarted = true;
+
+    var key = new Pair<>(from, to);
+    if (segmentCache.containsKey(key)) {
+      return segmentCache.get(key);
+    }
+
+    var isReverse = false;
+    var tree = forwardTrees.get(from);
+    if (tree == null) {
+      tree = reverseTrees.get(to);
+      isReverse = true;
+    }
+    if (tree == null) {
+      LOG.error("tree is null for vertices from {} to {}", from, to);
+      return null;
+    }
+
+    var arrival = tree.getState(isReverse ? from : to);
+    var segment = arrival == null ? null : new TreeSegment(from, to, arrival);
+    segmentCache.put(key, segment);
+    return segment;
+  }
+
+  /**
+   * Returns the total number of forward vertices (pending and computed). Package-private for
+   * testing.
+   */
+  int forwardTreeCount() {
+    return forwardTrees.count();
+  }
+
+  /**
+   * Returns the total number of reverse vertices (pending and computed). Package-private for
+   * testing.
+   */
+  int reverseTreeCount() {
+    return reverseTrees.count();
+  }
+
+  /** The trees of one direction: registered first, each built when it is first asked for. */
+  private static final class Trees {
+
+    private final boolean reverse;
+    private final Map<Vertex, Registration> registrations = new HashMap<>();
+    private final Map<Vertex, ShortestPathTree<State, Edge, Vertex>> trees = new HashMap<>();
+
+    Trees(boolean reverse) {
+      this.reverse = reverse;
+    }
+
+    /**
+     * Registers {@code root} keeping the larger of any already-registered limit and
+     * {@code searchLimit}: a vertex registered twice gets one tree, which has to serve both
+     * registrations. A larger tree only widens the search, so taking the maximum is always safe.
+     */
+    void register(Vertex root, Duration searchLimit, @Nullable Map<Vertex, Duration> targets) {
+      // A tree shared by two registrations must serve both, so it stops at neither one's targets.
+      registrations.merge(root, new Registration(searchLimit, targets), (a, b) ->
+        new Registration(max(a.searchLimit(), b.searchLimit()), null)
+      );
+    }
+
+    /** The tree of {@code root}, or {@code null} if the vertex was not registered. */
+    @Nullable
+    ShortestPathTree<State, Edge, Vertex> get(Vertex root) {
+      var tree = trees.get(root);
+      if (tree != null) {
+        return tree;
+      }
+      var registration = registrations.get(root);
+      if (registration == null) {
+        return null;
+      }
+      var targets = registration.targets();
+      var targetReach = targets == null ? null : new TargetReach(targets);
+      tree = carTree(root, reverse, registration.searchLimit(), targetReach);
+      trees.put(root, tree);
+      registrations.remove(root);
+      return tree;
+    }
+
+    int count() {
+      return registrations.size() + trees.size();
+    }
+  }
+
+  private record Registration(Duration searchLimit, @Nullable Map<Vertex, Duration> targets) {}
+
+  /**
+   * A car shortest-path tree from {@code root}, or to it when {@code reverse}. Nothing is expanded
+   * past {@code searchLimit}, nor where {@code alsoSkip}, if given, skips.
+   */
+  static ShortestPathTree<State, Edge, Vertex> carTree(
+    Vertex root,
+    boolean reverse,
     Duration searchLimit,
-    @Nullable Map<Vertex, Duration> targets
+    @Nullable SkipEdgeStrategy<State, Edge> alsoSkip
   ) {
-    // A tree shared by two registrations must serve both, so it stops at neither one's targets.
-    registrations.merge(vertex, new VertexRegistration(vertex, searchLimit, targets), (a, b) ->
-      new VertexRegistration(vertex, max(a.searchLimit(), b.searchLimit()), null)
-    );
+    var streetSearchRequest = reverse
+      ? StreetSearchRequest.of().withMode(StreetMode.CAR).withArriveBy(true).build()
+      : StreetSearchRequest.of().withMode(StreetMode.CAR).build();
+    SkipEdgeStrategy<State, Edge> skipEdgeStrategy = new DurationSkipEdgeStrategy<>(searchLimit);
+    if (alsoSkip != null) {
+      skipEdgeStrategy = new ComposingSkipEdgeStrategy<>(skipEdgeStrategy, alsoSkip);
+    }
+    var builder = StreetSearchBuilder.of()
+      .withPreStartHook(OTPRequestTimeoutException::checkForTimeout)
+      .withSkipEdgeStrategy(skipEdgeStrategy)
+      .withDominanceFunction(new DominanceFunctions.EarliestArrival())
+      .withRequest(streetSearchRequest);
+
+    if (reverse) {
+      return builder.withTo(root).getShortestPathTree();
+    }
+
+    return builder.withFrom(root).getShortestPathTree();
   }
 
   private static Duration max(Duration a, Duration b) {
@@ -227,60 +262,6 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
     private long maxNeeded() {
       return needed.values().stream().mapToLong(Long::longValue).max().orElse(0);
     }
-  }
-
-  /**
-   * Returns the total number of forward vertices (pending and computed). Package-private for
-   * testing.
-   */
-  int forwardTreeCount() {
-    return forwardRegistrations.size() + forwardTrees.size();
-  }
-
-  /**
-   * Returns the total number of reverse vertices (pending and computed). Package-private for
-   * testing.
-   */
-  int reverseTreeCount() {
-    return reverseRegistrations.size() + reverseTrees.size();
-  }
-
-  /**
-   * Find the shortest path between two vertices using lazily computed trees. Results are cached so
-   * repeated queries for the same vertex pair are free. The tree for a vertex is computed on the
-   * first {@link #route} call that needs it.
-   * <p>
-   * The method first looks for a forward tree rooted at {@code from}; if none exists it falls
-   * back to a reverse tree rooted at {@code to}. At least one of the two endpoints must therefore
-   * have been registered with {@link #addVertex} in the matching direction; a call whose endpoints
-   * were both left unregistered cannot be served and returns {@code null}. A registered endpoint
-   * whose tree does not reach the other endpoint within its search limit returns {@code null} as
-   * well.
-   */
-  @Override
-  public RoutedSegment route(Vertex from, Vertex to) {
-    routingStarted = true;
-
-    var key = new Pair<>(from, to);
-    if (segmentCache.containsKey(key)) {
-      return segmentCache.get(key);
-    }
-
-    var isReverse = false;
-    var tree = getOrCreateForwardTree(from);
-    if (tree == null) {
-      tree = getOrCreateReverseTree(to);
-      isReverse = true;
-    }
-    if (tree == null) {
-      LOG.error("tree is null for vertices from {} to {}", from, to);
-      return null;
-    }
-
-    var arrival = tree.getState(isReverse ? from : to);
-    var segment = arrival == null ? null : new TreeSegment(from, to, arrival);
-    segmentCache.put(key, segment);
-    return segment;
   }
 
   /**
