@@ -537,11 +537,8 @@
         <dependencies>
             <dependency>
                 <!--
-                  Netty is pulled in transitively by azure-core-http-netty (built against Netty 4.2)
-                  and hivemq-mqtt-client (built against Netty 4.1). Without a BOM, Maven resolves the
-                  core modules (netty-transport, netty-handler, ...) to 4.1 and the rest to 4.2. The
-                  mix fails at runtime with NoClassDefFoundError/NoSuchFieldError in the Azure
-                  updaters. Keep this BOM first, so it takes precedence over other imported BOMs.
+                  This makes sure all netty libraries are using compatible versions. Keep it first,
+                  so it takes precedence over other imported BOMs.
                 -->
                 <groupId>io.netty</groupId>
                 <artifactId>netty-bom</artifactId>
