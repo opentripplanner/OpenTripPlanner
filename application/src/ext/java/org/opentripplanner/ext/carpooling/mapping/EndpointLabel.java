@@ -7,18 +7,15 @@ import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
  * Names one end of a carpool itinerary: with the transit stop at the transit end of an access or
- * egress ride ({@link #forStop}), or with the user's input location at the passenger's end
- * ({@link #forLocation}), never both. With neither ({@link #EMPTY}) the itinerary mapper names the
- * end after its street vertex.
+ * egress ride ({@link #forStop}), with the user's input location at the passenger's end
+ * ({@link #forLocation}).
  */
 public record EndpointLabel(@Nullable StopLocation stop, @Nullable GenericLocation location) {
-  public static final EndpointLabel EMPTY = new EndpointLabel(null, null);
-
   public EndpointLabel {
-    if (stop != null && location != null) {
+    if ((stop == null) == (location == null)) {
       throw new IllegalArgumentException(
-        "EndpointLabel carries either a stop or a user location, never both; " +
-          "use the forStop/forLocation factories or EMPTY."
+        "EndpointLabel carries either a stop or a user location; " +
+          "use the forStop/forLocation factories."
       );
     }
   }

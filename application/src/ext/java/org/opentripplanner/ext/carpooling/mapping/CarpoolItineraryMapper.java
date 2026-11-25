@@ -42,12 +42,12 @@ import org.opentripplanner.utils.lang.StringUtils;
  * The itinerary is not shifted to the passenger's requested time: the driver is on a committed
  * schedule and cannot wait.
  * <p>
- * The itinerary's first {@code from} and last {@code to} are named, in order of precedence:
+ * The places of the itinerary are named:
  * <ol>
  *   <li>after the transit stop, at the transit end of an access or egress ride;</li>
  *   <li>with the label of the user's input location, or "origin" / "destination" if it has
- *       none;</li>
- *   <li>after the street vertex, as the places between a walk leg and the carpool leg are.</li>
+ *       none, at the passenger's end;</li>
+ *   <li>after the street vertex, where a walk leg meets the carpool leg.</li>
  * </ol>
  */
 public class CarpoolItineraryMapper {
@@ -101,13 +101,8 @@ public class CarpoolItineraryMapper {
     Place pickupPlace = makePlace(pickupVertex);
     Place dropoffPlace = makePlace(dropoffVertex);
 
-    Vertex startBoundaryVertex =
-      walkToPickup != null ? walkToPickup.states().getFirst().getVertex() : pickupVertex;
-    Vertex endBoundaryVertex =
-      walkFromDropoff != null ? walkFromDropoff.lastState().getVertex() : dropoffVertex;
-
-    Place itineraryStart = boundaryPlace(startLabel, ORIGIN_DEFAULT_NAME, startBoundaryVertex);
-    Place itineraryEnd = boundaryPlace(endLabel, DESTINATION_DEFAULT_NAME, endBoundaryVertex);
+    Place itineraryStart = boundaryPlace(startLabel, ORIGIN_DEFAULT_NAME);
+    Place itineraryEnd = boundaryPlace(endLabel, DESTINATION_DEFAULT_NAME);
 
     Place carpoolFromPlace = walkToPickup != null ? pickupPlace : itineraryStart;
     Place carpoolToPlace = walkFromDropoff != null ? dropoffPlace : itineraryEnd;
@@ -231,33 +226,25 @@ public class CarpoolItineraryMapper {
   }
 
   /**
-   * The place of an outer endpoint of the itinerary: the label's transit stop, else its input
-   * location, else the vertex. The vertex alone cannot name these: a stop's walk ends at a plain
-   * street vertex, and without a walk the path starts at the snapped vertex, not at the user's
-   * location.
+   * The place of an outer endpoint of the itinerary: the label's transit stop or input location.
+   * The path's vertex cannot name it: a stop's walk ends at a plain street vertex, and without a
+   * walk the path starts at the snapped vertex, not at the user's location.
    */
-  private static Place boundaryPlace(
-    EndpointLabel label,
-    I18NString locationDefaultName,
-    Vertex fallbackVertex
-  ) {
+  private static Place boundaryPlace(EndpointLabel label, I18NString locationDefaultName) {
     if (label.stop() != null) {
       return Place.forStop(label.stop());
     }
-    if (label.location() != null) {
-      // Place.forGenericLocation only swaps in defaultName when label() is null, but
-      // GenericLocationMapper coerces an absent GraphQL "name" to "" — so without StringUtils'
-      // null/blank check the Place name would render as a blank string instead of the localized
-      // "origin"/"destination" fallback.
-      var loc = label.location();
-      I18NString name = StringUtils.hasValue(loc.label())
-        ? new NonLocalizedString(loc.label())
-        : locationDefaultName;
-      return loc.wgsCoordinate() != null
-        ? Place.normal(loc.wgsCoordinate(), name)
-        : Place.noCoords(name);
-    }
-    return makePlace(fallbackVertex);
+    // Place.forGenericLocation only swaps in defaultName when label() is null, but
+    // GenericLocationMapper coerces an absent GraphQL "name" to "" — so without StringUtils'
+    // null/blank check the Place name would render as a blank string instead of the localized
+    // "origin"/"destination" fallback.
+    var loc = label.location();
+    I18NString name = StringUtils.hasValue(loc.label())
+      ? new NonLocalizedString(loc.label())
+      : locationDefaultName;
+    return loc.wgsCoordinate() != null
+      ? Place.normal(loc.wgsCoordinate(), name)
+      : Place.noCoords(name);
   }
 
   /**

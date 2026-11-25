@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.ext.carpooling.routing.InsertionCandidate;
 import org.opentripplanner.framework.model.TimeAndCost;
+import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.raptor.spi.RaptorCostConverter;
 import org.opentripplanner.street.model.path.StreetPath;
@@ -29,6 +30,9 @@ class CarpoolAccessEgressTest {
   private static final int PICKUP_POSITION = 1;
   private static final int DROPOFF_POSITION = 2;
   private static final Duration PICKUP_SEGMENT_DURATION = Duration.ofMinutes(1);
+  private static final EndpointLabel LABEL = EndpointLabel.forLocation(
+    GenericLocation.fromCoordinate(59.91, 10.75)
+  );
 
   /**
    * Walk time must be billed at the walk path's own A* weight (which already encodes walk
@@ -226,8 +230,8 @@ class CarpoolAccessEgressTest {
       TimeAndCost.ZERO,
       carpoolReluctance,
       boardCost,
-      EndpointLabel.EMPTY,
-      EndpointLabel.EMPTY
+      LABEL,
+      LABEL
     );
   }
 }
