@@ -16,7 +16,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.TestOtpModel;
-import org.opentripplanner.ext.carpooling.routing.CarpoolTreeStreetRouter.TargetReach;
+import org.opentripplanner.ext.carpooling.routing.CarTreeSearch.TargetReach;
 import org.opentripplanner.ext.carpooling.util.StreetVertexUtils;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
@@ -90,12 +90,12 @@ class CarpoolTreeStreetRouterTest extends GraphRoutingTest {
 
   @Test
   void aDetourBoundKeepsTheLegAndDropsTheRest() {
-    var unbounded = CarpoolTreeStreetRouter.carTree(vertexA, false, SEARCH_LIMIT, null);
+    var unbounded = CarTreeSearch.carTree(vertexA, false, SEARCH_LIMIT, null);
     long legSeconds = unbounded.getState(vertexC).getElapsedTimeSeconds();
     // The bound admits the leg A -> C with 5 s to spare; D lies beyond C and can never lead back to
     // it within that, while everything on the way to C stays.
     var bound = new DetourBound(vertexA, vertexC, Duration.ofSeconds(legSeconds + 5), 40.0);
-    var bounded = CarpoolTreeStreetRouter.carTree(
+    var bounded = CarTreeSearch.carTree(
       vertexA,
       false,
       SEARCH_LIMIT,
@@ -109,7 +109,7 @@ class CarpoolTreeStreetRouterTest extends GraphRoutingTest {
 
   @Test
   void aTreeWithTargetsStopsOnceTheyAreReached() {
-    var tree = CarpoolTreeStreetRouter.carTree(
+    var tree = CarTreeSearch.carTree(
       vertexA,
       false,
       SEARCH_LIMIT,
@@ -122,7 +122,7 @@ class CarpoolTreeStreetRouterTest extends GraphRoutingTest {
 
   @Test
   void aTargetThatIsNeverReachedKeepsItsWholeReach() {
-    var tree = CarpoolTreeStreetRouter.carTree(
+    var tree = CarTreeSearch.carTree(
       vertexA,
       false,
       SEARCH_LIMIT,

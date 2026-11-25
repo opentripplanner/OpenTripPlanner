@@ -79,7 +79,7 @@ class CorridorRouterTest extends GraphRoutingTest {
       CarpoolingParameters.DEFAULT.maxTripDuration()
     );
     router = new CorridorRouter(passengerRouter, List.of(p), pathRouter);
-    legSeconds = (int) CarpoolTreeStreetRouter.carTree(a, false, Duration.ofHours(1), null)
+    legSeconds = (int) CarTreeSearch.carTree(a, false, Duration.ofHours(1), null)
       .getState(d)
       .getElapsedTimeSeconds();
   }

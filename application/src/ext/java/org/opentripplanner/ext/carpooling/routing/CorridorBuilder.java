@@ -123,7 +123,7 @@ public class CorridorBuilder {
     Duration searchLimit,
     DetourBound bound
   ) {
-    return CarpoolTreeStreetRouter.carTree(
+    return CarTreeSearch.carTree(
       root,
       reverse,
       searchLimit,
