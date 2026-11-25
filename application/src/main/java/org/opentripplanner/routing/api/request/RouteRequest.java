@@ -566,7 +566,19 @@ public class RouteRequest implements Serializable {
     return routingErrors;
   }
 
+  /**
+   * Validate the search-window given in the request and the one decoded from the page cursor.
+   * The page cursor is supplied by the client, so its search-window must satisfy the same
+   * constraints as a search-window passed in directly.
+   */
   private void validateSearchWindow() {
+    validateSearchWindow(searchWindow);
+    if (pageCursor != null) {
+      validateSearchWindow(pageCursor.searchWindow());
+    }
+  }
+
+  private void validateSearchWindow(@Nullable Duration searchWindow) {
     if (searchWindow != null) {
       if (hasMaxSearchWindow() && searchWindow.toSeconds() > maxSearchWindow.toSeconds()) {
         throw new IllegalArgumentException("The search window cannot exceed " + maxSearchWindow);

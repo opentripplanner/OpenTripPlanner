@@ -3,6 +3,7 @@ package org.opentripplanner.model.plan.paging.cursor;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.plan.SortOrder.STREET_AND_DEPARTURE_TIME;
 import static org.opentripplanner.model.plan.paging.cursor.PageType.PREVIOUS_PAGE;
@@ -119,6 +120,20 @@ class PageCursorSerializerTest {
     assertNull(token.itineraryPageCut());
     assertFalse(token.containsGeneralizedCostMaxLimit());
     assertNull(token.generalizedCostMaxLimit());
+  }
+
+  @Test
+  void decodeTokenWithoutEarliestDepartureTimeFails() {
+    var token = new PageCursor(
+      PREVIOUS_PAGE,
+      STREET_AND_DEPARTURE_TIME,
+      null,
+      LAT,
+      SW,
+      null,
+      null
+    ).encode();
+    assertThrows(IllegalArgumentException.class, () -> PageCursorSerializer.decode(token));
   }
 
   @Test

@@ -299,6 +299,42 @@ class RouteRequestTest {
   }
 
   @Test
+  void testPageCursorSearchWindowEqualToMaxIsAllowed() {
+    // no exception thrown when the page cursor search-window is equal to the max search-window
+    minimal
+      .copyOf()
+      .withMaxSearchWindow(DURATION_24_HOURS)
+      .withPageCursorFromEncoded(pageCursorWithSearchWindow(DURATION_24_HOURS))
+      .buildRequest();
+  }
+
+  @Test
+  void testPageCursorWithZeroSearchWindowIsAllowed() {
+    // no exception thrown when the page cursor search-window is 0s
+    minimal
+      .copyOf()
+      .withPageCursorFromEncoded(pageCursorWithSearchWindow(DURATION_ZERO))
+      .buildRequest();
+  }
+
+  @Test
+  void testPageCursorWithTooLongSearchWindow() {
+    var builder = minimal
+      .copyOf()
+      .withMaxSearchWindow(DURATION_24_HOURS)
+      .withPageCursorFromEncoded(pageCursorWithSearchWindow(DURATION_24_HOURS.plusMinutes(1)));
+    assertThrows(IllegalArgumentException.class, builder::buildRequest);
+  }
+
+  @Test
+  void testPageCursorWithNegativeSearchWindow() {
+    var builder = minimal
+      .copyOf()
+      .withPageCursorFromEncoded(pageCursorWithSearchWindow(Duration.ofSeconds(-1)));
+    assertThrows(IllegalArgumentException.class, builder::buildRequest);
+  }
+
+  @Test
   void allowTransferOptimization() {
     var builder = RouteRequest.of();
     assertTrue(builder.buildDefault().allowTransferOptimization());
@@ -338,5 +374,17 @@ class RouteRequestTest {
       assertEquals(1, errors.size(), () -> errors.toString());
       assertTrue(errors.stream().anyMatch(e -> e.code == expCode && e.inputField == expField));
     }
+  }
+
+  private static String pageCursorWithSearchWindow(Duration searchWindow) {
+    return new PageCursor(
+      PageType.NEXT_PAGE,
+      SortOrder.STREET_AND_ARRIVAL_TIME,
+      DATE_TIME,
+      null,
+      searchWindow,
+      null,
+      null
+    ).encode();
   }
 }

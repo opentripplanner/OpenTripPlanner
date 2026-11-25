@@ -86,7 +86,7 @@ final class PageCursorSerializer {
       // This is a forward compatibility issue. To avoid this, add the value enum, role out.
       // Start using the enum, roll out again.
       PageType type = token.getEnum(TYPE_FIELD, PageType.class).orElseThrow();
-      var edt = token.getTimeInstant(EDT_FIELD).orElse(null);
+      var edt = token.getTimeInstant(EDT_FIELD).orElseThrow();
       var lat = token.getTimeInstant(LAT_FIELD).orElse(null);
       var searchWindow = token.getDuration(SEARCH_WINDOW_FIELD).orElseThrow();
       var originalSortOrder = token.getEnum(SORT_ORDER_FIELD, SortOrder.class).orElseThrow();
