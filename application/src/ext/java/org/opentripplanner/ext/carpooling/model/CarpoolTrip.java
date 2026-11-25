@@ -99,13 +99,6 @@ public class CarpoolTrip
   }
 
   /**
-   * Returns the origin stop (first stop in the trip).
-   */
-  public CarpoolStop getOrigin() {
-    return stops.getFirst();
-  }
-
-  /**
    * Returns the destination stop (last stop in the trip).
    */
   public CarpoolStop getDestination() {

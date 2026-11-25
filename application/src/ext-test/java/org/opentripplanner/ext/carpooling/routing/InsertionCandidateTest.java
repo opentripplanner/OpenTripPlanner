@@ -104,29 +104,6 @@ class InsertionCandidateTest {
   }
 
   @Test
-  void getSegmentsAfterDropoff_returnsCorrectRange() {
-    var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
-    var segments = createSegments(5);
-
-    var candidate = new InsertionCandidate(trip, 1, 3, segments, STOP_DURATION, null, null, null);
-
-    var segmentsAfterDropoff = candidate.getSegmentsAfterDropoff();
-    assertEquals(2, segmentsAfterDropoff.size());
-    assertEquals(segments.subList(3, 5), segmentsAfterDropoff);
-  }
-
-  @Test
-  void getSegmentsAfterDropoff_atEnd_returnsEmpty() {
-    var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
-    var segments = createSegments(3);
-
-    var candidate = new InsertionCandidate(trip, 1, 3, segments, STOP_DURATION, null, null, null);
-
-    var segmentsAfterDropoff = candidate.getSegmentsAfterDropoff();
-    assertTrue(segmentsAfterDropoff.isEmpty());
-  }
-
-  @Test
   void toString_includesKeyInformation() {
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
     var segments = createSegments(3);

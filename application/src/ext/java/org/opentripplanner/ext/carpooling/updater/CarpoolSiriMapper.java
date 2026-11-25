@@ -403,10 +403,6 @@ public class CarpoolSiriMapper {
    * occur between the first (boarding) and last (alighting) calls.
    */
   private void validateEstimatedCallOrder(List<EstimatedCall> calls) {
-    if (calls.size() < 2) {
-      return;
-    }
-
     ZonedDateTime firstTime = calls.getFirst().getAimedDepartureTime();
     ZonedDateTime lastTime = calls.getLast().getAimedArrivalTime();
 

@@ -93,9 +93,6 @@ public record InsertionCandidate(
    * @return all segments before the pickup position.
    */
   public List<RoutedSegment> getSegmentsBeforePickup() {
-    if (pickupPosition == 0) {
-      return List.of();
-    }
     return routeSegments.subList(0, pickupPosition);
   }
 
@@ -117,25 +114,10 @@ public record InsertionCandidate(
   }
 
   /**
-   * Gets the dropoff route segment(s) - from passenger dropoff to alighting.
-   *
-   * @return all segments after the dropoff position.
-   */
-  public List<RoutedSegment> getSegmentsAfterDropoff() {
-    if (dropoffPosition >= routeSegments.size()) {
-      return List.of();
-    }
-    return routeSegments.subList(dropoffPosition, routeSegments.size());
-  }
-
-  /**
    * Calculates the duration from trip start until the car arrives at the passenger's pickup.
    * Includes travel time through pickup segments and intermediate stop delays between them, but
    * <em>excludes</em> the boarding dwell at the pickup itself — that is accounted for in
    * {@link #getPassengerRideDuration()}.
-   *
-   * @return {@link Duration#ZERO} when the passenger boards at the trip origin (no pickup
-   *         segments).
    */
   public Duration getDurationUntilPickupArrival() {
     return totalSegmentDuration(getSegmentsBeforePickup(), stopDuration);
