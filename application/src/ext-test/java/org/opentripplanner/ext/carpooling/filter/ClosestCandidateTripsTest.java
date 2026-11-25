@@ -9,7 +9,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.carpooling.CarpoolTripTestData;
 import org.opentripplanner.ext.carpooling.RoutableCarpoolTripTestData;
-import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTrip;
+import org.opentripplanner.ext.carpooling.corridor.RoutableCarpoolTrip;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 
 class ClosestCandidateTripsTest {

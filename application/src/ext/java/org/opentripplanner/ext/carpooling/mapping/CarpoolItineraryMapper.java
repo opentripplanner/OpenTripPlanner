@@ -1,0 +1,363 @@
+package org.opentripplanner.ext.carpooling.mapping;
+
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Objects;
+import org.jspecify.annotations.Nullable;
+import org.opentripplanner.core.model.basic.Cost;
+import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.LocalizedString;
+import org.opentripplanner.core.model.i18n.NonLocalizedString;
+import org.opentripplanner.ext.carpooling.model.BookingUrlTemplate;
+import org.opentripplanner.ext.carpooling.model.CarpoolLeg;
+import org.opentripplanner.ext.carpooling.routing.InsertionCandidate;
+import org.opentripplanner.model.GenericLocation;
+import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.Place;
+import org.opentripplanner.model.plan.leg.StreetLeg;
+import org.opentripplanner.street.geometry.GeometryUtils;
+import org.opentripplanner.street.geometry.WgsCoordinate;
+import org.opentripplanner.street.model.path.StreetPath;
+import org.opentripplanner.street.model.vertex.StreetVertex;
+import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
+import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.transit.model.organization.ContactInfo;
+import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
+import org.opentripplanner.transit.model.timetable.booking.BookingMethod;
+import org.opentripplanner.transit.model.timetable.booking.BookingTime;
+import org.opentripplanner.utils.lang.StringUtils;
+
+/**
+ * Maps carpooling insertion candidates to OTP itineraries for API responses.
+ * <p>
+ * This mapper bridges between the carpooling domain model ({@link InsertionCandidate}) and OTP's
+ * standard itinerary model ({@link Itinerary}). It extracts the passenger's journey portion from
+ * the complete driver route and constructs an itinerary with timing, geometry, and cost
+ * information.
+ *
+ * <h2>Itinerary Shape</h2>
+ * <p>
+ * Both direct-mode and access/egress itineraries have between one and three legs, emitted in
+ * chronological order:
+ * <ol>
+ *   <li>An optional leading {@link StreetLeg} (WALK) from the passenger-side location (origin for
+ *       direct/access, transit stop for egress) to the snapped carpool pickup vertex.</li>
+ *   <li>A {@link CarpoolLeg} covering the shared ride between pickup and dropoff. The boarding dwell
+ *       at the pickup is included in this leg's duration, not added before it.</li>
+ *   <li>An optional trailing {@link StreetLeg} (WALK) from the snapped dropoff vertex to the
+ *       dropoff-side location (destination for direct/egress, transit stop for access).</li>
+ * </ol>
+ *
+ * <h2>Time Calculation</h2>
+ * <p>
+ * The carpool leg's start time is the moment the driver arrives at the pickup (trip start +
+ * pickup travel). If a leading walk leg exists, its start is back-shifted by the walk's duration;
+ * the trailing walk leg's end is forward-shifted similarly. The itinerary is <em>not</em> shifted
+ * to match the passenger's requested departure time — the driver is on a committed schedule and
+ * cannot wait. Whether the passenger should show up early or be matched at all is a filtering
+ * concern upstream of this mapper.
+ *
+ * <h2>Place naming</h2>
+ * <p>
+ * The itinerary's outermost endpoints (first leg's {@code from}, last leg's {@code to}) are
+ * resolved with this precedence:
+ * <ol>
+ *   <li>If the endpoint is a transit stop (access/egress), label with the stop's name via
+ *       {@link Place#forStop(StopLocation)}.</li>
+ *   <li>Else if the endpoint is the user's input location, label with the user-supplied label when
+ *       present, falling back to the localized {@code "origin"} / {@code "destination"} names that the
+ *       standard request flow produces.
+ *   <li>Else (intermediate boundaries between walk and carpool legs) fall back to vertex-based naming
+ *       via {@link #makePlace(Vertex)}: {@link StreetVertex#getIntersectionName()} for street
+ *       intersections (composed from OSM street names; mode-agnostic), the vertex's pre-set name for
+ *       {@link TemporaryStreetLocation}s.</li>
+ * </ol>
+ *
+ * <h2>Package Location</h2>
+ * <p>
+ * This class is in the {@code internal} package because it's an implementation detail of the
+ * carpooling service. API consumers interact with {@link Itinerary} objects, not this mapper.
+ *
+ * @see InsertionCandidate for the source data structure
+ * @see CarpoolLeg for the carpool-specific leg type
+ * @see Itinerary for the OTP itinerary model
+ */
+public class CarpoolItineraryMapper {
+
+  private static final I18NString ORIGIN_DEFAULT_NAME = new LocalizedString("origin");
+  private static final I18NString DESTINATION_DEFAULT_NAME = new LocalizedString("destination");
+
+  /**
+   * Converts an insertion candidate into an OTP itinerary representing the passenger's journey. The
+   * itinerary contains a {@link CarpoolLeg} for the shared ride, optionally preceded by a WALK
+   * {@link StreetLeg} from the passenger's origin to the snapped pickup vertex and optionally
+   * followed by a WALK leg from the snapped dropoff vertex to the destination.
+   *
+   * @param candidate         the insertion candidate containing route segments, trip details, and
+   *                          optional walk paths around the carpool pickup/dropoff
+   * @param carpoolReluctance multiplier applied to ride seconds when computing the carpool leg's
+   *                          {@code generalizedCost}.
+   * @param boardCost         fixed cost added to the carpool leg's {@code generalizedCost}.
+   * @param fromLocation      the request's {@code from} location (passenger origin), used to label
+   *                          the first leg's {@code from} place.
+   * @param toLocation        the request's {@code to} location (passenger destination), used to
+   *                          label the last leg's {@code to} place.
+   * @return an itinerary for the passenger's journey
+   */
+  public Itinerary toItinerary(
+    InsertionCandidate candidate,
+    double carpoolReluctance,
+    int boardCost,
+    GenericLocation fromLocation,
+    GenericLocation toLocation
+  ) {
+    return buildItinerary(
+      candidate,
+      candidate.getPassengerRideWeight(carpoolReluctance, boardCost),
+      EndpointLabel.forLocation(fromLocation),
+      EndpointLabel.forLocation(toLocation)
+    );
+  }
+
+  /**
+   * Converts a Raptor carpool access/egress leg back into an OTP itinerary for the response. Same
+   * shape as {@link #toItinerary(InsertionCandidate, double, int, GenericLocation, GenericLocation)} —
+   * an optional WALK leg, the carpool leg, and an optional WALK leg — but driven from the
+   * {@link CarpoolAccessEgress} accessors so the displayed times and ride cost agree with the
+   * values Raptor used during the search.
+   */
+  public Itinerary toItinerary(CarpoolAccessEgress accessEgress) {
+    return buildItinerary(
+      accessEgress.insertionCandidate(),
+      accessEgress.getPassengerRideWeight(),
+      accessEgress.startLabel(),
+      accessEgress.endLabel()
+    );
+  }
+
+  /**
+   * Assembles a WALK + CARPOOL + WALK itinerary around the shared ride. Walk legs are omitted when
+   * their corresponding path is {@code null}; the walk legs' outer times are derived from
+   * {@code carpoolStart}/{@code carpoolEnd} plus the walk durations.
+   * <p>
+   * Boundary-place precedence at the chain's outermost endpoints follows the
+   * {@link EndpointLabel} contract: a stop wins over a user location, which wins over the
+   * vertex-derived fallback name via {@link #makePlace(Vertex)}.
+   */
+  private static Itinerary buildItinerary(
+    InsertionCandidate candidate,
+    double rideWeight,
+    EndpointLabel startLabel,
+    EndpointLabel endLabel
+  ) {
+    var pathsWithNewPassenger = candidate.getPathsWithNewPassenger();
+    var walkToPickup = candidate.walkToPickup();
+    var walkFromDropoff = candidate.walkFromDropoff();
+    var carpoolStart = candidate.pickupTime();
+    var carpoolEnd = candidate.dropoffTime();
+
+    Vertex pickupVertex = pathsWithNewPassenger.getFirst().states().getFirst().getVertex();
+    Vertex dropoffVertex = pathsWithNewPassenger.getLast().lastState().getVertex();
+    Place pickupPlace = makePlace(pickupVertex);
+    Place dropoffPlace = makePlace(dropoffVertex);
+
+    Vertex startBoundaryVertex =
+      walkToPickup != null ? walkToPickup.states().getFirst().getVertex() : pickupVertex;
+    Vertex endBoundaryVertex =
+      walkFromDropoff != null ? walkFromDropoff.lastState().getVertex() : dropoffVertex;
+
+    Place itineraryStart = boundaryPlace(startLabel, ORIGIN_DEFAULT_NAME, startBoundaryVertex);
+    Place itineraryEnd = boundaryPlace(endLabel, DESTINATION_DEFAULT_NAME, endBoundaryVertex);
+
+    Place carpoolFromPlace = walkToPickup != null ? pickupPlace : itineraryStart;
+    Place carpoolToPlace = walkFromDropoff != null ? dropoffPlace : itineraryEnd;
+
+    var bookingInfo = toBookingInfo(
+      candidate.trip().publicContactInformation(),
+      candidate.trip().startTime(),
+      pickupVertex.toWgsCoordinate(),
+      dropoffVertex.toWgsCoordinate()
+    );
+
+    List<Leg> legs = new ArrayList<>(3);
+    if (walkToPickup != null) {
+      var walkStart = carpoolStart.minus(walkToPickup.duration());
+      legs.add(buildWalkLeg(walkToPickup, walkStart, carpoolStart, itineraryStart, pickupPlace));
+    }
+    legs.add(
+      buildCarpoolLeg(
+        pathsWithNewPassenger,
+        carpoolStart,
+        carpoolEnd,
+        rideWeight,
+        carpoolFromPlace,
+        carpoolToPlace,
+        bookingInfo
+      )
+    );
+    if (walkFromDropoff != null) {
+      var walkEnd = carpoolEnd.plus(walkFromDropoff.duration());
+      legs.add(buildWalkLeg(walkFromDropoff, carpoolEnd, walkEnd, dropoffPlace, itineraryEnd));
+    }
+
+    int totalCost = legs.stream().mapToInt(Leg::generalizedCost).sum();
+    return Itinerary.ofDirect(legs).withGeneralizedCost(Cost.costOfSeconds(totalCost)).build();
+  }
+
+  private static CarpoolLeg buildCarpoolLeg(
+    List<StreetPath> pathsWithNewPassenger,
+    ZonedDateTime startTime,
+    ZonedDateTime endTime,
+    double rideWeight,
+    Place fromPlace,
+    Place toPlace,
+    @Nullable BookingInfo bookingInfo
+  ) {
+    return CarpoolLeg.of()
+      .withStartTime(startTime)
+      .withEndTime(endTime)
+      .withFrom(fromPlace)
+      .withTo(toPlace)
+      .withGeometry(
+        GeometryUtils.concatenateLineStrings(pathsWithNewPassenger, StreetPath::geometry)
+      )
+      .withDistanceMeters(
+        pathsWithNewPassenger.stream().mapToDouble(StreetPath::distanceMeters).sum()
+      )
+      .withGeneralizedCost((int) rideWeight)
+      .withPickupBookingInfo(bookingInfo)
+      .build();
+  }
+
+  private static StreetLeg buildWalkLeg(
+    StreetPath walkPath,
+    ZonedDateTime startTime,
+    ZonedDateTime endTime,
+    Place fromPlace,
+    Place toPlace
+  ) {
+    return StreetLeg.of()
+      .withMode(TraverseMode.WALK)
+      .withStartTime(startTime)
+      .withEndTime(endTime)
+      .withFrom(fromPlace)
+      .withTo(toPlace)
+      .withGeometry(walkPath.geometry())
+      .withDistanceMeters(walkPath.distanceMeters())
+      .withGeneralizedCost((int) walkPath.weight())
+      .build();
+  }
+
+  /**
+   * Builds the carpool leg's {@code pickupBookingInfo} from the trip's public-contact details.
+   * <p>
+   * The contact's {@code bookingUrl} (if present) is a {@link BookingUrlTemplate}: its
+   * {@code {from}} and {@code {to}} placeholders are expanded with the passenger's carpool boarding
+   * and alighting vertices — i.e. where the passenger gets in/out of the driver's car.
+   * <p>
+   * {@code latestBookingTime} is a temporary placeholder: how a real booking deadline should be
+   * sourced for carpool trips is yet to be decided, so it is approximated by the trip's departure
+   * time-of-day at {@code daysPrior=0} — good enough until the source is settled. The
+   * {@code daysPrior=0} value is also load-bearing for the Transmodel API:
+   * {@code BookingArrangement.bookWhen} returns {@code "advanceAndDayOfTravel"} when
+   * {@code latestBookingTime.daysPrior == 0}, but collapses to {@code "timeOfTravelOnly"} if
+   * {@code latestBookingTime} is null — which would misrepresent the carpool product as not
+   * bookable in advance. See
+   * {@code org.opentripplanner.apis.transmodel.mapping.BookingInfoMapper#mapToBookWhen}.
+   *
+   * @param contact       the trip's public-contact details, or {@code null} if the trip publishes
+   *                      none.
+   * @param tripStartTime the driver's trip start time; only the time-of-day is used, as the
+   *                      placeholder source for {@code latestBookingTime}.
+   * @param pickup        the carpool boarding coordinate (where the passenger gets into the car),
+   *                      expanded into the booking URL's {@code {from}} placeholder.
+   * @param dropoff       the carpool alighting coordinate (where the passenger gets out of the
+   *                      car), expanded into the booking URL's {@code {to}} placeholder.
+   * @return a booking info populated with the contact details and derived booking methods
+   *         (CALL_OFFICE if phone is set, ONLINE if a booking URL is set), or {@code null} when no
+   *         actionable booking method can be derived — i.e. {@code contact} is {@code null}, or it
+   *         carries neither a phone number nor a booking URL. Consumers may therefore treat a
+   *         non-null return as "this leg has at least one booking method."
+   */
+  @Nullable
+  static BookingInfo toBookingInfo(
+    @Nullable ContactInfo contact,
+    ZonedDateTime tripStartTime,
+    WgsCoordinate pickup,
+    WgsCoordinate dropoff
+  ) {
+    if (contact == null || (contact.getPhoneNumber() == null && contact.getBookingUrl() == null)) {
+      return null;
+    }
+    var bookingMethods = EnumSet.noneOf(BookingMethod.class);
+    if (contact.getPhoneNumber() != null) {
+      bookingMethods.add(BookingMethod.CALL_OFFICE);
+    }
+    String bookingUrl = contact.getBookingUrl();
+    String expandedUrl =
+      bookingUrl == null ? null : BookingUrlTemplate.expand(bookingUrl, pickup, dropoff);
+    if (expandedUrl != null) {
+      bookingMethods.add(BookingMethod.ONLINE);
+    }
+    ContactInfo effectiveContact = Objects.equals(expandedUrl, bookingUrl)
+      ? contact
+      : contact.copy().withBookingUrl(expandedUrl).build();
+
+    return BookingInfo.of()
+      .withContactInfo(effectiveContact)
+      .withBookingMethods(bookingMethods)
+      .withLatestBookingTime(new BookingTime(tripStartTime.toLocalTime(), 0))
+      .build();
+  }
+
+  /**
+   * Resolves the outermost endpoint of an itinerary using the precedence transit stop &gt; user
+   * input location &gt; vertex-derived name. The first two are needed because the underlying State
+   * chain doesn't always carry a vertex with the right name — the transit-side end of an
+   * access/egress walk is a regular street vertex, and when no walk is needed at all the State
+   * chain skips the user's temporary origin/destination vertex and starts straight at the snapped
+   * pickup/dropoff (which has only an OSM intersection name).
+   */
+  private static Place boundaryPlace(
+    EndpointLabel label,
+    I18NString locationDefaultName,
+    Vertex fallbackVertex
+  ) {
+    if (label.stop() != null) {
+      return Place.forStop(label.stop());
+    }
+    if (label.location() != null) {
+      // Place.forGenericLocation only swaps in defaultName when label() is null, but
+      // GenericLocationMapper coerces an absent GraphQL "name" to "" — so without StringUtils'
+      // null/blank check the Place name would render as a blank string instead of the localized
+      // "origin"/"destination" fallback.
+      var loc = label.location();
+      I18NString name = StringUtils.hasValue(loc.label())
+        ? new NonLocalizedString(loc.label())
+        : locationDefaultName;
+      return loc.wgsCoordinate() != null
+        ? Place.normal(loc.wgsCoordinate(), name)
+        : Place.noCoords(name);
+    }
+    return makePlace(fallbackVertex);
+  }
+
+  /**
+   * Builds a {@link Place} from a vertex using the same naming logic the core street-leg mapper
+   * applies for any mode. {@link StreetVertex} intersections get the localized "corner of X and Y"
+   * name composed from the outgoing OSM street names (mode-agnostic);
+   * {@link TemporaryStreetLocation}s (passenger origin/destination) keep the name they were created
+   * with; everything else falls back to {@link Vertex#getName()}.
+   */
+  private static Place makePlace(Vertex vertex) {
+    if (vertex instanceof StreetVertex sv && !(vertex instanceof TemporaryStreetLocation)) {
+      return Place.normal(vertex, sv.getIntersectionName());
+    }
+    return Place.normal(vertex, vertex.getName());
+  }
+}

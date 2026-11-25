@@ -3,8 +3,9 @@ package org.opentripplanner.ext.carpooling.filter;
 import java.time.Duration;
 import java.util.Objects;
 import org.jspecify.annotations.Nullable;
-import org.opentripplanner.ext.carpooling.util.CarReachableVertexSnapper.SnapResult;
-import org.opentripplanner.ext.carpooling.util.StreetPathUtils;
+import org.opentripplanner.ext.carpooling.routing.CarpoolingRequest;
+import org.opentripplanner.ext.carpooling.street.CarReachableVertexSnapper.SnapResult;
+import org.opentripplanner.ext.carpooling.street.StreetPathUtils;
 
 /**
  * The passenger as the pre-filters see it: the request, and the car-reachable vertices the

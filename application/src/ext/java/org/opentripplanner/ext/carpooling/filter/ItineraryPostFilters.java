@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.carpooling.filter;
 
 import java.util.List;
+import org.opentripplanner.ext.carpooling.routing.CarpoolingRequest;
 import org.opentripplanner.model.plan.Itinerary;
 
 /**

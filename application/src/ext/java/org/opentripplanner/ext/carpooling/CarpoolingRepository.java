@@ -5,8 +5,8 @@ import java.time.Instant;
 import java.util.Collection;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.ext.carpooling.corridor.RoutableCarpoolTrip;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
-import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTrip;
 
 /**
  * Repository for managing carpooling trip ({@link CarpoolTrip}) data.

@@ -7,9 +7,11 @@ import java.util.List;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.ext.carpooling.routing.CarpoolCorridor.CorridorStop;
-import org.opentripplanner.ext.carpooling.util.CarReachableVertexSnapper.SnapResult;
-import org.opentripplanner.ext.carpooling.util.StreetPathUtils;
+import org.opentripplanner.ext.carpooling.corridor.CarpoolCorridor.CorridorStop;
+import org.opentripplanner.ext.carpooling.corridor.CarpoolStopIndex;
+import org.opentripplanner.ext.carpooling.corridor.RoutableCarpoolTrip;
+import org.opentripplanner.ext.carpooling.street.CarReachableVertexSnapper.SnapResult;
+import org.opentripplanner.ext.carpooling.street.StreetPathUtils;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 

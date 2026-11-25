@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.carpooling.filter;
 
 import java.util.List;
-import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTrip;
+import org.opentripplanner.ext.carpooling.corridor.RoutableCarpoolTrip;
 
 /**
  * Combines multiple {@link CarpoolTripFilter}s using AND logic (all filters must pass).

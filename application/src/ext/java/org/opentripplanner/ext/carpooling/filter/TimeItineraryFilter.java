@@ -2,6 +2,7 @@ package org.opentripplanner.ext.carpooling.filter;
 
 import java.time.Duration;
 import java.time.Instant;
+import org.opentripplanner.ext.carpooling.routing.CarpoolingRequest;
 import org.opentripplanner.model.plan.Itinerary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

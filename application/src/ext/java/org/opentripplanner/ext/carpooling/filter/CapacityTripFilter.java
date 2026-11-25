@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.carpooling.filter;
 
-import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTrip;
+import org.opentripplanner.ext.carpooling.corridor.RoutableCarpoolTrip;
 
 /**
  * Pre-filters carpool trips by whether the car has a free seat on at least one leg: a car that is

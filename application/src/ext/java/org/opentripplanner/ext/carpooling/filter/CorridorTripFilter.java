@@ -1,9 +1,9 @@
 package org.opentripplanner.ext.carpooling.filter;
 
 import org.jspecify.annotations.Nullable;
-import org.opentripplanner.ext.carpooling.routing.CarpoolCorridor;
-import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTrip;
-import org.opentripplanner.ext.carpooling.util.CarReachableVertexSnapper.SnapResult;
+import org.opentripplanner.ext.carpooling.corridor.CarpoolCorridor;
+import org.opentripplanner.ext.carpooling.corridor.RoutableCarpoolTrip;
+import org.opentripplanner.ext.carpooling.street.CarReachableVertexSnapper.SnapResult;
 
 /**
  * Pre-filters carpool trips by whether their corridor can reach the snapped passenger at all: see

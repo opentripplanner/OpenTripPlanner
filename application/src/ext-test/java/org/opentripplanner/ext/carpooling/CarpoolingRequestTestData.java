@@ -2,8 +2,8 @@ package org.opentripplanner.ext.carpooling;
 
 import java.time.Duration;
 import java.time.Instant;
-import org.opentripplanner.ext.carpooling.filter.CarpoolingRequest;
-import org.opentripplanner.ext.carpooling.filter.CarpoolingRequestBuilder;
+import org.opentripplanner.ext.carpooling.routing.CarpoolingRequest;
+import org.opentripplanner.ext.carpooling.routing.CarpoolingRequestBuilder;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 

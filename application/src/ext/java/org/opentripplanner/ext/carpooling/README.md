@@ -47,11 +47,12 @@ org.opentripplanner.ext.carpooling/
 ├── CarpoolingParameters    # The routing limits and heuristics, in one place
 ├── model/                  # A driver's trip and its stops; the carpool leg of an itinerary
 ├── updater/                # Reads the driver trips from SIRI-ET
-├── filter/                 # The request, and the filters screening trips and itineraries
-├── routing/                # Street searches, trip corridors, and insertion of the passenger
-├── util/                   # Snapping to the street network; the booking URL template
-├── internal/               # The repository implementation and the itinerary mapper
-├── service/                # The service implementation
+├── street/                 # Car searches on the street graph; snapping to where a car can stop
+├── corridor/               # What a trip can serve, computed when the trip arrives
+├── filter/                 # The filters screening trips and itineraries
+├── routing/                # The request; insertion of the passenger into its candidate trips
+├── mapping/                # The rides as Raptor access/egress legs and as itineraries
+├── internal/               # The service and the repository implementations
 ├── config/                 # The `carpooling` section of router-config.json
 └── configure/              # Dagger module
 ```

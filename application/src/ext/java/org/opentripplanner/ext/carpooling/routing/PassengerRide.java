@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.carpooling.routing;
 
 import org.jspecify.annotations.Nullable;
-import org.opentripplanner.ext.carpooling.util.CarReachableVertexSnapper.SnapResult;
+import org.opentripplanner.ext.carpooling.street.CarReachableVertexSnapper.SnapResult;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 /**

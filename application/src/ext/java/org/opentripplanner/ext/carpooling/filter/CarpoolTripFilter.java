@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.carpooling.filter;
 
-import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTrip;
+import org.opentripplanner.ext.carpooling.corridor.RoutableCarpoolTrip;
+import org.opentripplanner.ext.carpooling.routing.CarpoolingRequest;
 
 /**
  * Pre-filter applied to carpool trip candidates before expensive routing calculations.

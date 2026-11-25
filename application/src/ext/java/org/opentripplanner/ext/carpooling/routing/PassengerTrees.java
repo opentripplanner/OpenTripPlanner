@@ -4,7 +4,10 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.opentripplanner.ext.carpooling.routing.CarpoolTreeStreetRouter.Direction;
+import org.opentripplanner.ext.carpooling.corridor.DetourBound;
+import org.opentripplanner.ext.carpooling.corridor.RoutableCarpoolTrip;
+import org.opentripplanner.ext.carpooling.street.CarpoolTreeStreetRouter;
+import org.opentripplanner.ext.carpooling.street.CarpoolTreeStreetRouter.Direction;
 import org.opentripplanner.street.model.vertex.Vertex;
 
 /**

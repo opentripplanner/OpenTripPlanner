@@ -4,9 +4,9 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
+import org.opentripplanner.ext.carpooling.corridor.CarpoolCorridor;
+import org.opentripplanner.ext.carpooling.corridor.RoutableCarpoolTrip;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
-import org.opentripplanner.ext.carpooling.routing.CarpoolCorridor;
-import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTrip;
 import org.opentripplanner.street.model.StreetModelForTest;
 import org.opentripplanner.street.model.vertex.Vertex;
 

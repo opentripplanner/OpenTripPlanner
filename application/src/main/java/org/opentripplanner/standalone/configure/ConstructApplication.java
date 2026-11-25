@@ -8,7 +8,7 @@ import org.opentripplanner.core.model.transaction.RepositoryHandle;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
-import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTripResolver;
+import org.opentripplanner.ext.carpooling.corridor.RoutableCarpoolTripResolver;
 import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayRepository;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;

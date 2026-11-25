@@ -5,6 +5,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
+import org.opentripplanner.ext.carpooling.street.RoutedSegment;
 import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.transit.model.site.StopLocation;
 

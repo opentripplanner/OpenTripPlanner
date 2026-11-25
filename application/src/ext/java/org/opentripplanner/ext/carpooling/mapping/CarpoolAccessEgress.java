@@ -1,0 +1,258 @@
+package org.opentripplanner.ext.carpooling.mapping;
+
+import org.opentripplanner.ext.carpooling.routing.InsertionCandidate;
+import org.opentripplanner.ext.carpooling.street.StreetPathUtils;
+import org.opentripplanner.framework.model.TimeAndCost;
+import org.opentripplanner.raptor.spi.RaptorConstants;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccessEgress;
+import org.opentripplanner.routing.cost.CostLimit;
+
+/**
+ * Raptor access/egress adapter wrapping an {@link InsertionCandidate}: the candidate carries the
+ * carpool-side data (walks, shared segments, ride duration) and this class adds the Raptor framing
+ * (stop index, departure time anchor, c1, penalty, reluctance, board cost).
+ * <p>
+ * The walk paths' A* weights are used as-is for the walk portion of the cost; they already
+ * encode the user's walk preferences (reluctance, safety, slope, ...) from the search that produced
+ * them. The ride portion is weighted by {@code carpoolReluctance}, plus a fixed {@code boardCost}.
+ */
+public class CarpoolAccessEgress implements RoutingAccessEgress {
+
+  private final int stop;
+
+  /**
+   * The Raptor departure time of this access/egress leg, in seconds since
+   * {@code transitSearchTimeZero}. This is the moment the passenger leaves the origin side of the
+   * leg: the start of an optional walk to the carpool pickup, or — when no walk is needed — the
+   * moment the carpool itself arrives at the pickup. The driver runs on a committed schedule, so
+   * Raptor cannot delay this time.
+   */
+  private final int passengerDepartureTime;
+
+  /**
+   * The Raptor arrival time of this access/egress leg, in seconds since
+   * {@code transitSearchTimeZero}. This is the moment the passenger reaches the destination side of
+   * the leg: the end of an optional walk from the carpool dropoff, or — when no walk is needed —
+   * the moment the carpool reaches the dropoff. Equal to {@code passengerDepartureTime +
+   * walkToPickupSeconds + rideSeconds + walkFromDropoffSeconds}.
+   */
+  private final int passengerArrivalTime;
+
+  private final int durationInSeconds;
+  private final int c1;
+  private final int timePenalty;
+
+  private final InsertionCandidate insertionCandidate;
+  private final TimeAndCost penalty;
+  private final double carpoolReluctance;
+  private final int boardCost;
+
+  private final EndpointLabel startLabel;
+  private final EndpointLabel endLabel;
+
+  /**
+   * @param stop                   Raptor stop index of the transit-side endpoint — the stop the
+   *                               passenger boards transit at (for access) or alights from transit
+   *                               at (for egress).
+   * @param passengerDepartureTime see {@link #passengerDepartureTime}.
+   * @param insertionCandidate     the carpool-side data: walks bracketing the ride, the shared ride
+   *                               itself, the trip and pickup/dropoff positions. Everything except
+   *                               Raptor framing flows from here.
+   * @param penalty                optional Raptor time/cost penalty added on top of the leg,
+   *                               applied via {@link #withPenalty(TimeAndCost)}; pass
+   *                               {@link TimeAndCost#ZERO} for no penalty.
+   * @param carpoolReluctance      multiplier on ride seconds when computing {@link #c1()}; the walk
+   *                               portions are billed at the walks' own A* weights and are not
+   *                               multiplied by this.
+   * @param boardCost              fixed cost added to {@link #c1()}.
+   * @param startLabel             label data for the first leg's {@code from} place. For an access
+   *                               this is the passenger origin
+   *                               ({@link EndpointLabel#forLocation(org.opentripplanner.model.GenericLocation)});
+   *                               for an egress it is the transit stop the passenger alighted from
+   *                               ({@link EndpointLabel#forStop(org.opentripplanner.transit.model.site.StopLocation)}).
+   *                               The mapper resolves the label into a {@code Place}.
+   * @param endLabel               symmetric to {@code startLabel}: label data for the last leg's
+   *                               {@code to} place. Transit stop for an access, passenger
+   *                               destination for an egress.
+   */
+  public CarpoolAccessEgress(
+    int stop,
+    int passengerDepartureTime,
+    InsertionCandidate insertionCandidate,
+    TimeAndCost penalty,
+    double carpoolReluctance,
+    int boardCost,
+    EndpointLabel startLabel,
+    EndpointLabel endLabel
+  ) {
+    this.stop = stop;
+    this.passengerDepartureTime = passengerDepartureTime;
+    this.insertionCandidate = insertionCandidate;
+    this.penalty = penalty;
+    this.carpoolReluctance = carpoolReluctance;
+    this.boardCost = boardCost;
+    this.startLabel = startLabel;
+    this.endLabel = endLabel;
+    this.timePenalty = penalty.isZero() ? RaptorConstants.TIME_NOT_SET : penalty.timeInSeconds();
+
+    var walkToPickup = insertionCandidate.walkToPickup();
+    var walkFromDropoff = insertionCandidate.walkFromDropoff();
+    int walkSeconds = (int) (StreetPathUtils.durationOrZero(walkToPickup).getSeconds() +
+      StreetPathUtils.durationOrZero(walkFromDropoff).getSeconds());
+    int rideSeconds = (int) insertionCandidate.getPassengerRideDuration().getSeconds();
+    this.durationInSeconds = walkSeconds + rideSeconds;
+    this.passengerArrivalTime = passengerDepartureTime + this.durationInSeconds;
+
+    double walkWeight =
+      StreetPathUtils.weightOrZero(walkToPickup) + StreetPathUtils.weightOrZero(walkFromDropoff);
+    double totalWeight =
+      walkWeight + insertionCandidate.getPassengerRideWeight(carpoolReluctance, boardCost);
+    this.c1 = CostLimit.toRaptorCost(totalWeight) + penalty.cost().toCentiSeconds();
+  }
+
+  @Override
+  public int stop() {
+    return this.stop;
+  }
+
+  /**
+   * The Raptor cost of this leg, equal to {@code walkToPickupWeight + walkFromDropoffWeight +
+   * rideSeconds * carpoolReluctance + boardCost + penalty.cost()}, converted to Raptor's
+   * centi-second unit. The walk weights already encode the user's walk preferences (reluctance,
+   * safety, slope, ...) — only the ride portion is multiplied by {@code carpoolReluctance}.
+   */
+  @Override
+  public int c1() {
+    return this.c1;
+  }
+
+  /**
+   * Total wall-clock duration of the leg (walk + ride + walk), in seconds. Constant — Raptor cannot
+   * stretch or shrink this since the carpool runs on a fixed schedule.
+   */
+  @Override
+  public int durationInSeconds() {
+    return this.durationInSeconds;
+  }
+
+  @Override
+  public int timePenalty() {
+    return this.timePenalty;
+  }
+
+  /**
+   * The carpool's departure time is fixed by the driver's schedule. Returns
+   * {@link #passengerDepartureTime} if the requested time is at or before it, otherwise
+   * {@link RaptorConstants#TIME_NOT_SET} — the passenger can't be picked up later than the driver
+   * passes.
+   */
+  @Override
+  public int earliestDepartureTime(int requestedDepartureTime) {
+    if (requestedDepartureTime > passengerDepartureTime) {
+      return RaptorConstants.TIME_NOT_SET;
+    }
+    return passengerDepartureTime;
+  }
+
+  /**
+   * Symmetric to {@link #earliestDepartureTime(int)}: the carpool's arrival time is fixed. Returns
+   * {@link #passengerArrivalTime} if the requested time is at or after it, otherwise
+   * {@link RaptorConstants#TIME_NOT_SET}.
+   */
+  @Override
+  public int latestArrivalTime(int requestedArrivalTime) {
+    if (requestedArrivalTime < passengerArrivalTime) {
+      return RaptorConstants.TIME_NOT_SET;
+    }
+    return passengerArrivalTime;
+  }
+
+  /**
+   * Always {@code true}: a carpool leg has a fixed time window because the driver runs on a
+   * committed schedule, so Raptor must respect the leg's departure/arrival times rather than
+   * shifting the leg to fit the request.
+   */
+  @Override
+  public boolean hasOpeningHours() {
+    return true;
+  }
+
+  /** See {@link #passengerDepartureTime} for semantics. */
+  public int getPassengerDepartureTime() {
+    return passengerDepartureTime;
+  }
+
+  /** See {@link #passengerArrivalTime} for semantics. */
+  public int getPassengerArrivalTime() {
+    return passengerArrivalTime;
+  }
+
+  /**
+   * Returns a copy of this leg with the given Raptor penalty applied on top.
+   */
+  @Override
+  public RoutingAccessEgress withPenalty(TimeAndCost penalty) {
+    if (this.penalty != TimeAndCost.ZERO) {
+      throw new IllegalStateException("Can not add penalty twice...");
+    }
+    return new CarpoolAccessEgress(
+      this.stop,
+      this.passengerDepartureTime,
+      this.insertionCandidate,
+      penalty,
+      this.carpoolReluctance,
+      this.boardCost,
+      this.startLabel,
+      this.endLabel
+    );
+  }
+
+  /** The carpool-side data of this leg: the trip, the walks bracketing the ride and the ride. */
+  public InsertionCandidate insertionCandidate() {
+    return insertionCandidate;
+  }
+
+  /**
+   * Label data for the first leg's {@code from} place. For an access this carries the passenger
+   * origin; for an egress, the transit stop the passenger alighted from. Read by the itinerary
+   * mapper to name the chain's outermost start endpoint.
+   */
+  public EndpointLabel startLabel() {
+    return startLabel;
+  }
+
+  /**
+   * Symmetric to {@link #startLabel()}: label data for the last leg's {@code to} place. Transit
+   * stop for an access, passenger destination for an egress.
+   */
+  public EndpointLabel endLabel() {
+    return endLabel;
+  }
+
+  /** Always {@code false}: a passenger rides in the driver's car, not a station-rented vehicle. */
+  @Override
+  public boolean isRentingVehicleFromStation() {
+    return false;
+  }
+
+  /** Always {@code false}: a carpool leg, by definition, contains a vehicle ride. */
+  @Override
+  public boolean isWalkOnly() {
+    return false;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public TimeAndCost penalty() {
+    return this.penalty;
+  }
+
+  /**
+   * Cost of the carpool ride portion only (excluding walks and penalty), in raw weight units. The
+   * itinerary mapper uses this for {@code CarpoolLeg.generalizedCost} so the displayed cost agrees
+   * with the ride contribution to {@link #c1()}.
+   */
+  public double getPassengerRideWeight() {
+    return insertionCandidate.getPassengerRideWeight(carpoolReluctance, boardCost);
+  }
+}

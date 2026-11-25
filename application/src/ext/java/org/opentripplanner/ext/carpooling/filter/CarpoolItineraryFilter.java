@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.carpooling.filter;
 
+import org.opentripplanner.ext.carpooling.routing.CarpoolingRequest;
 import org.opentripplanner.model.plan.Itinerary;
 
 /**

@@ -24,8 +24,9 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.carpooling.CarpoolStreetPathBuilder;
 import org.opentripplanner.ext.carpooling.RoutableCarpoolTripTestData;
-import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTrip;
-import org.opentripplanner.ext.carpooling.util.CarReachableVertexSnapper.SnapResult;
+import org.opentripplanner.ext.carpooling.corridor.RoutableCarpoolTrip;
+import org.opentripplanner.ext.carpooling.routing.CarpoolingRequest;
+import org.opentripplanner.ext.carpooling.street.CarReachableVertexSnapper.SnapResult;
 
 /**
  * The trip starts at 10:00+01:00 and its one leg is routed to 50 minutes; with the destination's

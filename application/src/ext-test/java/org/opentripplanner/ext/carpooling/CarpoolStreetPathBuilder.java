@@ -3,7 +3,7 @@ package org.opentripplanner.ext.carpooling;
 import java.time.Duration;
 import java.util.List;
 import java.util.stream.IntStream;
-import org.opentripplanner.ext.carpooling.routing.RoutedSegment;
+import org.opentripplanner.ext.carpooling.street.RoutedSegment;
 import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 
