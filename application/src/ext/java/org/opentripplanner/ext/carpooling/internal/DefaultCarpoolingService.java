@@ -38,7 +38,6 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
@@ -207,7 +206,6 @@ public class DefaultCarpoolingService implements CarpoolingService {
   @Override
   public List<CarpoolAccessEgress> routeAccessEgress(
     RouteRequest request,
-    StreetRequest streetRequest,
     AccessEgressType accessOrEgress,
     TransitServiceResolver transitServiceResolver,
     ZonedDateTime transitSearchTimeZero

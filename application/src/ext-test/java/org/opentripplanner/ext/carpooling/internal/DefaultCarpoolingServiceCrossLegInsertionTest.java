@@ -160,7 +160,6 @@ class DefaultCarpoolingServiceCrossLegInsertionTest extends GraphRoutingTest {
 
     var results = service.routeAccessEgress(
       request,
-      new StreetRequest(StreetMode.CARPOOL),
       AccessEgressType.ACCESS,
       transitServiceResolver,
       SEARCH_TIME

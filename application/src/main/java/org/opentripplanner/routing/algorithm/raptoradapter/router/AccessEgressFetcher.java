@@ -226,7 +226,6 @@ class AccessEgressFetcher {
     if (OTPFeature.CarPooling.isOn() && mode == StreetMode.CARPOOL) {
       var carpoolAccessEgressList = carpoolingService.routeAccessEgress(
         accessRequest,
-        streetRequest,
         type,
         transitServiceResolver,
         transitSearchTimeZero

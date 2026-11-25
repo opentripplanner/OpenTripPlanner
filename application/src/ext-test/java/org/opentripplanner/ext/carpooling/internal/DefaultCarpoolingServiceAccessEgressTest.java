@@ -235,7 +235,6 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
       .buildRequest();
     return service.routeAccessEgress(
       request,
-      new StreetRequest(StreetMode.CARPOOL),
       AccessEgressType.ACCESS,
       transitServiceResolver,
       SEARCH_TIME
@@ -269,7 +268,6 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
 
     var results = service.routeAccessEgress(
       request,
-      new StreetRequest(StreetMode.WALK),
       AccessEgressType.ACCESS,
       transitServiceResolver,
       SEARCH_TIME
@@ -288,7 +286,6 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
 
     var results = service.routeAccessEgress(
       request,
-      new StreetRequest(StreetMode.WALK),
       AccessEgressType.EGRESS,
       transitServiceResolver,
       SEARCH_TIME
@@ -303,7 +300,6 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
 
     var results = service.routeAccessEgress(
       request,
-      new StreetRequest(StreetMode.CARPOOL),
       AccessEgressType.ACCESS,
       transitServiceResolver,
       SEARCH_TIME
@@ -322,7 +318,6 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
 
     var results = service.routeAccessEgress(
       request,
-      new StreetRequest(StreetMode.CARPOOL),
       AccessEgressType.ACCESS,
       transitServiceResolver,
       SEARCH_TIME
@@ -342,7 +337,6 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
 
     var results = service.routeAccessEgress(
       request,
-      new StreetRequest(StreetMode.CARPOOL),
       AccessEgressType.ACCESS,
       transitServiceResolver,
       SEARCH_TIME
@@ -397,7 +391,6 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
 
     var results = service.routeAccessEgress(
       request,
-      new StreetRequest(StreetMode.CARPOOL),
       AccessEgressType.EGRESS,
       transitServiceResolver,
       SEARCH_TIME
@@ -436,7 +429,6 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
 
     var results = service.routeAccessEgress(
       request,
-      new StreetRequest(StreetMode.CARPOOL),
       AccessEgressType.ACCESS,
       transitServiceResolver,
       transitSearchTimeZero
@@ -490,7 +482,6 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
 
     var results = service.routeAccessEgress(
       request,
-      new StreetRequest(StreetMode.CARPOOL),
       AccessEgressType.ACCESS,
       transitServiceResolver,
       SEARCH_TIME
@@ -544,7 +535,6 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
 
     var results = service.routeAccessEgress(
       request,
-      new StreetRequest(StreetMode.CARPOOL),
       AccessEgressType.ACCESS,
       transitServiceResolver,
       SEARCH_TIME
@@ -574,7 +564,6 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
 
     var results = service.routeAccessEgress(
       request,
-      new StreetRequest(StreetMode.CARPOOL),
       AccessEgressType.ACCESS,
       transitServiceResolver,
       SEARCH_TIME
@@ -632,7 +621,6 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
 
     var results = service.routeAccessEgress(
       request,
-      new StreetRequest(StreetMode.CARPOOL),
       AccessEgressType.ACCESS,
       transitServiceResolver,
       SEARCH_TIME
@@ -658,7 +646,6 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
 
     var results = service.routeAccessEgress(
       request,
-      new StreetRequest(StreetMode.CARPOOL),
       AccessEgressType.ACCESS,
       transitServiceResolver,
       SEARCH_TIME
@@ -680,7 +667,6 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
 
     var results = service.routeAccessEgress(
       request,
-      new StreetRequest(StreetMode.CARPOOL),
       AccessEgressType.ACCESS,
       transitServiceResolver,
       SEARCH_TIME
@@ -730,7 +716,6 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
 
     var results = service.routeAccessEgress(
       request,
-      new StreetRequest(StreetMode.CARPOOL),
       AccessEgressType.ACCESS,
       transitServiceResolver,
       SEARCH_TIME
@@ -795,7 +780,6 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
 
     var results = service.routeAccessEgress(
       request,
-      new StreetRequest(StreetMode.CARPOOL),
       AccessEgressType.ACCESS,
       transitServiceResolver,
       transitSearchTimeZero
@@ -885,7 +869,6 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
     var request = buildCarpoolRequest(coordP2, coordP3, SEARCH_TIME);
     var results = service.routeAccessEgress(
       request,
-      new StreetRequest(StreetMode.CARPOOL),
       AccessEgressType.ACCESS,
       transitServiceResolver,
       SEARCH_TIME
