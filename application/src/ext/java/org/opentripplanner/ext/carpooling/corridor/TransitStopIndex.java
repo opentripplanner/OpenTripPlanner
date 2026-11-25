@@ -30,9 +30,9 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Thread-safe: requests and the updater share one instance.
  */
-public class CarpoolStopIndex {
+public class TransitStopIndex {
 
-  private static final Logger LOG = LoggerFactory.getLogger(CarpoolStopIndex.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TransitStopIndex.class);
 
   /** Grid cell size in degrees, roughly 2 km north-south. */
   private static final double CELL_DEGREES = 0.02;
@@ -47,7 +47,7 @@ public class CarpoolStopIndex {
   private final Map<FeedScopedId, Optional<SnapResult>> dropoffSnaps = new ConcurrentHashMap<>();
   private final Map<FeedScopedId, Optional<SnapResult>> pickupSnaps = new ConcurrentHashMap<>();
 
-  public CarpoolStopIndex(Graph graph, CarReachableVertexSnapper snapper, Duration maxStopWalk) {
+  public TransitStopIndex(Graph graph, CarReachableVertexSnapper snapper, Duration maxStopWalk) {
     this.snapper = snapper;
     this.maxStopWalk = maxStopWalk;
     for (var vertex : graph.findVertices(TransitStopVertex.class)) {

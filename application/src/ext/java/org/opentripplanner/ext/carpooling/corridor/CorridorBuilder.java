@@ -29,13 +29,13 @@ public class CorridorBuilder {
 
   private static final Logger LOG = LoggerFactory.getLogger(CorridorBuilder.class);
 
-  private final CarpoolStopIndex stopIndex;
+  private final TransitStopIndex stopIndex;
   private final CarpoolStreetRouter baselineRouter;
   private final double maxCarSpeedMetersPerSecond;
   private final Duration maxTripDuration;
 
   public CorridorBuilder(
-    CarpoolStopIndex stopIndex,
+    TransitStopIndex stopIndex,
     StreetLimitationParametersService streetLimitationParametersService,
     Duration maxTripDuration
   ) {

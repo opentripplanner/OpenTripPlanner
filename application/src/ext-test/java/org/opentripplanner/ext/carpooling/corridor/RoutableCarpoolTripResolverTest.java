@@ -139,7 +139,7 @@ class RoutableCarpoolTripResolverTest extends GraphRoutingTest {
       new VertexCreationService(VertexLinkerTestFactory.of(model.graph())),
       SNAPPER,
       new CorridorBuilder(
-        new CarpoolStopIndex(model.graph(), SNAPPER, CarpoolingParameters.DEFAULT.maxStopWalk()),
+        new TransitStopIndex(model.graph(), SNAPPER, CarpoolingParameters.DEFAULT.maxStopWalk()),
         StreetLimitationParametersService.DEFAULT,
         CarpoolingParameters.DEFAULT.maxTripDuration()
       ),

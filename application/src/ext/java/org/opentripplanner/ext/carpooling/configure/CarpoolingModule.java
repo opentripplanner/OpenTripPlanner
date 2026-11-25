@@ -7,9 +7,9 @@ import org.jspecify.annotations.Nullable;
 import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
-import org.opentripplanner.ext.carpooling.corridor.CarpoolStopIndex;
 import org.opentripplanner.ext.carpooling.corridor.CorridorBuilder;
 import org.opentripplanner.ext.carpooling.corridor.RoutableCarpoolTripResolver;
+import org.opentripplanner.ext.carpooling.corridor.TransitStopIndex;
 import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingRepository;
 import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingService;
 import org.opentripplanner.ext.carpooling.street.CarReachableVertexSnapper;
@@ -50,7 +50,7 @@ public class CarpoolingModule {
   @Singleton
   @Nullable
   public static CorridorBuilder provideCorridorBuilder(
-    @Nullable CarpoolStopIndex stopIndex,
+    @Nullable TransitStopIndex stopIndex,
     StreetLimitationParametersService streetLimitationParametersService,
     @Nullable CarpoolingParameters parameters
   ) {
@@ -97,7 +97,7 @@ public class CarpoolingModule {
   @Provides
   @Singleton
   @Nullable
-  public static CarpoolStopIndex provideCarpoolStopIndex(
+  public static TransitStopIndex provideTransitStopIndex(
     Graph graph,
     @Nullable CarReachableVertexSnapper carReachableVertexSnapper,
     @Nullable CarpoolingParameters parameters
@@ -105,7 +105,7 @@ public class CarpoolingModule {
     if (OTPFeature.CarPooling.isOff()) {
       return null;
     }
-    return new CarpoolStopIndex(graph, carReachableVertexSnapper, parameters.maxStopWalk());
+    return new TransitStopIndex(graph, carReachableVertexSnapper, parameters.maxStopWalk());
   }
 
   @Provides
@@ -116,7 +116,7 @@ public class CarpoolingModule {
     StreetLimitationParametersService streetLimitationParametersService,
     VertexCreationService vertexCreationService,
     @Nullable CarReachableVertexSnapper carReachableVertexSnapper,
-    @Nullable CarpoolStopIndex stopIndex,
+    @Nullable TransitStopIndex stopIndex,
     @Nullable CarpoolingParameters parameters
   ) {
     if (OTPFeature.CarPooling.isOff()) {

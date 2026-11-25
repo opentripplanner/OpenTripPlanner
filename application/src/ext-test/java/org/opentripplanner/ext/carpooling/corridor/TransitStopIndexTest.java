@@ -31,11 +31,11 @@ import org.opentripplanner.street.model.vertex.TransitStopVertex;
  *   T4  unlinked stop, far away
  * </pre>
  */
-class CarpoolStopIndexTest extends GraphRoutingTest {
+class TransitStopIndexTest extends GraphRoutingTest {
 
   private static final WgsCoordinate ORIGIN = new WgsCoordinate(63.43, 10.39);
 
-  private CarpoolStopIndex index;
+  private TransitStopIndex index;
   private IntersectionVertex c;
   private TransitStopVertex t1;
   private TransitStopVertex t2;
@@ -74,7 +74,7 @@ class CarpoolStopIndexTest extends GraphRoutingTest {
         }
       }
     );
-    index = new CarpoolStopIndex(
+    index = new TransitStopIndex(
       model.graph(),
       new CarReachableVertexSnapper(CarpoolingParameters.DEFAULT.minCarEscapeMeters()),
       CarpoolingParameters.DEFAULT.maxStopWalk()

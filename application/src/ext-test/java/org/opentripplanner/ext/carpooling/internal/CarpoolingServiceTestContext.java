@@ -3,9 +3,9 @@ package org.opentripplanner.ext.carpooling.internal;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
-import org.opentripplanner.ext.carpooling.corridor.CarpoolStopIndex;
 import org.opentripplanner.ext.carpooling.corridor.CorridorBuilder;
 import org.opentripplanner.ext.carpooling.corridor.RoutableCarpoolTripResolver;
+import org.opentripplanner.ext.carpooling.corridor.TransitStopIndex;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.ext.carpooling.street.CarReachableVertexSnapper;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
@@ -63,7 +63,7 @@ record CarpoolingServiceTestContext(
     var carReachableVertexSnapper = new CarReachableVertexSnapper(
       CarpoolingParameters.DEFAULT.minCarEscapeMeters()
     );
-    var stopIndex = new CarpoolStopIndex(
+    var stopIndex = new TransitStopIndex(
       model.graph(),
       carReachableVertexSnapper,
       CarpoolingParameters.DEFAULT.maxStopWalk()

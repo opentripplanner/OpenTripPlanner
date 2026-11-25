@@ -8,8 +8,8 @@ import java.util.Map;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.corridor.CarpoolCorridor.CorridorStop;
-import org.opentripplanner.ext.carpooling.corridor.CarpoolStopIndex;
 import org.opentripplanner.ext.carpooling.corridor.RoutableCarpoolTrip;
+import org.opentripplanner.ext.carpooling.corridor.TransitStopIndex;
 import org.opentripplanner.ext.carpooling.street.CarReachableVertexSnapper.SnapResult;
 import org.opentripplanner.ext.carpooling.street.StreetPathUtils;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
@@ -24,7 +24,7 @@ import org.opentripplanner.street.search.request.StreetSearchRequest;
  */
 public class UsableStops {
 
-  private final CarpoolStopIndex stopIndex;
+  private final TransitStopIndex stopIndex;
   private final boolean access;
   private final StreetSearchRequest streetSearchRequest;
   private final Duration maxWalk;
@@ -34,7 +34,7 @@ public class UsableStops {
   public record UsableStop(CorridorStop stop, SnapResult snap) {}
 
   public UsableStops(
-    CarpoolStopIndex stopIndex,
+    TransitStopIndex stopIndex,
     AccessEgressType accessOrEgress,
     StreetSearchRequest streetSearchRequest,
     Duration maxWalk

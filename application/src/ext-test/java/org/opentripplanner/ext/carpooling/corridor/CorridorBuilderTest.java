@@ -41,7 +41,7 @@ class CorridorBuilderTest extends GraphRoutingTest {
 
   private static final WgsCoordinate ORIGIN = new WgsCoordinate(63.43, 10.39);
 
-  private CarpoolStopIndex stopIndex;
+  private TransitStopIndex stopIndex;
   private IntersectionVertex a;
   private IntersectionVertex d;
   private IntersectionVertex unconnected;
@@ -94,7 +94,7 @@ class CorridorBuilderTest extends GraphRoutingTest {
         }
       }
     );
-    stopIndex = new CarpoolStopIndex(
+    stopIndex = new TransitStopIndex(
       model.graph(),
       new CarReachableVertexSnapper(CarpoolingParameters.DEFAULT.minCarEscapeMeters()),
       CarpoolingParameters.DEFAULT.maxStopWalk()

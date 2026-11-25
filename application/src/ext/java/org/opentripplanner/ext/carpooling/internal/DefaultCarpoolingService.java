@@ -12,8 +12,8 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
-import org.opentripplanner.ext.carpooling.corridor.CarpoolStopIndex;
 import org.opentripplanner.ext.carpooling.corridor.RoutableCarpoolTrip;
+import org.opentripplanner.ext.carpooling.corridor.TransitStopIndex;
 import org.opentripplanner.ext.carpooling.filter.ClosestCandidateTrips;
 import org.opentripplanner.ext.carpooling.filter.ItineraryPostFilters;
 import org.opentripplanner.ext.carpooling.filter.SnappedPassenger;
@@ -76,7 +76,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
   private final CarpoolItineraryMapper itineraryMapper;
   private final VertexCreationService vertexCreationService;
   private final CarReachableVertexSnapper carReachableVertexSnapper;
-  private final CarpoolStopIndex stopIndex;
+  private final TransitStopIndex stopIndex;
   private final CarpoolingParameters parameters;
   private final CarpoolStreetRouter pathRouter;
 
@@ -85,7 +85,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
     StreetLimitationParametersService streetLimitationParametersService,
     VertexCreationService vertexCreationService,
     CarReachableVertexSnapper carReachableVertexSnapper,
-    CarpoolStopIndex stopIndex,
+    TransitStopIndex stopIndex,
     CarpoolingParameters parameters
   ) {
     this.repository = Objects.requireNonNull(repository, "repository");
