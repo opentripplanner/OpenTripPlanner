@@ -3,6 +3,7 @@ package org.opentripplanner.ext.carpooling.service;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -32,6 +33,7 @@ import org.opentripplanner.ext.carpooling.routing.UsableStops;
 import org.opentripplanner.ext.carpooling.routing.UsableStops.UsableStop;
 import org.opentripplanner.ext.carpooling.util.CarReachableVertexSnapper;
 import org.opentripplanner.ext.carpooling.util.CarReachableVertexSnapper.SnapResult;
+import org.opentripplanner.ext.carpooling.util.PassengerSnapper;
 import org.opentripplanner.ext.carpooling.util.StreetPathUtils;
 import org.opentripplanner.ext.carpooling.util.StreetVertexUtils;
 import org.opentripplanner.framework.model.TimeAndCost;
@@ -48,7 +50,7 @@ import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.linking.TemporaryVerticesContainer;
 import org.opentripplanner.street.model.StreetMode;
-import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.streetadapter.StreetSearchRequestMapper;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -103,7 +105,6 @@ public class DefaultCarpoolingService implements CarpoolingService {
   private static final Logger LOG = LoggerFactory.getLogger(DefaultCarpoolingService.class);
 
   private final CarpoolingRepository repository;
-  private final StreetLimitationParametersService streetLimitationParametersService;
   private final TripPreFilters preFilters;
   private final ItineraryPostFilters postFilters;
   private final CarpoolItineraryMapper itineraryMapper;
@@ -116,6 +117,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
   private final CarReachableVertexSnapper carReachableVertexSnapper;
   private final CarpoolStopIndex stopIndex;
   private final CarpoolingParameters parameters;
+  private final CarpoolStreetRouter pathRouter;
 
   /**
    * Creates a new carpooling service with the specified dependencies.
@@ -144,10 +146,6 @@ public class DefaultCarpoolingService implements CarpoolingService {
     CarpoolingParameters parameters
   ) {
     this.repository = Objects.requireNonNull(repository, "repository");
-    this.streetLimitationParametersService = Objects.requireNonNull(
-      streetLimitationParametersService,
-      "streetLimitationParametersService"
-    );
     this.preFilters = TripPreFilters.defaults();
     this.postFilters = ItineraryPostFilters.defaults();
     this.itineraryMapper = new CarpoolItineraryMapper();
@@ -161,6 +159,11 @@ public class DefaultCarpoolingService implements CarpoolingService {
     );
     this.stopIndex = Objects.requireNonNull(stopIndex, "stopIndex");
     this.parameters = Objects.requireNonNull(parameters, "parameters");
+    Objects.requireNonNull(streetLimitationParametersService, "streetLimitationParametersService");
+    this.pathRouter = new CarpoolStreetRouter(
+      streetLimitationParametersService,
+      parameters.maxTripDuration()
+    );
   }
 
   /**
@@ -213,68 +216,22 @@ public class DefaultCarpoolingService implements CarpoolingService {
 
     var itineraries = List.<Itinerary>of();
     try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
-      var pathRouter = new CarpoolStreetRouter(
-        streetLimitationParametersService,
-        parameters.maxTripDuration()
+      var passengerSnapper = passengerSnapper(
+        temporaryVerticesContainer,
+        StreetSearchRequestMapper.map(request).build(),
+        carpoolingRequest.getMaxWalkTime()
       );
-
-      var streetVertexUtils = new StreetVertexUtils(
-        this.vertexCreationService,
-        temporaryVerticesContainer
-      );
-
-      var stopDuration = request.preferences().car().pickupTime();
-      var maxWalkToCarpool = carpoolingRequest.getMaxWalkTime();
-      var streetSearchRequest = StreetSearchRequestMapper.map(request).build();
-
-      var passengerPickupVertex = streetVertexUtils.createPassengerVertex(
-        carpoolingRequest.getPassengerPickup()
-      );
-      var passengerDropoffVertex = streetVertexUtils.createPassengerVertex(
-        carpoolingRequest.getPassengerDropoff()
-      );
-      if (passengerPickupVertex == null || passengerDropoffVertex == null) {
-        LOG.info("Could not link passenger origin/destination to graph");
-        return List.of();
-      }
-
-      var pickupSnap = carReachableVertexSnapper.snapPickup(
-        streetSearchRequest,
-        passengerPickupVertex,
-        maxWalkToCarpool
-      );
-      var dropoffSnap = carReachableVertexSnapper.snapDropoff(
-        streetSearchRequest,
-        passengerDropoffVertex,
-        maxWalkToCarpool
-      );
+      var pickupSnap = passengerSnapper.snapPickup(carpoolingRequest.getPassengerPickup());
+      var dropoffSnap = passengerSnapper.snapDropoff(carpoolingRequest.getPassengerDropoff());
       if (pickupSnap == null || dropoffSnap == null) {
-        LOG.debug(
-          "No car-reachable pickup/dropoff reachable within {} from passenger origin/destination",
-          maxWalkToCarpool
-        );
         return List.of();
       }
 
-      var passenger = new SnappedPassenger(carpoolingRequest, pickupSnap, dropoffSnap);
-      var preFilteredTrips = allTrips
-        .stream()
-        .filter(trip -> preFilters.isCandidateTrip(trip, passenger))
-        .toList();
-
-      LOG.debug(
-        "{} trips passed pre-filters ({} rejected)",
-        preFilteredTrips.size(),
-        allTrips.size() - preFilteredTrips.size()
+      var candidateTrips = candidateTrips(
+        allTrips,
+        new SnappedPassenger(carpoolingRequest, pickupSnap, dropoffSnap),
+        List.of(carpoolingRequest.getPassengerPickup(), carpoolingRequest.getPassengerDropoff())
       );
-
-      // Every candidate widens the passenger's trees; evaluate only the trips passing closest.
-      var candidateTrips = ClosestCandidateTrips.closest(
-        preFilteredTrips,
-        List.of(carpoolingRequest.getPassengerPickup(), carpoolingRequest.getPassengerDropoff()),
-        parameters.maxCandidateTripsPerRequest()
-      );
-
       if (candidateTrips.isEmpty()) {
         return List.of();
       }
@@ -290,7 +247,10 @@ public class DefaultCarpoolingService implements CarpoolingService {
         List.of(pickupSnap.vertex(), dropoffSnap.vertex()),
         pathRouter
       );
-      var insertionEvaluator = new InsertionEvaluator(corridorRouter, stopDuration);
+      var insertionEvaluator = new InsertionEvaluator(
+        corridorRouter,
+        carpoolingRequest.getStopDuration()
+      );
       var ride = new PassengerRide(pickupSnap, dropoffSnap, null);
 
       var insertionCandidates = new ArrayList<InsertionCandidate>();
@@ -366,15 +326,9 @@ public class DefaultCarpoolingService implements CarpoolingService {
     TransitServiceResolver transitServiceResolver,
     ZonedDateTime transitSearchTimeZero
   ) throws RoutingValidationException {
-    if (
-      !StreetMode.CARPOOL.equals(request.journey().access().mode()) && accessOrEgress.isAccess()
-    ) {
-      return Collections.emptyList();
-    }
-
-    if (
-      !StreetMode.CARPOOL.equals(request.journey().egress().mode()) && accessOrEgress.isEgress()
-    ) {
+    boolean access = accessOrEgress.isAccess();
+    var mode = access ? request.journey().access().mode() : request.journey().egress().mode();
+    if (!StreetMode.CARPOOL.equals(mode)) {
       return Collections.emptyList();
     }
 
@@ -388,7 +342,11 @@ public class DefaultCarpoolingService implements CarpoolingService {
     var allTrips = repository.getCarpoolTrips();
     LOG.debug("Repository contains {} carpool trips", allTrips.size());
 
-    GenericLocation passengerLocation = accessOrEgress.isAccess() ? request.from() : request.to();
+    if (allTrips.isEmpty()) {
+      return List.of();
+    }
+
+    GenericLocation passengerLocation = access ? request.from() : request.to();
     WgsCoordinate passengerCoordinates = passengerLocation.wgsCoordinate();
     // A carpool leg is an access/egress leg: the request's maximum duration for the mode applies.
     long maxLegSeconds = request
@@ -399,64 +357,32 @@ public class DefaultCarpoolingService implements CarpoolingService {
       .valueOf(StreetMode.CARPOOL)
       .toSeconds();
 
-    if (allTrips.isEmpty()) {
-      return List.of();
-    }
-
     try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
-      var streetVertexUtils = new StreetVertexUtils(
-        this.vertexCreationService,
-        temporaryVerticesContainer
-      );
-
       var streetSearchRequest = StreetSearchRequestMapper.map(request).build();
       var maxWalkToCarpool = carpoolingRequest.getMaxWalkTime();
-      Vertex passengerAccessEgressVertex = streetVertexUtils.createPassengerVertex(
-        passengerCoordinates
+      var passengerSnapper = passengerSnapper(
+        temporaryVerticesContainer,
+        streetSearchRequest,
+        maxWalkToCarpool
       );
 
-      if (passengerAccessEgressVertex == null) {
-        LOG.info("Could not link passenger coordinates {} to graph", passengerCoordinates);
-        return List.of();
-      }
-
-      var passengerSnap = accessOrEgress.isEgress()
-        ? carReachableVertexSnapper.snapDropoff(
-            streetSearchRequest,
-            passengerAccessEgressVertex,
-            maxWalkToCarpool
-          )
-        : carReachableVertexSnapper.snapPickup(
-            streetSearchRequest,
-            passengerAccessEgressVertex,
-            maxWalkToCarpool
-          );
+      // An access passenger is picked up at the origin and dropped off for a transit stop; an
+      // egress passenger is picked up from a transit stop and dropped off at the destination.
+      boolean dropoffAtStop = access;
+      var passengerSnap = access
+        ? passengerSnapper.snapPickup(passengerCoordinates)
+        : passengerSnapper.snapDropoff(passengerCoordinates);
       if (passengerSnap == null) {
-        LOG.debug(
-          "No car-reachable vertex reachable within {} from passenger coords {}",
-          maxWalkToCarpool,
-          passengerCoordinates
-        );
         return List.of();
       }
-      var passengerVertex = passengerSnap.vertex();
 
-      var passenger = accessOrEgress.isAccess()
+      var passenger = access
         ? new SnappedPassenger(carpoolingRequest, passengerSnap, null)
         : new SnappedPassenger(carpoolingRequest, null, passengerSnap);
-      var preFilteredTrips = allTrips
-        .stream()
-        .filter(trip -> preFilters.isCandidateTrip(trip, passenger))
-        .toList();
-      var candidateTrips = ClosestCandidateTrips.closest(
-        preFilteredTrips,
-        List.of(passengerCoordinates),
-        parameters.maxCandidateTripsPerRequest()
-      );
+      var candidateTrips = candidateTrips(allTrips, passenger, List.of(passengerCoordinates));
 
       // Only a trip with a stop the passenger can walk to (access) or from (egress) can serve the
       // request, and only those trips size the passenger's trees.
-      boolean access = accessOrEgress.isAccess();
       var usableStops = new UsableStops(
         stopIndex,
         accessOrEgress,
@@ -480,25 +406,21 @@ public class DefaultCarpoolingService implements CarpoolingService {
         StreetPathUtils.durationOrZero(passengerSnap.walkPath())
       );
       var passengerRouter = PassengerTrees.accessEgressRouter(
-        passengerVertex,
+        passengerSnap.vertex(),
         trips,
         access,
         parameters.maxTripDuration(),
         maxRide
       );
-      var pathRouter = new CarpoolStreetRouter(
-        streetLimitationParametersService,
-        parameters.maxTripDuration()
-      );
       var corridorRouter = new CorridorRouter(
         passengerRouter,
-        List.of(passengerVertex),
+        List.of(passengerSnap.vertex()),
         pathRouter
       );
-
-      var stopDuration = request.preferences().car().pickupTime();
-
-      var insertionEvaluator = new InsertionEvaluator(corridorRouter, stopDuration);
+      var insertionEvaluator = new InsertionEvaluator(
+        corridorRouter,
+        carpoolingRequest.getStopDuration()
+      );
 
       // TODO carpooling currently reuses the car-mode reluctance; revisit whether it should have
       //   its own preference.
@@ -509,7 +431,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
         var trip = tripStops.trip();
         corridorRouter.beginTrip(trip);
         for (var usable : tripStops.stops()) {
-          corridorRouter.registerStop(usable.stop(), usable.snap().vertex(), access);
+          corridorRouter.registerStop(usable.stop(), usable.snap().vertex(), dropoffAtStop);
         }
         var rides = rides(tripStops.stops(), accessOrEgress, passengerSnap, transitServiceResolver);
         for (var candidate : insertionEvaluator.findBestInsertions(trip, rides)) {
@@ -534,6 +456,47 @@ public class DefaultCarpoolingService implements CarpoolingService {
       );
       return accessEgresses;
     }
+  }
+
+  private PassengerSnapper passengerSnapper(
+    TemporaryVerticesContainer temporaryVerticesContainer,
+    StreetSearchRequest streetSearchRequest,
+    Duration maxWalk
+  ) {
+    return new PassengerSnapper(
+      new StreetVertexUtils(vertexCreationService, temporaryVerticesContainer),
+      carReachableVertexSnapper,
+      streetSearchRequest,
+      maxWalk
+    );
+  }
+
+  /**
+   * The trips that pass the pre-filters; when more than the request may evaluate, those passing
+   * closest to the passenger.
+   */
+  private List<RoutableCarpoolTrip> candidateTrips(
+    Collection<RoutableCarpoolTrip> allTrips,
+    SnappedPassenger passenger,
+    List<WgsCoordinate> passengerPoints
+  ) {
+    var preFilteredTrips = allTrips
+      .stream()
+      .filter(trip -> preFilters.isCandidateTrip(trip, passenger))
+      .toList();
+
+    LOG.debug(
+      "{} trips passed pre-filters ({} rejected)",
+      preFilteredTrips.size(),
+      allTrips.size() - preFilteredTrips.size()
+    );
+
+    // Every candidate widens the passenger's trees; evaluate only the trips passing closest.
+    return ClosestCandidateTrips.closest(
+      preFilteredTrips,
+      passengerPoints,
+      parameters.maxCandidateTripsPerRequest()
+    );
   }
 
   /** A trip with the corridor stops the passenger can use, each with its snap. */
