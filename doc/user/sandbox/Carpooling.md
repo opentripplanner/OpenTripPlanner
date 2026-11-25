@@ -150,10 +150,8 @@ that minimize additional travel time while respecting all constraints.
 To ensure a good experience for all users, the system enforces several constraints:
 
 - **Vehicle Capacity**: Never exceeds the maximum number of seats
-- **Existing Passenger Protection**: Limits additional delay to existing passengers (maximum 5
-  minutes)
-- **Driver Deviation Budget**: Respects the driver's maximum acceptable detour time (currently 15
-  minutes)
+- **Deviation Budgets**: Never delays a stop of the trip beyond its latest expected arrival in the
+  SIRI-ET message (15 minutes after its expected arrival if the message has none)
 
 ### Multi-Stop Trips
 
@@ -172,18 +170,9 @@ distinct mode (`CARPOOL`) in multi-modal itineraries, alongside transit, walking
 
 ## Current Limitations
 
-- **Static deviation budget**: We currently assume a 15 minute budget for carpooling
 - **Static capacity**: Available seats are static trip properties; no reservation system
-- **Basic time windows**: Only simple departure time compatibility; no "arrive by" constraints
 
 ## Future Enhancements
-
-### Short Term
-
-- Improved time window handling (including arrive by constraints)
-- Add a street mode for carpooling (carpool) for filtering carpooling searches
-- Access/Egress searches for carpooling in order to integrate with transit searches
-- Establish an exchange mechanism for deviation budget and occupancy
 
 ### Medium Term
 
