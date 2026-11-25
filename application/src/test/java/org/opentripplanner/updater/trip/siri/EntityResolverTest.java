@@ -16,9 +16,12 @@ import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TransitRepository;
+import uk.org.siri.siri21.FramedVehicleJourneyRefStructure;
 
 class EntityResolverTest {
 
@@ -32,6 +35,21 @@ class EntityResolverTest {
   private static final FeedScopedId SSP_ID = new FeedScopedId(FEED_ID, "ssp-1");
   private static final Operator OPERATOR = Operator.of(new FeedScopedId(FEED_ID, "operator-1"))
     .withName("Operator 1")
+    .build();
+
+  private static final ZoneId TIME_ZONE = ZoneId.of("Europe/Oslo");
+  private static final LocalDate SERVICE_DATE = LocalDate.of(2026, 11, 25);
+  private static final LocalDate NEXT_DAY = SERVICE_DATE.plusDays(1);
+  private static final Trip REPLACED_TRIP = TransitRepositoryForTest.trip(
+    FEED_ID,
+    "trip-1"
+  ).build();
+  private static final String REPLACED_DATED_JOURNEY_ID = "replaced-journey";
+  private static final TripOnServiceDate REPLACED_TRIP_ON_SERVICE_DATE = TripOnServiceDate.of(
+    new FeedScopedId(FEED_ID, REPLACED_DATED_JOURNEY_ID)
+  )
+    .withTrip(REPLACED_TRIP)
+    .withServiceDate(SERVICE_DATE)
     .build();
 
   @Test
@@ -118,6 +136,62 @@ class EntityResolverTest {
     );
   }
 
+  @Test
+  void extraJourneyGetsServiceDateOfReplacedJourney() {
+    var journey = journeyDepartingAfterMidnight(builder ->
+      builder.withIsExtraJourney(true).withVehicleJourneyRef(REPLACED_DATED_JOURNEY_ID)
+    );
+
+    assertEquals(SERVICE_DATE, resolverWithReplacedJourney().resolveServiceDate(journey));
+  }
+
+  @Test
+  void extraJourneyGetsServiceDateOfFirstAdditionalReplacedJourneyThatExists() {
+    var evj = journeyBuilderDepartingAfterMidnight(builder ->
+      builder.withIsExtraJourney(true).withVehicleJourneyRef("unknown")
+    ).buildEstimatedVehicleJourney();
+    evj.getAdditionalVehicleJourneyReves().add(framedRef("unknown", NEXT_DAY));
+    evj
+      .getAdditionalVehicleJourneyReves()
+      .add(framedRef(REPLACED_TRIP.getId().getId(), SERVICE_DATE));
+
+    assertEquals(
+      SERVICE_DATE,
+      resolverWithReplacedJourney().resolveServiceDate(EstimatedVehicleJourneyWrapper.of(evj))
+    );
+  }
+
+  @Test
+  void extraJourneyWithoutKnownReplacedJourneyGetsDateOfDeparture() {
+    var journey = journeyDepartingAfterMidnight(builder ->
+      builder.withIsExtraJourney(true).withVehicleJourneyRef("unknown")
+    );
+
+    assertEquals(NEXT_DAY, resolverWithReplacedJourney().resolveServiceDate(journey));
+  }
+
+  @Test
+  void framedVehicleJourneyRefTakesPrecedenceOverReplacedJourney() {
+    var framedDate = SERVICE_DATE.minusDays(1);
+    var journey = journeyDepartingAfterMidnight(builder ->
+      builder
+        .withIsExtraJourney(true)
+        .withVehicleJourneyRef(REPLACED_DATED_JOURNEY_ID)
+        .withFramedVehicleJourneyRef("framed", framedDate)
+    );
+
+    assertEquals(framedDate, resolverWithReplacedJourney().resolveServiceDate(journey));
+  }
+
+  @Test
+  void journeyThatIsNotExtraIgnoresReplacedJourney() {
+    var journey = journeyDepartingAfterMidnight(builder ->
+      builder.withVehicleJourneyRef(REPLACED_DATED_JOURNEY_ID)
+    );
+
+    assertEquals(NEXT_DAY, resolverWithReplacedJourney().resolveServiceDate(journey));
+  }
+
   private static EntityResolver newResolver() {
     return newResolver(new TransitRepository());
   }
@@ -130,6 +204,46 @@ class EntityResolverTest {
       scheduledTimetableData
     );
     return new EntityResolver(timetableRepository, transitRepository, FEED_ID);
+  }
+
+  private static EntityResolver resolverWithReplacedJourney() {
+    var timetableDataImport = new TimetableDataImport();
+    timetableDataImport.addTripOnServiceDate(REPLACED_TRIP_ON_SERVICE_DATE);
+    var timetableRepository = new DefaultTimetableRepository(
+      RaptorTransitDataTestFactory.empty(),
+      timetableDataImport.toScheduledTimetableData()
+    );
+    return new EntityResolver(timetableRepository, new TransitRepository(), FEED_ID);
+  }
+
+  /** A journey whose first call departs at 00:08 on the day after {@link #SERVICE_DATE}. */
+  private static EstimatedVehicleJourneyWrapper journeyDepartingAfterMidnight(
+    UnaryOperator<SiriEtBuilder> configure
+  ) {
+    return EstimatedVehicleJourneyWrapper.of(
+      journeyBuilderDepartingAfterMidnight(configure).buildEstimatedVehicleJourney()
+    );
+  }
+
+  private static SiriEtBuilder journeyBuilderDepartingAfterMidnight(
+    UnaryOperator<SiriEtBuilder> configure
+  ) {
+    var builder = new SiriEtBuilder(new LocalTimeParser(TIME_ZONE, NEXT_DAY)).withEstimatedCalls(
+      calls ->
+        calls
+          .call(STOP_1)
+          .departAimedExpected("00:08", "00:08")
+          .call(STOP_2)
+          .arriveAimedExpected("00:25", "00:25")
+    );
+    return configure.apply(builder);
+  }
+
+  private static FramedVehicleJourneyRefStructure framedRef(String journeyId, LocalDate date) {
+    return new SiriEtBuilder.FramedVehicleRefBuilder()
+      .withVehicleJourneyRef(journeyId)
+      .withServiceDate(date)
+      .build();
   }
 
   private static EstimatedVehicleJourneyWrapper journey(UnaryOperator<SiriEtBuilder> configure) {
