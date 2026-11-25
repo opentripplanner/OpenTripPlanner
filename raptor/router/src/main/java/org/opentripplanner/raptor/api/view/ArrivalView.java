@@ -166,7 +166,7 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
    * The cost of the transfer used to reach this stop. Only valid when {@link #arrivedBy()} returns
    * {@link PathLegType#TRANSFER}. {@link RaptorConstants#NOT_SET} is returned if the cost is not
    * part of the state; the caller must then look it up, see
-   * {@link org.opentripplanner.raptor.spi.RaptorTransferDataProvider#findTransfer(int, int, int)}.
+   * {@link org.opentripplanner.raptor.spi.RaptorTransferDataProvider#findMaterializedTransfer(int, int, int)}.
    */
   default int transferC1() {
     return c1() - previous().c1();

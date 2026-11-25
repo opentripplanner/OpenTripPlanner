@@ -54,15 +54,16 @@ public interface RaptorTransferDataProvider<T extends RaptorTripSchedule> {
   Iterator<? extends RaptorTransfer> getTransfersToStop(int toStop);
 
   /**
-   * Find the transfer used by a path leg, after the search is complete. This is NOT used during
-   * routing, so it does not need to be fast, but the result must be materialized (not a flyweight
-   * valid only for one iterator step), see {@link RaptorTransfer#materialize()}.
+   * Find a materialized transfer, the returned transfer is an object which can be referenced.
+   * This is provided, because the {@link #getTransfersFromStop(int)} and
+   * {@link #getTransfersToStop(int)} return flyweight objects. This method allows the caller to
+   * store the transfer as part of the result. This is NOT used during routing, and the object
+   * returned is a ValueObject/DTO - created on every call, see
+   * {@link RaptorTransfer#materialize()}.
    * <p>
-   * The Raptor state does not keep the transfer used to arrive at a stop. It is restored from the
-   * stop pair and the time between the two arrivals. Among the transfers from {@code fromStop} to
-   * {@code toStop} with a duration less than or equal to {@code maxDurationInSeconds}, the one with
-   * the lowest c1 is returned. If more than one has the lowest c1, the one with the shortest
-   * duration is returned.
+   * Among the transfers from {@code fromStop} to {@code toStop} with a duration less than or equal
+   * to {@code maxDurationInSeconds}, the one with the lowest c1 is returned. If more than one has
+   * the lowest c1, the one with the shortest duration is returned.
    * <p>
    * The stops are given in the direction from origin to destination of the journey, independent
    * of the search direction. In the result {@link RaptorTransfer#stop()} is {@code toStop}.
@@ -70,7 +71,11 @@ public interface RaptorTransferDataProvider<T extends RaptorTripSchedule> {
    * @return the transfer or {@code null} if no transfer matches.
    */
   @Nullable
-  default RaptorTransfer findTransfer(int fromStop, int toStop, int maxDurationInSeconds) {
+  default RaptorTransfer findMaterializedTransfer(
+    int fromStop,
+    int toStop,
+    int maxDurationInSeconds
+  ) {
     RaptorTransfer best = null;
     var it = getTransfersFromStop(fromStop);
     while (it.hasNext()) {

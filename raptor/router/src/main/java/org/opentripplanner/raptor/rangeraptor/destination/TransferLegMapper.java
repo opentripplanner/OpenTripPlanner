@@ -62,7 +62,7 @@ final class TransferLegMapper<T extends RaptorTripSchedule> {
   }
 
   private int lookupC1(int fromStop, int toStop, int duration) {
-    var transfer = transferData.findTransfer(fromStop, toStop, duration);
+    var transfer = transferData.findMaterializedTransfer(fromStop, toStop, duration);
     if (transfer == null) {
       throw new IllegalStateException(
         "No transfer found from stop " +
