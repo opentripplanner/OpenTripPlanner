@@ -15,18 +15,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A {@link CarpoolRouter} implementation that lazily computes shortest-path trees (SPTs) from/to
- * registered vertices.
- * <p>
- * This is more efficient than individual A* searches when many routes share common origin or
- * destination vertices, as each SPT is computed at most once and reused for all queries involving
- * that vertex. Trees are only computed when first needed by a {@link #route} call, so vertices that
- * are never routed through never incur the cost of tree expansion. Results are cached to avoid
- * redundant tree lookups.
- * <p>
- * Vertices must be registered via {@link #addVertex} before routing. The router first attempts
- * to use a forward tree from the origin; if unavailable, it falls back to a reverse tree to the
- * destination.
+ * A {@link CarpoolRouter} that answers from shortest-path trees rooted at registered vertices,
+ * which is cheaper than an A* search per segment when many segments share an end. A tree is built
+ * the first time a {@link #route} call needs it, and every answer is kept.
  * <p>
  * This class is not thread-safe. Each instance should be used from a single thread.
  */
@@ -51,18 +42,11 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
   }
 
   /**
-   * Register a vertex for tree computation in the given direction(s). Tree computation is deferred
-   * until a {@link #route} call actually needs the tree. Vertices whose trees are never needed
-   * incur no computation cost. Adding vertices after routing has started is disallowed to ensure
-   * that all temporary vertices are linked to the graph before any SPT is created. Otherwise, a
-   * previously computed tree may not contain edges leading to the late-added vertex, making it
-   * unreachable.
+   * Registers a vertex for a tree from it ({@link Direction#FROM}) or to it ({@link Direction#TO}),
+   * expanded no further than {@code searchLimit}.
    *
-   * @param vertex      the street vertex to build trees from/to
-   * @param direction   whether to build a forward tree ({@link Direction#FROM}) or a reverse tree
-   *                    ({@link Direction#TO})
-   * @param searchLimit maximum duration for the tree expansion
-   * @throws IllegalStateException if called after {@link #route} has already been invoked
+   * @throws IllegalStateException if called after {@link #route}: a tree built earlier would lack
+   *                               the temporary edges linking a vertex added later
    */
   public void addVertex(Vertex vertex, Direction direction, Duration searchLimit) {
     addVertex(vertex, direction, searchLimit, null);
@@ -90,16 +74,9 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
   }
 
   /**
-   * Find the shortest path between two vertices using lazily computed trees. Results are cached so
-   * repeated queries for the same vertex pair are free. The tree for a vertex is computed on the
-   * first {@link #route} call that needs it.
-   * <p>
-   * The method first looks for a forward tree rooted at {@code from}; if none exists it falls
-   * back to a reverse tree rooted at {@code to}. At least one of the two endpoints must therefore
-   * have been registered with {@link #addVertex} in the matching direction; a call whose endpoints
-   * were both left unregistered cannot be served and returns {@code null}. A registered endpoint
-   * whose tree does not reach the other endpoint within its search limit returns {@code null} as
-   * well.
+   * The segment from the forward tree of {@code from} or, if that vertex has none, from the reverse
+   * tree of {@code to}. {@code null} if neither vertex is registered in that direction, or if the
+   * tree does not reach the other vertex within its search limit.
    */
   @Override
   public RoutedSegment route(Vertex from, Vertex to) {
@@ -127,18 +104,12 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
     return segment;
   }
 
-  /**
-   * Returns the total number of forward vertices (pending and computed). Package-private for
-   * testing.
-   */
+  /** The number of forward trees, built or not. Package-private for testing. */
   int forwardTreeCount() {
     return forwardTrees.count();
   }
 
-  /**
-   * Returns the total number of reverse vertices (pending and computed). Package-private for
-   * testing.
-   */
+  /** The number of reverse trees, built or not. Package-private for testing. */
   int reverseTreeCount() {
     return reverseTrees.count();
   }

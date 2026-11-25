@@ -10,19 +10,14 @@ import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
- * Represents a viable insertion of a passenger into a carpool trip.
- * <p>
- * Contains all information needed to construct an itinerary, including:
- * <pre>
- * - The original trip
- * - Insertion positions (where pickup and dropoff occur in the modified route)
- * - Route segments (all {@link RoutedSegment}s forming the complete modified route)
- * - Timing information
- * </pre>
- * <p>
- * {@code pickupPosition} and {@code dropoffPosition} are 0-based indices of the passenger's
- * pickup and dropoff stops in the modified route (the route after the passenger's stops have been
- * inserted into the carpool trip).
+ * A viable insertion of a passenger into a carpool trip.
+ *
+ * @param pickupPosition  the 0-based index of the passenger's pickup among the stops of the route
+ *                        with the passenger's two stops inserted
+ * @param dropoffPosition the index of the passenger's dropoff in the same route
+ * @param routeSegments   the segments of that route, one from each stop to the next
+ * @param stopDuration    the dwell at each stop between the first and the last
+ * @param transitStop     the transit stop of an access or egress ride
  */
 public record InsertionCandidate(
   CarpoolTrip trip,
@@ -36,12 +31,8 @@ public record InsertionCandidate(
   @Nullable StreetPath walkFromDropoff
 ) {
   /**
-   * {@link InsertionEvaluator} guarantees {@code 1 <= pickupPosition < dropoffPosition} (pickup is
-   * never at the driver's origin, and dropoff is always strictly after pickup).
-   * {@link #getPassengerRideDuration()} relies on the lower bound — it unconditionally adds a
-   * boarding dwell, which only makes sense when the passenger boards mid-trip rather than at the
-   * trip's start. Enforce both invariants here so a regression upstream fails loud at construction
-   * instead of silently producing inconsistent durations.
+   * The pickup is never at the trip's origin, which {@link #getPassengerRideDuration()} relies on
+   * when it adds the boarding dwell, and the dropoff always comes after the pickup.
    */
   public InsertionCandidate {
     if (pickupPosition < 1) {
@@ -87,20 +78,12 @@ public record InsertionCandidate(
     );
   }
 
-  /**
-   * Gets the pickup route segment(s) - from boarding to passenger pickup.
-   *
-   * @return all segments before the pickup position.
-   */
+  /** The segments the car drives before it reaches the passenger's pickup. */
   public List<RoutedSegment> getSegmentsBeforePickup() {
     return routeSegments.subList(0, pickupPosition);
   }
 
-  /**
-   * The segments the new passenger rides, from pickup to dropoff.
-   *
-   * @return all segments between pickup and dropoff positions.
-   */
+  /** The segments the new passenger rides, from the pickup to the dropoff. */
   public List<RoutedSegment> getSegmentsWithNewPassenger() {
     return routeSegments.subList(pickupPosition, dropoffPosition);
   }

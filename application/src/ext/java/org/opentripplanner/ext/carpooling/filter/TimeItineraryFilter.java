@@ -8,34 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Post-filter that rejects fully-routed carpool itineraries whose actual times fall outside the
- * passenger's requested window.
- * <p>
- * Unlike {@link TimeTripFilter}, which screens raw
- * {@link org.opentripplanner.ext.carpooling.model.CarpoolTrip} candidates using loose bounds on
- * {@code tripStart}/{@code tripEnd}, this filter receives the complete {@link Itinerary} with the
- * actual departure and arrival times after routing — and enforces the request window tightly. Today
- * this only runs for direct itineraries (the access/egress flow produces
- * {@code CarpoolAccessEgress} objects, not {@code Itinerary}).
- *
- * <h2>Variables</h2>
- *
- * The passenger's window is derived from {@code request.getRequestedDateTime()} and
- * {@code request.getSearchWindow()}. Which two of EDT/LDT/EAT/LAT exist depends on
- * {@code arriveBy}:
- *
- * <ul>
- *   <li><strong>EDT</strong> — earliest departure time = {@code requestedDateTime} (when
- *       {@code arriveBy = false}).</li>
- *   <li><strong>LDT</strong> — latest departure time = {@code requestedDateTime + searchWindow} (when
- *       {@code arriveBy = false}).</li>
- *   <li><strong>LAT</strong> — latest arrival time = {@code requestedDateTime} (when
- *       {@code arriveBy = true}).</li>
- *   <li><strong>EAT</strong> — earliest arrival time = {@code requestedDateTime − searchWindow} (when
- *       {@code arriveBy = true}).</li>
- * </ul>
- *
- * <h2>Rules</h2>
+ * Post-filter that rejects carpool itineraries whose times fall outside the passenger's window.
+ * {@link TimeTripFilter} bounds a trip loosely before routing; this filter sees the routed
+ * itinerary and enforces the window exactly. With EDT, LDT, EAT and LAT as defined there:
  *
  * <pre>
  * | arriveBy | Reject when itinerary.startTime | Reject when itinerary.endTime |
@@ -44,17 +19,8 @@ import org.slf4j.LoggerFactory;
  * | true     | —                               | ∉ [EAT, LAT]                  |
  * </pre>
  *
- * The arriveBy=false rules anchor the passenger's departure from origin; the arriveBy=true rules
- * anchor the passenger's arrival at destination. No slack is added on either side: post-filters see
- * actual itinerary times rather than trip-endpoint estimates, so the walk-time padding used by the
- * pre-filter is already baked into {@code startTime}/{@code endTime}. The leg type (direct, access,
- * egress) is irrelevant: identical bounds apply in all cases.
- *
- * <h2>Behavior with missing inputs</h2>
- *
- * <ul>
- *   <li>{@code requestedDateTime == null}: pass-through (no filtering possible).</li>
- * </ul>
+ * The walks are part of the itinerary's times, so no slack is added. Every itinerary passes when
+ * the request has no time.
  */
 public class TimeItineraryFilter implements CarpoolItineraryFilter {
 

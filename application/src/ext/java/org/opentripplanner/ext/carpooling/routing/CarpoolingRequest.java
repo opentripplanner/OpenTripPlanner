@@ -8,15 +8,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 
 /**
- * Encapsulates the passenger-facing parameters of a carpooling routing request: pickup and dropoff
- * coordinates, requested time, whether it is an arrive-by or depart-after search, the maximum time
- * the passenger is willing to walk between origin/destination and a carpool pickup/dropoff, the
- * search window applied to the requested time, the dwell the car makes at each stop, the longest
- * journey the search accepts, and — for transit-combined searches — whether the carpool leg is
- * access or egress.
- * <p>
- * Instances are constructed from a {@link org.opentripplanner.routing.api.request.RouteRequest}
- * via the {@link #of} factory methods.
+ * The parts of a {@link RouteRequest} that carpooling uses, created by the {@link #of} methods.
  */
 public class CarpoolingRequest {
 
@@ -78,29 +70,17 @@ public class CarpoolingRequest {
       .build();
   }
 
-  /**
-   * Returns {@code true} if this is an access-egress request (the carpool leg connects to a transit
-   * stop), determined by the presence of {@code accessOrEgress}. Returns {@code false} for direct
-   * routing (origin to destination without transit).
-   */
+  /** Whether the carpool leg connects to a transit stop; {@code false} for direct routing. */
   public boolean isAccessEgressRequest() {
     return accessOrEgress != null;
   }
 
-  /**
-   * Returns {@code true} if this is an access leg (passenger origin to transit stop). Returns
-   * {@code false} for egress legs and for direct routing (where {@code accessOrEgress} is
-   * {@code null}).
-   */
+  /** Whether the carpool leg runs from the passenger's origin to a transit stop. */
   public boolean isAccessRequest() {
     return accessOrEgress != null && accessOrEgress.isAccess();
   }
 
-  /**
-   * Returns {@code true} if this is an egress leg (transit stop to passenger destination). Returns
-   * {@code false} for access legs and for direct routing (where {@code accessOrEgress} is
-   * {@code null}).
-   */
+  /** Whether the carpool leg runs from a transit stop to the passenger's destination. */
   public boolean isEgressRequest() {
     return accessOrEgress != null && accessOrEgress.isEgress();
   }
@@ -121,35 +101,25 @@ public class CarpoolingRequest {
     return requestedDateTime;
   }
 
-  /**
-   * Returns the maximum time the passenger is willing to walk between their origin/destination and
-   * a carpool pickup/dropoff point. Never {@code null}; enforced at construction.
-   */
+  /** The longest walk between the passenger's origin or destination and the car. */
   public Duration getMaxWalkTime() {
     return maxWalkTime;
   }
 
   /**
-   * Returns the search window applied to {@link #getRequestedDateTime()}. For depart-after this
-   * widens the latest acceptable departure; for arrive-by it widens the earliest acceptable
-   * arrival. Never {@code null}; enforced at construction.
+   * The search window applied to {@link #getRequestedDateTime()}: after it for depart-after, before
+   * it for arrive-by.
    */
   public Duration getSearchWindow() {
     return searchWindow;
   }
 
-  /**
-   * Returns the dwell the car makes at each stop, the passenger's pickup and dropoff included (the
-   * car {@code pickupTime} preference). Never {@code null}; enforced at construction.
-   */
+  /** The dwell the car makes at each stop, the passenger's pickup and dropoff included. */
   public Duration getStopDuration() {
     return stopDuration;
   }
 
-  /**
-   * Returns the longest journey the search accepts, from leaving the origin to reaching the
-   * destination. Never {@code null}; enforced at construction.
-   */
+  /** The longest journey the search accepts, from the origin to the destination. */
   public Duration getMaxJourneyDuration() {
     return maxJourneyDuration;
   }

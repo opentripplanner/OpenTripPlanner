@@ -51,29 +51,15 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
   private final EndpointLabel endLabel;
 
   /**
-   * @param stop                   Raptor stop index of the transit-side endpoint — the stop the
-   *                               passenger boards transit at (for access) or alights from transit
-   *                               at (for egress).
-   * @param passengerDepartureTime see {@link #passengerDepartureTime}.
-   * @param insertionCandidate     the carpool-side data: walks bracketing the ride, the shared ride
-   *                               itself, the trip and pickup/dropoff positions. Everything except
-   *                               Raptor framing flows from here.
-   * @param penalty                optional Raptor time/cost penalty added on top of the leg,
-   *                               applied via {@link #withPenalty(TimeAndCost)}; pass
-   *                               {@link TimeAndCost#ZERO} for no penalty.
-   * @param carpoolReluctance      multiplier on ride seconds when computing {@link #c1()}; the walk
-   *                               portions are billed at the walks' own A* weights and are not
-   *                               multiplied by this.
-   * @param boardCost              fixed cost added to {@link #c1()}.
-   * @param startLabel             label data for the first leg's {@code from} place. For an access
-   *                               this is the passenger origin
-   *                               ({@link EndpointLabel#forLocation(org.opentripplanner.model.GenericLocation)});
-   *                               for an egress it is the transit stop the passenger alighted from
-   *                               ({@link EndpointLabel#forStop(org.opentripplanner.transit.model.site.StopLocation)}).
-   *                               The mapper resolves the label into a {@code Place}.
-   * @param endLabel               symmetric to {@code startLabel}: label data for the last leg's
-   *                               {@code to} place. Transit stop for an access, passenger
-   *                               destination for an egress.
+   * @param stop                   the Raptor index of the transit stop the leg connects to
+   * @param passengerDepartureTime see {@link #passengerDepartureTime}
+   * @param penalty                the Raptor penalty on the leg, {@link TimeAndCost#ZERO} for none
+   * @param carpoolReluctance      the cost of a second of the ride; the walks keep their own weights
+   * @param boardCost              the cost of being picked up, added once
+   * @param startLabel             names the itinerary's start: the passenger's origin for access,
+   *                               the transit stop for egress
+   * @param endLabel               names the itinerary's end: the transit stop for access, the
+   *                               passenger's destination for egress
    */
   public CarpoolAccessEgress(
     int stop,
@@ -212,19 +198,10 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
     return insertionCandidate;
   }
 
-  /**
-   * Label data for the first leg's {@code from} place. For an access this carries the passenger
-   * origin; for an egress, the transit stop the passenger alighted from. Read by the itinerary
-   * mapper to name the chain's outermost start endpoint.
-   */
   public EndpointLabel startLabel() {
     return startLabel;
   }
 
-  /**
-   * Symmetric to {@link #startLabel()}: label data for the last leg's {@code to} place. Transit
-   * stop for an access, passenger destination for an egress.
-   */
   public EndpointLabel endLabel() {
     return endLabel;
   }

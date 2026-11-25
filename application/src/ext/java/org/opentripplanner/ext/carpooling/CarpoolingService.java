@@ -7,6 +7,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
+import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.transit.service.TransitServiceResolver;
 
 /**
@@ -19,14 +20,21 @@ import org.opentripplanner.transit.service.TransitServiceResolver;
  */
 public interface CarpoolingService {
   /**
-   * Finds carpooling itineraries matching the passenger's routing request.
+   * Finds carpool itineraries from the request's origin to its destination.
    *
-   * @param request the routing request containing passenger origin, destination, and preferences
-   * @return list of carpool itineraries, may be empty if no compatible trips found
-   * @throws IllegalArgumentException if request is null
+   * @return the itineraries; empty unless the direct mode is {@code CARPOOL}
+   * @throws RoutingValidationException if the origin or the destination has no coordinates
    */
   List<Itinerary> routeDirect(RouteRequest request);
 
+  /**
+   * Finds carpool rides between the passenger and transit stops: from the origin to stops for
+   * access, from stops to the destination for egress.
+   *
+   * @param transitSearchTimeZero the time the returned legs' times are relative to
+   * @return the rides; empty unless the access or egress mode is {@code CARPOOL}
+   * @throws RoutingValidationException if the origin or the destination has no coordinates
+   */
   List<CarpoolAccessEgress> routeAccessEgress(
     RouteRequest request,
     StreetRequest streetRequest,

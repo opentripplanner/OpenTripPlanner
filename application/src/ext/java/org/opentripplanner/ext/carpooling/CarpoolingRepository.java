@@ -9,21 +9,13 @@ import org.opentripplanner.ext.carpooling.corridor.RoutableCarpoolTrip;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 
 /**
- * Repository for managing carpooling trip ({@link CarpoolTrip}) data.
- * <p>
- * This repository maintains an in-memory index of driver trips, each paired with the permanent
- * street vertices its route points resolve to ({@link RoutableCarpoolTrip}).
+ * Holds the driver trips ({@link CarpoolTrip}) in memory, each with its corridor
+ * ({@link RoutableCarpoolTrip}).
  *
- * @see CarpoolTrip for trip data model
  * @see org.opentripplanner.ext.carpooling.updater.SiriETCarpoolingUpdater for real-time updates
  */
 public interface CarpoolingRepository {
-  /**
-   * Returns all current carpooling trips.
-   * <p>
-   * The returned collection includes all driver trips that have been added via
-   * {@link #upsertCarpoolTrip} and not yet removed or expired.
-   */
+  /** Returns the current trips: those upserted and neither removed nor expired. */
   Collection<RoutableCarpoolTrip> getCarpoolTrips();
 
   /**
@@ -36,22 +28,8 @@ public interface CarpoolingRepository {
   int countCarpoolTrips(String feedId);
 
   /**
-   * Inserts a new carpooling trip or updates an existing trip with the same ID.
-   * <p>
-   * This method is the primary mechanism for adding driver trip data to the repository. It is
-   * typically called by real-time updaters when receiving trip information from external systems,
-   * or when passenger bookings modify trip capacity.
-   *
-   * <h3>Validation</h3>
-   * <p>
-   * The method does not validate trip data beyond basic null checks. It is the caller's
-   * responsibility to ensure the trip is valid (has stops, positive capacity, etc.) and that the
-   * vertices are the resolution of the trip's current route points. Invalid trips may cause routing
-   * failures later.
-   *
-   * @param trip the carpool trip to insert or update, must not be null. If a trip with the same ID
-   *             exists, it will be completely replaced.
-   * @throws IllegalArgumentException if trip is null
+   * Inserts the trip, replacing any trip with the same id. The trip is not validated: the caller
+   * makes sure that it is valid and that its corridor is that of its current route points.
    */
   void upsertCarpoolTrip(RoutableCarpoolTrip trip);
 
@@ -61,27 +39,15 @@ public interface CarpoolingRepository {
   void removeCarpoolTrip(FeedScopedId id);
 
   /**
-   * Removes all carpool trips that have already ended and are therefore no longer routable.
+   * Removes the trips whose {@link CarpoolTrip#latestEndTime()} is more than {@code expiry} before
+   * {@code now}. The SIRI source is not guaranteed to cancel a journey once it has completed, so
+   * this bounds the memory of an instance that runs for a long time.
    * <p>
-   * A trip is considered expired when its {@link CarpoolTrip#latestEndTime()} is before
-   * {@code now.minus(expiry)}. Removing such trips bounds the memory use of instances that run for
-   * a long time without restarting, since the SIRI source is not guaranteed to send an explicit
-   * cancellation for a journey once it has completed. This mirrors how real-time timetable data is
-   * purged once its service date has passed (see {@code TimetableRepository#purgeExpiredData}),
-   * with the difference that carpool trips carry a concrete instant rather than a service date.
-   * <p>
-   * The scan is throttled so that it runs at most once per sweep interval no matter how often it
-   * is called. The throttle state lives on the repository rather than on the caller, so when
-   * several updaters (one per SIRI feed) share a repository, the trips are swept at most once per
-   * interval in total instead of once per feed. Calls made before the interval has elapsed are a
-   * no-op and return {@code 0}. The method is safe to call concurrently from multiple updater
-   * threads.
+   * The trips are swept at most once per sweep interval, however often this is called and by
+   * however many updaters sharing the repository; a call in between does nothing and returns
+   * {@code 0}. The method is safe to call concurrently from multiple updater threads.
    *
-   * @param now    the current instant, used both as the throttle reference and to derive the expiry
-   *               cut-off
-   * @param expiry how long a trip is retained after its latest end time before it becomes eligible
-   *               for removal
-   * @return the number of trips removed, or {@code 0} when the call was throttled
+   * @return the number of trips removed
    */
   int removeExpiredTrips(Instant now, Duration expiry);
 }

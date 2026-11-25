@@ -13,45 +13,13 @@ import org.opentripplanner.transit.model.framework.TransitBuilder;
 import org.opentripplanner.transit.model.organization.ContactInfo;
 
 /**
- * Represents a driver's carpool journey with planned route, timing, and passenger capacity.
+ * A driver's journey that passengers can join: the stops of the planned route, the capacity of the
+ * car and, per stop, how much later than scheduled the driver may arrive.
  * <p>
- * A carpool trip models a driver offering their vehicle journey for passengers to join. It
- * includes the driver's planned route as a sequence of stops, total vehicle capacity, and timing
- * constraints including a deviation budget that allows the driver to slightly adjust their route to
- * accommodate passengers.
- *
- * <h2>Core Concepts</h2>
- * <ul>
- *   <li><strong>Origin/Destination Areas:</strong> Start and end zones for the driver's journey</li>
- *   <li><strong>Stops:</strong> Ordered sequence of waypoints along the route where passengers can be
- *       picked up or dropped off. Stops are dynamically updated as bookings occur.</li>
- *   <li><strong>Total Capacity:</strong> Number of seats in the car, including the driver seat</li>
- * </ul>
- *
- * <h2>Data Source</h2>
- * <p>
- * Trips are typically created from SIRI-ET messages provided by external carpooling platforms.
- * The platform manages driver registrations, trip creation, and real-time updates as passengers
- * book or cancel rides.
- *
- * <h2>Immutability</h2>
- * <p>
- * CarpoolTrip instances are immutable. Updates to trip state (e.g., adding a booked passenger)
- * require creating a new trip instance via {@link CarpoolTripBuilder} and upserting it to the
+ * Trips are created from SIRI-ET messages, see
+ * {@link org.opentripplanner.ext.carpooling.updater.SiriETCarpoolingUpdater}. They are immutable:
+ * an update is a new instance, upserted into the
  * {@link org.opentripplanner.ext.carpooling.CarpoolingRepository}.
- *
- * <h2>Usage in Routing</h2>
- * <p>
- * The routing algorithm uses trips to find compatible matches for passenger requests:
- * <ol>
- *   <li>Filters check basic compatibility (capacity, timing, direction)</li>
- *   <li>Insertion strategy finds optimal pickup/dropoff positions along the route, keeping every leg
- *       the passenger rides within capacity and every later stop within its deviation budget</li>
- * </ol>
- *
- * @see CarpoolStop for individual stop details
- * @see CarpoolTripBuilder for constructing trip instances
- * @see org.opentripplanner.ext.carpooling.updater.SiriETCarpoolingUpdater for trip updates
  */
 public class CarpoolTrip
   extends AbstractTransitEntity<CarpoolTrip, CarpoolTripBuilder>
@@ -136,14 +104,8 @@ public class CarpoolTrip
   }
 
   /**
-   * Returns the ordered sequence of stops along the carpool route.
-   * <p>
-   * Stops include both the driver's originally planned stops and any dynamically added stops for
-   * passenger pickups and dropoffs. The list is ordered by visit order along the route: the first
-   * element is the origin and the last is the destination.
-   *
-   * @return an immutable list of stops along the carpool route, in visit order; never null, and
-   *         always contains at least the origin and destination
+   * The stops in visit order, the origin first and the destination last, with the stops of booked
+   * passengers in between.
    */
   public List<CarpoolStop> stops() {
     return stops;
@@ -154,14 +116,7 @@ public class CarpoolTrip
     return publicContactInformation;
   }
 
-  /**
-   * Builds the full list of route points including origin area, all stops, and destination area.
-   * <p>
-   * This list represents the complete path of the carpool trip, useful for distance and
-   * direction calculations during filtering and matching.
-   *
-   * @return a list of coordinates representing the full route of the trip
-   */
+  /** The coordinates of the stops, in visit order. */
   public List<WgsCoordinate> routePoints() {
     return stops.stream().map(CarpoolStop::getCoordinate).toList();
   }

@@ -16,17 +16,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Finds the path of a corridor segment: an A* car search between its two vertices.
- *
- * <h2>Routing Strategy</h2>
- * <ul>
- *   <li><strong>Mode:</strong> CAR mode for both origin and destination</li>
- *   <li><strong>Algorithm:</strong> A* with Euclidean heuristic</li>
- *   <li><strong>Dominance:</strong> Minimum weight</li>
- *   <li><strong>Search Bound:</strong> the maximum trip duration</li>
- *   <li><strong>Error Handling:</strong> Returns null on routing failure (logged as warning); a
- *       cancelled request propagates, see {@link CarpoolRouter#route}</li>
- * </ul>
+ * Finds the path of a corridor segment: an A* car search between its two vertices, bounded by the
+ * maximum trip duration and never crossing another request's temporary edges.
+ * <p>
+ * A failed search is logged and answered with {@code null}; a cancelled request propagates, see
+ * {@link CarpoolRouter#route}.
  */
 public class CarpoolStreetRouter implements CarpoolRouter {
 
@@ -35,12 +29,6 @@ public class CarpoolStreetRouter implements CarpoolRouter {
   private final StreetLimitationParametersService streetLimitationParametersService;
   private final Duration maxTripDuration;
 
-  /**
-   * Creates a new carpool street router.
-   *
-   * @param streetLimitationParametersService provides street routing parameters (speed limits,
-   *                                          etc.)
-   */
   public CarpoolStreetRouter(
     StreetLimitationParametersService streetLimitationParametersService,
     Duration maxTripDuration
@@ -63,22 +51,7 @@ public class CarpoolStreetRouter implements CarpoolRouter {
     }
   }
 
-  /**
-   * Core A* routing for carpooling optimized for car travel.
-   * <p>
-   * Configures and executes an A* street search with settings optimized for carpooling:
-   * <ul>
-   *   <li><strong>Heuristic:</strong> Euclidean distance with max car speed</li>
-   *   <li><strong>Skip Strategy:</strong> Duration-based edge skipping, and no other request's
-   *       temporary edges</li>
-   *   <li><strong>Dominance:</strong> Minimum weight</li>
-   * </ul>
-   *
-   * @param fromVertex the origin vertex
-   * @param toVertex   the destination vertex
-   * @return the first (best) path found, or null if no path reaches the destination within the
-   *         maximum trip duration
-   */
+  /** The best path, or {@code null} if none reaches the destination within the bound. */
   private StreetPath carpoolRouting(Vertex fromVertex, Vertex toVertex) {
     var request = StreetSearchRequest.of().withMode(StreetMode.CAR).build();
     var streetSearch = StreetSearchBuilder.of()
