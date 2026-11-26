@@ -12,6 +12,7 @@ import java.util.Map;
 import org.entur.netex2.model.AccessibilityAssessment;
 import org.entur.netex2.model.AccessibilityLimitation;
 import org.entur.netex2.model.AccessibilityLimitations_RelStructure;
+import org.entur.netex2.model.DirectionTypeEnumeration;
 import org.entur.netex2.model.JourneyPattern;
 import org.entur.netex2.model.JourneyPatternRefStructure;
 import org.entur.netex2.model.JourneyPattern_VersionStructure;
@@ -32,6 +33,7 @@ import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
+import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.VehicleAssignment;
 import org.opentripplanner.transit.service.SiteRepository;
@@ -210,6 +212,79 @@ class TripMapperTest {
     List<DataImportIssue> issues = issueStore.listIssues();
     assertEquals(1, issues.size());
     assertEquals("InvalidLineRef", issues.getFirst().getType());
+  }
+
+  @Test
+  void directionFromServiceJourneyTakesPrecedence() {
+    var trip = mapWithDirections(
+      DirectionTypeEnumeration.INBOUND,
+      DirectionTypeEnumeration.OUTBOUND,
+      DirectionTypeEnumeration.CLOCKWISE
+    );
+    assertEquals(Direction.INBOUND, trip.getDirection());
+  }
+
+  @Test
+  void directionFromJourneyPatternTakesPrecedenceOverRoute() {
+    var trip = mapWithDirections(
+      null,
+      DirectionTypeEnumeration.OUTBOUND,
+      DirectionTypeEnumeration.CLOCKWISE
+    );
+    assertEquals(Direction.OUTBOUND, trip.getDirection());
+  }
+
+  @Test
+  void directionFromRoute() {
+    var trip = mapWithDirections(null, null, DirectionTypeEnumeration.ANTICLOCKWISE);
+    assertEquals(Direction.ANTICLOCKWISE, trip.getDirection());
+  }
+
+  @Test
+  void directionUnknownWhenNotSet() {
+    var trip = mapWithDirections(null, null, null);
+    assertEquals(Direction.UNKNOWN, trip.getDirection());
+  }
+
+  /**
+   * Maps a service journey that references a journey pattern, which in turn references a route,
+   * with the given direction type set on each of the three entities.
+   */
+  private Trip mapWithDirections(
+    DirectionTypeEnumeration serviceJourneyDirection,
+    DirectionTypeEnumeration journeyPatternDirection,
+    DirectionTypeEnumeration routeDirection
+  ) {
+    var transitBuilder = new TransitDataImportBuilder(new SiteRepository(), ISSUE_STORE);
+    transitBuilder.getRoutes().add(TransitRepositoryForTest.route(ROUTE_ID).build());
+
+    var netexRoute = new Route().withId(ROUTE_ID).withDirectionType(routeDirection);
+    netexRoute.setLineRef(LINE_REF);
+    var routeById = new HierarchicalMapById<Route>();
+    routeById.add(netexRoute);
+
+    var journeyPattern = new JourneyPattern()
+      .withId(JOURNEY_PATTERN_ID)
+      .withRouteRef(new RouteRefStructure().withRef(ROUTE_ID))
+      .withDirectionType(journeyPatternDirection);
+    var journeyPatternById = new HierarchicalMapById<JourneyPattern_VersionStructure>();
+    journeyPatternById.add(journeyPattern);
+
+    var tripMapper = new TripMapper(
+      ID_FACTORY,
+      ISSUE_STORE,
+      transitBuilder.getOperatorsById(),
+      transitBuilder.getRoutes(),
+      routeById,
+      journeyPatternById,
+      Map.of(SERVICE_JOURNEY_ID, SERVICE_ID)
+    );
+
+    var serviceJourney = createExampleServiceJourney().withDirectionType(serviceJourneyDirection);
+
+    var trip = tripMapper.mapServiceJourney(serviceJourney, this::headsign);
+    assertNotNull(trip);
+    return trip;
   }
 
   private ServiceJourney createExampleServiceJourney() {
