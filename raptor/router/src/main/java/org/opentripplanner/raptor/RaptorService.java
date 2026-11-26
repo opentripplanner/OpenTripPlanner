@@ -33,12 +33,12 @@ public class RaptorService<T extends RaptorTripSchedule> {
   @Nullable
   private final ExtraMcRouterSearch<T> extraMcSearch;
 
-  public RaptorService(RaptorConfig<T> config, @Nullable ExtraMcRouterSearch<T> extraMcSearch) {
+  RaptorService(RaptorConfig<T> config, @Nullable ExtraMcRouterSearch<T> extraMcSearch) {
     this.config = config;
     this.extraMcSearch = extraMcSearch;
   }
 
-  public RaptorService(RaptorConfig<T> config) {
+  RaptorService(RaptorConfig<T> config) {
     this(config, null);
   }
 

@@ -37,7 +37,7 @@ import org.opentripplanner.ext.taxi.configure.TaxiServiceModule;
 import org.opentripplanner.framework.transaction.configure.TransactionModule;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.place.api.NearbyStop;
-import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.RaptorServiceFactory;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -128,7 +128,7 @@ import org.opentripplanner.warmup.configure.WarmupModule;
 )
 public interface ConstructApplicationFactory {
   ConfigModel config();
-  RaptorConfig<TripSchedule> raptorConfig();
+  RaptorServiceFactory<TripSchedule> raptorServiceFactory();
   Graph graph();
   LinkingContextFactory linkingContextFactory();
   VertexLinker vertexLinker();

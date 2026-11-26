@@ -12,7 +12,7 @@ import org.opentripplanner.framework.application.ApplicationShutdownSupport;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.raptor.RaptorService;
-import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.RaptorServiceFactory;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
 import org.opentripplanner.routing.service.DefaultRoutingService;
 import org.opentripplanner.standalone.config.CommandLineParameters;
@@ -221,7 +221,10 @@ public class OTPMain {
     if (params.doServe()) {
       GrizzlyServer grizzlyServer = app.createGrizzlyServer();
 
-      registerShutdownHookToGracefullyShutDownServer(app.transitRepository(), app.raptorConfig());
+      registerShutdownHookToGracefullyShutDownServer(
+        app.transitRepository(),
+        app.raptorServiceFactory()
+      );
 
       // Loop to restart server on uncaught fatal exceptions.
       while (true) {
@@ -249,12 +252,12 @@ public class OTPMain {
    */
   private static void registerShutdownHookToGracefullyShutDownServer(
     TransitRepository transitRepository,
-    RaptorConfig<?> raptorConfig
+    RaptorServiceFactory<?> raptorServiceFactory
   ) {
     ApplicationShutdownSupport.addShutdownHook("server-shutdown", () -> {
       LOG.info("OTP shutdown started...");
       UpdaterConfigurator.shutdownGraph(transitRepository);
-      raptorConfig.shutdown();
+      raptorServiceFactory.shutdown();
       WeakCollectionCleaner.DEFAULT.exit();
       DeferredAuthorityFactory.exit();
       LOG.info("OTP shutdown: resources released...");

@@ -311,15 +311,19 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
   }
 
   private void onMessage(Mqtt5Publish message) {
+    byte[] payload = message.getPayloadAsBytes();
+    if (payload.length == 0) {
+      return;
+    }
     boolean offer;
     if (message.isRetain() && !primed) {
-      offer = primingMessageQueue.offer(message.getPayloadAsBytes());
+      offer = primingMessageQueue.offer(payload);
       primingMessageCounter.incrementAndGet();
-      primingMessageSize.addAndGet(message.getPayloadAsBytes().length);
+      primingMessageSize.addAndGet(payload.length);
     } else {
-      offer = liveMessageQueue.offer(message.getPayloadAsBytes());
+      offer = liveMessageQueue.offer(payload);
       liveMessageCounter.incrementAndGet();
-      liveMessageSize.addAndGet(message.getPayloadAsBytes().length);
+      liveMessageSize.addAndGet(payload.length);
     }
 
     if (!offer) {

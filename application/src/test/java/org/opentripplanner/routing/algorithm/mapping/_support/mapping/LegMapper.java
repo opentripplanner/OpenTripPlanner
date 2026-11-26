@@ -128,7 +128,6 @@ class LegMapper {
     api.steps = walkStepMapper.mapWalkSteps(domain.listWalkSteps());
 
     api.rentedBike = domain.rentedVehicle();
-    api.walkingBike = domain.walkingBike();
 
     return api;
   }

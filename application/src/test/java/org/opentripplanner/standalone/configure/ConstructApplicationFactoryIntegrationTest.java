@@ -24,7 +24,7 @@ import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.taxi.TaxiRepository;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.place.api.NearbyStop;
-import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.RaptorServiceFactory;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareServiceFactory;
@@ -76,7 +76,7 @@ class ConstructApplicationFactoryIntegrationTest {
     of(GraphQLSchema.class, GtfsSchema.class),
     of(GraphQLSchema.class, TransmodelSchema.class),
     of(MetricsLogging.class),
-    of(new GenericType<RaptorConfig<TripSchedule>>() {}),
+    of(new GenericType<RaptorServiceFactory<TripSchedule>>() {}),
     of(
       new GenericType<
         RepositoryHandle<RealtimeVehicleRepositorySnapshot, RealtimeVehicleRepository>

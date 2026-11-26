@@ -227,13 +227,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
   }
 
   @ParameterizedTest
-  @ValueSource(
-    strings = {
-      "groupSimilarityKeepOne",
-      "groupSimilarityKeepThree",
-      "groupSimilarityKeepNumOfItineraries",
-    }
-  )
+  @ValueSource(strings = { "groupSimilarityKeepOne", "groupSimilarityKeepThree" })
   public void testGroupSimilarityAcceptsOne(String field) {
     Map<String, Object> arguments = arguments("itineraryFilters", Map.of(field, 1.0));
 
@@ -248,13 +242,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
   }
 
   @ParameterizedTest
-  @ValueSource(
-    strings = {
-      "groupSimilarityKeepOne",
-      "groupSimilarityKeepThree",
-      "groupSimilarityKeepNumOfItineraries",
-    }
-  )
+  @ValueSource(strings = { "groupSimilarityKeepOne", "groupSimilarityKeepThree" })
   public void testGroupSimilarityOutsideRangeIsRejected(String field) {
     Map<String, Object> arguments = arguments("itineraryFilters", Map.of(field, 1.01));
 

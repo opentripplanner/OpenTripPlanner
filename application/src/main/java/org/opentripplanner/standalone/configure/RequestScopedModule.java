@@ -26,7 +26,7 @@ import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.ext.taxi.TaxiService;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.place.api.NearbyStop;
-import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.RaptorServiceFactory;
 import org.opentripplanner.routing.algorithm.filterchain.ext.EmissionDecorator;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -219,7 +219,7 @@ public class RequestScopedModule {
     TransitService transitService,
     TransitAlertService transitAlertService,
     Graph graph,
-    RaptorConfig<TripSchedule> raptorConfig,
+    RaptorServiceFactory<TripSchedule> raptorServiceFactory,
     StreetLimitationParametersService streetLimitationParametersService,
     VehicleRentalService vehicleRentalService,
     StreetDetailsService streetDetailsService,
@@ -241,7 +241,7 @@ public class RequestScopedModule {
     return new DefaultRoutingService(
       transitService,
       graph,
-      raptorConfig,
+      raptorServiceFactory,
       Metrics.globalRegistry,
       streetLimitationParametersService,
       vehicleRentalService,

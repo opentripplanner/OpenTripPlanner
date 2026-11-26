@@ -105,8 +105,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBike=[
             "name" : "Sulzer Pump (P4)",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         }
       ],
       "startTime" : "2009-10-21T22:58:03.000Z",
@@ -208,8 +207,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBikeRe
             ],
             "vertexType" : "BIKESHARE"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -279,8 +277,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBikeRe
             ],
             "vertexType" : "BIKESHARE"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -358,8 +355,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBikeRe
             "name" : "NW Hoyt St. & NW 20th Ave. (P2)",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         }
       ],
       "startTime" : "2009-10-21T23:10:00.000Z",
@@ -573,8 +569,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directWalk=[
             "name" : "Sulzer Pump (P4)",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         }
       ],
       "startTime" : "2009-10-21T23:10:00.000Z",
@@ -675,8 +670,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
             "vertexType" : "TRANSIT",
             "zoneId" : "0"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyId" : "prt:prt",
@@ -913,8 +907,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
             "name" : "SW Johnson St. & NW 24th Ave. (P1)",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         }
       ],
       "startTime" : "2009-10-21T23:12:39.000Z",
@@ -1009,8 +1002,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
             "vertexType" : "TRANSIT",
             "zoneId" : "0"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyId" : "prt:prt",
@@ -1273,8 +1265,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
             "name" : "SW Johnson St. & NW 24th Ave. (P1)",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         }
       ],
       "startTime" : "2009-10-21T23:14:19.000Z",
@@ -1408,8 +1399,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
             "vertexType" : "TRANSIT",
             "zoneId" : "0"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyId" : "prt:prt",
@@ -1633,8 +1623,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
             "name" : "SW Johnson St. & NW 24th Ave. (P1)",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         }
       ],
       "startTime" : "2009-10-21T23:18:18.000Z",
@@ -1729,8 +1718,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
             "vertexType" : "TRANSIT",
             "zoneId" : "0"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyId" : "prt:prt",
@@ -1967,8 +1955,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
             "name" : "SW Johnson St. & NW 24th Ave. (P1)",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         }
       ],
       "startTime" : "2009-10-21T23:27:39.000Z",
@@ -2063,8 +2050,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
             "vertexType" : "TRANSIT",
             "zoneId" : "0"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyId" : "prt:prt",
@@ -2327,8 +2313,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
             "name" : "SW Johnson St. & NW 24th Ave. (P1)",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         }
       ],
       "startTime" : "2009-10-21T23:29:19.000Z",
@@ -2462,8 +2447,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
             "vertexType" : "TRANSIT",
             "zoneId" : "0"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyId" : "prt:prt",
@@ -2687,8 +2671,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
             "name" : "SW Johnson St. & NW 24th Ave. (P1)",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         }
       ],
       "startTime" : "2009-10-21T23:37:18.000Z",

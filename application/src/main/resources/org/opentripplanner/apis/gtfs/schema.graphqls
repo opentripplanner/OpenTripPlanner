@@ -1091,7 +1091,7 @@ type Leg {
   "For transit legs, the trip on service date. For non-transit legs, `null`."
   tripOnServiceDate: TripOnServiceDate
   "Whether this leg is walking with a bike."
-  walkingBike: Boolean
+  walkingBike: Boolean @deprecated(reason : "Walking with a bike is not a separate leg. This field always returns `false`.")
 }
 
 """

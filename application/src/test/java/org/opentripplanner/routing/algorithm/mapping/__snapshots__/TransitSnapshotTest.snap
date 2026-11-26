@@ -56,8 +56,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyId" : "prt:prt",
@@ -475,8 +474,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name" : "NW Northrup St. & NW 22nd Ave. (P2)",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         }
       ],
       "startTime" : "2009-11-17T18:14:54.000Z",
@@ -544,8 +542,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyId" : "prt:prt",
@@ -963,8 +960,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name" : "NW Northrup St. & NW 22nd Ave. (P2)",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         }
       ],
       "startTime" : "2009-11-17T18:29:54.000Z",
@@ -1045,8 +1041,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyId" : "prt:prt",
@@ -1429,8 +1424,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name" : "NW Northrup St. & NW 22nd Ave. (P2)",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         }
       ],
       "startTime" : "2009-11-17T18:37:39.000Z",
@@ -1498,8 +1492,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyId" : "prt:prt",
@@ -1917,8 +1910,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name" : "NW Northrup St. & NW 22nd Ave. (P2)",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         }
       ],
       "startTime" : "2009-11-17T18:44:54.000Z",
@@ -1999,8 +1991,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyId" : "prt:prt",
@@ -2383,8 +2374,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name" : "NW Northrup St. & NW 22nd Ave. (P2)",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         }
       ],
       "startTime" : "2009-11-17T18:52:39.000Z",
@@ -2452,8 +2442,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyId" : "prt:prt",
@@ -2871,8 +2860,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name" : "NW Northrup St. & NW 22nd Ave. (P2)",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         }
       ],
       "startTime" : "2009-11-17T18:59:54.000Z",
@@ -3088,8 +3076,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name" : "NW Northrup St. & NW 24th Ave. (P3)",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         }
       ],
       "startTime" : "2009-11-17T18:00:00.000Z",
@@ -3173,8 +3160,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyId" : "prt:prt",
@@ -3375,8 +3361,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "0"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyId" : "prt:prt",
@@ -3624,8 +3609,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name" : "NW Northrup St. & NW 24th Ave. (P3)",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         }
       ],
       "startTime" : "2009-11-17T18:01:52.000Z",
@@ -3709,8 +3693,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyId" : "prt:prt",
@@ -4093,8 +4076,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name" : "NW Northrup St. & NW 24th Ave. (P3)",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         }
       ],
       "startTime" : "2009-11-17T18:12:52.000Z",
@@ -4178,8 +4160,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyId" : "prt:prt",
@@ -4519,8 +4500,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name" : "NW Northrup St. & NW 24th Ave. (P3)",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         }
       ],
       "startTime" : "2009-11-17T18:12:52.000Z",
@@ -4604,8 +4584,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyId" : "prt:prt",
@@ -4945,8 +4924,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name" : "NW Northrup St. & NW 24th Ave. (P3)",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         }
       ],
       "startTime" : "2009-11-17T18:27:52.000Z",
@@ -5030,8 +5008,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         },
         {
           "agencyId" : "prt:prt",
@@ -5414,8 +5391,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name" : "NW Northrup St. & NW 24th Ave. (P3)",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         }
       ],
       "startTime" : "2009-11-17T18:27:52.000Z",
@@ -5654,8 +5630,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name" : "NW Northrup St. & NW 22nd Ave. (P2)",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         }
       ],
       "startTime" : "2009-11-17T18:00:00.000Z",
@@ -5871,8 +5846,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name" : "NW Northrup St. & NW 22nd Ave. (P2)",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         }
       ],
       "startTime" : "2009-11-17T18:00:00.000Z",
@@ -6049,8 +6023,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name" : "NW Northrup St. & NW 24th Ave. (P3)",
             "vertexType" : "NORMAL"
           },
-          "transitLeg" : false,
-          "walkingBike" : false
+          "transitLeg" : false
         }
       ],
       "startTime" : "2009-11-17T18:00:00.000Z",
