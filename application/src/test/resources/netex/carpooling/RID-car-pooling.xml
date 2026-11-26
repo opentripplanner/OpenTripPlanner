@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  A commuter offering a ride on two days, modelled as in NeTEx Part 5: a car pooling service,
+  vehicle meeting points, a single journey path and one single journey for each operating day.
+  The last meeting point is assigned to a quay.
+-->
+<PublicationDelivery xmlns="http://www.netex.org.uk/netex" version="2.0">
+  <PublicationTimestamp>2026-11-26T12:00:00</PublicationTimestamp>
+  <ParticipantRef>RID</ParticipantRef>
+  <dataObjects>
+    <CompositeFrame version="1" id="RID:CompositeFrame:1">
+      <FrameDefaults>
+        <DefaultLocale>
+          <TimeZone>Europe/Oslo</TimeZone>
+        </DefaultLocale>
+      </FrameDefaults>
+      <frames>
+        <ResourceFrame version="1" id="RID:ResourceFrame:1">
+          <organisations>
+            <Operator version="1" id="RID:Operator:1">
+              <Name>Ride Along</Name>
+              <ContactDetails>
+                <Url>https://ridealong.example</Url>
+              </ContactDetails>
+            </Operator>
+          </organisations>
+          <modesOfOperation>
+            <VehiclePooling version="1" id="RID:VehiclePooling:1">
+              <VehiclePoolingType>commuterCarPooling</VehiclePoolingType>
+            </VehiclePooling>
+          </modesOfOperation>
+        </ResourceFrame>
+
+        <SiteFrame version="1" id="RID:SiteFrame:1">
+          <stopPlaces>
+            <StopPlace version="1" id="RID:StopPlace:1">
+              <Name>Central station</Name>
+              <Centroid>
+                <Location>
+                  <Longitude>10.7522</Longitude>
+                  <Latitude>59.9111</Latitude>
+                </Location>
+              </Centroid>
+              <TransportMode>rail</TransportMode>
+              <quays>
+                <Quay version="1" id="RID:Quay:1">
+                  <Centroid>
+                    <Location>
+                      <Longitude>10.7525</Longitude>
+                      <Latitude>59.9112</Latitude>
+                    </Location>
+                  </Centroid>
+                </Quay>
+              </quays>
+            </StopPlace>
+          </stopPlaces>
+        </SiteFrame>
+
+        <MobilityServiceFrame version="1" id="RID:MobilityServiceFrame:1">
+          <mobilityServices>
+            <CarPoolingService version="1" id="RID:CarPoolingService:1">
+              <Name>Ride Along commuter car pool</Name>
+              <OperatorRef ref="RID:Operator:1" version="1"/>
+              <serviceBookingArrangements>
+                <ServiceBookingArrangement version="1" id="RID:ServiceBookingArrangement:1">
+                  <BookingContact>
+                    <Url>https://ridealong.example/booking</Url>
+                  </BookingContact>
+                  <BookingMethods>online</BookingMethods>
+                  <MinimumBookingPeriod>PT30M</MinimumBookingPeriod>
+                </ServiceBookingArrangement>
+              </serviceBookingArrangements>
+              <BookingRequired>true</BookingRequired>
+              <VehiclePoolingRef ref="RID:VehiclePooling:1" version="1"/>
+            </CarPoolingService>
+          </mobilityServices>
+          <vehicleMeetingPoints>
+            <VehicleMeetingPoint version="1" id="RID:VehicleMeetingPoint:home">
+              <Name>Hill road 12</Name>
+              <Location>
+                <Longitude>10.7752</Longitude>
+                <Latitude>59.9467</Latitude>
+              </Location>
+            </VehicleMeetingPoint>
+            <VehicleMeetingPoint version="1" id="RID:VehicleMeetingPoint:school">
+              <Name>School car park</Name>
+              <Location>
+                <Longitude>10.7835</Longitude>
+                <Latitude>59.9374</Latitude>
+              </Location>
+            </VehicleMeetingPoint>
+            <VehicleMeetingPoint version="1" id="RID:VehicleMeetingPoint:station">
+              <Name>Central station</Name>
+            </VehicleMeetingPoint>
+          </vehicleMeetingPoints>
+          <vehicleMeetingPointAssignments>
+            <VehicleMeetingPointAssignment version="1" order="1" id="RID:VehicleMeetingPointAssignment:station">
+              <VehicleMeetingPointRef ref="RID:VehicleMeetingPoint:station" version="1"/>
+              <QuayRef ref="RID:Quay:1" version="1"/>
+            </VehicleMeetingPointAssignment>
+          </vehicleMeetingPointAssignments>
+        </MobilityServiceFrame>
+
+        <ServiceCalendarFrame version="1" id="RID:ServiceCalendarFrame:1">
+          <operatingDays>
+            <OperatingDay version="1" id="RID:OperatingDay:2026-12-01">
+              <CalendarDate>2026-12-01</CalendarDate>
+            </OperatingDay>
+            <OperatingDay version="1" id="RID:OperatingDay:2026-12-03">
+              <CalendarDate>2026-12-03</CalendarDate>
+            </OperatingDay>
+          </operatingDays>
+        </ServiceCalendarFrame>
+
+        <MobilityJourneyFrame version="1" id="RID:MobilityJourneyFrame:1">
+          <singleJourneyPaths>
+            <SingleJourneyPath version="1" id="RID:SingleJourneyPath:1">
+              <Name>Hill road to Central station</Name>
+              <pointsInSequence>
+                <VehicleMeetingPointInPath version="1" id="RID:VehicleMeetingPointInPath:1">
+                  <VehicleMeetingPointRef ref="RID:VehicleMeetingPoint:home" version="1"/>
+                </VehicleMeetingPointInPath>
+                <VehicleMeetingPointInPath version="1" id="RID:VehicleMeetingPointInPath:2">
+                  <VehicleMeetingPointRef ref="RID:VehicleMeetingPoint:school" version="1"/>
+                </VehicleMeetingPointInPath>
+                <VehicleMeetingPointInPath version="1" id="RID:VehicleMeetingPointInPath:3">
+                  <VehicleMeetingPointRef ref="RID:VehicleMeetingPoint:station" version="1"/>
+                </VehicleMeetingPointInPath>
+              </pointsInSequence>
+            </SingleJourneyPath>
+          </singleJourneyPaths>
+          <singleJourneys>
+            <SingleJourney version="1" id="RID:SingleJourney:2026-12-01">
+              <TransportMode>selfDrive</TransportMode>
+              <CarPoolingServiceRef ref="RID:CarPoolingService:1" version="1"/>
+              <SingleJourneyPathRef ref="RID:SingleJourneyPath:1" version="1"/>
+              <DepartureTime>08:00:00</DepartureTime>
+              <OperatingDayRef ref="RID:OperatingDay:2026-12-01" version="1"/>
+              <datedPassingTimes>
+                <TargetPassingTime version="1" id="RID:TargetPassingTime:2026-12-01-1">
+                  <PointInSingleJourneyPathRef ref="RID:VehicleMeetingPointInPath:1" version="1"/>
+                  <AimedDepartureTime>08:00:00</AimedDepartureTime>
+                </TargetPassingTime>
+                <TargetPassingTime version="1" id="RID:TargetPassingTime:2026-12-01-2">
+                  <PointInSingleJourneyPathRef ref="RID:VehicleMeetingPointInPath:2" version="1"/>
+                  <AimedArrivalTime>08:04:00</AimedArrivalTime>
+                  <AimedDepartureTime>08:05:00</AimedDepartureTime>
+                </TargetPassingTime>
+                <TargetPassingTime version="1" id="RID:TargetPassingTime:2026-12-01-3">
+                  <PointInSingleJourneyPathRef ref="RID:VehicleMeetingPointInPath:3" version="1"/>
+                  <AimedArrivalTime>08:15:00</AimedArrivalTime>
+                </TargetPassingTime>
+              </datedPassingTimes>
+            </SingleJourney>
+            <SingleJourney version="1" id="RID:SingleJourney:2026-12-03">
+              <TransportMode>selfDrive</TransportMode>
+              <CarPoolingServiceRef ref="RID:CarPoolingService:1" version="1"/>
+              <SingleJourneyPathRef ref="RID:SingleJourneyPath:1" version="1"/>
+              <DepartureTime>08:00:00</DepartureTime>
+              <OperatingDayRef ref="RID:OperatingDay:2026-12-03" version="1"/>
+              <datedPassingTimes>
+                <TargetPassingTime version="1" id="RID:TargetPassingTime:2026-12-03-1">
+                  <PointInSingleJourneyPathRef ref="RID:VehicleMeetingPointInPath:1" version="1"/>
+                  <AimedDepartureTime>08:00:00</AimedDepartureTime>
+                </TargetPassingTime>
+                <TargetPassingTime version="1" id="RID:TargetPassingTime:2026-12-03-2">
+                  <PointInSingleJourneyPathRef ref="RID:VehicleMeetingPointInPath:2" version="1"/>
+                  <AimedArrivalTime>08:04:00</AimedArrivalTime>
+                  <AimedDepartureTime>08:05:00</AimedDepartureTime>
+                </TargetPassingTime>
+                <TargetPassingTime version="1" id="RID:TargetPassingTime:2026-12-03-3">
+                  <PointInSingleJourneyPathRef ref="RID:VehicleMeetingPointInPath:3" version="1"/>
+                  <AimedArrivalTime>08:15:00</AimedArrivalTime>
+                </TargetPassingTime>
+              </datedPassingTimes>
+            </SingleJourney>
+          </singleJourneys>
+        </MobilityJourneyFrame>
+      </frames>
+    </CompositeFrame>
+  </dataObjects>
+</PublicationDelivery>

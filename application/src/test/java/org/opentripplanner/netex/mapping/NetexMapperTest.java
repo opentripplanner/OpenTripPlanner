@@ -2,8 +2,14 @@ package org.opentripplanner.netex.mapping;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.netex.NetexTestDataSupport.createCarPoolingService;
+import static org.opentripplanner.netex.NetexTestDataSupport.createOperatingDay;
+import static org.opentripplanner.netex.NetexTestDataSupport.createSingleJourney;
+import static org.opentripplanner.netex.NetexTestDataSupport.createSingleJourneyPath;
+import static org.opentripplanner.netex.NetexTestDataSupport.createVehicleMeetingPoint;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +22,7 @@ import org.entur.netex2.model.LineRefStructure;
 import org.entur.netex2.model.MultilingualString;
 import org.entur.netex2.model.Notice;
 import org.entur.netex2.model.NoticeAssignment;
+import org.entur.netex2.model.Operator;
 import org.entur.netex2.model.PointInLinkSequence_VersionedChildStructure;
 import org.entur.netex2.model.PointsInJourneyPattern_RelStructure;
 import org.entur.netex2.model.Quay;
@@ -38,6 +45,7 @@ import org.opentripplanner.netex.index.NetexEntityIndex;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.SiteRepository;
 
 class NetexMapperTest {
@@ -169,6 +177,70 @@ class NetexMapperTest {
     assertEquals(new FeedScopedId("CAL-SERVICE", "A:EMPTY"), serviceIdA);
     assertEquals(new FeedScopedId("CAL-SERVICE", "B:EMPTY"), serviceIdB);
     assertThat(timetableDataImport.getServiceCodes()).containsExactly(serviceIdA, 0, serviceIdB, 1);
+  }
+
+  /**
+   * A path and its journeys become one trip pattern. A second file with the same path would give
+   * a second trip pattern with the same id.
+   */
+  @Test
+  void singleJourneyPathInTwoFilesIsImportedFromTheFirstFile() {
+    var issueStore = new DefaultDataImportIssueStore();
+    var transitBuilder = new TransitDataImportBuilder(SiteRepository.of().build(), issueStore);
+
+    var netexMapper = new NetexMapper(
+      transitBuilder,
+      FEED_ID,
+      DEDUPLICATOR,
+      issueStore,
+      Set.of(),
+      Set.of(),
+      10,
+      0.0,
+      false
+    );
+    netexMapper.mapNetexToOtp(new NetexEntityIndex().readOnlyView());
+    for (String journeyId : List.of("RID:SingleJourney:1", "RID:SingleJourney:2")) {
+      netexMapper.push();
+      netexMapper.mapNetexToOtp(fileWithSingleJourney(journeyId).readOnlyView());
+      netexMapper.pop();
+    }
+
+    assertEquals(1, transitBuilder.getTripPatterns().size());
+    assertEquals(
+      List.of(new FeedScopedId(FEED_ID, "RID:SingleJourney:1")),
+      transitBuilder.getTripsById().values().stream().map(Trip::getId).toList()
+    );
+    var issueTypes = issueStore.listIssues().stream().map(DataImportIssue::getType).toList();
+    assertThat(issueTypes).contains("DuplicateSingleJourneyPath");
+  }
+
+  private static NetexEntityIndex fileWithSingleJourney(String journeyId) {
+    var index = new NetexEntityIndex();
+    index.timeZone.set("Europe/Oslo");
+    index.operatorsById.add(
+      new Operator().withId("RID:Operator:1").withName(new MultilingualString().withContent("Op"))
+    );
+    index.carPoolingServiceById.add(
+      createCarPoolingService("RID:CarPoolingService:1", "Ride Along", "RID:Operator:1")
+    );
+    index.vehicleMeetingPointById.add(createVehicleMeetingPoint("RID:A", "A", 60.0, 10.0));
+    index.vehicleMeetingPointById.add(createVehicleMeetingPoint("RID:B", "B", 60.1, 10.0));
+    index.operatingDayById.add(createOperatingDay("RID:Day:1", LocalDate.of(2026, 12, 1)));
+
+    var path = createSingleJourneyPath("RID:SingleJourneyPath:1", "RID:A", "RID:B");
+    index.singleJourneyPathById.add(path);
+    index.singleJourneyById.add(
+      createSingleJourney(
+        journeyId,
+        "RID:CarPoolingService:1",
+        "RID:Day:1",
+        path,
+        LocalTime.of(8, 0),
+        LocalTime.of(8, 15)
+      )
+    );
+    return index;
   }
 
   private static TransitDataImport mapFeedWithTripWithoutOperatingDays(String feedId) {
