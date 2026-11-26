@@ -1,7 +1,11 @@
 package org.opentripplanner.transit.service;
 
+import java.util.List;
+import java.util.Optional;
 import org.apache.commons.lang3.NotImplementedException;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.model.GenericLocation;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.SiteResolver;
 import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -21,6 +25,16 @@ public class NoopSiteResolver implements SiteResolver {
 
   @Override
   public Entrance getEntrance(FeedScopedId id) {
+    throw new NotImplementedException();
+  }
+
+  @Override
+  public List<FeedScopedId> findStopOrChildIds(FeedScopedId id) {
+    throw new NotImplementedException();
+  }
+
+  @Override
+  public Optional<WgsCoordinate> findCoordinate(GenericLocation location) {
     throw new NotImplementedException();
   }
 }

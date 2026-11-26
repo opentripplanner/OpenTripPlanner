@@ -37,6 +37,7 @@ public class RouterConfigurationDocTest {
     .skip("vehicleRentalServiceDirectory", "sandbox/VehicleRentalServiceDirectory.md")
     .skip("triasApi", "sandbox/TriasApi.md")
     .skip("ojpApi", "sandbox/OjpApi.md")
+    .skip("carpooling", "sandbox/Carpooling.md")
     .build();
 
   /**

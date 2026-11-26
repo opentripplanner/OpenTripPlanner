@@ -4,7 +4,6 @@ import io.micrometer.core.instrument.Metrics;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import org.opentripplanner.core.framework.transaction.configure.TransactionFactory;
 import org.opentripplanner.core.model.transaction.RepositoryHandle;
 import org.opentripplanner.core.model.transaction.RepositoryRegistry;
@@ -13,7 +12,7 @@ import org.opentripplanner.ext.emission.internal.DefaultEmissionService;
 import org.opentripplanner.ext.emission.internal.itinerary.EmissionItineraryDecorator;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.place.api.NearbyStop;
-import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.RaptorServiceFactory;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
@@ -63,6 +62,7 @@ import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.transit.service.TransitServiceResolver;
 import org.opentripplanner.transit.transfer.regular.NoRegularTransfers;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
@@ -195,13 +195,13 @@ public class TestServerContext {
     RegularTransferRepositorySnapshot<NearbyStop, RouteRequest> regularTransfers
   ) {
     var routerConfig = RouterConfig.DEFAULT;
-    var raptorConfig = createRaptorConfig();
+    var raptorServiceFactory = createRaptorServiceFactory();
     var vertexLinker = createVertexLinker(graph);
 
     return new DefaultRoutingService(
       transitService,
       graph,
-      raptorConfig,
+      raptorServiceFactory,
       Metrics.globalRegistry,
       createStreetLimitationParametersService(),
       createVehicleRentalService(),
@@ -229,9 +229,9 @@ public class TestServerContext {
     return VertexLinkerTestFactory.of(graph);
   }
 
-  public static RaptorConfig<TripSchedule> createRaptorConfig() {
+  public static RaptorServiceFactory<TripSchedule> createRaptorServiceFactory() {
     var routerConfig = RouterConfig.DEFAULT;
-    return new RaptorConfig<>(
+    return new RaptorServiceFactory<>(
       routerConfig.transitTuningConfig(),
       RaptorEnvironmentFactory.create(routerConfig.transitTuningConfig().searchThreadPoolSize())
     );
@@ -285,11 +285,7 @@ public class TestServerContext {
     return new LinkingContextFactory(
       graph,
       new VertexCreationService(vertexLinker),
-      transitService::findStopOrChildIds,
-      id -> {
-        var group = transitService.getStopLocationsGroup(id);
-        return Optional.ofNullable(group).map(locationsGroup -> locationsGroup.getCoordinate());
-      }
+      new TransitServiceResolver(transitService)
     );
   }
 }

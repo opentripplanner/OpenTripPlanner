@@ -359,12 +359,6 @@ public class CarpoolLeg implements Leg {
 
   @Nullable
   @Override
-  public Boolean walkingBike() {
-    return Leg.super.walkingBike();
-  }
-
-  @Nullable
-  @Override
   public Float accessibilityScore() {
     return Leg.super.accessibilityScore();
   }

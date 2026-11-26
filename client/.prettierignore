@@ -1,4 +1,5 @@
 node_modules/
 output/
+target/
 src/gql/
 src/static/query/tripQuery.tsx

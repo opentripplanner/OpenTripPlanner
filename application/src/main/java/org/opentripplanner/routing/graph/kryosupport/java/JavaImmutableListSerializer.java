@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.graph.kryosupport;
+package org.opentripplanner.routing.graph.kryosupport.java;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.Serializer;
@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.List;
 
 @SuppressWarnings("rawtypes")
-class JavaImmutableListSerializer extends Serializer<List> {
+public class JavaImmutableListSerializer extends Serializer<List> {
 
   @Override
   public void write(Kryo kryo, Output output, List list) {

@@ -134,6 +134,11 @@ public class AlertImpl implements GraphQLDataFetchers.GraphQLAlert {
   }
 
   @Override
+  public DataFetcher<String> alertId() {
+    return environment -> getSource(environment).getId().toString();
+  }
+
+  @Override
   public DataFetcher<GraphQLAlertSeverityLevelType> alertSeverityLevel() {
     return environment -> getGraphQLSeverity(getSource(environment).severity());
   }
@@ -353,6 +358,11 @@ public class AlertImpl implements GraphQLDataFetchers.GraphQLAlert {
         .map(EntitySelector.Trip.class::cast)
         .map(entitySelector -> getTransitService(environment).getTrip(entitySelector.tripId()))
         .orElse(null);
+  }
+
+  @Override
+  public DataFetcher<Integer> version() {
+    return environment -> getSource(environment).version();
   }
 
   private Object getAlertEntityOrUnknown(@Nullable Object entity, String id, String type) {

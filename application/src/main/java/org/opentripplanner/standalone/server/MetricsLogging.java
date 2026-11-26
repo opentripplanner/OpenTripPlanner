@@ -17,14 +17,13 @@ import io.micrometer.core.instrument.binder.system.UptimeMetrics;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ForkJoinPool;
 import org.opentripplanner.core.framework.transaction.configure.StreetDomain;
 import org.opentripplanner.core.framework.transaction.configure.TransitDomain;
 import org.opentripplanner.core.model.transaction.UpdateManager;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
-import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.RaptorServiceFactory;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.service.TransitRepository;
@@ -41,7 +40,7 @@ public class MetricsLogging {
   public MetricsLogging(
     TransitRepository transitRepository,
     TransitAlertService transitAlertService,
-    RaptorConfig<TripSchedule> raptorConfig,
+    RaptorServiceFactory<TripSchedule> raptorServiceFactory,
     DataImportIssueSummary issueSummary,
     @TransitDomain UpdateManager transitUpdateManager,
     @StreetDomain UpdateManager streetUpdateManager,
@@ -99,25 +98,14 @@ public class MetricsLogging {
       List.of(Tag.of("pool", "streetUpdateScheduler"))
     ).bindTo(Metrics.globalRegistry);
 
-    if (raptorConfig.isMultiThreaded()) {
+    if (raptorServiceFactory.isMultiThreaded()) {
       new ExecutorServiceMetrics(
-        raptorConfig.threadPool(),
+        raptorServiceFactory.threadPool(),
         "raptorHeuristics",
         List.of(Tag.of("pool", "raptorHeuristics"))
       ).bindTo(Metrics.globalRegistry);
     }
 
-    final Map<String, Long> issueCount = issueSummary.asMap();
-
-    var totalIssues = issueCount
-      .values()
-      .stream()
-      .mapToLong(i -> i)
-      .sum();
-    Metrics.globalRegistry.gauge("graph_build_issues_total", totalIssues);
-
-    issueCount.forEach((issueType, number) ->
-      Metrics.globalRegistry.gauge("graph_build_issues", List.of(Tag.of("type", issueType)), number)
-    );
+    new GraphBuildIssueMeterBinder(issueSummary).bindTo(Metrics.globalRegistry);
   }
 }

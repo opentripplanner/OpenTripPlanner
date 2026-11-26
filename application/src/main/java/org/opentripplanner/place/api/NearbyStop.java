@@ -15,8 +15,8 @@ import org.opentripplanner.street.search.state.State;
  * A specific stop at a distance. Also includes a geometry and potentially a list of edges and a
  * state of how to reach the stop from the search origin.
  * <p>
- * {@code state} is not itself {@link Serializable} - an instance can only be serialized (e.g. as
- * a raptor-data regular-transfer path template) with {@code state == null}.
+ * {@code state} is not itself {@link Serializable}, so it is {@code transient} and is {@code null}
+ * after the instance is deserialized (e.g. as a raptor-data regular-transfer path template).
  */
 public class NearbyStop implements Comparable<NearbyStop>, Serializable {
 
@@ -24,7 +24,7 @@ public class NearbyStop implements Comparable<NearbyStop>, Serializable {
   private final double distance;
 
   private final List<Edge> edges;
-  private final State state;
+  private final transient State state;
 
   public NearbyStop(FeedScopedId stopId, double distance, List<Edge> edges, State state) {
     this.stopId = Objects.requireNonNull(stopId);

@@ -64,6 +64,13 @@
           }
         }
         stopCalls {
+          destinationDisplay {
+            headsign
+          }
+          geometryToNextCall {
+            length
+            points
+          }
           schedule {
             time {
               ... on ArrivalDepartureTime {
@@ -78,6 +85,7 @@
               delay
               time
             }
+            canceled
             departure {
               delay
               time

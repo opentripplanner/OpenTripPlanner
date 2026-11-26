@@ -8,6 +8,7 @@ public enum Color {
   LIGHT_MAGENTA("#f783a0"),
   BRIGHT_GREEN("#22DD9E"),
   DARK_GREEN("#136b04"),
+  OLIVE_GREEN("#598734"),
   TEAL("#277eb5"),
   TURQUOISE("#1cafad"),
   RED("#fc0f2a"),

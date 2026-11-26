@@ -17,7 +17,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -59,6 +58,7 @@ import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.transit.service.TransitServiceResolver;
 import org.opentripplanner.transit.transfer.regular.NoRegularTransfers;
 
 class LegacyRouteRequestMapperTest implements PlanTestConstants {
@@ -86,11 +86,7 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
     var linkingContextFactory = new LinkingContextFactory(
       graph,
       vertexCreationService,
-      transitService::findStopOrChildIds,
-      id -> {
-        var group = transitService.getStopLocationsGroup(id);
-        return Optional.ofNullable(group).map(locationsGroup -> locationsGroup.getCoordinate());
-      }
+      new TransitServiceResolver(transitService)
     );
     CONTEXT = new TestGtfsGraphQLRequestContext(
       new TestRoutingService(List.of()),

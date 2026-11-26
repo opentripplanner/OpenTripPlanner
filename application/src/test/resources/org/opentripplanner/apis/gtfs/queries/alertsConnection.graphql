@@ -8,6 +8,8 @@
     edges {
       node {
         id
+        alertId
+        version
         headerDefault: alertHeaderText
         headerDe: alertHeaderText(language: "de")
         descriptionDefault: alertDescriptionText

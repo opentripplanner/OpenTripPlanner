@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 import org.jspecify.annotations.Nullable;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.model.PickDrop;
@@ -52,6 +53,9 @@ public class TripInput {
 
   @Nullable
   private String netexInternalPlanningCode;
+
+  @Nullable
+  private List<LineString> hopGeometries;
 
   private final boolean isFlex;
 
@@ -126,8 +130,25 @@ public class TripInput {
     return isFlex;
   }
 
+  /**
+   * The geometries of the hops of the trip pattern, or null if the hops are straight lines between
+   * the stops.
+   */
+  @Nullable
+  public List<LineString> hopGeometries() {
+    return hopGeometries;
+  }
+
   public TripInput addStop(RegularStop stop, String arrivalTime, String departureTime) {
-    return addStopWithHeadsign(stop, arrivalTime, departureTime, null);
+    stops.add(
+      new RegularStopCallInput(
+        stop,
+        TimeUtils.time(arrivalTime),
+        TimeUtils.time(departureTime),
+        null
+      )
+    );
+    return this;
   }
 
   public TripInput addStop(
@@ -159,6 +180,20 @@ public class TripInput {
     String arrivalTime,
     String departureTime,
     String headsign
+  ) {
+    return addStopWithHeadsign(
+      stop,
+      arrivalTime,
+      departureTime,
+      headsign == null ? null : new NonLocalizedString(headsign)
+    );
+  }
+
+  public TripInput addStopWithHeadsign(
+    RegularStop stop,
+    String arrivalTime,
+    String departureTime,
+    @Nullable I18NString headsign
   ) {
     stops.add(
       new RegularStopCallInput(
@@ -198,6 +233,19 @@ public class TripInput {
     return this;
   }
 
+  /**
+   * Set the geometries of the hops between the stops of the trip, which are used for the trip
+   * pattern. There must be one geometry for each hop, so one fewer than the number of stops.
+   * <p>
+   * Trips share a pattern only if they have the same stops, route and hop geometries. So if the
+   * geometries are set for only one of several trips with the same stops, that trip gets its own
+   * pattern.
+   */
+  public TripInput withHopGeometries(LineString... hopGeometries) {
+    this.hopGeometries = List.of(hopGeometries);
+    return this;
+  }
+
   public TripInput withMode(TransitMode mode) {
     this.mode = mode;
     return this;
@@ -222,7 +270,7 @@ public class TripInput {
     RegularStop stop,
     int arrivalTime,
     int departureTime,
-    @Nullable String headsign,
+    @Nullable I18NString headsign,
     @Nullable PickDrop pickupType,
     @Nullable PickDrop dropoffType
   ) implements StopCallInput {
@@ -230,7 +278,7 @@ public class TripInput {
       RegularStop stop,
       int arrivalTime,
       int departureTime,
-      @Nullable String headsign
+      @Nullable I18NString headsign
     ) {
       this(stop, arrivalTime, departureTime, headsign, null, null);
     }
@@ -243,7 +291,7 @@ public class TripInput {
       st.setArrivalTime(arrivalTime);
       st.setDepartureTime(departureTime);
       if (headsign != null) {
-        st.setStopHeadsign(new NonLocalizedString(headsign));
+        st.setStopHeadsign(headsign);
       }
       if (pickupType != null) {
         st.setPickupType(pickupType);

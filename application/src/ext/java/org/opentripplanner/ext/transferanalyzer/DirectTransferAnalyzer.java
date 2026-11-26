@@ -23,6 +23,7 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.service.NoopSiteResolver;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,7 +79,11 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
     var straightLineNearbyStopFinder = new StraightLineNearbyStopFinder(
       transitRepository.getSiteRepository()::findRegularStops
     );
-    var linkingContextFactory = new LinkingContextFactory(graph, new VertexCreationService(linker));
+    var linkingContextFactory = new LinkingContextFactory(
+      graph,
+      new VertexCreationService(linker),
+      new NoopSiteResolver()
+    );
     var streetNearbyStopFinder = StreetNearbyStopFinder.of(linkingContextFactory).build();
 
     int stopsAnalyzed = 0;

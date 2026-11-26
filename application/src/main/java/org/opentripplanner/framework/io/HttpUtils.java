@@ -4,6 +4,7 @@ import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.UriInfo;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.regex.Pattern;
 import org.apache.hc.core5.http.ContentType;
 
 public final class HttpUtils {
@@ -16,6 +17,11 @@ public final class HttpUtils {
   private static final String HEADER_X_FORWARDED_PROTO = "X-Forwarded-Proto";
   private static final String HEADER_X_FORWARDED_HOST = "X-Forwarded-Host";
   private static final String HEADER_HOST = "Host";
+
+  private static final Pattern ABSOLUTE_URL = Pattern.compile(
+    "^https?://.*",
+    Pattern.CASE_INSENSITIVE
+  );
 
   /**
    * Get the canonical url of a request, either based on headers or the URI. See
@@ -40,6 +46,19 @@ public final class HttpUtils {
     }
 
     return protocol + "://" + host;
+  }
+
+  /**
+   * Resolve a configured base path or URL against the address of the request, see
+   * {@link #getBaseAddress}. A full URL (http or https) is used as is, except for a trailing slash.
+   * A path is put after the request base address, and its leading and trailing slashes are
+   * optional. The result has no trailing slash.
+   */
+  public static String resolveBaseUrl(String requestBaseAddress, String basePathOrUrl) {
+    if (ABSOLUTE_URL.matcher(basePathOrUrl).matches()) {
+      return basePathOrUrl.replaceAll("/+$", "");
+    }
+    return "%s/%s".formatted(requestBaseAddress, basePathOrUrl.replaceAll("^/+|/+$", ""));
   }
 
   /**

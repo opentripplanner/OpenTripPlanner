@@ -3,6 +3,7 @@ package org.opentripplanner.core.model.i18n;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This is for translated strings for which translations are read from OSM or GTFS alerts.
@@ -29,12 +31,13 @@ public class TranslatedString implements I18NString, Serializable {
   private final Map<String, String> translations = new HashMap<>();
 
   private TranslatedString(Map<String, String> translations) {
-    for (Map.Entry<String, String> i : translations.entrySet()) {
-      if (i.getKey() == null) {
-        this.translations.put(null, i.getValue());
-      } else {
-        this.translations.put(i.getKey().toLowerCase(), i.getValue());
-      }
+    // Two codes can be normalized to the same tag, such as pt_BR and pt-BR, or iw and he. The codes
+    // are added in their natural order and the first one wins, so the kept translation does not
+    // depend on the iteration order of the map.
+    var entries = new ArrayList<>(translations.entrySet());
+    entries.sort(Entry.comparingByKey(Comparator.nullsFirst(Comparator.naturalOrder())));
+    for (Entry<String, String> it : entries) {
+      this.translations.putIfAbsent(normalizeLanguage(it.getKey()), it.getValue());
     }
   }
 
@@ -177,15 +180,53 @@ public class TranslatedString implements I18NString, Serializable {
   }
 
   /**
-   * @param locale Wanted locale
-   * @return The translation in the wanted language if it exists, otherwise the default translation
+   * Returns the translation whose language code best matches the wanted locale, by the "lookup"
+   * scheme of RFC 4647 ({@link Locale#lookupTag}): the language tag of the locale is shortened from
+   * the end until it equals a language code of the data, ignoring case. So {@code pt-BR} returns
+   * the {@code pt-BR} translation, or else the {@code pt} one, while {@code pt} never returns
+   * {@code pt-BR}. The lookup does not infer a script from a region: {@code zh-Hant-TW} returns the
+   * {@code zh-Hant} or the {@code zh} translation, never the {@code zh-TW} one.
+   * <p>
+   * A locale without a language, such as {@link Locale#ROOT}, returns the translation with a blank
+   * language code. If no language code matches, or the locale is {@code null}, returns the default
+   * translation.
    */
   @Override
   public String toString(Locale locale) {
-    String language = null;
-    if (locale != null) {
-      language = locale.getLanguage().toLowerCase();
+    if (locale == null) {
+      return toString();
     }
-    return translations.containsKey(language) ? translations.get(language) : toString();
+    if (locale.getLanguage().isEmpty()) {
+      return translations.containsKey("") ? translations.get("") : toString();
+    }
+    String tag = locale.toLanguageTag();
+    // The language codes are canonical tags, so an exact match needs no lookup
+    String translation = translations.get(tag);
+    if (translation != null) {
+      return translation;
+    }
+    List<String> languages = translations.keySet().stream().filter(Objects::nonNull).toList();
+    String language = Locale.lookupTag(Locale.LanguageRange.parse(tag), languages);
+    return language == null ? toString() : translations.get(language);
+  }
+
+  /**
+   * Converts a language code of the data to the canonical BCP 47 form that Java gives to a
+   * requested locale: {@code pt_BR} becomes {@code pt-BR}, {@code iw} becomes {@code he}. A code
+   * Java cannot parse, such as {@code etymology:wikidata} from the OSM key
+   * {@code name:etymology:wikidata}, is kept in lower case, as before. An OSM suffix that Java can
+   * parse is converted too, even when it is not a real subtag: {@code ja_rm} (romaji) becomes
+   * {@code ja-RM}, as if {@code RM} were a region. {@code null}, the default translation, and blank
+   * codes are kept unchanged.
+   */
+  @Nullable
+  static String normalizeLanguage(@Nullable String language) {
+    if (language == null || language.isBlank()) {
+      return language;
+    }
+    Locale locale = Locale.forLanguageTag(language.replace('_', '-'));
+    return locale.getLanguage().isEmpty()
+      ? language.toLowerCase(Locale.ROOT)
+      : locale.toLanguageTag();
   }
 }

@@ -223,8 +223,11 @@ public class LegType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("walkingBike")
           .description("Whether this leg is walking with a bike.")
+          .deprecate(
+            "Walking with a bike is not a separate leg. This field always returns `false`."
+          )
           .type(Scalars.GraphQLBoolean)
-          .dataFetcher(env -> leg(env).walkingBike())
+          .dataFetcher(env -> false)
           .build()
       )
       .field(

@@ -96,4 +96,44 @@ public class TransitGeneralizedCostFilterTest implements PlanTestConstants {
     // Expect - i3 to be dropped
     assertEquals(toStr(List.of(i1, i2, i4)), toStr(subject.removeMatchesForTest(all)));
   }
+
+  @Test
+  public void directFlexIsNotUsedInComparison() {
+    // Create a filter with f(x) = 0 + 2x, without any penalty for waiting at the beginning or end.
+    final TransitGeneralizedCostFilter subject = new TransitGeneralizedCostFilter(
+      CostLinearFunction.of(Cost.ZERO, 2.0),
+      0.0
+    );
+
+    // Direct flex with a low cost. Cost: 100 => Limit: 200, but direct flex sets no limit
+    Itinerary i1 = newItinerary(A, T11_00).flex(T11_00, T11_10, E).build(100);
+
+    // Bus ride. Cost: 120 + 10 * 60 = 720, kept even though it exceeds the direct-flex limit
+    Itinerary i2 = newItinerary(A).bus(21, T11_00, T11_10, E).build();
+
+    var all = List.of(i1, i2);
+
+    // Expect - nothing to be dropped
+    assertEquals(toStr(all), toStr(subject.removeMatchesForTest(all)));
+  }
+
+  @Test
+  public void directFlexIsNotFiltered() {
+    // Create a filter with f(x) = 0 + 2x, without any penalty for waiting at the beginning or end.
+    final TransitGeneralizedCostFilter subject = new TransitGeneralizedCostFilter(
+      CostLinearFunction.of(Cost.ZERO, 2.0),
+      0.0
+    );
+
+    // Bus ride. Cost: 120 + 10 * 60 = 720 => Limit: 1440
+    Itinerary i1 = newItinerary(A).bus(21, T11_00, T11_10, E).build();
+
+    // Direct flex outside cost limit. Cost: 2000, limit 1440, but direct flex is not filtered
+    Itinerary i2 = newItinerary(A, T11_00).flex(T11_00, T11_10, E).build(2000);
+
+    var all = List.of(i1, i2);
+
+    // Expect - nothing to be dropped
+    assertEquals(toStr(all), toStr(subject.removeMatchesForTest(all)));
+  }
 }

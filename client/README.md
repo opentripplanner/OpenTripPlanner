@@ -7,8 +7,8 @@ It is designed to work with the Transmodel GraphQL API.
 ## Stack notes
 
 This is a true Single Page Application (SPA) written in TypeScript on the React framework. It uses `vite` to run
-(locally) and for building static assets. It requires no server runtime, and can be served from a CDN and run entirely
-in the browser.
+(locally) and for building static assets. It requires no server runtime, and can be served by any static web server and
+run entirely in the browser. The Maven build bundles it into the OTP jar, which serves it.
 
 The design framework is Bootstrap with React support from `react-bootstrap`.
 
@@ -19,7 +19,9 @@ generated during build and are not checked into the repository.
 
 ## Prerequisites
 
-Use latest LTS version of Node/npm (currently v18). Recommend using a version manager such as `nvm`.
+Use the Node version set as `nodeVersion` in `pom.xml` in this directory. The Maven build installs it by itself, so you
+only need your own Node and npm to work on the client with `npm run dev`. Recommend using a version manager such as
+`nvm`.
 
 The dev and production builds require graphql schema to be present at
 `../application/src/main/resources/org/opentripplanner/apis/transmodel/schema.graphql`.
@@ -72,3 +74,10 @@ or add it to a new `.env.development.local` file (this file will be ignored by g
 In production mode, the default is to access OTP via the same origin as the client (see `.env`).
 This behavior can also be modified by changing the previously mentioned environment variable at
 build-time.
+
+The links from the debug client to GraphiQL (`VITE_GRAPHIQL_URL`) assume the API is at its default
+path. If OTP is served behind a proxy that exposes the API on another path, add a
+`transmodelEndpoint` parameter to the link, for example
+`/graphiql?flavor=transmodel&transmodelEndpoint=/my/proxy/graphql`. The GTFS API has its own
+parameter, `gtfsEndpoint`. The endpoints must be on the same origin as the GraphiQL page, other
+values are ignored, and they are kept when the API is switched in the page.
