@@ -173,7 +173,7 @@
         <dependency>
             <groupId>com.hivemq</groupId>
             <artifactId>hivemq-mqtt-client</artifactId>
-            <version>1.4.0</version>
+            <version>1.4.2</version>
         </dependency>
         <!-- kryo serializers for Guava types !-->
         <dependency>
