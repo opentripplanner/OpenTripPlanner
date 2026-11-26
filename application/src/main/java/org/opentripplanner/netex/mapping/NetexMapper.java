@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.Set;
 import org.entur.netex2.model.Authority;
 import org.entur.netex2.model.Branding;
+import org.entur.netex2.model.CarPoolingService;
 import org.entur.netex2.model.FlexibleLine;
 import org.entur.netex2.model.FlexibleStopPlace;
 import org.entur.netex2.model.GroupOfStopPlaces;
@@ -198,6 +199,7 @@ public class NetexMapper {
     Map<String, FeedScopedId> serviceIds = createCalendarForServiceJourney();
 
     mapRoute();
+    mapCarPoolingServices();
     mapGroupsOfLines();
     mapTripPatterns(serviceIds);
     mapNoticeAssignments();
@@ -436,6 +438,18 @@ public class NetexMapper {
       if (route != null) {
         transitBuilder.getRoutes().add(route);
       }
+    }
+  }
+
+  private void mapCarPoolingServices() {
+    var mapper = new CarPoolingServiceMapper(
+      idFactory,
+      transitBuilder.getAgenciesById(),
+      transitBuilder.getOperatorsById(),
+      currentNetexIndex.getTimeZone()
+    );
+    for (CarPoolingService service : currentNetexIndex.getCarPoolingServiceById().localValues()) {
+      transitBuilder.getRoutes().add(mapper.mapRoute(service));
     }
   }
 
