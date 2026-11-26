@@ -369,6 +369,24 @@ public class TripTimesUpdaterTest {
   }
 
   @Test
+  public void testUpdateWithOnlyNoDataAndNoForwardPropagation() {
+    var tripUpdate = new TripUpdateBuilder(TRIP_ID, SERVICE_DATE, SCHEDULED, TIME_ZONE)
+      .addNoDataStop(1)
+      .addNoDataStop(2)
+      .addNoDataStop(3)
+      .build();
+
+    assertFailure(INVALID_ARRIVAL_TIME, () ->
+      TRIP_TIMES_UPDATER.createUpdatedTripTimesFromGtfsRt(
+        timetable,
+        new TripUpdate(feedId, tripUpdate, NOW),
+        ForwardsDelayPropagationType.NONE,
+        BackwardsDelayPropagationType.REQUIRED_NO_DATA
+      )
+    );
+  }
+
+  @Test
   public void testUpdateWithNoData() {
     var tripUpdate = new TripUpdateBuilder(TRIP_ID, SERVICE_DATE, SCHEDULED, TIME_ZONE)
       .addNoDataStop(1)

@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.OptionalInt;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -221,8 +220,8 @@ class BackwardsDelayRequiredInterpolatorTest {
   @Test
   void noUpdatesAtAll() {
     var builder = SCHEDULED_TRIP_TIMES.createRealTimeWithoutScheduledTimes();
-    Assertions.assertThrows(IllegalArgumentException.class, () ->
-      new BackwardsDelayAlwaysInterpolator().propagateBackwards(builder)
-    );
+    assertThat(new BackwardsDelayRequiredInterpolator(true).propagateBackwards(builder)).isEmpty();
+    assertNull(builder.getArrivalTime(0));
+    assertNull(builder.getDepartureTime(0));
   }
 }
