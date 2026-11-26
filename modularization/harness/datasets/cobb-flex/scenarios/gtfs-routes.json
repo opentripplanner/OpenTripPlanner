@@ -1,0 +1,5 @@
+{
+  "api": "gtfs",
+  "query": "{ routes { gtfsId shortName longName mode type color agency { gtfsId } } }",
+  "sortArraysBy": "gtfsId"
+}

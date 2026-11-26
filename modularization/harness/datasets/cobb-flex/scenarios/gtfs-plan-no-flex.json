@@ -1,0 +1,4 @@
+{
+  "api": "gtfs",
+  "query": "{ planConnection(origin:{location:{coordinate:{latitude:33.7552,longitude:-84.4631}}}, destination:{location:{coordinate:{latitude:33.8694,longitude:-84.6233}}}, dateTime:{earliestDeparture:\"2021-12-02T12:00:00-05:00\"}, first:10) { routingErrors { code } edges { node { start end duration numberOfTransfers generalizedCost legs { mode transitLeg duration distance realTime start { scheduledTime } end { scheduledTime } from { name stop { gtfsId } } to { name stop { gtfsId } } route { gtfsId shortName } trip { gtfsId } pickupBookingInfo { message minimumBookingNotice contactInfo { phoneNumber } earliestBookingTime { daysPrior time } latestBookingTime { daysPrior time } } dropOffBookingInfo { message minimumBookingNotice } } } } } }"
+}

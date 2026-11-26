@@ -111,8 +111,9 @@ packages. It compares:
 - the generated configuration documentation (`doc/user`, from the source tree). OTP has no JSON
   schema
 - real-time updater results on generated input: SIRI-ET, SIRI-SX and GTFS-RT (trip updates, alerts, vehicle
-  positions) from files, and vehicle rental from GBFS feeds (v2.3 and v3.0, stations and
-  free-floating, with geofencing)
+  positions) from files, vehicle rental from GBFS feeds (v2.3 and v3.0, stations and
+  free-floating, with geofencing), and the vehicle parking updaters (ParkAPI, Liipi, Bikely,
+  Bikeep, SIRI-FM) from a local file server. Flexible transit (GTFS-Flex) is a static dataset
 
 Fares are not covered, by decision. They become a sandbox. When the extraction starts, a fare
 dataset is added so the extraction can be checked.

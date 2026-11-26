@@ -1,0 +1,52 @@
+{
+  "inputs": [
+    {
+      "from": "application/src/ext-test/resources/org/opentripplanner/ext/flex/cobb-county.filtered.osm.pbf"
+    },
+    {
+      "from": "application/src/ext-test/resources/org/opentripplanner/ext/flex/cobblinc-bus-30-only.gtfs.zip",
+      "as": "cobb-bus30.gtfs.zip"
+    },
+    {
+      "from": "application/src/ext-test/resources/org/opentripplanner/ext/flex/marta-bus-856-only.gtfs.zip",
+      "as": "marta-bus856.gtfs.zip"
+    },
+    {
+      "from": "application/src/ext-test/resources/org/opentripplanner/ext/flex/cobblinc-scheduled-deviated-flex.gtfs",
+      "zipAs": "cobb-flex.gtfs.zip"
+    }
+  ],
+  "otpConfig": {
+    "otpFeatures": {
+      "FlexRouting": true
+    }
+  },
+  "buildConfig": {
+    "transitServiceStart": "2021-10-01",
+    "transitServiceEnd": "2022-02-01",
+    "transitFeeds": [
+      {
+        "type": "gtfs",
+        "feedId": "COBB",
+        "source": "file://${workDir}/cobb-bus30.gtfs.zip"
+      },
+      {
+        "type": "gtfs",
+        "feedId": "MARTA",
+        "source": "file://${workDir}/marta-bus856.gtfs.zip"
+      },
+      {
+        "type": "gtfs",
+        "feedId": "FLEX",
+        "source": "file://${workDir}/cobb-flex.gtfs.zip"
+      }
+    ]
+  },
+  "routerConfig": {
+    "flex": {
+      "maxTransferDuration": "PT10M",
+      "maxFlexTripDuration": "PT1H",
+      "boardCost": 300
+    }
+  }
+}

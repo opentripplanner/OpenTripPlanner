@@ -1,0 +1,8 @@
+{
+  "api": "transmodel",
+  "query": "{ lines(flexibleOnly:true) { id name publicCode flexibleLineType transportMode journeyPatterns { id name } serviceJourneys { id passingTimes { arrival { time dayOffset } departure { time dayOffset } quay { id name flexibleGroup { id } } bookingArrangements { bookingMethods bookingNote minimumBookingPeriod latestBookingTime latestBookingDay bookingContact { phone contactPerson url } } } } } }",
+  "sortArraysBy": "id",
+  "unordered": [
+    "data.lines[*].journeyPatterns"
+  ]
+}

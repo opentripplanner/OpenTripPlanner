@@ -1,0 +1,5 @@
+{
+  "api": "transmodel",
+  "query": "{ quays { id name flexibleArea flexibleGroup { id } latitude longitude } }",
+  "sortArraysBy": "id"
+}

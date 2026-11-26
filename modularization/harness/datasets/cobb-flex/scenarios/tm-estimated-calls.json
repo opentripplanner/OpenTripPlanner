@@ -1,0 +1,4 @@
+{
+  "api": "transmodel",
+  "query": "{ q: quay(id:\"FLEX:yz85\") { name estimatedCalls(numberOfDepartures:5, startTime:\"2021-12-02T00:00:00-05:00\", timeRange:86400) { aimedDepartureTime bookingArrangements { bookingMethods bookingNote minimumBookingPeriod } serviceJourney { id line { id } } } } c: quay(id:\"FLEX:cujv\") { name estimatedCalls(numberOfDepartures:5, startTime:\"2021-12-02T00:00:00-05:00\", timeRange:86400) { aimedDepartureTime aimedArrivalTime serviceJourney { id line { id } } } } }"
+}

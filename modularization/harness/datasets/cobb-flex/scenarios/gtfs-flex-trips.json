@@ -1,0 +1,5 @@
+{
+  "api": "gtfs",
+  "query": "{ trips(feeds:[\"FLEX\"]) { gtfsId route { gtfsId shortName longName } pattern { code } stoptimes { stopPosition stopPositionInPattern pickupType dropoffType scheduledArrival scheduledDeparture timepoint stop { gtfsId name lat lon } } } }",
+  "sortArraysBy": "gtfsId"
+}

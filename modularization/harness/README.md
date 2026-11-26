@@ -43,6 +43,8 @@ tested. This way both trees get the same input, also after the test resources ha
 | `portland` | GTFS, OSM, elevation raster (NED), generated GTFS-RT | GTFS import, transit routing in both APIs, elevation on street edges and in steps, OSM park and ride, both GraphQL schemas. Two GTFS-RT update steps with trip updates (delays with propagation, absolute times, early run, cancelled trip, skipped stop, changed and withdrawn updates), alerts (route, stop, trip and route-type entities, translations, an alert that is removed) and vehicle positions (position, stop relationship, occupancy, vehicles that move, appear and disappear) |
 | `oslo` | NeTEx (Nordic profile), OSM, generated SIRI-ET and SIRI-SX | NeTEx import and its mapping in both APIs: authorities, operators, lines, quays, stop places, service journeys, calendars, departures, trip search with transit. Four SIRI-ET update steps: delay and early run, cancelled trip and cancelled stop, extra journey, a later update that replaces an earlier one. Two SIRI-SX steps (`earlyStart` is 30 minutes): ten situations that affect a line, a stop point, a stop place, an operator, a vehicle journey, line stops, an unknown stop, a past period, a future period and two periods (an eleventh has no text and is ignored), then a new version of one, a closed one, one moved to other targets and a new one. Shown as GTFS alerts (also on routes, stops, trips and trip legs) and as Transmodel situations (also on quays, calls and legs) |
 | `oslo-rental` | OSM, generated GBFS feeds | Vehicle rental from four GBFS networks: v2.3 stations, v2.3 free-floating scooters with geofencing, v3.0 stations, v3.0 free-floating vehicles with geofencing. Two update steps: station counts and flags change; vehicles are moved, disabled, removed and added and geofencing zones change. Rental trips in both APIs |
+| `oslo-parking` | OSM, generated parking feeds | The vehicle parking sandbox updaters: ParkAPI (cars), bicycle ParkAPI, Liipi (facilities, hubs, utilizations), Bikely (POST), Bikeep (GeoJSON) and SIRI-FM (availability only, for lots of a ParkAPI feed that is read once an hour). Three states (initial, and two steps that change availability, close and reopen lots, add and remove lots, change hubs). Shown as GTFS vehicle parkings, lookups by id, and park-and-ride searches that pick another lot when a lot closes or disappears |
+| `cobb-flex` | OSM, GTFS-Flex (Cobb County), two GTFS feeds | Flexible transit (the `FlexRouting` sandbox feature, enabled with `otpConfig`): zones, location stops, booking rules, trips with a flex window, flex transfers. Searches with flex access, egress and direct flex, arrive-by, a booking time, and outside the service period, in both APIs |
 | `herrenberg` | OSM (German tag mapping) | OSM street import: walk, bicycle and car routing, street steps, OSM parking |
 | `skoyen` | OSM (Norway) | The same on a second extract |
 
@@ -68,6 +70,13 @@ step in turn:
 The updaters read `file:` URLs, e.g. `"url": "file://${workDir}/siri-et"` in `routerConfig`. Do not
 name a directory in the work directory with `gtfs` or `netex` in it: OTP takes it for input data.
 The GTFS-RT files are replaced in place, and the updaters poll them every second.
+
+Some updaters read from HTTP only (the vehicle parking updaters). The harness serves the directory
+`<workDir>/http` on a local port for any method (some updaters POST), and the text `${httpBase}` in
+the configuration is replaced with the base URL, e.g. `"url": "${httpBase}/parkapi/lots.json"`. A
+step replaces the file with a drop into the directory (`"toDir": "http/parkapi"`). A step with no
+`awaitDir` only waits `settleMillis`. The optional `otpConfig` in `dataset.json` is written to
+`otp-config.json`, e.g. to turn on a sandbox feature.
 Steps build on each other. The SIRI-ET updater drops a delivery that is older than the one before
 or older than the start of OTP, so the generated files have increasing response timestamps in
 the future.
@@ -110,7 +119,7 @@ Found by `selfcheck`. They are worked around in the scenarios, not hidden:
 - `Stop.vehicleMode` in the GTFS API changes between runs for stops with several modes. It is not
   requested.
 - The order of patterns in `stoptimesForServiceDate`, of the routes of a stop, of the journey
-  patterns of a line, and of the tags of a parking is not stable. Those arrays are `unordered`.
+  patterns of a line, of the patterns of a route, and of the tags of a parking is not stable. Those arrays are `unordered`.
 - The Transmodel `lines` query fails with an internal error on these datasets. The scenarios use
   `line(id:)` instead.
 
@@ -129,10 +138,12 @@ which is right for the baseline only.
 
 - The JSON schema of the configuration. OTP has none.
 - Real-time updaters other than SIRI-ET, SIRI-SX, GTFS-RT (trip updates, alerts, vehicle
-  positions) and GBFS: MQTT, vehicle parking updaters, the HTTP request/response and Lite variants.
+  positions), GBFS and the vehicle parking updaters: MQTT, the HTTP request/response and Lite
+  variants of SIRI.
 - Fares. By decision: they become a sandbox, see `plan.md`.
 - More input: the EPIP NeTEx profile (the sample in the repository has no stop places, so it
-  gives no trips; it needs a real German extract), flex, vehicle rental, fares, GBFS.
+  gives no trips; it needs a real German extract), NeTEx flexible lines, flex with real-time
+  updates, fares.
 - Elevation outside Portland. Only the Portland raster is in the repository.
 - The graph build output itself, other than through the API answers.
 - Performance. SpeedTest stays the tool for that.

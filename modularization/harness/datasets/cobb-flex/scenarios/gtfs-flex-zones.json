@@ -1,0 +1,8 @@
+{
+  "api": "gtfs",
+  "query": "{ routes(feeds:[\"FLEX\"]) { gtfsId patterns { code stops { gtfsId name lat lon geometries { googleEncoded { length points } } } } } }",
+  "sortArraysBy": "gtfsId",
+  "unordered": [
+    "data.routes[*].patterns"
+  ]
+}
