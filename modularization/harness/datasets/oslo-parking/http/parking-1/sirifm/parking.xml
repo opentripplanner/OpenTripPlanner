@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Siri xmlns="http://www.siri.org.uk/siri" version="2.1">
+  <ServiceDelivery>
+    <ResponseTimestamp>2017-12-27T12:00:00+01:00</ResponseTimestamp>
+    <ProducerRef>HARNESS</ProducerRef>
+    <FacilityMonitoringDelivery version="2.1">
+      <ResponseTimestamp>2017-12-27T12:00:00+01:00</ResponseTimestamp>
+      <FacilityCondition>
+        <FacilityRef>st-1</FacilityRef>
+        <FacilityStatus><Status>available</Status></FacilityStatus>
+        <MonitoredCounting>
+          <CountingType>presentCount</CountingType>
+          <Count>3</Count>
+        </MonitoredCounting>
+      </FacilityCondition>
+      <FacilityCondition>
+        <FacilityRef>st-2</FacilityRef>
+        <FacilityStatus><Status>available</Status></FacilityStatus>
+        <MonitoredCounting>
+          <CountingType>presentCount</CountingType>
+          <Count>20</Count>
+        </MonitoredCounting>
+      </FacilityCondition>
+      <FacilityCondition>
+        <FacilityRef>st-3</FacilityRef>
+        <FacilityStatus><Status>available</Status></FacilityStatus>
+        <MonitoredCounting>
+          <CountingType>presentCount</CountingType>
+          <Count>99</Count>
+        </MonitoredCounting>
+      </FacilityCondition>
+    </FacilityMonitoringDelivery>
+  </ServiceDelivery>
+</Siri>

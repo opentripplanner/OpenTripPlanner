@@ -1,0 +1,190 @@
+{
+  "inputs": [
+    {
+      "from": "application/src/test/resources/org/opentripplanner/oslo-east-filtered.osm.pbf"
+    },
+    {
+      "from": "modularization/harness/datasets/oslo-parking/http/initial/parkapi/lots.json",
+      "as": "http/parkapi/lots.json"
+    },
+    {
+      "from": "modularization/harness/datasets/oslo-parking/http/initial/bparkapi/lots.json",
+      "as": "http/bparkapi/lots.json"
+    },
+    {
+      "from": "modularization/harness/datasets/oslo-parking/http/initial/sirifm/parking.xml",
+      "as": "http/sirifm/parking.xml"
+    },
+    {
+      "from": "modularization/harness/datasets/oslo-parking/http/initial/liipi/facilities.json",
+      "as": "http/liipi/facilities.json"
+    },
+    {
+      "from": "modularization/harness/datasets/oslo-parking/http/initial/liipi/hubs.json",
+      "as": "http/liipi/hubs.json"
+    },
+    {
+      "from": "modularization/harness/datasets/oslo-parking/http/initial/liipi/utilizations.json",
+      "as": "http/liipi/utilizations.json"
+    },
+    {
+      "from": "modularization/harness/datasets/oslo-parking/http/initial/bikely/locations.json",
+      "as": "http/bikely/locations.json"
+    },
+    {
+      "from": "modularization/harness/datasets/oslo-parking/http/initial/bikeep/locations.json",
+      "as": "http/bikeep/locations.json"
+    },
+    {
+      "from": "modularization/harness/datasets/oslo-parking/http/static/lots.json",
+      "as": "http/static/lots.json"
+    }
+  ],
+  "buildConfig": {},
+  "routerConfig": {
+    "updaters": [
+      {
+        "type": "vehicle-parking",
+        "sourceType": "park-api",
+        "feedId": "pa",
+        "url": "${httpBase}/parkapi/lots.json",
+        "timeZone": "Europe/Oslo",
+        "frequency": "PT1S",
+        "tags": [
+          "source:parkapi"
+        ]
+      },
+      {
+        "type": "vehicle-parking",
+        "sourceType": "bicycle-park-api",
+        "feedId": "bpa",
+        "url": "${httpBase}/bparkapi/lots.json",
+        "timeZone": "Europe/Oslo",
+        "frequency": "PT1S"
+      },
+      {
+        "type": "vehicle-parking",
+        "sourceType": "park-api",
+        "feedId": "st",
+        "url": "${httpBase}/static/lots.json",
+        "timeZone": "Europe/Oslo",
+        "frequency": "PT1H"
+      },
+      {
+        "type": "vehicle-parking",
+        "sourceType": "siri-fm",
+        "feedId": "st",
+        "url": "${httpBase}/sirifm/parking.xml",
+        "frequency": "PT1S"
+      },
+      {
+        "type": "vehicle-parking",
+        "sourceType": "liipi",
+        "feedId": "li",
+        "timeZone": "Europe/Oslo",
+        "facilitiesUrl": "${httpBase}/liipi/facilities.json",
+        "hubsUrl": "${httpBase}/liipi/hubs.json",
+        "utilizationsUrl": "${httpBase}/liipi/utilizations.json",
+        "facilitiesFrequencySec": 1,
+        "utilizationsFrequencySec": 1
+      },
+      {
+        "type": "vehicle-parking",
+        "sourceType": "bikely",
+        "feedId": "bk",
+        "url": "${httpBase}/bikely/locations.json",
+        "frequency": "PT1S"
+      },
+      {
+        "type": "vehicle-parking",
+        "sourceType": "bikeep",
+        "feedId": "bp",
+        "url": "${httpBase}/bikeep/locations.json",
+        "frequency": "PT1S"
+      }
+    ]
+  },
+  "steps": [
+    {
+      "name": "parking-initial",
+      "settleMillis": 3000,
+      "drops": []
+    },
+    {
+      "name": "parking-1",
+      "settleMillis": 3000,
+      "drops": [
+        {
+          "from": "modularization/harness/datasets/oslo-parking/http/parking-1/parkapi/lots.json",
+          "toDir": "http/parkapi"
+        },
+        {
+          "from": "modularization/harness/datasets/oslo-parking/http/parking-1/bparkapi/lots.json",
+          "toDir": "http/bparkapi"
+        },
+        {
+          "from": "modularization/harness/datasets/oslo-parking/http/parking-1/sirifm/parking.xml",
+          "toDir": "http/sirifm"
+        },
+        {
+          "from": "modularization/harness/datasets/oslo-parking/http/parking-1/liipi/facilities.json",
+          "toDir": "http/liipi"
+        },
+        {
+          "from": "modularization/harness/datasets/oslo-parking/http/parking-1/liipi/hubs.json",
+          "toDir": "http/liipi"
+        },
+        {
+          "from": "modularization/harness/datasets/oslo-parking/http/parking-1/liipi/utilizations.json",
+          "toDir": "http/liipi"
+        },
+        {
+          "from": "modularization/harness/datasets/oslo-parking/http/parking-1/bikely/locations.json",
+          "toDir": "http/bikely"
+        },
+        {
+          "from": "modularization/harness/datasets/oslo-parking/http/parking-1/bikeep/locations.json",
+          "toDir": "http/bikeep"
+        }
+      ]
+    },
+    {
+      "name": "parking-2",
+      "settleMillis": 3000,
+      "drops": [
+        {
+          "from": "modularization/harness/datasets/oslo-parking/http/parking-2/parkapi/lots.json",
+          "toDir": "http/parkapi"
+        },
+        {
+          "from": "modularization/harness/datasets/oslo-parking/http/parking-2/bparkapi/lots.json",
+          "toDir": "http/bparkapi"
+        },
+        {
+          "from": "modularization/harness/datasets/oslo-parking/http/parking-2/sirifm/parking.xml",
+          "toDir": "http/sirifm"
+        },
+        {
+          "from": "modularization/harness/datasets/oslo-parking/http/parking-2/liipi/facilities.json",
+          "toDir": "http/liipi"
+        },
+        {
+          "from": "modularization/harness/datasets/oslo-parking/http/parking-2/liipi/hubs.json",
+          "toDir": "http/liipi"
+        },
+        {
+          "from": "modularization/harness/datasets/oslo-parking/http/parking-2/liipi/utilizations.json",
+          "toDir": "http/liipi"
+        },
+        {
+          "from": "modularization/harness/datasets/oslo-parking/http/parking-2/bikely/locations.json",
+          "toDir": "http/bikely"
+        },
+        {
+          "from": "modularization/harness/datasets/oslo-parking/http/parking-2/bikeep/locations.json",
+          "toDir": "http/bikeep"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "result": [
+    {
+      "id": "b1",
+      "name": "Bikely Storgata",
+      "latitude": 59.914,
+      "longitude": 10.753,
+      "isInMaintenance": false,
+      "startPriceAmount": 0,
+      "startPriceDuration": 1,
+      "mainPriceAmount": 0,
+      "mainPriceDuration": 1,
+      "doorAvailibilities": [
+        {
+          "doorTypeName": "Standard",
+          "availableSpots": 3,
+          "totalSpots": 6
+        },
+        {
+          "doorTypeName": "Rack",
+          "availableSpots": 1,
+          "totalSpots": 2
+        },
+        {
+          "doorTypeName": "Other",
+          "availableSpots": 9,
+          "totalSpots": 9
+        }
+      ]
+    },
+    {
+      "id": "b2",
+      "name": "Bikely Youngstorget",
+      "latitude": 59.915,
+      "longitude": 10.75,
+      "isInMaintenance": false,
+      "startPriceAmount": 10,
+      "startPriceDuration": 4,
+      "mainPriceAmount": 5,
+      "mainPriceDuration": 24,
+      "doorAvailibilities": [
+        {
+          "doorTypeName": "Standard",
+          "availableSpots": 0,
+          "totalSpots": 4
+        }
+      ]
+    },
+    {
+      "id": "b3",
+      "name": "Bikely no doors",
+      "latitude": 59.916,
+      "longitude": 10.751,
+      "isInMaintenance": false,
+      "startPriceAmount": 0,
+      "startPriceDuration": 1,
+      "mainPriceAmount": 0,
+      "mainPriceDuration": 1,
+      "doorAvailibilities": []
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "results": [
+    {
+      "id": "h1",
+      "name": {
+        "fi": "Keskusta",
+        "en": "Centre"
+      },
+      "location": {
+        "type": "Point",
+        "coordinates": [
+          10.746,
+          59.915
+        ]
+      },
+      "facilityIds": [
+        "f1",
+        "f2"
+      ]
+    }
+  ]
+}

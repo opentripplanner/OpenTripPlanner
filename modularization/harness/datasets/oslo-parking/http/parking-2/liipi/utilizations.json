@@ -1,0 +1,37 @@
+[
+  {
+    "facilityId": "f1",
+    "capacityType": "CAR",
+    "spacesAvailable": 199
+  },
+  {
+    "facilityId": "f1",
+    "capacityType": "DISABLED",
+    "spacesAvailable": 8
+  },
+  {
+    "facilityId": "f1",
+    "capacityType": "BICYCLE",
+    "spacesAvailable": 40
+  },
+  {
+    "facilityId": "f2",
+    "capacityType": "BICYCLE",
+    "spacesAvailable": 59
+  },
+  {
+    "facilityId": "f3",
+    "capacityType": "CAR",
+    "spacesAvailable": 5
+  },
+  {
+    "facilityId": "f3",
+    "capacityType": "UNKNOWN",
+    "spacesAvailable": 1
+  },
+  {
+    "facilityId": "f4",
+    "capacityType": "CAR",
+    "spacesAvailable": 7
+  }
+]

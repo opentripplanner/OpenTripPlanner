@@ -1,0 +1,8 @@
+{
+  "api": "gtfs",
+  "query": "{ vehicleParkings { vehicleParkingId name lat lon state realtime bicyclePlaces carPlaces anyCarPlaces wheelchairAccessibleCarPlaces tags detailsUrl imageUrl capacity { bicycleSpaces carSpaces wheelchairAccessibleCarSpaces } availability { bicycleSpaces carSpaces wheelchairAccessibleCarSpaces } note openingHours { osm } } }",
+  "sortArraysBy": "vehicleParkingId",
+  "unordered": [
+    "data.vehicleParkings[*].tags"
+  ]
+}

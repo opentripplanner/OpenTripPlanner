@@ -1,0 +1,4 @@
+{
+  "api": "gtfs",
+  "query": "{ planConnection(origin:{location:{coordinate:{latitude:59.9230,longitude:10.7700}}}, destination:{location:{coordinate:{latitude:59.9118,longitude:10.7605}}}, dateTime:{earliestDeparture:\"2017-12-27T08:00:00+01:00\"}, first:3, modes:{directOnly:true, direct:[CAR_PARKING]}) { routingErrors { code } edges { node { duration legs { mode distance duration from { name vehicleParking { vehicleParkingId } } to { name vehicleParking { vehicleParkingId } } } } } } }"
+}

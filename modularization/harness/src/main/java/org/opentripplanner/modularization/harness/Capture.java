@@ -48,8 +48,11 @@ final class Capture {
       .findFirst()
       .orElseThrow(() -> new IllegalArgumentException("Unknown dataset: " + name));
     Path base = Files.createTempDirectory("harness-serve-");
-    try (var otp = new OtpRunner(jar, base.resolve("work"), base.resolve("logs"), port, xmx)) {
-      dataset.materialize(repoRoot, base.resolve("work"));
+    try (
+      var http = new StaticServer(base.resolve("work/http"));
+      var otp = new OtpRunner(jar, base.resolve("work"), base.resolve("logs"), port, xmx)
+    ) {
+      dataset.materialize(repoRoot, base.resolve("work"), http.baseUrl());
       otp.buildGraph();
       otp.startServer();
       System.out.println("OTP is running on http://localhost:" + port + "/otp/ (logs: " + base.resolve("logs") + ")");
@@ -67,14 +70,17 @@ final class Capture {
   ) throws IOException, InterruptedException {
     Files.createDirectories(outDir);
     Path work = outDir.resolve("_work");
-    try (var otp = new OtpRunner(jar, work, outDir.resolve("_logs"), port, xmx)) {
-      dataset.materialize(repoRoot, work);
+    try (
+      var http = new StaticServer(work.resolve("http"));
+      var otp = new OtpRunner(jar, work, outDir.resolve("_logs"), port, xmx)
+    ) {
+      dataset.materialize(repoRoot, work, http.baseUrl());
       otp.buildGraph();
       otp.startServer();
       runScenarios(otp, dataset.name(), dataset.scenarioDir(), outDir);
       for (Dataset.Step step : dataset.steps()) {
         System.out.println("-- step " + step.name());
-        dataset.applyDrops(step, repoRoot, work);
+        dataset.applyDrops(step, repoRoot, work, http.baseUrl());
         Path phaseOut = outDir.resolve("after-" + step.name());
         Files.createDirectories(phaseOut);
         if (!step.awaitDir().isEmpty()) {

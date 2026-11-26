@@ -1,0 +1,4 @@
+{
+  "api": "gtfs",
+  "query": "{ a: vehicleParking(id:\"pa:pa-1\") { name availability { carSpaces } } b: vehicleParking(id:\"li:f1\") { name availability { carSpaces bicycleSpaces wheelchairAccessibleCarSpaces } } c: vehicleParking(id:\"st:st-1\") { name availability { carSpaces } } d: vehicleParking(id:\"bk:b1\") { name state availability { bicycleSpaces } } e: vehicleParking(id:\"pa:pa-5\") { name } f: vehicleParking(id:\"pa:nope\") { name } m: vehicleParkings(ids:[\"bp:k1\",\"bpa:bpa-1\",\"li:h1\"]) { vehicleParkingId name } }"
+}

@@ -1,0 +1,32 @@
+{
+  "lots": [
+    {
+      "id": "bpa-1",
+      "name": "Sykkelhotell",
+      "coords": {
+        "lat": 59.9105,
+        "lng": 10.7525
+      },
+      "state": "open",
+      "lot_type": "Parkhaus",
+      "address": "Sykkelhotell gate 1",
+      "forecast": false,
+      "total": 50,
+      "free": 50
+    },
+    {
+      "id": "bpa-2",
+      "name": "Sykkelstativ Torggata",
+      "coords": {
+        "lat": 59.916,
+        "lng": 10.749
+      },
+      "state": "open",
+      "lot_type": "Parkhaus",
+      "address": "Sykkelstativ Torggata gate 1",
+      "forecast": false,
+      "total": 20,
+      "free": 8
+    }
+  ]
+}

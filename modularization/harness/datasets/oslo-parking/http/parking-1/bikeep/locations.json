@@ -1,0 +1,67 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.7405,
+          59.9125
+        ]
+      },
+      "properties": {
+        "code": "k1",
+        "label": "Bikeep Sentrum",
+        "tags": [
+          "covered",
+          "lockers"
+        ],
+        "parking": {
+          "available": 2,
+          "total": 20
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.758,
+          59.923
+        ]
+      },
+      "properties": {
+        "code": "k2",
+        "label": "Bikeep Grünerløkka",
+        "tags": [],
+        "parking": {
+          "available": 0,
+          "total": 12
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.715,
+          59.928
+        ]
+      },
+      "properties": {
+        "code": "k3",
+        "label": "Bikeep Majorstuen",
+        "tags": [
+          "covered"
+        ],
+        "parking": {
+          "available": 8,
+          "total": 8
+        }
+      }
+    }
+  ]
+}

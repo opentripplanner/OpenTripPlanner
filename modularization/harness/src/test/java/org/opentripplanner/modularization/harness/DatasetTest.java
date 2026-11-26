@@ -112,4 +112,30 @@ class DatasetTest {
     assertEquals(2000, dataset.steps().get(0).settleMillis());
     assertEquals(5, dataset.steps().get(1).settleMillis());
   }
+
+  @Test
+  void httpBaseIsSubstitutedAndOtpConfigIsWritten(@TempDir Path tmp) throws IOException {
+    Path repo = Files.createDirectories(tmp.resolve("repo"));
+    Files.writeString(repo.resolve("lots.json"), "{}");
+    var dataset = write(
+      tmp,
+      """
+      {"inputs":[{"from":"lots.json","as":"http/p/lots.json"}],
+       "otpConfig":{"otpFeatures":{"FlexRouting":true}},
+       "routerConfig":{"updaters":[{"url":"${httpBase}/p/lots.json"}]}}
+      """
+    );
+    Path work = tmp.resolve("work");
+    dataset.materialize(repo, work, "http://127.0.0.1:1234");
+
+    assertTrue(Files.readString(work.resolve("router-config.json")).contains("http://127.0.0.1:1234/p/lots.json"));
+    assertTrue(Files.readString(work.resolve("otp-config.json")).contains("FlexRouting"));
+  }
+
+  @Test
+  void noOtpConfigFileWhenTheDatasetHasNone(@TempDir Path tmp) throws IOException {
+    var dataset = write(tmp, "{}");
+    dataset.materialize(tmp, tmp.resolve("work"));
+    assertTrue(Files.notExists(tmp.resolve("work/otp-config.json")));
+  }
 }

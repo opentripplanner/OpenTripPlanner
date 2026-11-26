@@ -1,0 +1,18 @@
+{
+  "lots": [
+    {
+      "id": "bpa-1",
+      "name": "Sykkelhotell",
+      "coords": {
+        "lat": 59.9105,
+        "lng": 10.7525
+      },
+      "state": "open",
+      "lot_type": "Parkhaus",
+      "address": "Sykkelhotell gate 1",
+      "forecast": false,
+      "total": 50,
+      "free": 5
+    }
+  ]
+}

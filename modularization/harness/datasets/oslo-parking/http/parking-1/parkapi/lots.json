@@ -1,0 +1,70 @@
+{
+  "last_updated": "2017-12-27T12:00:00",
+  "lots": [
+    {
+      "id": "pa-1",
+      "name": "Oslo S",
+      "coords": {
+        "lat": 59.911,
+        "lng": 10.753
+      },
+      "state": "open",
+      "lot_type": "Parkhaus",
+      "address": "Oslo S gate 1",
+      "forecast": false,
+      "total": 400,
+      "free": 35,
+      "total:disabled": 10,
+      "free:disabled": 1,
+      "opening_hours": "Mo-Fr 06:00-23:00",
+      "notes": {
+        "en": "Pay at the machine",
+        "no": "Betal i automaten"
+      },
+      "url": "https://example.com/pa-1",
+      "image_url": "https://example.com/pa-1.jpg"
+    },
+    {
+      "id": "pa-2",
+      "name": "Vaterland",
+      "coords": {
+        "lat": 59.9138,
+        "lng": 10.7478
+      },
+      "state": "open",
+      "lot_type": "Parkhaus",
+      "address": "Vaterland gate 1",
+      "forecast": false,
+      "total": 250,
+      "free": 90
+    },
+    {
+      "id": "pa-3",
+      "name": "Operaen",
+      "coords": {
+        "lat": 59.9075,
+        "lng": 10.753
+      },
+      "state": "open",
+      "lot_type": "Parkhaus",
+      "address": "Operaen gate 1",
+      "forecast": false,
+      "total": 300,
+      "free": 150
+    },
+    {
+      "id": "pa-5",
+      "name": "Bjørvika",
+      "coords": {
+        "lat": 59.9085,
+        "lng": 10.758
+      },
+      "state": "open",
+      "lot_type": "Parkhaus",
+      "address": "Bjørvika gate 1",
+      "forecast": false,
+      "total": 120,
+      "free": 60
+    }
+  ]
+}

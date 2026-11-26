@@ -41,7 +41,11 @@ import java.util.zip.ZipOutputStream;
  *
  * <p>The text {@code ${workDir}} in the configuration is replaced with the absolute path of the
  * work directory, so an updater can read from a directory there, e.g.
- * {@code "url": "file://${workDir}/siri-et"}.
+ * {@code "url": "file://${workDir}/siri-et"}. Some updaters can only read from HTTP. The harness
+ * serves the directory {@code <workDir>/http} on a local port for any method, and the text
+ * {@code ${httpBase}} is replaced with the base URL, e.g.
+ * {@code "url": "${httpBase}/parkapi/lots.json"}. Optional {@code otpConfig} is written to
+ * {@code otp-config.json}, e.g. to enable a sandbox feature.
  */
 record Dataset(
   String name,
@@ -49,6 +53,7 @@ record Dataset(
   List<Input> inputs,
   JsonNode buildConfig,
   JsonNode routerConfig,
+  JsonNode otpConfig,
   List<Step> steps
 ) {
   record Input(String from, String as, String zipAs, boolean substitute) {}
@@ -121,6 +126,7 @@ record Dataset(
         inputs,
         n.path("buildConfig"),
         n.path("routerConfig"),
+        n.path("otpConfig"),
         steps
       );
     } catch (IOException e) {
@@ -130,6 +136,14 @@ record Dataset(
 
   /** Write the input files and the configuration to the work directory. */
   void materialize(Path repoRoot, Path workDir) throws IOException {
+    materialize(repoRoot, workDir, "");
+  }
+
+  /**
+   * Write the input files and the configuration to the work directory. {@code httpBase} is the
+   * base URL of the harness's file server, that serves {@code <workDir>/http}.
+   */
+  void materialize(Path repoRoot, Path workDir, String httpBase) throws IOException {
     Files.createDirectories(workDir);
     for (Input in : inputs) {
       Path src = repoRoot.resolve(in.from());
@@ -140,7 +154,7 @@ record Dataset(
         zipDirectory(src, workDir.resolve(in.zipAs()));
       } else {
         String target = in.as() != null ? in.as() : src.getFileName().toString();
-        copy(src, workDir.resolve(target), in.substitute(), workDir);
+        copy(src, workDir.resolve(target), in.substitute(), workDir, httpBase);
       }
     }
     for (Step step : steps) {
@@ -152,37 +166,54 @@ record Dataset(
       }
     }
     String work = workDir.toAbsolutePath().toString();
-    writeConfig(workDir.resolve("build-config.json"), buildConfig, work);
-    writeConfig(workDir.resolve("router-config.json"), routerConfig, work);
+    writeConfig(workDir.resolve("build-config.json"), buildConfig, work, httpBase);
+    writeConfig(workDir.resolve("router-config.json"), routerConfig, work, httpBase);
+    if (otpConfig != null && !otpConfig.isMissingNode()) {
+      writeConfig(workDir.resolve("otp-config.json"), otpConfig, work, httpBase);
+    }
   }
 
   /** Copy the files of a step into the directories the updaters read. */
   void applyDrops(Step step, Path repoRoot, Path workDir) throws IOException {
+    applyDrops(step, repoRoot, workDir, "");
+  }
+
+  void applyDrops(Step step, Path repoRoot, Path workDir, String httpBase) throws IOException {
     for (Drop drop : step.drops()) {
       Path src = repoRoot.resolve(drop.from());
       if (!Files.exists(src)) {
         throw new IllegalStateException("Update file of step " + step.name() + " not found: " + src);
       }
-      copy(src, workDir.resolve(drop.toDir()).resolve(src.getFileName()), drop.substitute(), workDir);
+      copy(
+        src,
+        workDir.resolve(drop.toDir()).resolve(src.getFileName()),
+        drop.substitute(),
+        workDir,
+        httpBase
+      );
     }
   }
 
-  private static void copy(Path src, Path target, boolean substitute, Path workDir)
+  private static void copy(Path src, Path target, boolean substitute, Path workDir, String httpBase)
     throws IOException {
     Files.createDirectories(target.getParent());
     if (substitute) {
-      String text = Files.readString(src).replace("${workDir}", workDir.toAbsolutePath().toString());
-      Files.writeString(target, text);
+      Files.writeString(target, substitute(Files.readString(src), workDir.toAbsolutePath().toString(), httpBase));
     } else {
       Files.copy(src, target, StandardCopyOption.REPLACE_EXISTING);
     }
   }
 
-  private static void writeConfig(Path file, JsonNode config, String workDir) throws IOException {
+  private static void writeConfig(Path file, JsonNode config, String workDir, String httpBase)
+    throws IOException {
     String text = config == null || config.isMissingNode()
       ? "{}"
-      : Json.MAPPER.writeValueAsString(config).replace("${workDir}", workDir);
+      : substitute(Json.MAPPER.writeValueAsString(config), workDir, httpBase);
     Files.writeString(file, text);
+  }
+
+  private static String substitute(String text, String workDir, String httpBase) {
+    return text.replace("${workDir}", workDir).replace("${httpBase}", httpBase);
   }
 
   /** Zip a directory with sorted entries and fixed timestamps, so the zip is reproducible. */

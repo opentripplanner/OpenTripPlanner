@@ -1,0 +1,82 @@
+{
+  "results": [
+    {
+      "id": "f1",
+      "name": {
+        "fi": "Kamppi",
+        "sv": "Kampen",
+        "en": "Kamppi"
+      },
+      "location": {
+        "type": "Point",
+        "coordinates": [
+          10.74,
+          59.917
+        ]
+      },
+      "status": "IN_OPERATION",
+      "builtCapacity": {
+        "CAR": 200,
+        "DISABLED": 8,
+        "BICYCLE": 40
+      },
+      "services": [
+        "LIGHTING",
+        "ELEVATOR"
+      ],
+      "authenticationMethods": [
+        "HSL_TRAVEL_CARD"
+      ],
+      "pricingMethod": "PAID_24H",
+      "openingHours": {
+        "byDayType": {
+          "BUSINESS_DAY": {
+            "from": "05",
+            "until": "24"
+          },
+          "SATURDAY": {
+            "from": "07:30",
+            "until": "22"
+          }
+        }
+      }
+    },
+    {
+      "id": "f2",
+      "name": {
+        "fi": "Rautatientori",
+        "en": "Central station"
+      },
+      "location": {
+        "type": "Point",
+        "coordinates": [
+          10.752,
+          59.913
+        ]
+      },
+      "status": "IN_OPERATION",
+      "builtCapacity": {
+        "BICYCLE": 100
+      },
+      "services": [],
+      "authenticationMethods": []
+    },
+    {
+      "id": "f3",
+      "name": {},
+      "location": {
+        "type": "Point",
+        "coordinates": [
+          10.745,
+          59.91
+        ]
+      },
+      "status": "TEMPORARILY_CLOSED",
+      "builtCapacity": {
+        "CAR": 30
+      },
+      "services": [],
+      "authenticationMethods": []
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "lots": [
+    {
+      "id": "st-1",
+      "name": "Aker brygge",
+      "coords": {
+        "lat": 59.911,
+        "lng": 10.727
+      },
+      "state": "open",
+      "lot_type": "Parkhaus",
+      "address": "Aker brygge gate 1",
+      "forecast": false,
+      "total": 500,
+      "free": 500
+    },
+    {
+      "id": "st-2",
+      "name": "Tjuvholmen",
+      "coords": {
+        "lat": 59.906,
+        "lng": 10.719
+      },
+      "state": "open",
+      "lot_type": "Parkhaus",
+      "address": "Tjuvholmen gate 1",
+      "forecast": false,
+      "total": 200,
+      "free": 200
+    },
+    {
+      "id": "st-3",
+      "name": "Skøyen",
+      "coords": {
+        "lat": 59.922,
+        "lng": 10.68
+      },
+      "state": "open",
+      "lot_type": "Parkhaus",
+      "address": "Skøyen gate 1",
+      "forecast": false,
+      "total": 100,
+      "free": 100
+    }
+  ]
+}
