@@ -24,7 +24,7 @@ public class WalkPreferencesMapper {
     }
     var walkSafetyFactor = args.getGraphQLSafetyFactor();
     if (walkSafetyFactor != null) {
-      preferences.withSafetyFactor(walkSafetyFactor);
+      preferences.withSafetyFactor(clampRatio(walkSafetyFactor));
     }
     var boardCost = args.getGraphQLBoardCost();
     if (boardCost != null) {
@@ -52,7 +52,12 @@ public class WalkPreferencesMapper {
     }
     var safetyFactor = args.getGraphQLSafetyFactor();
     if (safetyFactor != null) {
-      preferences.withSafetyFactor(safetyFactor);
+      preferences.withSafetyFactor(clampRatio(safetyFactor));
     }
+  }
+
+  /// The GTFS API clamps a safety factor outside [0, 1] instead of rejecting the request.
+  static double clampRatio(double value) {
+    return Math.clamp(value, 0.0, 1.0);
   }
 }

@@ -180,4 +180,11 @@ class WalkPreferencesTest {
       subject.toString()
     );
   }
+
+  @org.junit.jupiter.params.ParameterizedTest
+  @org.junit.jupiter.params.provider.ValueSource(doubles = { -0.1, 1.1 })
+  void safetyFactorOutsideTheRangeIsRejected(double value) {
+    var builder = WalkPreferences.of().withSafetyFactor(value);
+    org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, builder::build);
+  }
 }

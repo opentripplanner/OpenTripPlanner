@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.util.Objects;
 import java.util.function.Consumer;
 import org.opentripplanner.core.model.basic.Cost;
+import org.opentripplanner.utils.lang.DoubleUtils;
 import org.opentripplanner.utils.lang.Units;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
@@ -48,7 +49,9 @@ public final class WalkPreferences implements Serializable {
     this.boardCost = builder.boardCost;
     this.stairsReluctance = Units.reluctance(builder.stairsReluctance);
     this.stairsTimeFactor = Units.reluctance(builder.stairsTimeFactor);
-    this.safetyFactor = Units.reluctance(builder.safetyFactor);
+    this.safetyFactor = Units.reluctance(
+      DoubleUtils.requireInRange(builder.safetyFactor, 0.0, 1.0)
+    );
     this.escalator = builder.escalator;
   }
 
@@ -238,13 +241,7 @@ public final class WalkPreferences implements Serializable {
     }
 
     public Builder withSafetyFactor(double safetyFactor) {
-      if (safetyFactor < 0) {
-        this.safetyFactor = 0;
-      } else if (safetyFactor > 1) {
-        this.safetyFactor = 1;
-      } else {
-        this.safetyFactor = safetyFactor;
-      }
+      this.safetyFactor = safetyFactor;
       return this;
     }
 
