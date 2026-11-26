@@ -5,17 +5,24 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.time.Duration;
 import java.time.LocalTime;
+import java.util.EnumSet;
 import org.entur.netex2.model.BookingArrangementsStructure;
+import org.entur.netex2.model.BookingMethodEnumeration;
+import org.entur.netex2.model.CarPoolingService;
 import org.entur.netex2.model.ContactStructure;
 import org.entur.netex2.model.FlexibleLine;
 import org.entur.netex2.model.FlexibleServiceProperties;
 import org.entur.netex2.model.MultilingualString;
 import org.entur.netex2.model.PurchaseWhenEnumeration;
+import org.entur.netex2.model.ServiceBookingArrangement;
+import org.entur.netex2.model.ServiceBookingArrangement_VersionStructure;
+import org.entur.netex2.model.ServiceBookingArrangements_RelStructure;
 import org.entur.netex2.model.ServiceJourney;
 import org.entur.netex2.model.StopPointInJourneyPattern;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
+import org.opentripplanner.transit.model.timetable.booking.BookingMethod;
 
 class BookingInfoMapperTest {
 
@@ -27,6 +34,7 @@ class BookingInfoMapperTest {
   private static final String PHONE = "Phone";
   private static final String EMAIL = "Email";
   private static final String DETAILS = "Details";
+  private static final String BOOKING_URL = "https://ridealong.example/booking";
 
   private static final LocalTime FIVE_THIRTY = LocalTime.of(5, 30);
   private static final Duration THIRTY_MINUTES = Duration.ofMinutes(30);
@@ -191,5 +199,42 @@ class BookingInfoMapperTest {
     BookingInfo bookingInfo = subject.map(stopPoint, null, null);
 
     assertEquals(THIRTY_MINUTES, bookingInfo.getMinimumBookingNotice().get());
+  }
+
+  @Test
+  void mapBookingArrangementOfMobilityService() {
+    var service = new CarPoolingService().withServiceBookingArrangementsRelStructure(
+      new ServiceBookingArrangements_RelStructure().withServiceBookingArrangementRefOrServiceBookingArrangement(
+        new ServiceBookingArrangement()
+          .withBookingContact(new ContactStructure().withUrl(BOOKING_URL))
+          .withBookingMethods(BookingMethodEnumeration.ONLINE)
+          .withMinimumBookingPeriod(THIRTY_MINUTES)
+      )
+    );
+
+    BookingInfo bookingInfo = subject.map(service);
+
+    assertEquals(BOOKING_URL, bookingInfo.getContactInfo().getBookingUrl());
+    assertEquals(EnumSet.of(BookingMethod.ONLINE), bookingInfo.bookingMethods());
+    assertEquals(THIRTY_MINUTES, bookingInfo.getMinimumBookingNotice().get());
+  }
+
+  /**
+   * NeTEx versions before 2.0 have a single booking arrangement for a mobility service.
+   */
+  @Test
+  void mapSingleBookingArrangementOfMobilityService() {
+    var service = new CarPoolingService().withServiceBookingArrangements(
+      new ServiceBookingArrangement_VersionStructure().withBookingContact(
+        new ContactStructure().withUrl(BOOKING_URL)
+      )
+    );
+
+    assertEquals(BOOKING_URL, subject.map(service).getContactInfo().getBookingUrl());
+  }
+
+  @Test
+  void mobilityServiceWithoutBookingArrangement() {
+    assertNull(subject.map(new CarPoolingService()));
   }
 }

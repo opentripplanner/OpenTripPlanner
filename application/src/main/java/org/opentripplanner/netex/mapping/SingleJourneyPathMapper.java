@@ -6,11 +6,13 @@ import java.math.BigInteger;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import org.entur.netex2.model.CarPoolingService;
 import org.entur.netex2.model.OperatingDay;
 import org.entur.netex2.model.SingleJourney;
 import org.entur.netex2.model.SingleJourneyPath;
@@ -35,6 +37,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
+import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 import org.opentripplanner.transit.service.SiteRepositoryBuilder;
 
 /**
@@ -48,10 +51,13 @@ class SingleJourneyPathMapper {
   private final FeedScopedIdFactory idFactory;
   private final EntityById<Route> routesById;
   private final ReadOnlyHierarchicalMapById<OperatingDay> operatingDayById;
+  private final ReadOnlyHierarchicalMapById<CarPoolingService> carPoolingServiceById;
   private final VehicleMeetingPointMapper vehicleMeetingPointMapper;
+  private final BookingInfoMapper bookingInfoMapper;
   private final CalendarServiceBuilder calendarServiceBuilder;
   private final DeduplicatorService deduplicator;
   private final Multimap<String, SingleJourney> journeysByPathId = ArrayListMultimap.create();
+  private final Map<String, BookingInfo> bookingInfoByServiceId = new HashMap<>();
 
   SingleJourneyPathMapper(
     DataImportIssueStore issueStore,
@@ -66,12 +72,14 @@ class SingleJourneyPathMapper {
     this.idFactory = idFactory;
     this.routesById = routesById;
     this.operatingDayById = netexIndex.getOperatingDayById();
+    this.carPoolingServiceById = netexIndex.getCarPoolingServiceById();
     this.vehicleMeetingPointMapper = new VehicleMeetingPointMapper(
       idFactory,
       siteRepositoryBuilder,
       netexIndex.getVehicleMeetingPointById(),
       netexIndex.getQuayIdByVehicleMeetingPointRef()
     );
+    this.bookingInfoMapper = new BookingInfoMapper(issueStore);
     this.calendarServiceBuilder = calendarServiceBuilder;
     this.deduplicator = deduplicator;
 
@@ -96,13 +104,14 @@ class SingleJourneyPathMapper {
     // The validation has made sure all journeys of a path belong to the same car pooling service
     String serviceId = journeys.iterator().next().getCommonVehicleServiceRef().getValue().getRef();
     Route route = routesById.get(idFactory.createId(serviceId));
+    BookingInfo bookingInfo = mapBookingInfo(serviceId);
 
     Map<Trip, List<StopTime>> stopTimesByTrip = new LinkedHashMap<>();
     List<TripTimes<?>> tripTimes = new ArrayList<>();
 
     for (SingleJourney journey : journeys) {
       Trip trip = mapTrip(journey, route, stops.getLast());
-      List<StopTime> stopTimes = mapStopTimes(journey, trip, stops);
+      List<StopTime> stopTimes = mapStopTimes(journey, trip, stops, bookingInfo);
       try {
         tripTimes.add(TripTimesFactory.tripTimes(trip, stopTimes, deduplicator));
         stopTimesByTrip.put(trip, stopTimes);
@@ -171,12 +180,14 @@ class SingleJourneyPathMapper {
   }
 
   /**
-   * The validation has made sure there is a passing time for each stop, in the same order.
+   * The validation has made sure there is a passing time for each stop, in the same order. The
+   * booking arrangement of the car pooling service applies to every stop.
    */
   private static List<StopTime> mapStopTimes(
     SingleJourney journey,
     Trip trip,
-    List<RegularStop> stops
+    List<RegularStop> stops,
+    @Nullable BookingInfo bookingInfo
   ) {
     List<TargetPassingTime> passingTimes = journey.getDatedPassingTimes().getTargetPassingTime();
     List<StopTime> stopTimes = new ArrayList<>();
@@ -199,9 +210,21 @@ class SingleJourneyPathMapper {
       // A stop may have only one of the times, like the first and the last stop
       stopTime.setArrivalTime(arrivalTime == null ? departureTime : arrivalTime);
       stopTime.setDepartureTime(departureTime == null ? arrivalTime : departureTime);
+      stopTime.setPickupBookingInfo(bookingInfo);
+      stopTime.setDropOffBookingInfo(bookingInfo);
       stopTimes.add(stopTime);
     }
     return stopTimes;
+  }
+
+  /** The booking arrangement of a service is mapped once, it is the same for all its journeys. */
+  @Nullable
+  private BookingInfo mapBookingInfo(String serviceId) {
+    if (!bookingInfoByServiceId.containsKey(serviceId)) {
+      BookingInfo bookingInfo = bookingInfoMapper.map(carPoolingServiceById.lookup(serviceId));
+      bookingInfoByServiceId.put(serviceId, bookingInfo);
+    }
+    return bookingInfoByServiceId.get(serviceId);
   }
 
   @Nullable

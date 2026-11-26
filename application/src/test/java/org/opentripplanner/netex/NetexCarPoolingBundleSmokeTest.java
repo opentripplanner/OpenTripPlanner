@@ -104,6 +104,10 @@ class NetexCarPoolingBundleSmokeTest {
     assertEquals(TimeUtils.time("08:04"), tripTimes.getArrivalTime(1));
     assertEquals(TimeUtils.time("08:05"), tripTimes.getDepartureTime(1));
     assertEquals(TimeUtils.time("08:15"), tripTimes.getArrivalTime(2));
+    assertEquals(
+      "https://ridealong.example/booking",
+      tripTimes.getPickupBookingInfo(0).getContactInfo().getBookingUrl()
+    );
   }
 
   private static NetexBundle netexBundle(TransitDataImportBuilder transitBuilder) {

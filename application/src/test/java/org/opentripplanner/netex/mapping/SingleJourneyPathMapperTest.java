@@ -2,6 +2,7 @@ package org.opentripplanner.netex.mapping;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.netex.NetexTestDataSupport.createCarPoolingService;
 import static org.opentripplanner.netex.NetexTestDataSupport.createOperatingDay;
 import static org.opentripplanner.netex.NetexTestDataSupport.createSingleJourney;
 import static org.opentripplanner.netex.NetexTestDataSupport.createSingleJourneyPath;
@@ -13,6 +14,9 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
+import org.entur.netex2.model.CarPoolingService;
+import org.entur.netex2.model.ContactStructure;
+import org.entur.netex2.model.ServiceBookingArrangement_VersionStructure;
 import org.entur.netex2.model.SingleJourney;
 import org.entur.netex2.model.SingleJourneyPath;
 import org.entur.netex2.model.TargetPassingTime;
@@ -45,6 +49,7 @@ class SingleJourneyPathMapperTest {
   private static final String STATION_ID = "RID:VehicleMeetingPoint:station";
   private static final String JOURNEY_ID = "RID:SingleJourney:1";
   private static final String OTHER_JOURNEY_ID = "RID:SingleJourney:2";
+  private static final String BOOKING_URL = "https://ridealong.example/booking";
   private static final LocalDate DAY = LocalDate.of(2026, 12, 1);
   private static final LocalDate OTHER_DAY = LocalDate.of(2026, 12, 2);
   private static final LocalTime T08_00 = LocalTime.of(8, 0);
@@ -67,9 +72,15 @@ class SingleJourneyPathMapperTest {
     ID_FACTORY
   );
   private final SingleJourneyPath path = createSingleJourneyPath(PATH_ID, HOME_ID, STATION_ID);
+  private final CarPoolingService service = createCarPoolingService(
+    SERVICE_ID,
+    "Ride Along car pool",
+    "RID:Operator:1"
+  );
 
   @BeforeEach
   void setUp() {
+    index.carPoolingServiceById.add(service);
     index.vehicleMeetingPointById.add(
       createVehicleMeetingPoint(HOME_ID, "Hill road 12", 59.95, 10.78)
     );
@@ -162,6 +173,21 @@ class SingleJourneyPathMapperTest {
     add(journeyNextMonth);
 
     assertTrue(mapPath().isEmpty());
+  }
+
+  @Test
+  void bookingArrangementOfServiceAppliesToEveryStop() {
+    service.setServiceBookingArrangements(
+      new ServiceBookingArrangement_VersionStructure().withBookingContact(
+        new ContactStructure().withUrl(BOOKING_URL)
+      )
+    );
+    add(journey(JOURNEY_ID, DAY, T08_00, T08_15));
+
+    for (StopTime stopTime : mapStopTimes()) {
+      assertEquals(BOOKING_URL, stopTime.getPickupBookingInfo().getContactInfo().getBookingUrl());
+      assertEquals(BOOKING_URL, stopTime.getDropOffBookingInfo().getContactInfo().getBookingUrl());
+    }
   }
 
   @Test
