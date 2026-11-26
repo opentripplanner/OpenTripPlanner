@@ -11,6 +11,8 @@ import org.entur.netex2.model.CompositeFrame;
 import org.entur.netex2.model.FareFrame;
 import org.entur.netex2.model.GeneralFrame;
 import org.entur.netex2.model.InfrastructureFrame;
+import org.entur.netex2.model.MobilityJourneyFrame;
+import org.entur.netex2.model.MobilityServiceFrame;
 import org.entur.netex2.model.PublicationDeliveryStructure;
 import org.entur.netex2.model.ResourceFrame;
 import org.entur.netex2.model.ServiceCalendarFrame;
@@ -92,6 +94,10 @@ public class NetexDocumentParser {
       parse(frame, new SiteFrameParser(ignoredFeatures));
     } else if (!ignoredFeatures.contains(FARE_FRAME) && value instanceof FareFrame fareFrame) {
       parse(fareFrame, new FareFrameParser());
+    } else if (value instanceof MobilityServiceFrame frame) {
+      parse(frame, new MobilityServiceFrameParser());
+    } else if (value instanceof MobilityJourneyFrame frame) {
+      parse(frame, new MobilityJourneyFrameParser());
     } else if (value instanceof CompositeFrame frame) {
       // We recursively parse composite frames and content until there
       // is no more nested frames - this is accepting documents which

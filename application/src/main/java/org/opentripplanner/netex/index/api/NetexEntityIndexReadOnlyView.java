@@ -3,6 +3,7 @@ package org.opentripplanner.netex.index.api;
 import java.util.Collection;
 import org.entur.netex2.model.Authority;
 import org.entur.netex2.model.Branding;
+import org.entur.netex2.model.CarPoolingService;
 import org.entur.netex2.model.DatedServiceJourney;
 import org.entur.netex2.model.DayType;
 import org.entur.netex2.model.DayTypeAssignment;
@@ -25,8 +26,11 @@ import org.entur.netex2.model.Route;
 import org.entur.netex2.model.ServiceJourney;
 import org.entur.netex2.model.ServiceJourneyInterchange;
 import org.entur.netex2.model.ServiceLink;
+import org.entur.netex2.model.SingleJourney;
+import org.entur.netex2.model.SingleJourneyPath;
 import org.entur.netex2.model.StopPlace;
 import org.entur.netex2.model.TariffZone_VersionStructure;
+import org.entur.netex2.model.VehicleMeetingPoint;
 
 public interface NetexEntityIndexReadOnlyView {
   Network lookupNetworkForLine(String groupOfLineOrNetworkId);
@@ -34,6 +38,8 @@ public interface NetexEntityIndexReadOnlyView {
   ReadOnlyHierarchicalMapById<GroupOfLines> getGroupsOfLinesById();
 
   ReadOnlyHierarchicalMapById<Authority> getAuthoritiesById();
+
+  ReadOnlyHierarchicalMapById<CarPoolingService> getCarPoolingServiceById();
 
   ReadOnlyHierarchicalMapById<DayType> getDayTypeById();
 
@@ -71,6 +77,8 @@ public interface NetexEntityIndexReadOnlyView {
 
   ReadOnlyHierarchicalMap<String, String> getQuayIdByStopPointRef();
 
+  ReadOnlyHierarchicalMap<String, String> getQuayIdByVehicleMeetingPointRef();
+
   ReadOnlyHierarchicalMap<String, String> getFlexibleStopPlaceByStopPointRef();
 
   ReadOnlyHierarchicalMapById<Route> getRouteById();
@@ -81,11 +89,17 @@ public interface NetexEntityIndexReadOnlyView {
 
   ReadOnlyHierarchicalMapById<ServiceLink> getServiceLinkById();
 
+  ReadOnlyHierarchicalMapById<SingleJourney> getSingleJourneyById();
+
+  ReadOnlyHierarchicalMapById<SingleJourneyPath> getSingleJourneyPathById();
+
   ReadOnlyHierarchicalVersionMapById<StopPlace> getStopPlaceById();
 
   ReadOnlyHierarchicalMapById<Parking> getParkingsById();
 
   ReadOnlyHierarchicalVersionMapById<TariffZone_VersionStructure> getTariffZonesById();
+
+  ReadOnlyHierarchicalMapById<VehicleMeetingPoint> getVehicleMeetingPointById();
 
   ReadOnlyHierarchicalMapById<Branding> getBrandingById();
 
