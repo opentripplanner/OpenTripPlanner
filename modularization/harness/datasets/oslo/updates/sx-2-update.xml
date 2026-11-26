@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Siri xmlns="http://www.siri.org.uk/siri" version="2.0">
+  <ServiceDelivery>
+    <ResponseTimestamp>2099-01-01T00:01:02+01:00</ResponseTimestamp>
+    <ProducerRef>HARNESS</ProducerRef>
+    <SituationExchangeDelivery version="2.0">
+      <ResponseTimestamp>2099-01-01T00:01:02+01:00</ResponseTimestamp>
+      <Situations>
+      <PtSituationElement>
+        <CreationTime>2017-12-26T10:00:00+01:00</CreationTime>
+        <ParticipantRef>HARNESS</ParticipantRef>
+        <SituationNumber>HARNESS:SituationNumber:1</SituationNumber>
+        <Version>2</Version>
+        <Source><SourceType>directReport</SourceType></Source>
+        <VersionedAtTime>2017-12-26T12:00:00+01:00</VersionedAtTime>
+        <Progress>open</Progress>
+        <ValidityPeriod>
+          <StartTime>2017-12-01T00:00:00+01:00</StartTime>
+          <EndTime>2099-01-01T00:00:00+01:00</EndTime>
+        </ValidityPeriod>
+        <ReportType>incident</ReportType>
+        <Priority>1</Priority>
+        <Severity>verySevere</Severity>
+        <Summary xml:lang="NO">Store forsinkelser på linje 4</Summary>
+        <Summary xml:lang="EN">Major delays on line 4</Summary>
+        <Description xml:lang="EN">Replacement buses are running.</Description>
+        <Affects>
+          <Networks>
+            <AffectedNetwork>
+              <AffectedLine>
+                <LineRef>RUT:Line:4</LineRef>
+              </AffectedLine>
+            </AffectedNetwork>
+          </Networks>
+        </Affects>
+        <InfoLinks>
+          <InfoLink>
+            <Uri>https://example.com/line4</Uri>
+            <Label>More about line 4</Label>
+          </InfoLink>
+          <InfoLink>
+            <Uri>https://example.com/bus</Uri>
+            <Label>Replacement buses</Label>
+          </InfoLink>
+        </InfoLinks>
+      </PtSituationElement>
+      <PtSituationElement>
+        <CreationTime>2017-12-26T10:00:00+01:00</CreationTime>
+        <ParticipantRef>HARNESS</ParticipantRef>
+        <SituationNumber>HARNESS:SituationNumber:2</SituationNumber>
+        <Version>2</Version>
+        <Source><SourceType>directReport</SourceType></Source>
+        <VersionedAtTime>2017-12-26T12:00:00+01:00</VersionedAtTime>
+        <Progress>closed</Progress>
+        <ValidityPeriod>
+          <StartTime>2017-12-01T00:00:00+01:00</StartTime>
+          <EndTime>2099-01-01T00:00:00+01:00</EndTime>
+        </ValidityPeriod>
+        <ReportType>incident</ReportType>
+        <Priority>1</Priority>
+        <Severity>severe</Severity>
+        <Summary xml:lang="EN">Quay closed</Summary>
+        <Description xml:lang="EN">Open again.</Description>
+        <Affects>
+          <StopPoints>
+            <AffectedStopPoint><StopPointRef>NSR:Quay:10682</StopPointRef></AffectedStopPoint>
+          </StopPoints>
+        </Affects>
+      </PtSituationElement>
+      <PtSituationElement>
+        <CreationTime>2017-12-26T10:00:00+01:00</CreationTime>
+        <ParticipantRef>HARNESS</ParticipantRef>
+        <SituationNumber>HARNESS:SituationNumber:3</SituationNumber>
+        <Version>2</Version>
+        <Source><SourceType>directReport</SourceType></Source>
+        <VersionedAtTime>2017-12-26T12:00:00+01:00</VersionedAtTime>
+        <Progress>open</Progress>
+        <ValidityPeriod>
+          <StartTime>2017-12-01T00:00:00+01:00</StartTime>
+          <EndTime>2099-01-01T00:00:00+01:00</EndTime>
+        </ValidityPeriod>
+        <ReportType>general</ReportType>
+        <Priority>3</Priority>
+        <Severity>slight</Severity>
+        <Summary xml:lang="EN">Stop place works</Summary>
+        <Description xml:lang="EN">Works moved.</Description>
+        <Affects>
+          <StopPlaces>
+            <AffectedStopPlace><StopPlaceRef>NSR:StopPlace:3990</StopPlaceRef></AffectedStopPlace>
+          </StopPlaces>
+          <StopPoints>
+            <AffectedStopPoint><StopPointRef>NSR:Quay:7194</StopPointRef></AffectedStopPoint>
+          </StopPoints>
+        </Affects>
+      </PtSituationElement>
+      <PtSituationElement>
+        <CreationTime>2017-12-26T10:00:00+01:00</CreationTime>
+        <ParticipantRef>HARNESS</ParticipantRef>
+        <SituationNumber>HARNESS:SituationNumber:12</SituationNumber>
+        <Version>1</Version>
+        <Source><SourceType>directReport</SourceType></Source>
+        <VersionedAtTime>2017-12-26T11:00:00+01:00</VersionedAtTime>
+        <Progress>open</Progress>
+        <ValidityPeriod>
+          <StartTime>2017-12-01T00:00:00+01:00</StartTime>
+          <EndTime>2099-01-01T00:00:00+01:00</EndTime>
+        </ValidityPeriod>
+        <ReportType>incident</ReportType>
+        <Priority>2</Priority>
+        <Severity>normal</Severity>
+        <Summary xml:lang="EN">New: line 4 and quay</Summary>
+        <Description xml:lang="EN">Affects the line and one of its quays.</Description>
+        <Affects>
+          <Networks>
+            <AffectedNetwork>
+              <AffectedLine>
+                <LineRef>RUT:Line:4</LineRef>
+              </AffectedLine>
+            </AffectedNetwork>
+          </Networks>
+          <StopPoints>
+            <AffectedStopPoint><StopPointRef>NSR:Quay:7184</StopPointRef></AffectedStopPoint>
+          </StopPoints>
+        </Affects>
+      </PtSituationElement>
+      </Situations>
+    </SituationExchangeDelivery>
+  </ServiceDelivery>
+</Siri>

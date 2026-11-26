@@ -110,7 +110,7 @@ packages. It compares:
 - the GraphQL schemas
 - the generated configuration documentation (`doc/user`, from the source tree). OTP has no JSON
   schema
-- real-time updater results on generated input: SIRI-ET and GTFS-RT (trip updates, alerts, vehicle
+- real-time updater results on generated input: SIRI-ET, SIRI-SX and GTFS-RT (trip updates, alerts, vehicle
   positions) from files, and vehicle rental from GBFS feeds (v2.3 and v3.0, stations and
   free-floating, with geofencing)
 

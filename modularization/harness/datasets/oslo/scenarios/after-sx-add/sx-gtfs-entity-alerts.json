@@ -1,0 +1,5 @@
+{
+  "api": "gtfs",
+  "query": "{ l4: route(id:\"EN:RUT:Line:4\") { alerts { id alertHeaderText } } l12: route(id:\"EN:RUT:Line:12\") { alerts { id alertHeaderText } } q10682: stop(id:\"EN:NSR:Quay:10682\") { alerts { id alertHeaderText } } q7184: stop(id:\"EN:NSR:Quay:7184\") { alerts { id alertHeaderText } } q7194: stop(id:\"EN:NSR:Quay:7194\") { alerts { id alertHeaderText } } q7203: stop(id:\"EN:NSR:Quay:7203\") { alerts { id alertHeaderText } } t4: trip(id:\"EN:RUT:ServiceJourney:4-101493-1098\") { alerts { id alertHeaderText } } agency: agencies { gtfsId alerts { id alertHeaderText } } }",
+  "sortArraysBy": "id"
+}

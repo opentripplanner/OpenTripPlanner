@@ -1,0 +1,15 @@
+{
+  "api": "transmodel",
+  "query": "{ situations { situationNumber participant reportType severity priority version creationTime versionedAtTime summary { value language } description { value language } advice { value language } infoLinks { uri label } validityPeriods { startTime endTime } authority { id } lines { id } quays { id } stopPlaces { id } serviceJourneys { id } affects { __typename ... on AffectedLine { line { id } } ... on AffectedServiceJourney { serviceJourney { id } operatingDay } ... on AffectedStopPlace { quay { id } stopPlace { id } stopConditions } ... on AffectedStopPlaceOnLine { line { id } quay { id } stopPlace { id } stopConditions } ... on AffectedStopPlaceOnServiceJourney { serviceJourney { id } quay { id } stopPlace { id } } ... on AffectedUnknown { description } } } }",
+  "sortArraysBy": "situationNumber",
+  "unordered": [
+    "data.situations[*].lines",
+    "data.situations[*].quays",
+    "data.situations[*].stopPlaces",
+    "data.situations[*].affects",
+    "data.situations[*].validityPeriods",
+    "data.situations[*].serviceJourneys",
+    "data.situations[*].summary",
+    "data.situations[*].description"
+  ]
+}

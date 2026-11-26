@@ -1,0 +1,8 @@
+{
+  "api": "gtfs",
+  "query": "{ alerts { id alertHeaderText alertId alertDescriptionText alertEffect alertCause alertSeverityLevel alertUrl effectiveStartDate effectiveEndDate activityPeriods { start end } alertHeaderTextTranslations { text language } alertDescriptionTextTranslations { text language } entities { __typename ... on Route { gtfsId } ... on Stop { gtfsId } ... on Trip { gtfsId } ... on Agency { gtfsId } ... on RouteType { routeType } } } }",
+  "sortArraysBy": "id",
+  "unordered": [
+    "data.alerts[*].entities"
+  ]
+}

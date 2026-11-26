@@ -1,0 +1,8 @@
+{
+  "api": "transmodel",
+  "query": "{ q: quay(id:\"EN:NSR:Quay:10682\") { situations { situationNumber } estimatedCalls(numberOfDepartures:5, startTime:\"2017-12-27T14:00:00+01:00\", timeRange:7200) { aimedDepartureTime realtime cancellation serviceJourney { id } situations { situationNumber } } } }",
+  "unordered": [
+    "data.q.situations",
+    "data.q.estimatedCalls[*].situations"
+  ]
+}

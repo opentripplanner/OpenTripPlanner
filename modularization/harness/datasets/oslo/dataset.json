@@ -28,6 +28,13 @@
         "feedId": "EN",
         "url": "file://${workDir}/siri-et",
         "frequency": "PT1S"
+      },
+      {
+        "type": "siri-sx-updater",
+        "feedId": "EN",
+        "url": "file://${workDir}/siri-sx",
+        "frequency": "PT1S",
+        "earlyStart": "PT30M"
       }
     ]
   },
@@ -73,6 +80,28 @@
         {
           "from": "modularization/harness/datasets/oslo/updates/et-4-delay-again.xml",
           "toDir": "siri-et"
+        }
+      ]
+    },
+    {
+      "name": "sx-add",
+      "awaitDir": "siri-sx",
+      "settleMillis": 2000,
+      "drops": [
+        {
+          "from": "modularization/harness/datasets/oslo/updates/sx-1-add.xml",
+          "toDir": "siri-sx"
+        }
+      ]
+    },
+    {
+      "name": "sx-update",
+      "awaitDir": "siri-sx",
+      "settleMillis": 2000,
+      "drops": [
+        {
+          "from": "modularization/harness/datasets/oslo/updates/sx-2-update.xml",
+          "toDir": "siri-sx"
         }
       ]
     }

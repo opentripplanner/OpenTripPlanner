@@ -41,13 +41,13 @@ tested. This way both trees get the same input, also after the test resources ha
 | Dataset | Inputs | What it covers |
 |---|---|---|
 | `portland` | GTFS, OSM, elevation raster (NED), generated GTFS-RT | GTFS import, transit routing in both APIs, elevation on street edges and in steps, OSM park and ride, both GraphQL schemas. Two GTFS-RT update steps with trip updates (delays with propagation, absolute times, early run, cancelled trip, skipped stop, changed and withdrawn updates), alerts (route, stop, trip and route-type entities, translations, an alert that is removed) and vehicle positions (position, stop relationship, occupancy, vehicles that move, appear and disappear) |
-| `oslo` | NeTEx (Nordic profile), OSM, generated SIRI-ET | NeTEx import and its mapping in both APIs: authorities, operators, lines, quays, stop places, service journeys, calendars, departures, trip search with transit. Four SIRI-ET update steps: delay and early run, cancelled trip and cancelled stop, extra journey, a later update that replaces an earlier one |
+| `oslo` | NeTEx (Nordic profile), OSM, generated SIRI-ET and SIRI-SX | NeTEx import and its mapping in both APIs: authorities, operators, lines, quays, stop places, service journeys, calendars, departures, trip search with transit. Four SIRI-ET update steps: delay and early run, cancelled trip and cancelled stop, extra journey, a later update that replaces an earlier one. Two SIRI-SX steps (`earlyStart` is 30 minutes): ten situations that affect a line, a stop point, a stop place, an operator, a vehicle journey, line stops, an unknown stop, a past period, a future period and two periods (an eleventh has no text and is ignored), then a new version of one, a closed one, one moved to other targets and a new one. Shown as GTFS alerts (also on routes, stops, trips and trip legs) and as Transmodel situations (also on quays, calls and legs) |
 | `oslo-rental` | OSM, generated GBFS feeds | Vehicle rental from four GBFS networks: v2.3 stations, v2.3 free-floating scooters with geofencing, v3.0 stations, v3.0 free-floating vehicles with geofencing. Two update steps: station counts and flags change; vehicles are moved, disabled, removed and added and geofencing zones change. Rental trips in both APIs |
 | `herrenberg` | OSM (German tag mapping) | OSM street import: walk, bicycle and car routing, street steps, OSM parking |
 | `skoyen` | OSM (Norway) | The same on a second extract |
 
 The street scenarios are generated from the OSM file with `tools/gen_street_scenarios.py`
-(needs `osmium`). The SIRI-ET files and their scenarios come from `tools/gen_siri_et.py` and
+(needs `osmium`). The SIRI-ET files and their scenarios come from `tools/gen_siri_et.py` and the SIRI-SX files, steps and scenarios from `tools/gen_siri_sx.py`. The ET scenarios come from
 `tools/gen_oslo_rt_scenarios.py`, the GBFS feeds, dataset and scenarios of `oslo-rental` from
 `tools/gen_gbfs.py`, and the GTFS-RT protobuf files and scenarios of `portland` from
 `tools/gen_gtfs_rt.py` (a small protobuf encoder, no library needed). The output is deterministic and committed. The GBFS feeds are synthetic, in
@@ -128,8 +128,8 @@ which is right for the baseline only.
 ## Not covered yet
 
 - The JSON schema of the configuration. OTP has none.
-- Real-time updaters other than SIRI-ET, GTFS-RT (trip updates, alerts, vehicle positions) and
-  GBFS: SIRI-SX, MQTT, vehicle parking updaters.
+- Real-time updaters other than SIRI-ET, SIRI-SX, GTFS-RT (trip updates, alerts, vehicle
+  positions) and GBFS: MQTT, vehicle parking updaters, the HTTP request/response and Lite variants.
 - Fares. By decision: they become a sandbox, see `plan.md`.
 - More input: the EPIP NeTEx profile (the sample in the repository has no stop places, so it
   gives no trips; it needs a real German extract), flex, vehicle rental, fares, GBFS.
