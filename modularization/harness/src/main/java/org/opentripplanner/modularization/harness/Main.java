@@ -13,6 +13,7 @@ import java.util.Set;
  * <pre>
  * capture --jar OTP.jar --out DIR [--repo-root DIR] [--datasets DIR] [--only a,b] [--port N] [--xmx 3G]
  * serve --jar OTP.jar --only DATASET [--repo-root DIR] [--datasets DIR] [--port N] [--xmx 3G]
+ * docs --tree OTP_SOURCE_TREE --out DIR
  * compare --baseline DIR --candidate DIR [--approved FILE] [--report FILE]
  * </pre>
  *
@@ -44,6 +45,11 @@ public final class Main {
         Integer.parseInt(opts.getOrDefault("port", "8080")),
         opts.getOrDefault("xmx", "3G")
       );
+      case "docs" -> {
+        Path out = Path.of(required(opts, "out"));
+        int n = ConfigDocs.capture(Path.of(required(opts, "tree")), out);
+        System.out.println("Captured " + n + " configuration documents to " + out);
+      }
       case "compare" -> System.exit(compare(opts));
       default -> usage();
     }

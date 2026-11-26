@@ -114,9 +114,20 @@ Found by `selfcheck`. They are worked around in the scenarios, not hidden:
 - The Transmodel `lines` query fails with an internal error on these datasets. The scenarios use
   `line(id:)` instead.
 
+## Configuration documentation
+
+`harness.sh capture` also stores the generated configuration documentation under `config-docs/`.
+OTP generates the parameter documentation from the configuration code and checks it in under
+`doc/user`; the templates in `doc/templates` tell which files are generated (build, router, route
+request, updaters, sandbox features, OSM mappers, ...). The documentation is the contract of the
+configuration: parameter names, types, defaults, descriptions, examples. Each document is split by
+heading, and a changed section is one difference. The documents are read from the source tree, not
+from the jar. Set `OTP_TREE` to the tree the jar was built from. The default is this checkout,
+which is right for the baseline only.
+
 ## Not covered yet
 
-- Generated configuration documentation and the JSON schema of the configuration.
+- The JSON schema of the configuration. OTP has none.
 - Real-time updaters other than SIRI-ET, GTFS-RT (trip updates, alerts, vehicle positions) and
   GBFS: SIRI-SX, MQTT, vehicle parking updaters.
 - Fares. By decision: they become a sandbox, see `plan.md`.

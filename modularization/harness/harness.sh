@@ -7,7 +7,9 @@
 #   harness.sh selfcheck <otp-shaded.jar> <work-dir>
 #
 # capture   for each dataset (see datasets/): builds a graph with the jar from the dataset inputs,
-#           starts OTP, sends every scenario of the dataset and writes the answers.
+#           starts OTP, sends every scenario of the dataset and writes the answers. Also captures the
+#           generated configuration documentation (doc/user) of the tree in OTP_TREE (default: this
+#           checkout), which must be the tree the jar was built from.
 # serve     builds the graph of one dataset and keeps OTP running on port 8080 (Ctrl-C to stop),
 #           for exploring the data and writing scenarios.
 # compare   compares two captures against approved-discrepancies.json (exit 1 on differences).
@@ -38,6 +40,8 @@ case "${1:-}" in
     only=()
     [ -n "${4:-}" ] && only=(--only "$4")
     run capture --jar "$(abs "$2")" --out "$(abs "$3")" --repo-root "$REPO_ROOT" ${only[@]+"${only[@]}"}
+    # The documentation comes from the source tree that built the jar (OTP_TREE), by default this one.
+    run docs --tree "$(cd "${OTP_TREE:-$REPO_ROOT}" && pwd)" --out "$(abs "$3")/config-docs"
     ;;
   serve)
     run serve --jar "$(abs "$2")" --repo-root "$REPO_ROOT" --only "$3"

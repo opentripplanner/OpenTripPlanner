@@ -108,7 +108,8 @@ packages. It compares:
 - graph build output on fixed inputs, then routing results for fixed requests. Inputs: GTFS, NeTEx,
   OSM and elevation, in several datasets
 - the GraphQL schemas
-- generated configuration documentation and JSON schema (not built yet)
+- the generated configuration documentation (`doc/user`, from the source tree). OTP has no JSON
+  schema
 - real-time updater results on generated input: SIRI-ET and GTFS-RT (trip updates, alerts, vehicle
   positions) from files, and vehicle rental from GBFS feeds (v2.3 and v3.0, stations and
   free-floating, with geofencing)
