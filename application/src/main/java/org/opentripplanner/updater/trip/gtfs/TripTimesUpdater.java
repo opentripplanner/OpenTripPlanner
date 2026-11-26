@@ -170,18 +170,24 @@ class TripTimesUpdater {
   /**
    * Add a new or replacement trip to the snapshot
    *
-   * @param trip                   trip
-   * @param tripUpdate             information about the trip
-   * @param stopAndStopTimeUpdates updates for the stops
-   * @param added                  whether this trip was added (extra Trip)
-   * @param tripPatternModified    whether the trip Pattern was tripPatternModified
-   * @param serviceCode            serviceCode of the trip
+   * @param trip                          trip
+   * @param tripUpdate                    information about the trip
+   * @param stopAndStopTimeUpdates        updates for the stops
+   * @param forwardsDelayPropagationType  how the times of {@code NO_DATA} stops after the first
+   *                                      predicted stop are filled in
+   * @param backwardsDelayPropagationType how the times of {@code NO_DATA} stops before the first
+   *                                      predicted stop are filled in
+   * @param added                         whether this trip was added (extra Trip)
+   * @param tripPatternModified           whether the trip Pattern was tripPatternModified
+   * @param serviceCode                   serviceCode of the trip
    * @throws UpdateException if there are any errors with the TripUpdate
    */
   public TripTimesWithStopPattern createNewTripTimesFromGtfsRt(
     Trip trip,
     TripUpdate tripUpdate,
     List<StopAndStopTimeUpdate> stopAndStopTimeUpdates,
+    ForwardsDelayPropagationType forwardsDelayPropagationType,
+    BackwardsDelayPropagationType backwardsDelayPropagationType,
     boolean added,
     boolean tripPatternModified,
     int serviceCode
@@ -234,7 +240,7 @@ class TripTimesUpdater {
       trip,
       stopTimes,
       deduplicator
-    ).createRealTimeFromScheduledTimes();
+    ).createRealTimeWithoutScheduledTimes();
 
     // Update all times to mark trip times as realtime
     for (int stopIndex = 0; stopIndex < builder.numberOfStops(); stopIndex++) {
@@ -256,14 +262,19 @@ class TripTimesUpdater {
           stopAndStopTimeUpdate.stopTimeUpdate(),
           midnightSecondsSinceEpoch
         );
-      }
-      if (builder.getArrivalTime(stopIndex) == null) {
-        builder.withArrivalDelay(stopIndex, 0);
-      }
-      if (builder.getDepartureTime(stopIndex) == null) {
-        builder.withDepartureDelay(stopIndex, 0);
+        if (builder.getArrivalTime(stopIndex) == null) {
+          builder.withArrivalDelay(stopIndex, 0);
+        }
+        if (builder.getDepartureTime(stopIndex) == null) {
+          builder.withDepartureDelay(stopIndex, 0);
+        }
       }
     }
+
+    ForwardsDelayInterpolator.getInstance(forwardsDelayPropagationType).interpolateDelay(builder);
+    BackwardsDelayInterpolator.getInstance(backwardsDelayPropagationType).propagateBackwards(
+      builder
+    );
 
     // Set service code of new trip times
     builder.withServiceCode(serviceCode);

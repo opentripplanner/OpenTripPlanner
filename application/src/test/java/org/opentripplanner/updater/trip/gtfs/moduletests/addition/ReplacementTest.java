@@ -11,7 +11,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.updater.spi.UpdateErrorType.INVALID_ARRIVAL_TIME;
 import static org.opentripplanner.updater.spi.UpdateErrorType.INVALID_DEPARTURE_TIME;
-import static org.opentripplanner.updater.spi.UpdateErrorType.NEGATIVE_HOP_TIME;
 import static org.opentripplanner.updater.spi.UpdateErrorType.TOO_MANY_STOPS;
 import static org.opentripplanner.updater.spi.UpdateErrorType.UNKNOWN_STOP;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
@@ -380,7 +379,7 @@ public class ReplacementTest implements RealtimeTestConstants {
   }
 
   @Test
-  void replacementTripWithNoDataStopBeforePreviousDepartureIsRejected() {
+  void replacementTripWithNoDataStopAfterDelayedStopIsClampedForwards() {
     var env = noDataEnvironment();
     var rt = GtfsRtTestHelper.of(env);
 
@@ -391,8 +390,32 @@ public class ReplacementTest implements RealtimeTestConstants {
       .addStopTimeWithScheduled(STOP_C_ID, "8:55", "8:50")
       .build();
 
-    assertFailure(NEGATIVE_HOP_TIME, rt.applyTripUpdate(tripUpdate));
-    assertScheduledTripUnchanged(env);
+    assertSuccess(rt.applyTripUpdate(tripUpdate));
+
+    assertEquals(
+      "P U | A 8:45 8:45 | B [ND] 8:45 8:45 | C 8:55 8:55",
+      env.tripData(TRIP_1_ID).showTimetable()
+    );
+  }
+
+  @Test
+  void replacementTripWithNoDataStopBeforeEarlyStopIsClampedBackwards() {
+    var env = noDataEnvironment();
+    var rt = GtfsRtTestHelper.of(env);
+
+    var tripUpdate = rt
+      .tripUpdate(TRIP_1_ID, REPLACEMENT)
+      .addNoDataStopWithScheduled(STOP_A_ID, "8:30")
+      .addStopTimeWithScheduled(STOP_B_ID, "8:25", "8:40")
+      .addStopTimeWithScheduled(STOP_C_ID, "8:50", "8:50")
+      .build();
+
+    assertSuccess(rt.applyTripUpdate(tripUpdate));
+
+    assertEquals(
+      "P U | A [ND] 8:25 8:25 | B 8:25 8:25 | C 8:50 8:50",
+      env.tripData(TRIP_1_ID).showTimetable()
+    );
   }
 
   private static Stream<Arguments> invalidNoDataStopCases() {
