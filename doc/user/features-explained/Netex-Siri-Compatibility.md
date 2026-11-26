@@ -35,3 +35,24 @@ xmllint --noout --schema NeTEx-Profile-EPIP/NeTEx_publication_EPIP.xsd your-file
 
 It is the goal of the community to support both the Nordic profile and EPIP. If you have another
 profile, we encourage to get in touch with the community to find a way forward.
+
+## Car pooling
+
+Car pooling offers are imported as transit with the mode `CARPOOL`, when they are modelled as in
+NeTEx Part 5 (alternative modes) and its
+[car pooling example](https://github.com/TransmodelEcosystem/NeTEx/blob/v2.0/examples/functions/newModes/NewModes-CarPoolingExample.xml):
+a driver following a path between meeting points at given times.
+
+| NeTEx                                             | OTP                                                                |
+|---------------------------------------------------|--------------------------------------------------------------------|
+| `CarPoolingService`                               | Route. The authority or operator of the service is the agency.     |
+| `ServiceBookingArrangement` of the service        | Booking info at the stops of its journeys                          |
+| `VehicleMeetingPoint`                             | Stop at the location of the meeting point                          |
+| `VehicleMeetingPointAssignment` with a `QuayRef`  | The meeting point uses the stop of the quay instead                |
+| `SingleJourneyPath`                               | Trip pattern                                                       |
+| `SingleJourney` with its `TargetPassingTime`s     | Trip running on the `OperatingDay` of the journey                  |
+
+A `SingleJourney` must refer to a `CarPoolingService`, a `SingleJourneyPath` and an `OperatingDay`,
+and have a `TargetPassingTime` for each point in the path. The path must be in the same file as its
+journeys, and the service must refer to an `Authority` or `Operator`. The journeys of other mobility
+services, like taxi services, are not imported.

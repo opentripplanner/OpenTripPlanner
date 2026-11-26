@@ -78,8 +78,9 @@ public enum TransitMode implements DocumentedEnum<TransitMode> {
       Private car trips shared with others, operating on scheduled routes similar to transit.
 
       Use the _transit mode_, as opposed to the street mode `CARPOOL`, if your data source comes from
-      static GTFS feeds. This is currently not part of the specification, so we use the mode type values 1550-1560
-      which are in the range of private taxis.
+      static GTFS or NeTEx feeds. In GTFS this is currently not part of the specification, so we use the
+      mode type values 1550-1560 which are in the range of private taxis. In NeTEx it is the single
+      journeys of a car pooling service.
 
       If your data source for the carpool trips is SIRI use the `CARPOOL` street mode instead.
       """;
