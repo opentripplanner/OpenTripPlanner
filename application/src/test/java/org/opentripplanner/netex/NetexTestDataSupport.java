@@ -9,6 +9,8 @@ import java.util.Collection;
 import java.util.List;
 import javax.xml.namespace.QName;
 import org.entur.netex2.model.AllPublicTransportModesEnumeration;
+import org.entur.netex2.model.CarPoolingService;
+import org.entur.netex2.model.CarPoolingServiceRefStructure;
 import org.entur.netex2.model.DatedServiceJourney;
 import org.entur.netex2.model.DayOfWeekEnumeration;
 import org.entur.netex2.model.DayType;
@@ -23,6 +25,8 @@ import org.entur.netex2.model.OperatingDay;
 import org.entur.netex2.model.OperatingDayRefStructure;
 import org.entur.netex2.model.OperatingPeriod;
 import org.entur.netex2.model.OperatingPeriodRefStructure;
+import org.entur.netex2.model.OperatorRefStructure;
+import org.entur.netex2.model.PointInSingleJourneyPathRefStructure;
 import org.entur.netex2.model.PropertiesOfDay_RelStructure;
 import org.entur.netex2.model.PropertyOfDay;
 import org.entur.netex2.model.PublicCodeStructure;
@@ -30,8 +34,17 @@ import org.entur.netex2.model.Quay;
 import org.entur.netex2.model.Quays_RelStructure;
 import org.entur.netex2.model.ServiceAlterationEnumeration;
 import org.entur.netex2.model.SimplePoint_VersionStructure;
+import org.entur.netex2.model.SingleJourney;
+import org.entur.netex2.model.SingleJourneyPath;
+import org.entur.netex2.model.SingleJourneyPathRefStructure;
 import org.entur.netex2.model.StopPlace;
+import org.entur.netex2.model.TargetPassingTime;
+import org.entur.netex2.model.TargetPassingTimes_RelStructure;
 import org.entur.netex2.model.UicOperatingPeriod;
+import org.entur.netex2.model.VehicleMeetingPoint;
+import org.entur.netex2.model.VehicleMeetingPointInPath;
+import org.entur.netex2.model.VehicleMeetingPointRefStructure;
+import org.entur.netex2.model.VehicleMeetingPointsInSequence_RelStructure;
 import org.jspecify.annotations.Nullable;
 
 public final class NetexTestDataSupport {
@@ -279,6 +292,98 @@ public final class NetexTestDataSupport {
 
   public static Quay createQuay() {
     return createQuay(QUAY_ID, QUAY_NAME, QUAY_VERSION, QUAY_LAT, QUAY_LON, QUAY_PLATFORM_CODE);
+  }
+
+  public static CarPoolingService createCarPoolingService(
+    String id,
+    String name,
+    String organisationId
+  ) {
+    return new CarPoolingService()
+      .withId(id)
+      .withName(createMLString(name))
+      .withOrganisationRef(
+        OBJECT_FACTORY.createOperatorRef(new OperatorRefStructure().withRef(organisationId))
+      );
+  }
+
+  public static VehicleMeetingPoint createVehicleMeetingPoint(
+    String id,
+    String name,
+    double lat,
+    double lon
+  ) {
+    return new VehicleMeetingPoint()
+      .withId(id)
+      .withName(createMLString(name))
+      .withLocation(
+        new LocationStructure()
+          .withLatitude(BigDecimal.valueOf(lat))
+          .withLongitude(BigDecimal.valueOf(lon))
+      );
+  }
+
+  /**
+   * Create a path through the given meeting points. The id of a point in the path is the id of its
+   * meeting point followed by "-in-path".
+   */
+  public static SingleJourneyPath createSingleJourneyPath(
+    String id,
+    String... vehicleMeetingPointIds
+  ) {
+    var points = new VehicleMeetingPointsInSequence_RelStructure();
+    for (String meetingPointId : vehicleMeetingPointIds) {
+      points
+        .getVehicleMeetingPointInPath()
+        .add(
+          new VehicleMeetingPointInPath()
+            .withId(meetingPointId + "-in-path")
+            .withPointRef(
+              OBJECT_FACTORY.createVehicleMeetingPointRef(
+                new VehicleMeetingPointRefStructure().withRef(meetingPointId)
+              )
+            )
+        );
+    }
+    return new SingleJourneyPath().withId(id).withPointsInSequence(points);
+  }
+
+  /**
+   * Create a journey of a car pooling service. The journey departs from the first points in the
+   * path at the given times.
+   */
+  public static SingleJourney createSingleJourney(
+    String id,
+    String carPoolingServiceId,
+    String operatingDayId,
+    SingleJourneyPath path,
+    LocalTime... departureTimes
+  ) {
+    var points = path.getPointsInSequence().getVehicleMeetingPointInPath();
+    var passingTimes = new TargetPassingTimes_RelStructure();
+    for (int i = 0; i < departureTimes.length; i++) {
+      passingTimes
+        .getTargetPassingTime()
+        .add(
+          new TargetPassingTime()
+            .withPointInJourneyPatternRef(
+              OBJECT_FACTORY.createPointInSingleJourneyPathRef(
+                new PointInSingleJourneyPathRefStructure().withRef(points.get(i).getId())
+              )
+            )
+            .withAimedDepartureTime(departureTimes[i])
+        );
+    }
+    return new SingleJourney()
+      .withId(id)
+      .withCommonVehicleServiceRef(
+        OBJECT_FACTORY.createCarPoolingServiceRef(
+          new CarPoolingServiceRefStructure().withRef(carPoolingServiceId)
+        )
+      )
+      .withSingleJourneyPathRef(new SingleJourneyPathRefStructure().withRef(path.getId()))
+      .withOperatingDayRef(operatingDayRef(operatingDayId))
+      .withDatedPassingTimes(passingTimes);
   }
 
   private static MultilingualString createMLString(String name) {
