@@ -21,10 +21,18 @@ class WgsCoordinateMapper {
   @Nullable
   static WgsCoordinate mapToDomain(SimplePoint_VersionStructure point)
     throws InvalidCoordinateException {
-    if (point == null || point.getLocation() == null) {
+    return point == null ? null : mapLocationToDomain(point.getLocation());
+  }
+
+  /**
+   * Maps a NeTEx location, see {@link #mapToDomain(SimplePoint_VersionStructure)}.
+   */
+  @Nullable
+  static WgsCoordinate mapLocationToDomain(LocationStructure loc)
+    throws InvalidCoordinateException {
+    if (loc == null) {
       return null;
     }
-    LocationStructure loc = point.getLocation();
 
     final DirectPositionType pos = loc.getPos();
     try {
