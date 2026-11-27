@@ -5,12 +5,12 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.csvreader.CsvReader;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.csv.CsvRecordReader;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.utils.lang.DoubleRange;
@@ -109,7 +109,7 @@ class AbstractCsvParserTest {
 
     assertEquals("TestValueMissing", missingValue.getType());
     assertEquals(
-      "Value for 'id' is missing: ', 1, 28.0, 1, 2025-01-01' (@line:2)",
+      "Value for 'id' is missing: ',1,28.0,1,2025-01-01' (@line:2)",
       missingValue.getMessage()
     );
     assertEquals(1, issueStore.listIssues().size());
@@ -137,8 +137,7 @@ class AbstractCsvParserTest {
 
     assertEquals("TestFormat", intParseError.getType());
     assertEquals(
-      "Unable to parse value 'not an int' for 'int' of type int: 'F:2, not an int, 38.0, 1, " +
-        "2025-01-01' (@line:3)",
+      "Unable to parse value 'not an int' for 'int' of type int: 'F:2,not an int,38.0,1,2025-01-01' (@line:3)",
       intParseError.getMessage()
     );
     assertEquals(1, issueStore.listIssues().size());
@@ -168,12 +167,12 @@ class AbstractCsvParserTest {
     //assertEquals("TestFormat", error2.getType());
     assertEquals(
       "Unable to parse value '2025-01-32' for 'localDate' of type local-date: " +
-        "'F:1, 1, 3.0, 1, 2025-01-32' (@line:2)",
+        "'F:1,1,3.0,1,2025-01-32' (@line:2)",
       error1.getMessage()
     );
     assertEquals(
       "Unable to parse value '87-01-01' for 'localDate' of type local-date: " +
-        "'F:2, 2, 5.0, 0, 87-01-01' (@line:3)",
+        "'F:2,2,5.0,0,87-01-01' (@line:3)",
       error2.getMessage()
     );
     assertEquals(2, issueStore.listIssues().size());
@@ -204,13 +203,11 @@ class AbstractCsvParserTest {
     assertEquals("TestOutsideRange", valueTooSmall.getType());
     assertEquals("TestOutsideRange", valueTooBig.getType());
     assertEquals(
-      "The int value '-1' for int is outside expected range [0, 100]: 'F:1, -1, 1.0, 1, " +
-        "20250101' (@line:2)",
+      "The int value '-1' for int is outside expected range [0, 100]: 'F:1,-1,1.0,1,20250101' (@line:2)",
       valueTooSmall.getMessage()
     );
     assertEquals(
-      "The int value '101' for int is outside expected range [0, 100]: 'F:4, 101, 1.0, 1, " +
-        "2025-01-01' (@line:5)",
+      "The int value '101' for int is outside expected range [0, 100]: 'F:4,101,1.0,1,2025-01-01' (@line:5)",
       valueTooBig.getMessage()
     );
     assertEquals(2, issueStore.listIssues().size(), () -> issueStore.listIssues().toString());
@@ -236,8 +233,7 @@ class AbstractCsvParserTest {
 
     assertEquals("TestFormat", doubleParseError.getType());
     assertEquals(
-      "Unable to parse value 'not a double' for 'double' of type double: 'F:2, 2, " +
-        "not a double, 1, 2025-01-01' (@line:3)",
+      "Unable to parse value 'not a double' for 'double' of type double: 'F:2,2,not a double,1,2025-01-01' (@line:3)",
       doubleParseError.getMessage()
     );
     assertEquals(1, issueStore.listIssues().size());
@@ -268,11 +264,11 @@ class AbstractCsvParserTest {
     assertEquals("TestOutsideRange", valueTooSmall.getType());
     assertEquals("TestOutsideRange", valueTooBig.getType());
     assertEquals(
-      "The double value '-1.0E-6' for double is outside expected range [0.0, 100.0): 'F:1, 1, -0.000001, 1, 2025-01-01' (@line:2)",
+      "The double value '-1.0E-6' for double is outside expected range [0.0, 100.0): 'F:1,1,-0.000001,1,2025-01-01' (@line:2)",
       valueTooSmall.getMessage()
     );
     assertEquals(
-      "The double value '100.0' for double is outside expected range [0.0, 100.0): 'F:4, 4, 100.0, 1, 2025-01-01' (@line:5)",
+      "The double value '100.0' for double is outside expected range [0.0, 100.0): 'F:4,4,100.0,1,2025-01-01' (@line:5)",
       valueTooBig.getMessage()
     );
     assertEquals(2, issueStore.listIssues().size(), () -> issueStore.listIssues().toString());
@@ -309,7 +305,7 @@ class AbstractCsvParserTest {
     }
 
     public TestCsvParser(DataImportIssueStore issueStore, String csvText) {
-      super(issueStore, CsvReader.parse(csvText), "Test");
+      super(issueStore, CsvRecordReader.parse(csvText), "Test");
     }
 
     @Override

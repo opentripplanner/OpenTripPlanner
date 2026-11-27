@@ -4,8 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.csvreader.CsvReader;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.csv.CsvRecordReader;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 
 class RouteParserTest {
@@ -18,7 +18,7 @@ class RouteParserTest {
 
   @Test
   void test() {
-    var subject = new RouteCsvParser(DataImportIssueStore.NOOP, CsvReader.parse(DATA));
+    var subject = new RouteCsvParser(DataImportIssueStore.NOOP, CsvRecordReader.parse(DATA));
     assertTrue(subject.headersMatch(), subject::toString);
     assertTrue(subject.hasNext(), subject::toString);
     assertEquals(

@@ -4,8 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.csvreader.CsvReader;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.csv.CsvRecordReader;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 
 class TripHopsCsvParserTest {
@@ -18,7 +18,7 @@ class TripHopsCsvParserTest {
 
   @Test
   void test() {
-    var subject = new TripHopsCsvParser(DataImportIssueStore.NOOP, CsvReader.parse(DATA));
+    var subject = new TripHopsCsvParser(DataImportIssueStore.NOOP, CsvRecordReader.parse(DATA));
     assertTrue(subject.headersMatch());
     assertTrue(subject.hasNext());
     assertEquals(

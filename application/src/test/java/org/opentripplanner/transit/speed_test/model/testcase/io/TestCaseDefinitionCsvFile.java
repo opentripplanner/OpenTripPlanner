@@ -1,7 +1,6 @@
 package org.opentripplanner.transit.speed_test.model.testcase.io;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
@@ -26,7 +25,7 @@ public class TestCaseDefinitionCsvFile extends AbstractCsvFile<TestCaseDefinitio
   }
 
   @Override
-  TestCaseDefinition parseRow() throws IOException {
+  TestCaseDefinition parseRow() {
     return new TestCaseDefinition(
       parseString("testCaseId"),
       parseString("description"),

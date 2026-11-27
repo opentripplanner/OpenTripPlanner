@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.emission.internal.csvdata.trip;
 
-import com.csvreader.CsvReader;
 import java.util.List;
+import org.opentripplanner.framework.csv.CsvRecordReader;
 import org.opentripplanner.framework.csv.parser.AbstractCsvParser;
 import org.opentripplanner.framework.csv.parser.HandledCsvParseException;
 import org.opentripplanner.framework.model.Gram;
@@ -28,7 +28,7 @@ class TripHopsCsvParser extends AbstractCsvParser<TripHopsRow> {
    */
   private static final DoubleRange CO2_RANGE = DoubleRange.of(-1_000_000.0, 1_000_000_000.0);
 
-  public TripHopsCsvParser(DataImportIssueStore issueStore, CsvReader reader) {
+  public TripHopsCsvParser(DataImportIssueStore issueStore, CsvRecordReader reader) {
     super(issueStore, reader, "TripEmission");
   }
 
