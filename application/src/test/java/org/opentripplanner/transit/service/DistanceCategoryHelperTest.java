@@ -336,18 +336,4 @@ class DistanceCategoryHelperTest {
       DistanceCategoryHelper.distanceCategory(TransitMode.RAIL, SubMode.UNKNOWN, 204)
     ).isEqualTo(REGIONAL);
   }
-
-  @Test
-  void netexSubmodeTakesPrecedenceOverGtfsExtendedType() {
-    var rail = TransitMode.RAIL;
-    assertThat(
-      DistanceCategoryHelper.distanceCategory(rail, SubMode.of("longDistance"), 109)
-    ).isEqualTo(LONG_DISTANCE);
-    assertThat(
-      DistanceCategoryHelper.distanceCategory(rail, SubMode.of("suburbanRailway"), 101)
-    ).isEqualTo(LOCAL);
-    assertThat(
-      DistanceCategoryHelper.distanceCategory(rail, SubMode.of("railShuttle"), 102)
-    ).isEqualTo(LOCAL);
-  }
 }

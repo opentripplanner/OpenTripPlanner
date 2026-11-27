@@ -193,9 +193,10 @@ public final class DistanceCategoryHelper {
 
   /**
    * Derive the distance category of a trip from its main mode and its NeTEx submode or GTFS
-   * extended route type. Only one of the submode and route type is set, depending on the data
-   * source. They are only used if they are mapped for the trip's main mode, otherwise the trip
-   * gets the default category of the mode.
+   * extended route type. Usually only one of them is set, depending on the data source. Both are
+   * only set for SIRI added trips on GTFS routes, whose replacement submode isn't mapped, so the
+   * route type decides. They are only used if they are mapped for the trip's main mode, otherwise
+   * the trip gets the default category of the mode.
    */
   public static DistanceCategory distanceCategory(
     TransitMode mainMode,

@@ -49,9 +49,10 @@ public class AllowNarrowedTransitModeFilterTest {
 
   @Test
   void match() {
-    // filter.match will always be called with either netexSubmode == SubMode.UNKNOWN or gtfsExtendedType == null
+    // filter.match is usually called with either netexSubmode == SubMode.UNKNOWN or gtfsExtendedType == null
     // depending on the data source type. Both can be true if the data is from a GTFS source and the extended
-    // type just happens to be not set.
+    // type just happens to be not set. SIRI added trips on GTFS routes have both a replacement submode and
+    // the route type of the GTFS route.
     assertTrue(fullFilter.match(TransitMode.BUS, LOCAL_BUS, null));
     assertTrue(fullFilter.match(TransitMode.BUS, SubMode.UNKNOWN, 714));
     assertFalse(fullFilter.match(TransitMode.TRAM, SubMode.UNKNOWN, 714));
