@@ -39,6 +39,38 @@ public class TimeUtils {
   }
 
   /**
+   * Returns the offset in days corresponding to a given number of seconds since midnight. This is
+   * defined such that inputs in the range [0, 86400) fall on the same day, which results in a 0-day
+   * offset. Values in [86400, 172800) on the other hand fall on the next day, so that is a 1-day
+   * offset, and so on.
+   * <p>
+   * The function also supports negative values, which gives a negative day offset. For example,
+   * inputs in the range [-86400, 0) give -1, [-172800, -86400) -2, and so on.
+   * <p>
+   * The function assumes a day contains exactly 86400 seconds, and does not account for days that
+   * deviate from this, e.g. days with a daylight savings time clock change or a leap second.
+   */
+  public static int dayOffset(int secondsSinceMidnight) {
+    return Math.floorDiv(secondsSinceMidnight, ONE_DAY_SECONDS);
+  }
+
+  /**
+   * Returns the time of day corresponding to a given number of seconds since midnight.
+   * <p>
+   * For example, 60 seconds corresponds to 00:01, one minute past midnight.
+   * When given values larger than a full day in seconds, the function wraps around, so e.g. 86460
+   * also returns 00:01, corresponding to one minute past midnight one day later.
+   * Negative values are also supported, so e.g. -60 returns 23:59, meaning one minute before
+   * midnight on the day before.
+   * <p>
+   * The function assumes a day contains exactly 86400 seconds, and does not account for days that
+   * deviate from this, e.g. days with a daylight savings time clock change or a leap second.
+   */
+  public static LocalTime timeOfDay(int secondsSinceMidnight) {
+    return LocalTime.ofSecondOfDay(Math.floorMod(secondsSinceMidnight, ONE_DAY_SECONDS));
+  }
+
+  /**
    * Parse a time into seconds past midnight. Format accepted for time: HH, HH:MM and HH:MM:SS In
    * addition a day offset is allowed: (+|-)DDd. Examples:
    * <pre>

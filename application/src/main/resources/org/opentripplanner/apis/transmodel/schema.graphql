@@ -1468,7 +1468,7 @@ type TariffZone {
 }
 
 type TimeAndDayOffset {
-  "Number of days offset from base line time"
+  "Number of days offset from the service date. Negative if the time is before midnight of the service date."
   dayOffset: Int
   "Local time"
   time: Time
