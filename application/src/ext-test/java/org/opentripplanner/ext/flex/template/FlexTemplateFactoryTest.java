@@ -80,7 +80,6 @@ class FlexTemplateFactoryTest {
   private static final int T_10_10 = time("10:10");
   private static final int T_10_20 = time("10:20");
   private static final int T_10_30 = time("10:30");
-  private static final int T_10_40 = time("10:40");
 
   @Test
   void testCreateAccessTemplateForUnscheduledTripWithTwoStopsAndNoBoardRestrictions() {

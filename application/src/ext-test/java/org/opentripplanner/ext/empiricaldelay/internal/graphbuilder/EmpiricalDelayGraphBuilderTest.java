@@ -19,8 +19,6 @@ class EmpiricalDelayGraphBuilderTest {
   private static final RegularStop STOP_B = TEST_MODEL.stop("STOP-B", 2, 1).build();
   private static final RegularStop STOP_C = TEST_MODEL.stop("STOP-C", 3, 1).build();
 
-  private static final String FEED_ID = "F";
-
   @Test
   void createStopIdsByTripIdMap() {
     var trip = TransitRepositoryForTest.trip("Trip-A").build();

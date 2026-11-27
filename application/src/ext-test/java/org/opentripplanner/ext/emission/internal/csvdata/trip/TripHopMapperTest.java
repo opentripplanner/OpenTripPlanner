@@ -33,7 +33,6 @@ class TripHopMapperTest {
   private static final Gram CO2_BC = Gram.of(3.0);
   private static final Gram CO2_CD = Gram.of(4.0);
   private static final Gram CO2_AD = Gram.of(5.0);
-  private static final Gram CO2_ANY = Gram.of(10.0);
 
   static {
     var builder = TransitRepositoryForTest.of();

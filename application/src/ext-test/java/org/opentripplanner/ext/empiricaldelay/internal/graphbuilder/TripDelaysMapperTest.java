@@ -23,8 +23,6 @@ class TripDelaysMapperTest {
   private static final FeedScopedId STOP_ID_A = new FeedScopedId(FEED_ID, "Stop-A");
   private static final FeedScopedId STOP_ID_B = new FeedScopedId(FEED_ID, "Stop-B");
   private static final FeedScopedId STOP_ID_C = new FeedScopedId(FEED_ID, "Stop-C");
-  private static final FeedScopedId STOP_ID_D = new FeedScopedId(FEED_ID, "Stop-D");
-  private static final FeedScopedId STOP_ID_E = new FeedScopedId(FEED_ID, "Stop-E");
   private static final Map<FeedScopedId, List<FeedScopedId>> STOP_PATTERNS = Map.of(
     TRIP_ID_A,
     List.of(STOP_ID_A, STOP_ID_B, STOP_ID_C)
