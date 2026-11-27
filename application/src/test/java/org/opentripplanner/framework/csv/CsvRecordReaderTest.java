@@ -6,11 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import tools.jackson.core.JacksonException;
 
 class CsvRecordReaderTest {
@@ -92,14 +90,34 @@ class CsvRecordReaderTest {
     }
   }
 
-  @ParameterizedTest
-  @ValueSource(strings = { "UTF-8", "UTF-16BE", "UTF-16LE", "UTF-32BE", "UTF-32LE" })
-  void detectEncoding(String charsetName) {
-    byte[] bytes = "id,name\n1,Tromsø\n".getBytes(Charset.forName(charsetName));
+  @Test
+  void readUtf8() {
+    byte[] bytes = "id,name\n1,Tromsø\n".getBytes(StandardCharsets.UTF_8);
+    assertEquals("Tromsø", readName(bytes));
+  }
+
+  @Test
+  void skipByteOrderMark() {
+    byte[] bytes = "\uFEFFname\nTromsø\n".getBytes(StandardCharsets.UTF_8);
+    try (var subject = CsvRecordReader.of(new ByteArrayInputStream(bytes))) {
+      subject.readHeaders();
+      assertEquals(List.of("name"), subject.headers());
+      subject.readRecord();
+      assertEquals("Tromsø", subject.get("name"));
+    }
+  }
+
+  @Test
+  void replaceMalformedUtf8() {
+    byte[] bytes = "id,name\n1,Østfold\n".getBytes(StandardCharsets.ISO_8859_1);
+    assertEquals("\uFFFDstfold", readName(bytes));
+  }
+
+  private static String readName(byte[] bytes) {
     try (var subject = CsvRecordReader.of(new ByteArrayInputStream(bytes))) {
       subject.readHeaders();
       subject.readRecord();
-      assertEquals("Tromsø", subject.get("name"));
+      return subject.get("name");
     }
   }
 }

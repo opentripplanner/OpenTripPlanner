@@ -1,7 +1,6 @@
 package org.opentripplanner.transit.speed_test.model.testcase.io;
 
 import java.io.File;
-import java.io.IOException;
 import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.speed_test.model.testcase.Result;
@@ -64,7 +63,7 @@ public class ResultCsvFile extends AbstractCsvFile<Result> {
   }
 
   @Override
-  Result parseRow() throws IOException {
+  Result parseRow() {
     return new Result(
       parseString(TC_ID),
       parseInt(N_TRANSFERS),

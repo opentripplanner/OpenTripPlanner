@@ -1,7 +1,6 @@
 package org.opentripplanner.transit.speed_test.model.testcase.io;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -45,30 +44,29 @@ abstract class AbstractCsvFile<T> {
 
   abstract String cell(T row, String colName);
 
-  abstract T parseRow() throws IOException;
+  abstract T parseRow();
 
   public List<T> read() {
-    try {
-      List<T> rows = new ArrayList<>();
-      this.currentReader = CsvRecordReader.of(file);
-      currentReader.readHeaders();
+    List<T> rows = new ArrayList<>();
+    try (var reader = CsvRecordReader.of(file)) {
+      this.currentReader = reader;
+      reader.readHeaders();
 
-      while (currentReader.readRecord()) {
+      while (reader.readRecord()) {
         try {
-          if (isCommentOrEmpty(currentReader.rawRecord())) {
+          if (isCommentOrEmpty(reader.rawRecord())) {
             continue;
           }
           rows.add(parseRow());
         } catch (RuntimeException e) {
-          LOG.error("Parse error! Row: {}", currentReader.rawRecord());
+          LOG.error("Parse error! Row: {}", reader.rawRecord());
           throw e;
         }
       }
+    } finally {
       currentReader = null;
-      return rows;
-    } catch (IOException e) {
-      throw new RuntimeException("Can not read: " + file + ". Cause: " + e.getMessage(), e);
     }
+    return rows;
   }
 
   /**
@@ -106,20 +104,20 @@ abstract class AbstractCsvFile<T> {
 
   /* private methods */
 
-  protected String parseString(String colName) throws IOException {
+  protected String parseString(String colName) {
     return currentReader.get(colName);
   }
 
-  protected int parseInt(String colName) throws IOException {
+  protected int parseInt(String colName) {
     return Integer.parseInt(parseString(colName));
   }
 
-  protected int parseInt(String colName, int defaultValue) throws IOException {
+  protected int parseInt(String colName, int defaultValue) {
     var value = parseString(colName);
     return StringUtils.hasValue(value) ? Integer.parseInt(value) : defaultValue;
   }
 
-  protected double parseDouble(String colName) throws IOException {
+  protected double parseDouble(String colName) {
     return Double.parseDouble(parseString(colName));
   }
 
@@ -127,7 +125,7 @@ abstract class AbstractCsvFile<T> {
     return TimeUtils.timeToStrLong(timeOrDuration);
   }
 
-  protected Integer parseTime(String colName) throws IOException {
+  protected Integer parseTime(String colName) {
     return TimeUtils.time(parseString(colName), TestCase.NOT_SET);
   }
 
@@ -135,7 +133,7 @@ abstract class AbstractCsvFile<T> {
     return DurationUtils.durationToStr(duration);
   }
 
-  protected Duration parseDuration(String colName) throws IOException {
+  protected Duration parseDuration(String colName) {
     String timeOrDuration = parseString(colName);
     if (timeOrDuration.isBlank()) {
       return null;
@@ -148,8 +146,7 @@ abstract class AbstractCsvFile<T> {
     return DurationUtils.duration(timeOrDuration);
   }
 
-  protected <S> List<S> parseCollection(String colName, Function<String, S> mapFunction)
-    throws IOException {
+  protected <S> List<S> parseCollection(String colName, Function<String, S> mapFunction) {
     String value = parseString(colName);
     if (value == null || value.isBlank()) {
       return List.of();
@@ -158,7 +155,7 @@ abstract class AbstractCsvFile<T> {
     return Arrays.stream(toArray(value)).map(mapFunction).collect(Collectors.toList());
   }
 
-  protected List<String> parseCollection(String colName) throws IOException {
+  protected List<String> parseCollection(String colName) {
     return parseCollection(colName, s -> s);
   }
 

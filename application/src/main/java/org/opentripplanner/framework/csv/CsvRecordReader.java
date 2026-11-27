@@ -1,7 +1,15 @@
 package org.opentripplanner.framework.csv;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +23,10 @@ import tools.jackson.dataformat.csv.CsvSchema;
  * Reads a comma-separated file record by record and gives access to the values of the current
  * record by column name. The first record is the header. Spaces around values are trimmed and
  * empty lines are skipped.
+ * <p>
+ * Streams and files are decoded as UTF-8. Malformed bytes are replaced with the Unicode
+ * replacement character (U+FFFD) instead of failing, so that a feed with a few badly encoded
+ * values can still be read. A leading byte order mark is skipped.
  * <p>
  * This is a thin layer on top of the Jackson CSV module, so that OTP code does not depend directly
  * on a particular CSV library.
@@ -32,6 +44,7 @@ public class CsvRecordReader implements AutoCloseable {
     .with(CsvSchema.emptySchema());
 
   private static final String[] EMPTY = new String[0];
+  private static final int BYTE_ORDER_MARK = '\uFEFF';
 
   private final MappingIterator<String[]> records;
   private List<String> headers = List.of();
@@ -43,19 +56,19 @@ public class CsvRecordReader implements AutoCloseable {
   }
 
   /**
-   * Read CSV from the given stream. The encoding (UTF-8, UTF-16 or UTF-32) is detected
-   * automatically. The stream is closed by {@link #close()}.
+   * Read UTF-8 encoded CSV from the given stream. The stream is closed by {@link #close()}.
    */
   public static CsvRecordReader of(InputStream input) {
-    return new CsvRecordReader(READER.readValues(input));
+    return new CsvRecordReader(READER.readValues(utf8Reader(input)));
   }
 
-  /**
-   * Read CSV from the given file. The encoding (UTF-8, UTF-16 or UTF-32) is detected
-   * automatically.
-   */
+  /** Read UTF-8 encoded CSV from the given file. */
   public static CsvRecordReader of(File file) {
-    return new CsvRecordReader(READER.readValues(file));
+    try {
+      return of(new FileInputStream(file));
+    } catch (FileNotFoundException e) {
+      throw new UncheckedIOException(e);
+    }
   }
 
   /** Read CSV from the given text, useful in tests. */
@@ -117,6 +130,23 @@ public class CsvRecordReader implements AutoCloseable {
    */
   public String rawRecord() {
     return String.join(",", values);
+  }
+
+  /**
+   * Decode the stream as UTF-8, replacing malformed input, and skip a leading byte order mark.
+   * Jackson's own UTF-8 decoding is strict and fails on the first malformed byte.
+   */
+  private static Reader utf8Reader(InputStream input) {
+    var reader = new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8));
+    try {
+      reader.mark(1);
+      if (reader.read() != BYTE_ORDER_MARK) {
+        reader.reset();
+      }
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
+    return reader;
   }
 
   @Override
