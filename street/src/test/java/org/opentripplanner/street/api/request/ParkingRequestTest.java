@@ -1,15 +1,15 @@
-package org.opentripplanner.street.search.request;
+package org.opentripplanner.street.api.request;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.core.model.basic.Cost.costOfSeconds;
-import static org.opentripplanner.street.search.request.ImmutableRequestAsserts.assertEqualsAndHashCode;
+import static org.opentripplanner.street.api.request.ImmutableRequestAsserts.assertEqualsAndHashCode;
 
 import java.time.Duration;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Cost;
-import org.opentripplanner.street.search.request.filter.ParkingFilter;
-import org.opentripplanner.street.search.request.filter.ParkingSelect.TagsSelect;
+import org.opentripplanner.street.api.request.filter.ParkingFilter;
+import org.opentripplanner.street.api.request.filter.ParkingSelect.TagsSelect;
 
 class ParkingRequestTest {
 

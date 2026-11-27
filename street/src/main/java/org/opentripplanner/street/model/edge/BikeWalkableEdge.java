@@ -1,7 +1,7 @@
 package org.opentripplanner.street.model.edge;
 
+import org.opentripplanner.street.api.request.StreetSearchRequest;
 import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateEditor;
 

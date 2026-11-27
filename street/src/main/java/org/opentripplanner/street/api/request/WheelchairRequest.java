@@ -1,6 +1,6 @@
-package org.opentripplanner.street.search.request;
+package org.opentripplanner.street.api.request;
 
-import static org.opentripplanner.street.search.request.AccessibilityRequest.ofCost;
+import static org.opentripplanner.street.api.request.AccessibilityRequest.ofCost;
 
 import java.util.Objects;
 import java.util.function.Consumer;

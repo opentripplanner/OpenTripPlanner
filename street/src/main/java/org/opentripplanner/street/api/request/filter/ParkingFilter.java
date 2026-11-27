@@ -1,4 +1,4 @@
-package org.opentripplanner.street.search.request.filter;
+package org.opentripplanner.street.api.request.filter;
 
 import java.util.Arrays;
 import java.util.Collection;

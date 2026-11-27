@@ -1,4 +1,4 @@
-package org.opentripplanner.street.search.request;
+package org.opentripplanner.street.api.request;
 
 import static java.util.Objects.requireNonNull;
 

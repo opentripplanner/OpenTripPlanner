@@ -1,4 +1,4 @@
-package org.opentripplanner.street.search.request;
+package org.opentripplanner.street.api.request;
 
 import static org.opentripplanner.street.model.VehicleRoutingOptimizeType.SAFE_STREETS;
 import static org.opentripplanner.street.model.VehicleRoutingOptimizeType.TRIANGLE;

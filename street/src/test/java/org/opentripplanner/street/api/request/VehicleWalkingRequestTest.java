@@ -1,7 +1,7 @@
-package org.opentripplanner.street.search.request;
+package org.opentripplanner.street.api.request;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.street.search.request.ImmutableRequestAsserts.assertEqualsAndHashCode;
+import static org.opentripplanner.street.api.request.ImmutableRequestAsserts.assertEqualsAndHashCode;
 
 import java.time.Duration;
 import org.junit.jupiter.api.Test;

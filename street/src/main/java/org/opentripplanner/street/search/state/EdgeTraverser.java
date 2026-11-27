@@ -5,9 +5,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import org.opentripplanner.street.api.path.StreetPath;
+import org.opentripplanner.street.api.request.StreetSearchRequest;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.street.search.request.StreetSearchRequest;
 
 /**
  * This is a very reduced version of the A* algorithm: from an initial state a number of edges are

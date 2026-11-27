@@ -1,4 +1,4 @@
-package org.opentripplanner.street.search.request;
+package org.opentripplanner.street.api.request;
 
 import static java.util.Objects.requireNonNullElse;
 
@@ -6,7 +6,7 @@ import java.time.Duration;
 import java.util.Objects;
 import java.util.function.Consumer;
 import org.opentripplanner.core.model.basic.Cost;
-import org.opentripplanner.street.search.request.filter.ParkingFilter;
+import org.opentripplanner.street.api.request.filter.ParkingFilter;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**

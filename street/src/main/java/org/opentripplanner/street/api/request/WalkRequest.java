@@ -1,4 +1,4 @@
-package org.opentripplanner.street.search.request;
+package org.opentripplanner.street.api.request;
 
 import static org.opentripplanner.utils.lang.DoubleUtils.doubleEquals;
 import static org.opentripplanner.utils.lang.ObjectUtils.ifNotNull;

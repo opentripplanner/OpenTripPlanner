@@ -1,11 +1,11 @@
-package org.opentripplanner.street.search.request;
+package org.opentripplanner.street.api.request;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.street.search.request.ImmutableRequestAsserts.assertEqualsAndHashCode;
+import static org.opentripplanner.street.api.request.ImmutableRequestAsserts.assertEqualsAndHashCode;
 
 import org.junit.jupiter.api.Test;
 
