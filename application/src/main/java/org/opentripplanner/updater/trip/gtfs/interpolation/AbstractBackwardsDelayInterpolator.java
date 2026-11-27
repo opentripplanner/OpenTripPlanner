@@ -13,12 +13,17 @@ abstract class AbstractBackwardsDelayInterpolator implements BackwardsDelayInter
    *         stop already has an arrival time, or if no stop has real-time times to propagate from.
    */
   public OptionalInt propagateBackwards(RealTimeTripTimesBuilder builder) {
+    // Don't need to do anything if the first stop has an updated arrival time already.
+    if (
+      builder.numberOfStops() > 0 &&
+      !builder.containsNoRealTimeTimes(0) &&
+      builder.getArrivalTime(0) != null
+    ) {
+      return OptionalInt.empty();
+    }
+
     for (int i = 0; i < builder.numberOfStops(); i++) {
       if (!builder.containsNoRealTimeTimes(i)) {
-        // Don't need to do anything if the first stop has an updated arrival time already
-        if (i == 0 && builder.getArrivalTime(0) != null) {
-          return OptionalInt.empty();
-        }
         fillInMissingTimes(builder, i);
         return OptionalInt.of(i);
       }
