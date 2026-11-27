@@ -2,6 +2,7 @@ package org.opentripplanner.updater.trip.siri;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
@@ -145,6 +146,8 @@ public class EntityResolver {
    *   <li>the service date given by the journey's FramedVehicleJourneyRef -> DataFrameRef,</li>
    *   <li>the service date of the DatedServiceJourney referenced by the journey's
    *       DatedVehicleJourneyRef or EstimatedVehicleJourneyCode,</li>
+   *   <li>for an extra journey, the service date of the first dated vehicle journey it replaces
+   *       that exists in the transit model,</li>
    *   <li>the date of the aimed departure time at the first call, shifted back by the number of days
    *       the scheduled trip's first departure lies after midnight (for trips running past
    *       midnight).</li>
@@ -168,6 +171,13 @@ public class EntityResolver {
       }
     }
 
+    if (journey.isExtraJourney()) {
+      var replacedServiceDate = resolveReplacedServiceDate(journey);
+      if (replacedServiceDate != null) {
+        return replacedServiceDate;
+      }
+    }
+
     var calls = journey.calls();
     if (calls.isEmpty()) {
       return null;
@@ -181,6 +191,31 @@ public class EntityResolver {
     var daysOffset = calculateDayOffset(journey);
 
     return departureTime.toLocalDate().minusDays(daysOffset);
+  }
+
+  /**
+   * Return the service date of the first journey that {@code journey} replaces and that exists in
+   * the transit model, or {@code null} if there is none.
+   */
+  @Nullable
+  private LocalDate resolveReplacedServiceDate(EstimatedVehicleJourneyWrapper journey) {
+    var replacedTripOnServiceDate = journey
+      .replacedDatedVehicleJourneyRef()
+      .map(this::resolveTripOnServiceDate);
+    if (replacedTripOnServiceDate.isPresent()) {
+      return replacedTripOnServiceDate.get().getServiceDate();
+    }
+
+    var additionalReplacedTripsOnServiceDate = journey
+      .additionalReplacedDatedVehicleJourneyRefs()
+      .stream()
+      .map(this::resolveTripOnServiceDate)
+      .filter(Objects::nonNull);
+
+    return additionalReplacedTripsOnServiceDate
+      .findFirst()
+      .map(TripOnServiceDate::getServiceDate)
+      .orElse(null);
   }
 
   /**
