@@ -3,21 +3,12 @@ package org.opentripplanner.street.api.path;
 import java.time.Duration;
 import java.util.List;
 import org.opentripplanner.core.model.basic.Cost;
-import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.search.state.State;
 
 /// A path within the street network, the result of a street search.
 ///
 /// The states of the search are deliberately not exposed. To get the details of the path, split
 /// it into [StreetLeg]s using [#computeLegs(double)].
 public interface StreetPath {
-  /// Build a chronologically ordered path by following the back-state chain of `finalState` all
-  /// the way back to the origin of the search. Paths from arriveBy searches are reversed, so the
-  /// path always runs forward in time.
-  static StreetPath of(State finalState) {
-    return new DefaultStreetPath(finalState);
-  }
-
   /// The generalized cost (weight) of traversing the path.
   Cost generalizedCost();
 

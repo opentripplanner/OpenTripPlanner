@@ -40,7 +40,7 @@ import org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedP
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.via.model.ViaCoordinateTransfer;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
-import org.opentripplanner.street.api.path.StreetPath;
+import org.opentripplanner.street.api.path.DefaultStreetPath;
 import org.opentripplanner.street.api.request.StreetSearchRequest;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.graph.Graph;
@@ -476,7 +476,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       }
     }
     State[] states = transferStates.toArray(State[]::new);
-    var graphPath = StreetPath.of(states[states.length - 1]);
+    var graphPath = new DefaultStreetPath(states[states.length - 1]);
     return streetLegMapper.map(graphPath, request);
   }
 

@@ -41,6 +41,7 @@ import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRe
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsService;
 import org.opentripplanner.service.vehiclerental.model.TestFreeFloatingRentalVehicleBuilder;
 import org.opentripplanner.service.vehiclerental.model.TestVehicleRentalStationBuilder;
+import org.opentripplanner.street.api.path.DefaultStreetPath;
 import org.opentripplanner.street.api.path.StreetPath;
 import org.opentripplanner.street.api.path.step.RelativeDirection;
 import org.opentripplanner.street.api.request.StreetSearchRequest;
@@ -86,7 +87,7 @@ class StreetLegMapperTest {
 
   @Test
   void pathWithoutEdges() {
-    var path = StreetPath.of(TestStateBuilder.ofWalking().build());
+    var path = (StreetPath) new DefaultStreetPath(TestStateBuilder.ofWalking().build());
     assertThat(mapper.map(path, RouteRequest.defaultValue())).isEmpty();
   }
 
@@ -231,7 +232,7 @@ class StreetLegMapperTest {
       I18NString.of("destination")
     );
     var edge = TemporaryFreeEdge.createTemporaryFreeEdge(state.getVertex(), location);
-    var path = StreetPath.of(edge.traverse(state)[0]);
+    var path = (StreetPath) new DefaultStreetPath(edge.traverse(state)[0]);
 
     var leg = mapper.map(path, viaLocations, null).getFirst();
 
@@ -277,7 +278,7 @@ class StreetLegMapperTest {
       (StreetVertex) state.getVertex(),
       entranceVertex
     );
-    var path = StreetPath.of(link.traverse(state)[0]);
+    var path = (StreetPath) new DefaultStreetPath(link.traverse(state)[0]);
 
     var steps = mapper.map(path, RouteRequest.defaultValue()).getFirst().listWalkSteps();
 
@@ -319,7 +320,9 @@ class StreetLegMapperTest {
       new FlexPath(1000, 600, () -> GeometryUtils.makeLineString(1, 1, 2, 2)),
       FlexParameters.defaultValues()
     );
-    var path = StreetPath.of(edge.traverse(flexState(edge.getFromVertex()))[0]);
+    var path = (StreetPath) new DefaultStreetPath(
+      edge.traverse(flexState(edge.getFromVertex()))[0]
+    );
     var delay = Duration.ofMinutes(5);
 
     var legs = mapper.map(path, RouteRequest.defaultValue(), PATH_START.plus(delay));
@@ -335,7 +338,7 @@ class StreetLegMapperTest {
   }
 
   private static StreetPath path(TestStateBuilder builder) {
-    return StreetPath.of(builder.build());
+    return new DefaultStreetPath(builder.build());
   }
 
   private WalkStep findStep(StreetPath path, RelativeDirection direction) {

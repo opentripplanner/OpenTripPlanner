@@ -4,6 +4,7 @@ import java.util.Objects;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.routing.cost.CostLimit;
+import org.opentripplanner.street.api.path.DefaultStreetPath;
 import org.opentripplanner.street.api.path.StreetPath;
 import org.opentripplanner.street.search.state.State;
 
@@ -114,7 +115,7 @@ public class DefaultAccessEgress implements RoutingAccessEgress {
    * call, so only call this for paths which are actually used, like when mapping an itinerary.
    */
   public StreetPath streetPath() {
-    return StreetPath.of(finalState);
+    return new DefaultStreetPath(finalState);
   }
 
   @Override

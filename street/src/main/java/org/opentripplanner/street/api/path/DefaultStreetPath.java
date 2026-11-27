@@ -35,7 +35,7 @@ public final class DefaultStreetPath implements StreetPath {
    * search, the chain is reversed first, since the back-state chain otherwise runs the "wrong" way
    * for that search direction.
    */
-  DefaultStreetPath(State finalState) {
+  public DefaultStreetPath(State finalState) {
     var state = finalState.getRequest().arriveBy() ? finalState.reverse() : finalState;
 
     List<State> states = new ArrayList<>();

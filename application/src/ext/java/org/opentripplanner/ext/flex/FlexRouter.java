@@ -27,7 +27,7 @@ import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.routing.algorithm.mapping.StreetLegMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
-import org.opentripplanner.street.api.path.StreetPath;
+import org.opentripplanner.street.api.path.DefaultStreetPath;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.transfer.regular.FlexTransferService;
@@ -143,7 +143,7 @@ public class FlexRouter {
     for (DirectFlexPath it : directFlexPaths) {
       var startTime = startOfTime.plusSeconds(it.startTime());
       streetLegMapper
-        .mapToItinerary(StreetPath.of(it.state()), request, startTime)
+        .mapToItinerary(new DefaultStreetPath(it.state()), request, startTime)
         .ifPresent(itineraries::add);
     }
     return itineraries;

@@ -13,6 +13,7 @@ import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.graph_builder.module.TurnRestrictionModule;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
+import org.opentripplanner.street.api.path.DefaultStreetPath;
 import org.opentripplanner.street.api.path.StreetPath;
 import org.opentripplanner.street.api.path.StreetPathForTest;
 import org.opentripplanner.street.api.request.StreetSearchRequest;
@@ -206,7 +207,7 @@ public class TurnCostTest {
       .getShortestPathTree();
     State state = tree.getState(bottomLeft);
     assertNotNull(state);
-    StreetPath path = StreetPath.of(state);
+    StreetPath path = new DefaultStreetPath(state);
     List<State> states = StreetPathForTest.states(path);
 
     // Without turn costs, this path costs 2x100 + 2x50 = 300.

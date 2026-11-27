@@ -4,8 +4,8 @@ import java.time.Duration;
 import java.util.List;
 import java.util.stream.IntStream;
 import org.opentripplanner.ext.carpooling.routing.RoutedSegment;
+import org.opentripplanner.street.api.path.DefaultStreetPath;
 import org.opentripplanner.street.api.path.StreetPath;
-import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 
 /**
@@ -40,7 +40,7 @@ public class CarpoolStreetPathBuilder {
 
     builder.streetEdge("segment-0", distanceMeters);
 
-    return StreetPath.of(builder.build());
+    return new DefaultStreetPath(builder.build());
   }
 
   /** A driver route segment of the given duration, wrapping {@link #createStreetPath(Duration)}. */

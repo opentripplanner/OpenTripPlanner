@@ -23,6 +23,6 @@ public class StreetPathForTest {
    * given state.
    */
   public static List<State> states(State finalState) {
-    return states(StreetPath.of(finalState));
+    return states(new DefaultStreetPath(finalState));
   }
 }
