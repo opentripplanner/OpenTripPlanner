@@ -3,6 +3,7 @@ package org.opentripplanner.updater.configure;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.transaction.RepositoryHandle;
@@ -23,6 +24,7 @@ import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySnapshot;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
+import org.opentripplanner.street.elevator.ElevatorEdgeIndex;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.model.openinghours.OpeningHoursCalendarService;
@@ -36,6 +38,8 @@ import org.opentripplanner.updater.GraphWriterService;
 import org.opentripplanner.updater.UpdatersParameters;
 import org.opentripplanner.updater.alert.TransitAlertProvider;
 import org.opentripplanner.updater.alert.gtfs.GtfsRealtimeAlertsUpdater;
+import org.opentripplanner.updater.elevator.ElevatorStatusUpdater;
+import org.opentripplanner.updater.elevator.siri.SiriFmElevatorDataSource;
 import org.opentripplanner.updater.spi.GraphUpdater;
 import org.opentripplanner.updater.spi.WriteDomain;
 import org.opentripplanner.updater.spi.WriteToGraphCallbacks;
@@ -92,6 +96,7 @@ public class UpdaterConfigurator {
   private final VehicleParkingRepository parkingRepository;
   private final UpdateManager transitUpdateManager;
   private final UpdateManager streetUpdateManager;
+  private final Supplier<ElevatorEdgeIndex> elevatorEdgeIndex;
   private final RepositoryHandle<
     TimetableRepositorySnapshot,
     TimetableRepository
@@ -119,6 +124,7 @@ public class UpdaterConfigurator {
     UpdateManager transitUpdateManager,
     UpdateManager streetUpdateManager,
     RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableRepositoryHandle,
+    Supplier<ElevatorEdgeIndex> elevatorEdgeIndex,
     DelegatingTransitAlertServiceImpl transitAlertService,
     UpdatersParameters updatersParameters,
     GbfsNetworkOverrides gbfsNetworkOverrides
@@ -135,6 +141,7 @@ public class UpdaterConfigurator {
     this.transitUpdateManager = transitUpdateManager;
     this.streetUpdateManager = streetUpdateManager;
     this.timetableRepositoryHandle = timetableRepositoryHandle;
+    this.elevatorEdgeIndex = elevatorEdgeIndex;
     this.carpoolingRepository = carpoolingRepository;
     this.routableCarpoolTripResolver = routableCarpoolTripResolver;
     this.carpoolingParameters = carpoolingParameters;
@@ -160,6 +167,7 @@ public class UpdaterConfigurator {
     UpdateManager transitUpdateManager,
     UpdateManager streetUpdateManager,
     RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableRepositoryHandle,
+    Supplier<ElevatorEdgeIndex> elevatorEdgeIndex,
     DelegatingTransitAlertServiceImpl transitAlertService,
     UpdatersParameters updatersParameters,
     GbfsNetworkOverrides gbfsNetworkOverrides
@@ -179,6 +187,7 @@ public class UpdaterConfigurator {
       transitUpdateManager,
       streetUpdateManager,
       timetableRepositoryHandle,
+      elevatorEdgeIndex,
       transitAlertService,
       updatersParameters,
       gbfsNetworkOverrides
@@ -334,6 +343,15 @@ public class UpdaterConfigurator {
     }
     for (var configItem : updatersParameters.getSiriSXLiteUpdaterParameters()) {
       updaters.add(SiriUpdaterModule.createSiriSXUpdater(configItem, siriFuzzyTripMatcherCache()));
+    }
+    for (var configItem : updatersParameters.getSiriFmElevatorUpdaterParameters()) {
+      updaters.add(
+        new ElevatorStatusUpdater(
+          configItem,
+          new SiriFmElevatorDataSource(configItem),
+          elevatorEdgeIndex.get()
+        )
+      );
     }
     for (var configItem : updatersParameters.getMqttGtfsRealtimeUpdaterParameters()) {
       updaters.add(new MqttGtfsRealtimeUpdater(configItem, provideGtfsAdapter()));

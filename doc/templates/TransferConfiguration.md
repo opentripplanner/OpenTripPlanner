@@ -37,6 +37,9 @@ profiles. Other preferences are handled when the routing transfers are created, 
 [Warmup](#warmup). Profiles are grouped by type (`walk`, `wheelchair`, `bicycle` or `car`), and each
 type has its own configuration properties relevant for that specific type.
 
+The profiles are part of the graph: OTP does not start if the profiles of the configuration it
+starts with are not the ones the graph was built with.
+
 **User preferences.** The preferences of a traveler, like walking speed and reluctance, that are
 used to find and cost the templates, and to create the routing transfers. A profile without
 `userPreferences` gets the defaults of the type, see [User preferences](#user-preferences). The user
@@ -196,6 +199,29 @@ The graph build logs how many of the paths of each profile are the paths of an e
 ```
 Profile 'slow-walk'. Street paths: 85 142, 97% reused from earlier profiles (10s + 1%) - No transfers: 14% stops, 837 (3%) patterns - WalkPreferences{speed: 0.9m/s}.
 ```
+
+## Alternative paths for elevators
+
+A street path can use elevators that may be out of service. Only elevators with an id (see
+`elevatorRefTags` in the build configuration) can be told apart. If `elevatorAlternatives` is
+`true`, the graph build also finds alternative street paths for the transfers whose best path uses
+at least one elevator. For each non-empty subset of the elevators of the best path, the best street
+path that avoids the subset is stored as an alternative, if there is one. Identical paths are stored
+once. A transfer without a street path that avoids the subset has no alternative for it.
+
+Each distinct subset of a stop costs one extra street search from the stop, shared by all the
+transfers of the stop that need it. A path with `n` elevators needs `2^n - 1` searches. Street paths
+are only reused between profiles if they use the same elevators, the alternatives are not reused.
+`elevatorAlternatives` is `false` by default: no alternative paths are generated and the build is
+unchanged.
+
+At runtime, a transfer uses its best path if none of its elevators is out of service, and otherwise
+an alternative path whose elevators are all in service. If there is none, the stops have no
+transfer. **Turn `elevatorAlternatives` on if the elevator status is updated at runtime**, for
+example with the `siri-fm-elevator` updater. Without the alternative paths, the regular transfers do
+not follow the elevator status: a transfer can keep using an elevator that is out of service, or
+stay missing after it is back in service, until OTP is restarted. OTP logs a warning at startup in
+that case.
 
 ## Warmup
 

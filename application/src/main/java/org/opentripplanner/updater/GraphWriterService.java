@@ -60,7 +60,8 @@ public class GraphWriterService<C> implements WriteToGraphCallback<C> {
       new DefaultTransitRealTimeUpdateContext(
         transitRepository,
         ctx.repository(timetableHandle),
-        () -> ctx.repository(realtimeVehicleHandle)
+        () -> ctx.repository(realtimeVehicleHandle),
+        ctx
       )
     );
   }

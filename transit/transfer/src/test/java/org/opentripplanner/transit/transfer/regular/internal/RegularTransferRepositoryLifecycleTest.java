@@ -51,7 +51,7 @@ class RegularTransferRepositoryLifecycleTest {
     registry = TransactionFactory.createRepositoryRegistry();
     handle = registry.registerRepository(
       buildRepository.createRuntimeRepository(),
-      TestLifecycles.pathsOnly()
+      TestLifecycles.pathsOnly(WALK)
     );
     updateManager = TransactionFactory.createUpdateManagerWithAtomicCommits(
       "test",

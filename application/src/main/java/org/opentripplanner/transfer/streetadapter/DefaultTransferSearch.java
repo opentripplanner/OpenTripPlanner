@@ -4,7 +4,9 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.place.NearbyStopFinder;
 import org.opentripplanner.place.api.NearbyStop;
@@ -12,6 +14,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.cost.CostLimit;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetMode;
+import org.opentripplanner.street.model.edge.ElevatorHopEdge;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.EdgeTraverser;
@@ -88,6 +91,15 @@ final class DefaultTransferSearch implements TransferSearch<NearbyStop> {
     FeedScopedId fromStop,
     MaxDurationsPreference maxDurations
   ) {
+    return findNearbyStops(fromStop, maxDurations, Set.of());
+  }
+
+  @Override
+  public Collection<TransferPath<NearbyStop>> findNearbyStops(
+    FeedScopedId fromStop,
+    MaxDurationsPreference maxDurations,
+    Set<String> closedFacilityIds
+  ) {
     if (!isTransferSource.test(fromStop)) {
       return List.of();
     }
@@ -108,7 +120,8 @@ final class DefaultTransferSearch implements TransferSearch<NearbyStop> {
       mode(routeRequest),
       false,
       searchLimit.get(),
-      NO_STOP_COUNT_LIMIT
+      NO_STOP_COUNT_LIMIT,
+      closedFacilityIds
     );
     return nearbyStops
       .stream()
@@ -124,9 +137,26 @@ final class DefaultTransferSearch implements TransferSearch<NearbyStop> {
               allowedModes.modesAt(path.stopId())
             )
           )
-          .ifPresent(criteria -> consumer.accept(new TransferPath<>(path.stopId(), path, criteria)))
+          .ifPresent(criteria ->
+            consumer.accept(
+              new TransferPath<>(path.stopId(), path, criteria, closableFacilityIds(path))
+            )
+          )
       )
       .toList();
+  }
+
+  /** The ids of the elevators on the path. An elevator without an id can not be avoided. */
+  private static Set<String> closableFacilityIds(NearbyStop path) {
+    if (path.edges() == null) {
+      return Set.of();
+    }
+    return path
+      .edges()
+      .stream()
+      .filter(ElevatorHopEdge.class::isInstance)
+      .flatMap(edge -> ((ElevatorHopEdge) edge).id().stream())
+      .collect(Collectors.toUnmodifiableSet());
   }
 
   /**

@@ -1,9 +1,11 @@
 package org.opentripplanner.transit.transfer.regular.internal;
 
-import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.jspecify.annotations.Nullable;
+import org.opentripplanner.transit.transfer.regular.AlternativePath;
 import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 
 /**
@@ -80,15 +82,6 @@ final class OverlaidTemplatePaths<P> {
     return true;
   }
 
-  /** See {@link TemplatePathsByUserProfile#closestProfile}. */
-  @Nullable
-  AbstractUserPreferences<?> closestProfile(
-    AbstractUserPreferences<?> userPreferences,
-    Comparator<AbstractUserPreferences<?>> declarationOrder
-  ) {
-    return base.closestProfile(userPreferences, declarationOrder);
-  }
-
   /**
    * All paths from {@code fromStop} under {@code profile}, by {@code toStop}: the replaced ones if
    * the stop is in the overlay, the graph-build ones otherwise. The returned map must not be
@@ -119,6 +112,36 @@ final class OverlaidTemplatePaths<P> {
   @Nullable
   P findPath(@Nullable AbstractUserPreferences<?> profile, int fromStop, int toStop) {
     return profile == null ? null : pathsFrom(profile, fromStop).get(toStop);
+  }
+
+  /**
+   * The alternative paths of the transfer from {@code fromStop} to {@code toStop}, the best path
+   * first, see {@link TemplatePathsByStop}. Empty if the transfer does not depend on ids,
+   * or if the transfers from the stop were replaced: they are not generated for the replacements.
+   */
+  List<AlternativePath<P>> alternativePaths(
+    AbstractUserPreferences<?> profile,
+    int fromStop,
+    int toStop
+  ) {
+    if (overlay.getOrDefault(profile, Map.of()).containsKey(fromStop)) {
+      return List.of();
+    }
+    return base.alternativePaths(profile, fromStop, toStop);
+  }
+
+  /** The profiles the paths were generated for at graph build. */
+  Set<AbstractUserPreferences<?>> profiles() {
+    return base.profiles();
+  }
+
+  /**
+   * The stops with a transfer under {@code profile} that has an alternative path that depends on
+   * one of the facility ids. Stops with replaced transfers may be included, their transfers do
+   * not depend on any facility.
+   */
+  Set<Integer> fromStopsDependingOn(AbstractUserPreferences<?> profile, Set<String> facilityIds) {
+    return base.fromStopsDependingOn(profile, facilityIds);
   }
 
   private void assertProfileExists(AbstractUserPreferences<?> profile) {

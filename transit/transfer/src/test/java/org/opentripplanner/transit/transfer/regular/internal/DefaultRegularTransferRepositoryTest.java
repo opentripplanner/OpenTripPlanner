@@ -45,7 +45,7 @@ class DefaultRegularTransferRepositoryTest {
     buildRepository.setPaths(WALK, B, Map.of(C, PATH_BC));
     repository =
       (DefaultRegularTransferRepository<String>) buildRepository.createRuntimeRepository();
-    lifecycle = TestLifecycles.pathsOnly();
+    lifecycle = TestLifecycles.pathsOnly(WALK);
   }
 
   @Test
@@ -197,7 +197,7 @@ class DefaultRegularTransferRepositoryTest {
     repository.replaceTransfersFrom(WALK, B, Map.of());
 
     // A new runtime repository starts from the unchanged paths of the build repository
-    var snapshot = TestLifecycles.initialSnapshot(buildRepository);
+    var snapshot = TestLifecycles.initialSnapshot(buildRepository, WALK);
     assertThat(snapshot.forRequest(WALK).findPath(A, B)).isEqualTo(PATH_AB);
     assertThat(snapshot.forRequest(WALK).findPath(A, C)).isEqualTo(PATH_AC);
     assertThat(snapshot.forRequest(WALK).findPath(A, D)).isNull();
@@ -235,7 +235,7 @@ class DefaultRegularTransferRepositoryTest {
       repository.replaceTransfersFrom(withReluctance(3.5), A, Map.of())
     );
 
-    var snapshot = lifecycle.freeze(repository);
+    var snapshot = TestLifecycles.<String>pathsOnly(low, high).freeze(repository);
     assertThat(snapshot.forRequest(withReluctance(1.5)).findPath(A, B)).isEqualTo(PATH_AB);
     assertThat(snapshot.forRequest(withReluctance(3.5)).findPath(A, B)).isEqualTo(PATH_AB_NEW);
   }

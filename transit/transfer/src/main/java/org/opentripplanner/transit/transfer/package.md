@@ -63,13 +63,26 @@ at runtime. There are two reasons to do so:
 The remaining work is tracked in
 [#8061](https://github.com/opentripplanner/OpenTripPlanner/issues/8061).
 
-**What is supported today.** The storage and the cache are prepared for updates, but nothing
-generates them yet:
+**What is supported today.**
 
 - The **runtime repository** replaces the transfers of one leaf (all paths from one `fromStop` under
   one profile) with `replaceTransfersFrom`, and restores the graph-build paths of a leaf with
   `resetTransfersFrom`. The paths generated at graph build are never copied: they are shared, and
   the replaced leaves are kept separately.
+- **Closable facilities.** A path may depend on facilities that can be closed, for example
+  elevators, given as opaque `closableFacilityIds`. With `transfers.elevatorAlternatives` on, the
+  graph build stores the **alternative paths** of each transfer whose best path depends on such ids:
+  for every non-empty subset of the ids, the best path of the profile that avoids it. They are
+  stored in the cost order of the profile, the best path first.
+- `closeFacilities` sets the complete set of closed facilities. It only records the set and marks
+  the stops with a transfer whose paths depend on a changed id; the next request patches the cached
+  Raptor transfers of those stops.
+- The snapshot applies its closed set in one **view of the paths** (`OpenTemplatePaths`): a transfer
+  uses the first of its paths that depends on no closed facility, and has no transfer if there is
+  none. The Raptor transfers and the paths of the itineraries (`findPath`, `findPathsFrom`) both
+  read this view, so they agree on the path. The profile decides the path: the request preferences
+  only re-cost it, like the best paths. Replaced leaves have no alternatives and are used whatever
+  is closed.
 - The repository is updated in a transaction on the transaction framework. Each commit publishes a
   new immutable **snapshot**. A request resolves one snapshot at its start, so the transfers used
   for routing and the paths used for the itineraries always come from the same snapshot, even if an
@@ -79,11 +92,11 @@ generates them yet:
   changed stops are re-costed, as long as at most 5% of the stops changed. Above that, the value is
   created from scratch.
 
-**What is not implemented yet.** `RegularTransferRealtimeUpdater` defines the use cases: a new stop
-is used, and an elevator or other vertex is opened or closed. It has no implementation, and no
-updater writes to the repository. An implementation is expected to run the same profile search as
-the graph build for the affected stops, and to write the result with `replaceTransfersFrom` in a
-transaction.
+**What is not implemented yet.** A new stop used by a realtime update gets no transfers at runtime.
+An implementation is expected to run the same profile search as the graph build for the affected
+stops, and to write the result with `replaceTransfersFrom` in a transaction. The alternatives only
+cover the subsets of the ids of the best path: a closed facility that is only on an alternative
+path, for example the twin of a closed elevator, has no further alternative.
 
 ## Constrained Transfers
 

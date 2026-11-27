@@ -72,7 +72,7 @@ class DefaultRegularTransferGeneratorTest {
     generator.generateTransfersForAllStops();
 
     assertThat(
-      TestLifecycles.initialSnapshot(buildRepository)
+      TestLifecycles.initialSnapshot(buildRepository, userPreferences)
         .forRequest(userPreferences)
         .findPath(stopIndex.toStopIndex(A), stopIndex.toStopIndex(B))
     ).isSameInstanceAs(cheapAB);
@@ -98,7 +98,7 @@ class DefaultRegularTransferGeneratorTest {
     generator.generateTransfersForAllStops();
 
     assertThat(
-      TestLifecycles.initialSnapshot(buildRepository)
+      TestLifecycles.initialSnapshot(buildRepository, userPreferences)
         .forRequest(userPreferences)
         .findPath(stopIndex.toStopIndex(A), stopIndex.toStopIndex(B))
     ).isNull();
@@ -126,7 +126,9 @@ class DefaultRegularTransferGeneratorTest {
 
     assertThat(buildRepository.calculateNumberOfTransferPaths(userPreferences)).isEqualTo(1);
     assertThat(
-      TestLifecycles.initialSnapshot(buildRepository).forRequest(userPreferences).findPath(0, 1)
+      TestLifecycles.initialSnapshot(buildRepository, userPreferences)
+        .forRequest(userPreferences)
+        .findPath(0, 1)
     ).isEqualTo(pathAB);
   }
 
@@ -148,7 +150,9 @@ class DefaultRegularTransferGeneratorTest {
       buildRepository
     ).generateTransfersForAllStops();
 
-    var transfers = TestLifecycles.initialSnapshot(buildRepository).forRequest(userPreferences);
+    var transfers = TestLifecycles.initialSnapshot(buildRepository, userPreferences).forRequest(
+      userPreferences
+    );
     assertThat(
       transfers.findPath(stopIndex.toStopIndex(A), stopIndex.toStopIndex(B))
     ).isSameInstanceAs(path);
@@ -207,17 +211,18 @@ class DefaultRegularTransferGeneratorTest {
       var stopIndex = stopIndex();
       var buildRepository =
         new DefaultRegularTransferBuildRepository<FakeTransferPathProvider.FakePath>();
+      var parameters = new TransferParameters<>(
+        profiles,
+        Map.of(TransferProfileType.WALK, MaxDurationsPreference.DEFAULT)
+      );
       new DefaultRegularTransferGenerator<>(
         stopIndex,
-        new TransferParameters<>(
-          profiles,
-          Map.of(TransferProfileType.WALK, MaxDurationsPreference.DEFAULT)
-        ),
+        parameters,
         provider,
         FakeRequestMapper.INSTANCE,
         buildRepository
       ).generateTransfersForAllStops();
-      return TestLifecycles.initialSnapshot(buildRepository)
+      return TestLifecycles.initialSnapshot(buildRepository, parameters)
         .forRequest(forPreferences)
         .findPath(stopIndex.toStopIndex(A), stopIndex.toStopIndex(B));
     }

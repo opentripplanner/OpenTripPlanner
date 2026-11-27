@@ -6,11 +6,13 @@ import static org.opentripplanner.street.model.StreetModelFactory.V1;
 import static org.opentripplanner.street.model.StreetModelFactory.V2;
 
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 
@@ -143,6 +145,39 @@ class StreetEdgeCostTest {
     StreetEdge noStairsEdge = stairsEdge.toBuilder().withStairs(false).buildAndConnect();
     var notStairsResult = traverse(noStairsEdge, req.build());
     assertEquals(14, (long) notStairsResult.weight);
+  }
+
+  @Test
+  public void wheelchairStairsTime() {
+    var stairsEdge = new StreetEdgeBuilder<>()
+      .withFromVertex(V1)
+      .withToVertex(V2)
+      .withName("stairs")
+      .withMeterLength(10)
+      .withPermission(StreetTraversalPermission.ALL)
+      .withBack(false)
+      .withStairs(true)
+      .buildAndConnect();
+
+    var req = StreetSearchRequest.of().withMode(StreetMode.WALK).withWheelchairEnabled(true);
+    var result = traverse(stairsEdge, req.build());
+
+    // length / speed * WHEELCHAIR_STAIRS_TIME_FACTOR, instead of the stairs time factor of walking
+    assertEquals(7_519, result.getElapsedTimeSeconds());
+
+    // The cost still uses the stairs time factor of walking, like before the wheelchair factor
+    var walkingStairsTime =
+      stairsEdge.getEffectiveWalkDistance() /
+      stairsEdge.calculateSpeed(req.build(), TraverseMode.WALK, false);
+    assertEquals(
+      walkingStairsTime *
+        StreetEdgeReluctanceCalculator.computeWheelchairReluctance(req.build(), 0, true, true),
+      result.weight,
+      0.01
+    );
+
+    StreetEdge noStairsEdge = stairsEdge.toBuilder().withStairs(false).buildAndConnect();
+    assertEquals(8, traverse(noStairsEdge, req.build()).getElapsedTimeSeconds());
   }
 
   static Stream<Arguments> bikeStairsCases() {

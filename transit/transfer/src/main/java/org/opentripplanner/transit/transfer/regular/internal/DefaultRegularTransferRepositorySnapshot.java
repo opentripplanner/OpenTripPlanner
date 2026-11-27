@@ -2,28 +2,24 @@ package org.opentripplanner.transit.transfer.regular.internal;
 
 import static org.opentripplanner.utils.time.StopWatchMs.startStopWatch;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import org.jspecify.annotations.Nullable;
 import org.opentripplanner.raptor.data.transfers.regular.RaptorTransferStore;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 import org.opentripplanner.transit.transfer.regular.api.RegularTransfersService;
 import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 import org.opentripplanner.transit.transfer.regular.api.report.RegularTransferCacheMetrics;
 import org.opentripplanner.transit.transfer.regular.api.report.RegularTransferCacheReport;
-import org.opentripplanner.transit.transfer.regular.api.report.UserPreferenceSource;
 import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Default {@link RegularTransferRepositorySnapshot}, created by
- * {@link RegularTransferRepositoryLifecycle#freeze}. The snapshot owns its
- * {@link OverlaidTemplatePaths}, which is never written to after creation. Hence, the paths are
- * effectively immutable and safe to read from any number of request threads. The cache of the
- * Raptor transfers derived from them is the only mutable state, and it is thread-safe.
+ * {@link RegularTransferRepositoryLifecycle#freeze}. The snapshot owns its paths, which are never
+ * written to after creation. Hence, the paths are effectively immutable and safe to read from any
+ * number of request threads. The Raptor transfers and the paths of the requests are both read from
+ * the {@link OpenTemplatePaths} of the snapshot, so they always agree on the path of a transfer.
+ * The cache of the Raptor transfers is the only mutable state, and it is thread-safe.
  *
  * @param <P> the street path type
  * @param <R> the request type
@@ -37,38 +33,33 @@ class DefaultRegularTransferRepositorySnapshot<
     DefaultRegularTransferRepositorySnapshot.class
   );
 
-  private final OverlaidTemplatePaths<P> paths;
+  private final OpenTemplatePaths<P> openPaths;
   private final RegularTransferServiceCache<RaptorTransferStore> cache;
   private final CacheFactory cacheFactory;
   private final TransferRequestMapper<R> mapper;
   private final ProfileMatcher matcher;
-  private final List<WarmupEntry> warmup;
-  private final Map<AbstractUserPreferences<?>, WarmupEntry> entryByPreferences;
-  private final RegularTransferCacheStatistics statistics;
+  private final RegularTransferCacheReporter reporter;
 
   DefaultRegularTransferRepositorySnapshot(
-    OverlaidTemplatePaths<P> paths,
+    OpenTemplatePaths<P> openPaths,
     RegularTransferServiceCache<RaptorTransferStore> cache,
     RaptorTransfersFactory<P, R> raptorTransfersFactory,
     TransferRequestMapper<R> mapper,
     ProfileMatcher matcher,
-    List<WarmupEntry> warmup,
-    RegularTransferCacheStatistics statistics
+    RegularTransferCacheReporter reporter
   ) {
-    this.paths = paths;
+    this.openPaths = openPaths;
     this.cache = cache;
     this.mapper = mapper;
     this.matcher = matcher;
-    this.warmup = List.copyOf(warmup);
-    this.entryByPreferences = new HashMap<>();
-    warmup.forEach(entry -> entryByPreferences.put(entry.userPreferences(), entry));
-    this.statistics = statistics;
+    this.reporter = reporter;
     this.cacheFactory = new CacheFactory(raptorTransfersFactory);
   }
 
   @Override
   public void warmUp() {
     var totalStopWatch = startStopWatch();
+    var warmup = reporter.warmup();
     // The cache is thread-safe, the entries are independent
     warmup.parallelStream().forEach(entry -> {
       var stopWatch = startStopWatch();
@@ -81,10 +72,10 @@ class DefaultRegularTransferRepositorySnapshot<
   @Override
   public RegularTransfersService<P> forRequest(R request) {
     var userPreferences = mapper.toUserPreferences(request);
-    var profile = matcher.closestProfile(paths, userPreferences);
-    statistics.record(userPreferences);
+    var profile = matcher.closestProfile(userPreferences);
+    reporter.record(userPreferences);
     return new DefaultRegularTransfersService<>(
-      paths,
+      openPaths,
       cache,
       cacheFactory,
       userPreferences,
@@ -94,7 +85,7 @@ class DefaultRegularTransferRepositorySnapshot<
 
   @Override
   public RegularTransferCacheReport cacheReport() {
-    return () -> statistics.entries(cache::contains, this::keyInfo);
+    return reporter.report(cache, matcher);
   }
 
   @Override
@@ -102,40 +93,9 @@ class DefaultRegularTransferRepositorySnapshot<
     return cache.metrics();
   }
 
-  /**
-   * How a key of the cache came to be: a profile, a warmup entry, or on demand. It is only called
-   * when the report is built.
-   */
-  private RegularTransferCacheStatistics.KeyInfo keyInfo(
-    AbstractUserPreferences<?> userPreferences
-  ) {
-    var entry = entryByPreferences.get(userPreferences);
-    if (entry != null && entry.source() == UserPreferenceSource.PROFILE) {
-      return new RegularTransferCacheStatistics.KeyInfo(entry.source(), entry.id(), entry.id());
-    }
-    var closestProfile = closestProfileOrNull(userPreferences);
-    var closest = closestProfile == null ? null : entryByPreferences.get(closestProfile);
-    return new RegularTransferCacheStatistics.KeyInfo(
-      entry == null ? UserPreferenceSource.ON_DEMAND : entry.source(),
-      entry == null ? null : entry.id(),
-      closest == null ? null : closest.id()
-    );
-  }
-
-  /** The profile closest to the key in this snapshot, {@code null} if there is none. */
-  @Nullable
-  private AbstractUserPreferences<?> closestProfileOrNull(AbstractUserPreferences<?> key) {
-    try {
-      return matcher.closestProfile(paths, key);
-    } catch (IllegalArgumentException e) {
-      // The paths of the snapshot have no profile of the type of the key
-      return null;
-    }
-  }
-
-  /** The paths of this snapshot, for the lifecycle. */
-  OverlaidTemplatePaths<P> paths() {
-    return paths;
+  /** The paths of this snapshot and its closed facilities. */
+  OpenTemplatePaths<P> openPaths() {
+    return openPaths;
   }
 
   /** The cache of the Raptor transfers of this snapshot, for the lifecycle. */
@@ -157,9 +117,9 @@ class DefaultRegularTransferRepositorySnapshot<
     @Override
     public RaptorTransferStore create(AbstractUserPreferences<?> userPreferences) {
       return raptorTransfersFactory.create(
-        paths,
+        openPaths,
         userPreferences,
-        matcher.closestProfile(paths, userPreferences)
+        matcher.closestProfile(userPreferences)
       );
     }
 
@@ -170,9 +130,9 @@ class DefaultRegularTransferRepositorySnapshot<
       Set<Integer> changedFromStops
     ) {
       return raptorTransfersFactory.patch(
-        paths,
+        openPaths,
         userPreferences,
-        matcher.closestProfile(paths, userPreferences),
+        matcher.closestProfile(userPreferences),
         previous,
         changedFromStops
       );

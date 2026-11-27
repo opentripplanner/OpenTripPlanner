@@ -1,9 +1,18 @@
 package org.opentripplanner.transit.transfer.regular.internal;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
@@ -37,7 +46,7 @@ class DefaultRegularTransferBuildRepositoryTest {
 
     buildRepository.setPaths(WALK, A, Map.of(B, PATH_AB_NEW));
 
-    var snapshot = TestLifecycles.initialSnapshot(buildRepository);
+    var snapshot = TestLifecycles.initialSnapshot(buildRepository, WALK);
     assertThat(snapshot.forRequest(WALK).findPath(A, B)).isEqualTo(PATH_AB_NEW);
     assertThat(snapshot.forRequest(WALK).findPath(A, C)).isEqualTo(PATH_AC);
     assertThat(snapshot.forRequest(WALK).findPath(B, C)).isEqualTo(PATH_BC);
@@ -45,11 +54,35 @@ class DefaultRegularTransferBuildRepositoryTest {
 
   @Test
   void runtimeRepositoryContainsTheGeneratedPaths() {
-    var snapshot = TestLifecycles.initialSnapshot(createBuildRepository());
+    var snapshot = TestLifecycles.initialSnapshot(createBuildRepository(), WALK);
 
     assertThat(snapshot.forRequest(WALK).findPath(A, B)).isEqualTo(PATH_AB);
     assertThat(snapshot.forRequest(WALK).findPath(A, C)).isEqualTo(PATH_AC);
     assertThat(snapshot.forRequest(WALK).findPath(B, C)).isEqualTo(PATH_BC);
+  }
+
+  @Test
+  void noProfilesAreRecordedIfNoPathsWereGenerated() {
+    var buildRepository = new DefaultRegularTransferBuildRepository<String>();
+
+    assertNull(buildRepository.generatedProfiles());
+    assertFalse(buildRepository.hasPathAlternatives());
+  }
+
+  @Test
+  void theGeneratedProfilesAreSerialized() throws Exception {
+    var buildRepository = new DefaultRegularTransferBuildRepository<String>();
+    buildRepository.setGeneratedProfiles(Set.of(WALK), true);
+
+    var bytes = new ByteArrayOutputStream();
+    try (var out = new ObjectOutputStream(bytes)) {
+      out.writeObject(buildRepository);
+    }
+    try (var in = new ObjectInputStream(new ByteArrayInputStream(bytes.toByteArray()))) {
+      var copy = (DefaultRegularTransferBuildRepository<?>) in.readObject();
+      assertEquals(Set.of(WALK), copy.generatedProfiles());
+      assertTrue(copy.hasPathAlternatives());
+    }
   }
 
   @Test
@@ -70,7 +103,7 @@ class DefaultRegularTransferBuildRepositoryTest {
   void runtimeWritesDoNotChangeTheBuildRepository() {
     var buildRepository = createBuildRepository();
     var runtimeRepository = buildRepository.createRuntimeRepository();
-    var lifecycle = TestLifecycles.<String>pathsOnly();
+    var lifecycle = TestLifecycles.<String>pathsOnly(WALK);
 
     // The paths of the build repository are the base of the runtime repository, a write
     // replaces the paths from stop A in the runtime repository only
@@ -81,7 +114,7 @@ class DefaultRegularTransferBuildRepositoryTest {
     );
     // A new runtime repository starts from the unchanged paths of the build repository
     assertThat(
-      TestLifecycles.initialSnapshot(buildRepository).forRequest(WALK).findPath(A, B)
+      TestLifecycles.initialSnapshot(buildRepository, WALK).forRequest(WALK).findPath(A, B)
     ).isEqualTo(PATH_AB);
   }
 

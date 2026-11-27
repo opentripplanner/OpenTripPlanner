@@ -49,8 +49,7 @@ public class RegularTransferRepositoryLifecycle<
   private final RaptorTransfersFactory<P, R> raptorTransfersFactory;
   private final TransferRequestMapper<R> mapper;
   private final ProfileMatcher matcher;
-  private final List<WarmupEntry> warmup;
-  private final RegularTransferCacheStatistics statistics;
+  private final RegularTransferCacheReporter reporter;
   private final int cacheMaxSize;
   private final Set<AbstractUserPreferences<?>> retainedKeys;
   private final RegularTransferCacheCounters cacheCounters = new RegularTransferCacheCounters();
@@ -77,9 +76,9 @@ public class RegularTransferRepositoryLifecycle<
   }
 
   /**
-   * @param profiles               the configuration of the profiles the paths are stored under, the
-   *                               Raptor transfers are derived with the request of the profile
-   *                               closest to the request
+   * @param profiles               the configuration of the profiles, which must be the profiles
+   *                               the paths are stored under. The Raptor transfers are derived with
+   *                               the request of the profile closest to the request
    * @param cacheMaxSize           the max number of Raptor transfers cached for other preferences
    *                               than the ones of the profiles and the warmup entries, which are
    *                               always cached
@@ -99,7 +98,7 @@ public class RegularTransferRepositoryLifecycle<
       pathProvider,
       mapper,
       requestsByProfile(profiles, mapper),
-      new ProfileMatcher(List.copyOf(ProfileUserPreferences.resolveAll(profiles, mapper).keySet())),
+      List.copyOf(ProfileUserPreferences.resolveAll(profiles, mapper).keySet()),
       warmupEntries(profiles, mapper),
       numberOfStops,
       cacheMaxSize,
@@ -117,7 +116,7 @@ public class RegularTransferRepositoryLifecycle<
       pathProvider,
       mapper,
       profileRequests,
-      new ProfileMatcher(List.of()),
+      List.copyOf(profileRequests.keySet()),
       List.of(),
       numberOfStops,
       RegularTransferServiceCache.DEFAULT_MAX_SIZE,
@@ -129,22 +128,24 @@ public class RegularTransferRepositoryLifecycle<
     TransferPathProvider<P, R> pathProvider,
     TransferRequestMapper<R> mapper,
     Map<AbstractUserPreferences<?>, R> profileRequests,
-    ProfileMatcher matcher,
+    List<AbstractUserPreferences<?>> declaredProfiles,
     List<WarmupEntry> warmup,
     int numberOfStops,
     int cacheMaxSize,
     boolean collectCacheStatistics
   ) {
-    this.matcher = matcher;
-    this.warmup = warmup;
+    this.matcher = new ProfileMatcher(declaredProfiles);
     this.cacheMaxSize = cacheMaxSize;
     this.retainedKeys = warmup
       .stream()
       .map(WarmupEntry::userPreferences)
       .collect(Collectors.toUnmodifiableSet());
-    this.statistics = collectCacheStatistics
-      ? RegularTransferCacheStatistics.of(cacheMaxSize)
-      : RegularTransferCacheStatistics.NONE;
+    this.reporter = new RegularTransferCacheReporter(
+      warmup,
+      collectCacheStatistics
+        ? RegularTransferCacheStatistics.of(cacheMaxSize)
+        : RegularTransferCacheStatistics.NONE
+    );
     this.mapper = Objects.requireNonNull(mapper);
     this.raptorTransfersFactory = new RaptorTransfersFactory<>(
       numberOfStops,
@@ -212,13 +213,12 @@ public class RegularTransferRepositoryLifecycle<
             .carryForward(userPreferences -> changedFromStops(frozen, userPreferences));
     cacheCounters.setLatest(cache);
     return new DefaultRegularTransferRepositorySnapshot<>(
-      frozen.paths(),
+      new OpenTemplatePaths<>(frozen.paths(), frozen.closedFacilityIds()),
       cache,
       raptorTransfersFactory,
       mapper,
       matcher,
-      warmup,
-      statistics
+      reporter
     );
   }
 
@@ -230,7 +230,7 @@ public class RegularTransferRepositoryLifecycle<
     DefaultRegularTransferRepository.Frozen<?> frozen,
     AbstractUserPreferences<?> userPreferences
   ) {
-    var profile = matcher.closestProfile(frozen.paths(), userPreferences);
+    var profile = matcher.closestProfile(userPreferences);
     if (profile == null) {
       return Set.of();
     }

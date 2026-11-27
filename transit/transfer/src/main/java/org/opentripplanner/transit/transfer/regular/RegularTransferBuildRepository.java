@@ -1,7 +1,10 @@
 package org.opentripplanner.transit.transfer.regular;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 
 /**
@@ -37,6 +40,43 @@ public interface RegularTransferBuildRepository<P> extends Serializable {
     int fromStop,
     Map<Integer, P> pathsByToStop
   );
+
+  /**
+   * Store, for the transfers from {@code fromStop} that depend on ids, all the paths of the
+   * transfer, keyed by {@code toStop}: the best path first, then the paths that avoid some of its
+   * closable facility ids, see {@link AlternativePath}. The list is in the cost order of the
+   * profile: while facilities are closed, the transfer uses the first path that depends on none of
+   * them. The best path is also stored with
+   * {@link #setPaths}, the paths here are an addition, used to choose another path when a facility
+   * is unavailable. Existing entries for other stops are kept. The given map is copied, not
+   * retained.
+   *
+   * @throws IllegalStateException if the repository is sealed
+   */
+  void setAlternativePaths(
+    AbstractUserPreferences<?> userPreferences,
+    int fromStop,
+    Map<Integer, List<AlternativePath<P>>> pathsByToStop
+  );
+
+  /**
+   * Record the profiles the paths are generated for, by their user preferences, and whether the
+   * alternative paths are generated, see {@link #setAlternativePaths}. This replaces the record of
+   * an earlier generation.
+   *
+   * @throws IllegalStateException if the repository is sealed
+   */
+  void setGeneratedProfiles(Set<AbstractUserPreferences<?>> profiles, boolean pathAlternatives);
+
+  /**
+   * The user preferences of the profiles the paths are generated for, including the profiles
+   * without any path. {@code null} if no paths were generated.
+   */
+  @Nullable
+  Set<AbstractUserPreferences<?>> generatedProfiles();
+
+  /** Whether the alternative paths are generated, {@code false} if no paths were generated. */
+  boolean hasPathAlternatives();
 
   /** The number of paths stored under exactly the given user preferences. */
   int calculateNumberOfTransferPaths(AbstractUserPreferences<?> userPreferences);

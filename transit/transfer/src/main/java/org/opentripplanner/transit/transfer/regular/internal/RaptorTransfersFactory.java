@@ -10,10 +10,11 @@ import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
 import org.opentripplanner.transit.transfer.regular.spi.TransferSearch;
 
 /**
- * Derives the Raptor transfers from the path templates: each path stored under a profile is
- * re-costed under the request-time user preferences. Paths that can not be traversed under the
- * preferences are left out. The max duration of the profile type is not applied, it only bounds
- * the search that discovers the paths.
+ * Derives the Raptor transfers from the path templates: the open path of each transfer under a
+ * profile, see {@link OpenTemplatePaths}, is re-costed under the request-time user preferences.
+ * The preferences never choose another path, they only re-cost the path of the profile. Paths that
+ * can not be traversed under the preferences are left out. The max duration of the profile type is
+ * not applied, it only bounds the search that discovers the paths.
  * <p>
  * The transfers are either created from scratch, re-costing every path of the profile, or patched:
  * only the paths from the stops whose transfers changed are re-costed, and the rows of all other
@@ -69,9 +70,9 @@ final class RaptorTransfersFactory<P, R> {
     return pathProvider.searchFor(mapper.toRequest(userPreferences, base));
   }
 
-  /** Create the transfers of all paths stored under {@code profile}. */
+  /** Create the transfers of all open paths under {@code profile}. */
   RaptorTransferStore create(
-    OverlaidTemplatePaths<P> paths,
+    OpenTemplatePaths<P> paths,
     AbstractUserPreferences<?> userPreferences,
     @Nullable AbstractUserPreferences<?> profile
   ) {
@@ -91,11 +92,11 @@ final class RaptorTransfersFactory<P, R> {
 
   /**
    * Create the transfers from {@code previous} by replacing the transfers from
-   * {@code changedFromStops} with the ones of the paths now stored under {@code profile}. Falls
+   * {@code changedFromStops} with the ones of the open paths now under {@code profile}. Falls
    * back to {@link #create} if too many stops changed.
    */
   RaptorTransferStore patch(
-    OverlaidTemplatePaths<P> paths,
+    OpenTemplatePaths<P> paths,
     AbstractUserPreferences<?> userPreferences,
     @Nullable AbstractUserPreferences<?> profile,
     RaptorTransferStore previous,
