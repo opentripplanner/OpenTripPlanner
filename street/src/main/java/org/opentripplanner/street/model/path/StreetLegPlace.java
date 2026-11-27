@@ -17,6 +17,8 @@ import org.opentripplanner.street.search.state.State;
  *                               from the names of the streets meeting there.
  * @param realTimeVehicleParking If the vertex is a vehicle parking entrance: whether real-time
  *                               availability data exists for the mode used. Always false otherwise.
+ * @deprecated This type exposes the internal street model {@link Vertex}. It is temporary and will
+ * be removed in a future refactoring.
  */
 @Deprecated
 public record StreetLegPlace(Vertex vertex, I18NString name, boolean realTimeVehicleParking) {

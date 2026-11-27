@@ -15,6 +15,10 @@ public sealed interface StepEntrance {
 
   /**
    * An entrance which only exists in the street graph, typically imported from OSM.
+   *
+   * @deprecated This type exposes the internal street model {@link StationEntranceVertex}. It is
+   * temporary and will be removed in a future refactoring.
    */
+  @Deprecated
   record StationEntrance(StationEntranceVertex vertex) implements StepEntrance {}
 }

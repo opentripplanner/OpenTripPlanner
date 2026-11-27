@@ -164,7 +164,11 @@ public final class StreetStep {
 
   /**
    * The edges that make up this step.
+   *
+   * @deprecated This exposes the internal street model {@link Edge}. It is temporary and will be
+   * removed in a future refactoring.
    */
+  @Deprecated
   public List<Edge> edges() {
     return edges;
   }
