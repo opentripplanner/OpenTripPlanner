@@ -41,7 +41,7 @@ public interface StreetLeg {
   /**
    * The turn-by-turn directions of this leg.
    */
-  List<StreetStep> steps();
+  List<StreetStep> computeSteps();
 
   /**
    * Whether the leg is traversed with a rented vehicle.

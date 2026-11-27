@@ -149,7 +149,7 @@ public class StreetLegMapper {
       .withGeneralizedCost(leg.generalizedCost())
       .withGeometry(leg.geometry())
       .withElevationProfile(leg.elevationProfile())
-      .withWalkSteps(leg.steps().stream().map(this::mapStep).toList())
+      .withWalkSteps(leg.computeSteps().stream().map(this::mapStep).toList())
       .withRentedVehicle(leg.rentedVehicle());
 
     if (leg.vehicleRentalNetwork() != null) {

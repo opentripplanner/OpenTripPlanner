@@ -25,7 +25,7 @@ class StreetPathToLegsMapperTest {
     assertThat(legs).hasSize(1);
     var leg = legs.getFirst();
     assertThat(leg.computeMode()).isEqualTo(TraverseMode.WALK);
-    assertThat(leg.steps()).hasSize(2);
+    assertThat(leg.computeSteps()).hasSize(2);
     assertThat(leg.distanceMeters()).isEqualTo(200);
     assertThat(leg.rentedVehicle()).isFalse();
   }
@@ -68,7 +68,7 @@ class StreetPathToLegsMapperTest {
     assertThat(external.rentedVehicle()).isFalse();
     assertThat(external.vehicleRentalNetwork()).isNull();
     assertThat(external.elevationProfile()).isNull();
-    assertThat(external.steps()).isEmpty();
+    assertThat(external.computeSteps()).isEmpty();
   }
 
   @Test

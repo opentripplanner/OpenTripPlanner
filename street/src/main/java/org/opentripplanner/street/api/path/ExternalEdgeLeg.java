@@ -42,7 +42,7 @@ public record ExternalEdgeLeg(
   }
 
   @Override
-  public List<StreetStep> steps() {
+  public List<StreetStep> computeSteps() {
     return List.of();
   }
 
