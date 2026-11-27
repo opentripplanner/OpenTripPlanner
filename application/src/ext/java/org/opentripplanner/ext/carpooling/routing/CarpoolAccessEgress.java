@@ -9,7 +9,7 @@ import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccessEgress;
 import org.opentripplanner.routing.cost.CostLimit;
-import org.opentripplanner.street.model.path.StreetPath;
+import org.opentripplanner.street.api.path.StreetPath;
 
 /**
  * Raptor access/egress adapter wrapping an {@link InsertionCandidate}: the candidate carries the

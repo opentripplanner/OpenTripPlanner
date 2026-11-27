@@ -6,7 +6,7 @@ import java.util.function.Function;
 import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.model.SystemNotice;
-import org.opentripplanner.street.model.path.ElevationChange;
+import org.opentripplanner.street.api.path.ElevationChange;
 
 public class ItineraryBuilder {
 

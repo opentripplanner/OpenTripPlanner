@@ -18,14 +18,14 @@ import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingEntrance;
+import org.opentripplanner.street.api.request.StreetSearchRequest;
+import org.opentripplanner.street.api.request.filter.ParkingFilter;
+import org.opentripplanner.street.api.request.filter.ParkingSelect.TagsSelect;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.StreetModelFactory;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.street.search.request.StreetSearchRequest;
-import org.opentripplanner.street.search.request.filter.ParkingFilter;
-import org.opentripplanner.street.search.request.filter.ParkingSelect.TagsSelect;
 import org.opentripplanner.street.search.state.State;
 
 class StreetVehicleParkingLinkTest {

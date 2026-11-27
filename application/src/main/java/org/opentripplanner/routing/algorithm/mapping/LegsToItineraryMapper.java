@@ -6,7 +6,7 @@ import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.street.model.path.ElevationChange;
+import org.opentripplanner.street.api.path.ElevationChange;
 
 public class LegsToItineraryMapper {
 

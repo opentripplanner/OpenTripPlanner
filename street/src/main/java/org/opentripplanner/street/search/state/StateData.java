@@ -10,12 +10,12 @@ import java.util.List;
 import java.util.Set;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType.PropulsionType;
+import org.opentripplanner.street.api.request.StreetSearchRequest;
 import org.opentripplanner.street.mapping.StreetModeToFormFactorMapper;
 import org.opentripplanner.street.mapping.StreetModeToRentalTraverseModeMapper;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.street.search.request.StreetSearchRequest;
 
 /**
  * StateData contains the components of search state that are unlikely to be changed as often as

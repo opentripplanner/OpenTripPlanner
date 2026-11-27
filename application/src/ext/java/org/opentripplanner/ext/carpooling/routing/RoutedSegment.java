@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.carpooling.routing;
 
 import java.time.Duration;
-import org.opentripplanner.street.model.path.StreetPath;
+import org.opentripplanner.street.api.path.StreetPath;
 
 /**
  * The drive between two consecutive waypoints of a (possibly modified) driver route, as routed by a

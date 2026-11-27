@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.mapping._support.mapping;
 
 import org.opentripplanner.routing.algorithm.mapping._support.model.ApiRelativeDirection;
-import org.opentripplanner.street.model.path.step.RelativeDirection;
+import org.opentripplanner.street.api.path.step.RelativeDirection;
 
 @Deprecated
 class RelativeDirectionMapper {

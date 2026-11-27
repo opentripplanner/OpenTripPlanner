@@ -4,7 +4,7 @@ import java.time.Duration;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
-import org.opentripplanner.street.model.path.StreetPath;
+import org.opentripplanner.street.api.path.StreetPath;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 /**

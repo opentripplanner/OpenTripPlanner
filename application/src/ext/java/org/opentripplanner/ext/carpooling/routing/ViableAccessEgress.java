@@ -2,7 +2,7 @@ package org.opentripplanner.ext.carpooling.routing;
 
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
-import org.opentripplanner.street.model.path.StreetPath;
+import org.opentripplanner.street.api.path.StreetPath;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.model.site.StopLocation;
 
