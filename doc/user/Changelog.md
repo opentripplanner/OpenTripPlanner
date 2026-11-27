@@ -86,6 +86,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Remove deprecated groupSimilarityKeepNumOfItineraries in Transmodel [#8224](https://github.com/opentripplanner/OpenTripPlanner/pull/8224)
 - Remove refetchTripPattern query in Transmodel API [#8175](https://github.com/opentripplanner/OpenTripPlanner/pull/8175)
 - Index line strings only in the grid bins they pass through [#8242](https://github.com/opentripplanner/OpenTripPlanner/pull/8242)
+- Support `NO_DATA` stop time updates in GTFS-RT `NEW` and `REPLACEMENT` trips [#8265](https://github.com/opentripplanner/OpenTripPlanner/pull/8265)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.10.0 (2026-09-09)
