@@ -21,8 +21,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.opentripplanner.apis.transmodel.mapping.RelativeDirectionMapper;
 import org.opentripplanner.core.model.doc.DocumentedEnum;
-import org.opentripplanner.model.plan.walkstep.RelativeDirection;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
+import org.opentripplanner.street.model.path.step.RelativeDirection;
 import org.opentripplanner.transit.model.basic.TransitMode;
 
 class EnumTypesTest {
