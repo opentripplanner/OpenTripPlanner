@@ -170,7 +170,7 @@ type Alert implements Node {
   """
   ID of the alert as set by the producer, prefixed with the feed ID (`FeedId:AlertId`). For
   SIRI-SX this is the `SituationNumber` and for GTFS-RT the id of the `FeedEntity`.
-  
+    
   Unlike `id`, this value is not opaque and can be used to link the alert to the system it
   originates from.
   """
