@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.ojp.mapping;
 
-import de.vdv.ojp20.PersonalModesEnumeration;
+import org.opentripplanner.ojp.schema.ojp.PersonalModesEnumeration;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.search.TraverseMode;
 

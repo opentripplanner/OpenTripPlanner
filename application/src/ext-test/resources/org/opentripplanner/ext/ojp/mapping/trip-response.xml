@@ -12,11 +12,11 @@
                             <StopPoint>
                                 <siri:StopPointRef>F:A</siri:StopPointRef>
                                 <StopPointName>
-                                    <Text xsi:type="siri:DefaultedTextStructure">A</Text>
+                                    <Text>A</Text>
                                 </StopPointName>
                             </StopPoint>
                             <Name>
-                                <Text xsi:type="siri:DefaultedTextStructure">A</Text>
+                                <Text>A</Text>
                             </Name>
                             <GeoPosition>
                                 <siri:Longitude>8.0</siri:Longitude>
@@ -27,11 +27,11 @@
                             <StopPoint>
                                 <siri:StopPointRef>F:B</siri:StopPointRef>
                                 <StopPointName>
-                                    <Text xsi:type="siri:DefaultedTextStructure">B</Text>
+                                    <Text>B</Text>
                                 </StopPointName>
                             </StopPoint>
                             <Name>
-                                <Text xsi:type="siri:DefaultedTextStructure">B</Text>
+                                <Text>B</Text>
                             </Name>
                             <GeoPosition>
                                 <siri:Longitude>8.5</siri:Longitude>
@@ -42,11 +42,11 @@
                             <StopPoint>
                                 <siri:StopPointRef>F:C</siri:StopPointRef>
                                 <StopPointName>
-                                    <Text xsi:type="siri:DefaultedTextStructure">C</Text>
+                                    <Text>C</Text>
                                 </StopPointName>
                             </StopPoint>
                             <Name>
-                                <Text xsi:type="siri:DefaultedTextStructure">C</Text>
+                                <Text>C</Text>
                             </Name>
                             <GeoPosition>
                                 <siri:Longitude>9.0</siri:Longitude>
@@ -57,11 +57,11 @@
                             <StopPoint>
                                 <siri:StopPointRef>F:D</siri:StopPointRef>
                                 <StopPointName>
-                                    <Text xsi:type="siri:DefaultedTextStructure">D</Text>
+                                    <Text>D</Text>
                                 </StopPointName>
                             </StopPoint>
                             <Name>
-                                <Text xsi:type="siri:DefaultedTextStructure">D</Text>
+                                <Text>D</Text>
                             </Name>
                             <GeoPosition>
                                 <siri:Longitude>9.5</siri:Longitude>
@@ -85,13 +85,13 @@
                                 <LegStart>
                                     <siri:StopPointRef>F:A</siri:StopPointRef>
                                     <Name>
-                                        <Text xsi:type="siri:DefaultedTextStructure">A</Text>
+                                        <Text>A</Text>
                                     </Name>
                                 </LegStart>
                                 <LegEnd>
                                     <siri:StopPointRef>F:B</siri:StopPointRef>
                                     <Name>
-                                        <Text xsi:type="siri:DefaultedTextStructure">B</Text>
+                                        <Text>B</Text>
                                     </Name>
                                 </LegEnd>
                                 <Service>
@@ -111,7 +111,7 @@
                                 <LegBoard>
                                     <siri:StopPointRef>F:B</siri:StopPointRef>
                                     <StopPointName>
-                                        <Text xsi:type="siri:DefaultedTextStructure">B</Text>
+                                        <Text>B</Text>
                                     </StopPointName>
                                     <ServiceDeparture>
                                         <TimetabledTime>2020-02-02T11:05:00Z</TimetabledTime>
@@ -120,7 +120,7 @@
                                 <LegAlight>
                                     <siri:StopPointRef>F:C</siri:StopPointRef>
                                     <StopPointName>
-                                        <Text xsi:type="siri:DefaultedTextStructure">C</Text>
+                                        <Text>C</Text>
                                     </StopPointName>
                                     <ServiceArrival>
                                         <TimetabledTime>2020-02-02T11:15:00Z</TimetabledTime>
@@ -136,16 +136,16 @@
                                         <PtMode>bus</PtMode>
                                     </Mode>
                                     <PublishedServiceName>
-                                        <Text xsi:type="siri:DefaultedTextStructure">1</Text>
+                                        <Text>1</Text>
                                     </PublishedServiceName>
                                     <OriginStopPointRef>F:B</OriginStopPointRef>
                                     <OriginText>
-                                        <Text xsi:type="siri:DefaultedTextStructure">B</Text>
+                                        <Text>B</Text>
                                     </OriginText>
                                     <siri:OperatorRef>F:A1</siri:OperatorRef>
                                     <DestinationStopPointRef>F:C</DestinationStopPointRef>
                                     <DestinationText>
-                                        <Text xsi:type="siri:DefaultedTextStructure">Trip headsign 1</Text>
+                                        <Text>Trip headsign 1</Text>
                                     </DestinationText>
                                 </Service>
                             </TimedLeg>
@@ -157,13 +157,13 @@
                                 <LegStart>
                                     <siri:StopPointRef>F:C</siri:StopPointRef>
                                     <Name>
-                                        <Text xsi:type="siri:DefaultedTextStructure">C</Text>
+                                        <Text>C</Text>
                                     </Name>
                                 </LegStart>
                                 <LegEnd>
                                     <siri:StopPointRef>F:D</siri:StopPointRef>
                                     <Name>
-                                        <Text xsi:type="siri:DefaultedTextStructure">D</Text>
+                                        <Text>D</Text>
                                     </Name>
                                 </LegEnd>
                                 <Service>

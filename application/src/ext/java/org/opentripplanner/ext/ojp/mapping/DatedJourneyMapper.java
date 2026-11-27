@@ -2,18 +2,18 @@ package org.opentripplanner.ext.ojp.mapping;
 
 import static org.opentripplanner.ext.ojp.mapping.TextMapper.internationalText;
 
-import de.vdv.ojp20.DatedJourneyStructure;
-import de.vdv.ojp20.JourneyRefStructure;
-import de.vdv.ojp20.ModeStructure;
-import de.vdv.ojp20.OperatingDayRefStructure;
-import de.vdv.ojp20.siri.DirectionRefStructure;
-import de.vdv.ojp20.siri.LineRefStructure;
-import de.vdv.ojp20.siri.OperatorRefStructure;
 import java.time.LocalDate;
 import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.model.TripTimeOnDate;
+import org.opentripplanner.ojp.schema.ojp.DatedJourneyStructure;
+import org.opentripplanner.ojp.schema.ojp.JourneyRefStructure;
+import org.opentripplanner.ojp.schema.ojp.ModeStructure;
+import org.opentripplanner.ojp.schema.ojp.OperatingDayRefStructure;
+import org.opentripplanner.ojp.schema.siri.DirectionRefStructure;
+import org.opentripplanner.ojp.schema.siri.LineRefStructure;
+import org.opentripplanner.ojp.schema.siri.OperatorRefStructure;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;

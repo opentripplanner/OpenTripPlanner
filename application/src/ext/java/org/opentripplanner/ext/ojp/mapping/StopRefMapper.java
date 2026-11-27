@@ -1,8 +1,8 @@
 package org.opentripplanner.ext.ojp.mapping;
 
-import de.vdv.ojp20.StopPlaceRefStructure;
-import de.vdv.ojp20.siri.StopPointRefStructure;
 import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
+import org.opentripplanner.ojp.schema.ojp.StopPlaceRefStructure;
+import org.opentripplanner.ojp.schema.siri.StopPointRefStructure;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 

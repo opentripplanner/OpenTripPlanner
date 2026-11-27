@@ -4,31 +4,35 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
+import static org.opentripplanner.ext.ojp.mapping.TripResponseMapper.OptionalFeature.INTERMEDIATE_STOPS;
+import static org.opentripplanner.ext.ojp.mapping.TripResponseMapper.OptionalFeature.LEG_PROJECTIONS;
 
-import de.vdv.ojp20.LineDirectionFilterStructure;
-import de.vdv.ojp20.ModeAndModeOfOperationFilterStructure;
-import de.vdv.ojp20.OJPTripRequestStructure;
-import de.vdv.ojp20.OperatorFilterStructure;
-import de.vdv.ojp20.PersonalModesEnumeration;
-import de.vdv.ojp20.PlaceContextStructure;
-import de.vdv.ojp20.PlaceRefStructure;
-import de.vdv.ojp20.StopPlaceRefStructure;
-import de.vdv.ojp20.TripParamStructure;
-import de.vdv.ojp20.siri.LineDirectionStructure;
-import de.vdv.ojp20.siri.LineRefStructure;
-import de.vdv.ojp20.siri.LocationStructure;
-import de.vdv.ojp20.siri.OperatorRefStructure;
-import de.vdv.ojp20.siri.StopPointRefStructure;
-import de.vdv.ojp20.siri.VehicleModesOfTransportEnumeration;
 import java.time.Duration;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.api.model.transit.DefaultFeedIdMapper;
+import org.opentripplanner.ojp.schema.ojp.LineDirectionFilterStructure;
+import org.opentripplanner.ojp.schema.ojp.ModeAndModeOfOperationFilterStructure;
+import org.opentripplanner.ojp.schema.ojp.OJPTripRequestStructure;
+import org.opentripplanner.ojp.schema.ojp.OperatorFilterStructure;
+import org.opentripplanner.ojp.schema.ojp.PersonalModesEnumeration;
+import org.opentripplanner.ojp.schema.ojp.PlaceContextStructure;
+import org.opentripplanner.ojp.schema.ojp.PlaceRefStructure;
+import org.opentripplanner.ojp.schema.ojp.StopPlaceRefStructure;
+import org.opentripplanner.ojp.schema.ojp.TripParamStructure;
+import org.opentripplanner.ojp.schema.siri.LineDirectionStructure;
+import org.opentripplanner.ojp.schema.siri.LineRefStructure;
+import org.opentripplanner.ojp.schema.siri.LocationStructure;
+import org.opentripplanner.ojp.schema.siri.OperatorRefStructure;
+import org.opentripplanner.ojp.schema.siri.StopPointRefStructure;
+import org.opentripplanner.ojp.schema.siri.VehicleModesOfTransportEnumeration;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.street.model.StreetMode;
 
@@ -304,6 +308,82 @@ class RouteRequestMapperTest {
     var tripRequest = baseRequest().withParams(tripParamStructure);
 
     assertThrows(IllegalArgumentException.class, () -> mapper.map(tripRequest));
+  }
+
+  private static Stream<Arguments> optionalFeaturesCases() {
+    return Stream.of(
+      Arguments.of(null, Set.of()),
+      Arguments.of(new TripParamStructure(), Set.of()),
+      Arguments.of(
+        new TripParamStructure()
+          .withIncludeIntermediateStops(false)
+          .withIncludeLegProjection(false),
+        Set.of()
+      ),
+      Arguments.of(
+        new TripParamStructure().withIncludeIntermediateStops(true),
+        Set.of(INTERMEDIATE_STOPS)
+      ),
+      Arguments.of(
+        new TripParamStructure().withIncludeLegProjection(true),
+        Set.of(LEG_PROJECTIONS)
+      ),
+      Arguments.of(
+        new TripParamStructure().withIncludeIntermediateStops(true).withIncludeLegProjection(true),
+        Set.of(INTERMEDIATE_STOPS, LEG_PROJECTIONS)
+      )
+    );
+  }
+
+  @ParameterizedTest
+  @MethodSource("optionalFeaturesCases")
+  void optionalFeatures(
+    TripParamStructure params,
+    Set<TripResponseMapper.OptionalFeature> expected
+  ) {
+    var tripRequest = baseRequest().withParams(params);
+
+    assertEquals(expected, RouteRequestMapper.optionalFeatures(tripRequest));
+  }
+
+  private static Stream<Arguments> wheelchairCases() {
+    return Stream.of(
+      Arguments.of(null, false),
+      Arguments.of(new TripParamStructure(), false),
+      Arguments.of(
+        new TripParamStructure()
+          .withNoStairs(false)
+          .withLevelEntrance(false)
+          .withLevelEntranceOrBoardingAid(false),
+        false
+      ),
+      Arguments.of(new TripParamStructure().withNoStairs(true), true),
+      Arguments.of(new TripParamStructure().withLevelEntrance(true), true),
+      Arguments.of(new TripParamStructure().withLevelEntranceOrBoardingAid(true), true),
+      Arguments.of(new TripParamStructure().withNoStairs(false).withLevelEntrance(true), true)
+    );
+  }
+
+  @ParameterizedTest
+  @MethodSource("wheelchairCases")
+  void wheelchair(TripParamStructure params, boolean expected) {
+    var tripRequest = baseRequest().withParams(params);
+
+    var routeRequest = mapper.map(tripRequest);
+
+    assertEquals(expected, routeRequest.journey().wheelchair());
+  }
+
+  @Test
+  void wheelchairKeepsDefaultFromConfig() {
+    var defaultRequest = RouteRequest.of()
+      .withJourney(j -> j.withWheelchair(true))
+      .buildDefault();
+    var mapper = new RouteRequestMapper(new DefaultFeedIdMapper(), defaultRequest);
+
+    var routeRequest = mapper.map(baseRequest().withParams(new TripParamStructure()));
+
+    assertTrue(routeRequest.journey().wheelchair());
   }
 
   private static OJPTripRequestStructure baseRequest() {

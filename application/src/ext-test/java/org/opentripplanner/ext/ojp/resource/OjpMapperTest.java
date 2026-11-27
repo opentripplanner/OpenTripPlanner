@@ -3,7 +3,6 @@ package org.opentripplanner.ext.ojp.resource;
 import static jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
-import de.vdv.ojp20.OJP;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import java.io.StringWriter;
@@ -21,6 +20,7 @@ import org.opentripplanner.api.model.transit.DefaultFeedIdMapper;
 import org.opentripplanner.ext.ojp.mapping.StopEventResponseMapper;
 import org.opentripplanner.ext.ojp.service.CallAtStop;
 import org.opentripplanner.model.TripTimeOnDate;
+import org.opentripplanner.ojp.schema.ojp.OJP;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.Route;

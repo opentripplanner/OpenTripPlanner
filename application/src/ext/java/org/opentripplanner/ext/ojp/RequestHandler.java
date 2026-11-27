@@ -2,10 +2,6 @@ package org.opentripplanner.ext.ojp;
 
 import static java.util.Objects.requireNonNull;
 
-import de.vdv.ojp20.OJP;
-import de.vdv.ojp20.OJPStopEventRequestStructure;
-import de.vdv.ojp20.OJPTripRequestStructure;
-import de.vdv.ojp20.siri.AbstractFunctionalServiceRequestStructure;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
 import java.time.ZonedDateTime;
@@ -13,6 +9,10 @@ import java.util.Optional;
 import java.util.function.Function;
 import org.opentripplanner.ext.ojp.mapping.ErrorMapper;
 import org.opentripplanner.ext.ojp.service.OjpService;
+import org.opentripplanner.ojp.schema.ojp.OJP;
+import org.opentripplanner.ojp.schema.ojp.OJPStopEventRequestStructure;
+import org.opentripplanner.ojp.schema.ojp.OJPTripRequestStructure;
+import org.opentripplanner.ojp.schema.siri.AbstractFunctionalServiceRequestStructure;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.transit.model.framework.EntityNotFoundException;

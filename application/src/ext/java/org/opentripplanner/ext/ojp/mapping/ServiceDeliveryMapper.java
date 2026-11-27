@@ -1,8 +1,8 @@
 package org.opentripplanner.ext.ojp.mapping;
 
-import de.vdv.ojp20.siri.ParticipantRefStructure;
-import de.vdv.ojp20.siri.ServiceDelivery;
 import java.time.ZonedDateTime;
+import org.opentripplanner.ojp.schema.siri.ParticipantRefStructure;
+import org.opentripplanner.ojp.schema.siri.ServiceDelivery;
 import org.opentripplanner.ojp.time.XmlDateTime;
 
 public class ServiceDeliveryMapper {

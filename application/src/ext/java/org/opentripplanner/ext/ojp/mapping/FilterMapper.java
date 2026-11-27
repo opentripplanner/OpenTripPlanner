@@ -2,12 +2,6 @@ package org.opentripplanner.ext.ojp.mapping;
 
 import static java.lang.Boolean.TRUE;
 
-import de.vdv.ojp20.LineDirectionFilterStructure;
-import de.vdv.ojp20.OJPStopEventRequestStructure;
-import de.vdv.ojp20.OJPTripRequestStructure;
-import de.vdv.ojp20.OperatorFilterStructure;
-import de.vdv.ojp20.StopEventParamStructure;
-import de.vdv.ojp20.TripParamStructure;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -15,6 +9,12 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.ojp.schema.ojp.LineDirectionFilterStructure;
+import org.opentripplanner.ojp.schema.ojp.OJPStopEventRequestStructure;
+import org.opentripplanner.ojp.schema.ojp.OJPTripRequestStructure;
+import org.opentripplanner.ojp.schema.ojp.OperatorFilterStructure;
+import org.opentripplanner.ojp.schema.ojp.StopEventParamStructure;
+import org.opentripplanner.ojp.schema.ojp.TripParamStructure;
 
 class FilterMapper {
 

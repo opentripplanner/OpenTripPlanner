@@ -1,11 +1,11 @@
 package org.opentripplanner.ext.ojp.resource;
 
-import de.vdv.ojp20.OJP;
 import jakarta.ws.rs.core.StreamingOutput;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import java.io.OutputStreamWriter;
 import javax.xml.transform.TransformerException;
+import org.opentripplanner.ojp.schema.ojp.OJP;
 
 class OjpCodec {
 
