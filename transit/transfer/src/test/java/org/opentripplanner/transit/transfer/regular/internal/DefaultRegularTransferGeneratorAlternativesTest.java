@@ -10,6 +10,8 @@ import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.core.model.id.FeedScopedId;
@@ -130,6 +132,29 @@ class DefaultRegularTransferGeneratorAlternativesTest {
 
     assertEquals(15, subject.avoidedIdsOfExtraSearches().size());
     assertThat(subject.avoidedIdsOfExtraSearches()).containsNoDuplicates();
+  }
+
+  @Test
+  void aPathWithTheMaxNumberOfClosableFacilityIdsNeedsOneSearchForEachSubset() {
+    provider.addNearby(A, B, 100, 60, ids(DefaultRegularTransferGenerator.MAX_IDS_FOR_ALL_SUBSETS));
+
+    var subject = generate(true);
+
+    assertEquals(255, subject.avoidedIdsOfExtraSearches().size());
+  }
+
+  @Test
+  void aPathWithMoreThanTheMaxNumberOfClosableFacilityIdsNeedsOneSearchThatAvoidsAllOfThem() {
+    var ids = ids(DefaultRegularTransferGenerator.MAX_IDS_FOR_ALL_SUBSETS + 1);
+    var best = provider.addNearby(A, B, 100, 60, ids);
+    var avoidsAll = provider.addNearby(A, B, 400, 60);
+
+    var subject = generate(true);
+
+    assertThat(subject.avoidedIdsOfExtraSearches()).containsExactly(ids);
+    assertThat(subject.paths(FIRST, B_INDEX))
+      .containsExactly(new AlternativePath<>(best, ids), alternative(avoidsAll))
+      .inOrder();
   }
 
   @Test
@@ -277,6 +302,13 @@ class DefaultRegularTransferGeneratorAlternativesTest {
 
   private static AlternativePath<FakePath> alternative(FakePath path, String... ids) {
     return new AlternativePath<>(path, Set.of(ids));
+  }
+
+  /** The closable facility ids e1 to en. */
+  private static Set<String> ids(int n) {
+    return IntStream.rangeClosed(1, n)
+      .mapToObj(i -> "e" + i)
+      .collect(Collectors.toSet());
   }
 
   private static WalkPreferences withReluctance(double reluctance) {

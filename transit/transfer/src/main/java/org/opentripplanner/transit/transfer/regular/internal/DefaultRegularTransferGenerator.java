@@ -43,6 +43,16 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
   private static final Logger LOG = LoggerFactory.getLogger(DefaultRegularTransferGenerator.class);
 
   /**
+   * The max number of closable facility ids on a best path to search an alternative for each
+   * non-empty subset of them: 255 searches. A path with more ids gets one search that avoids all of
+   * them. Real transfer paths have few, mostly one or two.
+   */
+  static final int MAX_IDS_FOR_ALL_SUBSETS = 8;
+
+  /** The max number of stops listed in the warning about transfers with many ids. */
+  private static final int MAX_STOPS_IN_WARNING = 10;
+
+  /**
    * The order of the alternative paths of a transfer: by the cost of the search of the profile,
    * then by duration.
    */
@@ -67,6 +77,15 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
 
   /** The number of paths stored for the transfers that depend on ids. */
   private final LongAdder alternativePaths = new LongAdder();
+
+  /**
+   * The number of transfers with more than {@link #MAX_IDS_FOR_ALL_SUBSETS} closable facility ids
+   * on the best path.
+   */
+  private final LongAdder transfersWithManyIds = new LongAdder();
+
+  /** The stops these transfers start at. */
+  private final Set<FeedScopedId> stopsWithManyIds = ConcurrentHashMap.newKeySet();
 
   public DefaultRegularTransferGenerator(
     RaptorStopIndex stopIndex,
@@ -114,6 +133,21 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
         alternativeSearches.sum(),
         alternativePaths.sum()
       );
+      if (transfersWithManyIds.sum() > 0) {
+        LOG.warn(
+          "{} transfers have more than {} closable facility ids on the best path. Their only " +
+            "alternative is the path that avoids all of them. The transfers start at {} stops: {}",
+          transfersWithManyIds.sum(),
+          MAX_IDS_FOR_ALL_SUBSETS,
+          stopsWithManyIds.size(),
+          stopsWithManyIds
+            .stream()
+            .map(FeedScopedId::toString)
+            .sorted()
+            .limit(MAX_STOPS_IN_WARNING)
+            .toList()
+        );
+      }
     }
   }
 
@@ -254,13 +288,15 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
   }
 
   /**
-   * Find the alternatives of the transfers from the stop that depend on ids and store all
-   * paths of these transfers. For each non-empty subset {@code S} of the closable facility ids {@code E} of
-   * a best path, the best path of the transfer that avoids
-   * {@code S} is an alternative. There is one search for each distinct subset, it is shared by all
-   * the transfers that need it. A transfer without a path that avoids {@code S} has no alternative
-   * for {@code S}. The alternatives of a transfer are stored once even if several subsets give the
-   * same path. The number of searches grows as 2^n for a path with n closable facility ids.
+   * Find the alternatives of the transfers from the stop that depend on ids and store all paths of
+   * these transfers. For each non-empty subset {@code S} of the closable facility ids of a best
+   * path, the best path of the transfer that avoids {@code S} is an alternative. There is one
+   * search for each distinct subset, it is shared by all the transfers that need it. A transfer
+   * without a path that avoids {@code S} has no alternative for {@code S}. The alternatives of a
+   * transfer are stored once even if several subsets give the same path. The number of searches
+   * grows as 2^n for a path with n closable facility ids, so a path with more than
+   * {@link #MAX_IDS_FOR_ALL_SUBSETS} ids gets one search that avoids all of them: the transfer then
+   * uses that path as soon as one of the ids is closed.
    * <p>
    * The paths of a transfer are stored in the cost order of the profile: the best path first, so
    * its closable facility ids are known, then the alternatives by the cost the search of this
@@ -285,7 +321,7 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
       }
       bestByToStop.put(toStop, best);
       foundByToStop.put(toStop, new HashMap<>());
-      for (var subset : nonEmptySubsets(ids)) {
+      for (var subset : idsToAvoid(fromStopId, ids)) {
         toStopsByAvoidedIds.computeIfAbsent(subset, k -> new ArrayList<>()).add(toStop);
       }
     });
@@ -334,6 +370,19 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
   /** The sorted closable facility ids, a stable key to order paths that cost the same. */
   private static String idsKey(AlternativePath<?> path) {
     return path.closableFacilityIds().stream().sorted().toList().toString();
+  }
+
+  /**
+   * The sets of ids to search an alternative for: each non-empty subset of the ids, or, if there
+   * are more than {@link #MAX_IDS_FOR_ALL_SUBSETS}, only all of them.
+   */
+  private List<Set<String>> idsToAvoid(FeedScopedId fromStopId, Set<String> ids) {
+    if (ids.size() > MAX_IDS_FOR_ALL_SUBSETS) {
+      transfersWithManyIds.increment();
+      stopsWithManyIds.add(fromStopId);
+      return List.of(ids);
+    }
+    return nonEmptySubsets(ids);
   }
 
   /** All non-empty subsets of the ids, there are 2^n - 1 of them. */
