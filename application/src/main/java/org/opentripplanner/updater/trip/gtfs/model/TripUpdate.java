@@ -1,8 +1,9 @@
 package org.opentripplanner.updater.trip.gtfs.model;
 
+import static org.opentripplanner.updater.spi.UpdateErrorType.INVALID_ARRIVAL_TIME;
+import static org.opentripplanner.updater.spi.UpdateErrorType.INVALID_DEPARTURE_TIME;
 import static org.opentripplanner.updater.spi.UpdateErrorType.INVALID_INPUT_STRUCTURE;
 import static org.opentripplanner.updater.spi.UpdateErrorType.INVALID_STOP_SEQUENCE;
-import static org.opentripplanner.updater.spi.UpdateErrorType.NOT_IMPLEMENTED_NO_DATA_IN_REPLACEMENT;
 import static org.opentripplanner.updater.spi.UpdateErrorType.TOO_MANY_STOPS;
 import static org.opentripplanner.updater.trip.gtfs.model.GtfsRealtimeMapper.mapWheelchairAccessible;
 
@@ -129,6 +130,7 @@ public final class TripUpdate {
       throw UpdateException.of(tripId(), TOO_MANY_STOPS);
     }
 
+    var newTrip = isNewTrip();
     var lastStopSequence = -1;
     for (StopTimeUpdate update : stopTimeUpdates()) {
       // validate stop sequence
@@ -143,14 +145,22 @@ public final class TripUpdate {
         }
         lastStopSequence = seq;
       }
-      if (
-        scheduleRelationship() == ScheduleRelationship.REPLACEMENT &&
-        update.scheduleRelationship() ==
-          GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship.NO_DATA
-      ) {
-        throw UpdateException.of(tripId(), NOT_IMPLEMENTED_NO_DATA_IN_REPLACEMENT);
+      if (newTrip && update.isNoData()) {
+        if (!update.hasOnlyScheduledArrivalTime()) {
+          throw UpdateException.of(tripId(), INVALID_ARRIVAL_TIME);
+        }
+        if (!update.hasOnlyScheduledDepartureTime()) {
+          throw UpdateException.of(tripId(), INVALID_DEPARTURE_TIME);
+        }
       }
     }
+  }
+
+  private boolean isNewTrip() {
+    return switch (scheduleRelationship()) {
+      case NEW, ADDED, REPLACEMENT -> true;
+      default -> false;
+    };
   }
 
   /// Validates the requirement for the schedule relationship DUPLICATED.

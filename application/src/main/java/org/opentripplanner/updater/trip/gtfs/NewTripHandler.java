@@ -24,6 +24,8 @@ import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.spi.UpdateException;
 import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.opentripplanner.updater.trip.TripUpdateApplier;
+import org.opentripplanner.updater.trip.gtfs.interpolation.BackwardsDelayPropagationType;
+import org.opentripplanner.updater.trip.gtfs.interpolation.ForwardsDelayPropagationType;
 import org.opentripplanner.updater.trip.gtfs.model.StopTimeUpdate;
 import org.opentripplanner.updater.trip.gtfs.model.TripUpdate;
 import org.opentripplanner.updater.trip.patterncache.TripPatternCache;
@@ -55,7 +57,11 @@ class NewTripHandler {
   /**
    * Validate and handle GTFS-RT TripUpdate message containing a NEW trip.
    */
-  UpdateSuccess handleNew(final TripUpdate tripUpdate) throws UpdateException {
+  UpdateSuccess handleNew(
+    final TripUpdate tripUpdate,
+    ForwardsDelayPropagationType forwardsDelayPropagationType,
+    BackwardsDelayPropagationType backwardsDelayPropagationType
+  ) throws UpdateException {
     if (buffer.getScheduledTrip(tripUpdate.tripId()) != null) {
       throw UpdateException.of(tripUpdate.tripId(), TRIP_ALREADY_EXISTS);
     }
@@ -76,13 +82,25 @@ class NewTripHandler {
 
     Trip trip = tripBuilder.build();
 
-    return handleNewOrReplacementTrip(trip, tripUpdate, true, false, result.newRouteCreated());
+    return handleNewOrReplacementTrip(
+      trip,
+      tripUpdate,
+      forwardsDelayPropagationType,
+      backwardsDelayPropagationType,
+      true,
+      false,
+      result.newRouteCreated()
+    );
   }
 
   /**
    * Validate and handle GTFS-RT TripUpdate message containing a REPLACEMENT trip.
    */
-  UpdateSuccess handleReplacement(TripUpdate tripUpdate) throws UpdateException {
+  UpdateSuccess handleReplacement(
+    TripUpdate tripUpdate,
+    ForwardsDelayPropagationType forwardsDelayPropagationType,
+    BackwardsDelayPropagationType backwardsDelayPropagationType
+  ) throws UpdateException {
     Trip trip = buffer.getTrip(tripUpdate.tripId());
 
     if (trip == null) {
@@ -97,7 +115,15 @@ class NewTripHandler {
       throw UpdateException.of(tripUpdate.tripId(), NO_SERVICE_ON_DATE);
     }
 
-    return handleNewOrReplacementTrip(trip, tripUpdate, false, true, false);
+    return handleNewOrReplacementTrip(
+      trip,
+      tripUpdate,
+      forwardsDelayPropagationType,
+      backwardsDelayPropagationType,
+      false,
+      true,
+      false
+    );
   }
 
   /**
@@ -106,6 +132,8 @@ class NewTripHandler {
   private UpdateSuccess handleNewOrReplacementTrip(
     Trip trip,
     TripUpdate tripUpdate,
+    ForwardsDelayPropagationType forwardsDelayPropagationType,
+    BackwardsDelayPropagationType backwardsDelayPropagationType,
     boolean added,
     boolean modified,
     boolean hasANewRouteBeenCreated
@@ -132,6 +160,8 @@ class NewTripHandler {
       trip,
       tripUpdate,
       stopAndStopTimeUpdates,
+      forwardsDelayPropagationType,
+      backwardsDelayPropagationType,
       added,
       modified,
       buffer.getTripCalendars().getServiceCode(trip.getServiceId())

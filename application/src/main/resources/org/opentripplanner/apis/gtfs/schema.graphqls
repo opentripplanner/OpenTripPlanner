@@ -2898,10 +2898,11 @@ type Stoptime {
   """
   Real-time state of this stop.
     
-  `CANCELED` if the stop or its trip is canceled. `ADDED` if the stop has been added to a trip
-  whose stop pattern has been modified (e.g. by a GTFS-RT `REPLACEMENT` trip update or a SIRI extra
-  call). Otherwise this is the trip's real-time state. Scheduled stops left out of a modified trip
-  are not listed.
+  `CANCELED` if the stop or its trip is canceled. Otherwise this is the trip's real-time state,
+  except in a trip whose stop pattern has been modified (e.g. by a GTFS-RT `REPLACEMENT` trip
+  update or a SIRI extra call). In such a trip, a stop that has been added is `ADDED`, a stop
+  without real-time data (e.g. a GTFS-RT `NO_DATA` stop) is `SCHEDULED`, and scheduled stops that
+  have been left out are not listed.
     
   It is recommended to avoid using this field.
   """

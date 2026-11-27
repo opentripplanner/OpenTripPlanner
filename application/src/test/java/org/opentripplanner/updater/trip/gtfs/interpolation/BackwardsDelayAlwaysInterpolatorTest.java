@@ -3,7 +3,6 @@ package org.opentripplanner.updater.trip.gtfs.interpolation;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.OptionalInt;
 import org.junit.jupiter.api.Test;
@@ -115,8 +114,8 @@ class BackwardsDelayAlwaysInterpolatorTest {
   @Test
   void noUpdatesAtAll() {
     var builder = SCHEDULED_TRIP_TIMES.createRealTimeWithoutScheduledTimes();
-    assertThrows(IllegalArgumentException.class, () ->
-      new BackwardsDelayAlwaysInterpolator().propagateBackwards(builder)
-    );
+    assertThat(new BackwardsDelayAlwaysInterpolator().propagateBackwards(builder)).isEmpty();
+    assertNull(builder.getArrivalTime(0));
+    assertNull(builder.getDepartureTime(0));
   }
 }

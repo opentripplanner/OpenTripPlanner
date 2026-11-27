@@ -133,11 +133,19 @@ public class GtfsRealTimeUpdateHandler {
         forwardsDelayPropagationType,
         backwardsDelayPropagationType
       );
-      case NEW, ADDED -> addedTripHandler.handleNew(tripUpdate);
+      case NEW, ADDED -> addedTripHandler.handleNew(
+        tripUpdate,
+        forwardsDelayPropagationType,
+        backwardsDelayPropagationType
+      );
       case CANCELED -> canceledTripHandler.cancel(tripUpdate, updateIncrementality);
       case DELETED -> canceledTripHandler.delete(tripUpdate, updateIncrementality);
       case DUPLICATED -> duplicatedTripHandler.handleDuplicated(tripUpdate, updateIncrementality);
-      case REPLACEMENT -> addedTripHandler.handleReplacement(tripUpdate);
+      case REPLACEMENT -> addedTripHandler.handleReplacement(
+        tripUpdate,
+        forwardsDelayPropagationType,
+        backwardsDelayPropagationType
+      );
       case UNSCHEDULED -> throw UpdateException.of(
         tripUpdate.tripId(),
         NOT_IMPLEMENTED_UNSCHEDULED

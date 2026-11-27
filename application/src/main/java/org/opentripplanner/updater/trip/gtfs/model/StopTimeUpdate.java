@@ -145,10 +145,25 @@ public final class StopTimeUpdate {
     );
   }
 
+  public boolean hasOnlyScheduledArrivalTime() {
+    return stopTimeUpdate.hasArrival() && isScheduledOnly(stopTimeUpdate.getArrival());
+  }
+
+  public boolean hasOnlyScheduledDepartureTime() {
+    return stopTimeUpdate.hasDeparture() && isScheduledOnly(stopTimeUpdate.getDeparture());
+  }
+
   public boolean isSkipped() {
     return (
       stopTimeUpdate.getScheduleRelationship() ==
       GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship.SKIPPED
+    );
+  }
+
+  public boolean isNoData() {
+    return (
+      stopTimeUpdate.getScheduleRelationship() ==
+      GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship.NO_DATA
     );
   }
 
@@ -212,6 +227,12 @@ public final class StopTimeUpdate {
     return stopTimeEvent.hasTime()
       ? OptionalLong.of(stopTimeEvent.getTime())
       : OptionalLong.empty();
+  }
+
+  private static boolean isScheduledOnly(StopTimeEvent stopTimeEvent) {
+    return (
+      stopTimeEvent.hasScheduledTime() && !stopTimeEvent.hasTime() && !stopTimeEvent.hasDelay()
+    );
   }
 
   /**
