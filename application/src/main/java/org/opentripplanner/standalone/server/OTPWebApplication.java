@@ -3,8 +3,6 @@ package org.opentripplanner.standalone.server;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.binder.jersey.server.DefaultJerseyTagsProvider;
 import io.micrometer.core.instrument.binder.jersey.server.MetricsApplicationEventListener;
-import io.micrometer.prometheusmetrics.PrometheusConfig;
-import io.micrometer.prometheusmetrics.PrometheusMeterRegistry;
 import jakarta.ws.rs.container.ContainerResponseFilter;
 import jakarta.ws.rs.core.Application;
 import java.util.HashSet;
@@ -13,8 +11,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 import org.glassfish.jersey.CommonProperties;
-import org.glassfish.jersey.inject.hk2.AbstractBinder;
-import org.glassfish.jersey.internal.inject.Binder;
 import org.glassfish.jersey.jackson3.internal.jackson.jakarta.rs.json.JacksonJsonProvider;
 import org.opentripplanner.api.common.OTPExceptionMapper;
 import org.opentripplanner.apis.APIEndpoints;
@@ -40,6 +36,8 @@ public class OTPWebApplication extends Application {
   private final List<Class<? extends ContainerResponseFilter>> customFilters;
   private final HttpResponseTimeMetricsParameters httpResponseTimeMetricsParameters;
 
+  private final JerseyComponents additionalComponents;
+
   static {
     // Remove existing handlers attached to the j.u.l root logger
     SLF4JBridgeHandler.removeHandlersForRootLogger();
@@ -48,13 +46,20 @@ public class OTPWebApplication extends Application {
     SLF4JBridgeHandler.install();
   }
 
+  /**
+   * @param additionalComponents optional APIs served by this application, like the Actuator API
+   *                             when it is served on the main port. Use
+   *                             {@link JerseyComponents#EMPTY} if there are none.
+   */
   public OTPWebApplication(
     OTPWebApplicationParameters parameters,
-    Supplier<RequestScopedFactory> requestScopedComponentProvider
+    Supplier<RequestScopedFactory> requestScopedComponentProvider,
+    JerseyComponents additionalComponents
   ) {
     this.requestScopedFactoryProvider = requestScopedComponentProvider;
     this.customFilters = createCustomFilters(parameters.traceParameters());
     this.httpResponseTimeMetricsParameters = parameters.httpResponseTimeMetricsParameters();
+    this.additionalComponents = additionalComponents;
   }
 
   /**
@@ -70,6 +75,7 @@ public class OTPWebApplication extends Application {
     // Add API Endpoints defined in the api package
     Set<Class<?>> classes = new HashSet<>(APIEndpoints.listAPIEndpoints());
 
+    classes.addAll(additionalComponents.classes());
     classes.addAll(resolveFilterClasses());
 
     return classes;
@@ -111,22 +117,20 @@ public class OTPWebApplication extends Application {
       )
     );
 
-    if (OTPFeature.ActuatorAPI.isOn()) {
-      singletons.add(getBoundPrometheusRegistry());
+    singletons.addAll(additionalComponents.singletons());
 
-      // Add HTTP response time metrics filter if enabled
-      if (OTPFeature.HttpResponseTimeMetrics.isOn()) {
-        singletons.add(
-          new HttpResponseTimeMetricsFilter(
-            httpResponseTimeMetricsParameters.clientHeader(),
-            httpResponseTimeMetricsParameters.monitoredClients(),
-            httpResponseTimeMetricsParameters.monitoredEndpoints(),
-            httpResponseTimeMetricsParameters.metricName(),
-            httpResponseTimeMetricsParameters.minExpectedResponseTime(),
-            httpResponseTimeMetricsParameters.maxExpectedResponseTime()
-          )
-        );
-      }
+    // Add HTTP response time metrics filter if enabled, the metrics are exported by the Actuator API
+    if (OTPFeature.ActuatorAPI.isOn() && OTPFeature.HttpResponseTimeMetrics.isOn()) {
+      singletons.add(
+        new HttpResponseTimeMetricsFilter(
+          httpResponseTimeMetricsParameters.clientHeader(),
+          httpResponseTimeMetricsParameters.monitoredClients(),
+          httpResponseTimeMetricsParameters.monitoredEndpoints(),
+          httpResponseTimeMetricsParameters.metricName(),
+          httpResponseTimeMetricsParameters.minExpectedResponseTime(),
+          httpResponseTimeMetricsParameters.maxExpectedResponseTime()
+        )
+      );
     }
 
     return singletons;
@@ -148,26 +152,6 @@ public class OTPWebApplication extends Application {
       "http.server.requests",
       true
     );
-  }
-
-  /**
-   * Instantiate and add the prometheus micrometer registry to the global composite registry.
-   *
-   * @return An AbstractBinder, which can be used to inject the registry into the Actuator API calls
-   */
-  private Binder getBoundPrometheusRegistry() {
-    PrometheusMeterRegistry prometheusRegistry = new PrometheusMeterRegistry(
-      PrometheusConfig.DEFAULT
-    );
-
-    Metrics.globalRegistry.add(prometheusRegistry);
-
-    return new AbstractBinder() {
-      @Override
-      protected void configure() {
-        bind(prometheusRegistry).to(PrometheusMeterRegistry.class);
-      }
-    };
   }
 
   private List<Class<? extends ContainerResponseFilter>> createCustomFilters(

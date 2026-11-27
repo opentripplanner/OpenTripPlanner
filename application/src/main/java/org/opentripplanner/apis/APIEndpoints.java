@@ -2,7 +2,6 @@ package org.opentripplanner.apis;
 
 import static org.opentripplanner.framework.application.OTPFeature.APIServerInfo;
 import static org.opentripplanner.framework.application.OTPFeature.APIUpdaterStatus;
-import static org.opentripplanner.framework.application.OTPFeature.ActuatorAPI;
 import static org.opentripplanner.framework.application.OTPFeature.DebugRasterTiles;
 import static org.opentripplanner.framework.application.OTPFeature.DebugUi;
 import static org.opentripplanner.framework.application.OTPFeature.GtfsGraphQlApi;
@@ -23,7 +22,6 @@ import org.opentripplanner.api.resource.UpdaterStatusResource;
 import org.opentripplanner.apis.gtfs.GtfsGraphQLAPI;
 import org.opentripplanner.apis.transmodel.TransmodelAPI;
 import org.opentripplanner.apis.vectortiles.DebugVectorTilesResource;
-import org.opentripplanner.ext.actuator.ActuatorAPI;
 import org.opentripplanner.ext.debugrastertiles.api.resource.DebugRasterTileResource;
 import org.opentripplanner.ext.geocoder.GeocoderResource;
 import org.opentripplanner.ext.ojp.resource.OjpResource;
@@ -54,7 +52,8 @@ public class APIEndpoints {
     addIfEnabled(TransmodelGraphQlApi, TransmodelAPI.TransmodelAPIOldPath.class);
 
     // Sandbox extension APIs
-    addIfEnabled(ActuatorAPI, ActuatorAPI.class);
+    // The ActuatorAPI is not listed here, it is registered together with the Prometheus registry
+    // it needs by the web application serving it, see ActuatorApiComponents.
     addIfEnabled(DebugRasterTiles, DebugRasterTileResource.class);
     addIfEnabled(OjpApi, OjpResource.class);
     addIfEnabled(ReportApi, ReportResource.class);

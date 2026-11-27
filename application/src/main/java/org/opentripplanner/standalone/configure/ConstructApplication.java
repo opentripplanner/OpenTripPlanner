@@ -1,6 +1,8 @@
 package org.opentripplanner.standalone.configure;
 
-import jakarta.ws.rs.core.Application;
+import io.micrometer.core.instrument.Metrics;
+import io.micrometer.prometheusmetrics.PrometheusConfig;
+import io.micrometer.prometheusmetrics.PrometheusMeterRegistry;
 import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
@@ -39,7 +41,11 @@ import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.standalone.config.DebugUiConfig;
 import org.opentripplanner.standalone.config.OtpConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
+import org.opentripplanner.standalone.server.ActuatorApiComponents;
+import org.opentripplanner.standalone.server.ActuatorWebApplication;
 import org.opentripplanner.standalone.server.GrizzlyServer;
+import org.opentripplanner.standalone.server.GrizzlyServer.ActuatorEndpoint;
+import org.opentripplanner.standalone.server.JerseyComponents;
 import org.opentripplanner.standalone.server.OTPWebApplication;
 import org.opentripplanner.street.StreetRepository;
 import org.opentripplanner.street.graph.Graph;
@@ -175,11 +181,20 @@ public class ConstructApplication {
    * this method is called.
    */
   public GrizzlyServer createGrizzlyServer() {
-    return new GrizzlyServer(
-      cli,
-      createApplication(),
-      routerConfig().server().apiProcessingTimeout()
-    );
+    LOG.info("Wiring up and configuring server.");
+    setupTransitRoutingServer();
+
+    return switch (cli.actuatorApiPlacement(OTPFeature.ActuatorAPI.isOn())) {
+      case DISABLED -> createServer(JerseyComponents.EMPTY, null);
+      case MAIN_PORT -> createServer(createActuatorApi(), null);
+      case SEPARATE_PORT -> createServer(
+        JerseyComponents.EMPTY,
+        new ActuatorEndpoint(
+          new ActuatorWebApplication(this::requestScopedFactory, createActuatorApi()),
+          cli.actuatorPort
+        )
+      );
+    };
   }
 
   /**
@@ -226,10 +241,30 @@ public class ConstructApplication {
     return graphBuilderDataSources;
   }
 
-  private Application createApplication() {
-    LOG.info("Wiring up and configuring server.");
-    setupTransitRoutingServer();
-    return new OTPWebApplication(routerConfig().server(), this::requestScopedFactory);
+  private GrizzlyServer createServer(
+    JerseyComponents additionalComponents,
+    @Nullable ActuatorEndpoint actuatorEndpoint
+  ) {
+    return new GrizzlyServer(
+      cli,
+      new OTPWebApplication(
+        routerConfig().server(),
+        this::requestScopedFactory,
+        additionalComponents
+      ),
+      actuatorEndpoint,
+      routerConfig().server().apiProcessingTimeout()
+    );
+  }
+
+  /**
+   * Create the Actuator API with its Prometheus registry. Call this once: the registry is added to
+   * the global registry, so it collects the metrics of all of OTP.
+   */
+  private static JerseyComponents createActuatorApi() {
+    var prometheusRegistry = new PrometheusMeterRegistry(PrometheusConfig.DEFAULT);
+    Metrics.globalRegistry.add(prometheusRegistry);
+    return ActuatorApiComponents.create(prometheusRegistry);
   }
 
   private void setupTransitRoutingServer() {

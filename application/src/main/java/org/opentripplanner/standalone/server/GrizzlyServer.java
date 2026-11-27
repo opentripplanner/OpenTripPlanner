@@ -8,6 +8,7 @@ import jakarta.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.net.BindException;
 import java.time.Duration;
+import java.util.List;
 import java.util.Optional;
 import org.glassfish.grizzly.http.CompressionConfig;
 import org.glassfish.grizzly.http.server.CLStaticHttpHandler;
@@ -17,6 +18,7 @@ import org.glassfish.grizzly.http.server.NetworkListener;
 import org.glassfish.grizzly.http.server.StaticHttpHandler;
 import org.glassfish.grizzly.threadpool.ThreadPoolConfig;
 import org.glassfish.jersey.server.ContainerFactory;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.slf4j.Logger;
@@ -29,12 +31,22 @@ public class GrizzlyServer {
 
   private static final int MIN_THREADS = 4;
 
+  /**
+   * Health probes and metrics scraping are infrequent and fast, a small pool is enough. It is
+   * separate from the main pool, so they are answered even when the routing requests saturate it.
+   */
+  private static final int ACTUATOR_THREADS = 2;
+
   /** Where the debug client is on the classpath, it is put there by the Maven build. */
   private static final String DEBUG_CLIENT_INDEX = "client/index.html";
 
   /** The command line parameters, including things like port number and content directories. */
   private final CommandLineParameters params;
   private final Application app;
+
+  @Nullable
+  private final ActuatorEndpoint actuatorEndpoint;
+
   private final Duration httpTransactionTimeout;
 
   static {
@@ -44,21 +56,27 @@ public class GrizzlyServer {
     SLF4JBridgeHandler.install();
   }
 
-  /** Construct a Grizzly server with the given IoC injector and command line parameters. */
+  /**
+   * Construct a Grizzly server with the given IoC injector and command line parameters.
+   *
+   * @param actuatorEndpoint the Actuator API served on its own port. It is {@code null} if the
+   *                         Actuator API is served by the main {@code app}, or is disabled.
+   */
   public GrizzlyServer(
     CommandLineParameters params,
     Application app,
+    @Nullable ActuatorEndpoint actuatorEndpoint,
     Duration httpTransactionTimeout
   ) {
     this.params = params;
     this.app = app;
+    this.actuatorEndpoint = actuatorEndpoint;
     this.httpTransactionTimeout = httpTransactionTimeout;
   }
 
   /**
-   * This function goes through roughly the same steps as Jersey's GrizzlyServerFactory, but we
-   * instead construct an HttpServer and NetworkListener manually so we can set the number of
-   * threads and other details.
+   * Start the server, and the Actuator API server if it has its own port, and block until OTP is
+   * shut down.
    */
   public void run() {
     LOG.info(
@@ -67,6 +85,51 @@ public class GrizzlyServer {
       params.bindAddress
     );
     LOG.info("OTP server base directory is: {}", params.baseDirectory);
+    HttpServer httpServer = createHttpServer();
+    Optional<HttpServer> actuatorServer = createActuatorServer();
+    List<HttpServer> servers = actuatorServer
+      .map(it -> List.of(httpServer, it))
+      .orElse(List.of(httpServer));
+
+    // Add shutdown hook to gracefully shut down Grizzly. If no thread is returned then shutdown is already in progress.
+    Optional<Thread> shutdownThread = addShutdownHook("grizzly-shutdown", () ->
+      servers.forEach(HttpServer::shutdown)
+    );
+    if (!shutdownThread.isPresent()) {
+      return;
+    }
+
+    /* RELINQUISH CONTROL TO THE SERVER THREAD */
+    try {
+      start(httpServer, params.port);
+      if (actuatorServer.isPresent()) {
+        LOG.info(
+          "Starting Actuator API server on port {} of interface {}",
+          actuatorEndpoint.port(),
+          params.bindAddress
+        );
+        start(actuatorServer.get(), actuatorEndpoint.port());
+      }
+      LOG.info("Grizzly server running.");
+      Thread.currentThread().join();
+    } catch (BindException be) {
+      LOG.error(be.getMessage());
+    } catch (IOException ioe) {
+      LOG.error("IO exception while starting server.");
+    } catch (InterruptedException ie) {
+      LOG.info("Interrupted, shutting down.");
+    }
+
+    shutdownThread.ifPresent(thread -> removeShutdownHook(thread));
+    servers.forEach(HttpServer::shutdown);
+  }
+
+  /**
+   * This function goes through roughly the same steps as Jersey's GrizzlyServerFactory, but we
+   * instead construct an HttpServer and NetworkListener manually so we can set the number of
+   * threads and other details.
+   */
+  private HttpServer createHttpServer() {
     HttpServer httpServer = new HttpServer();
 
     // Set up a pool of threads to handle incoming HTTP requests.
@@ -144,27 +207,56 @@ public class GrizzlyServer {
     // Graph graph = gs.getGraph();
     // httpServer.getServerConfiguration().addHttpHandler(new OTPHttpHandler(graph), "/test/*");
 
-    // Add shutdown hook to gracefully shut down Grizzly. If no thread is returned then shutdown is already in progress.
-    Optional<Thread> shutdownThread = addShutdownHook("grizzly-shutdown", httpServer::shutdown);
-    if (!shutdownThread.isPresent()) {
-      return;
-    }
+    return httpServer;
+  }
 
-    /* RELINQUISH CONTROL TO THE SERVER THREAD */
+  /**
+   * A separate server is needed for the Actuator API, because Grizzly registers the handlers per
+   * server, not per listener. It has its own small thread pool, so it is isolated from the routing
+   * load, and serves nothing but the Actuator API.
+   */
+  private Optional<HttpServer> createActuatorServer() {
+    if (actuatorEndpoint == null) {
+      return Optional.empty();
+    }
+    HttpServer httpServer = new HttpServer();
+
+    ThreadPoolConfig threadPoolConfig = ThreadPoolConfig.defaultConfig()
+      .setPoolName("grizzly-actuator")
+      .setThreadFactory(Thread.ofPlatform().name("grizzly-actuator-", 0).factory())
+      .setCorePoolSize(ACTUATOR_THREADS)
+      .setMaxPoolSize(ACTUATOR_THREADS)
+      .setQueueLimit(-1);
+
+    NetworkListener httpListener = new NetworkListener(
+      "otp_actuator",
+      params.bindAddress,
+      actuatorEndpoint.port()
+    );
+    httpListener.setSecure(false);
+    httpListener.getTransport().setSelectorRunnersCount(1);
+    httpListener.getTransport().setWorkerThreadPoolConfig(threadPoolConfig);
+    httpListener.setTransactionTimeout((int) httpTransactionTimeout.toSeconds());
+    httpServer.addListener(httpListener);
+
+    HttpHandler actuatorHandler = ContainerFactory.createContainer(
+      HttpHandler.class,
+      actuatorEndpoint.app()
+    );
+    httpServer.getServerConfiguration().addHttpHandler(actuatorHandler, "/otp/");
+    return Optional.of(httpServer);
+  }
+
+  private static void start(HttpServer server, int port) throws IOException {
     try {
-      httpServer.start();
-      LOG.info("Grizzly server running.");
-      Thread.currentThread().join();
-    } catch (BindException be) {
-      LOG.error("Cannot bind to port {}. Is it already in use?", params.port);
-    } catch (IOException ioe) {
-      LOG.error("IO exception while starting server.");
-    } catch (InterruptedException ie) {
-      LOG.info("Interrupted, shutting down.");
+      server.start();
+    } catch (BindException e) {
+      var bindException = new BindException(
+        "Cannot bind to port " + port + ". Is it already in use? " + e.getMessage()
+      );
+      bindException.initCause(e);
+      throw bindException;
     }
-
-    shutdownThread.ifPresent(thread -> removeShutdownHook(thread));
-    httpServer.shutdown();
   }
 
   /**
@@ -186,6 +278,12 @@ public class GrizzlyServer {
     LOG.info("Maximum HTTP handler thread pool size will be {} threads.", maxThreads);
     return maxThreads;
   }
+
+  /**
+   * The Actuator API application and the port it is served on, when the Actuator API has its own
+   * port, separate from the public APIs.
+   */
+  public record ActuatorEndpoint(Application app, int port) {}
 
   /**
    * The debug client is not checked in, it is built by Maven. When OTP is started from an IDE
