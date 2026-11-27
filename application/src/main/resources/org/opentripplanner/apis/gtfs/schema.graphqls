@@ -3699,6 +3699,30 @@ enum DependentFareProductFilter {
   MATCH_CATEGORY_AND_MEDIUM
 }
 
+"""
+The distance category of a transit service: how far it travels and which kind of journeys it is
+meant for. The category is derived from the NeTEx submode or the GTFS extended route type of the
+trip, and it exists for every trip of every transit mode.
+
+Trips whose submode or extended route type isn't specific, e.g. a plain GTFS route type 2, get a
+best guess based on their transit mode: `REGIONAL` for `RAIL` and `FERRY`, `LONG_DISTANCE` for
+`COACH` and `AIRPLANE`, and `LOCAL` for all other modes.
+
+Similarly, all submodes that don't directly refer to travel distance are filtered by a
+best-effort chosen category which might not make sense for some services.
+
+NOTE, THIS FILTER IS EXPERIMENTAL AND THE MAPPING BETWEEN MODES/SUBMODES AND CATEGORIES CAN
+CHANGE WITHOUT PRIOR NOTICE.
+"""
+enum DistanceCategory {
+  "Services within a city or its suburbs, e.g. urban railways, trams, shuttles and local buses."
+  LOCAL
+  "National and international services, including high speed rail, night trains and domestic flights."
+  LONG_DISTANCE
+  "Services connecting the towns and cities of a region, e.g. regional trains and regional buses."
+  REGIONAL
+}
+
 "Entities, which are relevant for a feed and can contain alerts"
 enum FeedAlertType {
   "Alerts affecting the feed's agencies"
@@ -5302,6 +5326,15 @@ input PlanStreetPreferencesInput {
 input PlanTransitModePreferenceInput {
   "Costs related to using a transit mode."
   cost: TransitModePreferenceCostInput
+  """
+  If present and not null, only trips with one of these distance categories match. Every trip has
+  a category, see `DistanceCategory`. Like `replacement`, this further limits the transit mode
+  selection, and a trip has to match both. The list must not be empty.
+  
+  For example, `(mode: RAIL, distanceCategories: [LOCAL, REGIONAL])` matches all trains except the
+  long-distance trains.
+  """
+  distanceCategories: [DistanceCategory!]
   "Transit mode that could be (but doesn't have to be) used in an itinerary."
   mode: TransitMode!
   """
