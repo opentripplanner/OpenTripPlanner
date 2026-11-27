@@ -1,5 +1,6 @@
 package org.opentripplanner.updater;
 
+import org.opentripplanner.core.model.event.DomainEvent;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.service.TransitRepository;
@@ -48,4 +49,10 @@ public interface TransitRealTimeUpdateContext {
    * in a published snapshot.
    */
   EntityResolver entityResolver(String feedId);
+
+  /**
+   * Publish a domain event in this update task. The handlers registered for the event run
+   * synchronously, in the same transaction.
+   */
+  void publish(DomainEvent event);
 }
