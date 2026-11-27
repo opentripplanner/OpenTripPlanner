@@ -4,8 +4,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.opentripplanner.updater.spi.UpdateErrorType.INVALID_ARRIVAL_TIME;
+import static org.opentripplanner.updater.spi.UpdateErrorType.INVALID_DEPARTURE_TIME;
+import static org.opentripplanner.updater.spi.UpdateErrorType.NO_UPDATES;
+import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
+import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
@@ -148,5 +154,68 @@ class DelayedTest implements RealtimeTestConstants {
       "U | A 0:01 0:01:01 | B 0:02:10 0:02:31 | C 0:02:50 0:02:51",
       tripData.showTimetable()
     );
+  }
+
+  @Test
+  void noStopTimeUpdates() {
+    var tripInput = TripInput.of(TRIP_1_ID)
+      .addStop(STOP_A, "0:00:10", "0:00:11")
+      .addStop(STOP_B, "0:00:20", "0:00:21");
+    var env = ENV_BUILDER.addTrip(tripInput).build();
+    var rt = GtfsRtTestHelper.of(env);
+
+    var result = rt.applyTripUpdate(rt.tripUpdateScheduled(TRIP_1_ID).build());
+
+    assertFailure(NO_UPDATES, result);
+  }
+
+  @Test
+  void emptyArrival() {
+    var tripInput = TripInput.of(TRIP_1_ID)
+      .addStop(STOP_A, "0:00:10", "0:00:11")
+      .addStop(STOP_B, "0:00:20", "0:00:21");
+    var env = ENV_BUILDER.addTrip(tripInput).build();
+    var rt = GtfsRtTestHelper.of(env);
+
+    var tripUpdate = rt
+      .tripUpdateScheduled(TRIP_1_ID)
+      .addDelayedStopTime(0, 0)
+      .addRawStopTime(
+        StopTimeUpdate.newBuilder()
+          .setStopSequence(1)
+          .setArrival(StopTimeEvent.newBuilder().build())
+          .build()
+      )
+      .build();
+
+    var result = rt.applyTripUpdate(tripUpdate);
+
+    assertFailure(INVALID_ARRIVAL_TIME, result);
+    assertEquals(1, result.errors().getFirst().stopPosition());
+  }
+
+  @Test
+  void emptyDeparture() {
+    var tripInput = TripInput.of(TRIP_1_ID)
+      .addStop(STOP_A, "0:00:10", "0:00:11")
+      .addStop(STOP_B, "0:00:20", "0:00:21");
+    var env = ENV_BUILDER.addTrip(tripInput).build();
+    var rt = GtfsRtTestHelper.of(env);
+
+    var tripUpdate = rt
+      .tripUpdateScheduled(TRIP_1_ID)
+      .addDelayedStopTime(0, 0)
+      .addRawStopTime(
+        StopTimeUpdate.newBuilder()
+          .setStopSequence(1)
+          .setDeparture(StopTimeEvent.newBuilder().build())
+          .build()
+      )
+      .build();
+
+    var result = rt.applyTripUpdate(tripUpdate);
+
+    assertFailure(INVALID_DEPARTURE_TIME, result);
+    assertEquals(1, result.errors().getFirst().stopPosition());
   }
 }

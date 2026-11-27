@@ -1,7 +1,5 @@
 package org.opentripplanner.updater.trip.gtfs;
 
-import static org.opentripplanner.updater.spi.UpdateErrorType.INVALID_ARRIVAL_TIME;
-import static org.opentripplanner.updater.spi.UpdateErrorType.INVALID_DEPARTURE_TIME;
 import static org.opentripplanner.updater.spi.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
 
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship;
@@ -45,11 +43,6 @@ class TripTimesUpdater {
 
   private final ZoneId timeZone;
   private final DeduplicatorService deduplicator;
-
-  /**
-   * Maximum time in seconds since midnight for arrivals and departures
-   */
-  private static final long MAX_ARRIVAL_DEPARTURE_TIME = 48 * 60 * 60;
 
   TripTimesUpdater(ZoneId timeZone, DeduplicatorService deduplicator) {
     this.timeZone = timeZone;
@@ -138,12 +131,6 @@ class TripTimesUpdater {
         builder.withNoData(pos);
       } else {
         // Else the status is SCHEDULED, update times as needed.
-        if (!update.isArrivalValid()) {
-          throw UpdateException.of(tripId, INVALID_ARRIVAL_TIME, i);
-        }
-        if (!update.isDepartureValid()) {
-          throw UpdateException.of(tripId, INVALID_DEPARTURE_TIME, i);
-        }
         setArrivalAndDeparture(builder, pos, update, today);
       }
     }
@@ -210,20 +197,12 @@ class TripTimesUpdater {
       // Set arrival time
       final var arrival = update.scheduledArrivalTimeWithRealTimeFallback();
       if (arrival.isPresent()) {
-        final var arrivalTime = arrival.getAsLong() - midnightSecondsSinceEpoch;
-        if (arrivalTime < 0 || arrivalTime > MAX_ARRIVAL_DEPARTURE_TIME) {
-          throw UpdateException.of(trip.getId(), INVALID_ARRIVAL_TIME);
-        }
-        stopTime.setArrivalTime((int) arrivalTime);
+        stopTime.setArrivalTime((int) (arrival.getAsLong() - midnightSecondsSinceEpoch));
       }
       // Set departure time
       final var departure = update.scheduledDepartureTimeWithRealTimeFallback();
       if (departure.isPresent()) {
-        final long departureTime = departure.getAsLong() - midnightSecondsSinceEpoch;
-        if (departureTime < 0 || departureTime > MAX_ARRIVAL_DEPARTURE_TIME) {
-          throw UpdateException.of(trip.getId(), INVALID_DEPARTURE_TIME);
-        }
-        stopTime.setDepartureTime((int) departureTime);
+        stopTime.setDepartureTime((int) (departure.getAsLong() - midnightSecondsSinceEpoch));
       }
       // Exact time
       stopTime.setTimepoint(1);

@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.updater.spi.UpdateErrorType.INVALID_ARRIVAL_TIME;
+import static org.opentripplanner.updater.spi.UpdateErrorType.INVALID_DEPARTURE_TIME;
 import static org.opentripplanner.updater.spi.UpdateErrorType.INVALID_STOP_REFERENCE;
 import static org.opentripplanner.updater.spi.UpdateErrorType.TOO_FEW_STOPS;
 import static org.opentripplanner.updater.spi.UpdateErrorType.UNKNOWN_STOP;
@@ -18,12 +19,14 @@ import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailu
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL;
 
-import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
-import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
 import de.mfdz.MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupType;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
@@ -33,6 +36,7 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.updater.spi.UpdateErrorType;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.gtfs.GtfsRtTestHelper;
 import org.opentripplanner.updater.trip.gtfs.TripUpdateBuilder;
@@ -236,27 +240,43 @@ class AddedTest implements RealtimeTestConstants {
   }
 
   @Test
-  void addedTripWithNoDataStopWithPredictedTimeIsRejected() {
-    long time = 1_000_000;
+  void addedTripTimesAtTheLimitsOfTheServiceDay() {
     var tripUpdate = gtfsRt
       .tripUpdate(ADDED_TRIP_ID, NEW)
-      .addStopTime(STOP_A_ID, "00:30")
-      .addRawStopTime(
-        StopTimeUpdate.newBuilder()
-          .setStopId(STOP_B_ID)
-          .setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.NO_DATA)
-          .setArrival(
-            StopTimeEvent.newBuilder()
-              .setScheduledTime(time)
-              .setTime(time + 120)
-          )
-          .setDeparture(StopTimeEvent.newBuilder().setScheduledTime(time))
-          .build()
-      )
-      .addStopTime(STOP_C_ID, "00:55")
+      .addStopTime(STOP_A_ID, "0:00")
+      .addStopTime(STOP_B_ID, "48:00")
       .build();
 
-    assertFailure(INVALID_ARRIVAL_TIME, gtfsRt.applyTripUpdate(tripUpdate));
+    assertSuccess(gtfsRt.applyTripUpdate(tripUpdate));
+    assertAddedTrip(ADDED_TRIP_ID, env);
+  }
+
+  static Stream<Arguments> timesOutsideOfServiceDay() {
+    return Stream.of(
+      Arguments.of("-0:00:01", "10:00", INVALID_ARRIVAL_TIME),
+      Arguments.of("48:00:01", "48:00:01", INVALID_ARRIVAL_TIME),
+      Arguments.of("10:00", "-0:00:01", INVALID_DEPARTURE_TIME),
+      Arguments.of("10:00", "48:00:01", INVALID_DEPARTURE_TIME)
+    );
+  }
+
+  @ParameterizedTest
+  @MethodSource("timesOutsideOfServiceDay")
+  void addedTripWithTimeOutsideOfServiceDayIsRejected(
+    String arrival,
+    String departure,
+    UpdateErrorType expectedError
+  ) {
+    var tripUpdate = gtfsRt
+      .tripUpdate(ADDED_TRIP_ID, NEW)
+      .addStopTimeWithArrivalAndDeparture(0, "10:00", "10:00")
+      .addStopTimeWithArrivalAndDeparture(1, arrival, departure)
+      .build();
+
+    var result = gtfsRt.applyTripUpdate(tripUpdate);
+
+    assertFailure(expectedError, result);
+    assertEquals(1, result.errors().getFirst().stopPosition());
     assertTripNotAdded();
   }
 

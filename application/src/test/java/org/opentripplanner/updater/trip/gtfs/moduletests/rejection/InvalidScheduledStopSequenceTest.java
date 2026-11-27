@@ -1,5 +1,6 @@
 package org.opentripplanner.updater.trip.gtfs.moduletests.rejection;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.updater.spi.UpdateErrorType.INVALID_STOP_SEQUENCE;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
 
@@ -44,6 +45,9 @@ class InvalidScheduledStopSequenceTest implements RealtimeTestConstants {
       .addDelayedStopTime(1, 10)
       .build();
 
-    assertFailure(INVALID_STOP_SEQUENCE, rt.applyTripUpdate(update));
+    var result = rt.applyTripUpdate(update);
+
+    assertFailure(INVALID_STOP_SEQUENCE, result);
+    assertEquals(1, result.errors().getFirst().stopPosition());
   }
 }

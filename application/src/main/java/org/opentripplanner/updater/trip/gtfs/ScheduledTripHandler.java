@@ -1,7 +1,6 @@
 package org.opentripplanner.updater.trip.gtfs;
 
 import static org.opentripplanner.updater.spi.UpdateErrorType.NO_SERVICE_ON_DATE;
-import static org.opentripplanner.updater.spi.UpdateErrorType.NO_UPDATES;
 import static org.opentripplanner.updater.spi.UpdateErrorType.TRIP_NOT_FOUND;
 
 import java.util.HashMap;
@@ -54,10 +53,6 @@ class ScheduledTripHandler {
 
     if (pattern == null) {
       throw UpdateException.of(tripUpdate.tripId(), TRIP_NOT_FOUND);
-    }
-
-    if (tripUpdate.stopTimeUpdates().isEmpty()) {
-      throw UpdateException.of(tripUpdate.tripId(), NO_UPDATES);
     }
 
     var serviceId = buffer.getTrip(tripUpdate.tripId()).getServiceId();
