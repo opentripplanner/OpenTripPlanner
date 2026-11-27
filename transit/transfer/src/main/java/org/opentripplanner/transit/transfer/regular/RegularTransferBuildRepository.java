@@ -3,6 +3,8 @@ package org.opentripplanner.transit.transfer.regular;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 
 /**
@@ -56,6 +58,25 @@ public interface RegularTransferBuildRepository<P> extends Serializable {
     int fromStop,
     Map<Integer, List<AlternativePath<P>>> pathsByToStop
   );
+
+  /**
+   * Record the profiles the paths are generated for, by their user preferences, and whether the
+   * alternative paths are generated, see {@link #setAlternativePaths}. This replaces the record of
+   * an earlier generation.
+   *
+   * @throws IllegalStateException if the repository is sealed
+   */
+  void setGeneratedProfiles(Set<AbstractUserPreferences<?>> profiles, boolean pathAlternatives);
+
+  /**
+   * The user preferences of the profiles the paths are generated for, including the profiles
+   * without any path. {@code null} if no paths were generated.
+   */
+  @Nullable
+  Set<AbstractUserPreferences<?>> generatedProfiles();
+
+  /** Whether the alternative paths are generated, {@code false} if no paths were generated. */
+  boolean hasPathAlternatives();
 
   /** The number of paths stored under exactly the given user preferences. */
   int calculateNumberOfTransferPaths(AbstractUserPreferences<?> userPreferences);

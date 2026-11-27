@@ -2,6 +2,8 @@ package org.opentripplanner.transit.transfer.regular.internal;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -251,6 +253,22 @@ class DefaultRegularTransferGeneratorAlternativesTest {
   }
 
   @Test
+  void theBuildRepositoryRecordsTheProfilesAndThatAlternativesAreGenerated() {
+    var subject = generate(true, FIRST, SECOND);
+
+    assertEquals(Set.of(FIRST, SECOND), subject.buildRepository().generatedProfiles());
+    assertTrue(subject.buildRepository().hasPathAlternatives());
+  }
+
+  @Test
+  void theBuildRepositoryRecordsThatNoAlternativesAreGenerated() {
+    var subject = generate(false);
+
+    assertEquals(Set.of(FIRST), subject.buildRepository().generatedProfiles());
+    assertFalse(subject.buildRepository().hasPathAlternatives());
+  }
+
+  @Test
   void theAlternativePathsAreSerializedWithTheBuildRepository() throws Exception {
     var repository = new DefaultRegularTransferBuildRepository<String>();
     repository.setPaths(FIRST, A_INDEX, Map.of(B_INDEX, "best"));
@@ -297,7 +315,7 @@ class DefaultRegularTransferGeneratorAlternativesTest {
       FakePath,
       WalkPreferences
     >) TestLifecycles.initialSnapshot(buildRepository);
-    return new Generated(snapshot.openPaths().paths(), provider);
+    return new Generated(snapshot.openPaths().paths(), provider, buildRepository);
   }
 
   private static AlternativePath<FakePath> alternative(FakePath path, String... ids) {
@@ -318,7 +336,8 @@ class DefaultRegularTransferGeneratorAlternativesTest {
   /** The paths generated from stop A. */
   private record Generated(
     OverlaidTemplatePaths<FakePath> paths,
-    FakeTransferPathProvider provider
+    FakeTransferPathProvider provider,
+    DefaultRegularTransferBuildRepository<FakePath> buildRepository
   ) {
     List<AlternativePath<FakePath>> paths(WalkPreferences profile, int toStop) {
       return paths.alternativePaths(profile, A_INDEX, toStop);

@@ -1,5 +1,8 @@
 package org.opentripplanner.transit.transfer.regular.configure;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.transaction.RepositoryHandle;
 import org.opentripplanner.core.model.transaction.RepositoryRegistry;
 import org.opentripplanner.raptor.data.stop.RaptorStopIndex;
@@ -9,6 +12,7 @@ import org.opentripplanner.transit.transfer.regular.RegularTransferRealtimeUpdat
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferParameters;
+import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 import org.opentripplanner.transit.transfer.regular.internal.DefaultRegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.internal.DefaultRegularTransferGenerator;
 import org.opentripplanner.transit.transfer.regular.internal.DefaultRegularTransferRealtimeUpdater;
@@ -85,6 +89,10 @@ public final class RegularTransferFactory {
    * build repository. This seals the build repository. The snapshots use the {@code pathProvider}
    * to derive the Raptor transfers from their paths, with the request of the profile the paths are
    * stored under, and the {@code mapper} to map the routing requests to user preferences.
+   * <p>
+   * The profiles of the {@code parameters} must be the ones the paths were generated for. A
+   * request is served by the transfers of the closest configured profile, so the transfers of a
+   * profile without paths would be empty.
    *
    * @param numberOfStops the size of the stop index space ({@code RaptorStopIndex.size()}), not the
    *                      number of regular stops. The index space is shared with the flex stops,
@@ -92,6 +100,7 @@ public final class RegularTransferFactory {
    *                      than needed. This goes away when the stop index moves into Raptor.
    * @param cacheMaxSize  the max number of Raptor transfers cached for other user preferences than
    *                      the ones of the profiles and the warmup entries, which are always cached
+   * @throws IllegalStateException if the profiles are not the ones the paths were generated for
    */
   public static <P, R> RepositoryHandle<
     RegularTransferRepositorySnapshot<P, R>,
@@ -106,6 +115,10 @@ public final class RegularTransferFactory {
     int cacheMaxSize,
     boolean collectCacheStatistics
   ) {
+    assertGeneratedProfiles(
+      buildRepository.generatedProfiles(),
+      ProfileUserPreferences.resolveAll(parameters, mapper).keySet()
+    );
     var handle = repositoryRegistry.registerRepository(
       buildRepository.createRuntimeRepository(),
       new RegularTransferRepositoryLifecycle<>(
@@ -120,5 +133,33 @@ public final class RegularTransferFactory {
     // Create the Raptor transfers of the warmup entries before the first request
     handle.repositorySnapshot(repositoryRegistry.scope()).warmUp();
     return handle;
+  }
+
+  /**
+   * Check that the configured profiles are the ones the paths were generated for. Nothing is
+   * checked if no paths were generated.
+   *
+   * @throws IllegalStateException if they differ
+   */
+  static void assertGeneratedProfiles(
+    @Nullable Set<AbstractUserPreferences<?>> generatedProfiles,
+    Set<AbstractUserPreferences<?>> configuredProfiles
+  ) {
+    if (generatedProfiles == null || generatedProfiles.equals(configuredProfiles)) {
+      return;
+    }
+    var notGenerated = new LinkedHashSet<>(configuredProfiles);
+    notGenerated.removeAll(generatedProfiles);
+    var notConfigured = new LinkedHashSet<>(generatedProfiles);
+    notConfigured.removeAll(configuredProfiles);
+    throw new IllegalStateException(
+      "The transfer profiles are not the ones the graph was built with. Serve the graph with the " +
+        "transfer configuration it was built with, or build it again. Profiles without paths in " +
+        "the graph: " +
+        notGenerated +
+        ". Profiles of the graph that are not configured: " +
+        notConfigured +
+        "."
+    );
   }
 }

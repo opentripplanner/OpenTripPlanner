@@ -69,7 +69,7 @@ public class RegularTransferRepositoryModule {
       LOG.warn(warning);
     }
     missingElevatorAlternativesWarning(
-      transferParameters.pathAlternatives(),
+      buildRepository.hasPathAlternatives(),
       routerConfig.updaterConfig().getSiriFmElevatorUpdaterParameters().size()
     ).ifPresent(LOG::warn);
     var handle = StreetTransferFactory.registerRepository(

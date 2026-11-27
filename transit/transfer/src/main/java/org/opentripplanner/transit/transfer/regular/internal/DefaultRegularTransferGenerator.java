@@ -23,6 +23,7 @@ import org.opentripplanner.transit.transfer.regular.RegularTransferBuildReposito
 import org.opentripplanner.transit.transfer.regular.RegularTransferGenerator;
 import org.opentripplanner.transit.transfer.regular.RegularTransferProfileStatistics;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferParameters;
+import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 import org.opentripplanner.transit.transfer.regular.spi.PathCriteria;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPath;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
@@ -116,6 +117,9 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
 
   @Override
   public void generateTransfersForAllStops() {
+    var generatedProfiles = new HashSet<AbstractUserPreferences<?>>();
+    profiles.forEach(profile -> generatedProfiles.add(profile.userPreferences()));
+    buildRepository.setGeneratedProfiles(generatedProfiles, pathAlternatives);
     var stops = listAllStops();
     var progress = ProgressTracker.track("Generate regular transfers", 1000, stops.size());
     stops.parallelStream().forEach(stop -> {

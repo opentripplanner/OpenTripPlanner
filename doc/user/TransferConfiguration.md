@@ -37,6 +37,9 @@ profiles. Other preferences are handled when the routing transfers are created, 
 [Warmup](#warmup). Profiles are grouped by type (`walk`, `wheelchair`, `bicycle` or `car`), and each
 type has its own configuration properties relevant for that specific type.
 
+The profiles are part of the graph: OTP does not start if the profiles of the configuration it
+starts with are not the ones the graph was built with.
+
 **User preferences.** The preferences of a traveler, like walking speed and reluctance, that are
 used to find and cost the templates, and to create the routing transfers. A profile without
 `userPreferences` gets the defaults of the type, see [User preferences](#user-preferences). The user

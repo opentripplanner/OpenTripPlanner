@@ -76,9 +76,9 @@ public class RegularTransferRepositoryLifecycle<
   }
 
   /**
-   * @param profiles               the configuration of the profiles the paths are stored under, the
-   *                               Raptor transfers are derived with the request of the profile
-   *                               closest to the request
+   * @param profiles               the configuration of the profiles, which must be the profiles
+   *                               the paths are stored under. The Raptor transfers are derived with
+   *                               the request of the profile closest to the request
    * @param cacheMaxSize           the max number of Raptor transfers cached for other preferences
    *                               than the ones of the profiles and the warmup entries, which are
    *                               always cached

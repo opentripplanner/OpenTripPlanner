@@ -2,6 +2,8 @@ package org.opentripplanner.transit.transfer.regular.internal;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.transit.transfer.regular.AlternativePath;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
@@ -20,6 +22,11 @@ import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUser
 public class DefaultRegularTransferBuildRepository<P> implements RegularTransferBuildRepository<P> {
 
   private final TemplatePathsByUserProfile<P> paths = new TemplatePathsByUserProfile<>();
+
+  @Nullable
+  private Set<AbstractUserPreferences<?>> generatedProfiles = null;
+
+  private boolean pathAlternatives = false;
 
   /**
    * Set when this repository is converted into the runtime repository. Not serialized, a
@@ -45,6 +52,27 @@ public class DefaultRegularTransferBuildRepository<P> implements RegularTransfer
   ) {
     assertNotSealed();
     paths.setAlternativePaths(userPreferences, fromStop, pathsByToStop);
+  }
+
+  @Override
+  public void setGeneratedProfiles(
+    Set<AbstractUserPreferences<?>> profiles,
+    boolean pathAlternatives
+  ) {
+    assertNotSealed();
+    this.generatedProfiles = Set.copyOf(profiles);
+    this.pathAlternatives = pathAlternatives;
+  }
+
+  @Override
+  @Nullable
+  public Set<AbstractUserPreferences<?>> generatedProfiles() {
+    return generatedProfiles;
+  }
+
+  @Override
+  public boolean hasPathAlternatives() {
+    return pathAlternatives;
   }
 
   @Override
