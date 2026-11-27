@@ -3,7 +3,6 @@ package org.opentripplanner.updater.trip.gtfs;
 import static org.opentripplanner.updater.spi.UpdateErrorType.INVALID_STOP_REFERENCE;
 import static org.opentripplanner.updater.spi.UpdateErrorType.NO_SERVICE_ON_DATE;
 import static org.opentripplanner.updater.spi.UpdateErrorType.OUTSIDE_SERVICE_PERIOD;
-import static org.opentripplanner.updater.spi.UpdateErrorType.TOO_FEW_STOPS;
 import static org.opentripplanner.updater.spi.UpdateErrorType.TRIP_ALREADY_EXISTS;
 import static org.opentripplanner.updater.spi.UpdateErrorType.TRIP_NOT_FOUND;
 import static org.opentripplanner.updater.spi.UpdateErrorType.UNKNOWN_STOP;
@@ -55,7 +54,7 @@ class NewTripHandler {
   }
 
   /**
-   * Validate and handle GTFS-RT TripUpdate message containing a NEW trip.
+   * Handle GTFS-RT TripUpdate message containing a NEW trip.
    */
   UpdateSuccess handleNew(
     final TripUpdate tripUpdate,
@@ -94,7 +93,7 @@ class NewTripHandler {
   }
 
   /**
-   * Validate and handle GTFS-RT TripUpdate message containing a REPLACEMENT trip.
+   * Handle GTFS-RT TripUpdate message containing a REPLACEMENT trip.
    */
   UpdateSuccess handleReplacement(
     TripUpdate tripUpdate,
@@ -139,13 +138,7 @@ class NewTripHandler {
     boolean hasANewRouteBeenCreated
   ) throws UpdateException {
     FeedScopedId tripId = trip.getId();
-    var stopTimeUpdates = tripUpdate.stopTimeUpdates();
-
-    if (stopTimeUpdates.size() < 2) {
-      throw UpdateException.of(tripId, TOO_FEW_STOPS);
-    }
-
-    var stopAndStopTimeUpdates = resolveStops(tripId, stopTimeUpdates);
+    var stopAndStopTimeUpdates = resolveStops(tripId, tripUpdate.stopTimeUpdates());
 
     if (modified) {
       stopAndStopTimeUpdates = tripTimesUpdater.flagAddedStops(

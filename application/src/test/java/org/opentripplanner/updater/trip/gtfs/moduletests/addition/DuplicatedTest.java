@@ -3,6 +3,7 @@ package org.opentripplanner.updater.trip.gtfs.moduletests.addition;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.DUPLICATED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.updater.spi.UpdateErrorType.INVALID_INPUT_STRUCTURE;
 import static org.opentripplanner.updater.spi.UpdateErrorType.NOT_IMPLEMENTED_DIFFERENTIAL_DUPLICATED;
 import static org.opentripplanner.updater.spi.UpdateErrorType.OUTSIDE_SERVICE_PERIOD;
 import static org.opentripplanner.updater.spi.UpdateErrorType.TRIP_NOT_FOUND;
@@ -86,6 +87,13 @@ class DuplicatedTest implements RealtimeTestConstants {
     );
 
     assertThat(env.raptorData(date).summarizePatterns()).containsExactly("F:Pattern1[A U]");
+  }
+
+  @Test
+  void missingStartTime() {
+    var tripUpdate = gtfsRt.tripUpdate(TRIP_1_ID, DUPLICATED).withStartDate(SERVICE_DATE).build();
+
+    assertFailure(INVALID_INPUT_STRUCTURE, gtfsRt.applyTripUpdate(tripUpdate));
   }
 
   @Test

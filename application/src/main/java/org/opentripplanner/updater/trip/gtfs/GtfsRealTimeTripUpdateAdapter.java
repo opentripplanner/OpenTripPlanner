@@ -45,6 +45,7 @@ public class GtfsRealTimeTripUpdateAdapter {
     return new GtfsRealTimeUpdateHandler(
       buffer,
       localDateNow,
+      transitRepository.getTimeZone(),
       new ScheduledTripHandler(transitRepository, buffer, tripTimesUpdater, tripPatternCache),
       new NewTripHandler(transitRepository, buffer, tripTimesUpdater, tripPatternCache),
       new CanceledTripHandler(buffer),

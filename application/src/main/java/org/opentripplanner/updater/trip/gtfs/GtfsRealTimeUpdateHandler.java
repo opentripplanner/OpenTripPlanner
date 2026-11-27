@@ -5,6 +5,7 @@ import static org.opentripplanner.updater.trip.UpdateIncrementality.FULL_DATASET
 
 import com.google.transit.realtime.GtfsRealtime;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -31,6 +32,7 @@ public class GtfsRealTimeUpdateHandler {
 
   private final TimetableRepository buffer;
   private final Supplier<LocalDate> localDateNow;
+  private final ZoneId timeZone;
   private final ScheduledTripHandler scheduledTripHandler;
   private final NewTripHandler addedTripHandler;
   private final CanceledTripHandler canceledTripHandler;
@@ -39,6 +41,7 @@ public class GtfsRealTimeUpdateHandler {
   GtfsRealTimeUpdateHandler(
     TimetableRepository buffer,
     Supplier<LocalDate> localDateNow,
+    ZoneId timeZone,
     ScheduledTripHandler scheduledTripHandler,
     NewTripHandler addedTripHandler,
     CanceledTripHandler canceledTripHandler,
@@ -46,6 +49,7 @@ public class GtfsRealTimeUpdateHandler {
   ) {
     this.buffer = buffer;
     this.localDateNow = localDateNow;
+    this.timeZone = timeZone;
     this.scheduledTripHandler = scheduledTripHandler;
     this.addedTripHandler = addedTripHandler;
     this.canceledTripHandler = canceledTripHandler;
@@ -90,7 +94,7 @@ public class GtfsRealTimeUpdateHandler {
           rawTripUpdate = rawTripUpdate.toBuilder().setTrip(trip).build();
         }
 
-        var tripUpdate = new TripUpdate(feedId, rawTripUpdate, localDateNow);
+        var tripUpdate = new TripUpdate(feedId, rawTripUpdate, localDateNow, timeZone);
         tripUpdate.validate();
 
         result = applyUpdate(

@@ -289,7 +289,7 @@ public class LegacyTimetableRepositoryIntegrationTest {
     var ttUpdater = new TripTimesUpdater(TIME_ZONE, new Deduplicator());
     var result = ttUpdater.createUpdatedTripTimesFromGtfsRt(
       scheduledTimetable,
-      new TripUpdate(feedId, tripUpdate, () -> serviceDate),
+      new TripUpdate(feedId, tripUpdate, () -> serviceDate, TIME_ZONE),
       ForwardsDelayPropagationType.DEFAULT,
       BackwardsDelayPropagationType.REQUIRED_NO_DATA
     );
