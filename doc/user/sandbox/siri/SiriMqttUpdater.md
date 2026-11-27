@@ -30,27 +30,27 @@ To enable the SIRI-ET MQTT updater you need to add it to the updaters section of
 | Config Parameter                                             |    Type    | Summary                                                                                       |  Req./Opt. | Default Value | Since |
 |--------------------------------------------------------------|:----------:|-----------------------------------------------------------------------------------------------|:----------:|---------------|:-----:|
 | type = "siri-et-mqtt"                                        |   `enum`   | The type of the updater.                                                                      | *Required* |               |  1.5  |
-| [connectionStartupTimeout](#u__17__connectionStartupTimeout) | `duration` | How long to wait for the MQTT broker to be available at startup.                              | *Optional* | `"PT30S"`     |  2.10 |
+| [connectionStartupTimeout](#u__18__connectionStartupTimeout) | `duration` | How long to wait for the MQTT broker to be available at startup.                              | *Optional* | `"PT30S"`     |  2.10 |
 | feedId                                                       |  `string`  | The feed ID this updater should be applied to                                                 | *Required* |               |  2.9  |
-| [fuzzyTripMatching](#u__17__fuzzyTripMatching)               |  `boolean` | **Deprecated**, use `fuzzyMatching`. If the fuzzy trip matcher should be used to match trips. | *Optional* | `false`       |  2.9  |
+| [fuzzyTripMatching](#u__18__fuzzyTripMatching)               |  `boolean` | **Deprecated**, use `fuzzyMatching`. If the fuzzy trip matcher should be used to match trips. | *Optional* | `false`       |  2.9  |
 | host                                                         |  `string`  | The host of the MQTT broker                                                                   | *Required* |               |  2.9  |
-| [maxPrimingIdleTime](#u__17__maxPrimingIdleTime)             | `duration` | Max idle time until priming is considered complete.                                           | *Optional* | `"PT1S"`      |  2.9  |
-| [numberOfPrimingWorkers](#u__17__numberOfPrimingWorkers)     |  `integer` | Number of priming workers to process retained messages                                        | *Optional* | `1`           |  2.9  |
-| [password](#u__17__password)                                 |  `string`  | The password for authorization at the MQTT broker                                             | *Optional* |               |  2.9  |
+| [maxPrimingIdleTime](#u__18__maxPrimingIdleTime)             | `duration` | Max idle time until priming is considered complete.                                           | *Optional* | `"PT1S"`      |  2.9  |
+| [numberOfPrimingWorkers](#u__18__numberOfPrimingWorkers)     |  `integer` | Number of priming workers to process retained messages                                        | *Optional* | `1`           |  2.9  |
+| [password](#u__18__password)                                 |  `string`  | The password for authorization at the MQTT broker                                             | *Optional* |               |  2.9  |
 | port                                                         |  `integer` | The port of the MQTT broker                                                                   | *Required* |               |  2.9  |
 | qos                                                          |  `integer` | The qos used for the MQTT subscription                                                        | *Required* |               |  2.9  |
 | topic                                                        |  `string`  | The topic the updater should subscribe to                                                     | *Required* |               |  2.9  |
-| [user](#u__17__user)                                         |  `string`  | The user for authorization at the MQTT broker                                                 | *Optional* |               |  2.9  |
-| [fuzzyMatching](#u__17__fuzzyMatching)                       |  `object`  | Enable the fuzzy trip matcher, with options.                                                  | *Optional* |               |  2.11 |
-|    [timeTolerance](#u__17__fuzzyMatching_timeTolerance)      | `duration` | The maximum difference between the scheduled and the aimed times.                             | *Optional* | `"PT0S"`      |  2.11 |
+| [user](#u__18__user)                                         |  `string`  | The user for authorization at the MQTT broker                                                 | *Optional* |               |  2.9  |
+| [fuzzyMatching](#u__18__fuzzyMatching)                       |  `object`  | Enable the fuzzy trip matcher, with options.                                                  | *Optional* |               |  2.11 |
+|    [timeTolerance](#u__18__fuzzyMatching_timeTolerance)      | `duration` | The maximum difference between the scheduled and the aimed times.                             | *Optional* | `"PT0S"`      |  2.11 |
 
 
 ##### Parameter details
 
-<h4 id="u__17__connectionStartupTimeout">connectionStartupTimeout</h4>
+<h4 id="u__18__connectionStartupTimeout">connectionStartupTimeout</h4>
 
 **Since version:** `2.10` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT30S"`   
-**Path:** /updaters/[17] 
+**Path:** /updaters/[18] 
 
 How long to wait for the MQTT broker to be available at startup.
 
@@ -62,10 +62,10 @@ real-time data. The MQTT client will continue attempting to reconnect in the bac
 live messages will be processed once the broker is available.
 
 
-<h4 id="u__17__fuzzyTripMatching">fuzzyTripMatching</h4>
+<h4 id="u__18__fuzzyTripMatching">fuzzyTripMatching</h4>
 
 **Since version:** `2.9` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`   
-**Path:** /updaters/[17] 
+**Path:** /updaters/[18] 
 
 **Deprecated**, use `fuzzyMatching`. If the fuzzy trip matcher should be used to match trips.
 
@@ -74,10 +74,10 @@ set, so both can be set in a configuration used by OTP versions with and without
 `fuzzyMatching`.
 
 
-<h4 id="u__17__maxPrimingIdleTime">maxPrimingIdleTime</h4>
+<h4 id="u__18__maxPrimingIdleTime">maxPrimingIdleTime</h4>
 
 **Since version:** `2.9` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT1S"`   
-**Path:** /updaters/[17] 
+**Path:** /updaters/[18] 
 
 Max idle time until priming is considered complete.
 
@@ -86,10 +86,10 @@ the specified amount of time. When all priming workers are shut down, the update
 considered to be primed.
 
 
-<h4 id="u__17__numberOfPrimingWorkers">numberOfPrimingWorkers</h4>
+<h4 id="u__18__numberOfPrimingWorkers">numberOfPrimingWorkers</h4>
 
 **Since version:** `2.9` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `1`   
-**Path:** /updaters/[17] 
+**Path:** /updaters/[18] 
 
 Number of priming workers to process retained messages
 
@@ -102,28 +102,28 @@ workers further will decrease performance. The reception of the messages and the
 of the graph always occurs in a single thread.
 
 
-<h4 id="u__17__password">password</h4>
+<h4 id="u__18__password">password</h4>
 
 **Since version:** `2.9` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`   
-**Path:** /updaters/[17] 
+**Path:** /updaters/[18] 
 
 The password for authorization at the MQTT broker
 
 If no authorization is required, the password does not need to be supplied.
 
-<h4 id="u__17__user">user</h4>
+<h4 id="u__18__user">user</h4>
 
 **Since version:** `2.9` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`   
-**Path:** /updaters/[17] 
+**Path:** /updaters/[18] 
 
 The user for authorization at the MQTT broker
 
 If no authorization is required, the user does not need to be supplied.
 
-<h4 id="u__17__fuzzyMatching">fuzzyMatching</h4>
+<h4 id="u__18__fuzzyMatching">fuzzyMatching</h4>
 
 **Since version:** `2.11` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
-**Path:** /updaters/[17] 
+**Path:** /updaters/[18] 
 
 Enable the fuzzy trip matcher, with options.
 
@@ -139,10 +139,10 @@ If a trip matches the aimed times exactly, it is used. Otherwise, if more than o
 within the time tolerance, the message is rejected.
 
 
-<h4 id="u__17__fuzzyMatching_timeTolerance">timeTolerance</h4>
+<h4 id="u__18__fuzzyMatching_timeTolerance">timeTolerance</h4>
 
 **Since version:** `2.11` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT0S"`   
-**Path:** /updaters/[17]/fuzzyMatching 
+**Path:** /updaters/[18]/fuzzyMatching 
 
 The maximum difference between the scheduled and the aimed times.
 

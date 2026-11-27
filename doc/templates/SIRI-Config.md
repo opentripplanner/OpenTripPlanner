@@ -40,3 +40,19 @@ This updater follows the same definition of SIRI Lite as the SIRI-ET one: it dow
 feed in a single HTTP GET request.
 
 <!-- INSERT: siri-sx-lite -->
+
+## SIRI-FM Elevator Status
+
+This updater reads the status of elevators from a SIRI-FM (Facility Monitoring) feed. It downloads
+the entire feed in a single HTTP GET request, and expects the status of all elevators in each
+response: an elevator that is not in the response is in service.
+
+An elevator that is out of service is not used by street routing, for example for wheelchair users.
+The regular transfers avoid it too, if alternative transfer paths were generated at graph build
+(`elevatorAlternatives` in the transfer configuration).
+
+The `FacilityRef` of a `FacilityCondition` must be the id of an elevator in the street graph. The
+ids of the elevators are read from the OSM tags configured with `elevatorRefTags` in the build
+configuration. A `FacilityCondition` whose features are given and do not include `lift` is ignored.
+
+<!-- INSERT: siri-fm-elevator -->

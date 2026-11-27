@@ -68,9 +68,11 @@ import org.opentripplanner.standalone.config.configure.ConfigModule;
 import org.opentripplanner.standalone.config.configure.DeduplicatorServiceModule;
 import org.opentripplanner.standalone.server.MetricsLogging;
 import org.opentripplanner.street.StreetRepository;
+import org.opentripplanner.street.elevator.ElevatorEdgeIndex;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.service.StreetLimitationParametersServiceModule;
+import org.opentripplanner.streetadapter.configure.ElevatorEdgeIndexModule;
 import org.opentripplanner.transfer.configure.RegularTransferRepositoryModule;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.configure.TransferServiceModule;
@@ -98,6 +100,7 @@ import org.opentripplanner.warmup.configure.WarmupModule;
     ConfigModule.class,
     ConstructApplicationModule.class,
     DataOverlayParameterBindingsModule.class,
+    ElevatorEdgeIndexModule.class,
     EmissionServiceModule.class,
     TaxiServiceModule.class,
     EmpiricalDelayServiceModule.class,
@@ -148,6 +151,7 @@ public interface ConstructApplicationFactory {
     RealtimeVehicleRepositorySnapshot,
     RealtimeVehicleRepository
   > realtimeVehicleRepositoryHandle();
+  ElevatorEdgeIndex elevatorEdgeIndex();
   VehicleRentalRepository vehicleRentalRepository();
   VehicleRentalService vehicleRentalService();
   VehicleParkingRepository vehicleParkingRepository();
