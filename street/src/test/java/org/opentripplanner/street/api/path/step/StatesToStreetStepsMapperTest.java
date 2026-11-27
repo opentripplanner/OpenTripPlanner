@@ -1,8 +1,8 @@
-package org.opentripplanner.street.model.path.step;
+package org.opentripplanner.street.api.path.step;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.street.model.path.step.StatesToStreetStepsMapper.isOnSameStreet;
+import static org.opentripplanner.street.api.path.step.StatesToStreetStepsMapper.isOnSameStreet;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -11,8 +11,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.street.api.path.StreetPath;
 import org.opentripplanner.street.geometry.WgsCoordinate;
-import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 
 class StatesToStreetStepsMapperTest {

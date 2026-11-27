@@ -1,4 +1,4 @@
-package org.opentripplanner.street.model.path;
+package org.opentripplanner.street.api.path;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.street.model.edge.Edge;

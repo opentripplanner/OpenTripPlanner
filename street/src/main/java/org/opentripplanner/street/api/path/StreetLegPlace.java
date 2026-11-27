@@ -1,4 +1,4 @@
-package org.opentripplanner.street.model.path;
+package org.opentripplanner.street.api.path;
 
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.street.model.vertex.StreetVertex;

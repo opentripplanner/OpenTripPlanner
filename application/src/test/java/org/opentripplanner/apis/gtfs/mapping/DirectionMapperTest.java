@@ -4,8 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Arrays;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.street.model.path.step.AbsoluteDirection;
-import org.opentripplanner.street.model.path.step.RelativeDirection;
+import org.opentripplanner.street.api.path.step.AbsoluteDirection;
+import org.opentripplanner.street.api.path.step.RelativeDirection;
 
 class DirectionMapperTest {
 

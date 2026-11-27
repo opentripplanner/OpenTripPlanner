@@ -1,13 +1,13 @@
-package org.opentripplanner.street.model.path;
+package org.opentripplanner.street.api.path;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.function.Supplier;
 import org.jspecify.annotations.Nullable;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.street.api.path.step.StreetStep;
 import org.opentripplanner.street.model.edge.ExternalLegEdge;
 import org.opentripplanner.street.model.elevation.ElevationProfile;
-import org.opentripplanner.street.model.path.step.StreetStep;
 import org.opentripplanner.street.search.TraverseMode;
 
 /**

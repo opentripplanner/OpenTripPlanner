@@ -41,14 +41,14 @@ import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRe
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsService;
 import org.opentripplanner.service.vehiclerental.model.TestFreeFloatingRentalVehicleBuilder;
 import org.opentripplanner.service.vehiclerental.model.TestVehicleRentalStationBuilder;
+import org.opentripplanner.street.api.path.StreetPath;
+import org.opentripplanner.street.api.path.step.RelativeDirection;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.StreetModelForTest;
 import org.opentripplanner.street.model.edge.StreetTransitEntranceLink;
 import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
-import org.opentripplanner.street.model.path.StreetPath;
-import org.opentripplanner.street.model.path.step.RelativeDirection;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.Vertex;

@@ -40,11 +40,11 @@ import org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedP
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.via.model.ViaCoordinateTransfer;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
+import org.opentripplanner.street.api.path.StreetPath;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;

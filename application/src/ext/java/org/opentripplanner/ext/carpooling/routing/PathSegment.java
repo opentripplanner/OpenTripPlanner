@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.carpooling.routing;
 
 import java.util.Objects;
-import org.opentripplanner.street.model.path.StreetPath;
+import org.opentripplanner.street.api.path.StreetPath;
 
 /**
  * A {@link RoutedSegment} over a path that already exists, such as the result of a goal-directed

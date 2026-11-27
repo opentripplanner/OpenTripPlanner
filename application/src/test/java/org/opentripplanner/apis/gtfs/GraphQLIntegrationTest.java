@@ -101,10 +101,10 @@ import org.opentripplanner.service.vehiclerental.model.TestVehicleRentalStationB
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.standalone.config.framework.json.JsonSupport;
+import org.opentripplanner.street.api.path.step.RelativeDirection;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.edge.ElevatorAlightEdge;
 import org.opentripplanner.street.model.edge.ElevatorBoardEdge;
-import org.opentripplanner.street.model.path.step.RelativeDirection;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 import org.opentripplanner.test.support.FilePatternSource;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;

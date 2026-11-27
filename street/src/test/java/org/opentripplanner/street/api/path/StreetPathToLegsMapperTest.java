@@ -1,4 +1,4 @@
-package org.opentripplanner.street.model.path;
+package org.opentripplanner.street.api.path;
 
 import static com.google.common.truth.Truth.assertThat;
 

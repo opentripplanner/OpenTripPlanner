@@ -1,4 +1,4 @@
-package org.opentripplanner.street.model.path.step;
+package org.opentripplanner.street.api.path.step;
 
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.street.model.vertex.StationEntranceVertex;

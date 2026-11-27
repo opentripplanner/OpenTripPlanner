@@ -1,4 +1,4 @@
-package org.opentripplanner.street.model.path.step;
+package org.opentripplanner.street.api.path.step;
 
 import java.util.List;
 import java.util.Objects;
@@ -13,7 +13,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * Represents one instruction in the turn-by-turn directions of a {@link
- * org.opentripplanner.street.model.path.StreetLeg}, like "turn right onto Broadway" or "take the
+ * org.opentripplanner.street.api.path.StreetLeg}, like "turn right onto Broadway" or "take the
  * elevator".
  * <p>
  * This is the street model's representation of a step. Information which is not part of the

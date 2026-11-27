@@ -1,6 +1,6 @@
-package org.opentripplanner.street.model.path;
+package org.opentripplanner.street.api.path;
 
-import static org.opentripplanner.street.model.path.ElevationProfileEncoder.encodeElevationProfileWithNaN;
+import static org.opentripplanner.street.api.path.ElevationProfileEncoder.encodeElevationProfileWithNaN;
 
 import java.time.Duration;
 import java.time.Instant;

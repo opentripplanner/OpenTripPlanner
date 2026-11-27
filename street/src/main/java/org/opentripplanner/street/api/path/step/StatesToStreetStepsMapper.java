@@ -1,9 +1,9 @@
-package org.opentripplanner.street.model.path.step;
+package org.opentripplanner.street.api.path.step;
 
-import static org.opentripplanner.street.model.path.step.RelativeDirection.CONTINUE;
-import static org.opentripplanner.street.model.path.step.RelativeDirection.ENTER_STATION;
-import static org.opentripplanner.street.model.path.step.RelativeDirection.EXIT_STATION;
-import static org.opentripplanner.street.model.path.step.RelativeDirection.FOLLOW_SIGNS;
+import static org.opentripplanner.street.api.path.step.RelativeDirection.CONTINUE;
+import static org.opentripplanner.street.api.path.step.RelativeDirection.ENTER_STATION;
+import static org.opentripplanner.street.api.path.step.RelativeDirection.EXIT_STATION;
+import static org.opentripplanner.street.api.path.step.RelativeDirection.FOLLOW_SIGNS;
 
 import java.util.ArrayList;
 import java.util.List;

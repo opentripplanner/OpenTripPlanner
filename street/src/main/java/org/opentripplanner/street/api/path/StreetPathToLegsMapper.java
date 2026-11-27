@@ -1,4 +1,4 @@
-package org.opentripplanner.street.model.path;
+package org.opentripplanner.street.api.path;
 
 import static org.opentripplanner.street.search.state.VehicleRentalState.RENTING_FLOATING;
 

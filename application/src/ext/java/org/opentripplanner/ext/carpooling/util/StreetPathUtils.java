@@ -2,8 +2,8 @@ package org.opentripplanner.ext.carpooling.util;
 
 import java.time.Duration;
 import org.jspecify.annotations.Nullable;
+import org.opentripplanner.street.api.path.StreetPath;
 import org.opentripplanner.street.model.StreetMode;
-import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.EdgeTraverser;
 import org.opentripplanner.street.search.state.State;

@@ -1,15 +1,15 @@
 package org.opentripplanner.model.plan.walkstep;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.street.model.path.step.AbsoluteDirection.EAST;
-import static org.opentripplanner.street.model.path.step.AbsoluteDirection.NORTH;
-import static org.opentripplanner.street.model.path.step.AbsoluteDirection.SOUTHWEST;
+import static org.opentripplanner.street.api.path.step.AbsoluteDirection.EAST;
+import static org.opentripplanner.street.api.path.step.AbsoluteDirection.NORTH;
+import static org.opentripplanner.street.api.path.step.AbsoluteDirection.SOUTHWEST;
 
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
+import org.opentripplanner.street.api.path.step.RelativeDirection;
 import org.opentripplanner.street.geometry.WgsCoordinate;
-import org.opentripplanner.street.model.path.step.RelativeDirection;
 
 public class WalkStepTest {
 

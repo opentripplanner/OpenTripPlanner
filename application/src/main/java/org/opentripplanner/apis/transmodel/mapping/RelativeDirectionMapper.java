@@ -1,6 +1,6 @@
 package org.opentripplanner.apis.transmodel.mapping;
 
-import org.opentripplanner.street.model.path.step.RelativeDirection;
+import org.opentripplanner.street.api.path.step.RelativeDirection;
 
 /**
  * This mapper makes sure that only those values are returned which have a mapping in the Transmodel

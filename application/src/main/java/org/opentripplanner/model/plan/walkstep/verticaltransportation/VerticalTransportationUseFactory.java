@@ -5,10 +5,10 @@ import org.jspecify.annotations.Nullable;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.streetdetails.model.InclinedEdgeLevelInfo;
 import org.opentripplanner.service.streetdetails.model.Level;
+import org.opentripplanner.street.api.path.step.VerticalTransportation;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.ElevatorAlightEdge;
 import org.opentripplanner.street.model.edge.ElevatorBoardEdge;
-import org.opentripplanner.street.model.path.step.VerticalTransportation;
 import org.opentripplanner.street.model.vertex.OsmVertex;
 
 /**

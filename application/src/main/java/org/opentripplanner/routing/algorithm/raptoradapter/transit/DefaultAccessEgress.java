@@ -4,7 +4,7 @@ import java.util.Objects;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.routing.cost.CostLimit;
-import org.opentripplanner.street.model.path.StreetPath;
+import org.opentripplanner.street.api.path.StreetPath;
 import org.opentripplanner.street.search.state.State;
 
 /**

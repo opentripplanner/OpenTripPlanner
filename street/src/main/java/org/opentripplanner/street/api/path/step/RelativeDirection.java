@@ -1,4 +1,4 @@
-package org.opentripplanner.street.model.path.step;
+package org.opentripplanner.street.api.path.step;
 
 /**
  * Represents a turn direction, relative to the current heading.

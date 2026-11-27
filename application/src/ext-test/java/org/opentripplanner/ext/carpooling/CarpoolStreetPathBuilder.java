@@ -4,7 +4,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.stream.IntStream;
 import org.opentripplanner.ext.carpooling.routing.RoutedSegment;
-import org.opentripplanner.street.model.path.StreetPath;
+import org.opentripplanner.street.api.path.StreetPath;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 
 /**
