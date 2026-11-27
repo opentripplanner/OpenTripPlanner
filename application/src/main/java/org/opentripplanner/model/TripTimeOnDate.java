@@ -190,39 +190,59 @@ public class TripTimeOnDate {
 
   /**
    * The scheduled stop for this call, equal to {@link #getStop()} unless the stop was changed by a
-   * real time update. Falls back to the real time stop when the patterns differ in size.
+   * real time update. Falls back to the real time stop for extra calls and if the real-time stops
+   * of the trip can't be matched to the scheduled stops.
    */
   public StopLocation getScheduledStop(TripPattern scheduledTripPattern) {
     var scheduledPos = scheduledStopPosition(scheduledTripPattern);
-    // For extra calls we don't have a scheduled stop. Return the same stop as for realtime.
     return scheduledPos.isPresent()
       ? scheduledTripPattern.getStop(scheduledPos.getAsInt())
       : getStop();
   }
 
   /**
+   * Find the originally scheduled stop for this call. It differs from {@link #getStop()} if the
+   * stop, for example the platform, was changed by a real-time update.
+   * <p>
+   * Returns {@code null} if the call has no scheduled stop: if the trip or the call was added by a
+   * real-time update, or if the real-time stops of the trip can't be matched to the scheduled
+   * stops.
+   */
+  @Nullable
+  public StopLocation findScheduledStop(TripPattern scheduledTripPattern) {
+    if (tripTimes.isAdded()) {
+      return null;
+    }
+    var scheduledPos = scheduledStopPosition(scheduledTripPattern);
+    return scheduledPos.isPresent() ? scheduledTripPattern.getStop(scheduledPos.getAsInt()) : null;
+  }
+
+  /**
    * The position of this call in the given scheduled pattern, which differs from
-   * {@link #getStopPosition()} if stops have been added to the trip by a real-time update.
+   * {@link #getStopPosition()} if extra calls have been added to the trip by a real-time update.
+   * <p>
+   * The real-time stops of the trip can be matched to the scheduled stops if they are the
+   * scheduled stops plus any extra calls. This is not the case if, for example, a replacement trip
+   * calls at more or fewer stops than scheduled.
    *
-   * @return empty if this call is an extra call, which is not part of the scheduled pattern
+   * @return empty if this call is an extra call, which is not part of the scheduled pattern, or if
+   *         the real-time stops of the trip can't be matched to the scheduled stops
    */
   private OptionalInt scheduledStopPosition(TripPattern scheduledTripPattern) {
-    if (tripPattern.numberOfStops() == scheduledTripPattern.numberOfStops()) {
-      return OptionalInt.of(stopPosition);
-    }
-    // The number of stops is different. There must be extra stops in the tripPattern compared to
-    // the scheduledTripPattern.
     if (isExtraCall()) {
       return OptionalInt.empty();
     }
-    var extraCallsBefore = (int) IntStream.range(0, stopPosition)
-      .filter(tripTimes::isExtraCall)
-      .count();
-    var scheduledPos = stopPosition - extraCallsBefore;
-    if (scheduledPos >= scheduledTripPattern.numberOfStops()) {
-      throw new IllegalStateException("Number of stops is inconsistent in scheduled trip pattern");
+    int numberOfStops = tripPattern.numberOfStops();
+    int numberOfScheduledStops = numberOfStops - numberOfExtraCallsBefore(numberOfStops);
+    if (numberOfScheduledStops != scheduledTripPattern.numberOfStops()) {
+      return OptionalInt.empty();
     }
-    return OptionalInt.of(scheduledPos);
+    return OptionalInt.of(stopPosition - numberOfExtraCallsBefore(stopPosition));
+  }
+
+  /** The number of extra calls in this trip before the given stop position. */
+  private int numberOfExtraCallsBefore(int position) {
+    return (int) IntStream.range(0, position).filter(tripTimes::isExtraCall).count();
   }
 
   public int getStopPosition() {
@@ -431,7 +451,8 @@ public class TripTimeOnDate {
    * requires this awkward workaround. We hope to refactor this in the future.
    *
    * @param scheduledTripPattern the pattern of the trip without real-time updates
-   * @return null if this call is an extra call added by a real-time update, since it has no
+   * @return null if this call is an extra call added by a real-time update, or if the real-time
+   *         stops of the trip can't be matched to the scheduled stops, since it then has no
    *         scheduled pickup type
    */
   @Nullable
@@ -449,7 +470,8 @@ public class TripTimeOnDate {
    * requires this awkward workaround. We hope to refactor this in the future.
    *
    * @param scheduledTripPattern the pattern of the trip without real-time updates
-   * @return null if this call is an extra call added by a real-time update, since it has no
+   * @return null if this call is an extra call added by a real-time update, or if the real-time
+   *         stops of the trip can't be matched to the scheduled stops, since it then has no
    *         scheduled drop off type
    */
   @Nullable

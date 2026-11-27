@@ -21,6 +21,11 @@ public class CallScheduleImpl implements GraphQLDataFetchers.GraphQLCallSchedule
   }
 
   @Override
+  public DataFetcher<Object> stopLocation() {
+    return environment -> getSource(environment).stopLocation();
+  }
+
+  @Override
   public DataFetcher<CallScheduledTime> time() {
     return environment -> getSource(environment).time();
   }

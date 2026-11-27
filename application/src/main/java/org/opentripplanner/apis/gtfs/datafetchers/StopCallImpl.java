@@ -74,22 +74,24 @@ public class StopCallImpl implements GraphQLDataFetchers.GraphQLStopCall {
   public DataFetcher<CallSchedule> schedule() {
     return environment -> {
       var tripTime = getSource(environment);
+      var transitService = getTransitService(environment);
+      // This is quite awkward: the call only knows its (possibly real-time) pattern, so the
+      // scheduled pattern has to be looked up separately and the stop position translated to it
+      // to get the scheduled stop and pickup/drop off type. This should be refactored when the
+      // transit model is refactored.
+      var scheduledPattern = transitService.findPattern(tripTime.getTrip());
+      var scheduledStop = tripTime.findScheduledStop(scheduledPattern);
 
       if (tripTime.hasScheduledTimes()) {
         var scheduledArrival = getZonedDateTime(environment, tripTime.getScheduledArrival());
         var scheduledDeparture = getZonedDateTime(environment, tripTime.getScheduledDeparture());
-        // This is quite awkward: the call only knows its (possibly real-time) pattern, so the
-        // scheduled pattern has to be looked up separately and the stop position translated to it
-        // to get the scheduled pickup/drop off type. This should be refactored when the transit
-        // model is refactored.
-        var scheduledPattern = getTransitService(environment).findPattern(tripTime.getTrip());
         return new CallSchedule(
           new ArrivalDepartureTime(scheduledArrival, scheduledDeparture, tripTime.isTimepoint()),
           tripTime.getScheduledPickupType(scheduledPattern),
-          tripTime.getScheduledDropoffType(scheduledPattern)
+          tripTime.getScheduledDropoffType(scheduledPattern),
+          scheduledStop
         );
       } else {
-        var transitService = getTransitService(environment);
         var flexTrip = transitService.getFlexIndex().getTripById(tripTime.getTrip().getId());
         if (flexTrip == null) {
           return null;
@@ -106,7 +108,8 @@ public class StopCallImpl implements GraphQLDataFetchers.GraphQLStopCall {
         return new CallSchedule(
           new TimeWindow(start, end),
           flexTrip.getBoardRule(stopPosition),
-          flexTrip.getAlightRule(stopPosition)
+          flexTrip.getAlightRule(stopPosition),
+          scheduledStop
         );
       }
     };

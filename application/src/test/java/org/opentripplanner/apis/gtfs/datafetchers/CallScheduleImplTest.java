@@ -12,17 +12,25 @@ import org.opentripplanner.apis.gtfs.model.CallSchedule;
 import org.opentripplanner.apis.gtfs.model.CallScheduledTime.TimeWindow;
 import org.opentripplanner.apis.support.graphql.DataFetchingSupport;
 import org.opentripplanner.model.PickDrop;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
+import org.opentripplanner.transit.model.site.RegularStop;
 
 class CallScheduleImplTest {
 
   private static final OffsetDateTime NOON = OffsetDateTime.parse("2026-11-09T12:00+02:00");
   private static final TimeWindow TIME = new TimeWindow(NOON, NOON.plusMinutes(30));
+  private static final RegularStop STOP = TransitRepositoryForTest.of().stop("A").build();
 
   private final CallScheduleImpl subject = new CallScheduleImpl();
 
   @Test
   void time() throws Exception {
     assertEquals(TIME, subject.time().get(env(PickDrop.SCHEDULED, PickDrop.SCHEDULED)));
+  }
+
+  @Test
+  void stopLocation() throws Exception {
+    assertEquals(STOP, subject.stopLocation().get(env(PickDrop.SCHEDULED, PickDrop.SCHEDULED)));
   }
 
   @Test
@@ -53,6 +61,8 @@ class CallScheduleImplTest {
     @Nullable PickDrop pickup,
     @Nullable PickDrop dropOff
   ) {
-    return DataFetchingSupport.dataFetchingEnvironment(new CallSchedule(TIME, pickup, dropOff));
+    return DataFetchingSupport.dataFetchingEnvironment(
+      new CallSchedule(TIME, pickup, dropOff, STOP)
+    );
   }
 }

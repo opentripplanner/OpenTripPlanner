@@ -418,6 +418,15 @@ type CallSchedule {
   dropOffType: PickupDropoffType
   "The pick-up type at this call."
   pickupType: PickupDropoffType
+  """
+  The originally scheduled stop location for this call. This is not affected by real-time updates,
+  so if the stop (e.g. the platform) was changed by a real-time update, this differs from
+  `StopCall.stopLocation`.
+    
+  This is null if the call has no scheduled stop location: if the trip or the call was added by a
+  real-time update, or if the real-time stops of the trip can't be matched to the scheduled stops.
+  """
+  stopLocation: CallStopLocation
   "Scheduled time for a trip on a service date for a stop location."
   time: CallScheduledTime
 }
@@ -2805,9 +2814,13 @@ type StopCall {
   notices: [Notice!]! @deprecated(reason : "Experimental API that can be changed without notice.")
   "Real-time information and state for this stop location."
   realTime: CallRealTime
-  "Scheduled arrival and departure times for this stop location."
+  "The schedule of this call: the scheduled arrival and departure times and stop location."
   schedule: CallSchedule
-  "The stop where this arrival/departure happens."
+  """
+  The stop where this arrival/departure happens. This includes real-time updates, so it can differ
+  from the originally scheduled stop, for example after a platform change. The scheduled stop is
+  available in `schedule.stopLocation`.
+  """
   stopLocation: CallStopLocation!
 }
 

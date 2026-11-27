@@ -1,0 +1,23 @@
+{
+  pattern(id: "F:pattern-1") {
+    tripsOnServiceDate(serviceDate: "2024-01-01") {
+      trip {
+        gtfsId
+      }
+      stopCalls {
+        stopLocation {
+          ... on Stop {
+            gtfsId
+          }
+        }
+        schedule {
+          stopLocation {
+            ... on Stop {
+              gtfsId
+            }
+          }
+        }
+      }
+    }
+  }
+}

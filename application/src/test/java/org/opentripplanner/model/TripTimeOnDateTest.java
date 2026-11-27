@@ -328,6 +328,144 @@ class TripTimeOnDateTest {
     assertEquals(PickDrop.CALL_AGENCY, last.getScheduledDropoffType(scheduledPattern));
   }
 
+  @Test
+  void findScheduledStopWhenStopIsChanged() {
+    var route = TransitRepositoryForTest.route("R1").build();
+    var stopA = TEST_MODEL.stop("A").build();
+    var scheduledStop = TEST_MODEL.stop("scheduled").build();
+    var realTimeStop = TEST_MODEL.stop("realtime").build();
+    var stopC = TEST_MODEL.stop("C").build();
+
+    var scheduledPattern = TransitRepositoryForTest.tripPattern("P1", route)
+      .withStopPattern(TransitRepositoryForTest.stopPattern(stopA, scheduledStop, stopC))
+      .build();
+    var realTimePattern = TransitRepositoryForTest.tripPattern("P1", route)
+      .withStopPattern(TransitRepositoryForTest.stopPattern(stopA, realTimeStop, stopC))
+      .build();
+    var tripTimes = tripTimesFor(3);
+
+    assertEquals(
+      stopA,
+      new TripTimeOnDate(tripTimes, 0, realTimePattern).findScheduledStop(scheduledPattern)
+    );
+    assertEquals(
+      scheduledStop,
+      new TripTimeOnDate(tripTimes, 1, realTimePattern).findScheduledStop(scheduledPattern)
+    );
+    assertEquals(
+      stopC,
+      new TripTimeOnDate(tripTimes, 2, realTimePattern).findScheduledStop(scheduledPattern)
+    );
+  }
+
+  @Test
+  void findScheduledStopWithExtraCall() {
+    var route = TransitRepositoryForTest.route("R1").build();
+    var stopA = TEST_MODEL.stop("A").build();
+    var extraStop = TEST_MODEL.stop("extra").build();
+    var stopC = TEST_MODEL.stop("C").build();
+
+    var scheduledPattern = TransitRepositoryForTest.tripPattern("P1", route)
+      .withStopPattern(TransitRepositoryForTest.stopPattern(stopA, stopC))
+      .build();
+    var realTimePattern = TransitRepositoryForTest.tripPattern("P1", route)
+      .withStopPattern(TransitRepositoryForTest.stopPattern(stopA, extraStop, stopC))
+      .build();
+    var tripTimes = tripTimesFor(3)
+      .createRealTimeFromScheduledTimes()
+      .withExtraCall(1, true)
+      .build();
+
+    assertEquals(
+      stopA,
+      new TripTimeOnDate(tripTimes, 0, realTimePattern).findScheduledStop(scheduledPattern)
+    );
+    // The extra call has no scheduled stop
+    assertNull(
+      new TripTimeOnDate(tripTimes, 1, realTimePattern).findScheduledStop(scheduledPattern)
+    );
+    assertEquals(
+      stopC,
+      new TripTimeOnDate(tripTimes, 2, realTimePattern).findScheduledStop(scheduledPattern)
+    );
+  }
+
+  @Test
+  void findScheduledStopForAddedTrip() {
+    // An added trip has no scheduled pattern; the pattern it was added with stands in for it
+    var pattern = TEST_MODEL.pattern(TransitMode.BUS).build();
+    var tripTimes = tripTimesFor(3).createRealTimeFromScheduledTimes().withAdded().build();
+
+    for (int stopPos = 0; stopPos < 3; stopPos++) {
+      assertNull(new TripTimeOnDate(tripTimes, stopPos, pattern).findScheduledStop(pattern));
+    }
+  }
+
+  /**
+   * The real-time stops are not the scheduled stops plus extra calls, so they can't be matched to
+   * the scheduled stops, for example when a replacement trip calls at more or fewer stops.
+   */
+  @Test
+  void findScheduledStopWhenStopsCannotBeMatched() {
+    var route = TransitRepositoryForTest.route("R1").build();
+    var stopA = TEST_MODEL.stop("A").build();
+    var stopB = TEST_MODEL.stop("B").build();
+    var stopC = TEST_MODEL.stop("C").build();
+    var stopD = TEST_MODEL.stop("D").build();
+
+    var scheduledPattern = TransitRepositoryForTest.tripPattern("P1", route)
+      .withStopPattern(TransitRepositoryForTest.stopPattern(stopA, stopB, stopC))
+      .build();
+    var morePattern = TransitRepositoryForTest.tripPattern("P2", route)
+      .withStopPattern(TransitRepositoryForTest.stopPattern(stopA, stopB, stopC, stopD))
+      .build();
+    var fewerPattern = TransitRepositoryForTest.tripPattern("P3", route)
+      .withStopPattern(TransitRepositoryForTest.stopPattern(stopA, stopC))
+      .build();
+
+    var moreStops = tripTimesFor(4);
+    for (int stopPos = 0; stopPos < 4; stopPos++) {
+      assertNull(
+        new TripTimeOnDate(moreStops, stopPos, morePattern).findScheduledStop(scheduledPattern)
+      );
+    }
+    var fewerStops = tripTimesFor(2);
+    for (int stopPos = 0; stopPos < 2; stopPos++) {
+      assertNull(
+        new TripTimeOnDate(fewerStops, stopPos, fewerPattern).findScheduledStop(scheduledPattern)
+      );
+    }
+  }
+
+  /**
+   * If the real-time stops can't be matched to the scheduled stops, there is no scheduled pickup
+   * and drop off type, and the scheduled stop falls back to the real-time stop.
+   */
+  @Test
+  void scheduledPickupDropoffAndStopWhenStopsCannotBeMatched() {
+    var route = TransitRepositoryForTest.route("R1").build();
+    var stopA = TEST_MODEL.stop("A").build();
+    var stopB = TEST_MODEL.stop("B").build();
+    var stopC = TEST_MODEL.stop("C").build();
+    var stopD = TEST_MODEL.stop("D").build();
+
+    var scheduledPattern = TransitRepositoryForTest.tripPattern("P1", route)
+      .withStopPattern(TransitRepositoryForTest.stopPattern(stopA, stopB, stopC))
+      .build();
+    // A replacement trip that calls at one more stop than scheduled
+    var realTimePattern = TransitRepositoryForTest.tripPattern("P2", route)
+      .withStopPattern(TransitRepositoryForTest.stopPattern(stopA, stopB, stopC, stopD))
+      .build();
+    var tripTimes = tripTimesFor(4);
+
+    for (int stopPos = 0; stopPos < 4; stopPos++) {
+      var subject = new TripTimeOnDate(tripTimes, stopPos, realTimePattern);
+      assertNull(subject.getScheduledPickupType(scheduledPattern));
+      assertNull(subject.getScheduledDropoffType(scheduledPattern));
+      assertEquals(subject.getStop(), subject.getScheduledStop(scheduledPattern));
+    }
+  }
+
   private static TripTimes<?> tripTimesFor(int stops) {
     var trip = TransitRepositoryForTest.trip("123").build();
     var stopTimes = TEST_MODEL.stopTimesEvery5Minutes(stops, trip, "11:00");
