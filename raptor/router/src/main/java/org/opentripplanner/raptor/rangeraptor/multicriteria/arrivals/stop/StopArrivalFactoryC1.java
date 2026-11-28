@@ -41,6 +41,15 @@ public class StopArrivalFactoryC1<T extends RaptorTripSchedule> implements McSto
     RaptorTransfer transfer,
     int arrivalTime
   ) {
-    return new TransferStopArrival<>(previous, transfer, arrivalTime);
+    return new TransferStopArrival<>(previous, transfer.stop(), arrivalTime, transfer.c1());
+  }
+
+  @Override
+  public McStopArrival<T> createViaTransferStopArrival(
+    McStopArrival<T> previous,
+    RaptorTransfer viaTransfer,
+    int arrivalTime
+  ) {
+    return ViaStopArrival.ofViaTransfer(previous, viaTransfer, arrivalTime);
   }
 }

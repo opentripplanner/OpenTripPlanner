@@ -219,7 +219,15 @@ public class BasicPathTestCase implements RaptorTestConstants {
   public static DestinationArrival<TestTripSchedule> basicTripByForwardSearch() {
     ArrivalView<TestTripSchedule> prevArrival, egress;
     prevArrival = access(STOP_A, ACCESS_START, ACCESS_END, ACCESS_C1, ACCESS_C2);
-    prevArrival = bus(1, STOP_B, L11_END, LINE_11_C1, LINE_11_C2, TRIP_1, prevArrival);
+    prevArrival = bus(
+      1,
+      STOP_B,
+      L11_END + ALIGHT_SLACK,
+      LINE_11_C1,
+      LINE_11_C2,
+      TRIP_1,
+      prevArrival
+    );
     prevArrival = transfer(1, STOP_C, TX_START, TX_END, TX_C1, prevArrival);
     prevArrival = bus(2, STOP_D, L21_END, LINE_21_C1, LINE_21_C2, TRIP_2, prevArrival);
     prevArrival = bus(3, STOP_E, L31_END, LINE_31_C1, LINE_31_C2, TRIP_3, prevArrival);
@@ -261,7 +269,15 @@ public class BasicPathTestCase implements RaptorTestConstants {
       TRIP_2,
       nextArrival
     );
-    nextArrival = transfer(2, STOP_B, TX_END, TX_START, TX_C1, nextArrival);
+    int txDepartureTime = nextArrival.arrivalTime();
+    nextArrival = transfer(
+      2,
+      STOP_B,
+      txDepartureTime,
+      txDepartureTime - TX_DURATION,
+      TX_C1,
+      nextArrival
+    );
     nextArrival = busReverseSearch(
       3,
       STOP_A,
@@ -321,7 +337,8 @@ public class BasicPathTestCase implements RaptorTestConstants {
       STOP_C,
       TX_END,
       transfer.c1(),
-      transfer,
+      transfer.durationInSeconds(),
+      null,
       leg4.asTransitLeg()
     );
     var leg2 = new TransitPathLeg<>(

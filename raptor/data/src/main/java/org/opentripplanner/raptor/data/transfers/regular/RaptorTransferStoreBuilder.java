@@ -4,8 +4,6 @@ import com.carrotsearch.hppc.IntArrayList;
 
 public final class RaptorTransferStoreBuilder {
 
-  private final DefaultRaptorTransfer[] EMPTY_ARRAY = new DefaultRaptorTransfer[0];
-
   private final IntArrayList[] fromStops;
   private final IntArrayList[] toStops;
   private boolean freeze = false;
@@ -47,31 +45,16 @@ public final class RaptorTransferStoreBuilder {
 
   public RaptorTransferStore build() {
     this.freeze = true;
-    // The arrays/DefaultTransfer are created here in sequence, this will make the memory layout
-    // more cache-friendly and improve performance.
+    // The rows are created here in sequence, this will make the memory layout more cache-friendly
+    // and improve performance.
     return new RaptorTransferStore(mapToArrays(fromStops), mapToArrays(toStops));
   }
 
   private RaptorTransfers mapToArrays(IntArrayList[] transfers) {
-    DefaultRaptorTransfer[][] result = new DefaultRaptorTransfer[transfers.length][];
+    int[][] result = new int[transfers.length][];
     for (int i = 0; i < transfers.length; i++) {
-      result[i] = mapToArray(transfers[i]);
+      result[i] = transfers[i] == null ? RaptorTransfers.EMPTY_ROW : transfers[i].toArray();
     }
     return new RaptorTransfers(result);
-  }
-
-  private DefaultRaptorTransfer[] mapToArray(IntArrayList transfers) {
-    if (transfers == null) {
-      return EMPTY_ARRAY;
-    }
-    int[] array = transfers.toArray();
-    int size = array.length / 3;
-
-    DefaultRaptorTransfer[] result = new DefaultRaptorTransfer[size];
-    for (int i = 0; i < size; ++i) {
-      int j = i * 3;
-      result[i] = new DefaultRaptorTransfer(array[j], array[j + 1], array[j + 2]);
-    }
-    return result;
   }
 }

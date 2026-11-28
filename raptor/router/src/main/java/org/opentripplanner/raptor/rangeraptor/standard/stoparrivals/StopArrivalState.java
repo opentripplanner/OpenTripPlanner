@@ -1,7 +1,6 @@
 package org.opentripplanner.raptor.rangeraptor.standard.stoparrivals;
 
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
-import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 public interface StopArrivalState<T extends RaptorTripSchedule> {
@@ -68,11 +67,9 @@ public interface StopArrivalState<T extends RaptorTripSchedule> {
 
   int transferFromStop();
 
-  RaptorTransfer transferPath();
-
   /**
    * Set the time at a transit index iff it is optimal. This sets both the best time and the
    * transfer time
    */
-  void transferToStop(int fromStop, int arrivalTime, RaptorTransfer transferPath);
+  void transferToStop(int fromStop, int arrivalTime);
 }

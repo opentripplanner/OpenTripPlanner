@@ -137,6 +137,7 @@ class TimeShiftedDepartureTimeVersusPathTest implements RaptorTestConstants {
       SLACK,
       C1_CALCULATOR,
       RaptorTestConstants::stopIndexToName,
+      null,
       null
     ).mapToPath(a);
   }

@@ -1,6 +1,7 @@
 package org.opentripplanner.raptor.api.path;
 
 import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
@@ -16,7 +17,8 @@ public final class TransferPathLeg<T extends RaptorTripSchedule> implements Path
   private final int toStop;
   private final int toTime;
   private final int c1;
-  private final RaptorTransfer transfer;
+  private final int durationInSeconds;
+  private final RaptorTransfer viaTransfer;
   private final PathLeg<T> next;
 
   /**
@@ -26,6 +28,11 @@ public final class TransferPathLeg<T extends RaptorTripSchedule> implements Path
    *               {@code RaptorTransitDataProvider#getTransfersToStop(int)} reports {@code stop()}
    *               as the leg's origin, not its destination (see
    *               {@link org.opentripplanner.raptor.path.PathBuilderLeg#transferLeg}).
+   * @param durationInSeconds the time it takes to travel the transfer, not including wait time.
+   * @param viaTransfer the transfer passed in as part of a via connection, or {@code null} for a
+   *                    regular transfer. A regular transfer is not part of the path; look it up
+   *                    from the transfer data by {@link #fromStop()} and {@link #toStop()}. The via
+   *                    transfer is request specific and can not be looked up.
    */
   public TransferPathLeg(
     int fromStop,
@@ -33,7 +40,8 @@ public final class TransferPathLeg<T extends RaptorTripSchedule> implements Path
     int toStop,
     int toTime,
     int c1,
-    RaptorTransfer transfer,
+    int durationInSeconds,
+    @Nullable RaptorTransfer viaTransfer,
     PathLeg<T> next
   ) {
     this.fromStop = fromStop;
@@ -41,12 +49,22 @@ public final class TransferPathLeg<T extends RaptorTripSchedule> implements Path
     this.toStop = toStop;
     this.toTime = toTime;
     this.c1 = c1;
-    this.transfer = transfer;
+    this.durationInSeconds = durationInSeconds;
+    this.viaTransfer = viaTransfer;
     this.next = next;
   }
 
-  public RaptorTransfer transfer() {
-    return transfer;
+  public int durationInSeconds() {
+    return durationInSeconds;
+  }
+
+  /**
+   * The transfer of a via connection, or {@code null} if this is a regular transfer. See the
+   * constructor.
+   */
+  @Nullable
+  public RaptorTransfer viaTransfer() {
+    return viaTransfer;
   }
 
   @Override

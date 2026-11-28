@@ -75,6 +75,11 @@ public class ViaCoordinateTransfer implements RaptorTransfer {
   }
 
   @Override
+  public RaptorTransfer materialize() {
+    return this;
+  }
+
+  @Override
   public int stop() {
     return toStopIndex;
   }

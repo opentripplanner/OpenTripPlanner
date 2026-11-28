@@ -8,6 +8,7 @@ import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorPathConstrainedTransferSearch;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorStopNameResolver;
+import org.opentripplanner.raptor.spi.RaptorTransferDataProvider;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
@@ -20,17 +21,20 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
   private final RaptorCostCalculator<T> costCalculator;
   private final RaptorStopNameResolver stopNameResolver;
   private final RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch;
+  private final TransferLegMapper<T> transferLegMapper;
 
   public ForwardPathMapper(
     RaptorSlackProvider slackProvider,
     RaptorCostCalculator<T> costCalculator,
     RaptorStopNameResolver stopNameResolver,
-    RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch
+    RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch,
+    RaptorTransferDataProvider<T> transferData
   ) {
     this.slackProvider = slackProvider;
     this.costCalculator = costCalculator;
     this.stopNameResolver = stopNameResolver;
     this.transferConstraintsSearch = transferConstraintsSearch;
+    this.transferLegMapper = new TransferLegMapper<>(transferData);
   }
 
   @Override
@@ -52,7 +56,12 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
           var times = TripTimesSearch.findTripForwardSearch(arrival);
           pathBuilder.transit(arrival.transitPath().trip(), times);
         }
-        case TRANSFER -> pathBuilder.transfer(arrival.transfer(), arrival.stop());
+        case TRANSFER -> transferLegMapper.addTransfer(
+          pathBuilder,
+          arrival,
+          arrival.previous().stop(),
+          arrival.stop()
+        );
         case ACCESS -> pathBuilder.access(arrival.accessPath().access());
         case EGRESS -> throw new RuntimeException(
           "Unknown arrival type: " + arrival.getClass().getSimpleName()

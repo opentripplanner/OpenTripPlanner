@@ -1,10 +1,12 @@
 package org.opentripplanner.raptor.data.transfers.regular;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor.spi.RaptorTransfer;
 
@@ -48,6 +50,73 @@ class RaptorTransferStoreTest {
     assertThat(collect(subject.getTransfersFromStop(STOP_A)))
       .containsExactly(TX_AB, TX_AC)
       .inOrder();
+  }
+
+  @Test
+  void transfersWithSameDurationKeepInsertionOrder() {
+    RaptorTransferStore subject = RaptorTransferStore.of(4)
+      .addTransfer(STOP_A, STOP_C, TIME_AB, C1_AC)
+      .addTransfer(STOP_A, STOP_B, TIME_AB, C1_AB)
+      .addTransfer(STOP_A, 3, 50, 5)
+      .build();
+
+    assertThat(collect(subject.getTransfersFromStop(STOP_A)))
+      .containsExactly(new TxEntry(3, 50, 5), new TxEntry(STOP_C, TIME_AB, C1_AC), TX_AB)
+      .inOrder();
+  }
+
+  @Test
+  void theIteratorIsAFlyweightAndHasNextDoesNotAdvance() {
+    RaptorTransferStore subject = RaptorTransferStore.of(3)
+      .addTransfer(STOP_A, STOP_B, TIME_AB, C1_AB)
+      .addTransfer(STOP_A, STOP_C, TIME_AC, C1_AC)
+      .build();
+
+    var it = subject.getTransfersFromStop(STOP_A);
+    assertThat(it.hasNext()).isTrue();
+    assertThat(it.hasNext()).isTrue();
+    var first = it.next();
+    var second = it.next();
+
+    // The same object is reused, only the second transfer is visible after the second next()
+    assertThat(first).isSameInstanceAs(second);
+    assertThat(first.stop()).isEqualTo(STOP_C);
+    assertThat(it.hasNext()).isFalse();
+    assertThat(it.hasNext()).isFalse();
+  }
+
+  @Test
+  void aMaterializedTransferIsValidAfterTheIteratorIsAdvanced() {
+    RaptorTransferStore subject = RaptorTransferStore.of(3)
+      .addTransfer(STOP_A, STOP_B, TIME_AB, C1_AB)
+      .addTransfer(STOP_A, STOP_C, TIME_AC, C1_AC)
+      .build();
+
+    var it = subject.getTransfersFromStop(STOP_A);
+    var first = it.next();
+    var materialized = first.materialize();
+    it.next();
+
+    assertThat(materialized).isNotSameInstanceAs(first);
+    assertThat(materialized.stop()).isEqualTo(STOP_B);
+    assertThat(materialized.durationInSeconds()).isEqualTo(TIME_AB);
+    assertThat(materialized.c1()).isEqualTo(C1_AB);
+    assertThat(materialized.materialize()).isSameInstanceAs(materialized);
+    assertThat(materialized).isEqualTo(new DefaultRaptorTransfer(STOP_B, C1_AB, TIME_AB));
+  }
+
+  @Test
+  void theCursorIsSafeBeforeTheFirstAndAfterTheLastTransfer() {
+    RaptorTransferStore subject = RaptorTransferStore.of(3)
+      .addTransfer(STOP_A, STOP_B, TIME_AB, C1_AB)
+      .build();
+
+    var it = subject.getTransfersFromStop(STOP_A);
+    // toString is safe before the first next(), and next() fails after the last
+    assertThat(it.toString()).isNotEmpty();
+    it.next();
+    assertThat(it.toString()).contains("On-Street");
+    assertThrows(NoSuchElementException.class, it::next);
   }
 
   @Test

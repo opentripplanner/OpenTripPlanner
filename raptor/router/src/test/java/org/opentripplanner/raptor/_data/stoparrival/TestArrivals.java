@@ -51,6 +51,55 @@ public class TestArrivals {
     return new Transfer(round, arrivalTime, transfer, previous);
   }
 
+  /**
+   * A transfer arrival where the c1 of the transfer is not part of the state, like in Standard
+   * Raptor, see {@link ArrivalView#transferC1()}.
+   */
+  public static ArrivalView<TestTripSchedule> transferWithoutC1(
+    int round,
+    int arrivalTime,
+    RaptorTransfer transfer,
+    ArrivalView<TestTripSchedule> previous
+  ) {
+    return new Transfer(round, arrivalTime, transfer, previous) {
+      @Override
+      public int transferC1() {
+        return RaptorConstants.NOT_SET;
+      }
+    };
+  }
+
+  /** A transfer arrival where a via visit has added a wait time to the arrival time. */
+  public static ArrivalView<TestTripSchedule> slackedTransfer(
+    int round,
+    int arrivalTime,
+    RaptorTransfer transfer,
+    int viaWaitTime,
+    ArrivalView<TestTripSchedule> previous
+  ) {
+    return new Transfer(round, arrivalTime, transfer, previous) {
+      @Override
+      public int viaWaitTime() {
+        return viaWaitTime;
+      }
+    };
+  }
+
+  /** A transfer arrival of a via connection, the transfer is kept in the state. */
+  public static ArrivalView<TestTripSchedule> viaTransfer(
+    int round,
+    int arrivalTime,
+    RaptorTransfer viaTransfer,
+    ArrivalView<TestTripSchedule> previous
+  ) {
+    return new Transfer(round, arrivalTime, viaTransfer, previous) {
+      @Override
+      public RaptorTransfer viaTransfer() {
+        return transfer;
+      }
+    };
+  }
+
   public static ArrivalView<TestTripSchedule> transfer(
     int round,
     int stop,
