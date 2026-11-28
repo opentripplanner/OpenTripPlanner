@@ -61,6 +61,8 @@ class EmissionItineraryDecoratorTest implements PlanTestConstants {
   private Itinerary busZeroEmission;
   // Apply trip hop emissions
   private Itinerary rail;
+  // Trip hop emissions with fewer hops than the leg pattern, like when stops are added in real time
+  private Itinerary railAlightOutsideHops;
   // Car emissions
   private Itinerary car;
   // No emissions
@@ -82,6 +84,7 @@ class EmissionItineraryDecoratorTest implements PlanTestConstants {
     bus = newItinerary(A).bus(routeA, 21, START_TIME, END_TIME, B).build();
     busZeroEmission = newItinerary(A).bus(routeB, 22, START_TIME, END_TIME, B).build();
     rail = newItinerary(A).rail(3, START_TIME, END_TIME, B).build();
+    railAlightOutsideHops = newItinerary(A).rail(5, START_TIME, END_TIME, B).build();
     car = newItinerary(A).drive(START_TIME, END_TIME, B).build();
     flex = newItinerary(A).flex(START_TIME, END_TIME, B).build();
 
@@ -147,6 +150,11 @@ class EmissionItineraryDecoratorTest implements PlanTestConstants {
       expectedRailEmission = expectedRailEmission.plus(hopEmissions.get(i));
     }
     tripEmissions.put(rLeg.trip().getId(), new TripPatternEmission(hopEmissions));
+    var outsideHopsLeg = railAlightOutsideHops.legs().getFirst();
+    tripEmissions.put(
+      outsideHopsLeg.trip().getId(),
+      new TripPatternEmission(hopEmissions.subList(0, outsideHopsLeg.alightStopPosInPattern() - 1))
+    );
     tripEmissions.put(
       combinedWithFlex.legs().get(1).trip().getId(),
       new TripPatternEmission(hopEmissions)
@@ -183,6 +191,14 @@ class EmissionItineraryDecoratorTest implements PlanTestConstants {
     var it = subject.decorate(rail);
     assertEquals(expectedRailEmission, it.emissionPerPerson());
     assertEquals(expectedRailEmission, it.legs().getFirst().emissionPerPerson());
+  }
+
+  @Test
+  void decorateRailWithAlightOutsideTripPatternEmissionHops() {
+    var subject = new EmissionItineraryDecorator(emissionService);
+    var it = subject.decorate(railAlightOutsideHops);
+    assertNull(it.emissionPerPerson());
+    assertNull(it.legs().getFirst().emissionPerPerson());
   }
 
   @Test
