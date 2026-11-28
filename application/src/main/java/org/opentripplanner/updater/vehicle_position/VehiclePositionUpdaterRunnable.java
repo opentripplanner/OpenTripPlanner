@@ -33,7 +33,7 @@ class VehiclePositionUpdaterRunnable implements GraphWriterRunnable<TransitRealT
     RealtimeVehiclePatternMatcher matcher = new RealtimeVehiclePatternMatcher(
       feedId,
       timetableRepository::getTrip,
-      timetableRepository::findPattern,
+      timetableRepository::resolve,
       timetableRepository::findPattern,
       timetableRepository.getTripCalendars()::listServiceDates,
       context.realtimeVehicleRepository(),
