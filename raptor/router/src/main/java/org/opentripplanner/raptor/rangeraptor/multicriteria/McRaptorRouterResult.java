@@ -20,7 +20,7 @@ public class McRaptorRouterResult<T extends RaptorTripSchedule> implements Rapto
 
   @Override
   public Collection<RaptorPath<T>> extractPaths() {
-    return paths.listPaths();
+    return paths.listPathsWithTransit();
   }
 
   @Override
@@ -70,6 +70,6 @@ public class McRaptorRouterResult<T extends RaptorTripSchedule> implements Rapto
 
   @Override
   public boolean isDestinationReached() {
-    return !paths.isEmpty();
+    return paths.hasTransitPaths();
   }
 }

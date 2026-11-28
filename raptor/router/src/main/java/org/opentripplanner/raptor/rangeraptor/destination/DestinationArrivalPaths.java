@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
  * the constructor, making it possible to collect different sets in different scenarios.
  * <p>
  * The {@link DestinationArrival}s are stored in the pareto set, and the paths are built lazily when
- * {@link #listPaths()} is called. This is safe because the arrival chain of a destination arrival
+ * {@link #listPathsWithTransit()} is called. This is safe because the arrival chain of a destination arrival
  * is not changed by the search: McRaptor's per-stop pareto sets keep all accepted arrivals
  * indefinitely, and StdRaptor copies the values of the mutable stop-arrival state into the chain.
  *
@@ -108,7 +108,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
   }
 
   private void addDestinationArrivalToPaths(DestinationArrival<T> destArrival) {
-    if (arrivals.add(destArrival)) {
+    if (arrivals.add(destArrival) && destArrival.includesTransit()) {
       reachedCurrentRound = true;
     }
   }
@@ -126,6 +126,13 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
 
   public boolean isEmpty() {
     return arrivals.isEmpty();
+  }
+
+  /**
+   * Return {@code true} if there is at least one path containing transit.
+   */
+  public boolean hasTransitPaths() {
+    return arrivals.stream().anyMatch(DestinationArrivalPaths::isTransitPath);
   }
 
   /**
@@ -157,8 +164,16 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     return arrivals.qualify(probe);
   }
 
-  public Collection<RaptorPath<T>> listPaths() {
-    return arrivals.stream().map(this::buildAndValidatePath).toList();
+  /**
+   * Return paths that contain transit. Most paths contain transit, but there are exceptions such as
+   * a path consisting purely of an access followed by an egress.
+   */
+  public Collection<RaptorPath<T>> listPathsWithTransit() {
+    return arrivals
+      .stream()
+      .filter(DestinationArrivalPaths::isTransitPath)
+      .map(this::buildAndValidatePath)
+      .toList();
   }
 
   public void debugReject(ArrivalView<T> stopArrival, RaptorAccessEgress egress, String reason) {
@@ -186,6 +201,10 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
   }
 
   /* private methods */
+
+  private static boolean isTransitPath(DestinationArrival<?> arrival) {
+    return arrival.includesTransit();
+  }
 
   private RaptorPath<T> buildAndValidatePath(DestinationArrival<T> arrival) {
     var path = pathMapper.mapToPath(arrival);
