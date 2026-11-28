@@ -67,6 +67,8 @@ class TimePenaltyTest {
   void modifies() {
     var subject = TimePenalty.of(D2_m, 0.5);
     assertTrue(subject.modifies());
-    assertFalse(TimePenalty.ZERO.modifies());
+    assertTrue(TimePenalty.of(D2_m, 1.0).modifies());
+    assertTrue(TimePenalty.of(Duration.ZERO, 1.5).modifies());
+    assertFalse(TimePenalty.NONE.modifies());
   }
 }

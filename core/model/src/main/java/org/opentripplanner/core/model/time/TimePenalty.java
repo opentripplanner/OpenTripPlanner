@@ -41,7 +41,7 @@ public final class TimePenalty extends AbstractLinearFunction<Duration> {
    * Does this penalty actually modify a duration or would it be returned unchanged?
    */
   public boolean modifies() {
-    return !constant().isZero() && coefficient() != 1.0;
+    return !constant().isZero() || coefficient() != 1.0;
   }
 
   @Override
