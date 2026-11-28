@@ -8,11 +8,11 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPath;
 import org.opentripplanner.model.plan.PlanTestConstants;
+import org.opentripplanner.street.api.request.StreetSearchRequest;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.StreetModelForTest;
 import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 
 class FlexTripEdgeTest implements PlanTestConstants {

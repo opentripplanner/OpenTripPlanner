@@ -9,16 +9,16 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentripplanner.core.model.basic.Cost;
+import org.opentripplanner.street.api.path.TestStreetPath;
+import org.opentripplanner.street.api.request.StreetSearchRequest;
+import org.opentripplanner.street.api.request.filter.ParkingFilter;
+import org.opentripplanner.street.api.request.filter.ParkingSelect;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetMode;
-import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.street.search.StreetSearchBuilder;
-import org.opentripplanner.street.search.request.StreetSearchRequest;
-import org.opentripplanner.street.search.request.filter.ParkingFilter;
-import org.opentripplanner.street.search.request.filter.ParkingSelect;
 
 public abstract class ParkAndRideTest extends GraphRoutingTest {
 
@@ -177,8 +177,7 @@ public abstract class ParkAndRideTest extends GraphRoutingTest {
       return List.of();
     }
 
-    return new StreetPath(state)
-      .states()
+    return TestStreetPath.states(state)
       .stream()
       .map(s ->
         String.format(

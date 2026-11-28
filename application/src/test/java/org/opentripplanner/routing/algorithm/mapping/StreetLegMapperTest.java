@@ -41,19 +41,20 @@ import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRe
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsService;
 import org.opentripplanner.service.vehiclerental.model.TestFreeFloatingRentalVehicleBuilder;
 import org.opentripplanner.service.vehiclerental.model.TestVehicleRentalStationBuilder;
+import org.opentripplanner.street.api.path.DefaultStreetPath;
+import org.opentripplanner.street.api.path.StreetPath;
+import org.opentripplanner.street.api.path.step.RelativeDirection;
+import org.opentripplanner.street.api.request.StreetSearchRequest;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.StreetModelForTest;
 import org.opentripplanner.street.model.edge.StreetTransitEntranceLink;
 import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
-import org.opentripplanner.street.model.path.StreetPath;
-import org.opentripplanner.street.model.path.step.RelativeDirection;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
@@ -86,7 +87,7 @@ class StreetLegMapperTest {
 
   @Test
   void pathWithoutEdges() {
-    var path = new StreetPath(TestStateBuilder.ofWalking().build());
+    var path = (StreetPath) new DefaultStreetPath(TestStateBuilder.ofWalking().build());
     assertThat(mapper.map(path, RouteRequest.defaultValue())).isEmpty();
   }
 
@@ -98,12 +99,13 @@ class StreetLegMapperTest {
 
     assertThat(legs).hasSize(1);
     var leg = assertInstanceOf(StreetLeg.class, legs.getFirst());
+    var pathLeg = path.computeLegs(0).getFirst();
     assertEquals(TraverseMode.WALK, leg.getMode());
-    assertEquals(path.startTime().atZone(ZoneIds.BERLIN), leg.startTime());
-    assertEquals(path.endTime().atZone(ZoneIds.BERLIN), leg.endTime());
-    assertEquals(path.distanceMeters(), leg.distanceMeters(), 0.01);
+    assertEquals(pathLeg.startTime().atZone(ZoneIds.BERLIN), leg.startTime());
+    assertEquals(pathLeg.endTime().atZone(ZoneIds.BERLIN), leg.endTime());
+    assertEquals(pathLeg.distanceMeters(), leg.distanceMeters(), 0.01);
     assertTrue(leg.generalizedCost() > 0);
-    assertEquals(path.geometry(), leg.legGeometry());
+    assertEquals(pathLeg.geometry(), leg.legGeometry());
     assertEquals(VertexType.NORMAL, leg.from().vertexType);
     assertEquals(VertexType.NORMAL, leg.to().vertexType);
     assertFalse(leg.rentedVehicle());
@@ -125,7 +127,7 @@ class StreetLegMapperTest {
     var leg = tokyoMapper.map(path, RouteRequest.defaultValue()).getFirst();
 
     assertEquals(tokyo, leg.startTime().getZone());
-    assertEquals(path.startTime(), leg.startTime().toInstant());
+    assertEquals(path.computeLegs(0).getFirst().startTime(), leg.startTime().toInstant());
   }
 
   @Test
@@ -230,7 +232,7 @@ class StreetLegMapperTest {
       I18NString.of("destination")
     );
     var edge = TemporaryFreeEdge.createTemporaryFreeEdge(state.getVertex(), location);
-    var path = new StreetPath(edge.traverse(state)[0]);
+    var path = (StreetPath) new DefaultStreetPath(edge.traverse(state)[0]);
 
     var leg = mapper.map(path, viaLocations, null).getFirst();
 
@@ -276,7 +278,7 @@ class StreetLegMapperTest {
       (StreetVertex) state.getVertex(),
       entranceVertex
     );
-    var path = new StreetPath(link.traverse(state)[0]);
+    var path = (StreetPath) new DefaultStreetPath(link.traverse(state)[0]);
 
     var steps = mapper.map(path, RouteRequest.defaultValue()).getFirst().listWalkSteps();
 
@@ -318,7 +320,9 @@ class StreetLegMapperTest {
       new FlexPath(1000, 600, () -> GeometryUtils.makeLineString(1, 1, 2, 2)),
       FlexParameters.defaultValues()
     );
-    var path = new StreetPath(edge.traverse(flexState(edge.getFromVertex()))[0]);
+    var path = (StreetPath) new DefaultStreetPath(
+      edge.traverse(flexState(edge.getFromVertex()))[0]
+    );
     var delay = Duration.ofMinutes(5);
 
     var legs = mapper.map(path, RouteRequest.defaultValue(), PATH_START.plus(delay));
@@ -330,11 +334,11 @@ class StreetLegMapperTest {
     assertSame(STOP_B, leg.to().stop);
     assertEquals(PATH_START.plus(delay), leg.startTime());
     assertEquals(PATH_START.plus(delay).plusSeconds(600), leg.endTime());
-    assertEquals(path.weight(), leg.generalizedCost(), 1);
+    assertEquals(path.generalizedCost().toSeconds(), leg.generalizedCost());
   }
 
   private static StreetPath path(TestStateBuilder builder) {
-    return new StreetPath(builder.build());
+    return new DefaultStreetPath(builder.build());
   }
 
   private WalkStep findStep(StreetPath path, RelativeDirection direction) {

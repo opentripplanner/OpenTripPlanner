@@ -13,6 +13,7 @@ import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.ext.carpooling.util.CarReachableVertexSnapper;
+import org.opentripplanner.ext.carpooling.util.StreetPathUtils;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.StreetTraversalPermission;
@@ -102,20 +103,20 @@ class CarpoolStopIndexTest extends GraphRoutingTest {
     assertTrue(dropoff.walkPath().duration().isPositive());
     assertSame(
       c,
-      dropoff.walkPath().states().getFirst().getVertex(),
+      StreetPathUtils.firstVertex(dropoff.walkPath()),
       "walk runs from the car to the stop"
     );
-    assertSame(t3, dropoff.walkPath().lastState().getVertex());
+    assertSame(t3, StreetPathUtils.lastVertex(dropoff.walkPath()));
 
     var pickup = index.pickupSnap(t3.getId());
     assertNotNull(pickup);
     assertSame(c, pickup.vertex());
     assertSame(
       t3,
-      pickup.walkPath().states().getFirst().getVertex(),
+      StreetPathUtils.firstVertex(pickup.walkPath()),
       "walk runs from the stop to the car"
     );
-    assertSame(c, pickup.walkPath().lastState().getVertex());
+    assertSame(c, StreetPathUtils.lastVertex(pickup.walkPath()));
   }
 
   @Test

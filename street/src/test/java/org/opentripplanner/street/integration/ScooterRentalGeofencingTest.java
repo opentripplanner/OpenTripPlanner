@@ -21,17 +21,17 @@ import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.service.vehiclerental.street.geofencing.GeofencingBoundaryExtension;
+import org.opentripplanner.street.api.path.TestStreetPath;
+import org.opentripplanner.street.api.request.StreetSearchRequest;
 import org.opentripplanner.street.geometry.Polygons;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.StreetTraversalPermission;
-import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.street.search.StreetSearchBuilder;
-import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 
 /**
@@ -211,8 +211,7 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
     var state = tree.getState(T_ORIGIN);
     assertNotNull(state, "arriveBy should find a path");
 
-    var descriptor = new StreetPath(state)
-      .states()
+    var descriptor = TestStreetPath.states(state)
       .stream()
       .filter(s -> s.getBackEdge() != null)
       .map(s -> formatState(s))
@@ -418,8 +417,7 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
     var state = tree.getState(T_ORIGIN);
     assertNotNull(state, "arriveBy should find a path");
 
-    var descriptor = new StreetPath(state)
-      .states()
+    var descriptor = TestStreetPath.states(state)
       .stream()
       .filter(s -> s.getBackEdge() != null)
       .map(this::formatState)
@@ -599,8 +597,7 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
     var state = tree.getState(T_ORIGIN);
     assertNotNull(state, "arriveBy should find a path");
 
-    var arriveBy = new StreetPath(state)
-      .states()
+    var arriveBy = TestStreetPath.states(state)
       .stream()
       .filter(s -> s.getBackEdge() != null)
       .map(this::formatState)
@@ -665,8 +662,7 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
       return null;
     }
 
-    return new StreetPath(state)
-      .states()
+    return TestStreetPath.states(state)
       .stream()
       .filter(s -> s.getBackEdge() != null)
       .map(this::formatState)

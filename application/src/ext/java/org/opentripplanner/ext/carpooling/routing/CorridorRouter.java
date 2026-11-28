@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
-import org.opentripplanner.street.model.path.StreetPath;
+import org.opentripplanner.street.api.path.StreetPath;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.utils.collection.Pair;
 

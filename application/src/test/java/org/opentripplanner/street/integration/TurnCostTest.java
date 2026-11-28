@@ -13,6 +13,10 @@ import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.graph_builder.module.TurnRestrictionModule;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
+import org.opentripplanner.street.api.path.DefaultStreetPath;
+import org.opentripplanner.street.api.path.StreetPath;
+import org.opentripplanner.street.api.path.StreetPathForTest;
+import org.opentripplanner.street.api.request.StreetSearchRequest;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetMode;
@@ -23,7 +27,6 @@ import org.opentripplanner.street.model.TurnRestrictionType;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
-import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.EuclideanRemainingWeightHeuristic;
@@ -32,7 +35,6 @@ import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.street.search.intersection_model.ConstantIntersectionTraversalCalculator;
 import org.opentripplanner.street.search.intersection_model.IntersectionTraversalCalculator;
-import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 
 public class TurnCostTest {
@@ -118,7 +120,7 @@ public class TurnCostTest {
 
     // The intersection traversal cost should be applied to the state *after*
     // the intersection itself.
-    List<State> states = path.states();
+    List<State> states = StreetPathForTest.states(path);
     assertEquals(5, states.size());
 
     assertEquals("maple_1st", states.get(0).getVertex().getLabelString());
@@ -143,7 +145,7 @@ public class TurnCostTest {
     // Without turn costs, this path costs 3x100 + 1x50 = 300.
     StreetPath path = checkForwardRouteDuration(StreetMode.CAR, topRight, bottomLeft, 350);
 
-    List<State> states = path.states();
+    List<State> states = StreetPathForTest.states(path);
     assertEquals(5, states.size());
 
     assertEquals("maple_1st", getParentLabelString(states.get(0).getVertex()));
@@ -161,7 +163,7 @@ public class TurnCostTest {
     // Since there are 3 turns, the total cost should be 380.
     StreetPath path = checkForwardRouteDuration(StreetMode.CAR, topRight, bottomLeft, 380);
 
-    List<State> states = path.states();
+    List<State> states = StreetPathForTest.states(path);
     assertEquals(5, states.size());
 
     assertEquals("maple_1st", getParentLabelString(states.get(0).getVertex()));
@@ -205,8 +207,8 @@ public class TurnCostTest {
       .getShortestPathTree();
     State state = tree.getState(bottomLeft);
     assertNotNull(state);
-    StreetPath path = new StreetPath(state);
-    List<State> states = path.states();
+    StreetPath path = new DefaultStreetPath(state);
+    List<State> states = StreetPathForTest.states(path);
 
     // Without turn costs, this path costs 2x100 + 2x50 = 300.
     assertEquals(expectedDuration, states.getLast().getElapsedTimeSeconds());

@@ -7,10 +7,12 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.framework.time.ZoneIdFallback;
+import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.walkstep.WalkStep;
@@ -19,13 +21,13 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.via.ViaLocation;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
+import org.opentripplanner.street.api.path.ExternalEdgeLeg;
+import org.opentripplanner.street.api.path.StreetLeg;
+import org.opentripplanner.street.api.path.StreetLegPlace;
+import org.opentripplanner.street.api.path.StreetPath;
+import org.opentripplanner.street.api.path.step.StepEntrance;
+import org.opentripplanner.street.api.path.step.StreetStep;
 import org.opentripplanner.street.geometry.WgsCoordinate;
-import org.opentripplanner.street.model.path.ExternalEdgeLeg;
-import org.opentripplanner.street.model.path.StreetLeg;
-import org.opentripplanner.street.model.path.StreetLegPlace;
-import org.opentripplanner.street.model.path.StreetPath;
-import org.opentripplanner.street.model.path.step.StepEntrance;
-import org.opentripplanner.street.model.path.step.StreetStep;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
@@ -83,7 +85,33 @@ public class StreetLegMapper {
     List<ViaLocation> viaLocations,
     @Nullable ZonedDateTime startTime
   ) {
-    var pathLegs = path.computeLegs(ellipsoidToGeoidDifference);
+    return mapLegs(path.computeLegs(ellipsoidToGeoidDifference), viaLocations, startTime);
+  }
+
+  /**
+   * Generates an {@link Itinerary} consisting only of the legs of a {@link StreetPath}.
+   *
+   * @param startTime See {@link #map(StreetPath, RouteRequest, ZonedDateTime)}
+   * @return Empty if the path has no legs
+   */
+  public Optional<Itinerary> mapToItinerary(
+    StreetPath path,
+    RouteRequest request,
+    @Nullable ZonedDateTime startTime
+  ) {
+    var legs = map(path, request, startTime);
+    return LegsToItineraryMapper.map(
+      legs,
+      path.arrivesWithRentedVehicleFromStation(),
+      path.elevationChange()
+    );
+  }
+
+  private List<Leg> mapLegs(
+    List<StreetLeg> pathLegs,
+    List<ViaLocation> viaLocations,
+    @Nullable ZonedDateTime startTime
+  ) {
     if (pathLegs.isEmpty()) {
       return List.of();
     }
@@ -121,7 +149,7 @@ public class StreetLegMapper {
       .withGeneralizedCost(leg.generalizedCost())
       .withGeometry(leg.geometry())
       .withElevationProfile(leg.elevationProfile())
-      .withWalkSteps(leg.steps().stream().map(this::mapStep).toList())
+      .withWalkSteps(leg.computeSteps().stream().map(this::mapStep).toList())
       .withRentedVehicle(leg.rentedVehicle());
 
     if (leg.vehicleRentalNetwork() != null) {

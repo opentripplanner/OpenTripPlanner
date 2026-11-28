@@ -17,11 +17,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.ext.carpooling.routing.CarpoolTreeStreetRouter.TargetReach;
+import org.opentripplanner.ext.carpooling.util.StreetPathUtils;
 import org.opentripplanner.ext.carpooling.util.StreetVertexUtils;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
+import org.opentripplanner.street.api.path.StreetPathForTest;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.linking.TemporaryVerticesContainer;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
@@ -292,8 +294,8 @@ class CarpoolTreeStreetRouterTest extends GraphRoutingTest {
 
     assertNotNull(segment);
     var path = segment.path();
-    assertFalse(path.states().isEmpty(), "Path states should not be empty");
-    assertTrue(path.states().size() > 1, "Path should have at least one edge");
+    assertFalse(StreetPathForTest.states(path).isEmpty(), "Path states should not be empty");
+    assertTrue(StreetPathForTest.states(path).size() > 1, "Path should have at least one edge");
   }
 
   @Test
@@ -381,7 +383,7 @@ class CarpoolTreeStreetRouterTest extends GraphRoutingTest {
 
   private void assertGeometryRunsFromAToD(RoutedSegment segment) {
     assertThat(segment).isNotNull();
-    assertThat(List.of(segment.path().geometry().getCoordinates()))
+    assertThat(List.of(StreetPathUtils.geometry(List.of(segment.path())).getCoordinates()))
       .containsExactly(
         vertexA.getCoordinate(),
         vertexB.getCoordinate(),

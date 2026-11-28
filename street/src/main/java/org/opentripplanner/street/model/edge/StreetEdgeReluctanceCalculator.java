@@ -1,9 +1,9 @@
 package org.opentripplanner.street.model.edge;
 
+import org.opentripplanner.street.api.request.StreetSearchRequest;
+import org.opentripplanner.street.api.request.VehicleWalkingRequest;
+import org.opentripplanner.street.api.request.WalkRequest;
 import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.street.search.request.StreetSearchRequest;
-import org.opentripplanner.street.search.request.VehicleWalkingRequest;
-import org.opentripplanner.street.search.request.WalkRequest;
 
 class StreetEdgeReluctanceCalculator {
 

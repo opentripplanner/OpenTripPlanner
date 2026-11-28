@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.ext.carpooling.routing.CarpoolCorridor.CorridorStop;
+import org.opentripplanner.ext.carpooling.util.StreetPathUtils;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
@@ -128,8 +129,8 @@ class CorridorRouterTest extends GraphRoutingTest {
     var baseline = router.route(a, d);
 
     var path = baseline.path();
-    assertSame(a, path.states().getFirst().getVertex());
-    assertSame(d, path.lastState().getVertex());
+    assertSame(a, StreetPathUtils.firstVertex(path));
+    assertSame(d, StreetPathUtils.lastVertex(path));
     assertEquals(legSeconds, path.duration().toSeconds());
     assertSame(path, baseline.path(), "kept");
   }

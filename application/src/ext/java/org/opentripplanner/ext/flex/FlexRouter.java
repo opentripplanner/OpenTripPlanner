@@ -24,12 +24,11 @@ import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.place.api.NearbyStop;
-import org.opentripplanner.routing.algorithm.mapping.LegsToItineraryMapper;
 import org.opentripplanner.routing.algorithm.mapping.StreetLegMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
+import org.opentripplanner.street.api.path.DefaultStreetPath;
 import org.opentripplanner.street.graph.Graph;
-import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.transfer.regular.FlexTransferService;
 import org.opentripplanner.transfer.regular.model.PathTransfer;
@@ -143,10 +142,9 @@ public class FlexRouter {
 
     for (DirectFlexPath it : directFlexPaths) {
       var startTime = startOfTime.plusSeconds(it.startTime());
-      var path = new StreetPath(it.state());
-      var legs = streetLegMapper.map(path, request, startTime);
-      var itinerary = LegsToItineraryMapper.map(legs, false, path.calculateElevations());
-      itinerary.ifPresent(itineraries::add);
+      streetLegMapper
+        .mapToItinerary(new DefaultStreetPath(it.state()), request, startTime)
+        .ifPresent(itineraries::add);
     }
     return itineraries;
   }

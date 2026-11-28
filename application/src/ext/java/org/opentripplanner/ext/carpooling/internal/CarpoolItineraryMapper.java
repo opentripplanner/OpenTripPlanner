@@ -15,18 +15,19 @@ import org.opentripplanner.ext.carpooling.routing.CarpoolAccessEgress;
 import org.opentripplanner.ext.carpooling.routing.EndpointLabel;
 import org.opentripplanner.ext.carpooling.routing.InsertionCandidate;
 import org.opentripplanner.ext.carpooling.util.BookingUrlTemplate;
+import org.opentripplanner.ext.carpooling.util.StreetPathUtils;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.leg.StreetLeg;
-import org.opentripplanner.street.geometry.GeometryUtils;
+import org.opentripplanner.street.api.path.StreetPath;
 import org.opentripplanner.street.geometry.WgsCoordinate;
-import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.organization.ContactInfo;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
@@ -158,12 +159,8 @@ public class CarpoolItineraryMapper {
       .withEndTime(endTime)
       .withFrom(fromPlace)
       .withTo(toPlace)
-      .withGeometry(
-        GeometryUtils.concatenateLineStrings(pathsWithNewPassenger, StreetPath::geometry)
-      )
-      .withDistanceMeters(
-        pathsWithNewPassenger.stream().mapToDouble(StreetPath::distanceMeters).sum()
-      )
+      .withGeometry(StreetPathUtils.geometry(pathsWithNewPassenger))
+      .withDistanceMeters(StreetPathUtils.distanceMeters(pathsWithNewPassenger))
       .withGeneralizedCost((int) rideWeight)
       .withPickupBookingInfo(bookingInfo)
       .build();
@@ -182,9 +179,9 @@ public class CarpoolItineraryMapper {
       .withEndTime(endTime)
       .withFrom(fromPlace)
       .withTo(toPlace)
-      .withGeometry(walkPath.geometry())
-      .withDistanceMeters(walkPath.distanceMeters())
-      .withGeneralizedCost((int) walkPath.weight())
+      .withGeometry(StreetPathUtils.geometry(List.of(walkPath)))
+      .withDistanceMeters(StreetPathUtils.distanceMeters(List.of(walkPath)))
+      .withGeneralizedCost((int) StreetPathUtils.weightOrZero(walkPath))
       .build();
   }
 
@@ -242,15 +239,15 @@ public class CarpoolItineraryMapper {
     EndpointLabel endLabel,
     @Nullable BookingInfo bookingInfo
   ) {
-    Vertex pickupVertex = pathsWithNewPassenger.getFirst().states().getFirst().getVertex();
-    Vertex dropoffVertex = pathsWithNewPassenger.getLast().lastState().getVertex();
+    Vertex pickupVertex = StreetPathUtils.firstVertex(pathsWithNewPassenger.getFirst());
+    Vertex dropoffVertex = StreetPathUtils.lastVertex(pathsWithNewPassenger.getLast());
     Place pickupPlace = makePlace(pickupVertex);
     Place dropoffPlace = makePlace(dropoffVertex);
 
     Vertex startBoundaryVertex =
-      walkToPickup != null ? walkToPickup.states().getFirst().getVertex() : pickupVertex;
+      walkToPickup != null ? StreetPathUtils.firstVertex(walkToPickup) : pickupVertex;
     Vertex endBoundaryVertex =
-      walkFromDropoff != null ? walkFromDropoff.lastState().getVertex() : dropoffVertex;
+      walkFromDropoff != null ? StreetPathUtils.lastVertex(walkFromDropoff) : dropoffVertex;
 
     Place itineraryStart = boundaryPlace(startLabel, ORIGIN_DEFAULT_NAME, startBoundaryVertex);
     Place itineraryEnd = boundaryPlace(endLabel, DESTINATION_DEFAULT_NAME, endBoundaryVertex);
@@ -346,11 +343,11 @@ public class CarpoolItineraryMapper {
   }
 
   private static WgsCoordinate boardingCoordinate(List<StreetPath> pathsWithNewPassenger) {
-    return pathsWithNewPassenger.getFirst().states().getFirst().getVertex().toWgsCoordinate();
+    return StreetPathUtils.firstVertex(pathsWithNewPassenger.getFirst()).toWgsCoordinate();
   }
 
   private static WgsCoordinate alightingCoordinate(List<StreetPath> pathsWithNewPassenger) {
-    return pathsWithNewPassenger.getLast().lastState().getVertex().toWgsCoordinate();
+    return StreetPathUtils.lastVertex(pathsWithNewPassenger.getLast()).toWgsCoordinate();
   }
 
   /**

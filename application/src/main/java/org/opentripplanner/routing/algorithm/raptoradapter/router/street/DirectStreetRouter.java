@@ -9,7 +9,6 @@ import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.ItinerariesHelper;
-import org.opentripplanner.routing.algorithm.mapping.LegsToItineraryMapper;
 import org.opentripplanner.routing.algorithm.mapping.StreetLegMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.error.PathNotFoundException;
@@ -72,13 +71,7 @@ public class DirectStreetRouter {
       );
       List<Itinerary> itineraries = new ArrayList<>();
       for (var path : paths) {
-        var legs = streetLegMapper.map(path, request);
-        var itinerary = LegsToItineraryMapper.map(
-          legs,
-          path.lastState().isRentingVehicleFromStation(),
-          path.calculateElevations()
-        );
-        itinerary.ifPresent(itineraries::add);
+        streetLegMapper.mapToItinerary(path, request, null).ifPresent(itineraries::add);
       }
       return ItinerariesHelper.decorateItinerariesWithRequestData(
         itineraries,

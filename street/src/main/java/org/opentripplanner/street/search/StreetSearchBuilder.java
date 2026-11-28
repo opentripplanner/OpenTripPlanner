@@ -14,10 +14,11 @@ import org.opentripplanner.astar.spi.RemainingWeightHeuristic;
 import org.opentripplanner.astar.spi.SearchTerminationStrategy;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 import org.opentripplanner.astar.spi.TraverseVisitor;
+import org.opentripplanner.street.api.path.DefaultStreetPath;
+import org.opentripplanner.street.api.path.StreetPath;
+import org.opentripplanner.street.api.request.StreetSearchRequest;
 import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
 import org.opentripplanner.utils.collection.StreamUtils;
@@ -121,7 +122,7 @@ public class StreetSearchBuilder {
   public List<StreetPath> getPathsToTarget() {
     return StreamUtils.ofIterable(buildAstar().listFinalStates())
       .sorted(Comparator.comparingLong(State::getElapsedTimeSeconds))
-      .map(StreetPath::new)
+      .map(finalState -> (StreetPath) new DefaultStreetPath(finalState))
       .toList();
   }
 

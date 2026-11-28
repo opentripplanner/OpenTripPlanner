@@ -8,13 +8,14 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.opentripplanner.street.api.path.StreetPath;
+import org.opentripplanner.street.api.path.TestStreetPath;
+import org.opentripplanner.street.api.request.StreetSearchRequest;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.StreetTraversalPermission;
-import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.search.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.street.search.StreetSearchBuilder;
-import org.opentripplanner.street.search.request.StreetSearchRequest;
 
 class MillisecondResolutionTest extends GraphRoutingTest {
 
@@ -47,7 +48,7 @@ class MillisecondResolutionTest extends GraphRoutingTest {
 
     var forwardPaths = route(A, B, time, false);
     assertEquals(1, forwardPaths.size());
-    var forwardStates = forwardPaths.getFirst().states();
+    var forwardStates = TestStreetPath.states(forwardPaths.getFirst());
     var forwardDiff = ChronoUnit.MILLIS.between(
       forwardStates.getFirst().getTimeAccurate(),
       forwardStates.getLast().getTimeAccurate()
@@ -55,7 +56,7 @@ class MillisecondResolutionTest extends GraphRoutingTest {
 
     var backwardPaths = route(A, B, time, true);
     assertEquals(1, backwardPaths.size());
-    var backwardStates = backwardPaths.getFirst().states();
+    var backwardStates = TestStreetPath.states(backwardPaths.getFirst());
     var backwardDiff = ChronoUnit.MILLIS.between(
       backwardStates.getFirst().getTimeAccurate(),
       backwardStates.getLast().getTimeAccurate()

@@ -1,0 +1,175 @@
+package org.opentripplanner.street.api.request;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Collection;
+import java.util.Set;
+import java.util.function.Consumer;
+import org.jspecify.annotations.Nullable;
+import org.locationtech.jts.geom.Envelope;
+import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
+import org.opentripplanner.street.model.StreetMode;
+import org.opentripplanner.street.model.edge.ExtensionRequestContext;
+import org.opentripplanner.street.search.intersection_model.IntersectionTraversalCalculator;
+
+public class StreetSearchRequestBuilder {
+
+  Instant startTime;
+  StreetMode mode;
+  boolean arriveBy;
+  boolean wheelchairEnabled;
+  Envelope fromEnvelope;
+  Envelope toEnvelope;
+  boolean geoidElevation;
+  double turnReluctance;
+  WalkRequest walk;
+  BikeRequest bike;
+  CarRequest car;
+  WheelchairRequest wheelchair;
+  ScooterRequest scooter;
+  ElevatorRequest elevator;
+
+  @Nullable
+  RentalPeriod rentalPeriod;
+
+  IntersectionTraversalCalculator intersectionTraversalCalculator;
+  Collection<ExtensionRequestContext> extensionRequestContexts;
+  Duration timeout;
+  Set<GeofencingZone> arriveByDestinationZones;
+
+  StreetSearchRequestBuilder(StreetSearchRequest original) {
+    this.startTime = original.startTime();
+    this.mode = original.mode();
+    this.arriveBy = original.arriveBy();
+    this.wheelchairEnabled = original.wheelchairEnabled();
+    this.fromEnvelope = original.fromEnvelope();
+    this.toEnvelope = original.toEnvelope();
+    this.geoidElevation = original.geoidElevation();
+    this.turnReluctance = original.turnReluctance();
+    this.walk = original.walk();
+    this.bike = original.bike();
+    this.car = original.car();
+    this.scooter = original.scooter();
+    this.wheelchair = original.wheelchair();
+    this.elevator = original.elevator();
+    this.rentalPeriod = original.rentalPeriod();
+    this.intersectionTraversalCalculator = original.intersectionTraversalCalculator();
+    this.extensionRequestContexts = original.listExtensionRequestContexts();
+    this.timeout = original.timeout();
+    this.arriveByDestinationZones = original.arriveByDestinationZones();
+  }
+
+  public StreetSearchRequestBuilder withStartTime(Instant startTime) {
+    this.startTime = startTime;
+    return this;
+  }
+
+  public StreetSearchRequestBuilder withMode(StreetMode mode) {
+    this.mode = mode;
+    return this;
+  }
+
+  public StreetSearchRequestBuilder withArriveBy(boolean arriveBy) {
+    this.arriveBy = arriveBy;
+    return this;
+  }
+
+  public StreetSearchRequestBuilder withWheelchairEnabled(boolean wheelchair) {
+    this.wheelchairEnabled = wheelchair;
+    return this;
+  }
+
+  public StreetSearchRequestBuilder withWheelchair(Consumer<WheelchairRequest.Builder> request) {
+    this.wheelchair = this.wheelchair.copyOf().apply(request).build();
+    return this;
+  }
+
+  public StreetSearchRequestBuilder withFromEnvelope(@Nullable Envelope fromEnvelope) {
+    this.fromEnvelope = fromEnvelope;
+    return this;
+  }
+
+  public StreetSearchRequestBuilder withToEnvelope(@Nullable Envelope toEnvelope) {
+    this.toEnvelope = toEnvelope;
+    return this;
+  }
+
+  public StreetSearchRequestBuilder withGeoidElevation(boolean value) {
+    this.geoidElevation = value;
+    return this;
+  }
+
+  public StreetSearchRequestBuilder withTurnReluctance(double v) {
+    this.turnReluctance = v;
+    return this;
+  }
+
+  public StreetSearchRequestBuilder withUseRentalAvailability(boolean b) {
+    withCar(c -> c.withRental(r -> r.withUseAvailabilityInformation(b)));
+    withBike(c -> c.withRental(r -> r.withUseAvailabilityInformation(b)));
+    withScooter(c -> c.withRental(r -> r.withUseAvailabilityInformation(b)));
+    return this;
+  }
+
+  public StreetSearchRequestBuilder withWalk(Consumer<WalkRequest.Builder> body) {
+    this.walk = this.walk.copyOf().apply(body).build();
+    return this;
+  }
+
+  public StreetSearchRequestBuilder withBike(Consumer<BikeRequest.Builder> body) {
+    this.bike = this.bike.copyOf().apply(body).build();
+    return this;
+  }
+
+  public StreetSearchRequestBuilder withCar(Consumer<CarRequest.Builder> body) {
+    this.car = this.car.copyOf().apply(body).build();
+    return this;
+  }
+
+  public StreetSearchRequestBuilder withScooter(Consumer<ScooterRequest.Builder> body) {
+    this.scooter = this.scooter.copyOf().apply(body).build();
+    return this;
+  }
+
+  public StreetSearchRequestBuilder withElevator(Consumer<ElevatorRequest.Builder> body) {
+    this.elevator = this.elevator.copyOf().apply(body).build();
+    return this;
+  }
+
+  public StreetSearchRequestBuilder withRentalPeriod(RentalPeriod rentalPeriod) {
+    this.rentalPeriod = rentalPeriod;
+    return this;
+  }
+
+  public StreetSearchRequestBuilder withIntersectionTraversalCalculator(
+    IntersectionTraversalCalculator ic
+  ) {
+    this.intersectionTraversalCalculator = ic;
+    return this;
+  }
+
+  public StreetSearchRequestBuilder withTimeout(Duration duration) {
+    this.timeout = duration;
+    return this;
+  }
+
+  public StreetSearchRequestBuilder withExtensionRequestContexts(
+    Collection<ExtensionRequestContext> contexts
+  ) {
+    this.extensionRequestContexts = contexts;
+    return this;
+  }
+
+  public StreetSearchRequestBuilder withArriveByDestinationZones(Set<GeofencingZone> zones) {
+    this.arriveByDestinationZones = zones;
+    return this;
+  }
+
+  Instant startTimeOrNow() {
+    return startTime == null ? Instant.now() : startTime;
+  }
+
+  public StreetSearchRequest build() {
+    return new StreetSearchRequest(this);
+  }
+}

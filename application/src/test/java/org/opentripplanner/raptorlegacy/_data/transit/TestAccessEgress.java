@@ -7,8 +7,8 @@ import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultAccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccessEgress;
+import org.opentripplanner.street.api.request.StreetSearchRequest;
 import org.opentripplanner.street.model.vertex.StreetLocation;
-import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.utils.lang.IntUtils;
 
