@@ -22,6 +22,9 @@ public class CarpoolTripBuilder extends AbstractEntityBuilder<CarpoolTrip, Carpo
   @Nullable
   private ContactInfo publicContactInformation;
 
+  @Nullable
+  private ZonedDateTime recordedAt;
+
   public CarpoolTripBuilder(FeedScopedId id) {
     super(id);
   }
@@ -34,6 +37,7 @@ public class CarpoolTripBuilder extends AbstractEntityBuilder<CarpoolTrip, Carpo
     this.totalCapacity = original.totalCapacity();
     this.stops = new ArrayList<>(original.stops());
     this.publicContactInformation = original.publicContactInformation();
+    this.recordedAt = original.recordedAt();
   }
 
   public CarpoolTripBuilder withStartTime(ZonedDateTime startTime) {
@@ -82,6 +86,16 @@ public class CarpoolTripBuilder extends AbstractEntityBuilder<CarpoolTrip, Carpo
   @Nullable
   public ContactInfo publicContactInformation() {
     return publicContactInformation;
+  }
+
+  public CarpoolTripBuilder withRecordedAt(@Nullable ZonedDateTime recordedAt) {
+    this.recordedAt = recordedAt;
+    return this;
+  }
+
+  @Nullable
+  public ZonedDateTime recordedAt() {
+    return recordedAt;
   }
 
   public CarpoolTripBuilder withStops(List<CarpoolStop> stops) {
