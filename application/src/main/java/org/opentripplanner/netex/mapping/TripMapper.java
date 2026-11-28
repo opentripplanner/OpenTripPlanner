@@ -157,7 +157,14 @@ class TripMapper {
   }
 
   private DirectionTypeEnumeration resolveDirectionType(ServiceJourney serviceJourney) {
-    Route netexRoute = lookUpNetexRoute(serviceJourney);
+    if (serviceJourney.getDirectionType() != null) {
+      return serviceJourney.getDirectionType();
+    }
+    var pattern = findJourneyPattern(serviceJourney);
+    if (pattern != null && pattern.getDirectionType() != null) {
+      return pattern.getDirectionType();
+    }
+    var netexRoute = lookUpNetexRoute(serviceJourney);
     if (netexRoute != null && netexRoute.getDirectionType() != null) {
       return netexRoute.getDirectionType();
     } else {
@@ -167,15 +174,17 @@ class TripMapper {
 
   private Route lookUpNetexRoute(ServiceJourney serviceJourney) {
     if (serviceJourney.getJourneyPatternRef() != null) {
-      JourneyPattern_VersionStructure journeyPattern = journeyPatternsById.lookup(
-        serviceJourney.getJourneyPatternRef().getValue().getRef()
-      );
+      var journeyPattern = findJourneyPattern(serviceJourney);
       if (journeyPattern != null && journeyPattern.getRouteRef() != null) {
         String routeRef = journeyPattern.getRouteRef().getRef();
         return routeById.lookup(routeRef);
       }
     }
     return null;
+  }
+
+  private JourneyPattern_VersionStructure findJourneyPattern(ServiceJourney serviceJourney) {
+    return journeyPatternsById.lookup(serviceJourney.getJourneyPatternRef().getValue().getRef());
   }
 
   private org.opentripplanner.transit.model.network.@Nullable Route resolveRoute(
@@ -190,9 +199,7 @@ class TripMapper {
       lineRef = lineRefStruct.getValue().getRef();
     } else if (serviceJourney.getJourneyPatternRef() != null) {
       // Connect to Line referenced through JourneyPattern->Route
-      JourneyPattern_VersionStructure journeyPattern = journeyPatternsById.lookup(
-        serviceJourney.getJourneyPatternRef().getValue().getRef()
-      );
+      var journeyPattern = findJourneyPattern(serviceJourney);
       lineRef = JourneyPatternHelper.getLineFromRoute(routeById, journeyPattern);
     }
     org.opentripplanner.transit.model.network.Route route = otpRouteById.get(
