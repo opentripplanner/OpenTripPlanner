@@ -40,6 +40,14 @@ public class Validator {
     validate(index.serviceJourneyById, ServiceJourneyNonIncreasingPassingTime::new);
     validate(index.datedServiceJourneys, new DSJOperatingDayNotFound());
     validate(index.datedServiceJourneys, new DSJServiceJourneyNotFound());
+    validate(index.quayIdByVehicleMeetingPointRef, new VehicleMeetingPointAssignmentQuayNotFound());
+    validate(index.carPoolingServiceById, new CarPoolingServiceOrganisationNotFound());
+    validate(index.singleJourneyById, new SingleJourneyCarPoolingServiceNotFound());
+    validate(index.singleJourneyById, new SingleJourneyOperatingDayNotFound());
+    validate(index.singleJourneyById, new SingleJourneyPathNotFound());
+    validate(index.singleJourneyById, new SingleJourneyPassingTimesMismatch());
+    validate(index.singleJourneyById, new SingleJourneyNonIncreasingPassingTime());
+    validate(index.singleJourneyById, new SingleJourneyPathWithSeveralServices());
   }
 
   /**

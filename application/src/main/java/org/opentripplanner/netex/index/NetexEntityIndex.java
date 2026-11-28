@@ -3,6 +3,7 @@ package org.opentripplanner.netex.index;
 import java.util.Collection;
 import org.entur.netex2.model.Authority;
 import org.entur.netex2.model.Branding;
+import org.entur.netex2.model.CarPoolingService;
 import org.entur.netex2.model.DatedServiceJourney;
 import org.entur.netex2.model.DayType;
 import org.entur.netex2.model.DayTypeAssignment;
@@ -25,8 +26,11 @@ import org.entur.netex2.model.Route;
 import org.entur.netex2.model.ServiceJourney;
 import org.entur.netex2.model.ServiceJourneyInterchange;
 import org.entur.netex2.model.ServiceLink;
+import org.entur.netex2.model.SingleJourney;
+import org.entur.netex2.model.SingleJourneyPath;
 import org.entur.netex2.model.StopPlace;
 import org.entur.netex2.model.TariffZone_VersionStructure;
+import org.entur.netex2.model.VehicleMeetingPoint;
 import org.opentripplanner.netex.index.api.NetexEntityIndexReadOnlyView;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
@@ -71,6 +75,7 @@ public class NetexEntityIndex {
 
   // Indexes to entities
   public final HierarchicalMapById<Authority> authoritiesById;
+  public final HierarchicalMapById<CarPoolingService> carPoolingServiceById;
   public final HierarchicalMapById<DatedServiceJourney> datedServiceJourneys;
   public final HierarchicalMapById<DayType> dayTypeById;
   public final HierarchicalMultimap<String, DayTypeAssignment> dayTypeAssignmentByDayTypeId;
@@ -92,12 +97,16 @@ public class NetexEntityIndex {
   public final HierarchicalMap<String, String> stopPlaceIdByStopPointRef;
   public final HierarchicalMap<String, String> flexibleStopPlaceByStopPointRef;
   public final HierarchicalMap<String, String> quayIdByStopPointRef;
+  public final HierarchicalMap<String, String> quayIdByVehicleMeetingPointRef;
   public final HierarchicalMapById<Route> routeById;
   public final HierarchicalMapById<ServiceJourney> serviceJourneyById;
   public final HierarchicalMapById<ServiceJourneyInterchange> serviceJourneyInterchangeById;
   public final HierarchicalMapById<ServiceLink> serviceLinkById;
+  public final HierarchicalMapById<SingleJourney> singleJourneyById;
+  public final HierarchicalMapById<SingleJourneyPath> singleJourneyPathById;
   public final HierarchicalVersionMapById<StopPlace> stopPlaceById;
   public final HierarchicalVersionMapById<TariffZone_VersionStructure> tariffZonesById;
+  public final HierarchicalMapById<VehicleMeetingPoint> vehicleMeetingPointById;
   public final HierarchicalMapById<Branding> brandingById;
   public final HierarchicalMapById<Parking> parkings;
 
@@ -116,6 +125,7 @@ public class NetexEntityIndex {
   public NetexEntityIndex() {
     this.parent = null;
     this.authoritiesById = new HierarchicalMapById<>();
+    this.carPoolingServiceById = new HierarchicalMapById<>();
     this.dayTypeById = new HierarchicalMapById<>();
     this.dayTypeAssignmentByDayTypeId = new HierarchicalMultimap<>();
     this.datedServiceJourneys = new HierarchicalMapById<>();
@@ -138,12 +148,16 @@ public class NetexEntityIndex {
     this.flexibleStopPlaceByStopPointRef = new HierarchicalMap<>();
     this.stopPlaceIdByStopPointRef = new HierarchicalMap<>();
     this.quayIdByStopPointRef = new HierarchicalMap<>();
+    this.quayIdByVehicleMeetingPointRef = new HierarchicalMap<>();
     this.routeById = new HierarchicalMapById<>();
     this.serviceJourneyById = new HierarchicalMapById<>();
     this.serviceLinkById = new HierarchicalMapById<>();
     this.serviceJourneyInterchangeById = new HierarchicalMapById<>();
+    this.singleJourneyById = new HierarchicalMapById<>();
+    this.singleJourneyPathById = new HierarchicalMapById<>();
     this.stopPlaceById = new HierarchicalVersionMapById<>();
     this.tariffZonesById = new HierarchicalVersionMapById<>();
+    this.vehicleMeetingPointById = new HierarchicalMapById<>();
     this.brandingById = new HierarchicalMapById<>();
     this.timeZone = new HierarchicalElement<>();
     this.parkings = new HierarchicalMapById<>();
@@ -157,6 +171,7 @@ public class NetexEntityIndex {
   public NetexEntityIndex(NetexEntityIndex parent) {
     this.parent = parent;
     this.authoritiesById = new HierarchicalMapById<>(parent.authoritiesById);
+    this.carPoolingServiceById = new HierarchicalMapById<>(parent.carPoolingServiceById);
     this.dayTypeById = new HierarchicalMapById<>(parent.dayTypeById);
     this.dayTypeAssignmentByDayTypeId = new HierarchicalMultimap<>(
       parent.dayTypeAssignmentByDayTypeId
@@ -183,14 +198,20 @@ public class NetexEntityIndex {
       parent.flexibleStopPlaceByStopPointRef
     );
     this.quayIdByStopPointRef = new HierarchicalMap<>(parent.quayIdByStopPointRef);
+    this.quayIdByVehicleMeetingPointRef = new HierarchicalMap<>(
+      parent.quayIdByVehicleMeetingPointRef
+    );
     this.routeById = new HierarchicalMapById<>(parent.routeById);
     this.serviceJourneyById = new HierarchicalMapById<>(parent.serviceJourneyById);
     this.serviceLinkById = new HierarchicalMapById<>(parent.serviceLinkById);
     this.serviceJourneyInterchangeById = new HierarchicalMapById<>(
       parent.serviceJourneyInterchangeById
     );
+    this.singleJourneyById = new HierarchicalMapById<>(parent.singleJourneyById);
+    this.singleJourneyPathById = new HierarchicalMapById<>(parent.singleJourneyPathById);
     this.stopPlaceById = new HierarchicalVersionMapById<>(parent.stopPlaceById);
     this.tariffZonesById = new HierarchicalVersionMapById<>(parent.tariffZonesById);
+    this.vehicleMeetingPointById = new HierarchicalMapById<>(parent.vehicleMeetingPointById);
     this.brandingById = new HierarchicalMapById<>(parent.brandingById);
     this.timeZone = new HierarchicalElement<>(parent.timeZone);
     this.parkings = new HierarchicalMapById<>(parent.parkings);
@@ -243,6 +264,11 @@ public class NetexEntityIndex {
       @Override
       public ReadOnlyHierarchicalMapById<Authority> getAuthoritiesById() {
         return authoritiesById;
+      }
+
+      @Override
+      public ReadOnlyHierarchicalMapById<CarPoolingService> getCarPoolingServiceById() {
+        return carPoolingServiceById;
       }
 
       @Override
@@ -343,6 +369,11 @@ public class NetexEntityIndex {
       }
 
       @Override
+      public ReadOnlyHierarchicalMap<String, String> getQuayIdByVehicleMeetingPointRef() {
+        return quayIdByVehicleMeetingPointRef;
+      }
+
+      @Override
       public ReadOnlyHierarchicalMap<String, String> getFlexibleStopPlaceByStopPointRef() {
         return flexibleStopPlaceByStopPointRef;
       }
@@ -368,6 +399,16 @@ public class NetexEntityIndex {
       }
 
       @Override
+      public ReadOnlyHierarchicalMapById<SingleJourney> getSingleJourneyById() {
+        return singleJourneyById;
+      }
+
+      @Override
+      public ReadOnlyHierarchicalMapById<SingleJourneyPath> getSingleJourneyPathById() {
+        return singleJourneyPathById;
+      }
+
+      @Override
       public ReadOnlyHierarchicalVersionMapById<StopPlace> getStopPlaceById() {
         return stopPlaceById;
       }
@@ -380,6 +421,11 @@ public class NetexEntityIndex {
       @Override
       public ReadOnlyHierarchicalVersionMapById<TariffZone_VersionStructure> getTariffZonesById() {
         return tariffZonesById;
+      }
+
+      @Override
+      public ReadOnlyHierarchicalMapById<VehicleMeetingPoint> getVehicleMeetingPointById() {
+        return vehicleMeetingPointById;
       }
 
       @Override

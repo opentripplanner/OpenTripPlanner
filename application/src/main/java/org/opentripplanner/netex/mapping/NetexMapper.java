@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.Set;
 import org.entur.netex2.model.Authority;
 import org.entur.netex2.model.Branding;
+import org.entur.netex2.model.CarPoolingService;
 import org.entur.netex2.model.FlexibleLine;
 import org.entur.netex2.model.FlexibleStopPlace;
 import org.entur.netex2.model.GroupOfStopPlaces;
@@ -21,6 +22,7 @@ import org.entur.netex2.model.Line;
 import org.entur.netex2.model.LineRefs_RelStructure;
 import org.entur.netex2.model.NoticeAssignment;
 import org.entur.netex2.model.Operator;
+import org.entur.netex2.model.SingleJourneyPath;
 import org.entur.netex2.model.StopPlace;
 import org.entur.netex2.model.VersionOfObjectRefStructure;
 import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
@@ -198,8 +200,10 @@ public class NetexMapper {
     Map<String, FeedScopedId> serviceIds = createCalendarForServiceJourney();
 
     mapRoute();
+    mapCarPoolingServices();
     mapGroupsOfLines();
     mapTripPatterns(serviceIds);
+    mapSingleJourneyPaths();
     mapNoticeAssignments();
 
     mapScheduledStopPointsToQuays();
@@ -439,6 +443,18 @@ public class NetexMapper {
     }
   }
 
+  private void mapCarPoolingServices() {
+    var mapper = new CarPoolingServiceMapper(
+      idFactory,
+      transitBuilder.getAgenciesById(),
+      transitBuilder.getOperatorsById(),
+      currentNetexIndex.getTimeZone()
+    );
+    for (CarPoolingService service : currentNetexIndex.getCarPoolingServiceById().localValues()) {
+      transitBuilder.getRoutes().add(mapper.mapRoute(service));
+    }
+  }
+
   private void mapTripPatterns(Map<String, FeedScopedId> serviceIds) {
     TripPatternMapper tripPatternMapper = new TripPatternMapper(
       issueStore,
@@ -500,6 +516,46 @@ public class NetexMapper {
     currentMapperIndexes.addStopTimesByNetexId(result.stopTimeByNetexId());
     groupMapper.scheduledStopPointsIndex.putAll(Multimaps.asMap(result.scheduledStopPointsIndex()));
     transitBuilder.getTripOnServiceDates().addAll(result.tripOnServiceDates());
+  }
+
+  private void mapSingleJourneyPaths() {
+    var mapper = new SingleJourneyPathMapper(
+      issueStore,
+      idFactory,
+      transitBuilder.getRoutes(),
+      transitBuilder.siteRepository(),
+      currentNetexIndex,
+      calendarServiceBuilder,
+      deduplicator
+    );
+    for (SingleJourneyPath path : currentNetexIndex.getSingleJourneyPathById().localValues()) {
+      mapper.mapTripPattern(path).ifPresent(this::applySingleJourneyPathMapperResult);
+    }
+  }
+
+  private void applySingleJourneyPathMapperResult(SingleJourneyPathMapperResult result) {
+    var tripPattern = result.tripPattern();
+    var stopPattern = tripPattern.getStopPattern();
+    var pathIsMapped = transitBuilder
+      .getTripPatterns()
+      .get(stopPattern)
+      .stream()
+      .anyMatch(it -> it.getId().equals(tripPattern.getId()));
+    if (pathIsMapped) {
+      issueStore.add(
+        "DuplicateSingleJourneyPath",
+        "SingleJourneyPath %s is found in more than one file. Only its journeys in the first " +
+          "file are imported.",
+        tripPattern.getId().getId()
+      );
+      return;
+    }
+
+    for (Map.Entry<Trip, List<StopTime>> it : result.stopTimesByTrip().entrySet()) {
+      transitBuilder.getStopTimesSortedByTrip().put(it.getKey(), it.getValue());
+      transitBuilder.getTripsById().add(it.getKey());
+    }
+    transitBuilder.getTripPatterns().put(stopPattern, tripPattern);
   }
 
   private void mapNoticeAssignments() {

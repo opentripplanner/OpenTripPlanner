@@ -7,14 +7,17 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.entur.netex2.model.BookingArrangement_VersionStructure;
 import org.entur.netex2.model.BookingArrangementsStructure;
 import org.entur.netex2.model.BookingMethodEnumeration;
 import org.entur.netex2.model.ContactStructure;
 import org.entur.netex2.model.EntityStructure;
 import org.entur.netex2.model.FlexibleLine;
 import org.entur.netex2.model.FlexibleServiceProperties;
+import org.entur.netex2.model.MobilityService_VersionStructure;
 import org.entur.netex2.model.MultilingualString;
 import org.entur.netex2.model.PurchaseWhenEnumeration;
+import org.entur.netex2.model.ServiceBookingArrangement;
 import org.entur.netex2.model.ServiceJourney;
 import org.entur.netex2.model.StopPointInJourneyPattern;
 import org.jspecify.annotations.Nullable;
@@ -50,6 +53,43 @@ public class BookingInfoMapper {
       .withServiceJourney(serviceJourney)
       .withStopPoint(stopPoint)
       .build();
+  }
+
+  /**
+   * Maps the booking arrangement of a mobility service, like a car pooling service. A service may
+   * have several arrangements in NeTEx 2.0, the first one is used.
+   */
+  @Nullable
+  BookingInfo map(MobilityService_VersionStructure service) {
+    BookingArrangement_VersionStructure arrangement = findBookingArrangement(service);
+    if (arrangement == null) {
+      return null;
+    }
+    return new NetexBookingInfoBuilder().build(
+      arrangement.getBookingContact(),
+      arrangement.getBookingMethods(),
+      arrangement.getLatestBookingTime(),
+      arrangement.getBookWhen(),
+      arrangement.getMinimumBookingPeriod(),
+      arrangement.getBookingNote(),
+      NetexBookingInfoBuilder.ref("MobilityService", service)
+    );
+  }
+
+  @Nullable
+  private static BookingArrangement_VersionStructure findBookingArrangement(
+    MobilityService_VersionStructure service
+  ) {
+    var arrangements = service.getServiceBookingArrangementsRelStructure();
+    if (arrangements != null) {
+      for (Object it : arrangements.getServiceBookingArrangementRefOrServiceBookingArrangement()) {
+        if (it instanceof ServiceBookingArrangement arrangement) {
+          return arrangement;
+        }
+      }
+    }
+    // The single arrangement of NeTEx versions before 2.0
+    return service.getServiceBookingArrangements();
   }
 
   private class NetexBookingInfoBuilder {
