@@ -95,6 +95,14 @@ public interface StopLocation extends LogInfo, TransitEntity {
     return List.of();
   }
 
+  /**
+   * The GTFS areas ({@code stop_areas.txt}) this stop is part of, unique and sorted by id. Empty if
+   * the stop is not part of any area.
+   */
+  default List<FareArea> getFareAreas() {
+    return List.of();
+  }
+
   default Accessibility getWheelchairAccessibility() {
     return Accessibility.NO_INFORMATION;
   }

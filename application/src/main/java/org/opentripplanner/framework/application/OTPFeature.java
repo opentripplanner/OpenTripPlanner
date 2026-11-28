@@ -128,7 +128,12 @@ public enum OTPFeature {
     "Enable usage of data overlay when calculating costs for the street network."
   ),
   DebugRasterTiles(false, true, "Enable debug raster tile API."),
-  FaresV2(false, true, "Enable import of GTFS-Fares v2 data."),
+  FaresV2(
+    false,
+    true,
+    "Enable import of GTFS-Fares v2 data. `areas.txt` and `stop_areas.txt` are imported " +
+      "regardless of this flag, because the GTFS GraphQL API exposes the areas of a stop."
+  ),
   FlexRouting(false, true, "Enable FLEX routing."),
   GoogleCloudStorage(false, true, "Enable Google Cloud Storage integration."),
   MultiCriteriaGroupMaxFilter(

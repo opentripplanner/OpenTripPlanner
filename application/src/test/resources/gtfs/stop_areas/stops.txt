@@ -1,0 +1,6 @@
+stop_id,stop_name,stop_lat,stop_lon,location_type,parent_station
+station,Station,46.0,11.0,1,
+platform-inherit,Platform without own area,46.0001,11.0001,0,station
+platform-own,Platform with own area,46.0002,11.0002,0,station
+entrance,Entrance,46.0003,11.0003,2,station
+stop-none,Stop without area,46.1,11.1,0,

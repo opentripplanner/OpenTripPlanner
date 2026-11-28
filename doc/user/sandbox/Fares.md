@@ -39,6 +39,10 @@ To enable Fares V2 support, add the following to `otp-config.json`:
 }
 ```
 
+`areas.txt` and `stop_areas.txt` are imported also when the feature is off, because the GTFS GraphQL
+API exposes the areas of a stop. A reference to an unknown stop or area in these files fails the
+graph build.
+
 ### Supported Fares V2 fields
 
 A full list of the fields that OTP supports is available in the
@@ -81,7 +85,8 @@ Or this alternative form that could allow additional configuration
 }
 ```
 
-Turning the fare service _off_, this will ignore any fare data in the provided GTFS data.
+Turning the fare service _off_ disables the fare calculation and ignores the fare rules in the
+provided GTFS data.
 
 ```JSON
 // build-config.json

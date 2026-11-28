@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import java.time.ZoneId;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -39,6 +40,7 @@ public class Station
   private final I18NString url;
   private final ZoneId timezone;
   private final boolean transfersNotAllowed;
+  private final List<FareArea> fareAreas;
 
   // We serialize this class to json only for snapshot tests, and this creates cyclical structures
   @JsonBackReference
@@ -63,6 +65,7 @@ public class Station
     this.description = builder.getDescription();
     this.url = builder.getUrl();
     this.timezone = builder.getTimezone();
+    this.fareAreas = builder.getFareAreas();
 
     // Initialize the geometry with an empty set of children
     this.geometry = computeGeometry(coordinate, Set.of());
@@ -158,6 +161,14 @@ public class Station
   }
 
   /**
+   * The GTFS areas ({@code stop_areas.txt}) this station is part of, unique and sorted by id. Child
+   * stops without areas of their own inherit them, see {@link RegularStop#getFareAreas()}.
+   */
+  public List<FareArea> getFareAreas() {
+    return fareAreas;
+  }
+
+  /**
    * A geometry collection that contains the center point and the convex hull of all the child
    * stops.
    */
@@ -187,7 +198,8 @@ public class Station
       Objects.equals(shouldRouteToCentroid, other.shouldRouteToCentroid) &&
       Objects.equals(priority, other.priority) &&
       Objects.equals(url, other.url) &&
-      Objects.equals(timezone, other.timezone)
+      Objects.equals(timezone, other.timezone) &&
+      Objects.equals(fareAreas, other.fareAreas)
     );
   }
 

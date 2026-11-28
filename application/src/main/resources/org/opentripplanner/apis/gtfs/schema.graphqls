@@ -250,6 +250,14 @@ type AlertEdge {
   node: Alert
 }
 
+"A group of stops, for example a fare area."
+type Area {
+  "ID of the area in the format `FeedId:AreaId`."
+  gtfsId: String!
+  "Name of the area as displayed to the rider."
+  name: String
+}
+
 "Arrival and departure time (not relative to midnight)."
 type ArrivalDepartureTime {
   "Arrival time as an ISO-8601-formatted datetime."
@@ -2595,6 +2603,11 @@ type Stop implements Node & PlaceInterface {
     """
     types: [StopAlertType]
   ): [Alert]
+  """
+  The areas this stop belongs to. A stop without its own assignment inherits the areas of its
+  parent station. Empty if the stop is not part of any area.
+  """
+  areas: [Area!]!
   """
   Canceled stop calls (arrivals/departures) at this stop. A call is included if either the trip it
   belongs to has been canceled, or the visit at this stop has been canceled (skipped).

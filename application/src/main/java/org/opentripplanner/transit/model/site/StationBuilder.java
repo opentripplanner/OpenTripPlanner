@@ -1,6 +1,9 @@
 package org.opentripplanner.transit.model.site;
 
 import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.street.geometry.WgsCoordinate;
@@ -17,6 +20,7 @@ public class StationBuilder extends AbstractEntityBuilder<Station, StationBuilde
   private ZoneId timezone;
   private boolean transfersNotAllowed = false;
   private boolean shouldRouteToCentroid = false;
+  private final List<FareArea> fareAreas = new ArrayList<>();
 
   StationBuilder(FeedScopedId id) {
     super(id);
@@ -33,6 +37,7 @@ public class StationBuilder extends AbstractEntityBuilder<Station, StationBuilde
     this.timezone = original.getTimezone();
     this.transfersNotAllowed = original.isTransfersNotAllowed();
     this.shouldRouteToCentroid = original.shouldRouteToCentroid();
+    this.fareAreas.addAll(original.getFareAreas());
   }
 
   public I18NString getName() {
@@ -118,6 +123,19 @@ public class StationBuilder extends AbstractEntityBuilder<Station, StationBuilde
 
   public StationBuilder withTransfersNotAllowed(boolean transfersNotAllowed) {
     this.transfersNotAllowed = transfersNotAllowed;
+    return this;
+  }
+
+  /**
+   * @return a read-only deterministic list of unique fare areas
+   */
+  public List<FareArea> getFareAreas() {
+    return FareAreaBuilder.uniqueSortedById(fareAreas);
+  }
+
+  public StationBuilder withFareAreas(Collection<FareArea> fareAreas) {
+    this.fareAreas.clear();
+    this.fareAreas.addAll(fareAreas);
     return this;
   }
 

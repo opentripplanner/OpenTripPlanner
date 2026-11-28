@@ -41,6 +41,7 @@ config:
     AlertEdge: graphql.relay.Edge#Edge<TransitAlert>
     AlertEffectType: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLAlertEffectType#GraphQLAlertEffectType
     AlertSeverityLevelType: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLAlertSeverityLevelType#GraphQLAlertSeverityLevelType
+    Area: org.opentripplanner.transit.model.site.FareArea#FareArea
     BikePark: org.opentripplanner.service.vehicleparking.model.VehicleParking#VehicleParking
     BikeRentalStation: org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace#VehicleRentalPlace
     BikeRentalStationUris: org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris#VehicleRentalStationUris

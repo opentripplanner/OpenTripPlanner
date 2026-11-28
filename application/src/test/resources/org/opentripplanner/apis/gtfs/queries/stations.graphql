@@ -21,6 +21,10 @@
       alertHeaderText
       alertDescriptionText
     }
+    areas {
+      gtfsId
+      name
+    }
     # The following should always be empty because the pattern list of station is always empty
     patternAndRouteAlerts: alerts(types: [PATTERNS, ROUTES]) {
       alertHeaderText

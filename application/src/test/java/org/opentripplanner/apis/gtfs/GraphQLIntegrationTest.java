@@ -119,6 +119,7 @@ import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.Entrance;
+import org.opentripplanner.transit.model.site.FareArea;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -148,8 +149,14 @@ class GraphQLIntegrationTest {
 
   private static final TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
 
-  private static final Station OMEGA = TEST_MODEL.station("Omega").build();
-  private static final Place A = TEST_MODEL.place("A", 5.0, 8.0);
+  private static final Station OMEGA = TEST_MODEL.station("Omega")
+    .withFareAreas(List.of(FareArea.of(id("area-1")).withName("Area 1").build()))
+    .build();
+  private static final Place A = TEST_MODEL.place("A", builder ->
+    builder
+      .withCoordinate(5.0, 8.0)
+      .withFareAreas(List.of(FareArea.of(id("area-2")).withName("Area 2").build()))
+  );
   private static final Place B = TEST_MODEL.place("B", 6.0, 8.5);
   private static final Place C = TEST_MODEL.place(
     "C",

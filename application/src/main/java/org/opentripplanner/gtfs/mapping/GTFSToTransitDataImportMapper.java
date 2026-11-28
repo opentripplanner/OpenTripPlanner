@@ -89,6 +89,8 @@ public class GTFSToTransitDataImportMapper {
 
   private final StopAreaMapper stopAreaMapper;
 
+  private final FareAreaMapper fareAreaMapper;
+
   private final NoticeMapper noticeMapper;
   private final NoticeAssignmentMapper noticeAssignmentMapper;
 
@@ -116,12 +118,19 @@ public class GTFSToTransitDataImportMapper {
     translationHelper = new TranslationHelper();
     feedInfoMapper = new FeedInfoMapper(feedId);
     agencyMapper = new AgencyMapper(idFactory);
-    stationMapper = new StationMapper(idFactory, translationHelper, stationTransferPreference);
+    fareAreaMapper = new FareAreaMapper(idFactory);
+    stationMapper = new StationMapper(
+      idFactory,
+      translationHelper,
+      stationTransferPreference,
+      fareAreaMapper
+    );
     stopMapper = new StopMapper(
       idFactory,
       translationHelper,
       stationLookup,
-      builder.siteRepository()
+      builder.siteRepository(),
+      fareAreaMapper
     );
     entranceMapper = new EntranceMapper(idFactory, translationHelper, stationLookup);
     pathwayNodeMapper = new PathwayNodeMapper(idFactory, translationHelper, stationLookup);
@@ -207,6 +216,7 @@ public class GTFSToTransitDataImportMapper {
     // shape points is a large collection, so after mapping it can be cleared
     data.getAllShapePoints().clear();
 
+    fareAreaMapper.map(data.getAllStopAreaElements());
     mapGtfsStopsToOtpTypes(data.getAllStops());
 
     if (OTPFeature.FlexRouting.isOn()) {
@@ -232,7 +242,10 @@ public class GTFSToTransitDataImportMapper {
     fareRulesBuilder
       .fareTransferRules()
       .addAll(fareTransferRuleMapper.map(data.getAllFareTransferRules()));
-    fareRulesBuilder.stopAreas().putAll(stopAreaMapper.map(data.getAllStopAreaElements()));
+    // The stop areas are always read, but the fare service only uses them for Fares v2
+    if (OTPFeature.FaresV2.isOn()) {
+      fareRulesBuilder.stopAreas().putAll(stopAreaMapper.map(data.getAllStopAreaElements()));
+    }
 
     tripSegmentMapper.map(data.getAllTripSegments(), builder.getStopTimesSortedByTrip());
     noticeMapper.map(data.getAllNotices());

@@ -52,7 +52,13 @@ class LocationGroupMapperTest {
     var builder = SiteRepository.of();
     return new LocationGroupMapper(
       ID_FACTORY,
-      new StopMapper(ID_FACTORY, new TranslationHelper(), id -> null, builder),
+      new StopMapper(
+        ID_FACTORY,
+        new TranslationHelper(),
+        id -> null,
+        builder,
+        new FareAreaMapper(ID_FACTORY)
+      ),
       new LocationMapper(ID_FACTORY, builder, DataImportIssueStore.NOOP),
       builder
     );

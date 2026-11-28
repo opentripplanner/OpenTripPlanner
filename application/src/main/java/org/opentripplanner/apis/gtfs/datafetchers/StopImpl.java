@@ -36,6 +36,7 @@ import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.site.FareArea;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -132,6 +133,11 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
         return alertService.getStopLocationsAlerts(ids);
       }
     };
+  }
+
+  @Override
+  public DataFetcher<Iterable<FareArea>> areas() {
+    return environment -> getValue(environment, StopLocation::getFareAreas, Station::getFareAreas);
   }
 
   @Override

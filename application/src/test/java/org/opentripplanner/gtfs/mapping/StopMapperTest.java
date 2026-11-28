@@ -15,7 +15,9 @@ import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Area;
 import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.StopAreaElement;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
@@ -56,11 +58,16 @@ public class StopMapperTest {
 
   private static final String ZONE_ID = "Zone Id";
 
+  private static final IdFactory ID_FACTORY = new IdFactory("A");
+
+  private final FareAreaMapper fareAreaMapper = new FareAreaMapper(ID_FACTORY);
+
   private final StopMapper subject = new StopMapper(
-    new IdFactory("A"),
+    ID_FACTORY,
     new TranslationHelper(),
     stationId -> null,
-    new SiteRepository().withContext()
+    new SiteRepository().withContext(),
+    fareAreaMapper
   );
 
   @Test
@@ -103,6 +110,23 @@ public class StopMapperTest {
     // Skip getting coordinate, it will throw an exception
     assertEquals(Accessibility.NO_INFORMATION, result.getWheelchairAccessibility());
     assertNull(result.getFirstZoneAsString());
+    assertThat(result.getFareAreas()).isEmpty();
+  }
+
+  @Test
+  void testMapWithFareAreas() {
+    Stop input = createBasicStop();
+    fareAreaMapper.map(
+      List.of(stopAreaElement(input, "area-2", "Area Two"), stopAreaElement(input, "area-1", null))
+    );
+
+    RegularStop result = subject.map(input);
+
+    assertThat(result.getFareAreas()).containsExactlyElementsIn(fareAreaMapper.areasFor(input));
+    assertEquals("A:area-1", result.getFareAreas().get(0).getId().toString());
+    assertNull(result.getFareAreas().get(0).getName());
+    assertEquals("A:area-2", result.getFareAreas().get(1).getId().toString());
+    assertEquals("Area Two", result.getFareAreas().get(1).getName());
   }
 
   @Test
@@ -152,10 +176,11 @@ public class StopMapperTest {
     Station parentStation = testModel.station("Parent").build();
 
     StopMapper mapperWithStation = new StopMapper(
-      new IdFactory("A"),
+      ID_FACTORY,
       new TranslationHelper(),
       id -> parentStation,
-      new SiteRepository().withContext()
+      new SiteRepository().withContext(),
+      fareAreaMapper
     );
 
     Stop input = createBasicStop();
@@ -248,6 +273,16 @@ public class StopMapperTest {
 
       assertFalse(result.isSometimesUsedRealtime());
     });
+  }
+
+  private static StopAreaElement stopAreaElement(Stop stop, String areaId, String areaName) {
+    Area area = new Area();
+    area.setId(new AgencyAndId("A", areaId));
+    area.setName(areaName);
+    StopAreaElement element = new StopAreaElement();
+    element.setStop(stop);
+    element.setArea(area);
+    return element;
   }
 
   /**
