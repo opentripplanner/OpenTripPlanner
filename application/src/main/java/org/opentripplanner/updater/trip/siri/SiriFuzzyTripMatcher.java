@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.OptionalInt;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
@@ -79,7 +78,8 @@ public class SiriFuzzyTripMatcher {
   }
 
   /**
-   * Matches EstimatedVehicleJourney to a set of possible Trips based on tripId
+   * Matches a journey to a scheduled trip by the aimed arrival time at its last stop and the aimed
+   * departure time at its first stop.
    */
   public TripAndPattern match(
     EstimatedVehicleJourneyWrapper journeyWrapper,
@@ -98,25 +98,8 @@ public class SiriFuzzyTripMatcher {
 
     Optional<Route> route = journeyWrapper.lineRef().map(entityResolver::resolveRoute);
 
-    if (journeyWrapper.vehicleRef().isPresent() && journeyWrapper.isRail()) {
-      Set<Trip> trips = cache.tripsByInternalPlanningCode(journeyWrapper.vehicleRef().get());
-      if (!trips.isEmpty()) {
-        return singleMatch(
-          findPossibleTrips(
-            filterByRoute(trips, route),
-            calls,
-            OptionalInt.empty(),
-            entityResolver,
-            getCurrentTimetable,
-            getNewTripPatternForModifiedTrip
-          )
-        );
-      }
-    }
-
     CallWrapper lastCall = calls.getLast();
-    // resolves a scheduled stop point id to a quay (regular stop) if necessary
-    // quay ids also work
+    // accepts a quay id or a scheduled stop point id
     RegularStop stop = entityResolver.resolveQuay(lastCall.getStopPointRef());
     if (stop == null) {
       throw UpdateException.of(UNKNOWN_STOP);
@@ -143,7 +126,7 @@ public class SiriFuzzyTripMatcher {
       var possibleTrips = findPossibleTrips(
         trips,
         calls,
-        OptionalInt.of(lookup.arrivalTime()),
+        lookup.arrivalTime(),
         entityResolver,
         getCurrentTimetable,
         getNewTripPatternForModifiedTrip
@@ -184,26 +167,6 @@ public class SiriFuzzyTripMatcher {
       .stream()
       .filter(trip -> trip.getRoute().equals(route.get()))
       .collect(Collectors.toSet());
-  }
-
-  /**
-   * Returns a match of tripIds that match the provided values.
-   */
-  public List<FeedScopedId> getTripIdForInternalPlanningCodeServiceDate(
-    String internalPlanningCode,
-    LocalDate serviceDate
-  ) {
-    List<FeedScopedId> matches = new ArrayList<>();
-    for (Trip trip : cache.tripsByInternalPlanningCode(internalPlanningCode)) {
-      Set<LocalDate> serviceDates = timetableRepository
-        .getTripCalendars()
-        .listServiceDates(trip.getServiceId());
-      if (serviceDates.contains(serviceDate)) {
-        matches.add(trip.getId());
-      }
-    }
-
-    return matches;
   }
 
   /**
@@ -279,12 +242,12 @@ public class SiriFuzzyTripMatcher {
    * @param aimedArrivalTime The aimed arrival time at the last stop, in seconds since the start of
    *                         the service date of the candidates. The candidates already arrive
    *                         within the time tolerance of it. It is only used to find out if a
-   *                         candidate matches exactly. If empty, only the departure time is used.
+   *                         candidate matches exactly.
    */
   private List<Candidate> findPossibleTrips(
     Set<Trip> trips,
     List<CallWrapper> calls,
-    OptionalInt aimedArrivalTime,
+    int aimedArrivalTime,
     EntityResolver entityResolver,
     BiFunction<TripPattern, LocalDate, Timetable> getCurrentTimetable,
     BiFunction<FeedScopedId, LocalDate, TripPattern> getNewTripPatternForModifiedTrip
@@ -339,8 +302,7 @@ public class SiriFuzzyTripMatcher {
       if (isWithinTimeTolerance(scheduledDeparture, departureInSecondsSinceMidnight)) {
         boolean exact =
           scheduledDeparture == departureInSecondsSinceMidnight &&
-          (aimedArrivalTime.isEmpty() ||
-            times.getScheduledArrivalTime(times.getNumStops() - 1) == aimedArrivalTime.getAsInt());
+          times.getScheduledArrivalTime(times.getNumStops() - 1) == aimedArrivalTime;
         possibleTrips.add(new Candidate(new TripAndPattern(times.getTrip(), tripPattern), exact));
       }
     }

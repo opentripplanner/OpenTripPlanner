@@ -18,7 +18,6 @@ import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.trip.siri.EntityResolver;
-import org.opentripplanner.updater.trip.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 import uk.org.ifopt.siri21.StopPlaceRef;
 import uk.org.siri.siri21.AffectedLineStructure;
@@ -49,19 +48,16 @@ import uk.org.siri.siri21.VehicleJourneyRef;
 public class AffectsMapper {
 
   private final String feedId;
-  private final SiriFuzzyTripMatcher siriFuzzyTripMatcher;
   private final TransitRepository transitRepository;
 
   private final EntityResolver entityResolver;
 
   public AffectsMapper(
     String feedId,
-    SiriFuzzyTripMatcher siriFuzzyTripMatcher,
     TimetableRepository timetableRepository,
     TransitRepository transitRepository
   ) {
     this.feedId = feedId;
-    this.siriFuzzyTripMatcher = siriFuzzyTripMatcher;
     this.transitRepository = transitRepository;
     this.entityResolver = new EntityResolver(timetableRepository, transitRepository, feedId);
   }
@@ -113,29 +109,10 @@ public class AffectsMapper {
         List<FeedScopedId> affectedTripIds = new ArrayList<>();
 
         for (VehicleJourneyRef vehicleJourneyRef : vehicleJourneyReves) {
-          List<FeedScopedId> tripIds = new ArrayList<>();
-
           Trip trip = entityResolver.resolveTrip(vehicleJourneyRef.getValue());
-
-          if (trip != null) {
-            // Match found - add tripId to selector
-            tripIds.add(trip.getId());
-          } else if (siriFuzzyTripMatcher != null) {
-            // "Temporary", custom legacy solution - supports alerts tagged on NeTEx-"privateCode" + serviceDate
-            tripIds.addAll(
-              siriFuzzyTripMatcher.getTripIdForInternalPlanningCodeServiceDate(
-                vehicleJourneyRef.getValue(),
-                resolveServiceDate(affectedVehicleJourney.getOriginAimedDepartureTime())
-              )
-            );
-          }
-
-          if (tripIds.isEmpty()) {
-            // Neither referenced Trip nor Fuzzy-matching found Trip - add Trip-id as-is
-            tripIds.add(entityResolver.resolveId(vehicleJourneyRef.getValue()));
-          }
-
-          affectedTripIds.addAll(tripIds);
+          affectedTripIds.add(
+            trip != null ? trip.getId() : entityResolver.resolveId(vehicleJourneyRef.getValue())
+          );
         }
 
         selectors.addAll(

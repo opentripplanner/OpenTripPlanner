@@ -230,12 +230,10 @@ class EstimatedVehicleJourneyWrapperTest {
       .withVehicleMode(VehicleModesEnumeration.RAIL)
       .buildEstimatedVehicleJourney();
     var railWrapper = EstimatedVehicleJourneyWrapper.of(rail);
-    assertTrue(railWrapper.isRail());
     assertEquals(TransitMode.RAIL, railWrapper.transitMode());
 
     var bus = builder().withVehicleMode(VehicleModesEnumeration.BUS).buildEstimatedVehicleJourney();
     var busWrapper = EstimatedVehicleJourneyWrapper.of(bus);
-    assertFalse(busWrapper.isRail());
     assertEquals(TransitMode.BUS, busWrapper.transitMode());
   }
 
@@ -279,7 +277,6 @@ class EstimatedVehicleJourneyWrapperTest {
     assertFalse(wrapper.hasExtraCall());
     assertTrue(wrapper.additionalReplacedDatedVehicleJourneyRefs().isEmpty());
     assertEquals(TransitMode.BUS, wrapper.transitMode());
-    assertFalse(wrapper.isRail());
   }
 
   private static SiriEtBuilder builder() {

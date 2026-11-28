@@ -113,8 +113,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
       alertsUpdateHandler = new SiriAlertsUpdateHandler(
         FEED_ID,
         transitAlertService,
-        Duration.ZERO,
-        null
+        Duration.ZERO
       );
     }
   }
