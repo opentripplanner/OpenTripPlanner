@@ -186,7 +186,13 @@ public final class ConstrainedBoardingSearch
 
       var targetTrip = it.getOriginalTripTimes().getTrip();
 
+      // The transfers are sorted by specificity, so the first one that applies to the target trip
+      // is the one that governs boarding it. A less specific transfer must not be tried when the
+      // governing one does not leave enough time.
       for (TransferForPattern tx : transfers) {
+        if (!tx.applyToAllTargetTrips() && !tx.applyToTargetTrip(targetTrip)) {
+          continue;
+        }
         onTripTxConstraint = (TransferConstraint) tx.getTransferConstraint();
 
         onTripEarliestBoardTime = onTripTxConstraint.calculateTransferTargetTime(
@@ -198,20 +204,15 @@ public final class ConstrainedBoardingSearch
 
         if (!onTripTxConstraint.isFacilitated()) {
           if (searchStrategy.timeIsBefore(time, onTripEarliestBoardTime)) {
-            continue;
+            break;
           }
         }
 
-        if (tx.applyToAllTargetTrips()) {
-          return true;
-        } else if (tx.applyToTargetTrip(targetTrip)) {
-          if (onTripTxConstraint.isNotAllowed()) {
-            useNextNormalTrip = true;
-            continue outer;
-          } else {
-            return true;
-          }
+        if (onTripTxConstraint.isNotAllowed() && !tx.applyToAllTargetTrips()) {
+          useNextNormalTrip = true;
+          continue outer;
         }
+        return true;
       }
       if (useNextNormalTrip) {
         onTripEarliestBoardTime = earliestBoardTime;
