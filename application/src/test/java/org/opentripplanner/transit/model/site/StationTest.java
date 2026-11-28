@@ -25,8 +25,6 @@ class StationTest {
   private static final StopTransferPriority PRIORITY = StopTransferPriority.ALLOWED;
   private static final ZoneId TIMEZONE = ZoneId.of(TransitRepositoryForTest.TIME_ZONE_ID);
   private static final I18NString URL = new NonLocalizedString("url");
-  private static final TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
-  private static final Station PARENT_STATION = TEST_MODEL.station("stationId").build();
 
   private static final Station SUBJECT = Station.of(FeedScopedIdForTestFactory.id(ID))
     .withName(NAME)

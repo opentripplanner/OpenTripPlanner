@@ -12,7 +12,6 @@ import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model.TripInput;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.siri.SiriTestHelper;
 
@@ -24,7 +23,6 @@ class InvalidCallsTest implements RealtimeTestConstants {
   private final RegularStop STOP_B = ENV_BUILDER.stop(STOP_B_ID);
   private final RegularStop STOP_C = ENV_BUILDER.stop(STOP_C_ID);
   private final RegularStop STOP_D = ENV_BUILDER.stop(STOP_D_ID);
-  private final Station STATION_A = STOP_A.getParentStation();
 
   private final TripInput TRIP_INPUT = TripInput.of(TRIP_1_ID)
     .withWithTripOnServiceDate(TRIP_1_ID)

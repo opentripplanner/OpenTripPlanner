@@ -46,6 +46,7 @@
             <property name="format" value="^\s*$"/>
         </module>
         <module name="UnusedLocalVariable"/>
+        <module name="UnusedPrivateField"/>
         <module name="UnnecessaryFullyQualifiedType"/>
         <module name="NestedTryDepth">
             <property name="max" value="1"/>

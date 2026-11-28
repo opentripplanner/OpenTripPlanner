@@ -21,7 +21,6 @@ class SingleCriteriaComparatorTest {
   private static final Place A = TEST_MODEL.place("A", 10, 11);
   private static final Place B = TEST_MODEL.place("B", 10, 13);
   private static final Place C = TEST_MODEL.place("C", 10, 14);
-  private static final Place D = TEST_MODEL.place("D", 10, 15);
 
   private static final int START = 1000;
   private static final int TX_AT = 1500;

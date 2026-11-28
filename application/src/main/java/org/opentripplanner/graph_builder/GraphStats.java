@@ -35,12 +35,6 @@ public class GraphStats {
 
   private static final Logger LOG = LoggerFactory.getLogger(GraphStats.class);
 
-  @Parameter(names = { "-v", "--verbose" }, description = "Verbose output")
-  private final boolean verbose = false;
-
-  @Parameter(names = { "-d", "--debug" }, description = "Debug mode")
-  private final boolean debug = false;
-
   private final CommandEndpoints commandEndpoints = new CommandEndpoints();
   private final CommandPatternStats commandPatternStats = new CommandPatternStats();
   private final JCommander jc;

@@ -45,8 +45,6 @@ public class StreetEdge
 
   private static final Logger LOG = LoggerFactory.getLogger(StreetEdge.class);
 
-  private static final double SAFEST_STREETS_SAFETY_FACTOR = 0.1;
-
   /**
    * Fixed extra weight (about 10 minutes of walking) added once when a wheelchair user crosses a
    * wheelchair-inaccessible barrier vertex, e.g. a raised kerb. It is a point obstacle, so the

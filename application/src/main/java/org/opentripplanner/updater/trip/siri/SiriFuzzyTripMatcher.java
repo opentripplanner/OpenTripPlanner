@@ -29,8 +29,6 @@ import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.spi.UpdateErrorType;
 import org.opentripplanner.updater.spi.UpdateException;
 import org.opentripplanner.utils.time.ServiceDateUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Matches SIRI TripDescriptors without trip IDs to scheduled GTFS data.
@@ -52,8 +50,6 @@ import org.slf4j.LoggerFactory;
  * updaters.
  */
 public class SiriFuzzyTripMatcher {
-
-  private static final Logger LOG = LoggerFactory.getLogger(SiriFuzzyTripMatcher.class);
 
   private final SiriFuzzyTripMatcherCache cache;
   private final TimetableRepository timetableRepository;

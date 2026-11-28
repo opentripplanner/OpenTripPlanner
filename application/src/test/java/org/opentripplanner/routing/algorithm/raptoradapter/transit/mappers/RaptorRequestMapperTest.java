@@ -40,14 +40,6 @@ class RaptorRequestMapperTest {
   private static final GenericLocation FROM = GenericLocation.fromCoordinate(62.0, 12.0);
   private static final TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
   private static final StopLocation STOP_A = TEST_MODEL.stop("Stop:A").build();
-  private static final PassThroughViaLocation PASS_THROUGH_VIA_LOCATION =
-    new PassThroughViaLocation("Via A", List.of(STOP_A.getId()));
-  private static final VisitViaLocation VISIT_VIA_LOCATION = new VisitViaLocation(
-    "Via A",
-    null,
-    List.of(STOP_A.getId()),
-    null
-  );
   private static final int VIA_FROM_STOP_INDEX = 47;
   private static final int VIA_TO_STOP_INDEX = 123;
   private static final List<RaptorAccessEgress> ACCESS = List.of(TestAccessEgress.walk(12, 45));
@@ -74,9 +66,6 @@ class RaptorRequestMapperTest {
   private static final CostLinearFunction R3 = CostLinearFunction.of("30 + 2.0x");
 
   private static final Map<FeedScopedId, StopLocation> STOPS_MAP = Map.of(STOP_A.getId(), STOP_A);
-  private static final CostLinearFunction RELAX_TRANSIT_GROUP_PRIORITY = CostLinearFunction.of(
-    "30m + 1.2t"
-  );
 
   static List<Arguments> testCasesRelaxedCost() {
     return List.of(

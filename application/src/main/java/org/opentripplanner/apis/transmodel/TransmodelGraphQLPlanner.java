@@ -16,12 +16,8 @@ import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.api.response.ViaRoutingResponse;
 import org.opentripplanner.routing.error.InvalidRoutingInputException;
 import org.opentripplanner.routing.error.RoutingValidationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class TransmodelGraphQLPlanner {
-
-  private static final Logger LOG = LoggerFactory.getLogger(TransmodelGraphQLPlanner.class);
 
   private final TripRequestMapper tripRequestMapper;
   private final ViaRequestMapper viaRequestMapper;
