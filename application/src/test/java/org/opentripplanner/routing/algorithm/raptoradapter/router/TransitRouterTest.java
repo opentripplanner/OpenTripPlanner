@@ -41,6 +41,7 @@ class TransitRouterTest {
       null,
       null,
       null,
+      null,
       new FailingRegularTransfers(),
       null,
       List.of(),

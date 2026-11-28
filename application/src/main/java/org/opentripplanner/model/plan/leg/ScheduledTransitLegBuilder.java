@@ -10,6 +10,7 @@ import org.jspecify.annotations.Nullable;
 import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.service.shape.model.CompactLineStringSequence;
 import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
@@ -25,6 +26,7 @@ public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>>
 
   private TripTimes<?> tripTimes;
   private TripPattern tripPattern;
+  private CompactLineStringSequence tripPatternShape;
   private int boardStopIndexInPattern = POS_NOT_SET;
   private int alightStopIndexInPattern = POS_NOT_SET;
   private ZonedDateTime startTime;
@@ -49,6 +51,7 @@ public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>>
   public ScheduledTransitLegBuilder(ScheduledTransitLeg original) {
     tripTimes = original.tripTimes();
     tripPattern = original.tripPattern();
+    tripPatternShape = original.tripPatternShape();
     boardStopIndexInPattern = original.boardStopPosInPattern();
     alightStopIndexInPattern = original.alightStopPosInPattern();
     startTime = original.startTime();
@@ -85,6 +88,15 @@ public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>>
 
   public TripPattern tripPattern() {
     return tripPattern;
+  }
+
+  public B withTripPatternShape(CompactLineStringSequence tripPatternShape) {
+    this.tripPatternShape = tripPatternShape;
+    return instance();
+  }
+
+  public CompactLineStringSequence tripPatternShape() {
+    return tripPatternShape;
   }
 
   public B withBoardStopIndexInPattern(int boardStopIndexInPattern) {

@@ -33,6 +33,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
+import org.opentripplanner.service.shape.dataimport.ShapeDataImport;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
@@ -149,6 +150,7 @@ public class ConstantsForTests {
       var graph = new Graph();
       var transitRepository = new TransitRepository(new SiteRepository());
       var timetableDataImport = new TimetableDataImport();
+      var shapeDataImport = new ShapeDataImport();
       var fareFactory = new GtfsFareServiceFactory();
       // Add street data from OSM
       {
@@ -166,6 +168,7 @@ public class ConstantsForTests {
           graph,
           transitRepository,
           timetableDataImport,
+          shapeDataImport,
           PORTLAND_GTFS,
           fareFactory,
           "prt"
@@ -206,6 +209,7 @@ public class ConstantsForTests {
         graph,
         transitRepository,
         timetableDataImport,
+        shapeDataImport,
         transferRepository,
         fareFactory
       );
@@ -220,6 +224,7 @@ public class ConstantsForTests {
       var graph = new Graph();
       var transitRepository = new TransitRepository(siteRepository);
       var timetableDataImport = new TimetableDataImport();
+      var shapeDataImport = new ShapeDataImport();
       // Add street data from OSM
       var osmProvider = new DefaultOsmProvider(osmFile, true);
       var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
@@ -245,7 +250,13 @@ public class ConstantsForTests {
       } else {
         transferRepository = TransferServiceTestFactory.defaultTransferRepository();
       }
-      return new TestOtpModel(graph, transitRepository, timetableDataImport, transferRepository);
+      return new TestOtpModel(
+        graph,
+        transitRepository,
+        timetableDataImport,
+        shapeDataImport,
+        transferRepository
+      );
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
@@ -258,6 +269,7 @@ public class ConstantsForTests {
       otpModel.graph(),
       otpModel.transitRepository(),
       otpModel.timetableDataImport(),
+      otpModel.shapeDataImport(),
       gtfsPath,
       new GtfsFareServiceFactory(),
       null
@@ -282,11 +294,13 @@ public class ConstantsForTests {
     var graph = new Graph();
     var transitRepository = new TransitRepository(siteRepository);
     var timetableDataImport = new TimetableDataImport();
+    var shapeDataImport = new ShapeDataImport();
     var transferRepository = TransferServiceTestFactory.defaultTransferRepository();
     addGtfsToGraph(
       graph,
       transitRepository,
       timetableDataImport,
+      shapeDataImport,
       gtfsFile,
       fareServiceFactory,
       null
@@ -295,6 +309,7 @@ public class ConstantsForTests {
       graph,
       transitRepository,
       timetableDataImport,
+      shapeDataImport,
       transferRepository,
       fareServiceFactory
     );
@@ -309,6 +324,7 @@ public class ConstantsForTests {
       var transitRepository = new TransitRepository(siteRepository);
       var timetableDataImport = new TimetableDataImport();
       var streetDetailsRepository = new DefaultStreetDetailsRepository();
+      var shapeDataImport = new ShapeDataImport();
       // Add street data from OSM
       {
         var osmProvider = new DefaultOsmProvider(OSLO_EAST_OSM, false);
@@ -335,6 +351,7 @@ public class ConstantsForTests {
             sources,
             transitRepository,
             timetableDataImport,
+            shapeDataImport,
             parkingRepository,
             streetDetailsRepository,
             graph,
@@ -350,7 +367,9 @@ public class ConstantsForTests {
         graph,
         transitRepository,
         timetableDataImport,
-        TransferServiceTestFactory.defaultTransferRepository()
+        shapeDataImport,
+        TransferServiceTestFactory.defaultTransferRepository(),
+        new GtfsFareServiceFactory()
       );
     } catch (Exception e) {
       throw new RuntimeException(e);
@@ -361,6 +380,7 @@ public class ConstantsForTests {
     Graph graph,
     TransitRepository transitRepository,
     TimetableDataImport timetableDataImport,
+    ShapeDataImport shapeDataImport,
     File file,
     FareServiceFactory fareServiceFactory,
     @Nullable String feedId
@@ -371,6 +391,7 @@ public class ConstantsForTests {
       List.of(bundle),
       transitRepository,
       timetableDataImport,
+      shapeDataImport,
       new DefaultStreetDetailsRepository(),
       graph,
       new Deduplicator(),

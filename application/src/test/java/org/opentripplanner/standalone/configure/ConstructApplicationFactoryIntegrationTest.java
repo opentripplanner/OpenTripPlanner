@@ -33,6 +33,8 @@ import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySnapshot;
+import org.opentripplanner.service.shape.ShapeRepository;
+import org.opentripplanner.service.shape.ShapeRepositorySnapshot;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
@@ -83,6 +85,7 @@ class ConstructApplicationFactoryIntegrationTest {
       >() {}
     ),
     of(new GenericType<RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository>>() {}),
+    of(new GenericType<RepositoryHandle<ShapeRepositorySnapshot, ShapeRepository>>() {}),
     of(new GenericType<RegularTransferBuildRepository<NearbyStop>>() {}),
     of(
       new GenericType<

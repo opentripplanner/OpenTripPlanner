@@ -336,7 +336,7 @@ class ItineraryReferenceMapperTest {
   @Test
   void toRouteRequestRejectsUnsupportedLegReferenceTypeInsteadOfThrowingClassCastException() {
     var reference = new ItineraryReference(
-      List.of((LegReference) (transitService, transitAlertService) -> null),
+      List.of((LegReference) (transitService, shapeService, transitAlertService) -> null),
       null,
       null,
       StreetMode.WALK,
@@ -390,6 +390,7 @@ class ItineraryReferenceMapperTest {
     return new RefetchItineraryService(
       GRAPH,
       TRANSIT_ENV.transitService(),
+      TRANSIT_ENV.shapeService(),
       new TransitAlertServiceImpl(),
       FixedRegularTransfers.of().snapshot(),
       null,

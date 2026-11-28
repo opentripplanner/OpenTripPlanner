@@ -11,6 +11,10 @@ import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.DataFetchingEnvironmentImpl;
 import java.util.Map;
 import org.opentripplanner.apis.gtfs.TestGtfsGraphQLRequestContext;
+import org.opentripplanner.service.shape.ScheduledShapeData;
+import org.opentripplanner.service.shape.ShapeService;
+import org.opentripplanner.service.shape.internal.DefaultShapeRepository;
+import org.opentripplanner.service.shape.internal.DefaultShapeService;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.repository.ScheduledTimetableData;
 import org.opentripplanner.transit.service.DefaultTransitService;
@@ -36,14 +40,16 @@ public class DataFetchingSupport {
       new DefaultTransitService(
         new TransitRepository(),
         DefaultTimetableRepository.scheduledOnly(ScheduledTimetableData.empty())
-      )
+      ),
+      new DefaultShapeService(DefaultShapeRepository.scheduledOnly(ScheduledShapeData.empty()))
     );
   }
 
   public static DataFetchingEnvironment dataFetchingEnvironment(
     Object source,
     Map<String, Object> arguments,
-    TransitService service
+    TransitService service,
+    ShapeService shapeService
   ) {
     final var executionContext = executionContext();
     return DataFetchingEnvironmentImpl.newDataFetchingEnvironment(executionContext)
@@ -53,6 +59,7 @@ public class DataFetchingSupport {
         new TestGtfsGraphQLRequestContext(
           null,
           service,
+          shapeService,
           null,
           null,
           null,

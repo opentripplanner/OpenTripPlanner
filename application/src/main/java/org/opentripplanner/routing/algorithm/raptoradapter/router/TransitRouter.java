@@ -42,6 +42,7 @@ import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
+import org.opentripplanner.service.shape.ShapeService;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transfer.regular.FlexTransferService;
@@ -58,6 +59,7 @@ public class TransitRouter {
 
   private final RouteRequest request;
   private final TransitService transitService;
+  private final ShapeService shapeService;
   private final Graph graph;
   private final RaptorServiceFactory<TripSchedule> raptorServiceFactory;
   private final MeterRegistry meterRegistry;
@@ -89,6 +91,7 @@ public class TransitRouter {
   private TransitRouter(
     RouteRequest request,
     TransitService transitService,
+    ShapeService shapeService,
     Graph graph,
     RaptorServiceFactory<TripSchedule> raptorServiceFactory,
     MeterRegistry meterRegistry,
@@ -110,6 +113,7 @@ public class TransitRouter {
   ) {
     this.request = request;
     this.transitService = transitService;
+    this.shapeService = shapeService;
     this.graph = graph;
     this.raptorServiceFactory = raptorServiceFactory;
     this.meterRegistry = meterRegistry;
@@ -133,6 +137,7 @@ public class TransitRouter {
   public static TransitRouterResult route(
     RouteRequest request,
     TransitService transitService,
+    ShapeService shapeService,
     Graph graph,
     RaptorServiceFactory<TripSchedule> raptorServiceFactory,
     MeterRegistry meterRegistry,
@@ -159,6 +164,7 @@ public class TransitRouter {
     TransitRouter transitRouter = new TransitRouter(
       request,
       transitService,
+      shapeService,
       graph,
       raptorServiceFactory,
       meterRegistry,
@@ -292,6 +298,7 @@ public class TransitRouter {
     RaptorPathToItineraryMapper<TripSchedule> itineraryMapper = new RaptorPathToItineraryMapper<>(
       graph,
       transitService,
+      shapeService,
       streetDetailsService,
       raptorTransitData,
       regularTransfers,

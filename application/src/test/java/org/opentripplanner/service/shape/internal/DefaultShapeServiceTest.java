@@ -1,0 +1,108 @@
+package org.opentripplanner.service.shape.internal;
+
+import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
+
+import java.util.Map;
+import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.service.shape.ScheduledShapeData;
+import org.opentripplanner.service.shape.ShapeTestFactory;
+import org.opentripplanner.service.shape.model.CompactLineStringSequence;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
+import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.StopPattern;
+import org.opentripplanner.transit.model.network.TripPattern;
+
+class DefaultShapeServiceTest {
+
+  private static final TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
+  private static final Route ROUTE = TransitRepositoryForTest.route("route").build();
+  private static final StopPattern STOP_PATTERN = TransitRepositoryForTest.stopPattern(
+    TEST_MODEL.stop("A").build(),
+    TEST_MODEL.stop("B").build()
+  );
+
+  private static final TripPattern SCHEDULED_PATTERN = TransitRepositoryForTest.tripPattern(
+    "scheduled",
+    ROUTE
+  )
+    .withStopPattern(STOP_PATTERN)
+    .build();
+  private static final TripPattern RT_PATTERN = TransitRepositoryForTest.tripPattern("rt", ROUTE)
+    .withStopPattern(STOP_PATTERN)
+    .build();
+  private static final FeedScopedId UNKNOWN_PATTERN = id("unknown");
+
+  private static final CompactLineStringSequence SCHEDULED_TRIP_PATTERN_SHAPE =
+    ShapeTestFactory.straightLine(60.0);
+  private static final CompactLineStringSequence RT_TRIP_PATTERN_SHAPE =
+    ShapeTestFactory.straightLine(61.0);
+  private static final CompactLineStringSequence OVERRIDING_TRIP_PATTERN_SHAPE =
+    ShapeTestFactory.straightLine(62.0);
+
+  private final DefaultShapeRepository repository = new DefaultShapeRepository(
+    ScheduledShapeData.of(Map.of(SCHEDULED_PATTERN.getId(), SCHEDULED_TRIP_PATTERN_SHAPE))
+  );
+
+  @Test
+  void scheduledTripPatternShapeIsServed() {
+    var service = new DefaultShapeService(repository.createSnapshot());
+
+    assertSame(
+      SCHEDULED_TRIP_PATTERN_SHAPE,
+      service.getTripPatternShape(SCHEDULED_PATTERN.getId())
+    );
+  }
+
+  @Test
+  void realTimeTripPatternShapeIsServed() {
+    repository.setTripPatternShape(RT_PATTERN, RT_TRIP_PATTERN_SHAPE);
+    var service = new DefaultShapeService(repository.createSnapshot());
+
+    assertSame(RT_TRIP_PATTERN_SHAPE, service.getTripPatternShape(RT_PATTERN.getId()));
+  }
+
+  @Test
+  void realTimeTripPatternShapeTakesPrecedenceOverScheduled() {
+    repository.setTripPatternShape(SCHEDULED_PATTERN, OVERRIDING_TRIP_PATTERN_SHAPE);
+    var service = new DefaultShapeService(repository.createSnapshot());
+
+    assertSame(
+      OVERRIDING_TRIP_PATTERN_SHAPE,
+      service.getTripPatternShape(SCHEDULED_PATTERN.getId())
+    );
+  }
+
+  @Test
+  void serviceOverTheMutableRepositorySeesUncommittedWrites() {
+    var service = new DefaultShapeService(repository);
+    repository.setTripPatternShape(RT_PATTERN, RT_TRIP_PATTERN_SHAPE);
+
+    assertSame(RT_TRIP_PATTERN_SHAPE, service.getTripPatternShape(RT_PATTERN.getId()));
+  }
+
+  @Test
+  void serviceOverASnapshotDoesNotSeeLaterWrites() {
+    var service = new DefaultShapeService(repository.createSnapshot());
+
+    repository.setTripPatternShape(RT_PATTERN, RT_TRIP_PATTERN_SHAPE);
+
+    var exception = assertThrows(IllegalArgumentException.class, () ->
+      service.getTripPatternShape(RT_PATTERN.getId())
+    );
+    assertThat(exception).hasMessageThat().contains("No shape found");
+  }
+
+  @Test
+  void serviceFailsForUnknownPattern() {
+    var service = new DefaultShapeService(repository.createSnapshot());
+
+    var exception = assertThrows(IllegalArgumentException.class, () ->
+      service.getTripPatternShape(UNKNOWN_PATTERN)
+    );
+    assertThat(exception).hasMessageThat().contains("No shape found");
+  }
+}

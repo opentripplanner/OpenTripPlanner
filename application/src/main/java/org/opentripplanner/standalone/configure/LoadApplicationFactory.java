@@ -21,6 +21,8 @@ import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.osminfo.configure.OsmInfoGraphBuildRepositoryModule;
+import org.opentripplanner.service.shape.configure.ShapeDataImportModule;
+import org.opentripplanner.service.shape.dataimport.ShapeDataImport;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.streetdetails.configure.StreetDetailsRepositoryModule;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
@@ -62,6 +64,7 @@ import org.opentripplanner.transit.transfer.regular.RegularTransferBuildReposito
     StreetRepositoryModule.class,
     TransferRepositoryModule.class,
     TimetableDataImportModule.class,
+    ShapeDataImportModule.class,
     RegularTransferBuildRepositoryModule.class,
     VehicleParkingRepositoryModule.class,
     FareModule.class,
@@ -87,6 +90,9 @@ public interface LoadApplicationFactory {
 
   @Singleton
   TimetableDataImport emptyTimetableDataImport();
+
+  @Singleton
+  ShapeDataImport emptyShapeDataImport();
 
   @Singleton
   TransferRepository emptyTransferRepository();

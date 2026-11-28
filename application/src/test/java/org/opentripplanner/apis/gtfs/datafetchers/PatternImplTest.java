@@ -40,7 +40,8 @@ class PatternImplTest {
     var env = DataFetchingSupport.dataFetchingEnvironment(
       pattern,
       Map.of(),
-      realtimeEnv.transitService()
+      realtimeEnv.transitService(),
+      realtimeEnv.shapeService()
     );
 
     assertEquals(pattern.getId().toString(), impl.code().get(env));
@@ -55,7 +56,8 @@ class PatternImplTest {
     var env = DataFetchingSupport.dataFetchingEnvironment(
       pattern,
       Map.of(),
-      realtimeEnv.transitService()
+      realtimeEnv.transitService(),
+      realtimeEnv.shapeService()
     );
 
     assertEquals(Direction.UNKNOWN.gtfsCode, impl.directionId().get(env));
@@ -71,7 +73,8 @@ class PatternImplTest {
     var env = DataFetchingSupport.dataFetchingEnvironment(
       pattern,
       Map.of("serviceDate", SERVICE_DATE),
-      realtimeEnv.transitService()
+      realtimeEnv.transitService(),
+      realtimeEnv.shapeService()
     );
 
     var result = tripsOnServiceDate(impl, env);
@@ -93,7 +96,8 @@ class PatternImplTest {
     var env = DataFetchingSupport.dataFetchingEnvironment(
       pattern,
       Map.of("serviceDate", SERVICE_DATE),
-      realtimeEnv.transitService()
+      realtimeEnv.transitService(),
+      realtimeEnv.shapeService()
     );
 
     var result = tripsOnServiceDate(impl, env);
@@ -112,7 +116,8 @@ class PatternImplTest {
     var env = DataFetchingSupport.dataFetchingEnvironment(
       pattern,
       Map.of("serviceDate", SERVICE_DATE),
-      realtimeEnv.transitService()
+      realtimeEnv.transitService(),
+      realtimeEnv.shapeService()
     );
 
     var result = tripsOnServiceDate(impl, env);

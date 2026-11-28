@@ -22,6 +22,7 @@ import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.refetch.RefetchItineraryService;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
+import org.opentripplanner.service.shape.ShapeService;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
@@ -98,6 +99,8 @@ public interface RequestScopedFactory {
   FareService fareService();
 
   RealtimeVehicleService realtimeVehicleService();
+
+  ShapeService shapeService();
 
   @Nullable
   @GtfsSchema

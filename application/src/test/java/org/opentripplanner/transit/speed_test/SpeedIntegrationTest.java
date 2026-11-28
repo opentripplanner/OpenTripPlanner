@@ -108,6 +108,7 @@ public class SpeedIntegrationTest {
       model.graph(),
       model.transitRepository(),
       model.timetableDataImport(),
+      model.shapeDataImport(),
       model.transferRepository(),
       TestServerContext.defaultTransferParameters(),
       regularTransferBuildRepository

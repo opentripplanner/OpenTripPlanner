@@ -51,6 +51,10 @@ import org.opentripplanner.routing.via.configure.ViaModule;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySnapshot;
 import org.opentripplanner.service.realtimevehicles.configure.RealtimeVehicleRepositoryModule;
+import org.opentripplanner.service.shape.ScheduledShapeData;
+import org.opentripplanner.service.shape.ShapeRepository;
+import org.opentripplanner.service.shape.ShapeRepositorySnapshot;
+import org.opentripplanner.service.shape.configure.ShapeModule;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.streetdetails.configure.StreetDetailsServiceModule;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
@@ -115,6 +119,7 @@ import org.opentripplanner.warmup.configure.WarmupModule;
     StopConsolidationServiceModule.class,
     StreetLimitationParametersServiceModule.class,
     TransitModule.class,
+    ShapeModule.class,
     TransitAlertServiceModule.class,
     TransferServiceModule.class,
     VehicleParkingServiceModule.class,
@@ -160,6 +165,9 @@ public interface ConstructApplicationFactory {
   UpdateManager streetUpdateManager();
 
   RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableRepositoryHandle();
+
+  RepositoryHandle<ShapeRepositorySnapshot, ShapeRepository> shapeRepositoryHandle();
+
   DataImportIssueSummary dataImportIssueSummary();
 
   @Nullable
@@ -241,6 +249,12 @@ public interface ConstructApplicationFactory {
      */
     @BindsInstance
     Builder scheduledTimetableData(ScheduledTimetableData scheduledTimetableData);
+
+    /**
+     * The immutable scheduled shape data.
+     */
+    @BindsInstance
+    Builder scheduledShapeData(ScheduledShapeData scheduledShapeData);
 
     @BindsInstance
     Builder transferRepository(TransferRepository transferRepository);

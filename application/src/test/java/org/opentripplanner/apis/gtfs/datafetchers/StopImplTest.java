@@ -110,6 +110,7 @@ class StopImplTest {
         new TestGtfsGraphQLRequestContext(
           null,
           transitEnv.transitService(),
+          transitEnv.shapeService(),
           null,
           flexTransfers,
           regularTransfers,

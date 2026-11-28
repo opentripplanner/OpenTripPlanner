@@ -14,6 +14,7 @@ import org.opentripplanner.apis.gtfs.model.CallScheduledTime.ArrivalDepartureTim
 import org.opentripplanner.apis.gtfs.model.CallScheduledTime.TimeWindow;
 import org.opentripplanner.apis.gtfs.model.DestinationDisplay;
 import org.opentripplanner.model.TripTimeOnDate;
+import org.opentripplanner.service.shape.ShapeService;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.timetable.EstimatedTime;
 import org.opentripplanner.transit.service.TransitService;
@@ -43,7 +44,7 @@ public class StopCallImpl implements GraphQLDataFetchers.GraphQLStopCall {
       if (flexIndex != null && flexIndex.getTripById(tripTime.getTrip().getId()) != null) {
         return null;
       }
-      return pattern.getHopGeometry(stopPosition);
+      return getShapeService(environment).getTripPatternShape(pattern.getId()).get(stopPosition);
     };
   }
 
@@ -128,6 +129,10 @@ public class StopCallImpl implements GraphQLDataFetchers.GraphQLStopCall {
 
   private TransitService getTransitService(DataFetchingEnvironment environment) {
     return environment.<GtfsGraphQLRequestContext>getContext().transitService();
+  }
+
+  private ShapeService getShapeService(DataFetchingEnvironment environment) {
+    return environment.<GtfsGraphQLRequestContext>getContext().shapeService();
   }
 
   private ZonedDateTime getZonedDateTime(DataFetchingEnvironment environment, int time) {

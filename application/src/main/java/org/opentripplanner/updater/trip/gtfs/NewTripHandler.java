@@ -29,6 +29,7 @@ import org.opentripplanner.updater.trip.gtfs.interpolation.ForwardsDelayPropagat
 import org.opentripplanner.updater.trip.gtfs.model.StopTimeUpdate;
 import org.opentripplanner.updater.trip.gtfs.model.TripUpdate;
 import org.opentripplanner.updater.trip.patterncache.TripPatternCache;
+import org.opentripplanner.updater.trip.shape.RealTimeTripShapeWriter;
 
 /**
  * Handles GTFS-RT TripUpdates for trips with schedule relationship {@code NEW}, {@code ADDED}, or
@@ -41,17 +42,20 @@ class NewTripHandler {
   private final TimetableRepository buffer;
   private final TripTimesUpdater tripTimesUpdater;
   private final TripPatternCache tripPatternCache;
+  private final RealTimeTripShapeWriter shapeWriter;
 
   NewTripHandler(
     TransitRepository transitRepository,
     TimetableRepository buffer,
     TripTimesUpdater tripTimesUpdater,
-    TripPatternCache tripPatternCache
+    TripPatternCache tripPatternCache,
+    RealTimeTripShapeWriter shapeWriter
   ) {
     this.transitRepository = transitRepository;
     this.buffer = buffer;
     this.tripTimesUpdater = tripTimesUpdater;
     this.tripPatternCache = tripPatternCache;
+    this.shapeWriter = shapeWriter;
   }
 
   /**
@@ -212,7 +216,7 @@ class NewTripHandler {
         )
         .withTripCreation(true);
     }
-    return TripUpdateApplier.apply(buffer, builder.build());
+    return TripUpdateApplier.apply(buffer, shapeWriter, builder.build());
   }
 
   /**

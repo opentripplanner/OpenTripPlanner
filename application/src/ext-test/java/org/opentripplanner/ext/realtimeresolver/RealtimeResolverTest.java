@@ -160,6 +160,7 @@ class RealtimeResolverTest {
       List.of(itinerary),
       refetchService,
       transitEnv.transitService(),
+      transitEnv.shapeService(),
       new TransitAlertServiceImpl(),
       routeRequest()
     );
@@ -220,6 +221,7 @@ class RealtimeResolverTest {
       List.of(itinerary),
       refetchService,
       transitEnv.transitService(),
+      transitEnv.shapeService(),
       new TransitAlertServiceImpl(),
       routeRequest()
     );
@@ -294,6 +296,7 @@ class RealtimeResolverTest {
       List.of(itinerary),
       createRefetchService(transitAlertService, transitEnv),
       transitEnv.transitService(),
+      transitEnv.shapeService(),
       transitAlertService,
       routeRequest()
     );
@@ -343,6 +346,7 @@ class RealtimeResolverTest {
       itineraries,
       null,
       transitService,
+      transitEnv.shapeService(),
       new TransitAlertServiceImpl(),
       routeRequest()
     );
@@ -380,6 +384,7 @@ class RealtimeResolverTest {
       List.of(itinerary),
       refetchService,
       transitEnv.transitService(),
+      transitEnv.shapeService(),
       new TransitAlertServiceImpl(),
       routeRequest()
     );
@@ -444,6 +449,9 @@ class RealtimeResolverTest {
       .withBoardStopIndexInPattern(boardPos)
       .withAlightStopIndexInPattern(alightPos)
       .withGeneralizedCost(Cost.ZERO.toSeconds())
+      .withTripPatternShape(
+        transitEnv.shapeService().getTripPatternShape(trip.tripPattern().getId())
+      )
       .build();
   }
 
@@ -494,6 +502,7 @@ class RealtimeResolverTest {
     return new RefetchItineraryService(
       GRAPH,
       transitEnv.transitService(),
+      transitEnv.shapeService(),
       transitAlertService,
       REGULAR_TRANSFERS,
       streetDetailsService,

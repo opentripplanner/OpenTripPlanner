@@ -11,6 +11,7 @@ import org.opentripplanner.datastore.file.DirectoryDataSource;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.ConfiguredCompositeDataSource;
 import org.opentripplanner.netex.configure.NetexConfigure;
+import org.opentripplanner.service.shape.dataimport.ShapeDataImport;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.standalone.config.OtpConfigLoader;
@@ -53,6 +54,7 @@ class NetexModuleTest {
       List.of(new ConfiguredCompositeDataSource<>(dataSource, netexConfig)),
       transitRepository,
       new TimetableDataImport(),
+      new ShapeDataImport(),
       new DefaultVehicleParkingRepository(),
       new DefaultStreetDetailsRepository(),
       new Graph(),

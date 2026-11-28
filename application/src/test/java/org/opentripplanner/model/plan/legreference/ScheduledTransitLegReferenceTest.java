@@ -16,6 +16,9 @@ import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
+import org.opentripplanner.service.shape.ShapeService;
+import org.opentripplanner.service.shape.ShapeTestFactory;
+import org.opentripplanner.standalone.api.TestServerContext;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -46,6 +49,7 @@ class ScheduledTransitLegReferenceTest {
   public static final FeedScopedId STOP_3_A_ID = id("STOP3A");
   public static final FeedScopedId STOP_3_B_ID = id("STOP3B");
   private static TransitService transitService;
+  private static ShapeService shapeService;
   private static final FeedScopedId SIMPLE_TRIP_ID = id("trip");
   private static final FeedScopedId TRIP_ID_WITH_MULTIPLE_CALLS = id("multiple_calls");
   private static final FeedScopedId LOOP_TRIP_ID = id("loop");
@@ -125,6 +129,9 @@ class ScheduledTransitLegReferenceTest {
       transitRepository,
       DefaultTimetableRepository.scheduledOnly(timetableDataImport.toScheduledTimetableData())
     );
+    shapeService = TestServerContext.createShapeService(
+      ShapeTestFactory.shapeDataImport(timetableDataImport.getAllTripPatterns())
+    );
   }
 
   @Test
@@ -142,6 +149,7 @@ class ScheduledTransitLegReferenceTest {
     );
     ScheduledTransitLeg leg = scheduledTransitLegReference.getLeg(
       transitService,
+      shapeService,
       new TransitAlertServiceImpl()
     );
     assertNotNull(leg);
@@ -162,7 +170,13 @@ class ScheduledTransitLegReferenceTest {
       STOP_2_ID,
       null
     );
-    assertNull(scheduledTransitLegReference.getLeg(transitService, new TransitAlertServiceImpl()));
+    assertNull(
+      scheduledTransitLegReference.getLeg(
+        transitService,
+        shapeService,
+        new TransitAlertServiceImpl()
+      )
+    );
   }
 
   @Test
@@ -176,7 +190,13 @@ class ScheduledTransitLegReferenceTest {
       STOP_2_ID,
       null
     );
-    assertNull(scheduledTransitLegReference.getLeg(transitService, new TransitAlertServiceImpl()));
+    assertNull(
+      scheduledTransitLegReference.getLeg(
+        transitService,
+        shapeService,
+        new TransitAlertServiceImpl()
+      )
+    );
   }
 
   @Test
@@ -190,7 +210,13 @@ class ScheduledTransitLegReferenceTest {
       STOP_2_ID,
       null
     );
-    assertNull(scheduledTransitLegReference.getLeg(transitService, new TransitAlertServiceImpl()));
+    assertNull(
+      scheduledTransitLegReference.getLeg(
+        transitService,
+        shapeService,
+        new TransitAlertServiceImpl()
+      )
+    );
   }
 
   @Test
@@ -207,7 +233,11 @@ class ScheduledTransitLegReferenceTest {
       null
     );
     assertNotNull(
-      scheduledTransitLegReference.getLeg(transitService, new TransitAlertServiceImpl())
+      scheduledTransitLegReference.getLeg(
+        transitService,
+        shapeService,
+        new TransitAlertServiceImpl()
+      )
     );
   }
 
@@ -222,7 +252,11 @@ class ScheduledTransitLegReferenceTest {
       STOP_3_B_ID,
       null
     );
-    var leg = scheduledTransitLegReference.getLeg(transitService, new TransitAlertServiceImpl());
+    var leg = scheduledTransitLegReference.getLeg(
+      transitService,
+      shapeService,
+      new TransitAlertServiceImpl()
+    );
     assertNotNull(leg);
     assertEquals(TRIP_ID_WITH_MULTIPLE_CALLS, leg.trip().getId());
     assertEquals(SERVICE_DATE, leg.serviceDate());
@@ -243,7 +277,11 @@ class ScheduledTransitLegReferenceTest {
       STOP_3_B_ID,
       null
     );
-    var leg = scheduledTransitLegReference.getLeg(transitService, new TransitAlertServiceImpl());
+    var leg = scheduledTransitLegReference.getLeg(
+      transitService,
+      shapeService,
+      new TransitAlertServiceImpl()
+    );
     assertNotNull(leg);
     assertEquals(LOOP_TRIP_ID, leg.trip().getId());
     assertEquals(SERVICE_DATE, leg.serviceDate());
@@ -264,7 +302,11 @@ class ScheduledTransitLegReferenceTest {
       STOP_3_A_ID,
       null
     );
-    var leg = scheduledTransitLegReference.getLeg(transitService, new TransitAlertServiceImpl());
+    var leg = scheduledTransitLegReference.getLeg(
+      transitService,
+      shapeService,
+      new TransitAlertServiceImpl()
+    );
     assertNotNull(leg);
     assertEquals(SIMPLE_TRIP_ID, leg.trip().getId());
     assertEquals(SERVICE_DATE, leg.serviceDate());
@@ -283,7 +325,11 @@ class ScheduledTransitLegReferenceTest {
       STOP_3_B_ID,
       null
     );
-    var leg = scheduledTransitLegReference.getLeg(transitService, new TransitAlertServiceImpl());
+    var leg = scheduledTransitLegReference.getLeg(
+      transitService,
+      shapeService,
+      new TransitAlertServiceImpl()
+    );
     assertNotNull(leg);
     assertEquals(SIMPLE_TRIP_ID, leg.trip().getId());
     assertEquals(SERVICE_DATE, leg.serviceDate());
@@ -302,7 +348,11 @@ class ScheduledTransitLegReferenceTest {
       STOP_2_ID,
       null
     );
-    var leg = scheduledTransitLegReference.getLeg(transitService, new TransitAlertServiceImpl());
+    var leg = scheduledTransitLegReference.getLeg(
+      transitService,
+      shapeService,
+      new TransitAlertServiceImpl()
+    );
     assertNotNull(leg);
     assertEquals(SIMPLE_TRIP_ID, leg.trip().getId());
     assertEquals(SERVICE_DATE, leg.serviceDate());
@@ -321,7 +371,13 @@ class ScheduledTransitLegReferenceTest {
       STOP_1_ID,
       null
     );
-    assertNull(scheduledTransitLegReference.getLeg(transitService, new TransitAlertServiceImpl()));
+    assertNull(
+      scheduledTransitLegReference.getLeg(
+        transitService,
+        shapeService,
+        new TransitAlertServiceImpl()
+      )
+    );
   }
 
   @Test
@@ -336,7 +392,11 @@ class ScheduledTransitLegReferenceTest {
       STOP_2_ID,
       null
     );
-    var leg = scheduledTransitLegReference.getLeg(transitService, new TransitAlertServiceImpl());
+    var leg = scheduledTransitLegReference.getLeg(
+      transitService,
+      shapeService,
+      new TransitAlertServiceImpl()
+    );
     assertNotNull(leg);
     assertEquals(SIMPLE_TRIP_ID, leg.trip().getId());
     assertEquals(SERVICE_DATE, leg.serviceDate());
@@ -386,7 +446,13 @@ class ScheduledTransitLegReferenceTest {
       STOP_2_ID,
       TRIP_ON_SERVICE_DATE_ID
     );
-    assertNull(scheduledTransitLegReference.getLeg(transitService, new TransitAlertServiceImpl()));
+    assertNull(
+      scheduledTransitLegReference.getLeg(
+        transitService,
+        shapeService,
+        new TransitAlertServiceImpl()
+      )
+    );
   }
 
   @Test
@@ -400,7 +466,13 @@ class ScheduledTransitLegReferenceTest {
       STOP_2_ID,
       FeedScopedIdForTestFactory.id("unknown trip on date id")
     );
-    assertNull(scheduledTransitLegReference.getLeg(transitService, new TransitAlertServiceImpl()));
+    assertNull(
+      scheduledTransitLegReference.getLeg(
+        transitService,
+        shapeService,
+        new TransitAlertServiceImpl()
+      )
+    );
   }
 
   @Test
@@ -416,6 +488,7 @@ class ScheduledTransitLegReferenceTest {
     );
     ScheduledTransitLeg leg = scheduledTransitLegReference.getLeg(
       transitService,
+      shapeService,
       new TransitAlertServiceImpl()
     );
     assertNotNull(leg);
@@ -439,7 +512,11 @@ class ScheduledTransitLegReferenceTest {
       null
     );
     // Should handle gracefully by finding the closest matching stops, not throw ArrayIndexOutOfBoundsException
-    var leg = scheduledTransitLegReference.getLeg(transitService, new TransitAlertServiceImpl());
+    var leg = scheduledTransitLegReference.getLeg(
+      transitService,
+      shapeService,
+      new TransitAlertServiceImpl()
+    );
     assertNotNull(leg);
     assertEquals(0, leg.boardStopPosInPattern());
     assertEquals(1, leg.alightStopPosInPattern());
@@ -460,7 +537,11 @@ class ScheduledTransitLegReferenceTest {
       null
     );
     // Should handle gracefully by finding the closest matching stop, or return null
-    var leg = scheduledTransitLegReference.getLeg(transitService, new TransitAlertServiceImpl());
+    var leg = scheduledTransitLegReference.getLeg(
+      transitService,
+      shapeService,
+      new TransitAlertServiceImpl()
+    );
     assertNotNull(leg);
     assertEquals(0, leg.boardStopPosInPattern());
     assertEquals(1, leg.alightStopPosInPattern());

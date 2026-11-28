@@ -19,6 +19,8 @@ import org.opentripplanner.graph_builder.module.geometry.GeometryProcessor;
 import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.impl.TransitDataImportBuilder;
+import org.opentripplanner.service.shape.model.CompactLineStringSequence;
+import org.opentripplanner.service.shape.model.TripShapeFactory;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
@@ -53,6 +55,7 @@ public class GenerateTripPatternsOperation {
   private final Multimap<StopPattern, TripPatternBuilder> tripPatternBuilders =
     MultimapBuilder.linkedHashKeys().linkedHashSetValues().build();
   private final ListMultimap<Trip, Frequency> frequenciesForTrip = ArrayListMultimap.create();
+  private final Map<FeedScopedId, CompactLineStringSequence> shapesByTripPattern = new HashMap<>();
 
   private int freqCount = 0;
   private int scheduledCount = 0;
@@ -89,13 +92,9 @@ public class GenerateTripPatternsOperation {
       }
     }
 
-    tripPatternBuilders
-      .values()
-      .stream()
-      .map(TripPatternBuilder::build)
-      .forEach(tripPattern ->
-        transitServiceBuilder.getTripPatterns().put(tripPattern.getStopPattern(), tripPattern)
-      );
+    for (TripPatternBuilder builder : tripPatternBuilders.values()) {
+      registerTripPattern(builder.build());
+    }
 
     LOG.info(progressLogger.completeMessage());
     LOG.info(
@@ -187,10 +186,21 @@ public class GenerateTripPatternsOperation {
       .withRoute(route)
       .withStopPattern(stopPattern)
       .withMode(trip.getMode())
-      .withNetexSubmode(trip.getNetexSubMode())
-      .withHopGeometries(geometryProcessor.createHopGeometries(trip));
+      .withNetexSubmode(trip.getNetexSubMode());
+    CompactLineStringSequence tripPatternShape = TripShapeFactory.fromLineStrings(
+      geometryProcessor.createHopShapes(trip),
+      deduplicator
+    );
+    shapesByTripPattern.put(patternId, tripPatternShape);
     tripPatternBuilders.put(stopPattern, tripPatternBuilder);
     return tripPatternBuilder;
+  }
+
+  private void registerTripPattern(TripPattern tripPattern) {
+    transitServiceBuilder.getTripPatterns().put(tripPattern.getStopPattern(), tripPattern);
+    transitServiceBuilder
+      .getShapesByTripPattern()
+      .put(tripPattern.getId(), shapesByTripPattern.get(tripPattern.getId()));
   }
 
   /**

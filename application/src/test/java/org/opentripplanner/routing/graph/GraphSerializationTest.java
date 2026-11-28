@@ -1,9 +1,11 @@
 package org.opentripplanner.routing.graph;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.File;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -17,6 +19,7 @@ import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.ext.fares.service.gtfs.v1.GtfsFareServiceFactory;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
+import org.opentripplanner.service.shape.dataimport.ShapeDataImport;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.worldenvelope.internal.DefaultWorldEnvelopeRepository;
@@ -45,7 +48,17 @@ class GraphSerializationTest {
 
   @Test
   void roundTripGtfsGraph() {
-    assertRoundTrip(ConstantsForTests.buildNewPortlandGraph(true));
+    var model = ConstantsForTests.buildNewPortlandGraph(true);
+    // Make sure there are shapes, otherwise the shape comparison proves nothing
+    var shapes = model
+      .timetableDataImport()
+      .getAllTripPatterns()
+      .stream()
+      .map(p -> model.shapeDataImport().getTripPatternShape(p.getId()))
+      .filter(Objects::nonNull)
+      .toList();
+    assertThat(shapes).isNotEmpty();
+    assertRoundTrip(model);
   }
 
   @Test
@@ -65,6 +78,7 @@ class GraphSerializationTest {
 
     assertSameStreetGraph(model.graph(), copy.graph);
     assertSameScheduledData(model.timetableDataImport(), copy.timetableDataImport);
+    assertSameShapeData(model.timetableDataImport(), model.shapeDataImport(), copy.shapeDataImport);
   }
 
   private static void save(TestOtpModel model, File file) {
@@ -78,6 +92,7 @@ class GraphSerializationTest {
       streetRepository,
       model.transitRepository(),
       model.timetableDataImport(),
+      model.shapeDataImport(),
       model.transferRepository(),
       RegularTransferFactory.createBuildRepository(),
       new DefaultWorldEnvelopeRepository(),
@@ -147,5 +162,27 @@ class GraphSerializationTest {
       );
     }
     assertEquals(original.getServiceCodes(), copy.getServiceCodes());
+  }
+
+  private static void assertSameShapeData(
+    TimetableDataImport timetableDataImport,
+    ShapeDataImport original,
+    ShapeDataImport copy
+  ) {
+    for (var pattern : timetableDataImport.getAllTripPatterns()) {
+      var originalShape = original.getTripPatternShape(pattern.getId());
+      if (originalShape == null) {
+        continue;
+      }
+      var copiedShape = copy.getTripPatternShape(pattern.getId());
+      assertEquals(originalShape.size(), copiedShape.size());
+      for (int i = 0; i < originalShape.size(); i++) {
+        assertEquals(originalShape.get(i), copiedShape.get(i));
+        assertEquals(
+          originalShape.distanceBetween(i, i + 1),
+          copiedShape.distanceBetween(i, i + 1)
+        );
+      }
+    }
   }
 }

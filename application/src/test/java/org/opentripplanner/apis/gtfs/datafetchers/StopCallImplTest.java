@@ -26,6 +26,7 @@ import org.opentripplanner.core.model.i18n.TranslatedString;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.TripTimeOnDate;
+import org.opentripplanner.service.shape.ShapeService;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
@@ -93,7 +94,8 @@ class StopCallImplTest {
     var env = DataFetchingSupport.dataFetchingEnvironment(
       call,
       Map.of(),
-      realtimeEnv.transitService()
+      realtimeEnv.transitService(),
+      realtimeEnv.shapeService()
     );
 
     var schedule = impl.schedule().get(env);
@@ -121,7 +123,8 @@ class StopCallImplTest {
       var env = DataFetchingSupport.dataFetchingEnvironment(
         call,
         Map.of(),
-        realtimeEnv.transitService()
+        realtimeEnv.transitService(),
+        realtimeEnv.shapeService()
       );
       // Without a shape, the path is a straight line from this stop to the next one
       var coordinates = impl.geometryToNextCall().get(env).getCoordinates();
@@ -134,7 +137,8 @@ class StopCallImplTest {
     var env = DataFetchingSupport.dataFetchingEnvironment(
       lastCall,
       Map.of(),
-      realtimeEnv.transitService()
+      realtimeEnv.transitService(),
+      realtimeEnv.shapeService()
     );
     assertNull(impl.geometryToNextCall().get(env));
   }
@@ -158,7 +162,7 @@ class StopCallImplTest {
           .addStop(stopC1, "12:20:00", "12:20:00")
           .addStop(stopX, "12:30:00", "12:30:00")
           // Bent hops can be told apart from the straight lines of hops without a scheduled shape
-          .withHopGeometries(
+          .withHopShapes(
             bentLine(STOP_A, STOP_B),
             bentLine(STOP_B, stopC1),
             bentLine(stopC1, stopX)
@@ -169,16 +173,18 @@ class StopCallImplTest {
     var tripData = realtimeEnv.tripData(MODIFIED_TRIP_ID);
     var scheduledPattern = tripData.scheduledTripPattern();
     var transitService = realtimeEnv.transitService();
+    var shapeService = realtimeEnv.shapeService();
+    var scheduledShape = shapeService.getTripPatternShape(scheduledPattern.getId());
 
     var calls = transitService.findTripTimesOnDate(tripData.trip(), SERVICE_DATE).orElseThrow();
-    var geometries = geometriesToNextCall(calls, transitService);
+    var geometries = geometriesToNextCall(calls, transitService, shapeService);
     assertEquals(4, geometries.size());
 
     // Unchanged hop: the scheduled shape is kept
-    assertTrue(geometries.get(0).equalsExact(scheduledPattern.getHopGeometry(0), TOLERANCE));
+    assertTrue(geometries.get(0).equalsExact(scheduledShape.get(0), TOLERANCE));
 
     // Hop to another stop of the same station: the scheduled shape is moved to the new stop
-    var scheduledHop = scheduledPattern.getHopGeometry(1).getCoordinates();
+    var scheduledHop = scheduledShape.get(1).getCoordinates();
     var stationHop = geometries.get(1).getCoordinates();
     assertEquals(scheduledHop.length, stationHop.length);
     assertCoordinate(scheduledHop[0], stationHop[0]);
@@ -220,7 +226,8 @@ class StopCallImplTest {
       var env = DataFetchingSupport.dataFetchingEnvironment(
         call,
         Map.of(),
-        realtimeEnv.transitService()
+        realtimeEnv.transitService(),
+        realtimeEnv.shapeService()
       );
       try {
         assertNull(new StopCallImpl().geometryToNextCall().get(env));
@@ -253,7 +260,8 @@ class StopCallImplTest {
     var env = DataFetchingSupport.dataFetchingEnvironment(
       call,
       Map.of(),
-      transitEnv.transitService()
+      transitEnv.transitService(),
+      transitEnv.shapeService()
     );
 
     assertNull(new StopCallImpl().destinationDisplay().get(env));
@@ -283,7 +291,7 @@ class StopCallImplTest {
     var expectedCanceled = List.of(false, false, true);
     for (int stopPos = 0; stopPos < expectedCanceled.size(); stopPos++) {
       var call = new TripTimeOnDate(tripTimes, stopPos, pattern, SERVICE_DATE, MIDNIGHT);
-      assertCanceledInRealTime(expectedCanceled.get(stopPos), call, realtimeEnv.transitService());
+      assertCanceledInRealTime(expectedCanceled.get(stopPos), call, realtimeEnv);
     }
   }
 
@@ -297,7 +305,7 @@ class StopCallImplTest {
 
     for (int stopPos = 0; stopPos < 3; stopPos++) {
       var call = new TripTimeOnDate(tripTimes, stopPos, pattern, SERVICE_DATE, MIDNIGHT);
-      assertCanceledInRealTime(false, call, realtimeEnv.transitService());
+      assertCanceledInRealTime(false, call, realtimeEnv);
     }
   }
 
@@ -329,7 +337,7 @@ class StopCallImplTest {
 
     for (int stopPos = 0; stopPos < stops.size(); stopPos++) {
       var call = new TripTimeOnDate(tripData.tripTimes(), stopPos, pattern, SERVICE_DATE, MIDNIGHT);
-      assertCanceledInRealTime(canceled.get(stopPos), call, realtimeEnv.transitService());
+      assertCanceledInRealTime(canceled.get(stopPos), call, realtimeEnv);
     }
   }
 
@@ -347,7 +355,8 @@ class StopCallImplTest {
       var env = DataFetchingSupport.dataFetchingEnvironment(
         call,
         Map.of(),
-        realtimeEnv.transitService()
+        realtimeEnv.transitService(),
+        realtimeEnv.shapeService()
       );
 
       // using try-catch is not very nice here - ideally we would just add it to the method signature.
@@ -370,12 +379,18 @@ class StopCallImplTest {
 
   private static List<Geometry> geometriesToNextCall(
     Iterable<TripTimeOnDate> calls,
-    TransitService transitService
+    TransitService transitService,
+    ShapeService shapeService
   ) throws Exception {
     var impl = new StopCallImpl();
     var geometries = new ArrayList<Geometry>();
     for (var call : calls) {
-      var env = DataFetchingSupport.dataFetchingEnvironment(call, Map.of(), transitService);
+      var env = DataFetchingSupport.dataFetchingEnvironment(
+        call,
+        Map.of(),
+        transitService,
+        shapeService
+      );
       geometries.add(impl.geometryToNextCall().get(env));
     }
     return geometries;
@@ -420,7 +435,8 @@ class StopCallImplTest {
     var callEnv = DataFetchingSupport.dataFetchingEnvironment(
       call,
       Map.of(),
-      transitEnv.transitService()
+      transitEnv.transitService(),
+      transitEnv.shapeService()
     );
     var destinationDisplay = new StopCallImpl().destinationDisplay().get(callEnv);
     var env = DataFetchingSupport.dataFetchingEnvironment(destinationDisplay, arguments);
@@ -434,9 +450,14 @@ class StopCallImplTest {
   private static void assertCanceledInRealTime(
     boolean expected,
     TripTimeOnDate call,
-    TransitService transitService
+    TransitTestEnvironment transitEnv
   ) throws Exception {
-    var env = DataFetchingSupport.dataFetchingEnvironment(call, Map.of(), transitService);
+    var env = DataFetchingSupport.dataFetchingEnvironment(
+      call,
+      Map.of(),
+      transitEnv.transitService(),
+      transitEnv.shapeService()
+    );
     var realTime = new StopCallImpl().realTime().get(env);
     assertEquals(expected, realTime != null && realTime.canceled());
   }

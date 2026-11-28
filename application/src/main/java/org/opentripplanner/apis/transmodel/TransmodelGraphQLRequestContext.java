@@ -9,6 +9,7 @@ import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.service.shape.ShapeService;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
@@ -32,6 +33,8 @@ public interface TransmodelGraphQLRequestContext {
   RoutingService routingService();
 
   TransitService transitService();
+
+  ShapeService shapeService();
 
   TransitAlertService transitAlertService();
 

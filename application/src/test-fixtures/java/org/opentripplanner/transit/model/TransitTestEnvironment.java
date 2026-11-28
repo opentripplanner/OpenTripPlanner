@@ -7,6 +7,7 @@ import java.time.ZoneId;
 import java.util.concurrent.ExecutionException;
 import org.opentripplanner.LocalTimeParser;
 import org.opentripplanner.core.framework.transaction.configure.TransactionFactory;
+import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.core.model.transaction.RepositoryHandle;
 import org.opentripplanner.core.model.transaction.RepositoryRegistry;
@@ -17,6 +18,13 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.Rapto
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.DefaultTransitDataProviderFilterBuilder;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.service.shape.ScheduledShapeData;
+import org.opentripplanner.service.shape.ShapeRepository;
+import org.opentripplanner.service.shape.ShapeRepositorySnapshot;
+import org.opentripplanner.service.shape.ShapeService;
+import org.opentripplanner.service.shape.internal.DefaultShapeRepository;
+import org.opentripplanner.service.shape.internal.DefaultShapeService;
+import org.opentripplanner.service.shape.internal.ShapeRepositoryLifecycle;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
@@ -31,6 +39,8 @@ import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.transit.transfer.regular.NoRegularTransfers;
+import org.opentripplanner.updater.trip.shape.RealTimeTripShapeFactory;
+import org.opentripplanner.updater.trip.shape.RealTimeTripShapeWriter;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 /**
@@ -45,6 +55,7 @@ public final class TransitTestEnvironment {
   private final ScheduledTimetableData scheduledTimetableData;
   private final RepositoryRegistry repositoryRegistry;
   private final RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableHandle;
+  private final RepositoryHandle<ShapeRepositorySnapshot, ShapeRepository> shapeHandle;
   private final UpdateManager updateManager;
   private final LocalDate defaultServiceDate;
 
@@ -63,6 +74,7 @@ public final class TransitTestEnvironment {
   TransitTestEnvironment(
     TransitRepository transitRepository,
     ScheduledTimetableData scheduledTimetableData,
+    ScheduledShapeData scheduledShapeData,
     LocalDate defaultServiceDate
   ) {
     this.transitRepository = transitRepository;
@@ -85,6 +97,11 @@ public final class TransitTestEnvironment {
     this.timetableHandle = repositoryRegistry.registerRepositorySnapshot(
       timetableSnapshot,
       new TimetableRepositoryLifecycle(timetableSnapshot, false, () -> defaultServiceDate)
+    );
+    var shapeRepository = new DefaultShapeRepository(scheduledShapeData);
+    this.shapeHandle = repositoryRegistry.registerRepository(
+      shapeRepository,
+      new ShapeRepositoryLifecycle(shapeRepository)
     );
     var threadFactory = Thread.ofPlatform().name("test-commit").factory();
     // Use atomic commits (commit immediately after each task) so test assertions see results right away
@@ -118,6 +135,13 @@ public final class TransitTestEnvironment {
   }
 
   /**
+   * Returns a new fresh ShapeService backed by the current shape snapshot.
+   */
+  public ShapeService shapeService() {
+    return new DefaultShapeService(shapeHandle.repositorySnapshot(repositoryRegistry.scope()));
+  }
+
+  /**
    * Applies a real-time update through the transaction framework, committing it to the timetable
    * repository backing {@link #transitService()}, so that a subsequent call to that method returns
    * a snapshot reflecting the update. The method will wait for the update to be applied before
@@ -128,6 +152,11 @@ public final class TransitTestEnvironment {
       var task = updateManager.submit(ctx -> {
         TimetableRepository repository = ctx.repository(timetableHandle);
         repository.update(update);
+        // Like TripUpdateApplier, give a pattern created in real time a shape
+        new RealTimeTripShapeWriter(
+          () -> ctx.repository(shapeHandle),
+          new RealTimeTripShapeFactory(DeduplicatorService.NOOP)
+        ).ensureTripPatternShape(update.pattern());
       });
       // Wait for task to commit - this allows us to proceed with the test
       task.get();
@@ -187,6 +216,10 @@ public final class TransitTestEnvironment {
 
   public RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableHandle() {
     return timetableHandle;
+  }
+
+  public RepositoryHandle<ShapeRepositorySnapshot, ShapeRepository> shapeHandle() {
+    return shapeHandle;
   }
 
   public UpdateManager updateManager() {

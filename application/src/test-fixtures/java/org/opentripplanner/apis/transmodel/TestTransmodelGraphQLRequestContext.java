@@ -12,6 +12,7 @@ import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.service.shape.ShapeService;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
@@ -28,6 +29,7 @@ public class TestTransmodelGraphQLRequestContext implements TransmodelGraphQLReq
 
   private final RoutingService routingService;
   private final TransitService transitService;
+  private final ShapeService shapeService;
   private final TransitAlertService transitAlertService;
   private final @Nullable EmpiricalDelayService empiricalDelayService;
   private final RouteRequest defaultRouteRequest;
@@ -42,6 +44,7 @@ public class TestTransmodelGraphQLRequestContext implements TransmodelGraphQLReq
   public TestTransmodelGraphQLRequestContext(
     RoutingService routingService,
     TransitService transitService,
+    ShapeService shapeService,
     @Nullable TransitAlertService transitAlertService,
     @Nullable EmpiricalDelayService empiricalDelayService,
     RouteRequest defaultRouteRequest,
@@ -55,6 +58,7 @@ public class TestTransmodelGraphQLRequestContext implements TransmodelGraphQLReq
   ) {
     this.routingService = routingService;
     this.transitService = transitService;
+    this.shapeService = shapeService;
     this.transitAlertService = transitAlertService;
     this.empiricalDelayService = empiricalDelayService;
     this.defaultRouteRequest = defaultRouteRequest;
@@ -75,6 +79,11 @@ public class TestTransmodelGraphQLRequestContext implements TransmodelGraphQLReq
   @Override
   public TransitService transitService() {
     return transitService;
+  }
+
+  @Override
+  public ShapeService shapeService() {
+    return shapeService;
   }
 
   @Nullable
