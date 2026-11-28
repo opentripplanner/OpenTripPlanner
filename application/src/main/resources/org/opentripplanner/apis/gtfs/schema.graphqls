@@ -479,22 +479,6 @@ type CarPark implements Node & PlaceInterface {
   tags: [String]
 }
 
-"Cluster is a list of stops grouped by name and proximity"
-type Cluster implements Node {
-  "ID of the cluster"
-  gtfsId: String! @deprecated(reason : "Not implemented")
-  "Global object ID provided by Relay. This value can be used to refetch this object using **node** query."
-  id: ID!
-  "Latitude of the center of this cluster (i.e. average latitude of stops in this cluster)"
-  lat: Float! @deprecated(reason : "Not implemented")
-  "Longitude of the center of this cluster (i.e. average longitude of stops in this cluster)"
-  lon: Float! @deprecated(reason : "Not implemented")
-  "Name of the cluster"
-  name: String! @deprecated(reason : "Not implemented")
-  "List of stops in the cluster"
-  stops: [Stop!] @deprecated(reason : "Not implemented")
-}
-
 "Contact information for booking an on-demand or flexible service."
 type ContactInfo {
   "Additional notes about the contacting the service provider"
@@ -1661,10 +1645,6 @@ type QueryType {
     """
     ids: [String]
   ): [CarPark] @deprecated(reason : "carParks is deprecated. Use vehicleParkings instead.") @timingData
-  "Get a single cluster based on its ID, i.e. value of field `gtfsId`"
-  cluster(id: String!): Cluster @deprecated(reason : "Not implemented") @timingData
-  "Get all clusters"
-  clusters: [Cluster] @deprecated(reason : "Not implemented") @timingData
   "Get a single departure row based on its ID (ID format is `FeedId:StopId:PatternId`)"
   departureRow(id: String!): DepartureRow @timingData
   "Get all available feeds"
@@ -2628,8 +2608,6 @@ type Stop implements Node & PlaceInterface {
     """
     timeRanges: [OffsetDateTimeRangeInput!]
   ): [StopCallOnTripOnServiceDate!]!
-  "The cluster which this stop is part of"
-  cluster: Cluster @deprecated(reason : "Not implemented")
   "Stop code which is visible at the stop"
   code: String
   "Description of the stop, usually a street name"

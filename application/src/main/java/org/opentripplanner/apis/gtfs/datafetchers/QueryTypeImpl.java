@@ -269,18 +269,6 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
   }
 
   @Override
-  @Deprecated
-  public DataFetcher<Object> cluster() {
-    return environment -> null;
-  }
-
-  @Override
-  @Deprecated
-  public DataFetcher<Iterable<Object>> clusters() {
-    return environment -> Collections.EMPTY_LIST;
-  }
-
-  @Override
   public DataFetcher<PatternAtStop> departureRow() {
     return environment ->
       PatternAtStop.fromId(
@@ -492,9 +480,6 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
                 .filter(carPark -> carPark.getId().equals(carParkId))
                 .findAny()
                 .orElse(null);
-        case "Cluster":
-          // TODO
-          return null;
         case "DepartureRow":
           return PatternAtStop.fromId(transitService, id);
         case "Pattern":
