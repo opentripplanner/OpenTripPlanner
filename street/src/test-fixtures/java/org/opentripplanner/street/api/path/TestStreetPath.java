@@ -7,9 +7,9 @@ import org.opentripplanner.street.search.state.State;
  * Gives tests access to the states of a {@link StreetPath}, which are deliberately not part of its
  * public API.
  */
-public class StreetPathForTest {
+public class TestStreetPath {
 
-  private StreetPathForTest() {}
+  private TestStreetPath() {}
 
   /**
    * The states of the path in chronological order.

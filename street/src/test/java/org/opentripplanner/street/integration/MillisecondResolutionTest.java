@@ -9,7 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner.street.api.path.StreetPath;
-import org.opentripplanner.street.api.path.StreetPathForTest;
+import org.opentripplanner.street.api.path.TestStreetPath;
 import org.opentripplanner.street.api.request.StreetSearchRequest;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.StreetTraversalPermission;
@@ -48,7 +48,7 @@ class MillisecondResolutionTest extends GraphRoutingTest {
 
     var forwardPaths = route(A, B, time, false);
     assertEquals(1, forwardPaths.size());
-    var forwardStates = StreetPathForTest.states(forwardPaths.getFirst());
+    var forwardStates = TestStreetPath.states(forwardPaths.getFirst());
     var forwardDiff = ChronoUnit.MILLIS.between(
       forwardStates.getFirst().getTimeAccurate(),
       forwardStates.getLast().getTimeAccurate()
@@ -56,7 +56,7 @@ class MillisecondResolutionTest extends GraphRoutingTest {
 
     var backwardPaths = route(A, B, time, true);
     assertEquals(1, backwardPaths.size());
-    var backwardStates = StreetPathForTest.states(backwardPaths.getFirst());
+    var backwardStates = TestStreetPath.states(backwardPaths.getFirst());
     var backwardDiff = ChronoUnit.MILLIS.between(
       backwardStates.getFirst().getTimeAccurate(),
       backwardStates.getLast().getTimeAccurate()

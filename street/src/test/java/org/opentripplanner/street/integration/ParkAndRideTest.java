@@ -9,7 +9,7 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentripplanner.core.model.basic.Cost;
-import org.opentripplanner.street.api.path.StreetPathForTest;
+import org.opentripplanner.street.api.path.TestStreetPath;
 import org.opentripplanner.street.api.request.StreetSearchRequest;
 import org.opentripplanner.street.api.request.filter.ParkingFilter;
 import org.opentripplanner.street.api.request.filter.ParkingSelect;
@@ -177,7 +177,7 @@ public abstract class ParkAndRideTest extends GraphRoutingTest {
       return List.of();
     }
 
-    return StreetPathForTest.states(state)
+    return TestStreetPath.states(state)
       .stream()
       .map(s ->
         String.format(

@@ -11,7 +11,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.core.model.i18n.I18NString;
-import org.opentripplanner.street.api.path.StreetPathForTest;
+import org.opentripplanner.street.api.path.TestStreetPath;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 
@@ -244,7 +244,7 @@ class StatesToStreetStepsMapperTest {
 
   private static List<StreetStep> buildWalkSteps(TestStateBuilder builder) {
     var result = builder.build();
-    var mapper = new StatesToStreetStepsMapper(StreetPathForTest.states(result), null, 0);
+    var mapper = new StatesToStreetStepsMapper(TestStreetPath.states(result), null, 0);
     return mapper.generateSteps();
   }
 
