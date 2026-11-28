@@ -1,6 +1,7 @@
 package org.opentripplanner.standalone.config.buildconfig;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_10;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_11;
 
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.EscalatorPreferences;
@@ -58,7 +59,7 @@ final class TransferRequestConfig {
       .withStairsTimeFactor(
         c
           .of("stairsTimeFactor")
-          .since(V2_10)
+          .since(V2_11)
           .summary(
             "How much more time does it take to walk a flight of stairs compared to walking a similar horizontal length."
           )
@@ -154,6 +155,15 @@ final class TransferRequestConfig {
           .since(V2_10)
           .summary("How much stairs should be avoided.")
           .asDouble(dft.stairsReluctance())
+      )
+      .withStairsTimeFactor(
+        c
+          .of("stairsTimeFactor")
+          .since(V2_11)
+          .summary(
+            "How much more time does it take to traverse a flight of stairs in a wheelchair compared to a similar horizontal length."
+          )
+          .asDouble(dft.stairsTimeFactor())
       );
   }
 

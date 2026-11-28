@@ -109,7 +109,7 @@ public class DirectStreetRouter {
    * mode available. This assumes that it is not possible to exceed the speed defined in the
    * RouteRequest.
    */
-  private static double calculateDistanceMaxLimit(RouteRequest request, float maxCarSpeed) {
+  static double calculateDistanceMaxLimit(RouteRequest request, float maxCarSpeed) {
     var preferences = request.preferences();
     double distanceLimit;
     StreetMode mode = request.journey().direct().mode();
@@ -123,7 +123,10 @@ public class DirectStreetRouter {
     } else if (mode.includesScooter()) {
       distanceLimit = durationLimit * preferences.scooter().speed();
     } else if (mode.includesWalking()) {
-      distanceLimit = durationLimit * preferences.walk().speed();
+      var walkSpeed = request.journey().wheelchair()
+        ? preferences.wheelchair().speed()
+        : preferences.walk().speed();
+      distanceLimit = durationLimit * walkSpeed;
     } else {
       throw new IllegalStateException("Could not set max limit for StreetMode");
     }

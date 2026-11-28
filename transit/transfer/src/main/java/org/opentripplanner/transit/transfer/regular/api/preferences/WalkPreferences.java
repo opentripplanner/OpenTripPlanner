@@ -121,14 +121,18 @@ public final class WalkPreferences
     double distance = super.normalizedDistance(other);
     if (other instanceof WalkPreferences that) {
       distance += SPEED_WEIGHT * speed.normalizedDistance(that.speed);
-      double safetyDistance =
-        SAFETY_FACTOR_WEIGHT * safetyFactor.normalizedDistance(that.safetyFactor);
-      if (safetyFactor.asDouble() > that.safetyFactor.asDouble()) {
-        safetyDistance *= MORE_SAFETY_WEIGHT_FACTOR;
-      }
-      distance += safetyDistance;
+      distance += safetyDistance(safetyFactor, that.safetyFactor);
     }
     return distance;
+  }
+
+  /**
+   * The distance between the safety factor of the user and the one of a profile, see
+   * {@link #normalizedDistance(AbstractUserPreferences)} for the rules.
+   */
+  static double safetyDistance(NormalizedRatio user, NormalizedRatio profile) {
+    double distance = SAFETY_FACTOR_WEIGHT * user.normalizedDistance(profile);
+    return user.asDouble() > profile.asDouble() ? distance * MORE_SAFETY_WEIGHT_FACTOR : distance;
   }
 
   @Override

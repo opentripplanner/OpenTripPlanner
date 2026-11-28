@@ -1020,10 +1020,10 @@ type QueryType {
     via: [TripViaLocationInput!],
     "Wait cost is multiplied by this value. Setting this to a value lower than 1 indicates that waiting is better than staying on a vehicle. This should never be set higher than walkReluctance, since that would lead to walking down a line to avoid waiting."
     waitReluctance: Float = 1.0,
-    "Walk cost is multiplied by this value. This is the main parameter to use for limiting walking."
-    walkReluctance: Float = 2.0,
-    "The maximum walk speed along streets, in meters per second."
-    walkSpeed: Float = 1.35,
+    "Walk cost is multiplied by this value. This is the main parameter to use for limiting walking. If not set, the default is 2.0, or 2.0 if wheelchairAccessible is true."
+    walkReluctance: Float,
+    "The maximum walk speed along streets, in meters per second. If not set, the default is 1.35, or 1.0 if wheelchairAccessible is true."
+    walkSpeed: Float,
     "Whether the trip must be wheelchair accessible. Supported for the street part to the search, not implemented for the transit yet."
     wheelchairAccessible: Boolean = false,
     "Parameters for indicating the only authorities, lines or quays to be used in the trip patterns"
@@ -1049,10 +1049,10 @@ type QueryType {
     modes: Modes,
     "The destination location, if null the trip pattern will end with the last provided leg"
     to: Location,
-    "Walk cost is multiplied by this value. This is the main parameter to use for limiting walking."
-    walkReluctance: Float = 2.0,
-    "The maximum walk speed along streets, in meters per second."
-    walkSpeed: Float = 1.35,
+    "Walk cost is multiplied by this value. This is the main parameter to use for limiting walking. The default is 2.0, or 2.0 if wheelchairAccessible is true."
+    walkReluctance: Float,
+    "The maximum walk speed along streets, in meters per second. The default is 1.35, or 1.0 if wheelchairAccessible is true."
+    walkSpeed: Float,
     "Whether the trip must be wheelchair accessible. Supported for the street part of the search."
     wheelchairAccessible: Boolean = false
   ): TripPatternResult! @timingData

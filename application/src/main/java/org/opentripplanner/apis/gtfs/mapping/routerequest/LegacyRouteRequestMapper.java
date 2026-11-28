@@ -125,7 +125,16 @@ public class LegacyRouteRequestMapper {
         callWith.argument("walkReluctance", b::withReluctance);
         callWith.argument("walkSpeed", b::withSpeed);
         callWith.argument("walkBoardCost", b::withBoardCost);
-        callWith.argument("walkSafetyFactor", b::withSafetyFactor);
+        callWith.argument("walkSafetyFactor", (Double v) ->
+          b.withSafetyFactor(WalkPreferencesMapper.clampRatio(v))
+        );
+      });
+      preferences.withWheelchair(b -> {
+        callWith.argument("walkReluctance", b::withReluctance);
+        callWith.argument("walkSpeed", b::withSpeed);
+        callWith.argument("walkSafetyFactor", (Double v) ->
+          b.withSafetyFactor(WalkPreferencesMapper.clampRatio(v))
+        );
       });
       // TODO Add support for all debug filter variants
       callWith.argument("debugItineraryFilter", (Boolean v) ->
