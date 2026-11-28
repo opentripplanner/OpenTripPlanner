@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 
 class CollectionUtilsTest {
 
-  public static final String NULL_STRING = "<null>";
+  public static final String NULL_STRING = "<NULL>";
 
   @Test
   void testIsEmpty() {
@@ -36,13 +36,14 @@ class CollectionUtilsTest {
 
   @Test
   void testToString() {
-    assertEquals("<null>", CollectionUtils.toString(null, NULL_STRING));
-    assertEquals("[]", CollectionUtils.toString(Set.of(), NULL_STRING));
-    assertEquals("[]", CollectionUtils.toString(List.of(), NULL_STRING));
-    assertEquals("[JUNE]", CollectionUtils.toString(EnumSet.of(Month.JUNE), NULL_STRING));
+    assertEquals("<NULL>", CollectionUtils.toString(null, NULL_STRING));
+    assertEquals("<null>", CollectionUtils.toString(null));
+    assertEquals("[]", CollectionUtils.toString(Set.of()));
+    assertEquals("[]", CollectionUtils.toString(List.of()));
+    assertEquals("[JUNE]", CollectionUtils.toString(EnumSet.of(Month.JUNE)));
     assertEquals(
       "[APRIL, JANUARY, JUNE]",
-      CollectionUtils.toString(EnumSet.of(Month.JANUARY, Month.JUNE, Month.APRIL), "#")
+      CollectionUtils.toString(EnumSet.of(Month.JANUARY, Month.JUNE, Month.APRIL))
     );
 
     // Given a list of objects
@@ -53,11 +54,11 @@ class CollectionUtilsTest {
     list.add(Month.APRIL);
 
     // Then: keep list order, do not sort
-    assertEquals("[PT3H, <null>, JUNE, APRIL]", CollectionUtils.toString(list, NULL_STRING));
+    assertEquals("[PT3H, <null>, JUNE, APRIL]", CollectionUtils.toString(list));
 
     // And: Set should be sorted alphabetically
     Set<Object> set = new HashSet<>(list);
-    assertEquals("[<null>, APRIL, JUNE, PT3H]", CollectionUtils.toString(set, NULL_STRING));
+    assertEquals("[APRIL, JUNE, PT3H, ZZ]", CollectionUtils.toString(set, "ZZ"));
   }
 
   @Test

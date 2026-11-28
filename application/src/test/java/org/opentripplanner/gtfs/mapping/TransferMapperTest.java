@@ -1,22 +1,20 @@
 package org.opentripplanner.gtfs.mapping;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collections;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Transfer;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.model.TripStopTimes;
-import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
+import org.opentripplanner.transfer.constrained.model.DeferredConstrainedTransferPoint;
+import org.opentripplanner.transfer.constrained.model.PendingConstrainedTransfer;
 import org.opentripplanner.transfer.constrained.model.TransferPriority;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.opentripplanner.transit.service.SiteRepository;
@@ -47,21 +45,6 @@ public class TransferMapperTest {
     stationId -> null,
     SITE_REPOSITORY_BUILDER
   );
-  private static final BookingRuleMapper BOOKING_RULE_MAPPER = new BookingRuleMapper();
-
-  private static final LocationMapper LOCATION_MAPPER = new LocationMapper(
-    ID_FACTORY,
-    SITE_REPOSITORY_BUILDER,
-    ISSUE_STORE
-  );
-
-  private static final LocationGroupMapper LOCATION_GROUP_MAPPER = new LocationGroupMapper(
-    ID_FACTORY,
-    STOP_MAPPER,
-    LOCATION_MAPPER,
-    SITE_REPOSITORY_BUILDER
-  );
-  private static StopTimeMapper STOP_TIME_MAPPER;
 
   private static final Integer ID = 45;
 
@@ -82,8 +65,6 @@ public class TransferMapperTest {
   private static final TransferPriority TRANSFER_TYPE = TransferPriority.NOT_ALLOWED;
 
   private Transfer transfer;
-
-  private TripStopTimes tripStopTimes = new TripStopTimes();
 
   @BeforeEach
   void prepare() {
@@ -108,28 +89,6 @@ public class TransferMapperTest {
       StopTransferPriority.ALLOWED
     );
 
-    STOP_TIME_MAPPER = new StopTimeMapper(
-      STOP_MAPPER,
-      LOCATION_MAPPER,
-      LOCATION_GROUP_MAPPER,
-      new TripMapper(
-        ID_FACTORY,
-        new RouteMapper(
-          ID_FACTORY,
-          new AgencyMapper(ID_FACTORY),
-          new RouteNetworkAssignmentMapper(ID_FACTORY),
-          ISSUE_STORE,
-          TRANSLATION_HELPER
-        ),
-        new DirectionMapper(ISSUE_STORE),
-        TRANSLATION_HELPER
-      ),
-      BOOKING_RULE_MAPPER,
-      new TranslationHelper()
-    );
-
-    tripStopTimes = new TripStopTimes();
-
     transfer = new Transfer();
     transfer.setId(ID);
     transfer.setFromRoute(FROM_ROUTE);
@@ -144,42 +103,35 @@ public class TransferMapperTest {
 
   @Test
   public void testEmptyMapCollection() {
-    tripStopTimes.addAll(STOP_TIME_MAPPER.map(createStopTimes()));
-
     TransferMapper transferMapper = new TransferMapper(
       ROUTE_MAPPER,
       STATION_MAPPER,
       STOP_MAPPER,
       TRIP_MAPPER,
-      tripStopTimes,
       false,
       ISSUE_STORE
     );
-    assertTrue(transferMapper.map(Collections.emptyList()).constrainedTransfers().isEmpty());
+    assertTrue(transferMapper.map(Collections.emptyList()).pendingConstrainedTransfers().isEmpty());
   }
 
   @Test
   public void testMapCollection() throws Exception {
-    tripStopTimes.addAll(STOP_TIME_MAPPER.map(createStopTimes()));
-
     TransferMapper transferMapper = new TransferMapper(
       ROUTE_MAPPER,
       STATION_MAPPER,
       STOP_MAPPER,
       TRIP_MAPPER,
-      tripStopTimes,
       false,
       ISSUE_STORE
     );
     assertEquals(
       1,
-      transferMapper.map(Collections.singleton(transfer)).constrainedTransfers().size()
+      transferMapper.map(Collections.singleton(transfer)).pendingConstrainedTransfers().size()
     );
   }
 
   @Test
   public void testMapStopTransfer() {
-    tripStopTimes.addAll(STOP_TIME_MAPPER.map(createStopTimes()));
     transfer.setFromTrip(null);
     transfer.setToTrip(null);
     transfer.setFromRoute(null);
@@ -189,110 +141,64 @@ public class TransferMapperTest {
       STATION_MAPPER,
       STOP_MAPPER,
       TRIP_MAPPER,
-      tripStopTimes,
       false,
       ISSUE_STORE
     );
-    ConstrainedTransfer result = transferMapper.map(transfer);
+    PendingConstrainedTransfer result = transferMapper.map(transfer);
 
     assertNotNull(result);
-    assertNotNull(result.getFrom());
-    assertNotNull(result.getFrom().asStopTransferPoint().getStop());
-    assertNotNull(result.getTo());
-    assertNotNull(result.getTo().asStopTransferPoint().getStop());
+    assertNotNull(resolved(result.from()).asStopTransferPoint().getStop());
+    assertNotNull(resolved(result.to()).asStopTransferPoint().getStop());
   }
 
+  /**
+   * A trip-based endpoint can't be resolved to a stop position by {@link TransferMapper} alone -
+   * that only happens once {@link org.opentripplanner.model.impl.TransitDataImportBuilder#build()}
+   * has settled the trip's stop times. See {@link DeferredConstrainedTransferPoint}.
+   */
   @Test
   public void testMap() throws Exception {
-    tripStopTimes.addAll(STOP_TIME_MAPPER.map(createStopTimes()));
-
     TransferMapper transferMapper = new TransferMapper(
       ROUTE_MAPPER,
       STATION_MAPPER,
       STOP_MAPPER,
       TRIP_MAPPER,
-      tripStopTimes,
       false,
       ISSUE_STORE
     );
-    ConstrainedTransfer result = transferMapper.map(transfer);
-    assertNotNull(result.getFrom());
-    assertNotNull(result.getFrom().asTripTransferPoint().getTrip());
-    assertNotNull(result.getTo());
-    assertNotNull(result.getTo().asTripTransferPoint().getTrip());
-    assertEquals(MIN_TRANSFER_TIME, result.getTransferConstraint().getMinTransferTime());
-    assertEquals(TRANSFER_TYPE, result.getTransferConstraint().getPriority());
+    PendingConstrainedTransfer result = transferMapper.map(transfer);
+    DeferredConstrainedTransferPoint.PendingTripPosition from = pending(result.from());
+    DeferredConstrainedTransferPoint.PendingTripPosition to = pending(result.to());
+
+    assertNotNull(from.trip());
+    assertFalse(from.boardTrip());
+    assertNotNull(to.trip());
+    assertTrue(to.boardTrip());
+    assertEquals(MIN_TRANSFER_TIME, result.constraint().getMinTransferTime());
+    assertEquals(TRANSFER_TYPE, result.constraint().getPriority());
   }
 
-  @Test
-  public void testFromToSameStation() {
-    var stop_1 = new Stop();
-    stop_1.setId(new AgencyAndId("F", "S1"));
-    var stop_2 = new Stop();
-    stop_2.setId(new AgencyAndId("F", "S2"));
-    var stop_3 = new Stop();
-    stop_3.setId(new AgencyAndId("F", "S3"));
-
-    var stopTimes = List.of(
-      createStopTime(stop_1, 0, 0, FROM_TRIP),
-      createStopTime(stop_2, 1, 1, FROM_TRIP),
-      createStopTime(stop_3, 2, 2, FROM_TRIP),
-      createStopTime(stop_1, 3, 3, FROM_TRIP),
-      createStopTime(stop_1, 4, 0, TO_TRIP),
-      createStopTime(stop_2, 5, 1, TO_TRIP),
-      createStopTime(stop_3, 6, 2, TO_TRIP),
-      createStopTime(stop_1, 7, 3, TO_TRIP)
-    );
-
-    tripStopTimes.addAll(STOP_TIME_MAPPER.map(stopTimes));
-
-    transfer.setId(ID);
-    transfer.setFromRoute(FROM_ROUTE);
-    transfer.setFromStop(stop_1);
-    transfer.setFromTrip(FROM_TRIP);
-    transfer.setToRoute(TO_ROUTE);
-    transfer.setToStop(stop_1);
-    transfer.setToTrip(TO_TRIP);
-    transfer.setMinTransferTime(MIN_TRANSFER_TIME);
-    transfer.setTransferType(3);
-
-    ConstrainedTransfer result = new TransferMapper(
-      ROUTE_MAPPER,
-      STATION_MAPPER,
-      STOP_MAPPER,
-      TRIP_MAPPER,
-      tripStopTimes,
-      false,
-      ISSUE_STORE
-    ).map(transfer);
-
-    assertNotNull(result);
-    assertNotNull(result.getFrom());
-    assertNotNull(result.getFrom().asTripTransferPoint().getTrip());
-    assertNotNull(result.getTo());
-    assertNotNull(result.getTo().asTripTransferPoint().getTrip());
-    assertEquals(MIN_TRANSFER_TIME, result.getTransferConstraint().getMinTransferTime());
-    assertEquals(TRANSFER_TYPE, result.getTransferConstraint().getPriority());
+  private static DeferredConstrainedTransferPoint.Resolved resolvedPoint(
+    DeferredConstrainedTransferPoint point
+  ) {
+    if (point instanceof DeferredConstrainedTransferPoint.Resolved r) {
+      return r;
+    }
+    throw new AssertionError("Expected a resolved transfer point, got: " + point);
   }
 
-  private static StopTime createStopTime(Stop stop, int id, int stopSeq, Trip trip) {
-    StopTime stopTime = new StopTime();
-    stopTime.setStop(stop);
-    stopTime.setId(id);
-    stopTime.setStopSequence(stopSeq);
-    stopTime.setTrip(trip);
-
-    return stopTime;
+  private static org.opentripplanner.transfer.constrained.model.TransferPoint resolved(
+    DeferredConstrainedTransferPoint point
+  ) {
+    return resolvedPoint(point).point();
   }
 
-  private static List<StopTime> createStopTimes() {
-    return List.of(
-      createStopTime(TEST_DATA.stop, 0, 0, FROM_TRIP),
-      createStopTime(TEST_DATA.stop_2, 1, 1, FROM_TRIP),
-      createStopTime(TEST_DATA.stop_3, 2, 2, FROM_TRIP),
-      createStopTime(TEST_DATA.stop_3, 3, 0, TO_TRIP),
-      createStopTime(TEST_DATA.stop_4, 4, 1, TO_TRIP),
-      createStopTime(TEST_DATA.stop_5, 5, 2, TO_TRIP)
-    );
+  private static DeferredConstrainedTransferPoint.PendingTripPosition pending(
+    DeferredConstrainedTransferPoint point
+  ) {
+    if (point instanceof DeferredConstrainedTransferPoint.PendingTripPosition p) {
+      return p;
+    }
+    throw new AssertionError("Expected a pending trip-position transfer point, got: " + point);
   }
 }

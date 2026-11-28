@@ -4,33 +4,29 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
-import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.ext.fares.service.gtfs.v1.GtfsFareServiceFactory;
-import org.opentripplanner.ext.flex.FlexTripsMapper;
-import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.AddTransitEntitiesToGraph;
 import org.opentripplanner.graph_builder.module.AddTransitEntitiesToTimetable;
 import org.opentripplanner.graph_builder.module.TransitWithFutureDateValidator;
-import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesForEachTrip;
 import org.opentripplanner.graph_builder.module.geometry.GeometryProcessor;
 import org.opentripplanner.gtfs.GenerateTripPatternsOperation;
 import org.opentripplanner.gtfs.interlining.InterlineProcessor;
 import org.opentripplanner.gtfs.mapping.GTFSToTransitDataImportMapper;
 import org.opentripplanner.model.TransitDataImport;
-import org.opentripplanner.model.TripStopTimes;
-import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.impl.TransitDataImportBuilder;
+import org.opentripplanner.model.impl.TransitDataImportBuilder.StopTimeValidation;
+import org.opentripplanner.model.impl.TripPatternGenerator;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.slf4j.Logger;
@@ -114,7 +110,13 @@ public class GtfsModule implements GraphBuilderModule {
 
   @Override
   public void buildGraph() {
-    CalendarServiceData calendarServiceData = new CalendarServiceData();
+    // TODO - Cleanup the mapping and use of service-id. A GTFS feed service-id is NOT the same as
+    //        the OTP domain model service-id.
+    //        See https://github.com/opentripplanner/OpenTripPlanner/issues/7972.
+    //        This applies to the body of this method and related code, e.g. fares and
+    //        InterlineProcessor.
+
+    TripCalendars tripCalendars = TripCalendars.empty();
 
     Map<String, GtfsBundle> feedIdsEncountered = new HashMap<>();
 
@@ -127,8 +129,19 @@ public class GtfsModule implements GraphBuilderModule {
 
         feedIdsEncountered.put(feedId, gtfsBundle);
 
+        var tripPatternGenerator = new GtfsTripPatternGenerator(
+          deduplicator,
+          maxStopToShapeSnapDistance,
+          transitShapeSimplificationToleranceMeters
+        );
         GTFSToTransitDataImportMapper mapper = new GTFSToTransitDataImportMapper(
-          new TransitDataImportBuilder(transitRepository.getSiteRepository(), issueStore),
+          new TransitDataImportBuilder(
+            transitRepository.getSiteRepository(),
+            issueStore,
+            transitPeriodLimit,
+            StopTimeValidation.INTERPOLATE,
+            tripPatternGenerator
+          ),
           feedId,
           issueStore,
           gtfsBundle.parameters().discardMinTransferTimes(),
@@ -139,42 +152,18 @@ public class GtfsModule implements GraphBuilderModule {
         TransitDataImportBuilder builder = mapper.getBuilder();
         var fareRulesData = mapper.fareRulesData();
 
-        builder.limitServiceDays(transitPeriodLimit);
-
-        calendarServiceData.add(builder.buildCalendarServiceData());
-
-        calendarServiceData
-          .getServiceIds()
+        builder
+          .tripCalendars()
+          .listServiceIds()
           .forEach(sId ->
-            fareRulesData.putServiceIds(sId, calendarServiceData.getServiceDatesForServiceId(sId))
+            fareRulesData.putServiceIds(sId, builder.tripCalendars().listServiceDates(sId))
           );
 
-        if (OTPFeature.FlexRouting.isOn()) {
-          builder.getFlexTripsById().addAll(FlexTripsMapper.createFlexTrips(builder, issueStore));
-        }
-
-        validateAndInterpolateStopTimesForEachTrip(builder.getStopTimesSortedByTrip(), issueStore);
-
-        // We need to run this after the cleaning of the data, as stop indices might have changed
         mapper.mapAndAddTransfersToBuilder(gtfsDao);
 
-        GeometryProcessor geometryProcessor = new GeometryProcessor(
-          builder,
-          maxStopToShapeSnapDistance,
-          transitShapeSimplificationToleranceMeters,
-          issueStore
-        );
-
-        // NB! The calls below have side effects - the builder state is updated!
-        createTripPatterns(
-          deduplicator,
-          transitRepository,
-          builder,
-          calendarServiceData.getServiceIds(),
-          geometryProcessor,
-          issueStore
-        );
-
+        // NB! This call has side effects - it prunes/validates the builder's state, resolves
+        // pending transfers and generates trip patterns, in that fixed order - see
+        // TransitDataImportBuilder#build().
         TransitDataImport dataImport = builder.build();
 
         addTransitRepositoryToGraph(graph, transitRepository, streetDetailsRepository, dataImport);
@@ -185,19 +174,21 @@ public class GtfsModule implements GraphBuilderModule {
             builder.getStaySeatedNotAllowed(),
             gtfsBundle.parameters().maxInterlineDistance(),
             issueStore,
-            calendarServiceData
+            dataImport.getTripCalendars()
           ).run(dataImport.getTripPatterns());
         }
 
         fareServiceFactory.processGtfs(fareRulesData);
+
+        tripCalendars = tripCalendars.merge(dataImport.getTripCalendars());
       }
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
 
-    timetableDataImport.updateCalendarServiceData(calendarServiceData);
+    timetableDataImport.mergeTripCalendars(tripCalendars);
     TransitWithFutureDateValidator.validate(
-      calendarServiceData,
+      tripCalendars,
       issueStore,
       transitRepository.getTimeZone()
     );
@@ -239,43 +230,6 @@ public class GtfsModule implements GraphBuilderModule {
 
   /* Private Methods */
 
-  /**
-   * This method has side effects, the {@code stopTimesByTrip} is updated.
-   */
-  private void validateAndInterpolateStopTimesForEachTrip(
-    TripStopTimes stopTimesByTrip,
-    DataImportIssueStore issueStore
-  ) {
-    new ValidateAndInterpolateStopTimesForEachTrip(stopTimesByTrip, true, issueStore).run();
-  }
-
-  /**
-   * This method has side effects, the {@code builder} is updated with new TripPatterns.
-   */
-  private void createTripPatterns(
-    DeduplicatorService deduplicator,
-    TransitRepository transitRepository,
-    TransitDataImportBuilder builder,
-    Set<FeedScopedId> calServiceIds,
-    GeometryProcessor geometryProcessor,
-    DataImportIssueStore issueStore
-  ) {
-    GenerateTripPatternsOperation buildTPOp = new GenerateTripPatternsOperation(
-      builder,
-      issueStore,
-      deduplicator,
-      calServiceIds,
-      geometryProcessor
-    );
-    buildTPOp.run();
-    transitRepository.setHasFrequencyService(
-      transitRepository.hasFrequencyService() || buildTPOp.hasFrequencyBasedTrips()
-    );
-    transitRepository.setHasScheduledService(
-      transitRepository.hasScheduledService() || buildTPOp.hasScheduledTrips()
-    );
-  }
-
   private void addTransitRepositoryToGraph(
     Graph graph,
     TransitRepository transitRepository,
@@ -293,5 +247,47 @@ public class GtfsModule implements GraphBuilderModule {
       graph,
       streetDetailsRepository
     );
+  }
+
+  /**
+   * The GTFS {@link TripPatternGenerator}.
+   * <p>
+   * This wraps {@link GenerateTripPatternsOperation} rather than having it implement
+   * {@link TripPatternGenerator} directly, because building its {@link GeometryProcessor} needs
+   * the real {@link TransitDataImportBuilder} - but this generator is itself constructed and
+   * handed to {@link TransitDataImportBuilder}'s constructor before that builder exists, so the
+   * {@code GeometryProcessor} can only be built at {@link #generate} time, not upfront.
+   */
+  private static class GtfsTripPatternGenerator implements TripPatternGenerator {
+
+    private final DeduplicatorService deduplicator;
+    private final double maxStopToShapeSnapDistance;
+    private final double transitShapeSimplificationToleranceMeters;
+
+    private GtfsTripPatternGenerator(
+      DeduplicatorService deduplicator,
+      double maxStopToShapeSnapDistance,
+      double transitShapeSimplificationToleranceMeters
+    ) {
+      this.deduplicator = deduplicator;
+      this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
+      this.transitShapeSimplificationToleranceMeters = transitShapeSimplificationToleranceMeters;
+    }
+
+    @Override
+    public void generate(TransitDataImportBuilder builder, DataImportIssueStore issueStore) {
+      // NB! run() has side effects: it adds trip patterns to builder.
+      new GenerateTripPatternsOperation(
+        builder,
+        issueStore,
+        deduplicator,
+        new GeometryProcessor(
+          builder,
+          maxStopToShapeSnapDistance,
+          transitShapeSimplificationToleranceMeters,
+          issueStore
+        )
+      ).run();
+    }
   }
 }

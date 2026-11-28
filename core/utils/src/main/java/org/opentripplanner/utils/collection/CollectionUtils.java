@@ -23,15 +23,23 @@ public class CollectionUtils {
    * <p>
    * The final result string examples: {@code "[]", "[a]", "[a, b, c]"}
    */
-  public static <T> String toString(@Nullable Collection<T> c, String nullText) {
-    if (c == null) {
+  public static <T> String toString(@Nullable Iterable<T> bag, String nullText) {
+    if (bag == null) {
       return nullText;
     }
-    var stream = c.stream().map(it -> it == null ? nullText : it.toString());
-    if (c instanceof Set && !(c instanceof SortedSet<T>)) {
+    var stream = StreamUtils.ofIterable(bag).map(it -> it == null ? nullText : it.toString());
+    if (bag instanceof Set && !(bag instanceof SortedSet<T>)) {
       stream = stream.sorted();
     }
     return stream.collect(Collectors.joining(", ", "[", "]"));
+  }
+
+  /**
+   * Alias for {@code toString(myCollection, "null")}
+   * @see #toString(Iterable, String)
+   */
+  public static <T> String toString(@Nullable Iterable<T> bag) {
+    return toString(bag, "<null>");
   }
 
   /**

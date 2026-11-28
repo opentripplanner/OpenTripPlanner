@@ -54,7 +54,6 @@ import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.core.model.time.TimePeriod;
 import org.opentripplanner.model.FeedInfoTestFactory;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.fare.FareMedium;
 import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.fare.FareProduct;
@@ -112,6 +111,7 @@ import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.framework.AbstractBuilder;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.BikeAccess;
@@ -310,15 +310,15 @@ class GraphQLIntegrationTest {
     transitRepository.initTimeZone(BERLIN);
 
     // Crate a calendar (needed for testing cancelled trips)
-    CalendarServiceData calendarServiceData = new CalendarServiceData();
+    var calendarsBuilder = TripCalendars.of();
     var firstDate = LocalDate.of(2024, 8, 8);
     var secondDate = LocalDate.of(2024, 8, 9);
-    calendarServiceData.putServiceDatesForServiceId(
+    calendarsBuilder.putServiceDatesForServiceId(
       cal_id,
       List.of(firstDate, secondDate, SERVICE_DATE)
     );
     timetableDataImport.addNextServiceCodes(List.of(cal_id));
-    timetableDataImport.updateCalendarServiceData(calendarServiceData);
+    timetableDataImport.mergeTripCalendars(calendarsBuilder.build());
     transitRepository.index();
 
     var scheduledTimetableData = timetableDataImport.toScheduledTimetableData();

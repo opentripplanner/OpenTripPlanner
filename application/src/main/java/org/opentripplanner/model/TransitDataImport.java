@@ -7,6 +7,7 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
 import org.opentripplanner.transit.model.basic.Notice;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
@@ -47,9 +48,15 @@ public interface TransitDataImport {
   Collection<Pathway> getAllPathways();
 
   /**
-   * @return all ids for both Calendars and CalendarDates merged into on list without duplicates.
+   * @return all service ids used in the imported data, equivalent to
+   * {@code getTripCalendars().listServiceIds()}.
    */
-  Collection<FeedScopedId> getAllServiceIds();
+  Iterable<FeedScopedId> getAllServiceIds();
+
+  /**
+   * The trip calendars with service dates.
+   */
+  TripCalendars getTripCalendars();
 
   Collection<PathwayNode> getAllPathwayNodes();
 

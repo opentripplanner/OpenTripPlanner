@@ -16,9 +16,9 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.RouteBuilder;
 import org.opentripplanner.transit.model.network.StopPattern;
@@ -95,14 +95,14 @@ public class TransitRepositoryTestBuilder {
       timetableDataImport.addTripOnServiceDate(tripOnServiceDate);
     }
 
-    var calendarServiceData = new CalendarServiceData();
+    var calendarsBuilder = TripCalendars.of();
     for (var serviceCode : serviceCodes.values()) {
-      calendarServiceData.putServiceDatesForServiceId(serviceCode.id(), serviceCode.serviceDates());
+      calendarsBuilder.putServiceDatesForServiceId(serviceCode.id(), serviceCode.serviceDates());
     }
     timetableDataImport.addNextServiceCodes(
       serviceCodes.values().stream().map(ServiceCode::id).toList()
     );
-    timetableDataImport.updateCalendarServiceData(calendarServiceData);
+    timetableDataImport.mergeTripCalendars(calendarsBuilder.build());
 
     timetableDataImport
       .getAllTripPatterns()

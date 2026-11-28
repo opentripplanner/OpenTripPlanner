@@ -26,6 +26,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.utils.collection.ListUtils;
 
 public class DefaultTransitDataImportTest {
 
@@ -130,7 +131,7 @@ public class DefaultTransitDataImportTest {
 
   @Test
   public void testGetAllServiceIds() {
-    Collection<FeedScopedId> serviceIds = subject.getAllServiceIds();
+    Collection<FeedScopedId> serviceIds = ListUtils.ofIterable(subject.getAllServiceIds());
 
     assertEquals(2, serviceIds.size());
     assertEquals("F:alldays", first(serviceIds).toString());

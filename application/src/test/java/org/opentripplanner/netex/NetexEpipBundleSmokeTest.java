@@ -1,5 +1,6 @@
 package org.opentripplanner.netex;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -8,6 +9,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -18,9 +20,9 @@ import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.TransitDataImport;
-import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -29,6 +31,8 @@ import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.utils.collection.ListUtils;
+import org.opentripplanner.utils.collection.StreamUtils;
 
 /**
  * Load a small NeTEx file set without failing. This is just a smoke test and should be excluded
@@ -66,10 +70,10 @@ class NetexEpipBundleSmokeTest {
     assertStations(otpModel.siteRepository().listStations());
     assertTripPatterns(otpModel.getTripPatterns());
     assertTrips(otpModel.getAllTrips());
-    assertServiceIds(otpModel.getAllTrips(), otpModel.getAllServiceIds());
+    assertServiceIds(otpModel.getAllTrips(), ListUtils.ofIterable(otpModel.getAllServiceIds()));
 
     // And then - smoke test service calendar
-    assetServiceCalendar(transitBuilder.buildCalendarServiceData());
+    assetServiceCalendar(transitBuilder.tripCalendars().build());
   }
 
   /* private methods */
@@ -172,12 +176,16 @@ class NetexEpipBundleSmokeTest {
     assertEquals(tripServiceIds, Set.copyOf(serviceIds));
   }
 
-  private void assetServiceCalendar(CalendarServiceData cal) {
-    ArrayList<FeedScopedId> sIds = new ArrayList<>(cal.getServiceIds());
-    assertEquals(2, sIds.size());
-    FeedScopedId serviceId1 = sIds.getFirst();
+  private void assetServiceCalendar(TripCalendars cal) {
+    assertThat(cal.listServiceIds()).hasSize(2);
 
-    List<LocalDate> dates = cal.getServiceDatesForServiceId(serviceId1);
+    // Service ids are auto-generated in file-processing order, which is not deterministic
+    // (see java.io.File#listFiles), so pick the calendar to assert on by its own content
+    // instead of relying on which generated id happens to be first.
+    List<LocalDate> dates = StreamUtils.ofIterable(cal.listServiceIds())
+      .map(id -> cal.listServiceDates(id).stream().sorted().toList())
+      .min(Comparator.comparing(List::getFirst))
+      .orElseThrow();
 
     assertEquals("2023-02-02", dates.getFirst().toString());
     assertEquals("2023-12-08", dates.getLast().toString());

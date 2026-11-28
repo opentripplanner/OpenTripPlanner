@@ -2,9 +2,9 @@ package org.opentripplanner.gtfs;
 
 import static org.opentripplanner.transit.model._data.TransitRepositoryForTest.trip;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,6 +31,7 @@ import org.opentripplanner.transit.service.SiteRepository;
 
 class GenerateTripPatternsOperationTest {
 
+  public static final LocalDate ANY_DATE = LocalDate.of(2024, 1, 1);
   private static SiteRepository siteRepository;
   private static RegularStop stopA;
   private static RegularStop stopB;
@@ -133,12 +134,11 @@ class GenerateTripPatternsOperationTest {
 
   @Test
   void testGenerateTripPatternsNoTrip() {
-    Set<FeedScopedId> calendarServiceIds = Set.of();
+    addCalendarServiceIds(transitServiceBuilder);
     GenerateTripPatternsOperation generateTripPatternsOperation = new GenerateTripPatternsOperation(
       transitServiceBuilder,
       issueStore,
       deduplicator,
-      calendarServiceIds,
       geometryProcessor
     );
     generateTripPatternsOperation.run();
@@ -149,14 +149,13 @@ class GenerateTripPatternsOperationTest {
 
   @Test
   void testGenerateTripPatternsTripWithUndefinedService() {
-    transitServiceBuilder.getTripsById().computeIfAbsent(trip1.getId(), feedScopedId -> trip1);
-    Set<FeedScopedId> calendarServiceIds = Set.of();
+    transitServiceBuilder.getTripsById().computeIfAbsent(trip1.getId(), _ -> trip1);
+    addCalendarServiceIds(transitServiceBuilder);
 
     GenerateTripPatternsOperation generateTripPatternsOperation = new GenerateTripPatternsOperation(
       transitServiceBuilder,
       issueStore,
       deduplicator,
-      calendarServiceIds,
       geometryProcessor
     );
     generateTripPatternsOperation.run();
@@ -168,14 +167,14 @@ class GenerateTripPatternsOperationTest {
 
   @Test
   void testGenerateTripPatternsDegeneratedTrip() {
-    transitServiceBuilder.getTripsById().computeIfAbsent(trip1.getId(), feedScopedId -> trip1);
-    Set<FeedScopedId> calendarServiceIds = Set.of(trip1.getServiceId());
+    transitServiceBuilder.getTripsById().computeIfAbsent(trip1.getId(), _ -> trip1);
+
+    addCalendarServiceIds(transitServiceBuilder, trip1.getServiceId());
 
     GenerateTripPatternsOperation generateTripPatternsOperation = new GenerateTripPatternsOperation(
       transitServiceBuilder,
       issueStore,
       deduplicator,
-      calendarServiceIds,
       geometryProcessor
     );
     generateTripPatternsOperation.run();
@@ -187,16 +186,16 @@ class GenerateTripPatternsOperationTest {
 
   @Test
   void testGenerateTripPatterns() {
-    transitServiceBuilder.getTripsById().computeIfAbsent(trip1.getId(), feedScopedId -> trip1);
+    transitServiceBuilder.getTripsById().computeIfAbsent(trip1.getId(), _ -> trip1);
     Collection<StopTime> stopTimes = List.of(stopTimeA, stopTimeB);
     transitServiceBuilder.getStopTimesSortedByTrip().put(trip1, stopTimes);
-    Set<FeedScopedId> calendarServiceIds = Set.of(trip1.getServiceId());
+
+    addCalendarServiceIds(transitServiceBuilder, trip1.getServiceId());
 
     GenerateTripPatternsOperation generateTripPatternsOperation = new GenerateTripPatternsOperation(
       transitServiceBuilder,
       issueStore,
       deduplicator,
-      calendarServiceIds,
       geometryProcessor
     );
     generateTripPatternsOperation.run();
@@ -207,20 +206,19 @@ class GenerateTripPatternsOperationTest {
 
   @Test
   void testGenerateTripPatterns2TripsSameStops() {
-    transitServiceBuilder.getTripsById().computeIfAbsent(trip1.getId(), feedScopedId -> trip1);
-    transitServiceBuilder.getTripsById().computeIfAbsent(trip2.getId(), feedScopedId -> trip2);
+    transitServiceBuilder.getTripsById().computeIfAbsent(trip1.getId(), _ -> trip1);
+    transitServiceBuilder.getTripsById().computeIfAbsent(trip2.getId(), _ -> trip2);
     Collection<StopTime> stopTimes = List.of(stopTimeA, stopTimeB);
 
     transitServiceBuilder.getStopTimesSortedByTrip().put(trip1, stopTimes);
     transitServiceBuilder.getStopTimesSortedByTrip().put(trip2, stopTimes);
 
-    Set<FeedScopedId> calendarServiceIds = Set.of(trip1.getServiceId(), trip2.getServiceId());
+    addCalendarServiceIds(transitServiceBuilder, trip1.getServiceId(), trip2.getServiceId());
 
     GenerateTripPatternsOperation generateTripPatternsOperation = new GenerateTripPatternsOperation(
       transitServiceBuilder,
       issueStore,
       deduplicator,
-      calendarServiceIds,
       geometryProcessor
     );
     generateTripPatternsOperation.run();
@@ -243,21 +241,20 @@ class GenerateTripPatternsOperationTest {
 
   @Test
   void testGenerateTripPatterns2TripsDifferentStops() {
-    transitServiceBuilder.getTripsById().computeIfAbsent(trip1.getId(), feedScopedId -> trip1);
-    transitServiceBuilder.getTripsById().computeIfAbsent(trip2.getId(), feedScopedId -> trip2);
+    transitServiceBuilder.getTripsById().computeIfAbsent(trip1.getId(), _ -> trip1);
+    transitServiceBuilder.getTripsById().computeIfAbsent(trip2.getId(), _ -> trip2);
     Collection<StopTime> stopTimesTrip1 = List.of(stopTimeA, stopTimeB);
     Collection<StopTime> stopTimesTrip2 = List.of(stopTimeA, stopTimeC);
 
     transitServiceBuilder.getStopTimesSortedByTrip().put(trip1, stopTimesTrip1);
     transitServiceBuilder.getStopTimesSortedByTrip().put(trip2, stopTimesTrip2);
 
-    Set<FeedScopedId> calendarServiceIds = Set.of(trip1.getServiceId(), trip2.getServiceId());
+    addCalendarServiceIds(transitServiceBuilder, trip1.getServiceId(), trip2.getServiceId());
 
     GenerateTripPatternsOperation generateTripPatternsOperation = new GenerateTripPatternsOperation(
       transitServiceBuilder,
       issueStore,
       deduplicator,
-      calendarServiceIds,
       geometryProcessor
     );
     generateTripPatternsOperation.run();
@@ -280,25 +277,33 @@ class GenerateTripPatternsOperationTest {
   @ParameterizedTest
   @MethodSource("testCases")
   void testGenerateDifferentTripPatterns(Trip t1, Trip t2) {
-    transitServiceBuilder.getTripsById().computeIfAbsent(t1.getId(), feedScopedId -> t1);
-    transitServiceBuilder.getTripsById().computeIfAbsent(t2.getId(), feedScopedId -> t2);
+    transitServiceBuilder.getTripsById().computeIfAbsent(t1.getId(), _ -> t1);
+    transitServiceBuilder.getTripsById().computeIfAbsent(t2.getId(), _ -> t2);
     Collection<StopTime> stopTimes = List.of(stopTimeA, stopTimeB);
 
     transitServiceBuilder.getStopTimesSortedByTrip().put(t1, stopTimes);
     transitServiceBuilder.getStopTimesSortedByTrip().put(t2, stopTimes);
 
-    Set<FeedScopedId> calendarServiceIds = Set.of(t1.getServiceId(), t2.getServiceId());
+    addCalendarServiceIds(transitServiceBuilder, t1.getServiceId(), t2.getServiceId());
 
     GenerateTripPatternsOperation generateTripPatternsOperation = new GenerateTripPatternsOperation(
       transitServiceBuilder,
       issueStore,
       deduplicator,
-      calendarServiceIds,
       geometryProcessor
     );
     generateTripPatternsOperation.run();
 
     Assertions.assertEquals(2, transitServiceBuilder.getTripPatterns().size());
     Assertions.assertTrue(issueStore.listIssues().isEmpty());
+  }
+
+  private static void addCalendarServiceIds(
+    TransitDataImportBuilder builder,
+    FeedScopedId... serviceIds
+  ) {
+    for (var serviceId : serviceIds) {
+      builder.tripCalendars().addServiceDate(serviceId, ANY_DATE);
+    }
   }
 }

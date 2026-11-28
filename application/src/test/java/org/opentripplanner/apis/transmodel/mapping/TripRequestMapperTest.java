@@ -30,7 +30,6 @@ import org.opentripplanner.apis.support.graphql.DataFetchingSupport;
 import org.opentripplanner.apis.transmodel.TransmodelAPITestContextBuilder;
 import org.opentripplanner.apis.transmodel.TransmodelGraphQLRequestContext;
 import org.opentripplanner.core.model.basic.Ratio;
-import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
@@ -47,6 +46,7 @@ import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -100,13 +100,13 @@ public class TripRequestMapperTest implements PlanTestConstants {
     LocalDate serviceDate = itinerary.startTime().toLocalDate();
     TRANSIT_ENV = TransitTestEnvironment.of(LocalDate.of(2024, 5, 7), ZoneIds.STOCKHOLM)
       .withTimetableDataImport(timetableDataImport -> {
-        var calendarServiceData = new CalendarServiceData();
+        var calendarsBuilder = TripCalendars.of();
         patterns.forEach(pattern -> {
           timetableDataImport.addTripPattern(pattern.getId(), pattern);
           timetableDataImport.addNextServiceCodes(List.of(pattern.getId()));
-          calendarServiceData.putServiceDatesForServiceId(pattern.getId(), List.of(serviceDate));
+          calendarsBuilder.putServiceDatesForServiceId(pattern.getId(), List.of(serviceDate));
         });
-        timetableDataImport.updateCalendarServiceData(calendarServiceData);
+        timetableDataImport.mergeTripCalendars(calendarsBuilder.build());
       })
       .build();
     TRANSIT_REPOSITORY = TRANSIT_ENV.transitRepository();

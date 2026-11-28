@@ -10,7 +10,6 @@ import com.carrotsearch.hppc.IntHashSet;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.calendar.CalendarServiceData;
 
 /**
  * The service codes running for a date are HPPC {@link IntHashSet}s, which have no dedicated Kryo
@@ -36,11 +35,11 @@ class TripCalendarsKryoTest {
   }
 
   private static TripCalendars calendars() {
-    var data = new CalendarServiceData();
+    var data = TripCalendars.of();
     data.putServiceDatesForServiceId(id("A"), List.of(DATE, DATE.plusDays(1)));
     data.putServiceDatesForServiceId(id("B"), List.of(DATE));
     return TripCalendars.empty()
-      .merge(data)
+      .merge(data.build())
       .withNextServiceCodes(List.of(id("A"), id("B")))
       .initializeServiceCodesRunningForDate();
   }

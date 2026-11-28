@@ -7,8 +7,8 @@ import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 
@@ -45,7 +45,7 @@ class TimetableDataImportTest {
     );
     assertThrows(IllegalStateException.class, () -> subject.addFlexTrip(id("F1"), null));
     assertThrows(IllegalStateException.class, () ->
-      subject.updateCalendarServiceData(new CalendarServiceData())
+      subject.mergeTripCalendars(TripCalendars.empty())
     );
     assertThrows(IllegalStateException.class, () -> subject.addNextServiceCodes(List.of(id("S1"))));
   }
