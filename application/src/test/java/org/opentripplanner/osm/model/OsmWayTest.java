@@ -111,6 +111,9 @@ class OsmWayTest {
 
     way = OsmWay.of().withTag("junction", "roundabout").build();
     assertTrue(way.isRoundabout());
+
+    way = OsmWay.of().withTag("junction", "circular").build();
+    assertTrue(way.isRoundabout());
   }
 
   @Test

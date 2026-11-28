@@ -3,8 +3,12 @@ package org.opentripplanner.street.search.intersection_model;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.street.model.StreetModelFactory.intersectionVertex;
+import static org.opentripplanner.street.model.StreetModelFactory.streetEdge;
+import static org.opentripplanner.street.model.StreetModelFactory.streetEdgeBuilder;
 import static org.opentripplanner.street.search.intersection_model.AbstractIntersectionTraversalCalculator.calculateTurnAngle;
 
+import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,14 +19,23 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.street.geometry.GeometryUtils;
+import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.street.geometry.WgsCoordinate;
+import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
+import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.LabelledIntersectionVertex;
 import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
+import org.opentripplanner.street.search.EuclideanRemainingWeightHeuristic;
+import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.street.search.request.BikeRequest;
+import org.opentripplanner.street.search.request.StreetSearchRequest;
+import org.opentripplanner.street.search.request.WalkRequest;
 
 /**
  * Tests for SimpleIntersectionTraversalModel.
@@ -33,6 +46,9 @@ import org.opentripplanner.street.search.TraverseMode;
 public class SimpleIntersectionTraversalCalculatorTest {
 
   public SimpleIntersectionTraversalCalculator calculator;
+
+  private final Roundabout roundabout = Roundabout.withEastArmOffAxis(0);
+  private final FourWay fourWay = FourWay.atOrigin();
 
   @BeforeEach
   public void before() {
@@ -109,6 +125,230 @@ public class SimpleIntersectionTraversalCalculatorTest {
       leftHandDriveCostModel.computeTraversalDuration(v2, e3, e1, TraverseMode.BICYCLE, 40, 40),
       0.1
     );
+  }
+
+  /** A traffic circle at a four-way intersection, entered from the south. */
+  @Test
+  public void testBicycleTrafficCircle() {
+    assertEquals(4.5, bicycleTurnDuration(roundabout.right()), 0.01);
+    assertEquals(9.0, bicycleTurnDuration(roundabout.straight()), 0.01);
+    assertEquals(13.5, bicycleTurnDuration(roundabout.left()), 0.01);
+    assertEquals(18.0, bicycleTurnDuration(roundabout.uTurn()), 0.01);
+  }
+
+  /**
+   * The four-way intersection of {@link #testBicycleTrafficCircle()} without its traffic circle.
+   */
+  @Test
+  public void testBicycleFourWayIntersection() {
+    assertEquals(4.5, bicycleTurnDuration(fourWay.right()), 0.01);
+    assertEquals(0, bicycleTurnDuration(fourWay.straight()), 0.01);
+    assertEquals(13.5, bicycleTurnDuration(fourWay.left()), 0.01);
+    assertEquals(27.0, bicycleTurnDuration(fourWay.uTurn()), 0.01);
+  }
+
+  /** Turning right off the traffic circle when its east arm is a few degrees off square. */
+  @Test
+  public void testBicycleSkewedTrafficCircle() {
+    assertEquals(4.3, bicycleTurnDuration(Roundabout.withEastArmOffAxis(-4).right()), 0.01);
+    assertEquals(4.7, bicycleTurnDuration(Roundabout.withEastArmOffAxis(4).right()), 0.01);
+  }
+
+  /** Turning left, entering from the south. */
+  @Test
+  public void testBicycleWrongWayThroughTrafficCircle() {
+    var from = roundabout.south().in().getFromVertex();
+    var to = roundabout.west().out().getToVertex();
+    var tree = StreetSearchBuilder.of()
+      .withHeuristic(new EuclideanRemainingWeightHeuristic())
+      .withRequest(StreetSearchRequest.of().withMode(StreetMode.BIKE).build())
+      .withFrom(from)
+      .withTo(to)
+      .getShortestPathTree();
+    var wentRightWay = new StreetPath(tree.getState(to))
+      .states()
+      .stream()
+      .anyMatch(state -> state.getBackEdge() == roundabout.southToEast());
+    assertTrue(wentRightWay);
+  }
+
+  @Test
+  public void testCarTrafficCircle() {
+    assertEquals(16, carTurnDuration(roundabout.right()), 0.01);
+    assertEquals(24, carTurnDuration(roundabout.straight()), 0.01);
+    assertEquals(32, carTurnDuration(roundabout.left()), 0.01);
+    assertEquals(40, carTurnDuration(roundabout.uTurn()), 0.01);
+  }
+
+  @Test
+  public void testCarFourWayIntersection() {
+    assertEquals(8, carTurnDuration(fourWay.right()), 0.01);
+    assertEquals(0, carTurnDuration(fourWay.straight()), 0.01);
+    assertEquals(8, carTurnDuration(fourWay.left()), 0.01);
+    assertEquals(8, carTurnDuration(fourWay.uTurn()), 0.01);
+  }
+
+  @Test
+  public void testCarSkewedTrafficCircle() {
+    assertEquals(0, carTurnDuration(Roundabout.withEastArmOffAxis(-4).right()), 0.01);
+    assertEquals(16, carTurnDuration(Roundabout.withEastArmOffAxis(4).right()), 0.01);
+  }
+
+  @Test
+  public void testWalkTrafficCircle() {
+    assertEquals(3.38, walkTurnDuration(roundabout.right()), 0.01);
+    assertEquals(6.77, walkTurnDuration(roundabout.straight()), 0.01);
+    assertEquals(10.15, walkTurnDuration(roundabout.left()), 0.01);
+    assertEquals(13.53, walkTurnDuration(roundabout.uTurn()), 0.01);
+  }
+
+  @Test
+  public void testWalkFourWayIntersection() {
+    assertEquals(3.38, walkTurnDuration(fourWay.right()), 0.01);
+    assertEquals(0, walkTurnDuration(fourWay.straight()), 0.01);
+    assertEquals(3.38, walkTurnDuration(fourWay.left()), 0.01);
+    assertEquals(6.77, walkTurnDuration(fourWay.uTurn()), 0.01);
+  }
+
+  @Test
+  public void testWalkSkewedTrafficCircle() {
+    assertEquals(3.23, walkTurnDuration(Roundabout.withEastArmOffAxis(-4).right()), 0.01);
+    assertEquals(3.53, walkTurnDuration(Roundabout.withEastArmOffAxis(4).right()), 0.01);
+  }
+
+  private static final double ARM_LENGTH_METERS = 100;
+
+  /** A vertex {@code meters} from the origin at compass {@code bearing}. */
+  private static IntersectionVertex vertexAt(double bearing, double meters) {
+    var radians = Math.toRadians(bearing);
+    var c = SphericalDistanceLibrary.moveMeters(
+      new WgsCoordinate(0, 0),
+      meters * Math.cos(radians),
+      meters * Math.sin(radians)
+    );
+    return intersectionVertex(c.latitude(), c.longitude());
+  }
+
+  private record TwoWay(StreetEdge in, StreetEdge out) {}
+
+  /** A two-way street from {@code junction} to {@code end}. */
+  private static TwoWay twoWay(StreetVertex junction, StreetVertex end) {
+    return new TwoWay(streetEdge(end, junction), streetEdge(junction, end));
+  }
+
+  /** A plain four-way intersection; turns are named for entering from the south. */
+  private record FourWay(TwoWay south, TwoWay east, TwoWay north, TwoWay west) {
+    static FourWay atOrigin() {
+      var center = vertexAt(0, 0);
+      return new FourWay(
+        twoWay(center, vertexAt(180, ARM_LENGTH_METERS)),
+        twoWay(center, vertexAt(90, ARM_LENGTH_METERS)),
+        twoWay(center, vertexAt(0, ARM_LENGTH_METERS)),
+        twoWay(center, vertexAt(270, ARM_LENGTH_METERS))
+      );
+    }
+
+    List<StreetEdge> right() {
+      return List.of(south.in(), east.out());
+    }
+
+    List<StreetEdge> straight() {
+      return List.of(south.in(), north.out());
+    }
+
+    List<StreetEdge> left() {
+      return List.of(south.in(), west.out());
+    }
+
+    List<StreetEdge> uTurn() {
+      return List.of(south.in(), south.out());
+    }
+  }
+
+  /**
+   * A four-way traffic circle around the origin. Its edges run counterclockwise, as under the
+   * calculator's {@link DrivingDirection#RIGHT}. Turns are named for entering from the south.
+   */
+  private record Roundabout(
+    TwoWay south,
+    TwoWay east,
+    TwoWay north,
+    TwoWay west,
+    StreetEdge southToEast,
+    StreetEdge eastToNorth,
+    StreetEdge northToWest,
+    StreetEdge westToSouth
+  ) {
+    private static final double RADIUS_METERS = 7;
+
+    static Roundabout withEastArmOffAxis(double degrees) {
+      double eastBearing = 90 + degrees;
+      var south = vertexAt(180, RADIUS_METERS);
+      var east = vertexAt(eastBearing, RADIUS_METERS);
+      var north = vertexAt(0, RADIUS_METERS);
+      var west = vertexAt(270, RADIUS_METERS);
+      return new Roundabout(
+        twoWay(south, vertexAt(180, ARM_LENGTH_METERS)),
+        twoWay(east, vertexAt(eastBearing, ARM_LENGTH_METERS)),
+        twoWay(north, vertexAt(0, ARM_LENGTH_METERS)),
+        twoWay(west, vertexAt(270, ARM_LENGTH_METERS)),
+        ringEdge(south, east),
+        ringEdge(east, north),
+        ringEdge(north, west),
+        ringEdge(west, south)
+      );
+    }
+
+    /** One way for riders, like a mapped roundabout, though it can still be walked both ways. */
+    private static StreetEdge ringEdge(StreetVertex from, StreetVertex to) {
+      var meters = SphericalDistanceLibrary.distance(from.getCoordinate(), to.getCoordinate());
+      streetEdgeBuilder(to, from, meters, StreetTraversalPermission.PEDESTRIAN)
+        .withRoundabout(true)
+        .buildAndConnect();
+      return streetEdgeBuilder(from, to, meters, StreetTraversalPermission.ALL)
+        .withRoundabout(true)
+        .buildAndConnect();
+    }
+
+    List<StreetEdge> right() {
+      return List.of(south.in(), southToEast, east.out());
+    }
+
+    List<StreetEdge> straight() {
+      return List.of(south.in(), southToEast, eastToNorth, north.out());
+    }
+
+    List<StreetEdge> left() {
+      return List.of(south.in(), southToEast, eastToNorth, northToWest, west.out());
+    }
+
+    List<StreetEdge> uTurn() {
+      return List.of(south.in(), southToEast, eastToNorth, northToWest, westToSouth, south.out());
+    }
+  }
+
+  private double bicycleTurnDuration(List<StreetEdge> path) {
+    return turnDuration(TraverseMode.BICYCLE, (float) BikeRequest.DEFAULT.speed(), path);
+  }
+
+  private double carTurnDuration(List<StreetEdge> path) {
+    return turnDuration(TraverseMode.CAR, StreetEdgeBuilder.DEFAULT_CAR_SPEED, path);
+  }
+
+  private double walkTurnDuration(List<StreetEdge> path) {
+    return turnDuration(TraverseMode.WALK, (float) WalkRequest.DEFAULT.speed(), path);
+  }
+
+  /** Total turn duration travelling along {@code path}. */
+  private double turnDuration(TraverseMode mode, float speed, List<StreetEdge> path) {
+    double total = 0;
+    for (int i = 1; i < path.size(); i++) {
+      var from = path.get(i - 1);
+      var to = path.get(i);
+      var v = (IntersectionVertex) from.getToVertex();
+      total += calculator.computeTraversalDuration(v, from, to, mode, speed, speed);
+    }
+    return total;
   }
 
   @Test

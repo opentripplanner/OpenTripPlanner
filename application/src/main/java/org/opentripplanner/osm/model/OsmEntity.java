@@ -145,6 +145,8 @@ public abstract class OsmEntity {
   protected static final Set<String> CHECKED_MODES = Set.of("foot", "bicycle", "motorcar");
 
   private static final Set<String> WALK_ONLY_HIGHWAY_VALUES = Set.of("footway", "step", "corridor");
+  /** Values of the junction tag that denote a roundabout. */
+  public static final Set<String> ROUNDABOUT_JUNCTION_VALUES = Set.of("roundabout", "circular");
   private static final Set<String> NO_ACCESS_VALUES = Set.of("no", "license", "dismount");
   private static final Set<String> HIGHWAY_BOARDING_LOCATION_VALUES = Set.of(
     "platform",
@@ -785,10 +787,10 @@ public abstract class OsmEntity {
   }
 
   /**
-   * Is this way a roundabout?
+   * Is this way a roundabout or other circular junction?
    */
   public boolean isRoundabout() {
-    return "roundabout".equals(getTag("junction"));
+    return isOneOfTags("junction", ROUNDABOUT_JUNCTION_VALUES);
   }
 
   /**
